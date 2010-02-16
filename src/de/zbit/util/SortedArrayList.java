@@ -8,7 +8,11 @@ import java.util.Iterator;
 /**
  * 
  * @author Clemens Wrzodek
- * ACHTUNG: Nur die Methoden, welche ich ben�tige implementiert. Nur add(T), addAll, indexOf(T) und contains(T).
+ * ACHTUNG: Nur die Methoden, welche ich benoetige implementiert. Nur add(T), addAll, indexOf(T) und contains(T), isContained,... (s.u.).
+ *
+ * Haelt eine ArrayList stets sortiert. Nutzt Quicksort und BinarySearch.
+ * Kann mit ArrayList<Array> (z.B. ArrayList<String[]>) umgehen und sortiert diese dann nach gegebenen index im inneeren Array (default 0).
+ * Beispiel: ArrayList<String[]> - Elemente: String[a,z]; String[b,a] ; String[c,h] in der Reihenfolge.  
  *
  * @param <T>
  */

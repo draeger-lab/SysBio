@@ -27,7 +27,7 @@ public class KeggAdaptor {
     
     KeggAdaptor adap = new KeggAdaptor();
     adap.get("path:hsa00010");
-    adap.get("org:hsa");
+    adap.get("GN:hsa");
     if (true) return;
     adap.get("cpd:C00338");
     System.out.println("======================");
@@ -337,7 +337,7 @@ public class KeggAdaptor {
    *             (EC:2.7.11.1)
    * ORTHOLOGY   KO: K04406  mitogen-activated protein kinase kinase kinase kinase 3
    *                 [EC:2.7.11.1]
-   *  => Hier w�re startWith "NAME" oder "DEFINITION". (Case insensitive)                
+   *  => Hier waere startWith "NAME" oder "DEFINITION". (Case insensitive)                
    * @param completeString
    * @param startsWith
    * @return
@@ -350,7 +350,7 @@ public class KeggAdaptor {
     int pos = completeString.toLowerCase().indexOf("\n"+startsWith.toLowerCase()); // Prefer hits starting in a new line.
     if (pos<0) {
       pos = completeString.toLowerCase().indexOf(startsWith.toLowerCase());
-      // Pr�fen ob zeichen ausser \t und " " zwischen \n und pos. wenn ja => abort. (Beispiel: "  AUTHOR XYZ" m�glich.)
+      // Pruefen ob zeichen ausser \t und " " zwischen \n und pos. wenn ja => abort. (Beispiel: "  AUTHOR XYZ" m�glich.)
       if (pos<0) return null;
       int lPos = completeString.lastIndexOf("\n", pos);
       String toCheck = completeString.substring(Math.max(lPos, 0), pos);
