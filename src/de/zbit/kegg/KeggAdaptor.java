@@ -26,6 +26,9 @@ public class KeggAdaptor {
     printEachOutputToScreen = true;
     
     KeggAdaptor adap = new KeggAdaptor();
+    adap.get("path:hsa00010");
+    adap.get("org:hsa");
+    if (true) return;
     adap.get("cpd:C00338");
     System.out.println("======================");
     adap.get("path:map04010");
