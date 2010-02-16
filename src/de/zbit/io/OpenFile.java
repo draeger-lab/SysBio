@@ -12,6 +12,17 @@ import java.net.URISyntaxException;
 import de.zbit.util.FileDownload;
 import de.zbit.util.SortedArrayList;
 
+/*
+ * TODO:
+ * Implement retrieve fiel from other jar (hast not been used/implemented yet).
+ * Should be 5 minutes max: http://www.exampledepot.com/egs/java.net/JarUrl.html
+ */
+
+
+/**
+ * Class to Handle file inputs. No matter where (URL, FileSystem, Internet,... ) or what (raw,txt,gz,tar.gz,zip,...) they are.
+ * @author wrzodek
+ */
 public class OpenFile {
   private static SortedArrayList<String[]> downloadedFiles = new SortedArrayList<String[]>();
 
@@ -22,7 +33,7 @@ public class OpenFile {
   public static String doDownload(String URL, String toLocalFile) {
     int pos = downloadedFiles.indexOf(URL);
     if (pos>=0) {
-      // Cache. Aber dateien k�nnen ja auch nachtr�glich gel�scht werden => double check.
+      // Cache. Aber dateien koennen ja auch nachtraeglich geloescht werden => double check.
       if (new File(downloadedFiles.get(pos)[1]).exists())
         return downloadedFiles.get(pos)[1];
       else
@@ -46,13 +57,19 @@ public class OpenFile {
   }
   
   /**
-   * Entpackt automatich zip oder gzip files.
+   * Returns a readble, standard ASCII BufferedReader Object. No Matter the "filename" is an URL,
+   * FileSystem Adress, inside external jar or inside internal jar Adress.
+   * ZIP, GZ, TAR, BZ2, TAR.GZ and TAR.BZ2 will be automatically "decrypted" (not extracted fully,
+   * instead (what's much better) you're getting a stream with clearly readable (extracted) ACII content).
    * @param filename
-   * @return
+   * @return BufferedReader
    */
   public static BufferedReader openFile(String filename) {
-    //String c = filename.toLowerCase();
     BufferedReader ret=null;
+    
+    // Trivial checks
+    if (filename==null || filename.trim().isEmpty()) return ret;
+    filename = filename.trim();
     
     // Try to download file if it's an URL
     if (filename.length()>5 && filename.substring(0, 5).equalsIgnoreCase("http:")) {
@@ -60,17 +77,20 @@ public class OpenFile {
     } else if (filename.length()>4 && filename.substring(0, 4).equalsIgnoreCase("ftp:")) {
       filename = doDownload(filename);
     }
-    filename = filename.replace(File.separator+File.separator, File.separator).replace("//", "/"); // remove accidently added double slashes.
     
     // Identify format...
     File myFile = searchFile(filename);
     FormatDescription desc = null;
-    if (myFile==null && (OpenFile.class.getClassLoader().getResource(filename)!=null))
-      try {
-        desc = FormatIdentification.identify(new BufferedReader(new InputStreamReader(OpenFile.class.getClassLoader().getResource(filename).openStream())));
-      } catch (IOException e1) {e1.printStackTrace();}
-    else
-      if (myFile!=null) desc = FormatIdentification.identify(myFile);
+    desc = fetchDescription(filename, myFile);
+    
+    // 2nd try. Bugfixing accidently added slashes (not so seldomly...)
+    if (desc==null) {
+      // remove accidently added double slashes. Do NOT do this before checking if it's an URL
+      // May lead to problems on non http urls (jar urls e.g. "jar:http://xyz.de/my.jar!/com/...")
+      filename = filename.replace(File.separator+File.separator, File.separator).replace("//", "/");
+      myFile = searchFile(filename);
+      desc = fetchDescription(filename, myFile);
+    }
     //System.out.println(filename + " => " + (desc==null?"null":desc.getShortName()));
     
     
@@ -120,6 +140,24 @@ public class OpenFile {
     //if (c.endsWith(".tar") || c.endsWith(".tgz") || c.endsWith(".tar.gz")) System.out.println("Warning: Your input file '" + filename + "' seems to be a TAR archive. TAR archives are not supported!");
     
     return ret;
+  }
+  
+  /**
+   * Tries to open the file myFile and return a format description object.
+   * filename is needed for jar internal reference if file is not in Filesystem (myFile=null).
+   * @param filename
+   * @param myFile
+   * @return FormatDescription object
+   */
+  private static FormatDescription fetchDescription(String filename, File myFile) {
+    FormatDescription desc = null;
+    if (myFile==null && (OpenFile.class.getClassLoader().getResource(filename)!=null))
+      try {
+        desc = FormatIdentification.identify(new BufferedReader(new InputStreamReader(OpenFile.class.getClassLoader().getResource(filename).openStream())));
+      } catch (IOException e1) {e1.printStackTrace();}
+    else
+      if (myFile!=null) desc = FormatIdentification.identify(myFile);
+    return desc;
   }
   
   public static File searchFile(String infile) {

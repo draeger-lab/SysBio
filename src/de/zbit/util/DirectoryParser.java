@@ -29,7 +29,10 @@ public class DirectoryParser {
     return recurseIntoSubdirectories;
   }
   public void setRecurseIntoSubdirectories(boolean recurseIntoSubdirectories) {
-    this.recurseIntoSubdirectories = recurseIntoSubdirectories;
+    if (this.recurseIntoSubdirectories != recurseIntoSubdirectories) {
+      this.recurseIntoSubdirectories = recurseIntoSubdirectories;
+      reset();
+    }
   }
   private String getPath(String path) {
     path = appendSlash(path);
@@ -37,7 +40,9 @@ public class DirectoryParser {
   }
   private String appendSlash(String path) {
     if (!path.endsWith("\\") && !path.endsWith("/"))
-      if (path.contains("/")) path+="/"; else path+="\\";
+      if (path.contains("/")) path+="/";
+      else if (path.contains("\\")) path+="\\";
+      else path+="/";
     return path;
   }
   public String getPath() {

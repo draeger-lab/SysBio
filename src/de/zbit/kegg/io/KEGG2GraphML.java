@@ -52,9 +52,9 @@ public class KEGG2GraphML {
   public static boolean skipCompounds=false;
   public static boolean groupNodesWithSameEdges=false;
   public static boolean removeDegreeZeroNodes=true; // Bezieht sich nur auf "Non-map nodes" (Also nicht auf Pathway referenzen).
-  public static boolean renameCompoundToSmallMolecule=true; // F�r Jochen & GePS unbedingt true lassen (so was wie LPS, CA2+ als "sm" bezeichnen).
+  public static boolean renameCompoundToSmallMolecule=true; // Fuer Jochen & GePS unbedingt true lassen (so was wie LPS, CA2+ als "sm" bezeichnen).
   
-  public static boolean lastFileWasOverwritten=false; // Gibt an, ob das letzte geschriebene outFile bereits vorhanden war und deshalb �berschrieben wurde.
+  public static boolean lastFileWasOverwritten=false; // Gibt an, ob das letzte geschriebene outFile bereits vorhanden war und deshalb ueberschrieben wurde.
   /**
    * @param args
    */
@@ -195,7 +195,7 @@ public class KEGG2GraphML {
           nl.setFontSize(10); // ein bischen kleiner, sieht bei circles besser aus.
         } else if (g.getType().toString().equals("roundrectangle")) {
           nr = new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT);
-        //} else if (g.getType().toString().equals("line")) { // Vielleicht in neuerer yFiles version line verf�gbar?
+        //} else if (g.getType().toString().equals("line")) { // Vielleicht in neuerer yFiles version line verfuegbar?
           //nr = new ShapeNodeRealizer(ShapeNodeRealizer.TRAPEZOID);
         } else
           nr = new GenericNodeRealizer();
@@ -222,7 +222,7 @@ public class KEGG2GraphML {
         }
         
         
-        // Links im Knotenlabel (und sp�ter nochmal im Knoten) speichern.
+        // Links im Knotenlabel (und spaeter nochmal im Knoten) speichern.
         String link = e.getLink();
         if (link!=null && !link.isEmpty()) {
           try {
@@ -267,7 +267,7 @@ public class KEGG2GraphML {
           
           String name2="",definition="",entrezIds2="",uniprotIds2="",eType="",ensemblIds2="";
           for (String ko_id:e.getName().split(" ")) {
-            //Definition[] results = adap.getGenesForKO(e.getName(), retrieveKeggAnnotsForOrganism); // => GET only (und alles aus GET rausparsen). Zus�tzlich: in sortedArrayList merken.
+            //Definition[] results = adap.getGenesForKO(e.getName(), retrieveKeggAnnotsForOrganism); // => GET only (und alles aus GET rausparsen). Zusaetzlich: in sortedArrayList merken.
             if (ko_id.trim().equalsIgnoreCase("undefined")) continue;
             
             String infos = adap.get(ko_id);
@@ -316,11 +316,11 @@ public class KEGG2GraphML {
                 else
                   e.getType().toString();
               }
-              // XXX F�r Jochens Annotationen (entityType):
+              // XXX Fuer Jochens Annotationen (entityType):
               // Jochen:  "protein", "protein in complex", "complex", "RNA", "DNA", "small molecule", "RNA in complex", "DNA in complex", "small molecule in complex", "pathway", "biological process"
               // Mapping: gene/ortholog => protein. Group=>complex, compound=>complex, map=>pathway(/biolog. process)
               //          enzyme & other fehlen.
-              // Au�erdem: "bindsToChemicals" nicht gesetzt.
+              // Au-ss-erdem: "bindsToChemicals" nicht gesetzt.
             }
           }
 
@@ -395,7 +395,7 @@ public class KEGG2GraphML {
       Node nTwo = (Node) two.getCustom();
       
       Edge myEdge;
-      // XXX: Hier noch m�glich die Type der reaktion (PPI, etc.) hinzuzuf�gen.
+      // XXX: Hier noch moeglich die Type der reaktion (PPI, etc.) hinzuzufuegen.
       if (r.getSubtypes()!=null && r.getSubtypes().size()>0) {
         for (int stI=0; stI<r.getSubtypes().size(); stI++) {
           SubType st = r.getSubtypes().get(stI);
@@ -528,7 +528,7 @@ public class KEGG2GraphML {
       }
     }
     
-    if (removeDegreeZeroNodes) { // Verwaiste knoten l�schen
+    if (removeDegreeZeroNodes) { // Verwaiste knoten loeschen
       Node[] nodes = graph.getNodeArray();
       for (Node n: nodes) {
         if (PWReferenceNodeTexts.contains(graph.getRealizer(n).getLabelText())) continue; // Keine Links auf andere Pathways removen.
@@ -812,7 +812,7 @@ public class KEGG2GraphML {
       return;
     }
     
-    // H�bsche ANSI ProgressBar ;-)
+    // Huebsche ANSI ProgressBar ;-)
     String anim= "|/-\\";
     StringBuilder sb = new StringBuilder();
     int x = perc / 2;
