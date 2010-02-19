@@ -16,6 +16,7 @@ import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.util.ProgressBar;
 
 import y.base.Edge;
 import y.base.EdgeCursor;
@@ -43,6 +44,10 @@ import y.view.ShapeNodeRealizer;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 
+/**
+ * 
+ * @author wrzodek
+ */
 public class KEGG2GraphML {
   public static boolean silent = true; // Surpresses all outputs, except %-values
   public static boolean absoluteNoOutputs = true;
@@ -120,13 +125,14 @@ public class KEGG2GraphML {
     HierarchyManager hm = graph.getHierarchyManager();
     if (hm==null) hm = new HierarchyManager(graph);
     
-    aufrufeGesamt=p.getEntries().size(); //+p.getRelations().size(); // Relations gehen sehr schnell.
+    int aufrufeGesamt=p.getEntries().size(); //+p.getRelations().size(); // Relations gehen sehr schnell.
     if (adap==null) aufrufeGesamt+=p.getRelations().size();
+    ProgressBar progress = new ProgressBar(aufrufeGesamt);
     
     // Add nodes for all Entries
     if (!silent) System.out.println("Creating nodes...");
     for (int i=0; i<p.getEntries().size(); i++) {
-      if (silent && !absoluteNoOutputs) DisplayBar(null);
+      if (silent && !absoluteNoOutputs) progress.DisplayBar(null);
       if (!silent) System.out.println(i + "/" + p.getEntries().size());
       Entry e = p.getEntries().get(i);
       if (skipCompounds && e.getType().toString().equalsIgnoreCase("compound")) continue;
@@ -380,7 +386,7 @@ public class KEGG2GraphML {
     // Add Edges for all Relations
     if (!silent) System.out.println("Creating edges...");
     for (int i=0; i<p.getRelations().size(); i++) {
-      if (silent && !absoluteNoOutputs && adap==null) DisplayBar(null);
+      if (silent && !absoluteNoOutputs && adap==null) progress.DisplayBar(null);
       if (!silent) System.out.println(i + "/" + p.getRelations().size());
       Relation r = p.getRelations().get(i);
       Entry one = p.getEntryForId(r.getEntry1());
@@ -792,71 +798,4 @@ public class KEGG2GraphML {
     view.setPaintDetailThreshold(0.0); // never switch to less detail mode
   }
   
-  
-  private static int aufrufNr=0;
-  private static int aufrufeGesamt=0; // SET THIS VALUE!
-  private static int lastPerc=-1;
-  private static synchronized void DisplayBar(String additionalText) {
-    // ANSI Codes siehe http://en.wikipedia.org/wiki/ANSI_escape_code
-    aufrufNr++;
-    int perc = Math.min((int)((double)aufrufNr/(double)aufrufeGesamt*100), 100);
-    String percString = perc + "%";
-    
-    
-    // Simples File-out oder Eclipse-Output-Window tool
-    if (System.console()==null || System.console().writer()==null) {
-      if (perc!=lastPerc) {
-        System.out.println(percString + (additionalText!=null && !additionalText.isEmpty()? " " + additionalText:"") );
-        lastPerc=perc;
-      }
-      return;
-    }
-    
-    // Huebsche ANSI ProgressBar ;-)
-    String anim= "|/-\\";
-    StringBuilder sb = new StringBuilder();
-    int x = perc / 2;
-    sb.append("\r\033[K"); // <= clear line, Go to beginning
-    sb.append("\033[107m"); // Bright white bg color
-    int kMax = 50;
-    for (int k = 0; k < kMax; k++) {
-      if (x==k) sb.append("\033[100m"); // grey like bg color
-      
-      /*
-      // % Zahl ist immer am "Farbschwellwert" (klebt am rechten bankenrand)
-      if (x<percString.length()) {
-        if (x<=k && k<x+percString.length()) sb.append("\033[93m"+percString.charAt(k-x)); // yellow
-        else sb.append(" ");
-      } else {
-        if (k<x && (x-percString.length())<=k) sb.append("\033[34m"+percString.charAt(1-(x-percString.length()-k+1))); // blue 
-        else sb.append(" ");
-      }*/
-      
-      // %-Angabe zentriert
-      int pStart = kMax/2-percString.length()/2;
-      int pEnd = kMax/2+percString.length()/2;
-      if (k>=pStart && k<=pEnd) {
-        char c = ' ';
-        if (k-pStart<percString.length()) c = percString.charAt(k-pStart);
-        if (x<=k) sb.append("\033[93m"+c);
-        if (x> k) sb.append("\033[34m"+c);
-      } else
-        sb.append(" ");
-      
-    }
-
-    sb.append("\033[0m "); // Reset colors and stuff.
-    sb.append("\033[93m" + anim.charAt(aufrufNr % anim.length())  + " \033[1m" +  (additionalText!=null && !additionalText.isEmpty()? additionalText:""));
-    sb.append("\033[0m");
-    
-    //   \033[?25l  <=hide cursor.
-    //   \033[?25h  <=show cursor.
-    
-    try {
-      System.console().writer().print(sb.toString());
-      System.console().flush();
-    } catch (Exception e) {e.printStackTrace();}
-    
-    return; // sb.toString();
-  }
 }

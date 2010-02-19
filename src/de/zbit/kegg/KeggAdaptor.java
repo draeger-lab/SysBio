@@ -26,8 +26,20 @@ public class KeggAdaptor {
     printEachOutputToScreen = true;
     
     KeggAdaptor adap = new KeggAdaptor();
-    adap.get("path:hsa00010");
-    adap.get("GN:hsa");
+    //adap.get("hsa:8491");
+    //System.out.println("======================");
+    //adap.get("path:map00603");
+    adap.get("glycan:G00181");
+    System.out.println("======================");
+    adap.get("ec:2.4.1.-");
+    System.out.println("======================");
+    adap.get("ko:K01204");
+    System.out.println("======================");
+    adap.get("cpd:C00031");
+    System.out.println("======================");
+    adap.get("dr:D00694");
+    
+    //adap.get("GN:hsa");
     if (true) return;
     adap.get("cpd:C00338");
     System.out.println("======================");
