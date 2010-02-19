@@ -1,6 +1,7 @@
 package de.zbit.kegg;
 
 import java.rmi.RemoteException;
+import java.util.concurrent.TimeoutException;
 
 import keggapi.Definition;
 import keggapi.KEGGLocator;
@@ -210,6 +211,25 @@ public class KeggAdaptor {
       } catch (RemoteException e) {
         retried++;
         if (retried==3) e.printStackTrace();
+      }
+    }
+    
+    if (printEachOutputToScreen) System.out.println(results);
+    return results;
+  }
+  
+  public String getWithReturnInformation(String id) throws TimeoutException{
+    String results = null;
+    int retried=0;
+    
+    // Wenn mehrere Threads/ Instanzen gleichzeitig laufen, kommts zu starken delays. deshalb: 3x probieren.
+    while (retried<3) {
+      try {
+        results = serv.bget(id); // <--
+        break;
+      } catch (RemoteException e) {
+        retried++;
+        if (retried>=3) throw new TimeoutException();
       }
     }
     
