@@ -18,15 +18,20 @@ import org.sbml.jsbml.CVTerm.Qualifier;
 import y.view.Graph2D;
 
 import de.zbit.kegg.KeggAdaptor;
+import de.zbit.kegg.KeggInfoManagement;
+import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
 
 public class KEGG2jSBML {
   public static boolean retrieveKeggAnnots=true; // Retrieve annotations from Kegg or use purely information available in the document.
+  
+  private KeggInfoManagement manager;
   
   /**
    * @param args
@@ -39,7 +44,11 @@ public class KEGG2jSBML {
         String outfile = args[0].substring(0, args[0].contains(".")?args[0].lastIndexOf("."):args[0].length())+".sbml.xml";
         if (args.length>1) outfile = args[1];
         Pathway p = KeggParser.parse(args[0]).get(0);
-        KEGG2SBML(p, outfile);
+        // TODO: Load info manager from fileSystem and give the manager to KEGG2jSBML as argument.
+        //Example: InfoManagement<String, String> manager = (InfoManagement<String, String>) KeggInfoManagement.loadFromFilesystem(filepath);
+        KEGG2jSBML k2s = new KEGG2jSBML();
+        k2s.KEGG2SBML(p, outfile);
+        // TODO: Save info manager to fileSystem. Example: InfoManagement.saveToFilesystem(filepath, manager);
       }
       return;
     }
@@ -50,12 +59,25 @@ public class KEGG2jSBML {
     //p = KeggParser.parse("http://kaas.genome.jp/kegg/KGML/KGML_v0.6.1/ko/ko00010.xml").get(0);
     
     System.out.println("Converting to SBML");
-    KEGG2SBML(p, "test.sbml.xml");
+    KEGG2jSBML k2s = new KEGG2jSBML(); // TODO: s.o.
+    k2s.KEGG2SBML(p, "test.sbml.xml");
   }
   
-  public static SBMLDocument Kegg2jSBML(String filepath) {
+  
+  public KEGG2jSBML(KeggInfoManagement manager) {
+    this.manager = manager;
+  }
+  public KEGG2jSBML() {
+    this(new KeggInfoManagement(1000,new KeggAdaptor()));
+  }
+  
+  public SBMLDocument Kegg2jSBML(String filepath) {
     // TODO: implement me.
     return null;
+  }
+  
+  private void KEGG2SBML(Pathway p, String outfile) {
+    // TODO: ImplementMe
   }
 
   /*
@@ -68,13 +90,12 @@ public class KEGG2jSBML {
    * urn:miriam:kegg.genes (syn:ssr3451)
    */
   
-  private static void KEGG2SBML(Pathway p, String outfile) {
+  public SBMLDocument Kegg2jSBML(Pathway p) {
     int level=2; int version=4;
     SBMLDocument doc = new SBMLDocument(level,version);
     //ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>(); 
-    KeggAdaptor adap = null;
-    if (retrieveKeggAnnots) adap = new KeggAdaptor();
-    
+    if (!retrieveKeggAnnots) KeggInfoManagement.offlineMode=true; else KeggInfoManagement.offlineMode=false;
+      
     // Initialize a progress bar.
     int aufrufeGesamt=p.getEntries().size(); //+p.getRelations().size(); // Relations gehen sehr schnell.
     //if (adap==null) aufrufeGesamt+=p.getRelations().size(); // TODO: noch ausloten wann klasse aufgerufen wird.
@@ -98,33 +119,35 @@ public class KEGG2jSBML {
     // Parse Kegg Pathway information
     CVTerm mtPwID = new CVTerm();
     mtPwID.setModelQualifierType(Qualifier.BQM_IS);
-    mtPwID.addResource("urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":")));
+    mtPwID.addResource(KeggInfos.getMiriamURIforKeggID(p.getName())); // same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
+    
     model.addCVTerm(mtPwID);
     
-    // TODO: Implement list, which saves last queried items, sorts by queried last and manages to keep iNet usage low.
-    if (adap!=null) { // Retrieve further information via Kegg Adaptor
-      String orgInfos = adap.get("GN:" + p.getOrg()); // Retrieve all organism information via KeggAdaptor
-      String tax = KeggAdaptor.extractInfo(orgInfos, "TAXONOMY", "\n").trim(); // e.g. "TAXONOMY    TAX:9606" => "TAX:9606". 
+    // Retrieve further information via Kegg Adaptor
+    KeggInfos orgInfos = new KeggInfos("GN:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
+    if (orgInfos.queryWasSuccessfull()) {
       CVTerm mtOrgID = new CVTerm();
       mtOrgID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-      mtOrgID.addResource("urn:miriam:taxonomy" + tax.substring(tax.indexOf(':')));
+      appendAllIds(orgInfos.getTaxonomy(), mtOrgID, KeggInfos.miriam_urn_taxonomy);
       model.addCVTerm(mtOrgID);
       
-      model.appendNotes(String.format("<h1>Model of %s in %s</h1>\n", p.getTitle(), KeggAdaptor.extractInfo(orgInfos, "DEFINITION", "\n").trim()  ));
-      
-      // Get PW infos from KEGG Api for Description and GO ids.
-      String pwInfos = adap.get(p.getName()); // NAME, DESCRIPTION, DBLINKS verwertbar
-      model.appendNotes(String.format("%s<br>\n", KeggAdaptor.extractInfo(pwInfos, "DESCRIPTION").trim()));
+      model.appendNotes(String.format("<h1>Model of %s in %s</h1>\n", p.getTitle(), orgInfos.getDefinition() ));
+    } else {
+      model.appendNotes(String.format("<h1>Model of %s</h1>\n", p.getTitle() ));
+    }
+    
+    // Get PW infos from KEGG Api for Description and GO ids.
+    KeggInfos pwInfos =  new KeggInfos(p.getName(), manager); // NAME, DESCRIPTION, DBLINKS verwertbar
+    if (pwInfos.queryWasSuccessfull()) {
+      model.appendNotes(String.format("%s<br>\n", pwInfos.getDescription() ));
       
       // GO IDs
-      String goIDs = KeggAdaptor.extractInfo(pwInfos, "GO:", "\n").trim();
-      CVTerm mtGoID = new CVTerm();
-      mtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_VERSION_OF); // TODO: richtiger Qulifier für GO? (aus neustem Biomodel kopoiert).
-      for (String go_id:goIDs.split(" ")) {
-        if (go_id.length()!=7 || !containsOnlyDigits(go_id)) continue; // Invalid GO id.
-        mtGoID.addResource("urn:miriam:obo.go:GO:" + go_id);
+      if (pwInfos.getGo_id()!=null) {
+        CVTerm mtGoID = new CVTerm();
+        mtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_VERSION_OF);
+        appendAllGOids(pwInfos.getGo_id(), mtGoID);
+        if (mtGoID.getNumResources()>0) model.addCVTerm(mtGoID);
       }
-      if (mtGoID.getNumResources()>0) model.addCVTerm(mtGoID);
     }
     model.appendNotes(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br>\n", p.getImage(), p.getImage(), p.getImage()));
     model.appendNotes(String.format("<a href=\"%s\">Original Entry</a><br>\n", p.getLink()));
@@ -150,7 +173,7 @@ public class KEGG2jSBML {
       // Set SBO Term
       if (treatEntrysWithReactionDifferent && entry.getReaction()!=null && !entry.getReaction().trim().isEmpty()) {
         spec.setSBOTerm(ET_SpecialReactionCase2SBO);
-        // TODO: ...
+        // TODO: ... Beispiel um zu verdeutlich wie das mit reaktionen gehen soll. Muss natürlich gelöscht, gemerkt und später realisiert werden.
         Reaction r = new Reaction(level, version);
         r.setId("xyz");
         ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
@@ -186,69 +209,79 @@ public class KEGG2jSBML {
         // TODO: CellDesignerAnnotation
         spec.getAnnotation().appendNoRDFAnnotation("");
       }
-
+      
+      CVTerm cvtKGID = new CVTerm(); cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtEntrezID = new CVTerm(); cvtEntrezID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtOmimID = new CVTerm(); cvtOmimID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtHgncID = new CVTerm(); cvtHgncID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtEnsemblID = new CVTerm(); cvtEnsemblID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtUniprotID = new CVTerm(); cvtUniprotID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtChebiID = new CVTerm(); cvtChebiID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtDrugbankID = new CVTerm(); cvtDrugbankID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtGoID = new CVTerm(); cvtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_VERSION_OF);
+      CVTerm cvtHGNCID = new CVTerm(); cvtHGNCID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtPubchemID = new CVTerm(); cvtPubchemID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
+      CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
+      
       // Parse every gene/object in this node.
-      CVTerm cvtKGID = new CVTerm();     
-      cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
       for (String ko_id:entry.getName().split(" ")) {
         if (ko_id.trim().equalsIgnoreCase("undefined")) continue;
         
         // Add Kegg-id Miriam identifier
-        if (ko_id.trim().toLowerCase().startsWith("cpd:")) {
-          cvtKGID.addResource("urn:miriam:kegg.compound" + ko_id.substring(ko_id.indexOf(':')).trim());
-        } else if (ko_id.trim().toLowerCase().startsWith("glycan:")) {
-          cvtKGID.addResource("urn:miriam:kegg.glycan" + ko_id.substring(ko_id.indexOf(':')).trim());
-        } else if (ko_id.trim().toLowerCase().startsWith("ec:")) {
-          cvtKGID.addResource("urn:miriam:ec-code" + ko_id.substring(ko_id.indexOf(':')).trim());
-        } else if (ko_id.trim().toLowerCase().startsWith("dr:")) {
-          cvtKGID.addResource("urn:miriam:kegg.drug" + ko_id.substring(ko_id.indexOf(':')).trim());
-        } else if (ko_id.trim().toLowerCase().startsWith("path:")) { // Link to another pathway
-          cvtKGID.addResource("urn:miriam:kegg.pathway" + ko_id.substring(ko_id.indexOf(':')).trim());
-        } else if ((entry.getType().equals(EntryType.gene) || entry.getType().equals(EntryType.ortholog)) ) {// z.B. hsa:00123, ko:00123
-          cvtKGID.addResource("urn:miriam:kegg.genes:" + ko_id.trim());
-        } else {
-          System.err.println("Please implement MIRIAM urn for: '" + ko_id + "' (" + entry.getType().toString() + ").");
-        }
+        cvtKGID.addResource(KeggInfos.getMiriamURIforKeggID(ko_id, entry.getType()));
         
-        // Retrieve further information via Kegg API
-        CVTerm cvtEgID = new CVTerm(); cvtEgID.setBiologicalQualifierType(Qualifier.BQB_IS);
-        CVTerm cvtOmimID = new CVTerm(); cvtOmimID.setBiologicalQualifierType(Qualifier.BQB_IS);
-        CVTerm cvtHgncID = new CVTerm(); cvtHgncID.setBiologicalQualifierType(Qualifier.BQB_IS);
-        CVTerm cvtEnsemblID = new CVTerm(); cvtEnsemblID.setBiologicalQualifierType(Qualifier.BQB_IS);
-        CVTerm cvtUniprotID = new CVTerm(); cvtUniprotID.setBiologicalQualifierType(Qualifier.BQB_IS);
-        if (adap!=null) { // Be careful: very slow!
-          String infos = adap.get(ko_id);
+        // Retrieve further information via Kegg API -- Be careful: very slow!
+        KeggInfos infos = new KeggInfos(ko_id, manager);
+        if (infos.queryWasSuccessfull()) {
           
           // Set name to real and human-readable name.
           if (!hasMultipleIDs) {
-            name = KeggAdaptor.extractInfo(infos, "NAME", "\n").trim();
+            name = infos.getName();
           }
           
-          spec.getAnnotation().appendNoRDFAnnotation(String.format("Description for %s: %s\n", KeggAdaptor.extractInfo(infos, "NAME"),KeggAdaptor.extractInfo(infos, "DEFINITION")));
+          spec.getAnnotation().appendNoRDFAnnotation(String.format("<p><b>Description for %s:</b> %s</p>\n", infos.getName(),infos.getDefinition()));
+          if (infos.containsMultipleNames()) spec.getAnnotation().appendNoRDFAnnotation(String.format("<p><b>All given names:</b> %s</p>\n", infos.getNames()));
+          // TODO: CAS number, Formula, Mass
           
           // Parse "NCBI-GeneID:","UniProt:", "Ensembl:", ...
-          String text;
-          if (infos!=null && infos.length()>0) {
-            text = KeggAdaptor.extractInfo(infos, "Ensembl:", "\n");
-            if (text!=null && !text.isEmpty()) cvtEnsemblID.addResource("urn:miriam:ensembl:" + text.trim());
-            text = KeggAdaptor.extractInfo(infos, "UniProt:", "\n");
-            if (text!=null && !text.isEmpty()) cvtUniprotID.addResource("urn:miriam:ensembl:" + text.trim());
-            text = KeggAdaptor.extractInfo(infos, "HGNC:", "\n");
-            if (text!=null && !text.isEmpty()) cvtHgncID.addResource("urn:miriam:ensembl:" + text.trim());
-            text = KeggAdaptor.extractInfo(infos, "OMIM:", "\n");
-            if (text!=null && !text.isEmpty()) cvtOmimID.addResource("urn:miriam:ensembl:" + text.trim());
-            text = KeggAdaptor.extractInfo(infos, "NCBI-GeneID:", "\n");
-            if (text!=null && !text.isEmpty()) cvtEgID.addResource("urn:miriam:ensembl:" + text.trim());
-          }
+          if (infos.getEnsembl_id()!=null) appendAllIds(infos.getEnsembl_id(), cvtEnsemblID, KeggInfos.miriam_urn_ensembl);
+          if (infos.getChebi()!=null) appendAllIds(infos.getChebi(), cvtChebiID, KeggInfos.miriam_urn_chebi, "CHEBI:");
+          if (infos.getDrugbank()!=null) appendAllIds(infos.getDrugbank(), cvtDrugbankID, KeggInfos.miriam_urn_drugbank);
+          if (infos.getEntrez_id()!=null) appendAllIds(infos.getEntrez_id(), cvtEntrezID, KeggInfos.miriam_urn_entrezGene);
+          if (infos.getGo_id()!=null) appendAllGOids(infos.getGo_id(), cvtGoID);
+          if (infos.getHgnc_id()!=null) appendAllIds(infos.getHgnc_id(), cvtHGNCID, KeggInfos.miriam_urn_hgnc, "HGNC:");
+          
+          if (infos.getOmim_id()!=null) appendAllIds(infos.getOmim_id(), cvtOmimID, KeggInfos.miriam_urn_omim);
+          if (infos.getPubchem()!=null) appendAllIds(infos.getPubchem(), cvtPubchemID, KeggInfos.miriam_urn_PubChem_Substance);
+          
+          if (infos.getThree_dmet()!=null) appendAllIds(infos.getThree_dmet(), cvt3dmetID, KeggInfos.miriam_urn_3dmet);
+          if (infos.getUniprot_id()!=null) appendAllIds(infos.getUniprot_id(), cvtUniprotID, KeggInfos.miriam_urn_uniprot);
+          
+          if (infos.getReaction_id()!=null) appendAllIds(infos.getReaction_id(), cvtReactionID, KeggInfos.miriam_urn_kgReaction);
+          if (infos.getTaxonomy()!=null) appendAllIds(infos.getTaxonomy(), cvtTaxonomyID, KeggInfos.miriam_urn_taxonomy);
         }
-        if (cvtEgID.getNumResources()>0) spec.addCVTerm(cvtEgID);
-        if (cvtOmimID.getNumResources()>0) spec.addCVTerm(cvtOmimID);
-        if (cvtHgncID.getNumResources()>0) spec.addCVTerm(cvtHgncID);
-        if (cvtEnsemblID.getNumResources()>0) spec.addCVTerm(cvtEnsemblID);
-        if (cvtUniprotID.getNumResources()>0) spec.addCVTerm(cvtUniprotID);
+        
+        
       }
+      // Add all non-empty ressources.
       if (cvtKGID.getNumResources()>0) spec.addCVTerm(cvtKGID);
-
+      if (cvtEntrezID.getNumResources()>0) spec.addCVTerm(cvtEntrezID);
+      if (cvtOmimID.getNumResources()>0) spec.addCVTerm(cvtOmimID);
+      if (cvtHgncID.getNumResources()>0) spec.addCVTerm(cvtHgncID);
+      if (cvtEnsemblID.getNumResources()>0) spec.addCVTerm(cvtEnsemblID);
+      if (cvtUniprotID.getNumResources()>0) spec.addCVTerm(cvtUniprotID);
+      if (cvtChebiID.getNumResources()>0) spec.addCVTerm(cvtChebiID);
+      if (cvtDrugbankID.getNumResources()>0) spec.addCVTerm(cvtDrugbankID);
+      if (cvtGoID.getNumResources()>0) spec.addCVTerm(cvtGoID);
+      if (cvtHGNCID.getNumResources()>0) spec.addCVTerm(cvtHGNCID);
+      if (cvtPubchemID.getNumResources()>0) spec.addCVTerm(cvtPubchemID);
+      if (cvt3dmetID.getNumResources()>0) spec.addCVTerm(cvt3dmetID);
+      if (cvtReactionID.getNumResources()>0) spec.addCVTerm(cvtReactionID);
+      if (cvtTaxonomyID.getNumResources()>0) spec.addCVTerm(cvtTaxonomyID);
+      
+      
       // Finally, add the fully configured species.
       spec.setName(name);
       spec.setId(NameToSId(name));
@@ -257,9 +290,7 @@ public class KEGG2jSBML {
     }
     
     
-    
-    
-    
+    return doc;
   }
 
   private static boolean containsOnlyDigits(String myString) {
@@ -268,10 +299,46 @@ public class KEGG2jSBML {
       if (!Character.isDigit(c)) return false;
     return true;
   }
+  
+  private static void appendAllGOids(String goIDs, CVTerm mtGoID) {
+    for (String go_id:goIDs.split(" ")) {
+      if (go_id.length()!=7 || !containsOnlyDigits(go_id)) continue; // Invalid GO id.
+      mtGoID.addResource(KeggInfos.getGo_id_with_MiriamURN(go_id));
+    }
+  }
+  
+  /**
+   * Append all IDs with Miriam URNs to a CV term. Multiple IDs are separated by a space.
+   * Only the part behind the ":" will be added (if an ID contains a ":").
+   * @param IDs
+   * @param myCVterm
+   * @param miriam_URNPrefix
+   */
+  private static void appendAllIds(String IDs, CVTerm myCVterm, String miriam_URNPrefix) {
+    for (String id:IDs.split(" ")) {
+      myCVterm.addResource(miriam_URNPrefix + KeggInfos.suffix(id));
+    }
+  }
+  
+  /**
+   * Append all IDs with Miriam URNs to a CV term. Multiple IDs are separated by a space.
+   * All ids are required to contain a ":". If not,  mayContainDoublePointButAppendThisStringIfNot
+   *  will be used. E.g. "[mayContainDoublePointButAppendThisStringIfNot]:[ID]" or [ID] if it contains ":".
+   * @param IDs
+   * @param myCVterm
+   * @param miriam_URNPrefix
+   * @param mayContainDoublePointButAppendThisStringIfNot
+   */
+  private static void appendAllIds(String IDs, CVTerm myCVterm, String miriam_URNPrefix, String mayContainDoublePointButAppendThisStringIfNot) {
+    for (String id:IDs.split(" ")) {
+      myCVterm.addResource( miriam_URNPrefix + (miriam_URNPrefix.contains(":")?miriam_URNPrefix.trim():mayContainDoublePointButAppendThisStringIfNot+":"+miriam_URNPrefix.trim()) );
+    }
+  }
+
 
   private static String NameToSId(String name) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO Implement me. => See SBML document for definition of sid.
+    return name;
   }
 
   public static int ET_SpecialReactionCase2SBO = 461; // 461="enzymatic catalyst"
