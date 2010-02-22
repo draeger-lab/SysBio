@@ -311,25 +311,25 @@ public class KeggInfos {
     drugbank=KeggAdaptor.extractInfo(infos, "DrugBank:", "\n");
     
     // Free Memory instead of storing empty Strings.
-    if (taxonomy.trim().isEmpty()) taxonomy=null;
-    if (definition.trim().isEmpty()) definition=null;
-    if (description.trim().isEmpty()) description=null;
-    if (names.trim().isEmpty()) names=null;
-    if (name.trim().isEmpty()) name=null;
-    if (go_id.trim().isEmpty()) go_id=null;
-    if (reaction_id.trim().isEmpty()) reaction_id=null;
-    if (ensembl_id.trim().isEmpty()) ensembl_id=null;
-    if (uniprot_id.trim().isEmpty()) uniprot_id=null;
-    if (hgnc_id.trim().isEmpty()) hgnc_id=null;
-    if (omim_id.trim().isEmpty()) omim_id=null;
-    if (entrez_id.trim().isEmpty()) entrez_id=null;
-    if (formula.trim().isEmpty()) formula=null;
-    if (mass.trim().isEmpty()) mass=null;
-    if (chebi.trim().isEmpty()) chebi=null;
-    if (three_dmet.trim().isEmpty()) three_dmet=null;
-    if (cas.trim().isEmpty()) cas=null;
-    if (drugbank.trim().isEmpty()) drugbank=null;
-    if (pubchem.trim().isEmpty()) pubchem=null;
+    if (taxonomy!=null && taxonomy.trim().isEmpty()) taxonomy=null;
+    if (definition!=null && definition.trim().isEmpty()) definition=null;
+    if (description!=null && description.trim().isEmpty()) description=null;
+    if (names!=null && names.trim().isEmpty()) names=null;
+    if (name!=null && name.trim().isEmpty()) name=null;
+    if (go_id!=null && go_id.trim().isEmpty()) go_id=null;
+    if (reaction_id!=null && reaction_id.trim().isEmpty()) reaction_id=null;
+    if (ensembl_id!=null && ensembl_id.trim().isEmpty()) ensembl_id=null;
+    if (uniprot_id!=null && uniprot_id.trim().isEmpty()) uniprot_id=null;
+    if (hgnc_id!=null && hgnc_id.trim().isEmpty()) hgnc_id=null;
+    if (omim_id!=null && omim_id.trim().isEmpty()) omim_id=null;
+    if (entrez_id!=null && entrez_id.trim().isEmpty()) entrez_id=null;
+    if (formula!=null && formula.trim().isEmpty()) formula=null;
+    if (mass!=null && mass.trim().isEmpty()) mass=null;
+    if (chebi!=null && chebi.trim().isEmpty()) chebi=null;
+    if (three_dmet!=null && three_dmet.trim().isEmpty()) three_dmet=null;
+    if (cas!=null && cas.trim().isEmpty()) cas=null;
+    if (drugbank!=null && drugbank.trim().isEmpty()) drugbank=null;
+    if (pubchem!=null && pubchem.trim().isEmpty()) pubchem=null;
   }
   
   /**

@@ -1,11 +1,13 @@
 package de.zbit.kegg;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeoutException;
 
 import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.util.InfoManagement;
+import de.zbit.util.Utils;
 
-public class KeggInfoManagement extends InfoManagement<String, String> {
+public class KeggInfoManagement extends InfoManagement<String, String> implements Serializable {
   private static final long serialVersionUID = -2621701345149317801L;
   private KeggAdaptor adap=null;
   
@@ -22,6 +24,15 @@ public class KeggInfoManagement extends InfoManagement<String, String> {
   public KeggAdaptor getKeggAdaptor() {
     if (adap==null) adap = new KeggAdaptor();
     return adap;
+  }
+  
+  @Override  
+  protected void cleanupUnserializableObject() {
+    adap = null;
+  }
+  @Override
+  protected void restoreUnserializableObject () {
+    adap = getKeggAdaptor();
   }
 
   @Override

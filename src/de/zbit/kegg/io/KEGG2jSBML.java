@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Creator;
@@ -14,6 +15,7 @@ import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.CVTerm.Qualifier;
+import org.sbml.jsbml.CVTerm.Type;
 
 import y.view.Graph2D;
 
@@ -32,6 +34,7 @@ public class KEGG2jSBML {
   public static boolean retrieveKeggAnnots=true; // Retrieve annotations from Kegg or use purely information available in the document.
   
   private KeggInfoManagement manager;
+  private ArrayList<String> SIds = new ArrayList<String>();
   
   /**
    * @param args
@@ -53,16 +56,13 @@ public class KEGG2jSBML {
       return;
     }
     
-    //KeggParser.silent=false;
-    System.out.println("Reading kegg pathway...");
-    Pathway p = KeggParser.parse("_ko00010.xml").get(0); //04115 ko02010
-    //p = KeggParser.parse("http://kaas.genome.jp/kegg/KGML/KGML_v0.6.1/ko/ko00010.xml").get(0);
-    
-    System.out.println("Converting to SBML");
     KEGG2jSBML k2s = new KEGG2jSBML(); // TODO: s.o.
-    k2s.KEGG2SBML(p, "test.sbml.xml");
+    k2s.KEGG2SBML("src/de/zbit/kegg/samplefiles/hsa00010.xml", "src/de/zbit/kegg/samplefiles/hsa00010.sbml.xml");
   }
   
+  public KeggInfoManagement getKeggInfoManager(){
+    return manager;
+  }
   
   public KEGG2jSBML(KeggInfoManagement manager) {
     this.manager = manager;
@@ -72,12 +72,25 @@ public class KEGG2jSBML {
   }
   
   public SBMLDocument Kegg2jSBML(String filepath) {
-    // TODO: implement me.
-    return null;
+    //System.out.println("Reading kegg pathway...");
+    Pathway p = KeggParser.parse(filepath).get(0);
+    
+    //System.out.println("Converting to SBML");
+    SBMLDocument doc = Kegg2jSBML(p);
+    
+    return doc;
   }
   
-  private void KEGG2SBML(Pathway p, String outfile) {
-    // TODO: ImplementMe
+  public void KEGG2SBML(Pathway p, String outfile) {
+    SBMLDocument doc = Kegg2jSBML(p);
+    
+    // TODO: JSBML IO => write doc to outfile.
+  }
+  
+  public void KEGG2SBML(String infile, String outfile) {
+    SBMLDocument doc = Kegg2jSBML(infile);
+    
+    // TODO: JSBML IO => write doc to outfile.
   }
 
   /*
@@ -95,6 +108,7 @@ public class KEGG2jSBML {
     SBMLDocument doc = new SBMLDocument(level,version);
     //ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>(); 
     if (!retrieveKeggAnnots) KeggInfoManagement.offlineMode=true; else KeggInfoManagement.offlineMode=false;
+    SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
       
     // Initialize a progress bar.
     int aufrufeGesamt=p.getEntries().size(); //+p.getRelations().size(); // Relations gehen sehr schnell.
@@ -114,10 +128,11 @@ public class KEGG2jSBML {
     creator.setOrganisation("ZBIT, University of T\u00fcbingen, WSI-RA");
     hist.addCreator(creator);
     hist.addModifiedDate(Calendar.getInstance().getTime());
+    model.setAnnotation(new Annotation());
     model.setModelHistory(hist);
     
     // Parse Kegg Pathway information
-    CVTerm mtPwID = new CVTerm();
+    CVTerm mtPwID = new CVTerm(); mtPwID.setQualifierType(Type.MODEL_QUALIFIER);
     mtPwID.setModelQualifierType(Qualifier.BQM_IS);
     mtPwID.addResource(KeggInfos.getMiriamURIforKeggID(p.getName())); // same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
     
@@ -126,7 +141,7 @@ public class KEGG2jSBML {
     // Retrieve further information via Kegg Adaptor
     KeggInfos orgInfos = new KeggInfos("GN:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
     if (orgInfos.queryWasSuccessfull()) {
-      CVTerm mtOrgID = new CVTerm();
+      CVTerm mtOrgID = new CVTerm();  mtOrgID.setQualifierType(Type.BIOLOGICAL_QUALIFIER);
       mtOrgID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
       appendAllIds(orgInfos.getTaxonomy(), mtOrgID, KeggInfos.miriam_urn_taxonomy);
       model.addCVTerm(mtOrgID);
@@ -143,7 +158,7 @@ public class KEGG2jSBML {
       
       // GO IDs
       if (pwInfos.getGo_id()!=null) {
-        CVTerm mtGoID = new CVTerm();
+        CVTerm mtGoID = new CVTerm(); mtGoID.setQualifierType(Type.BIOLOGICAL_QUALIFIER);
         mtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_VERSION_OF);
         appendAllGOids(pwInfos.getGo_id(), mtGoID);
         if (mtGoID.getNumResources()>0) model.addCVTerm(mtGoID);
@@ -168,17 +183,18 @@ public class KEGG2jSBML {
       Species spec = new Species(level,version); // id?, level, version
       spec.initDefaults();
       spec.setCompartment(compartment); //spec.setId("s_" + entry.getId());
-      spec.appendNotes(String.format("<a href=\"%s\">Description</a><br>\n", entry.getLink()));
+      spec.setAnnotation(new Annotation("")); // manchmal ist jSBML schon bescheurt...
+      spec.appendNotes(String.format("<a href=\"%s\">Original Kegg Entry</a><br>\n", entry.getLink()));
       
       // Set SBO Term
       if (treatEntrysWithReactionDifferent && entry.getReaction()!=null && !entry.getReaction().trim().isEmpty()) {
         spec.setSBOTerm(ET_SpecialReactionCase2SBO);
         // TODO: ... Beispiel um zu verdeutlich wie das mit reaktionen gehen soll. Muss natürlich gelöscht, gemerkt und später realisiert werden.
-        Reaction r = new Reaction(level, version);
+        /*Reaction r = new Reaction(level, version);
         r.setId("xyz");
         ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
         modifier.setSBOTerm(461);
-        r.addModifier(modifier);
+        r.addModifier(modifier);*/
        
         // TODO: Obiges nicht richtig.
       } else {
@@ -207,23 +223,23 @@ public class KEGG2jSBML {
           name = g.getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
         
         // TODO: CellDesignerAnnotation
-        spec.getAnnotation().appendNoRDFAnnotation("");
+        spec.getAnnotation().appendNoRDFAnnotation("SpecisAnnotationForCellDesigner.");
       }
       
-      CVTerm cvtKGID = new CVTerm(); cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtEntrezID = new CVTerm(); cvtEntrezID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtOmimID = new CVTerm(); cvtOmimID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtHgncID = new CVTerm(); cvtHgncID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtEnsemblID = new CVTerm(); cvtEnsemblID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtUniprotID = new CVTerm(); cvtUniprotID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtChebiID = new CVTerm(); cvtChebiID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtDrugbankID = new CVTerm(); cvtDrugbankID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtGoID = new CVTerm(); cvtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_VERSION_OF);
-      CVTerm cvtHGNCID = new CVTerm(); cvtHGNCID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtPubchemID = new CVTerm(); cvtPubchemID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
-      CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
+      CVTerm cvtKGID = new CVTerm(); cvtKGID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtEntrezID = new CVTerm(); cvtEntrezID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEntrezID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtOmimID = new CVTerm(); cvtOmimID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtOmimID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtHgncID = new CVTerm(); cvtHgncID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtHgncID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtEnsemblID = new CVTerm(); cvtEnsemblID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEnsemblID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtUniprotID = new CVTerm(); cvtUniprotID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtUniprotID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtChebiID = new CVTerm(); cvtChebiID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtChebiID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtDrugbankID = new CVTerm(); cvtDrugbankID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtDrugbankID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtGoID = new CVTerm(); cvtGoID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_VERSION_OF);
+      CVTerm cvtHGNCID = new CVTerm(); cvtHGNCID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtHGNCID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtPubchemID = new CVTerm(); cvtPubchemID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtPubchemID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
+      CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
       
       // Parse every gene/object in this node.
       for (String ko_id:entry.getName().split(" ")) {
@@ -241,9 +257,17 @@ public class KEGG2jSBML {
             name = infos.getName();
           }
           
-          spec.getAnnotation().appendNoRDFAnnotation(String.format("<p><b>Description for %s:</b> %s</p>\n", infos.getName(),infos.getDefinition()));
-          if (infos.containsMultipleNames()) spec.getAnnotation().appendNoRDFAnnotation(String.format("<p><b>All given names:</b> %s</p>\n", infos.getNames()));
-          // TODO: CAS number, Formula, Mass
+          // HTML Information
+          spec.appendNotes(String.format("<p><b>Description for %s:</b> %s</p>\n", infos.getName(),infos.getDefinition()));
+          if (infos.containsMultipleNames()) spec.appendNotes(String.format("<p><b>All given names:</b> %s</p>\n", infos.getNames()));
+          if (infos.getCas()!=null) spec.appendNotes(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
+          if (infos.getFormula()!=null) spec.appendNotes(String.format("<p><b>Formula:</b> %s</p>\n", infos.getFormula()));
+          if (infos.getMass()!=null) spec.appendNotes(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
+          if (infos.containsMultipleNames()) spec.appendNotes(String.format("<p><b>All given names:</b> %s</p>\n", infos.getNames()));
+          
+          if (infos.getCas()!=null) spec.getAnnotation().appendNoRDFAnnotation(String.format(    "CAS number: %s\n", infos.getCas()));
+          if (infos.getFormula()!=null) spec.getAnnotation().appendNoRDFAnnotation(String.format("Formula:    %s\n", infos.getFormula()));
+          if (infos.getMass()!=null) spec.getAnnotation().appendNoRDFAnnotation(String.format(   "Mass:       %s\n", infos.getMass()));
           
           // Parse "NCBI-GeneID:","UniProt:", "Ensembl:", ...
           if (infos.getEnsembl_id()!=null) appendAllIds(infos.getEnsembl_id(), cvtEnsemblID, KeggInfos.miriam_urn_ensembl);
@@ -335,10 +359,50 @@ public class KEGG2jSBML {
     }
   }
 
-
-  private static String NameToSId(String name) {
-    // TODO Implement me. => See SBML document for definition of sid.
-    return name;
+  /**
+   * Generates a valid SId from a given name. If the name already is a valid SId, the name is returned.
+   * If the SId already exists in this document, "_<number>" will be appended and the next free number is
+   * being assigned.
+   * => See SBML L2V4 document for the Definition of SId. (Page 12/13)
+   * @param name
+   * @return SId
+   */
+  private String NameToSId(String name) {
+    /* letter ::= ’a’..’z’,’A’..’Z’
+     * digit ::= ’0’..’9’
+     * idChar ::= letter | digit | ’_’
+     * SId ::= ( letter | ’_’ ) idChar*
+     */
+    String ret = "";
+    if (name==null || name.trim().isEmpty()) {
+      ret = incrementSIdSuffix("SId");
+      SIds.add(ret);
+    } else {
+      name = name.trim();
+      char c = name.charAt(0);
+      if (!(Character.isLetter(c) || c=='_')) ret = "SId_"; else ret = Character.toString(c);
+      for (int i=1; i<name.length(); i++) {
+        c = name.charAt(i);
+        if (Character.isLetter(c) || Character.isDigit(c) || c=='_') ret+=Character.toString(c);
+      }
+      if (SIds.contains(ret)) ret = incrementSIdSuffix(ret);
+    }
+    
+    return ret;
+  }
+  
+  /**
+   * Appends "_<Number>" to a given String. <Number> is being set to the next free number, so that
+   * this sID is unique in this sbml document. Should only be called from "NameToSId".
+   * @return
+   */
+  private String incrementSIdSuffix(String prefix) {
+    int i=1;
+    String aktString = prefix + "_" + i;
+    while (SIds.contains(aktString)) {
+      aktString = prefix + "_" + (++i);
+    }
+    return aktString;
   }
 
   public static int ET_SpecialReactionCase2SBO = 461; // 461="enzymatic catalyst"

@@ -1,5 +1,6 @@
 package de.zbit.kegg;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.concurrent.TimeoutException;
 
@@ -14,8 +15,11 @@ import keggapi.SSDBRelation;
  * Nicht alle funktionen implementiert!
  * Siehe http://www.genome.jp/kegg/docs/keggapi_manual.html
  *
+ * Serializable funktioniert nicht, da Kegg-API nicht serialisierbar.
  */
-public class KeggAdaptor {
+public class KeggAdaptor implements Serializable {
+  private static final long serialVersionUID = 3338264258735043999L;
+
   public static boolean printEachOutputToScreen=false;
   
   private KEGGPortType serv;

@@ -12,7 +12,7 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
  * 
  * @author wrzodek
  */
-public abstract class InfoManagement<IDtype extends Comparable<?>, INFOtype> implements Serializable {
+public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable, INFOtype extends Serializable> implements Serializable {
   /**
    * It is recommended to generate a new ID when extending this class.
    */
@@ -23,9 +23,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?>, INFOtype> imp
   private int maxListSize;
   
   public static synchronized InfoManagement<?, ?> loadFromFilesystem(String filepath) {
-    return (InfoManagement<?, ?>)Utils.loadObject(filepath);
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(filepath);
+    m.restoreUnserializableObject();
+    return m;
   }
   public static synchronized void saveToFilesystem(String filepath, InfoManagement<?, ?> m) {
+    m.cleanupUnserializableObject();
     Utils.saveObject(filepath, m);
   }
   
@@ -69,10 +72,22 @@ public abstract class InfoManagement<IDtype extends Comparable<?>, INFOtype> imp
     while (rememberedInfos.size()>=maxListSize) {
       /* It is quite difficult to save an DataType sorted by object usage and object to quickly remove the least frequent
        * used one. That's I'm using a heuristic, just quering the bottom 1000 ones, which is in O(1). 
-       */
+       
       int min = Math.max(0, rememberedInfos.size()-1000);
       int itemToDelete = rememberedInfos.size()-1; int minUsage=Integer.MAX_VALUE;
       for (int i=rememberedInfos.size()-1; i>=min; i--) {
+        if(rememberedInfos.get(i).getTimesInfoAccessed()<minUsage) {
+          minUsage = rememberedInfos.get(i).getTimesInfoAccessed();
+          itemToDelete = i;
+          if (minUsage==0) break; // can't get any lower.
+        }
+      }
+      rememberedInfos.remove(itemToDelete);*/
+      
+      // Above solution is not good, since mostly the most recent added item gets deleted... Simple solution:
+      int min = Math.max(0, rememberedInfos.size()-1000);
+      int itemToDelete = rememberedInfos.size()-1; int minUsage=Integer.MAX_VALUE;
+      for (int i=0; i<rememberedInfos.size(); i++) {
         if(rememberedInfos.get(i).getTimesInfoAccessed()<minUsage) {
           minUsage = rememberedInfos.get(i).getTimesInfoAccessed();
           itemToDelete = i;
@@ -132,4 +147,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?>, INFOtype> imp
    */
   protected abstract INFOtype fetchInformation(IDtype id) throws TimeoutException, UnsuccessfulRetrieveException;
   
+  /**
+   * You may implement this Method to make your class serializable.
+   * This function is called directly before writing the object to your hard drive.
+   */
+  protected abstract void cleanupUnserializableObject();
+  /**
+   * You may implement this Method to make your class serializable.
+   * This function is called directly after loading the object from your hard drive.
+   */
+  protected abstract void restoreUnserializableObject();
 }
