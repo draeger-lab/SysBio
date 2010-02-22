@@ -16,6 +16,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.CVTerm.Type;
+import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import y.view.Graph2D;
 
@@ -40,6 +41,16 @@ public class KEGG2jSBML {
    * @param args
    */
   public static void main(String[] args) {
+    // Speedup Kegg2SBML by loading alredy queried objects. Reduces network load and heavily reduces computation time.
+    KEGG2jSBML k2s;
+    if (new File("keggdb.dat").exists() && new File("keggdb.dat").length()>0) {
+      KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem("keggdb.dat");
+      k2s = new KEGG2jSBML(manager);
+    } else {
+      k2s = new KEGG2jSBML();
+    }
+    //---
+    
     if (args!=null && args.length >0) {
       File f = new File(args[0]);
       if (f.isDirectory()) BatchConvertKegg.main(args); // TODO: Change to Batch for SBML
@@ -47,16 +58,13 @@ public class KEGG2jSBML {
         String outfile = args[0].substring(0, args[0].contains(".")?args[0].lastIndexOf("."):args[0].length())+".sbml.xml";
         if (args.length>1) outfile = args[1];
         Pathway p = KeggParser.parse(args[0]).get(0);
-        // TODO: Load info manager from fileSystem and give the manager to KEGG2jSBML as argument.
-        //Example: InfoManagement<String, String> manager = (InfoManagement<String, String>) KeggInfoManagement.loadFromFilesystem(filepath);
-        KEGG2jSBML k2s = new KEGG2jSBML();
         k2s.KEGG2SBML(p, outfile);
-        // TODO: Save info manager to fileSystem. Example: InfoManagement.saveToFilesystem(filepath, manager);
+        
+        KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager()); // Remember already queried objects
       }
       return;
     }
     
-    KEGG2jSBML k2s = new KEGG2jSBML(); // TODO: s.o.
     k2s.KEGG2SBML("src/de/zbit/kegg/samplefiles/hsa00010.xml", "src/de/zbit/kegg/samplefiles/hsa00010.sbml.xml");
   }
   
@@ -84,13 +92,15 @@ public class KEGG2jSBML {
   public void KEGG2SBML(Pathway p, String outfile) {
     SBMLDocument doc = Kegg2jSBML(p);
     
-    // TODO: JSBML IO => write doc to outfile.
+    // TODO: JSBML IO => write doc to outfile. Funzt noch nicht.
+    SBMLWriter.write(doc, outfile);
   }
   
   public void KEGG2SBML(String infile, String outfile) {
     SBMLDocument doc = Kegg2jSBML(infile);
     
-    // TODO: JSBML IO => write doc to outfile.
+    // TODO: JSBML IO => write doc to outfile. Funzt noch nicht.
+    SBMLWriter.write(doc, outfile);
   }
 
   /*
@@ -146,9 +156,9 @@ public class KEGG2jSBML {
       appendAllIds(orgInfos.getTaxonomy(), mtOrgID, KeggInfos.miriam_urn_taxonomy);
       model.addCVTerm(mtOrgID);
       
-      model.appendNotes(String.format("<h1>Model of %s in %s</h1>\n", p.getTitle(), orgInfos.getDefinition() ));
+      model.appendNotes(String.format("<h1>Model of &quot;%s&quot; in &quot;%s&quot;</h1>\n", p.getTitle(), orgInfos.getDefinition() ));
     } else {
-      model.appendNotes(String.format("<h1>Model of %s</h1>\n", p.getTitle() ));
+      model.appendNotes(String.format("<h1>Model of &quot;%s&quot;</h1>\n", p.getTitle() ));
     }
     
     // Get PW infos from KEGG Api for Description and GO ids.
@@ -258,12 +268,11 @@ public class KEGG2jSBML {
           }
           
           // HTML Information
-          spec.appendNotes(String.format("<p><b>Description for %s:</b> %s</p>\n", infos.getName(),infos.getDefinition()));
+          spec.appendNotes(String.format("<p><b>Description for &quot;%s&quot;:</b> %s</p>\n", infos.getName(),infos.getDefinition()));
           if (infos.containsMultipleNames()) spec.appendNotes(String.format("<p><b>All given names:</b> %s</p>\n", infos.getNames()));
           if (infos.getCas()!=null) spec.appendNotes(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
           if (infos.getFormula()!=null) spec.appendNotes(String.format("<p><b>Formula:</b> %s</p>\n", infos.getFormula()));
           if (infos.getMass()!=null) spec.appendNotes(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
-          if (infos.containsMultipleNames()) spec.appendNotes(String.format("<p><b>All given names:</b> %s</p>\n", infos.getNames()));
           
           if (infos.getCas()!=null) spec.getAnnotation().appendNoRDFAnnotation(String.format(    "CAS number: %s\n", infos.getCas()));
           if (infos.getFormula()!=null) spec.getAnnotation().appendNoRDFAnnotation(String.format("Formula:    %s\n", infos.getFormula()));
