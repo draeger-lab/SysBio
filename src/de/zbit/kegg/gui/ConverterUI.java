@@ -3,6 +3,8 @@
  */
 package de.zbit.kegg.gui;
 
+import java.io.File;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
@@ -11,7 +13,9 @@ import org.sbml.squeezer.SBMLsqueezer;
 import org.sbml.squeezer.gui.GUITools;
 import org.sbml.squeezer.gui.SBMLModelSplitPane;
 
+import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.io.KEGG2jSBML;
+import de.zbit.util.InfoManagement;
 
 /**
  * @author draeger
@@ -28,23 +32,25 @@ public class ConverterUI extends JFrame {
 	 * Shows a small GUI.
 	 */
 	public ConverterUI() {
+	  // Z:/workspace/SysBio/src/de/zbit/kegg/samplefiles/hsa00010.xml
 		super("KGML2SBMLconverter");
 		JFileChooser chooser = GUITools.createJFileChooser("usr.dir", false,
 				false, JFileChooser.FILES_ONLY, new FileFilterKGML());
 		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-			// TODO: Load info manager from fileSystem and give the manager to
-			// KEGG2jSBML as argument.
-			// Example: InfoManagement<String, String> manager =
-			// (InfoManagement<String, String>)
-			// KeggInfoManagement.loadFromFilesystem(filepath);
-			KEGG2jSBML k2s = new KEGG2jSBML();
-			SBMLDocument doc = k2s.Kegg2jSBML(chooser.getSelectedFile()
-					.getAbsolutePath());
-			// TODO: Save info manager to fileSystem. Example:
-			// InfoManagement.saveToFilesystem(filepath, manager);
-			getContentPane().add(
-					new SBMLModelSplitPane(doc.getModel(), SBMLsqueezer
-							.getDefaultSettings()));
+		  
+		  KEGG2jSBML k2s;
+		  if (new File("keggdb.dat").exists()) {
+		    KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem("keggdb.dat");
+		    k2s = new KEGG2jSBML(manager);
+		  } else {
+			  k2s = new KEGG2jSBML();
+		  }
+		  
+			SBMLDocument doc = k2s.Kegg2jSBML(chooser.getSelectedFile().getAbsolutePath());
+			
+  	  KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager());
+			
+			getContentPane().add(new SBMLModelSplitPane(doc.getModel(), SBMLsqueezer.getDefaultSettings()));
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
 			pack();
 			setVisible(true);
