@@ -65,7 +65,7 @@ public class KEGG2jSBML {
       return;
     }
     
-    k2s.KEGG2SBML("src/de/zbit/kegg/samplefiles/hsa00010.xml", "src/de/zbit/kegg/samplefiles/hsa00010.sbml.xml");
+    k2s.KEGG2SBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml", "resources/de/zbit/kegg/samplefiles/hsa00010.sbml.xml");
   }
   
   public KeggInfoManagement getKeggInfoManager(){
@@ -131,6 +131,8 @@ public class KEGG2jSBML {
     model.setMetaId("meta_" + model.getId());
     model.setName(p.getTitle());
     Compartment compartment = model.createCompartment(); // Create neccessary default compartment
+    compartment.setId("default"); // NECCESSARY for jSBML to work!!!
+    
     
     // Create Model History
     History hist = new History();
@@ -190,7 +192,7 @@ public class KEGG2jSBML {
        */
       
       // Initialize species object
-      Species spec = new Species(level,version); // id?, level, version
+      Species spec = model.createSpecies();
       spec.initDefaults();
       spec.setCompartment(compartment); //spec.setId("s_" + entry.getId());
       spec.setAnnotation(new Annotation("")); // manchmal ist jSBML schon bescheurt...
@@ -318,10 +320,9 @@ public class KEGG2jSBML {
       // Finally, add the fully configured species.
       spec.setName(name);
       spec.setId(NameToSId(name));
-      model.addSpecies(spec);
       entry.setCustom(spec); // Remember node in KEGG Structure for further references.
+      // Not neccessary to add species to model, due to call in "model.createSpecies()".
     }
-    
     
     return doc;
   }
