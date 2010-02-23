@@ -10,15 +10,11 @@ import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.History;
 import org.sbml.jsbml.Model;
-import org.sbml.jsbml.ModifierSpeciesReference;
-import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.CVTerm.Type;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
-
-import y.view.Graph2D;
 
 import de.zbit.kegg.KeggAdaptor;
 import de.zbit.kegg.KeggInfoManagement;
@@ -28,7 +24,6 @@ import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
-import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
 
 public class KEGG2jSBML {
@@ -141,13 +136,12 @@ public class KEGG2jSBML {
     hist.addCreator(creator);
     hist.addModifiedDate(Calendar.getInstance().getTime());
     model.setAnnotation(new Annotation());
-    model.setModelHistory(hist);
+    model.setHistory(hist);
     
     // Parse Kegg Pathway information
     CVTerm mtPwID = new CVTerm(); mtPwID.setQualifierType(Type.MODEL_QUALIFIER);
     mtPwID.setModelQualifierType(Qualifier.BQM_IS);
     mtPwID.addResource(KeggInfos.getMiriamURIforKeggID(p.getName())); // same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
-    
     model.addCVTerm(mtPwID);
     
     // Retrieve further information via Kegg Adaptor
@@ -158,9 +152,9 @@ public class KEGG2jSBML {
       appendAllIds(orgInfos.getTaxonomy(), mtOrgID, KeggInfos.miriam_urn_taxonomy);
       model.addCVTerm(mtOrgID);
       
-      model.appendNotes(String.format("<h1>Model of &quot;%s&quot; in &quot;%s&quot;</h1>\n", p.getTitle(), orgInfos.getDefinition() ));
+      model.appendNotes(String.format("<h1>Model of &#8220;%s&#8221; in &#8220;%s&#8221;</h1>\n", p.getTitle(), orgInfos.getDefinition() ));
     } else {
-      model.appendNotes(String.format("<h1>Model of &quot;%s&quot;</h1>\n", p.getTitle() ));
+      model.appendNotes(String.format("<h1>Model of &#8220;%s&#8221;</h1>\n", p.getTitle() ));
     }
     
     // Get PW infos from KEGG Api for Description and GO ids.
@@ -270,7 +264,7 @@ public class KEGG2jSBML {
           }
           
           // HTML Information
-          spec.appendNotes(String.format("<p><b>Description for &quot;%s&quot;:</b> %s</p>\n", infos.getName(),infos.getDefinition()));
+          spec.appendNotes(String.format("<p><b>Description for &#8220;%s&#8221;:</b> %s</p>\n", infos.getName(),infos.getDefinition()));
           if (infos.containsMultipleNames()) spec.appendNotes(String.format("<p><b>All given names:</b> %s</p>\n", infos.getNames()));
           if (infos.getCas()!=null) spec.appendNotes(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
           if (infos.getFormula()!=null) spec.appendNotes(String.format("<p><b>Formula:</b> %s</p>\n", infos.getFormula()));
@@ -364,8 +358,11 @@ public class KEGG2jSBML {
    * @param mayContainDoublePointButAppendThisStringIfNot
    */
   private static void appendAllIds(String IDs, CVTerm myCVterm, String miriam_URNPrefix, String mayContainDoublePointButAppendThisStringIfNot) {
+    // Trim double point from 'mayContainDoublePointButAppendThisStringIfNot' eventually.
+    if (mayContainDoublePointButAppendThisStringIfNot.endsWith(":")) mayContainDoublePointButAppendThisStringIfNot = mayContainDoublePointButAppendThisStringIfNot.substring(0, mayContainDoublePointButAppendThisStringIfNot.length()-1);
+    
     for (String id:IDs.split(" ")) {
-      myCVterm.addResource( miriam_URNPrefix + (miriam_URNPrefix.contains(":")?miriam_URNPrefix.trim():mayContainDoublePointButAppendThisStringIfNot+":"+miriam_URNPrefix.trim()) );
+      myCVterm.addResource( miriam_URNPrefix + (id.contains(":")?id.trim():mayContainDoublePointButAppendThisStringIfNot+":"+id.trim()) );
     }
   }
 
@@ -396,6 +393,7 @@ public class KEGG2jSBML {
         if (Character.isLetter(c) || Character.isDigit(c) || c=='_') ret+=Character.toString(c);
       }
       if (SIds.contains(ret)) ret = incrementSIdSuffix(ret);
+      SIds.add(ret);
     }
     
     return ret;
