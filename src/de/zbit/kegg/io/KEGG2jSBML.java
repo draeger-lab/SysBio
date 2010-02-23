@@ -122,7 +122,7 @@ public class KEGG2jSBML {
     progress.DisplayBar();
     
     // new Model with Kegg id as id.
-    Model model = doc.createModel(p.getName());
+    Model model = doc.createModel(NameToSId(p.getName().replace(":", "_")));
     model.setMetaId("meta_" + model.getId());
     model.setName(p.getTitle());
     Compartment compartment = model.createCompartment(); // Create neccessary default compartment
@@ -135,8 +135,11 @@ public class KEGG2jSBML {
     creator.setOrganisation("ZBIT, University of T\u00fcbingen, WSI-RA");
     hist.addCreator(creator);
     hist.addModifiedDate(Calendar.getInstance().getTime());
-    model.setAnnotation(new Annotation());
+    Annotation annot = new Annotation();
+    annot.setAbout("#"+model.getMetaId());
+    model.setAnnotation(annot);
     model.setHistory(hist);
+    model.appendNotes("<body xmlns=\"http://www.w3.org/1999/xhtml\">");
     
     // Parse Kegg Pathway information
     CVTerm mtPwID = new CVTerm(); mtPwID.setQualifierType(Type.MODEL_QUALIFIER);
@@ -160,7 +163,7 @@ public class KEGG2jSBML {
     // Get PW infos from KEGG Api for Description and GO ids.
     KeggInfos pwInfos =  new KeggInfos(p.getName(), manager); // NAME, DESCRIPTION, DBLINKS verwertbar
     if (pwInfos.queryWasSuccessfull()) {
-      model.appendNotes(String.format("%s<br>\n", pwInfos.getDescription() ));
+      model.appendNotes(String.format("%s<br/>\n", pwInfos.getDescription() ));
       
       // GO IDs
       if (pwInfos.getGo_id()!=null) {
@@ -170,8 +173,8 @@ public class KEGG2jSBML {
         if (mtGoID.getNumResources()>0) model.addCVTerm(mtGoID);
       }
     }
-    model.appendNotes(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br>\n", p.getImage(), p.getImage(), p.getImage()));
-    model.appendNotes(String.format("<a href=\"%s\">Original Entry</a><br>\n", p.getLink()));
+    model.appendNotes(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", p.getImage(), p.getImage(), p.getImage()));
+    model.appendNotes(String.format("<a href=\"%s\">Original Entry</a><br/>\n", p.getLink()));
     
     // Create species
     ArrayList<Entry> entries = p.getEntries();
@@ -189,8 +192,11 @@ public class KEGG2jSBML {
       Species spec = model.createSpecies();
       spec.initDefaults();
       spec.setCompartment(compartment); //spec.setId("s_" + entry.getId());
-      spec.setAnnotation(new Annotation("")); // manchmal ist jSBML schon bescheurt...
-      spec.appendNotes(String.format("<a href=\"%s\">Original Kegg Entry</a><br>\n", entry.getLink()));
+      Annotation specAnnot = new Annotation("");
+      specAnnot.setAbout("");
+      spec.setAnnotation(specAnnot); // manchmal ist jSBML schon bescheurt...
+      spec.appendNotes("<body xmlns=\"http://www.w3.org/1999/xhtml\">");
+      spec.appendNotes(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink()));
       
       // Set SBO Term
       if (treatEntrysWithReactionDifferent && entry.getReaction()!=null && !entry.getReaction().trim().isEmpty()) {
@@ -229,7 +235,7 @@ public class KEGG2jSBML {
           name = g.getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
         
         // TODO: CellDesignerAnnotation
-        spec.getAnnotation().appendNoRDFAnnotation("SpecisAnnotationForCellDesigner.");
+        //spec.getAnnotation().appendNoRDFAnnotation("<SpecisAnnotationForCellDesigner>");
       }
       
       CVTerm cvtKGID = new CVTerm(); cvtKGID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
@@ -269,10 +275,6 @@ public class KEGG2jSBML {
           if (infos.getCas()!=null) spec.appendNotes(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
           if (infos.getFormula()!=null) spec.appendNotes(String.format("<p><b>Formula:</b> %s</p>\n", infos.getFormula()));
           if (infos.getMass()!=null) spec.appendNotes(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
-          
-          if (infos.getCas()!=null) spec.getAnnotation().appendNoRDFAnnotation(String.format(    "CAS number: %s\n", infos.getCas()));
-          if (infos.getFormula()!=null) spec.getAnnotation().appendNoRDFAnnotation(String.format("Formula:    %s\n", infos.getFormula()));
-          if (infos.getMass()!=null) spec.getAnnotation().appendNoRDFAnnotation(String.format(   "Mass:       %s\n", infos.getMass()));
           
           // Parse "NCBI-GeneID:","UniProt:", "Ensembl:", ...
           if (infos.getEnsembl_id()!=null) appendAllIds(infos.getEnsembl_id(), cvtEnsemblID, KeggInfos.miriam_urn_ensembl);
@@ -314,9 +316,14 @@ public class KEGG2jSBML {
       // Finally, add the fully configured species.
       spec.setName(name);
       spec.setId(NameToSId(name));
+      spec.appendNotes("</body>");
+      spec.setMetaId("meta_"+spec.getId());
+      specAnnot.setAbout("#"+spec.getMetaId());
       entry.setCustom(spec); // Remember node in KEGG Structure for further references.
       // Not neccessary to add species to model, due to call in "model.createSpecies()".
     }
+    
+    model.appendNotes("</body>");
     
     return doc;
   }
