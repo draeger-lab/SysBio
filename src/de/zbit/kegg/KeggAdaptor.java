@@ -383,7 +383,7 @@ public class KeggAdaptor implements Serializable {
   }
   
   public static String extractInfo(String completeString, String startsWith, String endsWith) {
-    int pos = completeString.toLowerCase().indexOf("\n"+startsWith.toLowerCase()); // Prefer hits starting in a new line.
+    int pos = completeString.toLowerCase().indexOf("\n"+startsWith.toLowerCase()+1); // Prefer hits starting in a new line. // +1 because of \n
     if (pos<0) {
       pos = completeString.toLowerCase().indexOf(startsWith.toLowerCase());
       // Pruefen ob zeichen ausser \t und " " zwischen \n und pos. wenn ja => abort. (Beispiel: "  AUTHOR XYZ" m�glich.)
@@ -396,7 +396,7 @@ public class KeggAdaptor implements Serializable {
     String ret = "";
     if (endsWith==null || endsWith.isEmpty()) {
       int st = completeString.indexOf(" ",pos+startsWith.length());
-      if (st<0) st = pos+startsWith.length()+1; // +1 wegen "\n"+sw
+      if (st<0) st = pos+startsWith.length(); // +1 wegen "\n"+sw
       int nl = completeString.indexOf("\n",pos+startsWith.length());
       if (nl<0) nl = completeString.length();
       

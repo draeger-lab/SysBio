@@ -15,7 +15,6 @@ import org.sbml.squeezer.gui.SBMLModelSplitPane;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.io.KEGG2jSBML;
-import de.zbit.util.InfoManagement;
 
 /**
  * @author draeger
