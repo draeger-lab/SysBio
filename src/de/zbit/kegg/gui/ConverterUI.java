@@ -37,44 +37,54 @@ public class ConverterUI extends JFrame {
 		JFileChooser chooser = GUITools.createJFileChooser("usr.dir", false,
 				false, JFileChooser.FILES_ONLY, new FileFilterKGML());
 		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-
-			// Speedup Kegg2SBML by loading alredy queried objects. Reduces
-			// network load and heavily reduces computation time.
-			KEGG2jSBML k2s;
-			if (new File("keggdb.dat").exists()
-					&& new File("keggdb.dat").length() > 0) {
-				KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement
-						.loadFromFilesystem("keggdb.dat");
-				k2s = new KEGG2jSBML(manager);
-			} else {
-				k2s = new KEGG2jSBML();
-			}
-			// ---
-
-			// Convert Kegg File to SBML document.
-			SBMLDocument doc = k2s.Kegg2jSBML(chooser.getSelectedFile()
-					.getAbsolutePath());
-
-			// Remember already queried objects
-			KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s
-					.getKeggInfoManager());
-			// --
-
-			getContentPane().add(
-					new SBMLModelSplitPane(doc.getModel(), SBMLsqueezer
-							.getDefaultSettings()));
-			setDefaultCloseOperation(EXIT_ON_CLOSE);
-			pack();
-			setVisible(true);
+			showGUI(chooser.getSelectedFile().getAbsolutePath());
 		} else
 			dispose();
+	}
+
+	private void showGUI(String absolutePath) {
+		// Speedup Kegg2SBML by loading alredy queried objects. Reduces
+		// network load and heavily reduces computation time.
+		KEGG2jSBML k2s;
+		if (new File("keggdb.dat").exists()
+				&& new File("keggdb.dat").length() > 0) {
+			KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement
+					.loadFromFilesystem("keggdb.dat");
+			k2s = new KEGG2jSBML(manager);
+		} else {
+			k2s = new KEGG2jSBML();
+		}
+		// ---
+
+		// Convert Kegg File to SBML document.
+		SBMLDocument doc = k2s.Kegg2jSBML(absolutePath);
+
+		// Remember already queried objects
+		KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s
+				.getKeggInfoManager());
+		// --
+
+		getContentPane().add(
+				new SBMLModelSplitPane(doc.getModel(), SBMLsqueezer
+						.getDefaultSettings()));
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		pack();
+		setVisible(true);
+	}
+
+	public ConverterUI(String string) {
+		super("KGML2SBMLconverter");
+		showGUI(string);
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new ConverterUI();
+		if (args.length > 0 && args[0].startsWith("--input="))
+			new ConverterUI(args[0].split("=")[1]);
+		else
+			new ConverterUI();
 	}
 
 }
