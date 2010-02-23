@@ -32,7 +32,7 @@ public class ConverterUI extends JFrame {
 	 * Shows a small GUI.
 	 */
 	public ConverterUI() {
-		// Z:/workspace/SysBio/src/de/zbit/kegg/samplefiles/hsa00010.xml
+		// Z:/workspace/SysBio/resources/de/zbit/kegg/samplefiles/hsa00010.xml
 		super("KGML2SBMLconverter");
 		JFileChooser chooser = GUITools.createJFileChooser("usr.dir", false,
 				false, JFileChooser.FILES_ONLY, new FileFilterKGML());
