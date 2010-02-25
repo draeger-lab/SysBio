@@ -31,6 +31,9 @@ public class KeggInfos {
   private String three_dmet=null; //urn:miriam:3dmet
   private String cas=null; // NOT IN MIRIAM :( "CAS registry number, unique numerical identifiers for chemical substances"
   private String drugbank=null; //urn:miriam:drugbank
+  private String equation=null; // e.g. "G10609 + G00094 <=> G10619 + G00097"
+  private String pathways=null; // Referenced "PATHWAY" ids, without PATH: and comma separated.
+  private String pathwayDescs=null; // Description of referenced "PATHWAY" ids, comma separated.
   
   // Comments behind URNs are examples.
   public static final String miriam_urn_taxonomy="urn:miriam:taxonomy:"; // 9606
@@ -86,6 +89,8 @@ public class KeggInfos {
       ret=miriam_urn_ezymeECcode + suffix;
     } else if (prefix.startsWith("dr:")) {
       ret=miriam_urn_kgDrug + suffix;
+    } else if (prefix.startsWith("rn:")) {
+      ret=miriam_urn_kgReaction + suffix;
     } else if (prefix.startsWith("path:")) { // Link to another pathway
       ret=miriam_urn_kgPathway + suffix;
     } else if (et==null && prefix.startsWith("ko:") || et!=null && (et.equals(EntryType.gene) || et.equals(EntryType.ortholog)) ) {// z.B. hsa:00123, ko:00123
@@ -122,6 +127,16 @@ public class KeggInfos {
   }
   public String getDescription() {
     return description;
+  }
+  public String getEquation() {
+    return equation;
+  }
+  public String getPathways() {
+    return pathways;
+  }
+  public String getPathwayDescriptions() {
+    // Of REFENRECED pathways. not the actual queried one (if one queries a PW).
+    return pathwayDescs;
   }
   /**
    * All names, separated by ;
@@ -310,8 +325,29 @@ public class KeggInfos {
     // missing: NIKKAJI, LigandBox (CAS)
     drugbank=KeggAdaptor.extractInfo(infos, "DrugBank:", "\n");
     
+    // in reactions:
+    equation = KeggAdaptor.extractInfo(infos, "EQUATION", "\n");
+    String pathwaysTemp = KeggAdaptor.extractInfo(infos, "PATHWAY");
+    if (pathwaysTemp!=null && !pathwaysTemp.trim().isEmpty()) {
+      pathwaysTemp = pathwaysTemp.replace("PATH:", "");
+      String[] splitt = pathwaysTemp.split("\n");
+      pathways="";pathwayDescs="";
+      for (String s:splitt) {
+        if (!s.startsWith(" ") && !pathwayDescs.isEmpty()) { // Continuation of last line.
+          pathwayDescs+=" " + s;
+          continue;
+        }
+        s = s.trim();
+        pathways+=","+ s.substring(0,s.indexOf(" "));
+        pathwayDescs+=","+ s.substring(s.indexOf(" ")).trim().replace(",", "");
+      }
+    }
+    
     // Free Memory instead of storing empty Strings.
     if (taxonomy!=null && taxonomy.trim().isEmpty()) taxonomy=null;
+    if (equation!=null && equation.trim().isEmpty()) equation=null;
+    if (pathways!=null && pathways.trim().isEmpty()) pathways=null;
+    if (pathwayDescs!=null && pathwayDescs.trim().isEmpty()) pathwayDescs=null;
     if (definition!=null && definition.trim().isEmpty()) definition=null;
     if (description!=null && description.trim().isEmpty()) description=null;
     if (names!=null && names.trim().isEmpty()) names=null;

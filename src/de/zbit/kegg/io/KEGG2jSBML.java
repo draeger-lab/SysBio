@@ -12,6 +12,7 @@ import org.sbml.jsbml.History;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
+import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.CVTerm.Type;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
@@ -24,10 +25,14 @@ import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.kegg.parser.pathway.Reaction;
+import de.zbit.kegg.parser.pathway.ReactionComponent;
+import de.zbit.kegg.parser.pathway.ReactionType;
 import de.zbit.util.ProgressBar;
 
 public class KEGG2jSBML {
   public static boolean retrieveKeggAnnots=true; // Retrieve annotations from Kegg or use purely information available in the document.
+  public static boolean addCellDesignerAnnots=false;
   
   private KeggInfoManagement manager;
   private ArrayList<String> SIds = new ArrayList<String>();
@@ -87,14 +92,21 @@ public class KEGG2jSBML {
   public void KEGG2SBML(Pathway p, String outfile) {
     SBMLDocument doc = Kegg2jSBML(p);
     
-    // TODO: JSBML IO => write doc to outfile. Funzt noch nicht.
+    // JSBML IO => write doc to outfile.
+    /*
+     * Bisher:
+     * - Comportment mit / enden
+     * - <listOfCompartments>
+     * - <listOfSpecies>
+     * - <none> entfernen
+     */
     SBMLWriter.write(doc, outfile);
   }
   
   public void KEGG2SBML(String infile, String outfile) {
     SBMLDocument doc = Kegg2jSBML(infile);
     
-    // TODO: JSBML IO => write doc to outfile. Funzt noch nicht.
+    // JSBML IO => write doc to outfile.
     SBMLWriter.write(doc, outfile);
   }
 
@@ -111,6 +123,7 @@ public class KEGG2jSBML {
   public SBMLDocument Kegg2jSBML(Pathway p) {
     int level=2; int version=4;
     SBMLDocument doc = new SBMLDocument(level,version);
+    
     //ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>(); 
     if (!retrieveKeggAnnots) KeggInfoManagement.offlineMode=true; else KeggInfoManagement.offlineMode=false;
     SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
@@ -140,6 +153,15 @@ public class KEGG2jSBML {
     model.setAnnotation(annot);
     model.setHistory(hist);
     model.appendNotes("<body xmlns=\"http://www.w3.org/1999/xhtml\">");
+    
+    // CellDesigner Annotations
+    if (addCellDesignerAnnots) {
+      model.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
+      annot.addAnnotationNamespace("xmlns:celldesigner","","http://www.sbml.org/2001/ns/celldesigner");
+      doc.addNamespace("xmlns:celldesigner","","http://www.sbml.org/2001/ns/celldesigner"); //xmlns:celldesigner
+      addCellDesignerAnnotationPrefixToModel(p, annot);
+    }
+    
     
     // Parse Kegg Pathway information
     CVTerm mtPwID = new CVTerm(); mtPwID.setQualifierType(Type.MODEL_QUALIFIER);
@@ -234,9 +256,19 @@ public class KEGG2jSBML {
         if (!g.getName().isEmpty())
           name = g.getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
         
+        if (addCellDesignerAnnots) {
         // TODO: CellDesignerAnnotation
         //spec.getAnnotation().appendNoRDFAnnotation("<SpecisAnnotationForCellDesigner>");
+        }
       }
+      
+      // Process Component information
+      /*// No need to do that!
+      if (entry.getComponents()!=null && entry.getComponents().size()>0) {
+        for (int c:entry.getComponents()) {
+          
+        }
+      }*/
       
       CVTerm cvtKGID = new CVTerm(); cvtKGID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
       CVTerm cvtEntrezID = new CVTerm(); cvtEntrezID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEntrezID.setBiologicalQualifierType(Qualifier.BQB_IS);
@@ -252,10 +284,11 @@ public class KEGG2jSBML {
       CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_IS);
       CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
       CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
+      // TODO: Seit neustem noch mehr in MIRIAM verfügbar.
       
       // Parse every gene/object in this node.
       for (String ko_id:entry.getName().split(" ")) {
-        if (ko_id.trim().equalsIgnoreCase("undefined")) continue;
+        if (ko_id.trim().equalsIgnoreCase("undefined")) continue; // "undefined" = group node, which contains "Components"
         
         // Add Kegg-id Miriam identifier
         cvtKGID.addResource(KeggInfos.getMiriamURIforKeggID(ko_id, entry.getType()));
@@ -323,9 +356,128 @@ public class KEGG2jSBML {
       // Not neccessary to add species to model, due to call in "model.createSpecies()".
     }
     
+    //------------------------------------------------------------------
+    
+    // All species added. Parse reactions and relations.
+    for (Reaction r:p.getReactions()) {
+      org.sbml.jsbml.Reaction sbReaction = model.createReaction();
+      
+      sbReaction.initDefaults();
+      sbReaction.setCompartment(compartment);
+      Annotation rAnnot = new Annotation("");
+      rAnnot.setAbout("");
+      sbReaction.setAnnotation(rAnnot); // manchmal ist jSBML schon bescheurt...
+      sbReaction.appendNotes("<body xmlns=\"http://www.w3.org/1999/xhtml\">");
+      
+      // Pro/ Edukte
+      sbReaction.setReversible(r.getType().equals(ReactionType.reversible));
+      for (ReactionComponent rc:r.getSubstrates()) {
+        SpeciesReference sr = sbReaction.createReactant();
+        configureReactionComponent(p, rc, sr, 15); //15 =Substrate
+      }
+      for (ReactionComponent rc:r.getProducts()) {
+        SpeciesReference sr = sbReaction.createProduct();
+        configureReactionComponent(p, rc, sr, 11); // 11 =Product
+      }
+      
+      // Add Kegg-id Miriam identifier
+      CVTerm reID = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm rePWs = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
+      
+      for (String ko_id:r.getName().split(" ")) {
+        reID.addResource(KeggInfos.getMiriamURIforKeggID(r.getName()));
+      
+        // Retrieve further information via Kegg API -- Be careful: very slow!
+        KeggInfos infos = new KeggInfos(ko_id, manager);
+        if (infos.queryWasSuccessfull()) {
+          sbReaction.appendNotes("<p>");
+          if (infos.getDefinition()!=null)
+            sbReaction.appendNotes(String.format("<b>Definition of &#8220;%s&#8221;:</b> %s<br>\n", ko_id.toUpperCase(),infos.getDefinition()));
+          if (infos.getDefinition()!=null)
+            sbReaction.appendNotes(String.format("<b>Equation for &#8220;%s&#8221;:</b> %s<br>\n", ko_id.toUpperCase(),infos.getEquation()));
+          sbReaction.appendNotes(String.format("<img href=\"http://www.genome.jp/Fig/reaction/%s.gif\"/>", ko_id.toUpperCase())); // Experimental...
+          if (infos.getPathwayDescriptions()!=null) {
+            sbReaction.appendNotes("<b>Occurs in:</b><br>\n");
+            for (String desc:infos.getPathwayDescriptions().split(","))
+              sbReaction.appendNotes(desc);
+            sbReaction.appendNotes("-----<br>\n");
+          }
+          sbReaction.appendNotes("</p>");
+          
+          if (rePWs!=null) {
+            for (String pwId:infos.getPathways().split(","))
+              rePWs.addResource(KeggInfos.miriam_urn_kgPathway+KeggInfos.suffix(pwId));
+          }
+        }
+      }
+      
+      if (reID.getNumResources()>0) sbReaction.addCVTerm(reID);
+      if (rePWs.getNumResources()>0) sbReaction.addCVTerm(rePWs);
+      
+      
+      // Finally, add the fully configured reaction.
+      sbReaction.setName(r.getName());
+      sbReaction.setId(NameToSId(r.getName()));
+      sbReaction.appendNotes("</body>");
+      sbReaction.setMetaId("meta_"+sbReaction.getId());
+      rAnnot.setAbout("#"+sbReaction.getMetaId());
+      
+    }
+    
+    //------------------------------------------------------------------
+    
+    // TODO: Special reactions / relations.
+    
     model.appendNotes("</body>");
+    if (addCellDesignerAnnots) addCellDesignerAnnotationSuffixToModel(annot);
     
     return doc;
+  }
+
+  private void configureReactionComponent(Pathway p, ReactionComponent rc, SpeciesReference sr, int SBO) {
+    if (rc.getName()==null || rc.getName().trim().isEmpty()) {
+      rc = rc.getAlt();
+      if (rc.getName()==null || rc.getName().trim().isEmpty()) return;
+    }
+    sr.setName(rc.getName());
+    sr.setId(NameToSId(sr.getName()));
+    sr.setMetaId("meta_"+sr.getId());
+    
+    Entry spec = p.getEntryForName(rc.getName());
+    sr.setSpecies((spec!=null && spec.getCustom()!=null) ?(Species)spec.getCustom():null);
+    
+    if (sr.getSpeciesInstance()!=null && sr.getSpeciesInstance().getSBOTerm()<=0){
+      sr.getSpeciesInstance().setSBOTerm(SBO); // should be Product/Substrate
+      sr.setSBOTerm(SBO);
+    }
+  }
+
+  private void addCellDesignerAnnotationPrefixToModel(Pathway p, Annotation annot) {
+    annot.appendNoRDFAnnotation("<celldesigner:modelVersion>4.0</celldesigner:modelVersion>\n");
+    int[] maxCoords = getMaxCoords(p);
+    annot.appendNoRDFAnnotation("<celldesigner:modelDisplay sizeX=\"" + (maxCoords[0]+2) + "\" sizeY=\"" + (maxCoords[1]+2) + "\"/>\n");
+    annot.appendNoRDFAnnotation("<celldesigner:listOfCompartmentAliases/>\n");
+    annot.appendNoRDFAnnotation("<celldesigner:listOfComplexSpeciesAliases/>\n");
+    annot.appendNoRDFAnnotation("<celldesigner:listOfSpeciesAliases>\n");
+  }
+  
+  private void addCellDesignerAnnotationSuffixToModel(Annotation annot) {
+    annot.appendNoRDFAnnotation("</celldesigner:listOfSpeciesAliases>\n");
+    annot.appendNoRDFAnnotation("<celldesigner:listOfGroups/>\n");
+    /*
+     * TODO:
+     * </celldesigner:listOfSpeciesAliases>
+<celldesigner:listOfGroups/>
+<celldesigner:listOfProteins>
+<celldesigner:protein id="pr1" name="s1" type="GENERIC"/>
+</celldesigner:listOfProteins>
+<celldesigner:listOfGenes/>
+<celldesigner:listOfRNAs/>
+<celldesigner:listOfAntisenseRNAs/>
+<celldesigner:listOfLayers/>
+<celldesigner:listOfBlockDiagrams/>
+
+     */
   }
 
   private static boolean containsOnlyDigits(String myString) {
@@ -405,6 +557,23 @@ public class KEGG2jSBML {
     
     return ret;
   }
+  
+  /**
+   * Parses a Kegg Pathway and returns the maximum x and y coordinates
+   * @param p - Kegg Pathway Object
+   * @return int[]{x,y}
+   */
+  public static int[] getMaxCoords(Pathway p) {
+    int x=0,y=0;
+    for (Entry e: p.getEntries()) {
+      if (e.hasGraphics()) {
+        x=Math.max(x, e.getGraphics().getX() + e.getGraphics().getWidth());
+        y=Math.max(y, e.getGraphics().getY() + e.getGraphics().getHeight());
+      }
+    }
+    return new int[]{x,y};
+  }
+  
   
   /**
    * Appends "_<Number>" to a given String. <Number> is being set to the next free number, so that
