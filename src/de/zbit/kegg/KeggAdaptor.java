@@ -31,6 +31,9 @@ public class KeggAdaptor implements Serializable {
     printEachOutputToScreen = true;
     
     KeggAdaptor adap = new KeggAdaptor();
+    adap.get("rn:R05964");
+    if (true) return;
+    
     //adap.get("hsa:8491");
     //System.out.println("======================");
     //adap.get("path:map00603");

@@ -106,6 +106,11 @@ public class Pathway {
 	    if (entries.get(i).getId()==id) return entries.get(i);
 	  return null;
 	}
+  public Entry getEntryForName(String name) {
+    for (int i=0; i<entries.size(); i++)
+      if (entries.get(i).getName().equalsIgnoreCase(name)) return entries.get(i);
+    return null;
+  }
 
 	
 }
