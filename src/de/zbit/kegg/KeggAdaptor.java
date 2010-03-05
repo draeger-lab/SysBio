@@ -323,7 +323,6 @@ public class KeggAdaptor implements Serializable {
     try {
       s = serv.btit(id);
     } catch (RemoteException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return s;
@@ -373,6 +372,22 @@ public class KeggAdaptor implements Serializable {
     return results;
   }
 
+  public ArrayList<String> getPathwayList(String org) {
+    ArrayList<String> pws = new ArrayList<String>();
+    Definition[] results = new Definition[0];
+    try {
+      results = serv.list_pathways(org);
+      for (Definition definition : results) {
+        System.out.println(definition.getEntry_id());
+        pws.add(definition.getEntry_id());
+      }
+    } catch (RemoteException e) {
+      e.printStackTrace();
+    }
+    
+    return pws;
+  }
+  
   public Definition[] getKoClasses(String class_id) {
     Definition[] results = new Definition[0];
     try {
