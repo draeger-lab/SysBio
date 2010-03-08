@@ -35,6 +35,14 @@ public class KeggAdaptor implements Serializable {
     printEachOutputToScreen = true;
 
     KeggAdaptor adap = new KeggAdaptor();
+    String weat = adap.get("cpd:C00103 hsa:8491 rn:R05964 q:243 glycan:G00181");
+    System.out.println(extractInfo(weat, "ENTRY", " "));
+    if (true) return;
+    
+    //adap.get("hsa:8491");
+    //System.out.println("======================");
+    //adap.get("path:map00603");
+
     adap.getGenesByPathway("path:hsa04010");
     System.out.println("======================");
     String test = adap.get("hsa:4893");
@@ -536,13 +544,16 @@ public class KeggAdaptor implements Serializable {
           break;
       }
     } else {
-      int pos2 = completeString.toLowerCase().indexOf(endsWith,
-          pos + startsWith.length());
-      if (pos2 <= 0)
-        return "";
-      ret = completeString.substring(pos + startsWith.length(), pos2).trim();
+      // Jump to first non-Whitespace Character. Mind the new lines!
+      int sPos = pos+startsWith.length();
+      while (Character.isWhitespace(completeString.charAt(sPos)) && completeString.charAt(sPos)!='\n') sPos++;
+      
+      // Search for end position and trim string.
+      int pos2 = completeString.toLowerCase().indexOf(endsWith,sPos);
+      if (pos2<=0) return "";
+      ret = completeString.substring(sPos, pos2).trim();
     }
-
+    
     return ret;
 
   }

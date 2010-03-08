@@ -1,9 +1,12 @@
 package de.zbit.util;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -20,6 +23,13 @@ public class Utils {
     for (int i=0; i<times; i++)
       s.append(c);
     return s;
+  }
+  
+  /**
+   * Same as {@link isWord} !!!
+   */
+  public static boolean containsWord(String containingLine, String containedString) {
+    return isWord(containingLine, containedString);
   }
   
   /**
@@ -341,6 +351,92 @@ public class Utils {
     // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
     if (countNonNAN<=0) return Double.NaN;
     return retVal;
+  }
+  
+  /**
+   * Usefull for parsing command line arguments.
+   * @param args - Command line arguments.
+   * @param searchForCommand - Command to search for
+   * @param hasArgument - Has the command an argument? If yes, the Argument will be returned.
+   * @return The Argument, if {@link hasArgument} is set.
+   *         Otherwise: "true" if command is available. "false" if not.
+   * @throws Exception "Missing argument.". If that's the case.
+   */
+  public static String parseCommandLine(String[] args, String searchForCommand, boolean hasArgument) throws Exception {
+    searchForCommand = searchForCommand.replace("-", "").trim();
+    for (int i=0; i<args.length; i++) {
+      if (args[i].replace("-", "").trim().equalsIgnoreCase(searchForCommand)) {
+        if (hasArgument) {
+          if (i==(args.length-1)) throw new Exception ("Missing argument.");
+          else return args[i+1];
+        } else {
+          return "true";
+        }
+      }
+    }
+    
+    if (hasArgument) return "false";
+    return ""; // Don't return "false". May interfere with hasArgument
+  }
+  
+  public static boolean shutdownSystem() {
+    boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
+    
+    String sysDir = System.getProperty("os.home");
+    if (sysDir==null) sysDir = "";
+    sysDir = sysDir.trim();
+    if (sysDir==null || sysDir.isEmpty() && isWindows) sysDir = System.getenv("WinDir").trim();
+    if (!sysDir.isEmpty() && !sysDir.endsWith("/") && !sysDir.endsWith("\\"))
+      sysDir+=File.separator;
+    if (isWindows&&!sysDir.isEmpty()) sysDir += "system32\\";
+    
+    Runtime run = Runtime.getRuntime();
+    if (isWindows) sysDir += "shutdown.exe"; // -s -c "TimeLogger shutdown command." (-f)
+    else {
+      // Unter linux mit "which" Rscript suchen
+      try {
+        Process pr = run.exec("which shutdown");
+        pr.waitFor();
+        pr.getOutputStream();
+        
+        // read the child process' output
+        InputStreamReader r = new InputStreamReader(pr.getInputStream());
+        BufferedReader in = new BufferedReader(r);
+        String line = in.readLine(); // eine reicht
+        if (!line.toLowerCase().contains("no shutdown") && !line.contains(":"))
+          sysDir = line;
+      } catch(Exception e) {}
+      if (!sysDir.isEmpty() && !sysDir.endsWith("/") && !sysDir.endsWith("\\"))
+        sysDir+=File.separator;
+      sysDir += "shutdown";
+    }
+    
+    boolean successValue=false;
+    try {
+      String dir = sysDir.substring(0, sysDir.lastIndexOf(File.separator));
+      String command = sysDir.substring(sysDir.lastIndexOf(File.separator)+1);
+      
+      String[] commandToRun;
+      if (isWindows) commandToRun = new String[] {command, "-s", "-c", "\"TimeLogger shutdown command.\""}; // -f
+      else commandToRun = new String[] {command, "-h", "now"}; // Linux
+      
+      try { // Try to execute in input dir.
+        //Process pr = run.exec(cmd, null, new File(inputFolder));
+        Process pr = run.exec(commandToRun, null, new File(dir));
+        pr.waitFor();
+        successValue =(pr.exitValue()==0);
+        
+      } catch(Exception e) {
+        e.printStackTrace();
+        try {
+          run.exec(new String[] {sysDir}); // don't wait as it may not terminate...
+        } catch(Exception ex2) {
+          run.exec(new String[]{ "shutdown"}); // don't wait as it may not terminate...
+        }
+      }
+    } catch (Exception e) {e.printStackTrace();}
+    
+    return successValue;
   }
   
   public static boolean saveObject(String filename, Object obj) {

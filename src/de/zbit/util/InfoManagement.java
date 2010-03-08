@@ -1,6 +1,9 @@
 package de.zbit.util;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 
 import de.zbit.exception.UnsuccessfulRetrieveException;
@@ -48,9 +51,93 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     else {
       // Retrieve object and store it.
       INFOtype info = fetchInformationWrapper(id);
-      addInformation(id, info);
+      if (info!=null) addInformation(id, info);
       return info;
     }
+  }
+  
+  public synchronized INFOtype[] getInformations(IDtype[] ids) {
+    // WARNING: NOT TESTED (but I'm pretty sure it works...).
+    
+    ArrayList<IDtype> filteredIDs = new ArrayList<IDtype>();
+    boolean touched = false; // if true, ids!=filteredIDs
+    for (IDtype id: ids) {
+      if (rememberedInfos.indexOf(id)<0 && !unsuccessfulQueries.contains(id)) { // Same if-order as below!
+        filteredIDs.add(id);
+      } else {
+        touched = true;
+      }
+    }
+        
+    if (touched) {
+      IDtype[] test = Arrays.copyOf(ids, filteredIDs.size());
+      for (int i=0; i<test.length; i++)
+        Array.set(test, i, filteredIDs.get(i));
+      
+      INFOtype[] ret = fetchMultipleInformationWrapper(test);
+      
+      //INFOtype[] infos = new INFOtype[ids.length]; // Not permitted... workaround: 
+      INFOtype[] infosTemp = Arrays.copyOf(ret, ids.length); // Create a new Reference to an existing array, WITH NEW SIZE
+      INFOtype[] infos = infosTemp.clone(); // After creating new reference with correct size, create new array.
+      int i2=0;
+      for (int i=0; i<ids.length; i++) {
+        int pos = rememberedInfos.indexOf(ids[i]);
+        if (pos>=0) { // Same if-order as above!
+          infos[i] = rememberedInfos.get(pos).getInformation();
+        } else if (unsuccessfulQueries.contains(ids[i])) {
+          infos[i] = null;
+        } else {
+          if (ret==null || ret.length<i2 || ret[i2]==null) System.err.println("Something went badly wrong."); // should never happen. (=null => unsuccessfulQueries)
+          infos[i] = ret[i2];
+          if (ret[i2]!=null) addInformation(ids[i], ret[i2]);
+          i2++;
+        }
+      }
+      return infos;
+    } else {
+      INFOtype[] infos = fetchMultipleInformationWrapper(ids);
+      if (infos==null) return null;
+      for (int i=0; i<infos.length; i++)
+        if (infos[i]!=null && ids[i]!=null) addInformation(ids[i], infos[i]);
+      return infos;
+    }
+  }
+  
+  public synchronized void precacheIDs(IDtype[] ids) {
+    ArrayList<IDtype> filteredIDs = new ArrayList<IDtype>();
+    boolean touched = false; // if true, ids!=filteredIDs
+    for (IDtype id: ids) {
+      if (rememberedInfos.indexOf(id)<0 && !unsuccessfulQueries.contains(id)) {
+        filteredIDs.add(id);
+      } else {
+        touched = true;
+      }
+    }
+    
+    INFOtype[] infos;
+    if (touched) {
+      // IDtype[] test = new IDtype[filteredIDs.size()]; // Not permitted... workaround:
+      IDtype[] temp = Arrays.copyOf(ids, filteredIDs.size()); // Create a new Reference to an existing array, WITH NEW SIZE
+      IDtype[] filtIDs = temp.clone(); // After creating new reference with correct size, create new array.
+      
+      for (int i=0; i<filtIDs.length; i++)
+        Array.set(filtIDs, i, filteredIDs.get(i));
+      
+      infos = fetchMultipleInformationWrapper(filtIDs);
+      if (infos==null) return;
+      
+      // Add retrieved infos
+      for (int i=0; i<infos.length; i++)
+        if (infos[i]!=null && ids[i]!=null) addInformation(filtIDs[i], infos[i]);
+
+    } else {
+      infos = fetchMultipleInformationWrapper(ids);
+      if (infos==null) return;
+      
+      // Add retrieved infos
+      for (int i=0; i<infos.length; i++)
+        if (infos[i]!=null && ids[i]!=null) addInformation(ids[i], infos[i]);
+    }    
   }
   
   /**
@@ -85,7 +172,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       rememberedInfos.remove(itemToDelete);*/
       
       // Above solution is not good, since mostly the most recent added item gets deleted... Simple solution:
-      int min = Math.max(0, rememberedInfos.size()-1000);
+      //int min = Math.max(0, rememberedInfos.size()-1000);
       int itemToDelete = rememberedInfos.size()-1; int minUsage=Integer.MAX_VALUE;
       for (int i=0; i<rememberedInfos.size(); i++) {
         if(rememberedInfos.get(i).getTimesInfoAccessed()<minUsage) {
@@ -132,6 +219,34 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     return ret;
   }
   
+  private INFOtype[] fetchMultipleInformationWrapper(IDtype[] ids) {
+    // you should already have checked for "unsuccessfulQueries" when using this function.
+    INFOtype[] ret = null;
+    if (ids==null) return ret;
+    
+    int retried=0;
+    while (ret==null) {
+      try {
+        ret = fetchMultipleInformations(ids);
+        if (ret==null) unsuccessfulQueries.addAll(ids);
+        for (int i=0; i<ids.length; i++)
+          if (ids[i]!=null && !ids[i].equals("") && ret[i]==null) unsuccessfulQueries.add(ids[i]);
+        break;
+      } catch (TimeoutException e) {
+        retried++;
+        if (retried>=3) {
+          e.printStackTrace();
+          break;
+        }
+      } catch (UnsuccessfulRetrieveException e) {
+        unsuccessfulQueries.addAll(ids);
+        break;
+      }
+    }
+    
+    return ret;
+  }
+  
   /**
    * This function should NEVER be called from any other class. It fetches the information from an
    * online or hard disc source and does not use the remembered information in memory.
@@ -146,6 +261,17 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @return requested Information by id
    */
   protected abstract INFOtype fetchInformation(IDtype id) throws TimeoutException, UnsuccessfulRetrieveException;
+  
+  
+  /**
+   * Please SEE {@link fetchInformation} for more annotations!
+   * Return INFOtype for each id in ids. Use exactly the same index in both arrays.
+   * If you return null, all queries for all ids do not return results (unsuccessfull retrieve).
+   * If you set certain elements in the array to null, only the id at this index was not successfully queried. 
+   * @param ids - MAY CONTAIN null or empty IDS, may also be a list of size 0 !!!!!
+   * @return
+   */
+  protected abstract INFOtype[] fetchMultipleInformations(IDtype[] ids) throws TimeoutException, UnsuccessfulRetrieveException;
   
   /**
    * You may implement this Method to make your class serializable.

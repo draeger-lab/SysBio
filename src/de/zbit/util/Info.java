@@ -13,8 +13,7 @@ import java.io.Serializable;
  *            Type of information (arbitrary)
  */
 @SuppressWarnings("unchecked")
-public class Info<IDtype extends Comparable, INFOtype> implements Comparable,
-		Serializable {
+public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Serializable {
 	private static final long serialVersionUID = 3592331552130670620L;
 	private IDtype identifier;
 	private INFOtype information;
