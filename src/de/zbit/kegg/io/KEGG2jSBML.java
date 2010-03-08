@@ -42,6 +42,7 @@ public class KEGG2jSBML {
    */
   public static void main(String[] args) {
     // Speedup Kegg2SBML by loading alredy queried objects. Reduces network load and heavily reduces computation time.
+    
     KEGG2jSBML k2s;
     if (new File("keggdb.dat").exists() && new File("keggdb.dat").length()>0) {
       KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem("keggdb.dat");
@@ -65,7 +66,13 @@ public class KEGG2jSBML {
       return;
     }
     
-    k2s.KEGG2SBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml", "resources/de/zbit/kegg/samplefiles/hsa00010.sbml.xml");
+    long start = System.currentTimeMillis();
+    try {
+      //k2s.KEGG2SBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml", "resources/de/zbit/kegg/samplefiles/hsa00010.sbml.xml");
+      k2s.Kegg2jSBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml");
+    } catch (Exception e) {e.printStackTrace();}
+    System.out.println("Conversion took " + ((System.currentTimeMillis()-start)/1000/60) + " minutes and " + ((System.currentTimeMillis()-start)/1000%60) + " seconds.");
+    
   }
   
   public KeggInfoManagement getKeggInfoManager(){
@@ -123,9 +130,33 @@ public class KEGG2jSBML {
   public SBMLDocument Kegg2jSBML(Pathway p) {
     int level=2; int version=4;
     SBMLDocument doc = new SBMLDocument(level,version);
+    ArrayList<Entry> entries = p.getEntries();
     
     //ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>(); 
-    if (!retrieveKeggAnnots) KeggInfoManagement.offlineMode=true; else KeggInfoManagement.offlineMode=false;
+    if (!retrieveKeggAnnots) {
+      KeggInfoManagement.offlineMode=true; 
+    } else {
+      KeggInfoManagement.offlineMode=false;
+      
+      // PreFetch infos. Enormous performance improvement!
+      ArrayList<String> preFetchIDs = new ArrayList<String>();
+      preFetchIDs.add("GN:" + p.getOrg());
+      preFetchIDs.add(p.getName());
+      for (Entry entry: entries) {
+        for (String ko_id:entry.getName().split(" ")) {
+          if (ko_id.trim().equalsIgnoreCase("undefined")) continue; // "undefined" = group node, which contains "Components"
+          preFetchIDs.add(ko_id);
+        }
+      }
+      for (Reaction r:p.getReactions()) {      
+        for (String ko_id:r.getName().split(" ")) {
+          preFetchIDs.add(ko_id);
+        }
+      }
+      manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]));
+      // TODO: Add relations?
+      // -------------------------
+    }
     SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
       
     // Initialize a progress bar.
@@ -197,9 +228,9 @@ public class KEGG2jSBML {
     }
     model.appendNotes(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", p.getImage(), p.getImage(), p.getImage()));
     model.appendNotes(String.format("<a href=\"%s\">Original Entry</a><br/>\n", p.getLink()));
+        
     
     // Create species
-    ArrayList<Entry> entries = p.getEntries();
     for (Entry entry: entries) {
       progress.DisplayBar();
       /*

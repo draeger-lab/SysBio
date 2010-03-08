@@ -264,7 +264,7 @@ public class KeggInfos {
   
   private void parseInfos() {
     String infos = informationFromKeggAdaptor; // Create a shorter variable name ;-)
-    if (infos.trim().isEmpty()) infos=null;
+    if (infos!=null && infos.trim().isEmpty()) infos=null;
     if (infos==null) {
       informationFromKeggAdaptor = null;
       return;

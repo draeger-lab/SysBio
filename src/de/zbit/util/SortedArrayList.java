@@ -108,6 +108,25 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     return true;
   }
   
+  public boolean addAll(T[] c)  {
+    int i=-1;
+    while (true) {
+      i++;
+      try {
+        //Object o = Array.get(c, i);
+        //if (!(o instanceof T)) throw new DataFormatException();
+        //try {
+          //add((T)o);
+        //} catch (ClassCastException e) {
+        add(c[i]);
+      } catch (ArrayIndexOutOfBoundsException e) {
+        break;
+      }
+    }
+    
+    return true;
+  }
+  
   @Override
   public boolean contains(Object o) {
     if (this.size()==0) return false;
@@ -135,7 +154,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     } else {
       if (!o.getClass().isArray())
         pos = binarySearch(this, (T)o);
-      if (pos==0 && !((T)o).equals(this.get(0)) && !((T)o).equals(this.get(0).toString())) return -1;
+      if (pos==0 && compare(this, (T)o, 0)!=0) return -1; //((T)o).equals(this.get(0)) && !((T)o).equals(this.get(0).toString())) return -1;
     }
     
     
@@ -183,7 +202,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   
 
   /**
-   * Achtung: bei Not Found gibt er manchmal "0" zur�ck!! Das muss gesondert gecheckt werden.
+   * Achtung: bei Not Found gibt er manchmal "0" zurueck!! Das muss gesondert gecheckt werden.
    */
   @SuppressWarnings("unchecked")
   public static <K> int binarySearch(SortedArrayList<K> a, K x) {
@@ -195,14 +214,20 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
       mid = (low + high)/2;
 
       
-      if(((Comparable)a.get(mid)).compareTo(x) < 0 )
+      if (((Comparable)a.get(mid)).compareTo(x) < 0 )
         low = mid + 1;
-      else if(((Comparable)a.get(mid)).compareTo(x) > 0 )
+      else if (((Comparable)a.get(mid)).compareTo(x) > 0 )
         high = mid - 1;
       else
         return mid;
     }
       return -Math.abs(mid);     // NOT_FOUND = -1
+  }
+  
+  @SuppressWarnings("unchecked")
+  private static <K> int compare(SortedArrayList<K> a, K x, int index) {
+    if (index>=a.size()) return -1; // ...eigentlich error thowen besser.
+    return (((Comparable)a.get(index)).compareTo(x));
   }
   
   /**

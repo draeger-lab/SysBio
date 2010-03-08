@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="http://www.yworks.com/xml/graphml" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd">
-  <!--Created by yFiles for Java 2.7-->
+  <!--Created by yFiles for Java 2.7.0.1-->
   <key for="graphml" id="d0" yfiles.type="resources"/>
   <key attr.name="url" attr.type="string" for="node" id="d1"/>
   <key attr.name="ensemblIds" attr.type="string" for="node" id="d2"/>
@@ -21,7 +21,7 @@
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00128]]></data>
       <data key="d5"><![CDATA[aldehyde dehydrogenase (NAD+) [EC:1.2.1.3]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E1.2.1.3]]></data>
       <data key="d9">
@@ -40,7 +40,7 @@
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01895]]></data>
       <data key="d5"><![CDATA[acetyl-CoA synthetase [EC:6.2.1.1]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[ACSS acs]]></data>
       <data key="d9">
@@ -59,7 +59,7 @@
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00129]]></data>
       <data key="d5"><![CDATA[aldehyde dehydrogenase (NAD(P)+) [EC:1.2.1.5]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E1.2.1.5]]></data>
       <data key="d9">
@@ -100,7 +100,7 @@ Glacial acetic acid]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00650]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Butanoate metabolism]]></data>
       <data key="d9">
@@ -119,7 +119,7 @@ Glacial acetic acid]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00660]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[C5-Branched dibasic acid metabolism]]></data>
       <data key="d9">
@@ -138,7 +138,7 @@ Glacial acetic acid]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00640]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Propanoate metabolism]]></data>
       <data key="d9">
@@ -157,7 +157,7 @@ Glacial acetic acid]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00710]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Carbon fixation in photosynthetic organisms]]></data>
       <data key="d9">
@@ -176,7 +176,7 @@ Glacial acetic acid]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00030]]></data>
       <data key="d5"><![CDATA[The pentose phosphate pathway is a process of glucose turnover that produces NADPH as reducing equivalents and pentoses as essential parts of nucleotides. There are two different phases in the pathway. One is irreversible oxidative phase in which glucose-6P is converted to ribulose-5P by oxidative decarboxylation and NADPH is generated [MD:M00006]. The other is reversible non-oxidative phase in which phosphorylated sugars are interconverted to generate xylulose-5P ribulose-5P and ribose-5P [MD:M00007]. Phosphoribosyl pyrophosphate (PRPP) formed from ribose-5P [MD:M00005] is an activated compound used in the biosynthesis of histidine and purine/pyrimidine nucleotides. This pathway map also shows the Entner-Doudoroff pathway where 6-P-gluconate is dehydrated and then cleaved into pyruvate and glyceraldehyde-3P [MD:M00008].]]></data>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Pentose phosphate pathway]]></data>
       <data key="d9">
@@ -195,7 +195,7 @@ Glacial acetic acid]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00500]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Starch and sucrose metabolism]]></data>
       <data key="d9">
@@ -214,7 +214,7 @@ Glacial acetic acid]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00040]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Pentose and glucuronate interconversions]]></data>
       <data key="d9">
@@ -233,7 +233,7 @@ Glacial acetic acid]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01568]]></data>
       <data key="d5"><![CDATA[pyruvate decarboxylase [EC:4.1.1.1]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E4.1.1.1 pdc]]></data>
       <data key="d9">
@@ -251,7 +251,7 @@ Glacial acetic acid]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ec:1.1.1.71]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[enzyme]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[alcohol dehydrogenase [NAD(P)+];
 retinal reductase;
@@ -273,7 +273,7 @@ alcohol dehydrogenase [NAD(P)]]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00002]]></data>
       <data key="d5"><![CDATA[alcohol dehydrogenase (NADP+) [EC:1.1.1.2]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E1.1.1.2 adh]]></data>
       <data key="d9">
@@ -292,7 +292,7 @@ alcohol dehydrogenase [NAD(P)]]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00001]]></data>
       <data key="d5"><![CDATA[alcohol dehydrogenase [EC:1.1.1.1]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E1.1.1.1 adh]]></data>
       <data key="d9">
@@ -311,7 +311,7 @@ alcohol dehydrogenase [NAD(P)]]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01568]]></data>
       <data key="d5"><![CDATA[pyruvate decarboxylase [EC:4.1.1.1]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E4.1.1.1 pdc]]></data>
       <data key="d9">
@@ -328,9 +328,9 @@ alcohol dehydrogenase [NAD(P)]]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K00160+K00161+K00162+K00163]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K00160 ko:K00161 ko:K00162 ko:K00163]]></data>
+      <data key="d4"><![CDATA[ko:K00160,ko:K00161,ko:K00162,ko:K00163]]></data>
       <data key="d5"><![CDATA[pyruvate dehydrogenase E1 component subunit alpha [EC:1.2.4.1],pyruvate dehydrogenase E1 component subunit beta [EC:1.2.4.1],pyruvate dehydrogenase E1 component [EC:1.2.4.1]]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[PDHA pdhA,PDHB pdhB,aceE]]></data>
       <data key="d9">
@@ -347,9 +347,9 @@ alcohol dehydrogenase [NAD(P)]]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K00160+K00161+K00162+K00163]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K00160 ko:K00161 ko:K00162 ko:K00163]]></data>
+      <data key="d4"><![CDATA[ko:K00160,ko:K00161,ko:K00162,ko:K00163]]></data>
       <data key="d5"><![CDATA[pyruvate dehydrogenase E1 component subunit alpha [EC:1.2.4.1],pyruvate dehydrogenase E1 component subunit beta [EC:1.2.4.1],pyruvate dehydrogenase E1 component [EC:1.2.4.1]]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[PDHA pdhA,PDHB pdhB,aceE]]></data>
       <data key="d9">
@@ -368,7 +368,7 @@ alcohol dehydrogenase [NAD(P)]]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00627]]></data>
       <data key="d5"><![CDATA[pyruvate dehydrogenase E2 component (dihydrolipoamide acetyltransferase) [EC:2.3.1.12]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[DLAT aceF pdhC]]></data>
       <data key="d9">
@@ -387,7 +387,7 @@ alcohol dehydrogenase [NAD(P)]]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00072]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Synthesis and degradation of ketone bodies]]></data>
       <data key="d9">
@@ -406,7 +406,7 @@ alcohol dehydrogenase [NAD(P)]]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00016]]></data>
       <data key="d5"><![CDATA[L-lactate dehydrogenase [EC:1.1.1.27]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[LDH ldh]]></data>
       <data key="d9">
@@ -424,7 +424,7 @@ alcohol dehydrogenase [NAD(P)]]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ec:1.2.1.51]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[enzyme]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[pyruvate dehydrogenase (NADP+);
 pyruvate dehydrogenase (NADP+)]]></data>
@@ -444,7 +444,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00620]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Pyruvate metabolism]]></data>
       <data key="d9">
@@ -463,7 +463,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00873]]></data>
       <data key="d5"><![CDATA[pyruvate kinase [EC:2.7.1.40]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[PK pyk]]></data>
       <data key="d9">
@@ -482,7 +482,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00020]]></data>
       <data key="d5"><![CDATA[The citrate cycle (TCA cycle Krebs cycle) is an important aerobic pathway for the final steps of the oxidation of carbohydrates and fatty acids. The cycle starts with acetyl-CoA the activated form of acetate derived from glycolysis and pyruvate oxidation for carbohydrates and from beta oxidation of fatty acids. The two-carbon acetyl group in acetyl-CoA is transferred to the four-carbon compound of oxaloacetate to form the six-carbon compound of citrate. In a series of reactions two carbons in citrate are oxidized to CO2 and the reaction pathway supplies NADH for use in the oxidative phosphorylation and other metabolic processes. The pathway also supplies important precursor metabolites including 2-oxoglutarate. At the end of the cycle the remaining four-carbon part is transformed back to oxaloacetate. According to the genome sequence data many organisms seem to lack genes for the full cycle [MD:M00009] but contain genes for specific segments [MD:M00010 M00011].]]></data>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Citrate cycle (TCA cycle)]]></data>
       <data key="d9">
@@ -501,7 +501,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00010]]></data>
       <data key="d5"><![CDATA[Glycolysis is the process of converting glucose into pyruvate and generating small amounts of ATP (energy) and NADH (reducing power). It is a central pathway that produces important precursor metabolites: six-carbon compounds of glucose-6P and fructose-6P and three-carbon compounds of glycerone-P glyceraldehyde-3P glycerate-3P phosphoenolpyruvate and pyruvate [MD:M00001]. Acetyl-CoA another important precursor metabolite is produced by oxidative decarboxylation of pyruvate [MD:M00679]. When the enzyme genes of this pathway are examined in completely sequenced genomes the reaction steps of three-carbon compounds from glycerone-P to pyruvate form a conserved core module [MD:M00002] which is found in almost all organisms and which often corresponds to operon structures in bacterial genomes. Gluconeogenesis is a synthesis pathway of glucose from noncarbohydrate precursors. It is essentially a reversal of glycolysis with minor variations of alternative paths [MD:M00003].]]></data>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Glycolysis / Gluconeogenesis]]></data>
       <data key="d9">
@@ -520,7 +520,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01689]]></data>
       <data key="d5"><![CDATA[enolase [EC:4.2.1.11]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[ENO eno]]></data>
       <data key="d9">
@@ -539,7 +539,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01834]]></data>
       <data key="d5"><![CDATA[phosphoglycerate mutase [EC:5.4.2.1]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[PGAM gpm]]></data>
       <data key="d9">
@@ -577,7 +577,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01837]]></data>
       <data key="d5"><![CDATA[bisphosphoglycerate mutase [EC:5.4.2.4 5.4.2.1 3.1.3.13]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[BPGM]]></data>
       <data key="d9">
@@ -596,7 +596,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01837]]></data>
       <data key="d5"><![CDATA[bisphosphoglycerate mutase [EC:5.4.2.4 5.4.2.1 3.1.3.13]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[BPGM]]></data>
       <data key="d9">
@@ -615,7 +615,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00561]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Glycerolipid metabolism]]></data>
       <data key="d9">
@@ -634,7 +634,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00052]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Galactose metabolism]]></data>
       <data key="d9">
@@ -653,7 +653,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00134]]></data>
       <data key="d5"><![CDATA[glyceraldehyde 3-phosphate dehydrogenase [EC:1.2.1.12]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[GAPDH gapA]]></data>
       <data key="d9">
@@ -672,7 +672,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00710]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Carbon fixation in photosynthetic organisms]]></data>
       <data key="d9">
@@ -691,7 +691,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01803]]></data>
       <data key="d5"><![CDATA[triosephosphate isomerase (TIM) [EC:5.3.1.1]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[TPI tpiA]]></data>
       <data key="d9">
@@ -710,7 +710,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00051]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Fructose and mannose metabolism]]></data>
       <data key="d9">
@@ -727,9 +727,9 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K01622+K01623+K01624]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K01622 ko:K01623 ko:K01624]]></data>
+      <data key="d4"><![CDATA[ko:K01622,ko:K01623,ko:K01624]]></data>
       <data key="d5"><![CDATA[fructose-bisphosphate aldolase class I [EC:4.1.2.13],fructose-bisphosphate aldolase class II [EC:4.1.2.13]]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[ALDO fbaB,FBA fbaA]]></data>
       <data key="d9">
@@ -748,7 +748,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00850]]></data>
       <data key="d5"><![CDATA[6-phosphofructokinase [EC:2.7.1.11]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[PFK pfk]]></data>
       <data key="d9">
@@ -765,9 +765,9 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K01086+K03841+K02446+K04041]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K01086 ko:K03841 ko:K02446 ko:K04041]]></data>
+      <data key="d4"><![CDATA[ko:K01086,ko:K03841,ko:K02446,ko:K04041]]></data>
       <data key="d5"><![CDATA[fructose-16-bisphosphatase I [EC:3.1.3.11],fructose-16-bisphosphatase II [EC:3.1.3.11],fructose-16-bisphosphatase III [EC:3.1.3.11]]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[FBP fbp,glpX,fbp3]]></data>
       <data key="d9">
@@ -784,9 +784,9 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K02777+K02778+K02779+K02790+K02791]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K02777 ko:K02778 ko:K02779 ko:K02790 ko:K02791]]></data>
+      <data key="d4"><![CDATA[ko:K02777,ko:K02778,ko:K02779,ko:K02790,ko:K02791]]></data>
       <data key="d5"><![CDATA[PTS system glucose-specific IIA component [EC:2.7.1.69],PTS system glucose-specific IIB component [EC:2.7.1.69],PTS system glucose-specific IIC component,PTS system maltose and glucose-specific IIB component [EC:2.7.1.69],PTS system maltose and glucose-specific IIC component]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog,ortholog,ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[PTS-Glc-EIIA crr,PTS-Glc-EIIB ptsG,PTS-Glc-EIIC ptsG,PTS-Mal-EIIB malX,PTS-Mal-EIIC malX]]></data>
       <data key="d9">
@@ -803,9 +803,9 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K01810+K06859]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K01810 ko:K06859]]></data>
+      <data key="d4"><![CDATA[ko:K01810,ko:K06859]]></data>
       <data key="d5"><![CDATA[glucose-6-phosphate isomerase [EC:5.3.1.9],glucose-6-phosphate isomerase archaeal [EC:5.3.1.9]]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[GPI pgi,pgi1]]></data>
       <data key="d9">
@@ -824,7 +824,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01835]]></data>
       <data key="d5"><![CDATA[phosphoglucomutase [EC:5.4.2.2]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E5.4.2.2 pgm]]></data>
       <data key="d9">
@@ -843,7 +843,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00052]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Galactose metabolism]]></data>
       <data key="d9">
@@ -860,9 +860,9 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K01810+K06859]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K01810 ko:K06859]]></data>
+      <data key="d4"><![CDATA[ko:K01810,ko:K06859]]></data>
       <data key="d5"><![CDATA[glucose-6-phosphate isomerase [EC:5.3.1.9],glucose-6-phosphate isomerase archaeal [EC:5.3.1.9]]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[GPI pgi,pgi1]]></data>
       <data key="d9">
@@ -881,7 +881,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00844]]></data>
       <data key="d5"><![CDATA[hexokinase [EC:2.7.1.1]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[HK]]></data>
       <data key="d9">
@@ -900,7 +900,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00845]]></data>
       <data key="d5"><![CDATA[glucokinase [EC:2.7.1.2]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[glk]]></data>
       <data key="d9">
@@ -917,9 +917,9 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K01810+K06859]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K01810 ko:K06859]]></data>
+      <data key="d4"><![CDATA[ko:K01810,ko:K06859]]></data>
       <data key="d5"><![CDATA[glucose-6-phosphate isomerase [EC:5.3.1.9],glucose-6-phosphate isomerase archaeal [EC:5.3.1.9]]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[GPI pgi,pgi1]]></data>
       <data key="d9">
@@ -938,7 +938,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01792]]></data>
       <data key="d5"><![CDATA[glucose-6-phosphate 1-epimerase [EC:5.1.3.15]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E5.1.3.15]]></data>
       <data key="d9">
@@ -957,7 +957,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01785]]></data>
       <data key="d5"><![CDATA[aldose 1-epimerase [EC:5.1.3.3]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E5.1.3.3 galM]]></data>
       <data key="d9">
@@ -976,7 +976,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00845]]></data>
       <data key="d5"><![CDATA[glucokinase [EC:2.7.1.2]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[glk]]></data>
       <data key="d9">
@@ -995,7 +995,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00844]]></data>
       <data key="d5"><![CDATA[hexokinase [EC:2.7.1.1]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[HK]]></data>
       <data key="d9">
@@ -1014,7 +1014,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01084]]></data>
       <data key="d5"><![CDATA[glucose-6-phosphatase [EC:3.1.3.9]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[G6PC]]></data>
       <data key="d9">
@@ -1033,7 +1033,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01085]]></data>
       <data key="d5"><![CDATA[glucose-1-phosphatase [EC:3.1.3.10]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[agp]]></data>
       <data key="d9">
@@ -1052,7 +1052,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K05344]]></data>
       <data key="d5"><![CDATA[glucose-1-phosphate phosphodismutase [EC:2.7.1.41]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E2.7.1.41]]></data>
       <data key="d9">
@@ -1071,7 +1071,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00010]]></data>
       <data key="d5"><![CDATA[Glycolysis is the process of converting glucose into pyruvate and generating small amounts of ATP (energy) and NADH (reducing power). It is a central pathway that produces important precursor metabolites: six-carbon compounds of glucose-6P and fructose-6P and three-carbon compounds of glycerone-P glyceraldehyde-3P glycerate-3P phosphoenolpyruvate and pyruvate [MD:M00001]. Acetyl-CoA another important precursor metabolite is produced by oxidative decarboxylation of pyruvate [MD:M00679]. When the enzyme genes of this pathway are examined in completely sequenced genomes the reaction steps of three-carbon compounds from glycerone-P to pyruvate form a conserved core module [MD:M00002] which is found in almost all organisms and which often corresponds to operon structures in bacterial genomes. Gluconeogenesis is a synthesis pathway of glucose from noncarbohydrate precursors. It is essentially a reversal of glycolysis with minor variations of alternative paths [MD:M00003].]]></data>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Glycolysis / Gluconeogenesis]]></data>
       <data key="d9">
@@ -1090,7 +1090,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00382]]></data>
       <data key="d5"><![CDATA[dihydrolipoamide dehydrogenase [EC:1.8.1.4]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[DLD lpd pdhD]]></data>
       <data key="d9">
@@ -1109,7 +1109,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00520]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Amino sugar and nucleotide sugar metabolism]]></data>
       <data key="d9">
@@ -1128,7 +1128,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00730]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Thiamine metabolism]]></data>
       <data key="d9">
@@ -1147,7 +1147,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00770]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Pantothenate and CoA biosynthesis]]></data>
       <data key="d9">
@@ -1166,7 +1166,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00400]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Phenylalanine tyrosine and tryptophan biosynthesis]]></data>
       <data key="d9">
@@ -1185,7 +1185,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00350]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Tyrosine metabolism]]></data>
       <data key="d9">
@@ -1204,7 +1204,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00380]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Tryptophan metabolism]]></data>
       <data key="d9">
@@ -1223,7 +1223,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00440]]></data>
       <data key="d5"><![CDATA[Natural products containing carbon-phosphorous bonds so-called C-P compounds are derivatives of phosphonate and phosphinate with substitution of alkyl group for hydrogen of phosphorus-hydrogen bonds. C-P compounds have been found in many organisms but only protists and bacteria mostly Actinobacteria have biosynthetic capacity. A common reaction in the biosynthetic pathway is C-P bond forming reaction from phosphoenolpyruvate (PEP) to phosphonopyruvate (PnPy) catalyzed by PEP phosphomutase. 2-Aminoethylphosphonate (AEP) is the most abundant C-P compound in the natural world. AEP derivatives include phosphonoprotein phosphonoglycan and phosphonolipid. Other known C-P compounds are bioactive substances used in medicine (antibiotics) and agriculture (herbicide) such as fosfomycin FR-33289 rhizocticin and bialaphos.]]></data>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Phosphonate and phosphinate metabolism]]></data>
       <data key="d9">
@@ -1261,7 +1261,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00300]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[Lysine biosynthesis]]></data>
       <data key="d9">
@@ -1280,7 +1280,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[path:ko00473]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[map]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[D-Alanine metabolism]]></data>
       <data key="d9">
@@ -1299,7 +1299,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00927]]></data>
       <data key="d5"><![CDATA[phosphoglycerate kinase [EC:2.7.2.3]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[PGK pgk]]></data>
       <data key="d9">
@@ -1318,7 +1318,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01512]]></data>
       <data key="d5"><![CDATA[acylphosphatase [EC:3.6.1.7]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E3.6.1.7 acyP]]></data>
       <data key="d9">
@@ -1337,7 +1337,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00886]]></data>
       <data key="d5"><![CDATA[polyphosphate glucokinase [EC:2.7.1.63]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[ppgK]]></data>
       <data key="d9">
@@ -1356,7 +1356,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00886]]></data>
       <data key="d5"><![CDATA[polyphosphate glucokinase [EC:2.7.1.63]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[ppgK]]></data>
       <data key="d9">
@@ -1374,7 +1374,7 @@ pyruvate dehydrogenase (NADP+)]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ec:3.1.6.3]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[enzyme]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[glycosulfatase;
 glucosulfatase]]></data>
@@ -1393,7 +1393,7 @@ glucosulfatase]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ec:3.1.6.3]]></data>
       <data key="d5"/>
-      <data key="d6"><![CDATA[enzyme]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[glycosulfatase;
 glucosulfatase]]></data>
@@ -1413,7 +1413,7 @@ glucosulfatase]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K05716]]></data>
       <data key="d5"><![CDATA[cyclic 23-diphosphoglycerate synthetase [EC:4.6.1.-]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[CPGS]]></data>
       <data key="d9">
@@ -1432,7 +1432,7 @@ glucosulfatase]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K05715]]></data>
       <data key="d5"><![CDATA[2-phosphoglycerate kinase [EC:2.7.2.-]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[2PGK]]></data>
       <data key="d9">
@@ -1449,9 +1449,9 @@ glucosulfatase]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K02749+K02750+K02752+K02753]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K02749 ko:K02750 ko:K02752 ko:K02753]]></data>
+      <data key="d4"><![CDATA[ko:K02749,ko:K02750,ko:K02752,ko:K02753]]></data>
       <data key="d5"><![CDATA[PTS system arbutin-like IIB component [EC:2.7.1.69],PTS system arbutin-like IIC component,PTS system arbutin- cellobiose- and salicin-specific IIB component [EC:2.7.1.69],PTS system arbutin- cellobiose- and salicin-specific IIC component]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog,ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[PTS-Arb-EIIB glvB,PTS-Arb-EIIC glvC,PTS-Asc-EIIB ascF,PTS-Asc-EIIC ascF]]></data>
       <data key="d9">
@@ -1468,9 +1468,9 @@ glucosulfatase]]></data>
       <data key="d1"><![CDATA[http://www.genome.jp/dbget-bin/www_bget?ko+K02752+K02753]]></data>
       <data key="d2"/>
       <data key="d3"/>
-      <data key="d4"><![CDATA[ko:K02752 ko:K02753]]></data>
+      <data key="d4"><![CDATA[ko:K02752,ko:K02753]]></data>
       <data key="d5"><![CDATA[PTS system arbutin- cellobiose- and salicin-specific IIB component [EC:2.7.1.69],PTS system arbutin- cellobiose- and salicin-specific IIC component]]></data>
-      <data key="d6"><![CDATA[ortholog,ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[PTS-Asc-EIIB ascF,PTS-Asc-EIIC ascF]]></data>
       <data key="d9">
@@ -1489,7 +1489,7 @@ glucosulfatase]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01222]]></data>
       <data key="d5"><![CDATA[6-phospho-beta-glucosidase [EC:3.2.1.86]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E3.2.1.86A celF]]></data>
       <data key="d9">
@@ -1508,7 +1508,7 @@ glucosulfatase]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K01223]]></data>
       <data key="d5"><![CDATA[6-phospho-beta-glucosidase [EC:3.2.1.86]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E3.2.1.86B bglA]]></data>
       <data key="d9">
@@ -1527,7 +1527,7 @@ glucosulfatase]]></data>
       <data key="d3"/>
       <data key="d4"><![CDATA[ko:K00114]]></data>
       <data key="d5"><![CDATA[alcohol dehydrogenase (acceptor) [EC:1.1.99.8]]]></data>
-      <data key="d6"><![CDATA[ortholog]]></data>
+      <data key="d6"/>
       <data key="d7"/>
       <data key="d8"><![CDATA[E1.1.99.8]]></data>
       <data key="d9">

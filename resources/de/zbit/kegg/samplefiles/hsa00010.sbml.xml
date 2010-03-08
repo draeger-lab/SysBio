@@ -1,0 +1,2280 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" version="4">
+ <model id="path_hsa00010" metaid="meta_path_hsa00010" name="Glycolysis / Gluconeogenesis"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><h1>Model of “Glycolysis / Gluconeogenesis” in “Homo sapiens (human)”</h1>Glycolysis is the process of converting glucose into pyruvate and generating small amounts of ATP (energy) and NADH (reducing power). It is a central pathway that produces important precursor metabolites: six-carbon compounds of glucose-6P and fructose-6P and three-carbon compounds of glycerone-P, glyceraldehyde-3P, glycerate-3P, phosphoenolpyruvate, and pyruvate [MD:M00001]. Acetyl-CoA, another important precursor metabolite, is produced by oxidative decarboxylation of pyruvate [MD:M00679]. When the enzyme genes of this pathway are examined in completely sequenced genomes, the reaction steps of three-carbon compounds from glycerone-P to pyruvate form a conserved core module [MD:M00002], which is found in almost all organisms and which often corresponds to operon structures in bacterial genomes. Gluconeogenesis is a synthesis pathway of glucose from noncarbohydrate precursors. It is essentially a reversal of glycolysis with minor variations of alternative paths [MD:M00003].<br/><a href="http://www.genome.jp/kegg/pathway/hsa/hsa00010.png"><img alt="http://www.genome.jp/kegg/pathway/hsa/hsa00010.png" src="http://www.genome.jp/kegg/pathway/hsa/hsa00010.png"/></a><br/><a href="http://www.genome.jp/kegg-bin/show_pathway?hsa00010">Original Entry</a><br/></body>
+</notes> 
+<annotation><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_path_hsa00010"> 
+<creator> 
+<Bag> 
+<li parseType="Resource"> 
+<ORG parseType="Resource"><Orgname>ZBIT, University of Tübingen, WSI-RA</Orgname> 
+</ORG> 
+</li> 
+</Bag> 
+</creator> 
+<modified parseType="Resource"> 
+<W3CDTF>Thu Mar 04 17:49:19 CET 2010</W3CDTF> 
+</modified> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<compartment id="default" spatialDimension="3" constant="true"> 
+</compartment> 
+</none> 
+<none> 
+<species id="ALDOA" constant="false" hasOnlySubstanceUnits="false" metaid="meta_ALDOA" name="ALDOA..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:226+hsa:229+hsa:230">Original Kegg Entry</a><br/><p><b>Description for “ALDOA”:</b> aldolase A, fructose-bisphosphate (EC:4.1.2.13)</p><p><b>Description for “ALDOB”:</b> aldolase B, fructose-bisphosphate (EC:4.1.2.13)</p><p><b>Description for “ALDOC”:</b> aldolase C, fructose-bisphosphate (EC:4.1.2.13)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_ALDOA"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="ALDH2" constant="false" hasOnlySubstanceUnits="false" metaid="meta_ALDH2" name="ALDH2..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:217+hsa:219+hsa:223+hsa:224+hsa:501">Original Kegg Entry</a><br/><p><b>Description for “ALDH2”:</b> aldehyde dehydrogenase 2 family (mitochondrial) (EC:1.2.1.3)</p><p><b>Description for “ALDH1B1”:</b> aldehyde dehydrogenase 1 family, member B1 (EC:1.2.1.3)</p><p><b>Description for “ALDH9A1”:</b> aldehyde dehydrogenase 9 family, member A1 (EC:1.2.1.3 1.2.1.19
+1.2.1.47)</p><p><b>Description for “ALDH3A2”:</b> aldehyde dehydrogenase 3 family, member A2 (EC:1.2.1.3)</p><p><b>Description for “ALDH7A1”:</b> aldehyde dehydrogenase 7 family, member A1 (EC:1.2.1.31)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_ALDH2"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="ACSS2" constant="false" hasOnlySubstanceUnits="false" metaid="meta_ACSS2" name="ACSS2..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:55902+hsa:84532">Original Kegg Entry</a><br/><p><b>Description for “ACSS2”:</b> acyl-CoA synthetase short-chain family member 2 (EC:6.2.1.1)</p><p><b>Description for “ACSS1”:</b> acyl-CoA synthetase short-chain family member 1 (EC:6.2.1.1)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_ACSS2"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="ALDH3A1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_ALDH3A1" name="ALDH3A1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:218+hsa:220+hsa:221+hsa:222">Original Kegg Entry</a><br/><p><b>Description for “ALDH3A1”:</b> aldehyde dehydrogenase 3 family, memberA1 (EC:1.2.1.5)</p><p><b>Description for “ALDH1A3”:</b> aldehyde dehydrogenase 1 family, member A3 (EC:1.2.1.5)</p><p><b>Description for “ALDH3B1”:</b> aldehyde dehydrogenase 3 family, member B1 (EC:1.2.1.5)</p><p><b>Description for “ALDH3B2”:</b> aldehyde dehydrogenase 3 family, member B2 (EC:1.2.1.5)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_ALDH3A1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="Glacialaceticacid" constant="false" hasOnlySubstanceUnits="false" metaid="meta_Glacialaceticacid" name="Glacial acetic acid" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00033">Original Kegg Entry</a><br/><p><b>Description for “Glacial acetic acid”:</b> null</p><p><b>All given names:</b> Acetate;
+Acetic acid;
+Ethanoic acid;
+Glacial acetic acid</p><p><b>Formula:</b> C2H4O2</p><p><b>Mass:</b> 60.0211</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_Glacialaceticacid"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PentosephosphatepathwayHomosapienshuman" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PentosephosphatepathwayHomosapienshuman" name="Pentose phosphate pathway - Homo sapiens (human)" boundaryCondition="false" sboTerm="SBO:0000291" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa00030">Original Kegg Entry</a><br/><p><b>Description for “Pentose phosphate pathway - Homo sapiens (human)”:</b> null</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PentosephosphatepathwayHomosapienshuman"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="StarchandsucrosemetabolismHomosapienshuman" constant="false" hasOnlySubstanceUnits="false" metaid="meta_StarchandsucrosemetabolismHomosapienshuman" name="Starch and sucrose metabolism - Homo sapiens (human)" boundaryCondition="false" sboTerm="SBO:0000291" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa00500">Original Kegg Entry</a><br/><p><b>Description for “Starch and sucrose metabolism - Homo sapiens (human)”:</b> null</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_StarchandsucrosemetabolismHomosapienshuman"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="E4111pdc" constant="false" hasOnlySubstanceUnits="false" metaid="meta_E4111pdc" name="E4.1.1.1, pdc" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K01568">Original Kegg Entry</a><br/><p><b>Description for “E4.1.1.1, pdc”:</b> pyruvate decarboxylase [EC:4.1.1.1]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_E4111pdc"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="AKR1A1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_AKR1A1" name="AKR1A1" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:10327">Original Kegg Entry</a><br/><p><b>Description for “AKR1A1”:</b> aldo-keto reductase family 1, member A1 (aldehyde reductase)
+(EC:1.1.1.2)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_AKR1A1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="ADH1A" constant="false" hasOnlySubstanceUnits="false" metaid="meta_ADH1A" name="ADH1A..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:124+hsa:125+hsa:126+hsa:127+hsa:128+hsa:130+hsa:131">Original Kegg Entry</a><br/><p><b>Description for “ADH1A”:</b> alcohol dehydrogenase 1A (class I), alpha polypeptide (EC:1.1.1.1)</p><p><b>Description for “ADH1B”:</b> alcohol dehydrogenase 1B (class I), beta polypeptide (EC:1.1.1.1)</p><p><b>Description for “ADH1C”:</b> alcohol dehydrogenase 1C (class I), gamma polypeptide (EC:1.1.1.1)</p><p><b>Description for “ADH4”:</b> alcohol dehydrogenase 4 (class II), pi polypeptide (EC:1.1.1.1)</p><p><b>Description for “ADH5”:</b> alcohol dehydrogenase 5 (class III), chi polypeptide (EC:1.1.1.1
+1.1.1.284)</p><p><b>Description for “ADH6”:</b> alcohol dehydrogenase 6 (class V) (EC:1.1.1.1)</p><p><b>Description for “ADH7”:</b> alcohol dehydrogenase 7 (class IV), mu or sigma polypeptide
+(EC:1.1.1.1)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_ADH1A"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="E4111pdc_1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_E4111pdc_1" name="E4.1.1.1, pdc" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K01568">Original Kegg Entry</a><br/><p><b>Description for “E4.1.1.1, pdc”:</b> pyruvate decarboxylase [EC:4.1.1.1]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_E4111pdc_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PDHA1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PDHA1" name="PDHA1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:5160+hsa:5161+hsa:5162">Original Kegg Entry</a><br/><p><b>Description for “PDHA1”:</b> pyruvate dehydrogenase (lipoamide) alpha 1 (EC:1.2.4.1)</p><p><b>Description for “PDHA2”:</b> pyruvate dehydrogenase (lipoamide) alpha 2 (EC:1.2.4.1)</p><p><b>Description for “PDHB”:</b> pyruvate dehydrogenase (lipoamide) beta (EC:1.2.4.1)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PDHA1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PDHA1_1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PDHA1_1" name="PDHA1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:5160+hsa:5161+hsa:5162">Original Kegg Entry</a><br/><p><b>Description for “PDHA1”:</b> pyruvate dehydrogenase (lipoamide) alpha 1 (EC:1.2.4.1)</p><p><b>Description for “PDHA2”:</b> pyruvate dehydrogenase (lipoamide) alpha 2 (EC:1.2.4.1)</p><p><b>Description for “PDHB”:</b> pyruvate dehydrogenase (lipoamide) beta (EC:1.2.4.1)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PDHA1_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="DLAT" constant="false" hasOnlySubstanceUnits="false" metaid="meta_DLAT" name="DLAT" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:1737">Original Kegg Entry</a><br/><p><b>Description for “DLAT”:</b> dihydrolipoamide S-acetyltransferase (EC:2.3.1.12)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_DLAT"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="LDHAL6A" constant="false" hasOnlySubstanceUnits="false" metaid="meta_LDHAL6A" name="LDHAL6A..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:160287+hsa:3939+hsa:3945+hsa:3948+hsa:92483">Original Kegg Entry</a><br/><p><b>Description for “LDHAL6A”:</b> lactate dehydrogenase A-like 6A (EC:1.1.1.27)</p><p><b>Description for “LDHA”:</b> lactate dehydrogenase A (EC:1.1.1.27)</p><p><b>Description for “LDHB”:</b> lactate dehydrogenase B (EC:1.1.1.27)</p><p><b>Description for “LDHC”:</b> lactate dehydrogenase C (EC:1.1.1.27)</p><p><b>Description for “LDHAL6B”:</b> lactate dehydrogenase A-like 6B (EC:1.1.1.27)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_LDHAL6A"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PyruvatemetabolismHomosapienshuman" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PyruvatemetabolismHomosapienshuman" name="Pyruvate metabolism - Homo sapiens (human)" boundaryCondition="false" sboTerm="SBO:0000291" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa00620">Original Kegg Entry</a><br/><p><b>Description for “Pyruvate metabolism - Homo sapiens (human)”:</b> null</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PyruvatemetabolismHomosapienshuman"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PKLR" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PKLR" name="PKLR..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:5313+hsa:5315">Original Kegg Entry</a><br/><p><b>Description for “PKLR”:</b> pyruvate kinase, liver and RBC (EC:2.7.1.40)</p><p><b>Description for “PKM2”:</b> pyruvate kinase, muscle (EC:2.7.1.40)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PKLR"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="CitratecycleTCAcycleHomosapienshuman" constant="false" hasOnlySubstanceUnits="false" metaid="meta_CitratecycleTCAcycleHomosapienshuman" name="Citrate cycle (TCA cycle) - Homo sapiens (human)" boundaryCondition="false" sboTerm="SBO:0000291" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa00020">Original Kegg Entry</a><br/><p><b>Description for “Citrate cycle (TCA cycle) - Homo sapiens (human)”:</b> null</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_CitratecycleTCAcycleHomosapienshuman"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="ENO1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_ENO1" name="ENO1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:2023+hsa:2026+hsa:2027">Original Kegg Entry</a><br/><p><b>Description for “ENO1”:</b> enolase 1, (alpha) (EC:4.2.1.11)</p><p><b>Description for “ENO2”:</b> enolase 2 (gamma, neuronal) (EC:4.2.1.11)</p><p><b>Description for “ENO3”:</b> enolase 3 (beta, muscle) (EC:4.2.1.11)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_ENO1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PGAM4" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PGAM4" name="PGAM4..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:441531+hsa:5223+hsa:5224+hsa:669">Original Kegg Entry</a><br/><p><b>Description for “PGAM4”:</b> phosphoglycerate mutase family member 4 (EC:3.1.3.13 5.4.2.1
+5.4.2.4)</p><p><b>Description for “PGAM1”:</b> phosphoglycerate mutase 1 (brain) (EC:3.1.3.13 5.4.2.1 5.4.2.4)</p><p><b>Description for “PGAM2”:</b> phosphoglycerate mutase 2 (muscle) (EC:3.1.3.13 5.4.2.1 5.4.2.4)</p><p><b>Description for “BPGM”:</b> 2,3-bisphosphoglycerate mutase (EC:3.1.3.13 5.4.2.1 5.4.2.4)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PGAM4"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="GAPDH" constant="false" hasOnlySubstanceUnits="false" metaid="meta_GAPDH" name="GAPDH" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:2597">Original Kegg Entry</a><br/><p><b>Description for “GAPDH”:</b> glyceraldehyde-3-phosphate dehydrogenase (EC:1.2.1.12)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_GAPDH"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="Carbonfixationinphotosyntheticorganisms" constant="false" hasOnlySubstanceUnits="false" metaid="meta_Carbonfixationinphotosyntheticorganisms" name="Carbon fixation in photosynthetic organisms" boundaryCondition="false" sboTerm="SBO:0000291" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?map00710">Original Kegg Entry</a><br/><p><b>Description for “Carbon fixation in photosynthetic organisms”:</b> null</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_Carbonfixationinphotosyntheticorganisms"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="TPI1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_TPI1" name="TPI1" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:7167">Original Kegg Entry</a><br/><p><b>Description for “TPI1”:</b> triosephosphate isomerase 1 (EC:5.3.1.1)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_TPI1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PFKL" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PFKL" name="PFKL..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:5211+hsa:5213+hsa:5214">Original Kegg Entry</a><br/><p><b>Description for “PFKL”:</b> phosphofructokinase, liver (EC:2.7.1.11)</p><p><b>Description for “PFKM”:</b> phosphofructokinase, muscle (EC:2.7.1.11)</p><p><b>Description for “PFKP”:</b> phosphofructokinase, platelet (EC:2.7.1.11)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PFKL"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="FBP1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_FBP1" name="FBP1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:2203+hsa:8789">Original Kegg Entry</a><br/><p><b>Description for “FBP1”:</b> fructose-1,6-bisphosphatase 1 (EC:3.1.3.11)</p><p><b>Description for “FBP2”:</b> fructose-1,6-bisphosphatase 2 (EC:3.1.3.11)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_FBP1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K02777" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K02777" name="K02777..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K02777+K02778+K02779+K02790+K02791">Original Kegg Entry</a><br/><p><b>Description for “PTS-Glc-EIIA, crr”:</b> PTS system, glucose-specific IIA component [EC:2.7.1.69]</p><p><b>Description for “PTS-Glc-EIIB, ptsG”:</b> PTS system, glucose-specific IIB component [EC:2.7.1.69]</p><p><b>Description for “PTS-Glc-EIIC, ptsG”:</b> PTS system, glucose-specific IIC component</p><p><b>Description for “PTS-Mal-EIIB, malX”:</b> PTS system, maltose and glucose-specific IIB component [EC:2.7.1.69]</p><p><b>Description for “PTS-Mal-EIIC, malX”:</b> PTS system, maltose and glucose-specific IIC component</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K02777"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="GPI" constant="false" hasOnlySubstanceUnits="false" metaid="meta_GPI" name="GPI" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:2821">Original Kegg Entry</a><br/><p><b>Description for “GPI”:</b> glucose phosphate isomerase (EC:5.3.1.9)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_GPI"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PGM1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PGM1" name="PGM1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:5236+hsa:55276">Original Kegg Entry</a><br/><p><b>Description for “PGM1”:</b> phosphoglucomutase 1 (EC:5.4.2.2)</p><p><b>Description for “PGM2”:</b> phosphoglucomutase 2 (EC:5.4.2.2)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PGM1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="GPI_1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_GPI_1" name="GPI" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:2821">Original Kegg Entry</a><br/><p><b>Description for “GPI”:</b> glucose phosphate isomerase (EC:5.3.1.9)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_GPI_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="HK1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_HK1" name="HK1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:3098+hsa:3099+hsa:3101">Original Kegg Entry</a><br/><p><b>Description for “HK1”:</b> hexokinase 1 (EC:2.7.1.1)</p><p><b>Description for “HK2”:</b> hexokinase 2 (EC:2.7.1.1)</p><p><b>Description for “HK3”:</b> hexokinase 3 (white cell) (EC:2.7.1.1)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_HK1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="GCK" constant="false" hasOnlySubstanceUnits="false" metaid="meta_GCK" name="GCK" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:2645">Original Kegg Entry</a><br/><p><b>Description for “GCK”:</b> glucokinase (hexokinase 4) (EC:2.7.1.2)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_GCK"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="GPI_2" constant="false" hasOnlySubstanceUnits="false" metaid="meta_GPI_2" name="GPI" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:2821">Original Kegg Entry</a><br/><p><b>Description for “GPI”:</b> glucose phosphate isomerase (EC:5.3.1.9)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_GPI_2"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="E51315" constant="false" hasOnlySubstanceUnits="false" metaid="meta_E51315" name="E5.1.3.15" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K01792">Original Kegg Entry</a><br/><p><b>Description for “E5.1.3.15”:</b> glucose-6-phosphate 1-epimerase [EC:5.1.3.15]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_E51315"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="GALM" constant="false" hasOnlySubstanceUnits="false" metaid="meta_GALM" name="GALM" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:130589">Original Kegg Entry</a><br/><p><b>Description for “GALM”:</b> galactose mutarotase (aldose 1-epimerase) (EC:5.1.3.3)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_GALM"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="GCK_1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_GCK_1" name="GCK" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:2645">Original Kegg Entry</a><br/><p><b>Description for “GCK”:</b> glucokinase (hexokinase 4) (EC:2.7.1.2)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_GCK_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="HK1_1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_HK1_1" name="HK1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:3098+hsa:3099+hsa:3101">Original Kegg Entry</a><br/><p><b>Description for “HK1”:</b> hexokinase 1 (EC:2.7.1.1)</p><p><b>Description for “HK2”:</b> hexokinase 2 (EC:2.7.1.1)</p><p><b>Description for “HK3”:</b> hexokinase 3 (white cell) (EC:2.7.1.1)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_HK1_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="G6PC" constant="false" hasOnlySubstanceUnits="false" metaid="meta_G6PC" name="G6PC..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:2538+hsa:57818">Original Kegg Entry</a><br/><p><b>Description for “G6PC”:</b> glucose-6-phosphatase, catalytic subunit (EC:3.1.3.9)</p><p><b>Description for “G6PC2”:</b> glucose-6-phosphatase, catalytic, 2 (EC:3.1.3.9)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_G6PC"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="agp" constant="false" hasOnlySubstanceUnits="false" metaid="meta_agp" name="agp" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K01085">Original Kegg Entry</a><br/><p><b>Description for “agp”:</b> glucose-1-phosphatase [EC:3.1.3.10]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_agp"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="E27141" constant="false" hasOnlySubstanceUnits="false" metaid="meta_E27141" name="E2.7.1.41" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K05344">Original Kegg Entry</a><br/><p><b>Description for “E2.7.1.41”:</b> glucose-1-phosphate phosphodismutase [EC:2.7.1.41]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_E27141"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="GlycolysisGluconeogenesisHomosapienshuman" constant="false" hasOnlySubstanceUnits="false" metaid="meta_GlycolysisGluconeogenesisHomosapienshuman" name="Glycolysis / Gluconeogenesis - Homo sapiens (human)" boundaryCondition="false" sboTerm="SBO:0000291" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?pathway+hsa00010">Original Kegg Entry</a><br/><p><b>Description for “Glycolysis / Gluconeogenesis - Homo sapiens (human)”:</b> null</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_GlycolysisGluconeogenesisHomosapienshuman"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PGK1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PGK1" name="PGK1" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:1738">Original Kegg Entry</a><br/><p><b>Description for “PGK1”:</b> phosphoglycerate kinase 1 (EC:2.7.2.3)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PGK1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PGK1_1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PGK1_1" name="PGK1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:5230+hsa:5232">Original Kegg Entry</a><br/><p><b>Description for “PGK2”:</b> phosphoglycerate kinase 2 (EC:2.7.2.3)</p><p><b>Description for “ppgK”:</b> polyphosphate glucokinase [EC:2.7.1.63]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PGK1_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PTSArbEIIBglvB" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PTSArbEIIBglvB" name="PTS-Arb-EIIB, glvB" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K00886">Original Kegg Entry</a><br/><p><b>Description for “PTS-Arb-EIIB, glvB”:</b> PTS system, arbutin-like IIB component [EC:2.7.1.69]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PTSArbEIIBglvB"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PTSArbEIIBglvB_1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PTSArbEIIBglvB_1" name="PTS-Arb-EIIB, glvB" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K00886">Original Kegg Entry</a><br/><p><b>Description for “PTS-Arb-EIIB, glvB”:</b> PTS system, arbutin-like IIB component [EC:2.7.1.69]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PTSArbEIIBglvB_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K02749" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K02749" name="K02749..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K02749+K02750+K02752+K02753+K02777">Original Kegg Entry</a><br/><p><b>Description for “PTS-Arb-EIIC, glvC”:</b> PTS system, arbutin-like IIC component</p><p><b>Description for “PTS-Asc-EIIB, ascF”:</b> PTS system, arbutin-, cellobiose-, and salicin-specific IIB
+component [EC:2.7.1.69]</p><p><b>Description for “PTS-Asc-EIIC, ascF”:</b> PTS system, arbutin-, cellobiose-, and salicin-specific IIC
+component</p><p><b>Description for “PTS-Glc-EIIA, crr”:</b> PTS system, glucose-specific IIA component [EC:2.7.1.69]</p><p><b>Description for “PTS-Glc-EIIA, crr”:</b> PTS system, glucose-specific IIA component [EC:2.7.1.69]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K02749"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K02752" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K02752" name="K02752..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K02752+K02753+K02777">Original Kegg Entry</a><br/><p><b>Description for “PTS-Asc-EIIC, ascF”:</b> PTS system, arbutin-, cellobiose-, and salicin-specific IIC
+component</p><p><b>Description for “PTS-Glc-EIIA, crr”:</b> PTS system, glucose-specific IIA component [EC:2.7.1.69]</p><p><b>Description for “PTS-Glc-EIIA, crr”:</b> PTS system, glucose-specific IIA component [EC:2.7.1.69]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K02752"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K01222" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K01222" name="K01222..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K01222+K01223">Original Kegg Entry</a><br/><p><b>Description for “E3.2.1.86B, bglA”:</b> 6-phospho-beta-glucosidase [EC:3.2.1.86]</p><p><b>Description for “E3.2.1.86A, celF”:</b> 6-phospho-beta-glucosidase [EC:3.2.1.86]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K01222"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K01222_1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K01222_1" name="K01222..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K01222+K01223">Original Kegg Entry</a><br/><p><b>Description for “E3.2.1.86B, bglA”:</b> 6-phospho-beta-glucosidase [EC:3.2.1.86]</p><p><b>Description for “E3.2.1.86A, celF”:</b> 6-phospho-beta-glucosidase [EC:3.2.1.86]</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K01222_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00031" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00031" name="C00031" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00031">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00031"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00103" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00103" name="C00103" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00103">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00103"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00631" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00631" name="C00631" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00631">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00631"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00267" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00267" name="C00267" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00267">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00267"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00221" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00221" name="C00221" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00221">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00221"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00111" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00111" name="C00111" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00111">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00111"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C01172" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C01172" name="C01172" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C01172">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C01172"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00668" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00668" name="C00668" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00668">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00668"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C05345" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C05345" name="C05345" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C05345">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C05345"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00074" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00074" name="C00074" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00074">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00074"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00197" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00197" name="C00197" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00197">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00197"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00236" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00236" name="C00236" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00236">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00236"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00186" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00186" name="C00186" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00186">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00186"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C15972" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C15972" name="C15972" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C15972">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C15972"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00469" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00469" name="C00469" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00469">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00469"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00022" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00022" name="C00022" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00022">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00022"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C05125" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C05125" name="C05125" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C05125">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C05125"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00024" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00024" name="C00024" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00024">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00024"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00084" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00084" name="C00084" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00084">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00084"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C16255" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C16255" name="C16255" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C16255">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C16255"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C15973" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C15973" name="C15973" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C15973">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C15973"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C05378" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C05378" name="C05378" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C05378">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C05378"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C06186" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C06186" name="C06186" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C06186">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C06186"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C06187" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C06187" name="C06187" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C06187">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C06187"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C06188" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C06188" name="C06188" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C06188">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C06188"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C01451" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C01451" name="C01451" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C01451">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C01451"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00068" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00068" name="C00068" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00068">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00068"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="PCK1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_PCK1" name="PCK1..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:5105+hsa:5106">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_PCK1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00036" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00036" name="C00036" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00036">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00036"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K00114" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K00114" name="K00114" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K00114">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K00114"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K01610" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K01610" name="K01610" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K01610">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K01610"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K04022" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K04022" name="K04022" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K04022">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K04022"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="Propanoatemetabolism" constant="false" hasOnlySubstanceUnits="false" metaid="meta_Propanoatemetabolism" name="Propanoate metabolism" boundaryCondition="false" sboTerm="SBO:0000291" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa00640">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_Propanoatemetabolism"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K00150" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K00150" name="K00150" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K00150">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K00150"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K11389" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K11389" name="K11389" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K11389">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K11389"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K00131" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K00131" name="K00131" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K00131">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K00131"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K00169" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K00169" name="K00169..." boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K00169+K00170+K00171+K00172">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K00169"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="K03738" constant="false" hasOnlySubstanceUnits="false" metaid="meta_K03738" name="K03738" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?K03738">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_K03738"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C01159" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C01159" name="C01159" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C01159">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C01159"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="BPGM" constant="false" hasOnlySubstanceUnits="false" metaid="meta_BPGM" name="BPGM" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:669">Original Kegg Entry</a><br/><p><b>Description for “BPGM”:</b> 2,3-bisphosphoglycerate mutase (EC:3.1.3.13 5.4.2.1 5.4.2.4)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_BPGM"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="BPGM_1" constant="false" hasOnlySubstanceUnits="false" metaid="meta_BPGM_1" name="BPGM" boundaryCondition="false" sboTerm="SBO:0000461" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?hsa:669">Original Kegg Entry</a><br/><p><b>Description for “BPGM”:</b> 2,3-bisphosphoglycerate mutase (EC:3.1.3.13 5.4.2.1 5.4.2.4)</p></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_BPGM_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species id="C00118" constant="false" hasOnlySubstanceUnits="false" metaid="meta_C00118" name="C00118" boundaryCondition="false" sboTerm="SBO:0000247" compartment="default"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.kegg.jp/dbget-bin/www_bget?C00118">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_C00118"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+</none> 
+<none> 
+<reaction id="rnR00710" metaid="meta_rnR00710" name="rn:R00710" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00710"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00084" species="C00084" metaid="meta_cpdC00084" name="cpd:C00084"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00033" species="Glacialaceticacid" metaid="meta_cpdC00033" name="cpd:C00033"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00235" metaid="meta_rnR00235" name="rn:R00235" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00235"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00024" species="C00024" metaid="meta_cpdC00024" name="cpd:C00024"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00033_1" species="Glacialaceticacid" metaid="meta_cpdC00033_1" name="cpd:C00033"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00711" metaid="meta_rnR00711" name="rn:R00711" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00711"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00084_1" species="C00084" metaid="meta_cpdC00084_1" name="cpd:C00084"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00033_2" species="Glacialaceticacid" metaid="meta_cpdC00033_2" name="cpd:C00033"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00755" metaid="meta_rnR00755" name="rn:R00755" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00755"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC05125" species="C05125" metaid="meta_cpdC05125" name="cpd:C05125"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00084_2" species="C00084" metaid="meta_cpdC00084_2" name="cpd:C00084"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00746" metaid="meta_rnR00746" name="rn:R00746" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00746"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00469" species="C00469" metaid="meta_cpdC00469" name="cpd:C00469"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00084_3" species="C00084" metaid="meta_cpdC00084_3" name="cpd:C00084"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00754" metaid="meta_rnR00754" name="rn:R00754" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00754"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00469_1" species="C00469" metaid="meta_cpdC00469_1" name="cpd:C00469"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00084_4" species="C00084" metaid="meta_cpdC00084_4" name="cpd:C00084"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00014" metaid="meta_rnR00014" name="rn:R00014" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00014"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00022" species="C00022" metaid="meta_cpdC00022" name="cpd:C00022"> 
+</speciesReference> 
+<speciesReference id="cpdC00068" species="C00068" metaid="meta_cpdC00068" name="cpd:C00068"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC05125_1" species="C05125" metaid="meta_cpdC05125_1" name="cpd:C05125"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00014_1" metaid="meta_rnR00014_1" name="rn:R00014" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00014_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00022_1" species="C00022" metaid="meta_cpdC00022_1" name="cpd:C00022"> 
+</speciesReference> 
+<speciesReference id="cpdC00068_1" species="C00068" metaid="meta_cpdC00068_1" name="cpd:C00068"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC05125_2" species="C05125" metaid="meta_cpdC05125_2" name="cpd:C05125"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR03270" metaid="meta_rnR03270" name="rn:R03270" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR03270"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC05125_3" species="C05125" metaid="meta_cpdC05125_3" name="cpd:C05125"> 
+</speciesReference> 
+<speciesReference id="cpdC15972" species="C15972" metaid="meta_cpdC15972" name="cpd:C15972"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC16255" species="C16255" metaid="meta_cpdC16255" name="cpd:C16255"> 
+</speciesReference> 
+<speciesReference id="cpdC00068_2" species="C00068" metaid="meta_cpdC00068_2" name="cpd:C00068"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR02569" metaid="meta_rnR02569" name="rn:R02569" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR02569"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC15973" species="C15973" metaid="meta_cpdC15973" name="cpd:C15973"> 
+</speciesReference> 
+<speciesReference id="cpdC00024_1" species="C00024" metaid="meta_cpdC00024_1" name="cpd:C00024"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC16255_1" species="C16255" metaid="meta_cpdC16255_1" name="cpd:C16255"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00703" metaid="meta_rnR00703" name="rn:R00703" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00703"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00186" species="C00186" metaid="meta_cpdC00186" name="cpd:C00186"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00022_2" species="C00022" metaid="meta_cpdC00022_2" name="cpd:C00022"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00200" metaid="meta_rnR00200" name="rn:R00200" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00200"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00074" species="C00074" metaid="meta_cpdC00074" name="cpd:C00074"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00022_3" species="C00022" metaid="meta_cpdC00022_3" name="cpd:C00022"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00658" metaid="meta_rnR00658" name="rn:R00658" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00658"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00631" species="C00631" metaid="meta_cpdC00631" name="cpd:C00631"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00074_1" species="C00074" metaid="meta_cpdC00074_1" name="cpd:C00074"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01518" metaid="meta_rnR01518" name="rn:R01518" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01518"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00631_1" species="C00631" metaid="meta_cpdC00631_1" name="cpd:C00631"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00197" species="C00197" metaid="meta_cpdC00197" name="cpd:C00197"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01061rnR01063" metaid="meta_rnR01061rnR01063" name="rn:R01061 rn:R01063" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01061rnR01063"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00118" species="C00118" metaid="meta_cpdC00118" name="cpd:C00118"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00236" species="C00236" metaid="meta_cpdC00236" name="cpd:C00236"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01015" metaid="meta_rnR01015" name="rn:R01015" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01015"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00118_1" species="C00118" metaid="meta_cpdC00118_1" name="cpd:C00118"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00111" species="C00111" metaid="meta_cpdC00111" name="cpd:C00111"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01070" metaid="meta_rnR01070" name="rn:R01070" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01070"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC05378" species="C05378" metaid="meta_cpdC05378" name="cpd:C05378"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00111_1" species="C00111" metaid="meta_cpdC00111_1" name="cpd:C00111"> 
+</speciesReference> 
+<speciesReference id="cpdC00118_2" species="C00118" metaid="meta_cpdC00118_2" name="cpd:C00118"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR04779" metaid="meta_rnR04779" name="rn:R04779" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR04779"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC05345" species="C05345" metaid="meta_cpdC05345" name="cpd:C05345"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC05378_1" species="C05378" metaid="meta_cpdC05378_1" name="cpd:C05378"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR04780" metaid="meta_rnR04780" name="rn:R04780" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR04780"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC05378_2" species="C05378" metaid="meta_cpdC05378_2" name="cpd:C05378"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC05345_1" species="C05345" metaid="meta_cpdC05345_1" name="cpd:C05345"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR02738" metaid="meta_rnR02738" name="rn:R02738" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR02738"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00031" species="C00031" metaid="meta_cpdC00031" name="cpd:C00031"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00668" species="C00668" metaid="meta_cpdC00668" name="cpd:C00668"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR02740" metaid="meta_rnR02740" name="rn:R02740" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR02740"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00668_1" species="C00668" metaid="meta_cpdC00668_1" name="cpd:C00668"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC05345_2" species="C05345" metaid="meta_cpdC05345_2" name="cpd:C05345"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00959" metaid="meta_rnR00959" name="rn:R00959" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00959"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00103" species="C00103" metaid="meta_cpdC00103" name="cpd:C00103"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00668_2" species="C00668" metaid="meta_cpdC00668_2" name="cpd:C00668"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR03321" metaid="meta_rnR03321" name="rn:R03321" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR03321"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC01172" species="C01172" metaid="meta_cpdC01172" name="cpd:C01172"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC05345_3" species="C05345" metaid="meta_cpdC05345_3" name="cpd:C05345"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01600" metaid="meta_rnR01600" name="rn:R01600" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01600"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00221" species="C00221" metaid="meta_cpdC00221" name="cpd:C00221"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC01172_1" species="C01172" metaid="meta_cpdC01172_1" name="cpd:C01172"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01600_1" metaid="meta_rnR01600_1" name="rn:R01600" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01600_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00221_1" species="C00221" metaid="meta_cpdC00221_1" name="cpd:C00221"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC01172_2" species="C01172" metaid="meta_cpdC01172_2" name="cpd:C01172"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR02739" metaid="meta_rnR02739" name="rn:R02739" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR02739"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00668_3" species="C00668" metaid="meta_cpdC00668_3" name="cpd:C00668"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC01172_3" species="C01172" metaid="meta_cpdC01172_3" name="cpd:C01172"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR02739_1" metaid="meta_rnR02739_1" name="rn:R02739" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR02739_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00668_4" species="C00668" metaid="meta_cpdC00668_4" name="cpd:C00668"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC01172_4" species="C01172" metaid="meta_cpdC01172_4" name="cpd:C01172"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01602" metaid="meta_rnR01602" name="rn:R01602" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01602"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00267" species="C00267" metaid="meta_cpdC00267" name="cpd:C00267"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00221_2" species="C00221" metaid="meta_cpdC00221_2" name="cpd:C00221"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01786" metaid="meta_rnR01786" name="rn:R01786" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01786"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00267_1" species="C00267" metaid="meta_cpdC00267_1" name="cpd:C00267"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00668_5" species="C00668" metaid="meta_cpdC00668_5" name="cpd:C00668"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01786_1" metaid="meta_rnR01786_1" name="rn:R01786" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01786_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00267_2" species="C00267" metaid="meta_cpdC00267_2" name="cpd:C00267"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00668_6" species="C00668" metaid="meta_cpdC00668_6" name="cpd:C00668"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01788" metaid="meta_rnR01788" name="rn:R01788" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01788"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00668_7" species="C00668" metaid="meta_cpdC00668_7" name="cpd:C00668"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00267_3" species="C00267" metaid="meta_cpdC00267_3" name="cpd:C00267"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00947" metaid="meta_rnR00947" name="rn:R00947" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00947"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00103_1" species="C00103" metaid="meta_cpdC00103_1" name="cpd:C00103"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00267_4" species="C00267" metaid="meta_cpdC00267_4" name="cpd:C00267"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00960" metaid="meta_rnR00960" name="rn:R00960" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00960"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00103_2" species="C00103" metaid="meta_cpdC00103_2" name="cpd:C00103"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00267_5" species="C00267" metaid="meta_cpdC00267_5" name="cpd:C00267"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR07618" metaid="meta_rnR07618" name="rn:R07618" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR07618"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC15973_1" species="C15973" metaid="meta_cpdC15973_1" name="cpd:C15973"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC15972_1" species="C15972" metaid="meta_cpdC15972_1" name="cpd:C15972"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01512" metaid="meta_rnR01512" name="rn:R01512" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01512"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00197_1" species="C00197" metaid="meta_cpdC00197_1" name="cpd:C00197"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00236_1" species="C00236" metaid="meta_cpdC00236_1" name="cpd:C00236"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR02189" metaid="meta_rnR02189" name="rn:R02189" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR02189"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00267_6" species="C00267" metaid="meta_cpdC00267_6" name="cpd:C00267"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00668_8" species="C00668" metaid="meta_cpdC00668_8" name="cpd:C00668"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR02187" metaid="meta_rnR02187" name="rn:R02187" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR02187"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00221_3" species="C00221" metaid="meta_cpdC00221_3" name="cpd:C00221"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC01172_5" species="C01172" metaid="meta_cpdC01172_5" name="cpd:C01172"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR05132" metaid="meta_rnR05132" name="rn:R05132" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR05132"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC06186" species="C06186" metaid="meta_cpdC06186" name="cpd:C06186"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC06187" species="C06187" metaid="meta_cpdC06187" name="cpd:C06187"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR04394" metaid="meta_rnR04394" name="rn:R04394" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR04394"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC01451" species="C01451" metaid="meta_cpdC01451" name="cpd:C01451"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC06188" species="C06188" metaid="meta_cpdC06188" name="cpd:C06188"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR05133" metaid="meta_rnR05133" name="rn:R05133" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR05133"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC06187_1" species="C06187" metaid="meta_cpdC06187_1" name="cpd:C06187"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC01172_6" species="C01172" metaid="meta_cpdC01172_6" name="cpd:C01172"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR05134" metaid="meta_rnR05134" name="rn:R05134" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR05134"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC06188_1" species="C06188" metaid="meta_cpdC06188_1" name="cpd:C06188"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC01172_7" species="C01172" metaid="meta_cpdC01172_7" name="cpd:C01172"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00431rnR00726" metaid="meta_rnR00431rnR00726" name="rn:R00431 rn:R00726" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00431rnR00726"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00036" species="C00036" metaid="meta_cpdC00036" name="cpd:C00036"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00074_2" species="C00074" metaid="meta_cpdC00074_2" name="cpd:C00074"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR05198" metaid="meta_rnR05198" name="rn:R05198" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR05198"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00469_2" species="C00469" metaid="meta_cpdC00469_2" name="cpd:C00469"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00084_5" species="C00084" metaid="meta_cpdC00084_5" name="cpd:C00084"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00341" metaid="meta_rnR00341" name="rn:R00341" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00341"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00036_1" species="C00036" metaid="meta_cpdC00036_1" name="cpd:C00036"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00074_3" species="C00074" metaid="meta_cpdC00074_3" name="cpd:C00074"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR00754_1" metaid="meta_rnR00754_1" name="rn:R00754" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR00754_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00469_3" species="C00469" metaid="meta_cpdC00469_3" name="cpd:C00469"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00084_6" species="C00084" metaid="meta_cpdC00084_6" name="cpd:C00084"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01061rnR01063_1" metaid="meta_rnR01061rnR01063_1" name="rn:R01061 rn:R01063" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01061rnR01063_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00118_3" species="C00118" metaid="meta_cpdC00118_3" name="cpd:C00118"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00236_2" species="C00236" metaid="meta_cpdC00236_2" name="cpd:C00236"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR07159" metaid="meta_rnR07159" name="rn:R07159" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR07159"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00118_4" species="C00118" metaid="meta_cpdC00118_4" name="cpd:C00118"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00197_2" species="C00197" metaid="meta_cpdC00197_2" name="cpd:C00197"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01058" metaid="meta_rnR01058" name="rn:R01058" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01058"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00118_5" species="C00118" metaid="meta_cpdC00118_5" name="cpd:C00118"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00197_3" species="C00197" metaid="meta_cpdC00197_3" name="cpd:C00197"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01196" metaid="meta_rnR01196" name="rn:R01196" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01196"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00024_2" species="C00024" metaid="meta_cpdC00024_2" name="cpd:C00024"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00022_4" species="C00022" metaid="meta_cpdC00022_4" name="cpd:C00022"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR07159_1" metaid="meta_rnR07159_1" name="rn:R07159" reversible="false" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR07159_1"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00118_6" species="C00118" metaid="meta_cpdC00118_6" name="cpd:C00118"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00197_4" species="C00197" metaid="meta_cpdC00197_4" name="cpd:C00197"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01516" metaid="meta_rnR01516" name="rn:R01516" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01516"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC01159" species="C01159" metaid="meta_cpdC01159" name="cpd:C01159"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC00197_5" species="C00197" metaid="meta_cpdC00197_5" name="cpd:C00197"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+<reaction id="rnR01662" metaid="meta_rnR01662" name="rn:R01662" reversible="true" fast="false"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"/>
+</notes> 
+<annotation> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> 
+<rdf:Description rdf:about="#meta_rnR01662"> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<none> 
+<speciesReference id="cpdC00236_3" species="C00236" metaid="meta_cpdC00236_3" name="cpd:C00236"> 
+</speciesReference> 
+</none> 
+<none> 
+<speciesReference id="cpdC01159_1" species="C01159" metaid="meta_cpdC01159_1" name="cpd:C01159"> 
+</speciesReference> 
+</none> 
+<none> 
+</none> 
+</reaction> 
+</none> 
+</model> 
+</sbml>

@@ -9,11 +9,14 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import de.zbit.kegg.KeggAdaptor;
+import de.zbit.kegg.KeggInfoManagement;
+import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.util.ProgressBar;
@@ -60,10 +63,16 @@ public class KEGG2GraphML {
   public static boolean renameCompoundToSmallMolecule=true; // Fuer Jochen & GePS unbedingt true lassen (so was wie LPS, CA2+ als "sm" bezeichnen).
   
   public static boolean lastFileWasOverwritten=false; // Gibt an, ob das letzte geschriebene outFile bereits vorhanden war und deshalb ueberschrieben wurde.
+  
+  public static KeggInfoManagement manager=null;
+  
   /**
    * @param args
    */
   public static void main(String[] args) {
+    if (new File("keggdb.dat").exists() && new File("keggdb.dat").length()>0)
+      manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem("keggdb.dat");
+      
     if (args!=null && args.length >0) {
       File f = new File(args[0]);
       if (f.isDirectory()) BatchConvertKegg.main(args);
@@ -72,26 +81,48 @@ public class KEGG2GraphML {
         if (args.length>1) outfile = args[1];
         Pathway p = KeggParser.parse(args[0]).get(0);
         KEGG2GraphML(p, outfile);
+        
+        KeggInfoManagement.saveToFilesystem("keggdb.dat", manager); // Remember already queried objects
       }
       return;
     }
     
     //KeggParser.silent=false;
     System.out.println("Reading kegg pathway...");
-    Pathway p = KeggParser.parse("_ko00010.xml").get(0); //04115
+    Pathway p = KeggParser.parse("resources/de/zbit/kegg/samplefiles/_ko00010.xml").get(0); //04115
     //Pathway p = KeggParser.parse("ko02010.xml").get(0);
     //p = KeggParser.parse("http://kaas.genome.jp/kegg/KGML/KGML_v0.6.1/ko/ko00010.xml").get(0);
     
     System.out.println("Converting to GraphML");
     //silent = false;
-    KEGG2GraphML(p, "test.graphML");
+    KEGG2GraphML(p, "resources/de/zbit/kegg/samplefiles/test.graphML");
   }
   
   public static void KEGG2GraphML(Pathway p, String outFile) {
     Graph2D graph = new Graph2D();
-    ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>(); 
-    KeggAdaptor adap = null;
-    if (retrieveKeggAnnots) adap = new KeggAdaptor();
+    ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>();
+    if (retrieveKeggAnnots) {
+      if (manager==null) manager = new KeggInfoManagement();
+      
+      // PreFetch infos. Enormous performance improvement!
+      ArrayList<String> preFetchIDs = new ArrayList<String>();
+      //preFetchIDs.add("GN:" + p.getOrg());
+      //preFetchIDs.add(p.getName());
+      for (Entry entry: p.getEntries()) {
+        for (String ko_id:entry.getName().split(" ")) {
+          if (ko_id.trim().equalsIgnoreCase("undefined")) continue; // "undefined" = group node, which contains "Components"
+          preFetchIDs.add(ko_id);
+        }
+      }
+      /*for (Reaction r:p.getReactions()) {      
+        for (String ko_id:r.getName().split(" ")) {
+          preFetchIDs.add(ko_id);
+        }
+      }*/
+      manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]));
+      // Add relations?
+      // -------------------------
+    }
     lastFileWasOverwritten=false;
     
     
@@ -126,7 +157,7 @@ public class KEGG2GraphML {
     if (hm==null) hm = new HierarchyManager(graph);
     
     int aufrufeGesamt=p.getEntries().size(); //+p.getRelations().size(); // Relations gehen sehr schnell.
-    if (adap==null) aufrufeGesamt+=p.getRelations().size();
+    if (!retrieveKeggAnnots) aufrufeGesamt+=p.getRelations().size();
     ProgressBar progress = new ProgressBar(aufrufeGesamt);
     
     // Add nodes for all Entries
@@ -267,7 +298,7 @@ public class KEGG2GraphML {
         
 
         // KeggAdaptor. Achtung: Sehr langsam.
-        if (adap!=null) {
+        if (retrieveKeggAnnots) {
           boolean hasMultipleIDs = false;
           if (e.getName().trim().contains(" ")) hasMultipleIDs = true;
           
@@ -276,13 +307,13 @@ public class KEGG2GraphML {
             //Definition[] results = adap.getGenesForKO(e.getName(), retrieveKeggAnnotsForOrganism); // => GET only (und alles aus GET rausparsen). Zusaetzlich: in sortedArrayList merken.
             if (ko_id.trim().equalsIgnoreCase("undefined")) continue;
             
-            String infos = adap.get(ko_id);
+            KeggInfos infos = new KeggInfos(ko_id, manager);
             
             // "NCBI-GeneID:","UniProt:", "Ensembl:", ... aus dem GET rausparsen
-            if (infos!=null && infos.length()>0) {
+            if (infos.queryWasSuccessfull()) {
               String oldText=graph.getRealizer(n).getLabelText();
               
-              String exName = KeggAdaptor.extractInfo(infos, "NAME");
+              String exName = infos.getNames();
               if (exName!=null && !exName.isEmpty()) {
                 int pos = exName.lastIndexOf(";");
                 if (pos>0 && pos<(exName.length()-1)) exName = exName.substring(pos+1, exName.length()).replace("\n", "").trim();
@@ -293,22 +324,22 @@ public class KEGG2GraphML {
                   graph.getRealizer(n).setLabelText(exName);
               }
               
-              String text = KeggAdaptor.extractInfo(infos, "NAME");
+              String text = infos.getNames();
               if (text!=null && !text.isEmpty()) name2+=(!name2.isEmpty()?",":"")+text.replace(",", "");
               
               if (e.getType().equals(EntryType.map)) { // => Link zu anderem Pathway oder Title-Node des aktuellem PW.
-                text = KeggAdaptor.extractInfo(infos, "DESCRIPTION");
+                text = infos.getDescription();
                 if (text!=null && !text.isEmpty()) definition+=(!definition.isEmpty()?",":"")+text.replace(",", "").replace("\n", " ");
               } else {
-                text = KeggAdaptor.extractInfo(infos, "DEFINITION");
+                text = infos.getDefinition();
                 if (text!=null && !text.isEmpty()) definition+=(!definition.isEmpty()?",":"")+text.replace(",", "").replace("\n", " ");
               }
               
-              text = KeggAdaptor.extractInfo(infos, "NCBI-GeneID:", "\n"); //adap.getEntrezIDs(ko_id);
+              text = infos.getEntrez_id(); //KeggAdaptor.extractInfo(infos, "NCBI-GeneID:", "\n"); //adap.getEntrezIDs(ko_id);
               if (text!=null && !text.isEmpty()) entrezIds2+=(!entrezIds2.isEmpty()?",":"")+text; //.replace(",", "");
-              text = KeggAdaptor.extractInfo(infos, "UniProt:", "\n"); //adap.getUniprotIDs(ko_id);
+              text = infos.getUniprot_id(); //KeggAdaptor.extractInfo(infos, "UniProt:", "\n"); //adap.getUniprotIDs(ko_id);
               if (text!=null && !text.isEmpty()) uniprotIds2+=(!uniprotIds2.isEmpty()?",":"")+text; //.replace(",", "");
-              text = KeggAdaptor.extractInfo(infos, "Ensembl:", "\n"); //adap.getEnsemblIDs(ko_id);
+              text = infos.getEnsembl_id(); //KeggAdaptor.extractInfo(infos, "Ensembl:", "\n"); //adap.getEnsemblIDs(ko_id);
               if (text!=null && !text.isEmpty()) ensemblIds2+=(!ensemblIds2.isEmpty()?",":"")+text; //.replace(",", "");
               
               ////eType+=(!eType.isEmpty()?",":"")+e.getType().toString();
@@ -386,7 +417,7 @@ public class KEGG2GraphML {
     // Add Edges for all Relations
     if (!silent) System.out.println("Creating edges...");
     for (int i=0; i<p.getRelations().size(); i++) {
-      if (silent && !absoluteNoOutputs && adap==null) progress.DisplayBar(null);
+      if (silent && !absoluteNoOutputs && !retrieveKeggAnnots) progress.DisplayBar(null);
       if (!silent) System.out.println(i + "/" + p.getRelations().size());
       Relation r = p.getRelations().get(i);
       Entry one = p.getEntryForId(r.getEntry1());
