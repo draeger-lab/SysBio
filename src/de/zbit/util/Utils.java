@@ -33,7 +33,7 @@ public class Utils {
   }
   
   /**
-   * Kann auch als Synonym für "containsWord" gebraucht werden.
+   * Kann auch als Synonym fï¿½r "containsWord" gebraucht werden.
    * @param containingLine
    * @param containedString
    * @return
@@ -82,7 +82,7 @@ public class Utils {
   }
 
   /**
-   * Funzt nur für positive, natürliche Zahlen!
+   * Funzt nur fï¿½r positive, natï¿½rliche Zahlen!
    */
   public static int getNumberFromString(String behindLastIndexOfString, String toParse) {
     int i = toParse.lastIndexOf(behindLastIndexOfString)+1;
@@ -90,7 +90,7 @@ public class Utils {
   }
   public static int getNumberFromString(int startAtPos, String toParse) {
     int i = startAtPos;
-    if (i<=0) return -1; // Schlechte Rückgabe... aber was sonst? Exception throwen ist scheiße
+    if (i<=0) return -1; // Schlechte Rï¿½ckgabe... aber was sonst? Exception throwen ist scheiï¿½e
     
     String ret = "";
     while (Character.isDigit(toParse.charAt(i)))
@@ -300,7 +300,7 @@ public class Utils {
       if (retVal==null) retVal = new double[d[i].length];
       for (int j=0; j<d[i].length; j++) {
         if (spaltenCounter.size()<=j) spaltenCounter.add(0);
-        if (Double.isNaN(d[i][j])) continue; // Deshalb auch der Spaltencounter: Skip NaN einträge.
+        if (Double.isNaN(d[i][j])) continue; // Deshalb auch der Spaltencounter: Skip NaN eintrï¿½ge.
         //retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
         retVal[j]=retVal[j] * spaltenCounter.get(j)/(spaltenCounter.get(j)+1) + d[i][j] * 1/(spaltenCounter.get(j)+1);
         spaltenCounter.set(j,spaltenCounter.get(j)+1);
@@ -375,8 +375,15 @@ public class Utils {
       }
     }
     
-    if (hasArgument) return "false";
+    if (!hasArgument) return "false";
     return ""; // Don't return "false". May interfere with hasArgument
+  }
+  
+  public static String firstUppercase(String s) {
+    if (s==null) return null;
+    s = s.trim().toLowerCase();
+    if (s.isEmpty()) return "";
+    return Character.toString(s.charAt(0)).toUpperCase() + s.substring(1);
   }
   
   public static boolean shutdownSystem() {
