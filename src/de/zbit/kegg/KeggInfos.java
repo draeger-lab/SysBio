@@ -3,7 +3,8 @@ package de.zbit.kegg;
 import de.zbit.kegg.parser.pathway.EntryType;
 
 /**
- * Erleichert das parsen der KeggInfos vom Adapter.
+ * Simplyfies parsing KeggInfos from the Adaptor.
+ * Stores and handles all kegg infos very conveniently. 
  * @author wrzodek
  */
 public class KeggInfos {
@@ -180,7 +181,7 @@ public class KeggInfos {
     return entrez_id;
   }
   public static String getGo_id_with_MiriamURN(String go_id) {
-    // So aufgebaut, da GO_id mehrere enthält! Eine funktion muss also drüber iterieren und diese aufrugen.
+    // So aufgebaut, da GO_id mehrere enthï¿½lt! Eine funktion muss also drï¿½ber iterieren und diese aufrugen.
     return miriam_urn_geneOntology + (go_id.contains(":")?go_id.trim():"GO:"+go_id.trim());
   }
   public String getReaction_id_with_MiriamURN() {

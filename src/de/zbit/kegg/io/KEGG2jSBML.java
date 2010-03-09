@@ -30,6 +30,10 @@ import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
 import de.zbit.util.ProgressBar;
 
+/**
+ * 
+ * @author wrzodek
+ */
 public class KEGG2jSBML {
   public static boolean retrieveKeggAnnots=true; // Retrieve annotations from Kegg or use purely information available in the document.
   public static boolean addCellDesignerAnnots=false;
@@ -254,7 +258,7 @@ public class KEGG2jSBML {
       // Set SBO Term
       if (treatEntrysWithReactionDifferent && entry.getReaction()!=null && !entry.getReaction().trim().isEmpty()) {
         spec.setSBOTerm(ET_SpecialReactionCase2SBO);
-        // TODO: ... Beispiel um zu verdeutlich wie das mit reaktionen gehen soll. Muss natürlich gelöscht, gemerkt und später realisiert werden.
+        // TODO: ... Beispiel um zu verdeutlich wie das mit reaktionen gehen soll. Muss natï¿½rlich gelï¿½scht, gemerkt und spï¿½ter realisiert werden.
         /*Reaction r = new Reaction(level, version);
         r.setId("xyz");
         ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
@@ -315,7 +319,7 @@ public class KEGG2jSBML {
       CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_IS);
       CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
       CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-      // TODO: Seit neustem noch mehr in MIRIAM verfügbar.
+      // TODO: Seit neustem noch mehr in MIRIAM verfï¿½gbar.
       
       // Parse every gene/object in this node.
       for (String ko_id:entry.getName().split(" ")) {
@@ -565,10 +569,10 @@ public class KEGG2jSBML {
    * @return SId
    */
   private String NameToSId(String name) {
-    /* letter ::= ’a’..’z’,’A’..’Z’
-     * digit ::= ’0’..’9’
-     * idChar ::= letter | digit | ’_’
-     * SId ::= ( letter | ’_’ ) idChar*
+    /* letter ::= ï¿½aï¿½..ï¿½zï¿½,ï¿½Aï¿½..ï¿½Zï¿½
+     * digit ::= ï¿½0ï¿½..ï¿½9ï¿½
+     * idChar ::= letter | digit | ï¿½_ï¿½
+     * SId ::= ( letter | ï¿½_ï¿½ ) idChar*
      */
     String ret = "";
     if (name==null || name.trim().isEmpty()) {

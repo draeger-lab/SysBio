@@ -9,7 +9,11 @@ import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.util.DirectoryParser;
 
 
-
+/**
+ * Small bugfixes in generated graphML files.
+ * Much faster than re-generating all files.
+ * @author wrzodek
+ */
 public class FixFiles {
   
   /**

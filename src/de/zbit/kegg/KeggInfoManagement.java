@@ -7,6 +7,12 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.Utils;
 
+/**
+ * Retrieve and manage Kegg infos. Once retrieved, they are cached and don't have to
+ * be retrieved again. Also a "precache" statement is possible, to quickly cache and download
+ * many kegg IDs simultaneously.
+ * @author wrzodek
+ */
 public class KeggInfoManagement extends InfoManagement<String, String> implements Serializable {
   private static final long serialVersionUID = -2621701345149317801L;
   private KeggAdaptor adap=null;
@@ -89,7 +95,7 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
       while (idIndex<ids.length) {
         idIndex = i+numMissing;
         if (idIndex>= ids.length) {
-          // z.B. Query (GN:)"HSA" liefert eine Entry ID "T01001" zurück. Das findet man nicht so einfach. Deshalb komplett durchlaufen lassen
+          // z.B. Query (GN:)"HSA" liefert eine Entry ID "T01001" zurï¿½ck. Das findet man nicht so einfach. Deshalb komplett durchlaufen lassen
           // und spaeter noch mal unschaerfer suchen.
           numMissing = minNumMissing;
           idIndex = i+numMissing;
@@ -98,7 +104,7 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
         }
         aktQueryID = (ids[idIndex].contains(":")? ids[idIndex].substring(ids[idIndex].indexOf(':')+1):ids[idIndex]).trim().toUpperCase();
         if (aktQueryID.equalsIgnoreCase(aktEntryID) 
-            || ("EC " + aktQueryID).equalsIgnoreCase(aktEntryID) // Enzyme werden ohne "EC " gequeried, kommen aber MIT zurück... 
+            || ("EC " + aktQueryID).equalsIgnoreCase(aktEntryID) // Enzyme werden ohne "EC " gequeried, kommen aber MIT zurï¿½ck... 
             || (takeNotSoSureHits && Utils.isWord(splitt[i].toUpperCase(), aktQueryID))) { // Siehe obiges Beispiel.
           ret[idIndex] = splitt[i]; // Aufpassen. Hier nur i, da index von splitt und id2 hier gleich!
           found = true;

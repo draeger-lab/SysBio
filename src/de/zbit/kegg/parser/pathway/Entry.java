@@ -1,5 +1,9 @@
 package de.zbit.kegg.parser.pathway;
 
+/**
+ * Corresponding to the Kegg Entry class (see {@link http://www.genome.jp/kegg/xml/docs/})
+ * @author wrzodek
+ */
 import java.util.ArrayList;
 
 

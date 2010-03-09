@@ -1,6 +1,10 @@
 package de.zbit.kegg.parser.pathway;
 
 
+/**
+ * Corresponding to the Kegg Graphics class (see {@link http://www.genome.jp/kegg/xml/docs/})
+ * @author wrzodek
+ */
 public class Graphics {
   String name = "";
   int x=0;
