@@ -3,6 +3,11 @@ package de.zbit.kegg.parser.pathway;
 import java.util.ArrayList;
 
 
+/**
+ * Main Kegg document.
+ * Corresponding to the Kegg Pathway class (see {@link http://www.genome.jp/kegg/xml/docs/})
+ * @author wrzodek
+ */
 public class Pathway {
 	/* see http://www.genome.jp/kegg/xml/docs/ */
 	

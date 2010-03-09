@@ -8,7 +8,10 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.DirectoryParser;
 
 
-
+/**
+ * 
+ * @author wrzodek
+ */
 public class BatchConvertKegg {
   private static String changeOutdirTo = "";
   private static String orgOutdir = "";

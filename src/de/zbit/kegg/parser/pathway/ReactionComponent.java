@@ -1,6 +1,11 @@
 package de.zbit.kegg.parser.pathway;
 
 
+/**
+ * Corresponding to the Kegg ReactionComponent class (see {@link http://www.genome.jp/kegg/xml/docs/})
+ * Includes the Kegg "alt" class.
+ * @author wrzodek
+ */
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

@@ -5,6 +5,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Iterating through a directory (you may include subdirectories).
+ * @author wrzodek
+ */
 public class DirectoryParser {
   private String path = ".";
   private String extension = "";

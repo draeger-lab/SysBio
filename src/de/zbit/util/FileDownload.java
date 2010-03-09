@@ -11,11 +11,9 @@ import java.net.URL;
 import java.net.URLConnection;
 
 
-/*
- * Command line program to download data from URLs and save
- * it to local files. Run like this:
- * java FileDownload http://schmidt.devlib.org/java/file-download.html
- * @author Marco Schmidt
+/**
+ * Download files from a url (http/ftp).
+ * @author wrzodek (heavily modified by a template from Marco Schmidt).
  */
 public class FileDownload {
   public static Object ProgressBar;
