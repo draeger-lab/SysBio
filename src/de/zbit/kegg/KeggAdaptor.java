@@ -119,6 +119,11 @@ public class KeggAdaptor implements Serializable {
     serv = getServlet();
   }
 
+  /**
+   * 
+   * @param pathway_id e.g. 'path:hsa00650'
+   * @return String array with all genes of the pathway, e.g. 'hsa:10327', 'hsa:123'
+   */
   public String[] getGenesByPathway(String pathway_id) {
     String[] results = new String[0];
     try {
@@ -326,6 +331,14 @@ public class KeggAdaptor implements Serializable {
     return results;
   }
 
+  /**
+   * 
+   * @param a string with all hsa-numbers('hsa:103') separated with a blank
+   * @return a list description of the numbers, e.g.:
+   *   'hsa:9023 CH25H; cholesterol 25-hydroxylase (EC:1.14.99.38); 
+   *     K10223 cholesterol 25-hydroxylase [EC:1.14.99.38]' 
+   *     Each number gets one line
+   */
   public String getIdentifier(String id) {
     String s = "";
     try {
@@ -386,7 +399,7 @@ public class KeggAdaptor implements Serializable {
     try {
       results = serv.list_pathways(org);
       for (Definition definition : results) {
-        System.out.println(definition.getEntry_id());
+//        System.out.println(definition.getEntry_id());
         pws.add(definition.getEntry_id());
       }
     } catch (RemoteException e) {
