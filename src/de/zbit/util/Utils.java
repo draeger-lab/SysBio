@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 /**
@@ -444,6 +445,34 @@ public class Utils {
     } catch (Exception e) {e.printStackTrace();}
     
     return successValue;
+  }
+  
+  /**
+   * Copies a file. Does NOT check if out already exists. Will overwrite out if it already exists.
+   * @param in
+   * @param out
+   * @return success.
+   */
+  public static boolean copyFile(File in, File out) {
+    if (!in.exists()) {System.err.println("File '" + in.getName() + "' does not exist."); return false;}
+    boolean success=false;
+    try {
+      FileChannel inChannel = new FileInputStream(in).getChannel();
+      FileChannel outChannel = new FileOutputStream(out).getChannel();
+      // magic number for Windows, 64Mb - 32Kb)
+      int maxCount = (64 * 1024 * 1024) - (32 * 1024);
+      long size = inChannel.size();
+      long position = 0;
+      while (position < size) {
+        position += inChannel.transferTo(position, maxCount, outChannel);
+      }
+      if (inChannel != null) inChannel.close();
+      if (outChannel != null) outChannel.close();
+      if (in.length()==out.length()) success=true;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return success;
   }
   
   public static boolean saveObject(String filename, Object obj) {
