@@ -126,7 +126,7 @@ public class FileReadProgress {
     // if percentage output should be generated
     if (outputPercentage) {
       int perc = getPercentage();   // get the current percentage
-      if ( canPrintInSameLine() ) {
+      if ( printProgressInSameLine ) {
         try {
           System.out.write(getDisplayBarString(progressCounter, perc).getBytes());
         } catch (IOException e) {
@@ -153,9 +153,13 @@ public class FileReadProgress {
   
   
   public static String getDisplayBarString(int counter, int percent) {
-    // Wenn nicht in normaler Konsole laeuft, nur % angabe.
+    // when not in normal console, do not try to use carriage return
     if (System.console()==null || System.console().writer()==null) {
-      return percent+"%";
+      if( percent % 10 == 0 ) {
+        return percent+"%";
+      } else {
+        return ".";
+      }
     }
     
     StringBuilder sb = new StringBuilder();
