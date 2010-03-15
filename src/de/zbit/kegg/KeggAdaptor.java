@@ -35,6 +35,9 @@ public class KeggAdaptor implements Serializable {
     printEachOutputToScreen = true;
 
     KeggAdaptor adap = new KeggAdaptor();
+    
+    adap.getPathwayList("hsa");
+    
     String weat = adap.get("cpd:C00103 hsa:8491 rn:R05964 q:243 glycan:G00181");
     System.out.println(extractInfo(weat, "ENTRY", " "));
     if (true) return;
@@ -367,7 +370,7 @@ public class KeggAdaptor implements Serializable {
    * @param geneList
    *          as a string array with kegg identifiers e.g. 'hsa:7529' list size
    *          can be 1
-   * @return
+   * @return pathways identifiers (e.g. 'path:hsa04110') in a String array 
    */
   public String[] getPathwaysByGenes(String[] geneList) {
     String[] pathways = new String[0];
@@ -406,6 +409,7 @@ public class KeggAdaptor implements Serializable {
       e.printStackTrace();
     }
     
+//    System.out.println(pws.size());
     return pws;
   }
   
