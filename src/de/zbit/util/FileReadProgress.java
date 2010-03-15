@@ -129,6 +129,7 @@ public class FileReadProgress {
       if ( printProgressInSameLine ) {
         try {
           System.out.write(getDisplayBarString(progressCounter, perc).getBytes());
+          lastOutputtedPercentage = perc;
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -152,10 +153,12 @@ public class FileReadProgress {
   }
   
   
-  public static String getDisplayBarString(int counter, int percent) {
+  public String getDisplayBarString(int counter, int percent) {
     // when not in normal console, do not try to use carriage return
     if (System.console()==null || System.console().writer()==null) {
-      if( percent % 10 == 0 ) {
+      if( lastOutputtedPercentage == percent ) {
+        return "";
+      } else if( percent % 10 == 0 ) {
         return percent+"%";
       } else {
         return ".";
