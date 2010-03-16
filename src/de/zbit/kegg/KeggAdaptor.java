@@ -37,6 +37,7 @@ public class KeggAdaptor implements Serializable {
     KeggAdaptor adap = new KeggAdaptor();
     
     adap.getPathwayList("hsa");
+    adap.getOrganisms();
     
     String weat = adap.get("cpd:C00103 hsa:8491 rn:R05964 q:243 glycan:G00181");
     System.out.println(extractInfo(weat, "ENTRY", " "));
