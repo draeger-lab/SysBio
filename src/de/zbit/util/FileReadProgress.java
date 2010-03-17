@@ -35,9 +35,9 @@ public class FileReadProgress {
    * @param filepath  the path of the file
    * @param printProgessInSameLine if <code>true</code>, the output will always be in the same line
    */
-  public FileReadProgress(String filepath, boolean printProgessInSameLine) {
+  public FileReadProgress(String filepath, boolean printProgressInSameLine) {
     this(filepath);
-    this.printProgressInSameLine = printProgessInSameLine;
+    this.printProgressInSameLine = printProgressInSameLine;
   }
   
   /**
@@ -48,7 +48,18 @@ public class FileReadProgress {
   public FileReadProgress(String filepath) {
     this(new File(filepath));
   }
-  
+
+  /**
+   * Creates a new FileReadPrograss object for the given file.
+   * 
+   * @param file the file to be read from
+   * @param printProgressInSameLine if <code>true</code>, the output will always be in the same line
+   */
+  public FileReadProgress(File file, boolean printProgressInSameLine) {
+    this(file);
+    this.printProgressInSameLine = printProgressInSameLine;
+  }
+
   /**
    * Creates a new FileReadPrograss object for the given file.
    * 
