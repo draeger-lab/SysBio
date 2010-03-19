@@ -27,6 +27,8 @@ public class FileReadProgress {
   private int lastOutputtedPercentage = -1;
   private int progressCounter = 0;
   
+  private boolean isWindows;
+  
   /**
    * Creates a new FileReadProgress object with the file size retrieved from
    * the given file. Additionally, it has to be specified if the progress should
@@ -76,6 +78,7 @@ public class FileReadProgress {
    */
   public FileReadProgress(long length) {
     fileLength = length;
+    isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"))?true:false;
   }
 
   /**
@@ -166,7 +169,7 @@ public class FileReadProgress {
   
   public String getDisplayBarString(int counter, int percent) {
     // when not in normal console, do not try to use carriage return
-    if (System.console()==null || System.console().writer()==null) {
+    if (isWindows || System.console()==null || System.console().writer()==null) {
       if( lastOutputtedPercentage == percent ) {
         return "";
       } else if( percent % 10 == 0 ) {

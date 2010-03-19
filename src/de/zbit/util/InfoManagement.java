@@ -13,6 +13,8 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
  * remembering a certain number of most used elements, indestead of retrieving
  * them each time again and again.
  * 
+ * A better name for this class is maybe "Cache"
+ * 
  * @author wrzodek
  */
 public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable, INFOtype extends Serializable> implements Serializable {
@@ -50,8 +52,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     if (pos>=0) return rememberedInfos.get(pos).getInformation();
     else {
       // Retrieve object and store it.
+      long timer = System.currentTimeMillis();
       INFOtype info = fetchInformationWrapper(id);
-      if (info!=null) addInformation(id, info);
+      timer = System.currentTimeMillis()-timer;
+      if (info!=null) addInformation(id, info, (((float)timer)/1000) );
       return info;
     }
   }
@@ -139,6 +143,23 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         if (infos[i]!=null && ids[i]!=null) addInformation(ids[i], infos[i]);
     }    
   }
+
+ 
+  /**
+   * Adds the given information. It is intended, that this function does NOT check if the information
+   * is already available.
+   * 
+   * Use this function to also consider the time, fetching of each item took, when the class needs to
+   * remove old information.
+   * @param id
+   * @param info
+   * @param timeForRetrieve - IN SECONDS
+   */
+  public synchronized void addInformation(IDtype id, INFOtype info, float timeForRetrieve) {
+    Info<IDtype, INFOtype> myInfo = new Info<IDtype, INFOtype>(id, info);
+    myInfo.setTimeForFetchingInfo(timeForRetrieve);
+    addInformation(myInfo);
+  }
   
   /**
    * Adds the given information. It is intended, that this function does NOT check if the information
@@ -173,12 +194,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       
       // Above solution is not good, since mostly the most recent added item gets deleted... Simple solution:
       //int min = Math.max(0, rememberedInfos.size()-1000);
-      int itemToDelete = rememberedInfos.size()-1; int minUsage=Integer.MAX_VALUE;
-      for (int i=0; i<rememberedInfos.size(); i++) {
-        if(rememberedInfos.get(i).getTimesInfoAccessed()<minUsage) {
-          minUsage = rememberedInfos.get(i).getTimesInfoAccessed();
+      int itemToDelete = rememberedInfos.size()-1; //int minUsage=Integer.MAX_VALUE;
+      double minUsage = Double.MAX_VALUE;
+      for (int i=0; i<rememberedInfos.size(); i++)  {
+        double usageVal = (((double)rememberedInfos.get(i).getTimesInfoAccessed())+0.1) * rememberedInfos.get(i).getTimeForFetchingInfo();
+        if(usageVal<minUsage) {
+          minUsage = usageVal;
           itemToDelete = i;
-          if (minUsage==0) break; // can't get any lower.
+          if (minUsage<1) break; // 0.1 = can't get any lower.;  <1 = low enough ;-) (iterating though all items is inefficient).
         }
       }
       rememberedInfos.remove(itemToDelete);

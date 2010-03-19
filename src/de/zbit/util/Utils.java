@@ -448,6 +448,46 @@ public class Utils {
   }
   
   /**
+   * Given the miliseconds elapsed, returns a formatted time string up to a max deph of 3.
+   * e.g. "16h 4m 4s" or "2d 16h 4m" or "4s 126dms" 
+   * @param miliseconds
+   * @return
+   */
+  public static String getTimeString(long miliseconds) {
+    double seconds = (miliseconds/1000.0)%60.0;
+    double minutes = (seconds/60.0)%60.0;
+    double hours = (minutes/60.0)%24.0;
+    double days = hours/24;
+    
+    String ret;
+    if (days>=1) {
+      ret = cut(days) + "d " + cut(hours)  + "h " + cut(minutes) + "m";
+    } else if (hours>=1) {
+      ret = cut(hours)  + "h " + cut(minutes) + "m " + cut(seconds) + "s";
+    } else if (minutes>=1) {
+      ret = cut(minutes) + "m " + cut(seconds) + "s " + cut(miliseconds%1000.0) + "ms";
+    } else if (seconds>=1) {
+      ret = cut(seconds) + "s " + cut(miliseconds%1000.0) + "ms";
+    } else {
+      ret = cut(miliseconds%1000.0) + "ms";
+    }
+    return ret;
+  }
+
+/**
+ * Cut at dot. E.g. 1.68 => 1
+ * In contrary, decimal format "#" would return 2!
+ * @param d
+ * @return
+ */
+public static String cut(double d) {
+  String s = Double.toString(d);
+  int ep = s.indexOf(".");
+  if (ep<1) ep = s.length();
+  return s.substring(0, ep);
+}
+
+  /**
    * Copies a file. Does NOT check if out already exists. Will overwrite out if it already exists.
    * @param in
    * @param out
