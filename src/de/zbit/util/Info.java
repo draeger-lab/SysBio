@@ -19,6 +19,7 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 	private INFOtype information;
 
 	private int timesInfoAccessed = 0;
+	private float timeForFetchingInfo=(float) 1.0; // Remebering the time, the fetching of this information took (in s, (Minium of 1!!!))
 
 	public INFOtype getInformation() {
 		/*
@@ -40,6 +41,25 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 
 	public int getTimesInfoAccessed() {
 		return timesInfoAccessed;
+	}
+	/**
+	 * Returns the time, the fetching of this information took.
+	 * In seconds with minimum of 1!
+	 * @return
+	 */
+	public float getTimeForFetchingInfo() {
+	  return (float) Math.max(1.0, timeForFetchingInfo);
+	}
+	
+	/**
+   * Sets the time, the fetching of this information took.
+   * In seconds with minimum of 1!
+   * 
+   * If you give this information, items which take long to retrieve have less probability
+   * to get remove from the queue if it's full.
+   */
+	public void setTimeForFetchingInfo(float f) {
+	  this.timeForFetchingInfo = Math.max(f,(float)1.0);
 	}
 
 	public void resetTimesInfoAccessed() {

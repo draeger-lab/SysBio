@@ -154,7 +154,9 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     } else {
       if (!o.getClass().isArray())
         pos = binarySearch(this, (T)o);
-      if (pos==0 && compare(this, (T)o, 0)!=0) return -1; //((T)o).equals(this.get(0)) && !((T)o).equals(this.get(0).toString())) return -1;
+      if (pos==0 && compare(this, (T)o, 0)!=0) {
+        return -1; //((T)o).equals(this.get(0)) && !((T)o).equals(this.get(0).toString())) return -1;
+      }
     }
     
     

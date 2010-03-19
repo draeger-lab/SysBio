@@ -4,12 +4,13 @@ package de.zbit.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * Iterating through a directory (you may include subdirectories).
  * @author wrzodek
  */
-public class DirectoryParser {
+public class DirectoryParser implements Iterator<String> {
   private String path = ".";
   private String extension = "";
   private int curPos=0;
@@ -103,6 +104,8 @@ public class DirectoryParser {
     curPos=0;
     contents=null;
   }
+  
+  @Override
   public boolean hasNext(){
     if (contents==null) {
       readDir();
@@ -126,6 +129,8 @@ public class DirectoryParser {
     if (contents==null) readDir();
     if (contents!=null) curPos=contents.length;
   }
+  
+  @Override
   public String next(){
     if (curPos<(contents.length)) {
       return contents[curPos++];
@@ -168,6 +173,11 @@ public class DirectoryParser {
     DirectoryParser d = new DirectoryParser("S:\\SVM\\tools", "ft");
     while(d.hasNext())
       System.out.println(d.next());
+  }
+  
+  @Override
+  public void remove() {
+    System.err.println("Remove not supported.");
   }
   
 }

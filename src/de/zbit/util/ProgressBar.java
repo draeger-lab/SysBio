@@ -12,6 +12,7 @@ public class ProgressBar {
   
   private int aufrufNr=0;
   private int lastPerc=-1;
+  private boolean isWindows;
   
   /**
    * Initialize the progressBar object
@@ -19,11 +20,12 @@ public class ProgressBar {
    */
   public ProgressBar(int aufrufeGesamt) {
     this.aufrufeGesamt = aufrufeGesamt;
+    isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"))?true:false;
   }
   
   
   /**
-   * Please see "DisplayBar(String additionalText)".
+   * Please see "{@link DisplayBar(String additionalText)}".
    */
   public synchronized void DisplayBar() {
     DisplayBar(null);
@@ -40,15 +42,14 @@ public class ProgressBar {
     String percString = perc + "%";
     
     
-    // Simples File-out oder Eclipse-Output-Window tool
-    if (System.console()==null || System.console().writer()==null) {
+    // Simples File-out oder Eclipse-Output-Window tool. Windows Console unterstützt leider auch kein ANSI.
+    if (isWindows || System.console()==null || System.console().writer()==null) {
       if (perc!=lastPerc) {
         System.out.println(percString + (additionalText!=null && !additionalText.isEmpty()? " " + additionalText:"") );
         lastPerc=perc;
       }
       return;
     }
-    
     
     // Nice-and cool looking ANSI ProgressBar ;-)
     String anim= "|/-\\";

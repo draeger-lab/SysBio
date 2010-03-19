@@ -24,16 +24,20 @@ public class Timer {
    * @return s since last reset/initialization.
    */
   public long getAndReset() {
-    long ret = (System.currentTimeMillis() - start)/1000;
+    return (getAndReset(false));
+  }
+  
+  /**
+   * Returns the (mili-)seconds since the last Reset/Initialization.
+   * Resets the timer.
+   * @param milis - if true, time will be returned in miliseconds. Otherwise in seconds.
+   * @return ms or s since last reset/initialization.
+   */
+  public long getAndReset(boolean milis) {
+    long ret = (System.currentTimeMillis() - start);
+    if (!milis) ret/=1000;
     reset();
     return ret;
   }
-  
-  
-  /*
-   * 
-System.out.println("PC" + (System.currentTimeMillis()-lStart)/1000);
-
-   */
   
 }
