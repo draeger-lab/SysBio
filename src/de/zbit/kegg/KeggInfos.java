@@ -265,7 +265,7 @@ public class KeggInfos {
   
   private void parseInfos() {
     String infos = informationFromKeggAdaptor; // Create a shorter variable name ;-)
-    if (infos!=null && infos.trim().isEmpty()) infos=null;
+    if (infos!=null && infos.trim().length()==0) infos=null;
     if (infos==null) {
       informationFromKeggAdaptor = null;
       return;
@@ -273,7 +273,7 @@ public class KeggInfos {
     
     // General
     names = KeggAdaptor.extractInfo(infos, "NAME");
-    if (names!=null && !names.isEmpty()) {
+    if (names!=null && names.length()!=0) {
       int pos = names.lastIndexOf(";");
       if (pos>0 && pos<(names.length()-1)) name = names.substring(pos+1, names.length()).replace("\n", "").trim();
       else name = names;
@@ -329,12 +329,12 @@ public class KeggInfos {
     // in reactions:
     equation = KeggAdaptor.extractInfo(infos, "EQUATION", "\n");
     String pathwaysTemp = KeggAdaptor.extractInfo(infos, "PATHWAY");
-    if (pathwaysTemp!=null && !pathwaysTemp.trim().isEmpty()) {
+    if (pathwaysTemp!=null && pathwaysTemp.trim().length()!=0) {
       pathwaysTemp = pathwaysTemp.replace("PATH:", "");
       String[] splitt = pathwaysTemp.split("\n");
       pathways="";pathwayDescs="";
       for (String s:splitt) {
-        if (!s.startsWith(" ") && !pathwayDescs.isEmpty()) { // Continuation of last line.
+        if (!s.startsWith(" ") && pathwayDescs.length()!=0) { // Continuation of last line.
           pathwayDescs+=" " + s;
           continue;
         }
@@ -345,28 +345,28 @@ public class KeggInfos {
     }
     
     // Free Memory instead of storing empty Strings.
-    if (taxonomy!=null && taxonomy.trim().isEmpty()) taxonomy=null;
-    if (equation!=null && equation.trim().isEmpty()) equation=null;
-    if (pathways!=null && pathways.trim().isEmpty()) pathways=null;
-    if (pathwayDescs!=null && pathwayDescs.trim().isEmpty()) pathwayDescs=null;
-    if (definition!=null && definition.trim().isEmpty()) definition=null;
-    if (description!=null && description.trim().isEmpty()) description=null;
-    if (names!=null && names.trim().isEmpty()) names=null;
-    if (name!=null && name.trim().isEmpty()) name=null;
-    if (go_id!=null && go_id.trim().isEmpty()) go_id=null;
-    if (reaction_id!=null && reaction_id.trim().isEmpty()) reaction_id=null;
-    if (ensembl_id!=null && ensembl_id.trim().isEmpty()) ensembl_id=null;
-    if (uniprot_id!=null && uniprot_id.trim().isEmpty()) uniprot_id=null;
-    if (hgnc_id!=null && hgnc_id.trim().isEmpty()) hgnc_id=null;
-    if (omim_id!=null && omim_id.trim().isEmpty()) omim_id=null;
-    if (entrez_id!=null && entrez_id.trim().isEmpty()) entrez_id=null;
-    if (formula!=null && formula.trim().isEmpty()) formula=null;
-    if (mass!=null && mass.trim().isEmpty()) mass=null;
-    if (chebi!=null && chebi.trim().isEmpty()) chebi=null;
-    if (three_dmet!=null && three_dmet.trim().isEmpty()) three_dmet=null;
-    if (cas!=null && cas.trim().isEmpty()) cas=null;
-    if (drugbank!=null && drugbank.trim().isEmpty()) drugbank=null;
-    if (pubchem!=null && pubchem.trim().isEmpty()) pubchem=null;
+    if (taxonomy!=null && taxonomy.trim().length()==0) taxonomy=null;
+    if (equation!=null && equation.trim().length()==0) equation=null;
+    if (pathways!=null && pathways.trim().length()==0) pathways=null;
+    if (pathwayDescs!=null && pathwayDescs.trim().length()==0) pathwayDescs=null;
+    if (definition!=null && definition.trim().length()==0) definition=null;
+    if (description!=null && description.trim().length()==0) description=null;
+    if (names!=null && names.trim().length()==0) names=null;
+    if (name!=null && name.trim().length()==0) name=null;
+    if (go_id!=null && go_id.trim().length()==0) go_id=null;
+    if (reaction_id!=null && reaction_id.trim().length()==0) reaction_id=null;
+    if (ensembl_id!=null && ensembl_id.trim().length()==0) ensembl_id=null;
+    if (uniprot_id!=null && uniprot_id.trim().length()==0) uniprot_id=null;
+    if (hgnc_id!=null && hgnc_id.trim().length()==0) hgnc_id=null;
+    if (omim_id!=null && omim_id.trim().length()==0) omim_id=null;
+    if (entrez_id!=null && entrez_id.trim().length()==0) entrez_id=null;
+    if (formula!=null && formula.trim().length()==0) formula=null;
+    if (mass!=null && mass.trim().length()==0) mass=null;
+    if (chebi!=null && chebi.trim().length()==0) chebi=null;
+    if (three_dmet!=null && three_dmet.trim().length()==0) three_dmet=null;
+    if (cas!=null && cas.trim().length()==0) cas=null;
+    if (drugbank!=null && drugbank.trim().length()==0) drugbank=null;
+    if (pubchem!=null && pubchem.trim().length()==0) pubchem=null;
   }
   
   /**

@@ -34,7 +34,7 @@ methylation   +m    *
   
   public SubType(String name, String value) {
     this(name);
-    if (value != null && !value.isEmpty()) setValue(value);
+    if (value != null && value.length()!=0) setValue(value);
   }
   public SubType(String name) {
     super();

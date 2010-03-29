@@ -166,7 +166,7 @@ public class KeggAdaptor implements Serializable {
           continue;
 
         String te = r.substring(pos + ke.length(), r.indexOf("\n", pos)).trim();
-        if (!te.isEmpty())
+        if (te.length()!=0)
           last_id_results[k] += te + ",";
       }
     }
@@ -209,7 +209,7 @@ public class KeggAdaptor implements Serializable {
     Definition[] results = new Definition[0];
 
     try {
-      if (org != null && !org.trim().isEmpty())
+      if (org != null && org.trim().length()!=0)
         results = serv.get_genes_by_ko(ko_id, org);
       else
         results = serv.get_genes_by_ko(ko_id, "");
@@ -527,13 +527,12 @@ public class KeggAdaptor implements Serializable {
         return null;
       int lPos = completeString.lastIndexOf("\n", pos);
       String toCheck = completeString.substring(Math.max(lPos, 0), pos);
-      if (!toCheck.replace(" ", "").replace("\t", "").replace("\n", "")
-          .isEmpty())
+      if (toCheck.replace(" ", "").replace("\t", "").replace("\n", "").length()>0)
         return null;
     }
 
     String ret = "";
-    if (endsWith == null || endsWith.isEmpty()) {
+    if (endsWith == null || endsWith.length()!=0) {
       int st = completeString.indexOf(" ", pos + startsWith.length());
       if (st < 0)
         st = pos + startsWith.length(); // +1 wegen "\n"+sw

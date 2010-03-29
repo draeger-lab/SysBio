@@ -42,7 +42,7 @@ public class OpenFile {
     
     String filename = URL;
     FileDownload.StatusLabel=null; FileDownload.ProgressBar=null;
-    if (toLocalFile==null || toLocalFile.isEmpty())
+    if (toLocalFile==null || toLocalFile.length()==0)
       filename=FileDownload.download(URL);
     else
       filename=FileDownload.download(URL, toLocalFile);
@@ -68,7 +68,7 @@ public class OpenFile {
     BufferedReader ret=null;
     
     // Trivial checks
-    if (filename==null || filename.trim().isEmpty()) return ret;
+    if (filename==null || filename.trim().length()==0) return ret;
     filename = filename.trim();
     
     // Try to download file if it's an URL

@@ -52,7 +52,7 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     
     if (adap==null) adap = getKeggAdaptor(); // create new one
     String ret = adap.getWithReturnInformation(id);
-    if (ret==null || ret.trim().isEmpty()) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember this one.
+    if (ret==null || ret.trim().length()==0) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember this one.
     
     return ret; // Successfull and "with data" ;-) 
   }
@@ -64,7 +64,7 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     
     if (adap==null) adap = getKeggAdaptor(); // create new one
     String q = adap.getWithReturnInformation(concatenateKeggIDs(ids));
-    if (q==null || q.trim().isEmpty()) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember all.
+    if (q==null || q.trim().length()==0) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember all.
     
     String[] splitt = q.split("///");
     
@@ -72,11 +72,11 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     for (int i=0; i<ret.length; i++) ret[i] = null; // Initialite all non-successfull ids.
     int numMissing = 0;
     for (int i=0; i<splitt.length; i++) {
-      if (splitt[i]==null || splitt[i].trim().isEmpty()) {splitt[i]=null; continue;}
+      if (splitt[i]==null || splitt[i].trim().length()==0) {splitt[i]=null; continue;}
       
       // Extract Entry id of current dataset
       String aktEntryID = KeggAdaptor.extractInfo(splitt[i], "ENTRY", "  ");
-      if (aktEntryID==null || aktEntryID.isEmpty()) {
+      if (aktEntryID==null || aktEntryID.length()==0) {
         // Sollte NIE vorkommen, da kegg immer einen ENTRY-Eintrag mitgiebt.
         System.err.println("No Entry id found in Text:\n" + splitt[i].substring(0, Math.min(150, splitt[i].length())) + "...\n------------");
         continue;

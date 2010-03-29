@@ -3,7 +3,6 @@ package de.zbit.util;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 
 import de.zbit.exception.UnsuccessfulRetrieveException;
@@ -60,6 +59,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     }
   }
   
+  @SuppressWarnings("unchecked")
   public synchronized INFOtype[] getInformations(IDtype[] ids) {
     // WARNING: NOT TESTED (but I'm pretty sure it works...).
     
@@ -74,15 +74,20 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     }
         
     if (touched) {
-      IDtype[] test = Arrays.copyOf(ids, filteredIDs.size());
+      //IDtype[] test = (IDtype[]) Array.newInstance(ids.getClass(), filteredIDs.size());
+      IDtype[] test = (IDtype[]) resizeArray(ids.clone(),filteredIDs.size());
+      //IDtype[] test = Arrays.copyOf(ids, filteredIDs.size());
       for (int i=0; i<test.length; i++)
         Array.set(test, i, filteredIDs.get(i));
       
       INFOtype[] ret = fetchMultipleInformationWrapper(test);
       
       //INFOtype[] infos = new INFOtype[ids.length]; // Not permitted... workaround: 
-      INFOtype[] infosTemp = Arrays.copyOf(ret, ids.length); // Create a new Reference to an existing array, WITH NEW SIZE
-      INFOtype[] infos = infosTemp.clone(); // After creating new reference with correct size, create new array.
+      //INFOtype[] infosTemp = (INFOtype[]) Array.newInstance(ret.getClass(), ids.length);
+      //INFOtype[] infosTemp = Arrays.copyOf(ret, ids.length); // Create a new Reference to an existing array, WITH NEW SIZE
+      //INFOtype[] infos = infosTemp.clone(); // After creating new reference with correct size, create new array.
+      INFOtype[] infos = (INFOtype[]) resizeArray(ret.clone(),ids.length);
+      
       int i2=0;
       for (int i=0; i<ids.length; i++) {
         int pos = rememberedInfos.indexOf(ids[i]);
@@ -107,6 +112,18 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     }
   }
   
+  @SuppressWarnings("unchecked")
+  private static Object resizeArray(Object oldArray, int newSize) {
+    int oldSize = java.lang.reflect.Array.getLength(oldArray);
+    Class elementType = oldArray.getClass().getComponentType();
+    Object newArray = java.lang.reflect.Array.newInstance(elementType, newSize);
+    int preserveLength = Math.min(oldSize, newSize);
+    if (preserveLength > 0)
+      System.arraycopy(oldArray, 0, newArray, 0, preserveLength);
+    return newArray;
+  }
+  
+  @SuppressWarnings("unchecked")
   public synchronized void precacheIDs(IDtype[] ids) {
     ArrayList<IDtype> filteredIDs = new ArrayList<IDtype>();
     boolean touched = false; // if true, ids!=filteredIDs
@@ -120,9 +137,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     
     INFOtype[] infos;
     if (touched) {
-      // IDtype[] test = new IDtype[filteredIDs.size()]; // Not permitted... workaround:
-      IDtype[] temp = Arrays.copyOf(ids, filteredIDs.size()); // Create a new Reference to an existing array, WITH NEW SIZE
-      IDtype[] filtIDs = temp.clone(); // After creating new reference with correct size, create new array.
+      // IDtype[] filtIDs = new IDtype[filteredIDs.size()]; // Not permitted... workaround:
+      //IDtype[] filtIDs = (IDtype[]) Array.newInstance(ids.getClass(), filteredIDs.size()); // <= funzt auch nicht.
+      // Funzt in Java 1.6 (nächste zwei zeilen):
+      //IDtype[] temp = Arrays.copyOf(ids, filteredIDs.size()); // Create a new Reference to an existing array, WITH NEW SIZE
+      //IDtype[] filtIDs = temp.clone(); // After creating new reference with correct size, create new array.
+      IDtype[] filtIDs = (IDtype[]) resizeArray(ids.clone(),filteredIDs.size());
       
       for (int i=0; i<filtIDs.length; i++)
         Array.set(filtIDs, i, filteredIDs.get(i));

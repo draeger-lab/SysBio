@@ -131,7 +131,7 @@ public class ZIPUtils {
       ZipEntry ze;
       while ((ze = in2.getNextEntry()) != null) {
         if (!silentMode) System.out.println("Extracting file "+ze);
-        if (!silentMode && ze.getComment()!=null && !ze.getComment().isEmpty()) System.out.println("Comment: " + ze.getComment());
+        if (!silentMode && ze.getComment()!=null && ze.getComment().length()!=0) System.out.println("Comment: " + ze.getComment());
         
         // Eventually create directorys
         if (ze.getName().endsWith("/") || ze.getName().endsWith("\\")) {

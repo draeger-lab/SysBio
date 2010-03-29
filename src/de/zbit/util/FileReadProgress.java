@@ -156,27 +156,35 @@ public class FileReadProgress {
     }
   }
   
+  /*
+   * Kommentiert. Methode macht kein Sinn! Man kann immer (ob console oder nicht) in selbe Zeile Printen!
   protected boolean canPrintInSameLine() {
     return printProgressInSameLine
            && (System.console() != null)
            && (System.console().writer() != null);
   }
+  */
   
   public int getPercentage() {
     return (int)Math.round((double)bytesRead/fileLength*100.0);
   }
   
-  
   public String getDisplayBarString(int counter, int percent) {
     // when not in normal console, do not try to use carriage return
-    if (isWindows || System.console()==null || System.console().writer()==null) {
+    boolean useSimpleStyle=false;
+    try {
+      if (useSimpleStyle) {
+        useSimpleStyle=true;
+      }
+    } catch (Exception e) {useSimpleStyle=true;}// Java 1.5
+    if (useSimpleStyle) {
       if( lastOutputtedPercentage == percent ) {
         return "";
       } else if( percent % 10 == 0 ) {
         return percent+"%";
       } else {
         return ".";
-      }
+      }      
     }
     
     StringBuilder sb = new StringBuilder();
@@ -187,6 +195,31 @@ public class FileReadProgress {
       sb.append(((x <= k) ? " " : "="));
     sb.append("] " + anim.charAt(counter % anim.length())  + " " + percent + "%");
     
-    return sb.toString();    
-  }  
+    return sb.toString();
+  }
+  
+  /**
+   * Determins if ANSI compliance console commands can be used, based on java version, os type and outputStream Type.
+   * @return
+   */
+  protected boolean useSimpleStyle() {
+    boolean useSimpleStyle = false;
+    if (isWindows) useSimpleStyle = true; // MS Windows has (by default) no ANSI capabilities.
+    
+    // is TTY Check is only available for java 1.6. So a wrapper to determine java version is needed for Java 1.5 compatibility.
+    String v = System.getProperty("java.version");
+    if (v!=null && v.length()>2) {
+      try {
+        double d = Double.parseDouble(v.substring(0, 3));
+        if (d<1.6) useSimpleStyle = true;
+        else useSimpleStyle = !isTTY_Java16only.isTty();
+      } catch (Exception e) {
+        useSimpleStyle = true;
+      }
+    }
+    
+    return useSimpleStyle;
+  }
+  protected boolean useSimpleStyle = useSimpleStyle();
+  
 }

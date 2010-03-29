@@ -78,7 +78,7 @@ public class BatchConvertKegg {
 
   private static String getAndCreateOutDir(String dir) {
     String myDir = dir;
-    if (changeOutdirTo!=null && !changeOutdirTo.isEmpty()) {
+    if (changeOutdirTo!=null && changeOutdirTo.length()>0) {
       myDir = changeOutdirTo + myDir.substring(orgOutdir.length());
       try {
         new File(myDir).mkdirs();

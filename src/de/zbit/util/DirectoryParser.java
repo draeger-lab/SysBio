@@ -81,7 +81,7 @@ public class DirectoryParser implements Iterator<String> {
       if (recurseIntoSubdirectories && new File(path + file).isDirectory()) {
         myFiles.addAll(readDir(path + file));
       } else {
-        if (extension==null || extension.trim().isEmpty()) {
+        if (extension==null || extension.trim().length()==0) {
           myFiles.add(pathPrefix + file);
         } else {
           if (file.toLowerCase().endsWith(extension.toLowerCase())) myFiles.add(pathPrefix + file);
