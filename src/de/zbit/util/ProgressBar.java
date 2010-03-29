@@ -1,5 +1,15 @@
 package de.zbit.util;
 
+import java.io.Closeable;
+import java.io.FilterInputStream;
+import java.io.FilterOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.lang.reflect.Field;
+import java.security.PrivilegedAction;
+
 /**
  * Draws a nice graphical ASCII/ANSI Prograss bar on the console.
  * Auto detects if output is piped to a file or virtual console (e.g. Eclipse Output window) and
@@ -30,6 +40,31 @@ public class ProgressBar {
   public synchronized void DisplayBar() {
     DisplayBar(null);
   }
+  
+  /**
+   * Determins if ANSI compliance console commands can be used, based on java version, os type and outputStream Type.
+   * @return
+   */
+  protected boolean useSimpleStyle() {
+    boolean useSimpleStyle = false;
+    if (isWindows) useSimpleStyle = true; // MS Windows has (by default) no ANSI capabilities.
+    
+    // is TTY Check is only available for java 1.6. So a wrapper to determine java version is needed for Java 1.5 compatibility.
+    String v = System.getProperty("java.version");
+    if (v!=null && v.length()>2) {
+      try {
+        double d = Double.parseDouble(v.substring(0, 3));
+        if (d<1.6) useSimpleStyle = true;
+        else useSimpleStyle = !isTTY_Java16only.isTty();
+      } catch (Exception e) {
+        useSimpleStyle = true;
+      }
+    }
+    
+    return useSimpleStyle;
+  }
+  protected boolean useSimpleStyle = useSimpleStyle();
+  
   /**
    * This function should be called exactly as aften as defined in the constructor. 
    * It will draw or update a previously drawn progressBar.
@@ -40,12 +75,11 @@ public class ProgressBar {
     aufrufNr++;
     int perc = Math.min((int)((double)aufrufNr/(double)aufrufeGesamt*100), 100);
     String percString = perc + "%";
-    
-    
+
     // Simples File-out oder Eclipse-Output-Window tool. Windows Console unterstützt leider auch kein ANSI.
-    if (isWindows || System.console()==null || System.console().writer()==null) {
+    if (useSimpleStyle) {
       if (perc!=lastPerc) {
-        System.out.println(percString + (additionalText!=null && !additionalText.isEmpty()? " " + additionalText:"") );
+        System.out.println(percString + (additionalText!=null && (additionalText.length()>0)? " " + additionalText:"") );
         lastPerc=perc;
       }
       return;
@@ -85,15 +119,16 @@ public class ProgressBar {
     }
 
     sb.append("\033[0m "); // Reset colors and stuff.
-    sb.append("\033[93m" + anim.charAt(aufrufNr % anim.length())  + " \033[1m" +  (additionalText!=null && !additionalText.isEmpty()? additionalText:""));
+    sb.append("\033[93m" + anim.charAt(aufrufNr % anim.length())  + " \033[1m" +  (additionalText!=null && (additionalText.length()>0)? additionalText:""));
     sb.append("\033[0m");
     
     //   \033[?25l  <=hide cursor.
     //   \033[?25h  <=show cursor.
     
     try {
-      System.console().writer().print(sb.toString());
-      System.console().flush();
+      //System.console().writer().print(sb.toString()); // XXX: Not supported in Java 1.5
+      //System.console().flush();
+      System.out.print(sb.toString());
     } catch (Exception e) {e.printStackTrace();}
     
     return; // sb.toString();

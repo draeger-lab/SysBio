@@ -144,7 +144,7 @@ public class KEGG2GraphML {
     
     
     // Tut zwar eh nicht, aber egal...
-    if (p.getLink()!=null && !p.getLink().isEmpty()) {
+    if (p.getLink()!=null && p.getLink().length()!=0) {
       try {
         graph.setURL(new URL(p.getLink()));
       } catch (MalformedURLException e1) {
@@ -185,7 +185,7 @@ public class KEGG2GraphML {
         
         // Get name, description and other annotations via api (organism specific) possible!!
         Graphics g = e.getGraphics();
-        if (!g.getName().isEmpty())
+        if (g.getName().length()!=0)
           name = g.getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
         /*if (g.getWidth()>0 && g.getHeight()>0) {
           n = graph.createNode(g.getX(), g.getY(), g.getWidth(), g.getHeight(), name);
@@ -208,7 +208,7 @@ public class KEGG2GraphML {
 
           // New Text
           String newText = null;
-          if (nl.getText().isEmpty() || nl.getText().equals("undefined")) {
+          if (nl.getText().length()==0 || nl.getText().equals("undefined")) {
             /*String newText = "Group of: " + "\n";
             char sep = ',';
             for (Integer i2: e.getComponents()) {
@@ -238,12 +238,12 @@ public class KEGG2GraphML {
           nr = new GenericNodeRealizer();
         
         try {
-          if (g.getBgcolor()!=null && !g.getBgcolor().isEmpty() && !g.getBgcolor().trim().equalsIgnoreCase("none"))
+          if (g.getBgcolor()!=null && g.getBgcolor().length()!=0 && !g.getBgcolor().trim().equalsIgnoreCase("none"))
             nr.setFillColor(ColorFromHTML(g.getBgcolor()));
         } catch (Throwable t) {t.printStackTrace();}
         
         try {
-          if (g.getFgcolor()!=null && !g.getFgcolor().isEmpty() && !g.getFgcolor().trim().equalsIgnoreCase("none"))
+          if (g.getFgcolor()!=null && g.getFgcolor().length()!=0 && !g.getFgcolor().trim().equalsIgnoreCase("none"))
             nl.setTextColor(ColorFromHTML(g.getFgcolor()));
         } catch (Throwable t) {t.printStackTrace();}
         
@@ -261,7 +261,7 @@ public class KEGG2GraphML {
         
         // Links im Knotenlabel (und spaeter nochmal im Knoten) speichern.
         String link = e.getLink();
-        if (link!=null && !link.isEmpty()) {
+        if (link!=null && link.length()!=0) {
           try {
             nl.setUserData(new URL(link)); // In URL konvertieren, da er auch type speichert und URL besser ist als STRING
           } catch (MalformedURLException e1) {
@@ -314,38 +314,38 @@ public class KEGG2GraphML {
               String oldText=graph.getRealizer(n).getLabelText();
               
               String exName = infos.getNames();
-              if (exName!=null && !exName.isEmpty()) {
+              if (exName!=null && exName.length()!=0) {
                 int pos = exName.lastIndexOf(";");
                 if (pos>0 && pos<(exName.length()-1)) exName = exName.substring(pos+1, exName.length()).replace("\n", "").trim();
                 
                 if (!hasMultipleIDs) // Knotennamen nur anpassen, falls nicht mehrere IDs.
                   graph.getRealizer(n).setLabelText(exName);
-                else if (oldText.isEmpty()) // ... oder wenn er bisher leer ist.
+                else if (oldText.length()==0) // ... oder wenn er bisher leer ist.
                   graph.getRealizer(n).setLabelText(exName);
               }
               
               String text = infos.getNames();
-              if (text!=null && !text.isEmpty()) name2+=(!name2.isEmpty()?",":"")+text.replace(",", "");
+              if (text!=null && text.length()!=0) name2+=(name2.length()!=0?",":"")+text.replace(",", "");
               
               if (e.getType().equals(EntryType.map)) { // => Link zu anderem Pathway oder Title-Node des aktuellem PW.
                 text = infos.getDescription();
-                if (text!=null && !text.isEmpty()) definition+=(!definition.isEmpty()?",":"")+text.replace(",", "").replace("\n", " ");
+                if (text!=null && text.length()!=0) definition+=(definition.length()!=0?",":"")+text.replace(",", "").replace("\n", " ");
               } else {
                 text = infos.getDefinition();
-                if (text!=null && !text.isEmpty()) definition+=(!definition.isEmpty()?",":"")+text.replace(",", "").replace("\n", " ");
+                if (text!=null && text.length()!=0) definition+=(definition.length()!=0?",":"")+text.replace(",", "").replace("\n", " ");
               }
               
               text = infos.getEntrez_id(); //KeggAdaptor.extractInfo(infos, "NCBI-GeneID:", "\n"); //adap.getEntrezIDs(ko_id);
-              if (text!=null && !text.isEmpty()) entrezIds2+=(!entrezIds2.isEmpty()?",":"")+text; //.replace(",", "");
+              if (text!=null && text.length()!=0) entrezIds2+=(entrezIds2.length()!=0?",":"")+text; //.replace(",", "");
               text = infos.getUniprot_id(); //KeggAdaptor.extractInfo(infos, "UniProt:", "\n"); //adap.getUniprotIDs(ko_id);
-              if (text!=null && !text.isEmpty()) uniprotIds2+=(!uniprotIds2.isEmpty()?",":"")+text; //.replace(",", "");
+              if (text!=null && text.length()!=0) uniprotIds2+=(uniprotIds2.length()!=0?",":"")+text; //.replace(",", "");
               text = infos.getEnsembl_id(); //KeggAdaptor.extractInfo(infos, "Ensembl:", "\n"); //adap.getEnsemblIDs(ko_id);
-              if (text!=null && !text.isEmpty()) ensemblIds2+=(!ensemblIds2.isEmpty()?",":"")+text; //.replace(",", "");
+              if (text!=null && text.length()!=0) ensemblIds2+=(ensemblIds2.length()!=0?",":"")+text; //.replace(",", "");
               
-              ////eType+=(!eType.isEmpty()?",":"")+e.getType().toString();
-              //eType+=(!eType.isEmpty()?",":"");
+              ////eType+=(!eType.length()==0?",":"")+e.getType().toString();
+              //eType+=(!eType.length()==0?",":"");
               //if (renameCompoundToSmallMolecule && e.getType().equals(EntryType.compound)) eType+="small molecule"; else eType+=e.getType().toString();
-              if (eType.isEmpty()) {
+              if (eType.length()==0) {
                 if (e.getType().equals(EntryType.compound))
                   eType = "small molecule";
                 else if (e.getType().equals(EntryType.gene))
@@ -369,7 +369,7 @@ public class KEGG2GraphML {
           entityType.set(n, eType);
         }
         keggOntIds.set(n, e.getName().replace(" ", ","));
-        if (e.getLink()!=null && !e.getLink().isEmpty()) nodeURLs.set(n, e.getLink());
+        if (e.getLink()!=null && e.getLink().length()!=0) nodeURLs.set(n, e.getLink());
 
         if (isPathwayReference) PWReferenceNodeTexts.add(graph.getRealizer(n).getLabelText());
       }
@@ -806,7 +806,7 @@ public class KEGG2GraphML {
   }
 
   public static boolean isNumber(String s) {
-    if (s==null || s.trim().isEmpty()) return false;
+    if (s==null || s.trim().length()==0) return false;
     char[] m = s.toCharArray();
     for (char c: m)
       if (!Character.isDigit(c)) return false;

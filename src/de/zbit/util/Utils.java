@@ -383,7 +383,7 @@ public class Utils {
   public static String firstUppercase(String s) {
     if (s==null) return null;
     s = s.trim().toLowerCase();
-    if (s.isEmpty()) return "";
+    if (s.length()==0) return "";
     return Character.toString(s.charAt(0)).toUpperCase() + s.substring(1);
   }
   
@@ -393,10 +393,10 @@ public class Utils {
     String sysDir = System.getProperty("os.home");
     if (sysDir==null) sysDir = "";
     sysDir = sysDir.trim();
-    if (sysDir==null || sysDir.isEmpty() && isWindows) sysDir = System.getenv("WinDir").trim();
-    if (!sysDir.isEmpty() && !sysDir.endsWith("/") && !sysDir.endsWith("\\"))
+    if (sysDir==null || sysDir.length()==0 && isWindows) sysDir = System.getenv("WinDir").trim();
+    if (sysDir.length()!=0 && !sysDir.endsWith("/") && !sysDir.endsWith("\\"))
       sysDir+=File.separator;
-    if (isWindows&&!sysDir.isEmpty()) sysDir += "system32\\";
+    if (isWindows&&sysDir.length()!=0) sysDir += "system32\\";
     
     Runtime run = Runtime.getRuntime();
     if (isWindows) sysDir += "shutdown.exe"; // -s -c "TimeLogger shutdown command." (-f)
@@ -414,7 +414,7 @@ public class Utils {
         if (!line.toLowerCase().contains("no shutdown") && !line.contains(":"))
           sysDir = line;
       } catch(Exception e) {}
-      if (!sysDir.isEmpty() && !sysDir.endsWith("/") && !sysDir.endsWith("\\"))
+      if (sysDir.length()!=0 && !sysDir.endsWith("/") && !sysDir.endsWith("\\"))
         sysDir+=File.separator;
       sysDir += "shutdown";
     }

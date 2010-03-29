@@ -256,7 +256,7 @@ public class KEGG2jSBML {
       spec.appendNotes(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink()));
       
       // Set SBO Term
-      if (treatEntrysWithReactionDifferent && entry.getReaction()!=null && !entry.getReaction().trim().isEmpty()) {
+      if (treatEntrysWithReactionDifferent && entry.getReaction()!=null && entry.getReaction().trim().length()!=0) {
         spec.setSBOTerm(ET_SpecialReactionCase2SBO);
         // TODO: ... Beispiel um zu verdeutlich wie das mit reaktionen gehen soll. Muss nat�rlich gel�scht, gemerkt und sp�ter realisiert werden.
         /*Reaction r = new Reaction(level, version);
@@ -288,7 +288,7 @@ public class KEGG2jSBML {
         
         // Get name, description and other annotations via api (organism specific) possible!!
         Graphics g = entry.getGraphics();
-        if (!g.getName().isEmpty())
+        if (g.getName().length()!=0)
           name = g.getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
         
         if (addCellDesignerAnnots) {
@@ -470,9 +470,9 @@ public class KEGG2jSBML {
   }
 
   private void configureReactionComponent(Pathway p, ReactionComponent rc, SpeciesReference sr, int SBO) {
-    if (rc.getName()==null || rc.getName().trim().isEmpty()) {
+    if (rc.getName()==null || rc.getName().trim().length()==0) {
       rc = rc.getAlt();
-      if (rc.getName()==null || rc.getName().trim().isEmpty()) return;
+      if (rc.getName()==null || rc.getName().trim().length()==0) return;
     }
     sr.setName(rc.getName());
     sr.setId(NameToSId(sr.getName()));
@@ -575,7 +575,7 @@ public class KEGG2jSBML {
      * SId ::= ( letter | �_� ) idChar*
      */
     String ret = "";
-    if (name==null || name.trim().isEmpty()) {
+    if (name==null || name.trim().length()==0) {
       ret = incrementSIdSuffix("SId");
       SIds.add(ret);
     } else {

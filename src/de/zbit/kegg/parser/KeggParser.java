@@ -55,7 +55,7 @@ public class KeggParser extends DefaultHandler {
             line = "";
           }
         }
-        if (!line.isEmpty())sb.append(line);
+        if (line.length()==0)sb.append(line);
         
         inS = new InputSource((new StringReader(sb.toString()))); // sb.toString() only klappt nicht ?!?!?
       } catch (IOException e) {e.printStackTrace();}
