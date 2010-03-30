@@ -15,18 +15,20 @@ import java.util.regex.Pattern;
  */
 public class RegExpFileFilter implements FileFilter {
 
-  protected final Pattern p;
-  
-  public RegExpFileFilter(String regexp) {
-    p = Pattern.compile(regexp);
-  }
-  
-  /* (non-Javadoc)
-   * @see java.io.FileFilter#accept(java.io.File)
-   */
-  @Override
-  public boolean accept(File pathname) {
-    return p.matcher(pathname.getName()).matches();
-  }
+	protected final Pattern p;
+
+	public RegExpFileFilter(String regexp) {
+		p = Pattern.compile(regexp);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.io.FileFilter#accept(java.io.File)
+	 */
+	// @Override
+	public boolean accept(File pathname) {
+		return p.matcher(pathname.getName()).matches();
+	}
 
 }
