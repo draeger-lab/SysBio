@@ -96,7 +96,8 @@ public class OpenFile {
     
     //...  and return Input Stream
     try {
-      if (desc!=null && desc.getShortName().equalsIgnoreCase("GZ") ) { //(c.endsWith(".gz")) {
+      if (desc!=null && desc.getShortName().equalsIgnoreCase("GZ") || desc==null && filename.toLowerCase().trim().endsWith(".gz")) {
+        // Gzipped files do sadly not always contain the "magic bytes". That's why also the extension is considered if desc=null.
         ret = ZIPUtils.GUnzipStream(filename);
         FormatDescription desc2 = FormatIdentification.identify( ret );
         if (desc2!=null) { // Tar.GZ Archives

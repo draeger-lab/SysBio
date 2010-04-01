@@ -171,17 +171,11 @@ public class FileReadProgress {
   
   public String getDisplayBarString(int counter, int percent) {
     // when not in normal console, do not try to use carriage return
-    boolean useSimpleStyle=false;
-    try {
-      if (useSimpleStyle) {
-        useSimpleStyle=true;
-      }
-    } catch (Exception e) {useSimpleStyle=true;}// Java 1.5
     if (useSimpleStyle) {
       if( lastOutputtedPercentage == percent ) {
         return "";
       } else if( percent % 10 == 0 ) {
-        return percent+"%";
+        return percent+"%" + (percent==100?"\n":"");
       } else {
         return ".";
       }      
