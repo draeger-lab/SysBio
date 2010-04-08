@@ -54,6 +54,8 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     String ret = adap.getWithReturnInformation(id);
     if (ret==null || ret.trim().length()==0) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember this one.
     
+    ret = removeUnnecessaryInfos(ret);
+    
     return ret; // Successfull and "with data" ;-) 
   }
 
@@ -147,9 +149,43 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
       i+=subArr.length;
     }
     
+    realRet = removeUnnecessaryInfos(realRet);
+    
     return realRet;
   }
-  
+
+  /**
+   * This function allows you to extend this class and overwrite this function.
+   * Then you can remove all information from the KeggString which you don't need.
+   * This may save you a lot of RAM. Please keep this Class as generic as possible. So don't
+   * implement this function here directly!
+   * @return
+   */
+  private String[] removeUnnecessaryInfos(String[] realRet) {
+    for (int i=0; i<realRet.length; i++)
+      realRet[i] = removeUnnecessaryInfos(realRet[i]);
+    return realRet;
+  }
+  /**
+   * This function allows you to extend this class and overwrite this function.
+   * Then you can remove all information from the KeggString which you don't need.
+   * This may save you a lot of RAM. Please keep this Class as generic as possible. So don't
+   * implement this function here directly!
+   * @return
+   */
+  private String removeUnnecessaryInfos(String ret) {
+    /* Exmaple for content of ret:
+ENTRY       8491              CDS       H.sapiens
+NAME        MAP4K3
+DEFINITION  mitogen-activated protein kinase kinase kinase kinase 3
+            (EC:2.7.11.1)
+ORTHOLOGY   K04406  mitogen-activated protein kinase kinase kinase kinase 3
+                    [EC:2.7.11.1]
+PATHWAY     hsa04010  MAPK signaling pathway
+CLASS       Metabolism; [...]
+     */
+    return ret;
+  }  
 
   
 }

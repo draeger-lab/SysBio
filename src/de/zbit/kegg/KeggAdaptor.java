@@ -135,9 +135,24 @@ public class KeggAdaptor implements Serializable {
     } catch (RemoteException e) {
       e.printStackTrace();
     }
-
+    
     if (printEachOutputToScreen)
       printToScreen(results);
+    return results;
+  }
+  
+  public String[] getGenesByPathwayWithTimeout(String pathway_id) throws TimeoutException{
+    String[] results = null;
+    int retried=0;
+    while (retried < 3) {
+      try {
+        results = serv.get_genes_by_pathway(pathway_id); // <--
+        break;
+      } catch (RemoteException e) {
+        retried++;
+        if (retried >= 3) throw new TimeoutException();
+      }
+    }
     return results;
   }
 
@@ -145,10 +160,7 @@ public class KeggAdaptor implements Serializable {
   private String[] last_id_results = new String[3]; // Siehe 2 Zeilen tiefer
 
   private void retrieveVariousIDs(String in_id) { // z.B. "hsa:8491"
-    String key[] = new String[] { "NCBI-GeneID:", "UniProt:", "Ensembl:" }; // Siehe
-                                                                            // 2
-                                                                            // Zeilen
-                                                                            // dr�ber
+    String key[] = new String[] { "NCBI-GeneID:", "UniProt:", "Ensembl:" }; // Siehe 2 Zeilen drueber
 
     last_in_id = new String(in_id);
     in_id = in_id.replace(",", " ");
@@ -352,6 +364,21 @@ public class KeggAdaptor implements Serializable {
     }
     return s;
   }
+  
+  public String getIdentifierWithTimeout(String id) throws TimeoutException {
+    String s=null;
+    int retried=0;
+    while (retried < 3) {
+      try {
+        s = serv.btit(id);
+        break;
+      } catch (RemoteException e) {
+        retried++;
+        if (retried >= 3) throw new TimeoutException();
+      }
+    }
+    return s;
+  }
 
   public Definition[] getDatabases() {
     Definition[] results = new Definition[0];
@@ -411,6 +438,25 @@ public class KeggAdaptor implements Serializable {
     }
     
 //    System.out.println(pws.size());
+    return pws;
+  }
+  
+  public ArrayList<String> getPathwayListWithTimeout(String org) throws TimeoutException {
+    ArrayList<String> pws = null;
+    int retried=0;
+    while (retried < 3) {
+      try {
+        Definition[] results = new Definition[0];
+        results = serv.list_pathways(org);
+        pws = new ArrayList<String>(results.length+1);
+        for (Definition definition : results)
+          pws.add(definition.getEntry_id());
+        break;
+      } catch (RemoteException e) {
+        retried++;
+        if (retried >= 3) throw new TimeoutException();
+      }
+    }
     return pws;
   }
   
