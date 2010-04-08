@@ -35,6 +35,9 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
     if (adap==null) adap = new KeggAdaptor();
     return adap;
   }
+  public void setKeggAdaptor(KeggAdaptor adap) {
+    this.adap = adap;
+  }
   
   @Override  
   protected void cleanupUnserializableObject() {
@@ -60,7 +63,7 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
       } else if (j==KeggQuery.getIdentifier) {
         answer = adap.getIdentifierWithTimeout(id.getQuery());
       } else if (j==KeggQuery.getPathways) {
-        answer = adap.getPathwayListWithTimeout(id.getQuery());
+        answer = adap.getPathwaysWithTimeout(id.getQuery());
       } else {
         System.err.println("Unknown job '" + j + "'.");
         throw new UnsuccessfulRetrieveException(); // don't retry.

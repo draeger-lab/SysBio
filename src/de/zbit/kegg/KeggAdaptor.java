@@ -33,8 +33,28 @@ public class KeggAdaptor implements Serializable {
    */
   public static void main(String[] args) {
     printEachOutputToScreen = true;
-
+    
     KeggAdaptor adap = new KeggAdaptor();
+    adap.getPathways("hsa");
+    
+    String ret = adap.get("hsa:9965");
+    System.out.println("---\n"+KeggAdaptor.extractInfo(ret, "PATHWAY")+"\n---");
+    
+    String ttt = adap.get("path:hsa04010");
+    System.out.println(ttt+"\n======================");
+    
+    String[] genesRaw = adap.getGenesByPathway("path:hsa04010");
+    for (String s: genesRaw) {
+      System.out.println(s);
+    }
+    System.out.println("======================");
+    String genesString = adap.getIdentifier("hsa:9693 hsa:994 hsa:9965 hsa:998");
+    System.out.println(genesString);
+    System.out.println("======================");
+    String weatt = adap.get("hsa:9965 hsa:998");
+    System.out.println(extractInfo(weatt, "NAME", " "));
+    if (true) return;
+
     
     adap.getPathwayList("hsa");
     adap.getOrganisms();
@@ -350,10 +370,9 @@ public class KeggAdaptor implements Serializable {
   /**
    * 
    * @param a string with all hsa-numbers('hsa:103') separated with a blank
-   * @return a list description of the numbers, e.g.:
-   *   'hsa:9023 CH25H; cholesterol 25-hydroxylase (EC:1.14.99.38); 
-   *     K10223 cholesterol 25-hydroxylase [EC:1.14.99.38]' 
-   *     Each number gets one line
+   * @return KG-Number, GeneSymbol, Gene Description, one per line. e.g.:
+   *   hsa:9693 RAPGEF2; Rap guanine nucleotide exchange factor (GEF) 2; K08018 Rap guanine nucleotide exchange factor (GEF) 2
+   *   hsa:994 CDC25B; cell division cycle 25 homolog B (S. pombe) (EC:3.1.3.48); K05866 cell division cycle 25B [EC:3.1.3.48]
    */
   public String getIdentifier(String id) {
     String s = "";
@@ -421,6 +440,20 @@ public class KeggAdaptor implements Serializable {
 
     if (printEachOutputToScreen)
       printToScreen(results);
+    return results;
+  }
+  public Definition[] getPathwaysWithTimeout(String org) throws TimeoutException {
+    Definition[] results = null;
+    int retried=0;
+    while (retried < 3) {
+      try {
+        results = serv.list_pathways(org);
+        break;
+      } catch (RemoteException e) {
+        retried++;
+        if (retried >= 3) throw new TimeoutException();
+      }
+    }
     return results;
   }
 

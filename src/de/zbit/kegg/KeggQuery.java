@@ -13,7 +13,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
   /**
    * Input: Organism id (e.g. "hsa")
    */
-  public final static int getPathways=0; // returns: String[]
+  public final static int getPathways=0; // returns: Definition[] (alt: ArrayList<String>)
   /**
    * Input: Pathway id (e.g. "path:hsa04010")
    */
