@@ -473,20 +473,32 @@ public class Utils {
     }
     return ret;
   }
-
-/**
- * Cut at dot. E.g. 1.68 => 1
- * In contrary, decimal format "#" would return 2!
- * @param d
- * @return
- */
-public static String cut(double d) {
-  String s = Double.toString(d);
-  int ep = s.indexOf(".");
-  if (ep<1) ep = s.length();
-  return s.substring(0, ep);
-}
-
+  
+  /**
+   * Ensures that path ends with a slash (for folder processing).
+   * @param path
+   */
+  public static String ensureSlash(String path) {
+    if (!path.endsWith("\\") && !path.endsWith("/"))
+      if (path.contains("/")) path+="/";
+      else if (path.contains("\\")) path+="\\";
+      else path+="/";
+    return path;
+  }
+  
+  /**
+   * Cut at dot. E.g. 1.68 => 1
+   * In contrary, decimal format "#" would return 2!
+   * @param d
+   * @return
+   */
+  public static String cut(double d) {
+    String s = Double.toString(d);
+    int ep = s.indexOf(".");
+    if (ep<1) ep = s.length();
+    return s.substring(0, ep);
+  }
+  
   /**
    * Copies a file. Does NOT check if out already exists. Will overwrite out if it already exists.
    * @param in
