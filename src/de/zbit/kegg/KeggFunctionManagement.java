@@ -17,7 +17,7 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
   private KeggAdaptor adap=null;
   
   /**
-   * If this flag ist set to true, this class does NOT retrieve any Information, but uses stored information.
+   * If this flag is set to true, this class does NOT retrieve any Information, but uses stored information.
    */
   public static boolean offlineMode = false;
   
