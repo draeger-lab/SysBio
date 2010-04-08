@@ -596,7 +596,7 @@ public class KeggAdaptor implements Serializable {
   public static String extractInfo(String completeString, String startsWith,
       String endsWith) {
     int pos = completeString.toLowerCase().indexOf(
-        "\n" + startsWith.toLowerCase() + 1); // Prefer hits starting in a new
+        "\n" + startsWith.toLowerCase()) + 1; // Prefer hits starting in a new
                                               // line. // +1 because of \n
     if (pos < 0) {
       pos = completeString.toLowerCase().indexOf(startsWith.toLowerCase());

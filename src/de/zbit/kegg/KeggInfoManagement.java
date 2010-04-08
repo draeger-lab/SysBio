@@ -137,22 +137,25 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
 
   @Override
   protected String[] fetchMultipleInformations(String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
-    // Wrapper for {@link fetchMultipleInformationsUpTo100AtATime} because Kegg only supports 100 at a time :) 
-    if (ids.length<=100) return fetchMultipleInformationsUpTo100AtATime(ids);
-    String[] realRet = new String[ids.length];
-    
-    // Instead of requesting all objects at once, splitts Queries to 100 max and concatenates the results... that's it.
-    int i=0;
-    while (i<ids.length) {
-      String[] subArr = new String[Math.min(100, ids.length-i)];
-      System.arraycopy(ids, i, subArr, 0, subArr.length);
-      
-      String[] ret = fetchMultipleInformationsUpTo100AtATime(subArr);
-      System.arraycopy(ret, 0, realRet, i, ret.length);
-      
-      i+=subArr.length;
+    // Wrapper for {@link fetchMultipleInformationsUpTo100AtATime} because Kegg only supports 100 at a time :)
+    String[] realRet;
+    if (ids.length<=100) {
+      realRet = fetchMultipleInformationsUpTo100AtATime(ids);
+    } else {
+      realRet = new String[ids.length];
+
+      // Instead of requesting all objects at once, splitts Queries to 100 max and concatenates the results... that's it.
+      int i=0;
+      while (i<ids.length) {
+        String[] subArr = new String[Math.min(100, ids.length-i)];
+        System.arraycopy(ids, i, subArr, 0, subArr.length);
+
+        String[] ret = fetchMultipleInformationsUpTo100AtATime(subArr);
+        System.arraycopy(ret, 0, realRet, i, ret.length);
+
+        i+=subArr.length;
+      }
     }
-    
     realRet = removeUnnecessaryInfos(realRet);
     
     return realRet;
@@ -192,7 +195,6 @@ PATHWAY     hsa04010  MAPK signaling pathway
 CLASS       Metabolism; [...]
      */
     return ret;
-  }  
-
+  }
   
 }
