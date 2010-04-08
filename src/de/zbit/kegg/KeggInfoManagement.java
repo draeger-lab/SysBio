@@ -36,6 +36,10 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     if (adap==null) adap = new KeggAdaptor();
     return adap;
   }
+  public void setKeggAdaptor(KeggAdaptor adap) {
+    this.adap = adap;
+  }
+
   
   @Override  
   protected void cleanupUnserializableObject() {
@@ -157,8 +161,8 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
   /**
    * This function allows you to extend this class and overwrite this function.
    * Then you can remove all information from the KeggString which you don't need.
-   * This may save you a lot of RAM. Please keep this Class as generic as possible. So don't
-   * implement this function here directly!
+   * This may save you a lot of RAM. Please keep this Class as generic as possible.
+   * So don't implement this function here directly!
    * @return
    */
   private String[] removeUnnecessaryInfos(String[] realRet) {
@@ -169,12 +173,15 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
   /**
    * This function allows you to extend this class and overwrite this function.
    * Then you can remove all information from the KeggString which you don't need.
-   * This may save you a lot of RAM. Please keep this Class as generic as possible. So don't
-   * implement this function here directly!
+   * This may save you a lot of RAM. Please keep this Class as generic as possible.
+   * So don't implement this function here directly!
+   * 
+   * This class must be public, so the user can override it. Please never call this
+   * function from outside this class.
    * @return
    */
-  private String removeUnnecessaryInfos(String ret) {
-    /* Exmaple for content of ret:
+  public String removeUnnecessaryInfos(String ret) {
+    /* Example for content of ret:
 ENTRY       8491              CDS       H.sapiens
 NAME        MAP4K3
 DEFINITION  mitogen-activated protein kinase kinase kinase kinase 3

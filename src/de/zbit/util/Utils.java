@@ -454,20 +454,20 @@ public class Utils {
    * @return
    */
   public static String getTimeString(long miliseconds) {
-    double seconds = (miliseconds/1000.0)%60.0;
-    double minutes = (seconds/60.0)%60.0;
-    double hours = (minutes/60.0)%24.0;
+    double seconds = (miliseconds/1000.0);
+    double minutes = (seconds/60.0);
+    double hours = (minutes/60.0);
     double days = hours/24;
     
     String ret;
     if (days>=1) {
-      ret = cut(days) + "d " + cut(hours)  + "h " + cut(minutes) + "m";
+      ret = cut(days) + "d " + cut(hours%24.0)  + "h " + cut(minutes%60) + "m";
     } else if (hours>=1) {
-      ret = cut(hours)  + "h " + cut(minutes) + "m " + cut(seconds) + "s";
+      ret = cut(hours%24.0)  + "h " + cut(minutes%60) + "m " + cut(seconds%60) + "s";
     } else if (minutes>=1) {
-      ret = cut(minutes) + "m " + cut(seconds) + "s " + cut(miliseconds%1000.0) + "ms";
+      ret = cut(minutes%60) + "m " + cut(seconds%60) + "s " + cut(miliseconds%1000.0) + "ms";
     } else if (seconds>=1) {
-      ret = cut(seconds) + "s " + cut(miliseconds%1000.0) + "ms";
+      ret = cut(seconds%60) + "s " + cut(miliseconds%1000.0) + "ms";
     } else {
       ret = cut(miliseconds%1000.0) + "ms";
     }
