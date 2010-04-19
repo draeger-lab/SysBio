@@ -1,15 +1,19 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import org.jaxen.function.LastFunction;
 import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.History;
 import org.sbml.jsbml.Model;
+import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
@@ -28,25 +32,29 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
+import de.zbit.util.EscapeChars;
+import de.zbit.util.Info;
 import de.zbit.util.ProgressBar;
+import de.zbit.util.SortedArrayList;
 
 /**
  * 
  * @author wrzodek
  */
-public class KEGG2jSBML {
+public class KEGG2jSBML implements KeggConverter {
   public static boolean retrieveKeggAnnots=true; // Retrieve annotations from Kegg or use purely information available in the document.
   public static boolean addCellDesignerAnnots=false;
   
   private KeggInfoManagement manager;
   private ArrayList<String> SIds = new ArrayList<String>();
   
+  private boolean lastFileWasOverwritten = false;
+  
   /**
    * @param args
    */
   public static void main(String[] args) {
-    // Speedup Kegg2SBML by loading alredy queried objects. Reduces network load and heavily reduces computation time.
-    
+    // Speedup Kegg2SBML by loading alredy queried objects. Reduces network load and heavily reduces computation time.    
     KEGG2jSBML k2s;
     if (new File("keggdb.dat").exists() && new File("keggdb.dat").length()>0) {
       KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem("keggdb.dat");
@@ -58,22 +66,32 @@ public class KEGG2jSBML {
     
     if (args!=null && args.length >0) {
       File f = new File(args[0]);
-      if (f.isDirectory()) BatchConvertKegg.main(args); // TODO: Change to Batch for SBML
-      else {
+      if (f.isDirectory()) {
+        BatchConvertKegg batch = new BatchConvertKegg();
+        batch.setOrgOutdir(args[0]);
+        if (args.length>1) batch.setChangeOutdirTo(args[1]);
+        batch.setConverter(k2s);
+        batch.setOutFormat("sbml");
+        batch.parseDirAndSubDir();
+        
+      } else {
+        // Single file mode.
         String outfile = args[0].substring(0, args[0].contains(".")?args[0].lastIndexOf("."):args[0].length())+".sbml.xml";
         if (args.length>1) outfile = args[1];
         Pathway p = KeggParser.parse(args[0]).get(0);
-        k2s.KEGG2SBML(p, outfile);
+        k2s.Convert(p, outfile);
         
-        KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager()); // Remember already queried objects
       }
+      KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager()); // Remember already queried objects
+      
       return;
     }
+    System.out.println("Demo mode.");
     
     long start = System.currentTimeMillis();
     try {
-      //k2s.KEGG2SBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml", "resources/de/zbit/kegg/samplefiles/hsa00010.sbml.xml");
-      k2s.Kegg2jSBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml");
+      k2s.Convert("resources/de/zbit/kegg/samplefiles/hsa00010.xml", "resources/de/zbit/kegg/samplefiles/hsa00010.sbml.xml");
+      //k2s.Kegg2jSBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml");
     } catch (Exception e) {e.printStackTrace();}
     System.out.println("Conversion took " + ((System.currentTimeMillis()-start)/1000/60) + " minutes and " + ((System.currentTimeMillis()-start)/1000%60) + " seconds.");
     
@@ -100,7 +118,7 @@ public class KEGG2jSBML {
     return doc;
   }
   
-  public void KEGG2SBML(Pathway p, String outfile) {
+  public void Convert(Pathway p, String outfile) {
     SBMLDocument doc = Kegg2jSBML(p);
     
     // JSBML IO => write doc to outfile.
@@ -111,13 +129,15 @@ public class KEGG2jSBML {
      * - <listOfSpecies>
      * - <none> entfernen
      */
+    if (new File(outfile).exists()) lastFileWasOverwritten=true; // Remember that file was already there.
     SBMLWriter.write(doc, outfile);
   }
   
-  public void KEGG2SBML(String infile, String outfile) {
+  public void Convert(String infile, String outfile) {
     SBMLDocument doc = Kegg2jSBML(infile);
     
     // JSBML IO => write doc to outfile.
+    if (new File(outfile).exists()) lastFileWasOverwritten=true; // Remember that file was already there.
     SBMLWriter.write(doc, outfile);
   }
 
@@ -152,7 +172,7 @@ public class KEGG2jSBML {
           preFetchIDs.add(ko_id);
         }
       }
-      for (Reaction r:p.getReactions()) {      
+      for (Reaction r:p.getReactions()) {
         for (String ko_id:r.getName().split(" ")) {
           preFetchIDs.add(ko_id);
         }
@@ -232,7 +252,9 @@ public class KEGG2jSBML {
     }
     model.appendNotes(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", p.getImage(), p.getImage(), p.getImage()));
     model.appendNotes(String.format("<a href=\"%s\">Original Entry</a><br/>\n", p.getLink()));
-        
+    
+    // Save all reaction modifiers in a list. String = reaction id.
+    SortedArrayList<Info<String, ModifierSpeciesReference>> reactionModifiers = new SortedArrayList<Info<String, ModifierSpeciesReference>>();
     
     // Create species
     for (Entry entry: entries) {
@@ -257,15 +279,20 @@ public class KEGG2jSBML {
       
       // Set SBO Term
       if (treatEntrysWithReactionDifferent && entry.getReaction()!=null && entry.getReaction().trim().length()!=0) {
-        spec.setSBOTerm(ET_SpecialReactionCase2SBO);
-        // TODO: ... Beispiel um zu verdeutlich wie das mit reaktionen gehen soll. Muss nat�rlich gel�scht, gemerkt und sp�ter realisiert werden.
-        /*Reaction r = new Reaction(level, version);
-        r.setId("xyz");
+        spec.setSBOTerm(ET_SpecialReactionCase2SBO); // TODO: Ist es richtig, sowohl dem Modifier als auch der species eine neue (461) id zu geben?
         ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
-        modifier.setSBOTerm(461);
-        r.addModifier(modifier);*/
-       
-        // TODO: Obiges nicht richtig.
+        modifier.setSBOTerm(461); // Entymatic catalyst modifier // TODO: ist wirklich jeder Entry mit Reaction eine Enzymatic-Unit?
+        
+        Annotation tempAnnot = new Annotation("");
+        tempAnnot.setAbout("");
+        modifier.setAnnotation(tempAnnot);
+        modifier.setId(this.NameToSId("mod_" + entry.getReaction()));
+        modifier.setMetaId("meta_" + modifier.getId());
+        modifier.setName(modifier.getId());
+        
+        // Remember modifier for later association with reaction.
+        reactionModifiers.add(new Info<String, ModifierSpeciesReference>(entry.getReaction().toLowerCase().trim(), modifier));
+        
       } else {
         spec.setSBOTerm(getSBOTerm(entry.getType()));
       }
@@ -319,7 +346,7 @@ public class KEGG2jSBML {
       CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_IS);
       CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
       CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-      // TODO: Seit neustem noch mehr in MIRIAM verf�gbar.
+      // TODO: Seit neustem noch mehr in MIRIAM verfügbar.
       
       // Parse every gene/object in this node.
       for (String ko_id:entry.getName().split(" ")) {
@@ -338,10 +365,10 @@ public class KEGG2jSBML {
           }
           
           // HTML Information
-          spec.appendNotes(String.format("<p><b>Description for &#8220;%s&#8221;:</b> %s</p>\n", infos.getName(),infos.getDefinition()));
-          if (infos.containsMultipleNames()) spec.appendNotes(String.format("<p><b>All given names:</b> %s</p>\n", infos.getNames()));
+          spec.appendNotes(String.format("<p><b>Description for &#8220;%s&#8221;:</b> %s</p>\n", EscapeChars.forHTML(infos.getName()),EscapeChars.forHTML(infos.getDefinition())));
+          if (infos.containsMultipleNames()) spec.appendNotes(String.format("<p><b>All given names:</b> %s</p>\n", EscapeChars.forHTML(infos.getNames())));
           if (infos.getCas()!=null) spec.appendNotes(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
-          if (infos.getFormula()!=null) spec.appendNotes(String.format("<p><b>Formula:</b> %s</p>\n", infos.getFormula()));
+          if (infos.getFormula()!=null) spec.appendNotes(String.format("<p><b>Formula:</b> %s</p>\n", EscapeChars.forHTML(infos.getFormula())));
           if (infos.getMass()!=null) spec.appendNotes(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
           
           // Parse "NCBI-GeneID:","UniProt:", "Ensembl:", ...
@@ -401,7 +428,7 @@ public class KEGG2jSBML {
       sbReaction.setCompartment(compartment);
       Annotation rAnnot = new Annotation("");
       rAnnot.setAbout("");
-      sbReaction.setAnnotation(rAnnot); // manchmal ist jSBML schon bescheurt...
+      sbReaction.setAnnotation(rAnnot); // manchmal ist jSBML schon bescheuert... (Annotation darf nicht null sein, ist aber default null).
       sbReaction.appendNotes("<body xmlns=\"http://www.w3.org/1999/xhtml\">");
       
       // Pro/ Edukte
@@ -413,6 +440,14 @@ public class KEGG2jSBML {
       for (ReactionComponent rc:r.getProducts()) {
         SpeciesReference sr = sbReaction.createProduct();
         configureReactionComponent(p, rc, sr, 11); // 11 =Product
+      }
+      
+      // Eventually add modifier
+      int pos = reactionModifiers.indexOf(r.getName().toLowerCase().trim());
+      while (pos>=0) { // Multiple modifiers possible
+        sbReaction.addModifier(reactionModifiers.get(pos).getInformation());
+        reactionModifiers.remove(pos);
+        pos = reactionModifiers.indexOf(r.getName().toLowerCase().trim());
       }
       
       // Add Kegg-id Miriam identifier
@@ -427,15 +462,15 @@ public class KEGG2jSBML {
         if (infos.queryWasSuccessfull()) {
           sbReaction.appendNotes("<p>");
           if (infos.getDefinition()!=null)
-            sbReaction.appendNotes(String.format("<b>Definition of &#8220;%s&#8221;:</b> %s<br>\n", ko_id.toUpperCase(),infos.getDefinition()));
-          if (infos.getDefinition()!=null)
-            sbReaction.appendNotes(String.format("<b>Equation for &#8220;%s&#8221;:</b> %s<br>\n", ko_id.toUpperCase(),infos.getEquation()));
+            sbReaction.appendNotes(String.format("<b>Definition of &#8220;%s&#8221;:</b> %s<br />\n", ko_id.toUpperCase(), EscapeChars.forHTML(infos.getDefinition())));
+          if (infos.getEquation()!=null)
+            sbReaction.appendNotes(String.format("<b>Equation for &#8220;%s&#8221;:</b> %s<br />\n", ko_id.toUpperCase(),EscapeChars.forHTML(infos.getEquation())));
           sbReaction.appendNotes(String.format("<img href=\"http://www.genome.jp/Fig/reaction/%s.gif\"/>", ko_id.toUpperCase())); // Experimental...
           if (infos.getPathwayDescriptions()!=null) {
-            sbReaction.appendNotes("<b>Occurs in:</b><br>\n");
+            sbReaction.appendNotes("<b>Occurs in:</b><br />\n");
             for (String desc:infos.getPathwayDescriptions().split(","))
               sbReaction.appendNotes(desc);
-            sbReaction.appendNotes("-----<br>\n");
+            sbReaction.appendNotes("-----<br />\n");
           }
           sbReaction.appendNotes("</p>");
           
@@ -448,7 +483,6 @@ public class KEGG2jSBML {
       
       if (reID.getNumResources()>0) sbReaction.addCVTerm(reID);
       if (rePWs.getNumResources()>0) sbReaction.addCVTerm(rePWs);
-      
       
       // Finally, add the fully configured reaction.
       sbReaction.setName(r.getName());
@@ -644,6 +678,11 @@ public class KEGG2jSBML {
     
     if (type.equals(EntryType.other)) return ET_Compound2SBO;
     return ET_Compound2SBO;
+  }
+  
+  @Override
+  public boolean lastFileWasOverwritten() {
+    return lastFileWasOverwritten;
   }
   
 }

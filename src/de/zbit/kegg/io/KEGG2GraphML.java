@@ -8,19 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import de.zbit.kegg.KeggAdaptor;
-import de.zbit.kegg.KeggInfoManagement;
-import de.zbit.kegg.KeggInfos;
-import de.zbit.kegg.parser.KeggParser;
-import de.zbit.kegg.parser.pathway.Entry;
-import de.zbit.kegg.parser.pathway.EntryType;
-import de.zbit.kegg.parser.pathway.Graphics;
-import de.zbit.kegg.parser.pathway.Pathway;
-import de.zbit.kegg.parser.pathway.Reaction;
-import de.zbit.kegg.parser.pathway.Relation;
-import de.zbit.kegg.parser.pathway.SubType;
-import de.zbit.util.ProgressBar;
-
 import y.base.Edge;
 import y.base.EdgeCursor;
 import y.base.EdgeMap;
@@ -46,12 +33,22 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
+import de.zbit.kegg.KeggInfoManagement;
+import de.zbit.kegg.KeggInfos;
+import de.zbit.kegg.parser.KeggParser;
+import de.zbit.kegg.parser.pathway.Entry;
+import de.zbit.kegg.parser.pathway.EntryType;
+import de.zbit.kegg.parser.pathway.Graphics;
+import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.kegg.parser.pathway.Relation;
+import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.util.ProgressBar;
 
 /**
  * 
  * @author wrzodek
  */
-public class KEGG2GraphML {
+public class KEGG2GraphML implements KeggConverter {
   public static boolean silent = true; // Surpresses all outputs, except %-values
   public static boolean absoluteNoOutputs = true;
   
@@ -98,7 +95,17 @@ public class KEGG2GraphML {
     KEGG2GraphML(p, "resources/de/zbit/kegg/samplefiles/test.graphML");
   }
   
+  /**
+   * A simple static wrapper for the non-static Convert Method.
+   * @param p
+   * @param outFile
+   */
   public static void KEGG2GraphML(Pathway p, String outFile) {
+    KEGG2GraphML k2g = new KEGG2GraphML();
+    k2g.Convert(p, outFile);
+  }
+  
+  public void Convert(Pathway p, String outFile) {
     Graph2D graph = new Graph2D();
     ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>();
     if (retrieveKeggAnnots) {
@@ -827,6 +834,18 @@ public class KEGG2GraphML {
     view.zoomToArea(box.getX() - 10, box.getY() - 10, box.getWidth() + 20, box.getHeight() + 20);
     view.fitContent();
     view.setPaintDetailThreshold(0.0); // never switch to less detail mode
+  }
+
+  @Override
+  public void Convert(String infile, String outfile) {
+    Pathway p = KeggParser.parse(infile).get(0);
+    Convert(p, outfile);
+  }
+  
+  
+  @Override
+  public boolean lastFileWasOverwritten() {
+    return lastFileWasOverwritten;
   }
   
 }
