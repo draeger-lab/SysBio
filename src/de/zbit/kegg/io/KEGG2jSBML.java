@@ -44,6 +44,7 @@ public class KEGG2jSBML implements KeggConverter {
   public static boolean addCellDesignerAnnots=true;
   public static boolean removeOrphans=true; // remove single, not linked nodes
   public static boolean considerRelations=false;
+  public static boolean removeWhiteNodes=true;
   
   private KeggInfoManagement manager;
   private ArrayList<String> SIds = new ArrayList<String>();
@@ -286,7 +287,15 @@ public class KEGG2jSBML implements KeggConverter {
       if (name.toLowerCase().startsWith("path:") ||entry.getType().equals(EntryType.map)) isPathwayReference=true;
       
       // Eventually skip this node. It's just a label for the current pathway.
-      if (isPathwayReference && (entry.hasGraphics() && entry.getGraphics().getName().toLowerCase().startsWith("title:"))) continue;
+      if (isPathwayReference && (entry.hasGraphics() && entry.getGraphics().getName().toLowerCase().startsWith("title:"))) {
+        compartment.setName(entry.getGraphics().getName().substring(6).trim());
+        continue;
+      }
+      
+      // Skip it, if it's white
+      if (removeWhiteNodes && entry.hasGraphics() &&
+          entry.getGraphics().getBgcolor().toLowerCase().trim().endsWith("ffffff") &&
+          (entry.getType()==EntryType.gene || entry.getType()==EntryType.ortholog)) continue;
       
       // Look if not is an orphan
       if (removeOrphans) {
@@ -504,8 +513,25 @@ public class KEGG2jSBML implements KeggConverter {
     
     // All species added. Parse reactions and relations.
     for (Reaction r:p.getReactions()) {
-      org.sbml.jsbml.Reaction sbReaction = model.createReaction();
+      // Skip reaction if it has either no reactants or no products.
+      boolean hasAtLeastOneReactantAndProduct=false;
+      for (ReactionComponent rc:r.getSubstrates()) {
+        Entry spec = p.getEntryForName(rc.getName());
+        if (spec==null || spec.getCustom()==null) continue;
+        hasAtLeastOneReactantAndProduct=true;
+        break;
+      }
+      if (!hasAtLeastOneReactantAndProduct) continue;
+      hasAtLeastOneReactantAndProduct=false;
+      for (ReactionComponent rc:r.getProducts()) {
+        Entry spec = p.getEntryForName(rc.getName());
+        if (spec==null || spec.getCustom()==null) continue;
+        hasAtLeastOneReactantAndProduct=true;
+        break;
+      }
+      if (!hasAtLeastOneReactantAndProduct) continue;
       
+      org.sbml.jsbml.Reaction sbReaction = model.createReaction();      
       sbReaction.initDefaults();
       sbReaction.setCompartment(compartment);
       Annotation rAnnot = new Annotation("");
@@ -805,7 +831,7 @@ public class KEGG2jSBML implements KeggConverter {
     annot.appendNoRDFAnnotation("<celldesigner:class>SQUARE</celldesigner:class>\n");
     annot.appendNoRDFAnnotation(String.format("<celldesigner:bounds x=\"10.0\" y=\"10.0\" w=\"%d\" h=\"%d\" />\n", (maxCoords[0]+2),(maxCoords[1]+2) ));
     //<celldesigner:namePoint x="WIDTH HALBE - TEXT_WIDHT HALB" y="COMPARTMENT_HEIGHT-25"/>
-    annot.appendNoRDFAnnotation(String.format("<celldesigner:namePoint x=\"%d\" y=\"%d\"/>\n", (maxCoords[0]/2), maxCoords[1]-25 ));
+    annot.appendNoRDFAnnotation(String.format("<celldesigner:namePoint x=\"%d\" y=\"%d\"/>\n", ((maxCoords[0]+22)/2-(3*defaultC.getName().length())), maxCoords[1]-22 ));
     annot.appendNoRDFAnnotation("<celldesigner:doubleLine thickness=\"10.0\" outerWidth=\"2.0\" innerWidth=\"1.0\"/>\n");
     annot.appendNoRDFAnnotation("<celldesigner:paint color=\"ffcccc00\" scheme=\"Color\" />\n");
     annot.appendNoRDFAnnotation("<celldesigner:info state=\"empty\" angle=\"0.0\"/>\n");
