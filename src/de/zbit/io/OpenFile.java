@@ -121,24 +121,12 @@ public class OpenFile {
         ret = ZIPUtils.TARunCompressStream(filename);
       }
       
-      if (ret==null || !ret.ready()) { // ret is not ready if file wasn't really a zip file.
-        String curDir = System.getProperty("user.dir");
-        if (!curDir.endsWith(File.separator)) curDir+=File.separator;
-        
-        if (new File (filename).exists()) {
-          ret = new BufferedReader(new FileReader(filename));
-          
-        } else if (new File (curDir+filename).exists()) { // Load from Filesystem, relative to program path
-          ret = new BufferedReader(new FileReader(curDir+filename));
-
-        } else if (OpenFile.class.getClassLoader().getResource(filename)!=null) {// Load from same jar
-          InputStream x = OpenFile.class.getClassLoader().getResource(filename).openStream();
-          ret = new BufferedReader(new InputStreamReader(x));
-        }
+      // Native text file OR ret is not ready if file wasn't really a zip file.
+      if (ret==null || !ret.ready()) {
+        if (myFile!=null) ret = new BufferedReader(new FileReader(myFile));
       }
     } catch (Exception e) {e.printStackTrace();}
     if (ret==null) System.err.println("Error opening file '" + filename + "'. Probably this file does not exist.");    
-    //if (c.endsWith(".tar") || c.endsWith(".tgz") || c.endsWith(".tar.gz")) System.out.println("Warning: Your input file '" + filename + "' seems to be a TAR archive. TAR archives are not supported!");
     
     return ret;
   }
@@ -161,18 +149,27 @@ public class OpenFile {
     return desc;
   }
   
+  /**
+   * Searches for the file
+   * a) directly tries to open it by name.
+   * b) in the same jar / same project
+   * c) relative to the user dir.
+   * @param infile
+   * @return the actual file object or null if it does not exist / could not be found.
+   */
   public static File searchFile(String infile) {
     String curDir = System.getProperty("user.dir");
     if (!curDir.endsWith(File.separator)) curDir+=File.separator;
     
-    if (new File (infile).exists()) // Load from Filesystem
+    if (new File (infile).exists()) { // Load from Filesystem
       return new File (infile);
-    else if (new File (curDir+infile).exists()) // Load from Filesystem, relative to program path
-      return new File (curDir+infile);
-    else if (OpenFile.class.getClassLoader().getResource(infile)!=null)
+    } else if (OpenFile.class.getClassLoader().getResource(infile)!=null) { // Load from jar
       try {
         return new File(OpenFile.class.getClassLoader().getResource(infile).toURI());
       } catch (URISyntaxException e) {}
+    } else if (new File (curDir+infile).exists()) { // Load from Filesystem, relative to program path
+      return new File (curDir+infile);
+    }
     
     return null;
   }

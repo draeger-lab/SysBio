@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -559,5 +560,31 @@ public class Utils {
     }
     return null;
   }
+  public static Object loadObject(InputStream inn) {
+    try {
+      ObjectInputStream in = new ObjectInputStream(inn);
+      Object ret = in.readObject();
+      in.close();
+      inn.close();
+      return ret;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+  public static Object loadObject(File file) {
+    try {
+      FileInputStream fileIn = new FileInputStream(file);
+      ObjectInputStream in = new ObjectInputStream(fileIn);
+      Object ret = in.readObject();
+      in.close();
+      fileIn.close();
+      return ret;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
 
 }

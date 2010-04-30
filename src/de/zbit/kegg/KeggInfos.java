@@ -380,4 +380,13 @@ public class KeggInfos {
     else return (s.substring(s.indexOf(':')+1)).trim();
   }
   
+  public void test() {
+    String infos = informationFromKeggAdaptor;
+    taxonomy = KeggAdaptor.extractInfo(infos, "TAXONOMY", "\n"); // e.g. "TAXONOMY    TAX:9606" => "TAX:9606".
+    System.out.println(infos+"\n=================================");
+    System.out.println(KeggAdaptor.extractInfo(infos, " CAS:", "\n") + " \t=> " + cas);
+    System.out.println(KeggAdaptor.extractInfo(infos, "FORMULA", "\n") + " \t=> " + formula);
+    System.out.println(KeggAdaptor.extractInfo(infos, "MASS", "\n") + " \t=> " + mass);
+  }
+  
 }

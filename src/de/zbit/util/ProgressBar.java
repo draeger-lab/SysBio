@@ -1,14 +1,5 @@
 package de.zbit.util;
 
-import java.io.Closeable;
-import java.io.FilterInputStream;
-import java.io.FilterOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.lang.reflect.Field;
-import java.security.PrivilegedAction;
 
 /**
  * Draws a nice graphical ASCII/ANSI Prograss bar on the console.
@@ -19,10 +10,17 @@ import java.security.PrivilegedAction;
 public class ProgressBar {
   
   private int aufrufeGesamt=0; // SET THIS VALUE!
+  private boolean estimateTime=false;
   
+  // Internal variables (not to set by user).
   private int aufrufNr=0;
   private int lastPerc=-1;
   private boolean isWindows;
+  
+  // for time duration estimations
+  private long measureTime = 0;
+  private int numMeasurements = 0;
+  private long lastCallTime;
   
   /**
    * Initialize the progressBar object
@@ -33,6 +31,11 @@ public class ProgressBar {
     isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"))?true:false;
   }
   
+  public ProgressBar(int aufrufeGesamt, boolean estimateTime) {
+    this(aufrufeGesamt);
+    this.estimateTime = estimateTime;
+    if (estimateTime) lastCallTime = System.currentTimeMillis();
+  }
   
   /**
    * Please see "{@link DisplayBar(String additionalText)}".
@@ -75,11 +78,23 @@ public class ProgressBar {
     aufrufNr++;
     int perc = Math.min((int)((double)aufrufNr/(double)aufrufeGesamt*100), 100);
     String percString = perc + "%";
+    
+    // Calculate time remaining
+    String ETA="";
+    if (estimateTime) {
+      measureTime += System.currentTimeMillis() - lastCallTime;
+      numMeasurements++;
+      
+      //Infos ausgeben...
+      double ScansRemaining = (aufrufeGesamt - (aufrufNr+1)); // /(double)MLIBSVMSettings.runs;
+      double secsRemaining = ScansRemaining * ((measureTime/(double)numMeasurements)/1000.0) ;
+      ETA = " ETR: " + Utils.getTimeString((long) secsRemaining);
+    }
 
     // Simples File-out oder Eclipse-Output-Window tool. Windows Console unterstützt leider auch kein ANSI.
     if (useSimpleStyle) {
       if (perc!=lastPerc) {
-        System.out.println(percString + (additionalText!=null && (additionalText.length()>0)? " " + additionalText:"") );
+        System.out.println(percString + ETA + (additionalText!=null && (additionalText.length()>0)? " " + additionalText:"") );
         lastPerc=perc;
       }
       return;
@@ -119,7 +134,7 @@ public class ProgressBar {
     }
 
     sb.append("\033[0m "); // Reset colors and stuff.
-    sb.append("\033[93m" + anim.charAt(aufrufNr % anim.length())  + " \033[1m" +  (additionalText!=null && (additionalText.length()>0)? additionalText:""));
+    sb.append("\033[93m" + anim.charAt(aufrufNr % anim.length())  + " \033[1m" +  ETA.trim() + (ETA.length()>0?" ":"") + (additionalText!=null && (additionalText.length()>0)? additionalText:""));
     sb.append("\033[0m");
     
     //   \033[?25l  <=hide cursor.
