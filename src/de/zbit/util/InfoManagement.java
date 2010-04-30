@@ -1,5 +1,7 @@
 package de.zbit.util;
 
+import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -12,7 +14,7 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
  * remembering a certain number of most used elements, indestead of retrieving
  * them each time again and again.
  * 
- * A better name for this class is maybe "Cache"
+ * A better name for this class is maybe "Cache".
  * 
  * @author wrzodek
  */
@@ -28,6 +30,16 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   
   public static synchronized InfoManagement<?, ?> loadFromFilesystem(String filepath) {
     InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(filepath);
+    m.restoreUnserializableObject();
+    return m;
+  }
+  public static synchronized InfoManagement<?, ?> loadFromFilesystem(File file) {
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(file);
+    m.restoreUnserializableObject();
+    return m;
+  }
+  public static synchronized InfoManagement<?, ?> loadFromFilesystem(InputStream in) {
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(in);
     m.restoreUnserializableObject();
     return m;
   }
