@@ -2,11 +2,7 @@ package de.zbit.dbfetch;
 
 import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
 import uk.ac.ebi.webservices.WSDbfetchClient;
 import de.zbit.exception.UnsuccessfulRetrieveException;
@@ -50,19 +46,46 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
   public abstract String getDbName();
   
   
+  /**
+   * Returns the format string that is used for queries.
+   * 
+   * @return the format string that is used for queries
+   */
   public abstract String getFormat();
   
+  /**
+   * Sets the format string that is used for queries. Implementations that do
+   * not allow to change the format string should throw a
+   * {@link UnsupportedOperationException} here.
+   * 
+   * @param format the format string that should be used for queries
+   */
   public abstract void setFormat(String format);
   
   
+  /**
+   * Sets the style that is used for queries.
+   * 
+   * @param style the style that is used for queries
+   */
   public void setStyle(Style style) {
     this.style = style;
   }
   
+  /**
+   * Returns the style that is used for queries.
+   * 
+   * @return the style that is used for queries
+   */
   public Style getStyle() {
     return style;
   }
   
+  /**
+   * Returns the style that is used for queries as a string.
+   * 
+   * @return the style that is used for queries as a string
+   */
   public String getStyleString() {
     return style.toString();
   }
@@ -235,8 +258,12 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
   }
 
   /**
-   * @param info
-   * @return
+   * Returns a substring of the given info string that will be used for matching
+   * IDs to info strings.
+   * 
+   * @see #matchIDtoInfo(String, String)
+   * @param info the info string from which to generate the substring
+   * @return the string that will be used for matching IDs to info strings
    */
   public abstract String getCheckStrFromInfo(String info);
   
@@ -245,9 +272,10 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
    * case implemented here performs a simple <code>contains</code> check.
    * Overwrite this method, if you want to have a different behavior.
    * 
-   * @param id
-   * @param toCheck
-   * @return
+   * @param id the ID to check
+   * @param toCheck the string to check for occurence of the ID
+   * @return <code>true</code>, if the ID can be matched to the string,
+   *         otherwise <code>false</code>
    */
   public boolean matchIDtoInfo(String id, String toCheck) {
     return toCheck.contains(id);
