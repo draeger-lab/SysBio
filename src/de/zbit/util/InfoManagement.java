@@ -51,6 +51,13 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   public InfoManagement() {
     this(1000);
   }
+  
+  /**
+   * Constructor. Initialize this InfoManagement object with a maximum cache
+   * size of <code>maxListSize</code> entries.
+   * 
+   * @param maxListSize the maximum number of cached entries
+   */
   public InfoManagement(int maxListSize) {
     if (maxListSize<1) System.err.println("Initialized a InfoManagement list with size " + maxListSize);
     this.maxListSize = maxListSize;
