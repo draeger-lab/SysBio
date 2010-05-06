@@ -18,8 +18,13 @@ public class UniProtFetcher extends DBFetcher {
       System.out.println(anfrage[i] + ":\n" + ret[i] + "\n==============================");
     }
   }
-  
+
   public UniProtFetcher() {
+    this(1000);
+  }
+
+  public UniProtFetcher(int cacheSize) {
+    super(cacheSize);
     setStyle(Style.RAW);
   }
   
