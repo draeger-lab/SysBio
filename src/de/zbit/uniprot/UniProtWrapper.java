@@ -68,13 +68,13 @@ public class UniProtWrapper extends InfoManagement<String, String> {
   protected String fetchInformation(String id) throws TimeoutException,
             UnsuccessfulRetrieveException {
     // protNames must be comma separated uniprot ids/acs
-    if (id == null || id.isEmpty())
+    if (id == null || id.length() == 0)
       throw new UnsuccessfulRetrieveException();
 
     // fetch proteins
     String entriesStr = "";
     int retried = 0;
-    while (retried < 3 && (entriesStr == null || entriesStr.isEmpty())) {
+    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
       try {
         entriesStr = dbfetch.fetchData("uniprot:" + id.toUpperCase(),
                   "uniprot", "raw");
@@ -85,9 +85,9 @@ public class UniProtWrapper extends InfoManagement<String, String> {
       }
     }
 
-    if (retried >= 3 && (entriesStr == null || entriesStr.isEmpty()))
+    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0))
       throw new TimeoutException();
-    if (entriesStr.trim().isEmpty())
+    if (entriesStr.trim().length() == 0)
       throw new UnsuccessfulRetrieveException();
 
     return entriesStr;
@@ -127,7 +127,7 @@ public class UniProtWrapper extends InfoManagement<String, String> {
         prog.DisplayBar();
     }
 
-    if (!queryString.isEmpty()) {
+    if (queryString.length() > 0) {
       queryString = queryString.substring(0, queryString.length() - 1); // Remove last comma.
       fetchMultipleChecked(ids, ret, queryString, startID, ids.length - 1);
     }
@@ -136,7 +136,7 @@ public class UniProtWrapper extends InfoManagement<String, String> {
       if (showProgress) {
         int c = 0;
         for (int i = 0; i < ids.length; i++)
-          if (ret[i] == null || ret[i].isEmpty())
+          if (ret[i] == null || ret[i].length() == 0)
             c++;
         System.out.println("Fixing single not mappable or not found IDs (" + c
                   + ")...");
@@ -145,7 +145,7 @@ public class UniProtWrapper extends InfoManagement<String, String> {
 
       // Proteine, die nicht zugeordnet werden konnten, gesondert anfordern
       for (int i = 0; i < ids.length; i++) {
-        if (ret[i] == null || ret[i].isEmpty()) {
+        if (ret[i] == null || ret[i].length() == 0) {
           try {
             ret[i] = fetchInformation(ids[i]);
           } catch (Exception e) {
@@ -175,7 +175,7 @@ public class UniProtWrapper extends InfoManagement<String, String> {
     // fetch proteins
     String entriesStr = "";
     int retried = 0;
-    while (retried < 3 && (entriesStr == null || entriesStr.isEmpty())) {
+    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
       try {
         entriesStr = dbfetch.fetchBatch("uniprot", queryString, "uniprot",
                   "raw");
@@ -183,7 +183,7 @@ public class UniProtWrapper extends InfoManagement<String, String> {
         retried++;
       }
     }
-    if (retried >= 3 && (entriesStr == null || entriesStr.isEmpty())) {
+    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0)) {
       // Try it protein by protein
       String[] splitt = queryString.split(",");
       for (int j = 0; j < splitt.length; j++) {
@@ -217,7 +217,7 @@ public class UniProtWrapper extends InfoManagement<String, String> {
           if (endPos > 0)
             toCheck = info.substring(0, endPos);
           for (int index = startID; index <= i; index++) {
-            if (ret[index] != null && !ret[index].isEmpty())
+            if ((ret[index] != null) && (ret[index].length() > 0))
               continue;
 
             if (toCheck.contains(ids[index])) {
