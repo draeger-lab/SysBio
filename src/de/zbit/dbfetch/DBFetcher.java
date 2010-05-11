@@ -98,13 +98,13 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
   @Override
   protected String fetchInformation(String id) throws TimeoutException,
             UnsuccessfulRetrieveException {
-    if (id == null || id.isEmpty())
+    if (id == null || id.length() == 0)
       throw new UnsuccessfulRetrieveException();
 
     // fetch proteins
     String entriesStr = "";
     int retried = 0;
-    while (retried < 3 && (entriesStr == null || entriesStr.isEmpty())) {
+    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
       try {
         entriesStr = dbfetch.fetchData(getDbName() + ":" + id.toUpperCase(),
             getFormat(), getStyleString());
@@ -115,9 +115,9 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
       }
     }
 
-    if (retried >= 3 && (entriesStr == null || entriesStr.isEmpty()))
+    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0))
       throw new TimeoutException();
-    if (entriesStr.trim().isEmpty())
+    if (entriesStr.trim().length() == 0)
       throw new UnsuccessfulRetrieveException();
 
     return entriesStr;
@@ -157,7 +157,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         prog.DisplayBar();
     }
 
-    if (!queryString.isEmpty()) {
+    if (queryString.length() > 0) {
       queryString = queryString.substring(0, queryString.length() - 1); // Remove last comma.
       fetchMultipleChecked(ids, ret, queryString, startID, ids.length - 1);
     }
@@ -166,7 +166,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
       if (showProgress) {
         int c = 0;
         for (int i = 0; i < ids.length; i++)
-          if (ret[i] == null || ret[i].isEmpty())
+          if (ret[i] == null || ret[i].length() == 0)
             c++;
         log.info("Fixing single not mappable or not found IDs (" + c
                   + ")...");
@@ -175,7 +175,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
 
       // IDs that couldn't be mapped will be requested separately
       for (int i = 0; i < ids.length; i++) {
-        if (ret[i] == null || ret[i].isEmpty()) {
+        if (ret[i] == null || ret[i].length() == 0) {
           try {
             ret[i] = fetchInformation(ids[i]);
           } catch (Exception e) {
@@ -204,7 +204,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
             String queryString, int startID, int endID) {
     String entriesStr = "";
     int retried = 0;
-    while (retried < 3 && (entriesStr == null || entriesStr.isEmpty())) {
+    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
       try {
         entriesStr = dbfetch.fetchBatch(getDbName(), queryString, getFormat(),
                   getStyleString());
@@ -213,7 +213,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         log.debug("Attempt " + retried + " to fetch data failed", e);        
       }
     }
-    if (retried >= 3 && (entriesStr == null || entriesStr.isEmpty())) {
+    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0)) {
       // Try it protein by protein
       String[] splitt = queryString.split(",");
       for (int j = 0; j < splitt.length; j++) {
@@ -244,7 +244,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
           String toCheck = getCheckStrFromInfo(info);
           
           for (int index = startID; index <= endID; index++) {
-            if (ret[index] != null && !ret[index].isEmpty())
+            if (ret[index] != null && (ret[index].length() > 0))
               continue;
 
             if (matchIDtoInfo(ids[index], toCheck)) {
