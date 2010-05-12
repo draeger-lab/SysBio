@@ -5,8 +5,8 @@ package de.zbit.kegg.gui;
 
 import java.io.File;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.squeezer.SBMLsqueezer;
@@ -20,7 +20,7 @@ import de.zbit.kegg.io.KEGG2jSBML;
  * @author draeger
  * 
  */
-public class ConverterUI extends JFrame {
+public class ConverterUI extends JDialog {
 
 	/**
 	 * Generated serial version id
@@ -32,7 +32,7 @@ public class ConverterUI extends JFrame {
 	 * load and heavily reduces computation time.
 	 */
 	private static KEGG2jSBML k2s;
-	
+
 	static {
 		if (new File("keggdb.dat").exists()
 				&& new File("keggdb.dat").length() > 0) {
@@ -73,13 +73,15 @@ public class ConverterUI extends JFrame {
 	 */
 	public ConverterUI() {
 		// Z:/workspace/SysBio/resources/de/zbit/kegg/samplefiles/hsa00010.xml
-		super("KGML2SBMLconverter");
+		super();
+		setTitle("KGML2SBMLconverter");
 		JFileChooser chooser = GUITools.createJFileChooser("usr.dir", false,
 				false, JFileChooser.FILES_ONLY, new FileFilterKGML());
 		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			showGUI(chooser.getSelectedFile().getAbsolutePath());
-		} else
+		} else {
 			dispose();
+		}
 	}
 
 	/**
@@ -87,7 +89,8 @@ public class ConverterUI extends JFrame {
 	 * @param string
 	 */
 	public ConverterUI(String string) {
-		super("KGML2SBMLconverter");
+		super();
+		setTitle("KGML2SBMLconverter");
 		showGUI(string);
 	}
 
@@ -107,7 +110,7 @@ public class ConverterUI extends JFrame {
 		getContentPane().add(
 				new SBMLModelSplitPane(doc.getModel(), SBMLsqueezer
 						.getDefaultSettings()));
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		pack();
 		setTitle(getTitle() + " " + doc.getModel().getId());
 		setLocationRelativeTo(null);

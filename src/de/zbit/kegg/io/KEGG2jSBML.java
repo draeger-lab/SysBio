@@ -670,7 +670,7 @@ public class KEGG2jSBML implements KeggConverter {
       appendAllIds(orgInfos.getTaxonomy(), mtOrgID, KeggInfos.miriam_urn_taxonomy);
       model.addCVTerm(mtOrgID);
       
-      model.appendNotes(String.format("<h1>Model of " + quotStart + "%s" + quotEnd + " in " + quotStart + "%s" + quotEnd + "</h1>\n", p.getTitle(), orgInfos.getDefinition() ));
+      model.appendNotes(String.format("<h1>Model of %s%s%s in %s%s%s</h1>\n", quotStart, p.getTitle(), quotEnd, quotStart, orgInfos.getDefinition(), quotEnd));
     } else {
       model.appendNotes(String.format("<h1>Model of " + quotStart + "%s" + quotEnd + "</h1>\n", p.getTitle() ));
     }
@@ -682,7 +682,8 @@ public class KEGG2jSBML implements KeggConverter {
       
       // GO IDs
       if (pwInfos.getGo_id()!=null) {
-        CVTerm mtGoID = new CVTerm(); mtGoID.setQualifierType(Type.BIOLOGICAL_QUALIFIER);
+        CVTerm mtGoID = new CVTerm(); 
+        mtGoID.setQualifierType(Type.BIOLOGICAL_QUALIFIER);
         mtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_VERSION_OF);
         appendAllGOids(pwInfos.getGo_id(), mtGoID);
         if (mtGoID.getNumResources()>0) model.addCVTerm(mtGoID);
