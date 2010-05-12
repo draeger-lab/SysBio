@@ -621,8 +621,10 @@ public class KEGG2jSBML implements KeggConverter {
     Model model = doc.createModel(NameToSId(p.getName().replace(":", "_")));
     model.setMetaId("meta_" + model.getId());
     model.setName(p.getTitle());
-    Compartment compartment = model.createCompartment(); // Create neccessary default compartment
-    compartment.setId("default"); // NECCESSARY for jSBML to work!!!
+    Compartment compartment = model.createCompartment("default"); // Create neccessary default compartment
+    // TODO: provide a parameter for this value.
+    compartment.setSize(1d);
+    compartment.setUnits(model.getUnitDefinition("volume"));
     // Be careful: compartment ID ant other compartment stuff are HARDCODED in cellDesigner extension code generation!
     
     
@@ -777,8 +779,10 @@ public class KEGG2jSBML implements KeggConverter {
       
       // Initialize species object
       Species spec = model.createSpecies();
-      spec.initDefaults();
       spec.setCompartment(compartment); //spec.setId("s_" + entry.getId());
+      // TODO: introduce a parameter for this quantity.
+      spec.setInitialAmount(1d);
+      spec.setUnits(model.getUnitDefinition("substance"));
       
       // ID has to be at this place, because other refer to it by id and if id is not set. refenreces go to null.
       //spec.setId(NameToSId(entry.getName().replace(' ', '_')));
