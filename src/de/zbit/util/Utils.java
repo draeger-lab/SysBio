@@ -20,92 +20,144 @@ import java.util.ArrayList;
  */
 public class Utils {
 
-  public static StringBuffer replicateCharacter(char c, int times) {
-    StringBuffer s = new StringBuffer();
-    for (int i=0; i<times; i++)
-      s.append(c);
-    return s;
-  }
-  
   /**
-   * Same as {@link isWord} !!!
-   */
-  public static boolean containsWord(String containingLine, String containedString) {
-    return isWord(containingLine, containedString);
-  }
-  
-  /**
-   * Kann auch als Synonym f�r "containsWord" gebraucht werden.
-   * @param containingLine
-   * @param containedString
+   * 
+   * @param arr
+   * @param s
    * @return
    */
-  public static boolean isWord(String containingLine, String containedString) {
-    return isWord(containingLine, containedString, false);
-  }
-  
-  public static boolean isWord(String containingLine, String containedString, boolean ignoreDigits) {
-    // Check if it's a word
-    int pos = -1;
-    while (true) {
-      if (pos+1>=containedString.length()) break;
-      pos = containingLine.indexOf(containedString, pos+1);
-      if (pos<0) break;
-      
-      boolean linksOK = true;
-      if (pos>0) {
-        char l = containingLine.charAt(pos-1);
-        if ((Character.isDigit(l) && !ignoreDigits) || Character.isLetter(l)) linksOK = false;
-      }
-      boolean rechtsOK = true;
-      if (pos+containedString.length()<containingLine.length()) {
-        char l = containingLine.charAt(pos+containedString.length());
-        if ((Character.isDigit(l) &&!ignoreDigits) || Character.isLetter(l)) rechtsOK = false;
-      }
-      
-      if (rechtsOK && linksOK) return true;
-    }
+  public static boolean ArrayContains(String[][] arr, String s) {
+    s = s.toLowerCase().trim();
+    for (int i=0; i<arr.length; i++)
+      for (int j=0; j<arr[i].length; j++)
+        if (arr[i][j].toLowerCase().trim().equals(s)) return true;
     return false;
   }
   
-  /** Nicht ganz korrekt da auch 4.345,2.1 als nummer erkannt wird, aber das reicht mir so. **/
-  public static boolean isNumber(String s, boolean onlyDigits) {
-    char[] a = s.toCharArray();
-    for (int i=0; i< a.length; i++) {
-      if (onlyDigits){
-        if (Character.isDigit(a[i])) continue; else return false;
-      } else {
-        if (Character.isDigit(a[i])) continue;
-        if (a[i]=='-' || a[i]=='.' || a[i]==',' || a[i]=='E' || a[i]=='e') continue;
-        return false;
-      }
+  /**
+   * Mittelwertberechnung.
+   * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
+   */
+  public static double average(double[] d){
+    double average = average1(d);
+    if (Double.isNaN(average) || Double.isInfinite(average)) 
+        return average2(d);
+    return average;
+  }
+  
+  /**
+   * Spaltenweise mittelwertberechnung.
+   * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
+   */
+  public static double[] average(double[][] d){
+    double[] average = average1(d);
+    if (average == null) return null; // Koomt vor wenn er alle sequenzen nicht mappen kann 
+    for (int i=0; i<average.length; i++)
+      if (Double.isNaN(average[i]) || average[i]==Double.POSITIVE_INFINITY || average[i]==Double.NEGATIVE_INFINITY)
+        return average2(d);
+    return average;
+  }
+  
+  /**
+   * 
+   * @param d
+   * @return
+   */
+  public static double average1(double[] d){ // Schneller
+    if (d==null || d.length<1) return Double.NaN;
+    double retVal= 0;
+    
+    int countNonNAN=0;
+    for (int i=0; i<d.length; i++) {
+      if (Double.isNaN(d[i]) || Double.isInfinite(d[i])) continue;
+      countNonNAN++;
+      retVal+=d[i];
     }
-    return true;
+    
+    if (countNonNAN<=0) return Double.NaN;
+    return (retVal/countNonNAN);
+  }
+  
+  /**
+   * 
+   * @param d
+   * @return
+   */
+  public static double[] average1(double[][] d){ // Schneller
+    if (d.length<1) return new double[0];
+    double[] retVal= null;
+    
+    int countNonNull = 0;
+    for (int i=0; i<d.length; i++) {
+      if (d[i] == null) continue; // kommt vor wenn er sequenz i nicht mappen kann
+      countNonNull++;
+      if (retVal==null) retVal = new double[d[i].length];
+      for (int j=0; j<d[i].length; j++)
+        retVal[j]+=d[i][j];
+    }
+
+    if (retVal==null) return null; // Koomt vor wenn er alle sequenzen nicht mappen kann
+    for (int i=0; i<retVal.length; i++)
+      retVal[i] /= countNonNull;
+    
+    
+    return retVal;
   }
 
   /**
-   * Funzt nur f�r positive, nat�rliche Zahlen!
+   * 
+   * @param d
+   * @return
    */
-  public static int getNumberFromString(String behindLastIndexOfString, String toParse) {
-    int i = toParse.lastIndexOf(behindLastIndexOfString)+1;
-    return getNumberFromString(i, toParse);
-  }
-  public static int getNumberFromString(int startAtPos, String toParse) {
-    int i = startAtPos;
-    if (i<=0) return -1; // Schlechte R�ckgabe... aber was sonst? Exception throwen ist schei�e
+  public static double average2(double[] d){ // Keine to-large-numbers
+    if (d.length<1) return Double.NaN;
+    double retVal= 0;
+
+    int countNonNAN=0;
+    for (int i=0; i<d.length; i++) {
+      if (Double.isNaN(d[i]) || Double.isInfinite(d[i])) continue;
+      countNonNAN++;
+      
+      // retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
+      retVal=retVal * (countNonNAN-1)/(countNonNAN) + d[i] * 1/(countNonNAN);
+    }
     
-    String ret = "";
-    while (Character.isDigit(toParse.charAt(i)))
-      ret += toParse.charAt(i++);
-    
-    return Integer.parseInt(ret);
+    // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
+    if (countNonNAN<=0) return Double.NaN;
+    return retVal;
   }
   
-  
-  public static String reverse(String s) {
-    StringBuffer a = new StringBuffer(s);
-    return a.reverse().toString();
+  /**
+   * 
+   * @param d
+   * @return
+   */
+  public static double[] average2(double[][] d){ // Keine to-large-numbers
+    if (d.length<1) return new double[0];
+    double[] retVal= null;
+    ArrayList<Integer> spaltenCounter = new ArrayList<Integer>(); 
+    for (int i=0; i<d.length; i++) {
+      if (d[i] == null) continue; // kommt vor wenn er sequenz i nicht mappen kann
+      if (retVal==null) retVal = new double[d[i].length];
+      for (int j=0; j<d[i].length; j++) {
+        if (spaltenCounter.size()<=j) spaltenCounter.add(0);
+        if (Double.isNaN(d[i][j])) continue; // Deshalb auch der Spaltencounter: Skip NaN eintr�ge.
+        //retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
+        retVal[j]=retVal[j] * spaltenCounter.get(j)/(spaltenCounter.get(j)+1) + d[i][j] * 1/(spaltenCounter.get(j)+1);
+        spaltenCounter.set(j,spaltenCounter.get(j)+1);
+      }
+    }
+    // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
+    for (int i=0; i<spaltenCounter.size(); i++)
+      if (spaltenCounter.get(i)==0) retVal[i] = Double.NaN;
+    return retVal;
   }
+  
+  /**
+   * 
+   * @param s
+   * @return
+   */
   public static String complement(String s) {
     StringBuffer ret = new StringBuffer(s.length());
     char[] a = s.toLowerCase().toCharArray();
@@ -116,117 +168,6 @@ public class Utils {
       if (a[i]=='t') ret.append('a');
     }
     return ret.toString();
-  }
-  
-  
-  /**
-   * Example:
-   * AA: 0
-   * AC: 1
-   * AG: 2
-   * AT: 3
-   * CA: 4
-   * TA: 12
-   * TT: 15
-   **/
-  public static int DNA2Num(String a) {
-    int ret = 0;
-    char[] arr = reverse(a).toCharArray();
-    for(int i=0; i<arr.length; i++)
-      ret += (DNA2Num(arr[i])) * Math.pow(4, (i));
-    return ret;
-  }
-  public static int DNA2Num(char a) {
-    if (a =='A' || a =='a') return 0;
-    if (a =='C' || a =='c') return 1;
-    if (a =='G' || a =='g') return 2;
-    if (a =='T' || a =='t') return 3;
-    
-    System.err.println("Unknwon DNA Character: '" + a + "'.");
-    return -1;
-  }
-  
-  public static char Num2DNA(int a) {
-    if (a==0) return 'A';
-    if (a==1) return 'C';
-    if (a==2) return 'G';
-    if (a==3) return 'T';
-    
-    System.err.println("To large input parameter on Num2DNA. Use xMeres variant of this function instead." + a);
-    return 'N';
-  }
-  public static String Num2DNA(int n, int xMeres) {
-    String ret = "";
-    for (int i=xMeres-1; i>0; i--) {
-      int k = n/(int)Math.pow(4, (i));
-      ret += Num2DNA(k%4);
-    }
-    int k = n % 4;
-    ret += Num2DNA(k);    
-    return ret;
-  }
-  public static int[] countNucleotides(String sequence, int xMeres) {
-    int counts[] = new int[(int) Math.pow(4, xMeres)];
-    for (int i=0; i<sequence.length()-xMeres+1; i++)
-      counts[DNA2Num(sequence.substring(i, i+xMeres))]++;
-    return counts;
-  }
-  
-  public static double[][] divide (double[][] arr1, double[][] arr2) {
-    double[][] ret = new double[arr1.length][];
-    for (int i=0; i<arr1.length; i++){
-      ret[i] = new double [arr1[i].length];
-      for (int j=0; j<arr1[i].length; j++){
-        if (arr2[i][j]==0)
-          ret[i][j]=Double.NaN;
-        else
-          ret[i][j] = arr1[i][j]/arr2[i][j];
-      }
-    }
-    return ret;
-  }
-  public static double[][] divide (int[][] arr1, int[][] arr2) {
-    double[][] ret = new double[arr1.length][];
-    for (int i=0; i<arr1.length; i++){
-      ret[i] = new double [arr1[i].length];
-      for (int j=0; j<arr1[i].length; j++){
-        if (arr2[i][j]==0)
-          ret[i][j]=0;
-        else
-          ret[i][j] = (double)arr1[i][j]/arr2[i][j];
-      }
-    }
-    return ret;
-  }
-  public static boolean ArrayContains(String[][] arr, String s) {
-    s = s.toLowerCase().trim();
-    for (int i=0; i<arr.length; i++)
-      for (int j=0; j<arr[i].length; j++)
-        if (arr[i][j].toLowerCase().trim().equals(s)) return true;
-    return false;
-  }
-  public static String replicateCharacter(String ch, int times) {
-    String retval = "";
-    for (int i=0; i<times;i++){
-      retval += ch;
-    }
-    return retval;
-  }
-  
-  public static double round(double zahl, int stellen) {
-    double d = Math.pow(10, stellen);
-    return Math.round( zahl * ((long)d) ) / d;
-  }
-  
-  public static void printMinMaxInfNaN(double[] arr) {
-    double min = Double.MAX_VALUE; double max = Double.MIN_VALUE; int nan=0; int inf=0;
-    for (double v: arr) {
-      if (Double.isInfinite(v)) {inf++; continue;}
-      if (Double.isNaN(v)) {nan++; continue;}
-      if (v<min) min=v;
-      if (v>max) max=v;
-    }
-    System.out.println("Min: " + min + "\t Max:" + max + "\t Infinity:" + inf + "\t NaN:" + nan);
   }
   
   /**
@@ -261,98 +202,363 @@ public class Utils {
     return numerator / (denominator_x * denominator_y);
   }
   
+  
   /**
-   * Spaltenweise mittelwertberechnung.
-   * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
+   * Same as {@link isWord} !!!
    */
-  public static double[] average(double[][] d){
-    double[] average = average1(d);
-    if (average == null) return null; // Koomt vor wenn er alle sequenzen nicht mappen kann 
-    for (int i=0; i<average.length; i++)
-      if (Double.isNaN(average[i]) || average[i]==Double.POSITIVE_INFINITY || average[i]==Double.NEGATIVE_INFINITY)
-        return average2(d);
-    return average;
+  public static boolean containsWord(String containingLine, String containedString) {
+    return isWord(containingLine, containedString);
   }
-  public static double[] average1(double[][] d){ // Schneller
-    if (d.length<1) return new double[0];
-    double[] retVal= null;
-    
-    int countNonNull = 0;
-    for (int i=0; i<d.length; i++) {
-      if (d[i] == null) continue; // kommt vor wenn er sequenz i nicht mappen kann
-      countNonNull++;
-      if (retVal==null) retVal = new double[d[i].length];
-      for (int j=0; j<d[i].length; j++)
-        retVal[j]+=d[i][j];
+  
+  /**
+   * Copies a file. Does NOT check if out already exists. Will overwrite out if it already exists.
+   * @param in
+   * @param out
+   * @return success.
+   */
+  public static boolean copyFile(File in, File out) {
+    if (!in.exists()) {System.err.println("File '" + in.getName() + "' does not exist."); return false;}
+    boolean success=false;
+    try {
+      FileChannel inChannel = new FileInputStream(in).getChannel();
+      FileChannel outChannel = new FileOutputStream(out).getChannel();
+      // magic number for Windows, 64Mb - 32Kb)
+      int maxCount = (64 * 1024 * 1024) - (32 * 1024);
+      long size = inChannel.size();
+      long position = 0;
+      while (position < size) {
+        position += inChannel.transferTo(position, maxCount, outChannel);
+      }
+      if (inChannel != null) inChannel.close();
+      if (outChannel != null) outChannel.close();
+      if (in.length()==out.length()) success=true;
+    } catch (IOException e) {
+      e.printStackTrace();
     }
-
-    if (retVal==null) return null; // Koomt vor wenn er alle sequenzen nicht mappen kann
-    for (int i=0; i<retVal.length; i++)
-      retVal[i] /= countNonNull;
-    
-    
-    return retVal;
+    return success;
   }
-  public static double[] average2(double[][] d){ // Keine to-large-numbers
-    if (d.length<1) return new double[0];
-    double[] retVal= null;
-    ArrayList<Integer> spaltenCounter = new ArrayList<Integer>(); 
-    for (int i=0; i<d.length; i++) {
-      if (d[i] == null) continue; // kommt vor wenn er sequenz i nicht mappen kann
-      if (retVal==null) retVal = new double[d[i].length];
-      for (int j=0; j<d[i].length; j++) {
-        if (spaltenCounter.size()<=j) spaltenCounter.add(0);
-        if (Double.isNaN(d[i][j])) continue; // Deshalb auch der Spaltencounter: Skip NaN eintr�ge.
-        //retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
-        retVal[j]=retVal[j] * spaltenCounter.get(j)/(spaltenCounter.get(j)+1) + d[i][j] * 1/(spaltenCounter.get(j)+1);
-        spaltenCounter.set(j,spaltenCounter.get(j)+1);
+  
+  /**
+   * 
+   * @param sequence
+   * @param xMeres
+   * @return
+   */
+  public static int[] countNucleotides(String sequence, int xMeres) {
+    int counts[] = new int[(int) Math.pow(4, xMeres)];
+    for (int i=0; i<sequence.length()-xMeres+1; i++)
+      counts[DNA2Num(sequence.substring(i, i+xMeres))]++;
+    return counts;
+  }
+  
+  /**
+   * Cut at dot. E.g. 1.68 => 1
+   * In contrary, decimal format "#" would return 2!
+   * @param d
+   * @return
+   */
+  public static String cut(double d) {
+    String s = Double.toString(d);
+    int ep = s.indexOf(".");
+    if (ep<1) ep = s.length();
+    return s.substring(0, ep);
+  }
+  
+  /**
+   * 
+   * @param arr1
+   * @param arr2
+   * @return
+   */
+  public static double[][] divide (double[][] arr1, double[][] arr2) {
+    double[][] ret = new double[arr1.length][];
+    for (int i=0; i<arr1.length; i++){
+      ret[i] = new double [arr1[i].length];
+      for (int j=0; j<arr1[i].length; j++){
+        if (arr2[i][j]==0)
+          ret[i][j]=Double.NaN;
+        else
+          ret[i][j] = arr1[i][j]/arr2[i][j];
       }
     }
-    // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
-    for (int i=0; i<spaltenCounter.size(); i++)
-      if (spaltenCounter.get(i)==0) retVal[i] = Double.NaN;
-    return retVal;
+    return ret;
   }
+  
   /**
-   * Mittelwertberechnung.
-   * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
+   * 
+   * @param arr1
+   * @param arr2
+   * @return
    */
-  public static double average(double[] d){
-    double average = average1(d);
-    if (Double.isNaN(average) || Double.isInfinite(average)) 
-        return average2(d);
-    return average;
-  }
-  public static double average1(double[] d){ // Schneller
-    if (d==null || d.length<1) return Double.NaN;
-    double retVal= 0;
-    
-    int countNonNAN=0;
-    for (int i=0; i<d.length; i++) {
-      if (Double.isNaN(d[i]) || Double.isInfinite(d[i])) continue;
-      countNonNAN++;
-      retVal+=d[i];
+  public static double[][] divide (int[][] arr1, int[][] arr2) {
+    double[][] ret = new double[arr1.length][];
+    for (int i=0; i<arr1.length; i++){
+      ret[i] = new double [arr1[i].length];
+      for (int j=0; j<arr1[i].length; j++){
+        if (arr2[i][j]==0)
+          ret[i][j]=0;
+        else
+          ret[i][j] = (double)arr1[i][j]/arr2[i][j];
+      }
     }
-    
-    if (countNonNAN<=0) return Double.NaN;
-    return (retVal/countNonNAN);
+    return ret;
   }
-  public static double average2(double[] d){ // Keine to-large-numbers
-    if (d.length<1) return Double.NaN;
-    double retVal= 0;
-
-    int countNonNAN=0;
-    for (int i=0; i<d.length; i++) {
-      if (Double.isNaN(d[i]) || Double.isInfinite(d[i])) continue;
-      countNonNAN++;
+  
+  /**
+   * 
+   * @param a
+   * @return
+   */
+  public static int DNA2Num(char a) {
+    if (a =='A' || a =='a') return 0;
+    if (a =='C' || a =='c') return 1;
+    if (a =='G' || a =='g') return 2;
+    if (a =='T' || a =='t') return 3;
+    
+    System.err.println("Unknwon DNA Character: '" + a + "'.");
+    return -1;
+  }
+  
+  /**
+   * Example:
+   * AA: 0
+   * AC: 1
+   * AG: 2
+   * AT: 3
+   * CA: 4
+   * TA: 12
+   * TT: 15
+   **/
+  public static int DNA2Num(String a) {
+    int ret = 0;
+    char[] arr = reverse(a).toCharArray();
+    for(int i=0; i<arr.length; i++)
+      ret += (DNA2Num(arr[i])) * Math.pow(4, (i));
+    return ret;
+  }
+  
+  /**
+   * Ensures that path ends with a slash (for folder processing).
+   * @param path
+   */
+  public static String ensureSlash(String path) {
+    if (!path.endsWith("\\") && !path.endsWith("/"))
+      if (path.contains("/")) path+="/";
+      else if (path.contains("\\")) path+="\\";
+      else path+="/";
+    return path;
+  }
+  
+  /**
+   * 
+   * @param s
+   * @return
+   */
+  public static String firstUppercase(String s) {
+    if (s==null) return null;
+    s = s.trim().toLowerCase();
+    if (s.length()==0) return "";
+    return Character.toString(s.charAt(0)).toUpperCase() + s.substring(1);
+  }
+  
+  /**
+   * 
+   * @param startAtPos
+   * @param toParse
+   * @return
+   */
+  public static int getNumberFromString(int startAtPos, String toParse) {
+    int i = startAtPos;
+    if (i<=0) return -1; // Schlechte R�ckgabe... aber was sonst? Exception throwen ist schei�e
+    
+    String ret = "";
+    while (Character.isDigit(toParse.charAt(i)))
+      ret += toParse.charAt(i++);
+    
+    return Integer.parseInt(ret);
+  }
+  
+  /**
+   * Funzt nur f�r positive, nat�rliche Zahlen!
+   */
+  public static int getNumberFromString(String behindLastIndexOfString, String toParse) {
+    int i = toParse.lastIndexOf(behindLastIndexOfString)+1;
+    return getNumberFromString(i, toParse);
+  }
+  
+  /**
+   * Given the miliseconds elapsed, returns a formatted time string up to a max deph of 3.
+   * e.g. "16h 4m 4s" or "2d 16h 4m" or "4s 126dms" 
+   * @param miliseconds
+   * @return
+   */
+  public static String getTimeString(long miliseconds) {
+    double seconds = (miliseconds/1000.0);
+    double minutes = (seconds/60.0);
+    double hours = (minutes/60.0);
+    double days = hours/24;
+    
+    String ret;
+    if (days>=1) {
+      ret = cut(days) + "d " + cut(hours%24.0)  + "h " + cut(minutes%60) + "m";
+    } else if (hours>=1) {
+      ret = cut(hours%24.0)  + "h " + cut(minutes%60) + "m " + cut(seconds%60) + "s";
+    } else if (minutes>=1) {
+      ret = cut(minutes%60) + "m " + cut(seconds%60) + "s " + cut(miliseconds%1000.0) + "ms";
+    } else if (seconds>=1) {
+      ret = cut(seconds%60) + "s " + cut(miliseconds%1000.0) + "ms";
+    } else {
+      ret = cut(miliseconds%1000.0) + "ms";
+    }
+    return ret;
+  }
+  
+  /** Nicht ganz korrekt da auch 4.345,2.1 als nummer erkannt wird, aber das reicht mir so. **/
+  public static boolean isNumber(String s, boolean onlyDigits) {
+    char[] a = s.toCharArray();
+    for (int i=0; i< a.length; i++) {
+      if (onlyDigits){
+        if (Character.isDigit(a[i])) continue; else return false;
+      } else {
+        if (Character.isDigit(a[i])) continue;
+        if (a[i]=='-' || a[i]=='.' || a[i]==',' || a[i]=='E' || a[i]=='e') continue;
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  /**
+   * Kann auch als Synonym f�r "containsWord" gebraucht werden.
+   * @param containingLine
+   * @param containedString
+   * @return
+   */
+  public static boolean isWord(String containingLine, String containedString) {
+    return isWord(containingLine, containedString, false);
+  }
+  
+  /**
+   * 
+   * @param containingLine
+   * @param containedString
+   * @param ignoreDigits
+   * @return
+   */
+  public static boolean isWord(String containingLine, String containedString, boolean ignoreDigits) {
+    // Check if it's a word
+    int pos = -1;
+    while (true) {
+      if (pos+1>=containedString.length()) break;
+      pos = containingLine.indexOf(containedString, pos+1);
+      if (pos<0) break;
       
-      // retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
-      retVal=retVal * (countNonNAN-1)/(countNonNAN) + d[i] * 1/(countNonNAN);
+      boolean linksOK = true;
+      if (pos>0) {
+        char l = containingLine.charAt(pos-1);
+        if ((Character.isDigit(l) && !ignoreDigits) || Character.isLetter(l)) linksOK = false;
+      }
+      boolean rechtsOK = true;
+      if (pos+containedString.length()<containingLine.length()) {
+        char l = containingLine.charAt(pos+containedString.length());
+        if ((Character.isDigit(l) &&!ignoreDigits) || Character.isLetter(l)) rechtsOK = false;
+      }
+      
+      if (rechtsOK && linksOK) return true;
     }
+    return false;
+  }
+  
+  /**
+   * 
+   * @param file
+   * @return
+   */
+  public static Object loadObject(File file) {
+    try {
+      FileInputStream fileIn = new FileInputStream(file);
+      ObjectInputStream in = new ObjectInputStream(fileIn);
+      Object ret = in.readObject();
+      in.close();
+      fileIn.close();
+      return ret;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /**
+   * 
+   * @param inn
+   * @return
+   */
+  public static Object loadObject(InputStream inn) {
+    try {
+      ObjectInputStream in = new ObjectInputStream(inn);
+      Object ret = in.readObject();
+      in.close();
+      inn.close();
+      return ret;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /**
+   * 
+   * @param filename
+   * @return
+   */
+  public static Object loadObject(String filename) {
+    try {
+      FileInputStream fileIn = new FileInputStream(filename);
+      ObjectInputStream in = new ObjectInputStream(fileIn);
+      Object ret = in.readObject();
+      in.close();
+      fileIn.close();
+      return ret;
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    } catch(FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /**
+   * 
+   * @param a
+   * @return
+   */
+  public static char Num2DNA(int a) {
+    if (a==0) return 'A';
+    if (a==1) return 'C';
+    if (a==2) return 'G';
+    if (a==3) return 'T';
     
-    // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
-    if (countNonNAN<=0) return Double.NaN;
-    return retVal;
+    System.err.println("To large input parameter on Num2DNA. Use xMeres variant of this function instead." + a);
+    return 'N';
+  }
+  
+  /**
+   * 
+   * @param n
+   * @param xMeres
+   * @return
+   */
+  public static String Num2DNA(int n, int xMeres) {
+    String ret = "";
+    for (int i=xMeres-1; i>0; i--) {
+      int k = n/(int)Math.pow(4, (i));
+      ret += Num2DNA(k%4);
+    }
+    int k = n % 4;
+    ret += Num2DNA(k);    
+    return ret;
   }
   
   /**
@@ -381,13 +587,95 @@ public class Utils {
     return ""; // Don't return "false". May interfere with hasArgument
   }
   
-  public static String firstUppercase(String s) {
-    if (s==null) return null;
-    s = s.trim().toLowerCase();
-    if (s.length()==0) return "";
-    return Character.toString(s.charAt(0)).toUpperCase() + s.substring(1);
+  /**
+   * 
+   * @param arr
+   */
+  public static void printMinMaxInfNaN(double[] arr) {
+    double min = Double.MAX_VALUE; double max = Double.MIN_VALUE; int nan=0; int inf=0;
+    for (double v: arr) {
+      if (Double.isInfinite(v)) {inf++; continue;}
+      if (Double.isNaN(v)) {nan++; continue;}
+      if (v<min) min=v;
+      if (v>max) max=v;
+    }
+    System.out.println("Min: " + min + "\t Max:" + max + "\t Infinity:" + inf + "\t NaN:" + nan);
   }
   
+  /**
+   * 
+   * @param c
+   * @param times
+   * @return
+   */
+  public static StringBuffer replicateCharacter(char c, int times) {
+    StringBuffer s = new StringBuffer();
+    for (int i=0; i<times; i++)
+      s.append(c);
+    return s;
+  }
+  
+  /**
+   * 
+   * @param ch
+   * @param times
+   * @return
+   */
+  public static String replicateCharacter(String ch, int times) {
+    String retval = "";
+    for (int i=0; i<times;i++){
+      retval += ch;
+    }
+    return retval;
+  }
+  
+  /**
+   * 
+   * @param s
+   * @return
+   */
+  public static String reverse(String s) {
+    StringBuffer a = new StringBuffer(s);
+    return a.reverse().toString();
+  }
+  
+  /**
+   * 
+   * @param zahl
+   * @param stellen
+   * @return
+   */
+  public static double round(double zahl, int stellen) {
+    double d = Math.pow(10, stellen);
+    return Math.round( zahl * ((long)d) ) / d;
+  }
+  
+  /**
+   * 
+   * @param filename
+   * @param obj
+   * @return
+   */
+  public static boolean saveObject(String filename, Object obj) {
+    try {
+      FileOutputStream fileOut = new FileOutputStream(filename);
+      ObjectOutputStream out = new ObjectOutputStream(fileOut);
+      out.writeObject(obj);
+      out.close();
+      fileOut.close();
+      return true;
+    } catch(FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+  
+  /**
+   * 
+   * @return
+   */
   public static boolean shutdownSystem() {
     boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
     
@@ -447,144 +735,5 @@ public class Utils {
     
     return successValue;
   }
-  
-  /**
-   * Given the miliseconds elapsed, returns a formatted time string up to a max deph of 3.
-   * e.g. "16h 4m 4s" or "2d 16h 4m" or "4s 126dms" 
-   * @param miliseconds
-   * @return
-   */
-  public static String getTimeString(long miliseconds) {
-    double seconds = (miliseconds/1000.0);
-    double minutes = (seconds/60.0);
-    double hours = (minutes/60.0);
-    double days = hours/24;
-    
-    String ret;
-    if (days>=1) {
-      ret = cut(days) + "d " + cut(hours%24.0)  + "h " + cut(minutes%60) + "m";
-    } else if (hours>=1) {
-      ret = cut(hours%24.0)  + "h " + cut(minutes%60) + "m " + cut(seconds%60) + "s";
-    } else if (minutes>=1) {
-      ret = cut(minutes%60) + "m " + cut(seconds%60) + "s " + cut(miliseconds%1000.0) + "ms";
-    } else if (seconds>=1) {
-      ret = cut(seconds%60) + "s " + cut(miliseconds%1000.0) + "ms";
-    } else {
-      ret = cut(miliseconds%1000.0) + "ms";
-    }
-    return ret;
-  }
-  
-  /**
-   * Ensures that path ends with a slash (for folder processing).
-   * @param path
-   */
-  public static String ensureSlash(String path) {
-    if (!path.endsWith("\\") && !path.endsWith("/"))
-      if (path.contains("/")) path+="/";
-      else if (path.contains("\\")) path+="\\";
-      else path+="/";
-    return path;
-  }
-  
-  /**
-   * Cut at dot. E.g. 1.68 => 1
-   * In contrary, decimal format "#" would return 2!
-   * @param d
-   * @return
-   */
-  public static String cut(double d) {
-    String s = Double.toString(d);
-    int ep = s.indexOf(".");
-    if (ep<1) ep = s.length();
-    return s.substring(0, ep);
-  }
-  
-  /**
-   * Copies a file. Does NOT check if out already exists. Will overwrite out if it already exists.
-   * @param in
-   * @param out
-   * @return success.
-   */
-  public static boolean copyFile(File in, File out) {
-    if (!in.exists()) {System.err.println("File '" + in.getName() + "' does not exist."); return false;}
-    boolean success=false;
-    try {
-      FileChannel inChannel = new FileInputStream(in).getChannel();
-      FileChannel outChannel = new FileOutputStream(out).getChannel();
-      // magic number for Windows, 64Mb - 32Kb)
-      int maxCount = (64 * 1024 * 1024) - (32 * 1024);
-      long size = inChannel.size();
-      long position = 0;
-      while (position < size) {
-        position += inChannel.transferTo(position, maxCount, outChannel);
-      }
-      if (inChannel != null) inChannel.close();
-      if (outChannel != null) outChannel.close();
-      if (in.length()==out.length()) success=true;
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return success;
-  }
-  
-  public static boolean saveObject(String filename, Object obj) {
-    try {
-      FileOutputStream fileOut = new FileOutputStream(filename);
-      ObjectOutputStream out = new ObjectOutputStream(fileOut);
-      out.writeObject(obj);
-      out.close();
-      fileOut.close();
-      return true;
-    } catch(FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
-  public static Object loadObject(String filename) {
-    try {
-      FileInputStream fileIn = new FileInputStream(filename);
-      ObjectInputStream in = new ObjectInputStream(fileIn);
-      Object ret = in.readObject();
-      in.close();
-      fileIn.close();
-      return ret;
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    } catch(FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-  public static Object loadObject(InputStream inn) {
-    try {
-      ObjectInputStream in = new ObjectInputStream(inn);
-      Object ret = in.readObject();
-      in.close();
-      inn.close();
-      return ret;
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-  public static Object loadObject(File file) {
-    try {
-      FileInputStream fileIn = new FileInputStream(file);
-      ObjectInputStream in = new ObjectInputStream(fileIn);
-      Object ret = in.readObject();
-      in.close();
-      fileIn.close();
-      return ret;
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-
 
 }

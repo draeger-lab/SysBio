@@ -21,33 +21,63 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
    */
   public static boolean offlineMode = false;
   
+  /**
+   * 
+   */
   public KeggFunctionManagement () {
     super();
     this.adap = new KeggAdaptor();
   }
   
+  /**
+   * 
+   * @param maxListSize
+   * @param adap
+   */
   public KeggFunctionManagement (int maxListSize, KeggAdaptor adap) {
     super(maxListSize); // Remember maxListSize queries at max.
     this.adap = adap;
   }
   
+  /**
+   * 
+   * @return
+   */
   public KeggAdaptor getKeggAdaptor() {
     if (adap==null) adap = new KeggAdaptor();
     return adap;
   }
+  
+  /**
+   * 
+   * @param adap
+   */
   public void setKeggAdaptor(KeggAdaptor adap) {
     this.adap = adap;
   }
   
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.util.InfoManagement#cleanupUnserializableObject()
+   */
   @Override  
   protected void cleanupUnserializableObject() {
     adap = null;
   }
+  
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.util.InfoManagement#restoreUnserializableObject()
+   */
   @Override
   protected void restoreUnserializableObject () {
     adap = getKeggAdaptor();
   }
   
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.util.InfoManagement#fetchInformation(java.lang.Comparable)
+   */
   @Override
   protected CustomObject fetchInformation(KeggQuery id) throws TimeoutException, UnsuccessfulRetrieveException {
     if (offlineMode) throw new TimeoutException();
@@ -81,6 +111,10 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
     return new CustomObject(answer); // Successfull and "with data" ;-)
   }
   
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.util.InfoManagement#fetchMultipleInformations(IDtype[])
+   */
   @Override
   protected CustomObject[] fetchMultipleInformations(KeggQuery[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
     System.err.println("Fetching multiple infos not supported. Please use KeggInfoManagement, if possible.");

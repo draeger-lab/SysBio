@@ -15,40 +15,51 @@ import java.io.IOException;
  */
 public class FileReadProgress {
 
+  /**
+   * 
+   */
   public static final String anim= "|/-\\";
-
-  
+  /**
+   * 
+   */
   private long fileLength=0;
+  /**
+   * 
+   */
   private long bytesRead=0;
-
+  /**
+   * 
+   */
   private boolean outputPercentage=true;
+  /**
+   * 
+   */
   private boolean printProgressInSameLine = true;
-
+  /**
+   * 
+   */
   private int lastOutputtedPercentage = -1;
+  /**
+   * 
+   */
   private int progressCounter = 0;
-  
+  /**
+   * 
+   */
   private boolean isWindows;
   
   /**
-   * Creates a new FileReadProgress object with the file size retrieved from
-   * the given file. Additionally, it has to be specified if the progress should
-   * be written in the same line (default) or a new line for each percentage.
    * 
-   * @param filepath  the path of the file
-   * @param printProgessInSameLine if <code>true</code>, the output will always be in the same line
    */
-  public FileReadProgress(String filepath, boolean printProgressInSameLine) {
-    this(filepath);
-    this.printProgressInSameLine = printProgressInSameLine;
-  }
+  protected boolean useSimpleStyle = useSimpleStyle();
   
   /**
    * Creates a new FileReadPrograss object for the given file.
    * 
-   * @param filepath the file to be read from
+   * @param file the file to be read from
    */
-  public FileReadProgress(String filepath) {
-    this(new File(filepath));
+  public FileReadProgress(File file) {
+    this(file.length());
   }
 
   /**
@@ -63,15 +74,6 @@ public class FileReadProgress {
   }
 
   /**
-   * Creates a new FileReadPrograss object for the given file.
-   * 
-   * @param file the file to be read from
-   */
-  public FileReadProgress(File file) {
-    this(file.length());
-  }
-  
-  /**
    * Creates a new FileReadProgress object with the given length to be 100%.
    * 
    * @param length the length of the file
@@ -80,95 +82,35 @@ public class FileReadProgress {
     fileLength = length;
     isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"))?true:false;
   }
+  
+  /**
+   * Creates a new FileReadPrograss object for the given file.
+   * 
+   * @param filepath the file to be read from
+   */
+  public FileReadProgress(String filepath) {
+    this(new File(filepath));
+  }
 
   /**
-   * Returns if the current percentage should be put out every time it is updated.
+   * Creates a new FileReadProgress object with the file size retrieved from
+   * the given file. Additionally, it has to be specified if the progress should
+   * be written in the same line (default) or a new line for each percentage.
    * 
-   * @return <code>true</code>, if the current percentage should be put out
-   *         every time it is updated
+   * @param filepath  the path of the file
+   * @param printProgessInSameLine if <code>true</code>, the output will always be in the same line
    */
-  public boolean getOutputPercentage() {
-    return outputPercentage;
+  public FileReadProgress(String filepath, boolean printProgressInSameLine) {
+    this(filepath);
+    this.printProgressInSameLine = printProgressInSameLine;
   }
   
   /**
-   * Specify whether the current percentage should be put out every time it is
-   * updated. <code>true</code> means, the percentage will be put out every time
-   * it is updated, <code>false</code> means, no output will be automatically
-   * generated, but {@link DiplayBar} has to be called explicitly.
    * 
-   * @param outputPercentage
+   * @param counter
+   * @param percent
+   * @return
    */
-  public void setOutputPercentage(boolean outputPercentage) {
-    this.outputPercentage = outputPercentage;
-  }
-  /**
-   * Tries to establish a "command line" progress bar. Does not work correctly
-   * if output goes to a file.
-   */
-  public void setPrintProgessInSameLine(boolean b) {
-    printProgressInSameLine = b;
-  }
-  
-  /**
-   * Resets all counters back to zero.
-   */
-  public void reset() {
-    lastOutputtedPercentage = -1;
-    bytesRead=0;
-    progressCounter = 0;
-  }
-  
-  /**
-   * Reports that the given line has been read from the file. This implicitly
-   * adds 1 to the length of the given string to account for newline characters.
-   * 
-   * @param curLine
-   */
-  public void progress(String curLine) {
-    if (curLine != null) {
-      progress(curLine.length() + 1); // +1 for \n. For Windows possibly +2...
-    } else {
-      progress(0);
-    }
-  }
-  
-  public void progress(long bytesRead) {
-    this.bytesRead += bytesRead;
-    progressCounter++;
-    
-    // if percentage output should be generated
-    if (outputPercentage) {
-      int perc = getPercentage();   // get the current percentage
-      if ( printProgressInSameLine ) {
-        try {
-          System.out.write(getDisplayBarString(progressCounter, perc).getBytes());
-          lastOutputtedPercentage = perc;
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      } else {
-        if (perc != lastOutputtedPercentage) {
-          System.out.println(perc + "%");
-          lastOutputtedPercentage = perc;
-        }
-      }
-    }
-  }
-  
-  /*
-   * Kommentiert. Methode macht kein Sinn! Man kann immer (ob console oder nicht) in selbe Zeile Printen!
-  protected boolean canPrintInSameLine() {
-    return printProgressInSameLine
-           && (System.console() != null)
-           && (System.console().writer() != null);
-  }
-  */
-  
-  public int getPercentage() {
-    return (int)Math.round((double)bytesRead/fileLength*100.0);
-  }
-  
   public String getDisplayBarString(int counter, int percent) {
     // when not in normal console, do not try to use carriage return
     if (useSimpleStyle) {
@@ -193,6 +135,102 @@ public class FileReadProgress {
   }
   
   /**
+   * Returns if the current percentage should be put out every time it is updated.
+   * 
+   * @return <code>true</code>, if the current percentage should be put out
+   *         every time it is updated
+   */
+  public boolean getOutputPercentage() {
+    return outputPercentage;
+  }
+  
+  /**
+   * 
+   */
+  public int getPercentage() {
+    return (int)Math.round((double)bytesRead/fileLength*100.0);
+  }
+  
+  /**
+   * 
+   * @param bytesRead
+   */
+  public void progress(long bytesRead) {
+    this.bytesRead += bytesRead;
+    progressCounter++;
+    
+    // if percentage output should be generated
+    if (outputPercentage) {
+      int perc = getPercentage();   // get the current percentage
+      if ( printProgressInSameLine ) {
+        try {
+          System.out.write(getDisplayBarString(progressCounter, perc).getBytes());
+          lastOutputtedPercentage = perc;
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      } else {
+        if (perc != lastOutputtedPercentage) {
+          System.out.println(perc + "%");
+          lastOutputtedPercentage = perc;
+        }
+      }
+    }
+  }
+  
+  /**
+   * Reports that the given line has been read from the file. This implicitly
+   * adds 1 to the length of the given string to account for newline characters.
+   * 
+   * @param curLine
+   */
+  public void progress(String curLine) {
+    if (curLine != null) {
+      progress(curLine.length() + 1); // +1 for \n. For Windows possibly +2...
+    } else {
+      progress(0);
+    }
+  }
+  
+  /*
+   * Kommentiert. Methode macht kein Sinn! Man kann immer (ob console oder nicht) in selbe Zeile Printen!
+  protected boolean canPrintInSameLine() {
+    return printProgressInSameLine
+           && (System.console() != null)
+           && (System.console().writer() != null);
+  }
+  */
+  
+  /**
+   * Resets all counters back to zero.
+   */
+  public void reset() {
+    lastOutputtedPercentage = -1;
+    bytesRead=0;
+    progressCounter = 0;
+  }
+  
+  /**
+   * Specify whether the current percentage should be put out every time it is
+   * updated. <code>true</code> means, the percentage will be put out every time
+   * it is updated, <code>false</code> means, no output will be automatically
+   * generated, but {@link DiplayBar} has to be called explicitly.
+   * 
+   * @param outputPercentage
+   */
+  public void setOutputPercentage(boolean outputPercentage) {
+    this.outputPercentage = outputPercentage;
+  }
+  
+  /**
+   * Tries to establish a "command line" progress bar. Does not work correctly
+   * if output goes to a file.
+   */
+  public void setPrintProgessInSameLine(boolean b) {
+    printProgressInSameLine = b;
+  }
+  
+  /**
    * Determins if ANSI compliance console commands can be used, based on java version, os type and outputStream Type.
    * @return
    */
@@ -214,6 +252,5 @@ public class FileReadProgress {
     
     return useSimpleStyle;
   }
-  protected boolean useSimpleStyle = useSimpleStyle();
   
 }

@@ -1,11 +1,11 @@
 package de.zbit.kegg.io;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.util.DirectoryParser;
 
 
@@ -89,6 +89,12 @@ public class FixFiles {
     
   }
   
+  /**
+   * 
+   * @param c
+   * @param xTimes
+   * @return
+   */
   public static String replicateChar(char c, int xTimes) {
     String ret = "";
     for (int i=0; i<xTimes; i++)

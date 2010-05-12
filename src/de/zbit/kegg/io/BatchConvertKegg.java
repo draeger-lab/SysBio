@@ -12,12 +12,6 @@ import de.zbit.util.DirectoryParser;
  * @author wrzodek
  */
 public class BatchConvertKegg {
-  private String changeOutdirTo = "";
-  private String orgOutdir = "";
-  
-  private String outFormat = "GraphML"; // Possible: SBML & GraphML. Default to graphML
-  private KeggConverter converter;
-  
   /**
    * @param args
    */
@@ -34,40 +28,83 @@ public class BatchConvertKegg {
     batch.setChangeOutdirTo("C:\\Dokumente und Einstellungen\\wrzodek\\Desktop\\KEGG\\KEGG Daten\\kgml\\gml");
     batch.parseDirAndSubDir();
   }
-  
-  
-  public String getOutFormat() {
-    return outFormat;
-  }
   /**
-   * @param outFormat - "graphml" or "sbml".
+   * 
    */
-  public void setOutFormat(String outFormat) {
-    this.outFormat = outFormat;
+  private String changeOutdirTo = "";
+  /**
+   * 
+   */
+  private String orgOutdir = "";
+  /**
+   * Possible: SBML & GraphML. Default to graphML
+   */
+  private String outFormat = "GraphML";
+  
+  /**
+   * 
+   */
+  private KeggConverter converter;
+  
+  /**
+   * 
+   * @param dir
+   * @return
+   */
+  private String getAndCreateOutDir(String dir) {
+    String myDir = dir;
+    if (changeOutdirTo!=null && changeOutdirTo.length()>0) {
+      myDir = changeOutdirTo + myDir.substring(orgOutdir.length());
+      try {
+        new File(myDir).mkdirs();
+      } catch (Exception e) {} // Gibts schon...
+    }
+    return myDir;
   }
-  public KeggConverter getConverter() {
-    return converter;
-  }
-  public void setConverter(KeggConverter converter) {
-    this.converter = converter;
-  }
+  
+  /**
+   * 
+   * @return
+   */
   public String getChangeOutdirTo() {
     return changeOutdirTo;
   }
-  public void setChangeOutdirTo(String changeOutdirTo) {
-    this.changeOutdirTo = changeOutdirTo;
+  
+  /**
+   * 
+   * @return
+   */
+  public KeggConverter getConverter() {
+    return converter;
   }
+  
+  /**
+   * 
+   * @return
+   */
   public String getOrgOutdir() {
     return orgOutdir;
   }
-  public void setOrgOutdir(String orgOutdir) {
-    this.orgOutdir = orgOutdir;
+  
+  /**
+   * 
+   * @return
+   */
+  public String getOutFormat() {
+    return outFormat;
   }
-
-
+  
+  /**
+   * 
+   */
   public void parseDirAndSubDir() {
     parseDirAndSubDir(orgOutdir);
   }
+  
+  /**
+   * 
+   * @param dir
+   */
   private void parseDirAndSubDir(String dir) {
     if (!dir.endsWith("/") && !dir.endsWith("\\"))
       if (dir.contains("\\")) dir+="\\"; else dir +="/";
@@ -124,16 +161,36 @@ public class BatchConvertKegg {
       }
     }
   }
+  
+  /**
+   * 
+   * @param changeOutdirTo
+   */
+  public void setChangeOutdirTo(String changeOutdirTo) {
+    this.changeOutdirTo = changeOutdirTo;
+  }
 
-  private String getAndCreateOutDir(String dir) {
-    String myDir = dir;
-    if (changeOutdirTo!=null && changeOutdirTo.length()>0) {
-      myDir = changeOutdirTo + myDir.substring(orgOutdir.length());
-      try {
-        new File(myDir).mkdirs();
-      } catch (Exception e) {} // Gibts schon...
-    }
-    return myDir;
+  /**
+   * 
+   * @param converter
+   */
+  public void setConverter(KeggConverter converter) {
+    this.converter = converter;
+  }
+  
+  /**
+   * 
+   * @param orgOutdir
+   */
+  public void setOrgOutdir(String orgOutdir) {
+    this.orgOutdir = orgOutdir;
+  }
+
+  /**
+   * @param outFormat - "graphml" or "sbml".
+   */
+  public void setOutFormat(String outFormat) {
+    this.outFormat = outFormat;
   }
   
 }

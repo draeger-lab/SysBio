@@ -26,36 +26,39 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	public final static int getIdentifier = 2; // returns: String (each entry
 	// separated by new line)
 
+	/**
+	 * 
+	 */
 	private int jobToDo; // Required
+	/**
+	 * 
+	 */
 	private String query; // Required
 
+	/**
+	 * 
+	 * @param jobToDo
+	 * @param query
+	 */
 	public KeggQuery(int jobToDo, String query) {
 		this.jobToDo = jobToDo;
 		this.query = query;
 	}
 
-	// Getters and Setters
-	public int getJobToDo() {
-		return jobToDo;
-	}
-
-	public void setJobToDo(int jobToDo) {
-		this.jobToDo = jobToDo;
-	}
-
-	public String getQuery() {
-		return query;
-	}
-
-	public void setQuery(String query) {
-		this.query = query;
-	}
-
-	// ------------------------------
-
 	/*
-   * 
-   */
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public KeggQuery clone() {
+		KeggQuery clone = new KeggQuery(this.jobToDo, new String(query));
+		return clone;
+	}
+
+	/**
+	 * 
+	 */
 	public int compareTo(KeggQuery o) {
 		if (jobToDo < o.getJobToDo())
 			return -1;
@@ -64,27 +67,6 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 		else { // Same job to do
 			return query.compareTo(o.getQuery());
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Job:" + jobToDo + " Query:" + query;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		int hc = (int) (jobToDo + query.hashCode());
-		return (hc);
 	}
 
 	/*
@@ -102,15 +84,57 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 		return equal;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public int getJobToDo() {
+		return jobToDo;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getQuery() {
+		return query;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see java.lang.Object#clone()
+	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
-	public KeggQuery clone() {
-		KeggQuery clone = new KeggQuery(this.jobToDo, new String(query));
-		return clone;
+	public int hashCode() {
+		int hc = (int) (jobToDo + query.hashCode());
+		return (hc);
+	}
+
+	/**
+	 * 
+	 * @param jobToDo
+	 */
+	public void setJobToDo(int jobToDo) {
+		this.jobToDo = jobToDo;
+	}
+
+	/**
+	 * 
+	 * @param query
+	 */
+	public void setQuery(String query) {
+		this.query = query;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Job:" + jobToDo + " Query:" + query;
 	}
 
 }

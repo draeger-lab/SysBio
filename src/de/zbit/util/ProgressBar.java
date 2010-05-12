@@ -9,18 +9,45 @@ package de.zbit.util;
  */
 public class ProgressBar {
   
+  /**
+   * 
+   */
   private int aufrufeGesamt=0; // SET THIS VALUE!
+  /**
+   * 
+   */
   private boolean estimateTime=false;
   
-  // Internal variables (not to set by user).
+  /** 
+   * Internal variables (not to set by user).
+   */
   private int aufrufNr=0;
+  /**
+   * 
+   */
   private int lastPerc=-1;
+  /**
+   * 
+   */
   private boolean isWindows;
   
-  // for time duration estimations
+  /** 
+   * for time duration estimations
+   */
   private long measureTime = 0;
+  /**
+   * 
+   */
   private int numMeasurements = 0;
+  /**
+   * 
+   */
   private long lastCallTime;
+  
+  /**
+   * 
+   */
+  protected boolean useSimpleStyle = useSimpleStyle();
   
   /**
    * Initialize the progressBar object
@@ -31,6 +58,11 @@ public class ProgressBar {
     isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"))?true:false;
   }
   
+  /**
+   * 
+   * @param aufrufeGesamt
+   * @param estimateTime
+   */
   public ProgressBar(int aufrufeGesamt, boolean estimateTime) {
     this(aufrufeGesamt);
     this.estimateTime = estimateTime;
@@ -43,30 +75,6 @@ public class ProgressBar {
   public synchronized void DisplayBar() {
     DisplayBar(null);
   }
-  
-  /**
-   * Determins if ANSI compliance console commands can be used, based on java version, os type and outputStream Type.
-   * @return
-   */
-  protected boolean useSimpleStyle() {
-    boolean useSimpleStyle = false;
-    if (isWindows) useSimpleStyle = true; // MS Windows has (by default) no ANSI capabilities.
-    
-    // is TTY Check is only available for java 1.6. So a wrapper to determine java version is needed for Java 1.5 compatibility.
-    String v = System.getProperty("java.version");
-    if (v!=null && v.length()>2) {
-      try {
-        double d = Double.parseDouble(v.substring(0, 3));
-        if (d<1.6) useSimpleStyle = true;
-        else useSimpleStyle = !isTTY_Java16only.isTty();
-      } catch (Exception e) {
-        useSimpleStyle = true;
-      }
-    }
-    
-    return useSimpleStyle;
-  }
-  protected boolean useSimpleStyle = useSimpleStyle();
   
   /**
    * This function should be called exactly as aften as defined in the constructor. 
@@ -147,6 +155,29 @@ public class ProgressBar {
     } catch (Exception e) {e.printStackTrace();}
     
     return; // sb.toString();
+  }
+  
+  /**
+   * Determines if ANSI compliance console commands can be used, based on java version, os type and outputStream Type.
+   * @return
+   */
+  protected boolean useSimpleStyle() {
+    boolean useSimpleStyle = false;
+    if (isWindows) useSimpleStyle = true; // MS Windows has (by default) no ANSI capabilities.
+    
+    // is TTY Check is only available for java 1.6. So a wrapper to determine java version is needed for Java 1.5 compatibility.
+    String v = System.getProperty("java.version");
+    if (v!=null && v.length()>2) {
+      try {
+        double d = Double.parseDouble(v.substring(0, 3));
+        if (d<1.6) useSimpleStyle = true;
+        else useSimpleStyle = !isTTY_Java16only.isTty();
+      } catch (Exception e) {
+        useSimpleStyle = true;
+      }
+    }
+    
+    return useSimpleStyle;
   }
   
 }

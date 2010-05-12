@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
@@ -24,12 +23,26 @@ import de.zbit.util.SortedArrayList;
  * @author wrzodek
  */
 public class OpenFile {
+  /**
+   * 
+   */
   private static SortedArrayList<String[]> downloadedFiles = new SortedArrayList<String[]>();
 
+  /**
+   * 
+   * @param URL
+   * @return
+   */
   public static String doDownload(String URL) {
     return doDownload(URL, null);
   }
-  // ACHTUNG: Delteted on exit!!
+  
+  /**
+   * ACHTUNG: Delteted on exit!!
+   * @param URL
+   * @param toLocalFile
+   * @return
+   */
   public static String doDownload(String URL, String toLocalFile) {
     int pos = downloadedFiles.indexOf(URL);
     if (pos>=0) {
@@ -54,6 +67,24 @@ public class OpenFile {
     
     //System.out.println(URL + " \tFilesize: " +  new File(filename).length()/1024.0/1024.0);
     return filename;
+  }
+  
+  /**
+   * Tries to open the file myFile and return a format description object.
+   * filename is needed for jar internal reference if file is not in Filesystem (myFile=null).
+   * @param filename
+   * @param myFile
+   * @return FormatDescription object
+   */
+  private static FormatDescription fetchDescription(String filename, File myFile) {
+    FormatDescription desc = null;
+    if (myFile==null && (OpenFile.class.getClassLoader().getResource(filename)!=null))
+      try {
+        desc = FormatIdentification.identify(new BufferedReader(new InputStreamReader(OpenFile.class.getClassLoader().getResource(filename).openStream())));
+      } catch (IOException e1) {e1.printStackTrace();}
+    else
+      if (myFile!=null) desc = FormatIdentification.identify(myFile);
+    return desc;
   }
   
   /**
@@ -129,24 +160,6 @@ public class OpenFile {
     if (ret==null) System.err.println("Error opening file '" + filename + "'. Probably this file does not exist.");    
     
     return ret;
-  }
-  
-  /**
-   * Tries to open the file myFile and return a format description object.
-   * filename is needed for jar internal reference if file is not in Filesystem (myFile=null).
-   * @param filename
-   * @param myFile
-   * @return FormatDescription object
-   */
-  private static FormatDescription fetchDescription(String filename, File myFile) {
-    FormatDescription desc = null;
-    if (myFile==null && (OpenFile.class.getClassLoader().getResource(filename)!=null))
-      try {
-        desc = FormatIdentification.identify(new BufferedReader(new InputStreamReader(OpenFile.class.getClassLoader().getResource(filename).openStream())));
-      } catch (IOException e1) {e1.printStackTrace();}
-    else
-      if (myFile!=null) desc = FormatIdentification.identify(myFile);
-    return desc;
   }
   
   /**

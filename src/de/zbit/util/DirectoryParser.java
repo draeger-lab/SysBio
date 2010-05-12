@@ -11,42 +11,66 @@ import java.util.Iterator;
  * @author wrzodek
  */
 public class DirectoryParser implements Iterator<String> {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		DirectoryParser d = new DirectoryParser("S:\\SVM\\tools", "ft");
+		while (d.hasNext())
+			System.out.println(d.next());
+	}
+	/**
+	 * 
+	 */
 	private String path = ".";
+	/**
+	 * 
+	 */
 	private String extension = "";
+	/**
+	 * 
+	 */
 	private int curPos = 0;
+    /**
+	 * 
+	 */
 	private String[] contents = null;
 
+	/**
+     * 
+     */
 	private boolean recurseIntoSubdirectories = false;
 
-	public DirectoryParser(String path, String extension) {
-		this(path);
-		setExtension(extension);
+	/**
+	 * 
+	 */
+	public DirectoryParser() {
 	}
 
+	/**
+	 * 
+	 * @param path
+	 */
 	public DirectoryParser(String path) {
 		this();
 		setPath(path);
 	}
 
-	public DirectoryParser() {
+	/**
+	 * 
+	 * @param path
+	 * @param extension
+	 */
+	public DirectoryParser(String path, String extension) {
+		this(path);
+		setExtension(extension);
 	}
 
-	public boolean isRecurseIntoSubdirectories() {
-		return recurseIntoSubdirectories;
-	}
-
-	public void setRecurseIntoSubdirectories(boolean recurseIntoSubdirectories) {
-		if (this.recurseIntoSubdirectories != recurseIntoSubdirectories) {
-			this.recurseIntoSubdirectories = recurseIntoSubdirectories;
-			reset();
-		}
-	}
-
-	private String getPath(String path) {
-		path = appendSlash(path);
-		return path;
-	}
-
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
 	private String appendSlash(String path) {
 		if (!path.endsWith("\\") && !path.endsWith("/"))
 			if (path.contains("/"))
@@ -58,31 +82,168 @@ public class DirectoryParser implements Iterator<String> {
 		return path;
 	}
 
-	public String getPath() {
-		return getPath(this.path);
+	/**
+	 * 
+	 * @param item
+	 * @param caseSensitive
+	 * @return
+	 */
+	public boolean contains(String item, boolean caseSensitive) {
+		if (contents == null)
+			readDir();
+		if (contents == null)
+			return false;
+
+		for (String s : this.contents)
+			if (caseSensitive ? s.equals(item) : s.equalsIgnoreCase(item))
+				return true;
+		return false;
 	}
 
-	public void setPath(String path) {
-		this.path = getPath(path); // Append / or \\
-		reset();
+	/**
+	 * 
+	 * @return
+	 */
+	public String[] getAll() {
+		if (contents == null)
+			readDir();
+		if (contents == null)
+			return null;
+		return this.contents.clone();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public int getCount() {
+		if (contents == null)
+			readDir();
+		if (contents == null)
+			return 0;
+		return this.contents.length;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public String getExtension() {
 		return extension;
 	}
 
-	public void setExtension(String extension) {
-		if (extension.contains("*"))
-			extension = extension.replace("*", ""); // Prevent things like
-		// "*.dat"
-		this.extension = extension;
-		reset();
+	/**
+	 * 
+	 * @return
+	 */
+	public String getPath() {
+		return getPath(this.path);
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	private String getPath(String path) {
+		path = appendSlash(path);
+		return path;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Iterator#hasNext()
+	 */
+	// @Override
+	public boolean hasNext() {
+		if (contents == null) {
+			readDir();
+			if (contents == null)
+				return false;
+		}
+		if (curPos >= contents.length)
+			return false;
+		return true;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean hasPrevious() {
+		if (contents == null) {
+			readDir();
+			if (contents == null)
+				return false;
+		}
+		if (curPos <= 0)
+			return false;
+		return true;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isRecurseIntoSubdirectories() {
+		return recurseIntoSubdirectories;
+	}
+
+	/**
+	 * 
+	 */
+	public void jumpToEnd() {
+		if (contents == null)
+			readDir();
+		if (contents != null)
+			curPos = contents.length;
+	}
+
+	/**
+	 * 
+	 */
+	public void jumpToStart() {
+		curPos = 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Iterator#next()
+	 */
+	// @Override
+	public String next() {
+		if (curPos < (contents.length)) {
+			return contents[curPos++];
+		} else
+			return null;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String previous() {
+		if (curPos > 0) {
+			return contents[--curPos];
+		} else
+			return null;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	private ArrayList<String> readDir() {
 		return readDir(this.path);
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
 	private ArrayList<String> readDir(String path) {
 		path = appendSlash(path);
 		if (!new File(path).isDirectory()) {
@@ -119,115 +280,53 @@ public class DirectoryParser implements Iterator<String> {
 		return myFiles;
 	}
 
-	public void reset() {
-		curPos = 0;
-		contents = null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.Iterator#hasNext()
-	 */
-	// @Override
-	public boolean hasNext() {
-		if (contents == null) {
-			readDir();
-			if (contents == null)
-				return false;
-		}
-		if (curPos >= contents.length)
-			return false;
-		return true;
-	}
-
-	public boolean hasPrevious() {
-		if (contents == null) {
-			readDir();
-			if (contents == null)
-				return false;
-		}
-		if (curPos <= 0)
-			return false;
-		return true;
-	}
-
-	public void jumpToStart() {
-		curPos = 0;
-	}
-
-	public void jumpToEnd() {
-		if (contents == null)
-			readDir();
-		if (contents != null)
-			curPos = contents.length;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.Iterator#next()
-	 */
-	// @Override
-	public String next() {
-		if (curPos < (contents.length)) {
-			return contents[curPos++];
-		} else
-			return null;
-	}
-
-	public String previous() {
-		if (curPos > 0) {
-			return contents[--curPos];
-		} else
-			return null;
-	}
-
-	public String[] getAll() {
-		if (contents == null)
-			readDir();
-		if (contents == null)
-			return null;
-		return this.contents.clone();
-	}
-
-	public int getCount() {
-		if (contents == null)
-			readDir();
-		if (contents == null)
-			return 0;
-		return this.contents.length;
-	}
-
-	public boolean contains(String item, boolean caseSensitive) {
-		if (contents == null)
-			readDir();
-		if (contents == null)
-			return false;
-
-		for (String s : this.contents)
-			if (caseSensitive ? s.equals(item) : s.equalsIgnoreCase(item))
-				return true;
-		return false;
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		DirectoryParser d = new DirectoryParser("S:\\SVM\\tools", "ft");
-		while (d.hasNext())
-			System.out.println(d.next());
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see java.util.Iterator#remove()
 	 */
-	// @Override
 	public void remove() {
 		System.err.println("Remove not supported.");
+	}
+
+	/**
+	 * 
+	 */
+	public void reset() {
+		curPos = 0;
+		contents = null;
+	}
+
+	/**
+	 * 
+	 * @param extension
+	 */
+	public void setExtension(String extension) {
+		if (extension.contains("*"))
+			extension = extension.replace("*", ""); // Prevent things like
+		// "*.dat"
+		this.extension = extension;
+		reset();
+	}
+
+	/**
+	 * 
+	 * @param path
+	 */
+	public void setPath(String path) {
+		this.path = getPath(path); // Append / or \\
+		reset();
+	}
+
+	/**
+	 * 
+	 * @param recurseIntoSubdirectories
+	 */
+	public void setRecurseIntoSubdirectories(boolean recurseIntoSubdirectories) {
+		if (this.recurseIntoSubdirectories != recurseIntoSubdirectories) {
+			this.recurseIntoSubdirectories = recurseIntoSubdirectories;
+			reset();
+		}
 	}
 
 }

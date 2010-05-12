@@ -5,5 +5,16 @@ package de.zbit.kegg.parser.pathway;
  * @author wrzodek
  */
 public enum ReactionType {
-  reversible,irreversible, other
+  /**
+   * 
+   */
+  reversible,
+  /**
+   * 
+   */
+  irreversible,
+  /**
+   * 
+   */
+  other
 }

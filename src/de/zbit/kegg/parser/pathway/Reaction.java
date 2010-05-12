@@ -1,9 +1,5 @@
 package de.zbit.kegg.parser.pathway;
 
-/**
- * Corresponding to the Kegg Reaction class (see {@link http://www.genome.jp/kegg/xml/docs/})
- * @author wrzodek
- */
 import java.util.ArrayList;
 
 
@@ -13,31 +9,115 @@ import org.w3c.dom.NodeList;
 
 import de.zbit.kegg.parser.KeggParser;
 
-
+/**
+ * Corresponding to the Kegg Reaction class (see {@link http://www.genome.jp/kegg/xml/docs/})
+ * @author wrzodek
+ */
 public class Reaction {
+  /**
+   * 
+   */
   String Name;
+  /**
+   * 
+   */
   ReactionType type;
-  
+  /**
+   * 
+   */
   ArrayList<ReactionComponent> substrate = new ArrayList<ReactionComponent>(); // 1..*
+  /**
+   * 
+   */
   ArrayList<ReactionComponent> product = new ArrayList<ReactionComponent>(); // 1..*
   
+  /**
+   * 
+   * @param name
+   * @param type
+   */
   private Reaction(String name, ReactionType type) {
     super();
     this.Name = name;
     this.type = type;
   }
+  
+  /**
+   * 
+   * @param name
+   * @param type
+   * @param childNodes
+   */
+  public Reaction(String name, ReactionType type, NodeList childNodes) {
+    this(name, type);
+    parseSubNodes(childNodes);
+  }
+  
+  /**
+   * 
+   * @param name
+   * @param type
+   * @param substrate
+   * @param product
+   */
   public Reaction(String name, ReactionType type, ReactionComponent substrate, ReactionComponent product) {
     this (name, type);
     addProduct(product);
     addSubstrate(substrate);
   }
   
-  
-  public Reaction(String name, ReactionType type, NodeList childNodes) {
-    this(name, type);
-    parseSubNodes(childNodes);
+  /**
+   * 
+   * @param product
+   */
+  public void addProduct(ReactionComponent product) {
+    this.product.add(product);
+  }
+
+  /**
+   * 
+   * @param substrate
+   */
+  public void addSubstrate(ReactionComponent substrate) {
+    this.substrate.add(substrate);
   }
   
+  /**
+   * 
+   * @return
+   */
+  public String getName() {
+    return Name;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public ArrayList<ReactionComponent> getProducts() {
+    return product;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public ArrayList<ReactionComponent> getSubstrates() {
+    return substrate;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public ReactionType getType() {
+    return type;
+  }
+  
+  /**
+   * 
+   * @param nl
+   */
   private void parseSubNodes(NodeList nl) {
     if (nl==null) return;
     
@@ -55,37 +135,20 @@ public class Reaction {
     }
   }
 
-  public String getName() {
-    return Name;
-  }
+  /**
+   * 
+   * @param name
+   */
   public void setName(String name) {
     Name = name;
   }
-  public ReactionType getType() {
-    return type;
-  }
+
+  /**
+   * 
+   * @param type
+   */
   public void setType(ReactionType type) {
     this.type = type;
   }
-  
-  public void addSubstrate(ReactionComponent substrate) {
-    this.substrate.add(substrate);
-  }
-  public void addProduct(ReactionComponent product) {
-    this.product.add(product);
-  }
 
-
-  public ArrayList<ReactionComponent> getSubstrates() {
-    return substrate;
-  }
-
-
-  public ArrayList<ReactionComponent> getProducts() {
-    return product;
-  }
-  
-  
-  
-  
 }

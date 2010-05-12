@@ -16,35 +16,41 @@ import java.net.URLConnection;
  * @author wrzodek (heavily modified by a template from Marco Schmidt).
  */
 public class FileDownload {
+  /**
+   * 
+   */
   public static Object ProgressBar;
+  /**
+   * 
+   */
   public static Object StatusLabel;
-  public static void setProgressBar(Object o) {
-    ProgressBar = o;
-  }
-  public static void setStatusLabel(Object o) {
-    StatusLabel = o;
-  }
   
-  public static String download(String address, String localFileName) {
-    OutputStream out = null;
-
-    try {
-      out = new BufferedOutputStream(new FileOutputStream(localFileName));
-    } catch (Throwable t) {
-      final String tempDir = System.getProperty("java.io.tmpdir");
-      localFileName = tempDir + (tempDir.endsWith(File.separator)?"":File.separator) + localFileName;
-      try {
-        out = new BufferedOutputStream(new FileOutputStream(localFileName));
-      } catch (FileNotFoundException e) {
-        e.printStackTrace();
-      }
+  /**
+   * 
+   * @param address
+   * @return
+   */
+  public static String download(String address) {
+    int lastSlashIndex = address.lastIndexOf('/');
+    String localFile=null;
+    if (lastSlashIndex >= 0 &&
+        lastSlashIndex < address.length() - 1) {
+      localFile = address.substring(lastSlashIndex + 1);
+      if (localFile.contains("?") || localFile.contains("=")) localFile = "temp.tmp";
+      localFile = download(address, localFile);
+    } else {
+      localFile = "Temp.tmp";
+      System.err.println("Could not figure out local file name for " + address + ". Calling it '" + localFile + "'.");
+      localFile = download(address, localFile);
     }
-    
-    download(address, out);
-    
-    return localFileName;
+    return localFile;
   }
   
+  /**
+   * 
+   * @param address
+   * @param out
+   */
   public static void download(String address, OutputStream out) {
     if (out==null) return;
     URLConnection conn = null;
@@ -114,7 +120,38 @@ public class FileDownload {
     }
     return;
   }
+  
+  /**
+   * 
+   * @param address
+   * @param localFileName
+   * @return
+   */
+  public static String download(String address, String localFileName) {
+    OutputStream out = null;
 
+    try {
+      out = new BufferedOutputStream(new FileOutputStream(localFileName));
+    } catch (Throwable t) {
+      final String tempDir = System.getProperty("java.io.tmpdir");
+      localFileName = tempDir + (tempDir.endsWith(File.separator)?"":File.separator) + localFileName;
+      try {
+        out = new BufferedOutputStream(new FileOutputStream(localFileName));
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
+    
+    download(address, out);
+    
+    return localFileName;
+  }
+  
+  /**
+   * 
+   * @param address
+   * @return
+   */
   public static boolean isHTMLcontent(String address) {
     URLConnection conn = null;
     InputStream  in = null;
@@ -167,23 +204,11 @@ public class FileDownload {
     
     return ret;
   }
-  
-  public static String download(String address) {
-    int lastSlashIndex = address.lastIndexOf('/');
-    String localFile=null;
-    if (lastSlashIndex >= 0 &&
-        lastSlashIndex < address.length() - 1) {
-      localFile = address.substring(lastSlashIndex + 1);
-      if (localFile.contains("?") || localFile.contains("=")) localFile = "temp.tmp";
-      localFile = download(address, localFile);
-    } else {
-      localFile = "Temp.tmp";
-      System.err.println("Could not figure out local file name for " + address + ". Calling it '" + localFile + "'.");
-      localFile = download(address, localFile);
-    }
-    return localFile;
-  }
 
+  /**
+   * 
+   * @param args
+   */
   public static void main(String[] args) {
     System.out.println(isHTMLcontent("http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE9786"));
     System.out.println(isHTMLcontent("http://rsat.ulb.ac.be/rsat/data/genomes/Arabidopsis_thaliana/oligo-frequencies/5nt_upstream-noorf_Arabidopsis_thaliana-ovlp-2str.freq.gz"));
@@ -195,6 +220,22 @@ public class FileDownload {
     for (int i = 0; i < args.length; i++) {
       download(args[i]);
     }
+  }
+  
+  /**
+   * 
+   * @param o
+   */
+  public static void setProgressBar(Object o) {
+    ProgressBar = o;
+  }
+
+  /**
+   * 
+   * @param o
+   */
+  public static void setStatusLabel(Object o) {
+    StatusLabel = o;
   }
   
 }
