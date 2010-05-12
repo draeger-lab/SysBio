@@ -3,40 +3,37 @@ package de.zbit.kegg.parser.pathway;
 import java.util.ArrayList;
 
 /**
- * Main Kegg document. Corresponding to the Kegg Pathway class (see {@link http
- * ://www.genome.jp/kegg/xml/docs/})
+ * Main Kegg document. Corresponding to the Kegg Pathway class
+ * (see {@link http://www.genome.jp/kegg/xml/docs/})
  * 
  * @author wrzodek
  */
 public class Pathway {
 	/* see http://www.genome.jp/kegg/xml/docs/ */
 	/**
-	 * 
+	 * keggid.type the KEGGID of this pathway map
 	 */
-	String name = ""; // keggid.type the KEGGID of this pathway map
+	String name = "";
 	/**
-	 * 
+	 * maporg.type ko/ec/[org prefix]
 	 */
-	String org = ""; // maporg.type ko/ec/[org prefix]
+	String org = "";
 	/**
-	 * 
+	 * mapnumber.type the map number of this pathway map (5 digit integer)
 	 */
-	int number = 0; // mapnumber.type the map number of this pathway map (5
-	// digit integer)
+	int number = 0;
 	/**
-	 * 
+	 * string.type the title of this pathway map
 	 */
-	String title = ""; // string.type the title of this pathway map
+	String title = "";
 	/**
-	 * 
+	 * url.type the resource location of the image file of this pathway map
 	 */
-	String image = ""; // url.type the resource location of the image file of
-	// this pathway map
+	String image = "";
 	/**
-	 * 
+	 * url.type the resource location of the information about this pathway map
 	 */
-	String link = ""; // url.type the resource location of the information about
-	// this pathway map
+	String link = "";
 	/**
 	 * 
 	 */
@@ -50,6 +47,10 @@ public class Pathway {
 	 */
 	ArrayList<Relation> relations = new ArrayList<Relation>();
 
+	// Custom Variables, not in the KGML specification
+	String comment = null;
+	double version=0;
+	
 	/**
 	 * 
 	 */
@@ -266,4 +267,21 @@ public class Pathway {
 		this.title = title;
 	}
 
+  public String getComment() {
+    return comment;
+  }
+
+  public void setComment(String comment) {
+    this.comment = comment;
+  }
+
+  public double getVersion() {
+    return version;
+  }
+
+  public void setVersion(double version) {
+    this.version = version;
+  }
+
+	
 }

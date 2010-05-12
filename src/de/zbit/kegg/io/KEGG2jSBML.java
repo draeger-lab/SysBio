@@ -41,26 +41,34 @@ import de.zbit.util.SortedArrayList;
  */
 public class KEGG2jSBML implements KeggConverter {
   /**
-   * 
+   * Retrieve annotations from Kegg or use purely information available in the document.
    */
-  public static boolean retrieveKeggAnnots=true; // Retrieve annotations from Kegg or use purely information available in the document.
+  public static boolean retrieveKeggAnnots=true;
   /**
-   * 
+   * Generate pure SBML or do you want to add CellDesigner annotations?
    */
   public static boolean addCellDesignerAnnots=true;
   /**
-   * 
+   * Remove single, not linked nodes
    */
-  public static boolean removeOrphans=true; // remove single, not linked nodes
+  public static boolean removeOrphans=true;
   /**
-   * 
+   * If false, all relations in the document will be skipped. Just like
+   * moste of the other very-basic converters. 
    */
-  public static boolean considerRelations=false;
+  public static boolean considerRelations=true;
   /**
+   * If true, all nodes in white color (except for small molecules/
+   * compunds) will be removed from the grapg.
+   * Kegg colours all nodes, which do NOT occur in the current species
+   * in white. Removing these nodes is HEAVILY recommended if you want
+   * to use the SBML document for simulations.
    * 
+   * Set this node to false if you convert generic pathways (not
+   * species specific), since they ONLY contain white nodes.
    */
   public static boolean removeWhiteNodes=true;
-  /**
+  /*
    * MIRIAM Kegg IDs:
    * urn:miriam:kegg.pathway (hsa00620)
    * urn:miriam:kegg.compound (C12345)
@@ -202,6 +210,7 @@ public class KEGG2jSBML implements KeggConverter {
     if (type.equals(EntryType.enzyme)) return ET_Enzyme2SBO;
     if (type.equals(EntryType.gene)) return ET_Gene2SBO;
     if (type.equals(EntryType.group)) return ET_Group2SBO;
+    if (type.equals(EntryType.genes)) return ET_Group2SBO;
     if (type.equals(EntryType.map)) return ET_Map2SBO;
     if (type.equals(EntryType.ortholog)) return ET_Ortholog2SBO;
     
@@ -241,7 +250,11 @@ public class KEGG2jSBML implements KeggConverter {
         k2s.Convert(p, outfile);
         
       }
-      KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager()); // Remember already queried objects
+      
+      // Remember already queried objects
+      if (k2s.getKeggInfoManager().hasChanged()) {
+        KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager());
+      }
       
       return;
     }
@@ -249,34 +262,48 @@ public class KEGG2jSBML implements KeggConverter {
     
     long start = System.currentTimeMillis();
     try {
-      k2s.Convert("resources/de/zbit/kegg/samplefiles/hsa00010.xml", "resources/de/zbit/kegg/samplefiles/hsa00010.sbml.xml");
+      k2s.Convert("resources/de/zbit/kegg/samplefiles/map04010hsa.xml", "resources/de/zbit/kegg/samplefiles/map04010hsa.sbml.xml");
       //k2s.Kegg2jSBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml");
+      
+      // Remember already queried objects
+      if (k2s.getKeggInfoManager().hasChanged()) {
+        KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager());
+      }
     } catch (Exception e) {e.printStackTrace();}
     System.out.println("Conversion took " + ((System.currentTimeMillis()-start)/1000/60) + " minutes and " + ((System.currentTimeMillis()-start)/1000%60) + " seconds.");
     
   }
   
   /**
-   * 
+   * This manager uses a cache and retrieved informations
+   * from the KeggDB. By using the cache, it is very fast
+   * in retrieving informations.
    */
   private KeggInfoManagement manager;
 
   /**
-   * 
+   * Contains all ids already assigned to an element in the
+   * sbml document. Used for avoiding giving the same id to
+   * two or more different elements.
    */
   private ArrayList<String> SIds = new ArrayList<String>();
   
   /**
-   * 
+   * A flag, if the last sbml file that has been written by
+   * this class was overwritten.
+   * This variable is used by the BatchConverter.
    */
   private boolean lastFileWasOverwritten = false;
-  
-  StringBuffer CDloSpeciesAliases = new StringBuffer();
-  
-  StringBuffer CDloComplexSpeciesAliases = new StringBuffer();
 
-  
+  /**
+   * Temporary Stringbuffers, needed to write CellDesigner
+   * annotations.
+   * Clear thos before converting another document!
+   */
+  StringBuffer CDloSpeciesAliases = new StringBuffer();
+  StringBuffer CDloComplexSpeciesAliases = new StringBuffer();
   StringBuffer CDloProteins = new StringBuffer();
+  
   /**
    * 
    */
@@ -435,23 +462,24 @@ public class KEGG2jSBML implements KeggConverter {
   private void addCellDesignerAnnotationToSpecies(Species spec, Entry e) {
     // TODO: Sind die defaults so richtig? was bedeutet z.B. cd:activity?
     EntryType t = e.getType();
+    boolean isGroupNode = (t.equals(EntryType.group) || t.equals(EntryType.genes)); // genes = group in kgml v<0.7
     
     spec.getAnnotation().addAnnotationNamespace("xmlns:celldesigner","","http://www.sbml.org/2001/ns/celldesigner");
     spec.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
     
     // Add to Species Annotation list
     StringBuffer target;
-    if (t.equals(EntryType.group)) target = CDloComplexSpeciesAliases;
+    if (isGroupNode) target = CDloComplexSpeciesAliases;
     else target = CDloSpeciesAliases;
     // Warning: prefix "cd_sa" is also hardcoded in addCDAtoReaction!
-    target.append("<celldesigner:" + (t.equals(EntryType.group)?"complexSpeciesAlias":"speciesAlias") +" id=\"cd_sa" + spec.getId() + "\" species=\"" + spec.getId() + "\">\n");
+    target.append("<celldesigner:" + (isGroupNode?"complexSpeciesAlias":"speciesAlias") +" id=\"cd_sa" + spec.getId() + "\" species=\"" + spec.getId() + "\">\n");
     target.append("<celldesigner:activity>inactive</celldesigner:activity>\n");
     if (e.hasGraphics())
       target.append(String.format("<celldesigner:bounds x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\"/>\n", 
           e.getGraphics().getX(), e.getGraphics().getY(), e.getGraphics().getWidth(), e.getGraphics().getHeight()));
     target.append("<celldesigner:view state=\"usual\"/>\n");
     
-    if (t.equals(EntryType.group)) {
+    if (isGroupNode) {
       target.append("<celldesigner:backupSize w=\"0.0\" h=\"0.0\"/>\n");
       target.append("<celldesigner:backupView state=\"none\"/>\n");
     }
@@ -463,14 +491,14 @@ public class KEGG2jSBML implements KeggConverter {
       target.append("<celldesigner:innerPosition x=\"0.0\" y=\"0.0\"/>\n");
       target.append(String.format("<celldesigner:boxSize width=\"%d\" height=\"%d\"/>\n", 
           e.hasGraphics()?e.getGraphics().getWidth():90, e.hasGraphics()?e.getGraphics().getHeight():25));
-      target.append("<celldesigner:singleLine width=\"" +(t.equals(EntryType.group)?"2.0":(i==1?"1.0":"0.0")) + "\"/>\n");
+      target.append("<celldesigner:singleLine width=\"" +(isGroupNode?"2.0":(i==1?"1.0":"0.0")) + "\"/>\n");
       target.append(String.format("<celldesigner:paint color=\"" + (i==1?"ff":"3f")  + "%s\" scheme=\"Color\"/>\n", e.getGraphics().getBgcolor().replace("#", "").toLowerCase()));
       if (i==1) target.append("</celldesigner:usualView>\n");
       else target.append("</celldesigner:briefView>\n");
     }
     
     target.append("<celldesigner:info state=\"empty\" angle=\"0.0\"/>\n");
-    target.append("</celldesigner:" + (t.equals(EntryType.group)?"complexSpeciesAlias":"speciesAlias") + ">\n");
+    target.append("</celldesigner:" + (isGroupNode?"complexSpeciesAlias":"speciesAlias") + ">\n");
     
     
     // Add to type specific annotation
@@ -481,7 +509,7 @@ public class KEGG2jSBML implements KeggConverter {
       CDloProteins.append(String.format("<celldesigner:protein id=\"cd_pr%s\" name=\"%s\" type=\"GENERIC\"/>\n", spec.getId(), spec.getId()));
       type = "PROTEIN";
       reference="<celldesigner:proteinReference>cd_pr" + spec.getId() + "</celldesigner:proteinReference>";
-    } else if (t.equals(EntryType.group)) {
+    } else if (isGroupNode) { // t.equals(EntryType.group)
       type="COMPLEX";
       reference="<celldesigner:name>" + NameToCellDesignerName(spec.getName()) + "</celldesigner:name>";
     } else if (t.equals(EntryType.compound)) {
@@ -533,13 +561,6 @@ public class KEGG2jSBML implements KeggConverter {
     SBMLDocument doc = Kegg2jSBML(p);
     
     // JSBML IO => write doc to outfile.
-    /*
-     * Bisher:
-     * - Comportment mit / enden
-     * - <listOfCompartments>
-     * - <listOfSpecies>
-     * - <none> entfernen
-     */
     if (new File(outfile).exists()) lastFileWasOverwritten=true; // Remember that file was already there.
     SBMLWriter.write(doc, outfile);
   }
@@ -574,6 +595,22 @@ public class KEGG2jSBML implements KeggConverter {
     }
     return aktString;
   }
+  
+  /**
+   * 
+   * @param filepath
+   * @return
+   */
+  public SBMLDocument Kegg2jSBML(String filepath) {
+    //System.out.println("Reading kegg pathway...");
+    Pathway p = KeggParser.parse(filepath).get(0);
+    
+    //System.out.println("Converting to SBML");
+    SBMLDocument doc = Kegg2jSBML(p);
+    
+    return doc;
+  }
+  
   /**
    * 
    * @param p
@@ -596,7 +633,7 @@ public class KEGG2jSBML implements KeggConverter {
       preFetchIDs.add(p.getName());
       for (Entry entry: entries) {
         for (String ko_id:entry.getName().split(" ")) {
-          if (ko_id.trim().equalsIgnoreCase("undefined")) continue; // "undefined" = group node, which contains "Components"
+          if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents()) continue; // "undefined" = group node, which contains "Components"
           preFetchIDs.add(ko_id);
         }
       }
@@ -621,7 +658,8 @@ public class KEGG2jSBML implements KeggConverter {
     Model model = doc.createModel(NameToSId(p.getName().replace(":", "_")));
     model.setMetaId("meta_" + model.getId());
     model.setName(p.getTitle());
-    Compartment compartment = model.createCompartment("default"); // Create neccessary default compartment
+    Compartment compartment = model.createCompartment(); // Create neccessary default compartment
+    compartment.setName("default");
     // TODO: provide a parameter for this value.
     compartment.setSize(1d);
     compartment.setUnits(model.getUnitDefinition("volume"));
@@ -692,6 +730,18 @@ public class KEGG2jSBML implements KeggConverter {
     model.appendNotes(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", p.getImage(), p.getImage(), p.getImage()));
     model.appendNotes(String.format("<a href=\"%s\">Original Entry</a><br/>\n", p.getLink()));
     
+    // Write model version and creation date, if available, into model notes.
+    if (p.getVersion()>0 || (p.getComment()!=null && p.getComment().length()>0)) {
+      model.appendNotes("<p>");
+      if (p.getComment()!=null && p.getComment().length()>0) {
+        model.appendNotes(String.format("KGML Comment: " + quotStart + "%s" + quotEnd + "<br />\n", p.getComment() ));
+      }
+      if (p.getVersion()>0) {
+        model.appendNotes(String.format("KGML Version was: %s<br />\n", Double.toString(p.getVersion()) ));
+      }
+      model.appendNotes("</p>");
+    }
+    
     // Save all reaction modifiers in a list. String = reaction id.
     SortedArrayList<Info<String, ModifierSpeciesReference>> reactionModifiers = new SortedArrayList<Info<String, ModifierSpeciesReference>>();
     
@@ -761,6 +811,28 @@ public class KEGG2jSBML implements KeggConverter {
           if (!found) continue;
         }
       }
+      /*
+       * TODO: Gruppenknoten erstellen.
+       * Gibt es sowas in SBML?
+       * InCD -> ja, aber umsetzung ist ungenügend (nur
+       * zur visualisierung, keine SBML Species für alle species).
+       * 
+       *  Beispiel (aus map04010hsa.xml):
+       *      <entry id="141" name="group:" type="genes">
+       *         <graphics fgcolor="#000000" bgcolor="#FFFFFF" type="rectangle" x="945" y="310" width="129" height="59"/>
+       *         <component id="131"/>
+       *         <component id="133"/>
+       *         <component id="134"/>
+       *     </entry>
+       *  Beispiel aktuell (kg0.7 map04010.xml):
+       *    <entry id="138" name="undefined" type="group">
+       *         <graphics fgcolor="#000000" bgcolor="#FFFFFF"
+       *              type="rectangle" x="945" y="310" width="129" height="59"/>
+       *         <component id="131"/>
+       *         <component id="133"/>
+       *         <component id="134"/>
+       *     </entry>  
+       */
       
       // Get a good name for the node
       boolean hasMultipleIDs = false;
@@ -814,9 +886,11 @@ public class KEGG2jSBML implements KeggConverter {
         modifier.setMetaId("meta_" + modifier.getId());
         modifier.setName(modifier.getId());
         if (entry.getType().equals(EntryType.enzyme) || entry.getType().equals(EntryType.gene) ||
-            entry.getType().equals(EntryType.group)  || entry.getType().equals(EntryType.ortholog)) {
-          // 1 & 2: klar. 3 (group): Doku sagt "MOSTLY a protein complex". 4 (ortholog): Kommen in nicht-spezies spezifischen PWs vor und sind
-          // quasi otholog geclusterte gene.
+            entry.getType().equals(EntryType.group)  || entry.getType().equals(EntryType.ortholog) ||
+            entry.getType().equals(EntryType.genes)) {
+          // 1 & 2: klar. 3 (group): Doku sagt "MOSTLY a protein complex". 4 (ortholog): Kommen in
+          // nicht-spezies spezifischen PWs vor und sind quasi otholog geclusterte gene.
+          // 5. (genes) ist group in kgml versionen <0.7.
           modifier.setSBOTerm(ET_EnzymaticModifier2SBO); // 460 = Enzymatic catalyst
         } else { // "Metall oder etwas anderes, was definitiv nicht enzymatisch wirkt"
           modifier.setSBOTerm(ET_GeneralModifier2SBO); // 13 = Catalyst
@@ -869,10 +943,11 @@ public class KEGG2jSBML implements KeggConverter {
       
       // Parse every gene/object in this node.
       for (String ko_id:entry.getName().split(" ")) {
-        if (ko_id.trim().equalsIgnoreCase("undefined")) continue; // "undefined" = group node, which contains "Components"
+        if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents()) continue; // "undefined" = group node, which contains "Components"
         
         // Add Kegg-id Miriam identifier
-        cvtKGID.addResource(KeggInfos.getMiriamURIforKeggID(ko_id, entry.getType()));
+        String kgMiriamEntry = KeggInfos.getMiriamURIforKeggID(ko_id, entry.getType());
+        if (kgMiriamEntry!=null) cvtKGID.addResource(kgMiriamEntry);
         
         // Retrieve further information via Kegg API -- Be careful: very slow!
         KeggInfos infos = new KeggInfos(ko_id, manager);
@@ -1015,7 +1090,7 @@ public class KEGG2jSBML implements KeggConverter {
           }
           sbReaction.appendNotes("</p>");
           
-          if (rePWs!=null) {
+          if (rePWs!=null && infos.getPathways()!=null) {
             for (String pwId:infos.getPathways().split(","))
               rePWs.addResource(KeggInfos.miriam_urn_kgPathway+KeggInfos.suffix(pwId));
           }
@@ -1069,20 +1144,7 @@ public class KEGG2jSBML implements KeggConverter {
     
     return doc;
   }
-  /**
-   * 
-   * @param filepath
-   * @return
-   */
-  public SBMLDocument Kegg2jSBML(String filepath) {
-    //System.out.println("Reading kegg pathway...");
-    Pathway p = KeggParser.parse(filepath).get(0);
-    
-    //System.out.println("Converting to SBML");
-    SBMLDocument doc = Kegg2jSBML(p);
-    
-    return doc;
-  }
+
   /*
    * (non-Javadoc)
    * @see de.zbit.kegg.io.KeggConverter#lastFileWasOverwritten()

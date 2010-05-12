@@ -15,17 +15,7 @@ import de.zbit.util.Utils;
  */
 public class KeggInfoManagement extends InfoManagement<String, String> implements Serializable {
   private static final long serialVersionUID = -2621701345149317801L;
-  /**
-   * 
-   * @param ids
-   * @return
-   */
-  private static String concatenateKeggIDs(String[] ids) {
-    String ret = "";
-    for (String s: ids)
-      ret+=s.replace(" ", "")+" ";
-    return ret.trim();
-  }
+  private boolean hasChanged=false;
   
   private KeggAdaptor adap=null;
   
@@ -68,6 +58,7 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
   @Override
   protected String fetchInformation(String id) throws TimeoutException, UnsuccessfulRetrieveException {
     if (offlineMode) throw new TimeoutException();
+    hasChanged=true;
     
     if (adap==null) adap = getKeggAdaptor(); // create new one
     String ret = adap.getWithReturnInformation(id);
@@ -82,9 +73,11 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
    * (non-Javadoc)
    * @see de.zbit.util.InfoManagement#fetchMultipleInformations(IDtype[])
    */
+  /**
+   * Wrapper for {@link fetchMultipleInformationsUpTo100AtATime} because Kegg only supports 100 at a time :)
+   */
   @Override
   protected String[] fetchMultipleInformations(String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
-    // Wrapper for {@link fetchMultipleInformationsUpTo100AtATime} because Kegg only supports 100 at a time :)
     String[] realRet;
     if (ids.length<=100) {
       realRet = fetchMultipleInformationsUpTo100AtATime(ids);
@@ -109,7 +102,8 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
   }
 
   /**
-   * 
+   * Do not call this class by yourself.
+   * It's just a helper method for {@link fetchMultipleInformations}
    * @param ids
    * @return
    * @throws TimeoutException
@@ -119,6 +113,7 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     if (offlineMode) throw new TimeoutException();
     if (ids == null) return null;
     if (ids.length<1) return new String[0];
+    hasChanged=true;
     
     if (adap==null) adap = getKeggAdaptor(); // create new one
     String q = adap.getWithReturnInformation(concatenateKeggIDs(ids));
@@ -233,6 +228,7 @@ CLASS       Metabolism; [...]
   @Override
   protected void restoreUnserializableObject () {
     adap = getKeggAdaptor();
+    hasChanged=false;
   }
   /**
    * 
@@ -242,4 +238,22 @@ CLASS       Metabolism; [...]
     this.adap = adap;
   }
   
+  /**
+   * @return has the content of this class changed, since initilization/ Loading?
+   */
+  public boolean hasChanged() {
+    return hasChanged;
+  }
+  
+  /**
+   * Requiered for queries to the KeggDB.
+   * @param ids
+   * @return every id in the array in one string, separated by a whitespace.
+   */
+  private static String concatenateKeggIDs(String[] ids) {
+    String ret = "";
+    for (String s: ids)
+      ret+=s.replace(" ", "")+" ";
+    return ret.trim();
+  }
 }

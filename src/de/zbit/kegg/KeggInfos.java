@@ -47,7 +47,7 @@ public class KeggInfos {
     } else if (et==null && prefix.startsWith("ko:") || et!=null && (et.equals(EntryType.gene) || et.equals(EntryType.ortholog)) ) {// z.B. hsa:00123, ko:00123
       ret=miriam_urn_kgGenes + keggId.trim(); // Be careful here: Don't trim to ':'! (Don't use suffix)
     } else {
-      System.err.println("Please implement MIRIAM urn for: '" + keggId + et!=null?"' (" + et.toString() + ").":".");
+      System.err.println("Please implement MIRIAM urn for: '" + keggId + ((et!=null)?"' (" + et.toString() + ").":"."));
       return null;
     }
     return ret;
