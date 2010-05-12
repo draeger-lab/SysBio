@@ -1,4 +1,5 @@
 package de.zbit.kegg.io;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Rectangle;
@@ -49,19 +50,173 @@ import de.zbit.util.ProgressBar;
  * @author wrzodek
  */
 public class KEGG2GraphML implements KeggConverter {
+  /**
+   * 
+   */
   public static boolean silent = true; // Surpresses all outputs, except %-values
+  /**
+   * 
+   */
   public static boolean absoluteNoOutputs = true;
-  
+  /**
+   * 
+   */
   public static boolean retrieveKeggAnnots=true; // z.B. "hsa" = homo sapiens, "" => General, null => keine infos von kegg.
+  /**
+   * 
+   */
   public static boolean showEntriesWithoutGraphAttribute=true;
+  /**
+   * 
+   */
   public static boolean skipCompounds=false;
+  /**
+   * 
+   */
   public static boolean groupNodesWithSameEdges=false;
+  /**
+   * 
+   */
   public static boolean removeDegreeZeroNodes=true; // Bezieht sich nur auf "Non-map nodes" (Also nicht auf Pathway referenzen).
+  /**
+   * 
+   */
   public static boolean renameCompoundToSmallMolecule=true; // Fuer Jochen & GePS unbedingt true lassen (so was wie LPS, CA2+ als "sm" bezeichnen).
-  
+  /**
+   * 
+   */
   public static boolean lastFileWasOverwritten=false; // Gibt an, ob das letzte geschriebene outFile bereits vorhanden war und deshalb ueberschrieben wurde.
-  
+  /**
+   * 
+   */
   public static KeggInfoManagement manager=null;
+  
+  /**
+   * 
+   * @param nm
+   * @param ioh
+   * @param desc
+   */
+  private static void addEdgeMap(EdgeMap nm, Graph2DGraphMLHandler ioh, String desc) {
+    addEdgeMap(nm, ioh, desc, KeyType.STRING);//AttributeConstants.TYPE_STRING
+  }
+  
+  /**
+   * 
+   * @param nm
+   * @param ioh
+   * @param desc
+   * @param keytype
+   */
+  private static void addEdgeMap(EdgeMap nm, Graph2DGraphMLHandler ioh, String desc, KeyType keytype) {
+    ioh.addInputDataAcceptor (desc, nm, KeyScope.EDGE, keytype);
+    ioh.addOutputDataProvider(desc, nm, KeyScope.EDGE, keytype);
+    //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
+  }
+  
+  /**
+   * 
+   * @param nm
+   * @param ioh
+   * @param desc
+   */
+  private static void addNodeMap(NodeMap nm, Graph2DGraphMLHandler ioh, String desc) {
+    addNodeMap(nm, ioh, desc, KeyType.STRING);//AttributeConstants.TYPE_STRING
+  }
+
+  /**
+   * 
+   * @param nm
+   * @param ioh
+   * @param desc
+   * @param keytype
+   */
+  private static void addNodeMap(NodeMap nm, Graph2DGraphMLHandler ioh, String desc, KeyType keytype) {
+    ioh.addInputDataAcceptor (desc, nm, KeyScope.NODE, keytype);
+    ioh.addOutputDataProvider(desc, nm, KeyScope.NODE, keytype);
+    //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
+  }
+  
+  /**
+   * 
+   * @param theColor
+   * @return
+   */
+  public static Color ColorFromHTML(String theColor) {
+    if (theColor.startsWith("#")) theColor = theColor.substring(1);
+    if (theColor.trim().equalsIgnoreCase("none")) theColor="000000";
+    
+    if (theColor.length() != 6)
+      throw new IllegalArgumentException("Not a valid HTML color: " + theColor);
+    return new Color(
+      Integer.valueOf(theColor.substring(0, 2), 16).intValue(),
+      Integer.valueOf(theColor.substring(2, 4), 16).intValue(),
+      Integer.valueOf(theColor.substring(4, 6), 16).intValue());
+  }
+  
+  /**
+   * 
+   * @param color
+   * @return
+   */
+  public static String ColorToHTML(Color color) {
+    return "#" + Integer.toHexString(color.getRGB()).substring(2).toUpperCase();
+  }
+  
+  /**
+   * Configures the view that is used as rendering environment for some output
+   * formats.
+   */
+  private static void configureView(Graph2DView view) {
+    Graph2D graph = view.getGraph2D();
+    Rectangle box = graph.getBoundingBox();
+    // Dimension dim = //inBox.getSize();
+    // view.setPreferredSize(dim);
+    // view.setSize(dim);
+    view.zoomToArea(box.getX() - 10, box.getY() - 10, box.getWidth() + 20, box.getHeight() + 20);
+    view.fitContent();
+    view.setPaintDetailThreshold(0.0); // never switch to less detail mode
+  }
+
+  /**
+   * 
+   * @param e
+   * @param e2
+   * @param graph
+   * @return
+   */
+  public static boolean edgesEqualExceptTargets(Edge e, Edge e2, Graph2D graph) {
+    EdgeRealizer er = graph.getRealizer(e);
+    EdgeRealizer er2 = graph.getRealizer(e2);
+    if (er.equals(er2) || er.getTargetArrow().equals(er2.getTargetArrow()) && er.getSourceArrow().equals(er2.getSourceArrow()) && er.getLineType().equals(er2.getLineType()) && er.getLabelText().equals(er2.getLabelText())) {
+      return true;
+    }
+    return false;
+  }
+  
+  /**
+   * 
+   * @param s
+   * @return
+   */
+  public static boolean isNumber(String s) {
+    if (s==null || s.trim().length()==0) return false;
+    char[] m = s.toCharArray();
+    for (char c: m)
+      if (!Character.isDigit(c)) return false;
+    return true;
+  }
+  
+  
+  /**
+   * A simple static wrapper for the non-static Convert Method.
+   * @param p
+   * @param outFile
+   */
+  public static void KEGG2GraphML(Pathway p, String outFile) {
+    KEGG2GraphML k2g = new KEGG2GraphML();
+    k2g.Convert(p, outFile);
+  }
   
   /**
    * @param args
@@ -98,15 +253,127 @@ public class KEGG2GraphML implements KeggConverter {
   }
   
   /**
-   * A simple static wrapper for the non-static Convert Method.
-   * @param p
-   * @param outFile
+   * Tests, if two nodes do have exactly the same source and target nodes on their edges and if the edges do have the same shape (Arrow, LineType and description).
+   * @param n1
+   * @param n2
+   * @param graph
+   * @return
    */
-  public static void KEGG2GraphML(Pathway p, String outFile) {
-    KEGG2GraphML k2g = new KEGG2GraphML();
-    k2g.Convert(p, outFile);
+  public static boolean nodesHaveSameEdges(Node n1, Node n2, Graph2D graph) {
+    if (n1.inDegree()!=n2.inDegree() || n1.outDegree()!=n2.outDegree()) return false;
+    
+    Edge e = n1.firstInEdge();
+    while (e!=null) {
+      Edge e2 = n2.firstInEdge();
+      boolean found = false;
+      while (e2!=null) {
+        if (e.source().equals(e2.source())) {
+          if (edgesEqualExceptTargets(e, e2, graph)) {
+            found = true;
+            break;
+          }
+        }
+        e2 = e2.nextInEdge();
+      }
+      
+      if (!found) return false; // Edge from n1 not in n2
+      e = e.nextInEdge();
+    }
+
+    // Same for outEdges
+    e = n1.firstOutEdge();
+    while (e!=null) {
+      Edge e2 = n2.firstOutEdge();
+      boolean found = false;
+      while (e2!=null) {
+        if (e.target().equals(e2.target())) {
+          if (edgesEqualExceptTargets(e, e2, graph)) {
+            found = true;
+            break;
+          }
+        }
+        e2 = e2.nextOutEdge();
+      }
+      
+      if (!found) return false; // Edge from n1 not in n2
+      e = e.nextOutEdge();
+    }
+    
+    return true;
   }
   
+  /**
+   * 
+   * @param nl
+   * @param graph
+   * @return
+   */
+  private static NodeList removeOutlier(NodeList nl, Graph2D graph) {
+    // Calculate minimal distances
+    double[] minDists = new double[nl.size()];
+    for (int j=0; j<nl.size(); j++) {
+      NodeRealizer n1 = graph.getRealizer((Node) nl.get(j));
+      double minDist=Double.MAX_VALUE;
+      for (int k=0; k<nl.size(); k++) {
+        if (j==k) continue;
+        NodeRealizer n2 = graph.getRealizer((Node) nl.get(k));
+        double dist = Math.max(Math.abs(n1.getCenterX()-n2.getCenterX()), Math.abs(n1.getCenterY()-n2.getCenterY()));
+        minDist = Math.min(minDist, dist);
+      }
+      //System.out.println(minDist + " \t" + n1.getLabelText() );
+      minDists[j] = minDist;
+    }
+    
+    ArrayList<Integer> toRemove = new ArrayList<Integer>();
+    if (nl.size()<2) return nl; // one node
+    
+    for (int j=0; j<minDists.length; j++)
+      if (minDists[j]>50) toRemove.add(j);
+    
+    // Nothing to do?
+    if (toRemove.size()<1) return nl;
+    
+    NodeList nl2 = new NodeList(); 
+    for (int j=0; j<nl.size(); j++) {
+      if (toRemove.contains(j)) continue;
+      nl2.add(nl.get(j));
+    }
+    nl = nl2;
+    
+    return nl;
+  }
+
+  /**
+   * Standard Setup for group nodes.
+   * @param nl
+   * @param changeCaption = null if you don't want to change the caption.
+   */
+  private static NodeRealizer setupGroupNode(NodeLabel nl, String changeCaption) {
+    GroupNodeRealizer nr = new GroupNodeRealizer();
+    ((GroupNodeRealizer)nr).setGroupClosed(false);
+    nr.setTransparent(true);
+    
+    if (changeCaption!=null) {
+      String newText = changeCaption; //"Group";
+      nl.setText(newText);
+    }
+    
+    nr.setMinimalInsets(new YInsets(5, 2, 2, 2)); // top, left, bottom, right
+    nr.setAutoBoundsEnabled(true);
+    nl.setPosition(NodeLabel.TOP);
+    nl.setBackgroundColor(new Color((float)0.8,(float)0.8,(float)0.8,(float)0.5));
+    nl.setFontSize(10);
+    nl.setAutoSizePolicy(NodeLabel.AUTOSIZE_NODE_WIDTH);
+    
+    nr.setLabel(nl);
+    
+    return nr;
+  }
+  
+  
+  /**
+   * 
+   */
   public void Convert(Pathway p, String outFile) {
     Graph2D graph = new Graph2D();
     ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>();
@@ -673,187 +940,6 @@ public class KEGG2GraphML implements KeggConverter {
     } else {
       System.err.println("Y OutputHandler can't write.");
     }
-  }
-
-  private static void addNodeMap(NodeMap nm, Graph2DGraphMLHandler ioh, String desc, KeyType keytype) {
-    ioh.addInputDataAcceptor (desc, nm, KeyScope.NODE, keytype);
-    ioh.addOutputDataProvider(desc, nm, KeyScope.NODE, keytype);
-    //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
-  }
-  private static void addNodeMap(NodeMap nm, Graph2DGraphMLHandler ioh, String desc) {
-    addNodeMap(nm, ioh, desc, KeyType.STRING);//AttributeConstants.TYPE_STRING
-  }
-  private static void addEdgeMap(EdgeMap nm, Graph2DGraphMLHandler ioh, String desc, KeyType keytype) {
-    ioh.addInputDataAcceptor (desc, nm, KeyScope.EDGE, keytype);
-    ioh.addOutputDataProvider(desc, nm, KeyScope.EDGE, keytype);
-    //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
-  }
-  private static void addEdgeMap(EdgeMap nm, Graph2DGraphMLHandler ioh, String desc) {
-    addEdgeMap(nm, ioh, desc, KeyType.STRING);//AttributeConstants.TYPE_STRING
-  }
-
-
-  
-  private static NodeList removeOutlier(NodeList nl, Graph2D graph) {
-    // Calculate minimal distances
-    double[] minDists = new double[nl.size()];
-    for (int j=0; j<nl.size(); j++) {
-      NodeRealizer n1 = graph.getRealizer((Node) nl.get(j));
-      double minDist=Double.MAX_VALUE;
-      for (int k=0; k<nl.size(); k++) {
-        if (j==k) continue;
-        NodeRealizer n2 = graph.getRealizer((Node) nl.get(k));
-        double dist = Math.max(Math.abs(n1.getCenterX()-n2.getCenterX()), Math.abs(n1.getCenterY()-n2.getCenterY()));
-        minDist = Math.min(minDist, dist);
-      }
-      //System.out.println(minDist + " \t" + n1.getLabelText() );
-      minDists[j] = minDist;
-    }
-    
-    ArrayList<Integer> toRemove = new ArrayList<Integer>();
-    if (nl.size()<2) return nl; // one node
-    
-    for (int j=0; j<minDists.length; j++)
-      if (minDists[j]>50) toRemove.add(j);
-    
-    // Nothing to do?
-    if (toRemove.size()<1) return nl;
-    
-    NodeList nl2 = new NodeList(); 
-    for (int j=0; j<nl.size(); j++) {
-      if (toRemove.contains(j)) continue;
-      nl2.add(nl.get(j));
-    }
-    nl = nl2;
-    
-    return nl;
-  }
-  
-  /**
-   * Standard Setup for group nodes.
-   * @param nl
-   * @param changeCaption = null if you don't want to change the caption.
-   */
-  private static NodeRealizer setupGroupNode(NodeLabel nl, String changeCaption) {
-    GroupNodeRealizer nr = new GroupNodeRealizer();
-    ((GroupNodeRealizer)nr).setGroupClosed(false);
-    nr.setTransparent(true);
-    
-    if (changeCaption!=null) {
-      String newText = changeCaption; //"Group";
-      nl.setText(newText);
-    }
-    
-    nr.setMinimalInsets(new YInsets(5, 2, 2, 2)); // top, left, bottom, right
-    nr.setAutoBoundsEnabled(true);
-    nl.setPosition(NodeLabel.TOP);
-    nl.setBackgroundColor(new Color((float)0.8,(float)0.8,(float)0.8,(float)0.5));
-    nl.setFontSize(10);
-    nl.setAutoSizePolicy(NodeLabel.AUTOSIZE_NODE_WIDTH);
-    
-    nr.setLabel(nl);
-    
-    return nr;
-  }
-  
-  
-  /**
-   * Tests, if two nodes do have exactly the same source and target nodes on their edges and if the edges do have the same shape (Arrow, LineType and description).
-   * @param n1
-   * @param n2
-   * @param graph
-   * @return
-   */
-  public static boolean nodesHaveSameEdges(Node n1, Node n2, Graph2D graph) {
-    if (n1.inDegree()!=n2.inDegree() || n1.outDegree()!=n2.outDegree()) return false;
-    
-    Edge e = n1.firstInEdge();
-    while (e!=null) {
-      Edge e2 = n2.firstInEdge();
-      boolean found = false;
-      while (e2!=null) {
-        if (e.source().equals(e2.source())) {
-          if (edgesEqualExceptTargets(e, e2, graph)) {
-            found = true;
-            break;
-          }
-        }
-        e2 = e2.nextInEdge();
-      }
-      
-      if (!found) return false; // Edge from n1 not in n2
-      e = e.nextInEdge();
-    }
-
-    // Same for outEdges
-    e = n1.firstOutEdge();
-    while (e!=null) {
-      Edge e2 = n2.firstOutEdge();
-      boolean found = false;
-      while (e2!=null) {
-        if (e.target().equals(e2.target())) {
-          if (edgesEqualExceptTargets(e, e2, graph)) {
-            found = true;
-            break;
-          }
-        }
-        e2 = e2.nextOutEdge();
-      }
-      
-      if (!found) return false; // Edge from n1 not in n2
-      e = e.nextOutEdge();
-    }
-    
-    return true;
-  }
-  
-  public static boolean edgesEqualExceptTargets(Edge e, Edge e2, Graph2D graph) {
-    EdgeRealizer er = graph.getRealizer(e);
-    EdgeRealizer er2 = graph.getRealizer(e2);
-    if (er.equals(er2) || er.getTargetArrow().equals(er2.getTargetArrow()) && er.getSourceArrow().equals(er2.getSourceArrow()) && er.getLineType().equals(er2.getLineType()) && er.getLabelText().equals(er2.getLabelText())) {
-      return true;
-    }
-    return false;
-  }
-  
-  public static Color ColorFromHTML(String theColor) {
-    if (theColor.startsWith("#")) theColor = theColor.substring(1);
-    if (theColor.trim().equalsIgnoreCase("none")) theColor="000000";
-    
-    if (theColor.length() != 6)
-      throw new IllegalArgumentException("Not a valid HTML color: " + theColor);
-    return new Color(
-      Integer.valueOf(theColor.substring(0, 2), 16).intValue(),
-      Integer.valueOf(theColor.substring(2, 4), 16).intValue(),
-      Integer.valueOf(theColor.substring(4, 6), 16).intValue());
-  }
-  
-  public static String ColorToHTML(Color color) {
-    return "#" + Integer.toHexString(color.getRGB()).substring(2).toUpperCase();
-  }
-
-  public static boolean isNumber(String s) {
-    if (s==null || s.trim().length()==0) return false;
-    char[] m = s.toCharArray();
-    for (char c: m)
-      if (!Character.isDigit(c)) return false;
-    return true;
-  }
-  
-  
-  /**
-   * Configures the view that is used as rendering environment for some output
-   * formats.
-   */
-  private static void configureView(Graph2DView view) {
-    Graph2D graph = view.getGraph2D();
-    Rectangle box = graph.getBoundingBox();
-    // Dimension dim = //inBox.getSize();
-    // view.setPreferredSize(dim);
-    // view.setSize(dim);
-    view.zoomToArea(box.getX() - 10, box.getY() - 10, box.getWidth() + 20, box.getHeight() + 20);
-    view.fitContent();
-    view.setPaintDetailThreshold(0.0); // never switch to less detail mode
   }
 
   /*

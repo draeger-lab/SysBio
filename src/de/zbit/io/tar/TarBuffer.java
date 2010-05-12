@@ -49,14 +49,41 @@ public class TarBuffer {
     /** Default block size */
     public static final int DEFAULT_BLKSIZE = (DEFAULT_RCDSIZE * 20);
 
+    /**
+     * 
+     */
     private InputStream     inStream;
+    /**
+     * 
+     */
     private OutputStream    outStream;
+    /**
+     * 
+     */
     private byte[]          blockBuffer;
+    /**
+     * 
+     */
     private int             currBlkIdx;
+    /**
+     * 
+     */
     private int             currRecIdx;
+    /**
+     * 
+     */
     private int             blockSize;
+    /**
+     * 
+     */
     private int             recordSize;
+    /**
+     * 
+     */
     private int             recsPerBlock;
+    /**
+     * 
+     */
     private boolean         debug;
 
     /**

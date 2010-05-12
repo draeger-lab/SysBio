@@ -15,8 +15,15 @@ import java.util.regex.Pattern;
  */
 public class RegExpFileFilter implements FileFilter {
 
+	/**
+	 * 
+	 */
 	protected final Pattern p;
 
+	/**
+	 * 
+	 * @param regexp
+	 */
 	public RegExpFileFilter(String regexp) {
 		p = Pattern.compile(regexp);
 	}
@@ -26,7 +33,6 @@ public class RegExpFileFilter implements FileFilter {
 	 * 
 	 * @see java.io.FileFilter#accept(java.io.File)
 	 */
-	// @Override
 	public boolean accept(File pathname) {
 		return p.matcher(pathname.getName()).matches();
 	}

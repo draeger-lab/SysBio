@@ -28,6 +28,16 @@ public class ConverterUI extends JFrame {
 	private static final long serialVersionUID = -3833481758555783529L;
 
 	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		if (args.length > 0 && args[0].startsWith("--input="))
+			new ConverterUI(args[0].split("=")[1]);
+		else
+			new ConverterUI();
+	}
+
+	/**
 	 * Shows a small GUI.
 	 */
 	public ConverterUI() {
@@ -41,6 +51,19 @@ public class ConverterUI extends JFrame {
 			dispose();
 	}
 
+	/**
+	 * 
+	 * @param string
+	 */
+	public ConverterUI(String string) {
+		super("KGML2SBMLconverter");
+		showGUI(string);
+	}
+
+	/**
+	 * 
+	 * @param absolutePath
+	 */
 	private void showGUI(String absolutePath) {
 		// Speedup Kegg2SBML by loading alredy queried objects. Reduces
 		// network load and heavily reduces computation time.
@@ -69,21 +92,6 @@ public class ConverterUI extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		pack();
 		setVisible(true);
-	}
-
-	public ConverterUI(String string) {
-		super("KGML2SBMLconverter");
-		showGUI(string);
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		if (args.length > 0 && args[0].startsWith("--input="))
-			new ConverterUI(args[0].split("=")[1]);
-		else
-			new ConverterUI();
 	}
 
 }

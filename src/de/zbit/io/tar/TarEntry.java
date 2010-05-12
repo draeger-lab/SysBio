@@ -75,7 +75,6 @@ import java.util.Locale;
  * </pre>
  *
  */
-
 public class TarEntry implements TarConstants {
     /** The entry's name. */
     private StringBuffer name;

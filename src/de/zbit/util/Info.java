@@ -14,57 +14,26 @@ import java.io.Serializable;
  */
 @SuppressWarnings("unchecked")
 public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Serializable {
-	private static final long serialVersionUID = 3592331552130670620L;
-	private IDtype identifier;
-	private INFOtype information;
-
-	private int timesInfoAccessed = 0;
-	private float timeForFetchingInfo=(float) 1.0; // Remebering the time, the fetching of this information took (in s, (Minium of 1!!!))
-
-	public INFOtype getInformation() {
-		/*
-		 * Do NOT call this function internaly, since it remembers how often you
-		 * use it.
-		 */
-		if (timesInfoAccessed != Integer.MAX_VALUE)
-			timesInfoAccessed++;
-		return information;
-	}
-
-	public void setInformation(INFOtype information) {
-		this.information = information;
-	}
-
-	public IDtype getIdentifier() {
-		return identifier;
-	}
-
-	public int getTimesInfoAccessed() {
-		return timesInfoAccessed;
-	}
 	/**
-	 * Returns the time, the fetching of this information took.
-	 * In seconds with minimum of 1!
-	 * @return
+	 * 
 	 */
-	public float getTimeForFetchingInfo() {
-	  return (float) Math.max(1.0, timeForFetchingInfo);
-	}
-	
+	private static final long serialVersionUID = 3592331552130670620L;
 	/**
-   * Sets the time, the fetching of this information took.
-   * In seconds with minimum of 1!
-   * 
-   * If you give this information, items which take long to retrieve have less probability
-   * to get remove from the queue if it's full.
-   */
-	public void setTimeForFetchingInfo(float f) {
-	  this.timeForFetchingInfo = Math.max(f,(float)1.0);
-	}
-
-	public void resetTimesInfoAccessed() {
-		timesInfoAccessed = 0;
-	}
+	 * 
+	 */
+	private IDtype identifier;
+	/**
+	 * 
+	 */
+	private INFOtype information;
+    /**
+     * 
+     */
+	private int timesInfoAccessed = 0;
+	/**
+	 * Remebering the time, the fetching of this information took (in s, (Minium of 1!!!))
+	 */
+	private float timeForFetchingInfo=(float) 1.0;
 
 	/**
 	 * Construct a new element.
@@ -78,7 +47,10 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 		this.information = information;
 	}
 
-	// @Override
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	public int compareTo(Object o) {
 		if (o instanceof Info) {
 			return identifier.compareTo(((Info) o).getIdentifier());
@@ -93,11 +65,22 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 		return 0;
 	}
 
-	@Override
-	public int hashCode() {
-		return getIdentifier().hashCode() + information.hashCode();
+	/**
+	 * 
+	 * @param o
+	 * @return
+	 */
+	public boolean equals(Info<IDtype, INFOtype> o) {
+		if (o.getIdentifier().equals(this.getIdentifier())
+				&& o.information.equals(this.information))
+			return true;
+		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		try {
@@ -107,14 +90,85 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 		} // Other subtypes. Wrong cast!
 		return super.equals(obj);
 	}
-
-	public boolean equals(Info<IDtype, INFOtype> o) {
-		if (o.getIdentifier().equals(this.getIdentifier())
-				&& o.information.equals(this.information))
-			return true;
-		return false;
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public IDtype getIdentifier() {
+		return identifier;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public INFOtype getInformation() {
+		/*
+		 * Do NOT call this function internaly, since it remembers how often you
+		 * use it.
+		 */
+		if (timesInfoAccessed != Integer.MAX_VALUE)
+			timesInfoAccessed++;
+		return information;
 	}
 
+	/**
+	 * Returns the time, the fetching of this information took.
+	 * In seconds with minimum of 1!
+	 * @return
+	 */
+	public float getTimeForFetchingInfo() {
+	  return (float) Math.max(1.0, timeForFetchingInfo);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getTimesInfoAccessed() {
+		return timesInfoAccessed;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return getIdentifier().hashCode() + information.hashCode();
+	}
+
+	/**
+	 * 
+	 */
+	public void resetTimesInfoAccessed() {
+		timesInfoAccessed = 0;
+	}
+
+	/**
+	 * 
+	 * @param information
+	 */
+	public void setInformation(INFOtype information) {
+		this.information = information;
+	}
+
+	/**
+   * Sets the time, the fetching of this information took.
+   * In seconds with minimum of 1!
+   * 
+   * If you give this information, items which take long to retrieve have less probability
+   * to get remove from the queue if it's full.
+   */
+	public void setTimeForFetchingInfo(float f) {
+	  this.timeForFetchingInfo = Math.max(f,(float)1.0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "@InfoObject. ID: '" + getIdentifier().toString()

@@ -5,5 +5,24 @@ package de.zbit.kegg.parser.pathway;
  * @author wrzodek
  */
 public enum GraphicsType {
-  rectangle, circle, roundrectangle, line, other
+  /**
+   * 
+   */
+  rectangle,
+  /**
+   * 
+   */
+  circle,
+  /**
+   * 
+   */
+  roundrectangle,
+  /**
+   * 
+   */
+  line,
+  /**
+   * 
+   */
+  other
 }

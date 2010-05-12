@@ -15,41 +15,56 @@ import de.zbit.util.Utils;
  */
 public class KeggInfoManagement extends InfoManagement<String, String> implements Serializable {
   private static final long serialVersionUID = -2621701345149317801L;
+  /**
+   * 
+   * @param ids
+   * @return
+   */
+  private static String concatenateKeggIDs(String[] ids) {
+    String ret = "";
+    for (String s: ids)
+      ret+=s.replace(" ", "")+" ";
+    return ret.trim();
+  }
+  
   private KeggAdaptor adap=null;
   
   /**
    * If this flag ist set to true, this class does NOT retrieve any Information, but uses stored information.
    */
   public static boolean offlineMode = false;
-  
+      
+  /**
+   * 
+   */
   public KeggInfoManagement () {
     super();
     this.adap = new KeggAdaptor();
   }
-      
+  
+  /**
+   * 
+   * @param maxListSize
+   * @param adap
+   */
   public KeggInfoManagement (int maxListSize, KeggAdaptor adap) {
     super(maxListSize); // Remember maxListSize queries at max.
     this.adap = adap;
   }
   
-  public KeggAdaptor getKeggAdaptor() {
-    if (adap==null) adap = new KeggAdaptor();
-    return adap;
-  }
-  public void setKeggAdaptor(KeggAdaptor adap) {
-    this.adap = adap;
-  }
-
-  
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.util.InfoManagement#cleanupUnserializableObject()
+   */
   @Override  
   protected void cleanupUnserializableObject() {
     adap = null;
   }
-  @Override
-  protected void restoreUnserializableObject () {
-    adap = getKeggAdaptor();
-  }
 
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.util.InfoManagement#fetchInformation(java.lang.Comparable)
+   */
   @Override
   protected String fetchInformation(String id) throws TimeoutException, UnsuccessfulRetrieveException {
     if (offlineMode) throw new TimeoutException();
@@ -62,7 +77,44 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     
     return ret; // Successfull and "with data" ;-) 
   }
+  
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.util.InfoManagement#fetchMultipleInformations(IDtype[])
+   */
+  @Override
+  protected String[] fetchMultipleInformations(String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
+    // Wrapper for {@link fetchMultipleInformationsUpTo100AtATime} because Kegg only supports 100 at a time :)
+    String[] realRet;
+    if (ids.length<=100) {
+      realRet = fetchMultipleInformationsUpTo100AtATime(ids);
+    } else {
+      realRet = new String[ids.length];
 
+      // Instead of requesting all objects at once, splitts Queries to 100 max and concatenates the results... that's it.
+      int i=0;
+      while (i<ids.length) {
+        String[] subArr = new String[Math.min(100, ids.length-i)];
+        System.arraycopy(ids, i, subArr, 0, subArr.length);
+
+        String[] ret = fetchMultipleInformationsUpTo100AtATime(subArr);
+        System.arraycopy(ret, 0, realRet, i, ret.length);
+
+        i+=subArr.length;
+      }
+    }
+    realRet = removeUnnecessaryInfos(realRet);
+    
+    return realRet;
+  }
+
+  /**
+   * 
+   * @param ids
+   * @return
+   * @throws TimeoutException
+   * @throws UnsuccessfulRetrieveException
+   */
   private String[] fetchMultipleInformationsUpTo100AtATime(String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
     if (offlineMode) throw new TimeoutException();
     if (ids == null) return null;
@@ -127,52 +179,16 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     
     return ret; // Successfull and "with data" ;-) 
   }
-  
-  private static String concatenateKeggIDs(String[] ids) {
-    String ret = "";
-    for (String s: ids)
-      ret+=s.replace(" ", "")+" ";
-    return ret.trim();
-  }
-
-  @Override
-  protected String[] fetchMultipleInformations(String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
-    // Wrapper for {@link fetchMultipleInformationsUpTo100AtATime} because Kegg only supports 100 at a time :)
-    String[] realRet;
-    if (ids.length<=100) {
-      realRet = fetchMultipleInformationsUpTo100AtATime(ids);
-    } else {
-      realRet = new String[ids.length];
-
-      // Instead of requesting all objects at once, splitts Queries to 100 max and concatenates the results... that's it.
-      int i=0;
-      while (i<ids.length) {
-        String[] subArr = new String[Math.min(100, ids.length-i)];
-        System.arraycopy(ids, i, subArr, 0, subArr.length);
-
-        String[] ret = fetchMultipleInformationsUpTo100AtATime(subArr);
-        System.arraycopy(ret, 0, realRet, i, ret.length);
-
-        i+=subArr.length;
-      }
-    }
-    realRet = removeUnnecessaryInfos(realRet);
-    
-    return realRet;
-  }
 
   /**
-   * This function allows you to extend this class and overwrite this function.
-   * Then you can remove all information from the KeggString which you don't need.
-   * This may save you a lot of RAM. Please keep this Class as generic as possible.
-   * So don't implement this function here directly!
+   * 
    * @return
    */
-  private String[] removeUnnecessaryInfos(String[] realRet) {
-    for (int i=0; i<realRet.length; i++)
-      realRet[i] = removeUnnecessaryInfos(realRet[i]);
-    return realRet;
+  public KeggAdaptor getKeggAdaptor() {
+    if (adap==null) adap = new KeggAdaptor();
+    return adap;
   }
+  
   /**
    * This function allows you to extend this class and overwrite this function.
    * Then you can remove all information from the KeggString which you don't need.
@@ -195,6 +211,35 @@ PATHWAY     hsa04010  MAPK signaling pathway
 CLASS       Metabolism; [...]
      */
     return ret;
+  }
+
+  /**
+   * This function allows you to extend this class and overwrite this function.
+   * Then you can remove all information from the KeggString which you don't need.
+   * This may save you a lot of RAM. Please keep this Class as generic as possible.
+   * So don't implement this function here directly!
+   * @return
+   */
+  private String[] removeUnnecessaryInfos(String[] realRet) {
+    for (int i=0; i<realRet.length; i++)
+      realRet[i] = removeUnnecessaryInfos(realRet[i]);
+    return realRet;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.util.InfoManagement#restoreUnserializableObject()
+   */
+  @Override
+  protected void restoreUnserializableObject () {
+    adap = getKeggAdaptor();
+  }
+  /**
+   * 
+   * @param adap
+   */
+  public void setKeggAdaptor(KeggAdaptor adap) {
+    this.adap = adap;
   }
   
 }

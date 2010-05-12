@@ -29,13 +29,30 @@ import de.zbit.kegg.parser.pathway.RelationType;
  * @author wrzodek
  */
 public class KeggParser extends DefaultHandler {
+  /**
+   * 
+   */
   public static boolean silent = true;
+  /**
+   * 
+   */
   public static boolean offlineVersion=false;
   
+  /**
+   * 
+   * @param filename
+   * @return
+   */
   public static ArrayList<Pathway> parse(String filename) {
     InputSource inS = new InputSource(OpenFile.openFile(filename));
     return parse(inS);
   }
+  
+  /**
+   * 
+   * @param inS
+   * @return
+   */
   public static ArrayList<Pathway> parse(InputSource inS) {
     if (inS==null) return null;
     
@@ -74,6 +91,11 @@ public class KeggParser extends DefaultHandler {
     return null;
   }
   
+  /**
+   * 
+   * @param nl
+   * @return
+   */
   public static ArrayList<Pathway> parseKeggML(NodeList nl) {
     ArrayList<Pathway> pathways = new ArrayList<Pathway>();
     for (int i=0; i<nl.getLength(); i++) {
@@ -94,6 +116,11 @@ public class KeggParser extends DefaultHandler {
     return pathways;
   }
   
+  /**
+   * 
+   * @param nl
+   * @param p
+   */
   private static void parsePathway(NodeList nl, Pathway p) {
     for (int i=0; i<nl.getLength(); i++) {
       Node node = nl.item(i);
@@ -116,11 +143,24 @@ public class KeggParser extends DefaultHandler {
     }
   }
   
+  /**
+   * 
+   * @param n
+   * @param attribute
+   * @return
+   */
   public static String getNodeValue(NamedNodeMap n, String attribute) {
     Node no = n.getNamedItem(attribute);
     String att = no==null ? "":no.getNodeValue();
     return att;
   }
+  
+  /**
+   * 
+   * @param n
+   * @param attribute
+   * @return
+   */
   public static int getNodeValueInt(NamedNodeMap n, String attribute) {
     int number = 0;
     if (n.getNamedItem(attribute)!=null)

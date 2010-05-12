@@ -15,26 +15,14 @@ import de.zbit.util.ProgressBar;
  * 
  */
 public class UniProtWrapper extends InfoManagement<String, String> {
-  private static final long serialVersionUID = -1996313057043843757L;
-  private WSDbfetchClient dbfetch = new WSDbfetchClient();
-
-  public static boolean showProgress = false;
-  public static boolean fetchRenamedProteins = false;
-
-  /**
-   * @param listLength
-   */
-  public UniProtWrapper(int i) {
-    super(i);
-  }
-
   /**
    * 
    */
-  public UniProtWrapper() {
-    super();
-  }
-
+  private static final long serialVersionUID = -1996313057043843757L;
+  /**
+   * 
+   * @param args
+   */
   public static void main(String[] args) {
     UniProtWrapper uw = new UniProtWrapper();
 
@@ -47,6 +35,33 @@ public class UniProtWrapper extends InfoManagement<String, String> {
     // for (int i=0; i<ret.length; i++) {
     // System.out.println(anfrage[i] + ":\n" + ret[i] + "\n==============================");
     // }
+  }
+  /**
+   * 
+   */
+  private WSDbfetchClient dbfetch = new WSDbfetchClient();
+  /**
+   * 
+   */
+  public static boolean showProgress = false;
+
+  /**
+   * 
+   */
+  public static boolean fetchRenamedProteins = false;
+
+  /**
+   * 
+   */
+  public UniProtWrapper() {
+    super();
+  }
+
+  /**
+   * @param listLength
+   */
+  public UniProtWrapper(int i) {
+    super(i);
   }
 
   /*
@@ -91,6 +106,73 @@ public class UniProtWrapper extends InfoManagement<String, String> {
       throw new UnsuccessfulRetrieveException();
 
     return entriesStr;
+  }
+
+  /**
+   * @param ids
+   * @param ret
+   * @param queryString
+   * @param startID
+   * @param i
+   */
+  private void fetchMultipleChecked(String[] ids, String[] ret,
+            String queryString, int startID, int i) {
+    // fetch proteins
+    String entriesStr = "";
+    int retried = 0;
+    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
+      try {
+        entriesStr = dbfetch.fetchBatch("uniprot", queryString, "uniprot",
+                  "raw");
+      } catch (Exception e) {
+        retried++;
+      }
+    }
+    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0)) {
+      // Try it protein by protein
+      String[] splitt = queryString.split(",");
+      for (int j = 0; j < splitt.length; j++) {
+        try {
+          ret[startID + j] = fetchInformation(splitt[j]);
+        } catch (Exception e) {
+          ret[startID + j] = null;
+        }
+      }
+    }
+    else {
+      // by // divided
+      String[] splitt = entriesStr.split("\n//");
+
+      // Idealfall: Soviele Antworten wie Anfragen
+      if ((splitt.length - 1) == queryString.split(",").length) { // -1 wei letztes = "\n"
+        int j = 0;
+        for (int index = startID; index <= i; index++) {
+          ret[index] = splitt[j];
+          j++;
+        }
+      }
+      else {
+
+        // Ein paar Anfragen lieferten keine Antworten => Mapping.
+        for (String info : splitt) {
+          if (info.length() <= 1)
+            continue; // letzter split = "\n"
+          int endPos = info.indexOf("\n", info.indexOf("\nAC"));
+          String toCheck = info;
+          if (endPos > 0)
+            toCheck = info.substring(0, endPos);
+          for (int index = startID; index <= i; index++) {
+            if ((ret[index] != null) && (ret[index].length() > 0))
+              continue;
+
+            if (toCheck.contains(ids[index])) {
+              ret[index] = info;
+              break;
+            }
+          }
+        }
+      }
+    }
   }
 
   /*
@@ -161,73 +243,6 @@ public class UniProtWrapper extends InfoManagement<String, String> {
       System.out.println("Done.");
 
     return ret;
-  }
-
-  /**
-   * @param ids
-   * @param ret
-   * @param queryString
-   * @param startID
-   * @param i
-   */
-  private void fetchMultipleChecked(String[] ids, String[] ret,
-            String queryString, int startID, int i) {
-    // fetch proteins
-    String entriesStr = "";
-    int retried = 0;
-    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
-      try {
-        entriesStr = dbfetch.fetchBatch("uniprot", queryString, "uniprot",
-                  "raw");
-      } catch (Exception e) {
-        retried++;
-      }
-    }
-    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0)) {
-      // Try it protein by protein
-      String[] splitt = queryString.split(",");
-      for (int j = 0; j < splitt.length; j++) {
-        try {
-          ret[startID + j] = fetchInformation(splitt[j]);
-        } catch (Exception e) {
-          ret[startID + j] = null;
-        }
-      }
-    }
-    else {
-      // by // divided
-      String[] splitt = entriesStr.split("\n//");
-
-      // Idealfall: Soviele Antworten wie Anfragen
-      if ((splitt.length - 1) == queryString.split(",").length) { // -1 wei letztes = "\n"
-        int j = 0;
-        for (int index = startID; index <= i; index++) {
-          ret[index] = splitt[j];
-          j++;
-        }
-      }
-      else {
-
-        // Ein paar Anfragen lieferten keine Antworten => Mapping.
-        for (String info : splitt) {
-          if (info.length() <= 1)
-            continue; // letzter split = "\n"
-          int endPos = info.indexOf("\n", info.indexOf("\nAC"));
-          String toCheck = info;
-          if (endPos > 0)
-            toCheck = info.substring(0, endPos);
-          for (int index = startID; index <= i; index++) {
-            if ((ret[index] != null) && (ret[index].length() > 0))
-              continue;
-
-            if (toCheck.contains(ids[index])) {
-              ret[index] = info;
-              break;
-            }
-          }
-        }
-      }
-    }
   }
 
   /*

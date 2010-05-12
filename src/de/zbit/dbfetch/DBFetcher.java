@@ -16,78 +16,78 @@ import de.zbit.util.ProgressBar;
  * 
  */
 public abstract class DBFetcher extends InfoManagement<String, String> {
-
+  /**
+   * 
+   * @author buechel
+   *
+   */
+  public static enum Style {
+    DEFAULT ("default"),
+    HTML ("html"),
+    RAW ("raw");
+    
+    private String name;
+    
+    Style(String name) {
+      this.name = name;
+    }
+    
+    public String toString() {
+      return name;
+    }
+  }
+  /**
+   * 
+   */
   public static Logger log = Logger.getLogger(DBFetcher.class);
-  
+  /**
+   * 
+   */
   private static final long serialVersionUID = -1996313057043843757L;
-  private WSDbfetchClient dbfetch = new WSDbfetchClient();
 
+  /**
+   * 
+   */
+  private WSDbfetchClient dbfetch = new WSDbfetchClient();
   // TODO: get rid of global variables, this is unclean code
+  /**
+   * 
+   */
   public static boolean showProgress = false;
+  /**
+   * 
+   */
   public static boolean fetchNonMappableIDs = false;
   
-  
+  /**
+   *   
+   */
   private Style style;
-  
-  public DBFetcher(int i) {
-    super(i);
-  }
 
+  /**
+   * 
+   */
   public DBFetcher() {
     super();
   }
 
   /**
-   * Returns the DB name to be used for the dbfetch queries
-   * (e.g., uniprot, ipi, ...) 
    * 
-   * @return the DB name to be used for dbfetch queries
+   * @param i
    */
-  public abstract String getDbName();
-  
-  
-  /**
-   * Returns the format string that is used for queries.
-   * 
-   * @return the format string that is used for queries
-   */
-  public abstract String getFormat();
-  
-  /**
-   * Sets the format string that is used for queries. Implementations that do
-   * not allow to change the format string should throw a
-   * {@link UnsupportedOperationException} here.
-   * 
-   * @param format the format string that should be used for queries
-   */
-  public abstract void setFormat(String format);
-  
-  
-  /**
-   * Sets the style that is used for queries.
-   * 
-   * @param style the style that is used for queries
-   */
-  public void setStyle(Style style) {
-    this.style = style;
+  public DBFetcher(int i) {
+    super(i);
   }
   
-  /**
-   * Returns the style that is used for queries.
-   * 
-   * @return the style that is used for queries
-   */
-  public Style getStyle() {
-    return style;
-  }
   
-  /**
-   * Returns the style that is used for queries as a string.
+  /*
+   * (non-Javadoc)
    * 
-   * @return the style that is used for queries as a string
+   * @see de.zbit.util.InfoManagement#cleanupUnserializableObject()
    */
-  public String getStyleString() {
-    return style.toString();
+  @Override
+  protected void cleanupUnserializableObject() {
+    dbfetch = null;
   }
   
   /*
@@ -122,7 +122,72 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
 
     return entriesStr;
   }
+  
+  
+  /**
+   * @param ids
+   * @param ret
+   * @param queryString
+   * @param startID
+   * @param endID
+   */
+  private void fetchMultipleChecked(String[] ids, String[] ret,
+            String queryString, int startID, int endID) {
+    String entriesStr = "";
+    int retried = 0;
+    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
+      try {
+        entriesStr = dbfetch.fetchBatch(getDbName(), queryString, getFormat(),
+                  getStyleString());
+      } catch (Exception e) {
+        retried++;
+        log.debug("Attempt " + retried + " to fetch data failed", e);        
+      }
+    }
+    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0)) {
+      // Try it protein by protein
+      String[] splitt = queryString.split(",");
+      for (int j = 0; j < splitt.length; j++) {
+        try {
+          ret[startID + j] = fetchInformation(splitt[j]);
+        } catch (Exception e) {
+          ret[startID + j] = null;
+        }
+      }
+    } else {
+      // divided by "//"
+      String[] splitt = entriesStr.split("\n//");
 
+      // optimal case: as many answers as requests
+      if ((splitt.length - 1) == queryString.split(",").length) { // -1 due to last "\n"
+        int j = 0;
+        for (int index = startID; index <= endID; index++) {
+          ret[index] = splitt[j];
+          j++;
+        }
+      } else {
+
+        // Some requests had no results => Mapping.
+        for (String info : splitt) {
+          if (info.length() <= 1)
+            continue; // last split = "\n"
+          
+          String toCheck = getCheckStrFromInfo(info);
+          
+          for (int index = startID; index <= endID; index++) {
+            if (ret[index] != null && (ret[index].length() > 0))
+              continue;
+
+            if (matchIDtoInfo(ids[index], toCheck)) {
+              ret[index] = info;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  
   /*
    * (non-Javadoc)
    * 
@@ -192,71 +257,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
 
     return ret;
   }
-
-  /**
-   * @param ids
-   * @param ret
-   * @param queryString
-   * @param startID
-   * @param endID
-   */
-  private void fetchMultipleChecked(String[] ids, String[] ret,
-            String queryString, int startID, int endID) {
-    String entriesStr = "";
-    int retried = 0;
-    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
-      try {
-        entriesStr = dbfetch.fetchBatch(getDbName(), queryString, getFormat(),
-                  getStyleString());
-      } catch (Exception e) {
-        retried++;
-        log.debug("Attempt " + retried + " to fetch data failed", e);        
-      }
-    }
-    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0)) {
-      // Try it protein by protein
-      String[] splitt = queryString.split(",");
-      for (int j = 0; j < splitt.length; j++) {
-        try {
-          ret[startID + j] = fetchInformation(splitt[j]);
-        } catch (Exception e) {
-          ret[startID + j] = null;
-        }
-      }
-    } else {
-      // divided by "//"
-      String[] splitt = entriesStr.split("\n//");
-
-      // optimal case: as many answers as requests
-      if ((splitt.length - 1) == queryString.split(",").length) { // -1 due to last "\n"
-        int j = 0;
-        for (int index = startID; index <= endID; index++) {
-          ret[index] = splitt[j];
-          j++;
-        }
-      } else {
-
-        // Some requests had no results => Mapping.
-        for (String info : splitt) {
-          if (info.length() <= 1)
-            continue; // last split = "\n"
-          
-          String toCheck = getCheckStrFromInfo(info);
-          
-          for (int index = startID; index <= endID; index++) {
-            if (ret[index] != null && (ret[index].length() > 0))
-              continue;
-
-            if (matchIDtoInfo(ids[index], toCheck)) {
-              ret[index] = info;
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-
+  
   /**
    * Returns a substring of the given info string that will be used for matching
    * IDs to info strings.
@@ -266,6 +267,39 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
    * @return the string that will be used for matching IDs to info strings
    */
   public abstract String getCheckStrFromInfo(String info);
+  
+  /**
+   * Returns the DB name to be used for the dbfetch queries
+   * (e.g., uniprot, ipi, ...) 
+   * 
+   * @return the DB name to be used for dbfetch queries
+   */
+  public abstract String getDbName();
+
+  /**
+   * Returns the format string that is used for queries.
+   * 
+   * @return the format string that is used for queries
+   */
+  public abstract String getFormat();
+
+  /**
+   * Returns the style that is used for queries.
+   * 
+   * @return the style that is used for queries
+   */
+  public Style getStyle() {
+    return style;
+  }
+
+  /**
+   * Returns the style that is used for queries as a string.
+   * 
+   * @return the style that is used for queries as a string
+   */
+  public String getStyleString() {
+    return style.toString();
+  }
   
   /**
    * Returns whether the given ID matches to the String to check. The default
@@ -284,16 +318,6 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.zbit.util.InfoManagement#cleanupUnserializableObject()
-   */
-  @Override
-  protected void cleanupUnserializableObject() {
-    dbfetch = null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
    * @see de.zbit.util.InfoManagement#restoreUnserializableObject()
    */
   @Override
@@ -301,19 +325,21 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
     dbfetch = new WSDbfetchClient();
   }
 
-  public static enum Style {
-    DEFAULT ("default"),
-    HTML ("html"),
-    RAW ("raw");
-    
-    private String name;
-    
-    Style(String name) {
-      this.name = name;
-    }
-    
-    public String toString() {
-      return name;
-    }
+  /**
+   * Sets the format string that is used for queries. Implementations that do
+   * not allow to change the format string should throw a
+   * {@link UnsupportedOperationException} here.
+   * 
+   * @param format the format string that should be used for queries
+   */
+  public abstract void setFormat(String format);
+
+  /**
+   * Sets the style that is used for queries.
+   * 
+   * @param style the style that is used for queries
+   */
+  public void setStyle(Style style) {
+    this.style = style;
   }
 }

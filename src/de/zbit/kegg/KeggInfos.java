@@ -8,64 +8,14 @@ import de.zbit.kegg.parser.pathway.EntryType;
  * @author wrzodek
  */
 public class KeggInfos {
-  //private KeggAdaptor adap;
-  private String Kegg_ID;
-  
-  private String informationFromKeggAdaptor;
-  
-  private String taxonomy=null;
-  private String definition=null;
-  private String description=null;
-  private String names = null; // multiple synonyms separated by ;
-  private String name = null; // Last entry (mostly the most meaningful) in names.
-  private String go_id = null; // Be careful: multiple numbers without "GO:". eg "0006096 0006094" instead of "GO:0006096"
-  private String reaction_id = null; // Be careful: multiple numbers without "RN:". eg "R05966 R05967"
-  private String ensembl_id=null;
-  private String uniprot_id=null;
-  private String hgnc_id=null;
-  private String omim_id=null;
-  private String entrez_id=null;
-  private String formula=null;
-  private String mass=null;
-  private String pubchem=null; //urn:miriam:pubchem.compound urn:miriam:pubchem.substance urn:miriam:pubchem.bioassay
-  private String chebi=null; //urn:miriam:obo.chebi // be careful! E.g. CHEBI:36927
-  private String three_dmet=null; //urn:miriam:3dmet
-  private String cas=null; // NOT IN MIRIAM :( "CAS registry number, unique numerical identifiers for chemical substances"
-  private String drugbank=null; //urn:miriam:drugbank
-  private String equation=null; // e.g. "G10609 + G00094 <=> G10619 + G00097"
-  private String pathways=null; // Referenced "PATHWAY" ids, without PATH: and comma separated.
-  private String pathwayDescs=null; // Description of referenced "PATHWAY" ids, comma separated.
-  
-  // Comments behind URNs are examples.
-  public static final String miriam_urn_taxonomy="urn:miriam:taxonomy:"; // 9606
-  public static final String miriam_urn_geneOntology="urn:miriam:obo.go:"; // GO:0006915
-  public static final String miriam_urn_kgPathway="urn:miriam:kegg.pathway:"; // hsa00620
-  public static final String miriam_urn_kgCompound="urn:miriam:kegg.compound:"; // C12345
-  public static final String miriam_urn_kgGlycan="urn:miriam:kegg.glycan:"; // G00123
-  public static final String miriam_urn_kgDrug="urn:miriam:kegg.drug:"; // D00123
-  public static final String miriam_urn_kgGenes="urn:miriam:kegg.genes:"; // syn:ssr3451
-  public static final String miriam_urn_kgReaction="urn:miriam:kegg.reaction:"; // R00100
-  public static final String miriam_urn_ezymeECcode="urn:miriam:ec-code:"; // 1.1.1.1
-  public static final String miriam_urn_ensembl="urn:miriam:ensembl:"; // ENSG00000139618
-  public static final String miriam_urn_uniprot="urn:miriam:uniprot:"; // P62158
-  public static final String miriam_urn_hgnc="urn:miriam:hgnc:"; // HGNC:2674
-  public static final String miriam_urn_omim="urn:miriam:omim:"; // 603903
-  public static final String miriam_urn_entrezGene="urn:miriam:entrez.gene:"; // 100010
-  public static final String miriam_urn_PubChem_Compound="urn:miriam:pubchem.compound:"; // 100101
-  public static final String miriam_urn_PubChem_Substance="urn:miriam:pubchem.substance:"; // 100101
-  public static final String miriam_urn_PubChem_Bioassay="urn:miriam:pubchem.bioassay:"; // 1018
-  public static final String miriam_urn_chebi="urn:miriam:obo.chebi:"; // CHEBI:36927
-  public static final String miriam_urn_3dmet="urn:miriam:3dmet:"; // B00162
-  public static final String miriam_urn_drugbank="urn:miriam:drugbank:"; // DB00001
-  // GO, kgGenes, hgnc, chebi - require extra prefixes!
-  
   /**
-   * Same as 'getMiriamURIforKeggID(keggId, null)'. Please submit EntryTyp when available.
-   * @param keggId
-   * @return Complete Miriam URN Including the given ID.
+   * 
+   * @param go_id
+   * @return
    */
-  public static String getMiriamURIforKeggID(String keggId) {
-    return getMiriamURIforKeggID(keggId, null);
+  public static String getGo_id_with_MiriamURN(String go_id) {
+    // So aufgebaut, da GO_id mehrere enth�lt! Eine funktion muss also dr�ber iterieren und diese aufrugen.
+    return miriam_urn_geneOntology + (go_id.contains(":")?go_id.trim():"GO:"+go_id.trim());
   }
   /**
    * @param keggId
@@ -102,140 +52,207 @@ public class KeggInfos {
     }
     return ret;
   }
-  
-  public boolean queryWasSuccessfull() {
-    return (informationFromKeggAdaptor!=null);
-  }
-  
-  
-  public String getKegg_ID() {
-    return Kegg_ID;
-  }
-  public String getKegg_ID_with_MiriamURN() {
-    return getMiriamURIforKeggID(this.Kegg_ID);
-  }
-  public String getInformationFromKeggAdaptor() {
-    return informationFromKeggAdaptor;
-  }
-  public String getTaxonomy() {
-    return taxonomy;
-  }
-  public String getTaxonomy_with_MiriamURN() {
-    return miriam_urn_taxonomy + suffix(taxonomy);
-  }
-  public String getDefinition() {
-    return definition;
-  }
-  public String getDescription() {
-    return description;
-  }
-  public String getEquation() {
-    return equation;
-  }
-  public String getPathways() {
-    return pathways;
-  }
-  public String getPathwayDescriptions() {
-    // Of REFENRECED pathways. not the actual queried one (if one queries a PW).
-    return pathwayDescs;
-  }
   /**
-   * All names, separated by ;
-   * @return
+   * If s contains ":" => return values is all chars behind the ":".
+   * Else => return value is s.
+   * @param s - any String.
+   * @return see above. Result is always trimmed.
    */
-  public String getNames() {
-    return names;
+  public static String suffix(String s) {
+    if (!s.contains(":")) return s.trim();
+    else return (s.substring(s.indexOf(':')+1)).trim();
   }
-  public boolean containsMultipleNames() {
-    return names.contains(";");
-  }
+  //private KeggAdaptor adap;
   /**
-   * Hopefully the most meaningfull name (last in the list of getNames() ).
-   * @return
+   * 
    */
-  public String getName() {
-    return name;
-  }
+  private String Kegg_ID;
   /**
-   * Maybe multiple values separated by space!
+   * 
    */
-  public String getGo_id() {
-    return go_id;
-  }
-  public String getReaction_id() {
-    return reaction_id;
-  }
-  public String getEnsembl_id() {
-    return ensembl_id;
-  }
-  public String getUniprot_id() {
-    return uniprot_id;
-  }
-  public String getHgnc_id() {
-    return hgnc_id;
-  }
-  public String getOmim_id() {
-    return omim_id;
-  }
-  public String getEntrez_id() {
-    return entrez_id;
-  }
-  public static String getGo_id_with_MiriamURN(String go_id) {
-    // So aufgebaut, da GO_id mehrere enth�lt! Eine funktion muss also dr�ber iterieren und diese aufrugen.
-    return miriam_urn_geneOntology + (go_id.contains(":")?go_id.trim():"GO:"+go_id.trim());
-  }
-  public String getReaction_id_with_MiriamURN() {
-    return miriam_urn_kgReaction + suffix(reaction_id);
-  }
-  public String getEnsembl_id_with_MiriamURN() {
-    return miriam_urn_ensembl + suffix(ensembl_id);
-  }
-  public String getUniprot_id_with_MiriamURN() {
-    return miriam_urn_uniprot + suffix(uniprot_id);
-  }
-  public String getHgnc_id_with_MiriamURN() {
-    return miriam_urn_hgnc + (hgnc_id.contains(":")?hgnc_id.trim():"HGNC:"+hgnc_id.trim());
-  }
-  public String getOmim_id_with_MiriamURN() {
-    return miriam_urn_omim + suffix(omim_id);
-  }
-  public String getEntrez_id_with_MiriamURN() {
-    return miriam_urn_entrezGene + suffix(entrez_id);
-  }
-  public String getFormula() {
-    return formula;
-  }
-  public String getMass() {
-    return mass;
-  }
-  public String getPubchem() {
-    return pubchem;
-  }
-  public String getChebi() {
-    return chebi;
-  }
-  public String getThree_dmet() {
-    return three_dmet;
-  }
-  public String getCas() {
-    return cas;
-  }
-  public String getDrugbank() {
-    return drugbank;
-  }
-  public String getDrugbank_with_MiriamURN() {
-    return miriam_urn_drugbank + suffix(drugbank);
-  }
-  public String getPubchem_with_MiriamURN() {
-    // Pubchem occurs in compounds and drugs, according to http://www.genome.jp/kegg/kegg3.html
-    // Even Kegg Compounds refer to Pubchem Substance unnits. NOT to Pubchem compounds. Strange... but true.
-    return miriam_urn_PubChem_Substance + suffix(pubchem);
-  }
-  public String getChebi_with_MiriamURN() {
-    return miriam_urn_chebi + (chebi.contains(":")?chebi.trim():"CHEBI:"+chebi.trim());
-  }
-  public String getThree_dmet_with_MiriamURN() {
-    return miriam_urn_3dmet + suffix(three_dmet);
+  private String informationFromKeggAdaptor;
+  /**
+   * 
+   */
+  private String taxonomy=null;
+  /**
+   * 
+   */
+  private String definition=null;
+  /**
+   * 
+   */
+  private String description=null;
+  /**
+   * 
+   */
+  private String names = null; // multiple synonyms separated by ;
+  /**
+   * 
+   */
+  private String name = null; // Last entry (mostly the most meaningful) in names.
+  /**
+   * 
+   */
+  private String go_id = null; // Be careful: multiple numbers without "GO:". eg "0006096 0006094" instead of "GO:0006096"
+  /**
+   * 
+   */
+  private String reaction_id = null; // Be careful: multiple numbers without "RN:". eg "R05966 R05967"
+  /**
+   * 
+   */
+  private String ensembl_id=null;
+  /**
+   * 
+   */
+  private String uniprot_id=null;
+  /**
+   * 
+   */
+  private String hgnc_id=null;
+  /**
+   * 
+   */
+  private String omim_id=null;
+  /**
+   * 
+   */
+  private String entrez_id=null;
+  /**
+   * 
+   */
+  private String formula=null;
+  /**
+   * 
+   */
+  private String mass=null;
+  /**
+   * 
+   */
+  private String pubchem=null; //urn:miriam:pubchem.compound urn:miriam:pubchem.substance urn:miriam:pubchem.bioassay
+  /**
+   * 
+   */
+  private String chebi=null; //urn:miriam:obo.chebi // be careful! E.g. CHEBI:36927
+  /**
+   * 
+   */
+  private String three_dmet=null; //urn:miriam:3dmet
+  /**
+   * 
+   */
+  private String cas=null; // NOT IN MIRIAM :( "CAS registry number, unique numerical identifiers for chemical substances"
+  /**
+   * 
+   */
+  private String drugbank=null; //urn:miriam:drugbank
+  
+  /**
+   * 
+   */
+  private String equation=null; // e.g. "G10609 + G00094 <=> G10619 + G00097"
+  /**
+   * 
+   */
+  private String pathways=null; // Referenced "PATHWAY" ids, without PATH: and comma separated.
+  /**
+   * 
+   */
+  private String pathwayDescs=null; // Description of referenced "PATHWAY" ids, comma separated.
+  // Comments behind URNs are examples.
+  /**
+   * 
+   */
+  public static final String miriam_urn_taxonomy="urn:miriam:taxonomy:"; // 9606
+  /**
+   * 
+   */
+  public static final String miriam_urn_geneOntology="urn:miriam:obo.go:"; // GO:0006915
+  /**
+   * 
+   */
+  public static final String miriam_urn_kgPathway="urn:miriam:kegg.pathway:"; // hsa00620
+  /**
+   * 
+   */
+  public static final String miriam_urn_kgCompound="urn:miriam:kegg.compound:"; // C12345
+  /**
+   * 
+   */
+  public static final String miriam_urn_kgGlycan="urn:miriam:kegg.glycan:"; // G00123
+  /**
+   * 
+   */
+  public static final String miriam_urn_kgDrug="urn:miriam:kegg.drug:"; // D00123
+  /**
+   * 
+   */
+  public static final String miriam_urn_kgGenes="urn:miriam:kegg.genes:"; // syn:ssr3451
+  /**
+   * 
+   */
+  public static final String miriam_urn_kgReaction="urn:miriam:kegg.reaction:"; // R00100
+  /**
+   * 
+   */
+  public static final String miriam_urn_ezymeECcode="urn:miriam:ec-code:"; // 1.1.1.1
+  /**
+   * 
+   */
+  public static final String miriam_urn_ensembl="urn:miriam:ensembl:"; // ENSG00000139618
+  /**
+   * 
+   */
+  public static final String miriam_urn_uniprot="urn:miriam:uniprot:"; // P62158
+  /**
+   * 
+   */
+  public static final String miriam_urn_hgnc="urn:miriam:hgnc:"; // HGNC:2674
+  /**
+   * 
+   */
+  public static final String miriam_urn_omim="urn:miriam:omim:"; // 603903
+  /**
+   * 
+   */
+  public static final String miriam_urn_entrezGene="urn:miriam:entrez.gene:"; // 100010
+  /**
+   * 
+   */
+  public static final String miriam_urn_PubChem_Compound="urn:miriam:pubchem.compound:"; // 100101
+  /**
+   * 
+   */
+  public static final String miriam_urn_PubChem_Substance="urn:miriam:pubchem.substance:"; // 100101
+  /**
+   * 
+   */
+  public static final String miriam_urn_PubChem_Bioassay="urn:miriam:pubchem.bioassay:"; // 1018
+  
+  /**
+   * 
+   */
+  public static final String miriam_urn_chebi="urn:miriam:obo.chebi:"; // CHEBI:36927
+  
+  /**
+   * 
+   */
+  public static final String miriam_urn_3dmet="urn:miriam:3dmet:"; // B00162
+  
+  /**
+   * 
+   */
+  public static final String miriam_urn_drugbank="urn:miriam:drugbank:"; // DB00001
+  // GO, kgGenes, hgnc, chebi - require extra prefixes!
+  
+  /**
+   * Same as 'getMiriamURIforKeggID(keggId, null)'. Please submit EntryTyp when available.
+   * @param keggId
+   * @return Complete Miriam URN Including the given ID.
+   */
+  public static String getMiriamURIforKeggID(String keggId) {
+    return getMiriamURIforKeggID(keggId, null);
   }
   
   /**
@@ -244,6 +261,7 @@ public class KeggInfos {
   public KeggInfos(String Kegg_ID) {
     this(Kegg_ID, new KeggAdaptor());
   }
+  
   /**
    * Please use 'KeggInfos(String Kegg_ID, KeggInfoManagement info)' if possible.
    */
@@ -254,7 +272,12 @@ public class KeggInfos {
     informationFromKeggAdaptor = adap.get(Kegg_ID);
     parseInfos();
   }
-
+  
+  /**
+   * 
+   * @param Kegg_ID
+   * @param info
+   */
   public KeggInfos(String Kegg_ID, KeggInfoManagement info) {
     this.Kegg_ID = Kegg_ID;
     
@@ -263,6 +286,307 @@ public class KeggInfos {
     parseInfos();
   }
   
+  /**
+   * 
+   * @return
+   */
+  public boolean containsMultipleNames() {
+    return names.contains(";");
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getCas() {
+    return cas;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getChebi() {
+    return chebi;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getChebi_with_MiriamURN() {
+    return miriam_urn_chebi + (chebi.contains(":")?chebi.trim():"CHEBI:"+chebi.trim());
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getDefinition() {
+    return definition;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getDescription() {
+    return description;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getDrugbank() {
+    return drugbank;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getDrugbank_with_MiriamURN() {
+    return miriam_urn_drugbank + suffix(drugbank);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getEnsembl_id() {
+    return ensembl_id;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getEnsembl_id_with_MiriamURN() {
+    return miriam_urn_ensembl + suffix(ensembl_id);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getEntrez_id() {
+    return entrez_id;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getEntrez_id_with_MiriamURN() {
+    return miriam_urn_entrezGene + suffix(entrez_id);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getEquation() {
+    return equation;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getFormula() {
+    return formula;
+  }
+  
+  /**
+   * Maybe multiple values separated by space!
+   */
+  public String getGo_id() {
+    return go_id;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getHgnc_id() {
+    return hgnc_id;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getHgnc_id_with_MiriamURN() {
+    return miriam_urn_hgnc + (hgnc_id.contains(":")?hgnc_id.trim():"HGNC:"+hgnc_id.trim());
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getInformationFromKeggAdaptor() {
+    return informationFromKeggAdaptor;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getKegg_ID() {
+    return Kegg_ID;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getKegg_ID_with_MiriamURN() {
+    return getMiriamURIforKeggID(this.Kegg_ID);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getMass() {
+    return mass;
+  }
+  
+  /**
+   * Hopefully the most meaningfull name (last in the list of getNames() ).
+   * @return
+   */
+  public String getName() {
+    return name;
+  }
+  
+  /**
+   * All names, separated by ;
+   * @return
+   */
+  public String getNames() {
+    return names;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getOmim_id() {
+    return omim_id;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getOmim_id_with_MiriamURN() {
+    return miriam_urn_omim + suffix(omim_id);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getPathwayDescriptions() {
+    // Of REFENRECED pathways. not the actual queried one (if one queries a PW).
+    return pathwayDescs;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getPathways() {
+    return pathways;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getPubchem() {
+    return pubchem;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getPubchem_with_MiriamURN() {
+    // Pubchem occurs in compounds and drugs, according to http://www.genome.jp/kegg/kegg3.html
+    // Even Kegg Compounds refer to Pubchem Substance unnits. NOT to Pubchem compounds. Strange... but true.
+    return miriam_urn_PubChem_Substance + suffix(pubchem);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getReaction_id() {
+    return reaction_id;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getReaction_id_with_MiriamURN() {
+    return miriam_urn_kgReaction + suffix(reaction_id);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getTaxonomy() {
+    return taxonomy;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getTaxonomy_with_MiriamURN() {
+    return miriam_urn_taxonomy + suffix(taxonomy);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getThree_dmet() {
+    return three_dmet;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getThree_dmet_with_MiriamURN() {
+    return miriam_urn_3dmet + suffix(three_dmet);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getUniprot_id() {
+    return uniprot_id;
+  }
+
+  /**
+   * 
+   * @return
+   */
+  public String getUniprot_id_with_MiriamURN() {
+    return miriam_urn_uniprot + suffix(uniprot_id);
+  }
+  
+  /**
+   * 
+   */
   private void parseInfos() {
     String infos = informationFromKeggAdaptor; // Create a shorter variable name ;-)
     if (infos!=null && infos.trim().length()==0) infos=null;
@@ -370,16 +694,16 @@ public class KeggInfos {
   }
   
   /**
-   * If s contains ":" => return values is all chars behind the ":".
-   * Else => return value is s.
-   * @param s - any String.
-   * @return see above. Result is always trimmed.
+   * 
+   * @return
    */
-  public static String suffix(String s) {
-    if (!s.contains(":")) return s.trim();
-    else return (s.substring(s.indexOf(':')+1)).trim();
+  public boolean queryWasSuccessfull() {
+    return (informationFromKeggAdaptor!=null);
   }
   
+  /**
+   * 
+   */
   public void test() {
     String infos = informationFromKeggAdaptor;
     taxonomy = KeggAdaptor.extractInfo(infos, "TAXONOMY", "\n"); // e.g. "TAXONOMY    TAX:9606" => "TAX:9606".

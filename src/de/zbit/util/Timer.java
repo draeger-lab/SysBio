@@ -5,6 +5,9 @@ package de.zbit.util;
  * @author wrzodek
  */
 public class Timer {
+  /**
+   * 
+   */
   long start=-1;
   
   /**
@@ -14,10 +17,6 @@ public class Timer {
     reset();
   }
   
-  public void reset() {
-    start = System.currentTimeMillis();
-  }
-
   /**
    * Returns the seconds since the last Reset/Initialization.
    * Resets the timer.
@@ -26,7 +25,7 @@ public class Timer {
   public long getAndReset() {
     return (getAndReset(false));
   }
-  
+
   /**
    * Returns the (mili-)seconds since the last Reset/Initialization.
    * Resets the timer.
@@ -38,6 +37,13 @@ public class Timer {
     if (!milis) ret/=1000;
     reset();
     return ret;
+  }
+  
+  /**
+   * 
+   */
+  public void reset() {
+    start = System.currentTimeMillis();
   }
   
 }
