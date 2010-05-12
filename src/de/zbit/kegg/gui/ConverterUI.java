@@ -103,8 +103,9 @@ public class ConverterUI extends JDialog {
 		SBMLDocument doc = k2s.Kegg2jSBML(absolutePath);
 
 		// Remember already queried objects
-		KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s
-				.getKeggInfoManager());
+    if (k2s.getKeggInfoManager().hasChanged()) {
+      KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager());
+    }
 		// --
 
 		getContentPane().add(

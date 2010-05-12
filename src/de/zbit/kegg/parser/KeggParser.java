@@ -84,13 +84,117 @@ public class KeggParser extends DefaultHandler {
       builder = factory.newDocumentBuilder();
       Document document = builder.parse( inS );
       
-      return parseKeggML(document.getChildNodes());
+      // Give a warning if version does not match.
+      try {
+        double v = getKGMLVersion(document);
+        if (v>0 && v<0.7) {
+          System.out.println("WARNING: Your kgml document is rather old.\n"+
+            "It is written in kgml version " + v + ". This parser is for version 0.7 / 0.71.\n"+
+            "Trying to read your document in compatibility mode.");
+        } else if (v>0 && v>=0.8) {
+          System.out.println("WARNING: Your kgml document is rather new.\n"+
+              "It is written in kgml version " + v + ". This parser is for version 0.7 / 0.71.\n"+
+              "Trying to read your document anyways.");
+        }
+      } catch (Exception e) {} // doesn't matter.
+      
+      return parseKeggML(document);
     } catch (Exception e) {
       e.printStackTrace();
     }
     return null;
   }
   
+  /**
+   * Returns the KGML Version, parsed from the SystemID URL String.
+   * Returns 0 if an error occurs / no version could be parsed.
+   * @param document
+   * @return
+   */
+  private static double getKGMLVersion(Document document) {
+    double ret = 0;
+    try {
+      // e.g. http://www.genome.jp/kegg/xml/KGML_v0.6.1_.dtd
+      String s = document.getDoctype().getSystemId();
+      ret = parseNextDouble(s, s.lastIndexOf('v'),true);
+    } catch (Exception e){
+      e.printStackTrace();
+      if (document.getDoctype().getSystemId()!=null) {
+        System.err.println("Could not parse Pathway version from '" + document.getDoctype().getSystemId() + "'.");
+      }
+    }
+    
+    return ret;
+  }
+  
+  /**
+   * Returns the comment of the document, if available. Usually
+   * e.g. "Creation date: Mar 16 2007 16:05:56 +0900 (JST)".
+   * @param document
+   * @return
+   */
+  private static String getKGMLComment(Document document) {
+    String comment = "";
+    
+    if (document.getDoctype().getNextSibling()!=null) {
+      comment = document.getDoctype().getNextSibling().getNodeValue();
+    }
+    
+    return comment.trim();
+  }
+  
+  /**
+   * Parses the next double from a string, starting at the
+   * given position. Parses "0.6" but not ".6" (number must start
+   * with a digit).
+   * @param string
+   * @param position
+   * @param allowMultipledots - if true, e.g., will return 0.61 for 0.6.1
+   *                            if false: 0.6 will be returned.
+   * @return
+   */
+  public static double parseNextDouble(String string, int position, boolean allowMultipledots) {
+    if (position<0) return 0;
+    char[] ca = string.substring(position).toCharArray();
+    boolean parsedDot = false;
+    boolean foundDigit = false;
+    String myDouble="";
+    for (char c:ca) {
+      if (!Character.isDigit(c) && !foundDigit) continue; // Search for first digit.
+      if (Character.isDigit(c)) {
+        foundDigit = true;
+        myDouble+=c;
+      } else if (c=='.' && !parsedDot) {
+        parsedDot = true;
+        myDouble+=c;
+      } else if (c=='.' && parsedDot && allowMultipledots) {
+        // Do nothing. Simply skip this dot.
+      } else {
+        break;
+      }
+    }
+    return Double.parseDouble(myDouble);
+  }
+  
+  /**
+   * Parses a KGML XML document, returning all contained pathways.
+   * Usually this is in 99.9999% just one ;-)
+   * @param doc
+   * @return
+   */
+  public static ArrayList<Pathway> parseKeggML(Document doc) {
+    ArrayList<Pathway> ret = parseKeggML(doc.getChildNodes());
+    double version = getKGMLVersion(doc);
+    String comment = getKGMLComment(doc);
+    if (comment.trim().length()<1) comment = null;
+    if (ret!=null) {
+      for (Pathway p : ret) {
+        p.setVersion(version);
+        p.setComment(comment);
+      }
+    }
+    return ret;
+  }
   /**
    * 
    * @param nl
@@ -163,10 +267,37 @@ public class KeggParser extends DefaultHandler {
    */
   public static int getNodeValueInt(NamedNodeMap n, String attribute) {
     int number = 0;
+    boolean error = false;
+    Exception ex = null;
     if (n.getNamedItem(attribute)!=null)
       try {
         number = Integer.parseInt(getNodeValue(n, attribute));
-      } catch (Exception e) {e.printStackTrace();}
+        error = false; // Parsing was succesfull.
+      } catch (Exception e) {
+        error = true;
+        ex=e;
+        System.err.println("Error while parsing int '" + attribute + "' => " + getNodeValue(n, attribute));
+      }
+      if (error) {
+        // In old kegg definitions, number is often e.g. "04010hsa" instead of "04010".
+        // Removing the "hsa" fixes the problem in a compatibility-mode-way.
+        // I think it's still better than throwing errors.
+        String s = getNodeValue(n, attribute);
+        for (int i=0; i<s.length(); i++) {
+          if (!Character.isDigit(s.charAt(i))) {
+            s = s.replace(Character.toString(s.charAt(i)), "");
+            i--;
+          }
+        }
+        if (s.length()>0) {
+          number = Integer.parseInt(s);
+          System.err.println("Going into compatibility mode and returning '" + number + "'.");
+        } else {
+          if (ex!=null) {
+            ex.printStackTrace();
+          }
+        }
+      }
     return number;
   }
   

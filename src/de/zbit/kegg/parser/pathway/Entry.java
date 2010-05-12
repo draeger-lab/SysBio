@@ -101,6 +101,14 @@ public class Entry {
    * 
    * @return
    */
+  public boolean hasComponents() {
+    return (components!=null&&components.size()>0);
+  }
+  
+  /**
+   * 
+   * @return
+   */
   public Object getCustom() {
     return custom;
   }
