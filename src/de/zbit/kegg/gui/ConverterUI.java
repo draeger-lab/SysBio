@@ -28,13 +28,44 @@ public class ConverterUI extends JFrame {
 	private static final long serialVersionUID = -3833481758555783529L;
 
 	/**
+	 * Speedup Kegg2SBML by loading already queried objects. Reduces network
+	 * load and heavily reduces computation time.
+	 */
+	private static KEGG2jSBML k2s;
+	
+	static {
+		if (new File("keggdb.dat").exists()
+				&& new File("keggdb.dat").length() > 0) {
+			KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement
+					.loadFromFilesystem("keggdb.dat");
+			k2s = new KEGG2jSBML(manager);
+		} else {
+			k2s = new KEGG2jSBML();
+		}
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length > 0 && args[0].startsWith("--input="))
-			new ConverterUI(args[0].split("=")[1]);
-		else
+		if (args.length > 0) {
+			String infile = null, outfile = null;
+			for (String arg : args) {
+				if (arg.startsWith("--input=")) {
+					infile = arg.split("=")[1];
+				} else if (arg.startsWith("--output=")) {
+					outfile = arg.split("=")[1];
+				}
+			}
+			if (infile != null) {
+				new ConverterUI(infile);
+			}
+			if ((infile != null) && (outfile != null)) {
+				k2s.Convert(infile, outfile);
+			}
+		} else {
 			new ConverterUI();
+		}
 	}
 
 	/**
@@ -65,19 +96,6 @@ public class ConverterUI extends JFrame {
 	 * @param absolutePath
 	 */
 	private void showGUI(String absolutePath) {
-		// Speedup Kegg2SBML by loading alredy queried objects. Reduces
-		// network load and heavily reduces computation time.
-		KEGG2jSBML k2s;
-		if (new File("keggdb.dat").exists()
-				&& new File("keggdb.dat").length() > 0) {
-			KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement
-					.loadFromFilesystem("keggdb.dat");
-			k2s = new KEGG2jSBML(manager);
-		} else {
-			k2s = new KEGG2jSBML();
-		}
-		// ---
-
 		// Convert Kegg File to SBML document.
 		SBMLDocument doc = k2s.Kegg2jSBML(absolutePath);
 
@@ -91,6 +109,8 @@ public class ConverterUI extends JFrame {
 						.getDefaultSettings()));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		pack();
+		setTitle(getTitle() + " " + doc.getModel().getId());
+		setLocationRelativeTo(null);
 		setVisible(true);
 	}
 
