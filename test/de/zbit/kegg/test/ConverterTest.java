@@ -35,7 +35,8 @@ public class ConverterTest {
 			}
 			for (File file : files) {
 				System.out.println(file);
-				new ConverterUI(file.getAbsolutePath());
+				new ConverterUI(file.getAbsolutePath(), System
+						.getProperty("user.dir"));
 			}
 		}
 	}
