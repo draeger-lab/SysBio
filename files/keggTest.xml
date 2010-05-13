@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?><sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4"><model id="path_map04010" metaid="meta_path_map04010" name="MAPK signaling pathway"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><h1>Model of “MAPK signaling pathway”</h1>The mitogen-activated protein kinase (MAPK) cascade is a highly conserved module that is involved in various cellular functions, including cell proliferation, differentiation and migration. Mammals express at least four distinctly regulated groups of MAPKs, extracellular signal-related kinases (ERK)-1/2, Jun amino-terminal kinases (JNK1/2/3), p38 proteins (p38alpha/beta/gamma/delta) and ERK5, that are activated by specific MAPKKs: MEK1/2 for ERK1/2, MKK3/6 for the p38, MKK4/7 (JNKK1/2) for the JNKs, and MEK5 for ERK5. Each MAPKK, however, can be activated by more than one MAPKKK, increasing the complexity and diversity of MAPK signalling. Presumably each MAPKKK confers responsiveness to distinct stimuli. For example, activation of ERK1/2 by growth factors depends on the MAPKKK c-Raf, but other MAPKKKs may activate ERK1/2 in response to pro-inflammatory stimuli.<br/><a href="http://www.genome.jp/kegg/pathway/map/map04010.gif"><img alt="http://www.genome.jp/kegg/pathway/map/map04010.gif" src="http://www.genome.jp/kegg/pathway/map/map04010.gif"/></a><br/><a href="http://www.genome.jp/dbget-bin/show_pathway?map04010">Original Entry</a><br/></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:modelVersion>4.0</celldesigner:modelVersion>
+<celldesigner:modelDisplay sizeX="1357" sizeY="953"/>
+<celldesigner:listOfCompartmentAliases>
+<celldesigner:compartmentAlias compartment="default" id="cd_cadefault">
+<celldesigner:class>SQUARE</celldesigner:class>
+<celldesigner:bounds h="933" w="1337" x="10.0" y="10.0"/>
+<celldesigner:namePoint x="612" y="909"/>
+<celldesigner:doubleLine innerWidth="1.0" outerWidth="2.0" thickness="10.0"/>
+<celldesigner:paint color="ffcccc00" scheme="Color"/>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:compartmentAlias>
+</celldesigner:listOfCompartmentAliases>
+<celldesigner:listOfComplexSpeciesAliases/>
+<celldesigner:listOfSpeciesAliases/>
+<celldesigner:listOfProteins/>
+<celldesigner:listOfGroups/>
+<celldesigner:listOfGenes/>
+<celldesigner:listOfRNAs/>
+<celldesigner:listOfAntisenseRNAs/>
+<celldesigner:listOfLayers/>
+<celldesigner:listOfBlockDiagrams/>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_path_map04010"> 
+<creator> 
+<Bag> 
+<li parseType="Resource"> 
+<ORG parseType="Resource"><Orgname>ZBIT, University of Tübingen, WSI-RA</Orgname> 
+</ORG> 
+</li> 
+</Bag> 
+</creator> 
+<modified parseType="Resource"> 
+<W3CDTF>Wed May 12 14:18:22 JST 2010</W3CDTF> 
+</modified> 
+<bqmodel:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.pathway:map04010"/> 
+</Bag> 
+</bqmodel:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<listOfUnitDefinitions> 
+<unitDefinition id="area" name="Predefined unit area"> 
+<listOfUnits> 
+<unit scale="0" exponent="2" offset="0.0" kind="metre" multiplier="1.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+<unitDefinition id="length" name="Predefined unit length"> 
+<listOfUnits> 
+<unit scale="0" exponent="1" offset="0.0" kind="metre" multiplier="1.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+<unitDefinition id="substance" name="Predefined unit substance"> 
+<listOfUnits> 
+<unit scale="0" exponent="1" offset="0.0" kind="mole" multiplier="1.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+<unitDefinition id="time" name="Predefined unit time" sboTerm="SBO:0000345"> 
+<listOfUnits> 
+<unit scale="0" exponent="1" sboTerm="SBO:0000345" offset="0.0" kind="second" multiplier="1.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+<unitDefinition id="volume" name="Predefined unit volume"> 
+<listOfUnits> 
+<unit scale="0" exponent="1" offset="0.0" kind="litre" multiplier="1.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+</listOfUnitDefinitions> 
+<listOfCompartments> 
+<compartment id="default" name="MAPK signaling pathway" units="volume" size="1.0"> 
+</compartment> 
+</listOfCompartments> 
+<listOfSpecies> 
+</listOfSpecies> 
+</model> 
+</sbml>

@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.zbit.kegg.gui.ConverterUI;
-import de.zbit.kegg.gui.FileFilterKGML;
+import de.zbit.kegg.io.FileFilterKGML;
 
 /**
  * @author draeger
@@ -20,12 +20,19 @@ public class ConverterTest {
 	/**
 	 * 
 	 * @param path
-	 *            The path to a directory that contains KGML files.
+	 *            The path to a directory that contains KGML files or a single
+	 *            file.
 	 */
 	public ConverterTest(String path) {
 		File f = new File(path);
-		if (f.exists() && f.isDirectory()) {
-			List<File> files = findKGMLFiles(f);
+		if (f.exists()) {
+			List<File> files;
+			if (f.isDirectory()) {
+				files = findKGMLFiles(f);
+			} else {
+				files = new LinkedList<File>();
+				files.add(f);
+			}
 			for (File file : files) {
 				System.out.println(file);
 				new ConverterUI(file.getAbsolutePath());

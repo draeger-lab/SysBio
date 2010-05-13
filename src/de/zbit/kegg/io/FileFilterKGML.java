@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.zbit.kegg.gui;
+package de.zbit.kegg.io;
 
 import java.io.File;
 
