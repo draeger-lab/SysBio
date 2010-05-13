@@ -9,13 +9,18 @@ import java.io.File;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.gui.GUITools;
+import de.zbit.io.SBMLFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.io.FileFilterKGML;
 import de.zbit.kegg.io.KEGG2jSBML;
@@ -25,6 +30,40 @@ import de.zbit.kegg.io.KEGG2jSBML;
  * 
  */
 public class ConverterUI extends JDialog implements ActionListener {
+
+	/**
+	 * This is a enumeration of all possible commands this
+	 * {@link ActionListener} can process.
+	 * 
+	 * @author draeger
+	 * 
+	 */
+	public static enum Command {
+		/**
+		 * Command to open a file.
+		 */
+		OPEN_FILE,
+		/**
+		 * Command to save the conversion result to a file.
+		 */
+		SAVE_FILE;
+
+		/**
+		 * Returns a human-readable name for each command.
+		 * 
+		 * @return
+		 */
+		public String getName() {
+			switch (this) {
+			case OPEN_FILE:
+				return "Open";
+			case SAVE_FILE:
+				return "Save";
+			default:
+				return "Unknown";
+			}
+		}
+	}
 
 	static {
 		try {
@@ -38,20 +77,14 @@ public class ConverterUI extends JDialog implements ActionListener {
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * This is a enumeration of all possible commands this
-	 * {@link ActionListener} can process.
-	 * 
-	 * @author draeger
-	 * 
-	 */
-	public static enum Command {
-		/**
-		 * Command to open a file.
-		 */
-		OPEN_FILE
+		if (new File("keggdb.dat").exists()
+				&& new File("keggdb.dat").length() > 0) {
+			KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement
+					.loadFromFilesystem("keggdb.dat");
+			k2s = new KEGG2jSBML(manager);
+		} else {
+			k2s = new KEGG2jSBML();
+		}
 	}
 
 	/**
@@ -65,19 +98,10 @@ public class ConverterUI extends JDialog implements ActionListener {
 	 */
 	private static KEGG2jSBML k2s;
 
-	static {
-		if (new File("keggdb.dat").exists()
-				&& new File("keggdb.dat").length() > 0) {
-			KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement
-					.loadFromFilesystem("keggdb.dat");
-			k2s = new KEGG2jSBML(manager);
-		} else {
-			k2s = new KEGG2jSBML();
-		}
-	}
-
 	/**
 	 * @param args
+	 *            accepted arguments are --input=<base directory to open files>
+	 *            and --output=<base directory to save files>
 	 */
 	public static void main(String[] args) {
 		if (args.length > 0) {
@@ -90,10 +114,11 @@ public class ConverterUI extends JDialog implements ActionListener {
 				}
 			}
 			if (infile != null) {
-				new ConverterUI(infile);
-			}
-			if ((infile != null) && (outfile != null)) {
-				k2s.Convert(infile, outfile);
+				if (outfile != null) {
+					new ConverterUI(infile, outfile);
+				} else {
+					new ConverterUI(infile, System.getProperty("user.dir"));
+				}
 			}
 		} else {
 			new ConverterUI();
@@ -101,68 +126,147 @@ public class ConverterUI extends JDialog implements ActionListener {
 	}
 
 	/**
+	 * Basis directory when opening files.
+	 */
+	private String baseOpenDir;
+	/**
+	 * Basis directory when saving files.
+	 */
+	private String baseSaveDir;
+	/**
+	 * The SBML document as a result of a successful conversion.
+	 */
+	private SBMLDocument doc;
+
+	/**
 	 * Shows a small GUI.
 	 */
 	public ConverterUI() {
-		this(System.getProperty("user.dir"));
+		this(System.getProperty("user.dir"), System.getProperty("user.dir"));
 	}
 
 	/**
 	 * 
-	 * @param string
+	 * @param baseDir
+	 * @param saveDir
 	 */
-	public ConverterUI(String string) {
+	public ConverterUI(String baseDir, String saveDir) {
 		super();
-		setTitle("KGML2SBMLconverter");
-		showGUI(string);
+		this.baseOpenDir = baseDir;
+		this.baseSaveDir = saveDir;
+		this.doc = convert(openFile());
+		showGUI(doc);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		switch (Command.valueOf(e.getActionCommand())) {
+		case OPEN_FILE:
+			// Convert Kegg File to SBML document.
+			if (isVisible()) {
+				setVisible(false);
+				removeAll();
+			}
+			showGUI(convert(openFile()));
+			break;
+		case SAVE_FILE:
+			saveFile();
+			break;
+		default:
+			System.err.println("unsuported action");
+			break;
+		}
 	}
 
 	/**
+	 * Creates a JMenuBar for this component that provides access to all Actions
+	 * definied in the enum Command.
 	 * 
-	 * @param absolutePath
+	 * @return
 	 */
-	private void showGUI(String absolutePath) {
-		// Convert Kegg File to SBML document.
-		File f = new File(absolutePath);
+	private JMenuBar createJMenuBar() {
+		JMenuBar bar = new JMenuBar();
+		JMenu menu = new JMenu("File");
+		for (Command com : Command.values()) {
+			JMenuItem item = new JMenuItem(com.getName());
+			item.setActionCommand(com.toString());
+			item.addActionListener(this);
+			menu.add(item);
+		}
+		bar.add(menu);
+		return bar;
+	}
+
+	/**
+	 * Open and display a KGML file.
+	 */
+	private File openFile() {
+		File f = new File(baseOpenDir);
 		if (f.isDirectory()) {
-			// Z:/workspace/SysBio/resources/de/zbit/kegg/samplefiles/hsa00010.xml
-			setTitle("KGML2SBMLconverter");
 			JFileChooser chooser = GUITools
-					.createJFileChooser(absolutePath, false, false,
+					.createJFileChooser(baseOpenDir, false, false,
 							JFileChooser.FILES_ONLY, new FileFilterKGML());
 			if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 				f = chooser.getSelectedFile();
+				baseOpenDir = f.getParent();
 			} else {
 				dispose();
 				System.exit(0);
 			}
 		}
+		return f;
+	}
+
+	/**
+	 * Save a conversion result to a file
+	 */
+	private void saveFile() {
+		if (isVisible() && (doc != null)) {
+			JFileChooser chooser = GUITools
+					.createJFileChooser(baseSaveDir, false, false,
+							JFileChooser.FILES_ONLY, new SBMLFileFilter());
+			if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+				File f = chooser.getSelectedFile();
+				if (!f.exists() || GUITools.overwriteExistingFile(this, f)) {
+					SBMLWriter.write(doc, chooser.getSelectedFile()
+							.getAbsolutePath());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Displays an overview of the result of a conversion.
+	 */
+	private void showGUI(SBMLDocument doc) {
+		getContentPane().removeAll();
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setJMenuBar(createJMenuBar());
+		getContentPane().add(new SBMLModelSplitPane(doc.getModel()));
+		setTitle("KGML2SBMLconverter " + doc.getModel().getId());
+		pack();
+		setLocationRelativeTo(null);
+		setVisible(true);
+	}
+
+	/**
+	 * 
+	 * @param f
+	 * @return
+	 */
+	private SBMLDocument convert(File f) {
 		if (f.exists() && f.isFile() && f.canRead()) {
-			absolutePath = f.getAbsolutePath();
-			SBMLDocument doc = k2s.Kegg2jSBML(absolutePath);
+			this.doc = k2s.Kegg2jSBML(f.getAbsolutePath());
 
 			// Remember already queried objects
 			if (k2s.getKeggInfoManager().hasChanged()) {
 				KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s
 						.getKeggInfoManager());
 			}
-			// --
-
-			getContentPane().add(new SBMLModelSplitPane(doc.getModel()));
-			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-			pack();
-			setTitle(getTitle() + " " + doc.getModel().getId());
-			setLocationRelativeTo(null);
-			setVisible(true);
-		} else {
-			JOptionPane.showMessageDialog(this, "Cannot read input file",
-					"Warning", JOptionPane.WARNING_MESSAGE);
+			return doc;
 		}
-	}
-
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
+		JOptionPane.showMessageDialog(this, "Cannot read input file",
+				"Warning", JOptionPane.WARNING_MESSAGE);
+		return null;
 	}
 
 }

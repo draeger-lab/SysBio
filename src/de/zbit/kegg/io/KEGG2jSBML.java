@@ -789,8 +789,10 @@ public class KEGG2jSBML implements KeggConverter {
 		SBMLDocument doc = Kegg2jSBML(p);
 
 		// JSBML IO => write doc to outfile.
-		if (new File(outfile).exists())
-			lastFileWasOverwritten = true; // Remember that file was already
+		if (new File(outfile).exists()) {
+			// Remember that file was already
+			lastFileWasOverwritten = true;
+		}
 		// there.
 		SBMLWriter.write(doc, outfile);
 	}
