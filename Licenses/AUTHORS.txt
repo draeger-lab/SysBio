@@ -1,0 +1,34 @@
+###################
+# Core Developers #
+###################
+
+Clemens Wrzodek (1)
+  clemens.wrzodek@uni-tuebingen.de
+Andreas Dräger (1)
+  andreas.draeger@uni-tuebingen.de
+Florian Mittag (1)
+  florian.mittag@uni-tuebingen.de
+Finja Büchel (1)
+  finja.buechel@uni-tuebingen.de
+Adrian Schröder (1)
+  adrian.schroeder@uni-tuebingen.de
+Johannes Eichner (1)
+  johannes.eichner@uni-tuebingen.de
+  
+###################
+#  Contributors   #
+###################
+
+Andreas Zell (1)
+  andreas.zell@uni-tuebingen.de
+
+###################
+#     Alumini     #
+###################
+
+
+###################
+#  Institutions   #
+###################
+
+(1) University of Tübingen, Germany

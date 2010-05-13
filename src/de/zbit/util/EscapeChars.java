@@ -102,6 +102,13 @@ public final class EscapeChars {
   public static final String forHTML(String string){
     return forHTML(string,false);
   }
+  
+  /**
+   * 
+   * @param string
+   * @param skipExistingHTMLencodings
+   * @return
+   */
   public static final String forHTML(String string, boolean skipExistingHTMLencodings){
     final StringBuilder result = new StringBuilder();
     for (char character : string.toCharArray()) {

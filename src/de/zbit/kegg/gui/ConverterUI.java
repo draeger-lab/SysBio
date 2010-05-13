@@ -3,24 +3,56 @@
  */
 package de.zbit.kegg.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.sbml.jsbml.SBMLDocument;
-import org.sbml.squeezer.SBMLsqueezer;
-import org.sbml.squeezer.gui.GUITools;
-import org.sbml.squeezer.gui.SBMLModelSplitPane;
 
+import de.zbit.gui.GUITools;
 import de.zbit.kegg.KeggInfoManagement;
+import de.zbit.kegg.io.FileFilterKGML;
 import de.zbit.kegg.io.KEGG2jSBML;
 
 /**
  * @author draeger
  * 
  */
-public class ConverterUI extends JDialog {
+public class ConverterUI extends JDialog implements ActionListener {
+
+	static {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * This is a enumeration of all possible commands this
+	 * {@link ActionListener} can process.
+	 * 
+	 * @author draeger
+	 * 
+	 */
+	public static enum Command {
+		/**
+		 * Command to open a file.
+		 */
+		OPEN_FILE
+	}
 
 	/**
 	 * Generated serial version id
@@ -72,16 +104,7 @@ public class ConverterUI extends JDialog {
 	 * Shows a small GUI.
 	 */
 	public ConverterUI() {
-		// Z:/workspace/SysBio/resources/de/zbit/kegg/samplefiles/hsa00010.xml
-		super();
-		setTitle("KGML2SBMLconverter");
-		JFileChooser chooser = GUITools.createJFileChooser("usr.dir", false,
-				false, JFileChooser.FILES_ONLY, new FileFilterKGML());
-		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-			showGUI(chooser.getSelectedFile().getAbsolutePath());
-		} else {
-			dispose();
-		}
+		this(System.getProperty("user.dir"));
 	}
 
 	/**
@@ -100,22 +123,46 @@ public class ConverterUI extends JDialog {
 	 */
 	private void showGUI(String absolutePath) {
 		// Convert Kegg File to SBML document.
-		SBMLDocument doc = k2s.Kegg2jSBML(absolutePath);
+		File f = new File(absolutePath);
+		if (f.isDirectory()) {
+			// Z:/workspace/SysBio/resources/de/zbit/kegg/samplefiles/hsa00010.xml
+			setTitle("KGML2SBMLconverter");
+			JFileChooser chooser = GUITools
+					.createJFileChooser(absolutePath, false, false,
+							JFileChooser.FILES_ONLY, new FileFilterKGML());
+			if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+				f = chooser.getSelectedFile();
+			} else {
+				dispose();
+				System.exit(0);
+			}
+		}
+		if (f.exists() && f.isFile() && f.canRead()) {
+			absolutePath = f.getAbsolutePath();
+			SBMLDocument doc = k2s.Kegg2jSBML(absolutePath);
 
-		// Remember already queried objects
-    if (k2s.getKeggInfoManager().hasChanged()) {
-      KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager());
-    }
-		// --
+			// Remember already queried objects
+			if (k2s.getKeggInfoManager().hasChanged()) {
+				KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s
+						.getKeggInfoManager());
+			}
+			// --
 
-		getContentPane().add(
-				new SBMLModelSplitPane(doc.getModel(), SBMLsqueezer
-						.getDefaultSettings()));
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		pack();
-		setTitle(getTitle() + " " + doc.getModel().getId());
-		setLocationRelativeTo(null);
-		setVisible(true);
+			getContentPane().add(new SBMLModelSplitPane(doc.getModel()));
+			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+			pack();
+			setTitle(getTitle() + " " + doc.getModel().getId());
+			setLocationRelativeTo(null);
+			setVisible(true);
+		} else {
+			JOptionPane.showMessageDialog(this, "Cannot read input file",
+					"Warning", JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
