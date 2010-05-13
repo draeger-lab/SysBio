@@ -3,9 +3,12 @@
  */
 package de.zbit.gui;
 
+import java.awt.Component;
+import java.io.File;
 import java.util.StringTokenizer;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -43,13 +46,38 @@ public class GUITools {
 
 	/**
 	 * 
+	 * @param parent
+	 * @param out
+	 * @return
+	 */
+	public static boolean overwriteExistingFile(Component parent, File out) {
+		return GUITools.overwriteExistingFileDialog(parent, out) == JOptionPane.YES_OPTION;
+	}
+
+	/**
+	 * Shows a dialog that asks whether or not to overwrite an existing file and
+	 * returns the answer from JOptionPane constants.
+	 * 
+	 * @param parent
+	 * @param out
+	 * @return An integer representing the user's choice.
+	 */
+	public static int overwriteExistingFileDialog(Component parent, File out) {
+		return JOptionPane.showConfirmDialog(parent, toHTML(out.getName()
+				+ " already exists. Do you really want to over write it?", 40),
+				"Over write existing file?", JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
+	}
+
+	/**
+	 * 
 	 * @param string
 	 * @return
 	 */
 	public static String toHTML(String string) {
 		return toHTML(string, Integer.MAX_VALUE);
 	}
-
+	
 	/**
 	 * 
 	 * @param string
