@@ -6,6 +6,7 @@ package de.zbit.kegg.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -227,8 +228,15 @@ public class ConverterUI extends JDialog implements ActionListener {
 			if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 				File f = chooser.getSelectedFile();
 				if (!f.exists() || GUITools.overwriteExistingFile(this, f)) {
-					SBMLWriter.write(doc, chooser.getSelectedFile()
-							.getAbsolutePath());
+					try {
+						SBMLWriter.write(doc, chooser.getSelectedFile()
+								.getAbsolutePath());
+					} catch (Exception exc) {
+						exc.printStackTrace();
+						JOptionPane.showMessageDialog(this, exc.getMessage(),
+								exc.getClass().getSimpleName(),
+								JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		}
@@ -249,23 +257,20 @@ public class ConverterUI extends JDialog implements ActionListener {
 	}
 
 	/**
+	 * This method convertes a given KGML file into an SBMLDocument by calling
+	 * the dedicated method in Kegg2jSBML.
 	 * 
 	 * @param f
 	 * @return
 	 */
 	private SBMLDocument convert(File f) {
-		if (f.exists() && f.isFile() && f.canRead()) {
-			this.doc = k2s.Kegg2jSBML(f.getAbsolutePath());
-
-			// Remember already queried objects
-			if (k2s.getKeggInfoManager().hasChanged()) {
-				KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s
-						.getKeggInfoManager());
-			}
+		try {
+			this.doc = k2s.convert(f);
 			return doc;
+		} catch (IOException exc) {
+			JOptionPane.showMessageDialog(this, exc.getMessage(), exc
+					.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE);
 		}
-		JOptionPane.showMessageDialog(this, "Cannot read input file",
-				"Warning", JOptionPane.WARNING_MESSAGE);
 		return null;
 	}
 

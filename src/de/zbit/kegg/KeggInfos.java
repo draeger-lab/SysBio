@@ -74,9 +74,9 @@ public class KeggInfos {
 	 * @return see above. Result is always trimmed.
 	 */
 	public static String suffix(String s) {
-		if (!s.contains(":"))
+		if (!s.contains(":")){
 			return s.trim();
-		else
+		}
 			return (s.substring(s.indexOf(':') + 1)).trim();
 	}
 
@@ -696,13 +696,13 @@ public class KeggInfos {
 		// in reactions:
 		equation = KeggAdaptor.extractInfo(infos, "EQUATION", "\n");
 		String pathwaysTemp = KeggAdaptor.extractInfo(infos, "PATHWAY");
-		if (pathwaysTemp != null && pathwaysTemp.trim().length() != 0) {
+		if ((pathwaysTemp != null) && (pathwaysTemp.trim().length() != 0)) {
 			pathwaysTemp = pathwaysTemp.replace("PATH:", "");
 			String[] splitt = pathwaysTemp.split("\n");
 			pathways = "";
 			pathwayDescs = "";
 			for (String s : splitt) {
-				if (!s.startsWith(" ") && pathwayDescs.length() != 0) {
+				if (!s.startsWith(" ") && (pathwayDescs.length() != 0)) {
 					/*
 					 * Continuation of last line.
 					 */
@@ -714,6 +714,12 @@ public class KeggInfos {
 				pathwayDescs += ","
 						+ s.substring(s.indexOf(" ")).trim().replace(",", "");
 			}
+		}
+		if ((pathways != null) && pathways.startsWith(",")) {
+			pathways = pathways.substring(1);
+		}
+		if ((pathwayDescs != null) && pathwayDescs.startsWith(",")) {
+			pathwayDescs = pathwayDescs.substring(1);
 		}
 
 		// Free Memory instead of storing empty Strings.
