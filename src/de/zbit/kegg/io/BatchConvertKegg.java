@@ -3,6 +3,8 @@ package de.zbit.kegg.io;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.xml.stream.XMLStreamException;
+
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.DirectoryParser;
 
@@ -149,7 +151,15 @@ public class BatchConvertKegg {
           if (new File(outFile).exists()) continue; // Skip already converted files.
           
           // XXX: Main Part
-          converter.Convert(pw.get(i), outFile);
+          try {
+			converter.Convert(pw.get(i), outFile);
+		} catch (XMLStreamException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
           
           if (converter.lastFileWasOverwritten()) { // Datei war oben noch nicht da, sp�ter aber schon => ein anderer prezess macht das selbe bereits.
             System.out.println("It looks like another instance is processing the same files. Going to next subfolder.");

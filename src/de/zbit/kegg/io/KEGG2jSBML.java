@@ -1,8 +1,11 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.CVTerm;
@@ -253,8 +256,12 @@ public class KEGG2jSBML implements KeggConverter {
 
 	/**
 	 * @param args
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws XMLStreamException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws XMLStreamException,
+			InstantiationException, IllegalAccessException {
 		// Speedup Kegg2SBML by loading alredy queried objects. Reduces network
 		// load and heavily reduces computation time.
 		KEGG2jSBML k2s;
@@ -783,9 +790,13 @@ public class KEGG2jSBML implements KeggConverter {
 	}
 
 	/**
-   * 
-   */
-	public void Convert(Pathway p, String outfile) {
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws XMLStreamException
+	 * 
+	 */
+	public void Convert(Pathway p, String outfile) throws XMLStreamException,
+			InstantiationException, IllegalAccessException {
 		SBMLDocument doc = Kegg2jSBML(p);
 
 		// JSBML IO => write doc to outfile.
@@ -802,7 +813,9 @@ public class KEGG2jSBML implements KeggConverter {
 	 * 
 	 * @see de.zbit.kegg.io.KeggConverter#Convert()
 	 */
-	public void Convert(String infile, String outfile) {
+	public void Convert(String infile, String outfile)
+			throws XMLStreamException, InstantiationException,
+			IllegalAccessException {
 		SBMLDocument doc = Kegg2jSBML(infile);
 
 		// JSBML IO => write doc to outfile.
@@ -810,6 +823,27 @@ public class KEGG2jSBML implements KeggConverter {
 			lastFileWasOverwritten = true; // Remember that file was already
 		// there.
 		SBMLWriter.write(doc, outfile);
+	}
+
+	/**
+	 * This method converts a given KGML file into an SBMLDocument.
+	 * 
+	 * @param f
+	 * @return
+	 * @throws IOException
+	 */
+	public SBMLDocument convert(File f) throws IOException {
+		if (f.exists() && f.isFile() && f.canRead()) {
+			SBMLDocument doc = Kegg2jSBML(f.getAbsolutePath());
+
+			// Remember already queried objects
+			if (getKeggInfoManager().hasChanged()) {
+				KeggInfoManagement.saveToFilesystem("keggdb.dat",
+						getKeggInfoManager());
+			}
+			return doc;
+		}
+		throw new IOException("Cannot read input file " + f.getAbsolutePath());
 	}
 
 	/**
@@ -1015,11 +1049,11 @@ public class KEGG2jSBML implements KeggConverter {
 				|| (p.getComment() != null && p.getComment().length() > 0)) {
 			model.appendNotes("<p>");
 			if (p.getComment() != null && p.getComment().length() > 0) {
-				model.appendNotes(String.format("KGML Comment: " + quotStart
-						+ "%s" + quotEnd + "<br />\n", p.getComment()));
+				model.appendNotes(String.format("KGML Comment: %s%s%s<br/>\n",
+						quotStart, p.getComment(), quotEnd));
 			}
 			if (p.getVersion() > 0) {
-				model.appendNotes(String.format("KGML Version was: %s<br />\n",
+				model.appendNotes(String.format("KGML Version was: %s<br/>\n",
 						Double.toString(p.getVersion())));
 			}
 			model.appendNotes("</p>");
@@ -1513,53 +1547,58 @@ public class KEGG2jSBML implements KeggConverter {
 					sbReaction.appendNotes("<p>");
 					if (infos.getDefinition() != null) {
 						sbReaction.appendNotes(String.format(
-								"<b>Definition of " + quotStart + "%s"
-										+ quotEnd + ":</b> %s<br />\n", ko_id
-										.toUpperCase(), EscapeChars
-										.forHTML(infos.getDefinition().replace(
-												"\n", " "))));
+								"<b>Definition of %s%s%s:</b> %s<br/>\n",
+								quotStart, ko_id.toUpperCase(), quotEnd,
+								EscapeChars.forHTML(infos.getDefinition()
+										.replace("\n", " "))));
 						// System.out.println(sbReaction.getNotesString());
-						// notes="<body xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>&#8220;TEST&#8221;</b> A &lt;&#061;&gt;&#62;&#x3e;\u003E B<br /></p></body>";
+						// notes="<body xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>&#8220;TEST&#8221;</b> A &lt;&#061;&gt;&#62;&#x3e;\u003E B<br/></p></body>";
 					} else
 						sbReaction.appendNotes(String.format(
-								"<b>%s</b><br />\n", ko_id.toUpperCase()));
+								"<b>%s</b><br/>\n", ko_id.toUpperCase()));
 					if (infos.getEquation() != null) {
-						sbReaction.appendNotes(String.format("<b>Equation for "
-								+ quotStart + "%s" + quotEnd
-								+ ":</b> %s<br />\n", ko_id.toUpperCase(),
+						sbReaction.appendNotes(String.format(
+								"<b>Equation for %s%s%s:</b> %s<br/>\n",
+								quotStart, ko_id.toUpperCase(), quotEnd,
 								EscapeChars.forHTML(infos.getEquation())));
 					}
-					sbReaction
-							.appendNotes(String
-									.format(
-											"<img href=\"http://www.genome.jp/Fig/reaction/%s.gif\"/>",
-											KeggInfos.suffix(ko_id
-													.toUpperCase())));
+					String prefix = "http://www.genome.jp/Fig/reaction/";
+					String suffix = KeggInfos.suffix(ko_id.toUpperCase())
+							+ ".gif";
+					sbReaction.appendNotes(String.format("<a href=\"%s%s\">",
+							prefix, suffix));
+					sbReaction.appendNotes(String.format(
+							"<img src=\"%s%s\"/></a>\n", prefix, suffix));
 					if (infos.getPathwayDescriptions() != null) {
-						sbReaction.appendNotes("<b>Occurs in:</b><br />\n");
+						sbReaction.appendNotes("<b>Occurs in:</b><br/>\n");
 						for (String desc : infos.getPathwayDescriptions()
-								.split(","))
+								.split(",")) {
 							// e.g.
 							// ",Glycolysis / Gluconeogenesis,Metabolic pathways"
-							sbReaction.appendNotes(desc + "<br />\n");
-						sbReaction.appendNotes("<br />\n");
+							sbReaction.appendNotes(desc + "<br/>\n");
+						}
+						sbReaction.appendNotes("<br/>\n");
 					}
 					sbReaction.appendNotes("</p>");
 
 					if (rePWs != null && infos.getPathways() != null) {
-						for (String pwId : infos.getPathways().split(","))
+						for (String pwId : infos.getPathways().split(",")) {
 							rePWs.addResource(KeggInfos.miriam_urn_kgPathway
 									+ KeggInfos.suffix(pwId));
+						}
 					}
 				}
 			}
-			if ((reID.getNumResources() > 0) || (rePWs.getNumResources() > 0))
+			if ((reID.getNumResources() > 0) || (rePWs.getNumResources() > 0)) {
 				sbReaction.getAnnotation().addRDFAnnotationNamespace("bqbiol",
 						"", "http://biomodels.net/biology-qualifiers/");
-			if (reID.getNumResources() > 0)
+			}
+			if (reID.getNumResources() > 0) {
 				sbReaction.addCVTerm(reID);
-			if (rePWs.getNumResources() > 0)
+			}
+			if (rePWs.getNumResources() > 0) {
 				sbReaction.addCVTerm(rePWs);
+			}
 
 			// Finally, add the fully configured reaction.
 			sbReaction.setName(r.getName());
