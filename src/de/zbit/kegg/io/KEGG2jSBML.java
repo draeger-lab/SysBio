@@ -1,6 +1,7 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -259,9 +260,10 @@ public class KEGG2jSBML implements KeggConverter {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws XMLStreamException
+	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws XMLStreamException,
-			InstantiationException, IllegalAccessException {
+			InstantiationException, IllegalAccessException, FileNotFoundException {
 		// Speedup Kegg2SBML by loading alredy queried objects. Reduces network
 		// load and heavily reduces computation time.
 		KEGG2jSBML k2s;
@@ -793,10 +795,12 @@ public class KEGG2jSBML implements KeggConverter {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws XMLStreamException
+	 * @throws FileNotFoundException
 	 * 
 	 */
 	public void Convert(Pathway p, String outfile) throws XMLStreamException,
-			InstantiationException, IllegalAccessException {
+			InstantiationException, IllegalAccessException,
+			FileNotFoundException {
 		SBMLDocument doc = Kegg2jSBML(p);
 
 		// JSBML IO => write doc to outfile.
@@ -814,8 +818,8 @@ public class KEGG2jSBML implements KeggConverter {
 	 * @see de.zbit.kegg.io.KeggConverter#Convert()
 	 */
 	public void Convert(String infile, String outfile)
-			throws XMLStreamException, InstantiationException,
-			IllegalAccessException {
+			throws FileNotFoundException, XMLStreamException,
+			InstantiationException, IllegalAccessException {
 		SBMLDocument doc = Kegg2jSBML(infile);
 
 		// JSBML IO => write doc to outfile.

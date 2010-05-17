@@ -3,8 +3,6 @@
  */
 package de.zbit.kegg.io;
 
-import javax.xml.stream.XMLStreamException;
-
 import de.zbit.kegg.parser.pathway.Pathway;
 
 /**
@@ -17,24 +15,17 @@ public interface KeggConverter {
 	 * 
 	 * @param p
 	 * @param outFile
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws XMLStreamException
+	 * @throws Exception
 	 */
-	public void Convert(Pathway p, String outFile) throws XMLStreamException,
-			InstantiationException, IllegalAccessException;
+	public void Convert(Pathway p, String outFile) throws Exception;
 
 	/**
 	 * 
 	 * @param infile
 	 * @param outfile
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws XMLStreamException
+	 * @throws Exception
 	 */
-	public void Convert(String infile, String outfile)
-			throws XMLStreamException, InstantiationException,
-			IllegalAccessException;
+	public void Convert(String infile, String outfile) throws Exception;
 
 	/**
 	 * Gibt an, ob das letzte geschriebene outFile bereits vorhanden war und
