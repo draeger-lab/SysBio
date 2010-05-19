@@ -26,15 +26,15 @@ public class UniProtWrapper extends InfoManagement<String, String> {
   public static void main(String[] args) {
     UniProtWrapper uw = new UniProtWrapper();
 
-    System.out.println(uw.getInformation("ALBU_HUMAN"));
+    // System.out.println(uw.getInformation("ALBU_HUMAN"));
 
-    // String[] anfrage = new String[]{"ZCH18_HUMAN", "1433B_HUMAN", "QUATSCH", "ZCH14_HUMAN"};
-    // String[] ret = uw.getInformations(anfrage);
-    //    
-    // System.out.println("Rückgabe:");
-    // for (int i=0; i<ret.length; i++) {
-    // System.out.println(anfrage[i] + ":\n" + ret[i] + "\n==============================");
-    // }
+    String[] anfrage = new String[]{"ZCH18_HUMAN", "1433B_HUMAN", "QUATSCH", "ZCH14_HUMAN"};
+    String[] ret = uw.getInformations(anfrage);
+       
+    System.out.println("Rückgabe:");
+    for (int i=0; i<ret.length; i++) {
+      System.out.println(anfrage[i] + ":\n" + ret[i] + "\n==============================");
+    }
   }
   /**
    * 

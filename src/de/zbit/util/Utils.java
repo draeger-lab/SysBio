@@ -562,6 +562,37 @@ public class Utils {
   }
   
   /**
+   * Calculates and returns the variance of the given list of double values
+   * 
+   * @param d the list of double values
+   * @return
+   */
+  public static double variance(double[] d) {
+    double mean = average(d);
+    return variance(d, mean);
+  }
+  
+  /**
+   * Calculates and returns the variance of the given list of double values.
+   * This version of the method also takes the precalculated mean of the values
+   * as parameter to prevent redundant calculations.
+   * 
+   * @param d the list of double values
+   * @param mean the mean of the double values
+   * @return
+   */
+  public static double variance(double[] d, double mean) {
+    if( d.length <= 1 ) {
+      return 0.0;
+    }
+    double sum = 0.0;
+    for (int i = 0; i < d.length; i++) {
+      sum += Math.pow(d[i] - mean, 2);
+    }
+    return sum / (d.length - 1);
+  }
+  
+  /**
    * Usefull for parsing command line arguments.
    * @param args - Command line arguments.
    * @param searchForCommand - Command to search for

@@ -7,6 +7,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.log4j.Logger;
+
 import de.zbit.exception.UnsuccessfulRetrieveException;
 
 /**
@@ -19,6 +21,8 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
  * @author wrzodek
  */
 public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable, INFOtype extends Serializable> implements Serializable {
+  
+  public static final Logger log = Logger.getLogger(InfoManagement.class);
   /**
    * It is recommended to generate a new ID when extending this class.
    */
@@ -224,10 +228,11 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       } catch (TimeoutException e) {
         retried++;
         if (retried>=3) {
-          e.printStackTrace();
+          log.debug("3 attempts failed with a TimeoutException");
           break;
         }
       } catch (UnsuccessfulRetrieveException e) {
+        log.debug("Unsuccessful retrieval, marking this ID as unretrievable", e);
         unsuccessfulQueries.add(id);
         break;
       }
