@@ -2,6 +2,7 @@ package de.zbit.dbfetch;
 
 import java.util.concurrent.TimeoutException;
 
+import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
 import uk.ac.ebi.webservices.WSDbfetchClient;
@@ -16,10 +17,11 @@ import de.zbit.util.ProgressBar;
  * 
  */
 public abstract class DBFetcher extends InfoManagement<String, String> {
+  
   /**
+   * Enumeration to describe the requested style of a dbfetch result.
    * 
-   * @author buechel
-   *
+   * @author Florian Mittag
    */
   public static enum Style {
     DEFAULT ("default"),
@@ -109,6 +111,8 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         entriesStr = dbfetch.fetchData(getDbName() + ":" + id.toUpperCase(),
             getFormat(), getStyleString());
         break;
+      } catch (AxisFault e ) {
+        throw new UnsuccessfulRetrieveException( e );
       } catch (Exception e) {
         retried++;
         log.debug("Attempt " + retried + " to fetch data failed", e);
