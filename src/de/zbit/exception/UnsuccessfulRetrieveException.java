@@ -18,4 +18,16 @@ public class UnsuccessfulRetrieveException extends Exception {
 	public UnsuccessfulRetrieveException() {
 		super();
 	}
+
+  public UnsuccessfulRetrieveException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public UnsuccessfulRetrieveException(String message) {
+    super(message);
+  }
+
+  public UnsuccessfulRetrieveException(Throwable cause) {
+    super(cause);
+  }
 }
