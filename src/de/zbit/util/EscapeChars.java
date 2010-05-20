@@ -40,7 +40,7 @@ import java.util.regex.Matcher;
 *  1. ä = \u00e4
    2. Ä = \u00c4
    3. ö = \u00f6
-   4. Ö =\u00d6
+   4. Ö = \u00d6
    5. ü = \u00fc
    6. Ü = \u00dc
    7. ß = \u00df
