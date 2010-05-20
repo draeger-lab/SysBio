@@ -139,9 +139,13 @@ public class KeggAdaptor implements Serializable {
     printEachOutputToScreen = true;
     
     KeggAdaptor adap = new KeggAdaptor();
+    
+    adap.get("rn:R02750");
+    if (true) return;
+    
     adap.getPathways("hsa");
     
-    String ret = adap.get("hsa:9965");
+    String ret = adap.get("rn:R02750");
     System.out.println("---\n"+KeggAdaptor.extractInfo(ret, "PATHWAY")+"\n---");
     
     String ttt = adap.get("path:hsa04010");
