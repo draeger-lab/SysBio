@@ -69,8 +69,8 @@ import org.sbml.jsbml.StoichiometryMath;
 import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
-import org.sbml.jsbml.util.LaTeX;
 import org.sbml.jsbml.util.StringTools;
+import org.sbml.jsbml.util.compilers.LaTeX;
 
 import atp.sHotEqn;
 import de.zbit.gui.GUITools;

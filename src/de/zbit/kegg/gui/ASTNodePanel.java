@@ -28,7 +28,7 @@ import javax.swing.SpinnerNumberModel;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.MathContainer;
-import org.sbml.jsbml.util.LaTeX;
+import org.sbml.jsbml.util.compilers.LaTeX;
 
 import de.zbit.gui.LayoutHelper;
 
