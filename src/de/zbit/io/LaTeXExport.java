@@ -37,7 +37,7 @@ import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.StoichiometryMath;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
-import org.sbml.jsbml.util.LaTeX;
+import org.sbml.jsbml.util.compilers.LaTeX;
 
 /**
  * This class is used to export a SBML model as LaTeX file.
@@ -403,7 +403,7 @@ public class LaTeXExport extends LaTeX {
 			buffer = brackets(buffer);
 		if (u.getExponent() != 1) {
 			buffer.append("^{");
-			buffer.append(Integer.toString(u.getExponent()));
+			buffer.append(Double.toString(u.getExponent()));
 			buffer.append('}');
 		}
 		return buffer;

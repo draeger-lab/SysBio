@@ -1,10 +1,10 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.InvalidPropertiesFormatException;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -260,10 +260,12 @@ public class KEGG2jSBML implements KeggConverter {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws XMLStreamException
-	 * @throws FileNotFoundException 
+	 * @throws ClassNotFoundException 
+	 * @throws IOException 
+	 * @throws InvalidPropertiesFormatException 
 	 */
 	public static void main(String[] args) throws XMLStreamException,
-			InstantiationException, IllegalAccessException, FileNotFoundException {
+			InstantiationException, IllegalAccessException, InvalidPropertiesFormatException, IOException, ClassNotFoundException {
 		// Speedup Kegg2SBML by loading alredy queried objects. Reduces network
 		// load and heavily reduces computation time.
 		KEGG2jSBML k2s;
@@ -795,12 +797,14 @@ public class KEGG2jSBML implements KeggConverter {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws XMLStreamException
-	 * @throws FileNotFoundException
+	 * @throws ClassNotFoundException 
+	 * @throws IOException 
+	 * @throws InvalidPropertiesFormatException 
 	 * 
 	 */
 	public void Convert(Pathway p, String outfile) throws XMLStreamException,
 			InstantiationException, IllegalAccessException,
-			FileNotFoundException {
+			InvalidPropertiesFormatException, IOException, ClassNotFoundException {
 		SBMLDocument doc = Kegg2jSBML(p);
 
 		// JSBML IO => write doc to outfile.
@@ -818,8 +822,8 @@ public class KEGG2jSBML implements KeggConverter {
 	 * @see de.zbit.kegg.io.KeggConverter#Convert()
 	 */
 	public void Convert(String infile, String outfile)
-			throws FileNotFoundException, XMLStreamException,
-			InstantiationException, IllegalAccessException {
+			throws XMLStreamException,
+			InstantiationException, IllegalAccessException, InvalidPropertiesFormatException, IOException, ClassNotFoundException {
 		SBMLDocument doc = Kegg2jSBML(infile);
 
 		// JSBML IO => write doc to outfile.
