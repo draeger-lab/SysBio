@@ -21,6 +21,13 @@ public class ProcessExecutioner {
     defaultWorkDir = workdir;
   }
   
+  /**
+   * 
+   * @param command, i.e. ./convertPathwayFiles.sh 
+   * @param processOutput
+   * @return
+   * @throws IOException
+   */
   public static int executeProcess(String command, OutputStream processOutput) throws IOException {
     return executeProcess(Arrays.asList(command.split("\\s+")), processOutput);
   }
@@ -35,6 +42,14 @@ public class ProcessExecutioner {
     
     InputStream in = p.getInputStream();
     
+    if( processOutput == null ) {
+      processOutput = new OutputStream() {
+        @Override
+        public void write(int b) throws IOException {
+          // intentionally left blank
+        }
+      };
+    }
     int len;
     byte[] buffer = new byte[BUFFER_SIZE];
     while( (len = in.read(buffer)) != -1 ) {
