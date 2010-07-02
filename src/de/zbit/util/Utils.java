@@ -415,16 +415,24 @@ public class Utils {
   
   /** Nicht ganz korrekt da auch 4.345,2.1 als nummer erkannt wird, aber das reicht mir so. **/
   public static boolean isNumber(String s, boolean onlyDigits) {
-    char[] a = s.toCharArray();
+    if (s.trim().length()==0) return false;
+    char[] a = s.trim().toCharArray();
+    boolean atLeastOneDigit=false;
     for (int i=0; i< a.length; i++) {
+      if (!atLeastOneDigit && Character.isDigit(a[i])) atLeastOneDigit = true;
+      
       if (onlyDigits){
         if (Character.isDigit(a[i])) continue; else return false;
       } else {
         if (Character.isDigit(a[i])) continue;
-        if (a[i]=='-' || a[i]=='.' || a[i]==',' || a[i]=='E' || a[i]=='e') continue;
+        else if (i==0 && a[i]=='-') continue;
+        else if (a[i]=='.' || a[i]==',') continue;
+        else if (a[i]=='E' || a[i]=='e') continue;
+        //if (a[i]=='-' || a[i]=='.' || a[i]==',' || a[i]=='E' || a[i]=='e') continue;
         return false;
       }
     }
+    if (!atLeastOneDigit) return false; // Only "-" or "..." is no number.
     return true;
   }
   

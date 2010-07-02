@@ -70,6 +70,9 @@ public class KeggAdaptor implements Serializable {
       // Wenn was zwischen unserem Treffer und newLine steht => abort.
       if (toCheck.replace(" ", "").replace("\t", "").replace("\n", "").length()>0)
         return null;
+      // Wenn unser Treffer nicht von einem Whitespace char gefolgt wird => abort.
+      if (!Character.isWhitespace(completeString.charAt(pos+startsWith.length())))
+        return null;
     }
 
     String ret = "";
@@ -82,7 +85,8 @@ public class KeggAdaptor implements Serializable {
         nl = completeString.length();
 
       try {
-        ret = completeString.substring(st, nl).trim();
+        ret = completeString.substring(st,
+            nl).trim();
       } catch (Exception e) {
         System.out.println("St: " + st + " \t" + pos + " "
             + startsWith.length());
