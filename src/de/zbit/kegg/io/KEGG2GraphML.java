@@ -242,13 +242,13 @@ public class KEGG2GraphML implements KeggConverter {
     //KeggParser.silent=false;
     System.out.println("DEMO MODE");
     System.out.println("Reading kegg pathway...");
-    Pathway p = KeggParser.parse("resources/de/zbit/kegg/samplefiles/_ko00010.xml").get(0); //04115
+    Pathway p = KeggParser.parse("files/KGMLsamplefiles/hsa04310.xml").get(0); //04115
     //Pathway p = KeggParser.parse("ko02010.xml").get(0);
     //p = KeggParser.parse("http://kaas.genome.jp/kegg/KGML/KGML_v0.6.1/ko/ko00010.xml").get(0);
     
     System.out.println("Converting to GraphML");
     //silent = false;
-    KEGG2GraphML(p, "resources/de/zbit/kegg/samplefiles/test.graphML");
+    KEGG2GraphML(p, "files/KGMLsamplefiles/test.graphML");
     KeggInfoManagement.saveToFilesystem("keggdb.dat", manager); // Remember already queried objects
   }
   
@@ -631,7 +631,7 @@ public class KEGG2GraphML implements KeggConverter {
                 else if (e.getType().equals(EntryType.gene))
                   eType = "protein";
                 else
-                  e.getType().toString();
+                  eType = e.getType().toString();
               }
               // XXX Fuer Jochens Annotationen (entityType):
               // Jochen:  "protein", "protein in complex", "complex", "RNA", "DNA", "small molecule", "RNA in complex", "DNA in complex", "small molecule in complex", "pathway", "biological process"
@@ -639,6 +639,9 @@ public class KEGG2GraphML implements KeggConverter {
               //          enzyme & other fehlen.
               // Au-ss-erdem: "bindsToChemicals" nicht gesetzt.
             }
+          }
+          if (isPathwayReference) {
+            eType = "pathway";
           }
 
           nodeLabel.set(n, name2);
@@ -923,7 +926,7 @@ public class KEGG2GraphML implements KeggConverter {
         addNodeMap(nodePosition, ioh, "nodePosition");
                
         addEdgeMap(edgeDescription, ioh, "description");
-        addEdgeMap(interactionDescription, ioh, "interactionDescription");
+        addEdgeMap(interactionDescription, ioh, "interactionType");
       }
       
       if (new File(outFile).exists()) lastFileWasOverwritten=true; // Remember that file was already there.
