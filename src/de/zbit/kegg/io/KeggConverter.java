@@ -17,7 +17,7 @@ public interface KeggConverter {
 	 * @param outFile
 	 * @throws Exception
 	 */
-	public void Convert(Pathway p, String outFile) throws Exception;
+	public boolean Convert(Pathway p, String outFile) throws Exception;
 
 	/**
 	 * 

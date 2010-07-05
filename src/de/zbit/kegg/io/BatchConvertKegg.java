@@ -153,12 +153,6 @@ public class BatchConvertKegg {
           // XXX: Main Part
           try {
 			converter.Convert(pw.get(i), outFile);
-		} catch (XMLStreamException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
