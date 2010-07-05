@@ -92,6 +92,12 @@ public class KEGG2GraphML implements KeggConverter {
   public static KeggInfoManagement manager=null;
   
   /**
+   * Store last output hander. This handler contains all maps (node => nodeLabel,
+   * entrez id, etc.). The generated graph should be written to disk with this handler.
+   */
+  private IOHandler lastOutputHandler=null;
+  
+  /**
    * 
    * @param nm
    * @param ioh
@@ -370,11 +376,19 @@ public class KEGG2GraphML implements KeggConverter {
     return nr;
   }
   
+  public boolean Convert(Pathway p, String outFile) {
+    Graph2D graph = Convert(p);
+    if (graph==null) return false;
+    return writeGraphToFile(outFile, graph);
+  }
+  
   
   /**
-   * 
+   * Convert a Kegg Pathway to GraphML.
+   * You should write this pathway to disk with the internal writeGraphToFile method.
+   * If you don't do so, all meta-information (entrez ids for labels, etc.) will be lost.
    */
-  public void Convert(Pathway p, String outFile) {
+  public Graph2D Convert(Pathway p) {
     Graph2D graph = new Graph2D();
     ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>();
     if (retrieveKeggAnnots) {
@@ -903,6 +917,7 @@ public class KEGG2GraphML implements KeggConverter {
     
     // write out the graph using outputHandler
     IOHandler outputHandler = new GraphMLIOHandler(); // new GMLIOHandler();
+    this.lastOutputHandler = outputHandler;
     if (!silent) System.out.println("Writing file...");
     if (outputHandler != null && outputHandler.canWrite()) {
       Graph2DView view = new Graph2DView(graph);
@@ -927,24 +942,50 @@ public class KEGG2GraphML implements KeggConverter {
                
         addEdgeMap(edgeDescription, ioh, "description");
         addEdgeMap(interactionDescription, ioh, "interactionType");
+        
       }
-      
-      if (new File(outFile).exists()) lastFileWasOverwritten=true; // Remember that file was already there.
-      int retried=0;
-      while (retried<3) {
-        try {
-          outputHandler.write(graph, outFile);
-          break; // Success => No more need to retry
-        } catch (IOException iex) {
-          retried++;
-          if (retried>2) System.err.println("Error while encoding file " + outFile + "\n" + iex);
-        }
-      }
+  // Write file here. 
+
     } else {
       System.err.println("Y OutputHandler can't write.");
     }
+    return graph;
   }
 
+  public boolean writeGraphToFile(String outFile, Graph2D graph) {
+    if (lastOutputHandler==null || !lastOutputHandler.canWrite()) return false;
+    if (new File(outFile).exists()) lastFileWasOverwritten=true; // Remember that file was already there.
+    int retried=0;
+    while (retried<3) {
+      try {
+        lastOutputHandler.write(graph, outFile);
+        return true; // Success => No more need to retry
+      } catch (IOException iex) {
+        retried++;
+        if (retried>2) System.err.println("Error while encoding file " + outFile + "\n" + iex);
+      }
+    }
+    return false;
+  }
+  
+  public static Graph2D modifyNodeLabels(Graph2D g, boolean removeSpeciesTitles, boolean removeMultipleNodeNames) {
+    for (y.base.Node n:g.getNodeArray()) {
+      String t = g.getLabelText(n);
+      // Convert "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
+      if (removeSpeciesTitles && t.contains("-")) {
+        t = t.substring(0, t.indexOf("-")-1);
+        g.setLabelText(n, t);
+      }
+      
+      // Convert "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
+      if (removeMultipleNodeNames && t.contains(",")) {
+        t = t.substring(0, t.indexOf(",")-1);
+        g.setLabelText(n, t);
+      }
+    }
+    return g;
+  }
+  
   /*
    * (non-Javadoc)
    * @see de.zbit.kegg.io.KeggConverter#Convert()
