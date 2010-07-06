@@ -60,6 +60,7 @@ import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
+import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
@@ -285,9 +286,13 @@ public class SBasePanel extends JPanel {
 				laTeXpreview.append(latex.timeDerivative(rr.getVariable()));
 				laTeXpreview.append('=');
 			}
-			laTeXpreview.append(mc.getMath().compile(latex).toString().replace(
-					"mathrm", "mbox").replace("text", "mbox").replace("mathtt",
-					"mbox"));
+			try {
+				laTeXpreview.append(mc.getMath().compile(latex).toString()
+						.replace("mathrm", "mbox").replace("text", "mbox")
+						.replace("mathtt", "mbox"));
+			} catch (SBMLException e) {
+				e.printStackTrace();
+			}
 			laTeXpreview.append(LaTeX.eqEnd);
 			JPanel preview = new JPanel(new BorderLayout());
 			preview.add(new sHotEqn(laTeXpreview.toString()),
@@ -692,10 +697,16 @@ public class SBasePanel extends JPanel {
 			JPanel p = new JPanel(new GridLayout(1, 1));
 			p.setBorder(BorderFactory.createTitledBorder(" "
 					+ sMath.getClass().getCanonicalName() + ' '));
-			sHotEqn eqn = new sHotEqn(sMath.getMath().compile(latex).toString()
-					.replace("\\\\", "\\"));
-			eqn.setBorder(BorderFactory.createLoweredBevelBorder());
-			p.add(eqn);
+			sHotEqn eqn;
+			try {
+				eqn = new sHotEqn(sMath.getMath().compile(latex).toString()
+						.replace("\\\\", "\\"));
+
+				eqn.setBorder(BorderFactory.createLoweredBevelBorder());
+				p.add(eqn);
+			} catch (SBMLException e) {
+				e.printStackTrace();
+			}
 			lh.add(p, 3, ++row, 1, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		} else {

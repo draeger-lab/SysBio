@@ -1,6 +1,7 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,6 +17,7 @@ import org.sbml.jsbml.History;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.CVTerm.Qualifier;
@@ -263,9 +265,10 @@ public class KEGG2jSBML implements KeggConverter {
 	 * @throws ClassNotFoundException 
 	 * @throws IOException 
 	 * @throws InvalidPropertiesFormatException 
+	 * @throws SBMLException 
 	 */
 	public static void main(String[] args) throws XMLStreamException,
-			InstantiationException, IllegalAccessException, InvalidPropertiesFormatException, IOException, ClassNotFoundException {
+			InstantiationException, IllegalAccessException, InvalidPropertiesFormatException, IOException, ClassNotFoundException, SBMLException {
 		// Speedup Kegg2SBML by loading alredy queried objects. Reduces network
 		// load and heavily reduces computation time.
 		KEGG2jSBML k2s;
@@ -794,17 +797,9 @@ public class KEGG2jSBML implements KeggConverter {
 	}
 
 	/**
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws XMLStreamException
-	 * @throws ClassNotFoundException 
-	 * @throws IOException 
-	 * @throws InvalidPropertiesFormatException 
 	 * 
 	 */
-	public void Convert(Pathway p, String outfile) throws XMLStreamException,
-			InstantiationException, IllegalAccessException,
-			InvalidPropertiesFormatException, IOException, ClassNotFoundException {
+	public boolean Convert(Pathway p, String outfile) {
 		SBMLDocument doc = Kegg2jSBML(p);
 
 		// JSBML IO => write doc to outfile.
@@ -813,7 +808,19 @@ public class KEGG2jSBML implements KeggConverter {
 			lastFileWasOverwritten = true;
 		}
 		// there.
-		SBMLWriter.write(doc, outfile);
+		try {
+			SBMLWriter.write(doc, outfile);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		} catch (XMLStreamException e) {
+			e.printStackTrace();
+			return false;
+		} catch (SBMLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	/*
@@ -823,7 +830,7 @@ public class KEGG2jSBML implements KeggConverter {
 	 */
 	public void Convert(String infile, String outfile)
 			throws XMLStreamException,
-			InstantiationException, IllegalAccessException, InvalidPropertiesFormatException, IOException, ClassNotFoundException {
+			InstantiationException, IllegalAccessException, InvalidPropertiesFormatException, IOException, ClassNotFoundException, SBMLException {
 		SBMLDocument doc = Kegg2jSBML(infile);
 
 		// JSBML IO => write doc to outfile.
