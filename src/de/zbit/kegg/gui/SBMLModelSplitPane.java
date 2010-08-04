@@ -34,6 +34,7 @@ import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.Model;
+import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SBaseChangedListener;
 
@@ -66,8 +67,9 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 * @param model
+	 * @throws SBMLException 
 	 */
-	public SBMLModelSplitPane(Model model) {
+	public SBMLModelSplitPane(Model model) throws SBMLException {
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		actionListeners = new HashSet<ActionListener>();
 		model.addChangeListener(this);
@@ -87,8 +89,9 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 * @param sbase
 	 * @return
+	 * @throws SBMLException 
 	 */
-	private JScrollPane createRightComponent(SBase sbase) {
+	private JScrollPane createRightComponent(SBase sbase) throws SBMLException {
 		JPanel p = new JPanel();
 		p.add(new SBasePanel(sbase));
 		JScrollPane scroll = new JScrollPane(p,
@@ -101,8 +104,9 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 * @param model
 	 * @param keepDivider
+	 * @throws SBMLException 
 	 */
-	public void init(Model model, boolean keepDivider) {
+	public void init(Model model, boolean keepDivider) throws SBMLException {
 		int proportionalLocation = getDividerLocation();
 		TreePath path = null;
 		if (tree != null)
@@ -183,11 +187,21 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		Object nodeInfo = node.getUserObject();
 		if (nodeInfo instanceof SBase) {
 			int proportionalLocation = getDividerLocation();
-			setRightComponent(createRightComponent((SBase) nodeInfo));
+			try {
+				setRightComponent(createRightComponent((SBase) nodeInfo));
+			} catch (SBMLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			setDividerLocation(proportionalLocation);
 		} else if (nodeInfo instanceof ASTNode) {
 			int proportionalLocation = getDividerLocation();
-			setRightComponent(createRightComponent((ASTNode) nodeInfo));
+			try {
+				setRightComponent(createRightComponent((ASTNode) nodeInfo));
+			} catch (SBMLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			setDividerLocation(proportionalLocation);
 		} else {
 			// displayURL(helpURL);
@@ -199,8 +213,9 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 * @param nodeInfo
 	 * @return
+	 * @throws SBMLException 
 	 */
-	private JScrollPane createRightComponent(ASTNode node) {
+	private JScrollPane createRightComponent(ASTNode node) throws SBMLException {
 		return new JScrollPane(new ASTNodePanel(node),
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);

@@ -125,8 +125,9 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param sbase
+	 * @throws SBMLException 
 	 */
-	public SBasePanel(SBase sbase) {
+	public SBasePanel(SBase sbase) throws SBMLException {
 		super();
 		GridBagLayout gbl = new GridBagLayout();
 		setLayout(gbl);
@@ -221,8 +222,9 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param e
+	 * @throws SBMLException 
 	 */
-	private void addProperties(Event e) {
+	private void addProperties(Event e) throws SBMLException {
 		JCheckBox check = new JCheckBox("Uses values from trigger time", e
 				.getUseValuesFromTriggerTime());
 		check.setEnabled(editable);
@@ -259,8 +261,9 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param mc
+	 * @throws SBMLException 
 	 */
-	private void addProperties(MathContainer mc) {
+	private void addProperties(MathContainer mc) throws SBMLException {
 		if (mc.isSetMath()) {
 			StringBuffer laTeXpreview = new StringBuffer();
 			laTeXpreview.append(LaTeX.eqBegin);
@@ -456,8 +459,9 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param sbase
+	 * @throws SBMLException 
 	 */
-	private void addProperties(Reaction reaction) {
+	private void addProperties(Reaction reaction) throws SBMLException {
 		JCheckBox check = new JCheckBox("Reversible", reaction.getReversible());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 1, 1);
@@ -614,8 +618,9 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param ssr
+	 * @throws SBMLException 
 	 */
-	private void addProperties(SimpleSpeciesReference ssr) {
+	private void addProperties(SimpleSpeciesReference ssr) throws SBMLException {
 		if (ssr.isSetSpecies()) {
 			Model m = ssr.getModel();
 			String idsOrNames[] = new String[m.getNumSpecies()];
@@ -822,8 +827,9 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param ud
+	 * @throws SBMLException 
 	 */
-	private void addProperties(UnitDefinition ud) {
+	private void addProperties(UnitDefinition ud) throws SBMLException {
 		lh.add(new JLabel("Definition: "), 1, ++row, 1, 1, 1, 1);
 		lh.add(unitPreview(ud), 3, row, 1, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);

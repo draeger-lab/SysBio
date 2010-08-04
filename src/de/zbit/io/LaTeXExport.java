@@ -28,15 +28,16 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.sbml.jsbml.ASTNode;
-import org.sbml.jsbml.ASTNodeValue;
 import org.sbml.jsbml.Event;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.Reaction;
+import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.StoichiometryMath;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
+import org.sbml.jsbml.util.compilers.ASTNodeValue;
 import org.sbml.jsbml.util.compilers.LaTeX;
 
 /**
@@ -102,11 +103,12 @@ public class LaTeXExport extends LaTeX {
 	 * @param texFile
 	 * @param settings
 	 * @throws IOException
+	 * @throws SBMLException 
 	 */
 	public static void writeLaTeX(Model model, File texFile,
 			boolean namesInEquations, boolean landscape,
 			boolean typeWriterFont, boolean titlePage, short fontSize,
-			String paperSize) throws IOException {
+			String paperSize) throws IOException, SBMLException {
 		BufferedWriter buffer = new BufferedWriter(new FileWriter(texFile));
 		LaTeXExport exporter = new LaTeXExport(namesInEquations, landscape,
 				typeWriterFont, titlePage, fontSize, paperSize);
@@ -506,8 +508,9 @@ public class LaTeXExport extends LaTeX {
 	 * 
 	 * @param reaction
 	 * @return
+	 * @throws SBMLException 
 	 */
-	public String reactionEquation(Reaction reaction) {
+	public String reactionEquation(Reaction reaction) throws SBMLException {
 		StringBuffer reactionEqn = new StringBuffer();
 		reactionEqn.append(LaTeX.eqBegin);
 		LaTeX latex = new LaTeX();
@@ -677,10 +680,11 @@ public class LaTeXExport extends LaTeX {
 	 * @param astnode
 	 * @param file
 	 * @throws IOException
+	 * @throws SBMLException 
 	 */
 
 	@SuppressWarnings("deprecation")
-	public StringBuffer toLaTeX(Model model) throws IOException {
+	public StringBuffer toLaTeX(Model model) throws IOException, SBMLException {
 		StringBuffer laTeX;
 		String newLine = System.getProperty("line.separator");
 		String title = model.getName().length() > 0 ? model.getName()
@@ -1112,14 +1116,15 @@ public class LaTeXExport extends LaTeX {
 	 * @param model
 	 * @param file
 	 * @throws IOException
+	 * @throws SBMLException 
 	 */
-	public void toLaTeX(Model model, File file) throws IOException {
+	public void toLaTeX(Model model, File file) throws IOException, SBMLException {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 		bw.append(toLaTeX(model));
 		bw.close();
 	}
 
-	public StringBuffer toLaTeX(Reaction reaction) throws IOException {
+	public StringBuffer toLaTeX(Reaction reaction) throws IOException, SBMLException {
 		Model model = reaction.getModel();
 		String title = model.getName().length() > 0 ? model.getName()
 				.replaceAll("_", " ") : model.getId().replaceAll("_", " ");
