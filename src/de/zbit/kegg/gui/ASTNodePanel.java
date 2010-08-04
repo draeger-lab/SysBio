@@ -28,6 +28,7 @@ import javax.swing.SpinnerNumberModel;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.MathContainer;
+import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.util.compilers.LaTeX;
 
 import de.zbit.gui.LayoutHelper;
@@ -48,8 +49,9 @@ public class ASTNodePanel extends JPanel {
 	/**
 	 * 
 	 * @param node
+	 * @throws SBMLException 
 	 */
-	public ASTNodePanel(ASTNode node) {
+	public ASTNodePanel(ASTNode node) throws SBMLException {
 		super();
 		LayoutHelper lh = new LayoutHelper(this);
 		boolean enabled = false;

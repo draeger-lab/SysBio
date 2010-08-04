@@ -18,6 +18,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.gui.GUITools;
@@ -103,8 +104,9 @@ public class ConverterUI extends JDialog implements ActionListener {
 	 * @param args
 	 *            accepted arguments are --input=<base directory to open files>
 	 *            and --output=<base directory to save files>
+	 * @throws SBMLException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SBMLException {
 		if (args.length > 0) {
 			String infile = null, outfile = null;
 			for (String arg : args) {
@@ -141,8 +143,9 @@ public class ConverterUI extends JDialog implements ActionListener {
 
 	/**
 	 * Shows a small GUI.
+	 * @throws SBMLException 
 	 */
-	public ConverterUI() {
+	public ConverterUI() throws SBMLException {
 		this(System.getProperty("user.dir"), System.getProperty("user.dir"));
 	}
 
@@ -150,8 +153,9 @@ public class ConverterUI extends JDialog implements ActionListener {
 	 * 
 	 * @param baseDir
 	 * @param saveDir
+	 * @throws SBMLException 
 	 */
-	public ConverterUI(String baseDir, String saveDir) {
+	public ConverterUI(String baseDir, String saveDir) throws SBMLException {
 		super();
 		this.baseOpenDir = baseDir;
 		this.baseSaveDir = saveDir;
@@ -167,7 +171,12 @@ public class ConverterUI extends JDialog implements ActionListener {
 				setVisible(false);
 				removeAll();
 			}
-			showGUI(convert(openFile()));
+			try {
+				showGUI(convert(openFile()));
+			} catch (SBMLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			break;
 		case SAVE_FILE:
 			saveFile();
@@ -244,8 +253,9 @@ public class ConverterUI extends JDialog implements ActionListener {
 
 	/**
 	 * Displays an overview of the result of a conversion.
+	 * @throws SBMLException 
 	 */
-	private void showGUI(SBMLDocument doc) {
+	private void showGUI(SBMLDocument doc) throws SBMLException {
 		getContentPane().removeAll();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setJMenuBar(createJMenuBar());
