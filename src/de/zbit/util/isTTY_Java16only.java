@@ -12,7 +12,7 @@ public class isTTY_Java16only {
 	 * 
 	 * @return
 	 */
-	public static boolean isTty() {
+	public static boolean isTty() throws Throwable {
 		if ((System.console() == null) || (System.console().writer() == null)) {
 			return false;
 		}
