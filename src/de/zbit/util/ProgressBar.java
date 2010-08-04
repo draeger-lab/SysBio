@@ -35,13 +35,13 @@ public class ProgressBar extends aProgressBar {
   /* (non-Javadoc)
    * @see de.zbit.util.aProgressBar#drawProgressBar(int, double, java.lang.String)
    */
-  protected synchronized void drawProgressBar(int percent, double secondsRemaining, String additionalText) {
+  protected synchronized void drawProgressBar(int percent, double miliSecondsRemaining, String additionalText) {
     String percString = percent + "%";
     
     // Calculate time remaining
     String ETA="";
-    if (getEstimateTime()) {
-      ETA = " ETR: " + Utils.getTimeString((long) secondsRemaining);
+    if (getEstimateTime() && miliSecondsRemaining>=0) {
+      ETA = " ETR: " + Utils.getTimeString((long) miliSecondsRemaining);
     }
 
     // Simples File-out oder Eclipse-Output-Window tool. Windows Console unterstützt leider auch kein ANSI.
@@ -117,12 +117,16 @@ public class ProgressBar extends aProgressBar {
         double d = Double.parseDouble(v.substring(0, 3));
         if (d<1.6) useSimpleStyle = true;
         else useSimpleStyle = !isTTY_Java16only.isTty();
-      } catch (Exception e) {
+      } catch (Throwable e) {
         useSimpleStyle = true;
       }
     }
     
     return useSimpleStyle;
+  }
+  
+  public void finished() {
+    if (!useSimpleStyle) System.out.println();
   }
   
 }
