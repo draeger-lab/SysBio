@@ -35,14 +35,14 @@ public abstract class AbstractProgressBar implements Serializable {
    */
   private long measureTime = 0;
   private int numMeasurements = 0;
-  private long lastCallTime=System.currentTimeMillis();
+  private long lastCallTime=0;//System.currentTimeMillis();
   private boolean callNumbersInSyncWithTimeMeasurements=true;
   
   public void reset() {
     callNr=0;
     measureTime = 0;
     numMeasurements = 0;
-    lastCallTime=System.currentTimeMillis();
+    lastCallTime=0;System.currentTimeMillis();
     callNumbersInSyncWithTimeMeasurements=true;
   }
   
@@ -53,7 +53,7 @@ public abstract class AbstractProgressBar implements Serializable {
   
   public void setEstimateTime(boolean estimateTime) {
     this.estimateTime = estimateTime;
-    if (estimateTime) lastCallTime = System.currentTimeMillis();
+    if (estimateTime) lastCallTime = 0;//System.currentTimeMillis();
   }
   
   /**
@@ -105,15 +105,19 @@ public abstract class AbstractProgressBar implements Serializable {
     double miliSecsRemaining = -1;
     if (estimateTime && !omitTimeCount) {
       // Increment
-      measureTime += System.currentTimeMillis() - lastCallTime;
-      numMeasurements++;
+      if (lastCallTime>0) {
+        measureTime += System.currentTimeMillis() - lastCallTime;
+        numMeasurements++;
+      }
       
       // Calculate
-      double ScansRemaining = (totalCalls - (callNr+1)); // /(double)MLIBSVMSettings.runs;
-      if (callNumbersInSyncWithTimeMeasurements) {
-        miliSecsRemaining = ScansRemaining * ((measureTime/(double)numMeasurements)) ;
-      } else {
-        miliSecsRemaining = ScansRemaining * ((measureTime/(double)callNr)) ;
+      if (numMeasurements>0) {
+        double ScansRemaining = (totalCalls - (callNr+1)); // /(double)MLIBSVMSettings.runs;
+        if (callNumbersInSyncWithTimeMeasurements) {
+          miliSecsRemaining = ScansRemaining * ((measureTime/(double)numMeasurements)) ;
+        } else {
+          miliSecsRemaining = ScansRemaining * ((measureTime/(double)callNr)) ;
+        }
       }
       
       // Reset (intended not to reset if omitTimeCount)
