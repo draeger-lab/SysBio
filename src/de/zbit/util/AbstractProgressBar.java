@@ -1,5 +1,7 @@
 package de.zbit.util;
 
+import java.io.Serializable;
+
 /**
  * General class for progress bars.
  * This class does the management and computations. The visualization
@@ -14,30 +16,39 @@ package de.zbit.util;
  * 
  * @author wrzodek 
  */
-public abstract class aProgressBar {
+public abstract class AbstractProgressBar implements Serializable {
+  private static final long serialVersionUID = 6447054832080673569L;
   
-  /**
+  /*
    * Set these values.
    */
-  private int totalCalls=0;
+  private long totalCalls=0;
   private boolean estimateTime=false;
   
-  /** 
+  /*
    * Internal variables (not to set by user).
    */
-  private int callNr=0;
+  private long callNr=0;
   
-  /** 
+  /*
    * for time duration estimations
    */
   private long measureTime = 0;
   private int numMeasurements = 0;
   private long lastCallTime=System.currentTimeMillis();
+  private boolean callNumbersInSyncWithTimeMeasurements=true;
   
+  public void reset() {
+    callNr=0;
+    measureTime = 0;
+    numMeasurements = 0;
+    lastCallTime=System.currentTimeMillis();
+    callNumbersInSyncWithTimeMeasurements=true;
+  }
   
-  
-  public void setNumberOfTotalCalls(int totalCalls) {
+  public void setNumberOfTotalCalls(long totalCalls) {
     this.totalCalls = totalCalls;
+    reset(); // Reset when changing number of total calls.
   }
   
   public void setEstimateTime(boolean estimateTime) {
@@ -52,10 +63,11 @@ public abstract class aProgressBar {
     return estimateTime;
   }
   
+  
   /**
    * @return How often the DisplayBar method has been called.
    */
-  public int getCallNumber() {
+  public long getCallNumber() {
     return callNr;
   }
   
@@ -87,7 +99,7 @@ public abstract class aProgressBar {
     callNr++;
     
     // Calculate percentage
-    int perc = Math.min((int)((double)callNr/(double)totalCalls*100), 100);
+    int perc = Math.min((int)(((double)callNr/(double)totalCalls)*100.0), 100);
     
     // Calculate time remaining
     double miliSecsRemaining = -1;
@@ -98,7 +110,11 @@ public abstract class aProgressBar {
       
       // Calculate
       double ScansRemaining = (totalCalls - (callNr+1)); // /(double)MLIBSVMSettings.runs;
-      miliSecsRemaining = ScansRemaining * ((measureTime/(double)numMeasurements)) ;
+      if (callNumbersInSyncWithTimeMeasurements) {
+        miliSecsRemaining = ScansRemaining * ((measureTime/(double)numMeasurements)) ;
+      } else {
+        miliSecsRemaining = ScansRemaining * ((measureTime/(double)callNr)) ;
+      }
       
       // Reset (intended not to reset if omitTimeCount)
       lastCallTime = System.currentTimeMillis();
@@ -125,5 +141,15 @@ public abstract class aProgressBar {
    * @param additionalText - If available, additional text to display. , If NOT available, null.
    */
   protected abstract void drawProgressBar(int percent, double miliSecondsRemaining, String additionalText);
+
+  /**
+   * @param callNr
+   */
+  public void setCallNr(long callNr) {
+    // Remember this change when estimating the eta.
+    callNumbersInSyncWithTimeMeasurements=false;
+    
+    this.callNr = callNr;
+  }
   
 }

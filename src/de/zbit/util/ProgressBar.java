@@ -7,7 +7,8 @@ package de.zbit.util;
  * simply outputs percentages in this case.
  * @author wrzodek
  */
-public class ProgressBar extends aProgressBar {
+public class ProgressBar extends AbstractProgressBar {
+  private static final long serialVersionUID = 2073719565121276629L;
   
   private int lastPerc=-1;
   private boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"))?true:false;
@@ -18,6 +19,14 @@ public class ProgressBar extends aProgressBar {
    * @param totalCalls - how often you are planning to call the "DisplayBar" method.
    */
   public ProgressBar(int totalCalls) {
+    setNumberOfTotalCalls(totalCalls);
+  }
+  
+  /**
+   * Initialize the progressBar object
+   * @param totalCalls - how often you are planning to call the "DisplayBar" method.
+   */
+  public ProgressBar(long totalCalls) {
     setNumberOfTotalCalls(totalCalls);
   }
   
@@ -87,14 +96,14 @@ public class ProgressBar extends aProgressBar {
     }
 
     sb.append("\033[0m "); // Reset colors and stuff.
-    sb.append("\033[93m" + anim.charAt(getCallNumber() % anim.length())  + " \033[1m" +  ETA.trim() + (ETA.length()>0?" ":"") + (additionalText!=null && (additionalText.length()>0)? additionalText:""));
+    sb.append("\033[93m" + anim.charAt((int) (getCallNumber() % anim.length()))  + " \033[1m" +  ETA.trim() + (ETA.length()>0?" ":"") + (additionalText!=null && (additionalText.length()>0)? additionalText:""));
     sb.append("\033[0m");
     
     //   \033[?25l  <=hide cursor.
     //   \033[?25h  <=show cursor.
     
     try {
-      //System.console().writer().print(sb.toString()); // XXX: Not supported in Java 1.5
+      //System.console().writer().print(sb.toString()); // Not supported in Java 1.5!
       //System.console().flush();
       System.out.print(sb.toString());
     } catch (Exception e) {e.printStackTrace();}
