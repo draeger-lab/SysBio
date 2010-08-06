@@ -418,6 +418,74 @@ public class CSVReader implements Serializable {
   }
   
   /**
+   * This incredible cool function can be used to guess columns by its
+   * content. E.g. you can use it to find a column where all strings end
+   * with "_at" (which will be a column containing affy ids). Or a column
+   * starting with "ens" (ensembl ids), etc.
+   * In Other words, get column numbers by content, instead of headers or
+   * static variables. 
+   * 
+   * WARNING: Does RESET your file position.
+   * Use this method before reading data from the file at all!
+   * 
+   * If you read the whole file anyway, this function does not affect anything.
+   * @param regex - regular expression to match the column content.
+   * @param analyzeAllRows - should be FALSE by default.
+   * If set to true (NOT RECOMMENDED), the whole file
+   * will be read and every cell will be matched against the patter.
+   * The winning (most matches) column will be returned.
+   * If false - only the first 25 rows will be matched against the pattern.
+   * @return winning column (column with most matches). Or -1 (no matches).
+   */
+  public int getColumnByMatchingContent(String regex, boolean analyzeAllRows) {
+    Pattern pat = Pattern.compile(regex);
+    int threshold = 25; // Number of lines to match.
+    
+    // Read file content
+    String[][] data;
+    if (this.data!=null) {
+      data = this.data;
+    } else {
+      open();
+      
+      data = new String[analyzeAllRows?getNumberOfDataLines():threshold][];
+      String[] line;
+      int nline=-1;
+      try {
+        while ((line = getNextLine())!=null && (analyzeAllRows || !analyzeAllRows && (nline+1)<threshold)) {
+          data[++nline] = line;
+        }
+      }catch (Exception e) {e.printStackTrace();}
+      
+      open(); // Reset pointer
+    }
+    
+    // Match pattern agains content
+    int[] matches = new int[numCols];
+    for (int i=0; i<data.length; i++) {
+      if (data[i]==null) continue;
+      for (int j=0; j<data[i].length; j++) {
+        if (data[i][j]==null) continue;
+        
+        if (pat.matcher(data[i][j]).matches()) {
+          matches[j]++;
+        }
+      }
+    }
+    
+    // Get best matching column
+    int maxMatches=0, maxMatchesId=-1;
+    for (int i=0; i<matches.length; i++) {
+      if (matches[i]>maxMatches) {
+        maxMatches = matches[i];
+        maxMatchesId = i;
+      }
+    }
+     
+    return maxMatchesId;
+  }
+  
+  /**
    * Reads the whole file into memory.
    * Enables to use the getData() function.
    * @param filename
