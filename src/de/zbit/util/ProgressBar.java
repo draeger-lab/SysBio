@@ -117,7 +117,10 @@ public class ProgressBar extends AbstractProgressBar {
    */
   protected boolean useSimpleStyle() {
     boolean useSimpleStyle = false;
-    if (isWindows) useSimpleStyle = true; // MS Windows has (by default) no ANSI capabilities.
+    if (isWindows) {
+      useSimpleStyle = true; // MS Windows has (by default) no ANSI capabilities.
+      return useSimpleStyle;
+    }
     
     // is TTY Check is only available for java 1.6. So a wrapper to determine java version is needed for Java 1.5 compatibility.
     String v = System.getProperty("java.version");
