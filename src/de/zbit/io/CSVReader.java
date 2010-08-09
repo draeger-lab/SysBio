@@ -200,8 +200,21 @@ public class CSVReader implements Serializable {
   public void setNull(int[] columns) {
     if (data==null) return;
     for (int i=0; i<data.length; i++)
-      for (int j=0; j<columns.length; j++)
-        data[i][columns[j]] = null;
+      if (data[i]!=null)
+        for (int j=0; j<columns.length; j++)
+          data[i][columns[j]] = null;
+  }
+  
+  /**
+   * Remove the given column (more specific: set it to null. This does not shift indices).
+   * This will free memory by removing unused data.
+   * @param column numbers.
+   */
+  public void setNull(int column) {
+    if (data==null) return;
+    for (int i=0; i<data.length; i++)
+      if (data[i]!=null)
+        data[i][column] = null;
   }
   
   /**
@@ -422,67 +435,85 @@ public class CSVReader implements Serializable {
    * content. E.g. you can use it to find a column where all strings end
    * with "_at" (which will be a column containing affy ids). Or a column
    * starting with "ens" (ensembl ids), etc.
-   * In Other words, get column numbers by content, instead of headers or
+   * In other words, get column ids by content, instead of headers or
    * static variables. 
    * 
    * WARNING: Does RESET your file position.
-   * Use this method before reading data from the file at all!
+   * If you planning not to read the whole file into memory,
+   * use this method before reading data from the file at all!
    * 
    * If you read the whole file anyway, this function does not affect anything.
    * @param regex - regular expression to match the column content.
-   * @param analyzeAllRows - should be FALSE by default.
-   * If set to true (NOT RECOMMENDED), the whole file
-   * will be read and every cell will be matched against the patter.
-   * The winning (most matches) column will be returned.
-   * If false - only the first 25 rows will be matched against the pattern.
    * @return winning column (column with most matches). Or -1 (no matches).
    */
-  public int getColumnByMatchingContent(String regex, boolean analyzeAllRows) {
-    Pattern pat = Pattern.compile(regex);
+  public int getColumnByMatchingContent(String regex) {
+    return getColumnByMatchingContent(regex,0);
+  }
+  /**
+   * See {@link #getColumnByMatchingContent(String)}
+   * @param regex - Regular expression
+   * @param patternOptions - Static options as in Pattern.[Option]. E.g.
+   * Pattern.CASE_INSENSITIVE
+   * @return column number
+   */
+  public int getColumnByMatchingContent(String regex, int patternOptions) {
+    Pattern pat;
+    if (patternOptions>0) {
+      pat = Pattern.compile(regex, patternOptions);
+    } else {
+      pat = Pattern.compile(regex);  
+    }
     int threshold = 25; // Number of lines to match.
     
-    // Read file content
-    String[][] data;
-    if (this.data!=null) {
-      data = this.data;
-    } else {
-      open();
-      
-      data = new String[analyzeAllRows?getNumberOfDataLines():threshold][];
-      String[] line;
-      int nline=-1;
-      try {
-        while ((line = getNextLine())!=null && (analyzeAllRows || !analyzeAllRows && (nline+1)<threshold)) {
-          data[++nline] = line;
-        }
-      }catch (Exception e) {e.printStackTrace();}
-      
-      open(); // Reset pointer
+    if (this.data==null) {
+      open(); // Open/ Reset the file if not already read in.
     }
     
     // Match pattern agains content
     int[] matches = new int[numCols];
-    for (int i=0; i<data.length; i++) {
-      if (data[i]==null) continue;
-      for (int j=0; j<data[i].length; j++) {
-        if (data[i][j]==null) continue;
+    int matchesMax = 0;
+    int matchesMaxId = -1;
+    int lineNr=0;
+    while (matchesMax<threshold) {
+      
+      // Get the next data line
+      String[] line;
+      if (this.data!=null) {
+        if (lineNr==data.length) break; // EOF
+        line = data[lineNr];
+        lineNr++;
+      } else {
+        try {
+          line = getNextLine();
+        } catch (Exception e) {
+          e.printStackTrace();
+          break;
+        }
+        if (line==null) break; // EOF
+      }
+      if (line==null) continue;
+      // ---
+      
+      // Match against pattern
+      for (int j=0; j<line.length; j++) {
+        if (line[j]==null) continue;
         
-        if (pat.matcher(data[i][j]).matches()) {
+        if (pat.matcher(line[j]).matches()) {
           matches[j]++;
+          if (matches[j]>matchesMax) {
+            matchesMax = matches[j];
+            matchesMaxId=j;
+          }
         }
       }
     }
     
-    // Get best matching column
-    int maxMatches=0, maxMatchesId=-1;
-    for (int i=0; i<matches.length; i++) {
-      if (matches[i]>maxMatches) {
-        maxMatches = matches[i];
-        maxMatchesId = i;
-      }
+    // Reset pointer
+    if (this.data==null) {
+      open();
     }
      
-    return maxMatchesId;
+    return matchesMaxId;
   }
   
   /**
