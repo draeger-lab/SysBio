@@ -58,7 +58,8 @@ public class ProcessExecutioner {
     
     try {
       int exitCode = p.waitFor();
-      processOutput.close();
+      // do NOT use close here, or else you might be closing System.out
+      processOutput.flush();
       return exitCode;
     } catch (InterruptedException e) {
       System.out.println("Process was interrupted:");
