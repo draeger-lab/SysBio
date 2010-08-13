@@ -51,6 +51,10 @@ public abstract class AbstractProgressBar implements Serializable {
     reset(); // Reset when changing number of total calls.
   }
   
+  public long getNumberOfTotalCalls() {
+    return this.totalCalls;
+  }
+  
   public void setEstimateTime(boolean estimateTime) {
     this.estimateTime = estimateTime;
     if (estimateTime) lastCallTime = 0;//System.currentTimeMillis();

@@ -1,7 +1,10 @@
 package de.zbit.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+
+import de.zbit.io.OpenFile;
 
 /**
  * <p>When reading in files and processing each line (files line by line),
@@ -46,12 +49,14 @@ public class FileReadProgress {
   /**
    * 
    */
-  private boolean isWindows;
+  private boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
   
   /**
    * 
    */
   protected boolean useSimpleStyle = useSimpleStyle();
+  
+  private boolean fileUsesWindowsLinebreaks=false;
   
   /**
    * This enables a custom progress bar to use.
@@ -66,6 +71,7 @@ public class FileReadProgress {
    */
   public FileReadProgress(File file) {
     this(file.length());
+    fileUsesWindowsLinebreaks = fileUsesWindowsLinebreaks(file.getPath());
   }
 
   /**
@@ -86,7 +92,6 @@ public class FileReadProgress {
    */
   public FileReadProgress(long length) {
     fileLength = length;
-    isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"))?true:false;
     if (progressBar==null) setProgressBar(new ProgressBar(length));
   }
   
@@ -185,7 +190,7 @@ public class FileReadProgress {
    * 
    */
   public int getPercentage() {
-    return (int)Math.round((double)bytesRead/fileLength*100.0);
+    return Math.min((int)(((double)bytesRead/(double)fileLength)*100.0), 100);
   }
   
   /**
@@ -229,20 +234,21 @@ public class FileReadProgress {
    */
   public void progress(String curLine) {
     if (curLine != null) {
-      progress(curLine.length() + 1); // +1 for \n. For Windows possibly +2...
+      // +1 for \n. For Windows possibly +2...
+      progress(curLine.length() + (fileUsesWindowsLinebreaks?2:1) );
     } else {
       progress(0);
     }
   }
   
-  /*
-   * Kommentiert. Methode macht kein Sinn! Man kann immer (ob console oder nicht) in selbe Zeile Printen!
-  protected boolean canPrintInSameLine() {
-    return printProgressInSameLine
-           && (System.console() != null)
-           && (System.console().writer() != null);
+  /**
+   * Because using the filelength is only an approximation, calling this method
+   * after the whole file has been read may be a good idea.
+   * It will display the 100% mark and set all variables to "file fully read".
+   */
+  public void finished() {
+    progress(fileLength-bytesRead);
   }
-  */
   
   /**
    * Resets all counters back to zero.
@@ -298,6 +304,32 @@ public class FileReadProgress {
     }
     
     return useSimpleStyle;
+  }
+  
+  /**
+   * Determins if a file uses windows (\r\n) or Unix (\n) linebrakes.
+   * @return true for windows, false for unix linebreaks.
+   */
+  private static boolean fileUsesWindowsLinebreaks(String file) {
+    // OpenFile.openFile may be replaced by BufferedReader(new FileReader(file))
+    try {
+      // Read line with predefined method
+      BufferedReader inStream = OpenFile.openFile(file);
+      if (inStream==null || !inStream.ready()) return false;
+      String line = inStream.readLine();
+      inStream.close();
+      if (line==null) return false;
+      
+      // Custom read line
+      inStream = OpenFile.openFile(file);
+      char[] buff = new char[2];
+      inStream.skip(line.length());
+      inStream.read(buff);
+      inStream.close();
+      if (buff[buff.length-1]=='\n' && buff[buff.length-2]=='\r') return true;
+      else return false;
+    
+    } catch (Throwable t) {return false;}
   }
   
 }
