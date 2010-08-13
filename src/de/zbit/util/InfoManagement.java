@@ -1,7 +1,10 @@
 package de.zbit.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -21,88 +24,18 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
  * @author wrzodek
  */
 public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable, INFOtype extends Serializable> implements Serializable {
-  
-  public static final Logger log = Logger.getLogger(InfoManagement.class);
   /**
    * It is recommended to generate a new ID when extending this class.
    */
   private static final long serialVersionUID = -5172273501517643495L;
-  /**
-   * 
-   * @param file
-   * @return
-   */
-  public static synchronized InfoManagement<?, ?> loadFromFilesystem(File file) {
-    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(file);
-    m.restoreUnserializableObject();
-    return m;
-  }
-  /**
-   * 
-   * @param in
-   * @return
-   */
-  public static synchronized InfoManagement<?, ?> loadFromFilesystem(InputStream in) {
-    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(in);
-    m.restoreUnserializableObject();
-    return m;
-  }
-  /**
-   * 
-   * @param filepath
-   * @return
-   */
-  public static synchronized InfoManagement<?, ?> loadFromFilesystem(String filepath) {
-    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(filepath);
-    m.restoreUnserializableObject();
-    return m;
-  }
   
-  /**
-   * 
-   * @param oldArray
-   * @param newSize
-   * @return
-   */
-  @SuppressWarnings("unchecked")
-  private static Object resizeArray(Object oldArray, int newSize) {
-    int oldSize = java.lang.reflect.Array.getLength(oldArray);
-    Class elementType = oldArray.getClass().getComponentType();
-    Object newArray = java.lang.reflect.Array.newInstance(elementType, newSize);
-    int preserveLength = Math.min(oldSize, newSize);
-    if (preserveLength > 0)
-      System.arraycopy(oldArray, 0, newArray, 0, preserveLength);
-    return newArray;
-  }
+  public static final transient Logger log = Logger.getLogger(InfoManagement.class);
   
-  /**
-   * 
-   * @param filepath
-   * @param m
-   */
-  public static synchronized void saveToFilesystem(String filepath, InfoManagement<?, ?> m) {
-    m.cleanupUnserializableObject();
-    Utils.saveObject(filepath, m);
-  }
-  
-  /**
-   * 
-   */
-  private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;
-  
-  /**
-   * 
-   */
+  private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;  
   private SortedArrayList<IDtype> unsuccessfulQueries; // Remember those separately
-  
-  /**
-   * 
-   */
   private int maxListSize;
   
-  /**
-   * 
-   */
+  
   public InfoManagement() {
     this(1000);
   }
@@ -118,6 +51,16 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     this.maxListSize = maxListSize;
     rememberedInfos = new SortedArrayList<Info<IDtype, INFOtype>>(this.maxListSize+1);
     unsuccessfulQueries = new SortedArrayList<IDtype>((10*this.maxListSize)+1); // so many, since usually this does not take much memory.
+  }
+  
+  /**
+   * @return The number of remembered infos and unsuccessful queries (as sum).
+   */
+  public int getNumberOfCachedIDs() {
+    int sum = 0;
+    if (rememberedInfos!=null) sum+=rememberedInfos.size();
+    if (unsuccessfulQueries!=null) sum+=unsuccessfulQueries.size();
+    return sum;
   }
   
   /**
@@ -185,14 +128,35 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     
     rememberedInfos.add(infoObject);
   }
-
- 
-  /**
-   * You may implement this Method to make your class serializable.
-   * This function is called directly before writing the object to your hard drive.
-   */
-  protected abstract void cleanupUnserializableObject();
   
+  /**
+   * Removes one element from the cache. 
+   * @param id
+   * @return true, if the element has been found and removed. False instead.
+   */
+  public synchronized boolean removeInformation(IDtype id) {
+    boolean found = false;
+    for (int i=0; i<rememberedInfos.size(); i++) {
+      Info<IDtype, INFOtype> in = rememberedInfos.get(i);
+      if (in.getIdentifier().equals(id)) {
+        rememberedInfos.remove(i);
+        found = true;
+        break;
+      }
+    }
+    
+    if (!found) {
+      for (int i=0; i<unsuccessfulQueries.size(); i++) {
+        if (unsuccessfulQueries.get(i).equals(id)) {
+          unsuccessfulQueries.remove(i);
+          found = true;
+          break;
+        }
+      }
+    }
+    return found;
+  }
+ 
   /**
    * This function should NEVER be called from any other class. It fetches the information from an
    * online or hard disc source and does not use the remembered information in memory.
@@ -405,9 +369,83 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         if (infos[i]!=null && ids[i]!=null) addInformation(ids[i], infos[i]);
     }    
   }
+  
+  /**
+   * 
+   * @param file
+   * @return
+   */
+  public static synchronized InfoManagement<?, ?> loadFromFilesystem(File file) {
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(file);
+    return m;
+  }
+  /**
+   * 
+   * @param in
+   * @return
+   */
+  public static synchronized InfoManagement<?, ?> loadFromFilesystem(InputStream in) {
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(in);
+    return m;
+  }
+  /**
+   * 
+   * @param filepath
+   * @return
+   */
+  public static synchronized InfoManagement<?, ?> loadFromFilesystem(String filepath) {
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(filepath);
+    return m;
+  }
+
+  /**
+   * 
+   * @param filepath
+   * @param m
+   */
+  public static synchronized void saveToFilesystem(String filepath, InfoManagement<?, ?> m) {
+    Utils.saveObject(filepath, m);
+  }
+  
+  /**
+   * 
+   * @param oldArray
+   * @param newSize
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  private static Object resizeArray(Object oldArray, int newSize) {
+    int oldSize = java.lang.reflect.Array.getLength(oldArray);
+    Class elementType = oldArray.getClass().getComponentType();
+    Object newArray = java.lang.reflect.Array.newInstance(elementType, newSize);
+    int preserveLength = Math.min(oldSize, newSize);
+    if (preserveLength > 0)
+      System.arraycopy(oldArray, 0, newArray, 0, preserveLength);
+    return newArray;
+  }
+
+  
   /**
    * You may implement this Method to make your class serializable.
    * This function is called directly after loading the object from your hard drive.
    */
   protected abstract void restoreUnserializableObject();
+  
+  /**
+   * You may implement this Method to make your class serializable.
+   * This function is called directly before writing the object to your hard drive.
+   */
+  protected abstract void cleanupUnserializableObject();
+  
+  private void writeObject(ObjectOutputStream out) throws IOException {
+    cleanupUnserializableObject();
+    
+    out.defaultWriteObject();
+  }
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    
+    restoreUnserializableObject();
+  }
+  
 }

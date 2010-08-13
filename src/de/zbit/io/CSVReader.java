@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.zbit.util.AbstractProgressBar;
@@ -65,14 +66,29 @@ public class CSVReader implements Serializable {
   private boolean useOpenFileMethod=true;
   
   /**
-   * Removes " or ' symbols at cell start and end.
+   * Removes " symbol at cell start and end.
+   * WARNING: You should use " for strings. Using ' is delicate because of terms
+   * like "it's".
    */
   private boolean removeStringIndiciatorsAtCellStartEnd = true;
   
   /**
-   * The column separator char. If not set ('\u0000'), it will be infered automatically.
+   * If true, treates multiple consecutive separators as one.
+   * E.g. "H,A,,O" => "H,A,O"
+   * If false, will be set to true (if required) automatically.
+   * 
+   * Usually, no getter or setter required. Value is infered automatically.
    */
-  private char separatorChar='\u0000'; // Default Value. Equals: char separatorChar;
+  private boolean treatMultipleConsecutiveSeparatorsAsOne=false;
+  
+  private boolean autoDetectTreatMultipleConsecutiveSeparatorsAsOne=true;
+  
+  /**
+   * The column separator char.
+   * If not set ('\u0000' = Null Character), it will be infered automatically.
+   * '\u0001' equals the Regex whitespace (\\s).
+   */
+  private char separatorChar='\u0000';
   
   /**
    * ... if separatorChar is infered automatically, one of these chars in the given order
@@ -80,8 +96,9 @@ public class CSVReader implements Serializable {
    * 
    * Remark: The order of these chars (or the chars itself) should NOT be modified
    * without notice to the author of this class.
+   * '\u0001' equals the Regex whitespace (\\s).
    */
-  private char[] trennzeichen = new char[]{'\t', ',', ';', '|', '/', ' '};
+  private char[] trennzeichen = new char[]{'\t', ',', ';', '|', '/', ' ', '\u0001'};
   
   /**
    * First line with "consistent number of separator chars". This is the line, where
@@ -127,6 +144,15 @@ public class CSVReader implements Serializable {
   private StringBuffer preamble = new StringBuffer();
   
 
+  /**
+   * Initializes a CSV Reader.
+   * 
+   * The separator char, if multiple separator chars should be merged to one,
+   * the data start line, etc. - Everything will be infered automatically.
+   * 
+   * @param filename
+   * @param containsHeaders
+   */
   public CSVReader(String filename, boolean containsHeaders) {
     this(filename);
     this.containsHeaders = containsHeaders;
@@ -165,6 +191,7 @@ public class CSVReader implements Serializable {
   /**
    * Set the separator char, by which columns are separated. If not set, the algorithm will try to infer this automatically.
    * Set it to '\u0000' to infere it automatically.
+   * Set it to '\u0001' for any whitespace character (Regex \\s).
    * @param c = column separator char.
    */
   public void setSeparatorChar(char c) {
@@ -173,7 +200,9 @@ public class CSVReader implements Serializable {
   
   /**
    * Returns the separator char, that separates the columns.
-   * The char equals '\u0000' if it still needs to be infered automatically.
+   * Special return values:
+   * - The char equals '\u0000' if it still needs to be infered automatically.
+   * - The char equals '\u0001' if it is the regex pattern "\\s" (any whitespace character).
    * @return
    */
   public char getSeparatorChar() {
@@ -219,6 +248,7 @@ public class CSVReader implements Serializable {
   
   /**
    * Initialize and set default values, which were not set before.
+   * (So far, only the commentIndicators).
    */
   private void init() {
     CommentIndicators.add(';');
@@ -360,74 +390,85 @@ public class CSVReader implements Serializable {
     }
     
     // initialize variables
-    int consistentCounts[] = new int[separatorChars.length]; // Seit sovielen zeilen schon genau "count"
-    int firstConsistentLines[] = new int[separatorChars.length]; // Erste
-    String[] firstConsistentLineString = new String[separatorChars.length]; // For reading headers
-    int counts[] = new int[separatorChars.length]; // Anzahl eines Trennzeichens (= #Spalten)
-    for (int i=0; i<separatorChars.length; i++)
+    int dimension = autoDetectTreatMultipleConsecutiveSeparatorsAsOne?separatorChars.length*2:separatorChars.length;
+    int consistentCounts[] = new int[dimension]; // Seit sovielen zeilen schon genau "count"
+    int firstConsistentLines[] = new int[dimension]; // Erste
+    String[] firstConsistentLineString = new String[dimension]; // For reading headers
+    int counts[] = new int[dimension]; // Anzahl eines Trennzeichens (= #Spalten)
+    for (int i=0; i<consistentCounts.length; i++) 
     {consistentCounts[i] = 0; counts[i] = 0;}
+    
     firstConsistentLine = -1;
     numCols=-1;
     
     // Read a part of the file and fill variables.
+    int max=0; // If file had less then "threshold" consistent lines in total; Take the max.
     int j = -1;
-    while (in.ready() && firstConsistentLine<0) { //  && separatorChar=='\u0000'
+    while (in.ready() && max<=threshold) { //  && separatorChar=='\u0000'
       j++;
-      String line = in.readLine().trim();
+      String line = in.readLine();//.trim();
+      if (line.length()<1) continue;
       char firstChar = line.charAt(0);
       //if (CommentIndicators.contains(firstChar)) continue; // <=breakes header detection
       
       // Infere separator char
-      // Sucht 25x das selbe Zeichen genau gleich oft. Wenn dem so ist, ist dies unser separatorChar.
-      for (int i=0; i<separatorChars.length; i++) {
+      // Sucht 25x(=threshold) das selbe Zeichen genau gleich oft. Wenn dem so ist, ist dies unser separatorChar.
+      for (int i=0; i<dimension; i++) {
+        char curSepChar = separatorChars[i % separatorChars.length];
+        treatMultipleConsecutiveSeparatorsAsOne=(i>=separatorChars.length);
+        
         // Count chars for the current separator chars, ignoring occurences in strings.
-        int aktCounts = countCharAndIgnoreStrings(line, separatorChars[i]);
+        int aktCounts=0;
+        aktCounts = countChar(line, curSepChar, treatMultipleConsecutiveSeparatorsAsOne, true);
+        
+        // If number of columns is consistent, increment counter. If not, reset.
         if (counts[i]==aktCounts && aktCounts>0 && !CommentIndicators.contains(firstChar)) {
           consistentCounts[i]++;
         } else {
+          // Headers are allowed to start with a comment indicator.
           consistentCounts[i]=0;
           counts[i]=aktCounts;
           firstConsistentLines[i]=j;
           firstConsistentLineString[i] = line;
         }
-        if (consistentCounts[i]>threshold) {
-          if (separatorChar=='\u0000') separatorChar = separatorChars[i];
+        
+        if (consistentCounts[i]>max) {
+          char oldSeparatorChar=separatorChar;
+          separatorChar = separatorChars[i % separatorChars.length];
+          treatMultipleConsecutiveSeparatorsAsOne=(i>=separatorChars.length);
           numCols = counts[i]+1; // +1 because number of columns is number of separator chars in line+1
           firstConsistentLine = firstConsistentLines[i];
+          max = consistentCounts[i];
           
-          // Fill the headers eventually.
-          if (this.containsHeaders) {
-            headers = firstConsistentLineString[i].split(Pattern.quote(Character.toString(separatorChar)));
+          // Fill the headers (only if not the same...)
+          if (this.containsHeaders && separatorChar!=oldSeparatorChar) {
+            headers=getSplits(firstConsistentLineString[i], separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
             // Headers do often start with a comment symbol.
             if (CommentIndicators.contains(headers[0].charAt(0))) headers[0] = headers[0].substring(1); 
           }
           
-          break;
+          // Breakup here if threshold consistent lines reached.
+          if (consistentCounts[i]>threshold) break;
         }
       }
     }
     in.close();
     
-    // File had less then "threshold" consistent lines in total; Take the max.
-    int max=0;
+    
+    // Give an error in the very unlikely case that no separator char matches. 
     if (firstConsistentLine<0) {
-      for (int i=0; i<separatorChars.length; i++) {
-        if (consistentCounts[i]>max) {
-          if (separatorChar=='\u0000') separatorChar = separatorChars[i];
-          numCols = counts[i]+1; // +1 because number of columns is number of separator chars in line+1
-          firstConsistentLine = firstConsistentLines[i];
-          
-          // Fill the headers eventually.
-          if (this.containsHeaders) {
-            headers = firstConsistentLineString[i].split(Pattern.quote(Character.toString(separatorChar)));
-            // Headers do often start with a comment symbol.
-            if (CommentIndicators.contains(headers[0].charAt(0))) headers[0] = headers[0].substring(1); 
-          }
-        }
-      }
+      throw new Exception ("Could not analyze input file. Probably not a CSV file.");      
     }
     
-    if (firstConsistentLine<0) throw new Exception ("Could not analyze input file. Probably not a CSV file.");
+    /*if (separatorChar=='\u0001')
+      System.out.print("Winner: <RegexWS>");
+    else if (separatorChar=='\u0000')
+      System.out.print("No Winner.");
+    else
+      System.out.print("Winner: '" + separatorChar + "'");
+    System.out.println(" Max counts: " + max);
+    System.out.println("Treat consecutive as one: " + treatMultipleConsecutiveSeparatorsAsOne);*/
+    
   }
   
   /**
@@ -574,7 +615,7 @@ public class CSVReader implements Serializable {
         
         String line = currentOpenFile.readLine();
         if (displayProgress && progress!=null) progress.progress(line);
-        line = line.trim();
+        //line = line.trim();
         if (!(containsHeaders && j==firstConsistentLine)) {
           // Else, this line is the header.
           preamble.append(line+'\n');
@@ -586,26 +627,29 @@ public class CSVReader implements Serializable {
   }
   
   /**
-   * Requires to call open(file) first.
    * Returns the next line in the currently opened file, or null if the end of
    * the file has been reached. Throws an Exception, if no file is currently opened.
+   * 
+   * Remark: It is possible that trailing empty cells will be removed!
    * 
    * @return the next line in the currently opened file.
    * @throws Exception
    */
   public String[] getNextLine() throws Exception {
-    if (currentOpenFile==null) throw new Exception("No file is currently opened.");
+    if (currentOpenFile==null) open(); //throw new Exception("No file is currently opened.");
     if (!currentOpenFile.ready()) {
       close();
       return null;
     }
     
+    // Read next line, draw progress, split into columns
     String line = currentOpenFile.readLine();
     if (displayProgress && progress!=null) {
       progress.progress(line);
     }
-    line = line.trim();
-    String [] data = line.split(Pattern.quote(Character.toString(separatorChar)));
+    //line = line.trim();
+    String [] data;
+    data = getSplits(line,separatorChar,this.treatMultipleConsecutiveSeparatorsAsOne, true);
     
     // Post Process (trim and remove string indicators).
     for (int i=0; i<data.length; i++) {
@@ -640,11 +684,12 @@ public class CSVReader implements Serializable {
     int j=-1;
     int numDataLines = 0;
     long totalFileLength=0;
+    Pattern whitespace = Pattern.compile("\\s");
     while (in.ready()) {
       j++;
       String line = in.readLine();
       totalFileLength += line.length()+1; // +1 for \n
-      line = line.trim();
+      //line = line.trim();
       if (j<firstConsistentLine) continue; // Skip Preamble :-)
       
       char firstChar = line.charAt(0);
@@ -655,7 +700,15 @@ public class CSVReader implements Serializable {
       // Are comments allowed to occur later on in the file?
       // => Only if the number of columns does not match the usual number.
       if (CommentIndicators.contains(firstChar)) {
-        if (countCharAndIgnoreStrings(line, separatorChar)!=(numCols-1) ) continue;
+        
+        int aktCounts=0;
+        if (separatorChar=='\u0001') { // = Regex whitespace (Pattern.compile("\\s")).
+          aktCounts = countChar(line, whitespace, treatMultipleConsecutiveSeparatorsAsOne, true);
+        } else {
+          aktCounts = countChar(line, separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
+        }
+        
+        if (aktCounts!=(numCols-1) ) continue;
       }
       
       numDataLines++;
@@ -709,15 +762,219 @@ public class CSVReader implements Serializable {
    * @param toCount  Character to count
    * @return Occurences of the character in the string text, skipping all occurences in strings.
    */
-  private static int countCharAndIgnoreStrings(String input, char toCount){
+  private static int countChar(String input, char toCount, boolean treatMultipleConsecutiveCharsAsOne, boolean IgnoreStrings){
+    if (toCount=='\u0001') return countChar(input, Pattern.compile("\\s"), treatMultipleConsecutiveCharsAsOne, IgnoreStrings);
     int counter = 0;
     boolean skip1 = false, skip2 = false;
+    char lastC = '\u0000'; // \u0000 = The null character.
     for(char c: input.toCharArray()){
-      if (c=='"') skip1 = !skip1;
-      if (c=='\'') skip2 = !skip2;
-      if(c==toCount && !skip1 && !skip2) counter++;
+      if (c=='"' && IgnoreStrings) skip1 = !skip1;
+      //if (c=='\'') skip2 = !skip2;//Complicated because of terms like "it's"
+      if(c==toCount && !skip1 && !skip2) {
+        if (treatMultipleConsecutiveCharsAsOne && lastC!=c
+            || !treatMultipleConsecutiveCharsAsOne) {
+          counter++;
+        }
+      }
+      lastC=c;
     }
     return counter;
+  }
+  
+  /**
+   * Counts the number of hits of the compiled Pattern pat int the input-String. 
+   * @param input
+   * @param pat
+   * @param treatMultipleConsecutiveCharsAsOne
+   * @return
+   */
+  private static int countChar(String input, Pattern pat, boolean treatMultipleConsecutiveCharsAsOne, boolean IgnoreStrings){
+    // Count matches, skip strings.
+    int counter=0;
+    String newLine = "";
+    boolean skip1 = false, skip2 = false;
+    for(char c: input.toCharArray()){
+      if (c=='"' && IgnoreStrings) skip1 = !skip1;
+      //if (c=='\'') skip2 = !skip2;//Complicated because of terms like "it's"
+      
+      if(!skip1 && !skip2) {
+        newLine+=c;
+      } else {
+        if (newLine.length()>0) {
+          counter += countMatches(pat.matcher(newLine), treatMultipleConsecutiveCharsAsOne);        
+          newLine = "";
+        }
+      }
+    }
+    
+    // Remaining string (or full string, if no internal strings)
+    if (newLine.length()>0) {
+      counter += countMatches(pat.matcher(newLine), treatMultipleConsecutiveCharsAsOne);
+    }
+    
+    return counter;
+  }
+
+
+  /**
+   * Helper method for {@link #countCharAndIgnoreStrings(String, Pattern, boolean)}.
+   * Counts the number of matches.
+   * @param m - Matcher with a pattern compiled on a target string.
+   * @param skipConsecutiveMatches
+   * @return number of matches of this pattern, skipts consecutive matches if flag is set.
+   */
+  private static int countMatches(Matcher m, boolean skipConsecutiveMatches) {
+    // Count matches, eventually ignore consecutive ones.
+    int counter=0;
+    int lastEnd = -1;
+    while (m.find()) {
+      if (!skipConsecutiveMatches) counter++;
+      else {
+        if (m.start()!=lastEnd) counter++;
+        lastEnd = m.end();
+      }
+    }
+    return counter;
+  }
+  
+  private static String[] getSplits(String input, char separator, boolean skipConsecutiveMatches, boolean skipMatchesInStrings) {
+    if (separator=='\u0001') return getSplits(input, Pattern.compile("\\s"), skipConsecutiveMatches, skipMatchesInStrings);
+    // Get columns. A little bit more flexible than a simple .split()!
+    String splitter = Pattern.quote(Character.toString(separator));
+    ArrayList<String> splits = new ArrayList<String>();
+    
+    String newLine = ""; String stringColumn="";
+    boolean skip1 = false, skip2 = false;
+    Character lastC='\u0000';
+    for(char c: input.toCharArray()){
+      if (c=='"' && skipMatchesInStrings) {
+        skip1 = !skip1;
+        stringColumn+=c;
+        continue;
+      }
+      //if (c=='\'') skip2 = !skip2;//Complicated because of terms like "it's"
+      
+      if(!skip1 && !skip2) {
+        if (stringColumn.length()>0) {
+          splits.add(stringColumn);
+          stringColumn="";
+        }
+        if (!(skipConsecutiveMatches && c==separator && lastC==c)) {
+          newLine+=c;
+        }
+        lastC=c;
+      } else {
+        stringColumn+=c;
+        
+        if (newLine.length()>0) {
+          // Add all except the last hit (because: 'a "b"' => newLine is here 'a ' and would result in [a] [].
+          String[] ret = newLine.split(splitter);
+          
+          // Unfortunately, ret is emty if it equals splitter or consecutive instances of it.
+          // Try to reconstruct empty cells.
+          if (ret.length==0) {
+            String s = newLine.replace(Character.toString(separator), "");
+            if (s.length()>0) ret = new String[]{s};
+            else {
+              ret = new String[countChar(newLine, separator, skipConsecutiveMatches, skipMatchesInStrings)];
+            }
+          }
+            
+          for (String s: ret)
+            splits.add((s!=null?s:""));
+          //if (ret.length==0) 
+            //splits.add(newLine.replace(Character.toString(separator), ""));
+          newLine = "";
+          //skipFirstMatch = true;
+        }        
+      }
+    }
+    
+    // Remaining string (or full string, if no internal strings)
+    if (newLine.length()>0) {
+      // Take last, skip first if splits isn't empty.
+      String[] ret = newLine.split(splitter);
+      for (String s: ret)
+        splits.add(s);
+    }
+    
+    
+    return splits.toArray(new String[0]);
+    
+  }
+  
+  
+  private static String[] getSplits(String input, Pattern separator, boolean skipConsecutiveMatches, boolean skipMatchesInStrings) {
+    // Get columns. A little bit more flexible than a simple .split()!
+    ArrayList<String> splits = new ArrayList<String>();
+    
+    /*
+     * skipFirstMatch Explanation (separator char is a space (' ')):
+     * String: ' a b' => return: [],[a],[b]
+     * String: ' a "b c" d' => return: [],[a],[b c], [d]
+     * => when calling getSplitsNoSpecialStringTreatment with ' d'
+     * ignore first match. when calling with ' a b', don't ignore it.
+     */
+    
+    String newLine = ""; String stringColumn="";
+    boolean skip1 = false, skip2 = false;
+    for(char c: input.toCharArray()){
+      if (c=='"' && skipMatchesInStrings) {
+        skip1 = !skip1;
+        stringColumn+=c;
+        continue;
+      }
+      //if (c=='\'') skip2 = !skip2;//Complicated because of terms like "it's"
+      
+      if(!skip1 && !skip2) {
+        if (stringColumn.length()>0) {
+          splits.add(stringColumn);
+          stringColumn="";
+        }
+        newLine+=c;
+      } else {
+        stringColumn+=c;
+        if (newLine.length()>0) {
+          // Add all except the last hit (because: 'a "b"' => newLine is here 'a ' and would result in [a] [].
+          splits.addAll(getSplitsNoSpecialStringTreatment(newLine, separator, skipConsecutiveMatches, true, (splits.size()>0) ));        
+          newLine = "";
+        }
+      }
+    }
+    
+    // Remaining string (or full string, if no internal strings)
+    if (newLine.length()>0) {
+      splits.addAll(getSplitsNoSpecialStringTreatment(newLine, separator, skipConsecutiveMatches, false, (splits.size()>0)));
+    }
+    
+    return splits.toArray(new String[0]);
+  }
+  
+  private static ArrayList<String> getSplitsNoSpecialStringTreatment(String input, Pattern separator, boolean skipConsecutiveMatches, boolean skipLastMatch, boolean skipFirstMatch) {
+    Matcher m = separator.matcher(input);
+    
+    // Count matches, eventually ignore consecutive ones.
+    ArrayList<String> splits = new ArrayList<String>();
+    int lastEnd = (skipFirstMatch?0:-1);
+    while (m.find()) {
+      if (!skipConsecutiveMatches) {
+        splits.add(input.substring(Math.max(0, lastEnd), m.start()));
+      }
+      else {
+        if (m.start()!=lastEnd) {
+          splits.add(input.substring(Math.max(0, lastEnd), m.start()));
+        }
+        lastEnd = m.end();
+      }
+    }
+    // Don't forget the last match.
+    // Removing the last match makes sense, because when this function
+    // is called, the last character is usually a separator char.
+    if (!skipLastMatch) {
+      splits.add(input.substring(Math.max(0, lastEnd), input.length()));
+    }
+    
+    return splits;
   }
   
   // Nicht ganz korrekt da auch 4.345,2.1 als nummer erkannt wird, aber das reicht mir so.

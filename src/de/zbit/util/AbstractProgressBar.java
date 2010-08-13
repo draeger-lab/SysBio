@@ -42,7 +42,7 @@ public abstract class AbstractProgressBar implements Serializable {
     callNr=0;
     measureTime = 0;
     numMeasurements = 0;
-    lastCallTime=0;System.currentTimeMillis();
+    lastCallTime=0;//System.currentTimeMillis();
     callNumbersInSyncWithTimeMeasurements=true;
   }
   
@@ -77,6 +77,14 @@ public abstract class AbstractProgressBar implements Serializable {
    */
   public synchronized void DisplayBar() {
     DisplayBar(null);
+  }
+  
+  /**
+   * If using the time estimate counter, this function will reset the last
+   * call time (start time) to now.
+   */
+  public synchronized void resetLastCallTime() {
+    lastCallTime = System.currentTimeMillis();
   }
   
   /**
@@ -120,7 +128,7 @@ public abstract class AbstractProgressBar implements Serializable {
         }
       }
       
-      // Reset (intended not to reset if omitTimeCount)
+      // Reset (intended not to reset if omitTimeCount!)
       lastCallTime = System.currentTimeMillis();
     }
     
