@@ -39,7 +39,14 @@ public class ProgressBar extends AbstractProgressBar {
     this(totalCalls);
     setEstimateTime(estimateTime);
   }
-
+  
+  /**
+   * @return if there is a ANSI compliant console available.
+   */
+  public boolean isSimpleStyle() {
+    return useSimpleStyle;
+  }
+  
   
   /* (non-Javadoc)
    * @see de.zbit.util.aProgressBar#drawProgressBar(int, double, java.lang.String)
@@ -126,6 +133,11 @@ public class ProgressBar extends AbstractProgressBar {
     String v = System.getProperty("java.version");
     if (v!=null && v.length()>2) {
       try {
+        /*
+         * Use simply style for java version <1.6, because it's not 
+         * possible to determine if output goes into file or not
+         * (System.console not available in JDK 1.5).
+         */
         double d = Double.parseDouble(v.substring(0, 3));
         if (d<1.6) useSimpleStyle = true;
         else useSimpleStyle = !isTTY_Java16only.isTty();
