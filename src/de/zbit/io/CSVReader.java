@@ -1,7 +1,6 @@
 package de.zbit.io;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
@@ -59,6 +58,9 @@ public class CSVReader implements Serializable {
    */
   private boolean containsHeaders = true;
   
+  /**
+   * Auto detects {@link #containsHeaders}
+   */
   private boolean autoDetectContainsHeaders = true;
   
   /**
@@ -78,14 +80,39 @@ public class CSVReader implements Serializable {
   /**
    * If true, treates multiple consecutive separators as one.
    * E.g. "H,A,,O" => "H,A,O"
-   * If false, will be set to true (if required) automatically.
+   * If false - E.g. "H,A,,O" => "[H],[A],[],[O]"
    * 
    * Usually, no getter or setter required. Value is infered automatically.
    */
   private boolean treatMultipleConsecutiveSeparatorsAsOne=false;
   
+  /**
+   * Auto detects {@link #treatMultipleConsecutiveSeparatorsAsOne}
+   */
   private boolean autoDetectTreatMultipleConsecutiveSeparatorsAsOne=true;
   
+  
+  /**
+   * Performs a trim operation on each line after reading. Has crucial
+   * impact if space (' ') is a separator char.
+   * 
+   * E.g.
+   * trimLinesAfterReading=false: " Hallo" => "Hallo" is in column 2
+   * trimLinesAfterReading=true: " Hallo" => "Hallo" is in column 1
+   * 
+   * Default: false
+   */
+  private boolean trimLinesAfterReading=false;
+  
+  /**
+   * If greater than 0 skips this number of lines directly after
+   * opening the file for all operations.
+   */
+  private int skipLines=0;
+  
+  /**
+   * A flag if the initialize method has already been calles successfuly.
+   */
   private boolean isInitialized=false;
   
   /**
@@ -132,8 +159,8 @@ public class CSVReader implements Serializable {
    * Display the progress, while reading the file.
    */
   private boolean displayProgress=false;
-  private FileReadProgress progress=null;
-  private AbstractProgressBar progressBar=null;
+  private transient FileReadProgress progress=null;
+  private transient AbstractProgressBar progressBar=null;
   
   /**
    * The file to read.
@@ -213,6 +240,90 @@ public class CSVReader implements Serializable {
     autoDetectContainsHeaders = b;
   }
   
+  /**
+   * Performs a trim operation on each line after reading. Has crucial
+   * impact if space (' ') is a separator char.
+   * 
+   * E.g.
+   * trimLinesAfterReading=false: " Hallo" => "Hallo" is in column 2
+   * trimLinesAfterReading=true: " Hallo" => "Hallo" is in column 1
+   * 
+   * Default: false
+   */
+  public void setTrimLinesAfterReading(boolean trimLinesAfterReading) {
+    this.trimLinesAfterReading = trimLinesAfterReading;
+  }
+  /**
+   * If greater than 0 skips this number of lines directly after
+   * opening the file for all operations.
+   * 
+   * Default: 0.
+   */
+  public void setSkipLines(int skipLines) {
+    this.skipLines = skipLines;
+  }
+  
+  /**
+   * Sets the skipLines variable (see {@link #setSkipLines(int)})
+   * automatically to start reading the file in the line, below the
+   * line that equals s. Overrides already set vales from setSkipLines().
+   * @param s - any string that should equal a line in the inFile.
+   * @throws IOException 
+   */
+  public void setSkipLinesUntilString(String s) throws IOException {
+    this.skipLines=0;
+    
+    if (trimLinesAfterReading) s = s.trim();
+    BufferedReader r = getAndResetInputReader(this.filename);
+    String line;
+    int toSkip=0;
+    while ((line = r.readLine())!=null) {
+      toSkip++;
+      if (trimLinesAfterReading) line = line.trim();
+      if (line.equalsIgnoreCase(s)) break;
+    }
+    r.close();
+    
+    if (line==null) throw new IOException("Line '" +s+ "' not found in file '" + filename+"'.");
+    setSkipLines(toSkip);
+  }
+  
+  /**
+   * If true, treates multiple consecutive separators as one.
+   * E.g. "H,A,,O" => "H,A,O"
+   * If false - E.g. "H,A,,O" => "[H],[A],[],[O]"
+   * 
+   * Usually, no getting or setting required. Value is infered automatically.
+   * @return current value. May be changed after inizialization if
+   * autoDetectTreatMultipleConsecutiveSeparatorsAsOne is set.
+   */
+  public boolean getTreatMultipleConsecutiveSeparatorsAsOne() {
+    return treatMultipleConsecutiveSeparatorsAsOne;
+  }
+  /**
+   * See {@link #getTreatMultipleConsecutiveSeparatorsAsOne()}
+   * 
+   * Using this function disables auto detection.
+   * 
+   * @param treatMultipleConsecutiveSeparatorsAsOne
+   */
+  public void setTreatMultipleConsecutiveSeparatorsAsOne(boolean treatMultipleConsecutiveSeparatorsAsOne) {
+    this.treatMultipleConsecutiveSeparatorsAsOne = treatMultipleConsecutiveSeparatorsAsOne;
+    autoDetectTreatMultipleConsecutiveSeparatorsAsOne = false;
+  }
+  
+  /**
+   * Will infere automatically if multiple consecutive separators should
+   * be treated as one.
+   * See {@link #getTreatMultipleConsecutiveSeparatorsAsOne()} for more
+   * information. 
+   * 
+   * Default: true
+   * @param autoDetectTreatMultipleConsecutiveSeparatorsAsOne
+   */
+  public void setAutoDetectTreatMultipleConsecutiveSeparatorsAsOne(boolean autoDetectTreatMultipleConsecutiveSeparatorsAsOne) {
+    this.autoDetectTreatMultipleConsecutiveSeparatorsAsOne = autoDetectTreatMultipleConsecutiveSeparatorsAsOne;
+  }
   /**
    * Set wether you want to remove the char " or ' when it occurs at the start and end of a cell.
    * @param b
@@ -308,7 +419,11 @@ public class CSVReader implements Serializable {
    * @return
    */
   public String[][] getData(){
-    if (data==null) read();
+    if (data==null) try {
+      readUsingArrayList();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     return this.data;
   }
   
@@ -321,7 +436,7 @@ public class CSVReader implements Serializable {
     if (containsHeaders && headers==null) {
       try {
         initialize();
-      } catch (Exception e) {e.printStackTrace();}
+      } catch (IOException e) {e.printStackTrace();}
     }
     return this.headers;
   }
@@ -343,7 +458,7 @@ public class CSVReader implements Serializable {
     if (this.numCols<0)  {
       try {
         if (!isInitialized) initialize();
-      } catch (Exception e) {e.printStackTrace();}
+      } catch (IOException e) {e.printStackTrace();}
     }
     return this.numCols;
   }
@@ -383,13 +498,28 @@ public class CSVReader implements Serializable {
     return -1;
   }
   
-  private BufferedReader getAndResetInputReader(String filename) throws FileNotFoundException {
+  private BufferedReader getAndResetInputReader(String filename) throws IOException {
+    return getAndResetInputReader(filename, null);
+  }
+  private BufferedReader getAndResetInputReader(String filename, StringBuffer preamble) throws IOException {
+    BufferedReader in;
     if (useOpenFileMethod) {
       // Use the OpenFile Method to automatically extract ZIP archives and such.
-      return OpenFile.openFile(filename);
+      in = OpenFile.openFile(filename);
     } else {
-      return new BufferedReader(new FileReader(filename));
+      in = new BufferedReader(new FileReader(filename));
     }
+    
+    // Eventually skip first x lines.
+    if (skipLines>0) {
+      String line; int curLine=0;
+      while (curLine<skipLines && (line=in.readLine())!=null) {
+        if (preamble!=null) preamble.append(line+'\n');
+        curLine++;
+      }
+    }
+    
+    return in;
   }
   
   /**
@@ -399,9 +529,9 @@ public class CSVReader implements Serializable {
    * - Sets the number of columns (numCols)
    * - Reads the headers
    * @param filename
-   * @throws Exception if file appears not to be a valid CSV file.
+   * @throws IOException if file appears not to be a valid CSV file.
    */
-  private void initialize() throws Exception {
+  private void initialize() throws IOException {
     BufferedReader in = getAndResetInputReader(filename);
     
     // Number of lines, a separator char needs to have static occurences in-a-row.
@@ -433,7 +563,8 @@ public class CSVReader implements Serializable {
     int j = -1;
     while (in.ready() && max<=threshold) { //  && separatorChar=='\u0000'
       j++;
-      String line = in.readLine();//.trim();
+      String line = in.readLine();
+      if (trimLinesAfterReading && line!=null) line = line.trim();
       if (line.length()<1) continue;
       char firstChar = line.charAt(0);
       //if (CommentIndicators.contains(firstChar)) continue; // <=breakes header detection
@@ -442,7 +573,9 @@ public class CSVReader implements Serializable {
       // Sucht 25x(=threshold) das selbe Zeichen genau gleich oft. Wenn dem so ist, ist dies unser separatorChar.
       for (int i=0; i<dimension; i++) {
         char curSepChar = separatorChars[i % separatorChars.length];
-        treatMultipleConsecutiveSeparatorsAsOne=(i>=separatorChars.length);
+        boolean treatMultipleConsecutiveSeparatorsAsOne=this.treatMultipleConsecutiveSeparatorsAsOne;
+        if (autoDetectTreatMultipleConsecutiveSeparatorsAsOne)
+          treatMultipleConsecutiveSeparatorsAsOne=(i>=separatorChars.length);
         
         // Count chars for the current separator chars, ignoring occurences in strings.
         int aktCounts=0;
@@ -453,25 +586,27 @@ public class CSVReader implements Serializable {
           consistentCounts[i]++;
         } else {
           // Headers are allowed to start with a comment indicator.
-          consistentCounts[i]=0;
+          consistentCounts[i]=1; // 0: Requires at least 2 data rows (more reliable detection. 1:also reads file with just one data row
           counts[i]=aktCounts;
           firstConsistentLines[i]=j;
           firstConsistentLineString[i] = line;
         }
         
-        if (consistentCounts[i]>max) {
+        // If more consistent counts, or same but less columns, take this char.
+        if (consistentCounts[i]>max || consistentCounts[i]==max && numCols<=aktCounts) {
           char oldSeparatorChar=separatorChar;
           separatorChar = separatorChars[i % separatorChars.length];
-          treatMultipleConsecutiveSeparatorsAsOne=(i>=separatorChars.length);
+          this.treatMultipleConsecutiveSeparatorsAsOne=treatMultipleConsecutiveSeparatorsAsOne;
           numCols = counts[i]+1; // +1 because number of columns is number of separator chars in line+1
           firstConsistentLine = firstConsistentLines[i];
           max = consistentCounts[i];
           
           // Fill the headers (only if not the same...)
           if (this.containsHeaders && separatorChar!=oldSeparatorChar) {
-            headers=getSplits(firstConsistentLineString[i], separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
+            headers=getSplits(firstConsistentLineString[i], separatorChar, this.treatMultipleConsecutiveSeparatorsAsOne, true);
             // Headers do often start with a comment symbol.
-            if (CommentIndicators.contains(headers[0].charAt(0))) headers[0] = headers[0].substring(1); 
+            if (headers!=null && headers.length>0 && headers[0].length()>0)
+              if (CommentIndicators.contains(headers[0].charAt(0))) headers[0] = headers[0].substring(1); 
           }
           
           // Breakup here if threshold consistent lines reached.
@@ -482,8 +617,8 @@ public class CSVReader implements Serializable {
     in.close();
     
     // Give an error in the very unlikely case that no separator char matches. 
-    if (firstConsistentLine<0) {
-      throw new Exception ("Could not analyze input file. Probably not a CSV file.");      
+    if (firstConsistentLine<0 || max<1) {
+      throw new IOException ("Could not analyze input file. Probably not a CSV file.");      
     }
     
     isInitialized=true;
@@ -500,7 +635,7 @@ public class CSVReader implements Serializable {
       System.out.print("No Winner.");
     else
       System.out.print("Winner: '" + separatorChar + "'");
-    System.out.println(" Max counts: " + max);
+    System.out.println(" Max counts: " + max + " Cols: " + numCols);
     System.out.println("Treat consecutive as one: " + treatMultipleConsecutiveSeparatorsAsOne);*/
     
   }
@@ -520,8 +655,9 @@ public class CSVReader implements Serializable {
    * If you read the whole file anyway, this function does not affect anything.
    * @param regex - regular expression to match the column content.
    * @return winning column (column with most matches). Or -1 (no matches).
+   * @throws IOException 
    */
-  public int getColumnByMatchingContent(String regex) {
+  public int getColumnByMatchingContent(String regex) throws IOException {
     return getColumnByMatchingContent(regex,0);
   }
   /**
@@ -530,8 +666,9 @@ public class CSVReader implements Serializable {
    * @param patternOptions - Static options as in Pattern.[Option]. E.g.
    * Pattern.CASE_INSENSITIVE
    * @return column number
+   * @throws IOException 
    */
-  public int getColumnByMatchingContent(String regex, int patternOptions) {
+  public int getColumnByMatchingContent(String regex, int patternOptions) throws IOException {
     Pattern pat;
     if (patternOptions>0) {
       pat = Pattern.compile(regex, patternOptions);
@@ -560,7 +697,7 @@ public class CSVReader implements Serializable {
       } else {
         try {
           line = getNextLine();
-        } catch (Exception e) {
+        } catch (IOException e) {
           e.printStackTrace();
           break;
         }
@@ -595,25 +732,52 @@ public class CSVReader implements Serializable {
    * Reads the whole file into memory.
    * Enables to use the getData() function.
    * @param filename
+   * @throws IOException 
    */
-  public void read() {
-    try {
-      
-      // Initializes and opens the file
-      open();
-      
-      // Get total number of lines in the file
-      countNumberOfLines();
-      
-      // Finally... get the data
-      data = new String[numDataLines][numCols];
-      int nline=-1;
-      String[] line;
-      while ((line = getNextLine())!=null) {
-        data[++nline] = line;
-      }
-      
-    } catch (Exception ex) {ex.printStackTrace();}
+  public void read() throws IOException {
+    
+    // Initializes and opens the file
+    open();
+    
+    // Get total number of lines in the file
+    countNumberOfLines();
+    
+    // Finally... get the data
+    data = new String[numDataLines][numCols];
+    int nline=-1;
+    String[] line;
+    while ((line = getNextLine())!=null) {
+      data[++nline] = line;
+    }
+  }
+  
+  /**
+   * Reads the whole file into memory.
+   * Enables to use the getData() function.
+   * 
+   * read() reads the file twice, but declares a perfectly
+   * matching array, speeding up for fast hard drives and
+   * small files.
+   * 
+   * readUsingArrayList() reads the file once, but using an
+   * ArrayList and is slower on fast computers or small files.
+   * 
+   * @param filename
+   * @throws IOException 
+   */
+  public void readUsingArrayList() throws IOException {
+    
+    // Initializes and opens the file
+    open();
+    
+    // Finally... get the data
+    ArrayList<String[]> arr = new ArrayList<String[]>();
+    String[] line;
+    while ((line = getNextLine())!=null) {
+      arr.add(line);
+    }
+    
+    data = arr.toArray(new String[0][0]);
   }
   
   /**
@@ -622,42 +786,39 @@ public class CSVReader implements Serializable {
    * Reads the preamble.
    * @param filename
    */
-  public void open() {
-    try {
-      
-      // Infere separator char, get header and data start, etc.
-      if (!isInitialized) initialize();
-      
-      // Initialize a progress bar
-      if (displayProgress) {
-        progress = new FileReadProgress(filename);
-        if (this.progressBar!=null) { // Custom progress bar
-          this.progress.setProgressBar(progressBar);
-        }
+  public void open() throws IOException {
+    
+    // Infere separator char, get header and data start, etc.
+    if (!isInitialized) initialize();
+    
+    // Initialize a progress bar
+    if (displayProgress) {
+      progress = new FileReadProgress(filename);
+      if (this.progressBar!=null) { // Custom progress bar
+        this.progress.setProgressBar(progressBar);
+      }
+    }
+    
+    // Finally... get the data
+    preamble = new StringBuffer();
+    this.currentOpenFile = getAndResetInputReader(filename, preamble);
+    int j=-1;
+    while (currentOpenFile.ready()) {
+      j++;
+      if (j==firstConsistentLine && !containsHeaders || (j>firstConsistentLine) && containsHeaders ) {
+        // We reached the first data line (don't read it!).
+        break;
       }
       
-      // Finally... get the data
-      this.currentOpenFile = getAndResetInputReader(filename);
-      int j=-1;
-      preamble = new StringBuffer();
-      while (currentOpenFile.ready()) {
-        j++;
-        if (j==firstConsistentLine && !containsHeaders || (j>firstConsistentLine) && containsHeaders ) {
-          // We reached the first data line (don't read it!).
-          break;
-        }
-        
-        String line = currentOpenFile.readLine();
-        if (displayProgress && progress!=null) progress.progress(line);
-        //line = line.trim();
-        if (!(containsHeaders && j==firstConsistentLine)) {
-          // Else, this line is the header.
-          preamble.append(line+'\n');
-        }
-        
+      String line = currentOpenFile.readLine();
+      if (displayProgress && progress!=null) progress.progress(line);
+      if (trimLinesAfterReading) line = line.trim();
+      if (!(containsHeaders && j==firstConsistentLine)) {
+        // Else, this line is the header.
+        preamble.append(line+'\n');
       }
-      
-    } catch (Exception ex) {ex.printStackTrace();}
+    }
+    
   }
   
   /**
@@ -667,10 +828,13 @@ public class CSVReader implements Serializable {
    * Remark: It is possible that trailing empty cells will be removed!
    * 
    * @return the next line in the currently opened file.
-   * @throws Exception
+   * @throws IOException
    */
-  public String[] getNextLine() throws Exception {
-    if (currentOpenFile==null) open(); //throw new Exception("No file is currently opened.");
+  public String[] getNextLine() throws IOException {
+    if (currentOpenFile==null) {
+      open(); //throw new Exception("No file is currently opened.");
+      if (currentOpenFile==null) return null; // Open() threw exception.
+    }
     if (!currentOpenFile.ready()) {
       close();
       return null;
@@ -678,10 +842,8 @@ public class CSVReader implements Serializable {
     
     // Read next line, draw progress, split into columns
     String line = currentOpenFile.readLine();
-    if (displayProgress && progress!=null) {
-      progress.progress(line);
-    }
-    //line = line.trim();
+    if (displayProgress && progress!=null) progress.progress(line);
+    if (trimLinesAfterReading) line = line.trim();
     String [] data;
     data = getSplits(line,separatorChar,this.treatMultipleConsecutiveSeparatorsAsOne, true);
     
@@ -700,7 +862,11 @@ public class CSVReader implements Serializable {
   public void close() throws IOException {
     if (currentOpenFile!=null) {
       currentOpenFile.close();
-      progress=null; // Might not be serializable.
+      currentOpenFile=null;
+      if (progress!=null) {
+        progress.finished();
+        progress=null; // Might not be serializable.
+      }
     }
   }
   
@@ -729,6 +895,7 @@ public class CSVReader implements Serializable {
         j++;
         
         String line = currentOpenFile.readLine();
+        if (trimLinesAfterReading) line = line.trim();
         if (j==firstConsistentLine) {
           headerLine = getSplits(line, separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
         } else if (j>firstConsistentLine) {
@@ -736,6 +903,7 @@ public class CSVReader implements Serializable {
           dataLine[j-firstConsistentLine-1] = getSplits(line, separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
         }
       }
+      currentOpenFile.close();
       
       return containsHeaders(headerLine, dataLine);
     } catch (Exception ex) {ex.printStackTrace();}
@@ -774,7 +942,7 @@ public class CSVReader implements Serializable {
     for (int row=0; row<dataLine.length; row++) {
       if (dataLine[row]==null) continue;
       nonNullLines++;
-      for (int col=0; col<dataLine[row].length; col++) {
+      for (int col=0; col<Math.min(dataLine[row].length, headerLine.length); col++) {
         if (isNumber(dataLine[row][col], false)) isNumber[col]+=1;
       }
     }
@@ -893,7 +1061,7 @@ public class CSVReader implements Serializable {
    * @param filename
    * @throws IOException
    */
-  private void countNumberOfLines() throws Exception {
+  private void countNumberOfLines() throws IOException {
     if (!isInitialized) initialize();
     
     // Count lines
@@ -905,11 +1073,12 @@ public class CSVReader implements Serializable {
     while (in.ready()) {
       j++;
       String line = in.readLine();
+      if (trimLinesAfterReading) line = line.trim();
       totalFileLength += line.length()+1; // +1 for \n
       //line = line.trim();
       if (j<firstConsistentLine) continue; // Skip Preamble :-)
       
-      char firstChar = line.charAt(0);
+      char firstChar = line.length()>0?line.charAt(0):'\u0000';
       if (this.containsHeaders && j==firstConsistentLine) {
         // The initialize function is setting the header. 
         continue;
@@ -957,7 +1126,7 @@ public class CSVReader implements Serializable {
       // Only the case, if open has been called or neither open nor read.
       try {
         countNumberOfLines();
-      } catch (Exception e) {e.printStackTrace();}
+      } catch (IOException e) {e.printStackTrace();}
     }
     
     return numDataLines;
