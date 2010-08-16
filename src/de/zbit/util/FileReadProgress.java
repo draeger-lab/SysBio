@@ -228,7 +228,7 @@ public class FileReadProgress {
   
   /**
    * Reports that the given line has been read from the file. This implicitly
-   * adds 1 to the length of the given string to account for newline characters.
+   * adds 1 or 2 to the length of the given string to account for newline characters.
    * 
    * @param curLine
    */
@@ -247,7 +247,8 @@ public class FileReadProgress {
    * It will display the 100% mark and set all variables to "file fully read".
    */
   public void finished() {
-    progress(fileLength-bytesRead);
+    long missing = (fileLength-bytesRead);
+    if (missing!=0) progress(missing);
   }
   
   /**

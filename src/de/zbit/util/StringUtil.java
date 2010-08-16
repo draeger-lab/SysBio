@@ -254,7 +254,7 @@ public class StringUtil {
   public static String[] getColumn(String[][] data, int col) {
     String[] ret = new String[data.length];
     for (int i=0; i<data.length; i++)
-      if (data[i]==null)
+      if (data[i]==null || data[i].length<=col)
         ret[i]=null;
       else
         ret[i] = data[i][col];
