@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileReadProgress;
+import de.zbit.util.StringUtil;
 
 /**
  * Reads a CSV (e.g. tab delimited) file.
@@ -58,6 +59,8 @@ public class CSVReader implements Serializable {
    */
   private boolean containsHeaders = true;
   
+  private boolean autoDetectContainsHeaders = true;
+  
   /**
    * The OpenFile Method has many advantages. It automatically downloads http urls,
    * it can extract files from zips and the url might lay within the same jar or is
@@ -82,6 +85,8 @@ public class CSVReader implements Serializable {
   private boolean treatMultipleConsecutiveSeparatorsAsOne=false;
   
   private boolean autoDetectTreatMultipleConsecutiveSeparatorsAsOne=true;
+  
+  private boolean isInitialized=false;
   
   /**
    * The column separator char.
@@ -156,22 +161,31 @@ public class CSVReader implements Serializable {
   public CSVReader(String filename, boolean containsHeaders) {
     this(filename);
     this.containsHeaders = containsHeaders;
+    autoDetectContainsHeaders=false;
   }
   public CSVReader(String filename) {
-    init();
+    isInitialized=false;
+    CommentIndicators.add(';');
+    CommentIndicators.add('#');
+    
     this.filename = filename;
+    autoDetectContainsHeaders=true;
   }
   
   /**
    * Adds a new Symbol, which indicates that this line should be treated as a comment (=>ignored)
    */
   public void addCommentInidicator (char c) {
-    if (!(CommentIndicators.contains((c))))
+    if (!(CommentIndicators.contains((c)))) {
       CommentIndicators.add((c));
+      isInitialized=false;
+    }
   }
   public void removeCommentIndicator (char c) {
-    while (CommentIndicators.contains((c)))
+    while (CommentIndicators.contains((c))) {
       CommentIndicators.remove((c));
+      isInitialized=false;
+    }
   }
   
   /**
@@ -179,8 +193,26 @@ public class CSVReader implements Serializable {
    * @param b yes (true) or false (no). Default: yes
    */
   public void setContainsHeaders(boolean b) {
+    if (b!=containsHeaders) isInitialized=false;
     containsHeaders = b;
+    autoDetectContainsHeaders=false;
   }
+  
+  public boolean getContainsHeaders() {
+    return this.containsHeaders;
+  }
+  
+  /**
+   * Auto detects if your file contains headers. After initialization
+   * (through .open() or .read() ), you can get the predicted value with
+   * getContainsHeaders().
+   * @param b yes (true) or false (no). Default: yes
+   */
+  public void setAutoDetectContainsHeaders(boolean b) {
+    if (b!=autoDetectContainsHeaders) isInitialized=false;
+    autoDetectContainsHeaders = b;
+  }
+  
   /**
    * Set wether you want to remove the char " or ' when it occurs at the start and end of a cell.
    * @param b
@@ -195,6 +227,7 @@ public class CSVReader implements Serializable {
    * @param c = column separator char.
    */
   public void setSeparatorChar(char c) {
+    isInitialized=false;
     separatorChar = c;
   }
   
@@ -218,6 +251,7 @@ public class CSVReader implements Serializable {
    * @return 
    */
   public void setUseOpenFileMethod(boolean b) {
+    isInitialized=false;
     this.useOpenFileMethod=b;
   }
   
@@ -246,14 +280,6 @@ public class CSVReader implements Serializable {
         data[i][column] = null;
   }
   
-  /**
-   * Initialize and set default values, which were not set before.
-   * (So far, only the commentIndicators).
-   */
-  private void init() {
-    CommentIndicators.add(';');
-    CommentIndicators.add('#');
-  }
   
   /**
    * Allows to override the progressBar.
@@ -316,7 +342,7 @@ public class CSVReader implements Serializable {
   public int getNumberOfColumns() {
     if (this.numCols<0)  {
       try {
-      initialize();
+        if (!isInitialized) initialize();
       } catch (Exception e) {e.printStackTrace();}
     }
     return this.numCols;
@@ -398,6 +424,7 @@ public class CSVReader implements Serializable {
     for (int i=0; i<consistentCounts.length; i++) 
     {consistentCounts[i] = 0; counts[i] = 0;}
     
+    if (autoDetectContainsHeaders) containsHeaders = true; // will be set later
     firstConsistentLine = -1;
     numCols=-1;
     
@@ -454,10 +481,17 @@ public class CSVReader implements Serializable {
     }
     in.close();
     
-    
     // Give an error in the very unlikely case that no separator char matches. 
     if (firstConsistentLine<0) {
       throw new Exception ("Could not analyze input file. Probably not a CSV file.");      
+    }
+    
+    isInitialized=true;
+    
+    // Auto detect if file contains headers.
+    if (autoDetectContainsHeaders) {
+      containsHeaders = containsHeaders();
+      if (!containsHeaders) headers=null;
     }
     
     /*if (separatorChar=='\u0001')
@@ -592,7 +626,7 @@ public class CSVReader implements Serializable {
     try {
       
       // Infere separator char, get header and data start, etc.
-      initialize();
+      if (!isInitialized) initialize();
       
       // Initialize a progress bar
       if (displayProgress) {
@@ -670,6 +704,189 @@ public class CSVReader implements Serializable {
     }
   }
   
+  public boolean containsHeaders() {
+    try {
+      // Number of lines to "peek" into file.
+      int threshold = 25;
+      
+      // Infere separator char, get header and data start, etc.
+      if (!isInitialized) {
+        // If calling from initialize.. prevent loop here
+        boolean b = new Boolean(autoDetectContainsHeaders);
+        autoDetectContainsHeaders = false;
+        initialize();
+        autoDetectContainsHeaders = b;
+      }
+      
+      // Declate variables to examine
+      String[] headerLine = null; // Potential header
+      String[][] dataLine = new String[threshold][]; // Potential data line.
+      
+      // Finally... get the data, NOT Using the global variable
+      BufferedReader currentOpenFile = getAndResetInputReader(filename);
+      int j=-1;
+      while (currentOpenFile.ready()) {
+        j++;
+        
+        String line = currentOpenFile.readLine();
+        if (j==firstConsistentLine) {
+          headerLine = getSplits(line, separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
+        } else if (j>firstConsistentLine) {
+          if (j-firstConsistentLine-1>=dataLine.length) break;
+          dataLine[j-firstConsistentLine-1] = getSplits(line, separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
+        }
+      }
+      
+      return containsHeaders(headerLine, dataLine);
+    } catch (Exception ex) {ex.printStackTrace();}
+    return false;
+  }
+  
+  public boolean containsHeaders(String[] headerLine, String[][] dataLine) {
+    /*
+     * Different posibilities (each via versa):
+     * 1 Header cell is no number, data cell is number
+     * 2 Longest common prefix / suffix
+     * 3 Every data cell has the same length. Header cell not.
+     * 4 Data cells are binary enum, Header not.
+     */
+    int nonNullLines=0;
+    
+    // For 1
+    int[] isNumber = new int[headerLine.length];
+    
+    // For 2
+    String[] prefix = new String[headerLine.length];
+    int[] numPrefix = new int[headerLine.length];
+    String[] suffix = new String[headerLine.length];
+    int[] numSuffix = new int[headerLine.length];
+    
+    // For 3
+    int[] sameLength = new int[headerLine.length]; // length
+    int[] maxSameLength = new int[headerLine.length]; // Number of elements
+    
+    // For 4
+    boolean[] isBinary = new boolean[headerLine.length];
+    String[] stringOne = new String[headerLine.length]; // If binary, string1
+    String[] stringTwo = new String[headerLine.length]; // If binary, string2
+    
+    // Fill 1 - isNumber variable
+    for (int row=0; row<dataLine.length; row++) {
+      if (dataLine[row]==null) continue;
+      nonNullLines++;
+      for (int col=0; col<dataLine[row].length; col++) {
+        if (isNumber(dataLine[row][col], false)) isNumber[col]+=1;
+      }
+    }
+    
+    // Fill 2-4
+    if (nonNullLines>0) {
+      for (int col=0; col<headerLine.length; col++) {
+        String[] column = StringUtil.getColumn(dataLine, col);
+        
+        // 2
+        prefix[col]  = StringUtil.getLongestCommonPrefix(column, true);
+        suffix[col]  = StringUtil.getLongestCommonPrefix(column, true);
+        if (prefix[col].length()>0 || suffix[col].length()>0) {
+          for (int i=0; i<column.length; i++) {
+            if (column[i]==null) continue;
+            if (column[i].startsWith(prefix[col])) numPrefix[col]++;
+            if (column[i].endsWith(suffix[col])) numSuffix[col]++;
+          }
+        }
+        
+        // 3
+        int [] r = StringUtil.getLongestCommonLength(column);
+        sameLength[col] = r[0];
+        maxSameLength[col] = r[1];
+        
+        // 4
+        String[] re = containsBinaryData(column, stringOne[col], stringTwo[col]);
+        isBinary[col] = Boolean.parseBoolean(re[0]); stringOne[col] = re[1]; stringTwo[col] = re[2];
+      }
+    }
+    
+    // Compare to potential header
+    int headerMatchesData=0; int headerNOTMatchesData=0;
+    for (int col=0; col<headerLine.length; col++) {
+      String cell = headerLine[col];
+      
+      // If 90% have a "attribute", it's relevant
+      short checkAttribute=0; // 0=attribute seems to be random.
+      
+      // Check "isNumber" attribute.
+      int perc = isNumber[col]/nonNullLines;
+      if (perc>=0.9) checkAttribute=1; // yes
+      if (perc<=0.1) checkAttribute=2; // yes, but the other way round
+      if (checkAttribute!=0) {
+        boolean b = isNumber(cell, false);
+        if (checkAttribute==1 && b) headerMatchesData++;
+        else if (checkAttribute==2 && !b) headerMatchesData++;
+        else headerNOTMatchesData++;
+      }
+
+      // Check "prefix" attribute.
+      checkAttribute=0; // 0=attribute seems to be random.
+      perc = numPrefix[col]/nonNullLines;
+      if (perc>=0.9) checkAttribute=1; // yes
+      if (prefix[col].length()>0 && checkAttribute!=0) {
+        if (cell.startsWith(prefix[col])) headerMatchesData++;
+        else headerNOTMatchesData++;
+      }
+      
+      // Check "suffix" attribute.
+      checkAttribute=0; // 0=attribute seems to be random.
+      perc = numSuffix[col]/nonNullLines;
+      if (perc>=0.9) checkAttribute=1; // yes
+      if (suffix[col].length()>0 && checkAttribute!=0) {
+        if (cell.endsWith(suffix[col])) headerMatchesData++;
+        else headerNOTMatchesData++;
+      }
+      
+      // Check "length" attribute.
+      checkAttribute=0; // 0=attribute seems to be random.
+      perc = maxSameLength[col]/nonNullLines;
+      if (perc>=0.9) checkAttribute=1; // yes
+      if (checkAttribute!=0) {
+        if (cell.length()==sameLength[col]) headerMatchesData++;
+        else headerNOTMatchesData++;
+      }
+      
+      // Check "binary data" attribute 
+      checkAttribute=0; // 0=attribute seems to be random.
+      if (isBinary[col] && stringOne[col]!=null && stringOne[col].length()>0) checkAttribute=1; // yes
+      if (checkAttribute!=0) {
+        if (cell.equalsIgnoreCase(stringOne[col]) || cell.equalsIgnoreCase(stringTwo[col])) headerMatchesData++;
+        else headerNOTMatchesData++;
+      }
+    }
+    
+    return (headerNOTMatchesData>headerMatchesData);
+  }
+
+  
+  /**
+   * Skips null or empty cells!
+   * @param s
+   * @return
+   */
+  @SuppressWarnings("unused")
+  private static boolean containsBinaryData(String[] s) {
+    return Boolean.parseBoolean(containsBinaryData(s, new String(), new String())[0]);
+  }
+  private static String[] containsBinaryData(String[] s, String one, String two) {
+    one=null; two=null;
+    for (int i=0; i<s.length; i++) {
+      if (s[i]==null || s[i].length()<1) continue;
+      if (one==null) one = s[i];
+      else if (two==null && !s[i].equalsIgnoreCase(one)) two = s[i];
+      else if (s[i].equalsIgnoreCase(one) || s[i].equalsIgnoreCase(two)) continue;
+      else return new String[]{"false", one,two};
+    }
+    return new String[]{"true", one,two};
+  }
+
+  
   /**
    * Fill the numDataLines variable.
    * Requires: class has to be initialized (initialize() method).
@@ -677,7 +894,7 @@ public class CSVReader implements Serializable {
    * @throws IOException
    */
   private void countNumberOfLines() throws Exception {
-    if (firstConsistentLine<0) initialize();
+    if (!isInitialized) initialize();
     
     // Count lines
     BufferedReader in = getAndResetInputReader(filename);
