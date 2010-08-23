@@ -3,19 +3,24 @@
  */
 package de.zbit.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridBagLayout;
+import java.awt.LayoutManager;
 import java.io.File;
 import java.util.StringTokenizer;
 
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 /**
- * This class contains some methods from the corresponding class in
- * SBMLsqueezer.
+ * This class contains various GUI tools.
  * 
  * @author draeger
+ * @author wrzodek
  * 
  */
 public class GUITools {
@@ -105,5 +110,56 @@ public class GUITools {
 		sb.append("</body></html>");
 		return sb.toString();
 	}
+	
+	
+	
+	/**
+   * Replaces two components.
+   * Tries to preserve the layout while replacing the two components on
+   * the parent of the oldOne.
+   * @param oldOne
+   * @param newOne
+   */
+  public static void replaceComponent(JComponent oldOne, JComponent newOne) {
+    if (oldOne==null || oldOne.getParent()==null) {
+      // All I can do here is replacing the variables...
+      oldOne = newOne;
+      return;
+    }
+    
+    Container target = oldOne.getParent();
+    LayoutManager lm = target.getLayout();
+    
+    // Try to replace by setting same layout as old component
+    if (lm instanceof BorderLayout) {
+      Object c = ((BorderLayout) lm).getConstraints(oldOne);
+      lm.removeLayoutComponent(oldOne);
+      ((BorderLayout) lm).addLayoutComponent(newOne, c);
+      
+    } else if (lm instanceof GridBagLayout) {
+      Object c = ((GridBagLayout) lm).getConstraints(oldOne);
+      lm.removeLayoutComponent(oldOne);
+      ((GridBagLayout) lm).addLayoutComponent(newOne, c);
+      
+    } else {
+      // Layouts have no contstraints. Just set the correct index.
+      boolean replaced = false;
+      for (int i=0; i<target.getComponents().length; i++) {
+        if (target.getComponents()[i].equals(oldOne)) {
+          target.remove(oldOne);
+          target.add(newOne, i);
+          replaced = true;
+          break;
+        }
+      }
+      
+      // element not found? still add the new one.
+      if (!replaced) {
+        target.remove(oldOne);
+        target.add(newOne);
+      }
+        
+    }
+  }
 
 }
