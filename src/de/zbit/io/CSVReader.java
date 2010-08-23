@@ -15,23 +15,22 @@ import de.zbit.util.StringUtil;
 /**
  * Reads a CSV (e.g. tab delimited) file.
  * 
+ * Many optios are provided for customization. It is recommended to leave
+ * all default values, if you are unsure what you're doing.
+ * 
  * There are two use cases:
  * Read the file at once, or line by line.
  * 
  * Examples:
  * 1:  Read the whole file at once:
  *   CSVReader a = new CSVReader("test.txt");
- *   a.setContainsHeaders(false); // Important!
  *   a.setDisplayProgress(false); // Optional, false by default
- *   
- *   a.read();
  *   
  *   a.getData(); // The whole table, except headers
  *   a.getHeader(); // The header (if available)
  *   a.getPreamble(); // Everything, before actual table start
  *   
  * 2: Read the file, line by line (more memory save)
- *   a.open();
  *   String[] line;
  *   try {
  *     while ((line = a.getNextLine())!=null) {
@@ -39,12 +38,12 @@ import de.zbit.util.StringUtil;
  *     }
  *   } catch (Exception e) {e.printStackTrace();}
  *   
- *   a.getData(); // Returns null
- *   // All other getters are available as in case 1.
+ *   a.getHeader(); // The header (if available)
+ *   a.getPreamble(); // Everything, before actual table start
  * 
  * @author wrzodek
  */
-public class CSVReader implements Serializable {
+public class CSVReader implements Serializable, Cloneable {
   private static final long serialVersionUID = 7784651184371604357L;
 
   /**
@@ -103,6 +102,12 @@ public class CSVReader implements Serializable {
    * Default: false
    */
   private boolean trimLinesAfterReading=false;
+  
+  /**
+   * This should always be true.
+   * Automatically detects where the content start (stable count of columns).
+   */
+  private boolean autoDetectContentStart = true;
   
   /**
    * If greater than 0 skips this number of lines directly after
@@ -187,8 +192,7 @@ public class CSVReader implements Serializable {
    */
   public CSVReader(String filename, boolean containsHeaders) {
     this(filename);
-    this.containsHeaders = containsHeaders;
-    autoDetectContainsHeaders=false;
+    setContainsHeaders(containsHeaders);
   }
   public CSVReader(String filename) {
     isInitialized=false;
@@ -238,6 +242,26 @@ public class CSVReader implements Serializable {
   public void setAutoDetectContainsHeaders(boolean b) {
     if (b!=autoDetectContainsHeaders) isInitialized=false;
     autoDetectContainsHeaders = b;
+  }
+  
+  /**
+   * Automatically detects where the content start (stable count of columns).
+   * IT IS STRONGLY RECOMMENDED TO KEEP THIS TRUE!
+   * @param b
+   */
+  public void setAutoDetectContentStart(boolean b) {
+    this.autoDetectContentStart = b;
+  }
+  
+  /**
+   * @return line number where the content starts (Consistent counts
+   * of the separator char, below preamble).
+   * Can be set indirectly by using {@link #setSkipLines(int)}.
+   * Is detected automatically by the initialize method. Do NOT try
+   * to set this value directly.
+   */
+  public int getContentStartLine() {
+    return firstConsistentLine;
   }
   
   /**
@@ -308,6 +332,8 @@ public class CSVReader implements Serializable {
    * @param treatMultipleConsecutiveSeparatorsAsOne
    */
   public void setTreatMultipleConsecutiveSeparatorsAsOne(boolean treatMultipleConsecutiveSeparatorsAsOne) {
+    if (treatMultipleConsecutiveSeparatorsAsOne!=
+      this.treatMultipleConsecutiveSeparatorsAsOne) isInitialized=false;
     this.treatMultipleConsecutiveSeparatorsAsOne = treatMultipleConsecutiveSeparatorsAsOne;
     autoDetectTreatMultipleConsecutiveSeparatorsAsOne = false;
   }
@@ -424,6 +450,15 @@ public class CSVReader implements Serializable {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    return this.data;
+  }
+
+  /**
+   * Get the whole file content (except headers and preamble/comments).
+   * Will NOT read the file, if not already done.
+   * @return
+   */
+  public String[][] getDataButDoNotReadIfNotAvailable(){
     return this.data;
   }
   
@@ -560,13 +595,14 @@ public class CSVReader implements Serializable {
     
     // Read a part of the file and fill variables.
     int max=0; // If file had less then "threshold" consistent lines in total; Take the max.
-    int j = -1;
+    int j = -1 + this.skipLines;
+    String firstConsistentLineStringOfMax=null;
     while (in.ready() && max<=threshold) { //  && separatorChar=='\u0000'
       j++;
       String line = in.readLine();
       if (trimLinesAfterReading && line!=null) line = line.trim();
-      if (line.length()<1) continue;
-      char firstChar = line.charAt(0);
+      if (line.length()<1 && autoDetectContentStart) continue;
+      char firstChar = line.length()>0?line.charAt(0):'\u0000';
       //if (CommentIndicators.contains(firstChar)) continue; // <=breakes header detection
       
       // Infere separator char
@@ -594,20 +630,17 @@ public class CSVReader implements Serializable {
         
         // If more consistent counts, or same but less columns, take this char.
         if (consistentCounts[i]>max || consistentCounts[i]==max && numCols<=aktCounts) {
-          char oldSeparatorChar=separatorChar;
           separatorChar = separatorChars[i % separatorChars.length];
           this.treatMultipleConsecutiveSeparatorsAsOne=treatMultipleConsecutiveSeparatorsAsOne;
           numCols = counts[i]+1; // +1 because number of columns is number of separator chars in line+1
-          firstConsistentLine = firstConsistentLines[i];
-          max = consistentCounts[i];
-          
-          // Fill the headers (only if not the same...)
-          if (this.containsHeaders && separatorChar!=oldSeparatorChar) {
-            headers=getSplits(firstConsistentLineString[i], separatorChar, this.treatMultipleConsecutiveSeparatorsAsOne, true);
-            // Headers do often start with a comment symbol.
-            if (headers!=null && headers.length>0 && headers[0].length()>0)
-              if (CommentIndicators.contains(headers[0].charAt(0))) headers[0] = headers[0].substring(1); 
+          if (autoDetectContentStart) {
+            firstConsistentLine = firstConsistentLines[i];
+            firstConsistentLineStringOfMax=firstConsistentLineString[i];
+          } else if (firstConsistentLineStringOfMax==null) {
+            firstConsistentLineStringOfMax=firstConsistentLineString[i];
+            firstConsistentLine = firstConsistentLines[i];
           }
+          max = consistentCounts[i];
           
           // Breakup here if threshold consistent lines reached.
           if (consistentCounts[i]>threshold) break;
@@ -615,6 +648,16 @@ public class CSVReader implements Serializable {
       }
     }
     in.close();
+    
+    // Fill the headers variable
+    if (this.containsHeaders && firstConsistentLineStringOfMax!=null) {
+      headers=getSplits(firstConsistentLineStringOfMax, separatorChar, this.treatMultipleConsecutiveSeparatorsAsOne, true);
+      // Headers do often start with a comment symbol.
+      if (headers!=null && headers.length>0 && headers[0].length()>0)
+        if (CommentIndicators.contains(headers[0].charAt(0))) headers[0] = headers[0].substring(1); 
+    } else {
+      headers=null;
+    }
     
     // Give an error in the very unlikely case that no separator char matches. 
     if (firstConsistentLine<0 || max<1) {
@@ -664,11 +707,26 @@ public class CSVReader implements Serializable {
    * See {@link #getColumnByMatchingContent(String)}
    * @param regex - Regular expression
    * @param patternOptions - Static options as in Pattern.[Option]. E.g.
-   * Pattern.CASE_INSENSITIVE
+   * Pattern.CASE_INSENSITIVE. 0 for no options.
    * @return column number
    * @throws IOException 
    */
   public int getColumnByMatchingContent(String regex, int patternOptions) throws IOException {
+    return getColumnByMatchingContent(regex, patternOptions, 20000);
+  }
+  
+  /**
+   * See {@link #getColumnByMatchingContent(String, int)}
+   * @param regex - Regular expression
+   * @param patternOptions - Static options as in Pattern.[Option]. E.g.
+   * Pattern.CASE_INSENSITIVE. 0 for no options.
+   * @param maxLinesToCheck - Maximum number of lines to check. Terminates
+   * this search if more lines than this value have been read and no
+   * matching column has been found. 0 to disable. Default: 20,000
+   * @return column number
+   * @throws IOException
+   */
+  public int getColumnByMatchingContent(String regex, int patternOptions, int maxLinesToCheck) throws IOException {
     Pattern pat;
     if (patternOptions>0) {
       pat = Pattern.compile(regex, patternOptions);
@@ -677,7 +735,9 @@ public class CSVReader implements Serializable {
     }
     int threshold = 25; // Number of lines to match.
     
+    FileReadProgress tempProgress = this.progress;;
     if (this.data==null) {
+      this.progress = null;
       open(); // Open/ Reset the file if not already read in.
     }
     
@@ -685,8 +745,10 @@ public class CSVReader implements Serializable {
     int[] matches = new int[numCols];
     int matchesMax = 0;
     int matchesMaxId = -1;
-    int lineNr=0;
+    int lineNr=0; int linesRead=0;
     while (matchesMax<threshold) {
+      linesRead++;
+      if (maxLinesToCheck>0 && linesRead>maxLinesToCheck) break;
       
       // Get the next data line
       String[] line;
@@ -722,6 +784,8 @@ public class CSVReader implements Serializable {
     
     // Reset pointer
     if (this.data==null) {
+      close();
+      this.progress=tempProgress;
       open();
     }
      
@@ -802,7 +866,7 @@ public class CSVReader implements Serializable {
     // Finally... get the data
     preamble = new StringBuffer();
     this.currentOpenFile = getAndResetInputReader(filename, preamble);
-    int j=-1;
+    int j=-1+skipLines;
     while (currentOpenFile.ready()) {
       j++;
       if (j==firstConsistentLine && !containsHeaders || (j>firstConsistentLine) && containsHeaders ) {
@@ -870,7 +934,7 @@ public class CSVReader implements Serializable {
     }
   }
   
-  public boolean containsHeaders() {
+  private boolean containsHeaders() {
     try {
       // Number of lines to "peek" into file.
       int threshold = 25;
@@ -890,7 +954,7 @@ public class CSVReader implements Serializable {
       
       // Finally... get the data, NOT Using the global variable
       BufferedReader currentOpenFile = getAndResetInputReader(filename);
-      int j=-1;
+      int j=-1+skipLines;
       while (currentOpenFile.ready()) {
         j++;
         
@@ -910,7 +974,8 @@ public class CSVReader implements Serializable {
     return false;
   }
   
-  public boolean containsHeaders(String[] headerLine, String[][] dataLine) {
+  private boolean containsHeaders(String[] headerLine, String[][] dataLine) {
+    if (headerLine==null || dataLine==null || dataLine.length<1) return false;
     /*
      * Different posibilities (each via versa):
      * 1 Header cell is no number, data cell is number
@@ -973,6 +1038,7 @@ public class CSVReader implements Serializable {
         isBinary[col] = Boolean.parseBoolean(re[0]); stringOne[col] = re[1]; stringTwo[col] = re[2];
       }
     }
+    if (nonNullLines<1) return false;
     
     // Compare to potential header
     int headerMatchesData=0; int headerNOTMatchesData=0;
@@ -1066,7 +1132,7 @@ public class CSVReader implements Serializable {
     
     // Count lines
     BufferedReader in = getAndResetInputReader(filename);
-    int j=-1;
+    int j=-1+skipLines;
     int numDataLines = 0;
     long totalFileLength=0;
     Pattern whitespace = Pattern.compile("\\s");
@@ -1350,8 +1416,8 @@ public class CSVReader implements Serializable {
         if (m.start()!=lastEnd) {
           splits.add(input.substring(Math.max(0, lastEnd), m.start()));
         }
-        lastEnd = m.end();
       }
+      lastEnd = m.end();
     }
     // Don't forget the last match.
     // Removing the last match makes sense, because when this function
@@ -1363,7 +1429,13 @@ public class CSVReader implements Serializable {
     return splits;
   }
   
-  // Nicht ganz korrekt da auch 4.345,2.1 als nummer erkannt wird, aber das reicht mir so.
+  public Object clone() throws CloneNotSupportedException {
+    CSVReader clone=(CSVReader)super.clone();
+
+    return clone;
+  }
+  
+  // Nicht ganz korrekt da auch 4.34-5,2.1 als nummer erkannt wird, aber das reicht mir so.
   // macht MIT ABSICHT kein trim!
   public static boolean isNumber(String s, boolean onlyDigits) {
     if (s==null || s.length()<1) return false;
@@ -1377,6 +1449,13 @@ public class CSVReader implements Serializable {
         return false;
       }
     }
+    return true;
+  }
+  public static boolean isIntegerNumber(String s) {
+    if (s==null || s.length()<1) return false;
+    try{
+      Integer.parseInt(s);
+    } catch (Exception e) {return false;}
     return true;
   }
   
