@@ -133,6 +133,7 @@ public class FileReadProgress {
    * @param a
    */
   public void setProgressBar(AbstractProgressBar a) {
+    if (a==null) return;
     progressBar = a;
     progressBar.setNumberOfTotalCalls(fileLength);
     progressBar.setCallNr(bytesRead);

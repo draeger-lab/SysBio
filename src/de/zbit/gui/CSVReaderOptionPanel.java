@@ -587,7 +587,7 @@ public class CSVReaderOptionPanel extends JPanel {
     
     // Bring them all to the same column count
     for (int i=0; i<data.length; i++) {
-      if (data[i].length<maxColCount) {
+      if (data[i]!=null && data[i].length<maxColCount) {
         String[] newData = new String[maxColCount];
         System.arraycopy(data[i], 0, newData, 0, data[i].length);
         data[i] = newData;
