@@ -413,6 +413,35 @@ public class Utils {
     return ret;
   }
   
+  /**
+   * The same as {@link #getTimeString(long)} but a little less detail,
+   * making the resulting string more "pretty".
+   * @param miliseconds
+   * @return
+   */
+  public static String getPrettyTimeString(long miliseconds) {
+    double seconds = (miliseconds/1000.0);
+    double minutes = (seconds/60.0);
+    double hours = (minutes/60.0);
+    double days = hours/24;
+    
+    String ret;
+    if (days>=1) {
+      ret = cut(days) + "d " + cut(hours%24.0)  + "h";
+    } else if (hours>=1) {
+      ret = cut(hours%24.0)  + "h " + cut(minutes%60) + "m";
+    } else if (minutes>=2) {
+      ret = cut(minutes%60) + "m";
+    } else if (minutes>=1) {
+      ret = cut(minutes%60) + "m " + cut(seconds%60) + "s";
+    } else if (seconds>=1) {
+      ret = cut(seconds%60) + "s";
+    } else {
+      ret = cut(miliseconds%1000.0) + "ms";
+    }
+    return ret;
+  }
+  
   /** Nicht ganz korrekt da auch 4.345,2.1 als nummer erkannt wird, aber das reicht mir so. **/
   public static boolean isNumber(String s, boolean onlyDigits) {
     if (s.trim().length()==0) return false;

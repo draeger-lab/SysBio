@@ -6,6 +6,7 @@ package de.zbit.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.io.File;
@@ -37,17 +38,36 @@ public class GUITools {
 	public static JFileChooser createJFileChooser(String dir,
 			boolean allFilesAcceptable, boolean multiSelectionAllowed,
 			int mode, FileFilter... filter) {
-		JFileChooser chooser = new JFileChooser(dir);
-		chooser.setAcceptAllFileFilterUsed(allFilesAcceptable);
-		chooser.setMultiSelectionEnabled(multiSelectionAllowed);
-		chooser.setFileSelectionMode(mode);
-		int i = filter.length - 1;
-		while (0 <= i)
-			chooser.addChoosableFileFilter(filter[i--]);
-		if (i >= 0)
-			chooser.setFileFilter(filter[i]);
+		JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
+		    multiSelectionAllowed, mode);
+		if (filter!=null) {
+		  int i = filter.length - 1;
+		  while (0 <= i)
+		    chooser.addChoosableFileFilter(filter[i--]);
+		  if (i >= 0)
+		    chooser.setFileFilter(filter[i]);
+		}
 		return chooser;
 	}
+	
+	/**
+	 * 
+	 * @param dir
+	 * @param allFilesAcceptable
+	 * @param multiSelectionAllowed
+	 * @param mode
+	 * @return
+	 */
+	 public static JFileChooser createJFileChooser(String dir,
+	      boolean allFilesAcceptable, boolean multiSelectionAllowed,
+	      int mode) {
+	    JFileChooser chooser = new JFileChooser(dir);
+	    chooser.setAcceptAllFileFilterUsed(allFilesAcceptable);
+	    chooser.setMultiSelectionEnabled(multiSelectionAllowed);
+	    chooser.setFileSelectionMode(mode);
+	    return chooser;
+	  }
+	 
 
 	/**
 	 * 
@@ -111,7 +131,29 @@ public class GUITools {
 		return sb.toString();
 	}
 	
-	
+  /**
+   * Shows a generic Save file Dialog.
+   * @param parentComp
+   * @return
+   */
+  public static File saveFileDialog(final Component parentComp) {
+    final JFileChooser fc = new JFileChooser(new File("."));
+    fc.setDialogTitle("Select a target");
+    
+    if (fc.showSaveDialog(parentComp) == JFileChooser.APPROVE_OPTION) {
+      if (fc.getSelectedFile().exists()) {
+        if (!GUITools.overwriteExistingFile(parentComp, fc.getSelectedFile())) {
+          return null;
+        }
+      }
+      return fc.getSelectedFile();
+    }
+    return null;
+  }
+  
+  public static Font incrementFontSize(Font g, int incrementBy) {
+    return g.deriveFont((float)(g.getSize() + incrementBy) );
+  }
 	
 	/**
    * Replaces two components.

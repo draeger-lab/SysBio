@@ -6,9 +6,9 @@ package de.zbit.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -217,6 +217,7 @@ public class CSVReaderColumnChooser extends JPanel {
       
       if (p!=null) {
         for (int i=0; i<p.getComponentCount(); i++) {
+          if (p.getComponent(i) == null || p.getComponent(i).getName() == null) continue;
           if (p.getComponent(i).getName().equals(title) &&
               p.getComponent(i) instanceof JColumnChooser) {
             return  ((JColumnChooser)p.getComponent(i));
@@ -226,6 +227,37 @@ public class CSVReaderColumnChooser extends JPanel {
     }
     
     throw new Exception("No column chooser named '" + title + "'.");
+  }
+  
+  /**
+   * Checks if all JColumnChoosers are set to distinct columns. Only
+   * multiple optional Column Choosers are allowed to be "unselected".
+   * @return true if only distinct columns have been selected. Else: false.
+   */
+  public boolean isAllSelectedColumnsAreDistinct() {
+    // ArrayList is used to check if all selected columns are distinct.
+    ArrayList<Integer> alreadySelectedColumns = new ArrayList<Integer>();
+    
+    for (int j=0; j<2; j++) {
+      JPanel p;
+      if (j==0) p=requiredPanel; else p=optionalPanel;
+      
+      if (p!=null) {
+        for (int i=0; i<p.getComponentCount(); i++) {
+          if (p.getComponent(i) == null || 
+            !(p.getComponent(i) instanceof JColumnChooser)) {
+            continue;
+          } else {
+            int sel = ((JColumnChooser)p.getComponent(i)).getSelectedValue();
+            if (sel>=0) { // Multiple optional columns may be -1
+              if (alreadySelectedColumns.contains(sel)) return false;
+              alreadySelectedColumns.add(sel);
+            }
+          }
+        }
+      }
+    }
+    return true;
   }
   
   /**
@@ -256,8 +288,8 @@ public class CSVReaderColumnChooser extends JPanel {
    */
   public void setSplitRequiredAndOptional(boolean b) {
     if (b) {
-      setBorder(requiredPanel, "Required ");
-      setBorder(optionalPanel, "Optional ");
+      setBorder(requiredPanel, "Required columns ");
+      setBorder(optionalPanel, "Optional columns ");
     } else {
       requiredPanel.setBorder(null);
       optionalPanel.setBorder(null);

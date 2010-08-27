@@ -92,6 +92,25 @@ public abstract class AbstractProgressBar implements Serializable {
   }
   
   /**
+   * If using the time estimate counter, this function will return the
+   * System.currentTimeMillis() time of the last DisplayBar call.
+   * @return 
+   */
+  public long getLastCallTime() {
+    return lastCallTime;
+  }
+  
+  /**
+   * Only use this if you know exactly what you're doing!
+   * Adds time to measureTime, but does NOT increas
+   * numMeasurements.
+   * @param timespan
+   */
+  public synchronized void addTime(long timespan) {
+    measureTime += timespan;
+  }
+  
+  /**
    * Call this function, to set the counter one step further to totalCalls.
    * Paints automatically the progress bar and adds an @param additionalText.
    * 

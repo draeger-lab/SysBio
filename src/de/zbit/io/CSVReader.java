@@ -53,6 +53,14 @@ public class CSVReader implements Serializable, Cloneable {
   private ArrayList<Character> CommentIndicators = new ArrayList<Character>();
   
   /**
+   * Contains columns indices. All column indices in this array will
+   * always be set to null directly after reading.
+   * E.g. if this contains just [1] and reading the line "A B C"
+   * it will result is a returned split of "[A], [null], [C]".
+   */
+  private ArrayList<Integer> setToNull = new ArrayList<Integer>();
+  
+  /**
    * Indicates, that this file contains headers
    */
   private boolean containsHeaders = true;
@@ -158,7 +166,7 @@ public class CSVReader implements Serializable, Cloneable {
   /**
    * If a file is currently open, this enables to read it line by line and not the whole file.
    */
-  private BufferedReader currentOpenFile=null;
+  private transient BufferedReader currentOpenFile=null;
   
   /**
    * Display the progress, while reading the file.
@@ -288,6 +296,26 @@ public class CSVReader implements Serializable, Cloneable {
   }
   
   /**
+   * Set the file no open with this reader.
+   * Use this method with caution - it does not reset any settings. For instance,
+   * if on the last file a separator has been infered automatically. It will NOT 
+   * be infered again. Use a new instance of this class to infere all values
+   * automatically again.
+   * @param filename
+   */
+  public void setFilename(String filename) {
+    this.filename = filename;
+    isInitialized=false;
+  }
+  
+  /**
+   * @return the filename currently opened with this CSVReader instance.
+   */
+  public String getFilename() {
+    return this.filename;
+  }
+  
+  /**
    * Sets the skipLines variable (see {@link #setSkipLines(int)})
    * automatically to start reading the file in the line, below the
    * line that equals s. Overrides already set vales from setSkipLines().
@@ -393,28 +421,46 @@ public class CSVReader implements Serializable, Cloneable {
   }
   
   /**
-   * Remove columns (more specific: set them to null. This does not shift indices).
-   * This will free memory by removing unused data.
+   * If data has already been read - remove the given column
+   * (more specific: set it to null. This does not shift indices).
+   * If data has not been read, this will permanently set the column to
+   * null, directly after reading it (getNextLine(int column) will always
+   * be null).
+   *  
+   * The intention is freeing memory by removing unused data.
    * @param column numbers.
    */
   public void setNull(int[] columns) {
-    if (data==null) return;
+    if (data==null) {
+      for (int i=0; i<columns.length; i++)
+        setNull(columns[i]);
+    } else {
     for (int i=0; i<data.length; i++)
       if (data[i]!=null)
         for (int j=0; j<columns.length; j++)
           data[i][columns[j]] = null;
+    }
   }
   
   /**
-   * Remove the given column (more specific: set it to null. This does not shift indices).
-   * This will free memory by removing unused data.
+   * If data has already been read - remove the given column
+   * (more specific: set it to null. This does not shift indices).
+   * If data has not been read, this will permanently set the column to
+   * null, directly after reading it (getNextLine(int column) will always
+   * be null).
+   *  
+   * The intention is freeing memory by removing unused data.
    * @param column numbers.
    */
   public void setNull(int column) {
-    if (data==null) return;
-    for (int i=0; i<data.length; i++)
-      if (data[i]!=null)
-        data[i][column] = null;
+    if (data==null) {
+      if (!setToNull.contains(column))
+        setToNull.add(column);
+    } else {
+      for (int i=0; i<data.length; i++)
+        if (data[i]!=null)
+          data[i][column] = null;
+    }
   }
   
   
@@ -426,7 +472,7 @@ public class CSVReader implements Serializable, Cloneable {
    */
   public void setProgressBar(AbstractProgressBar progress) {
     progressBar = progress;
-    if (this.progress!=null && progressBar!=null) {
+    if (this.progress!=null) {
       this.progress.setProgressBar(progressBar);
     }
   }
@@ -913,6 +959,10 @@ public class CSVReader implements Serializable, Cloneable {
     
     // Post Process (trim and remove string indicators).
     for (int i=0; i<data.length; i++) {
+      if (setToNull!=null && setToNull.contains(i)) {
+        data[i]=null;
+        continue;
+      }
       data[i] = data[i].trim();
       if (removeStringIndiciatorsAtCellStartEnd && ((data[i].startsWith("\"") && data[i].endsWith("\"")) ||
           (data[i].startsWith("'") && data[i].endsWith("'")))) {
@@ -1101,13 +1151,20 @@ public class CSVReader implements Serializable, Cloneable {
   
   /**
    * Skips null or empty cells!
-   * @param s
-   * @return
+   * @param s - String[] of a column.
+   * @return if the column contains binary data
    */
   @SuppressWarnings("unused")
   private static boolean containsBinaryData(String[] s) {
     return Boolean.parseBoolean(containsBinaryData(s, new String(), new String())[0]);
   }
+  /**
+   * Checks if a column contains binary data (enum).
+   * @param s - String[] of a column.
+   * @param one - binary enum 1 (will be filled, should initially be null).
+   * @param two - binary enum 2 (will be filled, should initially be null).
+   * @return String[]{true/false, one, two};
+   */
   private static String[] containsBinaryData(String[] s, String one, String two) {
     one=null; two=null;
     for (int i=0; i<s.length; i++) {
