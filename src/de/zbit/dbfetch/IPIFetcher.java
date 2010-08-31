@@ -2,6 +2,8 @@ package de.zbit.dbfetch;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Level;
 
@@ -96,10 +98,20 @@ public class IPIFetcher extends DBFetcher {
     return ret;
   }
   
+  
   public static void main(String[] args) {
     LogUtil.initializeLogging(Level.ALL);
     
     IPIFetcher ipifetch = new IPIFetcher();
+    
+    // TODO: IPI seems to be case sensitive
+    /*String[] ids = {"IPI00003348","IPI00003865","IPI00021435","IPI00026833","IPI00105598","IPI00114375",
+              "IPI00116074","IPI00116283.1","IPI00117264","IPI00122565","IPI00126072","IPI00128023",
+              "IPI00131695","IPI00132042","IPI00133903","IPI00221402","IPI00223875","IPI00331436",
+              "IPI00381412","IPI00407692","IPI00420349","IPI00420385","IPI00454142","IPI00462072",
+              "IPI00467833"};*/
+
+    
     
     /*
     String[] ids = new String[] { "IPI00910870.1", "IPI00182126.3",
@@ -110,17 +122,22 @@ public class IPIFetcher extends DBFetcher {
         
     //String[] ids = new String[]{"ENSP00000383556", "LGALS1"};
     
-    /*
+    String[] ids = new String[]{"IPI00114375", "IPI00420349"};
+    
     String[] results = ipifetch.getInformations(ids);
     for( int i = 0; i < ids.length; i++) {
       System.out.println("=== ID: " + ids[i] + " ===");
       System.out.println(results[i]);
       System.out.println();
-    }*/
+    }
     
     // ENSP doesn't seem to work
     // String id = "ENSP00000383556";
-    String id = "ENSP00000332449";
-    System.out.println(ipifetch.getInformation(id));
+    //String id = "ENSP00000332449";
+    //System.out.println(ipifetch.getInformation(id));
+    
+    //String id = "IPI00420349";
+    //System.out.println(ipifetch.getInformation(id));
   }
+
 }
