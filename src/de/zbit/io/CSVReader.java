@@ -909,7 +909,7 @@ public class CSVReader implements Serializable, Cloneable {
    * @param filename
    * @throws IOException 
    */
-  public void read() throws IOException {
+  public String[][] read() throws IOException {
     
     // Initializes and opens the file
     open();
@@ -924,6 +924,7 @@ public class CSVReader implements Serializable, Cloneable {
     while ((line = getNextLine())!=null) {
       data[++nline] = line;
     }
+    return data;
   }
   
   /**
@@ -940,7 +941,7 @@ public class CSVReader implements Serializable, Cloneable {
    * @param filename
    * @throws IOException 
    */
-  public void readUsingArrayList() throws IOException {
+  public String[][] readUsingArrayList() throws IOException {
     
     // Initializes and opens the file
     open();
@@ -951,8 +952,8 @@ public class CSVReader implements Serializable, Cloneable {
     while ((line = getNextLine())!=null) {
       arr.add(line);
     }
-    
     data = arr.toArray(new String[0][0]);
+    return data;
   }
   
   /**
