@@ -22,7 +22,7 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.gui.GUITools;
-import de.zbit.io.SBMLFileFilter;
+import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.io.FileFilterKGML;
 import de.zbit.kegg.io.KEGG2jSBML;
@@ -104,7 +104,7 @@ public class ConverterUI extends JDialog implements ActionListener {
 	 * @param args
 	 *            accepted arguments are --input=<base directory to open files>
 	 *            and --output=<base directory to save files>
-	 * @throws SBMLException 
+	 * @throws SBMLException
 	 */
 	public static void main(String[] args) throws SBMLException {
 		if (args.length > 0) {
@@ -143,7 +143,8 @@ public class ConverterUI extends JDialog implements ActionListener {
 
 	/**
 	 * Shows a small GUI.
-	 * @throws SBMLException 
+	 * 
+	 * @throws SBMLException
 	 */
 	public ConverterUI() throws SBMLException {
 		this(System.getProperty("user.dir"), System.getProperty("user.dir"));
@@ -153,7 +154,7 @@ public class ConverterUI extends JDialog implements ActionListener {
 	 * 
 	 * @param baseDir
 	 * @param saveDir
-	 * @throws SBMLException 
+	 * @throws SBMLException
 	 */
 	public ConverterUI(String baseDir, String saveDir) throws SBMLException {
 		super();
@@ -231,9 +232,9 @@ public class ConverterUI extends JDialog implements ActionListener {
 	 */
 	private void saveFile() {
 		if (isVisible() && (doc != null)) {
-			JFileChooser chooser = GUITools
-					.createJFileChooser(baseSaveDir, false, false,
-							JFileChooser.FILES_ONLY, new SBMLFileFilter());
+			JFileChooser chooser = GUITools.createJFileChooser(baseSaveDir,
+					false, false, JFileChooser.FILES_ONLY,
+					SBFileFilter.SBML_FILE_FILTER);
 			if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 				File f = chooser.getSelectedFile();
 				if (!f.exists() || GUITools.overwriteExistingFile(this, f)) {
@@ -253,7 +254,8 @@ public class ConverterUI extends JDialog implements ActionListener {
 
 	/**
 	 * Displays an overview of the result of a conversion.
-	 * @throws SBMLException 
+	 * 
+	 * @throws SBMLException
 	 */
 	private void showGUI(SBMLDocument doc) throws SBMLException {
 		getContentPane().removeAll();

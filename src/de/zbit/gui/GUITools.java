@@ -10,17 +10,25 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.io.File;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JToolBar;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -37,7 +45,7 @@ public class GUITools {
 	 * and .jpg files)
 	 */
 	private static String imagePath = null;
-
+	
 	/**
 	 * The resource bundle for the default locale
 	 */
@@ -76,7 +84,7 @@ public class GUITools {
 			button.setToolTipText(toHTML(toolTip, 40));
 		return button;
 	}
-	
+
 	/**
 	 * 
 	 * @param text
@@ -94,6 +102,26 @@ public class GUITools {
 		return button;
 	}
 
+	/**
+	 * Creates and returns a JCheckBox with all the given properties.
+	 * 
+	 * @param label
+	 * @param selected
+	 * @param name
+	 *            The name for the component to be identifiable by the
+	 *            ItemListener
+	 * @param listener
+	 * @param toolTip
+	 * @return
+	 */
+	public static JCheckBox createJCheckBox(String label, boolean selected,
+			String name, ItemListener listener, String toolTip) {
+		JCheckBox chkbx = new JCheckBox(label, selected);
+		chkbx.setName(name);
+		chkbx.addItemListener(listener);
+		chkbx.setToolTipText(toHTML(toolTip, 40));
+		return chkbx;
+	}
 
 	/**
 	 * 
@@ -260,6 +288,101 @@ public class GUITools {
 			return fc.getSelectedFile();
 		}
 		return null;
+	}
+
+	/**
+	 * 
+	 * @param c
+	 * @param enabled
+	 */
+	public static void setAllEnabled(Container c, boolean enabled) {
+		Component children[] = c.getComponents();
+		for (int i = 0; i < children.length; i++) {
+			if (children[i] instanceof Container)
+				setAllEnabled((Container) children[i], enabled);
+			children[i].setEnabled(enabled);
+		}
+	}
+
+	/**
+	 * Enables or disables actions that can be performed by SBMLsqueezer, i.e.,
+	 * all menu items and buttons that are associated with the given actions are
+	 * enabled or disabled.
+	 * 
+	 * @param state
+	 *            if true buttons, items etc. are enabled, otherwise disabled.
+	 * @param menuBar
+	 * @param toolbar
+	 * @param commands
+	 */
+	public static void setEnabled(boolean state, JMenuBar menuBar,
+			JToolBar toolbar, Object... commands) {
+		int i, j;
+		Set<String> setOfCommands = new HashSet<String>();
+		for (Object command : commands)
+			setOfCommands.add(command.toString());
+		if (menuBar != null)
+			for (i = 0; i < menuBar.getMenuCount(); i++) {
+				JMenu menu = menuBar.getMenu(i);
+				for (j = 0; j < menu.getItemCount(); j++) {
+					JMenuItem item = menu.getItem(j);
+					if (item instanceof JMenu) {
+						JMenu m = (JMenu) item;
+						boolean containsCommand = false;
+						for (int k = 0; k < m.getItemCount(); k++) {
+							JMenuItem it = m.getItem(k);
+							if (it != null
+									&& it.getActionCommand() != null
+									&& setOfCommands.contains(it
+											.getActionCommand())) {
+								it.setEnabled(state);
+								containsCommand = true;
+							}
+						}
+						if (containsCommand)
+							m.setEnabled(state);
+					}
+					if (item != null && item.getActionCommand() != null
+							&& setOfCommands.contains(item.getActionCommand()))
+						item.setEnabled(state);
+				}
+			}
+		if (toolbar != null)
+			for (i = 0; i < toolbar.getComponentCount(); i++) {
+				Object o = toolbar.getComponent(i);
+				if (o instanceof JButton) {
+					JButton b = (JButton) o;
+					if (setOfCommands.contains(b.getActionCommand())) {
+						b.setEnabled(state);
+						// if (b.getIcon() != null
+						// && b.getIcon() instanceof CloseIcon)
+						// ((CloseIcon) b.getIcon())
+						// .setColor(state ? Color.BLACK : Color.GRAY);
+					}
+				}
+			}
+	}
+
+	/**
+	 * 
+	 * @param state
+	 * @param toolbar
+	 * @param commands
+	 */
+	public static void setEnabled(boolean state, JToolBar toolbar,
+			Object... commands) {
+		setEnabled(state, null, toolbar, commands);
+	}
+
+	/**
+	 * Displayes the error message on a {@link JOptionPane}.
+	 * 
+	 * @param exc
+	 */
+	public static void showErrorMessage(Component parent, Throwable exc) {
+		exc.printStackTrace();
+		JOptionPane.showMessageDialog(parent, exc.getMessage(), exc.getClass()
+				.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 	}
 
 	/**
