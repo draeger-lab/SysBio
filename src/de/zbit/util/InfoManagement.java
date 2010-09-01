@@ -274,8 +274,6 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   @SuppressWarnings("unchecked")
   public synchronized INFOtype[] getInformations(IDtype[] ids) {
-    // WARNING: NOT TESTED (but I'm pretty sure it works...).
-    
     ArrayList<IDtype> filteredIDs = new ArrayList<IDtype>();
     boolean touched = false; // if true, ids!=filteredIDs
     for (IDtype id: ids) {
@@ -437,11 +435,28 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   protected abstract void cleanupUnserializableObject();
   
+  
+  /**
+   * This overrides the Method from java.io.Serializable. It calls the super method
+   * and automatically calls cleanupUnserializableObject() each time the object is saved
+   * through the serializable API, before the actual super method is called.
+   * @param out
+   * @throws IOException
+   */
   private void writeObject(ObjectOutputStream out) throws IOException {
     cleanupUnserializableObject();
     
     out.defaultWriteObject();
   }
+  
+  /**
+   * This overrides the Method from java.io.Serializable. It calls the super method
+   * and automatically calls restoreUnserializableObject() each time the object is loaded
+   * through the serializable API.
+   * @param in
+   * @throws IOException
+   * @throws ClassNotFoundException
+   */
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     in.defaultReadObject();
     

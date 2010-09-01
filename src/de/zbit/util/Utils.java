@@ -526,6 +526,30 @@ public class Utils {
   }
   
   /**
+   * Returns the memory, that is currently allocated by the JVM in bytes.
+   * Divide it by /1024.0/1024.0 the get the amount in MB.
+   * @return
+   */
+  public double getMemoryUsed() {
+    /* Auf 2 Stellen hinter komma in MB:
+     * double memory_used = Math.round(((Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024.0/1024.0*100.0))/100.0;
+     */
+    return (((Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()) ));
+  }
+  
+  /**
+   * Returns the maxmimal available memory (set by Xmx, or long.maxValue if no limit is given) to the JVM.
+   * Divide it by /1024.0/1024.0 the get the amount in MB.
+   * @return
+   */
+  public double getMemoryMaximum() {
+    /* Auf 2 Stellen hinter komma in MB:
+     * double memory_max = Math.round((Runtime.getRuntime().maxMemory()/1024.0/1024.0*100.0))/100.0;
+     */
+    return ((Runtime.getRuntime().maxMemory() ));
+  }
+  
+  /**
    * 
    * @param inn
    * @return

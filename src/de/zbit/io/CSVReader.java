@@ -238,6 +238,14 @@ public class CSVReader implements Serializable, Cloneable {
   }
   
   public boolean getContainsHeaders() {
+    if (!isInitialized && autoDetectContainsHeaders) {
+      try {
+        initialize();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }  
+    
     return this.containsHeaders;
   }
   
@@ -258,6 +266,10 @@ public class CSVReader implements Serializable, Cloneable {
    * @param b
    */
   public void setAutoDetectContentStart(boolean b) {
+    if (b!=autoDetectContentStart) {
+      isInitialized=false;
+      firstConsistentLine=-1;
+    }
     this.autoDetectContentStart = b;
   }
   
@@ -269,6 +281,14 @@ public class CSVReader implements Serializable, Cloneable {
    * to set this value directly.
    */
   public int getContentStartLine() {
+    if (!isInitialized && firstConsistentLine<0) {
+      try {
+        initialize();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
     return firstConsistentLine;
   }
   
@@ -283,15 +303,24 @@ public class CSVReader implements Serializable, Cloneable {
    * Default: false
    */
   public void setTrimLinesAfterReading(boolean trimLinesAfterReading) {
+    if (trimLinesAfterReading!= this.trimLinesAfterReading)
+      isInitialized=false;
     this.trimLinesAfterReading = trimLinesAfterReading;
   }
   /**
    * If greater than 0 skips this number of lines directly after
    * opening the file for all operations.
    * 
+   * This does NOT disalbe autoDetectContentStart. That means, that the
+   * actual table may start SOMEWHERE below this number of lines but not
+   * before that much lines.
+   * 
    * Default: 0.
    */
   public void setSkipLines(int skipLines) {
+    if (skipLines>firstConsistentLine ||
+        !autoDetectContentStart && skipLines!=firstConsistentLine)
+      isInitialized=false;
     this.skipLines = skipLines;
   }
   
@@ -350,6 +379,14 @@ public class CSVReader implements Serializable, Cloneable {
    * autoDetectTreatMultipleConsecutiveSeparatorsAsOne is set.
    */
   public boolean getTreatMultipleConsecutiveSeparatorsAsOne() {
+    if (!isInitialized && autoDetectTreatMultipleConsecutiveSeparatorsAsOne) {
+      try {
+        initialize();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
     return treatMultipleConsecutiveSeparatorsAsOne;
   }
   /**
@@ -376,11 +413,14 @@ public class CSVReader implements Serializable, Cloneable {
    * @param autoDetectTreatMultipleConsecutiveSeparatorsAsOne
    */
   public void setAutoDetectTreatMultipleConsecutiveSeparatorsAsOne(boolean autoDetectTreatMultipleConsecutiveSeparatorsAsOne) {
+    if (autoDetectTreatMultipleConsecutiveSeparatorsAsOne!=
+      this.autoDetectTreatMultipleConsecutiveSeparatorsAsOne) isInitialized=false;
+    
     this.autoDetectTreatMultipleConsecutiveSeparatorsAsOne = autoDetectTreatMultipleConsecutiveSeparatorsAsOne;
   }
   /**
    * Set wether you want to remove the char " or ' when it occurs at the start and end of a cell.
-   * @param b
+   * @param b - if false will return e.g. ["hallo a"]; if true e.g.  [hallo a]. Default: true.
    */
   public void setRemoveStringIndiciatorsAtCellStartEnd(boolean b) {
     removeStringIndiciatorsAtCellStartEnd = b;
@@ -404,6 +444,14 @@ public class CSVReader implements Serializable, Cloneable {
    * @return
    */
   public char getSeparatorChar() {
+    if (!isInitialized && separatorChar=='\u0000') {
+      try {
+        initialize();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
     return separatorChar;
   }
   
@@ -416,7 +464,7 @@ public class CSVReader implements Serializable, Cloneable {
    * @return 
    */
   public void setUseOpenFileMethod(boolean b) {
-    isInitialized=false;
+    if (useOpenFileMethod!= b) isInitialized=false;
     this.useOpenFileMethod=b;
   }
   
@@ -514,7 +562,8 @@ public class CSVReader implements Serializable, Cloneable {
    * @return
    */
   public String[] getHeader(){
-    if (containsHeaders && headers==null) {
+    if (containsHeaders && headers==null ||
+        !isInitialized) {
       try {
         initialize();
       } catch (IOException e) {e.printStackTrace();}
@@ -554,6 +603,14 @@ public class CSVReader implements Serializable, Cloneable {
    * @return integer, column number
    */
   public int getColumnContaining(String s) {
+    if (!isInitialized) {
+      try {
+        initialize();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
     if (headers==null) return -1;
     for (int i=0; i<headers.length;i++) {
       String c = new String(headers[i]).toLowerCase();
@@ -572,6 +629,14 @@ public class CSVReader implements Serializable, Cloneable {
    * @return integer, column number
    */
   public int getColumn(String s) {
+    if (!isInitialized) {
+      try {
+        initialize();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
     if (headers==null) return -1;
     for (int i=0; i<headers.length;i++) {
       if (headers[i].equalsIgnoreCase(s)) return i;
@@ -1245,7 +1310,7 @@ public class CSVReader implements Serializable, Cloneable {
    * @return
    */
   public int getNumberOfDataLines() {
-    if (numDataLines<0) {
+    if (numDataLines<0 || !isInitialized) {
       // Only the case, if open has been called or neither open nor read.
       try {
         countNumberOfLines();
