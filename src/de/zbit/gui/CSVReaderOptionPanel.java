@@ -34,6 +34,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -65,7 +66,7 @@ public class CSVReaderOptionPanel extends JPanel {
   private final CSVReader original;
   private final CSVReader r;
   private int numDataLinesForPreview=5;
-  private boolean okPressed = false;
+  private int buttonPressed=-1; // Tracks if ok or cancel has been pressed
   private boolean showButtons = true;
   
   private JComponent currentOptions;
@@ -201,10 +202,30 @@ public class CSVReaderOptionPanel extends JPanel {
    * Else: the original CSV Reader.
    */
   public CSVReader getApprovedCSVReader() {
-    if (okPressed) {
+    if (isOkPressed()) {
       return getCSVReader();
-    } else
+    } else {
       return original;
+    }
+  }
+  
+  /**
+   * Has the OK-button been pressed or not. If false,
+   * either cancel has been pressed or the dialog has
+   * been closed.
+   * @return 
+   */
+  public boolean isOkPressed() {
+    return (buttonPressed == JOptionPane.OK_OPTION);
+  }
+  
+  /**
+   * @return the button pressed on this dialog as given by 
+   * JOptionPane. -1 if it has just been closed,
+   * JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION else.
+   */
+  public int getButtonPressed() {
+    return buttonPressed;
   }
   
   /**
@@ -280,13 +301,13 @@ public class CSVReaderOptionPanel extends JPanel {
     // Add listeners
     ok.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {
-        okPressed = true;
+        buttonPressed = JOptionPane.OK_OPTION;
         setVisible(false);
       }      
     });
     cancel.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {
-        okPressed = false;
+        buttonPressed = JOptionPane.CANCEL_OPTION;
         setVisible(false);
       }      
     });
@@ -498,6 +519,7 @@ public class CSVReaderOptionPanel extends JPanel {
   
   /**
    * Build a JTextfield that accepts only integer values.
+   * Should be PUBLIC because the method is also used by other classes.
    * @param defaultValue
    * @return
    */
@@ -506,6 +528,7 @@ public class CSVReaderOptionPanel extends JPanel {
   }
   /**
    * Build a JTextfield that accepts only integer values.
+   * Should be PUBLIC because the method is also used by other classes.
    * @param defaultValue
    * @param ac - actionListener that will get an action fired each time
    * a valid key has been released. The current textfield content is passed
@@ -751,11 +774,11 @@ public class CSVReaderOptionPanel extends JPanel {
   }
   
   
-  public static final Insets insets = new Insets(0, 0, 0, 0);
+  private static final Insets insets = new Insets(0, 0, 0, 0);
   /**
    * Helper Method for GridBagConstrains.
    */
-  public static void addComponent(Container container, Component component, int gridx, int gridy,
+  private static void addComponent(Container container, Component component, int gridx, int gridy,
       int gridwidth, int gridheight, int anchor, int fill) {
     GridBagConstraints gbc = new GridBagConstraints(gridx, gridy, gridwidth, gridheight, 1.0, 1.0,
         anchor, fill, insets, 0, 0);
@@ -768,7 +791,7 @@ public class CSVReaderOptionPanel extends JPanel {
    * @param parent - the parent to which this dialog is model. Either a frame or a dialog!
    * @param inFile - file to build a CSVReader around ( new CSVReader(inFile) )
    * @param title - title for this dialog
-   * @return original (cancel button pressed) or modified (ok) reader.
+   * @return default (cancel button pressed) or modified (ok) reader.
    * @throws Exception
    */
   public static CSVReader showDialog(java.awt.Window parent, String inFile, String title) throws Exception {
@@ -779,7 +802,7 @@ public class CSVReaderOptionPanel extends JPanel {
    * @param parent - the parent to which this dialog is model. Either a frame or a dialog!
    * @param r - the current CSV Reader
    * @param title - title for this dialog
-   * @return original (cancel button pressed) or modified (ok) reader.
+   * @return copy of original (cancel button pressed) or modified (ok) reader.
    * @throws Exception
    */
   public static CSVReader showDialog(java.awt.Window parent, CSVReader r, String title) throws Exception {
@@ -827,6 +850,7 @@ public class CSVReaderOptionPanel extends JPanel {
     
     // Dispose and return reader.
     r = c.getApprovedCSVReader();
+    
     jd.dispose();
     return (r);
   }
