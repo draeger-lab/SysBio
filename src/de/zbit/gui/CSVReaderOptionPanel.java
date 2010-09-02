@@ -90,6 +90,11 @@ public class CSVReaderOptionPanel extends JPanel {
   private final static String FIELD_TREAT_MULTI_AS_ONE = "treatMultiAsOne";
   private final static String FIELD_TO_SKIP = "toSkip";
   
+  /**
+   * 
+   * @param r
+   * @throws IOException
+   */
   public CSVReaderOptionPanel(CSVReader r) throws IOException {
     super();
     this.r = r;
@@ -323,6 +328,7 @@ public class CSVReaderOptionPanel extends JPanel {
   
   /**
    * Initializes the CSV Reader
+   * @throws IOException
    */
   private void init() throws IOException {
     this.setPreferredSize(new java.awt.Dimension(650, 350));
@@ -793,9 +799,9 @@ public class CSVReaderOptionPanel extends JPanel {
    * @param inFile - file to build a CSVReader around ( new CSVReader(inFile) )
    * @param title - title for this dialog
    * @return default (cancel button pressed) or modified (ok) reader.
-   * @throws Exception
+   * @throws IOException
    */
-  public static CSVReader showDialog(Window parent, String inFile, String title) throws Exception {
+  public static CSVReader showDialog(Window parent, String inFile, String title) throws IOException {
     return showDialog(parent, new CSVReader(inFile), title);
   }
   
@@ -809,9 +815,9 @@ public class CSVReaderOptionPanel extends JPanel {
    * @param r - the current CSV Reader
    * @param title - title for this dialog
    * @return copy of original (cancel button pressed) or modified (ok) reader.
-   * @throws Exception
+   * @throws IOException
    */
-  public static CSVReader showDialog(Component parent, CSVReader r, String title) throws Exception {
+  public static CSVReader showDialog(Component parent, CSVReader r, String title) throws IOException {
 
     // Initialize the dialog
     final JDialog jd;
