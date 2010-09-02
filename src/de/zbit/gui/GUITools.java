@@ -41,27 +41,6 @@ import javax.swing.filechooser.FileFilter;
 public class GUITools {
 
 	/**
-	 * Path to the image resources in the resource bundle (in this case, .gif
-	 * and .jpg files)
-	 */
-	private static String imagePath = null;
-	
-	/**
-	 * The resource bundle for the default locale
-	 */
-	private static ResourceBundle resources = null;
-
-	/**
-	 * Loads locale-specific resources: strings, images, et cetera
-	 */
-	static {
-		Locale locale = Locale.getDefault();
-		resources = ResourceBundle.getBundle(
-				"samples.resources.bundles.MetalEditResources", locale);
-		imagePath = resources.getString("images.path");
-	}
-
-	/**
 	 * Creates a JButton with the given properties. The tool tip becomes an HTML
 	 * formatted string with a line break after 40 symbols.
 	 * 
@@ -166,30 +145,10 @@ public class GUITools {
 
 	/**
 	 * 
+	 * @param g
+	 * @param incrementBy
 	 * @return
 	 */
-	public static ImageIcon getIconOpen() {
-		return getImageIcon("imageOpen");
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public static ImageIcon getIconSave() {
-		return getImageIcon("imageSave");
-	}
-
-	/**
-	 * 
-	 * @param string
-	 * @return
-	 */
-	private static ImageIcon getImageIcon(String string) {
-		return new ImageIcon(GUITools.class.getResource(imagePath
-				+ resources.getString(string)));
-	}
-
 	public static Font incrementFontSize(Font g, int incrementBy) {
 		return g.deriveFont((float) (g.getSize() + incrementBy));
 	}
