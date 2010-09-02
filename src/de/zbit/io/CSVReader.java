@@ -961,6 +961,7 @@ public class CSVReader implements Serializable, Cloneable {
    * Enables to use the getNextLine() function.
    * Reads the preamble.
    * @param filename
+   * @throws IOException
    */
   public void open() throws IOException {
     
