@@ -406,10 +406,17 @@ public class CSVReaderColumnChooser extends JPanel {
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      
       CSVReaderColumnChooser c = new CSVReaderColumnChooser("files/sample.csv.txt");
       c.addColumnChooser(new String[]{"sequenceStart","sequenceEnd"}, true, true);
       c.addColumnChooser("sequenceName",1, false, true);
+      
+      c.addColumnChooser("SBMLFile", false, false);
+      c.addColumnChooser("SBMLFile2", true, true);
+      
       c.addColumnChooser("test",1, true, true);
+      
+      
       frame.getContentPane().add(c);
     } catch (Exception e) {
       e.printStackTrace();
