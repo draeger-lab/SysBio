@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -37,9 +38,24 @@ public class CSVReaderColumnChooser extends JPanel {
   private static final long serialVersionUID = -7944793539696555890L;
   
   private CSVReader r;
+  
+  /**
+   * This String array is used for the previews.
+   */
   private String[] firstLine=null;
   
   private int prefferedWidth=0;
+  /**
+   * If unsorted, the columns appear as they appear in the file. Else,
+   * they are sorted alphabetically.
+   */
+  private boolean sortHeaders=false;
+  
+  /**
+   * Every integer added here corresponds to one column number. If an
+   * integer is added, the column will be hidden in all ColumnChoosers.
+   */
+  private ArrayList<Integer> hideColumns = new ArrayList<Integer>();
   
   private JPanel optionalPanel;
   private JPanel requiredPanel;
@@ -169,6 +185,63 @@ public class CSVReaderColumnChooser extends JPanel {
   }
   
   /**
+   * Decide, wether you want the headers to appear sorted, or not.
+   * @param sort - True: headers appear sorted. False: headers appear
+   * in the same ordering as they appear in the file.
+   */
+  public void setSortHeaders(boolean sort) {
+    if (sortHeaders != sort) {
+      sortHeaders = sort;
+      
+      for (JColumnChooser jc: getColumnChoosers()) {
+        jc.setSortHeaders(sort);
+      }
+      // Repaint is done by column chooser itself.
+    }
+  }
+  
+  /**
+   * Set the visibility of certain columns. This will hide the
+   * header of the column with the given number, so the user can't
+   * choose that column.
+   * Try to set multiple columns at once, because calling this class
+   * will also lead to refreshing and repainting the column chooser.
+   * @param columnNumbers - from 0 to n. 
+   * @param visible - true or false. Default: true (visible).
+   */
+  public void setHeaderVisible(int columnNumber, boolean visible) {
+    setHeaderVisible(new int[]{columnNumber}, visible);
+  }
+  
+  /**
+   * Set the visibility of certain columns. This will hide the
+   * header of the column with the given number, so the user can't
+   * choose that column.
+   * Try to set multiple columns at once, because calling this class
+   * will also lead to refreshing and repainting the column chooser.
+   * @param columnNumbers - from 0 to n. 
+   * @param visible - true or false. Default: true (visible).
+   */
+  public void setHeaderVisible(int[] columnNumbers, boolean visible) {
+    
+    // Change local list (for further column choosers)
+    for (int i=0; i<columnNumbers.length; i++) {
+      int pos = hideColumns.indexOf(columnNumbers[i]);
+      if (pos>=0) {
+        if (visible) hideColumns.remove(pos);
+      } else {
+        if (!visible) hideColumns.add(columnNumbers[i]);
+      }
+    }
+    
+    // Propagate changes to current column choosers
+    for (JColumnChooser jc: getColumnChoosers()) {
+      jc.setHeaderVisible(columnNumbers, visible);
+    }
+    // Repaint is done by column chooser itself.
+  }
+  
+  /**
    * Returns the CSVReader associated with this instance.
    * @return
    */
@@ -205,6 +278,18 @@ public class CSVReaderColumnChooser extends JPanel {
   }
   
   /**
+   * Returns the selected item (Usually a header string)
+   * for the given title.
+   * 
+   * @param title - Must be the same as given in addColumnChooser().
+   * @return selected item (header string).
+   * @throws Exception - if the title does not exist.
+   */
+  public Object getSelectedItem(String title) throws Exception {
+    return  getColumnChooser(title).getSelectedItem();
+  }
+  
+  /**
    * Returns the JColumnChooser for the given title.
    * @param title - Must be the same as given in addColumnChooser().
    * @return JColumnChooser for the given title.
@@ -227,6 +312,30 @@ public class CSVReaderColumnChooser extends JPanel {
     }
     
     throw new Exception("No column chooser named '" + title + "'.");
+  }
+  
+  /**
+   * Get all JColumnChoosers.
+   * @return ArrayList<JColumnChooser> containing all JColumnChoosers on this panel.
+   */
+  public Collection<JColumnChooser> getColumnChoosers() {
+    ArrayList<JColumnChooser> ret = new ArrayList<JColumnChooser>();
+    
+    // Get all column choosers from both panels.
+    for (int j=0; j<2; j++) {
+      JPanel p;
+      if (j==0) p=requiredPanel; else p=optionalPanel;
+      
+      if (p!=null) {
+        for (int i=0; i<p.getComponentCount(); i++) {
+          if (p.getComponent(i) == null) continue;
+          if (p.getComponent(i) instanceof JColumnChooser) {
+            ret.add ((JColumnChooser)p.getComponent(i));
+          }
+        }
+      }
+    }
+    return ret;
   }
   
   /**
@@ -334,9 +443,31 @@ public class CSVReaderColumnChooser extends JPanel {
   public void addColumnChooser(JColumnChooser jc) {
     if (jc==null) return;
     if (requiredPanel==null || optionalPanel==null) initGUI();
+    configureColumnChooser(jc);
+    
+    // Add to panel
     JPanel target = jc.isRequired()?requiredPanel:optionalPanel;
     target.add(jc);
+    
     setPrefferedSizes(0);
+  }
+  
+  /**
+   * Applys the current configuration (hidden headers, headers sorted)
+   * to the given JColumnChooser.
+   * @param jc
+   */
+  private void configureColumnChooser(JColumnChooser jc) {
+    
+    // Eventually hide columns
+    int[] toHide = new int[hideColumns.size()];
+    for (int i=0; i<hideColumns.size(); i++)
+      toHide[i] = hideColumns.get(i);
+    
+    jc.setHeaderVisible(toHide, false);
+    
+    // Eventually sort columns
+    jc.setSortHeaders(sortHeaders);
   }
   
   /**
@@ -349,13 +480,18 @@ public class CSVReaderColumnChooser extends JPanel {
   public void addColumnChooser(JColumnChooser jc, int index) {
     if (jc==null) return;
     if (requiredPanel==null || optionalPanel==null) initGUI();
+    configureColumnChooser(jc);
+    
+    // Add to panel
     JPanel target = jc.isRequired()?requiredPanel:optionalPanel;
     target.add(jc, index);
+    
     setPrefferedSizes(0);
   }
   
   /**
    * Creates a new Column Chooser WITHOUT adding it to any panel.
+   * Uses all settings from this class.
    * @param title of the JColumnChooser and caption of the describing label.
    * @param required - if it is required to select a value.
    * @param showExamples - shows a preview, based on the first data row in the CSV file.
@@ -366,6 +502,7 @@ public class CSVReaderColumnChooser extends JPanel {
     jc.setName(title);
     jc.setHeaders(r.getHeader(), r.getNumberOfColumns());
     jc.setUsePreview(showExamples);
+    configureColumnChooser(jc);
     return jc;
   }
   
@@ -407,14 +544,22 @@ public class CSVReaderColumnChooser extends JPanel {
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       
-      CSVReaderColumnChooser c = new CSVReaderColumnChooser("files/sample.csv.txt");
+      // Create the column chooser, based on a CSV file.
+      CSVReaderColumnChooser c = new CSVReaderColumnChooser("files/sample2.csv.txt");
+      
+      
+      // Add multiple columns to choose. Required=true, showPreview=true.
       c.addColumnChooser(new String[]{"sequenceStart","sequenceEnd"}, true, true);
-      c.addColumnChooser("sequenceName",1, false, true);
       
+      // Add a single column with a default selection. Required=false.
+      c.addColumnChooser("sequenceName",3, false, true);
+      
+      // Add a single column, that is not required and show no preview.
       c.addColumnChooser("SBMLFile", false, false);
-      c.addColumnChooser("SBMLFile2", true, true);
       
-      c.addColumnChooser("test",1, true, true);
+      // Try a few options
+      c.setSortHeaders(true);
+      c.setHeaderVisible(new int[]{5,6,7}, false);
       
       
       frame.getContentPane().add(c);

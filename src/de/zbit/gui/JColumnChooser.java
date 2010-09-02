@@ -14,6 +14,9 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -60,7 +63,17 @@ public class JColumnChooser extends JPanel {
   private String[] previews=null;
   private JLabel preview;
   
+  /**
+   * Every integer added here corresponds to one column number. If an
+   * integer is added, the column will be hidden in all ColumnChoosers.
+   */
+  private ArrayList<Integer> hideColumns = new ArrayList<Integer>();
   
+  /**
+   * If unsorted, the columns appear as they appear in the file. Else,
+   * they are sorted alphabetically.
+   */
+  private boolean sortHeaders=false;
   
   private static String noOptionChoosen="Not available";
   private static String exampleError="Invalid column";
@@ -211,6 +224,72 @@ public class JColumnChooser extends JPanel {
     }
   }
   
+  /**
+   * Set the visibility of a column. This will hide the
+   * header of the column with the given number, so the user can't
+   * choose that column.
+   * Try to set multiple columns at once, because calling this class
+   * will also lead to refreshing and repainting the column chooser.
+   * @param columnNumber - from 0 to n. 
+   * @param visible - true or false. Default: true (visible).
+   */
+  public void setHeaderVisible(int columnNumber, boolean visible) {
+    setHeaderVisible(new int[]{columnNumber}, visible);
+  }
+  
+  /**
+   * Set the visibility of certain columns. This will hide the
+   * header of the column with the given number, so the user can't
+   * choose that column.
+   * Try to set multiple columns at once, because calling this class
+   * will also lead to refreshing and repainting the column chooser.
+   * @param columnNumbers - from 0 to n. 
+   * @param visible - true or false. Default: true (visible).
+   */
+  public void setHeaderVisible(int[] columnNumbers, boolean visible) {
+    
+    // Internally, there is just one array with columns to hide.
+    // The array is changed here to reflect the desired visibilities.
+    boolean performedChanges=false;
+    for (int i=0; i<columnNumbers.length; i++) {
+      int pos = hideColumns.indexOf(columnNumbers[i]);
+      if (pos>=0) {
+        if (visible) {
+          hideColumns.remove(pos);
+          performedChanges=true;
+        }
+      } else {
+        if (!visible) {
+          hideColumns.add(columnNumbers[i]);
+          performedChanges=true;
+        }
+      }
+    }
+    
+    // If changed, change active ColumnChoosers
+    if (performedChanges) {
+      refreshAndRepaint();
+    }
+  }
+  
+  /**
+   * Decide, wether you want the headers to appear sorted, or not.
+   * @param sort - True: headers appear sorted. False: headers appear
+   * in the same ordering as they appear in the file.
+   */
+  public void setSortHeaders(boolean sort) {
+    if (sort!=this.sortHeaders) {
+      // Keep the selection
+      Object item = getSelectedItem();
+      
+      this.sortHeaders = sort;
+      refreshAndRepaint();
+      
+      // Restore selection.
+      setSelectedItem(item);
+    }
+  }
+  
   
   /**
    * Set the headers to display in the combo box.
@@ -221,6 +300,7 @@ public class JColumnChooser extends JPanel {
   public void setHeaders(int numberOfColumns) {
     setHeaders (null, numberOfColumns);
   }
+  
   /**
    * Set the headers to display in the combo box.
    * This function will fill empty fields in the combo box
@@ -262,24 +342,40 @@ public class JColumnChooser extends JPanel {
     
     // Remember required headers and build model
     headers = newHeader;
-    model = buildComboBoxModel(newHeader);
+    refreshAndRepaint();
+  }
+  
+  /**
+   * Builds the ComboBoxModel based on the current header,
+   * refreshs the selector with this model and validates/
+   * repaints the panel.
+   */
+  private void refreshAndRepaint() {
+    model = buildComboBoxModel(headers);
     
     refreshSelector();
     validateRepaint();
   }
   
   private ComboBoxModel buildComboBoxModel(String[] newHeader) {
+    
+    // Create a list, hiding all unwanted elements
+    Vector<String> headersToDisplay = new Vector<String>();
+    for (int i=0; i<newHeader.length; i++) {
+      if (hideColumns.contains(i)) continue;
+      headersToDisplay.add(newHeader[i]);
+    }
+    
+    // Sort eventually
+    if (sortHeaders) Collections.sort(headersToDisplay);
+    
     // If not required, add noOptionChoosen
     if (!required) {
-      String [] optional=null;
-      optional = new String[newHeader.length+1];
-      optional[0] = noOptionChoosen;
-      System.arraycopy(newHeader, 0, optional, 1, newHeader.length);
-      newHeader = optional;
+      headersToDisplay.add(0, noOptionChoosen);
     }
     
     // Build the model
-    return new DefaultComboBoxModel(newHeader);
+    return new DefaultComboBoxModel(headersToDisplay);
   }
   
   /**
@@ -300,10 +396,12 @@ public class JColumnChooser extends JPanel {
    * a NoOptionChoosen String at the start of the box.
    */
   public void setRequired(boolean required) {
-    this.required = required;
-    model = buildComboBoxModel(this.headers);
-    refreshSelector();
-    validateRepaint();
+    if (this.required != required) {
+      this.required = required;
+      model = buildComboBoxModel(this.headers);
+      refreshSelector();
+      validateRepaint();
+    }
   }
   
   /**
@@ -333,16 +431,29 @@ public class JColumnChooser extends JPanel {
    * Set the default value of the column chooser.
    * Does account for required or optional settings
    * (adds 1 for optional).
+   * Also automaticaly accounts for sorting.
    * 
    * @param i - index number
    */
   public void setDefaultValue(int i) {
-    if (!required) i+=1;
-    if (i<0) i=0;
-    if (model!=null && i>=model.getSize()) i = model.getSize()-1;
-    
-    if (model!=null && i<model.getSize()) {
-      model.setSelectedItem(model.getElementAt(i));
+    if (!sortHeaders) {
+      if (!required) i+=1;
+      if (i<0) i=0;
+      if (model!=null && i>=model.getSize()) i = model.getSize()-1;
+      
+      if (model!=null && i<model.getSize()) {
+        model.setSelectedItem(model.getElementAt(i));
+      }
+    } else {
+      // Search for position of the given item.
+      if (i<0 || i>=headers.length) return;
+      for (int j=0; j<model.getSize(); j++) {
+        if (model.getElementAt(j).equals(headers[i])) {
+          i=j;
+          System.out.println(i);
+          break;
+        }
+      }
     }
     setSelectedValue(i);
   }
@@ -424,14 +535,20 @@ public class JColumnChooser extends JPanel {
   }
   
   /**
-   * Returns the selected index. Accounts automatically for required or optional.
+   * Returns the selected index. Accounts automatically for sorting and
+   * required or optional.
+   * 
    * @return integer between -1 and headers.length.
    */
   public int getSelectedValue() {
     if (colChooser==null) return -1;
     if (colChooser instanceof JComboBox) {
-      if (required) return ((JComboBox)colChooser).getSelectedIndex();
-      else return ((JComboBox)colChooser).getSelectedIndex()-1;
+      if (!sortHeaders) {
+        if (required) return ((JComboBox)colChooser).getSelectedIndex();
+        else return ((JComboBox)colChooser).getSelectedIndex()-1;
+      } else {
+        return indexOf(headers, getSelectedItem().toString());
+      }
     } else {
       String s = ((JTextComponent)colChooser).getText().trim();
       
@@ -440,9 +557,23 @@ public class JColumnChooser extends JPanel {
     }
   }
   
+  
   /**
-   * Set the selected index to i. Does not account for required or
-   * optional (add 1 for optional). Use {@link #setDefaultValue(String)}
+   * Returns the selected item (Usually a header string).
+   * @return
+   */
+  public Object getSelectedItem() {
+    if (colChooser instanceof JComboBox) {
+      return ((JComboBox)colChooser).getSelectedItem();
+    } else {
+      String s = ((JTextComponent)colChooser).getText();
+      return s;
+    }
+  }
+  
+  /**
+   * Set the selected index to i. Does NOT account for required or
+   * optional (add 1 for optional) or sortation. Use {@link #setDefaultValue(String)}
    * or {@link #setDefaultValue(int))} to account for that.
    * @param i
    */
@@ -452,6 +583,25 @@ public class JColumnChooser extends JPanel {
         ((JComboBox)colChooser).setSelectedIndex(i);
     } else {
       ((JTextComponent)colChooser).setText(Integer.toString(i));
+    }
+  }
+  
+  /**
+   * Set the selected item to the given one.
+   * @param string
+   */
+  public void setSelectedItem(Object string) {
+    if (colChooser instanceof JComboBox) {
+      ((JComboBox)colChooser).setSelectedItem(string);
+    } else {
+      int pos = indexOf(headers, string.toString());
+      if (pos<0) {
+        if (CSVReader.isNumber(string.toString(), false)) {
+          ((JTextComponent)colChooser).setText(string.toString());
+        }
+      } else {
+        ((JTextComponent)colChooser).setText(Integer.toString(pos));
+      }
     }
   }
   
@@ -545,6 +695,20 @@ public class JColumnChooser extends JPanel {
     
     return ret;
   }
+  
+  /**
+   * Sequentially searches a string in an unsorted array.
+   * @param array
+   * @param toSearch
+   * @return index if found, -1 else.
+   */
+  private static int indexOf(String[] array, String toSearch) {
+    for (int i=0; i<array.length; i++) {
+      if (array[i].equals(toSearch)) return i;
+    }
+    return-1;
+  }
+  
   
   public static final Insets insets = new Insets(1,3,1,3);
   /**
