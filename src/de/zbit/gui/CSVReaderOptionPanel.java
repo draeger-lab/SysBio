@@ -15,6 +15,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -794,9 +795,14 @@ public class CSVReaderOptionPanel extends JPanel {
    * @return default (cancel button pressed) or modified (ok) reader.
    * @throws Exception
    */
-  public static CSVReader showDialog(java.awt.Window parent, String inFile, String title) throws Exception {
+  public static CSVReader showDialog(Window parent, String inFile, String title) throws Exception {
     return showDialog(parent, new CSVReader(inFile), title);
   }
+  
+  public static CSVReader showDialog(Container parent, String inFile, String title) throws Exception {
+	    return showDialog(parent, new CSVReader(inFile), title);
+  }
+  
   /**
    * Show a dialog to choose the CSVReader options.
    * @param parent - the parent to which this dialog is model. Either a frame or a dialog!
@@ -805,7 +811,7 @@ public class CSVReaderOptionPanel extends JPanel {
    * @return copy of original (cancel button pressed) or modified (ok) reader.
    * @throws Exception
    */
-  public static CSVReader showDialog(java.awt.Window parent, CSVReader r, String title) throws Exception {
+  public static CSVReader showDialog(Component parent, CSVReader r, String title) throws Exception {
 
     // Initialize the dialog
     final JDialog jd;
@@ -814,11 +820,15 @@ public class CSVReaderOptionPanel extends JPanel {
     } else if (parent instanceof Dialog) {
       jd = new JDialog((Dialog)parent, title, true);
     } else {
-      try {
-      jd = new JDialog((Frame)parent, title, true);
-      } catch (Exception e) {
-        throw new Exception ("Invalid parent.");
-      }
+    	jd = new JDialog();
+    	jd.setTitle(title);
+    	jd.setModal(true);
+    	// unnecessary
+//      try {
+//      jd = new JDialog((Frame)parent, title, true);
+//      } catch (Exception e) {
+//        throw new Exception ("Invalid parent.");
+//      }
     }
     
     // Initialize the panel
