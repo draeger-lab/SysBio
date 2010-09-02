@@ -10,6 +10,7 @@ import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -293,9 +294,9 @@ public class CSVReaderColumnChooser extends JPanel {
    * Returns the JColumnChooser for the given title.
    * @param title - Must be the same as given in addColumnChooser().
    * @return JColumnChooser for the given title.
-   * @throws Exception - if the title does not exist.
+   * @throws NoSuchElementException - if the title does not exist.
    */
-  public JColumnChooser getColumnChooser(String title) throws Exception {
+  public JColumnChooser getColumnChooser(String title) throws NoSuchElementException {
     for (int j=0; j<2; j++) {
       JPanel p;
       if (j==0) p=requiredPanel; else p=optionalPanel;
@@ -310,8 +311,7 @@ public class CSVReaderColumnChooser extends JPanel {
         }
       }
     }
-    
-    throw new Exception("No column chooser named '" + title + "'.");
+    throw new NoSuchElementException("No column chooser named '" + title + "'.");
   }
   
   /**
