@@ -153,6 +153,9 @@ public class CSVReaderColumnChooser extends JPanel {
    * of the larger one. Else: sets this width.
    */
   private void setPrefferedSizes(int width) {
+    if (optionalPanel!=null) optionalPanel.setVisible(optionalPanel.getComponentCount()>0);
+    if (requiredPanel!=null) requiredPanel.setVisible(requiredPanel.getComponentCount()>0);
+    
     // Give both panels the same width
     if (optionalPanel!=null && requiredPanel!=null && optionalPanel.isVisible() &&
         requiredPanel.isVisible()) {
@@ -272,9 +275,9 @@ public class CSVReaderColumnChooser extends JPanel {
    * 
    * @param title - Must be the same as given in addColumnChooser().
    * @return column index (or -1 if no column is choosen).
-   * @throws Exception - if the title does not exist.
+   * @throws NoSuchElementException - if the title does not exist.
    */
-  public int getSelectedValue(String title) throws Exception {
+  public int getSelectedValue(String title) throws NoSuchElementException {
     return  getColumnChooser(title).getSelectedValue();
   }
   
@@ -284,9 +287,9 @@ public class CSVReaderColumnChooser extends JPanel {
    * 
    * @param title - Must be the same as given in addColumnChooser().
    * @return selected item (header string).
-   * @throws Exception - if the title does not exist.
+   * @throws NoSuchElementException - if the title does not exist.
    */
-  public Object getSelectedItem(String title) throws Exception {
+  public Object getSelectedItem(String title) throws NoSuchElementException {
     return  getColumnChooser(title).getSelectedItem();
   }
   
