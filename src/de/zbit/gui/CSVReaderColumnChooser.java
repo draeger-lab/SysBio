@@ -4,16 +4,21 @@
  */
 package de.zbit.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -423,6 +428,20 @@ public class CSVReaderColumnChooser extends JPanel {
       addColumnChooser(s, required, showExamples);
     }
   }
+  
+  /**
+   * Add multiple column choosers.
+   * @param titles of the JColumnChooser and caption of the describing label.
+   * @param defaults - integer array of the same size as titles, containing default columns.
+   * @param required - if it is required to select a value.
+   * @param showExamples - shows a preview, based on the first data row in the CSV file.
+   */
+  public void addColumnChooser(String[] titles, int[] defaults, boolean required, boolean showExamples) {
+    for (int i=0; i<titles.length; i++) {
+      addColumnChooser(titles[i], defaults[i], required, showExamples);
+    }
+  }
+  
   /**
    * Add a single column chooser
    * @param title of the JColumnChooser and caption of the describing label.
@@ -536,8 +555,26 @@ public class CSVReaderColumnChooser extends JPanel {
     newOne.getParent().repaint();
   }
   
-  
-  
+  /**
+   * Convenient method to display a given ColumnChooser
+   * on a JOptionPane.
+   * @param c - CSVReaderColumnChooser to show.
+   * @return JOptionPane.OK_OPTION || JOptionPane.CANCEL_OPTION
+   */
+  public static int showAsDialog(CSVReaderColumnChooser c) {
+    JPanel panel = new JPanel(new BorderLayout());
+    panel.add(new JLabel(GUITools.toHTML(String.format("Please assign the following columns:"), 60)), BorderLayout.NORTH);
+    panel.add(c, BorderLayout.CENTER);
+    
+    if (c.getColumnChoosers().size() >0 )
+      return JOptionPane.showConfirmDialog(null, panel,
+          "Column assignment", JOptionPane.OK_CANCEL_OPTION,
+          JOptionPane.QUESTION_MESSAGE);
+    else
+      return JOptionPane.OK_OPTION;
+  }
+
+
   /**
    * Just for testing purposes.
    */
