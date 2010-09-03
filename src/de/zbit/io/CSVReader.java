@@ -458,6 +458,16 @@ public class CSVReader implements Serializable, Cloneable {
   }
   
   /**
+   * @return true - if the separator char should be detected automatically, but
+   * has not been detected yet.
+   * false - if either the user has set a custom separator char or the class has
+   * already auto-detected a separator char. 
+   */
+  public boolean isAutoDetectSeparatorChar() {
+    return (separatorChar=='\u0000');
+  }
+  
+  /**
    * Set if you want to use the openFile Method. True by default.
    * The OpenFile Method has many advantages. It automatically downloads http urls,
    * it can extract files from zips and the url might lay within the same jar or is
@@ -1457,6 +1467,7 @@ public class CSVReader implements Serializable, Cloneable {
         skip[pos] = !skip[pos];
         if (skip[pos]) activatedSkippers++; else activatedSkippers--;
         currentColumn+=c;
+        lastC=c;
         continue;
       }
       
