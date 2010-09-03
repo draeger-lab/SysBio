@@ -25,6 +25,7 @@ import java.util.Hashtable;
  *
  * @author Colin Mummery  e-mail: colin_mummery@yahoo.com Homepage:www.kagi.com/equitysoft -
  * Based on 'FlexLayout' in Java class libraries Vol 2 Chan/Lee Addison-Wesley 1998
+ * @author Clemens Wrzodek - Many bugfixes...
  */
 
 public class VerticalLayout implements LayoutManager{
@@ -112,7 +113,7 @@ public class VerticalLayout implements LayoutManager{
     }
     Insets insets=parent.getInsets();
     dim.width+=insets.left+insets.right;
-    dim.height+=insets.top+insets.bottom+vgap+vgap;
+    dim.height+=insets.top+insets.bottom+vgap*2;
     return dim;
   }
   //-----------------------------------------------------------------------------
@@ -138,13 +139,15 @@ public class VerticalLayout implements LayoutManager{
       //do layout
       for(int i=0;i<n;i++){
         Component c=parent.getComponent(i);
-        Dimension d=c.getPreferredSize();
-        int x=insets.left; int wid=d.width;
-        if(alignment==CENTER)x=(pd.width-d.width)/2;
-        else if(alignment==RIGHT)x=pd.width-d.width-insets.right;
-        else if(alignment==BOTH)wid=pd.width-insets.left-insets.right;
-        c.setBounds(x,y,wid,d.height);
-        y+=d.height+vgap;
+        if(c.isVisible()){
+          Dimension d=c.getPreferredSize();
+          int x=insets.left; int wid=d.width;
+          if(alignment==CENTER)x=(pd.width-d.width)/2;
+          else if(alignment==RIGHT)x=pd.width-d.width-insets.right;
+          else if(alignment==BOTH)wid=pd.width-insets.left-insets.right;
+          c.setBounds(x,y,wid,d.height);
+          y+=d.height+vgap;
+        }
       }
     }
   }

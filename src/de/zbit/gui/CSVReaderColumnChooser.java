@@ -105,7 +105,7 @@ public class CSVReaderColumnChooser extends JPanel {
         firstLine=r.getNextLine();
         r.close();
     }
-    if (firstLine==null) throw new IOException("Invalid CSV file.");
+    if (firstLine==null) throw new IOException("Invalid or empty CSV file.");
     
     // Init the panel
     // Don't set the preferred size. This breaks the layouts of implementing
