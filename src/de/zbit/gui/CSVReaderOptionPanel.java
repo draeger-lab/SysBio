@@ -874,9 +874,7 @@ public class CSVReaderOptionPanel extends JPanel {
     // Set size
     jd.setPreferredSize(c.getPreferredSize());
     jd.setSize(c.getPreferredSize());
-    if (parent!=null) {
-      jd.setLocationRelativeTo(parent);
-    }
+    jd.setLocationRelativeTo(parent);
     
     // Set visible and wait until invisible
     jd.setVisible(true);
