@@ -764,7 +764,7 @@ public class CSVReader implements Serializable, Cloneable {
     
     // Fill the headers variable
     if (this.containsHeaders && firstConsistentLineStringOfMax!=null) {
-      headers=getSplits(firstConsistentLineStringOfMax, separatorChar, this.treatMultipleConsecutiveSeparatorsAsOne, true);
+      headers=getSplits(firstConsistentLineStringOfMax);
       // Headers do often start with a comment symbol.
       if (headers!=null && headers.length>0 && headers[0].length()>0)
         if (CommentIndicators.contains(headers[0].charAt(0))) headers[0] = headers[0].substring(1); 
@@ -1024,7 +1024,7 @@ public class CSVReader implements Serializable, Cloneable {
     if (displayProgress && progress!=null) progress.progress(line);
     if (trimLinesAfterReading) line = line.trim();
     String [] data;
-    data = getSplits(line,separatorChar,this.treatMultipleConsecutiveSeparatorsAsOne, true);
+    data = getSplits(line);
     
     // Post Process (trim and remove string indicators).
     for (int i=0; i<data.length; i++) {
@@ -1080,10 +1080,10 @@ public class CSVReader implements Serializable, Cloneable {
         String line = currentOpenFile.readLine();
         if (trimLinesAfterReading) line = line.trim();
         if (j==firstConsistentLine) {
-          headerLine = getSplits(line, separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
+          headerLine = getSplits(line);
         } else if (j>firstConsistentLine) {
           if (j-firstConsistentLine-1>=dataLine.length) break;
-          dataLine[j-firstConsistentLine-1] = getSplits(line, separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
+          dataLine[j-firstConsistentLine-1] = getSplits(line);
         }
       }
       currentOpenFile.close();
@@ -1325,7 +1325,6 @@ public class CSVReader implements Serializable, Cloneable {
   }
   
   
-  @SuppressWarnings("unused")
   private static int countChar(String input, char toCount){
     int counter = 0;
     for(char c: input.toCharArray()){
@@ -1415,144 +1414,160 @@ public class CSVReader implements Serializable, Cloneable {
     return counter;
   }
   
-  private static String[] getSplits(String input, char separator, boolean skipConsecutiveMatches, boolean skipMatchesInStrings) {
-    if (separator=='\u0001') return getSplits(input, Pattern.compile("\\s"), skipConsecutiveMatches, skipMatchesInStrings);
-    // Get columns. A little bit more flexible than a simple .split()!
-    String splitter = Pattern.quote(Character.toString(separator));
-    ArrayList<String> splits = new ArrayList<String>();
+  /**
+   * Splits a string with the settings from this CSVReader.
+   * @param input - the String to split.
+   * @return String[] with the string splitted in columns.
+   */
+  private String[] getSplits(String input) {
+    String[] ret = getSplits(input, this.separatorChar, this.treatMultipleConsecutiveSeparatorsAsOne, true);
     
-    String newLine = ""; String stringColumn="";
-    boolean skip1 = false, skip2 = false;
-    Character lastC='\u0000';
-    for(char c: input.toCharArray()){
-      if (c=='"' && skipMatchesInStrings) {
-        skip1 = !skip1;
-        stringColumn+=c;
-        continue;
-      }
-      //if (c=='\'') skip2 = !skip2;//Complicated because of terms like "it's"
-      
-      if(!skip1 && !skip2) {
-        if (stringColumn.length()>0) {
-          splits.add(stringColumn);
-          stringColumn="";
-        }
-        if (!(skipConsecutiveMatches && c==separator && lastC==c)) {
-          newLine+=c;
-        }
-        lastC=c;
-      } else {
-        stringColumn+=c;
-        
-        if (newLine.length()>0) {
-          // Add all except the last hit (because: 'a "b"' => newLine is here 'a ' and would result in [a] [].
-          String[] ret = newLine.split(splitter);
-          
-          // Unfortunately, ret is emty if it equals splitter or consecutive instances of it.
-          // Try to reconstruct empty cells.
-          if (ret.length==0) {
-            String s = newLine.replace(Character.toString(separator), "");
-            if (s.length()>0) ret = new String[]{s};
-            else {
-              ret = new String[countChar(newLine, separator, skipConsecutiveMatches, skipMatchesInStrings)];
-            }
-          }
-            
-          for (String s: ret)
-            splits.add((s!=null?s:""));
-          //if (ret.length==0) 
-            //splits.add(newLine.replace(Character.toString(separator), ""));
-          newLine = "";
-          //skipFirstMatch = true;
-        }        
-      }
+    // If number of columns doesn't match expectations, retry with handling separator chars
+    // between string indicators (e.g. sepChar=' ' , String s = '"a b"' => split a and b).
+    if (isInitialized && ret.length!=getNumberOfColumns()) {
+      String[] ret2 = getSplits(input, this.separatorChar, this.treatMultipleConsecutiveSeparatorsAsOne, false);
+      if (ret2.length==getNumberOfColumns()) return ret2;
+      //... but prefer to skip matches in strings, if no method equals expectations.
     }
     
-    // Remaining string (or full string, if no internal strings)
-    if (newLine.length()>0) {
-      // Take last, skip first if splits isn't empty.
-      String[] ret = newLine.split(splitter);
-      for (String s: ret)
-        splits.add(s);
+    return ret;
+  }
+  
+  private static String[] getSplits(String input, char separator, boolean skipConsecutiveMatches, boolean skipMatchesInStrings) {
+    if (separator=='\u0001') return getSplits(input, Pattern.compile("\\s"), skipConsecutiveMatches, skipMatchesInStrings);
+    
+    // Get columns. A little bit more flexible than a simple .split()!
+    ArrayList<String> splits = new ArrayList<String>();
+    
+    // Move out of here
+    ArrayList<Character> stringIndicators = new ArrayList<Character>();
+    stringIndicators.add('\"');
+    // '\'' is complicated because of terms like "it's"
+    //---
+    
+    boolean[] skip = new boolean[stringIndicators.size()];
+    int activatedSkippers=0;
+    
+    String currentColumn = "";
+    Character lastC='\u0000';
+    for(char c: input.toCharArray()){
+      // Look for string indicators (that disable the separator).
+      int pos = stringIndicators.indexOf(c);
+      if (pos>=0 && skipMatchesInStrings) {
+        skip[pos] = !skip[pos];
+        if (skip[pos]) activatedSkippers++; else activatedSkippers--;
+        currentColumn+=c;
+        continue;
+      }
+      
+      // Divide on separator
+      if (c==separator && activatedSkippers<1) {
+        // Skip consecutive matches
+        if (skipConsecutiveMatches && lastC==c) {
+          continue;
+        }
+        
+        splits.add(currentColumn);
+        currentColumn="";
+      } else {
+        
+        // Add char to current column
+        currentColumn+=c;
+      }
+      lastC=c;
+      
+    }
+    
+    // Don't forger the last column
+    if (currentColumn.length()>0) {
+      splits.add(currentColumn);
+    }
+    
+    // If it ends with a separator, we should add an empty column.
+    if (lastC==separator && activatedSkippers<1) {
+      if (!(skipConsecutiveMatches && splits.size()>0 && splits.get(splits.size()-1).length()==0)) {
+        //... but only if there is not one before and we should skip consecutive ones.
+        splits.add("");
+      }
     }
     
     
     return splits.toArray(new String[0]);
-    
   }
   
   
   private static String[] getSplits(String input, Pattern separator, boolean skipConsecutiveMatches, boolean skipMatchesInStrings) {
-    // Get columns. A little bit more flexible than a simple .split()!
-    ArrayList<String> splits = new ArrayList<String>();
-    
-    /*
-     * skipFirstMatch Explanation (separator char is a space (' ')):
-     * String: ' a b' => return: [],[a],[b]
-     * String: ' a "b c" d' => return: [],[a],[b c], [d]
-     * => when calling getSplitsNoSpecialStringTreatment with ' d'
-     * ignore first match. when calling with ' a b', don't ignore it.
-     */
-    
-    String newLine = ""; String stringColumn="";
-    boolean skip1 = false, skip2 = false;
-    for(char c: input.toCharArray()){
-      if (c=='"' && skipMatchesInStrings) {
-        skip1 = !skip1;
-        stringColumn+=c;
-        continue;
-      }
-      //if (c=='\'') skip2 = !skip2;//Complicated because of terms like "it's"
-      
-      if(!skip1 && !skip2) {
-        if (stringColumn.length()>0) {
-          splits.add(stringColumn);
-          stringColumn="";
-        }
-        newLine+=c;
-      } else {
-        stringColumn+=c;
-        if (newLine.length()>0) {
-          // Add all except the last hit (because: 'a "b"' => newLine is here 'a ' and would result in [a] [].
-          splits.addAll(getSplitsNoSpecialStringTreatment(newLine, separator, skipConsecutiveMatches, true, (splits.size()>0) ));        
-          newLine = "";
-        }
-      }
-    }
-    
-    // Remaining string (or full string, if no internal strings)
-    if (newLine.length()>0) {
-      splits.addAll(getSplitsNoSpecialStringTreatment(newLine, separator, skipConsecutiveMatches, false, (splits.size()>0)));
-    }
-    
-    return splits.toArray(new String[0]);
-  }
-  
-  private static ArrayList<String> getSplitsNoSpecialStringTreatment(String input, Pattern separator, boolean skipConsecutiveMatches, boolean skipLastMatch, boolean skipFirstMatch) {
     Matcher m = separator.matcher(input);
     
-    // Count matches, eventually ignore consecutive ones.
+    // Move out of here
+    ArrayList<Character> stringIndicators = new ArrayList<Character>();
+    stringIndicators.add('\"');
+    // '\'' is complicated because of terms like "it's"
+    //---
+    
     ArrayList<String> splits = new ArrayList<String>();
-    int lastEnd = (skipFirstMatch?0:-1);
-    while (m.find()) {
-      if (!skipConsecutiveMatches) {
-        splits.add(input.substring(Math.max(0, lastEnd), m.start()));
-      }
-      else {
-        if (m.start()!=lastEnd) {
-          splits.add(input.substring(Math.max(0, lastEnd), m.start()));
+    boolean[] skip = new boolean[stringIndicators.size()];
+    int activatedSkippers=0;
+
+    
+    // Get matches, eventually ignore consecutive ones.
+    int lastEnd = -1;
+    String lastSplit = null;
+    boolean containsMatches=m.find(); boolean treatedLastMatch=false;
+    while (containsMatches || !treatedLastMatch) {
+      String curSplit = null;
+      if (!skipConsecutiveMatches || (skipConsecutiveMatches && (!containsMatches || (m.start()!=lastEnd)))) {
+        if (containsMatches) {
+          curSplit = input.substring(Math.max(0, lastEnd), m.start());
+        } else {
+          // The very last one (that does not end with a match).
+          treatedLastMatch=true;
+          curSplit = input.substring(Math.max(0, lastEnd), input.length());
         }
       }
-      lastEnd = m.end();
-    }
-    // Don't forget the last match.
-    // Removing the last match makes sense, because when this function
-    // is called, the last character is usually a separator char.
-    if (!skipLastMatch) {
-      splits.add(input.substring(Math.max(0, lastEnd), input.length()));
+      
+      if (curSplit!=null) {
+        if (activatedSkippers>0) {
+          // we are currently in an string environment
+          lastSplit+=curSplit; // Append
+        } else {
+          // we are NOT in an string environment
+          lastSplit = curSplit;
+        }
+        
+        // Check if we should go into or leave a string environment
+        if (skipMatchesInStrings) {
+          for (int i=0; i<stringIndicators.size(); i++) {
+            int occ = countChar(curSplit, stringIndicators.get(i));
+            if (occ%2==1) {
+              skip[i] = !skip[i];
+              if (skip[i]) activatedSkippers++; else activatedSkippers--;
+            }
+          }
+        }
+        
+        // If we are not in an string environment, add to splits
+        if (activatedSkippers<1) {
+          splits.add(lastSplit);
+          lastSplit=null;
+        }
+      }
+      if (activatedSkippers>0 && containsMatches) {
+        // Add the separator if we're in the string environment
+        lastSplit += input.substring(m.start(), m.end());
+      }
+      
+      // Continue to next match
+      if (containsMatches) {
+        lastEnd = m.end();
+        containsMatches=m.find();
+      }
     }
     
-    return splits;
+    // Don't forget the last match.
+    if (lastSplit!=null) splits.add(lastSplit);
+    
+    return splits.toArray(new String[0]);
   }
   
   public Object clone() throws CloneNotSupportedException {
