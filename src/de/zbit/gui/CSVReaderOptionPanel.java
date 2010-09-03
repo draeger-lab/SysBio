@@ -78,6 +78,7 @@ public class CSVReaderOptionPanel extends JPanel {
   private Font defaultPreviewFont = null;
   
   private String[] seperators = new String[]{"[Auto detect]", "[Any whitespace character]", "[Space]", "[Tab]", ",", ";", "|", "/"};
+  private boolean separatorAutoDetect=true;
   /**
    * This thread is refreshing the preview in a given time.
    * Use this.queueRefreshPreviewPanel(refreshInMiliseconds)
@@ -97,6 +98,8 @@ public class CSVReaderOptionPanel extends JPanel {
    */
   public CSVReaderOptionPanel(CSVReader r) throws IOException {
     super();
+    // Look if the user has previously set a custom separator.
+    separatorAutoDetect = r.isAutoDetectSeparatorChar();
     this.r = r;
     init();
     
@@ -460,8 +463,10 @@ public class CSVReaderOptionPanel extends JPanel {
         
         String s = editorcomp.getText();
         if (s.length()<1) return;
+        separatorAutoDetect = false;
         if (s.equalsIgnoreCase(m.getElementAt(0).toString())) {
           r.setSeparatorChar('\u0000');
+          separatorAutoDetect = true;
         } else if (s.equalsIgnoreCase(m.getElementAt(1).toString())) {
           r.setSeparatorChar('\u0001');
         } else if (s.equalsIgnoreCase(m.getElementAt(2).toString())) {
@@ -509,7 +514,18 @@ public class CSVReaderOptionPanel extends JPanel {
     
     return sep;
   }
+  
+  /**
+   * This will set the separator comboBox to the given separator char.
+   * It will leave the separatorAutoDetect variable untouched.
+   * 
+   * Use this function to set the combo box to the auto detected separator.
+   * Do not use it for user actions (the action listener is for that purpose).
+   * @param c
+   * @param sep
+   */
   private void setCurrentSeparator(char c, final JComboBox sep) {
+    boolean backupAutoDetec = separatorAutoDetect;
     if (c=='\u0000') {
       sep.setSelectedIndex(0);
     } else if (c=='\u0001') {
@@ -523,6 +539,7 @@ public class CSVReaderOptionPanel extends JPanel {
       if (id>=0) sep.setSelectedIndex(id);
       else sep.setSelectedItem(Character.toString(c));
     }
+    separatorAutoDetect = backupAutoDetec;
   }
   
   /**
@@ -595,6 +612,9 @@ public class CSVReaderOptionPanel extends JPanel {
    * @return JScrollPane with the preview table.
    */
   public JComponent buildPreview(int numDataLines) {
+    // If the user has not definately set a separator, allow
+    // to change the current selection, based on best-guess.
+    if (separatorAutoDetect) r.setSeparatorChar('\u0000');
     
     // Get Data
     ArrayList<String[]> firstLines = new ArrayList<String[]>(numDataLines);
