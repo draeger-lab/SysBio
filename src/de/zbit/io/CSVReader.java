@@ -221,8 +221,10 @@ public class CSVReader implements Serializable, Cloneable {
     }
   }
   public void removeCommentIndicator (char c) {
-    while (CommentIndicators.contains((c))) {
-      CommentIndicators.remove((c));
+    while (CommentIndicators.contains(c)) {
+      // Must cast to object. Else, the char is treated as int
+      // and leads to index out of bounds.
+      CommentIndicators.remove((Object)c);
       isInitialized=false;
     }
   }

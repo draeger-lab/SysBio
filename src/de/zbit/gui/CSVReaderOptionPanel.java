@@ -795,46 +795,60 @@ public class CSVReaderOptionPanel extends JPanel {
   
   /**
    * Show a dialog to choose the CSVReader options.
-   * @param parent - the parent to which this dialog is model. Either a frame or a dialog!
-   * @param inFile - file to build a CSVReader around ( new CSVReader(inFile) )
-   * @param title - title for this dialog
+   * @param parent - the parent to which this dialog is modal. Either a frame or a dialog!
+   * @param inFile - file to build a CSVReader around ( new CSVReader(inFile) ).
+   * @param title - title for this dialog.
    * @return default (cancel button pressed) or modified (ok) reader.
-   * @throws IOException
+   * @throws IOException - if input file is not readable or invalid.
    */
   public static CSVReader showDialog(Window parent, String inFile, String title) throws IOException {
     return showDialog(parent, new CSVReader(inFile), title);
   }
   
-  public static CSVReader showDialog(Container parent, String inFile, String title) throws Exception {
+  /**
+   * Show a dialog to choose the CSVReader options.
+   * @param parent - the parent to which this dialog is modal.
+   * @param inFile - file to build a CSVReader around ( new CSVReader(inFile) ).
+   * @param title - title for this dialog.
+   * @return default (cancel button pressed) or modified (ok) reader.
+   * @throws IOException - if input file is not readable or invalid.
+   */
+  public static CSVReader showDialog(Container parent, String inFile, String title) throws IOException {
 	    return showDialog(parent, new CSVReader(inFile), title);
   }
   
   /**
-   * Show a dialog to choose the CSVReader options.
-   * @param parent - the parent to which this dialog is model. Either a frame or a dialog!
+   * Show a dialog to choose the main CSVReader options.
+   * @param inFile - file to build a CSVReader around ( new CSVReader(inFile) ).
+   * @param title - title for this dialog.
+   * @return default (cancel button pressed) or modified (ok) reader.
+   * @throws IOException - if input file is not readable or invalid.
+   */
+  public static CSVReader showDialog(String inFile, String title) throws IOException {
+    return showDialog(null, new CSVReader(inFile), title);
+  }
+  
+  /**
+   * Show a dialog to choose the main CSVReader options.
+   * @param parent - the parent to which this dialog is modal. 
    * @param r - the current CSV Reader
    * @param title - title for this dialog
    * @return copy of original (cancel button pressed) or modified (ok) reader.
-   * @throws IOException
+   * Ok has been pressed if and only if (returnedReader==sourceReader).
+   * @throws IOException - if input file is not readable or invalid.
    */
   public static CSVReader showDialog(Component parent, CSVReader r, String title) throws IOException {
 
     // Initialize the dialog
     final JDialog jd;
-    if (parent instanceof Frame) {
+    if (parent!=null && parent instanceof Frame) {
       jd = new JDialog((Frame)parent, title, true);
-    } else if (parent instanceof Dialog) {
+    } else if (parent!=null && parent instanceof Dialog) {
       jd = new JDialog((Dialog)parent, title, true);
     } else {
     	jd = new JDialog();
     	jd.setTitle(title);
     	jd.setModal(true);
-    	// unnecessary
-//      try {
-//      jd = new JDialog((Frame)parent, title, true);
-//      } catch (Exception e) {
-//        throw new Exception ("Invalid parent.");
-//      }
     }
     
     // Initialize the panel
@@ -859,7 +873,9 @@ public class CSVReaderOptionPanel extends JPanel {
     // Set size
     jd.setPreferredSize(c.getPreferredSize());
     jd.setSize(c.getPreferredSize());
-    jd.setLocationRelativeTo(parent);
+    if (parent!=null) {
+      jd.setLocationRelativeTo(parent);
+    }
     
     // Set visible and wait until invisible
     jd.setVisible(true);
