@@ -6,6 +6,7 @@ package de.zbit.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -119,27 +120,31 @@ public class CSVConverter {
 		assignment = new int[sortedExpectedHead.length];
 		Arrays.fill(assignment, -1);
 		reader = new CSVReader(pathname);
-		int i;
+		int i, numProblems = 0;
+		CSVReaderColumnChooser c = new CSVReaderColumnChooser(reader);
 
 		/*
 		 * Read data field and try to automatically map columns from the data
 		 * file to expected column header entries.
 		 */
-		CSVReaderColumnChooser c = new CSVReaderColumnChooser(reader);
-		c.setSortHeaders(true);
-		int numProblems = 0;
-		if (reader.getContainsHeaders()) {
-			for (i = 0; i < sortedExpectedHead.length; i++) {
-				int col = reader.getColumn(sortedExpectedHead[i]);
-				if (col >= 0) {
-					assignment[i] = col;
-					c.setHeaderVisible(col, !hideExactColumnNames);
-				} else {
-					col = reader.getColumnContaining(sortedExpectedHead[i]);
-					c.addColumnChooser(sortedExpectedHead[i], col, false, true);
-					numProblems++;
+		if (reader == CSVReaderOptionPanel.showDialog(parent, reader, "Data import")) {
+			c.setSortHeaders(true);
+			if (reader.getContainsHeaders()) {
+				for (i = 0; i < sortedExpectedHead.length; i++) {
+					int col = reader.getColumn(sortedExpectedHead[i]);
+					if (col >= 0) {
+						assignment[i] = col;
+						c.setHeaderVisible(col, !hideExactColumnNames);
+					} else {
+						col = reader.getColumnContaining(sortedExpectedHead[i]);
+						c.addColumnChooser(sortedExpectedHead[i], col, false,
+								true);
+						numProblems++;
+					}
 				}
 			}
+		} else {
+			// numProblems = reader.getNumberOfColumns();
 		}
 
 		/*
@@ -149,13 +154,15 @@ public class CSVConverter {
 		if (numProblems > 0) {
 			JPanel panel = new JPanel(new BorderLayout());
 			panel.add(new JLabel(GUITools.toHTML(String.format(MESSAGE_STRING,
-					numProblems), 40)), BorderLayout.NORTH);
-			JScrollPane scroll = new JScrollPane(c,
-					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			scroll.setPreferredSize(new Dimension(250, Math.min(
-					35 * numProblems + 20, 400)));
-			panel.add(scroll, BorderLayout.CENTER);
+					numProblems), 60)), BorderLayout.NORTH);
+			panel.add(c, BorderLayout.CENTER);
+			// JScrollPane scroll = new JScrollPane(c,
+			// JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			// JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			// scroll.setPreferredSize(new Dimension(250, Math.min(
+			// 35 * numProblems + 20, 400)));
+			// panel.add(scroll);
+			panel.add(new JPanel(), BorderLayout.SOUTH);
 
 			if ((c.getColumnChoosers().size() < 1)
 					|| (JOptionPane.showConfirmDialog(parent, panel,
@@ -177,6 +184,7 @@ public class CSVConverter {
 			newHead = sortedExpectedHead;
 		}
 
+		expectedNameToColIndex = new Hashtable<String, Integer>();
 		for (i = 0; i < sortedExpectedHead.length; i++) {
 			expectedNameToColIndex.put(sortedExpectedHead[i], Integer
 					.valueOf(assignment[i]));
@@ -228,7 +236,7 @@ public class CSVConverter {
 	 */
 	public int getColumnIndex(String expectedHeadEntry) {
 		if (expectedNameToColIndex.containsKey(expectedHeadEntry)) {
-			return expectedNameToColIndex.get(expectedHeadEntry);
+			return expectedNameToColIndex.get(expectedHeadEntry).intValue();
 		}
 		return -1;
 	}
