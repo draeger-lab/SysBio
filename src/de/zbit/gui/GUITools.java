@@ -107,7 +107,7 @@ public class GUITools {
 	 * @param dir
 	 * @param allFilesAcceptable
 	 * @param multiSelectionAllowed
-	 * @param mode
+	 * @param mode - e.g. JFileChooser.FILES_ONLY
 	 * @return
 	 */
 	public static JFileChooser createJFileChooser(String dir,
@@ -124,7 +124,7 @@ public class GUITools {
 	 * @param dir
 	 * @param allFilesAcceptable
 	 * @param multiSelectionAllowed
-	 * @param mode
+	 * @param mode - e.g. JFileChooser.FILES_ONLY
 	 * @param filter
 	 * @return
 	 */
