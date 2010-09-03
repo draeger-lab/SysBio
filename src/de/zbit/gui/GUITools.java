@@ -13,13 +13,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.HashSet;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;

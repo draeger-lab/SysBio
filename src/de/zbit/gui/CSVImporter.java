@@ -6,7 +6,6 @@ package de.zbit.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -21,17 +20,16 @@ import javax.swing.JScrollPane;
 import de.zbit.io.CSVReader;
 
 /**
- * This {@link CSVImporter} tries to map the head entries in a given CSV file
- * to expected column head values. If this cannot be done automatically, a
- * dialog will be displayed to the user asking for doing or at least checking
- * the guessed column indices manually. To extract the data from the CSV file,
- * the {@link CSVReader} used to generate this mapping can be accessed that
- * grants access to all underlying data (as a two-dimensional array of
- * {@link String}s). Furthermore, this {@link CSVImporter} provides several
- * get-methods to access the selected or determined column index. For instance,
- * the method {@link #getColumnIndex(String)} directly delivers the new column
- * index of the expected table head entry or minus one if no such element
- * exists.
+ * This {@link CSVImporter} tries to map the head entries in a given CSV file to
+ * expected column head values. If this cannot be done automatically, a dialog
+ * will be displayed to the user asking for doing or at least checking the
+ * guessed column indices manually. To extract the data from the CSV file, the
+ * {@link CSVReader} used to generate this mapping can be accessed that grants
+ * access to all underlying data (as a two-dimensional array of {@link String}
+ * s). Furthermore, this {@link CSVImporter} provides several get-methods to
+ * access the selected or determined column index. For instance, the method
+ * {@link #getColumnIndex(String)} directly delivers the new column index of the
+ * expected table head entry or minus one if no such element exists.
  * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
@@ -127,22 +125,22 @@ public class CSVImporter {
 		 * Read data field and try to automatically map columns from the data
 		 * file to expected column header entries.
 		 */
-		if (reader == CSVReaderOptionPanel.showDialog(parent, reader, "Data import")) {
+		if (reader == CSVReaderOptionPanel.showDialog(parent, reader,
+				"Data import")) {
 			c.setSortHeaders(true);
-			if (reader.getContainsHeaders()) {
-				for (i = 0; i < sortedExpectedHead.length; i++) {
-					int col = reader.getColumn(sortedExpectedHead[i]);
-					if (col >= 0) {
-						assignment[i] = col;
-						c.setHeaderVisible(col, !hideExactColumnNames);
-					} else {
-						col = reader.getColumnContaining(sortedExpectedHead[i]);
-						c.addColumnChooser(sortedExpectedHead[i], col, false,
-								true);
-						numProblems++;
-					}
+			// if (reader.getContainsHeaders()) {
+			for (i = 0; i < sortedExpectedHead.length; i++) {
+				int col = reader.getColumn(sortedExpectedHead[i]);
+				if (col >= 0) {
+					assignment[i] = col;
+					c.setHeaderVisible(col, !hideExactColumnNames);
+				} else {
+					col = reader.getColumnContaining(sortedExpectedHead[i]);
+					c.addColumnChooser(sortedExpectedHead[i], col, false, true);
+					numProblems++;
 				}
 			}
+			// }
 		} else {
 			// numProblems = reader.getNumberOfColumns();
 		}
@@ -155,15 +153,21 @@ public class CSVImporter {
 			JPanel panel = new JPanel(new BorderLayout());
 			panel.add(new JLabel(GUITools.toHTML(String.format(MESSAGE_STRING,
 					numProblems), 60)), BorderLayout.NORTH);
-			panel.add(c, BorderLayout.CENTER);
-			
-			// JScrollPane scroll = new JScrollPane(c,
-			// JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			// JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			// scroll.setPreferredSize(new Dimension(250, Math.min(
-			// 35 * numProblems + 20, 400)));
-			// panel.add(scroll);
-			//panel.add(new JPanel(), BorderLayout.SOUTH);
+			if ((c.getPreferredSize().getWidth() > 450)
+					|| (c.getPreferredSize().getHeight() > 450)) {
+				JScrollPane scroll = new JScrollPane(c,
+						JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				// scroll.setPreferredSize(new Dimension(250, Math.min(
+				// 35 * numProblems + 20, 400)));
+				scroll.setPreferredSize(new Dimension((int) Math.round(Math
+						.min(470, panel.getPreferredSize().getWidth())),
+						(int) Math.round(Math.min(c.getPreferredSize()
+								.getHeight(), 470))));
+				panel.add(scroll);
+			} else {
+				panel.add(c, BorderLayout.CENTER);
+			}
 
 			if ((c.getColumnChoosers().size() < 1)
 					|| (JOptionPane.showConfirmDialog(parent, panel,
@@ -180,6 +184,8 @@ public class CSVImporter {
 					}
 					this.newHead = newHead.toArray(new String[0]);
 				}
+			} else {
+				newHead = new String[0];
 			}
 		} else {
 			newHead = sortedExpectedHead;
