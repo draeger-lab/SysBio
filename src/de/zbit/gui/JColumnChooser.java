@@ -641,7 +641,7 @@ public class JColumnChooser extends JPanel {
     if (previews==null || previews.length<1) {
       preview.setText("");
     } else if (defaultValue>=0 && defaultValue<previews.length) {
-      preview.setText("E.g. \""+previews[defaultValue]+"\"");
+      preview.setText("E.g., \""+previews[defaultValue]+"\"");
     } else if (defaultValue<0) {
       preview.setText(noSelection);
     } else {
