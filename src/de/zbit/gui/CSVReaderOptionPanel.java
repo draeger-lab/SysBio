@@ -239,6 +239,7 @@ public class CSVReaderOptionPanel extends JPanel {
    * @return
    */
   public CSVReader getCSVReader() {
+    // Reset reading position before returning the reader
     try {
       r.open();
     } catch (IOException e) {e.printStackTrace();}
