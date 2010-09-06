@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Neccessary for extending supertypes. They can not be extended by Object directly.
  * @author wrzodek
  */
-public class CustomObject implements Serializable {
+public class CustomObject<T> implements Serializable {
   /**
    * 
    */
@@ -14,13 +14,13 @@ public class CustomObject implements Serializable {
   /**
    * 
    */
-  private Object obj;
+  private T obj;
   
   /**
    * 
    * @param obj
    */
-  public CustomObject(Object obj) {
+  public CustomObject(T obj) {
     this.obj = obj;
   }
   
@@ -28,7 +28,7 @@ public class CustomObject implements Serializable {
    * 
    * @return
    */
-  public Object getObject() {
+  public T getObject() {
     return obj;
   }
 }

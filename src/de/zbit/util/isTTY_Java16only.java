@@ -1,6 +1,9 @@
 package de.zbit.util;
 
 /**
+ * TTY is a console that accepts ANSI commands.
+ * This class checks whether or not the System's console
+ * is of type TTY.
  * 
  * @author wrzodek
  */
