@@ -8,6 +8,8 @@ import java.io.FileFilter;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.sbml.jsbml.SBMLException;
+
 import de.zbit.kegg.gui.ConverterUI;
 import de.zbit.kegg.io.FileFilterKGML;
 
@@ -22,8 +24,9 @@ public class ConverterTest {
 	 * @param path
 	 *            The path to a directory that contains KGML files or a single
 	 *            file.
+	 * @throws SBMLException 
 	 */
-	public ConverterTest(String path) {
+	public ConverterTest(String path) throws SBMLException {
 		File f = new File(path);
 		if (f.exists()) {
 			List<File> files;
@@ -46,8 +49,9 @@ public class ConverterTest {
 	 * @param args
 	 *            The first argument must be a directory that contains KGML
 	 *            files.
+	 * @throws SBMLException 
 	 */
-	public static void main(String args[]) {
+	public static void main(String args[]) throws SBMLException {
 		new ConverterTest(args[0]);
 	}
 
