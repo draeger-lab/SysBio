@@ -11,7 +11,7 @@ import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
 
 /**
- * @author Finja Buechel: finja.buechel@uni-tuebingen.de
+ * @author Finja B&uuml;chel: finja.buechel@uni-tuebingen.de
  * @author Clemens Wrzodek: clemens.wrzodek@uni-tuebingen.de
  * @author Florian Mittag: florian.mittag@uni-tuebingen.de
  * 

@@ -1,0 +1,36 @@
+  Protokoll
+  =========
+
+0. Zugriff auf das Track-System:
+
+- Siehe: http://rarepos:8080/SysBio
+
+1. Wie ist das Projekt organisiert?
+
+- Doc-Verzeichnis für Dokumentation. Hier bitte keinen Java-Doc einpflegen,
+  nur lokal halten.
+- Protokolle werden ebenfalls dort gespeichert.
+
+- Quellen in src, test und resources
+
+- bin/build-Verzeichnis, das auch nicht eingpflegt wird.
+
+- Kurz erklärt, wie man JAR-Dateien erzeugt, die nicht alles enthalten.
+
+- Im lib-Verzeichnis werden benötigte JAR-Dateien abgelegt.
+  Dort findet sich auch eine package.html-Datei, in der eingetragen
+  werden soll, wofür die jeweilige JAR-Datei benötigt wird.
+
+- package.html-Datei in jedem Paket zur kurzen Erklärung, wofür
+  das Paket gut ist.
+
+2. Wofür gibt es bisher Code im SysBio-Projekt?
+
+- dbfetch-Paket
+- parser-Paket wird mit uniprot-Paket zusammengeführt.
+- Pakete durchgeschaut: KEGG-Parser sollte in ein eigenes Paket
+  überführt und möglichst bald publiziert werden.
+
+- Wichtiger Stichtag: 31. Dezember 2010 für Special Issue on 
+  Web Server in Nucleic Acids Research.
+
