@@ -2,7 +2,7 @@ package de.zbit.resources;
 
 /**
  * 
- * @author draeger
+ * @author Andreas Dr&auml;ger
  * 
  */
 public class Resource {

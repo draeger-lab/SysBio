@@ -31,12 +31,11 @@ import javax.swing.JPanel;
  * {@link GridBagLayout}.
  * 
  * @since 1.0
- * @author <a href="mailto:andreas.draeger@uni-tuebingen.de">Andreas
- *         Dr&auml;ger</a>
+ * @author Andreas Dr&auml;ger
  * @date 2005-07-29
  */
 public class LayoutHelper {
-
+	
 	/**
 	 * 
 	 * @param cont
@@ -55,14 +54,6 @@ public class LayoutHelper {
 		GridBagConstraints gbc = new GridBagConstraints();
 		addComponent(cont, gbl, c, x, y, width, height, weightx, weighty,
 				gbc.ipadx, gbc.ipady);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getRow() {
-		return row;
 	}
 
 	/**
@@ -97,10 +88,20 @@ public class LayoutHelper {
 		cont.add(c);
 	}
 
+	/**
+	 * 
+	 */
 	private Container cont;
-	private GridBagLayout gbl;
-	private int row;
 
+	/**
+	 * 
+	 */
+	private GridBagLayout gbl;
+
+	/**
+	 * 
+	 */
+	private int row;
 	/**
 	 * Creates a new GridBaglayout and associates this with the given container.
 	 * 
@@ -112,7 +113,6 @@ public class LayoutHelper {
 		this.cont.setLayout(gbl);
 		this.row = 0;
 	}
-
 	/**
 	 * 
 	 * @param cont
@@ -207,6 +207,21 @@ public class LayoutHelper {
 	}
 
 	/**
+	 * A row of components
+	 * 
+	 * @param label
+	 * @param components
+	 */
+	public void add(String label, Component... components) {
+		int x = 0;
+		add(new JLabel(label), x, ++row, 1, 1, 0, 0);
+		for (Component component : components) {
+			add(new JPanel(), ++x, row, 1, 1, 0, 0);
+			add(component, ++x, row, 1, 1);
+		}
+	}
+
+	/**
 	 * 
 	 * @param label
 	 * @param c
@@ -215,10 +230,10 @@ public class LayoutHelper {
 	 *            spacer.
 	 */
 	public void add(String label, Component c, boolean spaceLine) {
-		add(label, c, 0, row);
-		row++;
-		add(new JPanel(), 0, row, 3, 1, 0, 0);
-		row++;
+		add(label, c, 0, ++row);
+		if (spaceLine) {
+			add(new JPanel(), 0, ++row, 3, 1, 0, 0);
+		}
 	}
 
 	/**
@@ -244,18 +259,11 @@ public class LayoutHelper {
 	}
 
 	/**
-	 * A row of components
 	 * 
-	 * @param label
-	 * @param components
+	 * @return
 	 */
-	public void add(String label, Component... components) {
-		int x = 0;
-		add(new JLabel(label), x, ++row, 1, 1, 0, 0);
-		for (Component component : components) {
-			add(new JPanel(), ++x, row, 1, 1, 0, 0);
-			add(component, ++x, row, 1, 1);
-		}
+	public int getRow() {
+		return row;
 	}
 
 }
