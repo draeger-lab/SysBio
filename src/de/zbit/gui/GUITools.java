@@ -4,11 +4,13 @@
 package de.zbit.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -21,8 +23,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -37,15 +41,36 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
+import de.zbit.resources.Resource;
 
 /**
  * This class contains various GUI tools.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Hannes Borch
  * @author wrzodek
  * 
  */
 public class GUITools {
+	
+	/**
+	 * Checks whether the first container contains the second one.
+	 * 
+	 * @param c
+	 * @param insight
+	 * @return True if c contains insight.
+	 */
+	public static boolean contains(Component c, Component insight) {
+		boolean contains = c.equals(insight);
+		if ((c instanceof Container) && !contains)
+			for (Component c1 : ((Container) c).getComponents()) {
+				if (c1.equals(insight))
+					return true;
+				else
+					contains |= contains(c1, insight);
+			}
+		return contains;
+	}
 
 	/**
 	 * Creates a JButton with the given properties. The tool tip becomes an HTML
@@ -75,6 +100,7 @@ public class GUITools {
 		return button;
 	}
 
+	
 	/**
 	 * 
 	 * @param text
@@ -305,6 +331,18 @@ public class GUITools {
 	}
 
 	/**
+	 * Computes and returns the dimension, i.e., the size of a given icon.
+	 * 
+	 * @param icon
+	 *            an icon whose dimension is required.
+	 * @return The dimension of the given icon.
+	 */
+	public static Dimension getDimension(Icon icon) {
+		return icon == null ? new Dimension(0, 0) : new Dimension(icon
+				.getIconWidth(), icon.getIconHeight());
+	}
+
+	/**
 	 * 
 	 * @param g
 	 * @param incrementBy
@@ -312,6 +350,35 @@ public class GUITools {
 	 */
 	public static Font incrementFontSize(Font g, int incrementBy) {
 		return g.deriveFont((float) (g.getSize() + incrementBy));
+	}
+
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 * @throws IOException
+	 */
+	public static Icon loadIcon(String path) {
+		Image img = loadImage(path);
+		return img != null ? new ImageIcon(img) : null;
+	}
+
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static Image loadImage(String path) {
+		try {
+			String p = path.substring(path.indexOf("img"));
+			URL url = Resource.class.getResource(p);
+			return url != null ? ImageIO.read(Resource.class.getResource(path
+					.substring(path.indexOf("img")))) : ImageIO.read(new File(
+					path));
+		} catch (IOException exc) {
+			System.err.printf("Could not load image %s\n", path);
+			return null;
+		}
 	}
 
 	/**
@@ -413,6 +480,21 @@ public class GUITools {
 	/**
 	 * 
 	 * @param c
+	 * @param color
+	 */
+	public static void setAllBackground(Container c, Color color) {
+		c.setBackground(color);
+		Component children[] = c.getComponents();
+		for (int i = 0; i < children.length; i++) {
+			if (children[i] instanceof Container)
+				setAllBackground((Container) children[i], color);
+			children[i].setBackground(color);
+		}
+	}
+
+	/**
+	 * 
+	 * @param c
 	 * @param enabled
 	 */
 	public static void setAllEnabled(Container c, boolean enabled) {
@@ -481,6 +563,17 @@ public class GUITools {
 					}
 				}
 			}
+	}
+
+	/**
+	 * 
+	 * @param state
+	 * @param menuBar
+	 * @param commands
+	 */
+	public static void setEnabled(boolean state, JMenuBar menuBar,
+			Object... commands) {
+		setEnabled(state, menuBar, null, commands);
 	}
 
 	/**
@@ -568,6 +661,8 @@ public class GUITools {
 	}
 
 	/**
+	 * Returns a HTML formated String, in which each line is at most lineBreak
+	 * symbols long.
 	 * 
 	 * @param string
 	 * @return
@@ -577,6 +672,8 @@ public class GUITools {
 	}
 
 	/**
+	 * Returns a HTML formated String, in which each line is at most lineBreak
+	 * symbols long.
 	 * 
 	 * @param string
 	 * @param lineBreak
