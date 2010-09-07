@@ -55,7 +55,7 @@ public class SwisspfamParser {
       line = br.readLine();
       
       while ((line = br.readLine()) != null) {
-        if(!line.trim().isEmpty()){
+        if(line.trim().length()>0){
           if (line.substring(0, 1).equals(">")) {
             // get uniprot id
             start = 0;
