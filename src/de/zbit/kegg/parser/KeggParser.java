@@ -314,7 +314,7 @@ public class KeggParser extends DefaultHandler {
   public static void main(String[] args) {
     // For simple testing
     if (args==null || args.length<1)
-      args = new String[]{"files/kgml/metabolic/organisms/hsa/hsa00130.xml"};
+      args = new String[]{"files/kgmlSample.xml"};
     
     if (args!=null && args.length >0) {
       File f = new File(args[0]);
