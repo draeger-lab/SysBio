@@ -7,12 +7,14 @@ import de.zbit.util.CustomObject;
 import de.zbit.util.InfoManagement;
 
 /**
+ * Retrieves and caches specific informations from the Kegg database.
  * Uses Kegg functions (like retrieve all PWs for an organism) instead of just retrieving information
  * for a Kegg ID (what KeggInfoManagement does).
+ * 
  * Think of this class as a cache.
  * @author wrzodek
  */
-public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObject>{
+public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObject<Object>>{
   private static final long serialVersionUID = -4559358395869823899L;
   private KeggAdaptor adap=null;
   
@@ -79,7 +81,7 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
    * @see de.zbit.util.InfoManagement#fetchInformation(java.lang.Comparable)
    */
   @Override
-  protected CustomObject fetchInformation(KeggQuery id) throws TimeoutException, UnsuccessfulRetrieveException {
+  protected CustomObject<Object> fetchInformation(KeggQuery id) throws TimeoutException, UnsuccessfulRetrieveException {
     if (offlineMode) throw new TimeoutException();
     
     int j = id.getJobToDo();
@@ -108,13 +110,14 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
       */    
     if (answer==null || (answer instanceof String &&  ((String)answer).trim().length()==0)) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember this one.
     
-    return new CustomObject(answer); // Successfull and "with data" ;-)
+    return new CustomObject<Object>(answer); // Successfull and "with data" ;-)
   }
   
   /*
    * (non-Javadoc)
    * @see de.zbit.util.InfoManagement#fetchMultipleInformations(IDtype[])
    */
+  @SuppressWarnings("unchecked")
   @Override
   protected CustomObject[] fetchMultipleInformations(KeggQuery[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
     System.err.println("Fetching multiple infos not supported. Please use KeggInfoManagement, if possible.");

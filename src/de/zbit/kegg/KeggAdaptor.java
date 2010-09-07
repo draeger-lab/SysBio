@@ -2,7 +2,6 @@ package de.zbit.kegg;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -14,137 +13,53 @@ import keggapi.KEGGPortType;
 import keggapi.SSDBRelation;
 
 /**
+ * A Kegg Adaptor, that directly retrieves informations from the
+ * Kegg database.
+ * You should not use this class directly, but the cached derivates
+ * of this class e.g. {@link KeggInfoManagement} for general queries
+ * or {@link KeggFunctionManagement} for directly accessing certain
+ * methods.
+ * 
+ * This class does not implement the whole Kegg interface. Please see
+ * {@link http://www.genome.jp/kegg/docs/keggapi_manual.html} and feel
+ * free to add new methods to this class.
+ * 
  * @author wrzodek
- * 
- *         Nicht alle funktionen implementiert! Siehe
- *         http://www.genome.jp/kegg/docs/keggapi_manual.html
- * 
- *         Serializable funktioniert nicht, da Kegg-API nicht serialisierbar.
  */
-public class KeggAdaptor implements Serializable {
-  
+public class KeggAdaptor {
   /**
-   * 
-   */
-  private static final long serialVersionUID = 3338264258735043999L;
-
-  /**
-   * 
+   * If true, all queried objects will be printed to the console (for debugging).
    */
   public static boolean printEachOutputToScreen = false;
 
   /**
-   * Extrahiert infos aus einem String. Beispiel: NAME MAP4K3 DEFINITION
-   * mitogen-activated protein kinase kinase kinase kinase 3 (EC:2.7.11.1)
-   * ORTHOLOGY KO: K04406 mitogen-activated protein kinase kinase kinase kinase
-   * 3 [EC:2.7.11.1] => Hier waere startWith "NAME" oder "DEFINITION". (Case
-   * insensitive)
-   * 
-   * @param completeString
-   * @param startsWith
-   * @return
+   * The servlet that handles all queries.
    */
-  public static String extractInfo(String completeString, String startsWith) {
-    return extractInfo(completeString, startsWith, null);
-  }
+  private KEGGPortType serv;
 
   /**
-   * 
-   * @param completeString
-   * @param startsWith
-   * @param endsWith
-   * @return
+   * Initializes a new Kegg Adaptor with a new servlet.
    */
-  public static String extractInfo(String completeString, String startsWith, String endsWith) {
-    int pos = completeString.toLowerCase().indexOf(
-        "\n" + startsWith.toLowerCase()) + 1; // Prefer hits starting in a new
-                                              // line. // +1 because of \n
-    if (pos <= 0) { // <=0 because of +1 in line above.
-      pos = completeString.toLowerCase().indexOf(startsWith.toLowerCase());
-      // Pruefen ob zeichen ausser \t und " " zwischen \n und pos. wenn ja =>
-      // abort. (Beispiel: "  AUTHOR XYZ" m�glich.)
-      if (pos < 0)
-        return null;
-      int lPos = completeString.lastIndexOf("\n", pos);
-      String toCheck = completeString.substring(Math.max(lPos, 0), pos);
-      // Wenn was zwischen unserem Treffer und newLine steht => abort.
-      if (toCheck.replace(" ", "").replace("\t", "").replace("\n", "").length()>0)
-        return null;
-      // Wenn unser Treffer nicht von einem Whitespace char gefolgt wird => abort.
-      if (!Character.isWhitespace(completeString.charAt(pos+startsWith.length())))
-        return null;
-    }
-
-    String ret = "";
-    if (endsWith == null || endsWith.length()<1) {
-      int st = completeString.indexOf(" ", pos + startsWith.length());
-      if (st < 0)
-        st = pos + startsWith.length(); // +1 wegen "\n"+sw
-      int nl = completeString.indexOf("\n", pos + startsWith.length());
-      if (nl < 0)
-        nl = completeString.length();
-
-      try {
-        ret = completeString.substring(st,
-            nl).trim();
-      } catch (Exception e) {
-        System.out.println("St: " + st + " \t" + pos + " "
-            + startsWith.length());
-        System.out.println("Nl: " + nl + " \t" + completeString.length());
-        System.out.println(startsWith);
-        System.out.println("--------------\n" + completeString);
-        e.printStackTrace();
-      }
-      while (completeString.length() > (nl + 1)) {
-        if (completeString.charAt(nl + 1) == ' ') {
-          int nl2 = completeString.indexOf("\n", nl + 1);
-          if (nl2 < 0)
-            nl2 = completeString.length();
-          ret += "\n" + completeString.substring(nl + 1, nl2).trim();
-          nl = nl2;
-        } else
-          break;
-      }
-    } else {
-      // Jump to first non-Whitespace Character. Mind the new lines!
-      int sPos = pos+startsWith.length();
-      while (Character.isWhitespace(completeString.charAt(sPos)) && completeString.charAt(sPos)!='\n') sPos++;
-      
-      // Search for end position and trim string.
-      int pos2 = completeString.toLowerCase().indexOf(endsWith,sPos);
-      if (pos2<=0) return "";
-      ret = completeString.substring(sPos, pos2).trim();
-    }
-    
-    return ret;
-
+  public KeggAdaptor() {
+    serv = getServlet();
   }
-
-  /**
-   * 
-   * @return
-   */
-  private static KEGGPortType getServlet() {
-    KEGGLocator locator = new KEGGLocator();
-    KEGGPortType serv = null;
-    try {
-      serv = locator.getKEGGPort();
-    } catch (Exception e) {
-      System.err.println("Unable to initilize Kegg Servlet.");
-      e.printStackTrace();
-    }
-    return serv;
-  }
+  
 
   /**
    * @param args
    */
   public static void main(String[] args) {
     printEachOutputToScreen = true;
-    
     KeggAdaptor adap = new KeggAdaptor();
     
-    adap.get("rn:R02750");
+    adap.find("genes ENSG00000152413");
+    
+    ArrayList<String> kgIds = adap.getKEGGIdentifierForAGeneSymbol("ENSG00000152413", "hsa");
+    
+    if (kgIds!=null && kgIds.size()>0)
+      adap.getBestNeighborsByGene(kgIds.get(0));
+    else
+      System.out.println("No Kegg IDs found for xyz.");
     if (true) return;
     
     adap.getPathways("hsa");
@@ -251,6 +166,111 @@ public class KeggAdaptor implements Serializable {
 
   }
   
+  
+  
+  /**
+   * Extrahiert infos aus einem String. Beispiel: NAME MAP4K3 DEFINITION
+   * mitogen-activated protein kinase kinase kinase kinase 3 (EC:2.7.11.1)
+   * ORTHOLOGY KO: K04406 mitogen-activated protein kinase kinase kinase kinase
+   * 3 [EC:2.7.11.1] => Hier waere startWith "NAME" oder "DEFINITION". (Case
+   * insensitive)
+   * 
+   * @param completeString
+   * @param startsWith
+   * @return
+   */
+  public static String extractInfo(String completeString, String startsWith) {
+    return extractInfo(completeString, startsWith, null);
+  }
+
+  /**
+   * 
+   * @param completeString
+   * @param startsWith
+   * @param endsWith
+   * @return
+   */
+  public static String extractInfo(String completeString, String startsWith, String endsWith) {
+    int pos = completeString.toLowerCase().indexOf(
+        "\n" + startsWith.toLowerCase()) + 1; // Prefer hits starting in a new
+                                              // line. // +1 because of \n
+    if (pos <= 0) { // <=0 because of +1 in line above.
+      pos = completeString.toLowerCase().indexOf(startsWith.toLowerCase());
+      // Pruefen ob zeichen ausser \t und " " zwischen \n und pos. wenn ja =>
+      // abort. (Beispiel: "  AUTHOR XYZ" m�glich.)
+      if (pos < 0)
+        return null;
+      int lPos = completeString.lastIndexOf("\n", pos);
+      String toCheck = completeString.substring(Math.max(lPos, 0), pos);
+      // Wenn was zwischen unserem Treffer und newLine steht => abort.
+      if (toCheck.replace(" ", "").replace("\t", "").replace("\n", "").length()>0)
+        return null;
+      // Wenn unser Treffer nicht von einem Whitespace char gefolgt wird => abort.
+      if (!Character.isWhitespace(completeString.charAt(pos+startsWith.length())))
+        return null;
+    }
+
+    String ret = "";
+    if (endsWith == null || endsWith.length()<1) {
+      int st = completeString.indexOf(" ", pos + startsWith.length());
+      if (st < 0)
+        st = pos + startsWith.length(); // +1 wegen "\n"+sw
+      int nl = completeString.indexOf("\n", pos + startsWith.length());
+      if (nl < 0)
+        nl = completeString.length();
+
+      try {
+        ret = completeString.substring(st,
+            nl).trim();
+      } catch (Exception e) {
+        System.out.println("St: " + st + " \t" + pos + " "
+            + startsWith.length());
+        System.out.println("Nl: " + nl + " \t" + completeString.length());
+        System.out.println(startsWith);
+        System.out.println("--------------\n" + completeString);
+        e.printStackTrace();
+      }
+      while (completeString.length() > (nl + 1)) {
+        if (completeString.charAt(nl + 1) == ' ') {
+          int nl2 = completeString.indexOf("\n", nl + 1);
+          if (nl2 < 0)
+            nl2 = completeString.length();
+          ret += "\n" + completeString.substring(nl + 1, nl2).trim();
+          nl = nl2;
+        } else
+          break;
+      }
+    } else {
+      // Jump to first non-Whitespace Character. Mind the new lines!
+      int sPos = pos+startsWith.length();
+      while (Character.isWhitespace(completeString.charAt(sPos)) && completeString.charAt(sPos)!='\n') sPos++;
+      
+      // Search for end position and trim string.
+      int pos2 = completeString.toLowerCase().indexOf(endsWith,sPos);
+      if (pos2<=0) return "";
+      ret = completeString.substring(sPos, pos2).trim();
+    }
+    
+    return ret;
+
+  }
+
+  /**
+   * 
+   * @return
+   */
+  private static KEGGPortType getServlet() {
+    KEGGLocator locator = new KEGGLocator();
+    KEGGPortType serv = null;
+    try {
+      serv = locator.getKEGGPort();
+    } catch (Throwable e) {
+      System.err.println("Unable to initilize Kegg Servlet: " + e.getMessage());
+      e.printStackTrace();
+    }
+    return serv;
+  }
+  
   /**
    * 
    * @param results
@@ -321,27 +341,6 @@ public class KeggAdaptor implements Serializable {
     }
   }
 
-  /**
-   * 
-   */
-  private KEGGPortType serv;
-
-  /**
-   * 
-   */
-  private String last_in_id = "";
-
-  /**
-   * 
-   */
-  private String[] last_id_results = new String[3]; // Siehe 2 Zeilen tiefer
-
-  /**
-   * 
-   */
-  public KeggAdaptor() {
-    serv = getServlet();
-  }
 
   /**
    * See http://www.genome.jp/dbget-bin/show_man?bfind
@@ -553,6 +552,9 @@ public class KeggAdaptor implements Serializable {
         if (retried >= 3) throw new TimeoutException();
       }
     }
+    
+    if (printEachOutputToScreen)
+      printToScreen(results);
     return results;
   }
 
@@ -603,6 +605,9 @@ public class KeggAdaptor implements Serializable {
     } catch (RemoteException e) {
       e.printStackTrace();
     }
+    
+    if (printEachOutputToScreen)
+      if (s!=null && s.length()>0) System.out.println(s);
     return s;
   }
   
@@ -624,6 +629,9 @@ public class KeggAdaptor implements Serializable {
         if (retried >= 3) throw new TimeoutException();
       }
     }
+    
+    if (printEachOutputToScreen)
+      if (s!=null && s.length()>0) System.out.println(s);
     return s;
   }
   
@@ -645,6 +653,7 @@ public class KeggAdaptor implements Serializable {
       while ((line = br.readLine()) != null) {
         if (line.startsWith(species.toLowerCase())) {
           identifiers.add(line.substring(0, line.indexOf(" ")));
+          if (printEachOutputToScreen) System.out.println(line.substring(0, line.indexOf(" ")));
         }
       }
     } catch (RemoteException e) {
@@ -701,14 +710,14 @@ public class KeggAdaptor implements Serializable {
     try {
       results = serv.list_pathways(org);
       for (Definition definition : results) {
-//        System.out.println(definition.getEntry_id());
         pws.add(definition.getEntry_id());
+        if (printEachOutputToScreen)
+          System.out.println(definition.getEntry_id());
       }
     } catch (RemoteException e) {
       e.printStackTrace();
     }
     
-//    System.out.println(pws.size());
     return pws;
   }
 
@@ -726,8 +735,11 @@ public class KeggAdaptor implements Serializable {
         Definition[] results = new Definition[0];
         results = serv.list_pathways(org);
         pws = new ArrayList<String>(results.length+1);
-        for (Definition definition : results)
+        for (Definition definition : results) {
           pws.add(definition.getEntry_id());
+          if (printEachOutputToScreen)
+            System.out.println(definition.getEntry_id());
+        }
         break;
       } catch (RemoteException e) {
         retried++;
@@ -770,6 +782,8 @@ public class KeggAdaptor implements Serializable {
       e.printStackTrace();
     }
 
+    if (printEachOutputToScreen)
+      printToScreen(pathways);
     return pathways;
   }
 
@@ -791,27 +805,30 @@ public class KeggAdaptor implements Serializable {
         if (retried >= 3) throw new TimeoutException();
       }
     }
+    
+    if (printEachOutputToScreen)
+      printToScreen(results);
     return results;
   }
 
   /**
    * 
-   * @param in_id
+   * @param in_id - e.g.. "hsa:8491"
    * @return
    */
-  public String getUniprotIDs(String in_id) { // z.B. "hsa:8491"
+  public String getUniprotIDs(String in_id) {
     return getVariousIDs(in_id, 1);
   }
 
   /**
    * 
-   * @param in_id
-   * @param index
-   * @return
+   * @param in_id - e.g.. "hsa:8491"
+   * @param index - id to return: 0=entret, 1=uniprot, 2=ensembl
+   * @return requested id.
    */
   private String getVariousIDs(String in_id, int index) {
-    if (!in_id.equalsIgnoreCase(last_in_id))
-      retrieveVariousIDs(in_id);
+    //if (!in_id.equalsIgnoreCase(last_in_id))
+    String[] last_id_results = retrieveVariousIDs(in_id);
 
     if (printEachOutputToScreen)
       System.out.println(last_id_results[index]);
@@ -847,13 +864,15 @@ public class KeggAdaptor implements Serializable {
   }
 
   /**
-   * 
-   * @param in_id
+   * @param in_id - kegg id.
+   * @return "NCBI-GeneID:", "UniProt:", "Ensembl:"
    */
-  private void retrieveVariousIDs(String in_id) { // z.B. "hsa:8491"
+  private String[] retrieveVariousIDs(String in_id) { // z.B. "hsa:8491"
     String key[] = new String[] { "NCBI-GeneID:", "UniProt:", "Ensembl:" }; // Siehe 2 Zeilen drueber
 
-    last_in_id = new String(in_id);
+    String[] last_id_results = new String[3];
+    //String last_in_id = new String(in_id);
+    
     in_id = in_id.replace(",", " ");
     String[] split = in_id.split(" ");
 
@@ -878,6 +897,8 @@ public class KeggAdaptor implements Serializable {
       if (last_id_results[k].length() > 0 && last_id_results[k].endsWith(","))
         last_id_results[k] = last_id_results[k].substring(0, last_id_results[k]
             .length() - 1);
+    
+    return last_id_results;
   }
 
 }

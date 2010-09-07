@@ -1,4 +1,5 @@
 package de.zbit.kegg.parser;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -30,18 +31,23 @@ import de.zbit.kegg.parser.pathway.RelationType;
  */
 public class KeggParser extends DefaultHandler {
   /**
-   * 
+   * if silent=false, a few debugging outputs will occur during parsing.
    */
   public static boolean silent = true;
   /**
-   * 
+   * If true, the doctype reference will be removed from your document.
+   * E.g. "<!DOCTYPE pathway SYSTEM "http://www.genome.jp/kegg/xml/KGML_v0.7.0_.dtd">"
+   * will be changed to "<!DOCTYPE pathway>". This will prevent the java xml parser from
+   * going online and downloading the given namespace file.
    */
   public static boolean offlineVersion=false;
   
   /**
-   * 
+   * Parse kgml files.
    * @param filename
-   * @return
+   * @return all pathways in the given kgml file.
+   * Usually, there is only one pathway per file, so the size of the
+   * collection should always be 1.
    */
   public static ArrayList<Pathway> parse(String filename) {
     InputSource inS = new InputSource(OpenFile.openFile(filename));
@@ -49,9 +55,9 @@ public class KeggParser extends DefaultHandler {
   }
   
   /**
-   * 
+   * Parse kgml files.
    * @param inS
-   * @return
+   * @return all pathways in the given kgml file.
    */
   public static ArrayList<Pathway> parse(InputSource inS) {
     if (inS==null) return null;
@@ -299,6 +305,29 @@ public class KeggParser extends DefaultHandler {
         }
       }
     return number;
+  }
+  
+  /**
+   * Just for testing this parser.
+   * @param args
+   */
+  public static void main(String[] args) {
+    // For simple testing
+    if (args==null || args.length<1)
+      args = new String[]{"files/kgml/metabolic/organisms/hsa/hsa00130.xml"};
+    
+    if (args!=null && args.length >0) {
+      File f = new File(args[0]);
+      if (f.isDirectory()) 
+        System.err.println("Can't parse directories.");
+      else {
+        // Parse the pathway.
+        Pathway p = KeggParser.parse(args[0]).get(0);
+        
+        System.out.println(p);
+      }
+      return;
+    }
   }
   
 }

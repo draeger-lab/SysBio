@@ -10,78 +10,6 @@ import de.zbit.kegg.parser.pathway.EntryType;
  */
 public class KeggInfos {
 	/**
-	 * 
-	 * @param go_id
-	 * @return
-	 */
-	public static String getGo_id_with_MiriamURN(String go_id) {
-		// So aufgebaut, da GO_id mehrere enth�lt! Eine funktion muss also
-		// dr�ber iterieren und diese aufrugen.
-		return miriam_urn_geneOntology
-				+ (go_id.contains(":") ? go_id.trim() : "GO:" + go_id.trim());
-	}
-
-	/**
-	 * @param keggId
-	 * @return Complete Miriam URN Including the given ID.
-	 */
-	public static String getMiriamURIforKeggID(String keggId, EntryType et) {
-		String prefix = keggId.toLowerCase().trim();
-		int pos = keggId.indexOf(':');
-		if (pos <= 0) {
-			System.err
-					.println("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted:"
-							+ keggId);
-			return null;
-		}
-		String suffix = keggId.substring(pos + 1).trim();
-		String ret = "";
-
-		// Add Kegg-id Miriam identifier
-		if (prefix.startsWith("cpd:")) {
-			ret = miriam_urn_kgCompound + suffix;
-		} else if (prefix.startsWith("glycan:")) {
-			ret = miriam_urn_kgGlycan + suffix;
-		} else if (prefix.startsWith("ec:")) {
-			ret = miriam_urn_ezymeECcode + suffix;
-		} else if (prefix.startsWith("dr:")) {
-			ret = miriam_urn_kgDrug + suffix;
-		} else if (prefix.startsWith("rn:")) {
-			ret = miriam_urn_kgReaction + suffix;
-		} else if (prefix.startsWith("path:")) { // Link to another pathway
-			ret = miriam_urn_kgPathway + suffix;
-		} else if (et == null && prefix.startsWith("ko:") || et != null
-				&& (et.equals(EntryType.gene) || et.equals(EntryType.ortholog))) {// z.B.
-			// hsa:00123,
-			// ko:00123
-			ret = miriam_urn_kgGenes + keggId.trim(); // Be careful here: Don't
-			// trim to ':'! (Don't
-			// use suffix)
-		} else {
-			System.err.println("Please implement MIRIAM urn for: '" + keggId
-					+ ((et != null) ? "' (" + et.toString() + ")." : "."));
-			return null;
-		}
-		return ret;
-	}
-
-	/**
-	 * If s contains ":" => return values is all chars behind the ":". Else =>
-	 * return value is s.
-	 * 
-	 * @param s
-	 *            - any String.
-	 * @return see above. Result is always trimmed.
-	 */
-	public static String suffix(String s) {
-		if (!s.contains(":")){
-			return s.trim();
-		}
-			return (s.substring(s.indexOf(':') + 1)).trim();
-	}
-
-	// private KeggAdaptor adap;
-	/**
    * 
    */
 	private String Kegg_ID;
@@ -792,5 +720,76 @@ public class KeggInfos {
 		System.out.println(KeggAdaptor.extractInfo(infos, "MASS", "\n")
 				+ " \t=> " + mass);
 	}
+	
+	 /**
+   * 
+   * @param go_id
+   * @return
+   */
+  public static String getGo_id_with_MiriamURN(String go_id) {
+    // So aufgebaut, da GO_id mehrere enth�lt! Eine funktion muss also
+    // dr�ber iterieren und diese aufrugen.
+    return miriam_urn_geneOntology
+        + (go_id.contains(":") ? go_id.trim() : "GO:" + go_id.trim());
+  }
+
+  /**
+   * @param keggId
+   * @return Complete Miriam URN Including the given ID.
+   */
+  public static String getMiriamURIforKeggID(String keggId, EntryType et) {
+    String prefix = keggId.toLowerCase().trim();
+    int pos = keggId.indexOf(':');
+    if (pos <= 0) {
+      System.err
+          .println("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted:"
+              + keggId);
+      return null;
+    }
+    String suffix = keggId.substring(pos + 1).trim();
+    String ret = "";
+
+    // Add Kegg-id Miriam identifier
+    if (prefix.startsWith("cpd:")) {
+      ret = miriam_urn_kgCompound + suffix;
+    } else if (prefix.startsWith("glycan:")) {
+      ret = miriam_urn_kgGlycan + suffix;
+    } else if (prefix.startsWith("ec:")) {
+      ret = miriam_urn_ezymeECcode + suffix;
+    } else if (prefix.startsWith("dr:")) {
+      ret = miriam_urn_kgDrug + suffix;
+    } else if (prefix.startsWith("rn:")) {
+      ret = miriam_urn_kgReaction + suffix;
+    } else if (prefix.startsWith("path:")) { // Link to another pathway
+      ret = miriam_urn_kgPathway + suffix;
+    } else if (et == null && prefix.startsWith("ko:") || et != null
+        && (et.equals(EntryType.gene) || et.equals(EntryType.ortholog))) {// z.B.
+      // hsa:00123,
+      // ko:00123
+      ret = miriam_urn_kgGenes + keggId.trim(); // Be careful here: Don't
+      // trim to ':'! (Don't
+      // use suffix)
+    } else {
+      System.err.println("Please implement MIRIAM urn for: '" + keggId
+          + ((et != null) ? "' (" + et.toString() + ")." : "."));
+      return null;
+    }
+    return ret;
+  }
+
+  /**
+   * If s contains ":" => return values is all chars behind the ":". Else =>
+   * return value is s.
+   * 
+   * @param s
+   *            - any String.
+   * @return see above. Result is always trimmed.
+   */
+  public static String suffix(String s) {
+    if (!s.contains(":")){
+      return s.trim();
+    }
+    return (s.substring(s.indexOf(':') + 1)).trim();
+  }
 
 }
