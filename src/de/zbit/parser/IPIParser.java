@@ -4,6 +4,7 @@
 package de.zbit.parser;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.log4j.Level;
 
@@ -11,7 +12,9 @@ import de.zbit.dbfetch.IPIFetcher;
 import de.zbit.util.LogUtil;
 
 /**
- * @author Finja Buechel: finja.buechel@uni-tuebingen.de
+ * @author Finja B&uml;chel
+ * 
+ * Parse information out of the text it gets from the IPIFetcher
  * 
  */
 public class IPIParser {
@@ -32,10 +35,11 @@ public class IPIParser {
 
   /**
    * @param ids
-   * @return
+   * @return list of arrays[ipi,ac]
    */
-  private String[][] getUniProtACs(String[] ids) {
-    String[][] acs = new String[ids.length][2];
+  public ArrayList<String[]> getUniProtACs(String[] ids) {
+    ArrayList<String[]> ac = new ArrayList<String[]>();
+ 
     String[] results = IPIManagement.getInformations(ids);
     
     for( int i = 0; i < results.length; i++) {
@@ -45,20 +49,22 @@ public class IPIParser {
           String line = splitLines[j];
 
           if(line.startsWith("DR   UniProtKB/Swiss-Prot")){
-            acs[i][0] = ids[i];
+            
             String[] lineEntries = line.split(";");
-
-            acs[i][1] = lineEntries[1];
+            String[] s = new String[]{ids[i].trim(),lineEntries[1].trim()};
+            if(!ac.contains(s))
+              ac.add(s);
           }
         } 
       }
       else{
-        acs[i][0] = ids[i];
-        acs[i][1] = "null";
+        String[] s = new String[]{ids[i],null};
+        if(!ac.contains(s))
+          ac.add(s);
       }
     }
 
-    return acs;
+    return ac;
   }
   
   /**
@@ -75,9 +81,9 @@ public class IPIParser {
                     "IPI00381412","IPI00407692","IPI00420349","IPI00420385","IPI00454142","IPI00462072",
                     "IPI00467833"};
 
-    String[][] results = ipiParser.getUniProtACs(ids);
-    for (int i = 0; i<results.length; i++) {
-      System.out.println(results[i][0] + "\t" + results[i][1]);
+    ArrayList<String[]> results = ipiParser.getUniProtACs(ids);
+    for (int i = 0; i<results.size(); i++) {
+      System.out.println(results.get(i)[0] + "\t" + results.get(i)[1]);
     }
 
 }

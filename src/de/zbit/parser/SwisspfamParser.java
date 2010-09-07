@@ -13,7 +13,7 @@ import java.util.List;
 import de.zbit.io.OpenFile;
 
 /**
- * @author Finja Buechel: finja.buechel@uni-tuebingen.de
+ * @author Finja B&uml;chel
  * 
  * 
  * Der Parser erstellt aus der ursprünglichen Swisspfam Datei, eine Datei in folgendem Format:

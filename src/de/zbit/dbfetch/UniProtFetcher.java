@@ -4,6 +4,8 @@ package de.zbit.dbfetch;
  * 
  * @author unknown
  * 
+ * Fetches uniprot data, but doesn't save it like the UniProtWrapper! 
+ * 
  */
 public class UniProtFetcher extends DBFetcher {
 
