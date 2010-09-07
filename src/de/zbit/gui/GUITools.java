@@ -6,16 +6,22 @@ package de.zbit.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -25,13 +31,17 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
+
+import de.zbit.io.OpenFile;
 
 /**
  * This class contains various GUI tools.
  * 
- * @author draeger
+ * @author Andreas Dr&auml;ger
  * @author wrzodek
  * 
  */
@@ -50,14 +60,18 @@ public class GUITools {
 	public static JButton createButton(Icon icon, ActionListener listener,
 			Object command, String toolTip) {
 		JButton button = new JButton();
-		if (icon != null)
+		if (icon != null) {
 			button.setIcon(icon);
-		if (listener != null)
+		}
+		if (listener != null) {
 			button.addActionListener(listener);
-		if (command != null)
+		}
+		if (command != null) {
 			button.setActionCommand(command.toString());
-		if (toolTip != null)
+		}
+		if (toolTip != null) {
 			button.setToolTipText(toHTML(toolTip, 40));
+		}
 		return button;
 	}
 
@@ -73,8 +87,9 @@ public class GUITools {
 	public static JButton createButton(String text, Icon icon,
 			ActionListener listener, Object command, String toolTip) {
 		JButton button = createButton(icon, listener, command, toolTip);
-		if (text != null)
+		if (text != null) {
 			button.setText(text);
+		}
 		return button;
 	}
 
@@ -104,7 +119,8 @@ public class GUITools {
 	 * @param dir
 	 * @param allFilesAcceptable
 	 * @param multiSelectionAllowed
-	 * @param mode - e.g. JFileChooser.FILES_ONLY
+	 * @param mode
+	 *            - e.g. JFileChooser.FILES_ONLY
 	 * @return
 	 */
 	public static JFileChooser createJFileChooser(String dir,
@@ -121,7 +137,8 @@ public class GUITools {
 	 * @param dir
 	 * @param allFilesAcceptable
 	 * @param multiSelectionAllowed
-	 * @param mode - e.g. JFileChooser.FILES_ONLY
+	 * @param mode
+	 *            - e.g. JFileChooser.FILES_ONLY
 	 * @param filter
 	 * @return
 	 */
@@ -132,12 +149,159 @@ public class GUITools {
 				multiSelectionAllowed, mode);
 		if (filter != null) {
 			int i = filter.length - 1;
-			while (0 <= i)
+			while (0 <= i) {
 				chooser.addChoosableFileFilter(filter[i--]);
-			if (i >= 0)
+			}
+			if (i >= 0) {
 				chooser.setFileFilter(filter[i]);
+			}
 		}
 		return chooser;
+	}
+
+	/**
+	 * Creates a new JMenuItem with the given text as label and the mnemonic.
+	 * All given menu items are added to the menu.
+	 * 
+	 * @param text
+	 * @param mnemonic
+	 * @param menuItems
+	 * @return
+	 */
+	public static JMenu createJMenu(String text, char mnemonic,
+			JMenuItem... menuItems) {
+		JMenu fileMenu = new JMenu(text);
+		fileMenu.setMnemonic(mnemonic);
+		for (JMenuItem item : menuItems) {
+			fileMenu.add(item);
+		}
+		return fileMenu;
+	}
+
+	/**
+	 * Creates a new {@link JMenu} with the given menu items and sets the first
+	 * letter in the menu's name as mnemonic.
+	 * 
+	 * @param text
+	 * @param menuItems
+	 * @return
+	 */
+	public static JMenu createJMenu(String text, JMenuItem... menuItems) {
+		return createJMenu(text, text.charAt(0), menuItems);
+	}
+
+	/**
+	 * Creates an entry for the menu bar.
+	 * 
+	 * @param text
+	 * @param listener
+	 * @param command
+	 * @return
+	 */
+	public static JMenuItem createJMenuItem(String text,
+			ActionListener listener, Object command) {
+		return createJMenuItem(text, listener, command, (Icon) null);
+	}
+
+	/**
+	 * 
+	 * @param text
+	 * @param listener
+	 * @param command
+	 * @param icon
+	 * @return
+	 */
+	public static JMenuItem createJMenuItem(String text,
+			ActionListener listener, Object command, Icon icon) {
+		return createJMenuItem(text, listener, command, icon, null);
+	}
+
+	/**
+	 * Creates an entry for the menu bar.
+	 * 
+	 * @param text
+	 * @param listener
+	 * @param command
+	 * @param icon
+	 * @param mnemonic
+	 * @return
+	 */
+	public static JMenuItem createJMenuItem(String text,
+			ActionListener listener, Object command, Icon icon, char mnemonic) {
+		return createJMenuItem(text, listener, command, icon, null, Character
+				.valueOf(mnemonic));
+	}
+
+	/**
+	 * Creates a new item for a {@link JMenu}.
+	 * 
+	 * @param text
+	 *            the text of the JMenuItem
+	 * @param listener
+	 *            the ActionListener to be added
+	 * @param command
+	 *            the action command for this button, i.e., the item in the
+	 *            menu. This will be converted to a {@link String} using the
+	 *            {@link String.#toString()} method.
+	 * @param icon
+	 *            the icon of the JMenuItem (can be null)
+	 * @param keyStroke
+	 *            the KeyStroke which will serve as an accelerator
+	 * @return A new {@link JMenuItem} with the given features.
+	 */
+	public static JMenuItem createJMenuItem(String text,
+			ActionListener listener, Object command, Icon icon,
+			KeyStroke keyStroke) {
+		return createJMenuItem(text, listener, command, icon, keyStroke, null);
+	}
+
+	/**
+	 * Creates an entry for the menu bar.
+	 * 
+	 * @param text
+	 * @param listener
+	 * @param command
+	 * @param icon
+	 * @param ks
+	 * @param mnemonic
+	 * @return
+	 */
+	public static JMenuItem createJMenuItem(String text,
+			ActionListener listener, Object command, Icon icon, KeyStroke ks,
+			Character mnemonic) {
+		JMenuItem item = new JMenuItem();
+		if (text != null) {
+			item.setText(text);
+		}
+		if (ks != null) {
+			item.setAccelerator(ks);
+		}
+		if (listener != null) {
+			item.addActionListener(listener);
+		}
+		if (mnemonic != null) {
+			item.setMnemonic(mnemonic.charValue());
+		}
+		if (command != null) {
+			item.setActionCommand(command.toString());
+		}
+		if (icon != null) {
+			item.setIcon(icon);
+		}
+		return item;
+	}
+
+	/**
+	 * 
+	 * @param text
+	 * @param listener
+	 * @param command
+	 * @param keyStroke
+	 * @return
+	 */
+	public static JMenuItem createJMenuItem(String text,
+			ActionListener listener, Object command, KeyStroke keyStroke) {
+		return createJMenuItem(text, listener, command, null, keyStroke);
 	}
 
 	/**
@@ -339,6 +503,68 @@ public class GUITools {
 		exc.printStackTrace();
 		JOptionPane.showMessageDialog(parent, exc.getMessage(), exc.getClass()
 				.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+	}
+
+	/**
+	 * Displays a message on a message dialog window, i.e., an HTML document.
+	 * 
+	 * @param path
+	 *            the URL of an HTML document.
+	 * @param title
+	 *            the title of the dialog to be displayed
+	 * @param owner
+	 *            the parent of the dialog or null.
+	 */
+	public static void showMessage(URL path, String title, Component owner) {
+		showMessage(path, title, owner, null);
+	}
+
+	/**
+	 * 
+	 * @param path
+	 * @param title
+	 * @param owner
+	 * @param icon
+	 */
+	public static void showMessage(URL path, String title, Component owner,
+			Icon icon) {
+		JBrowserPane browser = new JBrowserPane(path);
+		browser.removeHyperlinkListener(browser);
+		browser.addHyperlinkListener(new SystemBrowser());
+		browser.setBorder(BorderFactory.createEtchedBorder());
+
+		try {
+			File f = new File(OpenFile.doDownload(path.toString()));
+			BufferedReader br;
+			br = new BufferedReader(new FileReader(f));
+			String line;
+			int rowCount = 0, maxLine = 0;
+			while (br.ready()) {
+				line = br.readLine();
+				if (line.length() > maxLine) {
+					maxLine = line.length();
+				}
+				rowCount++;
+			}
+
+			if ((rowCount > 100) || (maxLine > 250)) {
+				JScrollPane scroll = new JScrollPane(browser,
+						JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				// TODO: Calculate required size using the font size.
+				scroll.setMaximumSize(new Dimension(470, 470));
+				Dimension prefered = new Dimension(450, 450);
+				browser.setPreferredSize(prefered);
+				JOptionPane.showMessageDialog(owner, scroll, title,
+						JOptionPane.INFORMATION_MESSAGE, icon);
+			} else {
+				JOptionPane.showMessageDialog(owner, browser, title,
+						JOptionPane.INFORMATION_MESSAGE, icon);
+			}
+		} catch (IOException exc) {
+			exc.printStackTrace();
+			showErrorMessage(owner, exc);
+		}
 	}
 
 	/**
