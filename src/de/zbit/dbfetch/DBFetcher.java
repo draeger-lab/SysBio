@@ -9,8 +9,13 @@ import uk.ac.ebi.webservices.WSDbfetchClient;
 import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
+import de.zbit.util.Utils;
 
 /**
+ * Abstract implementation of the WSDBfetch client:
+ * {@link http://www.ebi.ac.uk/Tools/webservices/services/dbfetch}.
+ * 
+ * 
  * @author Finja B&uuml;chel: finja.buechel@uni-tuebingen.de
  * @author Clemens Wrzodek: clemens.wrzodek@uni-tuebingen.de
  * @author Florian Mittag: florian.mittag@uni-tuebingen.de
@@ -178,13 +183,21 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
           
           String toCheck = getCheckStrFromInfo(info);
           
+          // Iterate over every ID and try to map the block to the id
           for (int index = startID; index <= endID; index++) {
+            // Has the id already an associated block?
             if (ret[index] != null && (ret[index].length() > 0))
               continue;
 
+            // Does the ID or AC line contain this idText?
             if (matchIDtoInfo(ids[index], toCheck)) {
               ret[index] = info;
-              break;
+              
+              // Don't break here. 1:n mapping possible. With break,
+              // we would make an 1:1 mapping.
+              // E.g. when fetching "ENOA_MOUSE" and "P17182" the result
+              // is the same data-block.
+              // break;
             }
           }
         }
@@ -237,8 +250,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         for (int i = 0; i < ids.length; i++)
           if (ret[i] == null || ret[i].length() == 0)
             c++;
-        log.info("Fixing single not mappable or not found IDs (" + c
-                  + ")...");
+        log.info("Fixing single not mappable or not found IDs (" + c + ")...");
         prog = new ProgressBar(c);
       }
 
@@ -316,7 +328,13 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
    *         otherwise <code>false</code>
    */
   public boolean matchIDtoInfo(String id, String toCheck) {
-    return toCheck.contains(id);
+    /*
+     *  Contains might lead to wrong results. Perform an
+     *  Case insensitive word search (e.g. query: NOA_MOUSE and
+     *  result contains "ENOA_MOUSE" => result is a wrong mapping.
+     */
+    //return toCheck.contains(id);
+    return Utils.isWord(toCheck, id);
   }
   
   /*
