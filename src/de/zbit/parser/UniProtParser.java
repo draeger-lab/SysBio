@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.zbit.uniprot.UniProtWrapper;
+import de.zbit.dbfetch.UniProtFetcher;
 
 /**
  * @author Finja B&uml;chel
@@ -19,22 +19,22 @@ import de.zbit.uniprot.UniProtWrapper;
  * 
  */
 public class UniProtParser {
-  UniProtWrapper UniProtWrapper = null;
+  UniProtFetcher UniProtFetcher = null;
 
-  public UniProtParser(UniProtWrapper w) {
+  public UniProtParser(UniProtFetcher w) {
     super();
-    this.UniProtWrapper = w;
+    this.UniProtFetcher = w;
   }
   
   public UniProtParser() {
     super();
     try {
       if (new File("uniprot.dat").exists())
-        UniProtWrapper = (UniProtWrapper) UniProtWrapper.loadFromFilesystem("uniprot.dat");
+        UniProtFetcher = (UniProtFetcher) UniProtFetcher.loadFromFilesystem("uniprot.dat");
     } catch (Throwable e) {
     }
-    if (UniProtWrapper == null)
-      UniProtWrapper = new UniProtWrapper(80000);
+    if (UniProtFetcher == null)
+      UniProtFetcher = new UniProtFetcher(80000);
   }
 
   /**
@@ -42,7 +42,7 @@ public class UniProtParser {
    */
   public List<String[]> getGene(String[] identifier) {
     List<String[]> genes = new ArrayList<String[]>();
-    String[] proteins = UniProtWrapper.getInformations(identifier);
+    String[] proteins = UniProtFetcher.getInformations(identifier);
 
     String[] splitLine, splitEntry, split;
     String protein = "", gene = "";
@@ -100,7 +100,7 @@ public class UniProtParser {
     String[] uniProtBlockLine, splitLine;
     String id = "";
 
-    String[] results = UniProtWrapper.getInformations(acs);
+    String[] results = UniProtFetcher.getInformations(acs);
 
     for (int i=0; i<results.length; i++) {
       String uniProtBlock = results[i];
@@ -141,8 +141,8 @@ public class UniProtParser {
   /**
    * @return
    */
-  public UniProtWrapper getUniprotManager() {
-    return UniProtWrapper;
+  public UniProtFetcher getUniprotManager() {
+    return UniProtFetcher;
   }
 
 
