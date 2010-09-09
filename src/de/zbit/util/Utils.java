@@ -466,34 +466,41 @@ public class Utils {
   }
   
   /**
-   * Kann auch als Synonym f�r "containsWord" gebraucht werden.
+   * Returns, wether the containedString does occur somewhere in containingLine as a word.
+   * E.g. containingLine = "12.ENOA_MOUSE ABC". "NOA_MOUSE" is no word, but "ENOA_MOUSE"
+   * is a word.
+   * The function could also be called "containsWord".
    * @param containingLine
    * @param containedString
-   * @return
+   * @return true if and only if containedString is contained in containingLine and is not
+   * sourrounded by a digit or letter.
    */
   public static boolean isWord(String containingLine, String containedString) {
     return isWord(containingLine, containedString, false);
   }
   
   /**
-   * 
+   * Returns, wether the containedString does occur somewhere in containingLine as a word.
+   * E.g. containingLine = "12.ENOA_MOUSE ABC". "NOA_MOUSE" is no word, but "ENOA_MOUSE"
+   * is a word.
    * @param containingLine
    * @param containedString
-   * @param ignoreDigits
-   * @return
+   * @param ignoreDigits - if false, digits will be treated as part of a word (default case).
+   * If true, digits will be treated as NOT being part of a word (a word splitter, like a space).
+   * @return true if and only if containedString is contained in containingLine as word.
    */
   public static boolean isWord(String containingLine, String containedString, boolean ignoreDigits) {
     // Check if it's a word
     int pos = -1;
     while (true) {
-      if (pos+1>=containedString.length()) break;
+      if (pos+1>=containingLine.length()) break;
       pos = containingLine.indexOf(containedString, pos+1);
       if (pos<0) break;
       
-      boolean linksOK = true;
+      boolean leftOK = true;
       if (pos>0) {
         char l = containingLine.charAt(pos-1);
-        if ((Character.isDigit(l) && !ignoreDigits) || Character.isLetter(l)) linksOK = false;
+        if ((Character.isDigit(l) && !ignoreDigits) || Character.isLetter(l)) leftOK = false;
       }
       boolean rechtsOK = true;
       if (pos+containedString.length()<containingLine.length()) {
@@ -501,7 +508,7 @@ public class Utils {
         if ((Character.isDigit(l) &&!ignoreDigits) || Character.isLetter(l)) rechtsOK = false;
       }
       
-      if (rechtsOK && linksOK) return true;
+      if (rechtsOK && leftOK) return true;
     }
     return false;
   }
