@@ -57,7 +57,7 @@ public class UniProtFetcher extends DBFetcher {
 	@Override
 	public String getCheckStrFromInfo(String info) {
 		// check every line until AC or everything if no AC line is there
-		int endPos = info.indexOf("\n", info.indexOf("\nAC"));
+		int endPos = info.indexOf("\n", info.indexOf("\nAC")+1);
 		String toCheck = (endPos > 0) ? info.substring(0, endPos) : info;
 		return toCheck;
 	}
