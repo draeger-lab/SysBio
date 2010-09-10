@@ -34,6 +34,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;  
   private SortedArrayList<IDtype> unsuccessfulQueries; // Remember those separately
   private int maxListSize;
+  private boolean cacheChangedSinceLastLoading=false;
   
   
   public InfoManagement() {
@@ -72,7 +73,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * what may be usefull if the underlying database is updated.
    */
   public void cleanupUnsuccessfulAndEmptyInfos() {
-    unsuccessfulQueries.clear();
+    if (unsuccessfulQueries.size()>0) {
+      cacheChangedSinceLastLoading=true;
+      unsuccessfulQueries.clear();
+    }
     
     for (int i=0; i<rememberedInfos.size(); i++) {
       Info<IDtype, INFOtype> in = rememberedInfos.get(i);
@@ -80,6 +84,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
           in.getInformation()==null || in.getInformation().toString().equals("") || in.getInformation().toString().equals("0") ){
         rememberedInfos.remove(i);
         i--;
+        cacheChangedSinceLastLoading=true;
       }
     }
   }
@@ -88,11 +93,22 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * Clears the whole cache (rememberedInfos and unsuccessfulQueries).
    */
   public void clearCache() {
+    if (unsuccessfulQueries.size()>0 || rememberedInfos.size()>0) cacheChangedSinceLastLoading=true;
     unsuccessfulQueries.clear();
     rememberedInfos.clear();
   }
   
-  // TODO Cacha Changed Method.
+  /**
+   * Returns wether this class has been changed since it has been initiated
+   * or loaded from the hard drive.
+   * You should only save the cache if this is true. Else, saving won't give
+   * you more information.
+   * @return class has been changed since last readObject() (serializable loading)
+   * or since initializing.
+   */
+  public boolean isCacheChangedSinceLastLoading() {
+    return cacheChangedSinceLastLoading;
+  }
   
   /**
    * Adds the given information. It is intended, that this function does NOT check if the information
@@ -158,6 +174,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     }
     
     rememberedInfos.add(infoObject);
+    cacheChangedSinceLastLoading=true;
   }
   
   /**
@@ -185,6 +202,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         }
       }
     }
+    
+    if (found) cacheChangedSinceLastLoading=true;
+    
     return found;
   }
  
@@ -218,7 +238,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     while (ret==null) {
       try {
         ret = fetchInformation(id);
-        if (ret==null) unsuccessfulQueries.add(id);
+        if (ret==null) {
+          unsuccessfulQueries.add(id);
+          cacheChangedSinceLastLoading=true;
+        }
         break;
       } catch (TimeoutException e) {
         retried++;
@@ -230,6 +253,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       } catch (UnsuccessfulRetrieveException e) {
         log.debug("Unsuccessful retrieval, marking this ID as unretrievable", e);
         unsuccessfulQueries.add(id);
+        cacheChangedSinceLastLoading=true;
         break;
       } catch (Throwable t) {
         // do NOT retry and do NOT save anything... simply return the null
@@ -259,7 +283,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   protected abstract INFOtype[] fetchMultipleInformations(IDtype[] ids) throws TimeoutException, UnsuccessfulRetrieveException;
   
   /**
-   * 
+   * This will fetch all given ids (NOT using cache) and handle the UnsuccessfulRetrieveException
+   * and TimeoutException exceptions. It will update the unsuccessfulQueries() collection and
+   * return the resulting infos.
    * @param ids
    * @return
    */
@@ -272,13 +298,19 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     while (ret==null) {
       try {
         ret = fetchMultipleInformations(ids);
-        /* !do NOT modify unsuccessfulQueries in this method. This will break
-         * mapping of old cache and new infos in the getInformation method!
-        if (ret==null) unsuccessfulQueries.addAll(ids);
-        else {
-          for (int i=0; i<ids.length; i++)
-            if (ids[i]!=null && !ids[i].equals("") && ret[i]==null) unsuccessfulQueries.add(ids[i]);
-        }*/
+        
+        // Cache the unsuccessfulQueries
+        if (ret==null) {
+          unsuccessfulQueries.addAll(ids);
+          cacheChangedSinceLastLoading=true;
+        } else {
+          for (int i=0; i<ids.length; i++) {
+            if (ids[i]!=null && !ids[i].equals("") && ret[i]==null) {
+              unsuccessfulQueries.add(ids[i]);
+              cacheChangedSinceLastLoading=true;
+            }
+          }
+        }
         break;
       } catch (TimeoutException e) {
         retried++;
@@ -289,12 +321,8 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         }
       } catch (UnsuccessfulRetrieveException e) {
         log.debug("Unsuccessful retrieval, marking ALL IDs as unretrievable", e);
-        /*
-         * !do NOT modify unsuccessfulQueries in this method. This will break
-         * mapping of old cache and new infos in the getInformation method!
-         
         unsuccessfulQueries.addAll(ids);
-        */
+        cacheChangedSinceLastLoading=true;
         break;
       } catch (Throwable t) {
         // do NOT retry and do NOT save anything... simply return the null
@@ -311,9 +339,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   }
   
   /**
-   * 
-   * @param id
-   * @return
+   * Retrieve a single information. This will use the cached information, if available. Else,
+   * it will call the fetchInformation method and cache the answer.
+   * @param id - id to query.
+   * @return INFOtype - the answer.
    */
   public synchronized INFOtype getInformation(IDtype id) {
     int pos = rememberedInfos.indexOf(id);
@@ -330,62 +359,68 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   
   
   /**
-   * 
-   * @param ids
-   * @return
+   * Retrieve multiple informations. This will used the cached information, if available. Else,
+   * it will call the fetchMultipleInformation method and build a cache on the answer. The
+   * returned results use the same indices as the given ids. 
+   * @param ids - ids to query.
+   * @return INFOtype - array of same size, with same ordering as ids.
    */
   @SuppressWarnings("unchecked")
   public synchronized INFOtype[] getInformations(IDtype[] ids) {
+    if (ids==null) return null;
     ArrayList<IDtype> filteredIDs = new ArrayList<IDtype>();
     boolean touched = false; // if true, ids!=filteredIDs
+    INFOtype anyCachedInfo=null;
     for (IDtype id: ids) {
-      if (rememberedInfos.indexOf(id)<0 && !unsuccessfulQueries.contains(id)) { // Same if-order as below!
+      int pos = rememberedInfos.indexOf(id);
+      if (pos<0 && !unsuccessfulQueries.contains(id)) { // Same if-order as below!
         filteredIDs.add(id);
       } else {
         touched = true;
+        if (anyCachedInfo==null) anyCachedInfo=rememberedInfos.get(pos).getInformation();
       }
     }
     
-        
+    
+    
     if (touched) {
-      //IDtype[] test = (IDtype[]) Array.newInstance(ids.getClass(), filteredIDs.size());
-      IDtype[] test = (IDtype[]) resizeArray(ids.clone(),filteredIDs.size());
-      //IDtype[] test = Arrays.copyOf(ids, filteredIDs.size());
-      for (int i=0; i<test.length; i++)
-        Array.set(test, i, filteredIDs.get(i));
+      // Some elements are already in our cache.
+    
+      IDtype[] filtIDs = (IDtype[]) createNewArray(ids,filteredIDs.size());
+      for (int i=0; i<filtIDs.length; i++)
+        Array.set(filtIDs, i, filteredIDs.get(i));
       
-      INFOtype[] ret = fetchMultipleInformationWrapper(test);
+      INFOtype[] ret = fetchMultipleInformationWrapper(filtIDs);
       
+      // Big Problem: Java does not permit creating an generic array
       //INFOtype[] infos = new INFOtype[ids.length]; // Not permitted... workaround: 
       //INFOtype[] infosTemp = (INFOtype[]) Array.newInstance(ret.getClass(), ids.length);
       //INFOtype[] infosTemp = Arrays.copyOf(ret, ids.length); // Create a new Reference to an existing array, WITH NEW SIZE
       //INFOtype[] infos = infosTemp.clone(); // After creating new reference with correct size, create new array.
-      // TODO: RET=NULL?, UNSUC. QUERIES.
-      INFOtype[] infos = (INFOtype[]) resizeArray(ret.clone(),ids.length);
+      INFOtype[] infos = (INFOtype[]) createNewArray(anyCachedInfo,ids.length);
       
-      int i2=0;
+      // Iterate in parallel through ids, infos and filteredIDs
+      int infos_i=0;
       for (int i=0; i<ids.length; i++) {
         int pos = rememberedInfos.indexOf(ids[i]);
         if (pos>=0) { // Same if-order as above!
           infos[i] = rememberedInfos.get(pos).getInformation();
-          System.out.println(ids[i] + " fram cache");
-        } else if (unsuccessfulQueries.contains(ids[i])) {
-          infos[i] = null;
-          System.out.println(ids[i] + " unsuccesfull Cache");
-        } else {
+        } else if (ids[i].equals(filtIDs[infos_i])){
           // Newly fetched infos
-          if (ret!=null && ret.length<i2) System.err.println("Something went badly wrong."); // should never happen. (=null => unsuccessfulQueries)
-          if (ret!=null){
-            infos[i] = ret[i2];
-            if (ret[i2]!=null) addInformation(ids[i], ret[i2]);
-            i2++;
-            if (infos[i]!=null)
-              System.out.println(ids[i] + " q " + infos[i].toString().substring(0,50).replace("\n", "|"));
-            else
-              System.out.println(ids[i] + " NULL");
+          if (ret!=null && ret.length<infos_i) {
+            // should never happen. (=null => unsuccessfulQueries)
+            System.err.println("Something went badly wrong. Your fetchMultipleInformations method must return an array of exactly the same size as the input id array!");
+            infos[i] = null;
+          } else if (ret!=null){
+            infos[i] = ret[infos_i];
+            if (ret[infos_i]!=null) addInformation(ids[i], ret[infos_i]);
           }else{
             infos[i] = null;
           }
+          infos_i++;
+        } else if (unsuccessfulQueries.contains(ids[i])) {
+          // Must be below "Newly fetched infos" because it is modified in fetchMultipleInformationWrapper.
+          infos[i] = null;
         }
       }
       return infos;
@@ -399,11 +434,16 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   }
   
   /**
-   * 
+   * Precache ids, so they are available as soon as you query them.
+   * This is usefull if you know that you are going to query mulitple ids with
+   * a single query. Than you can precache them here, which results in on fetchMulti
+   * query, and later on retrieve them with getInformation().
+   * This will significantly increas performance, since you queried all with one query.
    * @param ids
    */
   @SuppressWarnings("unchecked")
   public synchronized void precacheIDs(IDtype[] ids) {
+    if (ids==null || ids.length<1) return;
     ArrayList<IDtype> filteredIDs = new ArrayList<IDtype>();
     boolean touched = false; // if true, ids!=filteredIDs
     for (IDtype id: ids) {
@@ -415,32 +455,30 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     }
     
     INFOtype[] infos;
+    IDtype[] filtIDs = ids;
     if (touched) {
+      // Some elements are already in our cache.
+      
+      // Big Problem: Java does not permit creating an generic array
       // IDtype[] filtIDs = new IDtype[filteredIDs.size()]; // Not permitted... workaround:
       //IDtype[] filtIDs = (IDtype[]) Array.newInstance(ids.getClass(), filteredIDs.size()); // <= funzt auch nicht.
-      // Funzt in Java 1.6 (nächste zwei zeilen):
+      // Funzt nur in Java 1.6 (nächste zwei zeilen):
       //IDtype[] temp = Arrays.copyOf(ids, filteredIDs.size()); // Create a new Reference to an existing array, WITH NEW SIZE
       //IDtype[] filtIDs = temp.clone(); // After creating new reference with correct size, create new array.
-      IDtype[] filtIDs = (IDtype[]) resizeArray(ids.clone(),filteredIDs.size());
+      filtIDs = (IDtype[]) createNewArray(ids,filteredIDs.size());
       
       for (int i=0; i<filtIDs.length; i++)
         Array.set(filtIDs, i, filteredIDs.get(i));
-      
-      infos = fetchMultipleInformationWrapper(filtIDs);
-      if (infos==null) return;
-      
-      // Add retrieved infos
-      for (int i=0; i<infos.length; i++)
-        if (infos[i]!=null && ids[i]!=null) addInformation(filtIDs[i], infos[i]);
-
-    } else {
-      infos = fetchMultipleInformationWrapper(ids);
-      if (infos==null) return;
-      
-      // Add retrieved infos
-      for (int i=0; i<infos.length; i++)
-        if (infos[i]!=null && ids[i]!=null) addInformation(ids[i], infos[i]);
-    }    
+    }
+    
+    // Query unknown ids    
+    infos = fetchMultipleInformationWrapper(ids);
+    if (infos==null) return;
+    
+    // Add retrieved infos
+    for (int i=0; i<infos.length; i++)
+      if (infos[i]!=null && ids[i]!=null) addInformation(ids[i], infos[i]);
+    
   }
   
   /**
@@ -481,19 +519,48 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   }
   
   /**
-   * 
+   * Creates a new array, of the given size, that contains all items
+   * from the old one and has the new size.
+   * Uses reflection methods, so this method is save to use with generics.
    * @param oldArray
    * @param newSize
-   * @return
+   * @return resized array (copy of old one, including elements of old one).
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("unused")
   private static Object resizeArray(Object oldArray, int newSize) {
-    int oldSize = java.lang.reflect.Array.getLength(oldArray);
-    Class elementType = oldArray.getClass().getComponentType();
-    Object newArray = java.lang.reflect.Array.newInstance(elementType, newSize);
+    int oldSize = 0;
+    if (oldArray.getClass().isArray())
+      oldSize = java.lang.reflect.Array.getLength(oldArray);
+    
+    Object newArray = createNewArray(oldArray, newSize);
+    
     int preserveLength = Math.min(oldSize, newSize);
     if (preserveLength > 0)
       System.arraycopy(oldArray, 0, newArray, 0, preserveLength);
+    return newArray;
+  }
+  
+  /**
+   * Creates a new array, uses reflection methods, so this method is save
+   * to use with generics.
+   * @param type - the method will infere the class of the object from this
+   * given sample. Just give any sample of the class you want to create a new
+   * array from. The sample won't be touched.
+   * @param size
+   * @return new array of the class of the given type, with the given size.
+   */
+  @SuppressWarnings("unchecked")
+  private static Object createNewArray(Object type, int size) {
+    Class elementType=null;
+    if (type instanceof Class)
+      elementType = (Class) type;
+    else if (type.getClass().isArray())
+      elementType = type.getClass().getComponentType();
+    
+    // If oldArray was in fact no array, then elementType==null here.
+    if (elementType==null) elementType = type.getClass();
+    Object newArray = java.lang.reflect.Array.newInstance(elementType, size);
+    
     return newArray;
   }
 
@@ -536,6 +603,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     in.defaultReadObject();
     
     restoreUnserializableObject();
+    cacheChangedSinceLastLoading=false;
   }
   
 }
