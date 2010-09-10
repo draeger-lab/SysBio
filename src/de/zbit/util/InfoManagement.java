@@ -33,7 +33,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   
   private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;  
   private SortedArrayList<IDtype> unsuccessfulQueries; // Remember those separately
-  private int cacheSize;
+  private int maxListSize; // Unfortunately serialized in many instances. Don't rename it.
   private boolean cacheChangedSinceLastLoading=false;
   
   
@@ -49,9 +49,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   public InfoManagement(int maxCacheSize) {
     if (maxCacheSize<1) System.err.println("Initialized a InfoManagement cache with size " + maxCacheSize);
-    this.cacheSize = maxCacheSize;
-    rememberedInfos = new SortedArrayList<Info<IDtype, INFOtype>>(Math.max(this.cacheSize+1, 0));
-    unsuccessfulQueries = new SortedArrayList<IDtype>((10*this.cacheSize)+1); // so many, since usually this does not take much memory.
+    this.maxListSize = maxCacheSize;
+    rememberedInfos = new SortedArrayList<Info<IDtype, INFOtype>>(Math.max(this.maxListSize+1, 0));
+    unsuccessfulQueries = new SortedArrayList<IDtype>((10*this.maxListSize)+1); // so many, since usually this does not take much memory.
   }
   
   /**
@@ -75,7 +75,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @return the maximum number of elements, to store informations for.
    */
   public int getCacheSize() {
-    return cacheSize;
+    return maxListSize;
   }
 
   /**
@@ -85,7 +85,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @param cacheSize
    */
   public void setCacheSize(int cacheSize) {
-    this.cacheSize = cacheSize;
+    this.maxListSize = cacheSize;
   }
 
   /**
@@ -167,7 +167,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   public synchronized void addInformation(Info<IDtype, INFOtype> infoObject) {
     // Ensure constant max list capacity. Remove least frequently used item.
-    while (rememberedInfos.size()>=cacheSize) {
+    while (rememberedInfos.size()>=maxListSize) {
       /* It is quite difficult to save an DataType sorted by object usage and object to quickly remove the least frequent
        * used one. That's I'm using a heuristic, just quering the bottom 1000 ones, which is in O(1). 
        
@@ -194,7 +194,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
           if (minUsage<1) break; // 0.1 = can't get any lower.;  <1 = low enough ;-) (iterating though all items is inefficient).
         }
       }
-      rememberedInfos.remove(itemToDelete);
+      
+      // If some honks set list size to 0 or -1, itemToDelete is -1.
+      if (itemToDelete>=0)
+        rememberedInfos.remove(itemToDelete);
+      else
+        break;
     }
     
     rememberedInfos.add(infoObject);
@@ -406,7 +411,6 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     }
     
     
-    
     if (touched) {
       // Some elements are already in our cache.
     
@@ -447,8 +451,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
           infos[i] = null;
         }
       }
+      
       return infos;
     } else {
+      // No id is cached.
       INFOtype[] infos = fetchMultipleInformationWrapper(ids);
       if (infos==null) return null;
       for (int i=0; i<infos.length; i++)
@@ -495,7 +501,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         Array.set(filtIDs, i, filteredIDs.get(i));
     }
     
-    // Query unknown ids    
+    // Query unknown ids
     infos = fetchMultipleInformationWrapper(ids);
     if (infos==null) return;
     

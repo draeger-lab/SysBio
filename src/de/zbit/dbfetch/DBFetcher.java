@@ -7,6 +7,7 @@ import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
 import uk.ac.ebi.webservices.axis1.WSDbfetchClient;
+import uk.ac.ebi.webservices.axis1.stubs.wsdbfetch.DbfNoEntryFoundException;
 import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
@@ -56,7 +57,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
   /**
    * 
    */
-  private WSDbfetchClient dbfetch = new WSDbfetchClient();
+  private transient WSDbfetchClient dbfetch = new WSDbfetchClient();
   // TODO: get rid of global variables, this is unclean code
   /**
    * 
@@ -112,20 +113,23 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
     // fetch proteins
     String entriesStr = "";
     int retried = 0;
-    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
+    final int retryLimit=3;
+    while (retried < retryLimit && (entriesStr == null || entriesStr.length() == 0)) {
       try {
+        if (dbfetch==null) restoreUnserializableObject();
         entriesStr = dbfetch.fetchData(getDbName() + ":" + id.toUpperCase(),
             getFormat(), getStyleString());
         break;
-      } catch (AxisFault e ) {
+      } catch (DbfNoEntryFoundException e ) {
         throw new UnsuccessfulRetrieveException( e );
       } catch (Exception e) {
         retried++;
+        if (retryLimit==retryLimit) e.printStackTrace();
         log.debug("Attempt " + retried + " to fetch data failed", e);
       }
     }
 
-    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0))
+    if (retried >= retryLimit && (entriesStr == null || entriesStr.length() == 0))
       throw new TimeoutException();
     if (entriesStr.trim().length() == 0)
       throw new UnsuccessfulRetrieveException();
@@ -144,17 +148,27 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
   private void fetchMultipleChecked(String[] ids, String[] ret,
             String queryString, int startID, int endID) {
     String entriesStr = "";
+    final int retryLimit=3;
     int retried = 0;
-    while (retried < 3 && (entriesStr == null || entriesStr.length() == 0)) {
+    while (retried < retryLimit && (entriesStr == null || entriesStr.length() == 0)) {
       try {
-        entriesStr = dbfetch.fetchBatch(getDbName(), queryString, getFormat(),
-                  getStyleString());
+        // I've no idea why, but sometimes the initial restoring call didn't work.
+        if (dbfetch==null) restoreUnserializableObject();
+        entriesStr = dbfetch.fetchBatch(getDbName(), queryString, getFormat(),getStyleString());
+      } catch (DbfNoEntryFoundException e) {
+        // Propagate to caller.
+        for (int index = startID; index <= endID; index++)
+          ret[index] = null;
+        return;
       } catch (Exception e) {
+        // One of DbfParamsException, DbfConnException, DbfException, 
+        // InputException, RemoteException, ServiceException
         retried++;
+        if (retryLimit==retryLimit) e.printStackTrace();
         log.debug("Attempt " + retried + " to fetch data failed", e);        
       }
     }
-    if (retried >= 3 && (entriesStr == null || entriesStr.length() == 0)) {
+    if (retried >= retryLimit && (entriesStr == null || entriesStr.length() == 0)) {
       // Try it protein by protein
       String[] splitt = queryString.split(",");
       for (int j = 0; j < splitt.length; j++) {
@@ -268,6 +282,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         }
       }
     }
+    
 
     if (showProgress)
       log.info("Done.");
