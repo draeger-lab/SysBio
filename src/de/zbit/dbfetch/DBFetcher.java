@@ -127,8 +127,14 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         entriesStr = dbfetch.fetchData(getDbName() + ":" + id.toUpperCase(),
             getFormat(), getStyleString());
         break;
-      } catch (DbfNoEntryFoundException e ) {
-        throw new UnsuccessfulRetrieveException( e );
+      } catch (AxisFault e) {
+        if (e.getMessage().contains("DbfNoEntryFoundException"))
+          throw new UnsuccessfulRetrieveException( e );
+        else {
+          retried++;
+          if (retryLimit==retryLimit) e.printStackTrace();
+          log.debug("Attempt " + retried + " to fetch data failed", e);
+        }
       } catch (Exception e) {
         retried++;
         if (retryLimit==retryLimit) e.printStackTrace();
@@ -162,11 +168,17 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         // I've no idea why, but sometimes the initial restoring call didn't work.
         if (dbfetch==null) restoreUnserializableObject();
         entriesStr = dbfetch.fetchBatch(getDbName(), queryString, getFormat(),getStyleString());
-      } catch (DbfNoEntryFoundException e) {
-        // Propagate to caller.
-        for (int index = startID; index <= endID; index++)
-          ret[index] = null;
-        return;
+      } catch (AxisFault e) {
+        if (e.getMessage().contains("DbfNoEntryFoundException")) {
+          // Propagate to caller.
+          for (int index = startID; index <= endID; index++)
+            ret[index] = null;
+          return;
+        } else {
+          retried++;
+          if (retryLimit==retryLimit) e.printStackTrace();
+          log.debug("Attempt " + retried + " to fetch data failed", e);
+        }
       } catch (Exception e) {
         // One of DbfParamsException, DbfConnException, DbfException, 
         // InputException, RemoteException, ServiceException
