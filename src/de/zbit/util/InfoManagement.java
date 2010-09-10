@@ -405,8 +405,8 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         int pos = rememberedInfos.indexOf(ids[i]);
         if (pos>=0) { // Same if-order as above!
           infos[i] = rememberedInfos.get(pos).getInformation();
-        } else if (ids[i].equals(filtIDs[infos_i])){
-          // Newly fetched infos
+        } else if (filteredIDs.size()>0 && ids[i].equals(filtIDs[infos_i])){
+          // Newly fetched infos (filteredIDs==0 if all in cache).
           if (ret!=null && ret.length<infos_i) {
             // should never happen. (=null => unsuccessfulQueries)
             System.err.println("Something went badly wrong. Your fetchMultipleInformations method must return an array of exactly the same size as the input id array!");
