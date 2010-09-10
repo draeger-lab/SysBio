@@ -36,7 +36,6 @@ public class UniProtParser {
     }
     if (UniProtManagement == null)
       UniProtManagement = new UniProtFetcher(80000);
-    UniProtManagement.cleanupUnsuccessfulAndEmptyInfos(); // TODO: Remove this line.
   }
 
   /**
@@ -103,20 +102,12 @@ public class UniProtParser {
     String[] uniProtBlockLine, splitLine;
 
     String[] results = UniProtManagement.getInformations(acs);
-    if (results==null) System.out.println("All null.");
+    
     if(results!=null){
-      
-      
       for (int i=0; i<results.length; i++) {
-        
-        System.out.print("Result for " + acs[i]+":");
-        if (results[i]==null) System.out.println("null");
-        else System.out.println(results[i].substring(0, Math.min(results[i].length(), 50)).replace("\n", " ").trim());
-        
         String uniProtBlock = results[i];
 
         if (uniProtBlock==null) {
-          
           continue;
         }
 
