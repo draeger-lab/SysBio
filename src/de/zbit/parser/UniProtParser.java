@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.zbit.dbfetch.UniProtFetcher;
+import de.zbit.util.InfoManagement;
 
 /**
  * @author Finja B&uml;chel
@@ -19,22 +20,23 @@ import de.zbit.dbfetch.UniProtFetcher;
  * 
  */
 public class UniProtParser {
-  UniProtFetcher UniProtFetcher = null;
+  UniProtFetcher UniProtManagement = null;
 
   public UniProtParser(UniProtFetcher w) {
     super();
-    this.UniProtFetcher = w;
+    this.UniProtManagement = w;
   }
   
   public UniProtParser() {
     super();
     try {
       if (new File("uniprot.dat").exists())
-        UniProtFetcher = (UniProtFetcher) UniProtFetcher.loadFromFilesystem("uniprot.dat");
+        UniProtManagement = (UniProtFetcher) UniProtManagement.loadFromFilesystem("uniprot.dat");
     } catch (Throwable e) {
     }
-    if (UniProtFetcher == null)
-      UniProtFetcher = new UniProtFetcher(80000);
+    if (UniProtManagement == null)
+      UniProtManagement = new UniProtFetcher(80000);
+    UniProtManagement.cleanupUnsuccessfulAndEmptyInfos(); // TODO: Remove this line.
   }
 
   /**
@@ -42,7 +44,7 @@ public class UniProtParser {
    */
   public List<String[]> getGene(String[] identifier) {
     List<String[]> genes = new ArrayList<String[]>();
-    String[] proteins = UniProtFetcher.getInformations(identifier);
+    String[] proteins = UniProtManagement.getInformations(identifier);
 
     String[] splitLine, splitEntry, split;
     String protein = "", gene = "";
@@ -96,44 +98,61 @@ public class UniProtParser {
    * @return list of [uniprot ac][uniprot id]
    */
   public ArrayList<String[]> getUniProtID(String[] acs) {
+    
     ArrayList<String[]> ids = new ArrayList<String[]>();
     String[] uniProtBlockLine, splitLine;
-    String id = "";
 
-    String[] results = UniProtFetcher.getInformations(acs);
+    String[] results = UniProtManagement.getInformations(acs);
+    if (results==null) System.out.println("All null.");
+    if(results!=null){
+      
+      
+      for (int i=0; i<results.length; i++) {
+        
+        System.out.print("Result for " + acs[i]+":");
+        if (results[i]==null) System.out.println("null");
+        else System.out.println(results[i].substring(0, Math.min(results[i].length(), 50)).replace("\n", " ").trim());
+        
+        String uniProtBlock = results[i];
 
-    for (int i=0; i<results.length; i++) {
-      String uniProtBlock = results[i];
-
-      if (uniProtBlock==null) {
-        continue;
-      }
-
-      while (uniProtBlock.contains("   ")) {
-        uniProtBlock = uniProtBlock.replace("   ", "  ");
-      }
-
-      uniProtBlock = uniProtBlock.replace("  ", "\t");
-
-      uniProtBlockLine = uniProtBlock.split("\n");
-      for (String line : uniProtBlockLine) {
-        line = line.trim().toUpperCase();
-        splitLine = line.split("\t");
-
-        if (splitLine[0].equals("ID")) {
-          id = splitLine[1];
+        if (uniProtBlock==null) {
+          
+          continue;
         }
 
-        if (splitLine[0].equals("AC")) {
-          String[] splitACLine = splitLine[1].split(";");
-          for(int j=0; j<splitACLine.length; j++){ 
-            if(acs[i].startsWith(splitACLine[j].trim())){
-              ids.add(new String[]{acs[i], id});
-            }
+        while (uniProtBlock.contains("   ")) {
+          uniProtBlock = uniProtBlock.replace("   ", "  ");
+        }
+
+        uniProtBlock = uniProtBlock.replace("  ", "\t");
+        uniProtBlockLine = uniProtBlock.split("\n");
+        
+        String id = "";
+        for (String line : uniProtBlockLine) {
+          line = line.trim().toUpperCase();
+          splitLine = line.split("\t");
+
+          if (splitLine[0].equals("ID")) {
+            id = splitLine[1].trim();
+            if (id.contains(" "))
+              id = id.substring(0, id.indexOf(" "));
+            break;
           }
+
+          /*if (splitLine[0].equals("AC")) {
+            String[] splitACLine = splitLine[1].split(";");
+            for(int j=0; j<splitACLine.length; j++){ 
+              if(splitACLine[j].trim().startsWith(acs[i])){
+                ids.add(new String[]{acs[i], id});
+              }
+            }
+          }*/
+          
         }
+        ids.add(new String[]{acs[i], id});
       }
     }
+    
 
     return ids;
   }
@@ -142,7 +161,7 @@ public class UniProtParser {
    * @return
    */
   public UniProtFetcher getUniprotManager() {
-    return UniProtFetcher;
+    return UniProtManagement;
   }
 
 
@@ -253,6 +272,12 @@ public class UniProtParser {
         //          for (String[] s : overAllArray) {
         //            System.out.println(s[0] + "\t" + s[1] + "\t\t" + s[2]);
         //          }
+      }
+      
+      // Just make sure you don't loose infos next time.
+      if (ipiParser.getIPIManagement().isCacheChangedSinceLastLoading()) {
+        InfoManagement.saveToFilesystem("ipi.dat", ipiParser.getIPIManagement());
+        System.out.println("Saved ipi.dat with size " + ipiParser.getIPIManagement().getNumberOfCachedIDs() + "(" + ipiParser.getIPIManagement().getNumberOfCachedInfos() + " infos).");
       }
     }
   }

@@ -33,7 +33,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   
   private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;  
   private SortedArrayList<IDtype> unsuccessfulQueries; // Remember those separately
-  private int maxListSize;
+  private int cacheSize;
   private boolean cacheChangedSinceLastLoading=false;
   
   
@@ -43,19 +43,19 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   
   /**
    * Constructor. Initialize this InfoManagement object with a maximum cache
-   * size of <code>maxListSize</code> entries.
+   * size of <code>maxCacheSize</code> entries.
    * 
-   * @param maxListSize the maximum number of cached entries
+   * @param maxCacheSize the maximum number of cached entries
    */
-  public InfoManagement(int maxListSize) {
-    if (maxListSize<1) System.err.println("Initialized a InfoManagement list with size " + maxListSize);
-    this.maxListSize = maxListSize;
-    rememberedInfos = new SortedArrayList<Info<IDtype, INFOtype>>(this.maxListSize+1);
-    unsuccessfulQueries = new SortedArrayList<IDtype>((10*this.maxListSize)+1); // so many, since usually this does not take much memory.
+  public InfoManagement(int maxCacheSize) {
+    if (maxCacheSize<1) System.err.println("Initialized a InfoManagement cache with size " + maxCacheSize);
+    this.cacheSize = maxCacheSize;
+    rememberedInfos = new SortedArrayList<Info<IDtype, INFOtype>>(Math.max(this.cacheSize+1, 0));
+    unsuccessfulQueries = new SortedArrayList<IDtype>((10*this.cacheSize)+1); // so many, since usually this does not take much memory.
   }
   
   /**
-   * @return The number of remembered infos and unsuccessful queries (as sum).
+   * @return The number of remembered-infos and unsuccessful queries (as sum).
    */
   public int getNumberOfCachedIDs() {
     int sum = 0;
@@ -64,6 +64,30 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     return sum;
   }
   
+  /**
+   * @return Returns the number of remember-infos (no unsuccessful queries).
+   */
+  public int getNumberOfCachedInfos() {
+    return rememberedInfos.size();
+  }
+  
+  /**
+   * @return the maximum number of elements, to store informations for.
+   */
+  public int getCacheSize() {
+    return cacheSize;
+  }
+
+  /**
+   * Set a new cache size. This is the maximum number of ids to
+   * store infos for. The number of unsuccessful queries (ids
+   * without infos) is not affected by the maximum cache size!
+   * @param cacheSize
+   */
+  public void setCacheSize(int cacheSize) {
+    this.cacheSize = cacheSize;
+  }
+
   /**
    * This method clears the unsuccessfulQueries array. In addition, it removes
    * all rememberedInfos that have a query(IDtype) or content(INFOtype) that is
@@ -99,12 +123,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   }
   
   /**
-   * Returns wether this class has been changed since it has been initiated
-   * or loaded from the hard drive.
-   * You should only save the cache if this is true. Else, saving won't give
-   * you more information.
-   * @return class has been changed since last readObject() (serializable loading)
-   * or since initializing.
+   * Returns whether this class has been changed since it has been initiated
+   * or loaded from the hard drive or saved to hard drive.
+   * You should only save the cache if this is true. Else, saving won't make
+   * much sense.
+   * @return class has been changed since last readObject() (serializable loading),
+   * writeObject() (serializable saving) or since initializing.
    */
   public boolean isCacheChangedSinceLastLoading() {
     return cacheChangedSinceLastLoading;
@@ -143,7 +167,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   public synchronized void addInformation(Info<IDtype, INFOtype> infoObject) {
     // Ensure constant max list capacity. Remove least frequently used item.
-    while (rememberedInfos.size()>=maxListSize) {
+    while (rememberedInfos.size()>=cacheSize) {
       /* It is quite difficult to save an DataType sorted by object usage and object to quickly remove the least frequent
        * used one. That's I'm using a heuristic, just quering the bottom 1000 ones, which is in O(1). 
        
@@ -589,6 +613,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     cleanupUnserializableObject();
     
     out.defaultWriteObject();
+    cacheChangedSinceLastLoading=false;
   }
   
   /**
