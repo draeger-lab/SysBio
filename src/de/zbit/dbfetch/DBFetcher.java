@@ -14,10 +14,17 @@ import de.zbit.util.ProgressBar;
 import de.zbit.util.Utils;
 
 /**
- * Abstract implementation of the WSDBfetch client:
+ * Abstract implementation of the WSDBfetch client, using a cache and
+ * more convenient methods.
  * {@link http://www.ebi.ac.uk/Tools/webservices/services/dbfetch}.
  * 
- * 
+ * <p>For further infos on WSDBFetch, see:</p>
+ * <ul>
+ * <li><a href="http://www.ebi.ac.uk/Tools/webservices/services/dbfetch">http://www.ebi.ac.uk/Tools/webservices/services/dbfetch</a></li>
+ * <li><a href="http://www.ebi.ac.uk/Tools/webservices/tutorials/06_programming/java">http://www.ebi.ac.uk/Tools/webservices/tutorials/06_programming/java</a></li>
+ * <li><a href="http://ws.apache.org/axis/">http://ws.apache.org/axis/</a></li>
+ * </ul>
+ *
  * @author Finja B&uuml;chel: finja.buechel@uni-tuebingen.de
  * @author Clemens Wrzodek: clemens.wrzodek@uni-tuebingen.de
  * @author Florian Mittag: florian.mittag@uni-tuebingen.de
@@ -233,6 +240,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
     int protInQS = 0;
     int startID = 0;
     ProgressBar prog = null;
+    
 
     if (showProgress) {
       log.info("Trying mass retrieve...");
