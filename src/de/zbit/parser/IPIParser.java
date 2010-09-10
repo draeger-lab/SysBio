@@ -29,8 +29,13 @@ public class IPIParser {
     }
     if (IPIManagement == null)
       IPIManagement = new IPIFetcher(80000);
+    
+    IPIManagement.cleanupUnsuccessfulAndEmptyInfos();
   }
   
+  public IPIFetcher getIPIManagement() {
+    return IPIManagement;
+  }
 
 
   /**

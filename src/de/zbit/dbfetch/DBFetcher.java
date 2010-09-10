@@ -1,6 +1,7 @@
 package de.zbit.dbfetch;
 
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
@@ -165,13 +166,13 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
       }
     } else {
       // divided by "//"
-      String[] splitt = entriesStr.split("\n//");
+      String[] splitt = entriesStr.split(Pattern.quote("\n//\n"));
 
       // optimal case: as many answers as requests
       if ((splitt.length - 1) == queryString.split(",").length) { // -1 due to last "\n"
         int j = 0;
         for (int index = startID; index <= endID; index++) {
-          ret[index] = splitt[j];
+          ret[index] = splitt[j]+"\n//\n";
           j++;
         }
       } else {
@@ -191,7 +192,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
 
             // Does the ID or AC line contain this idText?
             if (matchIDtoInfo(ids[index], toCheck)) {
-              ret[index] = info;
+              ret[index] = info+"\n//\n";
               
               // Don't break here. 1:n mapping possible. With break,
               // we would make an 1:1 mapping.
