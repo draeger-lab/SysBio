@@ -7,7 +7,6 @@ import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
 import uk.ac.ebi.webservices.axis1.WSDbfetchClient;
-import uk.ac.ebi.webservices.axis1.stubs.wsdbfetch.DbfNoEntryFoundException;
 import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
