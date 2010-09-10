@@ -85,6 +85,16 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   }
   
   /**
+   * Clears the whole cache (rememberedInfos and unsuccessfulQueries).
+   */
+  public void clearCache() {
+    unsuccessfulQueries.clear();
+    rememberedInfos.clear();
+  }
+  
+  // TODO Cacha Changed Method.
+  
+  /**
    * Adds the given information. It is intended, that this function does NOT check if the information
    * is already available.
    * @param id
@@ -262,9 +272,13 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     while (ret==null) {
       try {
         ret = fetchMultipleInformations(ids);
+        /* !do NOT modify unsuccessfulQueries in this method. This will break
+         * mapping of old cache and new infos in the getInformation method!
         if (ret==null) unsuccessfulQueries.addAll(ids);
-        for (int i=0; i<ids.length; i++)
-          if (ids[i]!=null && !ids[i].equals("") && ret[i]==null) unsuccessfulQueries.add(ids[i]);
+        else {
+          for (int i=0; i<ids.length; i++)
+            if (ids[i]!=null && !ids[i].equals("") && ret[i]==null) unsuccessfulQueries.add(ids[i]);
+        }*/
         break;
       } catch (TimeoutException e) {
         retried++;
@@ -275,7 +289,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         }
       } catch (UnsuccessfulRetrieveException e) {
         log.debug("Unsuccessful retrieval, marking ALL IDs as unretrievable", e);
+        /*
+         * !do NOT modify unsuccessfulQueries in this method. This will break
+         * mapping of old cache and new infos in the getInformation method!
+         
         unsuccessfulQueries.addAll(ids);
+        */
         break;
       } catch (Throwable t) {
         // do NOT retry and do NOT save anything... simply return the null
@@ -326,6 +345,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         touched = true;
       }
     }
+    
         
     if (touched) {
       //IDtype[] test = (IDtype[]) Array.newInstance(ids.getClass(), filteredIDs.size());
@@ -340,6 +360,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       //INFOtype[] infosTemp = (INFOtype[]) Array.newInstance(ret.getClass(), ids.length);
       //INFOtype[] infosTemp = Arrays.copyOf(ret, ids.length); // Create a new Reference to an existing array, WITH NEW SIZE
       //INFOtype[] infos = infosTemp.clone(); // After creating new reference with correct size, create new array.
+      // TODO: RET=NULL?, UNSUC. QUERIES.
       INFOtype[] infos = (INFOtype[]) resizeArray(ret.clone(),ids.length);
       
       int i2=0;
@@ -347,13 +368,24 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         int pos = rememberedInfos.indexOf(ids[i]);
         if (pos>=0) { // Same if-order as above!
           infos[i] = rememberedInfos.get(pos).getInformation();
+          System.out.println(ids[i] + " fram cache");
         } else if (unsuccessfulQueries.contains(ids[i])) {
           infos[i] = null;
+          System.out.println(ids[i] + " unsuccesfull Cache");
         } else {
-          if (ret==null || ret.length<i2 || ret[i2]==null) System.err.println("Something went badly wrong."); // should never happen. (=null => unsuccessfulQueries)
-          infos[i] = ret[i2];
-          if (ret[i2]!=null) addInformation(ids[i], ret[i2]);
-          i2++;
+          // Newly fetched infos
+          if (ret!=null && ret.length<i2) System.err.println("Something went badly wrong."); // should never happen. (=null => unsuccessfulQueries)
+          if (ret!=null){
+            infos[i] = ret[i2];
+            if (ret[i2]!=null) addInformation(ids[i], ret[i2]);
+            i2++;
+            if (infos[i]!=null)
+              System.out.println(ids[i] + " q " + infos[i].toString().substring(0,50).replace("\n", "|"));
+            else
+              System.out.println(ids[i] + " NULL");
+          }else{
+            infos[i] = null;
+          }
         }
       }
       return infos;
