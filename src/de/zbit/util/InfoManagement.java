@@ -64,6 +64,27 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   }
   
   /**
+   * This method clears the unsuccessfulQueries array. In addition, it removes
+   * all rememberedInfos that have a query(IDtype) or content(INFOtype) that is
+   * a) null, b) .toString().equals("") or c) .toString().equals("0").
+   * 
+   * The intention of this method is to re-fetch empty or unsuccessfulQueries
+   * what may be usefull if the underlying database is updated.
+   */
+  public void cleanupUnsuccessfulAndEmptyInfos() {
+    unsuccessfulQueries.clear();
+    
+    for (int i=0; i<rememberedInfos.size(); i++) {
+      Info<IDtype, INFOtype> in = rememberedInfos.get(i);
+      if (in.getIdentifier()==null || in.getIdentifier().toString().equals("") || in.getIdentifier().toString().equals("0") ||
+          in.getInformation()==null || in.getInformation().toString().equals("") || in.getInformation().toString().equals("0") ){
+        rememberedInfos.remove(i);
+        i--;
+      }
+    }
+  }
+  
+  /**
    * Adds the given information. It is intended, that this function does NOT check if the information
    * is already available.
    * @param id
@@ -193,17 +214,27 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         retried++;
         if (retried>=3) {
           log.debug("3 attempts failed with a TimeoutException");
+          e.printStackTrace();
           break;
         }
       } catch (UnsuccessfulRetrieveException e) {
         log.debug("Unsuccessful retrieval, marking this ID as unretrievable", e);
         unsuccessfulQueries.add(id);
         break;
+      } catch (Throwable t) {
+        // do NOT retry and do NOT save anything... simply return the null
+        // This may happen e.g. if this class is used to manage db queries
+        // and the user or database is offline.
+        log.debug("Catched an unknown exception while fetching informations", t);
+        t.printStackTrace();
+        ret=null;
+        break;
       }
     }
     
     return ret;
   }
+  
   
   /**
    * Please SEE {@link fetchInformation} for more annotations!
@@ -212,6 +243,8 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * If you set certain elements in the array to null, only the id at this index was not successfully queried. 
    * @param ids - MAY CONTAIN null or empty IDS, may also be a list of size 0 !!!!!
    * @return
+   * @throws TimeoutException - if and only if the timeout is for ALL object.
+   * @throws UnsuccessfulRetrieveException - if and only if none of all ids could be retrieved.
    */
   protected abstract INFOtype[] fetchMultipleInformations(IDtype[] ids) throws TimeoutException, UnsuccessfulRetrieveException;
   
@@ -236,11 +269,21 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       } catch (TimeoutException e) {
         retried++;
         if (retried>=3) {
+          log.debug("3 attempts failed for all with a TimeoutException");
           e.printStackTrace();
           break;
         }
       } catch (UnsuccessfulRetrieveException e) {
+        log.debug("Unsuccessful retrieval, marking ALL IDs as unretrievable", e);
         unsuccessfulQueries.addAll(ids);
+        break;
+      } catch (Throwable t) {
+        // do NOT retry and do NOT save anything... simply return the null
+        // This may happen e.g. if this class is used to manage db queries
+        // and the user or database is offline.
+        log.debug("Catched an unknown exception while fetching multiple informations", t);
+        t.printStackTrace();
+        ret=null;
         break;
       }
     }
