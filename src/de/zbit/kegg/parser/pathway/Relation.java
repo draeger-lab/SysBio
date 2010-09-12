@@ -82,6 +82,14 @@ public class Relation {
   
   /**
    * 
+   * @param s
+   */
+  public void addSubtype(SubType s) {
+	  subtypes.add(s);
+  }
+  
+  /**
+   * 
    * @return
    */
   public RelationType getType() {
