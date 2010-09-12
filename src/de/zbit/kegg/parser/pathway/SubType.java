@@ -53,9 +53,23 @@ public class SubType {
 	 */
 	String name;
 	/**
+	 * Interaction/relation property value.
+	 * See <a href="http://www.genome.jp/kegg/xml/docs/#label:34">official
+	 * documentation</a>.
 	 * 
 	 */
 	String value;
+	
+	
+	/**
+	 * This is not part of the official kgml specification,
+	 * but it is needed in parts of own code. This allows to
+	 * set an edge color, that should be handled by
+	 * visualizers and converters.
+	 * Set to null, to disable and take default color.
+	 * Color must be encoded as HTML color. E.g. "#FF0000".
+	 */
+	String edgeColor = null;
 
 	/**
 	 * 
@@ -137,9 +151,28 @@ public class SubType {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	
+	/**
+	 * See {@link #edgeColor}.
+	 * @return
+	 */
+	public String getEdgeColor() {
+		return edgeColor;
+	}
+	
+	/**
+	 * See {@link #edgeColor}.
+	 * Color must be encoded as HTML color. E.g. "#FF0000".
+	 * @param edgeColor
+	 */
+	public void setEdgeColor(String edgeColor) {
+		this.edgeColor = edgeColor;
+	}
 
 	/**
-	 * 
+	 * Be careful, value is set with value.replace("&gt;", ">").
+	 * Because when parsing html, "-->" becomes "--&gt;".
 	 * @param value
 	 */
 	public void setValue(String value) {
