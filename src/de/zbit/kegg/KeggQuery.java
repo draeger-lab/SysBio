@@ -25,6 +25,12 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	 */
 	public final static int getIdentifier = 2; // returns: String (each entry
 	// separated by new line)
+	
+	/**
+	 * Input: String gene, String species
+	 * Returns: ArrayList<String> kegg identifiers in an arrayList e.g. "hsa:7529"
+	 */
+	public final static int getKEGGIdentifierForAGeneSymbol = 3;
 
 	/**
 	 * 

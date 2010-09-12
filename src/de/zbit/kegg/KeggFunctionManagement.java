@@ -96,6 +96,8 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
         answer = adap.getIdentifierWithTimeout(id.getQuery());
       } else if (j==KeggQuery.getPathways) {
         answer = adap.getPathwaysWithTimeout(id.getQuery());
+      } else if (j==KeggQuery.getKEGGIdentifierForAGeneSymbol) {
+    	answer = adap.getKEGGIdentifierForAGeneSymbol(id.getQuery(), null);
       } else {
         System.err.println("Unknown job '" + j + "'.");
         throw new UnsuccessfulRetrieveException(); // don't retry.
