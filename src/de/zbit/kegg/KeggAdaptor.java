@@ -635,9 +635,10 @@ public class KeggAdaptor {
     return s;
   }
   
+
   /**
-   * @param gene
-   *          symbol, species e.g. 'hsa'
+   * @param gene symbol
+   * @param species - optional. E.g. "hsa". Set to null for all.
    * @return kegg identifiers in an arrayList e.g. "hsa:7529"
    */
   public ArrayList<String> getKEGGIdentifierForAGeneSymbol(String gene,
@@ -651,7 +652,8 @@ public class KeggAdaptor {
       BufferedReader br = new BufferedReader(new StringReader(s));
       String line;
       while ((line = br.readLine()) != null) {
-        if (line.startsWith(species.toLowerCase())) {
+        if (species==null || species.length()<1 ||
+        		line.startsWith(species.toLowerCase())) {
           identifiers.add(line.substring(0, line.indexOf(" ")));
           if (printEachOutputToScreen) System.out.println(line.substring(0, line.indexOf(" ")));
         }
