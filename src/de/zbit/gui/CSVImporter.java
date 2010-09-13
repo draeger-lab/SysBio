@@ -284,5 +284,4 @@ public class CSVImporter {
 	public boolean isHidingExactColumnNames() {
 		return hideExactColumnNames;
 	}
-
 }
