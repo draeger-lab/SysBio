@@ -146,6 +146,16 @@ public class LayoutHelper {
 			add(comps[i], i + 1, row, 1, 1, 0, 0);
 		}
 	}
+	
+
+	/**
+	 * 
+	 * @param c
+	 * @param width
+	 */
+	public void add(Component c, int width) {
+		add(c, 0, ++row, width, 1);
+	}
 
 	/**
 	 * 

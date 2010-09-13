@@ -164,9 +164,10 @@ public class Reflect {
 				File f = new File(jarPath);
 				if (f.isDirectory()) {
 					String[] pathElements = f.list();
-					for (String entry : pathElements)
+					for (String entry : pathElements) {
 						Reflect.getClassesFromJarFltr(set, jarPath + entry,
 								packageName, true, superClass);
+					}
 				}
 			}
 			classes = Reflect.hashSetToClassArray(set, true);
@@ -176,7 +177,7 @@ public class Reflect {
 
 	/**
 	 * @param <T>
-	 * @param oackage
+	 * @param packageName
 	 * @param includeSubs
 	 * @param bSort
 	 * @param superClass
@@ -185,10 +186,10 @@ public class Reflect {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Class<T>[] getAllClassesInPackage(String oackage,
+	public static <T> Class<T>[] getAllClassesInPackage(String packageName,
 			boolean includeSubs, boolean bSort, Class<T> superClass,
 			String jarPath, boolean excludeAbstractClasses) {
-		Class<T> classes[] = getAllClassesInPackage(oackage, includeSubs,
+		Class<T> classes[] = getAllClassesInPackage(packageName, includeSubs,
 				bSort, superClass, jarPath);
 		if (excludeAbstractClasses) {
 			List<Class<T>> impl = new LinkedList<Class<T>>();
@@ -377,8 +378,9 @@ public class Reflect {
 				}
 				dir = path + "/" + pckgname.replace(".", "/");
 
-				if (TRACE)
+				if (TRACE) {
 					System.out.println(".. opening " + path);
+				}
 
 				directory = new File(dir);
 
@@ -396,9 +398,10 @@ public class Reflect {
 				return getClassesFromDirFltr(set, directory, pckgname,
 						includeSubs, reqSuperCls);
 			} else {
-				if (TRACE)
+				if (TRACE) {
 					System.err.println(directory.getPath()
 							+ " doesnt exist in " + path + ", dir was " + dir);
+				}
 				return 0;
 			}
 		} catch (ClassNotFoundException e) {
@@ -522,22 +525,26 @@ public class Reflect {
 				} catch (Exception e) {
 					System.err.println(e.getMessage());
 				}
-			} else
+			} else {
 				dynCP = getClassPathElements();
+			}
 		}
 
-		if (TRACE)
+		if (TRACE) {
 			System.out.println("classpath is " + classPath);
+		}
 		for (int i = 0; i < dynCP.length; i++) {
-			if (TRACE)
+			if (TRACE) {
 				System.out.println("reading element " + dynCP[i]);
+			}
 			if (dynCP[i].endsWith(".jar")) {
 				getClassesFromJarFltr(set, dynCP[i], pckg, includeSubs,
 						reqSuperCls);
 			} else {
-				if (TRACE)
+				if (TRACE) {
 					System.out.printf("reading from files: %s %s\n", dynCP[i],
 							pckg);
+				}
 				getClassesFromFilesFltr(set, dynCP[i], pckg, includeSubs,
 						reqSuperCls);
 			}
