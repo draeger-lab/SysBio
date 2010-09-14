@@ -10,7 +10,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -23,10 +22,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -41,7 +38,6 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
-import de.zbit.resources.Resource;
 
 /**
  * This class contains various GUI tools.
@@ -350,35 +346,6 @@ public class GUITools {
 	 */
 	public static Font incrementFontSize(Font g, int incrementBy) {
 		return g.deriveFont((float) (g.getSize() + incrementBy));
-	}
-
-	/**
-	 * 
-	 * @param path
-	 * @return
-	 * @throws IOException
-	 */
-	public static Icon loadIcon(String path) {
-		Image img = loadImage(path);
-		return img != null ? new ImageIcon(img) : null;
-	}
-
-	/**
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public static Image loadImage(String path) {
-		try {
-			String p = path.substring(path.indexOf("img"));
-			URL url = Resource.class.getResource(p);
-			return url != null ? ImageIO.read(Resource.class.getResource(path
-					.substring(path.indexOf("img")))) : ImageIO.read(new File(
-					path));
-		} catch (IOException exc) {
-			System.err.printf("Could not load image %s\n", path);
-			return null;
-		}
 	}
 
 	/**

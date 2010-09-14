@@ -29,9 +29,11 @@ import java.awt.event.KeyListener;
 import java.util.Properties;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -109,7 +111,8 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getActionCommand().equals(CANCEL)) {
+		if ((ae.getActionCommand() == null)
+				|| ae.getActionCommand().equals(CANCEL)) {
 			dispose();
 		} else if (ae.getActionCommand().equals(DEFAULTS)) {
 			Properties p = (Properties) properties.clone();
@@ -146,6 +149,11 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * Initializes this dialog.
 	 */
 	private void init(SettingsPanel panel) {
+
+		KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+		getRootPane().registerKeyboardAction(this, stroke,
+				JComponent.WHEN_IN_FOCUSED_WINDOW);
+
 		panelAllSettings = panel;
 		getContentPane().add(panelAllSettings, BorderLayout.CENTER);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -244,6 +252,7 @@ public class SettingsDialog extends JDialog implements ActionListener,
 		setModal(true);
 		panelAllSettings.addItemListener(this);
 		panelAllSettings.addChangeListener(this);
+		panelAllSettings.addKeyListener(this);
 		setVisible(true);
 		return exitStatus;
 	}

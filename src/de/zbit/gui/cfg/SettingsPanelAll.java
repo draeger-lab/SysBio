@@ -20,7 +20,9 @@ package de.zbit.gui.cfg;
 
 import java.awt.GridLayout;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyListener;
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.Properties;
 
 import javax.swing.JPanel;
@@ -94,6 +96,17 @@ public class SettingsPanelAll extends SettingsPanel {
 			getSettingsPanelAt(i).addItemListener(listener);
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.Component#addKeyListener(java.awt.event.KeyListener)
+	 */
+	@Override
+	public void addKeyListener(KeyListener listener) {
+		for (int i = 0; i < tab.getComponentCount(); i++) {
+			getSettingsPanelAt(i).addKeyListener(listener);
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -144,13 +157,13 @@ public class SettingsPanelAll extends SettingsPanel {
 	public void init() {
 		tab = new JTabbedPane();
 		SettingsPanel settingsPanel;
-
 		for (int i = 0; i < classes.length; i++) {
 			if (!classes[i].equals(getClass())) {
 				try {
-					settingsPanel = classes[i].getConstructor(
-							settings.getClass(), defaultSettings.getClass())
-							.newInstance(settings, defaultSettings);
+					Class<SettingsPanel> c = classes[i];
+					Constructor<SettingsPanel> con = c.getConstructor(settings.getClass(),
+							defaultSettings.getClass());
+					settingsPanel = con.newInstance(settings, defaultSettings);
 
 					tab.addTab(settingsPanel.getTitle(), new JScrollPane(
 							settingsPanel,
