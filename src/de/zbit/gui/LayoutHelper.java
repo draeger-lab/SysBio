@@ -146,7 +146,6 @@ public class LayoutHelper {
 			add(comps[i], i + 1, row, 1, 1, 0, 0);
 		}
 	}
-	
 
 	/**
 	 * 
@@ -206,7 +205,7 @@ public class LayoutHelper {
 				weightx, weighty, ipadx, ipady);
 		row = y;
 	}
-
+	
 	/**
 	 * 
 	 * @param label
