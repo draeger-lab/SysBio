@@ -18,6 +18,7 @@
  */
 package de.zbit.gui.cfg;
 
+import java.awt.Panel;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -31,6 +32,24 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
+ * Abstract super class for any {@link SettingsPanel}s, i.e., a GUI element on
+ * which the user may manipulate some preferences. All these are gathered in a
+ * {@link Properties} object. There is one such {@link Properties} element for
+ * the default settings and one that only contains those key-value pairs of
+ * interest here. All key-value pairs that are not required by this class are
+ * removed from the current {@link Properties} element before initialization.
+ * The {@link #init()} method creates the layout of this {@link Panel}. You may
+ * consider to override the method {@link #initConstantFields(Properties)} to
+ * extract other key-value pairs than those that are directly needed for
+ * manipulation. The {@link #getProperties()} method may also be overridden in
+ * case that not all {@link Properties} can be updated while this object is
+ * still visible. In some cases this method may have to gather information from
+ * other GUI elements. Furthermore, this element already implements several
+ * methods to notify listeners about changes. This is absolutely required, but
+ * you may want to override these methods, such as {@link #keyPressed(KeyEvent)}
+ * or {@link #itemStateChanged(ItemEvent)}. Please make sure not to forget to
+ * call these methods from the super class also.
+ * 
  * @author Andreas Dr&auml;ger
  * @since 1.4
  * @date 2010-04-13
@@ -56,7 +75,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * The settings to be changed by the user and the default settings as a
 	 * backup.
 	 */
-	protected Properties settings, defaultSettings;
+	protected Properties properties, defaultSettings;
 
 	/**
 	 * 
@@ -70,6 +89,20 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 		this.defaultSettings = defaultProperties;
 		setProperties(properties);
 	}
+
+	/**
+	 * This method decides whether or not this {@link SettingsPanel} accepts the
+	 * given key parameter as a valid key for which an option can be shown on
+	 * this panel. This method is necessary to filter those settings that are
+	 * not supported to avoid later write conflicts.
+	 * 
+	 * @param key
+	 *            A key parameter for which it is to be decided whether it
+	 *            constitutes a valid option here.
+	 * @return True if the given key corresponds to a valid option, false
+	 *         otherwise.
+	 */
+	public abstract boolean accepts(Object key);
 
 	/**
 	 * 
@@ -95,10 +128,17 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	}
 
 	/**
+	 * A derived class may override this method because it might be necessary to
+	 * gather information from some GUI elements in the properties field
+	 * variable. By default, this method returns a pointer to the properties
+	 * field assuming that during the manipulation of all fields by the user the
+	 * entries within this {@link Properties} object have been updated already.
 	 * 
-	 * @return
+	 * @return A pointer to the currently set properties of this class.
 	 */
-	public abstract Properties getProperties();
+	public Properties getProperties() {
+		return properties;
+	}
 
 	/**
 	 * Returns a meaningful human-readable title for this {@link SettingsPanel}.
@@ -185,9 +225,39 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 
 	/**
 	 * 
-	 * @param settings
+	 * @param properties
 	 */
-	public abstract void setProperties(Properties settings);
+	public void setProperties(Properties properties) {
+		this.properties = new Properties();
+		for (Object key : properties.keySet()) {
+			if (accepts(key)) {
+				this.properties.put(key, properties.get(key));
+			}
+		}
+		initConstantFields(properties);
+		init();
+	}
+
+	/**
+	 * This method allows an implementing class to extract key-value pairs from
+	 * the given properties to set the values of non-modifiable elements. For
+	 * instance, the default open directory for certain file types may not be
+	 * set in this {@link SettingsPanel}, but the path to this directory may be
+	 * required for something else. To avoid writing conflicts, all key-value
+	 * pairs that may cause clashes are removed from the current properties
+	 * using the {@link #accepts(Object)} method. Hence, the field
+	 * {@link #properties} may not contain other important data. In this method
+	 * it is possible to extract these. In the default case, this method will be
+	 * an empty method. If you want to extract other fields, just override this
+	 * method.
+	 * 
+	 * @param properties
+	 *            The originally given {@link Properties} before filtering.
+	 */
+	public void initConstantFields(Properties properties) {
+		// Empty implementation provided so that implementing classes
+		// are not forced to implement this method.
+	}
 
 	/*
 	 * (non-Javadoc)

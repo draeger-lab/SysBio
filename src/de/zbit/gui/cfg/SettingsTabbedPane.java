@@ -41,14 +41,14 @@ import de.zbit.util.Reflect;
  * @since This was part of SBMLsqueezer 1.3
  * @date 2009-09-22
  */
-public class SettingsPanelAll extends SettingsPanel {
+public class SettingsTabbedPane extends SettingsPanel {
 
 	/**
 	 * Load all available {@link SettingsPanel}s. This array is constructed by
 	 * querying the current project and the calling project as well.
 	 */
 	private static Class<SettingsPanel> classes[] = Reflect
-			.getAllClassesInPackage(SettingsPanelAll.class.getPackage()
+			.getAllClassesInPackage(SettingsTabbedPane.class.getPackage()
 					.getName(), true, true, SettingsPanel.class, System
 					.getProperty("user.dir")
 					+ File.separatorChar, true);
@@ -68,8 +68,26 @@ public class SettingsPanelAll extends SettingsPanel {
 	 * @param properties
 	 * @param defaultProperties
 	 */
-	public SettingsPanelAll(Properties properties, Properties defaultProperties) {
+	public SettingsTabbedPane(Properties properties,
+			Properties defaultProperties) {
 		super(properties, defaultProperties);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.cfg.SettingsPanel#accepts(java.lang.Object)
+	 */
+	@Override
+	public boolean accepts(Object key) {
+		if ((tab != null) && (tab.getTabCount() > 0)) {
+			boolean accepts = false;
+			for (int i = 0; i < tab.getTabCount(); i++) {
+				accepts |= getSettingsPanelAt(i).accepts(key);
+			}
+			return accepts;
+		}
+		return true;
 	}
 
 	/*
@@ -96,9 +114,10 @@ public class SettingsPanelAll extends SettingsPanel {
 			getSettingsPanelAt(i).addItemListener(listener);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.awt.Component#addKeyListener(java.awt.event.KeyListener)
 	 */
 	@Override
@@ -115,9 +134,9 @@ public class SettingsPanelAll extends SettingsPanel {
 	 */
 	public Properties getProperties() {
 		for (int i = 0; i < tab.getComponentCount(); i++) {
-			this.settings.putAll(getSettingsPanelAt(i).getProperties());
+			this.properties.putAll(getSettingsPanelAt(i).getProperties());
 		}
-		return settings;
+		return properties;
 	}
 
 	/**
@@ -161,9 +180,10 @@ public class SettingsPanelAll extends SettingsPanel {
 			if (!classes[i].equals(getClass())) {
 				try {
 					Class<SettingsPanel> c = classes[i];
-					Constructor<SettingsPanel> con = c.getConstructor(settings.getClass(),
-							defaultSettings.getClass());
-					settingsPanel = con.newInstance(settings, defaultSettings);
+					Constructor<SettingsPanel> con = c.getConstructor(
+							properties.getClass(), defaultSettings.getClass());
+					settingsPanel = con
+							.newInstance(properties, defaultSettings);
 
 					tab.addTab(settingsPanel.getTitle(), new JScrollPane(
 							settingsPanel,
@@ -205,7 +225,7 @@ public class SettingsPanelAll extends SettingsPanel {
 			removeAll();
 			setLayout(new GridLayout(1, 1));
 		}
-		this.settings = properties;
+		this.properties = properties;
 		init();
 		if (tabIndex < tab.getComponentCount()) {
 			setSelectedIndex(tabIndex);
