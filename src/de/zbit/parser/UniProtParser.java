@@ -3,17 +3,12 @@
  */
 package de.zbit.parser;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import data.Gene;
 import de.zbit.dbfetch.UniProtFetcher;
-import de.zbit.util.InfoManagement;
 import de.zbit.util.SortedArrayList;
 
 /**
@@ -44,8 +39,8 @@ public class UniProtParser {
       UniProtManagement = new UniProtFetcher(80000);
   }
   
-  public SortedArrayList<String> getGeneNames(String block){
-    SortedArrayList<String> names = new SortedArrayList<String>();
+  public String getGeneName(String block){
+    String name = "";
     String[] lineSplit = block.split("\n");
     
     for (String line : lineSplit) {
@@ -59,33 +54,94 @@ public class UniProtParser {
 
             if(split[0].trim().equals("NAME")){
               for (String e : entry) {
-                e = e.trim();
-                if(!names.contains(e))
-                  names.add(e);
+                name = e.trim();
               }
             }
           }
         }    
       }
     }
-    return names;
+    return name;
   }
 
   public SortedArrayList<String> getGeneSynonyms(String block){
     SortedArrayList<String> synonyms = new SortedArrayList<String>();
+    String[] lineSplit = block.split("\n");
     
+    for (String line : lineSplit) {
+      if(line!=null && line.length()>0){
+        String[] geneSplit = line.split(";");
+        for (String gs : geneSplit) {
+          gs = gs.trim();
+          String[] split = gs.split("=");
+          if(split.length==2){          
+            String[] entry = split[1].trim().split(",");
+
+            if(split[0].trim().equals("SYNONYMS")){
+              for (String e : entry) {
+                e = e.trim();
+                if(!synonyms.contains(e))
+                  synonyms.add(e);
+              }
+            }
+          }
+        }    
+      }
+    }
     return synonyms;
   }
   
   public SortedArrayList<String> getGeneOrderedLocusNames(String block){
     SortedArrayList<String> orderedLocusNames = new SortedArrayList<String>();
+    String[] lineSplit = block.split("\n");
     
+    for (String line : lineSplit) {
+      if(line!=null && line.length()>0){
+        String[] geneSplit = line.split(";");
+        for (String gs : geneSplit) {
+          gs = gs.trim();
+          String[] split = gs.split("=");
+          if(split.length==2){          
+            String[] entry = split[1].trim().split(",");
+
+            if(split[0].trim().equals("ORDEREDLOCUSNAMES")){
+              for (String e : entry) {
+                e = e.trim();
+                if(!orderedLocusNames.contains(e))
+                  orderedLocusNames.add(e);
+              }
+            }
+          }
+        }    
+      }
+    }
     return orderedLocusNames;
   }
   
   public SortedArrayList<String> getGeneOrfNames(String block){
     SortedArrayList<String> orfNames = new SortedArrayList<String>();
+    String[] lineSplit = block.split("\n");
     
+    for (String line : lineSplit) {
+      if(line!=null && line.length()>0){
+        String[] geneSplit = line.split(";");
+        for (String gs : geneSplit) {
+          gs = gs.trim();
+          String[] split = gs.split("=");
+          if(split.length==2){          
+            String[] entry = split[1].trim().split(",");
+
+            if(split[0].trim().equals("ORFNAMES")){
+              for (String e : entry) {
+                e = e.trim();
+                if(!orfNames.contains(e))
+                  orfNames.add(e);
+              }
+            }
+          }
+        }    
+      }
+    }
     return orfNames;
   }
   
@@ -99,7 +155,7 @@ public class UniProtParser {
    *             [4] = orfNames (SortedArrayList<String>)
    *  
    */
-  public ArrayList<String>[] getGeneBlock(String[] identifier) {
+  public ArrayList<String>[] getGeneBlocks(String[] identifier) {
     log.info("getGene identifier.length(): " + identifier.length);
     
     String[] proteinBlock = UniProtManagement.getInformations(identifier);
@@ -126,7 +182,8 @@ public class UniProtParser {
             geneBlocks.add(sb.toString());
             sb.setLength(0);
           }
-          sb.append(line + "\n");
+          else
+            sb.append(line + "\n");
         }
       }
       geneBlocks.add(sb.toString());
