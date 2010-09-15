@@ -208,10 +208,21 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	}
 
 	/**
+	 * This actually checks whether or not the directory on the given
+	 * {@link JTextField} does exist or not. The second argument gives the
+	 * default value to reset the element. Depending on the value of the field
+	 * {@link #createDir} this method attempts to create the directory if not
+	 * yet existent or directly displays an error message on a
+	 * {@link JOptionPane}.
 	 * 
 	 * @param tf
+	 *            The text field with a directory name.
 	 * @param defaultDir
-	 * @return
+	 *            The default value in case of invalid content in the text
+	 *            field.
+	 * @return True if the content of the given text field is a valid directory
+	 *         or could be successfully created, false otherwise. Maybe error
+	 *         messages will be displayed to the user on {@link JOptionPane}s.
 	 */
 	private boolean checkDir(JTextField tf, String defaultDir) {
 		if (tf != null) {
@@ -222,6 +233,7 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 			if (createDir) {
 				try {
 					f.createNewFile();
+					return true;
 				} catch (IOException exc) {
 					GUITools.showErrorMessage(this, exc);
 				}
@@ -237,16 +249,28 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	}
 
 	/**
+	 * Checks whether or not the currently selected open directory represents a
+	 * valid and existing directory. Depending on the field {@link #createDir}
+	 * this method will attempt to create the directory if not yet present or
+	 * directly display an error message to the user using a certain
+	 * {@link JOptionPane}.
 	 * 
-	 * @return
+	 * @return True if the directory in the open text field is already existing
+	 *         or could be successfully created, false otherwise.
 	 */
 	public boolean checkOpenDir() {
 		return checkDir(tfOpenDir, defaultOpenDir);
 	}
 
 	/**
+	 * Checks whether or not the currently selected save directory represents a
+	 * valid and existing directory. Depending on the field {@link #createDir}
+	 * this method will attempt to create the directory if not yet present or
+	 * directly display an error message to the user using a certain
+	 * {@link JOptionPane}.
 	 * 
-	 * @return
+	 * @return True if the directory in the save text field is already existing
+	 *         or could be successfully created, false otherwise.
 	 */
 	public boolean checkSaveDir() {
 		return checkDir(tfSaveDir, defaultSaveDir);
@@ -283,16 +307,22 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	}
 
 	/**
+	 * Provides access to the default value for the open directory.
 	 * 
-	 * @return
+	 * @return The path to the directory that is the default value for the open
+	 *         text field or null if no default value has been set for this
+	 *         element.
 	 */
 	public String getDefaultOpenDir() {
 		return defaultOpenDir;
 	}
 
 	/**
+	 * Provides access to the default value for the save directory.
 	 * 
-	 * @return
+	 * @return The path to the directory that is the default value for the save
+	 *         text field or null if no default value has been set for this
+	 *         element.
 	 */
 	public String getDefaultSaveDir() {
 		return defaultSaveDir;
@@ -325,8 +355,11 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	}
 
 	/**
+	 * Necessary to check whether the methods {@link #checkOpenDir()} and
+	 * {@link #checkSaveDir()} will attempt to create a directory if the entry
+	 * in the associated text field is not yet existing.
 	 * 
-	 * @return
+	 * @return True if directories should be created or false otherwise.
 	 */
 	public boolean isSetCreateDir() {
 		return createDir;
@@ -355,8 +388,13 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	}
 
 	/**
+	 * Method to decide whether or not this element should attempt to create
+	 * directories in the methods {@link #checkOpenDir()} and
+	 * {@link #checkSaveDir()} if the value in the corresponding text field
+	 * points to a path that is not yet existent.
 	 * 
 	 * @param createDir
+	 *            True means try to create directories, false not.
 	 */
 	public void setCreateDir(boolean createDir) {
 		this.createDir = createDir;

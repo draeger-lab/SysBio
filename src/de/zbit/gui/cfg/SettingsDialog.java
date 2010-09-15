@@ -19,6 +19,7 @@
 package de.zbit.gui.cfg;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,7 +67,22 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	private static final long serialVersionUID = -8842237776948135071L;
 
 	/**
+	 * Method to demonstrate how to use this element.
 	 * 
+	 * @param args
+	 *            nothing.
+	 */
+	public static void main(String args[]) {
+		SettingsDialog d = new SettingsDialog("Properties", new Properties());
+		if (d.showSettingsDialog(new Properties()) == APPROVE_OPTION) {
+			System.out.printf("Approve:\t%s\n", d.getProperties());
+		} else {
+			System.out.println("Cancel");
+		}
+	}
+
+	/**
+	 * The buttons for the foot panel of this {@link SettingsDialog}.
 	 */
 	private JButton apply, defaults, ok;
 
@@ -76,27 +92,53 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	private boolean exitStatus;
 
 	/**
-	 * 
+	 * What ever is displayed on this {@link SettingsDialog}'s content pane must
+	 * be available on this {@link SettingsPanel}.
 	 */
 	private SettingsPanel panelAllSettings;
 
 	/**
-	 * 
+	 * The current and the default {@link Properties}. The latter one is
+	 * necessary to re-set the values to the default configuration.
 	 */
 	private Properties properties, defaultProperties;
 
 	/**
+	 * Creates a new {@link SettingsDialog} with the given parent element and
+	 * the default {@link Properties}.
 	 * 
 	 * @param owner
-	 * @param properties
+	 *            The parent element of this {@link SettingsDialog}.
+	 * @param defaultProperties
+	 *            The default {@link Properties} to reset all options.
 	 */
-	public SettingsDialog(Frame owner, Properties defaultSettings) {
+	public SettingsDialog(Dialog owner, Properties defaultProperties) {
 		super(owner, "Preferences");
-		this.defaultProperties = defaultSettings;
+		this.defaultProperties = defaultProperties;
 	}
 
 	/**
+	 * Creates a new {@link SettingsDialog} with the given parent element and
+	 * the default {@link Properties}.
 	 * 
+	 * @param owner
+	 *            The parent element of this {@link SettingsDialog}.
+	 * @param defaultProperties
+	 *            The default {@link Properties} to reset all options.
+	 */
+	public SettingsDialog(Frame owner, Properties defaultProperties) {
+		super(owner, "Preferences");
+		this.defaultProperties = defaultProperties;
+	}
+
+	/**
+	 * Creates a new {@link SettingsDialog} without any parent element and the
+	 * default {@link Properties}.
+	 * 
+	 * @param title
+	 *            The title of the dialog
+	 * @param defaultSettings
+	 *            The default {@link Properties} to reset all options.
 	 */
 	public SettingsDialog(String title, Properties defaultSettings) {
 		super();
@@ -138,15 +180,21 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	}
 
 	/**
+	 * Method to retrieve all current properties of this element, i.e., after
+	 * interaction with the user.
 	 * 
-	 * @return
+	 * @return A pointer to this {@link SettingsDialog}'s current
+	 *         {@link Properties}.
 	 */
 	public Properties getProperties() {
 		return properties;
 	}
 
 	/**
-	 * Initializes this dialog.
+	 * Initializes the GUI of this dialog.
+	 * 
+	 * @param panel
+	 *            The element to be put on the content pane.
 	 */
 	private void init(SettingsPanel panel) {
 
@@ -228,19 +276,39 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	}
 
 	/**
+	 * Shows this {@link SettingsDialog} with all available instances of
+	 * {@link SettingsPanel} embedded in a pane with tabs, i.e.,
+	 * {@link SettingsTabbedPane}. If there is only one such implementation
+	 * available, no tabs will be displayed, the element will be directly added
+	 * to this element's content pane.
 	 * 
 	 * @param properties
-	 * @return
+	 *            The current properties.
+	 * @return {@link #APPROVE_OPTION} if the dialog was closed by clicking its
+	 *         OK button. In this case it makes sense to call the
+	 *         {@link #getProperties()} method to obtain all properties as set
+	 *         by the user.
 	 */
 	public boolean showSettingsDialog(Properties properties) {
-		return showSettingsDialog(new SettingsTabbedPane(properties,
-				defaultProperties));
+		SettingsTabbedPane pane = new SettingsTabbedPane(properties,
+				defaultProperties);
+		if (pane.getSettingsPanelCount() == 1) {
+			return showSettingsDialog(pane.getSettingsPanelAt(0));
+		}
+		return showSettingsDialog(pane);
 	}
 
 	/**
+	 * Shows this {@link SettingsDialog} with the given {@link SettingsPanel} on
+	 * its content pane.
 	 * 
 	 * @param panel
-	 * @return
+	 *            The {@link SettingsPanel} whose options are to be selected by
+	 *            the user.
+	 * @return {@link #APPROVE_OPTION} if the dialog was closed by clicking its
+	 *         OK button. In this case it makes sense to call the
+	 *         {@link #getProperties()} method to obtain all properties as set
+	 *         by the user.
 	 */
 	public boolean showSettingsDialog(SettingsPanel panel) {
 		this.properties = panel.getProperties();
