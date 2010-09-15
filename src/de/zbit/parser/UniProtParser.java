@@ -175,7 +175,7 @@ public class UniProtParser {
       
       String[] splitLines = block.split("\n");  // separates lines
       for (String line : splitLines) {
-        if (line.startsWith("GN")){
+        if (line.startsWith("GN   ")){
           line = line.substring(5,line.length());
           line = line.trim().toUpperCase();
           if(line.equals("AND")){
