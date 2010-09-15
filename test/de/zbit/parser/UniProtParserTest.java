@@ -14,18 +14,31 @@ public class UniProtParserTest {
   public static void main(String[] args) {
     System.out.println("llmmm");
     UniProtParser uw = new UniProtParser();
-    ArrayList<String>[] blocks = uw.getGeneBlock(new String[]{"1433B_MOUSE", "SER1_DROME"});
+    ArrayList<String>[] blocks = uw.getGeneBlocks(new String[]{"1433B_MOUSE", "SER1_DROME"});
     System.out.println("blocks.length " + blocks.length);
     for (int i = 0; i < blocks.length; i++) {
       if(i==0){
         System.out.println("1433B_Mouse:");
       }
       else if (i==1)
-        System.out.println("SER1_DROME");
+        System.out.println("SER1_DROME:");
+      
       ArrayList<String> block = blocks[i];
       for (String geneEntry : block) {
-        System.out.println("----");
-        System.out.println(geneEntry);
+        System.out.println(uw.getGeneName(geneEntry));
+        if(uw.getGeneSynonyms(geneEntry).size()>0)
+          for (String string : uw.getGeneSynonyms(geneEntry)) {
+            System.out.println("Synonyms: " + string);
+          }
+        if(uw.getGeneOrderedLocusNames(geneEntry).size()>0)
+          for (String string : uw.getGeneOrderedLocusNames(geneEntry)) {
+            System.out.println("OrderedLocusName: " + string);
+          }
+        if(uw.getGeneOrfNames(geneEntry).size()>0)
+          for (String string : uw.getGeneOrfNames(geneEntry)) {
+            System.out.println("ORFName: " + string);
+          }
+        
       }
     }
     
