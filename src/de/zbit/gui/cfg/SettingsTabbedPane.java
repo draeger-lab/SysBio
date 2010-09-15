@@ -157,6 +157,16 @@ public class SettingsTabbedPane extends SettingsPanel {
 				.getViewport().getComponent(0);
 	}
 
+	/**
+	 * Gives the number of {@link SettingsPanel}s displayed on this element.
+	 * 
+	 * @return 0 if there is no panel or if this element has not yet been
+	 *         initialized properly.
+	 */
+	public int getSettingsPanelCount() {
+		return tab == null ? 0 : tab.getTabCount();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -180,10 +190,11 @@ public class SettingsTabbedPane extends SettingsPanel {
 			if (!classes[i].equals(getClass())) {
 				try {
 					Class<SettingsPanel> c = classes[i];
-					Constructor<SettingsPanel> con = c.getConstructor(
-							properties.getClass(), defaultSettings.getClass());
-					settingsPanel = con
-							.newInstance(properties, defaultSettings);
+					Constructor<SettingsPanel> con = c
+							.getConstructor(properties.getClass(),
+									defaultProperties.getClass());
+					settingsPanel = con.newInstance(properties,
+							defaultProperties);
 
 					tab.addTab(settingsPanel.getTitle(), new JScrollPane(
 							settingsPanel,

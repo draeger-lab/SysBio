@@ -63,11 +63,13 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 */
 	private static final long serialVersionUID = 1852850798328875230L;
 	/**
-	 * 
+	 * A list of {@link ChangeListener}s to be notified in case that values
+	 * change on this {@link SettingsPanel}.
 	 */
 	private List<ChangeListener> changeListeners;
 	/**
-	 * 
+	 * A list of {@link ItemListener}s to be notified when switching items on
+	 * this {@link SettingsPanel}.
 	 */
 	private List<ItemListener> itemListeners;
 
@@ -75,18 +77,25 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * The settings to be changed by the user and the default settings as a
 	 * backup.
 	 */
-	protected Properties properties, defaultSettings;
+	protected Properties properties, defaultProperties;
 
 	/**
+	 * Creates a new {@link SettingsPanel}.
 	 * 
 	 * @param properties
+	 *            The current user properties. These will be filtered to contain
+	 *            only accepted elements. Access to other elements is possible
+	 *            by overriding {@link #initConstantFields(Properties)}.
 	 * @param defaultProperties
+	 *            A backup of original properties, default values to
+	 *            re-initialize this object.
+	 * @see #accepts(Object)
 	 */
 	public SettingsPanel(Properties properties, Properties defaultProperties) {
 		super();
 		changeListeners = new LinkedList<ChangeListener>();
 		itemListeners = new LinkedList<ItemListener>();
-		this.defaultSettings = defaultProperties;
+		this.defaultProperties = defaultProperties;
 		setProperties(properties);
 	}
 
@@ -105,26 +114,40 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	public abstract boolean accepts(Object key);
 
 	/**
+	 * Adds the given {@link ChangeListener} to this element's list of this kind
+	 * of listeners.
 	 * 
 	 * @param listener
+	 *            the element to be added.
 	 */
 	public void addChangeListener(ChangeListener listener) {
 		changeListeners.add(listener);
 	}
 
 	/**
+	 * Adds the given {@link ItemListener} to this element's list of this kind
+	 * of listeners.
 	 * 
 	 * @param listener
+	 *            the element to be added.
 	 */
 	public void addItemListener(ItemListener listener) {
 		itemListeners.add(listener);
 	}
 
 	/**
-	 * @return
+	 * The default {@link Properties} are the standard values to be used if the
+	 * user wants to re-initialize this object. With this method you can access
+	 * these elements. Note that the default properties are never filtered and
+	 * may therefore contain many additional elements in comparison to the
+	 * current properties of this {@link SettingsPanel}
+	 * 
+	 * @return The {@link Properties} object containing the default key-value
+	 *         pairs of user settings.
+	 * @see #getProperties()
 	 */
 	public Properties getDefaultProperties() {
-		return defaultSettings;
+		return defaultProperties;
 	}
 
 	/**
@@ -148,9 +171,38 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	public abstract String getTitle();
 
 	/**
-	 * Initializes the layout and GUI of this {@link SettingsPanel}.
+	 * Initializes the layout and GUI of this {@link SettingsPanel}. This method
+	 * should use the values stored in the field variable {@link #properties}.
+	 * Please note, although the {@link #accepts(Object)} method is used to
+	 * filter possible values from the given {@link Properties}, there is no
+	 * guarantee that a desired key-value pair is set. You can also access the
+	 * {@link #defaultProperties} field here. Please make sure, all GUI elements
+	 * used on this {@link SettingsPanel} provide some method to update the
+	 * {@link #properties} field as this is the interesting value to be returned
+	 * by the {@link #getProperties()} method.
 	 */
 	public abstract void init();
+
+	/**
+	 * This method allows an implementing class to extract key-value pairs from
+	 * the given properties to set the values of non-modifiable elements. For
+	 * instance, the default open directory for certain file types may not be
+	 * set in this {@link SettingsPanel}, but the path to this directory may be
+	 * required for something else. To avoid writing conflicts, all key-value
+	 * pairs that may cause clashes are removed from the current properties
+	 * using the {@link #accepts(Object)} method. Hence, the field
+	 * {@link #properties} may not contain other important data. In this method
+	 * it is possible to extract these. In the default case, this method will be
+	 * an empty method. If you want to extract other fields, just override this
+	 * method.
+	 * 
+	 * @param properties
+	 *            The originally given {@link Properties} before filtering.
+	 */
+	public void initConstantFields(Properties properties) {
+		// Empty implementation provided so that implementing classes
+		// are not forced to implement this method.
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -198,18 +250,24 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	}
 
 	/**
+	 * Removes the given {@link ChangeListener} from the list of this kind of
+	 * listeners in this object.
 	 * 
 	 * @param listener
-	 * @return
+	 *            the element to be removed.
+	 * @return true if the list contained the specified element.
 	 */
 	public boolean removeChangeListener(ChangeListener listener) {
 		return changeListeners.remove(listener);
 	}
 
 	/**
+	 * Removes the given {@link ItemListener} from the list of this kind of
+	 * listeners in this object.
 	 * 
 	 * @param listener
-	 * @return
+	 *            the element to be removed.
+	 * @return true if the list contained the specified element.
 	 */
 	public boolean removeItemListener(ItemListener listener) {
 		return itemListeners.remove(listener);
@@ -220,12 +278,19 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * re-initializes the graphical user interface.
 	 */
 	public void restoreDefaults() {
-		setProperties((Properties) defaultSettings.clone());
+		setProperties((Properties) defaultProperties.clone());
 	}
 
 	/**
+	 * Filters the given properties and only keeps those key-value pairs that
+	 * are accepted by this class. Then it initializes the layout of this GUI
+	 * element and also allows to select non-modifiable but important key-value
+	 * pairs from the given {@link Properties} by overriding the method
+	 * {@link #initConstantFields(Properties)}.
 	 * 
 	 * @param properties
+	 *            All available current properties of the user.
+	 * @see #accepts(Object)
 	 */
 	public void setProperties(Properties properties) {
 		this.properties = new Properties();
@@ -236,27 +301,6 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 		}
 		initConstantFields(properties);
 		init();
-	}
-
-	/**
-	 * This method allows an implementing class to extract key-value pairs from
-	 * the given properties to set the values of non-modifiable elements. For
-	 * instance, the default open directory for certain file types may not be
-	 * set in this {@link SettingsPanel}, but the path to this directory may be
-	 * required for something else. To avoid writing conflicts, all key-value
-	 * pairs that may cause clashes are removed from the current properties
-	 * using the {@link #accepts(Object)} method. Hence, the field
-	 * {@link #properties} may not contain other important data. In this method
-	 * it is possible to extract these. In the default case, this method will be
-	 * an empty method. If you want to extract other fields, just override this
-	 * method.
-	 * 
-	 * @param properties
-	 *            The originally given {@link Properties} before filtering.
-	 */
-	public void initConstantFields(Properties properties) {
-		// Empty implementation provided so that implementing classes
-		// are not forced to implement this method.
 	}
 
 	/*
