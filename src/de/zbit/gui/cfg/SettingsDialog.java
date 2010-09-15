@@ -233,7 +233,7 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * @return
 	 */
 	public boolean showSettingsDialog(Properties properties) {
-		return showSettingsDialog(new SettingsPanelAll(properties,
+		return showSettingsDialog(new SettingsTabbedPane(properties,
 				defaultProperties));
 	}
 

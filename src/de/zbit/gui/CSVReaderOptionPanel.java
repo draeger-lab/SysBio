@@ -40,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
@@ -881,8 +882,17 @@ public class CSVReaderOptionPanel extends JPanel {
     }
     
     // Initialize the panel
-    CSVReaderOptionPanel c = new CSVReaderOptionPanel(r);
+    final CSVReaderOptionPanel c = new CSVReaderOptionPanel(r);
     jd.add(c);
+    // Close dialog with ESC button.
+    jd.getRootPane().registerKeyboardAction(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			c.buttonPressed = JOptionPane.CANCEL_OPTION;
+			jd.dispose();			
+		}
+	},  KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+			JComponent.WHEN_IN_FOCUSED_WINDOW);
     
     // Set close operations
     jd.addWindowListener(new WindowAdapter() {

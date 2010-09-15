@@ -100,6 +100,11 @@ public class CSVImporter {
 	private Hashtable<String, Integer> expectedNameToColIndex;
 
 	/**
+	 * Whether or not the user clicked on cancel while reading the file.
+	 */
+	private boolean cancelOption;
+
+	/**
 	 * 
 	 * @param parent
 	 * @param hideExactColumnNames
@@ -143,6 +148,7 @@ public class CSVImporter {
 			// }
 		} else {
 			// numProblems = reader.getNumberOfColumns();
+			cancelOption = true;
 		}
 
 		/*
@@ -283,5 +289,13 @@ public class CSVImporter {
 	 */
 	public boolean isHidingExactColumnNames() {
 		return hideExactColumnNames;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCanceled() {
+		return cancelOption;
 	}
 }
