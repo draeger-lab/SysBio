@@ -157,6 +157,7 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 				labelSaveDir = new JLabel("Save directory:");
 				lh.add(labelSaveDir, 0, row, 1, 1, 0, 0);
 				if (openDir == null) {
+					lh.add(new JPanel(), 1, row, 1, 1, 0, 0);
 					lh.add(new JPanel(), 3, row, 1, 1, 0, 0);
 				}
 				lh.add(tfSaveDir, 2, row, 1, 1, 1, 0);

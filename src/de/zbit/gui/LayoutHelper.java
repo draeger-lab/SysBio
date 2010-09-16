@@ -35,7 +35,7 @@ import javax.swing.JPanel;
  * @date 2005-07-29
  */
 public class LayoutHelper {
-	
+
 	/**
 	 * 
 	 * @param cont
@@ -102,6 +102,7 @@ public class LayoutHelper {
 	 * 
 	 */
 	private int row;
+
 	/**
 	 * Creates a new GridBaglayout and associates this with the given container.
 	 * 
@@ -113,6 +114,7 @@ public class LayoutHelper {
 		this.cont.setLayout(gbl);
 		this.row = 0;
 	}
+
 	/**
 	 * 
 	 * @param cont
@@ -205,7 +207,7 @@ public class LayoutHelper {
 				weightx, weighty, ipadx, ipady);
 		row = y;
 	}
-	
+
 	/**
 	 * 
 	 * @param label
@@ -273,6 +275,37 @@ public class LayoutHelper {
 	 */
 	public int getRow() {
 		return row;
+	}
+
+	/**
+	 * 
+	 * @param label
+	 * @param c
+	 * @param width
+	 * @param weightx
+	 * @param weighty
+	 */
+	public void add(String label, Component c, int width, int weightx,
+			int weighty) {
+		add(label, c, 0, row, weightx, weighty);
+		row++;
+	}
+
+	/**
+	 * 
+	 * @param label
+	 * @param c
+	 * @param x
+	 * @param y
+	 * @param weightx
+	 * @param weighty
+	 */
+	public void add(String label, Component c, int x, int y, int weightx,
+			int weighty) {
+		add(new JLabel(label), x, y, 1, 1, 0, 0);
+		add(new JPanel(), x + 1, y, 1, 1, 0, 0);
+		add(c, x + 2, y, 1, 1, weightx, weighty);
+		this.row = y;
 	}
 
 }
