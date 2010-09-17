@@ -5,12 +5,11 @@ import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.TTCCLayout;
-import org.apache.log4j.varia.NullAppender;
 
 /**
  * Class with helper functions regarding logging.
  * 
- * @author Florian Mittag
+ * @author Florian Mittag <florian.mittag@uni-tuebingen.de>
  */
 public class LogUtil {
 

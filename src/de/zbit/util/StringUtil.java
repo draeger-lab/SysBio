@@ -4,19 +4,22 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Class containing frequently used utility functions for String processing.
  * 
- * @author mittag
+ * @author Florian Mittag <florian.mittag@uni-tuebingen.de>
  * @author wrzodek
  */
 public class StringUtil {
   
   /**
-   * Returns the concatenated strings of the array separated with the given
-   * delimiter.
+   * <p>Returns the concatenated strings of the array separated with the given
+   * delimiter. Useful for constructing queries from arrays.</p>
+   * <p>Example: The array <code>{"a", "b", "c"}</code> and delimiter
+   * <code>"--"</code> will results in <code>"a--b--c"</code>.
    * 
-   * @param ary
-   * @param delim
-   * @return
+   * @param ary the array of strings to concatenate
+   * @param delim the delimiter string between the single strings (the "glue").
+   * @return the concatenated string separated by the delimiter
    */
   public static String implode(String[] ary, String delim) {
     String out = "";
@@ -28,12 +31,12 @@ public class StringUtil {
   }
   
   /**
-   * Returns the concatenated strings of the array separated with the given
-   * delimiter.
+   * <p>Returns the concatenated strings of the array separated with the given
+   * delimiter. See {@link #implode(String, String)} for details.</p>
    * 
-   * @param ary
-   * @param delim
-   * @return
+   * @param ary the list of strings to concatenate
+   * @param delim the delimiter string between the single strings (the "glue").
+   * @return the concatenated string separated by the delimiter
    */
   public static String implode(List<String> list, String delim) {
     String[] ary = new String[list.size()];
@@ -41,10 +44,24 @@ public class StringUtil {
     return implode(ary, delim);
   }
   
+  /**
+   * Return the given string filled up to the given length with the given
+   * character. If the length of the input string is equal or greater than the
+   * target length, it will be return unchanged, i.e., it will NOT be shortened.
+   * The <code>prepend</code> parameter defines whether the fill character
+   * should be prepended (or appended).
+   * 
+   * @param input the input string to fill up
+   * @param len the target length of the filled up string
+   * @param fill the fill character
+   * @param prepend whether the filling characters should be prepended
+   * @return the filled up string
+   */
   public static String fill(String input, int len, char fill, boolean prepend) {
     if( input == null ) {
       input = "";
     }
+    // if the input string already has target size or is longer, do nothing
     if( len <= input.length() ) {
       return input;
     }
@@ -55,6 +72,14 @@ public class StringUtil {
     return prepend ? (new String(cs) + input) : input + (new String(cs));
   }
   
+  /**
+   * Returns the longest common prefix of both strings. This method is
+   * case-sensitive.
+   * 
+   * @param a string a
+   * @param b string b
+   * @return the longest common prefix
+   */
   public static String getLongestCommonPrefix(String a, String b) {
     int i;
     for (i=0; i<Math.min(a.length(), b.length()); i++) {
@@ -62,6 +87,16 @@ public class StringUtil {
     }
     return a.substring(0, i);
   }
+  
+  
+  /**
+   * Returns the longest common suffix of both strings. This method is
+   * case-sensitive.
+   * 
+   * @param a string a
+   * @param b string b
+   * @return the longest common suffix
+   */
   public static String getLongestCommonSuffix(String a, String b) {
     int i;
     for (i=1; i<=Math.min(a.length(), b.length()); i++) {
@@ -69,6 +104,8 @@ public class StringUtil {
     }
     return a.substring(a.length()-i+1, a.length());
   }
+  
+  
   public static String getLongestCommonPrefix(String a, String[] b, boolean ignoreEmptyStrings) {
     int i;
     
@@ -182,11 +219,11 @@ public class StringUtil {
   }
   
   /**
-   * Returns the longest common length and the number of it's occurences.
-   * If multiple lengths occure equally often, prefres the longer length.
+   * Returns the longest common length and the number of it's occurrences.
+   * If multiple lengths occur equally often, prefers the longer length.
    * Null strings are treated as length=0.
    * @param b
-   * @return int[2].
+   * @return an integer array of size 2.
    * [0]=The longest common String length
    * [1]=The number of strings in b with that length.
    */
