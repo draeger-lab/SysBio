@@ -6,10 +6,9 @@ import java.io.Serializable;
  */
 
 /**
- * Class to save to strings
+ * Class for saving two strings.
  * 
  * @author Finja B&uml;chel
- * 
  */
 public class StringPair implements Comparable, Serializable{
 
@@ -22,7 +21,7 @@ public class StringPair implements Comparable, Serializable{
   public StringPair(String s1, String s2) {
     if (s1.compareTo(s2) < 0) {
       this.string1 = s1;
-      this.string2 = s2;  
+      this.string2 = s2;
     }
     else{
       this.string1 = s2;
@@ -62,7 +61,6 @@ public class StringPair implements Comparable, Serializable{
   }
 
   
-  @Override
   public int compareTo(Object o) {
     
     if(o instanceof StringPair){

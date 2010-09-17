@@ -29,6 +29,7 @@ import java.util.Collection;
  * Represents a simple interval on a sequence.  Coordinates are 1-based closed ended.
  *
  * @author Tim Fennell
+ * @author Clenens Wrzodek
  */
 public class Interval implements Comparable<Interval>, Cloneable {
   private final String sequence;
@@ -62,7 +63,11 @@ public class Interval implements Comparable<Interval>, Cloneable {
    *
    */
   public Interval(final String sequence, final int start, final int end, final boolean negative, final String name) {
-    this.sequence = sequence;
+    if (!sequence.toLowerCase().trim().startsWith("chr")) {
+      this.sequence = "chr" + sequence;
+    } else {
+      this.sequence = sequence;
+    }
     this.start = start;
     this.end = end;
     this.negativeStrand = negative;

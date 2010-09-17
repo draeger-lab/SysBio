@@ -183,7 +183,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         // InputException, RemoteException, ServiceException
         retried++;
         if (retryLimit==retryLimit) e.printStackTrace();
-        log.debug("Attempt " + retried + " to fetch data failed", e);        
+        log.debug("Attempt " + retried + " to fetch data failed", e);
       }
     }
     if (retried >= retryLimit && (entriesStr == null || entriesStr.length() == 0)) {

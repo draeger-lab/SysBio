@@ -551,8 +551,11 @@ public class CSVReaderColumnChooser extends JPanel {
   public void replaceColumnChooser(JColumnChooser oldOne, JColumnChooser newOne) {    
     GUITools.replaceComponent(oldOne, newOne);
     
-    newOne.getParent().validate();
-    newOne.getParent().repaint();
+    
+    if (newOne.getParent()!=null) {
+      newOne.getParent().validate();
+      newOne.getParent().repaint();
+    }
   }
   
   /**

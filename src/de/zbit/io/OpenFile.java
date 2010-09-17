@@ -2,6 +2,7 @@ package de.zbit.io;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -185,6 +186,25 @@ public class OpenFile {
     }
     
     return null;
+  }
+
+  /**
+   * Reads the given file completely and returns the content as StringBuffer.
+   * @param filename
+   * @return file content.
+   * @throws IOException 
+   */
+  public static StringBuffer readFile(String filename) throws IOException {
+    BufferedReader r = openFile(filename);
+    String line;
+    StringBuffer ret = new StringBuffer();
+    while (r!=null && (line=r.readLine())!=null) {
+      ret.append(line);
+      ret.append('\n');
+    }
+    if (r!=null && r instanceof Closeable) r.close();
+    
+    return ret;
   }
   
 }

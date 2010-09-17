@@ -886,11 +886,10 @@ public class CSVReaderOptionPanel extends JPanel {
     jd.add(c);
     // Close dialog with ESC button.
     jd.getRootPane().registerKeyboardAction(new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			c.buttonPressed = JOptionPane.CANCEL_OPTION;
-			jd.dispose();			
-		}
+      public void actionPerformed(ActionEvent e) {
+        c.buttonPressed = JOptionPane.CANCEL_OPTION;
+        jd.dispose();   
+      }
 	},  KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
 			JComponent.WHEN_IN_FOCUSED_WINDOW);
     
