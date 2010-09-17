@@ -15,32 +15,37 @@ import de.zbit.util.StringUtil;
 /**
  * Reads a CSV (e.g. tab delimited) file.
  * 
- * Many optios are provided for customization. It is recommended to leave
- * all default values, if you are unsure what you're doing.
- * 
+ * <p>Many optios are provided for customization. It is recommended to leave
+ * all default values, if you are unsure what you're doing. There is automatic
+ * detection for content start, separator char, treat multiple consecutive
+ * separators as one, and if file contains headers.
+ * </p>
  * There are two use cases:
  * Read the file at once, or line by line.
  * 
- * Examples:
+ * <p><b> Usage Examples: </b><br/>
  * 1:  Read the whole file at once:
+ * <pre>
  *   CSVReader a = new CSVReader("test.txt");
  *   a.setDisplayProgress(false); // Optional, false by default
  *   
  *   a.getData(); // The whole table, except headers
  *   a.getHeader(); // The header (if available)
  *   a.getPreamble(); // Everything, before actual table start
- *   
+ *</pre>
  * 2: Read the file, line by line (more memory save)
+ * <pre>
+ *   CSVReader a = new CSVReader("test.txt");
+ *   a.setDisplayProgress(false); // Optional, false by default
+ *   
  *   String[] line;
- *   try {
- *     while ((line = a.getNextLine())!=null) {
- *       // Do something with the line
- *     }
- *   } catch (Exception e) {e.printStackTrace();}
+ *   while ((line = a.getNextLine())!=null) {
+ *     // Do something with the line
+ *   }
  *   
  *   a.getHeader(); // The header (if available)
  *   a.getPreamble(); // Everything, before actual table start
- * 
+ * </pre></p>
  * @author wrzodek
  */
 public class CSVReader implements Serializable, Cloneable {
