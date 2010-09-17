@@ -34,9 +34,11 @@ import de.zbit.io.CSVReader;
  * but the sequenceName is optional, you can easily create a dialog with
  * the following command:
  * 
+ * <pre>
  *    CSVReaderColumnChooser c = new CSVReaderColumnChooser("file.csv.txt");
  *    c.addColumnChooser(new String[]{"sequenceStart","sequenceEnd"}, true, true);
  *    c.addColumnChooser(new String[]{"sequenceName"}, false, true);
+ * </pre>
  * 
  * @author wrzodek
  */

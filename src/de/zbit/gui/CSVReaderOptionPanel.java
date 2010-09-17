@@ -53,11 +53,14 @@ import de.zbit.io.CSVReader;
  * It displays a preview of the file with the current settings and
  * allows to change some settings.
  * 
- * Use Case 1 (Dialog): showDialog(parent, "files.csv.txt", "My title")
+ * <p>
+ * Use Case 1 (Dialog): <pre>showDialog(parent, "files.csv.txt", "My title")</pre>
  * Use Case 2 (Panel) :
+ * <pre>
  * CSVReaderOptionPanel c = new CSVReaderOptionPanel("files.csv.txt")
  * setShowButtons(false); // Hide ok and cancel
- * 
+ * </pre>
+ * </p>
  * 
  * @author wrzodek
  */
