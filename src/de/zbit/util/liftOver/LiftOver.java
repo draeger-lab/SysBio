@@ -45,7 +45,7 @@ import de.zbit.util.liftOver.util.OverlapDetector;
  * It requires lift over annotations that can be optained from UCSC (e.g. for hg16:
  * http://hgdownload.cse.ucsc.edu/goldenPath/hg16/liftOver/ ).
  * 
- * TODO: Supply a few files in the resources directory.
+ * It is suggested to put these chain files in de.zbit.resources.liftover
  *
  * @author alecw@broadinstitute.org
  * @author Clemens Wrzodek
@@ -59,8 +59,8 @@ public class LiftOver {
   private final OverlapDetector<Chain> chains;
   
   public static void main (String[] args) {
-    String chainFile = "S:/mapCoords/TEST/hg16ToHg18.over.chain";
-    String toLiftFile = "S:/mapCoords/TEST/hep.txt";
+    String chainFile = "S:/mapCoords/hg17ToHg18.over.chain";
+    String toLiftFile = "S:/mapCoords/liftme.csv";
     
     // Stream for successful mapped coordinates
     Appendable out = System.out;
