@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -48,7 +49,7 @@ import de.zbit.io.OpenFile;
  * 
  */
 public class GUITools {
-	
+
 	/**
 	 * Checks whether the first container contains the second one.
 	 * 
@@ -96,7 +97,6 @@ public class GUITools {
 		return button;
 	}
 
-	
 	/**
 	 * 
 	 * @param text
@@ -123,15 +123,17 @@ public class GUITools {
 	 * @param name
 	 *            The name for the component to be identifiable by the
 	 *            ItemListener
-	 * @param listener
 	 * @param toolTip
+	 * @param listener
 	 * @return
 	 */
 	public static JCheckBox createJCheckBox(String label, boolean selected,
-			String name, ItemListener listener, String toolTip) {
+			Object command, String toolTip, ItemListener... listener) {
 		JCheckBox chkbx = new JCheckBox(label, selected);
-		chkbx.setName(name);
-		chkbx.addItemListener(listener);
+		chkbx.setActionCommand(command.toString());
+		for (ItemListener l : listener) {
+			chkbx.addItemListener(l);
+		}
 		chkbx.setToolTipText(toHTML(toolTip, 40));
 		return chkbx;
 	}
@@ -470,6 +472,29 @@ public class GUITools {
 			if (children[i] instanceof Container)
 				setAllEnabled((Container) children[i], enabled);
 			children[i].setEnabled(enabled);
+		}
+	}
+
+	/**
+	 * Tries to recursively find instances of {@link AbstractButton} within the
+	 * given container and sets their enabled status to the given value.
+	 * 
+	 * @param state
+	 * @param c
+	 * @param command
+	 */
+	public static void setEnabled(boolean state, Container c, Object command) {
+		Component inside;
+		for (int i = 0; i < c.getComponentCount(); i++) {
+			inside = c.getComponent(i);
+			if (inside instanceof Container) {
+				setEnabled(state, (Container) inside, command);
+			} else if (inside instanceof AbstractButton) {
+				String com = ((AbstractButton) inside).getActionCommand();
+				if ((com != null) && (com.equals(command.toString()))) {
+					inside.setEnabled(state);
+				}
+			}
 		}
 	}
 
