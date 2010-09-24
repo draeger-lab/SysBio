@@ -320,6 +320,26 @@ public class GUITools {
 	 * @param text
 	 * @param listener
 	 * @param command
+	 * @param icon
+	 * @param ks
+	 * @param mnemonic
+	 * @param enabled
+	 * @return
+	 */
+	public static JMenuItem createJMenuItem(String text,
+			ActionListener listener, Object command, Icon icon, KeyStroke ks,
+			Character mnemonic, boolean enabled) {
+		JMenuItem item = createJMenuItem(text, listener, command, icon, ks,
+				mnemonic);
+		item.setEnabled(enabled);
+		return item;
+	}
+
+	/**
+	 * 
+	 * @param text
+	 * @param listener
+	 * @param command
 	 * @param keyStroke
 	 * @return
 	 */
@@ -428,20 +448,73 @@ public class GUITools {
 	 * Shows a generic Save file Dialog.
 	 * 
 	 * @param parentComp
-	 * @return
+	 * @return null if no {@link File} has been selected for any reason or the
+	 *         selected {@link File}.
 	 */
 	public static File saveFileDialog(final Component parentComp) {
-		final JFileChooser fc = new JFileChooser(new File("."));
-		fc.setDialogTitle("Select a target");
+		return saveFileDialog(parentComp, System.getProperty("user.dir"), true,
+				false, JFileChooser.FILES_AND_DIRECTORIES);
+	}
 
-		if (fc.showSaveDialog(parentComp) == JFileChooser.APPROVE_OPTION) {
-			if (fc.getSelectedFile().exists()) {
-				if (!GUITools.overwriteExistingFile(parentComp, fc
-						.getSelectedFile())) {
-					return null;
+	/**
+	 * 
+	 * @param parent
+	 * @param dir
+	 * @param allFilesAcceptable
+	 * @param multiSelectionAllowed
+	 * @param mode
+	 * @param filter
+	 * @return null if no {@link File} has been selected for any reason or the
+	 *         selected {@link File}.
+	 */
+	public static File saveFileDialog(final Component parent, String dir,
+			boolean allFilesAcceptable, boolean multiSelectionAllowed,
+			int mode, FileFilter... filter) {
+		final JFileChooser fc = createJFileChooser(dir, allFilesAcceptable,
+				multiSelectionAllowed, mode, filter);
+		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
+			File f = fc.getSelectedFile();
+			if (f.exists()) {
+				if (!f.canWrite()) {
+					JOptionPane.showMessageDialog(parent,
+							toHTML("Cannot write to file "
+									+ f.getAbsolutePath() + ".", 60),
+							"No writing access", JOptionPane.WARNING_MESSAGE);
+				} else if (GUITools.overwriteExistingFile(parent, f)) {
+					return f;
 				}
+			} else {
+				return f;
 			}
-			return fc.getSelectedFile();
+		}
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param parent
+	 * @param dir
+	 * @param allFilesAcceptable
+	 * @param multiSelectionAllowed
+	 * @param mode
+	 * @param filter
+	 * @return null if for some reason the no {@link File} has been selected or
+	 *         the {@link File} cannot be read, else the selected {@link File}.
+	 */
+	public static File openFileDialog(final Component parent, String dir,
+			boolean allFilesAcceptable, boolean multiSelectionAllowed,
+			int mode, FileFilter... filter) {
+		JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
+				multiSelectionAllowed, mode, filter);
+		if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+			File f = chooser.getSelectedFile();
+			if (!f.canRead()) {
+				JOptionPane.showMessageDialog(parent, toHTML(
+						"Cannot read file " + f.getAbsolutePath() + ".", 60),
+						"Unable to read file", JOptionPane.WARNING_MESSAGE);
+			} else {
+				return f;
+			}
 		}
 		return null;
 	}
