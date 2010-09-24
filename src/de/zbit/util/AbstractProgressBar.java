@@ -3,16 +3,23 @@ package de.zbit.util;
 import java.io.Serializable;
 
 /**
+ * <p>
  * General class for progress bars.
  * This class does the management and computations. The visualization
  * should be done in implementing classes.
+ * </p>
  * 
+ * <p>
  * The principle is, setting a number of "calls" and calling this class
- * exactly that often. Example:
+ * exactly that often.
+ * 
+ * <br /><b>Example:</b></p>
+ * <pre>
  * setNumberOfTotalCalls(5)
  * for (int i=0; i<5; i++) {
  *   DisplayBar();
  * }
+ * </pre>
  * 
  * @author wrzodek 
  */

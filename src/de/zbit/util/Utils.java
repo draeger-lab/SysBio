@@ -12,6 +12,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Various utils, which I need quite often.
@@ -31,6 +33,19 @@ public class Utils {
     for (int i=0; i<arr.length; i++)
       for (int j=0; j<arr[i].length; j++)
         if (arr[i][j].toLowerCase().trim().equals(s)) return true;
+    return false;
+  }
+  
+  /**
+   * 
+   * @param <T>
+   * @param arr
+   * @param s
+   * @return
+   */
+  public static <T> boolean ArrayContains(T[] arr, T s) {
+    for (int i=0; i<arr.length; i++)
+        if (arr[i].equals(s)) return true;
     return false;
   }
   
@@ -150,6 +165,69 @@ public class Utils {
     // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
     for (int i=0; i<spaltenCounter.size(); i++)
       if (spaltenCounter.get(i)==0) retVal[i] = Double.NaN;
+    return retVal;
+  }
+  
+  /**
+   * Mittelwertberechnung.
+   * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
+   */
+  @SuppressWarnings("unchecked")
+  public static double average(Collection d){
+    double average = average1(d);
+    if (Double.isNaN(average) || Double.isInfinite(average)) 
+        return average2(d);
+    return average;
+  }
+  @SuppressWarnings("unchecked")
+  private static double average1(Collection doubles){ // Schneller
+    if (doubles==null || doubles.size()<1) return Double.NaN;
+    double retVal= 0;
+    
+    int countNonNAN=0;
+    Iterator it = doubles.iterator();
+    while (it.hasNext()) {
+      try  {
+        double d=0;
+        Object o = it.next();
+        if (o instanceof Double) d = (Double)o;
+        else d = Double.parseDouble(it.next().toString());
+        
+        if (Double.isNaN(d) || Double.isInfinite(d)) continue;
+        countNonNAN++;
+        retVal+=d;        
+        
+      } catch (Throwable t) {t.printStackTrace();}
+    }
+    
+    if (countNonNAN<=0) return Double.NaN;
+    return (retVal/countNonNAN);
+  }
+  @SuppressWarnings("unchecked")
+  private static double average2(Collection doubles){ // Keine to-large-numbers
+    if (doubles==null || doubles.size()<1) return Double.NaN;
+    double retVal= 0;
+    
+    int countNonNAN=0;
+    Iterator it = doubles.iterator();
+    while (it.hasNext()) {
+      try  {
+        double d=0;
+        Object o = it.next();
+        if (o instanceof Double) d = (Double)o;
+        else d = Double.parseDouble(it.next().toString());
+        
+        if (Double.isNaN(d) || Double.isInfinite(d)) continue;
+        countNonNAN++;
+        
+        // retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
+        retVal=retVal * (countNonNAN-1)/(countNonNAN) + d * 1/(countNonNAN);
+        
+      } catch (Throwable t) {t.printStackTrace();}
+    }
+    
+    // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
+    if (countNonNAN<=0) return Double.NaN;
     return retVal;
   }
   
@@ -747,6 +825,22 @@ public class Utils {
   public static double round(double zahl, int stellen) {
     double d = Math.pow(10, stellen);
     return Math.round( zahl * ((long)d) ) / d;
+  }
+  
+  /**
+   * Checks wether all elements of the given array are null.
+   * @param <T>
+   * @param arr
+   * @return
+   */
+  public static <T> boolean allElementsAreNull(T[] arr) {
+    if (arr == null) return true;
+    
+    for (T e: arr) {
+      if (e!=null) return false;
+    }
+    
+    return true;
   }
   
   /**
