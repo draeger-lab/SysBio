@@ -137,16 +137,28 @@ public class LayoutHelper {
 	}
 
 	/**
+	 * 
+	 * @param sameWidth
+	 *            if true, a maximum width will be applied to each component,
+	 *            sharing the total width of the {@link Container}.
+	 * @param c
+	 * @param components
+	 */
+	public void add(boolean sameWidth, Component c, Component... components) {
+		add(c, 0, ++row, 1, 1, sameWidth ? 1 : 0, 0);
+		for (int i = 0; i < components.length; i++) {
+			add(components[i], i + 1, row, 1, 1, sameWidth ? 1 : 0, 0);
+		}
+	}
+
+	/**
 	 * Add one or many components in one line.
 	 * 
 	 * @param c
 	 * @param comps
 	 */
 	public void add(Component c, Component... comps) {
-		add(c, 0, ++row, 1, 1, 0, 0);
-		for (int i = 0; i < comps.length; i++) {
-			add(comps[i], i + 1, row, 1, 1, 0, 0);
-		}
+		add(false, c, comps);
 	}
 
 	/**
