@@ -168,6 +168,10 @@ public class Utils {
     return retVal;
   }
   
+  public static double standardDeviation(double[] values){
+    return Math.sqrt(variance(values));
+  }
+  
   /**
    * Mittelwertberechnung.
    * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
