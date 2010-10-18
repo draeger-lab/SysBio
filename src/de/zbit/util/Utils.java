@@ -15,6 +15,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
@@ -186,6 +187,33 @@ public class Utils {
     for (int i=0; i<spaltenCounter.size(); i++)
       if (spaltenCounter.get(i)==0) retVal[i] = Double.NaN;
     return retVal;
+  }
+  
+  /**
+   * Calculates the median of the given values.
+   * The input array is MODIFIED (sorted).
+   * The median of an empty array is defined to be Double.NaN
+   * 
+   * From Wikipedia:
+   * The median of a finite list of numbers can be found by arranging all the
+   * observations from lowest value to highest value and picking the middle
+   * one. If there is an even number of observations, then there is no single
+   * middle value; the median is then usually defined to be the mean of the
+   * two middle values.
+   * 
+   * @param values
+   * @return median
+   */
+  public static double median(double[] values) {
+    if (values.length<1) return Double.NaN;
+    Arrays.sort(values);
+    
+    if (values.length%2!=0) {
+      return values[values.length/2];
+    } else {
+      int upper = (int) Math.ceil(values.length/2);
+      return (values[upper-1]+(values[upper]-values[upper-1])/2);
+    }
   }
   
   /**
