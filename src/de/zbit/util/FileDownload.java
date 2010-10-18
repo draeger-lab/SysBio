@@ -16,13 +16,7 @@ import java.net.URLConnection;
  * @author wrzodek (heavily modified by a template from Marco Schmidt).
  */
 public class FileDownload {
-  /**
-   * 
-   */
   public static Object ProgressBar;
-  /**
-   * 
-   */
   public static Object StatusLabel;
   
   /**
@@ -31,17 +25,32 @@ public class FileDownload {
    * @return
    */
   public static String download(String address) {
+    String localFile = getLocalFilenameForURL(address);
+    
+    if (localFile==null) {
+      localFile = "temp.tmp";
+      System.err.println("Could not figure out local file name for " + address + ". Calling it '" + localFile + "'.");
+    }
+    
+    localFile = download(address, localFile);
+    return localFile;
+  }
+  
+  /**
+   * Extracts a valid FileName from an URL. E.g. if the Url is 
+   * "http://www.cgi.de/content.txt" the return value is "content.txt".
+   * If the URL contains variable characters like "?" or "=", or no
+   * valid filename could be extracted, NULL is returned.
+   * @param address
+   * @return FileName, denoted by this url, or null if it is not valid. 
+   */
+  public static String getLocalFilenameForURL(String address) {
     int lastSlashIndex = address.lastIndexOf('/');
     String localFile=null;
     if (lastSlashIndex >= 0 &&
         lastSlashIndex < address.length() - 1) {
       localFile = address.substring(lastSlashIndex + 1);
-      if (localFile.contains("?") || localFile.contains("=")) localFile = "temp.tmp";
-      localFile = download(address, localFile);
-    } else {
-      localFile = "Temp.tmp";
-      System.err.println("Could not figure out local file name for " + address + ". Calling it '" + localFile + "'.");
-      localFile = download(address, localFile);
+      if (localFile.contains("?") || localFile.contains("=")) localFile = null;
     }
     return localFile;
   }
@@ -58,6 +67,10 @@ public class FileDownload {
     String statusLabelText = "Downloading '" + address + "' ";
     System.out.println(statusLabelText);
     
+    AbstractProgressBar progress = null;
+    if (ProgressBar!=null && ProgressBar instanceof AbstractProgressBar)
+      progress = (AbstractProgressBar) ProgressBar;
+    
     int retry = 0;
     while (true) {
       try {
@@ -69,29 +82,34 @@ public class FileDownload {
           url.openConnection(); //status = ((URLConnection) url.openConnection()).getResponseCode();
         
         if (status>=400) {
-          System.out.println("Failed: HTTP error (code " + status + ").");
+          System.err.println("Failed: HTTP error (code " + status + ").");
           
           break; //404 und sowas ... >400 nur error codes. Normal:200 =>OK
         }
         
         conn = url.openConnection();
         
-        //conn.getContentLength()
-        
         in = conn.getInputStream();
         byte[] buffer = new byte[1024];
         int numRead;
         long numWritten = 0;
+        
+        final int reportEveryXKB = 50; // Set progressbar every X kb.
         //guiOperations.SetProgressBarMAXThreadlike(Math.max(conn.getContentLength(), in.available()), ProgressBar);
+        if (progress!=null) progress.setNumberOfTotalCalls(Math.max(conn.getContentLength(), in.available()));
         
         int calls = 0;
         while ((numRead = in.read(buffer)) != -1) {
-          if ((calls%10) == 0) { // Alle 10kb
+          if (progress!=null &&  (calls%reportEveryXKB) == 0) {
+            if (Thread.currentThread().isInterrupted()) break;
+            double mb = (Math.round(numWritten/1024.0/1024.0*10.0)/10.0);
             //if (ProgressBar!=null) guiOperations.SetProgressBarVALUEThreadlike((int)numWritten, true, ProgressBar);
-            //double mb = (Math.round(numWritten/1024.0/1024.0*10.0)/10.0);
         	  //if (StatusLabel!=null) guiOperations.SetStatusLabelThreadlike(statusLabelText + "(" + mb + " MB)", StatusLabel);
             //System.out.println(statusLabelText + "(" + mb + " MB)");
-            // System.out.println((Math.round(numWritten/1024/1024)));
+            //System.out.println((Math.round(numWritten/1024/1024)));
+            
+            progress.setCallNr(numWritten);
+            progress.DisplayBar("(" + mb + " MB)");
           }
           
           out.write(buffer, 0, numRead);
@@ -129,10 +147,26 @@ public class FileDownload {
    */
   public static String download(String address, String localFileName) {
     OutputStream out = null;
-
+    
+    // If file already exists, look if it is complete and skip re-downloading it.
+    try {
+      if (new File(localFileName).exists()) {
+        URL url = new URL(address);
+        int targetFileSize = url.openConnection().getContentLength();
+        if (targetFileSize==new File(localFileName).length()) {
+          System.out.println("File already exists and file length matches. Not downloading it again.");
+          return localFileName;
+        }
+      }
+    } catch (Throwable t) {
+      // Doesn't matter.
+    }
+    
+    // Try to open stream as given filename
     try {
       out = new BufferedOutputStream(new FileOutputStream(localFileName));
     } catch (Throwable t) {
+      // Try to open stream in official system tempDir.
       final String tempDir = System.getProperty("java.io.tmpdir");
       localFileName = tempDir + (tempDir.endsWith(File.separator)?"":File.separator) + localFileName;
       try {

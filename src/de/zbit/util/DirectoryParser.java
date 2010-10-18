@@ -67,6 +67,17 @@ public class DirectoryParser implements Iterator<String> {
 	}
 
 	/**
+	 * Creates a new DirectoryParser instance.
+   * @param cgiDir - if it is a directory, a new DirectoryParser
+   * will be created with this directory as input. If it is a file,
+   * a new DirectoryParser will be created with the directory in
+   * which the file resides as input.
+   */
+  public DirectoryParser(File cgiDir) {
+    this (cgiDir.isDirectory()?cgiDir.getPath():cgiDir.getParent());
+  }
+
+  /**
 	 * 
 	 * @param path
 	 * @return

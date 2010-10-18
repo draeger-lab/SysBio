@@ -1,7 +1,10 @@
 package de.zbit.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -14,6 +17,8 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Various utils, which I need quite often.
@@ -23,21 +28,36 @@ import java.util.Iterator;
 public class Utils {
 
   /**
-   * 
+   * Returns true if and only if arr contains s (case insensitive).
    * @param arr
    * @param s
    * @return
    */
   public static boolean ArrayContains(String[][] arr, String s) {
-    s = s.toLowerCase().trim();
+    s = s.trim();
     for (int i=0; i<arr.length; i++)
       for (int j=0; j<arr[i].length; j++)
-        if (arr[i][j].toLowerCase().trim().equals(s)) return true;
+        if (arr[i][j].trim().equalsIgnoreCase(s)) return true;
     return false;
   }
   
   /**
-   * 
+   * If there exists one element in arr such that arr[i].equals(s),
+   * i (the index) is returned.
+   * @param <T>
+   * @param arr
+   * @param s
+   * @return
+   */
+  public static <T> int arrayIndexOf(T[] arr, T s) {
+    for (int i=0; i<arr.length; i++)
+        if (arr[i].equals(s)) return i;
+    return -1;
+  }
+  
+  /**
+   * Returns true if and only if there exists one item in arr
+   * such that arr[i].equals(s).
    * @param <T>
    * @param arr
    * @param s
@@ -168,6 +188,12 @@ public class Utils {
     return retVal;
   }
   
+  /**
+   * Returns the standard deviation of the given double values.
+   * The Standard deviation is the square root of the variance.
+   * @param values
+   * @return
+   */
   public static double standardDeviation(double[] values){
     return Math.sqrt(variance(values));
   }
@@ -596,25 +622,6 @@ public class Utils {
   }
   
   /**
-   * 
-   * @param file
-   * @return
-   */
-  public static Object loadObject(File file) {
-    try {
-      FileInputStream fileIn = new FileInputStream(file);
-      ObjectInputStream in = new ObjectInputStream(fileIn);
-      Object ret = in.readObject();
-      in.close();
-      fileIn.close();
-      return ret;
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-  
-  /**
    * Returns the memory, that is currently allocated by the JVM in bytes.
    * Divide it by /1024.0/1024.0 the get the amount in MB.
    * @return
@@ -636,47 +643,6 @@ public class Utils {
      * double memory_max = Math.round((Runtime.getRuntime().maxMemory()/1024.0/1024.0*100.0))/100.0;
      */
     return ((Runtime.getRuntime().maxMemory() ));
-  }
-  
-  /**
-   * 
-   * @param inn
-   * @return
-   */
-  public static Object loadObject(InputStream inn) {
-    try {
-      ObjectInputStream in = new ObjectInputStream(inn);
-      Object ret = in.readObject();
-      in.close();
-      inn.close();
-      return ret;
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-  
-  /**
-   * 
-   * @param filename
-   * @return
-   */
-  public static Object loadObject(String filename) {
-    try {
-      FileInputStream fileIn = new FileInputStream(filename);
-      ObjectInputStream in = new ObjectInputStream(fileIn);
-      Object ret = in.readObject();
-      in.close();
-      fileIn.close();
-      return ret;
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    } catch(FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
   }
   
   /**
@@ -848,29 +814,8 @@ public class Utils {
   }
   
   /**
-   * 
-   * @param filename
-   * @param obj
-   * @return
-   */
-  public static boolean saveObject(String filename, Object obj) {
-    try {
-      FileOutputStream fileOut = new FileOutputStream(filename);
-      ObjectOutputStream out = new ObjectOutputStream(fileOut);
-      out.writeObject(obj);
-      out.close();
-      fileOut.close();
-      return true;
-    } catch(FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
-  
-  /**
-   * 
+   * Shutdown the computer. System independent implementation - should work on windows
+   * and unix operating systems.
    * @return
    */
   public static boolean shutdownSystem() {
@@ -932,5 +877,274 @@ public class Utils {
     
     return successValue;
   }
+  
+  /**
+   * Load a serializable object.
+   * @param file
+   * @return the loaded object or null if it failed.
+   */
+  public static Object loadObject(File file) {
+    try {
+      FileInputStream fileIn = new FileInputStream(file);
+      BufferedInputStream bIn = new BufferedInputStream(fileIn);
+      Object o = loadObject(bIn);
+      fileIn.close();
+      return o;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /**
+   * Load a serializable object.
+   * Does NOT buffer the stream. Make sure to pipe your
+   * stream though a BufferedStream for more performance
+   * (e.g. BufferedInputStream). 
+   * @param inn
+   * @return the loaded object or null if it failed.
+   */
+  public static Object loadObject(InputStream inn) {
+    try {
+      ObjectInputStream in = new ObjectInputStream(inn);
+      Object ret = in.readObject();
+      in.close();
+      inn.close();
+      return ret;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /**
+   * Load a serializable object.
+   * @param filename
+   * @return the loaded object or null if it failed.
+   */
+  public static Object loadObject(String filename) {
+    return loadObject(new File(filename));
+  }
+  
+  /**
+   * Load a serializable object from a gzipped file.
+   * @param file (String, File, FileDescriptor or InputStream).
+   * @return the loaded object or null if it failed.
+   */
+  public static Object loadGZippedObject(Object infile) {
+    Object ret = null;
+    if (infile==null) return ret;
+    
+    try {
+      InputStream fileIn;
+      if (infile instanceof String) {
+        fileIn = new FileInputStream((String)infile);
+      } else if (infile instanceof File) {
+        fileIn = new FileInputStream((File)infile);
+      } else if (infile instanceof FileDescriptor) {
+        fileIn = new FileInputStream((FileDescriptor)infile);
+      } else if (infile instanceof InputStream) {
+        fileIn = ((InputStream)infile);
+      } else {
+        throw new IOException("Unsupported input file object: "+infile.getClass().getName());
+      }
+      BufferedInputStream bIn = new BufferedInputStream(fileIn);
+      
+      GZIPInputStream gzIn = new GZIPInputStream(bIn);
+      
+      ret = loadObject((InputStream)gzIn);
+      
+      bIn.close();
+      if (fileIn instanceof Closeable) ((Closeable)fileIn).close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    return ret;
+  }
+  
+  /**
+   * Load a serializable object from a gzipped or normal file
+   * (is infered automatically).
+   * @param file (String, File, FileDescriptor or InputStream).
+   * @return the loaded object or null if it failed.
+   * @throws IOException 
+   */
+  public static Object loadObjectAutoDetectZIP(Object serializedFile) throws IOException {
+    
+    Object ret = null;
+    if (serializedFile==null) return ret;
+    
+    // Create input stream
+    InputStream fileIn;
+    if (serializedFile instanceof String) {
+      fileIn = new FileInputStream((String)serializedFile);
+    } else if (serializedFile instanceof File) {
+      fileIn = new FileInputStream((File)serializedFile);
+    } else if (serializedFile instanceof FileDescriptor) {
+      fileIn = new FileInputStream((FileDescriptor)serializedFile);
+    } else if (serializedFile instanceof InputStream) {
+      fileIn = ((InputStream)serializedFile);
+    } else {
+      throw new IOException("Unsupported input file object: "+serializedFile.getClass().getName());
+    }
+    
+    // Create buffered Stream to be able to read and reset the magic bytes
+    BufferedInputStream bin = new BufferedInputStream(fileIn);
+    bin.mark(20); // Set mark to be able to reset if magic bytes don't match.
+    
+    // Look if it is an GZipped Object
+    InputStream in=null;
+    try {
+      in = new GZIPInputStream(bin);
+    } catch (IOException e) {
+      // java.io.IOException: Not in GZIP format
+      in=null;
+      bin.reset();
+    }
+    
+    // Take directly the source input stream, if it is no GZstream
+    if (in==null) in = bin;
+    
+    ret = loadObject(in);
+    
+    bin.close();
+    fileIn.close();
+    
+    return ret;
+  }
+  
+  
+  /**
+   * Saves and GZipps a serializable object.
+   * @param filename - the file to save the object to.
+   * Please make sure by yourself, that this filename ends with ".gz".
+   * @param obj - the object to save.
+   * @return true if and only if saving was succesfull.
+   */
+  public static boolean saveGZippedObject(String filename, Object obj) {
+    try {
+      FileOutputStream fileOut = new FileOutputStream(filename);
+      GZIPOutputStream gzOut = new GZIPOutputStream(fileOut);
+      ObjectOutputStream out = new ObjectOutputStream(gzOut);
+      out.writeObject(obj);
+      out.close();
+      gzOut.close();
+      fileOut.close();
+      return true;
+    } catch(FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+  
+  
+  /**
+   * Saves a serializable object.
+   * @param filename - the file to save the object to.
+   * @param obj - the object to save.
+   * @return true if and only if saving was succesfull.
+   */
+  public static boolean saveObject(String filename, Object obj) {
+    try {
+      FileOutputStream fileOut = new FileOutputStream(filename);
+      ObjectOutputStream out = new ObjectOutputStream(fileOut);
+      out.writeObject(obj);
+      out.close();
+      fileOut.close();
+      return true;
+    } catch(FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
 
+  /**
+   * Returns the relative path, in which this file is contained.
+   * E.g. if fn is "res/home.dat", the return value will be "res/".
+   * 
+   * It is NOT recommended to use "new File(X).getParent()" because
+   * the path can be inside a jar and no real path.
+   * 
+   * @param fn - any input file and path combination.
+   * @return
+   */
+  public static String getPath(String fn) {
+    if (fn.contains("/")) {
+      // Exclisive file separator char, can be used in any os.
+      return fn.substring(0, fn.lastIndexOf("/")+1);
+    } else if (System.getProperty("file.separator").equals("\\") &&
+        fn.contains("\\")) {
+      // Unix filesystems can use \ to escape e.g. a whitespace. So
+      // this one should only be parsed when it is a valud file separator
+      return fn.substring(0, fn.lastIndexOf("\\")+1);
+    } else {
+      return "";
+    }
+  }
+
+  /**
+   * Performs a deep compareTo on two arrays. If the array contains other arrays as elements,
+   * the compareTo is based on their contents and so on, ad infinitum. It is therefore
+   * unacceptable to invoke this method on an array that contains itself as an element,
+   * either directly or indirectly through one or more levels of arrays.
+   * The behavior of such an invocation is undefined.
+   * 
+   * For any two arrays a and b such that Arrays.deepEquals(a, b), it is also the case that
+   * Arrays.deepCompareTo(a) == Arrays.deepCompareTo(b). 
+   * 
+   * @param arr1 - the first array to comapre to the second one.
+   * @param arr2 - the second array to compare to the first one.
+   * @return a value, <0 if the first array is "lower" or null, compared to the second one.
+   * A value >0 if it is the other way round and 0 if both arrays are deepEqual.
+   */
+  @SuppressWarnings("unchecked")
+  public static int deepCompareTo(Object[] arr1, Object[] arr2) {
+    if (arr1==null && arr2==null) return 0;
+    if (arr1==null) return -1;
+    if (arr2==null) return 1;
+    
+    int min = Math.min(arr1.length, arr2.length);
+    for (int i=0; i<min; i++) {
+      int ret=0;
+      
+      // Look if the current object is smaller, greater or eqal
+      if (arr1[i]==null && arr2[i]==null) ret =0;
+      else if (arr1[i]==null) ret = -1;
+      else if (arr2[i]==null) ret = 1;
+      
+      else if (arr1[i].getClass().isArray() && arr2[i].getClass().isArray()) {
+        // Deep array comparison
+        ret = deepCompareTo((Object[])arr1[i], (Object[])arr2[i]);
+        
+      } else if (arr1[i] instanceof Comparable && arr2[i] instanceof Comparable) {
+        // Comparables
+        ret = ((Comparable)arr1[i]).compareTo(((Comparable)arr2[i]));
+        
+      } else if (arr1[i] instanceof Number && arr2[i] instanceof Number ) {
+        // Numbers
+        double diff = (((Number)arr2[i]).doubleValue()-((Number)arr1[i]).doubleValue());
+        ret = (int) diff;
+        if (ret==0 && !((Number)arr2[i]).equals((Number)arr1[i])) ret = diff<0?-1:1;
+        
+      } else {
+        // String based comparison
+        ret = arr1[i].toString().compareTo(arr2[i].toString());
+        
+      }
+      
+      // Evaluate results
+      if (ret!=0) return ret;
+      
+      
+    }
+    
+    // They are equal.
+    return 0;
+  }
+  
 }

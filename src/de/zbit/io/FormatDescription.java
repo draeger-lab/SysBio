@@ -9,6 +9,7 @@ import java.util.List;
  * Data class to store information on a file format.
  * 
  * @author Marco Schmidt
+ * @author Clemens Wrzodek
  */
 public class FormatDescription implements Comparable<FormatDescription> {
   private List<String> fileExtensions;

@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.StringTokenizer;
 
 import javax.swing.event.TableModelListener;
@@ -447,8 +448,10 @@ public class CSVWriter {
 	 * @param writer
 	 * @throws IOException
 	 */
-	private void write(TableModel data, char separator, BufferedWriter writer)
+	private void write(TableModel data, char separator, Writer writer)
 			throws IOException {
+	  String lineSep = System.getProperty ( "line.separator" );
+	  
 		// setSeparator(separator);
 		int i, j;
 		Object value;
@@ -472,7 +475,7 @@ public class CSVWriter {
 					writer.append(separator);
 				}
 			}
-			writer.newLine();
+			writer.write(lineSep);
 		}
 
 		// write table body
@@ -484,7 +487,7 @@ public class CSVWriter {
 					writer.append(separator);
 				}
 			}
-			writer.newLine();
+			writer.write(lineSep);
 		}
 		writer.close();
 	}

@@ -231,6 +231,37 @@ public class LiftOver {
     return ret;
   }
   
+  /**
+   * Convenient method for liftovers.
+   * @param start
+   * @param end
+   * @param chr
+   * @param lo
+   * @return new String[]{chr, start, end};
+   */
+  public static String[] liftOver(String chr, int start, int end, LiftOver lo) {
+    String[] ret = new String[]{chr, start+"", end+""};
+    if (!chr.toLowerCase().trim().startsWith("chr"))
+      chr = "chr" + chr;
+    
+    if (chr.length()>0) {
+      Interval reti = lo.liftOver(chr, start, end);
+      if (reti==null || reti.getSequence()==null) {
+        ret=null;
+      } else {
+        ret = new String[3];
+        if (reti.getSequence().startsWith("chr"))
+          ret[0] = reti.getSequence().substring(3);
+        else
+          ret[0] = reti.getSequence();
+        ret[1] = Integer.toString(reti.getStart());
+        ret[2] = Integer.toString(reti.getEnd());
+      }
+    }
+    
+    return ret;
+  }
+  
   private static Interval createToInterval(final String intervalName, final TargetIntersection targetIntersection) {
     // Compute the query interval given the offsets of the target interval start and end into the first and
     // last ContinuousBlocks.

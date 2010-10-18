@@ -26,6 +26,7 @@ import java.util.List;
  * </pre>
  * 
  * @author Marco Schmidt
+ * @author Clemens Wrzodek
  */
 public class FormatIdentification {
   private static List<FormatDescription> descriptions;
@@ -96,6 +97,7 @@ public class FormatIdentification {
         if (in != null) in.close();
       } catch (IOException ioe) {}
     }
+    
     return identify(data);
   }
   
@@ -133,7 +135,8 @@ public class FormatIdentification {
   }
   
   private static void init() {
-    String INfilename = "data/formats.txt";
+    //String INfilename = "data/formats.txt";
+    String INfilename = "de/zbit/io/formats.txt";
     descriptions = new ArrayList<FormatDescription>();
     minBufferSize = 1;
     try {
@@ -142,8 +145,11 @@ public class FormatIdentification {
         input = new FileInputStream(INfilename);
       else if (FormatIdentification.class.getClassLoader().getResource(INfilename) != null) // Load from same jar
         input = FormatIdentification.class.getClassLoader().getResource(INfilename).openStream();
+      else if (FormatIdentification.class.getClassLoader().getResource(new File(INfilename).getName() ) != null) // Load from same jar
+        input = FormatIdentification.class.getClassLoader().getResource(new File(INfilename).getName()).openStream();
       
       if (input == null) {
+        System.err.println("WARNING: Could not load format identification magic byte file.");
         return;
       }
       FormatDescriptionReader in = new FormatDescriptionReader(

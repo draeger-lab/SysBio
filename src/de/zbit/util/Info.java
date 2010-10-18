@@ -105,8 +105,8 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 	 */
 	public INFOtype getInformation() {
 		/*
-		 * Do NOT call this function internaly, since it remembers how often you
-		 * use it.
+		 * Do NOT call this function internaly (e.g. for sorting), because
+		 * it remembers how often you use it.
 		 */
 		if (timesInfoAccessed != Integer.MAX_VALUE)
 			timesInfoAccessed++;
