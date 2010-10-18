@@ -390,8 +390,8 @@ public class GUITools {
 	 */
 	public static int overwriteExistingFileDialog(Component parent, File out) {
 		return JOptionPane.showConfirmDialog(parent, toHTML(out.getName()
-				+ " already exists. Do you really want to over write it?", 40),
-				"Over write existing file?", JOptionPane.YES_NO_OPTION,
+				+ " already exists. Do you really want to overwrite it?", 40),
+				"Overwrite existing file?", JOptionPane.YES_NO_OPTION,
 				JOptionPane.QUESTION_MESSAGE);
 	}
 
@@ -453,7 +453,7 @@ public class GUITools {
 	 */
 	public static File saveFileDialog(final Component parentComp) {
 		return saveFileDialog(parentComp, System.getProperty("user.dir"), true,
-				false, JFileChooser.FILES_AND_DIRECTORIES);
+				false, JFileChooser.FILES_ONLY);
 	}
 
 	/**
@@ -480,7 +480,8 @@ public class GUITools {
 							toHTML("Cannot write to file "
 									+ f.getAbsolutePath() + ".", 60),
 							"No writing access", JOptionPane.WARNING_MESSAGE);
-				} else if (GUITools.overwriteExistingFile(parent, f)) {
+				} else if (f.isDirectory() ||
+				    GUITools.overwriteExistingFile(parent, f)) {
 					return f;
 				}
 			} else {

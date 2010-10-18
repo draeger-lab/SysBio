@@ -22,6 +22,7 @@ import java.util.zip.CheckedOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
@@ -39,21 +40,26 @@ import de.zbit.io.tar.TarInputStream;
 
 /**
  * 
- * @author Clemens
+ * @author Clemens Wrzodek
  * @contens -Zipping / Unzipping /GZipping
  *
  */
 public class ZIPUtils {
 
   /**
-   * 
+   * Allows for unpacking of archives into a specific path.
    */
-  public static String prefixOfOutFile=""; // Erm�glicht entpacken in einen spezifischen Pfad.
+  public static String prefixOfOutFile="";
   
   /**
-   * 
+   * While extracting archives, skip files that already exist.
    */
   public static boolean skipIfExist=true;
+  
+  /**
+   * The buffer that is used to extract some files.
+   */
+  public static int BUFFER = 4096;
   
   /**
    * 
@@ -626,23 +632,22 @@ public class ZIPUtils {
   /**
    * 
    * @param INfilename
+   * @return true if and only if files have been successfully extracted (CRC Checked).
    * @throws IOException
    */
-  public static void ZIPunCompress(String INfilename) throws IOException {
-    ZIPunCompress(INfilename,false);
+  public static boolean ZIPunCompress(String INfilename) throws IOException {
+    return ZIPunCompress(INfilename,false);
   }
   
   /**
    * 
    * @param INfilename
    * @param silentMode
-   * @return
+   * @return true if and only if files have been successfully extracted (CRC Checked).
    * @throws IOException
    */
   public static boolean ZIPunCompress(String INfilename, boolean silentMode) throws IOException {
-    if (getInStream(INfilename)==null) return false;
-    ZIPunCompress(new String[]{INfilename},silentMode);
-    return true;
+    return ZIPunCompress(new String[]{INfilename},silentMode);
   }
   
   /**
@@ -650,65 +655,70 @@ public class ZIPUtils {
    * @param INfilename
    * @param fileInZip
    * @param outFile
-   * @return
+   * @return true if and only if files have been successfully extracted (CRC Checked).
    * @throws IOException
    */
   public static boolean ZIPunCompress(String INfilename, String fileInZip, String outFile) throws IOException {
-    // Now decompress archive
-    InputStream fi = getInStream(INfilename);
-    if (fi==null) return false;
+    // Check, if file exists
+    File inFile = OpenFile.searchFile(INfilename);
+    if (inFile==null) return false;
     
-    CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
-    ZipInputStream in2 = new ZipInputStream(new BufferedInputStream(csumi));
+    // Look, if desired file in Zip exists
+    ZipFile zipfile = new ZipFile(inFile);
+    ZipEntry entry = zipfile.getEntry(fileInZip);
+    if (entry==null) return false;
     
-    fileInZip = fileInZip.toLowerCase().trim();
-    ZipEntry ze;
-    while ((ze = in2.getNextEntry()) != null) {
-      if (!ze.getName().toLowerCase().trim().equals(fileInZip)) continue;
-      
-      BufferedWriter out = new BufferedWriter(new FileWriter(outFile));
-      int x;
-      while ((x = in2.read()) != -1)
-        out.write(x);
-      out.close();
-      
-      in2.close();
-      return true;
+    // Extract file
+    BufferedInputStream is = new BufferedInputStream(zipfile.getInputStream(entry));
+    int count;
+    byte data[] = new byte[BUFFER];
+    FileOutputStream fos = new FileOutputStream(outFile);
+    BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER);
+    while ((count = is.read(data, 0, BUFFER)) != -1) {
+      dest.write(data, 0, count);
     }
-    in2.close();
-    return false;
+    dest.flush();
+    dest.close();
+    is.close();
+    
+    return true;
   }
   
   /**
    * 
    * @param INfilenames
+   * @return true if and only if files have been successfully extracted (CRC Checked).
    * @throws IOException
    */
-  public static void ZIPunCompress(String[] INfilenames) throws IOException {
-    ZIPunCompress(INfilenames,false);
+  public static boolean ZIPunCompress(String[] INfilenames) throws IOException {
+    return ZIPunCompress(INfilenames,false);
   }
   
   /**
    * 
    * @param INfilenames
    * @param silentMode
+   * @return true if and only if files have been successfully extracted (CRC Checked).
    * @throws IOException
    */
-  public static void ZIPunCompress(String[] INfilenames, boolean silentMode) throws IOException {
+  public static boolean ZIPunCompress(String[] INfilenames, boolean silentMode) throws IOException {
+    boolean noErrors=true;
     for (int i=0; i< INfilenames.length; i++) {
       // Now decompress archive
       InputStream fi = getInStream(INfilenames[i]);
-      if (fi==null) continue;
-      
-      CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
-      ZipInputStream in2 = new ZipInputStream( new BufferedInputStream(csumi));
+      if (fi==null) {
+        System.err.println("Could not get input stream for " + INfilenames[i]);
+        noErrors=false;
+        continue;
+      }
+      ZipInputStream in2 = new ZipInputStream( new BufferedInputStream(fi));
       
       ZipEntry ze;
       while ((ze = in2.getNextEntry()) != null) {
         if (!silentMode) System.out.println("Extracting file "+ze);
         if (!silentMode && ze.getComment()!=null && ze.getComment().length()!=0) System.out.println("Comment: " + ze.getComment());
         
-        // Eventually create directorys
+        // Eventually create directories
         if (ze.getName().endsWith("/") || ze.getName().endsWith("\\")) {
           try {
             new File(prefixOfOutFile + ze.getName()).mkdirs();
@@ -716,20 +726,43 @@ public class ZIPUtils {
           } catch (Throwable e) {}
         }
         
-        if (skipIfExist && new File(prefixOfOutFile+ze.getName()).exists()) continue;
-        //BufferedWriter out = new BufferedWriter(new FileWriter(prefixOfOutFile+ze.getName())); // TUT NICHT F�R BIN�RDATEIEN!!!
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int x;
-        while ((x = in2.read()) != -1)
-          out.write(x);
-        //if (!silentMode) System.out.println();
-        out.writeTo( new FileOutputStream (prefixOfOutFile+ze.getName()));
-        out.flush();
-        out.close();
+        // Check if file already exists
+        if (skipIfExist && new File(prefixOfOutFile+ze.getName()).exists()) {
+          if (ze.getSize()>=0 && ze.getSize()==new File(prefixOfOutFile+ze.getName()).length()) {
+            continue;
+          } else {
+            if (!silentMode) System.out.println("Overwriting '" + ze.getName() + "', because file length differs.");
+          }
+        }
+
+        // Create output streams
+        FileOutputStream fos = new FileOutputStream(prefixOfOutFile+ze.getName());
+        BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER);
+        CheckedInputStream cisZE = new CheckedInputStream(in2, new CRC32());
+        
+        // Uncompress and write data
+        int count;
+        byte data[] = new byte[BUFFER];
+        while ((count = cisZE.read(data, 0, BUFFER)) != -1) {
+          dest.write(data, 0, count);
+        }
+        
+        // Flush and close streams
+        dest.flush();
+        dest.close();
+        fos.close();
+        
+        // CRC-Check
+        if (ze.getCrc()!=cisZE.getChecksum().getValue()) {
+          System.err.println("CRC-Error in file '" + ze.getName() + "': extracted " + cisZE.getChecksum().getValue() + " but expected " + ze.getCrc());
+          noErrors=false;
+        }
       }
-      if (!silentMode)System.out.println("Checksum extracted: "+ csumi.getChecksum().getValue());
+      
       in2.close();
+      fi.close();
     }
+    return noErrors;
   }
   
   /**

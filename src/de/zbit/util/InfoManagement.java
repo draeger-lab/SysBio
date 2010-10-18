@@ -36,7 +36,6 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   private int maxListSize; // Unfortunately serialized in many instances. Don't rename it.
   private boolean cacheChangedSinceLastLoading=false;
   
-  
   public InfoManagement() {
     this(1000);
   }
@@ -86,6 +85,8 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   public void setCacheSize(int cacheSize) {
     this.maxListSize = cacheSize;
+    rememberedInfos.ensureCapacity(maxListSize);
+    unsuccessfulQueries.ensureCapacity(maxListSize);
   }
 
   /**
@@ -111,6 +112,32 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         cacheChangedSinceLastLoading=true;
       }
     }
+  }
+  
+  /**
+   * This function re-sorts all internal id lists. It is usefull to call this function
+   * if your compareTo (i.e. your sorting) has changed, to keep a consistent sorting of
+   * your lists. It will also remove all duplicate ids. 
+   */
+  public void resortLists() {
+    SortedArrayList<Info<IDtype, INFOtype>> tempRI = new SortedArrayList<Info<IDtype, INFOtype>>(Math.max(rememberedInfos.size(), maxListSize));
+    SortedArrayList<IDtype> tempU = new SortedArrayList<IDtype>(Math.max(unsuccessfulQueries.size(), maxListSize));
+    
+    // Re-sort rememberedInfos
+    for (Info<IDtype, INFOtype> i: rememberedInfos) {
+      if (!tempRI.contains(i))
+        tempRI.add(i);
+    }
+    
+    // Re-sort unsuccessfulQueries
+    for (IDtype i: unsuccessfulQueries) {
+      if (!tempRI.contains(i) && !tempU.contains(i))
+        tempU.add(i);
+    }
+    
+    rememberedInfos = tempRI;
+    unsuccessfulQueries = tempU;
+    cacheChangedSinceLastLoading = true;
   }
   
   /**
@@ -512,40 +539,46 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   }
   
   /**
-   * 
+   * Load an instance of the cache (InfoManagement) from the filesystem.
    * @param file
-   * @return
+   * @return loaded InfoManagement instance.
+   * @throws IOException 
    */
-  public static synchronized InfoManagement<?, ?> loadFromFilesystem(File file) {
-    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(file);
+  public static synchronized InfoManagement<?, ?> loadFromFilesystem(File file) throws IOException {
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObjectAutoDetectZIP(file);
     return m;
   }
   /**
-   * 
+   * Load an instance of the cache (InfoManagement) from the filesystem. The inputStream is not
+   * buffered, so make sure to have it buffered before calling this function (for performance
+   * reasons only).
    * @param in
-   * @return
+   * @return loaded InfoManagement instance.
+   * @throws IOException 
    */
-  public static synchronized InfoManagement<?, ?> loadFromFilesystem(InputStream in) {
-    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(in);
+  public static synchronized InfoManagement<?, ?> loadFromFilesystem(InputStream in) throws IOException {
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObjectAutoDetectZIP(in);
     return m;
   }
   /**
-   * 
+   * Load an instance of the cache (InfoManagement) from the filesystem.
    * @param filepath
-   * @return
+   * @return loaded InfoManagement instance.
+   * @throws IOException 
    */
-  public static synchronized InfoManagement<?, ?> loadFromFilesystem(String filepath) {
-    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObject(filepath);
+  public static synchronized InfoManagement<?, ?> loadFromFilesystem(String filepath) throws IOException {
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObjectAutoDetectZIP(filepath);
     return m;
   }
 
   /**
-   * 
+   * Save the given instance of the cache (InfoManagement) as serialized object.
    * @param filepath
-   * @param m
+   * @param m - object to store.
+   * @return true if and only if the file has been successfully saved.
    */
-  public static synchronized void saveToFilesystem(String filepath, InfoManagement<?, ?> m) {
-    Utils.saveObject(filepath, m);
+  public static synchronized boolean saveToFilesystem(String filepath, InfoManagement<?, ?> m) {
+    return Utils.saveGZippedObject(filepath, m);
   }
   
   /**

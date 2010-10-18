@@ -680,7 +680,7 @@ public class CSVReaderOptionPanel extends JPanel {
     // For correct sizing, at least a space is required in each header column.
     String[] newHeader=header;
     newHeader = new String[maxColCount];
-    if (header!=null) System.arraycopy(header, 0, newHeader, 0, header.length);      
+    if (header!=null) System.arraycopy(header, 0, newHeader, 0, Math.min(newHeader.length, header.length));
     for (int i=0; i<newHeader.length; i++) {
       if (!r.getContainsHeaders()) newHeader[i] = "Column " + (i+1);
       else if (newHeader[i]==null || newHeader[i].length()<1) newHeader[i]= " ";
