@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
@@ -77,6 +78,7 @@ public class OpenFile {
    * @param myFile
    * @return FormatDescription object
    */
+  @SuppressWarnings("unused")
   private static FormatDescription fetchDescription(String filename, File myFile) {
     FormatDescription desc = null;
     if (myFile==null && (OpenFile.class.getClassLoader().getResource(filename)!=null))
@@ -85,6 +87,23 @@ public class OpenFile {
       } catch (IOException e1) {e1.printStackTrace();}
     else
       if (myFile!=null) desc = FormatIdentification.identify(myFile);
+    return desc;
+  }
+  
+  
+  /**
+   * 
+   * @param myStream
+   * @return
+   */
+  private static FormatDescription fetchDescription(InputStream myStream) {
+    FormatDescription desc=null;
+    try {
+      if (myStream!=null)
+        desc = FormatIdentification.identify(new BufferedReader(new InputStreamReader(myStream)));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     return desc;
   }
   
@@ -111,17 +130,26 @@ public class OpenFile {
     }
     
     // Identify format...
-    File myFile = searchFile(filename);
+    InputStream myStream=null;
+    try {
+      myStream = searchFileAndGetInputStream(filename);
+    } catch (IOException e1) {
+      e1.printStackTrace();
+    }
     FormatDescription desc = null;
-    desc = fetchDescription(filename, myFile);
+    desc = fetchDescription(myStream);
     
     // 2nd try. Bugfixing accidently added slashes (not so seldomly...)
     if (desc==null) {
       // remove accidently added double slashes. Do NOT do this before checking if it's an URL
       // May lead to problems on non http urls (jar urls e.g. "jar:http://xyz.de/my.jar!/com/...")
       filename = filename.replace(File.separator+File.separator, File.separator).replace("//", "/");
-      myFile = searchFile(filename);
-      desc = fetchDescription(filename, myFile);
+      try {
+        myStream = searchFileAndGetInputStream(filename);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      desc = fetchDescription(myStream);
     }
     //System.out.println(filename + " => " + (desc==null?"null":desc.getShortName()));
     
@@ -155,12 +183,41 @@ public class OpenFile {
       
       // Native text file OR ret is not ready if file wasn't really a zip file.
       if (ret==null || !ret.ready()) {
-        if (myFile!=null) ret = new BufferedReader(new FileReader(myFile));
+        if (myStream!=null) ret = new BufferedReader(new InputStreamReader(searchFileAndGetInputStream(filename)));
       }
     } catch (Exception e) {e.printStackTrace();}
     if (ret==null) System.err.println("Error opening file '" + filename + "'. Probably this file does not exist.");    
     
     return ret;
+  }
+
+
+  /**
+   * Searches for the file
+   * a) directly tries to open it by name.
+   * b) in the same jar / same project
+   * c) relative to the user dir.
+   * 
+   * WARNING: a File object can not be built upon a resource inside a jar. Use the
+   * {@link #searchFileAndGetInputStream(String)} method instead.
+   * 
+   * @param infile
+   * @return the actual file object or null if it does not exist / could not be found.
+   * @throws URISyntaxException  - if the resource is inside a jar-file.
+   */
+  public static File searchFile(String infile) throws URISyntaxException {
+    String curDir = System.getProperty("user.dir");
+    if (!curDir.endsWith(File.separator)) curDir+=File.separator;
+    
+    if (new File (infile).exists()) { // Load from Filesystem
+      return new File (infile);
+    } else if (OpenFile.class.getClassLoader().getResource(infile)!=null) { // Load from jar
+      return new File(OpenFile.class.getClassLoader().getResource(infile).toURI());
+    } else if (new File (curDir+infile).exists()) { // Load from Filesystem, relative to program path
+      return new File (curDir+infile);
+    }
+    
+    return null;
   }
   
   /**
@@ -168,21 +225,20 @@ public class OpenFile {
    * a) directly tries to open it by name.
    * b) in the same jar / same project
    * c) relative to the user dir.
-   * @param infile
-   * @return the actual file object or null if it does not exist / could not be found.
+   * @param infile - the file name and path to search for.
+   * @return InputStream of the given file.
+   * @throws IOException 
    */
-  public static File searchFile(String infile) {
+  public static InputStream searchFileAndGetInputStream(String infile) throws IOException {
     String curDir = System.getProperty("user.dir");
     if (!curDir.endsWith(File.separator)) curDir+=File.separator;
     
     if (new File (infile).exists()) { // Load from Filesystem
-      return new File (infile);
+      return  new FileInputStream (infile);
     } else if (OpenFile.class.getClassLoader().getResource(infile)!=null) { // Load from jar
-      try {
-        return new File(OpenFile.class.getClassLoader().getResource(infile).toURI());
-      } catch (URISyntaxException e) {}
+      return (OpenFile.class.getClassLoader().getResource(infile).openStream());
     } else if (new File (curDir+infile).exists()) { // Load from Filesystem, relative to program path
-      return new File (curDir+infile);
+      return new FileInputStream (curDir+infile);
     }
     
     return null;

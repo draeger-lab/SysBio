@@ -227,6 +227,17 @@ public class Utils {
   }
   
   /**
+   * Returns the standard deviation of the given double values.
+   * The Standard deviation is the square root of the variance.
+   * @param values
+   * @param mean -  the precomputed mean value
+   * @return
+   */
+  public static double standardDeviation(double[] values, double mean){
+    return Math.sqrt(variance(values, mean));
+  }
+  
+  /**
    * Mittelwertberechnung.
    * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
    */

@@ -23,15 +23,18 @@
  */
 package de.zbit.util.liftOver.io;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 
 /**
  * LineReader implementation that detects the OS and selects the preferred implementation for that
  * OS and delegates to it. 
  *
  * @author alecw
+ * @author wrzodek
  */
-public class AsciiLineReader implements LineReader {
+public class AsciiLineReader extends Reader implements LineReader {
 
     private final LineReader readerImpl;
 
@@ -98,6 +101,18 @@ public class AsciiLineReader implements LineReader {
 
     public void close() {
         readerImpl.close();
+    }
+
+    /* (non-Javadoc)
+     * @see java.io.Reader#read(char[], int, int)
+     */
+    @Override
+    public int read(char[] cbuf, int off, int len) throws IOException {
+      if (readerImpl instanceof Reader) {
+        return ((Reader)readerImpl).read(cbuf, off, len);
+      } else {
+        throw new IOException("read(char[], int, int) - Method not supported by " + getClass().getName());
+      }
     }
 }
 
