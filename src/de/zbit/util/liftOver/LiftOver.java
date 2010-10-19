@@ -23,10 +23,14 @@
  */
 package de.zbit.util.liftOver;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +62,7 @@ public class LiftOver {
   private double liftOverMinMatch = DEFAULT_LIFTOVER_MINMATCH;
   private final OverlapDetector<Chain> chains;
   
-  public static void main (String[] args) {
+  public static void main (String[] args) throws IOException {
     String chainFile = "S:/mapCoords/hg17ToHg18.over.chain";
     String toLiftFile = "S:/mapCoords/liftme.csv";
     
@@ -129,8 +133,9 @@ public class LiftOver {
   
   /**
    * Load UCSC chain file in order to lift over Intervals.
+   * @throws IOException 
    */
-  public LiftOver(File chainFile) {
+  public LiftOver(File chainFile) throws IOException {
     IoUtil.assertFileIsReadable(chainFile);
     chains = Chain.loadChains(chainFile);
   }
@@ -147,6 +152,31 @@ public class LiftOver {
 
     }*/
   
+  /**
+   * Load UCSC chain file in order to lift over Intervals.
+   * @param searchFileAndGetInputStream
+   * @throws IOException 
+   */
+  public LiftOver(Reader in) throws IOException {
+    chains = Chain.loadChains(in, "unknown file");
+  }
+
+
+  /**
+   * @param searchFileAndGetInputStream
+   * @throws IOException 
+   */
+  public LiftOver(InputStream in) throws IOException {
+    InputStreamReader insr = new InputStreamReader(in);
+    BufferedReader buff = new BufferedReader(insr);
+    
+    chains = Chain.loadChains(buff, "unknown file");
+    
+    buff.close();
+    insr.close();
+  }
+
+
   /**
    * Lift over the given interval to the new genome build using the liftOverMinMatch set for this
    * LiftOver object.

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.CheckedOutputStream;
@@ -660,7 +661,13 @@ public class ZIPUtils {
    */
   public static boolean ZIPunCompress(String INfilename, String fileInZip, String outFile) throws IOException {
     // Check, if file exists
-    File inFile = OpenFile.searchFile(INfilename);
+    File inFile;
+    try {
+      inFile = OpenFile.searchFile(INfilename);
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+      throw new IOException(e.getMessage());
+    }
     if (inFile==null) return false;
     
     // Look, if desired file in Zip exists
