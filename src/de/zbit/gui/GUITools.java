@@ -19,6 +19,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -36,6 +37,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
@@ -480,8 +483,8 @@ public class GUITools {
 							toHTML("Cannot write to file "
 									+ f.getAbsolutePath() + ".", 60),
 							"No writing access", JOptionPane.WARNING_MESSAGE);
-				} else if (f.isDirectory() ||
-				    GUITools.overwriteExistingFile(parent, f)) {
+				} else if (f.isDirectory()
+						|| GUITools.overwriteExistingFile(parent, f)) {
 					return f;
 				}
 			} else {
@@ -665,6 +668,25 @@ public class GUITools {
 	}
 
 	/**
+	 * Shows an error dialog with the given message in case the exception does
+	 * not provide any detailed message.
+	 * 
+	 * @param parent
+	 * @param exc
+	 * @param defaultMessage
+	 */
+	public static void showErrorMessage(Component parent, Throwable exc,
+			String defaultMessage) {
+		if ((exc.getMessage() == null) || (exc.getMessage().length() == 0)) {
+			exc.printStackTrace();
+			JOptionPane.showMessageDialog(parent, defaultMessage, exc
+					.getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
+		} else {
+			showErrorMessage(parent, exc);
+		}
+	}
+
+	/**
 	 * Displays a message on a message dialog window, i.e., an HTML document.
 	 * 
 	 * @param path
@@ -766,5 +788,63 @@ public class GUITools {
 		sb.append("</body></html>");
 		return sb.toString();
 	}
-
+	
+	/**
+	 * Initializes the look and feel.
+	 * 
+	 * @param title
+	 */
+	public static void initLaF(String title) {
+		Locale.setDefault(Locale.ENGLISH);
+		// For MacOS X
+		boolean isMacOSX = false;
+		if (System.getProperty("mrj.version") != null) {
+			isMacOSX = true;
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty(
+					"com.apple.mrj.application.apple.menu.about.name", title);
+		}
+		try {
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			// If Nimbus is not available, you can set the GUI to another look
+			// and feel.
+			// Native look and feel for Windows, MacOS X. GTK look and
+			// feel for Linux, FreeBSD
+			try {
+				UIManager
+						.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
+				String osName = System.getProperty("os.name");
+				if (osName.equals("Linux") || osName.equals("FreeBSD")) {
+					UIManager
+							.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+					// UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+				} else if (isMacOSX) {
+					UIManager
+							.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+				} else if (osName.contains("Windows")) {
+					UIManager
+							.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
+				} else {
+					// UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+					UIManager.setLookAndFeel(UIManager
+							.getSystemLookAndFeelClassName());
+				}
+				// } catch (Exception e) {
+				// }
+				// try {
+				// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (Exception exc) {
+				JOptionPane.showMessageDialog(null, GUITools.toHTML(exc
+						.getMessage(), 40), exc.getClass().getName(),
+						JOptionPane.WARNING_MESSAGE);
+				exc.printStackTrace();
+			}
+		}
+	}
 }
