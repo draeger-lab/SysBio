@@ -1,4 +1,5 @@
 package de.zbit.kegg.parser;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -50,7 +51,7 @@ public class KeggParser extends DefaultHandler {
    * collection should always be 1.
    */
   public static ArrayList<Pathway> parse(String filename) {
-    InputSource inS = new InputSource(OpenFile.openFile(filename));
+    InputSource inS = new InputSource(new BufferedReader(OpenFile.openFile(filename)));
     return parse(inS);
   }
   
@@ -62,7 +63,8 @@ public class KeggParser extends DefaultHandler {
   public static ArrayList<Pathway> parse(InputSource inS) {
     if (inS==null) return null;
     
-    if (offlineVersion) {
+    double kgmlVersion = getKGMLVersion(inS.getCharacterStream());
+    if (offlineVersion || kgmlVersion<=0.5) {
       // Remove System + Url in "<!DOCTYPE pathway SYSTEM "http://www.genome.jp/kegg/xml/KGML_v0.7.0_.dtd">"
       Reader s = inS.getCharacterStream();
       char c; String line="";
@@ -72,8 +74,16 @@ public class KeggParser extends DefaultHandler {
           c = (char)s.read();
           line += c;
           if (c=='\n') {
-            if (line.contains("SYSTEM") && line.contains("http://") && line.contains("pathway"))
+            if (offlineVersion && line.contains("SYSTEM") && line.contains("http://") && line.contains("pathway")) {
+              kgmlVersion = getKGMLVersion(line); // Get KGML version
+              // Remove the URL
               line = line.substring(0, line.indexOf("pathway")+"pathway".length()) + line.substring(line.lastIndexOf(">"));
+            }
+            
+            // Remove invalid XML code in older KGML versions
+            if (kgmlVersion<=0.5 && line.contains("&keywords="))
+              line = line.replace("&keywords=", "");
+            
             sb.append(line);
             line = "";
           }
@@ -92,14 +102,15 @@ public class KeggParser extends DefaultHandler {
       
       // Give a warning if version does not match.
       try {
-        double v = getKGMLVersion(document);
-        if (v>0 && v<0.7) {
+        if (kgmlVersion==0)
+          kgmlVersion = getKGMLVersion(document);
+        if (kgmlVersion>0 && kgmlVersion<0.7) {
           System.out.println("WARNING: Your kgml document is rather old.\n"+
-            "It is written in kgml version " + v + ". This parser is for version 0.7 / 0.71.\n"+
+            "It is written in kgml version " + kgmlVersion + ". This parser is for version 0.7 / 0.71.\n"+
             "Trying to read your document in compatibility mode.");
-        } else if (v>0 && v>=0.8) {
+        } else if (kgmlVersion>0 && kgmlVersion>=0.8) {
           System.out.println("WARNING: Your kgml document is rather new.\n"+
-              "It is written in kgml version " + v + ". This parser is for version 0.7 / 0.71.\n"+
+              "It is written in kgml version " + kgmlVersion + ". This parser is for version 0.7 / 0.71.\n"+
               "Trying to read your document anyways.");
         }
       } catch (Exception e) {} // doesn't matter.
@@ -115,18 +126,80 @@ public class KeggParser extends DefaultHandler {
    * Returns the KGML Version, parsed from the SystemID URL String.
    * Returns 0 if an error occurs / no version could be parsed.
    * @param document
-   * @return
+   * @return KGML version number
    */
   private static double getKGMLVersion(Document document) {
     double ret = 0;
     try {
       // e.g. http://www.genome.jp/kegg/xml/KGML_v0.6.1_.dtd
       String s = document.getDoctype().getSystemId();
-      ret = parseNextDouble(s, s.lastIndexOf('v'),true);
+      if (s!=null)
+        ret = parseNextDouble(s, s.lastIndexOf('v'),true);
     } catch (Exception e){
       e.printStackTrace();
       if (document.getDoctype().getSystemId()!=null) {
         System.err.println("Could not parse Pathway version from '" + document.getDoctype().getSystemId() + "'.");
+      }
+    }
+    
+    return ret;
+  }
+  
+  /**
+   * Returns the version information from a string like
+   * <!DOCTYPE pathway SYSTEM "http://www.genome.jp/kegg/xml/KGML_v0.6.1_.dtd">
+   * @param SYSTEMline
+   * @return KGML version number
+   */
+  private static double getKGMLVersion(String SYSTEMline) {
+    double ret = 0;
+    try {
+      // e.g. http://www.genome.jp/kegg/xml/KGML_v0.6.1_.dtd
+      if (SYSTEMline!=null)
+        ret = parseNextDouble(SYSTEMline, SYSTEMline.lastIndexOf('v'),true);
+    } catch (Exception e){
+      e.printStackTrace();
+      if (SYSTEMline!=null) {
+        System.err.println("Could not parse Pathway version from '" + SYSTEMline + "'.");
+      }
+    }
+    
+    return ret;
+  }
+  
+  /**
+   * Fetches the head of the reader (and resets the stream afterwards)
+   * and returns the KGML version.
+   * Parsing of the version is done as in {@link #getKGMLVersion(String)}.
+   * @param in
+   * @return KGML version number
+   */
+  private static double getKGMLVersion(Reader in) {
+    // Parse the head
+    double ret = 0;
+    String s = null;
+    try {
+      // Set a mark
+      Reader bin;
+      if (in.markSupported()) {
+        bin = in;
+      } else {
+        bin = new BufferedReader(in);
+      }
+      bin.mark(200);
+      // Read the head
+      char[] head = new char[200];
+      bin.read(head);
+      // Reset stream and parse the version
+      bin.reset();
+      
+      s = new String(head);
+      if (s!=null)
+        ret = parseNextDouble(s, s.lastIndexOf('v'),true);
+    } catch (Exception e){
+      e.printStackTrace();
+      if (s!=null) {
+        System.err.println("Could not parse Pathway version from '" + s + "'.");
       }
     }
     
