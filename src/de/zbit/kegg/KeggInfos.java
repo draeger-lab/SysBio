@@ -752,7 +752,7 @@ public class KeggInfos {
     // Add Kegg-id Miriam identifier
     if (prefix.startsWith("cpd:")) {
       ret = miriam_urn_kgCompound + suffix;
-    } else if (prefix.startsWith("glycan:")) {
+    } else if (prefix.startsWith("glycan:") || prefix.startsWith("gl:")) {
       ret = miriam_urn_kgGlycan + suffix;
     } else if (prefix.startsWith("ec:")) {
       ret = miriam_urn_ezymeECcode + suffix;
