@@ -122,28 +122,22 @@ public class KeggParser extends DefaultHandler {
     return null;
   }
   
-  /**
-   * Returns the KGML Version, parsed from the SystemID URL String.
-   * Returns 0 if an error occurs / no version could be parsed.
-   * @param document
-   * @return KGML version number
-   */
-  private static double getKGMLVersion(Document document) {
-    double ret = 0;
-    try {
-      // e.g. http://www.genome.jp/kegg/xml/KGML_v0.6.1_.dtd
-      String s = document.getDoctype().getSystemId();
-      if (s!=null)
-        ret = parseNextDouble(s, s.lastIndexOf('v'),true);
-    } catch (Exception e){
-      e.printStackTrace();
-      if (document.getDoctype().getSystemId()!=null) {
-        System.err.println("Could not parse Pathway version from '" + document.getDoctype().getSystemId() + "'.");
-      }
-    }
-    
-    return ret;
-  }
+	/**
+	 * Returns the KGML Version, parsed from the SystemID URL String. Returns 0
+	 * if an error occurs / no version could be parsed.
+	 * 
+	 * @param document
+	 * @return KGML version number
+	 */
+	private static double getKGMLVersion(Document document) {
+		double ret = 0;
+		// e.g. http://www.genome.jp/kegg/xml/KGML_v0.6.1_.dtd
+		String s = document.getDoctype().getSystemId();
+		if (s != null) {
+			ret = parseNextDouble(s, s.lastIndexOf('v'), true);
+		}
+		return ret;
+	}
   
   /**
    * Returns the version information from a string like
