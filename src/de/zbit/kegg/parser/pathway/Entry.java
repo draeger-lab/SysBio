@@ -1,9 +1,6 @@
 package de.zbit.kegg.parser.pathway;
 
-/**
- * Corresponding to the Kegg Entry class (see {@link http://www.genome.jp/kegg/xml/docs/})
- * @author wrzodek
- */
+
 import java.util.ArrayList;
 
 
@@ -13,39 +10,50 @@ import org.w3c.dom.NodeList;
 
 import de.zbit.kegg.parser.KeggParser;
 
+/**
+ * Corresponding to the Kegg Entry class (see 
+ * <a href="http://www.genome.jp/kegg/xml/docs/">KeggAPI</a>)
+ * @author wrzodek
+ */
 public class Entry {
   /**
-   * 
+   * id.type    the ID of this entry in the pathway map
    */
-  int id = 0; // id.type    the ID of this entry in the pathway map
+  int id = 0;
   /**
-   * 
+   * keggid.type    the KEGGID of this entry
    */
-  String name = ""; // keggid.type    the KEGGID of this entry
+  String name = "";
   /**
-   * 
+   * entry_type.type    the type of this entry
    */
-  EntryType type; // entry_type.type    the type of this entry
+  EntryType type;
   /**
-   * 
+   * url.type   the resource location of the information about this entry
    */
-  String link = ""; // url.type   the resource location of the information about this entry
+  String link = "";
   /**
-   * 
+   * keggid.type    the KEGGID of corresponding reaction
    */
-  String reaction = ""; // keggid.type    the KEGGID of corresponding reaction
+  String reaction = "";
   /**
-   * 
+   * For Customize purposes (e.g. saving a corresponding node reference)
    */
-  Object custom=null; // For Customize purposes (e.g. saving a corresponding node reference)
+  Object custom=null;
   /**
    * 
    */
   Graphics graph=null;
   /**
-   * 
+   * If it is a group node, this list contains the ids of all children.
    */
-  ArrayList<Integer> components = new ArrayList<Integer>();
+  ArrayList<Integer> components = null;
+  /**
+   * The reverse-argument to the components argument.
+   * I.e. if this is contained in a components list, this is
+   * the reference back to the node, that contains this node as component.
+   */
+  private Entry parent = null;
   
   /**
    * 
@@ -94,7 +102,7 @@ public class Entry {
    * @return
    */
   public ArrayList<Integer> getComponents() {
-    return components;
+    return components==null?new ArrayList<Integer>():components;
   }
   
   /**
@@ -183,6 +191,7 @@ public class Entry {
       
       NamedNodeMap att = node.getAttributes();
       if (name.equalsIgnoreCase("component")) { // 0 .. *
+        if (components==null) components = new ArrayList<Integer>();
         components.add(KeggParser.getNodeValueInt(att, "id"));
       } else if(name.equals("graphics")) { // 0 .. 1
         graph = new Graphics(KeggParser.getNodeValue(att, "name"), KeggParser.getNodeValueInt(att, "x"), KeggParser.getNodeValueInt(att, "y"), GraphicsType.valueOf(KeggParser.getNodeValue(att, "type")), KeggParser.getNodeValueInt(att, "width"), KeggParser.getNodeValueInt(att, "height"), KeggParser.getNodeValue(att, "fgcolor"), KeggParser.getNodeValue(att, "bgcolor"), (type==EntryType.gene));
@@ -236,6 +245,22 @@ public class Entry {
    */
   public void setType(EntryType type) {
     this.type = type;
+  }
+
+  /**
+   * If there exists a group node, with this node/entry as component,
+   * then this function is the reference, back to the group node.
+   * @return
+   */
+  public Entry getParentNode() {
+    return parent;
+  }
+
+  /**
+   * See {@link #getParentNode()}
+   */
+  public void setParentNode(Entry parent) {
+    this.parent = parent;
   }
 
 }

@@ -287,12 +287,30 @@ public class KeggParser extends DefaultHandler {
         parsePathway(node.getChildNodes(), p);
         pathways.add(p);
         
+        // Creates back references of group nodes
+        createGroupNodeBackReferences(p);
       }
       
     }
     return pathways;
   }
   
+  /**
+   * Creates back-references for childs of group nodes, to the
+   * group node.
+   * @param p
+   */
+  private static void createGroupNodeBackReferences(Pathway p) {
+    for (Entry e:p.getEntries()) {
+      if (e.hasComponents()) {
+        for (Integer c: e.getComponents()) {
+          Entry e2 = p.getEntryForId(c);
+          if (e2!=null) e2.setParentNode(e);
+        }
+      }
+    }
+  }
+
   /**
    * 
    * @param nl
