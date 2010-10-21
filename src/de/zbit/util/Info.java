@@ -54,16 +54,25 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 	 * 
    * Do NOT call this function internaly (e.g. for sorting), because
    * it affects the caching behaviour (it stores last usage informations).
+   * Use {@link #getInformation(boolean)} instead.
    * 
 	 * @return
 	 */
 	public INFOtype getInformation() {
-		/*
-		 * Do NOT call this function internaly (e.g. for sorting), because
-		 * it remembers how often you use it.
-		 */
-	  lastUsage = System.currentTimeMillis();
-		return information;
+	  return getInformation(true);
+	}
+	
+	/**
+	 * Returns the information content of this object.
+	 * @param updateTimestamp - if true, the timestamp of this
+	 * object will be set to currentTimeMillis().
+	 * @return
+	 */
+	protected INFOtype getInformation(boolean updateTimestamp) {
+	  if (updateTimestamp) {
+	    lastUsage = System.currentTimeMillis();
+	  }
+	  return information;
 	}
 	
 	/**
