@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 /**
  * Improves data Management when data is associated to an id or descriptor.
+ * This class represents one element in the cache.
  * 
  * @author wrzodek
  * 
@@ -14,85 +15,34 @@ import java.io.Serializable;
  */
 @SuppressWarnings("unchecked")
 public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3592331552130670620L;
 	/**
-	 * 
+	 * Identifier for the stored information.
 	 */
 	private IDtype identifier;
 	/**
-	 * 
+	 * The information itself.
 	 */
 	private INFOtype information;
-    /**
-     * 
-     */
-	private int timesInfoAccessed = 0;
-	/**
-	 * Remebering the time, the fetching of this information took (in s, (Minium of 1!!!))
-	 */
-	private float timeForFetchingInfo=(float) 1.0;
+  /**
+   * Datestamp, when this information has been accessed the last time.
+   */
+  private long lastUsage = System.currentTimeMillis();
+  
 
 	/**
 	 * Construct a new element.
 	 * 
 	 * @param identifier
-	 * @param information
-	 *            - Content
+	 * @param information - Content
 	 */
 	public Info(IDtype identifier, INFOtype information) {
 		this.identifier = identifier;
 		this.information = information;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public int compareTo(Object o) {
-		if (o instanceof Info) {
-			return identifier.compareTo(((Info) o).getIdentifier());
-		} else if (o instanceof Comparable) {
-			try {
-				return identifier.compareTo((IDtype) o);
-			} catch (Exception e) {
-			} // Invalid cast
-			return identifier.compareTo((Comparable) o);
-		}
-		System.err.println("Cannot compare Info to " + o);
-		return 0;
-	}
-
-	/**
-	 * 
-	 * @param o
-	 * @return
-	 */
-	public boolean equals(Info<IDtype, INFOtype> o) {
-		if (o.getIdentifier().equals(this.getIdentifier())
-				&& o.information.equals(this.information))
-			return true;
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		try {
-			if (obj instanceof Info)
-				return equals((Info<IDtype, INFOtype>) obj);
-		} catch (Exception e) {
-		} // Other subtypes. Wrong cast!
-		return super.equals(obj);
-	}
 	
 	/**
-	 * 
+	 * Returns the identifier for this object.
 	 * @return
 	 */
 	public IDtype getIdentifier() {
@@ -100,7 +50,11 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 	}
 	
 	/**
+	 * Returns the information content of this object.
 	 * 
+   * Do NOT call this function internaly (e.g. for sorting), because
+   * it affects the caching behaviour (it stores last usage informations).
+   * 
 	 * @return
 	 */
 	public INFOtype getInformation() {
@@ -108,28 +62,26 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 		 * Do NOT call this function internaly (e.g. for sorting), because
 		 * it remembers how often you use it.
 		 */
-		if (timesInfoAccessed != Integer.MAX_VALUE)
-			timesInfoAccessed++;
+	  lastUsage = System.currentTimeMillis();
 		return information;
 	}
-
+	
 	/**
-	 * Returns the time, the fetching of this information took.
-	 * In seconds with minimum of 1!
-	 * @return
+	 * @return date stamp, when this information has been accessed
+	 * the last time.
 	 */
-	public float getTimeForFetchingInfo() {
-	  return (float) Math.max(1.0, timeForFetchingInfo);
+	public long getLastUsage() {
+	  return lastUsage;
 	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getTimesInfoAccessed() {
-		return timesInfoAccessed;
-	}
-
+	
+  /**
+   * 
+   * @param information
+   */
+  public void setInformation(INFOtype information) {
+    this.information = information;
+  }
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -138,32 +90,51 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 	public int hashCode() {
 		return getIdentifier().hashCode() + information.hashCode();
 	}
+	
 
-	/**
-	 * 
-	 */
-	public void resetTimesInfoAccessed() {
-		timesInfoAccessed = 0;
-	}
-
-	/**
-	 * 
-	 * @param information
-	 */
-	public void setInformation(INFOtype information) {
-		this.information = information;
-	}
-
-	/**
-   * Sets the time, the fetching of this information took.
-   * In seconds with minimum of 1!
-   * 
-   * If you give this information, items which take long to retrieve have less probability
-   * to get remove from the queue if it's full.
+  /*
+   * (non-Javadoc)
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-	public void setTimeForFetchingInfo(float f) {
-	  this.timeForFetchingInfo = Math.max(f,(float)1.0);
-	}
+  public int compareTo(Object o) {
+    if (o instanceof Info) {
+      return identifier.compareTo(((Info) o).getIdentifier());
+    } else if (o instanceof Comparable) {
+      try {
+        return identifier.compareTo((IDtype) o);
+      } catch (Exception e) {
+      } // Invalid cast
+      return identifier.compareTo((Comparable) o);
+    }
+    System.err.println("Cannot compare Info to " + o);
+    return 0;
+  }
+
+  /**
+   * 
+   * @param o
+   * @return
+   */
+  public boolean equals(Info<IDtype, INFOtype> o) {
+    if (o.getIdentifier().equals(this.getIdentifier())
+        && o.information.equals(this.information))
+      return true;
+    return false;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    try {
+      if (obj instanceof Info)
+        return equals((Info) obj);
+    } catch (Exception e) {
+    } // Other subtypes. Wrong cast!
+    return super.equals(obj);
+  }
 
 	/*
 	 * (non-Javadoc)
@@ -171,8 +142,8 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
 	 */
 	@Override
 	public String toString() {
-		return "@InfoObject. ID: '" + getIdentifier().toString()
-				+ "'. Information: '" + information.toString() + "'.";
+		return "[@Info ID: '" + getIdentifier().toString()
+				+ "' Information: '" + information.toString() + "']";
 	}
 
 }

@@ -793,7 +793,7 @@ public class GUITools {
 	/**
 	 * Initializes the look and feel.
 	 * 
-	 * @param title
+	 * @param title - Name of your application.
 	 */
 	public static void initLaF(String title) {
 	  Locale.setDefault(Locale.ENGLISH);
