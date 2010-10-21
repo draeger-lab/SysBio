@@ -75,6 +75,20 @@ public class KeggInfos {
    */
 	private String mass = null;
 	/**
+	 * PDB-CCD
+   * PDBeChem - Dictionary of chemical components (ligands, small molecules and monomers) referred in PDB entries and maintained by the wwPDB
+   * http://www.ebi.ac.uk/msd-srv/msdchem/cgi-bin/cgi.pl?APPLICATION=1 
+	 */
+	private String PDBeChem=null;
+	/**
+	 * urn:miriam:glycomedb
+	 */
+	private String GlycomeDB=null;
+	/**
+	 * urn:miriam:lipidbank
+	 */
+	private String LipidBank=null;
+	/**
 	 * <ul>
 	 * <li>urn:miriam:pubchem.compound</li>
 	 * <li>urn:miriam:pubchem.substance</li>
@@ -132,6 +146,10 @@ public class KeggInfos {
 	 * G00123
 	 */
 	public static final String miriam_urn_kgGlycan = "urn:miriam:kegg.glycan:";
+  /**
+   * G00123
+   */
+  public static final String miriam_urn_kgOrthology = "urn:miriam:kegg.orthology:";
 	/**
 	 * D00123
 	 */
@@ -180,6 +198,18 @@ public class KeggInfos {
 	 * 1018
 	 */
 	public static final String miriam_urn_PubChem_Bioassay = "urn:miriam:pubchem.bioassay:";
+	/**
+	 * PDBeChem/pdb-ccd ID e.g. "2PM"
+	 */
+	public static final String miriam_urn_PDBeChem = "urn:miriam:pdb-ccd:";
+  /**
+   * Example: 1
+   */
+  public static final String miriam_urn_GlycomeDB = "urn:miriam:glycomedb:";
+  /**
+   * Example: BBA0001
+   */
+  public static final String miriam_urn_LipidBank = "urn:miriam:lipidbank:";
 	/**
 	 * CHEBI:36927
 	 */
@@ -384,7 +414,28 @@ public class KeggInfos {
 	public String getInformationFromKeggAdaptor() {
 		return informationFromKeggAdaptor;
 	}
+	
+  /**
+   * @return
+   */
+  public String getPDBeChem() {
+    return PDBeChem;
+  }
 
+  /**
+   * @return
+   */
+  public String getGlycomeDB() {
+    return GlycomeDB;
+  }
+  
+  /**
+   * @return
+   */
+  public String getLipidBank() {
+    return LipidBank;
+  }
+  
 	/**
 	 * 
 	 * @return
@@ -613,9 +664,13 @@ public class KeggInfos {
 		mass = KeggAdaptor.extractInfo(infos, "MASS"); // MASS 180.0634
 
 		pubchem = KeggAdaptor.extractInfo(infos, "PubChem:", "\n");
+		PDBeChem = KeggAdaptor.extractInfo(infos, "PDB-CCD:", "\n");
 		chebi = KeggAdaptor.extractInfo(infos, "ChEBI:", "\n");
 		three_dmet = KeggAdaptor.extractInfo(infos, "3DMET:", "\n");
 		cas = KeggAdaptor.extractInfo(infos, " CAS:", "\n");
+		
+		GlycomeDB = KeggAdaptor.extractInfo(infos, "GlycomeDB:", "\n");
+		LipidBank = KeggAdaptor.extractInfo(infos, "LipidBank:", "\n");
 
 		// Mainly drg (eg. "dr:D00694")
 		// missing: NIKKAJI, LigandBox (CAS)
@@ -695,6 +750,12 @@ public class KeggInfos {
 			drugbank = null;
 		if (pubchem != null && pubchem.trim().length() == 0)
 			pubchem = null;
+    if (PDBeChem != null && PDBeChem.trim().length() == 0)
+      PDBeChem = null;
+    if (GlycomeDB != null && GlycomeDB.trim().length() == 0)
+      GlycomeDB = null;
+    if (LipidBank != null && LipidBank.trim().length() == 0)
+      LipidBank = null;
 	}
 
 	/**
@@ -762,13 +823,12 @@ public class KeggInfos {
       ret = miriam_urn_kgReaction + suffix;
     } else if (prefix.startsWith("path:")) { // Link to another pathway
       ret = miriam_urn_kgPathway + suffix;
-    } else if (et == null && prefix.startsWith("ko:") || et != null
-        && (et.equals(EntryType.gene) || et.equals(EntryType.ortholog))) {// z.B.
-      // hsa:00123,
-      // ko:00123
-      ret = miriam_urn_kgGenes + keggId.trim(); // Be careful here: Don't
-      // trim to ':'! (Don't
-      // use suffix)
+    } else if (prefix.startsWith("ko:")) {
+      // TODO: ist das so korrekt? Oder auch ko:has:234 möglich (s.u.)?
+      ret = miriam_urn_kgOrthology + suffix;
+    } else if (et == null || et != null
+        && (et.equals(EntryType.gene) || et.equals(EntryType.ortholog))) {// z.B. hsa:00123, ko:00123
+      ret = miriam_urn_kgGenes + keggId.trim(); // Be careful here: Don't trim to ':'! (Don't use suffix)
     } else {
       System.err.println("Please implement MIRIAM urn for: '" + keggId
           + ((et != null) ? "' (" + et.toString() + ")." : "."));
@@ -791,5 +851,6 @@ public class KeggInfos {
     }
     return (s.substring(s.indexOf(':') + 1)).trim();
   }
+
 
 }

@@ -31,13 +31,13 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   
   public static final transient Logger log = Logger.getLogger(InfoManagement.class);
   
-  private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;  
+  private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;
   private SortedArrayList<IDtype> unsuccessfulQueries; // Remember those separately
   private int maxListSize; // Unfortunately serialized in many instances. Don't rename it.
   private boolean cacheChangedSinceLastLoading=false;
   
   public InfoManagement() {
-    this(1000);
+    this(100000);
   }
   
   /**
@@ -83,7 +83,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * without infos) is not affected by the maximum cache size!
    * @param cacheSize
    */
-  public void setCacheSize(int cacheSize) {
+  public synchronized void setCacheSize(int cacheSize) {
     this.maxListSize = cacheSize;
     rememberedInfos.ensureCapacity(maxListSize);
     unsuccessfulQueries.ensureCapacity(maxListSize);
@@ -97,7 +97,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * The intention of this method is to re-fetch empty or unsuccessfulQueries
    * what may be usefull if the underlying database is updated.
    */
-  public void cleanupUnsuccessfulAndEmptyInfos() {
+  public synchronized void cleanupUnsuccessfulAndEmptyInfos() {
     if (unsuccessfulQueries.size()>0) {
       cacheChangedSinceLastLoading=true;
       unsuccessfulQueries.clear();
@@ -119,7 +119,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * if your compareTo (i.e. your sorting) has changed, to keep a consistent sorting of
    * your lists. It will also remove all duplicate ids. 
    */
-  public void resortLists() {
+  public synchronized void resortLists() {
     SortedArrayList<Info<IDtype, INFOtype>> tempRI = new SortedArrayList<Info<IDtype, INFOtype>>(Math.max(rememberedInfos.size(), maxListSize));
     SortedArrayList<IDtype> tempU = new SortedArrayList<IDtype>(Math.max(unsuccessfulQueries.size(), maxListSize));
     
@@ -143,7 +143,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   /**
    * Clears the whole cache (rememberedInfos and unsuccessfulQueries).
    */
-  public void clearCache() {
+  public synchronized void clearCache() {
     if (unsuccessfulQueries.size()>0 || rememberedInfos.size()>0) cacheChangedSinceLastLoading=true;
     unsuccessfulQueries.clear();
     rememberedInfos.clear();
@@ -174,63 +174,57 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   /**
    * Adds the given information. It is intended, that this function does NOT check if the information
    * is already available.
-   * 
-   * Use this function to also consider the time, fetching of each item took, when the class needs to
-   * remove old information.
-   * @param id
-   * @param info
-   * @param timeForRetrieve - IN SECONDS
-   */
-  public synchronized void addInformation(IDtype id, INFOtype info, float timeForRetrieve) {
-    Info<IDtype, INFOtype> myInfo = new Info<IDtype, INFOtype>(id, info);
-    myInfo.setTimeForFetchingInfo(timeForRetrieve);
-    addInformation(myInfo);
-  }
-  
-  /**
-   * Adds the given information. It is intended, that this function does NOT check if the information
-   * is already available.
    * @param infoObject
    */
   public synchronized void addInformation(Info<IDtype, INFOtype> infoObject) {
     // Ensure constant max list capacity. Remove least frequently used item.
-    while (rememberedInfos.size()>=maxListSize) {
-      /* It is quite difficult to save an DataType sorted by object usage and object to quickly remove the least frequent
-       * used one. That's I'm using a heuristic, just quering the bottom 1000 ones, which is in O(1). 
-       
-      int min = Math.max(0, rememberedInfos.size()-1000);
-      int itemToDelete = rememberedInfos.size()-1; int minUsage=Integer.MAX_VALUE;
-      for (int i=rememberedInfos.size()-1; i>=min; i--) {
-        if(rememberedInfos.get(i).getTimesInfoAccessed()<minUsage) {
-          minUsage = rememberedInfos.get(i).getTimesInfoAccessed();
-          itemToDelete = i;
-          if (minUsage==0) break; // can't get any lower.
-        }
-      }
-      rememberedInfos.remove(itemToDelete);*/
-      
-      // Above solution is not good, since mostly the most recent added item gets deleted... Simple solution:
-      //int min = Math.max(0, rememberedInfos.size()-1000);
-      int itemToDelete = rememberedInfos.size()-1; //int minUsage=Integer.MAX_VALUE;
-      double minUsage = Double.MAX_VALUE;
-      for (int i=0; i<rememberedInfos.size(); i++)  {
-        double usageVal = (((double)rememberedInfos.get(i).getTimesInfoAccessed())+0.1) * rememberedInfos.get(i).getTimeForFetchingInfo();
-        if(usageVal<minUsage) {
-          minUsage = usageVal;
-          itemToDelete = i;
-          if (minUsage<1) break; // 0.1 = can't get any lower.;  <1 = low enough ;-) (iterating though all items is inefficient).
-        }
-      }
-      
-      // If some honks set list size to 0 or -1, itemToDelete is -1.
-      if (itemToDelete>=0)
-        rememberedInfos.remove(itemToDelete);
-      else
-        break;
+    if (isCacheFull()) {
+      freeCache(Math.max(10, maxListSize/100));
     }
     
     rememberedInfos.add(infoObject);
     cacheChangedSinceLastLoading=true;
+  }
+
+  /**
+   * @return true if and only if rememberedInfos.size() is at least maxListSize.
+   */
+  public boolean isCacheFull() {
+    return (rememberedInfos.size()>=maxListSize);
+  }
+  
+  /**
+   * Removes the given number of elements from the cache.
+   * Tries to remove the least used object first and to preserve
+   * objects, that are recently added/used.
+   * 
+   * You should try to remove a bunch of elements at once,
+   * because removing elements might take some time O(n).
+   * 
+   * @param elements - number of elements to remove.
+   */
+  private synchronized void freeCache(int elements) {
+    // Sort the list by lastUsage and delete lowest time-stamps.
+    ArrayList<Object> itemToDelete = new ArrayList<Object>(elements+1);
+    SortedArrayList<Long> minDate = new SortedArrayList<Long>(elements+1);
+    long minMaxDate = Long.MIN_VALUE;
+    for (int i=0; i<rememberedInfos.size(); i++)  {
+      long usageDate = rememberedInfos.get(i).getLastUsage();
+      
+      if(usageDate<=minMaxDate || itemToDelete.size() < elements) {
+        minDate.add(usageDate);
+        itemToDelete.add(minDate.getIndexOfLastAddedItem(), rememberedInfos.get(i));
+        minMaxDate = minDate.get(0); // Math.min(elements-1, minDate.size()-1)
+        // XXX: It would be good to have a break condition (i.e. good enough)
+        // here, to speedup the whole process.
+        //if (minMaxDate<1) break;
+      }
+    }
+    
+    // If some honks set list size to 0 or -1, itemToDelete is -1.
+    if (itemToDelete.size()>=0)
+      for (int i=0; i<Math.min(elements, itemToDelete.size()); i++)
+        rememberedInfos.remove((Object)itemToDelete.get(i));
   }
   
   /**
@@ -405,10 +399,8 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     if (pos>=0) return rememberedInfos.get(pos).getInformation();
     else {
       // Retrieve object and store it.
-      long timer = System.currentTimeMillis();
       INFOtype info = fetchInformationWrapper(id);
-      timer = System.currentTimeMillis()-timer;
-      if (info!=null) addInformation(id, info, (((float)timer)/1000) );
+      if (info!=null) addInformation(id, info);
       return info;
     }
   }
@@ -424,13 +416,13 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   @SuppressWarnings("unchecked")
   public synchronized INFOtype[] getInformations(IDtype[] ids) {
     if (ids==null) return null;
-    ArrayList<IDtype> filteredIDs = new ArrayList<IDtype>();
+    ArrayList<IDtype> unknownIDs = new ArrayList<IDtype>();
     boolean touched = false; // if true, ids!=filteredIDs
     INFOtype anyCachedInfo=null;
     for (IDtype id: ids) {
       int pos = rememberedInfos.indexOf(id);
       if (pos<0 && !unsuccessfulQueries.contains(id)) { // Same if-order as below!
-        filteredIDs.add(id);
+        unknownIDs.add(id);
       } else {
         touched = true;
         if (anyCachedInfo==null) anyCachedInfo=rememberedInfos.get(pos).getInformation();
@@ -440,12 +432,21 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     
     if (touched) {
       // Some elements are already in our cache.
-    
-      IDtype[] filtIDs = (IDtype[]) createNewArray(ids,filteredIDs.size());
-      for (int i=0; i<filtIDs.length; i++)
-        Array.set(filtIDs, i, filteredIDs.get(i));
       
-      INFOtype[] ret = fetchMultipleInformationWrapper(filtIDs);
+      // Retain all elements that have to be fetched
+      IDtype[] filtIDs = (IDtype[]) createNewArray(ids,unknownIDs.size());
+      for (int i=0; i<unknownIDs.size(); i++)
+        Array.set(filtIDs, i, unknownIDs.get(i));
+      
+      INFOtype[] newItems=null;
+      if (unknownIDs.size()>0) {
+        
+        // Fetch new items
+        newItems = fetchMultipleInformationWrapper(filtIDs);
+        
+        // Free enough cache for them
+        freeCache(Math.max(unknownIDs.size(), maxListSize/100));
+      }
       
       // Big Problem: Java does not permit creating an generic array
       //INFOtype[] infos = new INFOtype[ids.length]; // Not permitted... workaround: 
@@ -460,15 +461,15 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         int pos = rememberedInfos.indexOf(ids[i]);
         if (pos>=0) { // Same if-order as above!
           infos[i] = rememberedInfos.get(pos).getInformation();
-        } else if (filteredIDs.size()>0 && ids[i].equals(filtIDs[infos_i])){
+        } else if (unknownIDs.size()>0 && ids[i].equals(filtIDs[infos_i])){
           // Newly fetched infos (filteredIDs==0 if all in cache).
-          if (ret!=null && ret.length<infos_i) {
+          if (newItems!=null && newItems.length<infos_i) {
             // should never happen. (=null => unsuccessfulQueries)
             System.err.println("Something went badly wrong. Your fetchMultipleInformations method must return an array of exactly the same size as the input id array!");
             infos[i] = null;
-          } else if (ret!=null){
-            infos[i] = ret[infos_i];
-            if (ret[infos_i]!=null) addInformation(ids[i], ret[infos_i]);
+          } else if (newItems!=null){
+            infos[i] = newItems[infos_i];
+            if (newItems[infos_i]!=null) addInformation(ids[i], newItems[infos_i]);
           }else{
             infos[i] = null;
           }
@@ -501,15 +502,16 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   @SuppressWarnings("unchecked")
   public synchronized void precacheIDs(IDtype[] ids) {
     if (ids==null || ids.length<1) return;
-    ArrayList<IDtype> filteredIDs = new ArrayList<IDtype>();
+    ArrayList<IDtype> unknownIDs = new ArrayList<IDtype>();
     boolean touched = false; // if true, ids!=filteredIDs
     for (IDtype id: ids) {
       if (rememberedInfos.indexOf(id)<0 && !unsuccessfulQueries.contains(id)) {
-        filteredIDs.add(id);
+        unknownIDs.add(id);
       } else {
         touched = true;
       }
     }
+    if (unknownIDs.size()<1) return; // All ids are known.
     
     INFOtype[] infos;
     IDtype[] filtIDs = ids;
@@ -522,15 +524,18 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       // Funzt nur in Java 1.6 (nächste zwei zeilen):
       //IDtype[] temp = Arrays.copyOf(ids, filteredIDs.size()); // Create a new Reference to an existing array, WITH NEW SIZE
       //IDtype[] filtIDs = temp.clone(); // After creating new reference with correct size, create new array.
-      filtIDs = (IDtype[]) createNewArray(ids,filteredIDs.size());
+      filtIDs = (IDtype[]) createNewArray(ids,unknownIDs.size());
       
       for (int i=0; i<filtIDs.length; i++)
-        Array.set(filtIDs, i, filteredIDs.get(i));
-    }
+        Array.set(filtIDs, i, unknownIDs.get(i));
+    } // Else, all ids are unknown.
     
     // Query unknown ids
-    infos = fetchMultipleInformationWrapper(ids);
+    infos = fetchMultipleInformationWrapper(filtIDs);
     if (infos==null) return;
+    
+    // Free enough cache for them
+    freeCache(Math.max(infos.length, maxListSize/100));
     
     // Add retrieved infos
     for (int i=0; i<infos.length; i++)
