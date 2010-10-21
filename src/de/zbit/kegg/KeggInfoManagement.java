@@ -242,7 +242,7 @@ CLASS       Metabolism; [...]
    * @return has the content of this class changed, since initilization/ Loading?
    */
   public boolean hasChanged() {
-    return hasChanged;
+    return hasChanged || isCacheChangedSinceLastLoading();
   }
   
   /**
