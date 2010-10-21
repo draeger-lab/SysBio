@@ -105,8 +105,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     
     for (int i=0; i<rememberedInfos.size(); i++) {
       Info<IDtype, INFOtype> in = rememberedInfos.get(i);
+      INFOtype info = in.getInformation(false);
       if (in.getIdentifier()==null || in.getIdentifier().toString().equals("") || in.getIdentifier().toString().equals("0") ||
-          in.getInformation()==null || in.getInformation().toString().equals("") || in.getInformation().toString().equals("0") ){
+          info==null || info.toString().equals("") || info.toString().equals("0") ){
         rememberedInfos.remove(i);
         i--;
         cacheChangedSinceLastLoading=true;
@@ -152,8 +153,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   /**
    * Returns whether this class has been changed since it has been initiated
    * or loaded from the hard drive or saved to hard drive.
-   * You should only save the cache if this is true. Else, saving won't make
-   * much sense.
+   *
+   * This does NOT reflect time stamp changes of the cached informations. Just
+   * adding and removing items is reflected by this flag.
+   * 
    * @return class has been changed since last readObject() (serializable loading),
    * writeObject() (serializable saving) or since initializing.
    */
@@ -425,7 +428,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         unknownIDs.add(id);
       } else {
         touched = true;
-        if (anyCachedInfo==null) anyCachedInfo=rememberedInfos.get(pos).getInformation();
+        if (anyCachedInfo==null) anyCachedInfo=rememberedInfos.get(pos).getInformation(false);
       }
     }
     
