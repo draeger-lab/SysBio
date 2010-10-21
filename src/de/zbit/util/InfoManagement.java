@@ -448,7 +448,8 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         newItems = fetchMultipleInformationWrapper(filtIDs);
         
         // Free enough cache for them
-        freeCache(Math.max(unknownIDs.size(), maxListSize/100));
+        if (isCacheFull())
+          freeCache(Math.max(unknownIDs.size(), maxListSize/100));
       }
       
       // Big Problem: Java does not permit creating an generic array
@@ -538,7 +539,8 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     if (infos==null) return;
     
     // Free enough cache for them
-    freeCache(Math.max(infos.length, maxListSize/100));
+    if (isCacheFull())
+      freeCache(Math.max(infos.length, maxListSize/100));
     
     // Add retrieved infos
     for (int i=0; i<infos.length; i++)

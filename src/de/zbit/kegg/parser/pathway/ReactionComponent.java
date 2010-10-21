@@ -50,7 +50,7 @@ public class ReactionComponent {
         alt = new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes());
     }
   }
-  
+
   /**
    * 
    * @return
