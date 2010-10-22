@@ -69,7 +69,7 @@ public class GUITools {
 	 *            A {@link URL} representing a directory with image files.
 	 * @throws URISyntaxException
 	 */
-	public static void initIcons(URL directory) {
+	public static void initImages(URL directory) {
 		try {
 			File dir = new File(directory.toURI());
 			if (dir.canRead() && dir.isDirectory()) {
