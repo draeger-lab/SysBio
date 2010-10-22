@@ -31,6 +31,8 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.zbit.util.SBProperties;
+
 /**
  * Abstract super class for any {@link SettingsPanel}s, i.e., a GUI element on
  * which the user may manipulate some preferences. All these are gathered in a
@@ -74,10 +76,10 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	private List<ItemListener> itemListeners;
 
 	/**
-	 * The settings to be changed by the user and the default settings as a
+	 * The settings to be changed by the user including default settings as a
 	 * backup.
 	 */
-	protected Properties properties, defaultProperties;
+	protected SBProperties properties;
 
 	/**
 	 * Creates a new {@link SettingsPanel}.
@@ -86,16 +88,15 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 *            The current user properties. These will be filtered to contain
 	 *            only accepted elements. Access to other elements is possible
 	 *            by overriding {@link #initConstantFields(Properties)}.
-	 * @param defaultProperties
-	 *            A backup of original properties, default values to
-	 *            re-initialize this object.
 	 * @see #accepts(Object)
 	 */
-	public SettingsPanel(Properties properties, Properties defaultProperties) {
+	public SettingsPanel(SBProperties properties) {
 		super();
+		if (!properties.isSetDefaults()) {
+			properties.setDefaults((Properties) properties.clone());
+		}
 		changeListeners = new LinkedList<ChangeListener>();
 		itemListeners = new LinkedList<ItemListener>();
-		this.defaultProperties = defaultProperties;
 		setProperties(properties);
 	}
 
@@ -147,7 +148,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * @see #getProperties()
 	 */
 	public Properties getDefaultProperties() {
-		return defaultProperties;
+		return properties.getDefaults();
 	}
 
 	/**
@@ -159,7 +160,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * 
 	 * @return A pointer to the currently set properties of this class.
 	 */
-	public Properties getProperties() {
+	public SBProperties getProperties() {
 		return properties;
 	}
 
@@ -278,7 +279,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * re-initializes the graphical user interface.
 	 */
 	public void restoreDefaults() {
-		setProperties((Properties) defaultProperties.clone());
+		setProperties((Properties) getDefaultProperties().clone());
 	}
 
 	/**
@@ -293,11 +294,14 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * @see #accepts(Object)
 	 */
 	public void setProperties(Properties properties) {
-		this.properties = new Properties();
+		this.properties = new SBProperties(getDefaultProperties());
 		for (Object key : properties.keySet()) {
 			if (accepts(key)) {
 				this.properties.put(key, properties.get(key));
 			}
+		}
+		if (!this.properties.isSetDefaults()) {
+			this.properties.setDefaults((Properties) this.properties.clone());
 		}
 		initConstantFields(properties);
 		init();
