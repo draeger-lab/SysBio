@@ -23,10 +23,11 @@ import java.util.Properties;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import com.sun.xml.internal.bind.v2.runtime.property.Property;
-
 /**
- * This class manages storing and retriving a configuration of the user.
+ * This class manages storing and retrieving a configuration of the user. A
+ * {@link Configuration} deals with user-defined preferences assuming that a
+ * specialized {@link Enum} exists that contains the keys for the key-value
+ * pairs to be defined by the user.
  * 
  * @author Andreas Dr&auml;ger
  * @date 2010-10-21
@@ -37,7 +38,7 @@ public class Configuration {
 	/**
 	 * An optional comment for the configuration file.
 	 */
-	private String commentCfgFile = null;
+	private String commentCfgFile;
 
 	/**
 	 * Path to the configuration file with default properties.
@@ -53,25 +54,32 @@ public class Configuration {
 	 * A hash table of key value pairs representing the user's program
 	 * configuration.
 	 */
-	private Properties properties = null;
+	private Properties properties;
 
 	/**
 	 * The root node for the user's preferences.
 	 */
-	private String userRootNode;
+	private String userPrefNode;
 
 	/**
 	 * 
 	 * @param <T>
 	 * @param keys
-	 * @param userRootNode
+	 * @param userPrefNode
 	 * @param defaultsCfgFile
 	 */
 	public <T extends Enum<?>> Configuration(Class<T> keys,
-			String userRootNode, String defaultsCfgFile) {
+			String userPrefNode, String defaultsCfgFile) {
+		this(keys, userPrefNode, defaultsCfgFile, null);
+	}
+
+	public <T extends Enum<?>> Configuration(Class<T> keys,
+			String userPrefNode, String defaultsCfgFile, String commentCfgFile) {
 		this.keys = keys;
-		this.userRootNode = userRootNode;
+		this.userPrefNode = userPrefNode;
 		this.defaultsCfgFile = defaultsCfgFile;
+		this.commentCfgFile = commentCfgFile;
+		this.properties = new Properties();
 	}
 
 	/**
@@ -171,11 +179,42 @@ public class Configuration {
 		return props;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Configuration) {
+			Configuration cfg = (Configuration) o;
+			boolean equal = cfg.isSetCommentCfgFile() == isSetCommentCfgFile();
+			equal &= cfg.isSetDefaultsCfgFile() == isSetDefaultsCfgFile();
+			equal &= cfg.isSetUserPrefNode() == isSetUserPrefNode();
+			equal &= cfg.getKeys().equals(getKeys());
+			if (equal) {
+				if (isSetCommentCfgFile()) {
+					equal &= cfg.getCommentCfgFile()
+							.equals(getCommentCfgFile());
+				}
+				if (isSetDefaultsCfgFile()) {
+					equal &= cfg.getDefaultsCfgFile().equals(
+							getDefaultsCfgFile());
+				}
+				if (isSetUserPrefNode()) {
+					equal &= cfg.getUserPrefNode().equals(getUserPrefNode());
+				}
+			}
+			return equal;
+		}
+		return false;
+	}
+
 	/**
 	 * @return the commentCfgFile
 	 */
 	public String getCommentCfgFile() {
-		return commentCfgFile;
+		return isSetCommentCfgFile() ? commentCfgFile : "";
 	}
 
 	/**
@@ -213,6 +252,14 @@ public class Configuration {
 	 * 
 	 * @return
 	 */
+	public Class<? extends Enum> getKeys() {
+		return keys;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public Properties getProperties() {
 		if (properties == null) {
 			try {
@@ -229,7 +276,7 @@ public class Configuration {
 	 * @return
 	 */
 	public String getUserPrefNode() {
-		return userRootNode;
+		return userPrefNode;
 	}
 
 	/**
@@ -238,7 +285,7 @@ public class Configuration {
 	 * @throws BackingStoreException
 	 */
 	public Properties initProperties() throws BackingStoreException {
-		Preferences prefs = Preferences.userRoot().node(userRootNode);
+		Preferences prefs = Preferences.userRoot().node(userPrefNode);
 		Properties defaults = getDefaultProperties();
 		boolean change = false;
 		for (Object k : defaults.keySet()) {
@@ -254,6 +301,30 @@ public class Configuration {
 		Properties props = convert(prefs);
 		properties = props;
 		return properties;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isSetCommentCfgFile() {
+		return commentCfgFile != null;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isSetDefaultsCfgFile() {
+		return defaultsCfgFile != null;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isSetUserPrefNode() {
+		return userPrefNode != null;
 	}
 
 	/**
@@ -306,7 +377,7 @@ public class Configuration {
 	 */
 	public void saveProperties(Properties props) throws BackingStoreException {
 		if (!initProperties().equals(props)) {
-			Preferences pref = Preferences.userRoot().node(userRootNode);
+			Preferences pref = Preferences.userRoot().node(userPrefNode);
 			for (Object key : props.keySet()) {
 				put(pref, key, props.get(key));
 			}
@@ -336,7 +407,7 @@ public class Configuration {
 	 * @param usrPrefNode
 	 */
 	public void setUserPrefNode(String usrPrefNode) {
-		userRootNode = usrPrefNode;
+		userPrefNode = usrPrefNode;
 	}
 
 }
