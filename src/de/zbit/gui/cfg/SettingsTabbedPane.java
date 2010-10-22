@@ -32,6 +32,7 @@ import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.GUITools;
 import de.zbit.util.Reflect;
+import de.zbit.util.SBProperties;
 
 /**
  * A {@link JPanel} containing a {@link JTabbedPane} with several options for
@@ -68,9 +69,8 @@ public class SettingsTabbedPane extends SettingsPanel {
 	 * @param properties
 	 * @param defaultProperties
 	 */
-	public SettingsTabbedPane(Properties properties,
-			Properties defaultProperties) {
-		super(properties, defaultProperties);
+	public SettingsTabbedPane(SBProperties properties) {
+		super(properties);
 	}
 
 	/*
@@ -132,7 +132,8 @@ public class SettingsTabbedPane extends SettingsPanel {
 	 * 
 	 * @see org.sbml.squeezer.gui.SettingsPanel#getProperties()
 	 */
-	public Properties getProperties() {
+	@Override
+	public SBProperties getProperties() {
 		for (int i = 0; i < tab.getComponentCount(); i++) {
 			this.properties.putAll(getSettingsPanelAt(i).getProperties());
 		}
@@ -191,10 +192,8 @@ public class SettingsTabbedPane extends SettingsPanel {
 				try {
 					Class<SettingsPanel> c = classes[i];
 					Constructor<SettingsPanel> con = c
-							.getConstructor(properties.getClass(),
-									defaultProperties.getClass());
-					settingsPanel = con.newInstance(properties,
-							defaultProperties);
+							.getConstructor(properties.getClass());
+					settingsPanel = con.newInstance(properties);
 
 					tab.addTab(settingsPanel.getTitle(), new JScrollPane(
 							settingsPanel,
@@ -236,7 +235,8 @@ public class SettingsTabbedPane extends SettingsPanel {
 			removeAll();
 			setLayout(new GridLayout(1, 1));
 		}
-		this.properties = properties;
+		this.properties = new SBProperties();
+		this.properties.putAll(properties);
 		init();
 		if (tabIndex < tab.getComponentCount()) {
 			setSelectedIndex(tabIndex);

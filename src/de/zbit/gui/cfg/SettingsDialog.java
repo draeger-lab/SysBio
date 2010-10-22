@@ -38,6 +38,8 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.zbit.util.SBProperties;
+
 /**
  * A specialized {@link JDialog} that shows several configuration options in a
  * {@link JTabbedPane}, provides a button for applying the chosen selection and
@@ -73,8 +75,8 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 *            nothing.
 	 */
 	public static void main(String args[]) {
-		SettingsDialog d = new SettingsDialog("Properties", new Properties());
-		if (d.showSettingsDialog(new Properties()) == APPROVE_OPTION) {
+		SettingsDialog d = new SettingsDialog("Properties");
+		if (d.showSettingsDialog(new SBProperties()) == APPROVE_OPTION) {
 			System.out.printf("Approve:\t%s\n", d.getProperties());
 		} else {
 			System.out.println("Cancel");
@@ -98,10 +100,9 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	private SettingsPanel panelAllSettings;
 
 	/**
-	 * The current and the default {@link Properties}. The latter one is
-	 * necessary to re-set the values to the default configuration.
+	 * The current {@link Properties} including the current defaults.
 	 */
-	private Properties properties, defaultProperties;
+	private SBProperties properties;
 
 	/**
 	 * Creates a new {@link SettingsDialog} with the given parent element and
@@ -109,12 +110,9 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * 
 	 * @param owner
 	 *            The parent element of this {@link SettingsDialog}.
-	 * @param defaultProperties
-	 *            The default {@link Properties} to reset all options.
 	 */
-	public SettingsDialog(Dialog owner, Properties defaultProperties) {
+	public SettingsDialog(Dialog owner) {
 		super(owner, "Preferences");
-		this.defaultProperties = defaultProperties;
 	}
 
 	/**
@@ -126,9 +124,8 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * @param defaultProperties
 	 *            The default {@link Properties} to reset all options.
 	 */
-	public SettingsDialog(Frame owner, Properties defaultProperties) {
+	public SettingsDialog(Frame owner) {
 		super(owner, "Preferences");
-		this.defaultProperties = defaultProperties;
 	}
 
 	/**
@@ -137,13 +134,10 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * 
 	 * @param title
 	 *            The title of the dialog
-	 * @param defaultSettings
-	 *            The default {@link Properties} to reset all options.
 	 */
-	public SettingsDialog(String title, Properties defaultSettings) {
+	public SettingsDialog(String title) {
 		super();
 		setTitle(title);
-		this.defaultProperties = defaultSettings;
 	}
 
 	/*
@@ -157,8 +151,8 @@ public class SettingsDialog extends JDialog implements ActionListener,
 				|| ae.getActionCommand().equals(CANCEL)) {
 			dispose();
 		} else if (ae.getActionCommand().equals(DEFAULTS)) {
-			Properties p = (Properties) properties.clone();
-			properties = defaultProperties;
+			SBProperties p = (SBProperties) properties.clone();
+			properties.putAll(properties.getDefaults());
 			panelAllSettings.setProperties(properties);
 			properties = p;
 			apply.setEnabled(true);
@@ -209,7 +203,7 @@ public class SettingsDialog extends JDialog implements ActionListener,
 		defaults = new JButton("Defaults");
 		defaults.addActionListener(this);
 		defaults.setActionCommand(DEFAULTS);
-		defaults.setEnabled(!properties.equals(defaultProperties));
+		defaults.setEnabled(!properties.equals(properties.getDefaults()));
 		JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(this);
 		cancel.setActionCommand(CANCEL);
@@ -289,9 +283,8 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 *         {@link #getProperties()} method to obtain all properties as set
 	 *         by the user.
 	 */
-	public boolean showSettingsDialog(Properties properties) {
-		SettingsTabbedPane pane = new SettingsTabbedPane(properties,
-				defaultProperties);
+	public boolean showSettingsDialog(SBProperties properties) {
+		SettingsTabbedPane pane = new SettingsTabbedPane(properties);
 		if (pane.getSettingsPanelCount() == 1) {
 			return showSettingsDialog(pane.getSettingsPanelAt(0));
 		}

@@ -19,7 +19,10 @@
 package de.zbit.util;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -39,23 +42,15 @@ public class Configuration {
 	 * An optional comment for the configuration file.
 	 */
 	private String commentCfgFile;
-
 	/**
 	 * Path to the configuration file with default properties.
 	 */
 	private String defaultsCfgFile;
-
-	/**
-	 * 
-	 */
-	private Class<? extends Enum> keys;
-
 	/**
 	 * A hash table of key value pairs representing the user's program
 	 * configuration.
 	 */
-	private Properties properties;
-
+	private SBProperties properties;
 	/**
 	 * The root node for the user's preferences.
 	 */
@@ -63,34 +58,38 @@ public class Configuration {
 
 	/**
 	 * 
-	 * @param <T>
 	 * @param keys
 	 * @param userPrefNode
 	 * @param defaultsCfgFile
 	 */
-	public <T extends Enum<?>> Configuration(Class<T> keys,
-			String userPrefNode, String defaultsCfgFile) {
+	public Configuration(Class<?> keys, String userPrefNode,
+			String defaultsCfgFile) {
 		this(keys, userPrefNode, defaultsCfgFile, null);
+
 	}
+
+	private Set<String> keySet;
 
 	/**
 	 * 
-	 * @param <T>
 	 * @param keys
 	 * @param userPrefNode
 	 * @param defaultsCfgFile
 	 * @param commentCfgFile
 	 */
-	public <T extends Enum<?>> Configuration(Class<T> keys,
-			String userPrefNode, String defaultsCfgFile, String commentCfgFile) {
-		this.keys = keys;
+	public Configuration(Class<?> keys, String userPrefNode,
+			String defaultsCfgFile, String commentCfgFile) {
 		this.userPrefNode = userPrefNode;
 		this.defaultsCfgFile = defaultsCfgFile;
 		this.commentCfgFile = commentCfgFile;
+		this.keySet = new HashSet<String>();
+		for (Field f : keys.getFields()) {
+			keySet.add(f.getName());
+		}
 		try {
 			properties = initProperties();
 		} catch (BackingStoreException e) {
-			properties = getDefaultProperties();
+			properties = new SBProperties(getDefaultProperties());
 		}
 	}
 
@@ -99,8 +98,8 @@ public class Configuration {
 	 * @param args
 	 * @return
 	 */
-	public Properties analyzeCommandLineArguments(String[] args) {
-		Properties p = new Properties();
+	public SBProperties analyzeCommandLineArguments(String[] args) {
+		SBProperties p = new SBProperties(getDefaultProperties());
 		short count;
 		for (String arg : args) {
 			count = 0;
@@ -122,8 +121,13 @@ public class Configuration {
 				arg = keyVal[0];
 				value = keyVal[1];
 			}
-			arg = arg.toUpperCase().replace('-', '_');
-			p.put(Enum.valueOf(keys, arg), value);
+			String argument = arg.toUpperCase().replace('-', '_');
+			if (keySet.contains(argument)) {
+				p.put(argument, value);
+			} else {
+				throw new IllegalArgumentException(String.format(
+						"Unknown argument %s.", arg));
+			}
 		}
 		return correctProperties(p);
 	}
@@ -134,10 +138,10 @@ public class Configuration {
 	 * @return
 	 * @throws BackingStoreException
 	 */
-	public Properties convert(Preferences prefs) throws BackingStoreException {
-		Properties p = new Properties();
+	public SBProperties convert(Preferences prefs) throws BackingStoreException {
+		SBProperties p = new SBProperties();
 		for (String key : prefs.keys()) {
-			p.put(Enum.valueOf(keys, key), prefs.get(key, "null"));
+			p.put(key, prefs.get(key, "null"));
 		}
 		return correctProperties(p);
 	}
@@ -150,38 +154,38 @@ public class Configuration {
 	 * @param properties
 	 * @return
 	 */
-	public Properties correctProperties(Properties properties) {
+	public SBProperties correctProperties(SBProperties properties) {
 		Object k[] = properties.keySet().toArray();
-		Properties props = new Properties();
+		SBProperties props = new SBProperties();
+		String key;
 		for (int i = k.length - 1; i >= 0; i--) {
-			String val = properties.get(k[i]).toString();
+			key = k[i].toString();
+			if (!keySet.contains(key)) {
+				continue;
+			}
+			String val = properties.get(key).toString();
 
 			if (val.startsWith("user.")) {
-				props.put(Enum.valueOf(keys, k[i].toString()), System
-						.getProperty(val));
+				props.put(key, System.getProperty(val));
 			} else if (val.equalsIgnoreCase("true")
 					|| val.equalsIgnoreCase("false")) {
-				props.put(Enum.valueOf(keys, k[i].toString()), Boolean
-						.parseBoolean(val));
+				props.put(key, Boolean.parseBoolean(val));
 			} else {
 				try {
-					props.put(Enum.valueOf(keys, k[i].toString()), Integer
-							.valueOf(val));
+					props.put(key, Integer.valueOf(val));
 				} catch (NumberFormatException e1) {
 					try {
-						props.put(Enum.valueOf(keys, k[i].toString()), Float
-								.valueOf(val));
+						props.put(key, Float.valueOf(val));
 					} catch (NumberFormatException e2) {
 						try {
-							props.put(Enum.valueOf(keys, k[i].toString()),
-									Double.valueOf(val));
+							props.put(key, Double.valueOf(val));
 						} catch (NumberFormatException e3) {
 							if (val.length() == 1) {
-								props.put(Enum.valueOf(keys, k[i].toString()),
-										Character.valueOf(val.charAt(0)));
+								props
+										.put(key, Character.valueOf(val
+												.charAt(0)));
 							} else {
-								props.put(Enum.valueOf(keys, k[i].toString()),
-										val);
+								props.put(key, val);
 							}
 						}
 					}
@@ -235,8 +239,8 @@ public class Configuration {
 	 * 
 	 * @return
 	 */
-	public Properties getDefaultProperties() {
-		Properties defaults = new Properties();
+	public SBProperties getDefaultProperties() {
+		SBProperties defaults = new SBProperties();
 		try {
 			defaults.loadFromXML(defaults.getClass().getResourceAsStream(
 					defaultsCfgFile));
@@ -264,20 +268,20 @@ public class Configuration {
 	 * 
 	 * @return
 	 */
-	public Class<? extends Enum> getKeys() {
-		return keys;
+	public Set<String> getKeys() {
+		return keySet;
 	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	public Properties getProperties() {
+	public SBProperties getProperties() {
 		if (properties == null) {
 			try {
 				initProperties();
 			} catch (BackingStoreException e) {
-				properties = new Properties();
+				properties = new SBProperties(getDefaultProperties());
 			}
 		}
 		return properties;
@@ -296,7 +300,7 @@ public class Configuration {
 	 * @return
 	 * @throws BackingStoreException
 	 */
-	public Properties initProperties() throws BackingStoreException {
+	public SBProperties initProperties() throws BackingStoreException {
 		Preferences prefs = Preferences.userRoot().node(userPrefNode);
 		Properties defaults = getDefaultProperties();
 		boolean change = false;
@@ -310,8 +314,9 @@ public class Configuration {
 		if (change) {
 			prefs.flush();
 		}
-		Properties props = convert(prefs);
+		SBProperties props = convert(prefs);
 		properties = props;
+		properties.setDefaults(defaults);
 		return properties;
 	}
 
@@ -364,7 +369,7 @@ public class Configuration {
 	/**
 	 * 
 	 * @param value
-	 *            The new {@link Property} value for this key.
+	 *            The new {@link Properties} value for this key.
 	 * @return the previous value belonging to this key or null if there was no
 	 *         other value.
 	 */
@@ -387,7 +392,7 @@ public class Configuration {
 	 * @param props
 	 * @throws BackingStoreException
 	 */
-	public void saveProperties(Properties props) throws BackingStoreException {
+	public void saveProperties(SBProperties props) throws BackingStoreException {
 		if (!initProperties().equals(props)) {
 			Preferences pref = Preferences.userRoot().node(userPrefNode);
 			for (Object key : props.keySet()) {
