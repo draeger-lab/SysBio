@@ -10,6 +10,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -17,15 +18,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -38,11 +42,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
+import de.zbit.io.SBFileFilter;
 
 /**
  * This class contains various GUI tools.
@@ -53,6 +57,57 @@ import de.zbit.io.OpenFile;
  * 
  */
 public class GUITools {
+
+	/**
+	 * Loads all image files that can be found in the directory referenced by
+	 * the given {@link URL} into the dedicated hash table in {@link UIManager}.
+	 * The key to access these image files is then the file name, i.e., the
+	 * substring of the file name ending at the last dot symbol, for instance,
+	 * myFile.png will result in the key "myFile".
+	 * 
+	 * @param directory
+	 *            A {@link URL} representing a directory with image files.
+	 * @throws URISyntaxException
+	 */
+	public static void initIcons(URL directory) {
+		try {
+			File dir = new File(directory.toURI());
+			if (dir.canRead() && dir.isDirectory()) {
+				for (File f : dir.listFiles(SBFileFilter.IMAGE_FILE_FILTER)) {
+					UIManager.put(f.getName().substring(0,
+							f.getName().lastIndexOf('.')), loadIcon(f));
+				}
+			}
+		} catch (URISyntaxException e) {
+			System.err.println(String.format(
+					"Could not load icons from directory %s.", directory));
+		}
+	}
+
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 * @throws IOException
+	 */
+	public static Icon loadIcon(File file) {
+		Image img = loadImage(file);
+		return img != null ? new ImageIcon(img) : null;
+	}
+
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static Image loadImage(File file) {
+		try {
+			return ImageIO.read(file);
+		} catch (IOException exc) {
+			System.err.printf("Could not load image %s.\n", file);
+			return null;
+		}
+	}
 
 	/**
 	 * Checks whether the first container contains the second one.
@@ -789,63 +844,64 @@ public class GUITools {
 		sb.append("</body></html>");
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Initializes the look and feel.
 	 * 
-	 * @param title - Name of your application.
+	 * @param title
+	 *            - Name of your application.
 	 */
 	public static void initLaF(String title) {
-	  Locale.setDefault(Locale.ENGLISH);
-	  // For MacOS X
-	  boolean isMacOSX = false;
-	  if (System.getProperty("mrj.version") != null) {
-	    isMacOSX = true;
-	    System.setProperty("apple.laf.useScreenMenuBar", "true");
-	    System.setProperty(
-	        "com.apple.mrj.application.apple.menu.about.name", title);
-	  }
-	  try {
-	    
-	    UIManager
-	    .setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
-	    String osName = System.getProperty("os.name");
-	    if (osName.equals("Linux") || osName.equals("FreeBSD")) {
-	      UIManager
-	      .setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-	      // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-	    } else if (isMacOSX) {
-	      UIManager
-	      .setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
-	    } else if (osName.contains("Windows")) {
-	      UIManager
-	      .setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
-	    }  else {
-	      // UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-	      UIManager.setLookAndFeel(UIManager
-	          .getSystemLookAndFeelClassName());
-	    }
-	    
-	  } catch (Exception e) {
-	    // If Nimbus is not available, you can set the GUI to another look
-	    // and feel.
-	    // Native look and feel for Windows, MacOS X. GTK look and
-	    // feel for Linux, FreeBSD
-	    try {
-	      for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-	        if ("Nimbus".equals(info.getName())) {
-	          UIManager.setLookAndFeel(info.getClassName());
-	          break;
-	        }
-	      }
-	      
-	      
-	    } catch (Exception exc) {
-	      JOptionPane.showMessageDialog(null, GUITools.toHTML(exc
-	          .getMessage(), 40), exc.getClass().getName(),
-	          JOptionPane.WARNING_MESSAGE);
-	      exc.printStackTrace();
-	    }
-	  }
+		Locale.setDefault(Locale.ENGLISH);
+		// For MacOS X
+		boolean isMacOSX = false;
+		if (System.getProperty("mrj.version") != null) {
+			isMacOSX = true;
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty(
+					"com.apple.mrj.application.apple.menu.about.name", title);
+		}
+		try {
+
+			UIManager
+					.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
+			String osName = System.getProperty("os.name");
+			if (osName.equals("Linux") || osName.equals("FreeBSD")) {
+				UIManager
+						.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+				// UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+			} else if (isMacOSX) {
+				UIManager
+						.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+			} else if (osName.contains("Windows")) {
+				UIManager
+						.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
+			} else {
+				// UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+				UIManager.setLookAndFeel(UIManager
+						.getSystemLookAndFeelClassName());
+			}
+
+		} catch (Exception e) {
+			// If Nimbus is not available, you can set the GUI to another look
+			// and feel.
+			// Native look and feel for Windows, MacOS X. GTK look and
+			// feel for Linux, FreeBSD
+			try {
+				for (LookAndFeelInfo info : UIManager
+						.getInstalledLookAndFeels()) {
+					if ("Nimbus".equals(info.getName())) {
+						UIManager.setLookAndFeel(info.getClassName());
+						break;
+					}
+				}
+
+			} catch (Exception exc) {
+				JOptionPane.showMessageDialog(null, GUITools.toHTML(exc
+						.getMessage(), 40), exc.getClass().getName(),
+						JOptionPane.WARNING_MESSAGE);
+				exc.printStackTrace();
+			}
+		}
 	}
 }

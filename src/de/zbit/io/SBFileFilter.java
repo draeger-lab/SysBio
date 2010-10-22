@@ -103,6 +103,13 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 			FileType.TEXT_FILES);
 
 	/**
+	 * Filter for any kind of image file supported by this class.
+	 */
+	public static final MultipleFileFilter IMAGE_FILE_FILTER = new MultipleFileFilter(
+			"image file (*.jpg, *.png)", SBFileFilter.JPEG_FILE_FILTER,
+			SBFileFilter.PNG_FILE_FILTER);
+
+	/**
 	 * Allowable file type.
 	 */
 	private FileType type;
