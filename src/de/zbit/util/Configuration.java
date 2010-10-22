@@ -73,13 +73,25 @@ public class Configuration {
 		this(keys, userPrefNode, defaultsCfgFile, null);
 	}
 
+	/**
+	 * 
+	 * @param <T>
+	 * @param keys
+	 * @param userPrefNode
+	 * @param defaultsCfgFile
+	 * @param commentCfgFile
+	 */
 	public <T extends Enum<?>> Configuration(Class<T> keys,
 			String userPrefNode, String defaultsCfgFile, String commentCfgFile) {
 		this.keys = keys;
 		this.userPrefNode = userPrefNode;
 		this.defaultsCfgFile = defaultsCfgFile;
 		this.commentCfgFile = commentCfgFile;
-		this.properties = new Properties();
+		try {
+			properties = initProperties();
+		} catch (BackingStoreException e) {
+			properties = getDefaultProperties();
+		}
 	}
 
 	/**
