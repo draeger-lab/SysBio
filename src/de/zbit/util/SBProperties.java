@@ -43,7 +43,7 @@ public class SBProperties extends Properties {
 	 * @return
 	 */
 	public boolean isSetDefaults() {
-		return defaults == null;
+		return defaults != null;
 	}
 
 	/**
@@ -51,10 +51,10 @@ public class SBProperties extends Properties {
 	 * @param defaults
 	 */
 	public void setDefaults(Properties defaults) {
-		if (defaults == null) {
-			defaults = new Properties();
+		if (this.defaults == null) {
+			this.defaults = new Properties();
 		}
-		defaults.putAll(defaults);
+		this.defaults.putAll(defaults);
 	}
 
 }

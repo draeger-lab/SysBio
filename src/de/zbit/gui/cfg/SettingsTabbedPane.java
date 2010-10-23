@@ -235,7 +235,16 @@ public class SettingsTabbedPane extends SettingsPanel {
 			removeAll();
 			setLayout(new GridLayout(1, 1));
 		}
-		this.properties = new SBProperties();
+		this.properties = new SBProperties(getDefaultProperties());
+		if (!this.properties.isSetDefaults()
+				|| (this.properties.getDefaults().isEmpty())) {
+			if (properties instanceof SBProperties) {
+				this.properties.setDefaults(((SBProperties) properties)
+						.getDefaults());
+			} else {
+				this.properties.setDefaults(properties);
+			}
+		}
 		this.properties.putAll(properties);
 		init();
 		if (tabIndex < tab.getComponentCount()) {

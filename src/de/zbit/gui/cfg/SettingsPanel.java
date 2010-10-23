@@ -148,7 +148,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * @see #getProperties()
 	 */
 	public Properties getDefaultProperties() {
-		return properties.getDefaults();
+		return properties != null ? properties.getDefaults() : new Properties();
 	}
 
 	/**

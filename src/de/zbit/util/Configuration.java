@@ -65,7 +65,6 @@ public class Configuration {
 	public Configuration(Class<?> keys, String userPrefNode,
 			String defaultsCfgFile) {
 		this(keys, userPrefNode, defaultsCfgFile, null);
-
 	}
 
 	private Set<String> keySet;
@@ -315,8 +314,8 @@ public class Configuration {
 			prefs.flush();
 		}
 		SBProperties props = convert(prefs);
+		props.setDefaults(defaults);
 		properties = props;
-		properties.setDefaults(defaults);
 		return properties;
 	}
 

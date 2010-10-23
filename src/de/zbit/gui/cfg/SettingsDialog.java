@@ -180,7 +180,7 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * @return A pointer to this {@link SettingsDialog}'s current
 	 *         {@link Properties}.
 	 */
-	public Properties getProperties() {
+	public SBProperties getProperties() {
 		return properties;
 	}
 
