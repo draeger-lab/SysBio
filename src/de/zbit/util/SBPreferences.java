@@ -513,6 +513,22 @@ public class SBPreferences implements Map<Object, Object> {
 		prefs.sync();
 	}
 
+	/**
+	 * Creates basically a copy of these preferences by creating a new
+	 * {@link SBProperties} object with the same defaults as given here and then
+	 * copying all user preferences as key-value pairs into this new
+	 * {@link SBProperties} object.
+	 * 
+	 * @return
+	 */
+	public SBProperties toProperties() {
+		SBProperties properties = new SBProperties(defaults);
+		for (String key : keys()) {
+			properties.put(key, get(key));
+		}
+		return properties;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
