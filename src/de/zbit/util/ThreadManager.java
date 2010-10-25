@@ -127,7 +127,7 @@ public class ThreadManager {
         break;
       }
       if (sleepTime<1000) sleepTime += 10; // Sleep a second at max.
-      else System.out.println(pool.getTaskCount());
+      //else System.out.println(pool.getTaskCount());
     }
     
     // Terminate all idle threads.
