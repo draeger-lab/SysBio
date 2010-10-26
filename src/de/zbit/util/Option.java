@@ -13,7 +13,7 @@ import argparser.ObjectHolder;
 import argparser.StringHolder;
 
 /**
- * @author Andreas D&auml;ger
+ * @author Andreas Dr&auml;ger
  * @date 2010-10-24
  */
 public class Option {
