@@ -3,12 +3,10 @@ package de.zbit.kegg.parser.pathway;
 
 import java.util.ArrayList;
 
-
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.parser.KeggParser;
 
 /**
@@ -60,6 +58,12 @@ public class Entry {
    * The parent pathway object.
    */
   private Pathway parentPathway = null;
+  
+  /**
+   * A node which is removed, but may still be linked to other nodes
+   * gets this name assignes.
+   */
+  protected final static String removedNodeName = "REMOVEDNODE";
   
   /**
    * 
@@ -284,6 +288,9 @@ public class Entry {
    * @return
    */
   public Entry getParentNode() {
+    if (parent!=null && parent.getName().equals(removedNodeName)) {
+      parent = null;
+    }
     return parent;
   }
 

@@ -163,6 +163,18 @@ public class Pathway {
       if (!l.contains(e)) l.add(e);
     }
 	}
+	
+  /**
+   * Removes the given entry from the {@link #reactionModifiers}
+   * list.
+   * @param e
+   */
+  private void removeReactionModifier(Entry entry) {
+    if (entry.getReaction()!=null && entry.getReaction().length()>0) {
+      List<Entry> l = reactionModifiers.get(entry.getReaction());
+      if (l!=null) l.remove(entry);
+    }
+  }
 
 	/**
 	 * 
@@ -388,18 +400,27 @@ public class Pathway {
    */
   protected void idChange(Entry entry, int id) {
     // Change the maxId
-    if (entry.getId() == maxId) {
-      maxId=0;
-      for (Entry e:getEntries()) {
-        if (e.equals(entry)) continue;
-        maxId = Math.max(maxId, e.getId());
-      }
-    }
+    resetMaxId(entry);
     maxId=Math.max(maxId, id);
     
     // Change the idMap
     idMap.remove(entry.getId());
     idMap.put(id, entry);
+  }
+  
+  /**
+   * Reset the maxId by iterating through all elements
+   * @param entry - entry to IGNORE if it occurs. Set to
+   * null to disable this feature.
+   */
+  private void resetMaxId(Entry entry) {
+    if (entry.getId() == maxId) {
+      maxId=0;
+      for (Entry e:getEntries()) {
+        if (entry!=null && e.equals(entry)) continue;
+        maxId = Math.max(maxId, e.getId());
+      }
+    }
   }
 
   /**
@@ -422,11 +443,34 @@ public class Pathway {
    */
   protected void reactionChange(Entry entry, String reaction) {
     // Remove the old entry
-    if (entry.getReaction()!=null && entry.getReaction().length()>0) {
-      List<Entry> l = reactionModifiers.get(entry.getReaction());
-      if (l!=null) l.remove(entry);
-    }
+    removeReactionModifier(entry);
     addReactionModifier(entry, reaction);
+  }
+  
+  /**
+   * Remove the given entry from this pathway.
+   * @param e
+   */
+  public void removeEntry(Entry e) {
+    removeEntry(entries.indexOf(e));
+  }
+  /**
+   * Remove the entry at the given index in the {@link #entries} list.
+   * @param index - index of the entry to remove.
+   */
+  public void removeEntry(int index) {
+    if (index<0) return;
+    Entry e = entries.get(index);
+    
+    idMap.remove(e.getId());
+    nameMap.remove(e.getName());
+    removeReactionModifier(e);
+    if (maxId==e.getId()) resetMaxId(e);
+    
+    entries.remove(index);
+    
+    e.setName(Entry.removedNodeName);
+    e=null;
   }
 
 	
