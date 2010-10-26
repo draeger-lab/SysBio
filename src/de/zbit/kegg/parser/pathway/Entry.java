@@ -8,6 +8,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.parser.KeggParser;
 
 /**
@@ -19,35 +20,35 @@ public class Entry {
   /**
    * id.type    the ID of this entry in the pathway map
    */
-  int id = 0;
+  private int id = 0;
   /**
    * keggid.type    the KEGGID of this entry
    */
-  String name = "";
+  private String name = "";
   /**
    * entry_type.type    the type of this entry
    */
-  EntryType type;
+  private EntryType type;
   /**
    * url.type   the resource location of the information about this entry
    */
-  String link = "";
+  private String link = "";
   /**
    * keggid.type    the KEGGID of corresponding reaction
    */
-  String reaction = "";
+  private String reaction = "";
   /**
    * For Customize purposes (e.g. saving a corresponding node reference)
    */
-  Object custom=null;
+  private Object custom=null;
   /**
-   * 
+   * Contains the Graphics information from the KGML
    */
-  Graphics graph=null;
+  private Graphics graph=null;
   /**
    * If it is a group node, this list contains the ids of all children.
    */
-  ArrayList<Integer> components = null;
+  private ArrayList<Integer> components = null;
   /**
    * The reverse-argument to the components argument.
    * I.e. if this is contained in a components list, this is
@@ -56,16 +57,22 @@ public class Entry {
   private Entry parent = null;
   
   /**
+   * The parent pathway object.
+   */
+  private Pathway parentPathway = null;
+  
+  /**
    * 
    * @param id
    * @param name
    * @param type
    */
-  public Entry(int id, String name, EntryType type) {
+  public Entry(Pathway parentPathway, int id, String name, EntryType type) {
     super();
+    this.parentPathway = parentPathway;
     this.id = id;
-    this.name = name;
     this.type = type;
+    setName(name);
     //if (type==EntryType.gene) graph = new Graphics(true); else graph = new Graphics(false);
   }
   
@@ -77,8 +84,8 @@ public class Entry {
    * @param link
    * @param reaction
    */
-  public Entry(int id, String name, EntryType type, String link, String reaction) {
-    this(id, name, type);
+  public Entry(Pathway parentPathway, int id, String name, EntryType type, String link, String reaction) {
+    this(parentPathway, id, name, type);
     this.link = link;
     this.reaction = reaction;
   }
@@ -92,11 +99,19 @@ public class Entry {
    * @param reaction
    * @param childNodes
    */
-  public Entry(int id, String name, EntryType type, String link, String reaction, NodeList childNodes) {
-    this(id,name,type,link,reaction);
+  public Entry(Pathway parentPathway, int id, String name, EntryType type, String link, String reaction, NodeList childNodes) {
+    this(parentPathway, id,name,type,link,reaction);
     parseSubNodes(childNodes);
   }
   
+  /**
+   * @param newEntrysId
+   * @param substrate
+   */
+  public Entry(Pathway parentPathway, int id, String name) {
+    this(parentPathway, id,name,Entry.getEntryTypeForKeggId(name));
+  }
+
   /**
    * 
    * @return
@@ -119,6 +134,14 @@ public class Entry {
    */
   public Object getCustom() {
     return custom;
+  }
+  
+  /**
+   * 
+   * @return the pathway in which this Entry occurs.
+   */
+  public Pathway getParentPathway() {
+    return parentPathway;
   }
   
   /**
@@ -212,6 +235,7 @@ public class Entry {
    * @param id
    */
   public void setId(int id) {
+    parentPathway.idChange(this, id);
     this.id = id;
   }
 
@@ -228,6 +252,12 @@ public class Entry {
    * @param name
    */
   public void setName(String name) {
+    // Convenient helper for compounds (add "cpd:" to "C00186")
+    if (name!=null && (name.length()>2) && !name.contains(":")
+        && name.charAt(0)=='C' && Character.isDigit(name.charAt(1))) {
+      name = "cpd:"+name;
+    }
+    parentPathway.nameChange(this, name);
     this.name = name;
   }
 
@@ -236,6 +266,7 @@ public class Entry {
    * @param reaction
    */
   public void setReaction(String reaction) {
+    parentPathway.reactionChange(this, name);
     this.reaction = reaction;
   }
 
@@ -261,6 +292,32 @@ public class Entry {
    */
   public void setParentNode(Entry parent) {
     this.parent = parent;
+  }
+
+  /**
+   * Tryis to infere the EntryType from the id's prefix.
+   * @param kgId
+   * @return EntryType
+   */
+  public static EntryType getEntryTypeForKeggId(String kgId) {
+    kgId = kgId.toLowerCase().trim();
+    if (kgId.startsWith("cpd:")) {
+      return EntryType.compound;
+    } else if (kgId.startsWith("glycan:") || kgId.startsWith("gl:")) {
+      return EntryType.compound;
+    } else if (kgId.startsWith("ec:")) {
+      return EntryType.enzyme;
+    } else if (kgId.startsWith("group:")) {
+      return EntryType.group;
+    } else if (kgId.startsWith("path:")) { // Link to another pathway
+      return EntryType.map;
+    } else if (kgId.startsWith("ko:")) {
+      return EntryType.ortholog;
+    } else if (kgId.contains(":")) {// z.B. hsa:00123, ko:00123
+      return EntryType.gene;
+    } else {
+      return EntryType.other;
+    }
   }
 
 }

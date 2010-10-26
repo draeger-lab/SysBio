@@ -378,9 +378,6 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    */
   @Override
   public String toString() {
-    StringBuffer retVal = new StringBuffer(); 
-    for (int i=0; i<this.size(); i++)
-      retVal.append(get(i) + " ||| ");
-    return retVal.toString();
+    return super.toString();
   }
 }

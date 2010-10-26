@@ -14,7 +14,7 @@ public class KeggInfos {
    */
 	private String Kegg_ID;
 	/**
-   * 
+   * The complete info-block from kegg.
    */
 	private String informationFromKeggAdaptor;
 	/**
@@ -126,6 +126,15 @@ public class KeggInfos {
 	 * URNs are examples.
 	 */
 	private String pathwayDescs = null;
+	/**
+	 * Enzymes for the reaction
+	 * E.g. "5.4.2.1         5.4.2.4"
+	 */
+	private String enzymes=null;
+	
+	
+	
+	
 	/**
 	 * 9606
 	 */
@@ -368,10 +377,18 @@ public class KeggInfos {
 
 	/**
 	 * 
-	 * @return
+	 * @return e.g. "G10609 + G00094 <=> G10619 + G00097"
 	 */
 	public String getEquation() {
 		return equation;
+	}
+	
+	/**
+	 * 
+	 * @return e.g. "5.4.2.1         5.4.2.4"
+	 */
+	public String getEnzymes() {
+	  return enzymes;
 	}
 
 	/**
@@ -704,12 +721,15 @@ public class KeggInfos {
 		if ((pathwayDescs != null) && pathwayDescs.startsWith(",")) {
 			pathwayDescs = pathwayDescs.substring(1);
 		}
+		enzymes = KeggAdaptor.extractInfo(infos, "ENZYME", "\n");
 
 		// Free Memory instead of storing empty Strings.
 		if (taxonomy != null && taxonomy.trim().length() == 0)
 			taxonomy = null;
 		if (equation != null && equation.trim().length() == 0)
 			equation = null;
+    if (enzymes != null && enzymes.trim().length() == 0)
+      enzymes = null;		
 		if (pathways != null && pathways.trim().length() == 0)
 			pathways = null;
 		if (pathwayDescs != null && pathwayDescs.trim().length() == 0)
@@ -802,9 +822,7 @@ public class KeggInfos {
     String prefix = keggId.toLowerCase().trim();
     int pos = keggId.indexOf(':');
     if (pos <= 0) {
-      System.err
-          .println("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted:"
-              + keggId);
+      System.err.println("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted:" + keggId);
       return null;
     }
     String suffix = keggId.substring(pos + 1).trim();
@@ -836,7 +854,7 @@ public class KeggInfos {
     }
     return ret;
   }
-
+  
   /**
    * If s contains ":" => return values is all chars behind the ":". Else =>
    * return value is s.

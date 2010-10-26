@@ -324,7 +324,7 @@ public class KeggParser extends DefaultHandler {
       NamedNodeMap att = node.getAttributes();
       if (name.equalsIgnoreCase("entry")) {
         if (!silent) System.out.println("Parsing Entry " + getNodeValue(att,"name") + "...");
-        Entry e = new Entry(getNodeValueInt(att, "id"), getNodeValue(att, "name"), EntryType.valueOf(getNodeValue(att,"type")), getNodeValue(att, "link"), getNodeValue(att, "reaction"), node.getChildNodes() );
+        Entry e = new Entry(p, getNodeValueInt(att, "id"), getNodeValue(att, "name"), EntryType.valueOf(getNodeValue(att,"type")), getNodeValue(att, "link"), getNodeValue(att, "reaction"), node.getChildNodes() );
         p.addEntry(e);
       } else if (name.equalsIgnoreCase("reaction")) {
         if (!silent) System.out.println("Parsing Reaction " + getNodeValue(att,"name") + "...");

@@ -1,6 +1,10 @@
 package de.zbit.kegg.parser.pathway;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Main Kegg document. Corresponding to the Kegg Pathway class
@@ -13,44 +17,77 @@ public class Pathway {
 	/**
 	 * keggid.type the KEGGID of this pathway map
 	 */
-	String name = "";
+	private String name = "";
 	/**
 	 * maporg.type ko/ec/[org prefix]
 	 */
-	String org = "";
+	private String org = "";
 	/**
 	 * mapnumber.type the map number of this pathway map (5 digit integer)
 	 */
-	int number = 0;
+	private int number = 0;
 	/**
 	 * string.type the title of this pathway map
 	 */
-	String title = "";
+	private String title = "";
 	/**
 	 * url.type the resource location of the image file of this pathway map
 	 */
-	String image = "";
+	private String image = "";
 	/**
 	 * url.type the resource location of the information about this pathway map
 	 */
-	String link = "";
+	private String link = "";
 	/**
-	 * 
+	 * All entries of the pathway
 	 */
-	ArrayList<Entry> entries = new ArrayList<Entry>();
+	private ArrayList<Entry> entries = new ArrayList<Entry>();
 	/**
-	 * 
+	 * All reactions of the pathway
 	 */
-	ArrayList<Reaction> reactions = new ArrayList<Reaction>();
+	private ArrayList<Reaction> reactions = new ArrayList<Reaction>();
 	/**
-	 * 
+	 * All relations of the pathway
 	 */
-	ArrayList<Relation> relations = new ArrayList<Relation>();
+	private ArrayList<Relation> relations = new ArrayList<Relation>();
 
-	// Custom Variables, not in the KGML specification
-	String comment = null;
-	double version=0;
+	/*
+	 *  Custom Variables, not in the KGML specification
+	 */
 	
+	/**
+	 * Comment of the source KGML file.
+	 */
+	private String comment = null;
+	/**
+	 * Version number of the source KGML file
+	 */
+	private double version=0;
+	
+	/*
+	 * Speed improvements
+	 */
+
+	/**
+	 * Contains ids of entrys and the entry itself.
+	 */
+	private Map<Integer, Entry> idMap = new HashMap<Integer, Entry>();
+	
+  /**
+   * Contains names of entrys and the entry itself.
+   */
+  private Map<String, Entry> nameMap = new HashMap<String, Entry>();
+
+  /**
+   * Contains names of reactions and entrys that modify this reactions (usually enzymes).
+   */
+  private Map<String, List<Entry>> reactionModifiers = new HashMap<String, List<Entry>>();
+	
+  /**
+   * The maxmimum id number of an contained entry.
+   */
+  private int maxId=0;
+  
 	/**
 	 * 
 	 */
@@ -93,7 +130,38 @@ public class Pathway {
 	 * @param e
 	 */
 	public void addEntry(Entry e) {
+	  idMap.put(e.getId(), e);
+	  nameMap.put(e.getName(), e);
+	  addReactionModifier(e);
+	  
+	  maxId=Math.max(maxId, e.getId());
+	  
 		entries.add(e);
+	}
+	
+	/**
+	 * If and only if e is a reactionModifier, it is
+	 * added to the list.
+	 * @param e
+	 */
+	private void addReactionModifier(Entry e) {
+	  addReactionModifier(e, e.getReaction());
+	}
+	/**
+   * If and only if e is a reactionModifier, it is
+   * added to the list.
+	 * @param e
+	 * @param reactionName
+	 */
+	private void addReactionModifier(Entry e, String reactionName) {
+    if (reactionName!=null && reactionName.length()>0) {
+      List<Entry> l = reactionModifiers.get(reactionName);
+      if (l==null) {
+        l = new LinkedList<Entry>();
+        reactionModifiers.put(reactionName, l);
+      }
+      if (!l.contains(e)) l.add(e);
+    }
 	}
 
 	/**
@@ -113,35 +181,64 @@ public class Pathway {
 	}
 
 	/**
+	 * Returns the complete entry list.
 	 * 
+	 * You should NOT modify this list, but use the provided methods
+	 * (e.g. {@link #addEntry(Entry)}), else the id and name references
+	 * are getting corrupt. 
 	 * @return
 	 */
 	public ArrayList<Entry> getEntries() {
 		return entries;
 	}
+	
+	/**
+	 * Iteratively parsing through all entries and
+	 * returning the maximum entry id.
+	 * @return
+	 */
+	public int getMaxEntryId() {
+	  return maxId;
+	}
 
 	/**
-	 * 
+	 * Iterates through all entries all returns the entry
+	 * with the given id if it exists, or null.
 	 * @param id
 	 * @return
 	 */
 	public Entry getEntryForId(int id) {
-		for (int i = 0; i < entries.size(); i++)
+		/*for (int i = 0; i < entries.size(); i++)
 			if (entries.get(i).getId() == id)
-				return entries.get(i);
-		return null;
+				return entries.get(i); 
+		return null;*/
+	  return idMap.get(id);
 	}
 
 	/**
-	 * 
+	 * Returns the entry that has a name that
+	 * equalsIgnoreCase the given name.
+	 * If no entry with this contidion can be found,
+	 * returns null.
 	 * @param name
 	 * @return
 	 */
 	public Entry getEntryForName(String name) {
-		for (int i = 0; i < entries.size(); i++)
+		/*for (int i = 0; i < entries.size(); i++)
 			if (entries.get(i).getName().equalsIgnoreCase(name))
 				return entries.get(i);
-		return null;
+		return null;*/
+	  return nameMap.get(name);
+	}
+	
+	/**
+	 * Returns all modifiers (usually enzymes) for the given
+	 * reaction, as noted in the KGML document.
+	 * @param reactionName - e.g. "rn:R01662"
+	 * @return List<Entry> or null
+	 */
+	public List<Entry> getReactionModifiers(String reactionName) {
+	  return reactionModifiers.get(reactionName);
 	}
 
 	/**
@@ -281,6 +378,55 @@ public class Pathway {
 
   public void setVersion(double version) {
     this.version = version;
+  }
+
+  /**
+   * This function has to be called by entries, before their
+   * ids change. It does NOT perform the change itself.
+   * @param entry - Entry object BEFORE THE CHANGE
+   * @param id - new id.
+   */
+  protected void idChange(Entry entry, int id) {
+    // Change the maxId
+    if (entry.getId() == maxId) {
+      maxId=0;
+      for (Entry e:getEntries()) {
+        if (e.equals(entry)) continue;
+        maxId = Math.max(maxId, e.getId());
+      }
+    }
+    maxId=Math.max(maxId, id);
+    
+    // Change the idMap
+    idMap.remove(entry.getId());
+    idMap.put(id, entry);
+  }
+
+  /**
+   * This function has to be called by entries, before their
+   * names change. It does NOT perform the change itself.
+   * @param entry - Entry object BEFORE THE CHANGE
+   * @param name - the new name.
+   */
+  protected void nameChange(Entry entry, String name) {
+    // Change the nameMap
+    nameMap.remove(entry.getName());
+    nameMap.put(name, entry);
+  }
+  
+  /**
+   * This function has to be called by entries, before their
+   * reaction changes. It does NOT perform the change itself.
+   * @param entry - Entry object BEFORE THE CHANGE
+   * @param reaction - the new reaction.
+   */
+  protected void reactionChange(Entry entry, String reaction) {
+    // Remove the old entry
+    if (entry.getReaction()!=null && entry.getReaction().length()>0) {
+      List<Entry> l = reactionModifiers.get(entry.getReaction());
+      if (l!=null) l.remove(entry);
+    }
+    addReactionModifier(entry, reaction);
   }
 
 	
