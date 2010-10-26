@@ -42,7 +42,8 @@ public class SBPreferences implements Map<Object, Object> {
 		/**
 		 * 
 		 */
-		private Object key, value;
+		private final Object key;
+		private Object value;
 
 		/**
 		 * 
@@ -86,28 +87,100 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	private static Properties defaults;
 
+	/***
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static final String getDefault(Object key) {
+		return getDefaultString(key);
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static final boolean getDefaultBoolean(Object key) {
+		return Boolean.parseBoolean(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static final double getDefaultDouble(Object key) {
+		return Double.parseDouble(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static final float getDefaultFloat(Object key) {
+		return Float.parseFloat(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static final int getDefaultInt(Object key) {
+		return Integer.parseInt(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static final long getDefaultLong(Object key) {
+		return Long.parseLong(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static final String getDefaultString(Object key) {
+		String v = defaults.get(key.toString()).toString();
+		if (System.getProperties().containsKey(v)) {
+			return System.getProperty(v);
+		}
+		return v;
+	}
+
 	/**
 	 * Some {@link Class} that contains a certain number of static {@link Field}
 	 * objects of type {@link Option} and whose class name is used to address
 	 * the node in the user preferences to persist all key-value pairs of user
 	 * settings.
 	 */
-	private Class<?> keyProvider;
+	private final Class<?> keyProvider;
 
 	/**
 	 * User-defined values that may change and may be stored persistently.
 	 */
-	private Preferences prefs;
+	private final Preferences prefs;
 
 	/**
 	 * 
-	 * @param keyProvider A class that should contain instances of {@link Option}
-	 * defined as public static field members. The package name of this class identifies
-	 * precisely the location of the user-specific settings.
-	 * @param relPath A {@link String} that specifies a relative path to a resource
-	 * that can be parsed by {@link Properties} class and must contain all default
-	 * values corresponding to the {@link Option} instances defined in the keyProvider. For instance,
-	 * "cfg/MyConf.xml"
+	 * @param keyProvider
+	 *            A class that should contain instances of {@link Option}
+	 *            defined as public static field members. The package name of
+	 *            this class identifies precisely the location of the
+	 *            user-specific settings.
+	 * @param relPath
+	 *            A {@link String} that specifies a relative path to a resource
+	 *            that can be parsed by {@link Properties} class and must
+	 *            contain all default values corresponding to the {@link Option}
+	 *            instances defined in the keyProvider. For instance,
+	 *            "cfg/MyConf.xml" if cfg is the name of a package relative to
+	 *            the keyProvider class.
 	 * @throws InvalidPropertiesFormatException
 	 * @throws IOException
 	 */
@@ -115,8 +188,8 @@ public class SBPreferences implements Map<Object, Object> {
 			throws InvalidPropertiesFormatException, IOException {
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
-		this.defaults = new Properties();
-		this.defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));
+		defaults = new Properties();
+		defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));
 	}
 
 	/**
@@ -125,6 +198,24 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param args
 	 */
 	public void analyzeCommandLineArguments(String usage, String args[]) {
+		try {
+			analyzeCommandLineArguments(usage, args, false);
+		} catch (BackingStoreException e) {
+			// This can never happen because we don't try to persist anything!
+		}
+	}
+
+	/**
+	 * 
+	 * @param usage
+	 * @param args
+	 * @param persist
+	 *            whether or not to save the command-line argument values
+	 *            directly in the user's options.
+	 * @throws BackingStoreException
+	 */
+	public void analyzeCommandLineArguments(String usage, String args[],
+			boolean persist) throws BackingStoreException {
 		// create the parser and specify the allowed options ...
 		ArgParser parser = new ArgParser(usage);
 		Class<?> keyProvider = getKeyProvider();
@@ -136,6 +227,10 @@ public class SBPreferences implements Map<Object, Object> {
 				fieldValue = f.get(keyProvider);
 				if (fieldValue instanceof Option) {
 					option = (Option) fieldValue;
+					// We here set the default value as pre-defined value
+					// in this way we make sure that if the user does not
+					// give a command-line argument for this option, we will
+					// stick with the default value:
 					argHolder = option.createArgumentHolder(get(option));
 					parser.addOption(option.getSpecification(), argHolder);
 					options.put(option, argHolder);
@@ -169,6 +264,9 @@ public class SBPreferences implements Map<Object, Object> {
 			} else {
 				put(key, ((ObjectHolder) options.get(key)).value);
 			}
+		}
+		if (persist) {
+			flush();
 		}
 	}
 
@@ -247,10 +345,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public boolean getBoolean(Object key) {
-	  // TODO: getDefaultBoolean... and also for all other get methods!
 		String k = key.toString();
-		return prefs.getBoolean(k, Boolean.parseBoolean(defaults.get(k)
-				.toString()));
+		return prefs.getBoolean(k, getDefaultBoolean(k));
 	}
 
 	/**
@@ -260,8 +356,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public double getDouble(Object key) {
 		String k = key.toString();
-		return prefs.getDouble(k, Double
-				.parseDouble(defaults.get(k).toString()));
+		return prefs.getDouble(k, getDefaultDouble(k));
 	}
 
 	/**
@@ -271,7 +366,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public float getFloat(Object key) {
 		String k = key.toString();
-		return prefs.getFloat(k, Float.parseFloat(defaults.get(k).toString()));
+		return prefs.getFloat(k, getDefaultFloat(k));
 	}
 
 	/**
@@ -281,7 +376,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public int getInt(Object key) {
 		String k = key.toString();
-		return prefs.getInt(k, Integer.parseInt(defaults.get(k).toString()));
+		return prefs.getInt(k, getDefaultInt(k));
 	}
 
 	/**
@@ -298,7 +393,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public long getLong(Object key) {
 		String k = key.toString();
-		return prefs.getLong(k, Long.parseLong(defaults.get(k).toString()));
+		return prefs.getLong(k, getDefaultLong(k));
 	}
 
 	/**
@@ -308,7 +403,11 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public String getString(Object key) {
 		String k = key.toString();
-		return prefs.get(k, defaults.get(k).toString());
+		String v = prefs.get(k, getDefaultString(k));
+		if (System.getProperties().containsKey(v)) {
+			return System.getProperty(v);
+		}
+		return v;
 	}
 
 	/*
