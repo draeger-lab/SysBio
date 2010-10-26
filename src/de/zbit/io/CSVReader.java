@@ -1057,6 +1057,11 @@ public class CSVReader implements Serializable, Cloneable {
     }
     return data;
   }
+  
+  /**
+   * If a file is currently open, this function closes the file.
+   * @throws IOException
+   */
   public void close() throws IOException {
     if (currentOpenFile!=null) {
       currentOpenFile.close();
