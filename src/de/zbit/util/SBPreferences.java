@@ -59,7 +59,6 @@ public class SBPreferences implements Map<Object, Object> {
 		 * 
 		 * @see java.util.Map.Entry#getKey()
 		 */
-		@Override
 		public Object getKey() {
 			return key;
 		}
@@ -67,7 +66,6 @@ public class SBPreferences implements Map<Object, Object> {
 		/**
 		 * 
 		 */
-		@Override
 		public Object getValue() {
 			return value;
 		}
@@ -77,7 +75,6 @@ public class SBPreferences implements Map<Object, Object> {
 		 * 
 		 * @see java.util.Map.Entry#setValue(java.lang.Object)
 		 */
-		@Override
 		public Object setValue(Object value) {
 			return this.value = value;
 		}
@@ -85,9 +82,9 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 
 	/**
-	 * 
+	 * The default values that cannot change!
 	 */
-	private Properties defaults;
+	private static Properties defaults;
 
 	/**
 	 * Some {@link Class} that contains a certain number of static {@link Field}
@@ -98,14 +95,19 @@ public class SBPreferences implements Map<Object, Object> {
 	private Class<?> keyProvider;
 
 	/**
-	 * 
+	 * User-defined values that may change and may be stored persistently.
 	 */
 	private Preferences prefs;
 
 	/**
 	 * 
-	 * @param keyProvider
-	 * @param relPath
+	 * @param keyProvider A class that should contain instances of {@link Option}
+	 * defined as public static field members. The package name of this class identifies
+	 * precisely the location of the user-specific settings.
+	 * @param relPath A {@link String} that specifies a relative path to a resource
+	 * that can be parsed by {@link Properties} class and must contain all default
+	 * values corresponding to the {@link Option} instances defined in the keyProvider. For instance,
+	 * "cfg/MyConf.xml"
 	 * @throws InvalidPropertiesFormatException
 	 * @throws IOException
 	 */
@@ -119,12 +121,12 @@ public class SBPreferences implements Map<Object, Object> {
 
 	/**
 	 * 
-	 * @param usuage
+	 * @param usage
 	 * @param args
 	 */
-	public void analyzeCommandLineArguments(String usuage, String args[]) {
+	public void analyzeCommandLineArguments(String usage, String args[]) {
 		// create the parser and specify the allowed options ...
-		ArgParser parser = new ArgParser(usuage);
+		ArgParser parser = new ArgParser(usage);
 		Class<?> keyProvider = getKeyProvider();
 		Map<Option, Object> options = new HashMap<Option, Object>();
 		Object fieldValue, argHolder;
@@ -175,7 +177,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#clear()
 	 */
-	@Override
 	public void clear() {
 		try {
 			String keys[] = prefs.keys();
@@ -192,7 +193,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#containsKey(java.lang.Object)
 	 */
-	@Override
 	public boolean containsKey(Object key) {
 		return keySet().contains(key);
 	}
@@ -202,7 +202,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#containsValue(java.lang.Object)
 	 */
-	@Override
 	public boolean containsValue(Object value) {
 		for (String key : keys()) {
 			if (get(key).equals(value)) {
@@ -217,7 +216,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#entrySet()
 	 */
-	@Override
 	public Set<java.util.Map.Entry<Object, Object>> entrySet() {
 		Set<Map.Entry<Object, Object>> set = new HashSet<Map.Entry<Object, Object>>();
 		for (String key : keys()) {
@@ -239,7 +237,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#get(java.lang.Object)
 	 */
-	@Override
 	public String get(Object key) {
 		return getString(key);
 	}
@@ -250,6 +247,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public boolean getBoolean(Object key) {
+	  // TODO: getDefaultBoolean... and also for all other get methods!
 		String k = key.toString();
 		return prefs.getBoolean(k, Boolean.parseBoolean(defaults.get(k)
 				.toString()));
@@ -318,7 +316,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#isEmpty()
 	 */
-	@Override
 	public boolean isEmpty() {
 		return keys().length == 0;
 	}
@@ -345,7 +342,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#keySet()
 	 */
-	@Override
 	public Set<Object> keySet() {
 		Set<Object> set = new HashSet<Object>();
 		for (String key : keys()) {
@@ -434,7 +430,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
 	 */
-	@Override
 	public Object put(Object key, Object value) {
 		Object o = get(key);
 		put(key, value.toString());
@@ -461,7 +456,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#putAll(java.util.Map)
 	 */
-	@Override
 	public void putAll(Map<? extends Object, ? extends Object> m) {
 		for (Object key : m.keySet()) {
 			put(key, m.get(key));
@@ -500,7 +494,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#size()
 	 */
-	@Override
 	public int size() {
 		return keys().length;
 	}
@@ -544,7 +537,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#values()
 	 */
-	@Override
 	public Collection<Object> values() {
 		Collection<Object> c = new LinkedList<Object>();
 		for (String key : keys()) {
