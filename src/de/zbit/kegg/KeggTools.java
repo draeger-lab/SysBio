@@ -10,6 +10,8 @@ import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
+import de.zbit.kegg.parser.pathway.Relation;
+import de.zbit.kegg.parser.pathway.SubType;
 
 /**
  * @author wrzodek
@@ -236,6 +238,91 @@ public class KeggTools {
       }
     }
     return new int[] { x, y };
+  }
+  
+  
+
+  /**
+   * Remove all white nodes from the pathway. More specific: removes a entry,
+   * if it has graphics information, if the bgcolor endsWith ffffff AND
+   * the entryType is gene or ortholog.
+   * 
+   * Background: Kegg colors in organism specific pathways all nodes white,
+   * that do not occur in this organism.
+   * 
+   * @param p
+   */
+  public static void removeWhiteNodes(Pathway p) {
+    for (int i=0; i<p.getEntries().size(); i++) {
+      Entry entry = p.getEntries().get(i);
+      if (entry.hasGraphics() && entry.getGraphics().getBgcolor().toLowerCase().trim().endsWith("ffffff")
+          && (entry.getType() == EntryType.gene || entry.getType() == EntryType.ortholog)) {
+        p.removeEntry(i);
+        i--;
+      }
+    }
+  }
+  
+  /**
+   * Iterates through all entries and removes all nodes that are
+   * not contained in any reaction.
+   * @param p - Parent pathway.
+   * @param considerRelations - if true, only removes the node if
+   * it is also not contained in any relation. If false, relations
+   * are getting ignored.
+   */
+  public static void removeOrphans(Pathway p, boolean considerRelations) {
+    for (int i=0; i<p.getEntries().size(); i++) {
+      Entry entry = p.getEntries().get(i);
+      // Look if it is NOT an enzyme (or other reaction modifier)
+      if (entry.getReaction() == null || entry.getReaction().length() < 1) {
+        
+        // Loop through all reactions and look for the node.
+        boolean found = false;
+        for (Reaction r : p.getReactions()) {
+          for (ReactionComponent rc : r.getProducts())
+            if (rc.getName().equalsIgnoreCase(entry.getName())) {
+              found = true;
+              break;
+            }
+          if (!found) {
+            for (ReactionComponent rc : r.getSubstrates())
+              if (rc.getName().equalsIgnoreCase(entry.getName())) {
+                found = true;
+                break;
+              }
+          }
+          if (found) break;
+        }
+        
+        // Loop through all relations and look for the node.
+        if (considerRelations && !found) {
+          for (Relation r : p.getRelations()) {
+            if (r.getEntry1() == entry.getId() || r.getEntry2() == entry.getId()) {
+              found = true;
+              break;
+            }
+            for (SubType st : r.getSubtypes()) {
+              try {
+                if (Integer.parseInt(st.getValue()) == entry.getId()) {
+                  found = true;
+                  break;
+                }
+              } catch (Exception e) {}
+            }
+            if (found) break;
+          }
+        }
+        
+        // It is an orphan!
+        if (!found) {
+          //return null; //continue;
+          p.removeEntry(i);
+          i--;
+        }
+        
+      }
+    }
   }
   
 }
