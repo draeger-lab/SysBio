@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
 import de.zbit.io.SBFileFilter;
@@ -45,11 +46,15 @@ public class ImageTools {
 		try {
 			File dir = new File(directory.toURI());
 			if (dir.canRead() && dir.isDirectory()) {
+				String key;
 				for (File file : dir.listFiles(SBFileFilter.IMAGE_FILE_FILTER)) {
+					key = file.getName().substring(0,
+							file.getName().lastIndexOf('.'));
 					try {
-						UIManager.put(file.getName().substring(0,
-								file.getName().lastIndexOf('.')), ImageIO
-								.read(file));
+						if (UIManager.getIcon(key) == null) {
+							UIManager.put(key,
+									new ImageIcon(ImageIO.read(file)));
+						}
 					} catch (Exception exc) {
 						System.err.printf("Could not load image %s.\n", file);
 					}

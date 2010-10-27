@@ -6,6 +6,7 @@ package de.zbit.util;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.InvalidPropertiesFormatException;
@@ -87,6 +88,27 @@ public class SBPreferences implements Map<Object, Object> {
 	 * again.
 	 */
 	private static final Map<String, Properties> allDefaults = new HashMap<String, Properties>();
+
+	/**
+	 * 
+	 * @param keyProvider
+	 * @param relPath
+	 * @param persist
+	 * @param usage
+	 * @param args
+	 * @return
+	 * @throws InvalidPropertiesFormatException
+	 * @throws IOException
+	 * @throws BackingStoreException
+	 */
+	public static final SBProperties analyzeCommandLineArguments(
+			Class<?> keyProvider, String relPath, boolean persist,
+			String usage, String args[])
+			throws InvalidPropertiesFormatException, IOException,
+			BackingStoreException {
+		SBPreferences prefs = getPreferencesFor(keyProvider, relPath);
+		return prefs.analyzeCommandLineArguments(usage, args, persist);
+	}
 
 	/**
 	 * 
@@ -190,6 +212,25 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @param keyProvider
 	 * @param relPath
+	 * @param usage
+	 * @param args
+	 * @return
+	 */
+	public static final SBProperties analyzeCommandLineArguments(
+			Class<?> keyProvider, String relPath, String usage, String args[]) {
+		try {
+			return analyzeCommandLineArguments(keyProvider, relPath, false,
+					usage, args);
+		} catch (Exception e) {
+			// This can actually never happen because we don't persist anything.
+			return new SBProperties();
+		}
+	}
+
+	/**
+	 * 
+	 * @param keyProvider
+	 * @param relPath
 	 * @return
 	 * @throws IOException
 	 * @throws InvalidPropertiesFormatException
@@ -271,15 +312,18 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param persist
 	 *            whether or not to save the command-line argument values
 	 *            directly in the user's options.
+	 * @return
 	 * @throws BackingStoreException
 	 */
-	public void analyzeCommandLineArguments(String usage, String args[],
-			boolean persist) throws BackingStoreException {
-		putAll(analyzeCommandLineArguments(getKeyProvider(), usage, args,
-				defaults));
+	public SBProperties analyzeCommandLineArguments(String usage,
+			String args[], boolean persist) throws BackingStoreException {
+		SBProperties props = analyzeCommandLineArguments(getKeyProvider(),
+				usage, args, defaults);
+		putAll(props);
 		if (persist) {
 			flush();
 		}
+		return props;
 	}
 
 	/*
@@ -413,6 +457,18 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public final long getDefaultLong(Object key) {
 		return Long.parseLong(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * Creates an unmodifiable copy of the defaults of this
+	 * {@link SBPreferences} object and returns a pointer to this copy. The
+	 * actual defaults must not be changed, therefore there is no method
+	 * available to manipulate these.
+	 * 
+	 * @return An unmodifiable copy of the default preferences.
+	 */
+	public final Map<Object, Object> getDefaults() {
+		return Collections.unmodifiableMap(defaults);
 	}
 
 	/**
