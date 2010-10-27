@@ -10,7 +10,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -18,18 +17,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -46,7 +42,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
-import de.zbit.io.SBFileFilter;
 
 /**
  * This class contains various GUI tools.
@@ -57,57 +52,6 @@ import de.zbit.io.SBFileFilter;
  * 
  */
 public class GUITools {
-
-	/**
-	 * Loads all image files that can be found in the directory referenced by
-	 * the given {@link URL} into the dedicated hash table in {@link UIManager}.
-	 * The key to access these image files is then the file name, i.e., the
-	 * substring of the file name ending at the last dot symbol, for instance,
-	 * myFile.png will result in the key "myFile".
-	 * 
-	 * @param directory
-	 *            A {@link URL} representing a directory with image files.
-	 * @throws URISyntaxException
-	 */
-	public static void initImages(URL directory) {
-		try {
-			File dir = new File(directory.toURI());
-			if (dir.canRead() && dir.isDirectory()) {
-				for (File f : dir.listFiles(SBFileFilter.IMAGE_FILE_FILTER)) {
-					UIManager.put(f.getName().substring(0,
-							f.getName().lastIndexOf('.')), loadIcon(f));
-				}
-			}
-		} catch (URISyntaxException e) {
-			System.err.println(String.format(
-					"Could not load icons from directory %s.", directory));
-		}
-	}
-
-	/**
-	 * 
-	 * @param path
-	 * @return
-	 * @throws IOException
-	 */
-	public static Icon loadIcon(File file) {
-		Image img = loadImage(file);
-		return img != null ? new ImageIcon(img) : null;
-	}
-
-	/**
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public static Image loadImage(File file) {
-		try {
-			return ImageIO.read(file);
-		} catch (IOException exc) {
-			System.err.printf("Could not load image %s.\n", file);
-			return null;
-		}
-	}
 
 	/**
 	 * Checks whether the first container contains the second one.

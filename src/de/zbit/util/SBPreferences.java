@@ -83,6 +83,12 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 
 	/**
+	 * Pointers to avoid senselessly parsing configuration files again and
+	 * again.
+	 */
+	private static final Map<String, Properties> allDefaults = new HashMap<String, Properties>();
+
+	/**
 	 * 
 	 * @param keyProvider
 	 * @param usage
@@ -181,6 +187,20 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 
 	/**
+	 * 
+	 * @param keyProvider
+	 * @param relPath
+	 * @return
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
+	 */
+	public static SBPreferences getPreferencesFor(Class<?> keyProvider,
+			String relPath) throws InvalidPropertiesFormatException,
+			IOException {
+		return new SBPreferences(keyProvider, relPath);
+	}
+
+	/**
 	 * The default values that cannot change!
 	 * 
 	 */
@@ -220,8 +240,15 @@ public class SBPreferences implements Map<Object, Object> {
 			throws InvalidPropertiesFormatException, IOException {
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
-		defaults = new Properties();
-		defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));
+		String path = keyProvider.getPackage().getName().replace('.', '/')
+				+ '/' + relPath;
+		if (!allDefaults.containsKey(path)) {
+			defaults = new Properties();
+			defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));
+			allDefaults.put(path, defaults);
+		} else {
+			defaults = allDefaults.get(path);
+		}
 	}
 
 	/**
