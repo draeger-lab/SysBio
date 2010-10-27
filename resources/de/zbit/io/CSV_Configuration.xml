@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+    Default configuration for the CSVReader/Writer.
+  </comment>
+  <entry key="CSV_FILE"></entry> <!-- no default file -->
+  <entry key="CSV_FILES_OPEN_DIR">user.home</entry>
+  <entry key="CSV_FILES_QUOTE_CHAR">"</entry>
+  <entry key="CSV_FILES_SAVE_DIR">user.home</entry>
+  <entry key="CSV_FILES_SEPARATOR_CHAR">,</entry>
+ </properties>
+ 

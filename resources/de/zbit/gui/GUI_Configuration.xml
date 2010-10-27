@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+    Default configuration for the CSVReader/Writer.
+  </comment>
+  <entry key="CHECK_FOR_UPDATES">false</entry>
+  <entry key="OPEN_DIR">user.home</entry>
+  <entry key="SAVE_DIR">user.home</entry>
+  <entry key="GUI">false</entry>
+  <entry key="SPINNER_MIN_VALUE">0d</entry>
+  <entry key="SPINNER_MAX_VALUE">1E5</entry>
+  <entry key="SPINNER_MIN_VALUE">0d</entry>
+  <entry key="SPINNER_STEP_SIZE">1E-2</entry>
+ </properties>
+ 
