@@ -83,76 +83,108 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 
 	/**
-	 * The default values that cannot change!
-	 */
-	private static Properties defaults;
-
-	/***
 	 * 
-	 * @param key
+	 * @param keyProvider
+	 * @param usage
+	 * @param args
 	 * @return
 	 */
-	public static final String getDefault(Object key) {
-		return getDefaultString(key);
+	public static final SBProperties analyzeCommandLineArguments(
+			Class<?> keyProvider, String usage, String args[]) {
+		return analyzeCommandLineArguments(keyProvider, usage, args, null);
 	}
 
 	/**
 	 * 
-	 * @param key
+	 * @param keyProvider
+	 * @param usage
+	 * @param args
+	 * @param defaults
 	 * @return
 	 */
-	public static final boolean getDefaultBoolean(Object key) {
-		return Boolean.parseBoolean(defaults.get(key.toString()).toString());
-	}
-
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public static final double getDefaultDouble(Object key) {
-		return Double.parseDouble(defaults.get(key.toString()).toString());
-	}
-
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public static final float getDefaultFloat(Object key) {
-		return Float.parseFloat(defaults.get(key.toString()).toString());
-	}
-
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public static final int getDefaultInt(Object key) {
-		return Integer.parseInt(defaults.get(key.toString()).toString());
-	}
-
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public static final long getDefaultLong(Object key) {
-		return Long.parseLong(defaults.get(key.toString()).toString());
-	}
-
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public static final String getDefaultString(Object key) {
-		String v = defaults.get(key.toString()).toString();
-		if (System.getProperties().containsKey(v)) {
-			return System.getProperty(v);
+	public static final SBProperties analyzeCommandLineArguments(
+			Class<?> keyProvider, String usage, String args[],
+			Map<Object, Object> defaults) {
+		SBProperties props;
+		if (defaults != null) {
+			props = new SBProperties(new Properties());
+		} else {
+			props = new SBProperties();
 		}
-		return v;
+		// create the parser and specify the allowed options ...
+		ArgParser parser = new ArgParser(usage);
+		Map<Option, Object> options = new HashMap<Option, Object>();
+		Object fieldValue, argHolder;
+		Option option;
+		String k;
+		for (Field f : keyProvider.getFields()) {
+			try {
+				fieldValue = f.get(keyProvider);
+				if (fieldValue instanceof Option) {
+					option = (Option) fieldValue;
+					k = option.toString();
+					if ((defaults != null) && defaults.containsKey(option)) {
+						// We here set the default value as pre-defined value
+						// if the given Map contains the corresponding key.
+						// In this way we make sure that if the user does not
+						// give a command-line argument for this option, we will
+						// stick with the default value:
+						argHolder = option.createArgumentHolder(defaults
+								.get(option));
+						props.getDefaults().put(k, defaults.get(option));
+					} else {
+						if ((defaults != null) && defaults.containsKey(k)) {
+							argHolder = option.createArgumentHolder(defaults
+									.get(k));
+							props.getDefaults().put(k, defaults.get(k));
+						} else {
+							// If there is no default value available,
+							// we cannot do anything...
+							argHolder = option.createArgumentHolder();
+						}
+					}
+					parser.addOption(option.getSpecification(), argHolder);
+					options.put(option, argHolder);
+				}
+			} catch (Exception exc) {
+				// This my happen if there are other fields than static options
+				// in the key provider. Also happens if the wrong type of
+				// argHolder has been added or created! But this method should
+				// work fine... (I hope). You can check with -? option.
+				// Just ignore...
+			}
+		}
+		parser.matchAllArgs(args);
+		for (Option key : options.keySet()) {
+			k = key.toString();
+			if (key.getRequiredType().equals(Float.class)) {
+				props.put(k, ((FloatHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Double.class)) {
+				props.put(k, ((DoubleHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Short.class)) {
+				props.put(key, (short) ((IntHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Integer.class)) {
+				props.put(k, ((IntHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Long.class)) {
+				props.put(k, ((LongHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Boolean.class)) {
+				props.put(k, ((BooleanHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Character.class)) {
+				props.put(k, ((CharHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(String.class)) {
+				props.put(k, ((StringHolder) options.get(key)).value);
+			} else {
+				props.put(k, ((ObjectHolder) options.get(key)).value);
+			}
+		}
+		return props;
 	}
+
+	/**
+	 * The default values that cannot change!
+	 * 
+	 */
+	private Properties defaults;
 
 	/**
 	 * Some {@link Class} that contains a certain number of static {@link Field}
@@ -216,55 +248,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public void analyzeCommandLineArguments(String usage, String args[],
 			boolean persist) throws BackingStoreException {
-		// create the parser and specify the allowed options ...
-		ArgParser parser = new ArgParser(usage);
-		Class<?> keyProvider = getKeyProvider();
-		Map<Option, Object> options = new HashMap<Option, Object>();
-		Object fieldValue, argHolder;
-		Option option;
-		for (Field f : keyProvider.getFields()) {
-			try {
-				fieldValue = f.get(keyProvider);
-				if (fieldValue instanceof Option) {
-					option = (Option) fieldValue;
-					// We here set the default value as pre-defined value
-					// in this way we make sure that if the user does not
-					// give a command-line argument for this option, we will
-					// stick with the default value:
-					argHolder = option.createArgumentHolder(get(option));
-					parser.addOption(option.getSpecification(), argHolder);
-					options.put(option, argHolder);
-				}
-			} catch (Exception exc) {
-				// This my happen if there are other fields than static options
-				// in the key provider. Also happens if the wrong type of
-				// argHolder has been added or created! But this method should
-				// work fine... (I hope). You can check with -? option.
-				// Just ignore...
-			}
-		}
-		parser.matchAllArgs(args);
-		for (Option key : options.keySet()) {
-			if (key.getRequiredType().equals(Float.class)) {
-				put(key, ((FloatHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Double.class)) {
-				put(key, ((DoubleHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Short.class)) {
-				put(key, (short) ((IntHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Integer.class)) {
-				put(key, ((IntHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Long.class)) {
-				put(key, ((LongHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Boolean.class)) {
-				put(key, ((BooleanHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Character.class)) {
-				put(key, ((CharHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(String.class)) {
-				put(key, ((StringHolder) options.get(key)).value);
-			} else {
-				put(key, ((ObjectHolder) options.get(key)).value);
-			}
-		}
+		putAll(analyzeCommandLineArguments(getKeyProvider(), usage, args,
+				defaults));
 		if (persist) {
 			flush();
 		}
@@ -347,6 +332,73 @@ public class SBPreferences implements Map<Object, Object> {
 	public boolean getBoolean(Object key) {
 		String k = key.toString();
 		return prefs.getBoolean(k, getDefaultBoolean(k));
+	}
+
+	/***
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public final String getDefault(Object key) {
+		return getDefaultString(key);
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public final boolean getDefaultBoolean(Object key) {
+		return Boolean.parseBoolean(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public final double getDefaultDouble(Object key) {
+		return Double.parseDouble(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public final float getDefaultFloat(Object key) {
+		return Float.parseFloat(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public final int getDefaultInt(Object key) {
+		return Integer.parseInt(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public final long getDefaultLong(Object key) {
+		return Long.parseLong(defaults.get(key.toString()).toString());
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public final String getDefaultString(Object key) {
+		String v = defaults.get(key.toString()).toString();
+		if (System.getProperties().containsKey(v)) {
+			return System.getProperty(v);
+		}
+		return v;
 	}
 
 	/**
