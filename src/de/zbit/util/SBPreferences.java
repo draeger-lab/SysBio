@@ -286,6 +286,12 @@ public class SBPreferences implements Map<Object, Object> {
 		if (!allDefaults.containsKey(path)) {
 			defaults = new Properties();
 			defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));
+			for (Map.Entry<Object, Object> e : defaults.entrySet()) {
+				if (System.getProperties().containsKey(e.getValue())) {
+					defaults.setProperty(e.getKey().toString(), System
+							.getProperty(e.getValue().toString()));
+				}
+			}
 			allDefaults.put(path, defaults);
 		} else {
 			defaults = allDefaults.get(path);
@@ -677,8 +683,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public String put(Object key, String value) {
 		String k = key.toString();
-		if (!defaults.contains(key)) {
-			defaults.put(k, value);
+		if (!defaults.containsKey(k)) {
+			defaults.setProperty(k, value);
 		}
 		String oldValue = get(key);
 		prefs.put(k, value);
