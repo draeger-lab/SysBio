@@ -120,6 +120,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 				}
 			}
 		}
+		init();
 	}
 
 	/**
