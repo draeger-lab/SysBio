@@ -7,41 +7,38 @@ package de.zbit.kegg.parser.pathway;
  */
 public class Graphics {
   /**
-   * 
+   * the label of this graphics object
    */
-  String name = "";
+  private String name = "";
   /**
-   * 
+   * the X axis position of this graphics object
    */
-  int x=0;
+  private int x=0;
   /**
-   * 
+   * the Y axis position of this graphics object
    */
-  int y=0;
+  private int y=0;
   /**
-   * 
+   * the shape of this graphics object
    */
-  String coords="";
+  private GraphicsType type = GraphicsType.rectangle;
   /**
-   * 
+   * the width of this graphics object
    */
-  GraphicsType type = GraphicsType.rectangle;
+  private int width=45;
   /**
-   * 
+   * the height of this graphics object
    */
-  int width=0;
+  private int height=17;
   /**
-   * 
+   * the foreground color used by this graphics object
    */
-  int height=0;
+  private String fgcolor="#000000";
   /**
-   * 
+   * the backgraound color used by this graphics object
+   * "=> for gene products"
    */
-  String fgcolor="#000000";
-  /**
-   * for gene products
-   */
-  String bgcolor = "#FFFFFF"; // "#BFFFBF"; 
+  private String bgcolor = "#FFFFFF"; // "#BFFFBF"; 
   
   /**
    * 
@@ -52,7 +49,7 @@ public class Graphics {
   
   /**
    * 
-   * @param isGeneProduct
+   * @param isGeneProduct - (EntryType==EntryType.gene)
    */
   public Graphics( boolean isGeneProduct) {
     this();
@@ -69,7 +66,7 @@ public class Graphics {
    * @param height
    * @param fgcolor
    * @param bgcolor
-   * @param isGeneProduct
+   * @param isGeneProduct - (EntryType==EntryType.gene)
    */
   public Graphics(String name, int x, int y, GraphicsType type, int width, int height, String fgcolor, String bgcolor, boolean isGeneProduct) {
     this(isGeneProduct);
@@ -84,23 +81,35 @@ public class Graphics {
   }
   
   /**
-   * 
+   * Returns true if and only if the background color has been set.
    * @return
+   */
+  public boolean isBGcolorSet() {
+    if (bgcolor!=null && bgcolor.length()>0 && !bgcolor.trim().equalsIgnoreCase("none"))
+      return true;
+    return false;
+  }
+  
+  /**
+   * The bgcolor attribute specifies the background color of this object. The default
+   * value is "#FFFFFF". The background color for the gene product is "#BFFFBF".
+   * @return Background color
    */
   public String getBgcolor() {
     return bgcolor;
   }
   
   /**
-   * 
-   * @return
+   * The coords attribute specifies a set of coordinates, x1,y1,x2,y2,..., for the line object.
+   * @return new String( x + "," + y + "," + (x+width)+ "," + (y+height) )
    */
   public String getCoords() {
-    return coords;
+    return x + "," + y + "," + (x+width)+ "," + (y+height);
   }
   
   /**
-   * 
+   * The fgcolor attribute specifies the foreground color of this object. It applies
+   * to the frame and the character string. The default value is "#000000".
    * @return
    */
   public String getFgcolor() {
@@ -108,7 +117,7 @@ public class Graphics {
   }
   
   /**
-   * 
+   * The height attribute specifies the height of this object. The default value is "17".
    * @return
    */
   public int getHeight() {
@@ -116,23 +125,40 @@ public class Graphics {
   }
   
   /**
-   *   
-   * @return
+   * The name attribute contains the label that is associated with this graphics object.
+   * When two or more name attributes are specified in the same entry element, the first
+   * one is taken as the attribute value. When the type attribute value of the entry element
+   * is "gene", the gene name is specified for this attribute value. 
+   * @return the label of this graphics object (e.g. "1.1.1.43" or "Methane metabolism")
    */
   public String getName() {
     return name;
   }
   
   /**
-   * 
-   * @return
+   * The type attribute specifies the shape of this object. The default value is "rectangle".
+   * <table style="" border="1">
+  <tbody><tr id="item"> <td id="a1">attribute value</td> <td id="a2">explanation</td> </tr>
+  <tr><td>rectangle</td>
+  <td>the shape is a rectangle, which is used to represent a gene product and its complex
+  (including an ortholog group).</td></tr>
+  <tr><td>circle</td>
+  <td>the shape is a circle, which is used to specify any other molecule such as a chemical
+  compound and a glycan.</td></tr>
+  <tr><td>roundrectangle</td>
+  <td>the shape is a round rectangle, which is used to represent a linked pathway.</td></tr>
+  <tr><td>line</td>
+  <td>the shape is a polyline, which is used to represent a reaction or a relation
+  (and also a gene or an ortholog group).</td></tr>
+  </tbody></table>
+   * @return GraphicsType
    */
   public GraphicsType getType() {
     return type;
   }
   
   /**
-   * 
+   * The width attribute specifies the width this object. The default value is "45".
    * @return
    */
   public int getWidth() {
@@ -140,7 +166,8 @@ public class Graphics {
   }
   
   /**
-   * 
+   * The x attribute specifies the x-coordinate value of this graphics object
+   * in the manually drawn KEGG pathway map.
    * @return
    */
   public int getX() {
@@ -148,7 +175,8 @@ public class Graphics {
   }
   
   /**
-   * 
+   * The y attribute specifies the y-coordinate value of this graphics object
+   * in the manually drawn KEGG pathway map.
    * @return
    */
   public int getY() {
@@ -156,19 +184,10 @@ public class Graphics {
   }
   
   /**
-   * 
    * @param bgcolor
    */
   public void setBgcolor(String bgcolor) {
     this.bgcolor = bgcolor;
-  }
-  
-  /**
-   * 
-   * @param coords
-   */
-  public void setCoords(String coords) {
-    this.coords = coords;
   }
   
   /**
@@ -226,5 +245,5 @@ public class Graphics {
   public void setY(int y) {
     this.y = y;
   }
-
+  
 }

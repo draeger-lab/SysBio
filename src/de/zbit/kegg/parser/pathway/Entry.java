@@ -125,8 +125,7 @@ public class Entry {
   }
   
   /**
-   * 
-   * @return
+   * @return true if and only if the node has children (i.e. if it is a group node).
    */
   public boolean hasComponents() {
     return (components!=null&&components.size()>0);
