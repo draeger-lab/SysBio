@@ -286,10 +286,37 @@ public class SBPreferences implements Map<Object, Object> {
 		if (!allDefaults.containsKey(path)) {
 			defaults = new Properties();
 			defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));
+			Set<String> options = new HashSet<String>();
+			Object fieldValue;
+			String k, v;
+			for (Field field : keyProvider.getFields()) {
+				try {
+					fieldValue = field.get(keyProvider);
+					if (fieldValue instanceof Option) {
+						k = fieldValue.toString();
+						if (defaults.getProperty(k) == null) {
+							throw new IllegalArgumentException(
+									String
+											.format(
+													"No default value available for option %s in file %s.",
+													k, path));
+						}
+						options.add(k);
+					}
+				} catch (Exception exc) {
+					// ignore non-static fields
+				}
+			}
 			for (Map.Entry<Object, Object> e : defaults.entrySet()) {
-				if (System.getProperties().containsKey(e.getValue())) {
-					defaults.setProperty(e.getKey().toString(), System
-							.getProperty(e.getValue().toString()));
+				k = e.getKey().toString();
+				v = e.getValue().toString();
+				if (!options.contains(k)) {
+					throw new IllegalArgumentException(String.format(
+							"No option %s defined by %s.", k, keyProvider
+									.getName()));
+				}
+				if (System.getProperties().containsKey(v)) {
+					defaults.setProperty(k, System.getProperty(v));
 				}
 			}
 			allDefaults.put(path, defaults);
@@ -561,6 +588,8 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 
 	/**
+	 * Creates an array of keys for all those key-value pairs for which the user
+	 * has already specified some values.
 	 * 
 	 * @return
 	 */
@@ -588,6 +617,32 @@ public class SBPreferences implements Map<Object, Object> {
 			set.add(key);
 		}
 		return set;
+	}
+
+	/**
+	 * Creates a complete set of all keys defined by this data structure, i.e.,
+	 * it creates a set of keys for those key-value pairs for which the user has
+	 * already specified some value and in addition it also adds all remaining
+	 * keys from the default configuration.
+	 * 
+	 * @return
+	 */
+	public Set<Object> keySetFull() {
+		Set<Object> set = keySet();
+		set.addAll(defaults.keySet());
+		return set;
+	}
+
+	/**
+	 * Creates a complete array of all keys defined by this data structure,
+	 * i.e., it creates a set of keys for those key-value pairs for which the
+	 * user has already specified some value and in addition it also adds all
+	 * remaining keys from the default configuration.
+	 * 
+	 * @return
+	 */
+	public Object[] keysFull() {
+		return keySetFull().toArray(new Object[0]);
 	}
 
 	/**
