@@ -28,6 +28,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Properties;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -38,7 +39,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.zbit.util.SBProperties;
+import de.zbit.gui.GUITools;
 
 /**
  * A specialized {@link JDialog} that shows several configuration options in a
@@ -75,9 +76,9 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 *            nothing.
 	 */
 	public static void main(String args[]) {
-		SettingsDialog d = new SettingsDialog("Properties");
-		if (d.showSettingsDialog(new SBProperties()) == APPROVE_OPTION) {
-			System.out.printf("Approve:\t%s\n", d.getProperties());
+		SettingsDialog d = new SettingsDialog("Preferences");
+		if (d.showSettingsDialog() == APPROVE_OPTION) {
+			System.out.printf("Approve:\t%s\n");
 		} else {
 			System.out.println("Cancel");
 		}
@@ -98,11 +99,6 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * be available on this {@link SettingsPanel}.
 	 */
 	private SettingsPanel panelAllSettings;
-
-	/**
-	 * The current {@link Properties} including the current defaults.
-	 */
-	private SBProperties properties;
 
 	/**
 	 * Creates a new {@link SettingsDialog} with the given parent element and
@@ -151,37 +147,24 @@ public class SettingsDialog extends JDialog implements ActionListener,
 				|| ae.getActionCommand().equals(CANCEL)) {
 			dispose();
 		} else if (ae.getActionCommand().equals(DEFAULTS)) {
-			SBProperties p = (SBProperties) properties.clone();
-			properties.putAll(properties.getDefaults());
-			panelAllSettings.setProperties(properties);
-			properties = p;
+			panelAllSettings.restoreDefaults();
 			apply.setEnabled(true);
 			ok.setEnabled(true);
 			defaults.setEnabled(false);
-			panelAllSettings.addChangeListener(this);
-			panelAllSettings.addItemListener(this);
-			panelAllSettings.addKeyListener(this);
 			validate();
 		} else if (ae.getActionCommand().equals(APPLY)
 				|| ae.getActionCommand().equals(OK)) {
-			properties.putAll(panelAllSettings.getProperties());
-			apply.setEnabled(false);
-			exitStatus = APPROVE_OPTION;
+			try {
+				panelAllSettings.persist();
+				apply.setEnabled(false);
+				exitStatus = APPROVE_OPTION;
+			} catch (BackingStoreException exc) {
+				GUITools.showErrorMessage(this, exc);
+			}
 			if (ae.getActionCommand().equals(OK)) {
 				dispose();
 			}
 		}
-	}
-
-	/**
-	 * Method to retrieve all current properties of this element, i.e., after
-	 * interaction with the user.
-	 * 
-	 * @return A pointer to this {@link SettingsDialog}'s current
-	 *         {@link Properties}.
-	 */
-	public SBProperties getProperties() {
-		return properties;
 	}
 
 	/**
@@ -203,7 +186,7 @@ public class SettingsDialog extends JDialog implements ActionListener,
 		defaults = new JButton("Defaults");
 		defaults.addActionListener(this);
 		defaults.setActionCommand(DEFAULTS);
-		defaults.setEnabled(!properties.equals(properties.getDefaults()));
+		defaults.setEnabled(!panel.isDefaultConfiguration());
 		JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(this);
 		cancel.setActionCommand(CANCEL);
@@ -276,19 +259,23 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * available, no tabs will be displayed, the element will be directly added
 	 * to this element's content pane.
 	 * 
-	 * @param properties
-	 *            The current properties.
 	 * @return {@link #APPROVE_OPTION} if the dialog was closed by clicking its
 	 *         OK button. In this case it makes sense to call the
 	 *         {@link #getProperties()} method to obtain all properties as set
 	 *         by the user.
 	 */
-	public boolean showSettingsDialog(SBProperties properties) {
-		SettingsTabbedPane pane = new SettingsTabbedPane(properties);
-		if (pane.getSettingsPanelCount() == 1) {
-			return showSettingsDialog(pane.getSettingsPanelAt(0));
+	public boolean showSettingsDialog() {
+		SettingsTabbedPane pane;
+		try {
+			pane = new SettingsTabbedPane();
+			if (pane.getSettingsPanelCount() == 1) {
+				return showSettingsDialog(pane.getSettingsPanelAt(0));
+			}
+			return showSettingsDialog(pane);
+		} catch (Exception exc) {
+			GUITools.showErrorMessage(this, exc);
+			return false;
 		}
-		return showSettingsDialog(pane);
 	}
 
 	/**
@@ -304,7 +291,6 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 *         by the user.
 	 */
 	public boolean showSettingsDialog(SettingsPanel panel) {
-		this.properties = panel.getProperties();
 		this.exitStatus = CANCEL_OPTION;
 		init(panel);
 		pack();

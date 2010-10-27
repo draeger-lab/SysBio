@@ -18,11 +18,12 @@
  */
 package de.zbit.gui.cfg;
 
-import java.awt.GridLayout;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
 import javax.swing.JPanel;
@@ -32,7 +33,7 @@ import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.GUITools;
 import de.zbit.util.Reflect;
-import de.zbit.util.SBProperties;
+import de.zbit.util.SBPreferences;
 
 /**
  * A {@link JPanel} containing a {@link JTabbedPane} with several options for
@@ -68,9 +69,14 @@ public class SettingsTabbedPane extends SettingsPanel {
 	 * 
 	 * @param properties
 	 * @param defaultProperties
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public SettingsTabbedPane(SBProperties properties) {
-		super(properties);
+	public SettingsTabbedPane() throws InvalidPropertiesFormatException,
+			IOException {
+		super();
 	}
 
 	/*
@@ -80,14 +86,7 @@ public class SettingsTabbedPane extends SettingsPanel {
 	 */
 	@Override
 	public boolean accepts(Object key) {
-		if ((tab != null) && (tab.getTabCount() > 0)) {
-			boolean accepts = false;
-			for (int i = 0; i < tab.getTabCount(); i++) {
-				accepts |= getSettingsPanelAt(i).accepts(key);
-			}
-			return accepts;
-		}
-		return true;
+		return false;
 	}
 
 	/*
@@ -97,6 +96,7 @@ public class SettingsTabbedPane extends SettingsPanel {
 	 * org.sbml.squeezer.gui.SettingsPanel#addChangeListener(javax.swing.event
 	 * .ChangeListener)
 	 */
+	@Override
 	public void addChangeListener(ChangeListener listener) {
 		for (int i = 0; i < tab.getComponentCount(); i++) {
 			getSettingsPanelAt(i).addChangeListener(listener);
@@ -109,6 +109,7 @@ public class SettingsTabbedPane extends SettingsPanel {
 	 * @seeorg.sbml.squeezer.gui.SettingsPanel#addItemListener(java.awt.event.
 	 * ItemListener)
 	 */
+	@Override
 	public void addItemListener(ItemListener listener) {
 		for (int i = 0; i < tab.getComponentCount(); i++) {
 			getSettingsPanelAt(i).addItemListener(listener);
@@ -125,19 +126,6 @@ public class SettingsTabbedPane extends SettingsPanel {
 		for (int i = 0; i < tab.getComponentCount(); i++) {
 			getSettingsPanelAt(i).addKeyListener(listener);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.sbml.squeezer.gui.SettingsPanel#getProperties()
-	 */
-	@Override
-	public SBProperties getProperties() {
-		for (int i = 0; i < tab.getComponentCount(); i++) {
-			this.properties.putAll(getSettingsPanelAt(i).getProperties());
-		}
-		return properties;
 	}
 
 	/**
@@ -175,7 +163,7 @@ public class SettingsTabbedPane extends SettingsPanel {
 	 */
 	@Override
 	public String getTitle() {
-		return "All settings";
+		return "User preferences";
 	}
 
 	/*
@@ -191,10 +179,8 @@ public class SettingsTabbedPane extends SettingsPanel {
 			if (!classes[i].equals(getClass())) {
 				try {
 					Class<SettingsPanel> c = classes[i];
-					Constructor<SettingsPanel> con = c
-							.getConstructor(properties.getClass());
-					settingsPanel = con.newInstance(properties);
-
+					Constructor<SettingsPanel> con = c.getConstructor();
+					settingsPanel = con.newInstance();
 					tab.addTab(settingsPanel.getTitle(), new JScrollPane(
 							settingsPanel,
 							JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -206,6 +192,17 @@ public class SettingsTabbedPane extends SettingsPanel {
 		}
 		this.add(tab);
 		addItemListener(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.cfg.SettingsPanel#loadPreferences()
+	 */
+	@Override
+	protected SBPreferences loadPreferences()
+			throws InvalidPropertiesFormatException, IOException {
+		return null;
 	}
 
 	/*
@@ -224,32 +221,16 @@ public class SettingsTabbedPane extends SettingsPanel {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.sbml.squeezer.gui.SettingsPanel#setProperties(java.util.Properties)
+	 * @see de.zbit.gui.cfg.SettingsPanel#isDefaultConfiguration()
 	 */
 	@Override
-	public void setProperties(Properties properties) {
-		int tabIndex = 0;
-		if (tab != null) {
-			tabIndex = getSelectedIndex();
-			removeAll();
-			setLayout(new GridLayout(1, 1));
-		}
-		this.properties = new SBProperties(getDefaultProperties());
-		if (!this.properties.isSetDefaults()
-				|| (this.properties.getDefaults().isEmpty())) {
-			if (properties instanceof SBProperties) {
-				this.properties.setDefaults(((SBProperties) properties)
-						.getDefaults());
-			} else {
-				this.properties.setDefaults(properties);
+	public boolean isDefaultConfiguration() {
+		for (int i = 0; i < getSettingsPanelCount(); i++) {
+			if (!getSettingsPanelAt(i).isDefaultConfiguration()) {
+				return false;
 			}
 		}
-		this.properties.putAll(properties);
-		init();
-		if (tabIndex < tab.getComponentCount()) {
-			setSelectedIndex(tabIndex);
-		}
+		return true;
 	}
 
 	/**

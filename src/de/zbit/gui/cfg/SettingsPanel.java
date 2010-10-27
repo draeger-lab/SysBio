@@ -23,14 +23,20 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.zbit.util.SBPreferences;
 import de.zbit.util.SBProperties;
 
 /**
@@ -68,13 +74,20 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * A list of {@link ChangeListener}s to be notified in case that values
 	 * change on this {@link SettingsPanel}.
 	 */
-	private List<ChangeListener> changeListeners;
+	private final List<ChangeListener> changeListeners;
 	/**
 	 * A list of {@link ItemListener}s to be notified when switching items on
 	 * this {@link SettingsPanel}.
 	 */
-	private List<ItemListener> itemListeners;
+	private final List<ItemListener> itemListeners;
 
+	/**
+	 * These are the persistently saved user-preferences of which some ore all
+	 * elements are possibly to be changed in this panel. But only if the user
+	 * wants. Hence, we have to first manipulate the field {@link #properties}
+	 * and can maybe persist these changes.
+	 */
+	protected SBPreferences preferences;
 	/**
 	 * The settings to be changed by the user including default settings as a
 	 * backup.
@@ -88,16 +101,25 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 *            The current user properties. These will be filtered to contain
 	 *            only accepted elements. Access to other elements is possible
 	 *            by overriding {@link #initConstantFields(Properties)}.
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 * @see #accepts(Object)
 	 */
-	public SettingsPanel(SBProperties properties) {
+	public SettingsPanel() throws InvalidPropertiesFormatException, IOException {
 		super();
-		if (!properties.isSetDefaults()) {
-			properties.setDefaults((Properties) properties.clone());
-		}
 		changeListeners = new LinkedList<ChangeListener>();
 		itemListeners = new LinkedList<ItemListener>();
-		setProperties(properties);
+		properties = new SBProperties(new Properties());
+		preferences = loadPreferences();
+		if (preferences != null) {
+			for (String key : preferences.keys()) {
+				if (accepts(key)) {
+					properties.setProperty(key, preferences.get(key));
+					properties.getDefaults().setProperty(key,
+							preferences.getDefault(key));
+				}
+			}
+		}
 	}
 
 	/**
@@ -185,24 +207,19 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	public abstract void init();
 
 	/**
-	 * This method allows an implementing class to extract key-value pairs from
-	 * the given properties to set the values of non-modifiable elements. For
-	 * instance, the default open directory for certain file types may not be
-	 * set in this {@link SettingsPanel}, but the path to this directory may be
-	 * required for something else. To avoid writing conflicts, all key-value
-	 * pairs that may cause clashes are removed from the current properties
-	 * using the {@link #accepts(Object)} method. Hence, the field
-	 * {@link #properties} may not contain other important data. In this method
-	 * it is possible to extract these. In the default case, this method will be
-	 * an empty method. If you want to extract other fields, just override this
-	 * method.
+	 * Method to test whether the current properties equal the default
+	 * configuration.
 	 * 
-	 * @param properties
-	 *            The originally given {@link Properties} before filtering.
+	 * @return true if the values of all current properties equal the values of
+	 *         the defaults.
 	 */
-	public void initConstantFields(Properties properties) {
-		// Empty implementation provided so that implementing classes
-		// are not forced to implement this method.
+	public boolean isDefaultConfiguration() {
+		for (Entry<Object, Object> e : properties.entrySet()) {
+			if (!e.getValue().equals(properties.getDefaults().get(e.getKey()))) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/*
@@ -251,6 +268,24 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	}
 
 	/**
+	 * 
+	 * @return
+	 * @throws InvalidPropertiesFormatException
+	 * @throws IOException
+	 */
+	protected abstract SBPreferences loadPreferences()
+			throws InvalidPropertiesFormatException, IOException;
+
+	/**
+	 * 
+	 * @throws BackingStoreException
+	 */
+	public void persist() throws BackingStoreException {
+		preferences.putAll(properties);
+		preferences.flush();
+	}
+
+	/**
 	 * Removes the given {@link ChangeListener} from the list of this kind of
 	 * listeners in this object.
 	 * 
@@ -279,7 +314,8 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * re-initializes the graphical user interface.
 	 */
 	public void restoreDefaults() {
-		setProperties((Properties) getDefaultProperties().clone());
+		setProperties(preferences != null ? preferences.getDefaults()
+				: new Properties());
 	}
 
 	/**
@@ -289,21 +325,18 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * pairs from the given {@link Properties} by overriding the method
 	 * {@link #initConstantFields(Properties)}.
 	 * 
-	 * @param properties
+	 * @param map
 	 *            All available current properties of the user.
 	 * @see #accepts(Object)
 	 */
-	public void setProperties(Properties properties) {
-		this.properties = new SBProperties(getDefaultProperties());
-		for (Object key : properties.keySet()) {
+	public void setProperties(Map<Object, Object> map) {
+		for (Object key : map.keySet()) {
 			if (accepts(key)) {
-				this.properties.put(key, properties.get(key));
+				this.properties.setProperty(key.toString(), map.get(key)
+						.toString());
 			}
 		}
-		if (!this.properties.isSetDefaults()) {
-			this.properties.setDefaults((Properties) this.properties.clone());
-		}
-		initConstantFields(properties);
+		removeAll();
 		init();
 	}
 
