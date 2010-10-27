@@ -112,11 +112,13 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 		properties = new SBProperties(new Properties());
 		preferences = loadPreferences();
 		if (preferences != null) {
-			for (String key : preferences.keys()) {
+			String k;
+			for (Object key : preferences.keySetFull()) {
 				if (accepts(key)) {
-					properties.setProperty(key, preferences.get(key));
-					properties.getDefaults().setProperty(key,
-							preferences.getDefault(key));
+					k = key.toString();
+					properties.setProperty(k, preferences.get(k));
+					properties.getDefaults().setProperty(k,
+							preferences.getDefault(k));
 				}
 			}
 		}
