@@ -98,6 +98,11 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     }
     realRet = removeUnnecessaryInfos(realRet);
     
+    // For Debugging
+    //for (int i=0; i<ids.length; i++) {
+    //  System.out.println(ids[i] + ": '" + realRet[i].substring(0, 50).replace("\n", "|").replaceAll(" +", " ")+"'");
+    //}
+    
     return realRet;
   }
 

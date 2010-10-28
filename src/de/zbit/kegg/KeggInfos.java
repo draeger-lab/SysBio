@@ -246,7 +246,7 @@ public class KeggInfos {
 	}
 
 	/**
-	 * Please use 'KeggInfos(String Kegg_ID, KeggInfoManagement info)' if
+	 * Please use {@link #KeggInfos(String, KeggInfoManagement)} if
 	 * possible.
 	 */
 	public KeggInfos(String Kegg_ID) {
@@ -254,10 +254,11 @@ public class KeggInfos {
 	}
 
 	/**
-	 * Please use 'KeggInfos(String Kegg_ID, KeggInfoManagement info)' if
+	 * Please use {@link #KeggInfos(String, KeggInfoManagement)} if
 	 * possible.
 	 */
 	public KeggInfos(String Kegg_ID, KeggAdaptor adap) {
+	  super();
 		this.Kegg_ID = Kegg_ID;
 		// this.adap = adap;
 
@@ -271,6 +272,7 @@ public class KeggInfos {
 	 * @param info
 	 */
 	public KeggInfos(String Kegg_ID, KeggInfoManagement info) {
+	  super();
 		this.Kegg_ID = Kegg_ID;
 
 		informationFromKeggAdaptor = info.getInformation(Kegg_ID);
@@ -617,8 +619,7 @@ public class KeggInfos {
    * 
    */
 	private void parseInfos() {
-		String infos = informationFromKeggAdaptor; // Create a shorter variable
-		// name ;-)
+		String infos = informationFromKeggAdaptor; // Create a shorter variable name ;-)
 		if (infos != null && infos.trim().length() == 0)
 			infos = null;
 		if (infos == null) {

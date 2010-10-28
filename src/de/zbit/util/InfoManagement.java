@@ -36,6 +36,17 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   private int maxListSize; // Unfortunately serialized in many instances. Don't rename it.
   private boolean cacheChangedSinceLastLoading=false;
   
+  /**
+   * Version number of this java class.
+   */
+  private final static int latestVersion=1;
+  
+  /**
+   * Allows to change older caches (when reading serialized files)
+   * if the version number changed.
+   */
+  private int version=latestVersion;
+  
   public InfoManagement() {
     this(100000);
   }
@@ -358,7 +369,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
           cacheChangedSinceLastLoading=true;
         } else {
           for (int i=0; i<ids.length; i++) {
-            if (ids[i]!=null && !ids[i].equals("") && ret[i]==null) {
+            if (ret[i]==null && ids[i]!=null && !ids[i].equals("")) {
               unsuccessfulQueries.add(ids[i]);
               cacheChangedSinceLastLoading=true;
             }
@@ -539,12 +550,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     if (infos==null) return;
     
     // Free enough cache for them
-    if (isCacheFull())
+    if (isCacheFull()) {
       freeCache(Math.max(infos.length, maxListSize/100));
+    }
     
     // Add retrieved infos
-    for (int i=0; i<infos.length; i++)
-      if (infos[i]!=null && ids[i]!=null) addInformation(ids[i], infos[i]);
+    for (int i=0; i<infos.length; i++) {
+      if (infos[i]!=null && filtIDs[i]!=null) addInformation(filtIDs[i], infos[i]);
+    }
     
   }
   
@@ -678,6 +691,15 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     
     restoreUnserializableObject();
     cacheChangedSinceLastLoading=false;
+    
+    // Eventually change old file for compatibility with latest release
+    if (version!=latestVersion) {
+      if (version<1) {
+        clearCache();
+      }
+      
+      version=latestVersion;
+    }
   }
   
 }
