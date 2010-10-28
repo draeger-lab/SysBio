@@ -44,6 +44,9 @@ public class SBPreferences implements Map<Object, Object> {
 		 * 
 		 */
 		private final Object key;
+		/**
+		 * 
+		 */
 		private Object value;
 
 		/**
@@ -141,7 +144,121 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 		// create the parser and specify the allowed options ...
 		ArgParser parser = new ArgParser(usage);
+		Map<Option, Object> options = configureArgParser(parser,
+				new HashMap<Option, Object>(), keyProvider, props, defaults);
+		parser.matchAllArgs(args);
+		putAll(props, options);
+		return props;
+	}
+
+	/**
+	 * 
+	 * @param keyProvider
+	 * @param relPath
+	 * @param usage
+	 * @param args
+	 * @return
+	 */
+	public static final SBProperties analyzeCommandLineArguments(
+			Class<?> keyProvider, String relPath, String usage, String args[]) {
+		try {
+			return analyzeCommandLineArguments(keyProvider, relPath, false,
+					usage, args);
+		} catch (Exception e) {
+			// This can actually never happen because we don't persist anything.
+			return new SBProperties();
+		}
+	}
+
+	/**
+	 * 
+	 * @param defFileAndKeys
+	 *            This {@link Map} is supposed to contain the relative paths of
+	 *            the configuration files with default preferences as key and
+	 *            each corresponding value must be a keyProvider, i.e., some
+	 *            {@link Class} object that contains as many static final fields
+	 *            of {@link Option} instances as the corresponding defaults
+	 *            option file contains entries.
+	 * @param usage
+	 *            A String describing how to invoke the class that is calling
+	 *            this method.
+	 * @param args
+	 *            The given command line arguments.
+	 * @return
+	 */
+	public static final SBProperties analyzeCommandLineArguments(
+			Map<String, Class<?>> defFileAndKeys, String usage, String args[]) {
+		SBProperties props = new SBProperties(new Properties());
+		ArgParser parser = new ArgParser(usage);
 		Map<Option, Object> options = new HashMap<Option, Object>();
+		SBPreferences prefs[] = new SBPreferences[defFileAndKeys.size()];
+
+		// Configure argument parser by passing all possible option definitions
+		// to it.
+		int i = 0;
+		for (Map.Entry<String, Class<?>> entry : defFileAndKeys.entrySet()) {
+			try {
+				prefs[i] = getPreferencesFor(entry.getValue(), entry.getKey());
+				options.putAll(configureArgParser(parser,
+ options,
+ entry
+						.getValue(), props, loadDefaults(entry.getValue(),
+						entry.getKey())));
+			} catch (Exception e) {
+				Exception exc = new Exception(String.format(
+										"Could not load properties for %s from config file %s.",
+										entry.getValue(), entry.getKey()),
+						e);
+				exc.printStackTrace();
+			} finally {
+				i++;
+			}
+		}
+
+		// Do the actual parsing
+		parser.matchAllArgs(args);
+		putAll(props, options);
+
+		// Now all command line arguments must be made persistent:
+		String k, property, value;
+		for (i = 0; i < prefs.length; i++) {
+			for (Object key : prefs[i].keySetFull()) {
+				k = key.toString();
+				if (props.containsKey(k)) {
+					property = props.getProperty(k);
+					value = prefs[i].get(k);
+					if (!value.equals(property)) {
+						prefs[i].put(k, property);
+					}
+				}
+			}
+			try {
+				prefs[i].flush();
+			} catch (BackingStoreException e) {
+				Exception exc = new Exception(
+						String
+								.format(
+										"Could not persistently store the user configuration for %s.",
+										prefs[i].getKeyProvider().getName()), e);
+				exc.printStackTrace();
+			}
+		}
+
+		return props;
+	}
+
+	/**
+	 * 
+	 * @param parser
+	 * @param options
+	 * @param keyProvider
+	 * @param props
+	 * @param defaults
+	 * @return
+	 */
+	private static Map<Option, Object> configureArgParser(ArgParser parser,
+			Map<Option, Object> options, Class<?> keyProvider,
+			SBProperties props, Map<Object, Object> defaults) {
 		Object fieldValue, argHolder;
 		Option option;
 		String k;
@@ -182,49 +299,7 @@ public class SBPreferences implements Map<Object, Object> {
 				// Just ignore...
 			}
 		}
-		parser.matchAllArgs(args);
-		for (Option key : options.keySet()) {
-			k = key.toString();
-			if (key.getRequiredType().equals(Float.class)) {
-				props.put(k, ((FloatHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Double.class)) {
-				props.put(k, ((DoubleHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Short.class)) {
-				props.put(key, (short) ((IntHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Integer.class)) {
-				props.put(k, ((IntHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Long.class)) {
-				props.put(k, ((LongHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Boolean.class)) {
-				props.put(k, ((BooleanHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(Character.class)) {
-				props.put(k, ((CharHolder) options.get(key)).value);
-			} else if (key.getRequiredType().equals(String.class)) {
-				props.put(k, ((StringHolder) options.get(key)).value);
-			} else {
-				props.put(k, ((ObjectHolder) options.get(key)).value);
-			}
-		}
-		return props;
-	}
-
-	/**
-	 * 
-	 * @param keyProvider
-	 * @param relPath
-	 * @param usage
-	 * @param args
-	 * @return
-	 */
-	public static final SBProperties analyzeCommandLineArguments(
-			Class<?> keyProvider, String relPath, String usage, String args[]) {
-		try {
-			return analyzeCommandLineArguments(keyProvider, relPath, false,
-					usage, args);
-		} catch (Exception e) {
-			// This can actually never happen because we don't persist anything.
-			return new SBProperties();
-		}
+		return options;
 	}
 
 	/**
@@ -242,45 +317,18 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 
 	/**
-	 * The default values that cannot change!
-	 * 
-	 */
-	private Properties defaults;
-
-	/**
-	 * Some {@link Class} that contains a certain number of static {@link Field}
-	 * objects of type {@link Option} and whose class name is used to address
-	 * the node in the user preferences to persist all key-value pairs of user
-	 * settings.
-	 */
-	private final Class<?> keyProvider;
-
-	/**
-	 * User-defined values that may change and may be stored persistently.
-	 */
-	private final Preferences prefs;
-
-	/**
+	 * Parses the configuration file with defaults values or loads the defaults
+	 * from memory.
 	 * 
 	 * @param keyProvider
-	 *            A class that should contain instances of {@link Option}
-	 *            defined as public static field members. The package name of
-	 *            this class identifies precisely the location of the
-	 *            user-specific settings.
 	 * @param relPath
-	 *            A {@link String} that specifies a relative path to a resource
-	 *            that can be parsed by {@link Properties} class and must
-	 *            contain all default values corresponding to the {@link Option}
-	 *            instances defined in the keyProvider. For instance,
-	 *            "cfg/MyConf.xml" if cfg is the name of a package relative to
-	 *            the keyProvider class.
+	 * @return
 	 * @throws InvalidPropertiesFormatException
 	 * @throws IOException
 	 */
-	public SBPreferences(Class<?> keyProvider, String relPath)
+	private static Properties loadDefaults(Class<?> keyProvider, String relPath)
 			throws InvalidPropertiesFormatException, IOException {
-		this.keyProvider = keyProvider;
-		this.prefs = Preferences.userNodeForPackage(keyProvider);
+		Properties defaults;
 		String path = keyProvider.getPackage().getName().replace('.', '/')
 				+ '/' + relPath;
 		if (!allDefaults.containsKey(path)) {
@@ -323,6 +371,103 @@ public class SBPreferences implements Map<Object, Object> {
 		} else {
 			defaults = allDefaults.get(path);
 		}
+		return defaults;
+	}
+
+	/**
+	 * Convenient method to put all values gathered from a command line into an
+	 * {@link SBProperties} table.
+	 * 
+	 * @param props
+	 *            The {@link SBProperties} where to put all the values from the
+	 *            value holders in the given {@link Map} data structure.
+	 * @param options
+	 *            A map between {@link Option} instances and {@link ArgParser}
+	 *            holders for the desired values.
+	 */
+	private static void putAll(SBProperties props, Map<Option, Object> options) {
+		String k, v, value;
+		for (Option key : options.keySet()) {
+			k = key.toString();
+			if (key.getRequiredType().equals(Float.class)) {
+				value = Float.toString(((FloatHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Double.class)) {
+				value = Double
+						.toString(((DoubleHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Short.class)) {
+				value = Short
+						.toString((short) ((IntHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Integer.class)) {
+				value = Integer.toString(((IntHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Long.class)) {
+				value = Long.toString(((LongHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Boolean.class)) {
+				value = Boolean
+						.toString(((BooleanHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(Character.class)) {
+				value = Character
+						.toString(((CharHolder) options.get(key)).value);
+			} else if (key.getRequiredType().equals(String.class)) {
+				value = ((StringHolder) options.get(key)).value;
+			} else {
+				value = ((ObjectHolder) options.get(key)).value.toString();
+			}
+			if (props.isSetDefaults()) {
+				v = props.getProperty(k);
+				if (v == null) {
+					throw new IllegalArgumentException(String.format(
+							"No default value defined for property %s.", k));
+				}
+				if (!v.equals(value)) {
+					props.setProperty(k, value);
+				}
+			} else {
+				props.setProperty(k, value);
+			}
+		}
+	}
+
+	/**
+	 * The default values that cannot change!
+	 * 
+	 */
+	private Properties defaults;
+
+	/**
+	 * Some {@link Class} that contains a certain number of static {@link Field}
+	 * objects of type {@link Option} and whose class name is used to address
+	 * the node in the user preferences to persist all key-value pairs of user
+	 * settings.
+	 */
+	private final Class<?> keyProvider;
+
+	/**
+	 * User-defined values that may change and may be stored persistently.
+	 */
+	private final Preferences prefs;
+
+	/**
+	 * 
+	 * @param keyProvider
+	 *            A class that should contain instances of {@link Option}
+	 *            defined as public static field members. The package name of
+	 *            this class identifies precisely the location of the
+	 *            user-specific settings.
+	 * @param relPath
+	 *            A {@link String} that specifies a relative path to a resource
+	 *            that can be parsed by {@link Properties} class and must
+	 *            contain all default values corresponding to the {@link Option}
+	 *            instances defined in the keyProvider. For instance,
+	 *            "cfg/MyConf.xml" if cfg is the name of a package relative to
+	 *            the keyProvider class.
+	 * @throws InvalidPropertiesFormatException
+	 * @throws IOException
+	 */
+	public SBPreferences(Class<?> keyProvider, String relPath)
+			throws InvalidPropertiesFormatException, IOException {
+		this.keyProvider = keyProvider;
+		this.prefs = Preferences.userNodeForPackage(keyProvider);
+		this.defaults = loadDefaults(keyProvider, relPath);
 	}
 
 	/**
