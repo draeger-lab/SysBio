@@ -41,9 +41,9 @@ public class Graphics {
   private String bgcolor = "#FFFFFF"; // "#BFFFBF"; 
   
   /**
-   * 
+   * Should not be public, because isGeneProduct information is important!
    */
-  public Graphics(){
+  private Graphics(){
     super();
   }
   
@@ -54,6 +54,17 @@ public class Graphics {
   public Graphics( boolean isGeneProduct) {
     this();
     if (isGeneProduct) bgcolor = "#BFFFBF"; // Default for gene product
+  }
+  
+  /**
+   * Create a new graphics object, based on the given entry.
+   * Does NOT set this graphics as the graphics object of e and
+   * does NOT consider any other graphics object that may already
+   * belong to e.
+   * @param e
+   */
+  public Graphics(Entry e) {
+    this(e.getType()==EntryType.gene || e.getType()==EntryType.genes);
   }
   
   /**

@@ -218,15 +218,8 @@ public class Option {
 	}
 
 	/**
-	 * @return the rangeSpec
-	 */
-	public String getRangeSpec() {
-		return rangeSpec;
-	}
-
-	/**
 	 * 
-	 * @return
+	 * @return the rangeSpec
 	 */
 	public String getRangeSpecifiaction() {
 		return rangeSpec;

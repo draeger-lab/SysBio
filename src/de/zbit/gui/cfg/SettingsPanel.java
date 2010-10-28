@@ -21,7 +21,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +32,10 @@ import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.AbstractButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -42,6 +46,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.util.Option;
 import de.zbit.util.SBPreferences;
 import de.zbit.util.SBProperties;
 
@@ -400,7 +405,104 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	    }
 	}
     }
+	
+	/**
+	 * Automatically builds an option panel, based on the static
+	 * Option fields of the preferences.keyProvider.
+	 * 
+	 * @return all options that could not automatically
+	 * be converted into a JComponent.
+	 */
+	public List<Option> autoBuildPanel() {
+	  List<Option> unprocessedOptions = new LinkedList<Option>();
+	  Class<?> keyProvider = preferences.getKeyProvider();
+	  
+	  for (Field field : keyProvider.getDeclaredFields()) {
+	    try {
+	      Object fieldValue = field.get(keyProvider);
+	      if (fieldValue instanceof Option) {
+	        Option o = (Option) fieldValue;
+	        
+	        // Create swing option based on field type
+	        JComponent jc = getJComponentForOption(o);
+	        if (jc!=null) {
+	          add(jc);
+	        } else {
+	          // Remember unprocessed options
+	          unprocessedOptions.add(o);
+	        }
+	        
+	      }
+	    } catch (Exception exc) {
+	      // ignore non-static fields
+	    }
+	  }
+	  
+	  return unprocessedOptions;
+	}
+	
+	/**
+	 * Automatically generates a JComponent for the given option.
+	 * This includes:<ul>
+	 * <li>Setting the text</li>
+	 * <li>Setting the name</li>
+	 * <li>Setting the tooltiptext</li>
+	 * <li>Setting the default value</li>
+	 * <li>Adding this panel as item-listener</li>
+	 * </ul>
+	 * 
+	 * @param o - option to build the JComponent for.
+	 * @return JComponent or NULL if the getRequiredType()
+	 * is unknown.
+	 */
+	public JComponent getJComponentForOption(Option o) {
+	  // Create swing option based on field type
+	  JComponent jc = null;
+	  if (o.getRequiredType() == Boolean.class) {
+	    jc = new JCheckBox();
+	  } else if (o.getRequiredType() == File.class) {
+	    // TODO: Implement this
+      // XXX: Is it possible to store the extension or
+      // "only directories" in o.getRangeSpecifiaction()?
+    } else if (o.getRequiredType() == Character.class) {
+      // TODO: Implement this
+      // don't forget to check o.getRangeSpecifiaction()
+    } else if (o.getRequiredType() == String.class) {
+      // TODO: Implement this
+      // don't forget to check o.getRangeSpecifiaction()
+    } else if (o.getRequiredType() == Number.class) {
+      // TODO: Implement this double, short, int, etc.
+      // don't forget to check o.getRangeSpecifiaction()
+    }
+    
+    // Check if the option could be converted to a JComponent
+    if (jc!=null) {
+      if (jc instanceof AbstractButton) {
+        ((AbstractButton)jc).setText(formatOptionName(o.getOptionName()));
+        ((AbstractButton)jc).setSelected(Boolean.parseBoolean(properties.get(o.getOptionName()).toString()));
+        ((AbstractButton)jc).addItemListener(this);
+      }
+      jc.setName(o.getOptionName());
+      jc.setToolTipText(o.getDescription());
+    }
+    
+    return jc;
+	}
 
+	/**
+	 * Changes an optionName by replacing all underscores with a space,
+	 * setting the whole string to lowercase and changing the first letter
+	 * to uppercase. E.g. "REMOVE_ORPHANS" => "Remove orphans"
+   * @param optionName
+   * @return reformatted option string
+   */
+  private static String formatOptionName(String optionName) {
+    String ret = optionName;
+    ret = ret.replace("_", " ");
+    ret = ret.toLowerCase().trim();
+    ret = Character.toUpperCase(ret.charAt(0)) + ret.substring(1);
+    return ret;
+  }
     /*
      * (non-Javadoc)
      * @see
