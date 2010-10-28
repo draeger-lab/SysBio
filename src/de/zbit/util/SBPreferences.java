@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -97,14 +96,12 @@ public class SBPreferences implements Map<Object, Object> {
      * @param usage
      * @param args
      * @return
-     * @throws InvalidPropertiesFormatException
      * @throws IOException
      * @throws BackingStoreException
      */
     public static final SBProperties analyzeCommandLineArguments(
 	Class<?> keyProvider, String relPath, boolean persist, String usage,
-	String args[]) throws InvalidPropertiesFormatException, IOException,
-	BackingStoreException {
+	String args[]) throws IOException, BackingStoreException {
 	SBPreferences prefs = getPreferencesFor(keyProvider, relPath);
 	return prefs.analyzeCommandLineArguments(usage, args, persist);
     }
@@ -296,10 +293,9 @@ public class SBPreferences implements Map<Object, Object> {
      * @param relPath
      * @return
      * @throws IOException
-     * @throws InvalidPropertiesFormatException
      */
     public static SBPreferences getPreferencesFor(Class<?> keyProvider,
-	String relPath) throws InvalidPropertiesFormatException, IOException {
+	String relPath) throws IOException {
 	return new SBPreferences(keyProvider, relPath);
     }
 
@@ -310,11 +306,10 @@ public class SBPreferences implements Map<Object, Object> {
      * @param keyProvider
      * @param relPath
      * @return
-     * @throws InvalidPropertiesFormatException
      * @throws IOException
      */
     private static Properties loadDefaults(Class<?> keyProvider, String relPath)
-	throws InvalidPropertiesFormatException, IOException {
+	throws IOException {
 	Properties defaults;
 	String path = keyProvider.getPackage().getName().replace('.', '/')
 		+ '/' + relPath;
@@ -445,11 +440,10 @@ public class SBPreferences implements Map<Object, Object> {
      *        instances defined in the keyProvider. For instance,
      *        "cfg/MyConf.xml" if cfg is the name of a package relative to
      *        the keyProvider class.
-     * @throws InvalidPropertiesFormatException
      * @throws IOException
      */
     public SBPreferences(Class<?> keyProvider, String relPath)
-	throws InvalidPropertiesFormatException, IOException {
+	throws IOException {
 	this.keyProvider = keyProvider;
 	this.prefs = Preferences.userNodeForPackage(keyProvider);
 	this.defaults = loadDefaults(keyProvider, relPath);
