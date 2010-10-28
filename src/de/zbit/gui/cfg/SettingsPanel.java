@@ -18,6 +18,7 @@
  */
 package de.zbit.gui.cfg;
 
+import java.awt.Component;
 import java.awt.Panel;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -32,9 +33,18 @@ import java.util.Properties;
 import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
 
+import javax.swing.AbstractButton;
+import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.JTextComponent;
 
 import de.zbit.util.SBPreferences;
 import de.zbit.util.SBProperties;
@@ -225,6 +235,23 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 		return true;
 	}
 
+	/**
+	 * Method to test whether the current properties equal the user's current
+	 * configuration.
+	 * 
+	 * @return true if the values of all current properties equal the current
+	 *         persistent user configuration.
+	 */
+	public boolean isUserConfiguration() {
+		for (Entry<Object, Object> e : properties.entrySet()) {
+			if (!e.getValue().toString().equals(
+					preferences.get(e.getKey().toString()))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -232,6 +259,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
 	public void itemStateChanged(ItemEvent e) {
+		setProperty(e.getSource());
 		for (ItemListener i : itemListeners) {
 			i.itemStateChanged(e);
 		}
@@ -243,6 +271,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
 	public void keyPressed(KeyEvent e) {
+		setProperty(e.getSource());
 		for (KeyListener i : getKeyListeners()) {
 			i.keyPressed(e);
 		}
@@ -254,6 +283,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	public void keyReleased(KeyEvent e) {
+		setProperty(e.getSource());
 		for (KeyListener kl : getKeyListeners()) {
 			kl.keyReleased(e);
 		}
@@ -265,6 +295,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	public void keyTyped(KeyEvent e) {
+		setProperty(e.getSource());
 		for (KeyListener kl : getKeyListeners()) {
 			kl.keyTyped(e);
 		}
@@ -343,6 +374,47 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 		init();
 	}
 
+	/**
+	 * Attempts to set the new value of the changed element in this panel's
+	 * properties. To this end, it is required that the name property is set for
+	 * each graphical component that may change.
+	 * 
+	 * @param source
+	 *            The element whose value has been changed.
+	 */
+	private void setProperty(Object source) {
+		if (source instanceof Component) {
+			Component c = (Component) source;
+			String name = c.getName();
+			if ((name != null) && (properties.containsKey(name))) {
+				String value = null;
+				if (c instanceof AbstractButton) {
+					value = Boolean.toString(((AbstractButton) c).isSelected());
+				} else if (c instanceof JColorChooser) {
+					value = ((JColorChooser) c).getColor().toString();
+				} else if (c instanceof JComboBox) {
+					value = ((JComboBox) c).getSelectedItem().toString();
+				} else if (c instanceof JFileChooser) {
+					value = ((JFileChooser) c).getSelectedFile()
+							.getAbsolutePath();
+				} else if (c instanceof JList) {
+					value = ((JList) c).getSelectedValue().toString();
+				} else if (c instanceof JSlider) {
+					value = Integer.toString(((JSlider) c).getValue());
+				} else if (c instanceof JSpinner) {
+					value = ((JSpinner) c).getValue().toString();
+				} else if (c instanceof JTable) {
+					JTable tab = (JTable) c;
+					value = tab.getModel().getValueAt(tab.getSelectedRow(),
+							tab.getSelectedColumn()).toString();
+				} else if (c instanceof JTextComponent) {
+					value = ((JTextComponent) c).getText();
+				}
+				properties.setProperty(name, value);
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -355,5 +427,4 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 			cl.stateChanged(e);
 		}
 	}
-
 }

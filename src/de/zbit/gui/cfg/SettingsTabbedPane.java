@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -197,12 +198,54 @@ public class SettingsTabbedPane extends SettingsPanel {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see de.zbit.gui.cfg.SettingsPanel#isDefaultConfiguration()
+	 */
+	@Override
+	public boolean isDefaultConfiguration() {
+		for (int i = 0; i < getSettingsPanelCount(); i++) {
+			if (!getSettingsPanelAt(i).isDefaultConfiguration()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.cfg.SettingsPanel#isUserConfiguration()
+	 */
+	@Override
+	public boolean isUserConfiguration() {
+		for (int i = 0; i < getSettingsPanelCount(); i++) {
+			if (!getSettingsPanelAt(i).isUserConfiguration()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.zbit.gui.cfg.SettingsPanel#loadPreferences()
 	 */
 	@Override
 	protected SBPreferences loadPreferences()
 			throws InvalidPropertiesFormatException, IOException {
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.cfg.SettingsPanel#persist()
+	 */
+	@Override
+	public void persist() throws BackingStoreException {
+		for (int i = 0; i < tab.getComponentCount(); i++) {
+			getSettingsPanelAt(i).persist();
+		}
 	}
 
 	/*
@@ -216,21 +259,6 @@ public class SettingsTabbedPane extends SettingsPanel {
 			getSettingsPanelAt(i).restoreDefaults();
 		}
 		validate();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.cfg.SettingsPanel#isDefaultConfiguration()
-	 */
-	@Override
-	public boolean isDefaultConfiguration() {
-		for (int i = 0; i < getSettingsPanelCount(); i++) {
-			if (!getSettingsPanelAt(i).isDefaultConfiguration()) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**

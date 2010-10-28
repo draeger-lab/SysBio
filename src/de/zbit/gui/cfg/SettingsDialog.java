@@ -174,7 +174,6 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 *            The element to be put on the content pane.
 	 */
 	private void init(SettingsPanel panel) {
-
 		KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 		getRootPane().registerKeyboardAction(this, stroke,
 				JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -220,8 +219,8 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
 	public void itemStateChanged(ItemEvent e) {
-		apply.setEnabled(true);
-		defaults.setEnabled(true);
+		apply.setEnabled(!panelAllSettings.isUserConfiguration());
+		defaults.setEnabled(!panelAllSettings.isDefaultConfiguration());
 		ok.setEnabled(true);
 	}
 
@@ -247,8 +246,8 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	public void keyTyped(KeyEvent e) {
-		apply.setEnabled(true);
-		defaults.setEnabled(true);
+		apply.setEnabled(!panelAllSettings.isUserConfiguration());
+		defaults.setEnabled(!panelAllSettings.isDefaultConfiguration());
 		ok.setEnabled(true);
 	}
 
@@ -312,8 +311,8 @@ public class SettingsDialog extends JDialog implements ActionListener,
 	 * )
 	 */
 	public void stateChanged(ChangeEvent e) {
-		apply.setEnabled(true);
-		defaults.setEnabled(true);
+		apply.setEnabled(!panelAllSettings.isUserConfiguration());
+		defaults.setEnabled(!panelAllSettings.isDefaultConfiguration());
 		ok.setEnabled(true);
 	}
 }
