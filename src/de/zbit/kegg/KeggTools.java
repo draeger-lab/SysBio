@@ -52,6 +52,8 @@ public class KeggTools {
               }
               if (reactant.charAt(0)!='C') {
                 System.err.println("Warning: non-compound reactat: " + reactant);
+              } else if (!reactant.contains(":")) {
+                reactant = "cpd:" + reactant;
               }
               
               Entry found = p.getEntryForName(reactant);

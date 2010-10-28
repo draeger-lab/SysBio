@@ -460,6 +460,7 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
 	  JComponent jc = null;
 	  if (o.getRequiredType() == Boolean.class) {
 	    jc = new JCheckBox();
+	    ((AbstractButton)jc).setSelected(Boolean.parseBoolean(properties.get(o.getOptionName()).toString()));
 	  } else if (o.getRequiredType() == File.class) {
 	    // TODO: Implement this
       // XXX: Is it possible to store the extension or
@@ -479,7 +480,6 @@ public abstract class SettingsPanel extends JPanel implements KeyListener,
     if (jc!=null) {
       if (jc instanceof AbstractButton) {
         ((AbstractButton)jc).setText(formatOptionName(o.getOptionName()));
-        ((AbstractButton)jc).setSelected(Boolean.parseBoolean(properties.get(o.getOptionName()).toString()));
         ((AbstractButton)jc).addItemListener(this);
       }
       jc.setName(o.getOptionName());
