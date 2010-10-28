@@ -25,7 +25,6 @@ import argparser.DoubleHolder;
 import argparser.FloatHolder;
 import argparser.IntHolder;
 import argparser.LongHolder;
-import argparser.ObjectHolder;
 import argparser.StringHolder;
 
 /**
@@ -392,7 +391,7 @@ public class SBPreferences implements Map<Object, Object> {
 	    } else if (key.getRequiredType().equals(String.class)) {
 		value = ((StringHolder) options.get(key)).value;
 	    } else {
-		value = ((ObjectHolder) options.get(key)).value.toString();
+		value = ((StringHolder) options.get(key)).value.toString();
 	    }
 	    if (props.isSetDefaults()) {
 		v = props.getProperty(k);
