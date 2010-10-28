@@ -14,7 +14,7 @@ import de.zbit.util.Option;
  * @author Andreas Dr&auml;ger
  * @date 2010-10-22
  */
-public interface GUIKeys {
+public interface GUIOptions {
 	/**
 	 * The path to the associated configuration file, which contains one default
 	 * value for each option defined in this interface.
