@@ -3,6 +3,8 @@
 <properties>
   <comment>
     Default configuration for the CSVReader/Writer.
+    These options give the default values for the keys defined
+    in de.zbit.io.CSVOptions.
   </comment>
   <entry key="CSV_FILE"></entry> <!-- no default file -->
   <entry key="CSV_FILES_OPEN_DIR">user.home</entry>
