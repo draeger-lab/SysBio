@@ -160,6 +160,26 @@ public class SBPreferences implements Map<Object, Object> {
     }
 
     /**
+     * Automatically builds the usage string.
+     * @param defFileAndKeys
+     *        This {@link List} is supposed to contain the relative paths of
+     *        the configuration files with default preferences as first
+     *        value and each corresponding second value must be the full
+     *        class name of the corresponding keyProvider class, i.e., the
+     *        name of some {@link Class} object that contains as many static
+     *        final fields of {@link Option} instances as the corresponding
+     *        defaults option file contains entries.
+     * @param args
+     *        The given command line arguments.
+     * @return
+     */
+    public static final SBProperties analyzeCommandLineArguments(
+        SortedMap<String, Class<?>> defFileAndKeys, String args[]) {
+      
+      
+      return analyzeCommandLineArguments(defFileAndKeys, generateUsageString(), args);
+    }
+    /**
      * @param defFileAndKeys
      *        This {@link List} is supposed to contain the relative paths of
      *        the configuration files with default preferences as first
@@ -231,6 +251,64 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 
 	return props;
+    }
+    
+    /**
+     * Generates a usage/synopsis string for the given mainClass.
+     * Looks if the class is inside a jar. If yes,
+     * "java -jar [NAME].jar" is the usage string. Else
+     * "java package.ClassName" is the usage string.
+     * @param mainClass of your project
+     * @return usage String
+     */
+    public static String generateUsageString(Class<?> mainClass) {
+      String synopsis = "java ";
+      
+      String jarName = Utils.getNameOfJar(mainClass);
+      if (jarName!=null && jarName.length()>0) {
+        synopsis+="-jar " + jarName;
+      } else {
+        // class.getName() also returns the package prefix.
+        synopsis += mainClass.getName();
+      }
+      
+      return synopsis;
+    }
+    
+    /**
+     * Automatically generates a usage string, based on the main class
+     * that has been called.
+     * Automatically detects, if the main class is in a jar file or not
+     * and builds the usage string.
+     * @return usage String (also called synopsis).
+     */
+    public static String generateUsageString() {
+      Class<?> mainClass = null;
+      
+      // Get the main class from the stackTrace
+      final Throwable t = new Throwable();
+      for (StackTraceElement e: t.getStackTrace()) {
+        // Search the main class
+        if (e.getMethodName().equalsIgnoreCase("main")) {
+          // Get it's name
+          try {
+            mainClass = Class.forName(e.getClassName());
+            break;
+          } catch (ClassNotFoundException e1) {
+            // Not possible, because class is in StackTrace
+          }
+        }
+      }
+      
+      String usage;
+      if (mainClass==null) {
+        // Should never happen...
+        usage = "java [program_name]";
+      } else {
+        usage = generateUsageString(mainClass) + " [options]";
+      }
+      
+      return usage;
     }
 
     /**
@@ -369,6 +447,8 @@ public class SBPreferences implements Map<Object, Object> {
     private static void putAll(SBProperties props, Map<Option, Object> options) {
 	String k, v, value;
 	for (Option key : options.keySet()) {
+	  
+	  //try {
 	    k = key.toString();
 	    if (key.getRequiredType().equals(Float.class)) {
 		value = Float.toString(((FloatHolder) options.get(key)).value);
@@ -391,7 +471,8 @@ public class SBPreferences implements Map<Object, Object> {
 	    } else if (key.getRequiredType().equals(String.class)) {
 		value = ((StringHolder) options.get(key)).value;
 	    } else {
-		value = ((StringHolder) options.get(key)).value.toString();
+		value = ((StringHolder) options.get(key)).value;
+		if (value!=null) value = value.toString();
 	    }
 	    if (props.isSetDefaults()) {
 		v = props.getProperty(k);
@@ -449,17 +530,28 @@ public class SBPreferences implements Map<Object, Object> {
     }
 
     /**
-     * @param usage
      * @param args
      */
-    public void analyzeCommandLineArguments(String usage, String args[]) {
+    public void analyzeCommandLineArguments(String args[]) {
 	try {
-	    analyzeCommandLineArguments(usage, args, false);
+	    analyzeCommandLineArguments(generateUsageString(), args, false);
 	} catch (BackingStoreException e) {
 	    // This can never happen because we don't try to persist anything!
 	}
     }
 
+    /**
+     * @param usage
+     * @param args
+     */
+    public void analyzeCommandLineArguments(String usage, String args[]) {
+  try {
+      analyzeCommandLineArguments(usage, args, false);
+  } catch (BackingStoreException e) {
+      // This can never happen because we don't try to persist anything!
+  }
+    }
+    
     /**
      * @param usage
      * @param args
