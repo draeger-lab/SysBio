@@ -299,6 +299,22 @@ public class Entry {
   public void setParentNode(Entry parent) {
     this.parent = parent;
   }
+  
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append('[');
+    sb.append(getClass().getName());
+    sb.append(String.format(" Id: %s, Name: '%s', Type: %s", id, name, type.toString()));
+    if (reaction!=null && reaction.length()>0) {
+      sb.append(String.format(", Reaction: %s", reaction));
+    }
+    sb.append(String.format(", HasComponents: %s, HasGraphics: %s", hasComponents(), hasGraphics()));
+    sb.append(']');
+    
+    // Missing: link
+    
+    return sb.toString();
+  }
 
   /**
    * Tryis to infere the EntryType from the id's prefix.
