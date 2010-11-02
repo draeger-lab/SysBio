@@ -291,11 +291,12 @@ public class SBPreferences implements Map<Object, Object> {
 		// Now all command line arguments must be made persistent:
 		String k, property, value;
 		for (int i = 0; i < prefs.length; i++) {
+			if (prefs[i]==null) continue;
 			for (Object key : prefs[i].keySetFull()) {
 				k = key.toString();
 				if (props.containsKey(k)) {
 					property = props.getProperty(k);
-					value = prefs[i].get(k);
+					value = prefs[i].getString(k);
 					if (!value.equals(property)) {
 						prefs[i].put(k, property);
 					}
@@ -777,8 +778,17 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#get(java.lang.Object)
 	 */
-	public String get(Object key) {
+	public Object get(Object key) {
+		// Why returning a string and later on parsing the
+		// double or whatever? Directly returning the
+		// value is much better.
 		return getString(key);
+		
+		
+		//String k = key.toString();
+		//Object v = prefs.get(k, getDefaultString(k));
+		
+		//return v;
 	}
 
 	/**
@@ -1075,7 +1085,7 @@ public class SBPreferences implements Map<Object, Object> {
 		if (!defaults.containsKey(k)) {
 			defaults.setProperty(k, value);
 		}
-		String oldValue = get(key);
+		String oldValue = getString(key);
 		prefs.put(k, value);
 		return oldValue;
 	}

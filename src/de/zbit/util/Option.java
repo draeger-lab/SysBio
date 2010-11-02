@@ -318,14 +318,42 @@ public class Option<Type> {
       return defaultValue;
     }
     
-    // TODO: Experimental method.
+    /**
+     * Returns the value for this Option, which must be contained
+     * in the given SBPreferences. 
+     * @param parentPreferences
+     * @return
+     */
     @SuppressWarnings("unchecked")
-		public Type getValue() {
-      Object ret = SBPreferences.getPreferencesFor(requiredType).get(this.toString());
-      if (ret == null)
-      	return null;
-      else
-      	return (Type) ret;
+    public Type getValue(SBPreferences parentPreferences) {
+    	// Returns a string.
+    	Object ret = parentPreferences.get(this.toString());
+    	
+    	if (ret == null)
+    		return null;
+    	if (Reflect.containsParser(requiredType))
+    		ret = Reflect.invokeParser(requiredType, ret);
+    	
+    	return (Type) ret;
+    }
+    
+    /**
+     * Returns the value for this Option, which must be contained
+     * in the given SBProperties. 
+     * @param parentPreferences
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+		public Type getValue(SBProperties parentProperties) {
+    	// Returns a string.
+    	Object ret = parentProperties.getProperty(this.toString());
+    	
+    	if (ret == null)
+    		return null;
+    	if (Reflect.containsParser(requiredType))
+    		ret = Reflect.invokeParser(requiredType, ret);
+    	
+    	return (Type) ret;
     }
     
 
