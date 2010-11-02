@@ -23,6 +23,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
 import de.zbit.io.CSVReader;
+import de.zbit.util.StringUtil;
 
 /**
  * Builds a panel to asign columns from the CSVReader to certain subjects.
@@ -564,18 +565,21 @@ public class CSVReaderColumnChooser extends JPanel {
    * @param c - CSVReaderColumnChooser to show.
    * @return JOptionPane.OK_OPTION || JOptionPane.CANCEL_OPTION
    */
-  public static int showAsDialog(CSVReaderColumnChooser c) {
-    JPanel panel = new JPanel(new BorderLayout());
-    panel.add(new JLabel(GUITools.toHTML(String.format("Please assign the following columns:"), 60)), BorderLayout.NORTH);
-    panel.add(c, BorderLayout.CENTER);
-    
-    if (c.getColumnChoosers().size() >0 )
-      return JOptionPane.showConfirmDialog(null, panel,
-          "Column assignment", JOptionPane.OK_CANCEL_OPTION,
-          JOptionPane.QUESTION_MESSAGE);
-    else
-      return JOptionPane.OK_OPTION;
-  }
+	public static int showAsDialog(CSVReaderColumnChooser c) {
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(new JLabel(StringUtil.toHTML(String
+				.format("Please assign the following columns:"), 60)),
+				BorderLayout.NORTH);
+		panel.add(c, BorderLayout.CENTER);
+
+		if (c.getColumnChoosers().size() > 0) {
+			return JOptionPane.showConfirmDialog(null, panel,
+					"Column assignment", JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE);
+		} else {
+			return JOptionPane.OK_OPTION;
+		}
+	}
 
 
   /**

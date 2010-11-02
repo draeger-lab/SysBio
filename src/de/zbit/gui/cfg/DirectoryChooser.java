@@ -19,6 +19,7 @@ import javax.swing.UIManager;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
+import de.zbit.util.StringUtil;
 
 /**
  * This is a special {@link JPanel} that displays {@link JTextField}s together
@@ -86,7 +87,7 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	/**
 	 * Explaining text for the buttons.
 	 */
-	private static final String toolTipButtons = "Select the default directory to %s various kinds of files.";
+	private static final String TOOL_TIP_BUTTONS = "Select the default directory to %s various kinds of files.";
 
 	/**
 	 * Both arguments may be empty Strings, i.e., no default value is given, or
@@ -134,7 +135,7 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 				tfOpenDir = new JTextField(openDir);
 				openButton = GUITools.createButton("Browse", UIManager
 						.getIcon("ICON_OPEN"), this, Command.OPEN, String
-						.format(toolTipButtons, "open"));
+						.format(TOOL_TIP_BUTTONS, "open"));
 				// tfOpenDir.addKeyListener(this);
 				labelOpenDir = new JLabel("Open directory:");
 				lh.add(labelOpenDir, 0, row, 1, 1, 0, 0);
@@ -152,7 +153,7 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 				tfSaveDir = new JTextField(saveDir);
 				saveButton = GUITools.createButton("Browse", UIManager
 						.getIcon("ICON_SAVE"), this, Command.SAVE, String
-						.format(toolTipButtons, "save"));
+						.format(TOOL_TIP_BUTTONS, "save"));
 				// tfSaveDir.addKeyListener(this);
 				labelSaveDir = new JLabel("Save directory:");
 				lh.add(labelSaveDir, 0, row, 1, 1, 0, 0);
@@ -240,7 +241,7 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 				}
 			} else {
 				JOptionPane.showMessageDialog(getTopLevelAncestor(),
-						new JLabel(GUITools.toHTML(String.format(
+						new JLabel(StringUtil.toHTML(String.format(
 								"No such directory %s.", f.getPath()), 40)),
 						"Warning", JOptionPane.WARNING_MESSAGE);
 				tf.setText(defaultDir);

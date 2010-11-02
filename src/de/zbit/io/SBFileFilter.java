@@ -1,21 +1,3 @@
-/*
- *  SBMLsqueezer creates rate equations for reactions in SBML files
- *  (http://sbml.org).
- *  Copyright (C) 2009 ZBIT, University of Tübingen, Andreas Dräger
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package de.zbit.io;
 
 import java.io.File;
@@ -26,10 +8,9 @@ import javax.swing.filechooser.FileFilter;
  * A file filter implementation for TeX and text files. It also accepts
  * directories. Otherwise one could not browse in the file system.
  * 
- * @since 1.0
- * @date 2007-08-03
- * @version
  * @author Andreas Dr&auml;ger
+ * @date 2007-08-03
+ * 
  */
 public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 
@@ -48,6 +29,10 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 		 * True if this filter accepts JPEG picture files.
 		 */
 		JPEG_FILES,
+		/**
+		 * A file filter for portable document format files.
+		 */
+		PDF_FILES,
 		/**
 		 * True if this filter accepts portable network graphic files.
 		 */
@@ -73,10 +58,23 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 			FileType.CSV_FILES);
 
 	/**
+	 * Filter for any kind of image file supported by this class.
+	 */
+	public static final MultipleFileFilter IMAGE_FILE_FILTER = new MultipleFileFilter(
+			"image file (*.jpg, *.png)", SBFileFilter.JPEG_FILE_FILTER,
+			SBFileFilter.PNG_FILE_FILTER);
+
+	/**
 	 * A filter for joint picture expert group files.
 	 */
 	public static FileFilter JPEG_FILE_FILTER = new SBFileFilter(
 			FileType.JPEG_FILES);
+
+	/**
+	 * A filter for PDF files.
+	 */
+	public static final SBFileFilter PDF_FILE_FILTER = new SBFileFilter(
+			FileType.PDF_FILES);
 
 	/**
 	 * A filter for portable network graphic files.
@@ -103,11 +101,64 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 			FileType.TEXT_FILES);
 
 	/**
-	 * Filter for any kind of image file supported by this class.
+	 * 
+	 * @param f
+	 * @return
 	 */
-	public static final MultipleFileFilter IMAGE_FILE_FILTER = new MultipleFileFilter(
-			"image file (*.jpg, *.png)", SBFileFilter.JPEG_FILE_FILTER,
-			SBFileFilter.PNG_FILE_FILTER);
+	public static boolean isCSVFile(File f) {
+		return f.getName().toLowerCase().endsWith(".csv");
+	}
+
+	/**
+	 * 
+	 * @param f
+	 * @return
+	 */
+	public static boolean isJPEGFile(File f) {
+		String extension = f.getName().toLowerCase();
+		return extension.endsWith(".jpg") || extension.endsWith(".jpeg");
+	}
+
+	/**
+	 * Returns true if the given file is a portable network graphics file.
+	 * 
+	 * @param f
+	 * @return
+	 */
+	public static boolean isPNGFile(File f) {
+		return f.getName().toLowerCase().endsWith(".png");
+	}
+
+	/**
+	 * Returns true if the given file is an SBML file.
+	 * 
+	 * @param f
+	 * @return
+	 */
+	public static boolean isSBMLFile(File f) {
+		String extension = f.getName().toLowerCase();
+		return extension.endsWith(".xml") || extension.endsWith(".sbml");
+	}
+
+	/**
+	 * Returns true if the given file is a TeX file.
+	 * 
+	 * @param f
+	 * @return
+	 */
+	public static boolean isTeXFile(File f) {
+		return f.getName().toLowerCase().endsWith(".tex");
+	}
+
+	/**
+	 * Returns true if the given file is a text file.
+	 * 
+	 * @param f
+	 * @return
+	 */
+	public static boolean isTextFile(File f) {
+		return f.getName().toLowerCase().endsWith(".txt");
+	}
 
 	/**
 	 * Allowable file type.
@@ -137,7 +188,8 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 				|| (type == FileType.SBML_FILES && isSBMLFile(f))
 				|| (type == FileType.CSV_FILES && isCSVFile(f))
 				|| (type == FileType.PNG_FILES && isPNGFile(f))
-				|| (type == FileType.JPEG_FILES && isJPEGFile(f)))
+				|| (type == FileType.JPEG_FILES && isJPEGFile(f))
+				|| (type == FileType.PDF_FILES && isPDFFile(f)))
 			return true;
 		return false;
 	}
@@ -210,68 +262,18 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 			return "Joint Photographic Experts Group files (*.jpg, *.jpeg)";
 		case PNG_FILES:
 			return "Portable Network Graphics files (*.png)";
+		case PDF_FILES:
+			return "Portable Document Format files (*.pdf)";
 		default:
 			return "";
 		}
 	}
 
 	/**
-	 * 
 	 * @param f
 	 * @return
 	 */
-	public static boolean isCSVFile(File f) {
-		return f.getName().toLowerCase().endsWith(".csv");
-	}
-
-	/**
-	 * 
-	 * @param f
-	 * @return
-	 */
-	public static boolean isJPEGFile(File f) {
-		String extension = f.getName().toLowerCase();
-		return extension.endsWith(".jpg") || extension.endsWith(".jpeg");
-	}
-
-	/**
-	 * Returns true if the given file is a portable network graphics file.
-	 * 
-	 * @param f
-	 * @return
-	 */
-	public static boolean isPNGFile(File f) {
-		return f.getName().toLowerCase().endsWith(".png");
-	}
-
-	/**
-	 * Returns true if the given file is an SBML file.
-	 * 
-	 * @param f
-	 * @return
-	 */
-	public static boolean isSBMLFile(File f) {
-		String extension = f.getName().toLowerCase();
-		return extension.endsWith(".xml") || extension.endsWith(".sbml");
-	}
-
-	/**
-	 * Returns true if the given file is a TeX file.
-	 * 
-	 * @param f
-	 * @return
-	 */
-	public static boolean isTeXFile(File f) {
-		return f.getName().toLowerCase().endsWith(".tex");
-	}
-
-	/**
-	 * Returns true if the given file is a text file.
-	 * 
-	 * @param f
-	 * @return
-	 */
-	public static boolean isTextFile(File f) {
-		return f.getName().toLowerCase().endsWith(".txt");
+	public boolean isPDFFile(File file) {
+		return file.getName().toLowerCase().endsWith(".pdf");
 	}
 }

@@ -2,11 +2,12 @@ package de.zbit.util;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Class containing frequently used utility functions for String processing.
  * 
- * @author Florian Mittag <florian.mittag@uni-tuebingen.de>
+ * @author Florian Mittag
  * @author wrzodek
  */
 public class StringUtil {
@@ -297,5 +298,76 @@ public class StringUtil {
         ret[i] = data[i][col];
     return ret;
   }
+  
+  /**
+	 * Returns a HTML formated String, in which each line is at most lineBreak
+	 * symbols long.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public static String toHTML(String string) {
+		return toHTML(string, Integer.MAX_VALUE);
+	}
+
+	/**
+	 * Returns a HTML formated String, in which each line is at most lineBreak
+	 * symbols long.
+	 * 
+	 * @param string
+	 * @param lineBreak
+	 * @return
+	 */
+	public static String toHTML(String string, int lineBreak) {
+		StringBuilder sb = new StringBuilder();
+		if (!string.startsWith("<html><body>")) {
+			sb.insert(0, "<html><body>");
+		}
+		sb.append(insertLineBreaks(string, lineBreak, "<br>"));
+		if (!string.endsWith("</body></html>")) {
+			sb.append("</body></html>");
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * @param string
+	 * @param lineBreak
+	 * @param string2
+	 * @param sb
+	 */
+	public static StringBuilder insertLineBreaks(String string, int lineBreak,
+			String lineBreakSymbol) {
+		StringBuilder sb = new StringBuilder();
+		StringTokenizer st = new StringTokenizer(string != null ? string : "",
+				" ");
+		if (st.hasMoreElements()) {
+			sb.append(st.nextElement().toString());
+		}
+		int length = sb.length();
+		while (st.hasMoreElements()) {
+			if ((length >= lineBreak) && (lineBreak < Integer.MAX_VALUE)) {
+				sb.append(lineBreakSymbol);
+				length = 0;
+			} else {
+				sb.append(' ');
+			}
+			String tmp = st.nextElement().toString();
+			length += tmp.length() + 1;
+			sb.append(tmp);
+		}
+		return sb;
+	}
+
+	/**
+	 * 
+	 * @param sb
+	 * @param whatToAppend
+	 */
+	public static void append(StringBuilder sb, Object... whatToAppend) {
+		for (Object o : whatToAppend) {
+			sb.append(o.toString());
+		}
+	}
   
 }
