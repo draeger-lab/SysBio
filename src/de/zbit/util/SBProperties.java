@@ -3,6 +3,7 @@
  */
 package de.zbit.util;
 
+import java.lang.reflect.Field;
 import java.util.Properties;
 
 /**
@@ -110,6 +111,32 @@ public class SBProperties extends Properties {
 			this.defaults = new Properties();
 		}
 		this.defaults.putAll(defaults);
+	}
+	
+	/**
+	 * Loads all properties from this class from the public static
+	 * final Options - default values in the keyProvider.
+	 * @param keyProvider
+	 */
+	public void loadFromKeyProvider(Class<?> keyProvider) {
+    Object fieldValue;
+    String k;
+    
+	  for (Field field : keyProvider.getFields()) {
+      try {
+        fieldValue = field.get(keyProvider);
+        if (fieldValue instanceof Option) {
+          k = fieldValue.toString();
+          // Would be possible to check for already setted values.
+          //if (defaults.getProperty(k) != null) {}
+          this.put(k, 
+          	((Option<?>)fieldValue).getDefaultValue() );
+        }
+      } catch (Exception exc) {
+        exc.printStackTrace(); // XXX: Remove me.
+        // ignore non-static fields
+      }
+    }
 	}
 
 }
