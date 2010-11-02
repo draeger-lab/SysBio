@@ -192,7 +192,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 				if (errors.size() > 1) {
 					msg.append("</ul>");
 				}
-				msg.append("</body></html>");
+				msg.append("</body></html>\n");
 				JOptionPane.showMessageDialog(this, new JLabel(msg.toString()),
 					"Please check your configuration", JOptionPane.WARNING_MESSAGE);
 			}
