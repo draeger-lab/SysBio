@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -50,9 +51,10 @@ public class KeggParser extends DefaultHandler {
    * Usually, there is only one pathway per file, so the size of the
    * collection should always be 1.
    */
-  public static ArrayList<Pathway> parse(String filename) {
+  public static List<Pathway> parse(String filename) {
     InputSource inS = new InputSource(new BufferedReader(OpenFile.openFile(filename)));
-    return parse(inS);
+    List<Pathway> l = parse(inS);
+    return l;
   }
   
   /**
@@ -60,8 +62,10 @@ public class KeggParser extends DefaultHandler {
    * @param inS
    * @return all pathways in the given kgml file.
    */
-  public static ArrayList<Pathway> parse(InputSource inS) {
-    if (inS==null) return null;
+  public static List<Pathway> parse(InputSource inS) {
+    if (inS==null) {
+    	return null;
+    }
     
     double kgmlVersion = getKGMLVersion(inS.getCharacterStream());
     if (offlineVersion || kgmlVersion<=0.5) {
@@ -81,14 +85,15 @@ public class KeggParser extends DefaultHandler {
             }
             
             // Remove invalid XML code in older KGML versions
-            if (kgmlVersion<=0.5 && line.contains("&keywords="))
+            if (kgmlVersion<=0.5 && line.contains("&keywords=")){
               line = line.replace("&keywords=", "");
+            }
             
             sb.append(line);
             line = "";
           }
         }
-        if (line.length()==0)sb.append(line);
+        if (line.length()==0){sb.append(line);}
         
         inS = new InputSource((new StringReader(sb.toString()))); // sb.toString() only klappt nicht ?!?!?
       } catch (IOException e) {e.printStackTrace();}
@@ -102,8 +107,8 @@ public class KeggParser extends DefaultHandler {
       
       // Give a warning if version does not match.
       try {
-        if (kgmlVersion==0)
-          kgmlVersion = getKGMLVersion(document);
+        if (kgmlVersion==0){
+          kgmlVersion = getKGMLVersion(document);}
         if (kgmlVersion>0 && kgmlVersion<0.7) {
           System.out.println("WARNING: Your kgml document is rather old.\n"+
             "It is written in kgml version " + kgmlVersion + ". This parser is for version 0.7 / 0.71.\n"+
@@ -119,7 +124,7 @@ public class KeggParser extends DefaultHandler {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return null;
+    return new ArrayList<Pathway>(0);
   }
   
 	/**

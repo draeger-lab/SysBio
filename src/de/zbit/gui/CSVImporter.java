@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import de.zbit.io.CSVReader;
+import de.zbit.util.StringUtil;
 
 /**
  * This {@link CSVImporter} tries to map the head entries in a given CSV file to
@@ -157,8 +158,8 @@ public class CSVImporter {
 		 */
 		if (numProblems > 0) {
 			JPanel panel = new JPanel(new BorderLayout());
-			panel.add(new JLabel(GUITools.toHTML(String.format(MESSAGE_STRING,
-					numProblems), 60)), BorderLayout.NORTH);
+			panel.add(new JLabel(StringUtil.toHTML(String.format(
+					MESSAGE_STRING, numProblems), 60)), BorderLayout.NORTH);
 			if ((c.getPreferredSize().getWidth() > 450)
 					|| (c.getPreferredSize().getHeight() > 450)) {
 				JScrollPane scroll = new JScrollPane(c,
