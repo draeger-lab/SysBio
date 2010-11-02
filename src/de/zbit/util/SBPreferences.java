@@ -5,6 +5,7 @@ package de.zbit.util;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -137,8 +138,8 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 		// create the parser and specify the allowed options ...
 		ArgParser parser = new ArgParser(usage);
-		Map<Option, Object> options = configureArgParser(parser,
-				new HashMap<Option, Object>(), keyProvider, props, defaults);
+		Map<Option<?>, Object> options = configureArgParser(parser,
+				new HashMap<Option<?>, Object>(), keyProvider, props, defaults);
 		parser.matchAllArgs(args);
 		putAll(props, options);
 		return props;
@@ -183,6 +184,53 @@ public class SBPreferences implements Map<Object, Object> {
 		return analyzeCommandLineArguments(defFileAndKeys,
 				generateUsageString(), args);
 	}
+	
+	/**
+	 * 
+	 * @param defKeys
+	 * @param args
+	 * @return
+	 */
+	public static SBProperties analyzeCommandLineArguments(Class<?> defKeys, String[] args) {
+		List<Class<?>> l = new ArrayList<Class<?>>(1);
+		l.add(defKeys);
+		
+		return analyzeCommandLineArguments(l, args);
+	}
+  /**
+   * @param defKeys
+   * @param args
+   * @return
+   */
+	public static SBProperties analyzeCommandLineArguments(List<Class<?>> defKeys, String[] args) {
+		String usage = generateUsageString();
+    SBPreferences prefs[] = new SBPreferences[defKeys.size()];
+    Map<Option<?>, Object> options = new HashMap<Option<?>, Object>();
+    ArgParser parser = new ArgParser(usage);
+    SBProperties props = new SBProperties(new SBProperties());
+
+		// Configure argument parser by passing all possible option definitions
+		// to it.
+		int i = 0;
+		for (Class<?> entry : defKeys) {
+			try {
+				prefs[i] = getPreferencesFor(entry);
+				options.putAll(configureArgParser(parser, options, entry, props, 
+						loadDefaults(entry)));
+				
+			} catch (Exception e) {
+				Exception exc = new Exception(
+						String.format(
+										"Could not load properties for %s.",
+										entry.getName()), e);
+				exc.printStackTrace();
+			} finally {
+				i++;
+			}
+		}
+
+		return analyzeCommandLineArguments(prefs, options, parser, props, usage, args);
+	}
 
 	/**
 	 * @param defFileAndKeys
@@ -203,10 +251,11 @@ public class SBPreferences implements Map<Object, Object> {
 	public static final SBProperties analyzeCommandLineArguments(
 			SortedMap<String, Class<?>> defFileAndKeys, String usage,
 			String args[]) {
-		SBProperties props = new SBProperties(new SBProperties());
-		ArgParser parser = new ArgParser(usage);
-		Map<Option, Object> options = new HashMap<Option, Object>();
-		SBPreferences prefs[] = new SBPreferences[defFileAndKeys.size()];
+
+    SBPreferences prefs[] = new SBPreferences[defFileAndKeys.size()];
+    Map<Option<?>, Object> options = new HashMap<Option<?>, Object>();
+    ArgParser parser = new ArgParser(usage);
+    SBProperties props = new SBProperties(new SBProperties());
 
 		// Configure argument parser by passing all possible option definitions
 		// to it.
@@ -214,29 +263,34 @@ public class SBPreferences implements Map<Object, Object> {
 		for (Map.Entry<String, Class<?>> entry : defFileAndKeys.entrySet()) {
 			try {
 				prefs[i] = getPreferencesFor(entry.getValue(), entry.getKey());
-				options.putAll(configureArgParser(parser, options, entry
-						.getValue(), props, loadDefaults(entry.getValue(),
-						entry.getKey())));
+				options.putAll(configureArgParser(parser, options, entry.getValue(), props, 
+						loadDefaults(entry.getValue(), entry.getKey())));
+				
 			} catch (Exception e) {
 				Exception exc = new Exception(
-						String
-								.format(
+						String.format(
 										"Could not load properties for %s from config file %s.",
-										entry.getValue().getName(), entry
-												.getKey()), e);
+										entry.getValue().getName(), entry.getKey()), e);
 				exc.printStackTrace();
 			} finally {
 				i++;
 			}
 		}
 
+		return analyzeCommandLineArguments(prefs, options, parser, props, usage, args);
+	}
+	
+	private static final SBProperties analyzeCommandLineArguments(SBPreferences[] prefs, 
+		Map<Option<?>, Object> options, ArgParser parser, SBProperties props,
+		String usage, String args[]) {
+		
 		// Do the actual parsing
 		parser.matchAllArgs(args);
 		putAll(props, options);
 
 		// Now all command line arguments must be made persistent:
 		String k, property, value;
-		for (i = 0; i < prefs.length; i++) {
+		for (int i = 0; i < prefs.length; i++) {
 			for (Object key : prefs[i].keySetFull()) {
 				k = key.toString();
 				if (props.containsKey(k)) {
@@ -251,17 +305,16 @@ public class SBPreferences implements Map<Object, Object> {
 				prefs[i].flush();
 			} catch (BackingStoreException e) {
 				Exception exc = new Exception(
-						String
-								.format(
+						String.format(
 										"Could not persistently store the user configuration for %s.",
 										prefs[i].getKeyProvider().getName()), e);
 				exc.printStackTrace();
 			}
 		}
-
+		
 		return props;
 	}
-
+	
 	/**
 	 * Generates a usage/synopsis string for the given mainClass. Looks if the
 	 * class is inside a jar. If yes, "java -jar [NAME].jar" is the usage
@@ -329,17 +382,17 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param defaults
 	 * @return
 	 */
-	private static Map<Option, Object> configureArgParser(ArgParser parser,
-			Map<Option, Object> options, Class<?> keyProvider,
+	private static Map<Option<?>, Object> configureArgParser(ArgParser parser,
+			Map<Option<?>, Object> options, Class<?> keyProvider,
 			SBProperties props, Map<Object, Object> defaults) {
 		Object fieldValue, argHolder;
-		Option option;
+		Option<?> option;
 		String k;
 		for (Field f : keyProvider.getFields()) {
 			try {
 				fieldValue = f.get(keyProvider);
-				if (fieldValue instanceof Option) {
-					option = (Option) fieldValue;
+				if (fieldValue instanceof Option<?>) {
+					option = (Option<?>) fieldValue;
 					k = option.toString();
 					if ((defaults != null) && defaults.containsKey(option)) {
 						// We here set the default value as pre-defined value
@@ -385,6 +438,17 @@ public class SBPreferences implements Map<Object, Object> {
 			String relPath) throws IOException {
 		return new SBPreferences(keyProvider, relPath);
 	}
+	
+	/**
+	 * 
+	 * @param keyProvider
+	 * @param relPath
+	 * @return
+	 * @throws IOException
+	 */
+	public static SBPreferences getPreferencesFor(Class<?> keyProvider) {
+		return new SBPreferences(keyProvider);
+	}
 
 	/**
 	 * Parses the configuration file with defaults values or loads the defaults
@@ -422,6 +486,9 @@ public class SBPreferences implements Map<Object, Object> {
 					}
 				} catch (Exception exc) {
 					// ignore non-static fields
+        	if (exc instanceof IllegalArgumentException) {
+        		throw (IllegalArgumentException)exc;
+        	}
 				}
 			}
 			for (Map.Entry<Object, Object> e : defaults.entrySet()) {
@@ -443,6 +510,60 @@ public class SBPreferences implements Map<Object, Object> {
 		return defaults;
 	}
 
+	 /**
+   * Parses the keyProvider for defaults values or loads the defaults
+   * from memory.
+   * 
+   * @param keyProvider
+   * @return
+   */
+  private static SBProperties loadDefaults(Class<?> keyProvider) {
+    SBProperties defaults;
+    
+    if (!allDefaults.containsKey(keyProvider.getName())) {
+      defaults = new SBProperties();
+      defaults.loadFromKeyProvider(keyProvider);
+      Set<String> options = new HashSet<String>();
+      Object fieldValue;
+      String k;
+      for (Field field : keyProvider.getFields()) {
+        try {
+          fieldValue = field.get(keyProvider);
+          if (fieldValue instanceof Option) {
+            k = fieldValue.toString();
+            if (defaults.getProperty(k) == null) {
+              throw new IllegalArgumentException(
+                  String.format(
+                          "No default value available for option %s.",
+                          k));
+            }
+            options.add(k);
+          }
+        } catch (Exception exc) {
+          // ignore non-static fields
+        	if (exc instanceof IllegalArgumentException) {
+        		throw (IllegalArgumentException)exc;
+        	}
+        }
+      }
+      
+      
+      for (Map.Entry<Object, Object> e : defaults.entrySet()) {
+        k = e.getKey().toString();
+        
+        if (!options.contains(k)) {
+          throw new IllegalArgumentException(String.format(
+              "No option %s defined by %s.", k, keyProvider
+                  .getName()));
+        }
+      }
+      allDefaults.put(keyProvider.getName(), defaults);
+    } else {
+      defaults = allDefaults.get(keyProvider.getName());
+    }
+    return defaults;
+  }
+  
 	/**
 	 * Convenient method to put all values gathered from a command line into an
 	 * {@link SBProperties} table.
@@ -454,9 +575,9 @@ public class SBPreferences implements Map<Object, Object> {
 	 *            A map between {@link Option} instances and {@link ArgParser}
 	 *            holders for the desired values.
 	 */
-	private static void putAll(SBProperties props, Map<Option, Object> options) {
+	private static void putAll(SBProperties props, Map<Option<?>, Object> options) {
 		String k, v, value;
-		for (Option key : options.keySet()) {
+		for (Option<?> key : options.keySet()) {
 
 			// try {
 			k = key.toString();
@@ -538,6 +659,15 @@ public class SBPreferences implements Map<Object, Object> {
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
 		this.defaults = loadDefaults(keyProvider, relPath);
+	}
+
+	/**
+	 * @param keyProvider
+	 */
+	public SBPreferences(Class<?> keyProvider) {
+		this.keyProvider = keyProvider;
+		this.prefs = Preferences.userNodeForPackage(keyProvider);
+		this.defaults = loadDefaults(keyProvider);
 	}
 
 	/**
@@ -1040,4 +1170,5 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 		return c;
 	}
+
 }

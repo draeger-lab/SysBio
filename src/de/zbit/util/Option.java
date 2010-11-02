@@ -19,7 +19,7 @@ import argparser.StringHolder;
  * @author Andreas Dr&auml;ger
  * @date 2010-10-24
  */
-public class Option {
+public class Option<Type> {
 
     /**
      * A short description what the purpose of this option is.
@@ -44,7 +44,14 @@ public class Option {
      * of this {@link Option}'s name and a value. For instance, Boolean,
      * Integer, String etc.
      */
-    private final Class<?> requiredType;
+    private final Class<Type> requiredType;
+    
+    /**
+     * The default value for this option. May be null, if it is going to be read from
+     * the XML-file later.
+     */
+    private final Type defaultValue;
+    
     /**
      * A shorter name for the command line, for instance, in addition to --file
      * one might want the option -f.
@@ -56,8 +63,8 @@ public class Option {
      * @param requiredType
      * @param description
      */
-    public Option(String optionName, Class<?> requiredType, String description) {
-	this(optionName, requiredType, description, null);
+    public Option(String optionName, Class<Type> requiredType, String description) {
+	this(optionName, requiredType, description, null,null);
     }
 
     /**
@@ -67,7 +74,7 @@ public class Option {
      * @param numLeadingMinus
      * @param shortCmdName
      */
-    public Option(String optionName, Class<?> requiredType, String description,
+    public Option(String optionName, Class<Type> requiredType, String description,
 	short numLeadingMinus, String shortCmdName) {
 	this(optionName, requiredType, description, null, numLeadingMinus,
 	    shortCmdName);
@@ -79,7 +86,7 @@ public class Option {
      * @param description
      * @param rangeSpec
      */
-    public Option(String optionName, Class<?> requiredType, String description,
+    public Option(String optionName, Class<Type> requiredType, String description,
 	String rangeSpec) {
 	this(optionName, requiredType, description, rangeSpec, (short) 2);
     }
@@ -93,13 +100,14 @@ public class Option {
      *        the number of leading '-' symbols of the command-line argument
      *        corresponding to this option.
      */
-    public Option(String optionName, Class<?> requiredType, String description,
+    public Option(String optionName, Class<Type> requiredType, String description,
 	String rangeSpec, short numLeadingMinus) {
 	this(optionName, requiredType, description, rangeSpec, numLeadingMinus,
-	    null);
+	    null,null);
     }
 
     /**
+     * 
      * @param optionName
      * @param requiredType
      * @param description
@@ -107,13 +115,90 @@ public class Option {
      * @param numLeadingMinus
      * @param shortCmdName
      */
-    public Option(String optionName, Class<?> requiredType, String description,
-	String rangeSpec, short numLeadingMinus, String shortCmdName) {
+    public Option(String optionName, Class<Type> requiredType, String description,
+        String rangeSpec, short numLeadingMinus, String shortCmdName) {
+      this(optionName, requiredType, description, rangeSpec, numLeadingMinus,
+          null,null);
+    }
+    
+    
+    
+    
+    /**
+     * 
+     * @param optionName
+     * @param requiredType
+     * @param description
+     * @param defaultValue
+     */
+    public Option(String optionName, Class<Type> requiredType, String description,
+        Type defaultValue) {
+      this(optionName, requiredType, description, null, defaultValue);
+    }
+    
+    /**
+     * 
+     * @param optionName
+     * @param requiredType
+     * @param description
+     * @param numLeadingMinus
+     * @param shortCmdName
+     * @param defaultValue
+     */
+    public Option(String optionName, Class<Type> requiredType, String description,
+        short numLeadingMinus, String shortCmdName, Type defaultValue) {
+      this(optionName, requiredType, description, null, numLeadingMinus,
+          shortCmdName, defaultValue);
+    }
+    
+    /**
+     * 
+     * @param optionName
+     * @param requiredType
+     * @param description
+     * @param rangeSpec
+     * @param defaultValue
+     */
+    public Option(String optionName, Class<Type> requiredType, String description,
+        String rangeSpec, Type defaultValue) {
+      this(optionName, requiredType, description, rangeSpec, (short) 2, defaultValue);
+    }
+    
+    /**
+     * 
+     * @param optionName
+     * @param requiredType
+     * @param description
+     * @param rangeSpec
+     * @param numLeadingMinus
+     *        the number of leading '-' symbols of the command-line argument
+     *        corresponding to this option.
+     * @param defaultValue
+     */
+    public Option(String optionName, Class<Type> requiredType, String description,
+        String rangeSpec, short numLeadingMinus, Type defaultValue) {
+      this(optionName, requiredType, description, rangeSpec, numLeadingMinus,
+          null, defaultValue);
+    }
+    
+    /**
+     * 
+     * @param optionName
+     * @param requiredType
+     * @param description
+     * @param rangeSpec
+     * @param numLeadingMinus
+     * @param shortCmdName
+     * @param defaultValue
+     */
+    public Option(String optionName, Class<Type> requiredType, String description,
+	String rangeSpec, short numLeadingMinus, String shortCmdName, Type defaultValue) {
 	this.optionName = optionName;
 	this.requiredType = requiredType;
 	this.description = description;
 	this.rangeSpec = rangeSpec;
 	this.shortCmdName = shortCmdName;
+	this.defaultValue = defaultValue;
 	if (numLeadingMinus < 0) {
 	    throw new IllegalArgumentException(
 		"numLeadingMinus must be a positive number");
@@ -218,9 +303,31 @@ public class Option {
     /**
      * @return the type
      */
-    public Class<?> getRequiredType() {
+    public Class<Type> getRequiredType() {
 	return requiredType;
     }
+    
+    /**
+     * The default value for this option. If it is null,
+     * the cfg packet tries to read it from an config.xml.
+     * 
+     * If this fails, an exception is thrown.
+     * @return
+     */
+    public Type getDefaultValue() {
+      return defaultValue;
+    }
+    
+    // TODO: Experimental method.
+    @SuppressWarnings("unchecked")
+		public Type getValue() {
+      Object ret = SBPreferences.getPreferencesFor(requiredType).get(this.toString());
+      if (ret == null)
+      	return null;
+      else
+      	return (Type) ret;
+    }
+    
 
     /**
      * @return the shortCmdName
