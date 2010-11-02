@@ -6,8 +6,10 @@ package de.zbit.gui.cfg;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -71,7 +73,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	 */
 	public static void main(String[] args) {
 		GUITools.initLaF("File selecter");
-		FileSelector selector = new FileSelector();
+		FileSelector selector = new FileSelector(Command.SAVE);
 		JOptionPane.showMessageDialog(null, selector);
 		System.out.println(selector.getSelectedFile());
 	}
@@ -100,26 +102,40 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * 
 	 */
 	public FileSelector() {
-		this(Command.OPEN, null);
+		this(Command.OPEN);
 	}
 	
 	/**
+	 * 
+	 * @param type
+	 */
+	public FileSelector(Command type) {
+		this(type, null);
+	}
+	
+	/**
+	 * Depending on the given type, this constructor looks in the
+	 * {@link UIManager} for the icons ICON_OPEN or ICON_SAVE to be displayed on
+	 * the browse button.
 	 * 
 	 * @param type
 	 * @param baseDir
 	 * @param filter
 	 */
 	public FileSelector(Command type, String baseDir, FileFilter... filter) {
+		this.type = type;
+		this.baseDir = baseDir != null ? baseDir : System.getProperty("user.dir");
+		this.filter = filter;
 		LayoutHelper lh = new LayoutHelper(this);
-		textField = new JTextField();
-		lh.add(textField, 0, 0, 1, 1, 1, 0);
+		textField = new JTextField(this.baseDir);
+		lh.add(new JLabel(type == Command.OPEN ? "Open file: " : "Save file: "), 0,
+			0, 1, 1, 0, 0);
 		lh.add(new JPanel(), 1, 0, 1, 1, 0, 0);
+		lh.add(textField, 2, 0, 1, 1, 1, 0);
+		lh.add(new JPanel(), 3, 0, 1, 1, 0, 0);
 		lh.add(GUITools.createButton("Browse", UIManager
 				.getIcon(type == Command.OPEN ? "ICON_OPEN" : "ICON_SAVE"), this, type,
-			type.getToolTip()), 2, 0, 1, 1, 0, 0);
-		this.type = type;
-		this.baseDir = baseDir != null ? baseDir : System.getProperty("user.home");
-		this.filter = filter;
+			type.getToolTip()), 4, 0, 1, 1, 0, 0);
 	}
 	
 	/*
@@ -185,9 +201,16 @@ public class FileSelector extends JPanel implements ActionListener {
 				case OPEN:
 					if (file.canRead()) { return file; }
 				case SAVE:
-					if (file.canWrite()) { return file; }
+					if (file.canWrite() && GUITools.overwriteExistingFile(this, file)) { return file; }
 				default:
 					break;
+			}
+		} else if (!file.exists() && !file.isDirectory()) {
+			try {
+				file.createNewFile();
+				return file;
+			} catch (IOException exc) {
+				GUITools.showErrorMessage(this, exc);
 			}
 		}
 		return null;
