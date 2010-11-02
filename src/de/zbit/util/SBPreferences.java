@@ -463,18 +463,31 @@ public class SBPreferences implements Map<Object, Object> {
 	private static SBProperties loadDefaults(Class<?> keyProvider,
 			String relPath) throws IOException {
 		SBProperties defaults;
-		String path = keyProvider.getPackage().getName().replace('.', '/')
+		String path;
+		boolean loadFromXML;
+		if (relPath!=null && relPath.length()>0) {
+		  path = keyProvider.getPackage().getName().replace('.', '/')
 				+ '/' + relPath;
+		  loadFromXML = true;
+		} else {
+			path = keyProvider.getClass().getName();
+			loadFromXML=false;
+		}
 		if (!allDefaults.containsKey(path)) {
 			defaults = new SBProperties();
-			defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));
+			
+			if (loadFromXML)
+			  defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));
+			else
+				defaults.loadFromKeyProvider(keyProvider);
+			
 			Set<String> options = new HashSet<String>();
 			Object fieldValue;
 			String k, v;
 			for (Field field : keyProvider.getFields()) {
 				try {
 					fieldValue = field.get(keyProvider);
-					if (fieldValue instanceof Option) {
+					if (fieldValue instanceof Option<?>) {
 						k = fieldValue.toString();
 						if (defaults.getProperty(k) == null) {
 							throw new IllegalArgumentException(
@@ -519,50 +532,12 @@ public class SBPreferences implements Map<Object, Object> {
    * @return
    */
   private static SBProperties loadDefaults(Class<?> keyProvider) {
-    SBProperties defaults;
-    
-    if (!allDefaults.containsKey(keyProvider.getName())) {
-      defaults = new SBProperties();
-      defaults.loadFromKeyProvider(keyProvider);
-      Set<String> options = new HashSet<String>();
-      Object fieldValue;
-      String k;
-      for (Field field : keyProvider.getFields()) {
-        try {
-          fieldValue = field.get(keyProvider);
-          if (fieldValue instanceof Option) {
-            k = fieldValue.toString();
-            if (defaults.getProperty(k) == null) {
-              throw new IllegalArgumentException(
-                  String.format(
-                          "No default value available for option %s.",
-                          k));
-            }
-            options.add(k);
-          }
-        } catch (Exception exc) {
-          // ignore non-static fields
-        	if (exc instanceof IllegalArgumentException) {
-        		throw (IllegalArgumentException)exc;
-        	}
-        }
-      }
-      
-      
-      for (Map.Entry<Object, Object> e : defaults.entrySet()) {
-        k = e.getKey().toString();
-        
-        if (!options.contains(k)) {
-          throw new IllegalArgumentException(String.format(
-              "No option %s defined by %s.", k, keyProvider
-                  .getName()));
-        }
-      }
-      allDefaults.put(keyProvider.getName(), defaults);
-    } else {
-      defaults = allDefaults.get(keyProvider.getName());
-    }
-    return defaults;
+    try {
+			return loadDefaults(keyProvider, null);
+		} catch (IOException e) {
+			// Can never happen
+		}
+		return null;
   }
   
 	/**

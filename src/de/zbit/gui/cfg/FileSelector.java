@@ -28,19 +28,24 @@ import de.zbit.util.StringUtil;
 public class FileSelector extends JPanel implements ActionListener {
 	
 	/**
+	 * Lists all possible action commands for this {@link FileSelector}. These are
+	 * necessary when calling the
+	 * {@link FileSelector#actionPerformed(ActionEvent)} to decide what to do.
 	 * 
 	 * @author draeger
 	 * @date 2010-11-02
 	 */
 	public enum Command implements ActionCommand {
 		/**
-		 * 
+		 * Command to open a {@link JFileChooser} with an open dialog.
 		 */
 		OPEN,
 		/**
-		 * 
+		 * Command to open a {@link JFileChooser} with a save dialog.
 		 */
 		SAVE;
+		
+		private boolean fileMode = true;
 		
 		/*
 		 * (non-Javadoc)
@@ -51,14 +56,25 @@ public class FileSelector extends JPanel implements ActionListener {
 			return StringUtil.firstLetterUpperCase(this.toString());
 		}
 		
+		/**
+		 * 
+		 * @param fileMode
+		 */
+		public void setMode(boolean fileMode) {
+			this.fileMode = fileMode;
+		}
+		
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see de.zbit.gui.ActionCommand#getToolTip()
 		 */
 		public String getToolTip() {
-			return String.format("Select the file to be %s.", this == OPEN ? "opened"
-					: "saved");
+			if (fileMode) { return String.format("Select the file to be %s.",
+				this == OPEN ? "opened" : "saved"); }
+			return String.format(
+				"Select the default directory to %s various kinds of files.",
+				this == OPEN ? "open" : "save");
 		}
 		
 	}
@@ -126,6 +142,9 @@ public class FileSelector extends JPanel implements ActionListener {
 		this.type = type;
 		this.baseDir = baseDir != null ? baseDir : System.getProperty("user.dir");
 		this.filter = filter;
+		// Decide whether to deal with directories or files:
+		boolean mode = !((this.filter == null) || (this.filter.length == 0));
+		this.type.setMode(mode);
 		LayoutHelper lh = new LayoutHelper(this);
 		textField = new JTextField(this.baseDir);
 		lh.add(new JLabel(type == Command.OPEN ? "Open file: " : "Save file: "), 0,

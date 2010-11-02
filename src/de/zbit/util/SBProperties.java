@@ -73,7 +73,8 @@ public class SBProperties extends Properties {
 	 */
 	@Override
 	public String get(Object key) {
-		return super.getProperty(key.toString());
+		Object o = super.get(key.toString()); 
+		return o != null ? o.toString() : null;
 	}
 
 	/**
@@ -82,6 +83,7 @@ public class SBProperties extends Properties {
 	public SBProperties getDefaults() {
 		return (SBProperties) defaults;
 	}
+
 
 	/**
 	 * @return
@@ -100,7 +102,7 @@ public class SBProperties extends Properties {
 	 */
 	@Override
 	public synchronized Object put(Object key, Object value) {
-		return super.put(key.toString(), value.toString());
+		return super.put(key.toString(), value == null ? null : value.toString());
 	}
 
 	/**
@@ -125,7 +127,7 @@ public class SBProperties extends Properties {
 	  for (Field field : keyProvider.getFields()) {
       try {
         fieldValue = field.get(keyProvider);
-        if (fieldValue instanceof Option) {
+        if (fieldValue instanceof Option<?>) {
           k = fieldValue.toString();
           // Would be possible to check for already setted values.
           //if (defaults.getProperty(k) != null) {}
@@ -137,6 +139,15 @@ public class SBProperties extends Properties {
         // ignore non-static fields
       }
     }
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public String getProperty(Object key) {
+		return getProperty(key.toString());
 	}
 
 }
