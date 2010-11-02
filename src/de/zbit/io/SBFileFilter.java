@@ -58,13 +58,6 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 			FileType.CSV_FILES);
 
 	/**
-	 * Filter for any kind of image file supported by this class.
-	 */
-	public static final MultipleFileFilter IMAGE_FILE_FILTER = new MultipleFileFilter(
-			"image file (*.jpg, *.png)", SBFileFilter.JPEG_FILE_FILTER,
-			SBFileFilter.PNG_FILE_FILTER);
-
-	/**
 	 * A filter for joint picture expert group files.
 	 */
 	public static FileFilter JPEG_FILE_FILTER = new SBFileFilter(
@@ -99,6 +92,13 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	 */
 	public static final SBFileFilter TEXT_FILE_FILTER = new SBFileFilter(
 			FileType.TEXT_FILES);
+	
+	/**
+	 * Filter for any kind of image file supported by this class.
+	 */
+	public static final MultipleFileFilter IMAGE_FILE_FILTER = new MultipleFileFilter(
+			"image file (*.jpg, *.png)", SBFileFilter.JPEG_FILE_FILTER,
+			SBFileFilter.PNG_FILE_FILTER);
 
 	/**
 	 * 
