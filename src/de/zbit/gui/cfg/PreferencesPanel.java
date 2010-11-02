@@ -128,7 +128,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			for (Object key : preferences.keySetFull()) {
 				if (accepts(key)) {
 					k = key.toString();
-					properties.setProperty(k, preferences.get(k));
+					properties.put(k, preferences.get(k));
 					properties.getDefaults().setProperty(k,
 							preferences.getDefault(k));
 				}
@@ -180,8 +180,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @return all options that could not automatically be converted into a
 	 *         JComponent.
 	 */
-	public List<Option> autoBuildPanel() {
-		List<Option> unprocessedOptions = new LinkedList<Option>();
+	public List<Option<?>> autoBuildPanel() {
+		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
 		Class<?> keyProvider = preferences.getKeyProvider();
 		LayoutHelper lh = new LayoutHelper(this);
 
@@ -189,7 +189,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			try {
 				Object fieldValue = field.get(keyProvider);
 				if (fieldValue instanceof Option) {
-					Option o = (Option) fieldValue;
+					Option<?> o = (Option<?>) fieldValue;
 
 					// Create swing option based on field type
 					JComponent jc = getJComponentForOption(o);
@@ -251,7 +251,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 *            - option to build the JComponent for.
 	 * @return JComponent or NULL if the getRequiredType() is unknown.
 	 */
-	public JComponent getJComponentForOption(Option o) {
+	public JComponent getJComponentForOption(Option<?> o) {
 		// Create swing option based on field type
 		JComponent jc = null;
 		if (o.getRequiredType() == Boolean.class) {

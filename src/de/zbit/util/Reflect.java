@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +23,7 @@ import java.util.jar.JarInputStream;
  * 
  * @author Marcel Kronfeld
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2009-09-22
  * @since This class was part of SBMLsqueezer version 1.3.
  */
@@ -569,6 +572,58 @@ public class Reflect {
 		list = Arrays.asList(clsArr);
 		return (Class<T>[]) list.toArray(new Class<?>[list.size()]);
 	}
+	
+	
+	/**
+	 * Returns true if and only if the given class
+	 * contains a String-parser (e.g. Boolean.parseBoolean()
+	 * or Float.parseFloat()).
+	 * @param clazz
+	 * @return
+	 */
+	public static boolean containsParser(Class<?> clazz) {
+		return getStringParser(clazz)!=null;
+	}
+	
+	/**
+	 * Returns the parse-Method for the given class
+	 * (e.g. Boolean.parseBoolean())
+	 * @param clazz
+	 * @return
+	 */
+	public static Method getStringParser(Class<?> clazz) {
+		String searchFor = "parse" + clazz.getSimpleName();
+		try {
+			return clazz.getMethod(searchFor, String.class);
+		} catch (Exception e) {
+			// NoSuchMethodException, SecurityException
+      return null;
+		}
+	}
+	
+	/**
+	 * Invokes the parse-Method of clazz on the given Object.
+	 * @param clazz
+	 * @param toParse
+	 * @return
+	 */
+	public static Object invokeParser(Class<?> clazz, Object toParse) {
+		Method m = getStringParser(clazz);
+		if (m==null) return null;
+		
+		try {
+			return m.invoke(clazz, toParse);
+			
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	
 	/**
 	 * 
