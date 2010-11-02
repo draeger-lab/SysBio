@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
+import de.zbit.gui.ActionCommand;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.util.StringUtil;
@@ -37,17 +38,16 @@ import de.zbit.util.StringUtil;
  * 
  */
 public class DirectoryChooser extends JPanel implements ActionListener {
-
+	
 	/**
-	 * Lists all possible action commands for this {@link DirectoryChooser}.
-	 * These are necessary when calling the
-	 * {@link DirectoryChooser#actionPerformed(ActionEvent)} to decide what to
-	 * do.
+	 * Lists all possible action commands for this {@link DirectoryChooser}. These
+	 * are necessary when calling the
+	 * {@link DirectoryChooser#actionPerformed(ActionEvent)} to decide what to do.
 	 * 
 	 * @author Andreas Dr&auml;ger
 	 * @date 2010-09-10
 	 */
-	public enum Command {
+	public enum Command implements ActionCommand {
 		/**
 		 * Command to open a {@link JFileChooser} with an open dialog.
 		 */
@@ -55,24 +55,44 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 		/**
 		 * Command to open a {@link JFileChooser} with a save dialog.
 		 */
-		SAVE
+		SAVE;
+		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.zbit.gui.ActionCommand#getName()
+		 */
+		public String getName() {
+			return StringUtil.firstLetterUpperCase(this.toString());
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.zbit.gui.ActionCommand#getToolTip()
+		 */
+		public String getToolTip() {
+			return String.format(
+				"Select the default directory to %s various kinds of files.",
+				this == OPEN ? "open" : "save");
+		}
 	}
-
+	
 	/**
 	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = -3353915785190340070L;
-
+	
 	/**
 	 * These fields contain the desired directory name.
 	 */
 	private JTextField tfOpenDir, tfSaveDir;
-
+	
 	/**
 	 * The default, i.e., initial values for both text fields
 	 */
 	private String defaultOpenDir, defaultSaveDir;
-
+	
 	/**
 	 * Switch of whether to
 	 * <ul>
@@ -83,42 +103,35 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	 * </ul>
 	 */
 	private boolean createDir;
-
-	/**
-	 * Explaining text for the buttons.
-	 */
-	private static final String TOOL_TIP_BUTTONS = "Select the default directory to %s various kinds of files.";
-
+	
 	/**
 	 * Both arguments may be empty Strings, i.e., no default value is given, or
-	 * null, i.e., no such label/field/button combination will appear. If
-	 * selected directories do not yet exist, with this constructor those will
-	 * not be created. This behavior can be changed using
-	 * {@link #setCreateDir(boolean)}.
+	 * null, i.e., no such label/field/button combination will appear. If selected
+	 * directories do not yet exist, with this constructor those will not be
+	 * created. This behavior can be changed using {@link #setCreateDir(boolean)}.
 	 * 
 	 * @param openDir
-	 *            The default directory to open files
+	 *        The default directory to open files
 	 * @param saveDir
-	 *            The default directory to save files
+	 *        The default directory to save files
 	 */
 	public DirectoryChooser(String openDir, String saveDir) {
 		this(openDir, saveDir, false);
 	}
-
+	
 	/**
 	 * Both arguments may be empty Strings, i.e., no default value is given, or
-	 * null, i.e., no such label/field/button combination will appear. If
-	 * selected directories do not yet exist, with this constructor those will
-	 * be created if possible. This behavior can be changed using
+	 * null, i.e., no such label/field/button combination will appear. If selected
+	 * directories do not yet exist, with this constructor those will be created
+	 * if possible. This behavior can be changed using
 	 * {@link #setCreateDir(boolean)}.
 	 * 
 	 * @param openDir
-	 *            The default directory to open files
+	 *        The default directory to open files
 	 * @param saveDir
-	 *            The default directory to save files
+	 *        The default directory to save files
 	 * @param createDir
-	 *            Whether or not to try to create directories that do not yet
-	 *            exist.
+	 *        Whether or not to try to create directories that do not yet exist.
 	 */
 	public DirectoryChooser(String openDir, String saveDir, boolean createDir) {
 		super();
@@ -134,8 +147,8 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 				defaultOpenDir = openDir;
 				tfOpenDir = new JTextField(openDir);
 				openButton = GUITools.createButton("Browse", UIManager
-						.getIcon("ICON_OPEN"), this, Command.OPEN, String
-						.format(TOOL_TIP_BUTTONS, "open"));
+						.getIcon("ICON_OPEN"), this, Command.OPEN, Command.OPEN
+						.getToolTip());
 				// tfOpenDir.addKeyListener(this);
 				labelOpenDir = new JLabel("Open directory:");
 				lh.add(labelOpenDir, 0, row, 1, 1, 0, 0);
@@ -152,8 +165,8 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 				defaultSaveDir = saveDir;
 				tfSaveDir = new JTextField(saveDir);
 				saveButton = GUITools.createButton("Browse", UIManager
-						.getIcon("ICON_SAVE"), this, Command.SAVE, String
-						.format(TOOL_TIP_BUTTONS, "save"));
+						.getIcon("ICON_SAVE"), this, Command.SAVE, Command.SAVE
+						.getToolTip());
 				// tfSaveDir.addKeyListener(this);
 				labelSaveDir = new JLabel("Save directory:");
 				lh.add(labelSaveDir, 0, row, 1, 1, 0, 0);
@@ -166,7 +179,7 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 			}
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -178,21 +191,21 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 			try {
 				Command com = Command.valueOf(e.getActionCommand());
 				switch (com) {
-				case OPEN:
-					chooseDirectory(tfOpenDir, Command.OPEN);
-					break;
-				case SAVE:
-					chooseDirectory(tfSaveDir, Command.SAVE);
-					break;
-				default:
-					break;
+					case OPEN:
+						chooseDirectory(tfOpenDir, Command.OPEN);
+						break;
+					case SAVE:
+						chooseDirectory(tfSaveDir, Command.SAVE);
+						break;
+					default:
+						break;
 				}
 			} catch (Throwable t) {
 				// Just ignore this invalid event.
 			}
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -208,30 +221,26 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 			tfSaveDir.addKeyListener(listener);
 		}
 	}
-
+	
 	/**
 	 * This actually checks whether or not the directory on the given
-	 * {@link JTextField} does exist or not. The second argument gives the
-	 * default value to reset the element. Depending on the value of the field
-	 * {@link #createDir} this method attempts to create the directory if not
-	 * yet existent or directly displays an error message on a
-	 * {@link JOptionPane}.
+	 * {@link JTextField} does exist or not. The second argument gives the default
+	 * value to reset the element. Depending on the value of the field
+	 * {@link #createDir} this method attempts to create the directory if not yet
+	 * existent or directly displays an error message on a {@link JOptionPane}.
 	 * 
 	 * @param tf
-	 *            The text field with a directory name.
+	 *        The text field with a directory name.
 	 * @param defaultDir
-	 *            The default value in case of invalid content in the text
-	 *            field.
-	 * @return True if the content of the given text field is a valid directory
-	 *         or could be successfully created, false otherwise. Maybe error
+	 *        The default value in case of invalid content in the text field.
+	 * @return True if the content of the given text field is a valid directory or
+	 *         could be successfully created, false otherwise. Maybe error
 	 *         messages will be displayed to the user on {@link JOptionPane}s.
 	 */
 	private boolean checkDir(JTextField tf, String defaultDir) {
 		if (tf != null) {
 			File f = new File(tf.getText());
-			if (f.exists() && f.isDirectory()) {
-				return true;
-			}
+			if (f.exists() && f.isDirectory()) { return true; }
 			if (createDir) {
 				try {
 					f.createNewFile();
@@ -240,16 +249,16 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 					GUITools.showErrorMessage(this, exc);
 				}
 			} else {
-				JOptionPane.showMessageDialog(getTopLevelAncestor(),
-						new JLabel(StringUtil.toHTML(String.format(
-								"No such directory %s.", f.getPath()), 40)),
-						"Warning", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(getTopLevelAncestor(), new JLabel(
+					StringUtil.toHTML(
+						String.format("No such directory %s.", f.getPath()), 40)),
+					"Warning", JOptionPane.WARNING_MESSAGE);
 				tf.setText(defaultDir);
 			}
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Checks whether or not the currently selected open directory represents a
 	 * valid and existing directory. Depending on the field {@link #createDir}
@@ -257,13 +266,13 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	 * directly display an error message to the user using a certain
 	 * {@link JOptionPane}.
 	 * 
-	 * @return True if the directory in the open text field is already existing
-	 *         or could be successfully created, false otherwise.
+	 * @return True if the directory in the open text field is already existing or
+	 *         could be successfully created, false otherwise.
 	 */
 	public boolean checkOpenDir() {
 		return checkDir(tfOpenDir, defaultOpenDir);
 	}
-
+	
 	/**
 	 * Checks whether or not the currently selected save directory represents a
 	 * valid and existing directory. Depending on the field {@link #createDir}
@@ -271,43 +280,43 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	 * directly display an error message to the user using a certain
 	 * {@link JOptionPane}.
 	 * 
-	 * @return True if the directory in the save text field is already existing
-	 *         or could be successfully created, false otherwise.
+	 * @return True if the directory in the save text field is already existing or
+	 *         could be successfully created, false otherwise.
 	 */
 	public boolean checkSaveDir() {
 		return checkDir(tfSaveDir, defaultSaveDir);
 	}
-
+	
 	/**
 	 * Displays a {@link JFileChooser} to the user to select the desired
 	 * directory. If the user approves the dialog, the corresponding
 	 * {@link JTextField} will display the selected file.
 	 * 
 	 * @param tf
-	 *            The text field whose value is to be changed.
+	 *        The text field whose value is to be changed.
 	 * @param com
-	 *            The command, i.e., open directory or save directory.
+	 *        The command, i.e., open directory or save directory.
 	 */
 	private void chooseDirectory(JTextField tf, Command com) {
 		JFileChooser chooser = GUITools.createJFileChooser(tf.getText(), false,
-				false, JFileChooser.DIRECTORIES_ONLY);
+			false, JFileChooser.DIRECTORIES_ONLY);
 		int returnType;
 		switch (com) {
-		case OPEN:
-			returnType = chooser.showOpenDialog(this);
-			break;
-		case SAVE:
-			returnType = chooser.showSaveDialog(this);
-			break;
-		default:
-			returnType = JFileChooser.CANCEL_OPTION;
-			break;
+			case OPEN:
+				returnType = chooser.showOpenDialog(this);
+				break;
+			case SAVE:
+				returnType = chooser.showSaveDialog(this);
+				break;
+			default:
+				returnType = JFileChooser.CANCEL_OPTION;
+				break;
 		}
 		if (returnType == JFileChooser.APPROVE_OPTION) {
 			tf.setText(chooser.getSelectedFile().getAbsolutePath());
 		}
 	}
-
+	
 	/**
 	 * Provides access to the default value for the open directory.
 	 * 
@@ -318,7 +327,7 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	public String getDefaultOpenDir() {
 		return defaultOpenDir;
 	}
-
+	
 	/**
 	 * Provides access to the default value for the save directory.
 	 * 
@@ -329,44 +338,44 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	public String getDefaultSaveDir() {
 		return defaultSaveDir;
 	}
-
+	
 	/**
 	 * Returns the directory to open files as selected by the user or null if no
 	 * such field is present on this {@link DirectoryChooser}.
 	 * 
-	 * @return The path to the selected directory. This may be an invalid path,
-	 *         or the file may have to be created. An application will have to
-	 *         check this.
+	 * @return The path to the selected directory. This may be an invalid path, or
+	 *         the file may have to be created. An application will have to check
+	 *         this.
 	 * @see #checkOpenDir()
 	 */
 	public String getOpenDir() {
 		return tfOpenDir != null ? tfOpenDir.getText() : null;
 	}
-
+	
 	/**
 	 * Returns the directory to save files as selected by the user or null if no
 	 * such field is present on this {@link DirectoryChooser}.
 	 * 
-	 * @return The path to the selected directory. This may be an invalid path,
-	 *         or the file may have to be created. An application will have to
-	 *         check this.
+	 * @return The path to the selected directory. This may be an invalid path, or
+	 *         the file may have to be created. An application will have to check
+	 *         this.
 	 * @see #checkSaveDir()
 	 */
 	public String getSaveDir() {
 		return tfSaveDir != null ? tfSaveDir.getText() : null;
 	}
-
+	
 	/**
 	 * Necessary to check whether the methods {@link #checkOpenDir()} and
-	 * {@link #checkSaveDir()} will attempt to create a directory if the entry
-	 * in the associated text field is not yet existing.
+	 * {@link #checkSaveDir()} will attempt to create a directory if the entry in
+	 * the associated text field is not yet existing.
 	 * 
 	 * @return True if directories should be created or false otherwise.
 	 */
 	public boolean isSetCreateDir() {
 		return createDir;
 	}
-
+	
 	/**
 	 * Method to check whether or not this element displays a chooser for open
 	 * directories.
@@ -377,7 +386,7 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	public boolean isSetOpenChooser() {
 		return tfOpenDir != null;
 	}
-
+	
 	/**
 	 * Method to check whether or not this element displays a chooser for save
 	 * directories.
@@ -388,18 +397,18 @@ public class DirectoryChooser extends JPanel implements ActionListener {
 	public boolean isSetSaveChooser() {
 		return tfSaveDir != null;
 	}
-
+	
 	/**
 	 * Method to decide whether or not this element should attempt to create
 	 * directories in the methods {@link #checkOpenDir()} and
-	 * {@link #checkSaveDir()} if the value in the corresponding text field
-	 * points to a path that is not yet existent.
+	 * {@link #checkSaveDir()} if the value in the corresponding text field points
+	 * to a path that is not yet existent.
 	 * 
 	 * @param createDir
-	 *            True means try to create directories, false not.
+	 *        True means try to create directories, false not.
 	 */
 	public void setCreateDir(boolean createDir) {
 		this.createDir = createDir;
 	}
-
+	
 }
