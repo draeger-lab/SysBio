@@ -13,11 +13,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -1146,6 +1149,34 @@ public class Utils {
       // Not important
     }
     return null;
+  }
+  
+  /**
+   * Returns true if and only if the given class is any instance of
+   * an integer (german: "Ganzzahlig"). This includes:<ul>
+   * <li>AtomicInteger</li>
+   * <li>AtomicLong</li>
+   * <li>BigInteger</li>
+   * <li>Byte</li>
+   * <li>Integer</li>
+   * <li>Long</li>
+   * <li>Short</li>
+   * </ul>
+   * @param clazz
+   * @return
+   */
+  public static boolean isInteger(Class<?> clazz) {
+  	// Speeup possilble, if one could check the Number subclass...
+  	//if (!(clazz.((Number.class)))) return false;
+  	if (clazz.equals(AtomicInteger.class)) return true;
+  	else if (clazz.equals(AtomicLong.class)) return true;
+  	else if (clazz.equals(BigInteger.class)) return true;
+  	else if (clazz.equals(Byte.class)) return true;
+  	else if (clazz.equals(Integer.class)) return true;
+  	else if (clazz.equals(Long.class)) return true;
+  	else if (clazz.equals(Short.class)) return true;
+  	
+  	return false;
   }
   
   /**

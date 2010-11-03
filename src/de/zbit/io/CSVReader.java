@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1456,16 +1457,33 @@ public class CSVReader implements Serializable, Cloneable {
   private static String[] getSplits(String input, char separator, boolean skipConsecutiveMatches, boolean skipMatchesInStrings) {
     if (separator=='\u0001') return getSplits(input, Pattern.compile("\\s"), skipConsecutiveMatches, skipMatchesInStrings);
     
-    // Get columns. A little bit more flexible than a simple .split()!
-    ArrayList<String> splits = new ArrayList<String>();
-    
     // Move out of here
     ArrayList<Character> stringIndicators = new ArrayList<Character>();
     stringIndicators.add('\"');
     // '\'' is complicated because of terms like "it's"
     //---
     
-    boolean[] skip = new boolean[stringIndicators.size()];
+    return getSplits(input, separator, skipConsecutiveMatches,
+			skipMatchesInStrings, stringIndicators);
+  }
+  
+  /**
+   * Split the given String at the given separator.
+   * Remark: intances if separator, in stringIndicators are ignored, but the
+   * indicators are NOT REMOVED!
+   * @param input - String to split
+   * @param separator - separator char
+   * @param skipConsecutiveMatches
+   * @param skipMatchesInStrings - skip matches, between instances of 'stringIndicators' 
+   * @param stringIndicators - only if 'skipMatchesInStrings' a list if string indicators.
+   * @return
+   */
+	public static String[] getSplits(String input, char separator,
+		boolean skipConsecutiveMatches, boolean skipMatchesInStrings, List<Character> stringIndicators) {
+    // Get columns. A little bit more flexible than a simple .split()!
+    ArrayList<String> splits = new ArrayList<String>();
+    
+		boolean[] skip = new boolean[stringIndicators.size()];
     int activatedSkippers=0;
     
     String currentColumn = "";
@@ -1514,7 +1532,7 @@ public class CSVReader implements Serializable, Cloneable {
     
     
     return splits.toArray(new String[0]);
-  }
+	}
   
   
   private static String[] getSplits(String input, Pattern separator, boolean skipConsecutiveMatches, boolean skipMatchesInStrings) {

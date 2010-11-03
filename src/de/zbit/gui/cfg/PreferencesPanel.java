@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
@@ -14,7 +15,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
@@ -27,13 +27,13 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.LayoutHelper;
+import de.zbit.gui.cfg.FileSelector.Type;
 import de.zbit.util.Option;
 import de.zbit.util.Reflect;
 import de.zbit.util.SBPreferences;
@@ -59,11 +59,12 @@ import de.zbit.util.SBProperties;
  * call these methods from the super class also.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2010-04-13
  */
 public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		ItemListener, ChangeListener {
-
+	
 	/**
 	 * Generated serial version identifier
 	 */
@@ -261,43 +262,47 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		JComponent jc = null;
 		String optionTitle = formatOptionName(o.getOptionName());
 		
-		// Process range specification
-		/*String range = o.getRangeSpecifiaction();
-		if (range!=null && range.length()>0) {
-			try {
-				range = range.substring(range.indexOf('{')+1, range.lastIndexOf('}'));
-				String[] items = range.split(Pattern.quote(","));
-				
-			} catch (Exception e) {
-				System.err.println("Range in wrong format: '" + o.getRangeSpecifiaction()+"'.");
+		// If a range is specified, get all possible values.
+		String[] values = null;
+		{
+			if (o.getRange()!=null) {
+				List<?> val = o.getRange().getAllAcceptableValues();
+				if (val!=null) {
+					values = new String[val.size()];
+					for (int i=0; i<val.size(); i++)
+						values[i]=val.get(i).toString();
+				}
 			}
-		}*/
+		}
 		
+		// TODO: Guppieren, Testen, Accept automatieren
 		if (o.getRequiredType() == Boolean.class) {
 			jc = new JCheckBox();
 			((AbstractButton) jc).setSelected(((Option<Boolean>)o).getValue(preferences));
 			
 			//((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
 			//		.get(o.getOptionName()).toString()));
-		/*} else if (o.getRequiredType() == File.class) {
-			// TODO: Implement this
+		} else if (o.getRequiredType() == File.class) {
 			// XXX: Is it possible to store the extension or
 			// "only directories" in o.getRangeSpecifiaction()?
+			// TODO: Infere arguments.
+			jc = new FileSelector(Type.OPEN);
+			
 		} else if (o.getRequiredType() == Character.class) {
-			// TODO: Implement this
-			// don't forget to check o.getRangeSpecifiaction()
-		} else if (o.getRequiredType() == String.class) {
-			// TODO: Implement this
-			// don't forget to check o.getRangeSpecifiaction()
-		} else if (o.getRequiredType() == Number.class) {
-			// TODO: Implement this double, short, int, etc.
-			// don't forget to check o.getRangeSpecifiaction()
-		}*/
-		} else {
-			jc = new JColumnChooser(optionTitle, true);
+			jc = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
 			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
-			}
+			//JComponent cs = ((JColumnChooser)jc).getColumnChooser();
+			// TODO: Limit maximum size to one (don't accept inputs after that).
+			
+		} else if (o.getRequiredType() == String.class) {
+			jc = new JColumnChooser(optionTitle, true, values);
+			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
+			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
+		} else if (o.getRequiredType() == Number.class) {
+			jc = new JColumnChooser(optionTitle, true, values);
+			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
+		}
 
 		// Check if the option could be converted to a JComponent
 		if (jc != null) {

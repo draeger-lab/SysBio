@@ -3,6 +3,9 @@
  */
 package de.zbit.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import argparser.ArgParser;
 import argparser.BooleanHolder;
 import argparser.CharHolder;
@@ -11,15 +14,208 @@ import argparser.FloatHolder;
 import argparser.IntHolder;
 import argparser.LongHolder;
 import argparser.StringHolder;
+import de.zbit.io.CSVReader;
 
 /**
  * An {@link Option} defines a key in a key-provider class and can also be used
  * to specify command-line options for a program.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2010-10-24
  */
 public class Option<Type> {
+	
+	/**
+	 * A range of any type. Consisting of lower and upper bound and
+	 * the information, if the lower/upper bound itself is included
+	 * or not. 
+	 * @author wrzodek
+	 */
+	class Range {
+		public Type lBound;
+		public Type uBound;
+		public boolean excludingLBound=false;
+		public boolean excludingUBound=false;
+		
+		public Range() {
+			super();
+		}
+		
+		public Range (Type value) {
+			this (value, value);
+		}
+		
+		public Range (Type lowerBound, Type upperBound) {
+			this (lowerBound, upperBound, false, false);
+		}
+		
+		@SuppressWarnings("unchecked")
+		public Range (Type lowerBound, Type upperBound, boolean excludingLBound, boolean excludingUBound) {
+			super();
+			lBound = lowerBound;
+			uBound = upperBound;
+			
+			this.excludingLBound = excludingLBound;
+			this.excludingUBound = excludingUBound;
+			
+			// Ensure, that lBound is always smaller than uBound
+			if (lBound instanceof Comparable) {
+				if (((Comparable)lBound).compareTo(((Comparable)uBound)) >0) {
+					// SWAP
+					Type temp = lBound;
+					lBound=uBound;
+					uBound=temp;
+					
+					boolean temp2 = this.excludingLBound;
+					this.excludingLBound = this.excludingUBound;
+					this.excludingUBound = temp2;
+				}
+			}
+		}
+	  
+
+		@SuppressWarnings("unchecked")
+		public boolean isInRange(Type value) {
+			if (value instanceof Comparable) {
+				// Check lower bound
+				int r = ((Comparable)value).compareTo(((Comparable)lBound));
+				if (r<0 || (r==0 && excludingLBound) ) return false;
+				
+				// Check upper bound
+				r = ((Comparable)value).compareTo(((Comparable)uBound));
+				if (r>0 || (r==0 && excludingUBound) ) return false;
+				
+				return true;
+			} else if (lBound.equals(uBound)) {
+				// Check absolute value
+				if (!excludingLBound && !excludingUBound) {
+				  if (value.equals(lBound)) return true;
+				  else return false;
+				} else {
+					return false;
+				}
+			} else {
+				System.err.println("Cannot compare class " + value.getClass().getName() + ". Please implement the Comparable interface.");
+				return false;
+			}
+		}
+		
+		public List<Type> getAllAcceptableValues() {
+			List<Type> r = new LinkedList<Type>();
+			
+			// Check absolute value
+		  if (lBound.equals(uBound)) {
+		  	if (!excludingLBound && !excludingUBound)
+		  	  r.add(lBound);
+		  	return r;
+		  }
+		  
+		  // Check if ranges have a finite length
+		  double start=0;double end=0;
+		  if (Utils.isInteger(lBound.getClass())) {
+		  	start = ((Number)lBound).doubleValue();
+		  	end = ((Number)uBound).doubleValue();
+		  	
+		  } else if (lBound instanceof Character) {
+		  	start = (int)(Character)lBound;
+		  	end = (int)(Character)uBound;
+		  	
+		  } else {
+		  	// E.g. Strings
+		  	return null;
+		  }
+		  
+		  // Exit if too much choices and handle bounds
+	  	if ((end-start)>10) return null;
+	  	if (!excludingLBound) addNumberOrCharacter(lBound.getClass(), r, start);
+	  	// Collect all possible choices
+	  	for (start+=1; start<end; start++) {
+	  		addNumberOrCharacter(lBound.getClass(), r, start);
+	  	}
+	  	if (!excludingUBound) addNumberOrCharacter(lBound.getClass(), r, end);
+	  	
+	  	return r;
+		}
+		
+		@SuppressWarnings("unchecked")
+		private boolean addNumberOrCharacter(Class<?> Type, List<Type> list, double val) {
+			//Integer.decode(nm)
+			//Object re = Reflect.invokeIfContains(Type, "decode", String.class, Double.toString(val));
+			
+			// Make an Integer value of the double
+			String strVal = Double.toString(val);
+			int pos = strVal.indexOf('.');
+			if (pos>0) strVal = strVal.substring(0, pos);
+			
+			// Parse it into Type and add it to the list.
+			Object re = Reflect.invokeParser(Type, strVal);
+			if (re==null) {
+				// Character
+				if (Type.equals(Character.class)) {
+					((List<Character>)list).add(( (char)val) );
+					return true;
+				} else {
+					try {
+					  list.add( (Type)Type.cast(val) );
+					} catch(Throwable t) {return false;}
+				}
+			} else {
+				try {
+				  list.add( (Type)(re) );
+				} catch(Throwable t) {return false;}
+				return true;
+			}
+			return false;
+		}
+		
+	 }
+	
+	/**
+	 * A collection of ranges with a few convenient methods to work with them.
+	 * 
+	 * @author wrzodek
+	 */
+	public class rangeCollection {
+		private List<Range> ranges = new LinkedList<Range>();
+		
+		public void addRange(Range range) {
+			ranges.add(range);
+		}
+		
+		/**
+		 * If there are less or equal than 10 acceptable values, all those
+		 * are returned. Else: null is returned.
+		 * @return
+		 */
+		public List<Type> getAllAcceptableValues() {
+			List<Type> ret = new LinkedList<Type>();
+			for (Range r : ranges) {
+				List<Type> newItems = r.getAllAcceptableValues();
+				// Too many elements, or invalid Type
+				if (newItems==null) return null;
+				for (Type type : newItems) {
+					if (!ret.contains(type)) ret.add(type);
+				}
+				if (ret.size()>10) return null;
+			}
+			return ret;
+		}
+		
+		/**
+		 * Checks, if the given value is in range of all ranges.
+		 * @param value
+		 * @return
+		 */
+		public boolean isInRange(Type value) {
+			for (Range r : ranges) {
+				if (!r.isInRange(value)) return false;
+			}
+			return true;
+		}
+		
+	}
+	
 
     /**
      * A short description what the purpose of this option is.
@@ -37,9 +233,14 @@ public class Option<Type> {
     /**
      * An optional range specification string to limit the allowable values when
      * using this {@link Option} on the command line.
+     * See {@link #getRangeSpecifiaction()} for more information.
      */
     private final String rangeSpec;
     /**
+     * More convenient format of {@link #rangeSpec}
+     */
+    private final rangeCollection range;
+		/**
      * The data type that is expected as an associated value in a key-value pair
      * of this {@link Option}'s name and a value. For instance, Boolean,
      * Integer, String etc.
@@ -84,7 +285,7 @@ public class Option<Type> {
      * @param optionName
      * @param requiredType
      * @param description
-     * @param rangeSpec
+     * @param rangeSpec - See {@link #getRangeSpecifiaction()}.
      */
     public Option(String optionName, Class<Type> requiredType, String description,
 	String rangeSpec) {
@@ -95,7 +296,7 @@ public class Option<Type> {
      * @param optionName
      * @param requiredType
      * @param description
-     * @param rangeSpec
+     * @param rangeSpec - See {@link #getRangeSpecifiaction()}.
      * @param numLeadingMinus
      *        the number of leading '-' symbols of the command-line argument
      *        corresponding to this option.
@@ -111,7 +312,7 @@ public class Option<Type> {
      * @param optionName
      * @param requiredType
      * @param description
-     * @param rangeSpec
+     * @param rangeSpec - See {@link #getRangeSpecifiaction()}.
      * @param numLeadingMinus
      * @param shortCmdName
      */
@@ -156,7 +357,7 @@ public class Option<Type> {
      * @param optionName
      * @param requiredType
      * @param description
-     * @param rangeSpec
+     * @param rangeSpec - See {@link #getRangeSpecifiaction()}.
      * @param defaultValue
      */
     public Option(String optionName, Class<Type> requiredType, String description,
@@ -169,7 +370,7 @@ public class Option<Type> {
      * @param optionName
      * @param requiredType
      * @param description
-     * @param rangeSpec
+     * @param rangeSpec - See {@link #getRangeSpecifiaction()}.
      * @param numLeadingMinus
      *        the number of leading '-' symbols of the command-line argument
      *        corresponding to this option.
@@ -186,7 +387,7 @@ public class Option<Type> {
      * @param optionName
      * @param requiredType
      * @param description
-     * @param rangeSpec
+     * @param rangeSpec - See {@link #getRangeSpecifiaction()}.
      * @param numLeadingMinus
      * @param shortCmdName
      * @param defaultValue
@@ -197,6 +398,11 @@ public class Option<Type> {
 	this.requiredType = requiredType;
 	this.description = description;
 	this.rangeSpec = rangeSpec;
+	if (rangeSpec!=null && rangeSpec.length()>0) {
+	  this.range = parseRangeSpec(rangeSpec);
+	} else {
+		this.range=null;
+	}
 	this.shortCmdName = shortCmdName;
 	this.defaultValue = defaultValue;
 	if (numLeadingMinus < 0) {
@@ -285,15 +491,52 @@ public class Option<Type> {
     public short getNumLeadingMinus() {
 	return numLeadingMinus;
     }
-
+    
+    /**
+     * @return the range
+     */
+    public rangeCollection getRange() {
+    	return range;
+    }
+    
     /**
      * @return this {@link Option}'s name
      */
     public String getOptionName() {
 	return optionName;
     }
-
+    
     /**
+     * <p><var>rangeSpec</var> is an optional range specification,
+     * placed inside curly braces, consisting of a
+     * comma-separated list of range items each specifying
+     * permissible values for the option. A range item may be an
+     * individual value, or it may itself be a subrange,
+     * consisting of two individual values, separated by a comma,
+     * and enclosed in square or round brackets. Square and round
+     * brackets denote closed and open endpoints of a subrange, indicating
+     * that the associated endpoint value is included or excluded
+     * from the subrange.
+     * The values specified in the range spec need to be
+     * consistent with the type of value expected by the option.
+     *
+     * <p><b>Examples:</b>
+     *
+     * <p>A range spec of <code>{2,4,8,16}</code> for an integer
+     * value will allow the integers 2, 4, 8, or 16.
+     *
+     * <p>A range spec of <code>{[-1.0,1.0]}</code> for a floating
+     * point value will allow any floating point number in the
+     * range -1.0 to 1.0.
+     * 
+     * <p>A range spec of <code>{(-88,100],1000}</code> for an integer
+     * value will allow values > -88 and <= 100, as well as 1000.
+     *
+     * <p>A range spec of <code>{"foo", "bar", ["aaa","zzz")} </code> for a
+     * string value will allow strings equal to <code>"foo"</code> or
+     * <code>"bar"</code>, plus any string lexically greater than or equal
+     * to <code>"aaa"</code> but less then <code>"zzz"</code>.
+     *
      * @return the rangeSpec
      */
     public String getRangeSpecifiaction() {
@@ -324,17 +567,11 @@ public class Option<Type> {
      * @param parentPreferences
      * @return
      */
-    @SuppressWarnings("unchecked")
     public Type getValue(SBPreferences parentPreferences) {
     	// Returns a string.
     	Object ret = parentPreferences.get(this.toString());
     	
-    	if (ret == null)
-    		return null;
-    	if (Reflect.containsParser(requiredType))
-    		ret = Reflect.invokeParser(requiredType, ret);
-    	
-    	return (Type) ret;
+    	return parseOrCast(ret);
     }
     
     /**
@@ -343,18 +580,32 @@ public class Option<Type> {
      * @param parentPreferences
      * @return
      */
-    @SuppressWarnings("unchecked")
 		public Type getValue(SBProperties parentProperties) {
     	// Returns a string.
     	Object ret = parentProperties.getProperty(this.toString());
     	
-    	if (ret == null)
+    	return parseOrCast(ret);
+    }
+
+    /**
+     * Convert 'ret' to {@link #requiredType} by parsing it
+     * (e.g. Integer.parseInt), or casting it to the desired type.
+     * @param ret
+     * @return
+     */
+		@SuppressWarnings("unchecked")
+		private Type parseOrCast(Object ret) {
+			if (ret == null)
     		return null;
     	if (Reflect.containsParser(requiredType))
     		ret = Reflect.invokeParser(requiredType, ret);
     	
+    	if (requiredType.equals(Character.class)) {
+    		ret = ((Character)ret.toString().charAt(0));
+    	}
+    	
     	return (Type) ret;
-    }
+		}
     
 
     /**
@@ -481,6 +732,69 @@ public class Option<Type> {
 	return sb.toString();
     }
 
+    /**
+     * Parse the range specification string into a more convenient
+     * data structute. See {@link #getRangeSpecifiaction()} for
+     * more information on possible Strings.
+     * @param range
+     * @return rangeCollection<Type>
+     */
+    private rangeCollection parseRangeSpec(String range) {
+    	rangeCollection ret = new rangeCollection();
+    	
+			try {
+				range = range.substring(range.indexOf('{')+1, range.lastIndexOf('}'));
+				// Be carefull with " and '
+				//String[] items = range.split(Pattern.quote(","));
+				List<Character> stringSep = new LinkedList<Character>();
+				stringSep.add('\''); stringSep.add('\"');
+				String[] items = CSVReader.getSplits(range, ',', true, true, stringSep);
+				
+				Range r = null;
+				for (int i=0; i<items.length; i++) {
+					String item = items[i].trim();
+					String item2=item;
+					r = new Range();
+					
+					// Check if we have a range
+					char c = item.charAt(0);
+					if (c=='(' || c=='[') {
+						if (c=='(') r.excludingLBound=true;
+						i++;
+						item = item.substring(1);
+						item2 = items[i].trim();
+						
+						c = item2.charAt(item2.length()-1);
+						if (c!=')' && c!=']') throw new Exception();
+						else if (c==')') r.excludingUBound=true;
+						item2 = item2.substring(0, item2.length()-1);
+					}
+					
+					// Trim the string indicators
+					for (Character sep : stringSep) {
+						if (item.length()>2 && item.charAt(0)==(sep) && item.charAt(item.length()-1)==(sep) ) {
+							item = item.substring(1, item.length()-1);
+						}
+						if (item2.length()>2 && item2.charAt(0)==(sep) && item2.charAt(item2.length()-1)==(sep) ) {
+							item2 = item2.substring(1, item2.length()-1);
+						}
+					}
+					
+					r.lBound=parseOrCast(item);
+					r.uBound=parseOrCast(item2);
+					ret.addRange(r);
+				}
+				
+			} catch (Exception e) {
+				System.err.println("Range in wrong format: '" + range +"'.");
+				e.printStackTrace();
+				return null;
+			}
+
+    	return ret;
+    }
+    
+    
     /*
      * (non-Javadoc)
      * @see java.lang.Object#toString()
