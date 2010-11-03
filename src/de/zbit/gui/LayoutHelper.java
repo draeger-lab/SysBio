@@ -128,15 +128,6 @@ public class LayoutHelper {
 	}
 	
 	/**
-	 * adds this component in the next row.
-	 * 
-	 * @param c
-	 */
-	public void add(Component c) {
-		add(c, 0, ++row, 1, 1, 1, 1);
-	}
-	
-	/**
 	 * 
 	 * @param sameWidth
 	 *        if true, a maximum width will be applied to each component, sharing
@@ -149,6 +140,15 @@ public class LayoutHelper {
 		for (int i = 0; i < components.length; i++) {
 			add(components[i], i + 1, row, 1, 1, sameWidth ? 1 : 0, 0);
 		}
+	}
+	
+	/**
+	 * adds this component in the next row.
+	 * 
+	 * @param c
+	 */
+	public void add(Component c) {
+		add(c, 0, ++row, 1, 1, 1, 1);
 	}
 	
 	/**
@@ -168,6 +168,22 @@ public class LayoutHelper {
 	 */
 	public void add(Component c, int width) {
 		add(c, 0, ++row, width, 1);
+	}
+	
+	/**
+	 * Add a component without specifying the row.
+	 * 
+	 * @param c
+	 * @param x
+	 * @param width
+	 * @param height
+	 * @param weightx
+	 * @param weighty
+	 */
+	public void add(Component c, int x, int width, int height, double weightx,
+		double weighty) {
+		add(c, x, row, width, height, weightx, weighty);
+		row++;
 	}
 	
 	/**
@@ -275,22 +291,6 @@ public class LayoutHelper {
 	
 	/**
 	 * 
-	 * @return
-	 */
-	public Container getContainer() {
-		return this.cont;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public int getRow() {
-		return row;
-	}
-	
-	/**
-	 * 
 	 * @param label
 	 * @param c
 	 * @param width
@@ -320,6 +320,23 @@ public class LayoutHelper {
 	}
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public Container getContainer() {
+		return this.cont;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getRow() {
+		return row;
+	}
+	
+	/**
+	 * Manually increment the current row.
 	 * 
 	 * @param increment
 	 */
