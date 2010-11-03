@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import javax.swing.text.StyleContext.SmallAttributeSet;
+
 /**
  * This class loads other classes that implement certain interfaces or extend
  * certain super types. With this method it becomes possible to load and
@@ -593,10 +595,15 @@ public class Reflect {
 	 */
 	public static Method getStringParser(Class<?> clazz) {
 		String searchFor = "parse" + clazz.getSimpleName();
+		if (searchFor.equals("parseInteger")) searchFor = "parseInt";
 		try {
 			return clazz.getMethod(searchFor, String.class);
 		} catch (Exception e) {
 			// NoSuchMethodException, SecurityException
+			try {
+				// Decode does the same as the "parseX" methods.
+				return clazz.getMethod("decode", String.class);
+			} catch (Exception e2) {}
       return null;
 		}
 	}

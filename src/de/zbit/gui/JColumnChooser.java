@@ -64,6 +64,14 @@ public class JColumnChooser extends JPanel {
   private JLabel preview;
   
   /**
+   * This should always be true. Just if you want to use this
+   * class not for "Choosing columns" but other stuff, you may
+   * want to change this behaviour.
+   */
+  private boolean acceptOnlyIntegers=true;
+  
+  
+  /**
    * Every integer added here corresponds to one column number. If an
    * integer is added, the column will be hidden in all ColumnChoosers.
    */
@@ -122,7 +130,9 @@ public class JColumnChooser extends JPanel {
     setName(title);
     // setHeaders handles this variable.. so set it directly.
     this.required = fieldIsRequired;
-    setHeaders(columnHeaders);    
+    setHeaders(columnHeaders);
+    
+    usePreview = (preview!=null);
     setPreview(preview);
     
     label.setLabelFor(colChooser);
@@ -167,7 +177,38 @@ public class JColumnChooser extends JPanel {
     layoutElements();
   }
   
+  
   /**
+	 * @return acceptOnlyIntegers
+	 */
+	public boolean isAcceptOnlyIntegers() {
+		return acceptOnlyIntegers;
+	}
+	
+	/**
+   * This should always be true. Just if you want to use this
+   * class not for "Choosing columns" but other stuff, you may
+   * want to change this behaviour.
+   * 
+	 * @param acceptOnlyIntegers
+	 */
+	public void setAcceptOnlyIntegers(boolean acceptOnlyIntegers) {
+		if (this.acceptOnlyIntegers != acceptOnlyIntegers) {
+		  this.acceptOnlyIntegers = acceptOnlyIntegers;
+		  refreshSelector();
+		}
+	}
+	
+	/**
+	 * Returns the actual column chooser object, which is either
+	 * a JComboBox or a JTextField.
+	 * @return
+	 */
+	public JComponent getColumnChooser() {
+		return colChooser;
+	}
+	
+	/**
    * {@inheritDoc}
    */
   public void setToolTipText(String s) {
@@ -358,6 +399,7 @@ public class JColumnChooser extends JPanel {
   }
   
   private ComboBoxModel buildComboBoxModel(String[] newHeader) {
+  	if (newHeader==null || newHeader.length<1) return null;
     
     // Create a list, hiding all unwanted elements
     Vector<String> headersToDisplay = new Vector<String>();
@@ -422,9 +464,31 @@ public class JColumnChooser extends JPanel {
   public void setUsePreview(boolean b) {
     if (this.usePreview != b) {
       this.usePreview = b;
-      preview.setVisible(usePreview);
-      validateRepaint();
+      if (preview!=null) {
+        preview.setVisible(usePreview);
+        validateRepaint();
+      }
     }
+  }
+  
+  /**
+   * Hide the preview label. Wrapper for 
+   * <pre>
+   * setUsePreview(false);
+   * </pre> 
+   */
+  public void hidePreview() {
+  	setUsePreview(false);
+  }
+  
+  /**
+   * Show the preview label. Wrapper for 
+   * <pre>
+   * setUsePreview(true);
+   * </pre> 
+   */
+  public void showPreview() {
+  	setUsePreview(true);
   }
   
   /**
@@ -466,8 +530,10 @@ public class JColumnChooser extends JPanel {
     if (model!=null) {
       model.setSelectedItem(s);
     } else {
-      if (CSVReader.isNumber(s, false)) {
+      if (CSVReader.isNumber(s, true)) {
         setDefaultValue(Integer.parseInt(s));
+      } else if (colChooser instanceof JTextField){
+      	((JTextField) colChooser).setText(s);
       }
     }
   }
@@ -517,7 +583,7 @@ public class JColumnChooser extends JPanel {
     
     // Column chooser
     ActionListener al = createActionListener();
-    colChooser = getColumnChooser(useJTextField?null:model, -1, required, al);
+    colChooser = getColumnChooser(useJTextField?null:model, -1, required, al, acceptOnlyIntegers);
     colChooser.setToolTipText(getToolTipText());
     if (getLayout() instanceof GridBagLayout) {
       addComponent(this, colChooser, 1, 0, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
@@ -605,8 +671,8 @@ public class JColumnChooser extends JPanel {
     }
   }
   
+  /** Create action listener to refresh preview */
   private ActionListener createActionListener() {
-    // Create action listener to refresh preview
     ActionListener previewAction = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         if (colChooser!=null && usePreview) {
@@ -673,9 +739,9 @@ public class JColumnChooser extends JPanel {
   
   @SuppressWarnings("unused")
   private static JComponent getColumnChooser(ComboBoxModel model) {
-    return getColumnChooser(model, -1, false, null);
+    return getColumnChooser(model, -1, false, null, true);
   }
-  private static JComponent getColumnChooser(ComboBoxModel model, int defaultValue, boolean required, ActionListener l) {
+  private static JComponent getColumnChooser(ComboBoxModel model, int defaultValue, boolean required, ActionListener l, boolean acceptOnlyIntegers) {
     JComponent ret;
     
     if (model!=null && model.getSize()>0) {
@@ -689,7 +755,13 @@ public class JColumnChooser extends JPanel {
       ret = cb;
     } else {
       if (defaultValue<0) defaultValue=0;
-      JTextField tf =CSVReaderOptionPanel.buildIntegerBox(Integer.toString(defaultValue), l);
+      JTextField tf;
+      if (acceptOnlyIntegers) {
+        tf =CSVReaderOptionPanel.buildIntegerBox(Integer.toString(defaultValue), l);
+      } else {
+      	tf = new JTextField(defaultValue);
+      	tf.addActionListener(l);
+      }
       ret = tf;
     }
     
