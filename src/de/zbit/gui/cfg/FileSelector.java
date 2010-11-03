@@ -13,6 +13,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -21,6 +22,7 @@ import javax.swing.filechooser.FileFilter;
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
+import de.zbit.io.SBFileFilter;
 import de.zbit.util.StringUtil;
 
 /**
@@ -253,6 +255,8 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * 
 	 * @param type
 	 * @param filter
+	 *        - if null, only directories are permitted. If you want to be able to
+	 *        select all Files, use e.g. {@link SBFileFilter#ALL_FILE_FILTER}.
 	 */
 	public FileSelector(Command type, FileFilter... filter) {
 		this(type, null, filter);
@@ -294,7 +298,7 @@ public class FileSelector extends JPanel implements ActionListener {
 		this.baseDir = baseDir != null ? baseDir : System.getProperty("user.dir");
 		this.filter = filter;
 		// Decide whether to deal with directories or files:
-		boolean mode = !((this.filter == null) || (this.filter.length == 0));
+		boolean mode = acceptOnlyFiles();
 		this.type.setMode(mode);
 		textField = new JTextField(this.baseDir);
 		String label = String.format(mode ? "%s file: " : "%s file directory: ",
@@ -332,19 +336,17 @@ public class FileSelector extends JPanel implements ActionListener {
 		if (e.getActionCommand() != null) {
 			baseDir = getBaseDir();
 			File file;
-			boolean mode = !((this.filter == null) || (this.filter.length == 0));
+			boolean mode = acceptOnlyFiles();
 			switch (Command.valueOf(e.getActionCommand())) {
 				case OPEN:
-					file = GUITools.openFileDialog(this, baseDir,
-						mode ? allFilesAcceptable : false, false,
-						mode ? JFileChooser.FILES_ONLY : JFileChooser.DIRECTORIES_ONLY,
-						filter);
+					file = GUITools.openFileDialog(this, baseDir, allFilesAcceptable,
+						false, mode ? JFileChooser.FILES_ONLY
+								: JFileChooser.DIRECTORIES_ONLY, filter);
 					break;
 				case SAVE:
-					file = GUITools.saveFileDialog(this, baseDir,
-						mode ? allFilesAcceptable : false, false, false,
-						mode ? JFileChooser.FILES_ONLY : JFileChooser.DIRECTORIES_ONLY,
-						filter);
+					file = GUITools.saveFileDialog(this, baseDir, allFilesAcceptable,
+						false, false, mode ? JFileChooser.FILES_ONLY
+								: JFileChooser.DIRECTORIES_ONLY, filter);
 					break;
 				default:
 					file = null;
@@ -355,6 +357,12 @@ public class FileSelector extends JPanel implements ActionListener {
 				baseDir = file.getParent();
 			}
 		}
+	}
+
+	private boolean acceptOnlyFiles() {
+		boolean mode = !((this.filter == null) || (this.filter.length == 0))
+				|| allFilesAcceptable;
+		return mode;
 	}
 	
 	/**
@@ -401,7 +409,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	 */
 	public File getSelectedFile() throws IOException {
 		File file = new File(textField.getText());
-		boolean mode = !((this.filter == null) || (this.filter.length == 0));
+		boolean mode = acceptOnlyFiles();
 		boolean justCreated = false;
 		if (!file.exists() && create) {
 			if (mode) {

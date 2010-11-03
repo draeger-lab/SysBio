@@ -6,7 +6,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
@@ -15,6 +14,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
@@ -27,12 +27,15 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.util.Option;
+import de.zbit.util.Reflect;
 import de.zbit.util.SBPreferences;
 import de.zbit.util.SBProperties;
 
@@ -202,6 +205,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 
 				}
 			} catch (Exception exc) {
+				exc.printStackTrace();
 				// ignore non-static fields
 			}
 		}
@@ -251,14 +255,31 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 *            - option to build the JComponent for.
 	 * @return JComponent or NULL if the getRequiredType() is unknown.
 	 */
+	@SuppressWarnings("unchecked")
 	public JComponent getJComponentForOption(Option<?> o) {
 		// Create swing option based on field type
 		JComponent jc = null;
+		String optionTitle = formatOptionName(o.getOptionName());
+		
+		// Process range specification
+		/*String range = o.getRangeSpecifiaction();
+		if (range!=null && range.length()>0) {
+			try {
+				range = range.substring(range.indexOf('{')+1, range.lastIndexOf('}'));
+				String[] items = range.split(Pattern.quote(","));
+				
+			} catch (Exception e) {
+				System.err.println("Range in wrong format: '" + o.getRangeSpecifiaction()+"'.");
+			}
+		}*/
+		
 		if (o.getRequiredType() == Boolean.class) {
 			jc = new JCheckBox();
-			((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
-					.get(o.getOptionName()).toString()));
-		} else if (o.getRequiredType() == File.class) {
+			((AbstractButton) jc).setSelected(((Option<Boolean>)o).getValue(preferences));
+			
+			//((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
+			//		.get(o.getOptionName()).toString()));
+		/*} else if (o.getRequiredType() == File.class) {
 			// TODO: Implement this
 			// XXX: Is it possible to store the extension or
 			// "only directories" in o.getRangeSpecifiaction()?
@@ -271,17 +292,29 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		} else if (o.getRequiredType() == Number.class) {
 			// TODO: Implement this double, short, int, etc.
 			// don't forget to check o.getRangeSpecifiaction()
-		}
+		}*/
+		} else {
+			jc = new JColumnChooser(optionTitle, true);
+			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
+			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
+			}
 
 		// Check if the option could be converted to a JComponent
 		if (jc != null) {
 			if (jc instanceof AbstractButton) {
-				((AbstractButton) jc).setText(formatOptionName(o
-						.getOptionName()));
-				((AbstractButton) jc).addItemListener(this);
+				((AbstractButton) jc).setText(optionTitle);
+			//} else if (jc instanceof JColumnChooser) {
+				//((JColumnChooser) jc).setTitle(optionTitle);
+				//((JColumnChooser) jc).setDefaultValue(o.getValue(preferences));
 			}
+			
+			Reflect.invokeIfContains(jc, "addItemListener", ItemListener.class, this);
+		  Reflect.invokeIfContains(jc, "addChangeListener", ChangeListener.class, this);
 			jc.setName(o.getOptionName());
 			jc.setToolTipText(o.getDescription());
+			jc.addKeyListener(this);
+			
+			//jc.setBorder(new TitledBorder("test"));
 		}
 
 		return jc;

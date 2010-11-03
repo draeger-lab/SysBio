@@ -2,6 +2,7 @@ package de.zbit.io;
 
 import java.io.File;
 
+import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -99,6 +100,12 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public static final MultipleFileFilter IMAGE_FILE_FILTER = new MultipleFileFilter(
 			"image file (*.jpg, *.png)", SBFileFilter.JPEG_FILE_FILTER,
 			SBFileFilter.PNG_FILE_FILTER);
+	
+	/**
+	 * The {@link FileFilter} for all files.
+	 */
+	public final static FileFilter ALL_FILE_FILTER = (new JFileChooser()).getAcceptAllFileFilter();
+	
 
 	/**
 	 * 
