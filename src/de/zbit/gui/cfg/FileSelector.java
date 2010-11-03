@@ -74,6 +74,29 @@ import de.zbit.util.StringUtil;
  * }
  * </pre>
  * 
+ * The following example demonstrate how to create a {@link FileSelector} for an
+ * input and an output file:
+ * 
+ * <pre>
+ * GUITools.initLaF(&quot;FileSelector test&quot;);
+ * JPanel p = new JPanel();
+ * FileSelector selectors[] = createOpenSavePanel(p, System
+ * 		.getProperty(&quot;user.dir&quot;), false,
+ * 	new SBFileFilter[] { SBFileFilter.SBML_FILE_FILTER }, System
+ * 			.getProperty(&quot;user.dir&quot;), false,
+ * 	new SBFileFilter[] { SBFileFilter.TeX_FILE_FILTER });
+ * if (JOptionPane
+ * 		.showConfirmDialog(null, p, &quot;Test&quot;, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+ * 	for (FileSelector fs : selectors) {
+ * 		try {
+ * 			System.out.println(fs.getSelectedFile());
+ * 		} catch (IOException exc) {
+ * 			GUITools.showErrorMessage(null, exc);
+ * 		}
+ * 	}
+ * }
+ * </pre>
+ * 
  * @author draeger
  * @date 2010-11-02
  */
@@ -83,10 +106,26 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * 
 	 * @return
 	 */
-	public static JPanel createOpenSavePanel() {
-		JPanel p = new JPanel();
-		// TODO
-		return p;
+	public static FileSelector[] createOpenSavePanel(JPanel panel,
+		String openBaseDir, boolean allOpenFilesAcceptable,
+		FileFilter[] openFilter, String saveBaseDir,
+		boolean allSaveFilesAcceptable, FileFilter[] saveFilter) {
+		
+		FileSelector selector[] = new FileSelector[2];
+		selector[0] = new FileSelector();
+		LayoutHelper lh = new LayoutHelper(panel);
+		lh.add(new JPanel(), 0, 0, 5, 1, 1, 0);
+		lh.incrementRowBy(1);
+		selector[0].init(lh, Command.OPEN, openBaseDir, allOpenFilesAcceptable,
+			openFilter);
+		lh.incrementRowBy(1);
+		lh.add(new JPanel(), 0, 2, 5, 1, 1, 0);
+		lh.incrementRowBy(1);
+		selector[1] = new FileSelector();
+		selector[1].init(lh, Command.SAVE, saveBaseDir, allSaveFilesAcceptable,
+			saveFilter);
+		
+		return selector;
 	}
 	
 	/**
@@ -181,11 +220,16 @@ public class FileSelector extends JPanel implements ActionListener {
 	private Command type;
 	
 	/**
-	 * Creates a new {@link FileSelector} to open an directory. The base directory
-	 * of browsing will be given by the {@link System} property "user.dir".
+	 * Creates a new empty {@link FileSelector}. All of its properties are
+	 * undefined.
 	 */
 	public FileSelector() {
-		this(Command.OPEN);
+		super();
+		this.create = true;
+		this.allFilesAcceptable = false;
+		this.type = null;
+		this.baseDir = System.getProperty("user.dir");
+		this.filter = null;
 	}
 	
 	/**
@@ -230,6 +274,20 @@ public class FileSelector extends JPanel implements ActionListener {
 	 */
 	public FileSelector(Command type, String baseDir,
 		boolean allFilesAreAcceptable, FileFilter... filter) {
+		super();
+		init(new LayoutHelper(this), type, baseDir, allFilesAreAcceptable, filter);
+	}
+	
+	/**
+	 * 
+	 * @param fileSelector
+	 * @param type
+	 * @param baseDir
+	 * @param allFilesAreAcceptable
+	 * @param filter
+	 */
+	private void init(LayoutHelper lh, Command type, String baseDir,
+		boolean allFilesAreAcceptable, FileFilter... filter) {
 		this.create = true;
 		this.allFilesAcceptable = allFilesAreAcceptable;
 		this.type = type;
@@ -238,18 +296,16 @@ public class FileSelector extends JPanel implements ActionListener {
 		// Decide whether to deal with directories or files:
 		boolean mode = !((this.filter == null) || (this.filter.length == 0));
 		this.type.setMode(mode);
-		LayoutHelper lh = new LayoutHelper(this);
 		textField = new JTextField(this.baseDir);
 		String label = String.format(mode ? "%s file: " : "%s file directory: ",
 			type == Command.OPEN ? "Open" : "Save");
-		
-		lh.add(new JLabel(label), 0, 0, 1, 1, 0, 0);
-		lh.add(new JPanel(), 1, 0, 1, 1, 0, 0);
-		lh.add(textField, 2, 0, 1, 1, 1, 0);
-		lh.add(new JPanel(), 3, 0, 1, 1, 0, 0);
+		lh.add(new JLabel(label), 0, lh.getRow(), 1, 1, 0, 0);
+		lh.add(new JPanel(), 1, lh.getRow(), 1, 1, 0, 0);
+		lh.add(textField, 2, lh.getRow(), 1, 1, 1, 0);
+		lh.add(new JPanel(), 3, lh.getRow(), 1, 1, 0, 0);
 		lh.add(GUITools.createButton("Browse", UIManager
 				.getIcon(type == Command.OPEN ? "ICON_OPEN" : "ICON_SAVE"), this, type,
-			type.getToolTip()), 4, 0, 1, 1, 0, 0);
+			type.getToolTip()), 4, lh.getRow(), 1, 1, 0, 0);
 	}
 	
 	/**
@@ -286,7 +342,7 @@ public class FileSelector extends JPanel implements ActionListener {
 					break;
 				case SAVE:
 					file = GUITools.saveFileDialog(this, baseDir,
-						mode ? allFilesAcceptable : false, false,
+						mode ? allFilesAcceptable : false, false, false,
 						mode ? JFileChooser.FILES_ONLY : JFileChooser.DIRECTORIES_ONLY,
 						filter);
 					break;

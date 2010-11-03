@@ -1,20 +1,20 @@
 /*
- *  SBMLsqueezer creates rate equations for reactions in SBML files
- *  (http://sbml.org).
- *  Copyright (C) 2009 ZBIT, University of Tübingen, Andreas Dräger
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * SBMLsqueezer creates rate equations for reactions in SBML files
+ * (http://sbml.org). Copyright (C) 2009 ZBIT, University of Tübingen, Andreas
+ * Dräger
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.zbit.gui;
 
@@ -35,7 +35,7 @@ import javax.swing.JPanel;
  * @date 2005-07-29
  */
 public class LayoutHelper {
-
+	
 	/**
 	 * 
 	 * @param cont
@@ -49,13 +49,13 @@ public class LayoutHelper {
 	 * @param weighty
 	 */
 	public static void addComponent(Container cont, GridBagLayout gbl,
-			Component c, int x, int y, int width, int height, double weightx,
-			double weighty) {
+		Component c, int x, int y, int width, int height, double weightx,
+		double weighty) {
 		GridBagConstraints gbc = new GridBagConstraints();
 		addComponent(cont, gbl, c, x, y, width, height, weightx, weighty,
-				gbc.ipadx, gbc.ipady);
+			gbc.ipadx, gbc.ipady);
 	}
-
+	
 	/**
 	 * TODO
 	 * 
@@ -72,8 +72,8 @@ public class LayoutHelper {
 	 * @param ipady
 	 */
 	public static void addComponent(Container cont, GridBagLayout gbl,
-			Component c, int x, int y, int width, int height, double weightx,
-			double weighty, int ipadx, int ipady) {
+		Component c, int x, int y, int width, int height, double weightx,
+		double weighty, int ipadx, int ipady) {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = x;
@@ -87,22 +87,22 @@ public class LayoutHelper {
 		gbl.setConstraints(c, gbc);
 		cont.add(c);
 	}
-
+	
 	/**
 	 * 
 	 */
 	private Container cont;
-
+	
 	/**
 	 * 
 	 */
 	private GridBagLayout gbl;
-
+	
 	/**
 	 * 
 	 */
 	private int row;
-
+	
 	/**
 	 * Creates a new GridBaglayout and associates this with the given container.
 	 * 
@@ -114,7 +114,7 @@ public class LayoutHelper {
 		this.cont.setLayout(gbl);
 		this.row = 0;
 	}
-
+	
 	/**
 	 * 
 	 * @param cont
@@ -126,7 +126,7 @@ public class LayoutHelper {
 		this.cont.setLayout(this.gbl);
 		this.row = 0;
 	}
-
+	
 	/**
 	 * adds this component in the next row.
 	 * 
@@ -135,12 +135,12 @@ public class LayoutHelper {
 	public void add(Component c) {
 		add(c, 0, ++row, 1, 1, 1, 1);
 	}
-
+	
 	/**
 	 * 
 	 * @param sameWidth
-	 *            if true, a maximum width will be applied to each component,
-	 *            sharing the total width of the {@link Container}.
+	 *        if true, a maximum width will be applied to each component, sharing
+	 *        the total width of the {@link Container}.
 	 * @param c
 	 * @param components
 	 */
@@ -150,7 +150,7 @@ public class LayoutHelper {
 			add(components[i], i + 1, row, 1, 1, sameWidth ? 1 : 0, 0);
 		}
 	}
-
+	
 	/**
 	 * Add one or many components in one line.
 	 * 
@@ -160,7 +160,7 @@ public class LayoutHelper {
 	public void add(Component c, Component... comps) {
 		add(false, c, comps);
 	}
-
+	
 	/**
 	 * 
 	 * @param c
@@ -169,7 +169,7 @@ public class LayoutHelper {
 	public void add(Component c, int width) {
 		add(c, 0, ++row, width, 1);
 	}
-
+	
 	/**
 	 * 
 	 * @param c
@@ -179,11 +179,11 @@ public class LayoutHelper {
 	 * @param height
 	 */
 	public void add(Component c, int x, int y, int width, int height) {
-		LayoutHelper.addComponent(this.cont, this.gbl, c, x, y, width, height,
-				0, 0);
+		LayoutHelper
+				.addComponent(this.cont, this.gbl, c, x, y, width, height, 0, 0);
 		row = y;
 	}
-
+	
 	/**
 	 * 
 	 * @param c
@@ -195,12 +195,12 @@ public class LayoutHelper {
 	 * @param weighty
 	 */
 	public void add(Component c, int x, int y, int width, int height,
-			double weightx, double weighty) {
+		double weightx, double weighty) {
 		LayoutHelper.addComponent(this.cont, this.gbl, c, x, y, width, height,
-				weightx, weighty);
+			weightx, weighty);
 		row = y;
 	}
-
+	
 	/**
 	 * 
 	 * @param c
@@ -214,12 +214,12 @@ public class LayoutHelper {
 	 * @param ipady
 	 */
 	public void add(Component c, int x, int y, int width, int height,
-			double weightx, double weighty, int ipadx, int ipady) {
+		double weightx, double weighty, int ipadx, int ipady) {
 		LayoutHelper.addComponent(this.cont, this.gbl, c, x, y, width, height,
-				weightx, weighty, ipadx, ipady);
+			weightx, weighty, ipadx, ipady);
 		row = y;
 	}
-
+	
 	/**
 	 * 
 	 * @param label
@@ -228,7 +228,7 @@ public class LayoutHelper {
 	public void add(String label, Component c) {
 		add(label, c, 0, ++row);
 	}
-
+	
 	/**
 	 * A row of components
 	 * 
@@ -243,14 +243,14 @@ public class LayoutHelper {
 			add(component, ++x, row, 1, 1);
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @param label
 	 * @param c
 	 * @param spaceLine
-	 *            If true, a new line with an empty JPanel will be created as a
-	 *            spacer.
+	 *        If true, a new line with an empty JPanel will be created as a
+	 *        spacer.
 	 */
 	public void add(String label, Component c, boolean spaceLine) {
 		add(label, c, 0, ++row);
@@ -258,7 +258,7 @@ public class LayoutHelper {
 			add(new JPanel(), 0, ++row, 3, 1, 0, 0);
 		}
 	}
-
+	
 	/**
 	 * Creates a pair of a label and a component separated by a spacing panel.
 	 * 
@@ -272,7 +272,7 @@ public class LayoutHelper {
 		add(new JPanel(), x + 1, y, 1, 1, 0, 0);
 		add(c, x + 2, y, 1, 1);
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -280,7 +280,7 @@ public class LayoutHelper {
 	public Container getContainer() {
 		return this.cont;
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -288,7 +288,7 @@ public class LayoutHelper {
 	public int getRow() {
 		return row;
 	}
-
+	
 	/**
 	 * 
 	 * @param label
@@ -297,12 +297,11 @@ public class LayoutHelper {
 	 * @param weightx
 	 * @param weighty
 	 */
-	public void add(String label, Component c, int width, int weightx,
-			int weighty) {
+	public void add(String label, Component c, int width, int weightx, int weighty) {
 		add(label, c, 0, row, weightx, weighty);
 		row++;
 	}
-
+	
 	/**
 	 * 
 	 * @param label
@@ -313,11 +312,19 @@ public class LayoutHelper {
 	 * @param weighty
 	 */
 	public void add(String label, Component c, int x, int y, int weightx,
-			int weighty) {
+		int weighty) {
 		add(new JLabel(label), x, y, 1, 1, 0, 0);
 		add(new JPanel(), x + 1, y, 1, 1, 0, 0);
 		add(c, x + 2, y, 1, 1, weightx, weighty);
 		this.row = y;
 	}
-
+	
+	/**
+	 * 
+	 * @param increment
+	 */
+	public void incrementRowBy(int increment) {
+		row += increment;
+	}
+	
 }
