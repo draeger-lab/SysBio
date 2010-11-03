@@ -36,7 +36,7 @@ import de.zbit.util.StringUtil;
  * <li>ICON_OPEN</li>
  * <li>ICON_SAVE</li>
  * </ul>
- * To this end, please proceede as follows:
+ * To this end, please proceed as follows:
  * 
  * <pre>
  * UIManager.put(&quot;ICON_OPEN&quot;, myOpenIcon);
@@ -66,7 +66,7 @@ import de.zbit.util.StringUtil;
  * 
  * <pre>
  * GUITools.initLaF(&quot;File selector&quot;);
- * FileSelector selector = new FileSelector(Command.OPEN,
+ * FileSelector selector = new FileSelector(Type.OPEN,
  * 	SBFileFilter.SBML_FILE_FILTER);
  * JOptionPane.showMessageDialog(null, selector);
  * try {
@@ -82,7 +82,7 @@ import de.zbit.util.StringUtil;
  * <pre>
  * GUITools.initLaF(&quot;FileSelector test&quot;);
  * JPanel p = new JPanel();
- * FileSelector selectors[] = createOpenSavePanel(p, System
+ * FileSelector selectors[] = createOpenSavePanel(new LayoutHelper(p), System
  * 		.getProperty(&quot;user.dir&quot;), false,
  * 	new SBFileFilter[] { SBFileFilter.SBML_FILE_FILTER }, System
  * 			.getProperty(&quot;user.dir&quot;), false,
@@ -106,28 +106,151 @@ public class FileSelector extends JPanel implements ActionListener {
 	
 	/**
 	 * 
-	 * @return
+	 * @author draeger
+	 * @date 2010-11-03
 	 */
-	public static FileSelector[] createOpenSavePanel(JPanel panel,
-		String openBaseDir, boolean allOpenFilesAcceptable,
-		FileFilter[] openFilter, String saveBaseDir,
-		boolean allSaveFilesAcceptable, FileFilter[] saveFilter) {
+	public class Command implements ActionCommand {
+		/**
+		 * 
+		 */
+		private Type type;
 		
-		FileSelector selector[] = new FileSelector[2];
-		selector[0] = new FileSelector();
-		LayoutHelper lh = new LayoutHelper(panel);
-		lh.add(new JPanel(), 0, 0, 5, 1, 1, 0);
-		lh.incrementRowBy(1);
-		selector[0].init(lh, Command.OPEN, openBaseDir, allOpenFilesAcceptable,
-			openFilter);
-		lh.incrementRowBy(1);
-		lh.add(new JPanel(), 0, 2, 5, 1, 1, 0);
-		lh.incrementRowBy(1);
-		selector[1] = new FileSelector();
-		selector[1].init(lh, Command.SAVE, saveBaseDir, allSaveFilesAcceptable,
-			saveFilter);
+		/**
+		 * 
+		 * @param type
+		 */
+		public Command(String type) {
+			this.type = Type.valueOf(type);
+		}
 		
-		return selector;
+		/**
+		 * 
+		 * @param type
+		 */
+		public Command(Type type) {
+			this.type = type;
+		}
+		
+		/**
+		 * 
+		 * @return
+		 */
+		public String getLabelText() {
+			return String.format(acceptOnlyFiles() ? "%s file: "
+					: "%s file directory: ", command.getType() == Type.OPEN ? "Open"
+					: "Save");
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.zbit.gui.ActionCommand#getName()
+		 */
+		public String getName() {
+			return StringUtil.firstLetterUpperCase(type.toString());
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.zbit.gui.ActionCommand#getToolTip()
+		 */
+		public String getToolTip() {
+			if (acceptOnlyFiles()) { return String.format(
+				"Select the file to be %s.", type == Type.OPEN ? "opened" : "saved"); }
+			return String.format(
+				"Select the default directory to %s various kinds of files.",
+				type == Type.OPEN ? "open" : "save");
+		}
+		
+		/**
+		 * 
+		 * @return
+		 */
+		public Type getType() {
+			return type;
+		}
+	}
+	
+	/**
+	 * Contains the complete configuration for a {@link FileSelector}.
+	 * 
+	 * @author draeger
+	 * @date 2010-11-03
+	 */
+	public static class Configuration {
+		private boolean allFilesAcceptable;
+		private String baseDir;
+		private FileFilter filter[];
+		private Type type;
+		
+		public Configuration(Type type, String baseDir, boolean allFilesAcceptable,
+			FileFilter... filter) {
+			this.type = type;
+			this.baseDir = baseDir;
+			this.allFilesAcceptable = allFilesAcceptable;
+			this.filter = filter;
+		}
+		
+		/**
+		 * @return the baseDir
+		 */
+		public String getBaseDir() {
+			return baseDir;
+		}
+		
+		/**
+		 * @return the filter
+		 */
+		public FileFilter[] getFileFilters() {
+			return filter;
+		}
+		
+		/**
+		 * @return the type
+		 */
+		public Type getType() {
+			return type;
+		}
+		
+		/**
+		 * @return the allFilesAcceptable
+		 */
+		public boolean isAllFilesAcceptable() {
+			return allFilesAcceptable;
+		}
+		
+		/**
+		 * @param allFilesAcceptable
+		 *        the allFilesAcceptable to set
+		 */
+		public void setAllFilesAcceptable(boolean allFilesAcceptable) {
+			this.allFilesAcceptable = allFilesAcceptable;
+		}
+		
+		/**
+		 * @param baseDir
+		 *        the baseDir to set
+		 */
+		public void setBaseDir(String baseDir) {
+			this.baseDir = baseDir;
+		}
+		
+		/**
+		 * @param filter
+		 *        the filter to set
+		 */
+		public void setFileFilters(FileFilter... filter) {
+			this.filter = filter;
+		}
+		
+		/**
+		 * @param type
+		 *        the type to set
+		 */
+		public void setType(Type type) {
+			this.type = type;
+		}
 	}
 	
 	/**
@@ -138,7 +261,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * @author draeger
 	 * @date 2010-11-02
 	 */
-	public enum Command implements ActionCommand {
+	public enum Type {
 		/**
 		 * Command to open a {@link JFileChooser} with an open dialog.
 		 */
@@ -147,45 +270,49 @@ public class FileSelector extends JPanel implements ActionListener {
 		 * Command to open a {@link JFileChooser} with a save dialog.
 		 */
 		SAVE;
-		
-		private boolean fileMode = true;
-		
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see de.zbit.gui.ActionCommand#getName()
-		 */
-		public String getName() {
-			return StringUtil.firstLetterUpperCase(this.toString());
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see de.zbit.gui.ActionCommand#getToolTip()
-		 */
-		public String getToolTip() {
-			if (fileMode) { return String.format("Select the file to be %s.",
-				this == OPEN ? "opened" : "saved"); }
-			return String.format(
-				"Select the default directory to %s various kinds of files.",
-				this == OPEN ? "open" : "save");
-		}
-		
-		/**
-		 * 
-		 * @param fileMode
-		 */
-		public void setMode(boolean fileMode) {
-			this.fileMode = fileMode;
-		}
-		
 	}
 	
 	/**
 	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = 2479909701477969474L;
+	
+	/**
+	 * 
+	 * @param lh
+	 * @param configuration
+	 * @return
+	 */
+	public static FileSelector[] addSelectorsToLayout(LayoutHelper lh,
+		Configuration... configuration) {
+		FileSelector selectors[] = new FileSelector[configuration != null ? configuration.length
+				: 0];
+		for (int i = 0; i < configuration.length; i++) {
+			selectors[i] = new FileSelector();
+			selectors[i].init(lh, configuration[i].getType(), configuration[i]
+					.getBaseDir(), configuration[i].isAllFilesAcceptable(),
+				configuration[i].getFileFilters());
+			if (i < configuration.length - 1) {
+				lh.add(new JPanel(), 0, 5, 1, 1d, 0d);
+			}
+		}
+		return selectors;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static FileSelector[] createOpenSavePanel(LayoutHelper lh,
+		String openBaseDir, boolean allOpenFilesAcceptable,
+		FileFilter[] openFilter, String saveBaseDir,
+		boolean allSaveFilesAcceptable, FileFilter[] saveFilter) {
+		Configuration openConfig = new Configuration(Type.OPEN, openBaseDir,
+			allOpenFilesAcceptable, openFilter);
+		Configuration saveConfig = new Configuration(Type.SAVE, saveBaseDir,
+			allSaveFilesAcceptable, saveFilter);
+		return addSelectorsToLayout(lh, openConfig, saveConfig);
+	}
 	
 	/**
 	 * Switch if all files can also be selected in case of {@link File} mode (not
@@ -199,6 +326,18 @@ public class FileSelector extends JPanel implements ActionListener {
 	private String baseDir;
 	
 	/**
+	 * We need a reference to the {@link JButton} just to be able to change its
+	 * tool tip text if necessary.
+	 */
+	private JButton button;
+	
+	/**
+	 * The type of this {@link FileSelector}, can either be {@link Type#OPEN} or
+	 * {@link Type#SAVE}.
+	 */
+	private Command command;
+	
+	/**
 	 * Switch to decide if non-existing files or directories should be created.
 	 */
 	private boolean create;
@@ -210,16 +349,16 @@ public class FileSelector extends JPanel implements ActionListener {
 	private FileFilter filter[];
 	
 	/**
+	 * We need a reference to the {@link JLabel} just to be able to change its
+	 * text text if necessary.
+	 */
+	private JLabel label;
+	
+	/**
 	 * An editable {@link JTextField} whith the full path of the selected file or
 	 * directory.
 	 */
 	private JTextField textField;
-	
-	/**
-	 * The type of this {@link FileSelector}, can either be {@link Command#OPEN}
-	 * or {@link Command#SAVE}.
-	 */
-	private Command type;
 	
 	/**
 	 * Creates a new empty {@link FileSelector}. All of its properties are
@@ -229,26 +368,25 @@ public class FileSelector extends JPanel implements ActionListener {
 		super();
 		this.create = true;
 		this.allFilesAcceptable = false;
-		this.type = null;
+		this.command = null;
 		this.baseDir = System.getProperty("user.dir");
 		this.filter = null;
 	}
 	
 	/**
 	 * Creates a new {@link FileSelector} of the desired type, i.e., to
-	 * {@link Command#OPEN} or {@link Command#SAVE}, for directories. The base
-	 * directory of browsing will be given by the {@link System} property
-	 * "user.dir".
+	 * {@link Type#OPEN} or {@link Type#SAVE}, for directories. The base directory
+	 * of browsing will be given by the {@link System} property "user.dir".
 	 * 
 	 * @param type
 	 */
-	public FileSelector(Command type) {
+	public FileSelector(Type type) {
 		this(type, (String) null);
 	}
 	
 	/**
 	 * Creates a new {@link FileSelector} of the desired type, i.e., to
-	 * {@link Command#OPEN} or {@link Command#SAVE}, whose selection starts at the
+	 * {@link Type#OPEN} or {@link Type#SAVE}, whose selection starts at the
 	 * directory specified by the {@link System} property "user.dir" as the base
 	 * directory. The filters can be null or empty. In this case this object will
 	 * allow to select directories only.
@@ -258,15 +396,15 @@ public class FileSelector extends JPanel implements ActionListener {
 	 *        - if null, only directories are permitted. If you want to be able to
 	 *        select all Files, use e.g. {@link SBFileFilter#ALL_FILE_FILTER}.
 	 */
-	public FileSelector(Command type, FileFilter... filter) {
+	public FileSelector(Type type, FileFilter... filter) {
 		this(type, null, filter);
 	}
 	
 	/**
 	 * Creates a new {@link FileSelector} of the desired type, i.e., to
-	 * {@link Command#OPEN} or {@link Command#SAVE}, whose selection starts
-	 * opening files at the given base directory. It can be decided if besides the
-	 * given {@link FileFilter} instances also the all files filter (*) should be
+	 * {@link Type#OPEN} or {@link Type#SAVE}, whose selection starts opening
+	 * files at the given base directory. It can be decided if besides the given
+	 * {@link FileFilter} instances also the all files filter (*) should be
 	 * available in the underlying {@link JFileChooser}. No filters are given, the
 	 * value of this boolean flag is ignored, because then directories are to be
 	 * selected.
@@ -276,54 +414,36 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * @param allFilesAreAcceptable
 	 * @param filter
 	 */
-	public FileSelector(Command type, String baseDir,
-		boolean allFilesAreAcceptable, FileFilter... filter) {
+	public FileSelector(Type type, String baseDir, boolean allFilesAreAcceptable,
+		FileFilter... filter) {
 		super();
 		init(new LayoutHelper(this), type, baseDir, allFilesAreAcceptable, filter);
 	}
 	
 	/**
+	 * Creates a new {@link FileSelector} of the desired type, i.e., to
+	 * {@link Type#OPEN} or {@link Type#SAVE}, whose selection starts opening
+	 * files at the given base directory. The filters can be null or empty. In
+	 * this case this object will allow to select directories only.
 	 * 
-	 * @param fileSelector
 	 * @param type
 	 * @param baseDir
-	 * @param allFilesAreAcceptable
 	 * @param filter
 	 */
-	private void init(LayoutHelper lh, Command type, String baseDir,
-		boolean allFilesAreAcceptable, FileFilter... filter) {
-		this.create = true;
-		this.allFilesAcceptable = allFilesAreAcceptable;
-		this.type = type;
-		this.baseDir = baseDir != null ? baseDir : System.getProperty("user.dir");
-		this.filter = filter;
-		// Decide whether to deal with directories or files:
-		boolean mode = acceptOnlyFiles();
-		this.type.setMode(mode);
-		textField = new JTextField(this.baseDir);
-		String label = String.format(mode ? "%s file: " : "%s file directory: ",
-			type == Command.OPEN ? "Open" : "Save");
-		lh.add(new JLabel(label), 0, lh.getRow(), 1, 1, 0, 0);
-		lh.add(new JPanel(), 1, lh.getRow(), 1, 1, 0, 0);
-		lh.add(textField, 2, lh.getRow(), 1, 1, 1, 0);
-		lh.add(new JPanel(), 3, lh.getRow(), 1, 1, 0, 0);
-		lh.add(GUITools.createButton("Browse", UIManager
-				.getIcon(type == Command.OPEN ? "ICON_OPEN" : "ICON_SAVE"), this, type,
-			type.getToolTip()), 4, lh.getRow(), 1, 1, 0, 0);
+	public FileSelector(Type type, String baseDir, FileFilter... filter) {
+		this(type, baseDir, false, filter);
 	}
 	
 	/**
-	 * Creates a new {@link FileSelector} of the desired type, i.e., to
-	 * {@link Command#OPEN} or {@link Command#SAVE}, whose selection starts
-	 * opening files at the given base directory. The filters can be null or
-	 * empty. In this case this object will allow to select directories only.
+	 * This method checks if the current configuration of this
+	 * {@link FileSelector} only accepts files and no directories.
 	 * 
-	 * @param type
-	 * @param baseDir
-	 * @param filter
+	 * @return true if only files are accepted, false if only directories are
+	 *         accepted.
 	 */
-	public FileSelector(Command type, String baseDir, FileFilter... filter) {
-		this(type, baseDir, false, filter);
+	public boolean acceptOnlyFiles() {
+		return !((this.filter == null) || (this.filter.length == 0))
+				|| allFilesAcceptable;
 	}
 	
 	/*
@@ -337,7 +457,7 @@ public class FileSelector extends JPanel implements ActionListener {
 			baseDir = getBaseDir();
 			File file;
 			boolean mode = acceptOnlyFiles();
-			switch (Command.valueOf(e.getActionCommand())) {
+			switch (Type.valueOf(e.getActionCommand())) {
 				case OPEN:
 					file = GUITools.openFileDialog(this, baseDir, allFilesAcceptable,
 						false, mode ? JFileChooser.FILES_ONLY
@@ -357,12 +477,6 @@ public class FileSelector extends JPanel implements ActionListener {
 				baseDir = file.getParent();
 			}
 		}
-	}
-
-	private boolean acceptOnlyFiles() {
-		boolean mode = !((this.filter == null) || (this.filter.length == 0))
-				|| allFilesAcceptable;
-		return mode;
 	}
 	
 	/**
@@ -384,6 +498,10 @@ public class FileSelector extends JPanel implements ActionListener {
 			baseDir = file.getAbsolutePath();
 		}
 		return baseDir;
+	}
+	
+	public Command getCommand(Type type) {
+		return new Command(type);
 	}
 	
 	/**
@@ -421,7 +539,7 @@ public class FileSelector extends JPanel implements ActionListener {
 		}
 		if (file.exists()) {
 			if (mode && file.isFile()) {
-				switch (type) {
+				switch (command.getType()) {
 					case OPEN:
 						if (file.canRead()) { return file; }
 						throw new IOException(String.format("Cannot read from file %s.",
@@ -436,7 +554,7 @@ public class FileSelector extends JPanel implements ActionListener {
 						break;
 				}
 			} else if (!mode && file.isDirectory()) {
-				switch (type) {
+				switch (command.getType()) {
 					case OPEN:
 						if (file.canRead()) { return file; }
 						throw new IOException(String.format(
@@ -456,13 +574,40 @@ public class FileSelector extends JPanel implements ActionListener {
 	}
 	
 	/**
-	 * One of the types defined by the {@link ActionCommand} {@link Command#OPEN}
-	 * or {@link Command#SAVE}
+	 * One of the types defined by the {@link ActionCommand} {@link Type#OPEN} or
+	 * {@link Type#SAVE}
 	 * 
 	 * @return the type
 	 */
 	public Command getType() {
-		return type;
+		return command;
+	}
+	
+	/**
+	 * 
+	 * @param fileSelector
+	 * @param type
+	 * @param baseDir
+	 * @param allFilesAreAcceptable
+	 * @param filter
+	 */
+	private void init(LayoutHelper lh, Type type, String baseDir,
+		boolean allFilesAreAcceptable, FileFilter... filter) {
+		this.create = true;
+		this.allFilesAcceptable = allFilesAreAcceptable;
+		this.command = getCommand(type);
+		this.baseDir = baseDir != null ? baseDir : System.getProperty("user.dir");
+		this.filter = filter;
+		textField = new JTextField(this.baseDir);
+		button = GUITools.createButton("Browse", UIManager
+				.getIcon(type == Type.OPEN ? "ICON_OPEN" : "ICON_SAVE"), this, type,
+			command.getToolTip());
+		label = new JLabel(command.getLabelText());
+		lh.add(label, 0, lh.getRow(), 1, 1, 0, 0);
+		lh.add(new JPanel(), 1, lh.getRow(), 1, 1, 0, 0);
+		lh.add(textField, 2, lh.getRow(), 1, 1, 1, 0);
+		lh.add(new JPanel(), 3, lh.getRow(), 1, 1, 0, 0);
+		lh.add(button, 4, 1, 1, 0, 0);
 	}
 	
 	/**
@@ -496,6 +641,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	 */
 	public void setAllFilesAcceptable(boolean allFilesAcceptable) {
 		this.allFilesAcceptable = allFilesAcceptable;
+		updateLabelAndButton();
 	}
 	
 	/**
@@ -529,6 +675,16 @@ public class FileSelector extends JPanel implements ActionListener {
 	 */
 	public void setFilter(FileFilter... filter) {
 		this.filter = filter;
+		updateLabelAndButton();
+	}
+	
+	/**
+	 * Updates label and tool tip for this element.
+	 */
+	private void updateLabelAndButton() {
+		button.setToolTipText(command.getToolTip());
+		label.setText(command.getLabelText());
+		validate();
 	}
 	
 }
