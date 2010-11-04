@@ -2,9 +2,12 @@
  *
  * @author wrzodek
  */
-package de.zbit.util;
+package de.zbit.gui;
 
 import javax.swing.JProgressBar;
+
+import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.Utils;
 
 /**
  * ProgressBarSwing - a swing implementation that wraps the

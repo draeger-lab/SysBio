@@ -2,13 +2,15 @@
  *
  * @author wrzodek
  */
-package de.zbit.util;
+package de.zbit.util.prefs;
 
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.zbit.io.CSVReader;
+import de.zbit.util.Reflect;
+import de.zbit.util.Utils;
 
 /**
  * A collection of ranges with a few convenient methods to work with them.

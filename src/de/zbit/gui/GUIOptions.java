@@ -5,9 +5,9 @@ package de.zbit.gui;
 
 import java.io.File;
 
-import de.zbit.util.Directory;
-import de.zbit.util.KeyProvider;
-import de.zbit.util.Option;
+import de.zbit.io.Directory;
+import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.Option;
 
 /**
  * A collection of meaningful {@link Option} instances for graphical user

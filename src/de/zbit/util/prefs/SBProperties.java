@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.zbit.util;
+package de.zbit.util.prefs;
 
 import java.lang.reflect.Field;
 import java.util.Properties;

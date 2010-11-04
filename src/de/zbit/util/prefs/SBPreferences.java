@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.zbit.util;
+package de.zbit.util.prefs;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import de.zbit.util.Utils;
 
 import argparser.ArgParser;
 import argparser.BooleanHolder;

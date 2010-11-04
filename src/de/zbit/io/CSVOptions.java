@@ -5,8 +5,8 @@ package de.zbit.io;
 
 import java.io.File;
 
-import de.zbit.util.KeyProvider;
-import de.zbit.util.Option;
+import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.Option;
 
 /**
  * A collection of meaningful {@link Option} instances for parsing and writing
