@@ -219,14 +219,10 @@ public class Option<Type> {
      * @return
      * @throws ParseException
      */
-    public static <Type> Range<Type> buildRange(Class<Type> requiredType, String rangeSpec) {
-    	try {
-				return new Range<Type>(requiredType, rangeSpec);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			return null;
-    }
+	public static <Type> Range<Type> buildRange(Class<Type> requiredType,
+		String rangeSpec) {
+		return new Range<Type>(requiredType, rangeSpec);
+	}
     
 
     /**

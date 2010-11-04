@@ -242,13 +242,20 @@ public class Range<Type> {
    *
    * @param requiredType - The class object of the Type.
    * @param rangeSpec - as defined above.
-   * @throws ParseException - if the rangeSpec String is in a wrong format.
 	 */
-	public Range(Class<Type> requiredType, String rangeSpec) throws ParseException {
+	public Range(Class<Type> requiredType, String rangeSpec) {
 		super();
 		this.typee = requiredType;
 		this.rangeString = rangeSpec;
-		parseRangeSpec(rangeSpec);
+		try {
+			parseRangeSpec(rangeSpec);
+		} catch (ParseException e) {
+			/*
+			 * We cannot throw this exception because in interfaces it is impossible
+			 * to catch these
+			 */
+			throw new IllegalArgumentException(rangeSpec);
+		}
 	}
 	
 	/**
