@@ -38,8 +38,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public boolean accepts(Object key) {
-		// TODO Auto-generated method stub
-		return false;
+		return preferences.containsKey(key);
 	}
 	
 	/* (non-Javadoc)
