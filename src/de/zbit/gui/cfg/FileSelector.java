@@ -12,6 +12,7 @@ import java.io.IOException;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -314,6 +315,27 @@ public class FileSelector extends JPanel implements ActionListener {
 		return addSelectorsToLayout(lh, openConfig, saveConfig);
 	}
 	
+	public static void main(String args[]) {
+		GUITools.initLaF("FileSelector test");
+		JPanel p = new JPanel();
+		FileSelector selectors[] = createOpenSavePanel(new LayoutHelper(p), System
+				.getProperty("user.dir"), false,
+			new SBFileFilter[] { SBFileFilter.SBML_FILE_FILTER }, System
+					.getProperty("user.dir"), false,
+			new SBFileFilter[] { SBFileFilter.TeX_FILE_FILTER });
+		if (JOptionPane.showConfirmDialog(null, p, "Test",
+			JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+			for (FileSelector fs : selectors) {
+				try {
+					System.out.println(fs.getSelectedFile());
+				} catch (IOException exc) {
+					GUITools.showErrorMessage(null, exc);
+				}
+			}
+		}
+		
+	}
+	
 	/**
 	 * Switch if all files can also be selected in case of {@link File} mode (not
 	 * directory).
@@ -358,7 +380,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * An editable {@link JTextField} whith the full path of the selected file or
 	 * directory.
 	 */
-	private JTextField textField;
+	private JFormattedTextField textField;
 	
 	/**
 	 * Creates a new empty {@link FileSelector}. All of its properties are
@@ -473,7 +495,7 @@ public class FileSelector extends JPanel implements ActionListener {
 					break;
 			}
 			if (file != null) {
-				textField.setText(file.getAbsolutePath());
+				textField.setValue(file);
 				baseDir = file.getParent();
 			}
 		}
@@ -598,7 +620,10 @@ public class FileSelector extends JPanel implements ActionListener {
 		this.command = getCommand(type);
 		this.baseDir = baseDir != null ? baseDir : System.getProperty("user.dir");
 		this.filter = filter;
-		textField = new JTextField(this.baseDir);
+		textField = new JFormattedTextField(new File(this.baseDir));
+		textField.setInputVerifier(new FileInputVerifier(
+			acceptOnlyFiles() ? FileInputVerifier.FileType.FILE
+					: FileInputVerifier.FileType.DIRECTORY));
 		button = GUITools.createButton("Browse", UIManager
 				.getIcon(type == Type.OPEN ? "ICON_OPEN" : "ICON_SAVE"), this, type,
 			command.getToolTip());
@@ -641,7 +666,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	 */
 	public void setAllFilesAcceptable(boolean allFilesAcceptable) {
 		this.allFilesAcceptable = allFilesAcceptable;
-		updateLabelAndButton();
+		updateGUIelements();
 	}
 	
 	/**
@@ -675,15 +700,18 @@ public class FileSelector extends JPanel implements ActionListener {
 	 */
 	public void setFilter(FileFilter... filter) {
 		this.filter = filter;
-		updateLabelAndButton();
+		updateGUIelements();
 	}
 	
 	/**
 	 * Updates label and tool tip for this element.
 	 */
-	private void updateLabelAndButton() {
+	private void updateGUIelements() {
 		button.setToolTipText(command.getToolTip());
 		label.setText(command.getLabelText());
+		textField.setInputVerifier(new FileInputVerifier(
+			acceptOnlyFiles() ? FileInputVerifier.FileType.FILE
+					: FileInputVerifier.FileType.DIRECTORY));
 		validate();
 	}
 	
