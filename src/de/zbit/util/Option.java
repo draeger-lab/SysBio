@@ -211,15 +211,21 @@ public class Option<Type> {
     
     
     /**
-     * Just a convenient wrapper method for {@link Range#Range(Class, String)}
+     * Just a convenient wrapper method for {@link Range#Range(Class, String)},
+     * that catches the exception.
      * @param <Type>
      * @param requiredType
      * @param rangeSpec
      * @return
      * @throws ParseException
      */
-    public static <Type> Range<Type> buildRange(Class<Type> requiredType, String rangeSpec) throws ParseException {
-    	return new Range<Type>(requiredType, rangeSpec);
+    public static <Type> Range<Type> buildRange(Class<Type> requiredType, String rangeSpec) {
+    	try {
+				return new Range<Type>(requiredType, rangeSpec);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			return null;
     }
     
 
