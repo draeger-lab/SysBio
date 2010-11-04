@@ -1,9 +1,7 @@
-/**
- * 
- */
 package de.zbit.util.prefs;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -165,29 +163,6 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
-	 * Automatically builds the usage string.
-	 * 
-	 * @param defFileAndKeys
-	 *        This {@link List} is supposed to contain the relative paths of the
-	 *        configuration files with default preferences as first value and each
-	 *        corresponding second value must be the full class name of the
-	 *        corresponding keyProvider class, i.e., the name of some
-	 *        {@link Class} object that contains as many static final fields of
-	 *        {@link Option} instances as the corresponding defaults option file
-	 *        contains entries.
-	 * @param args
-	 *        The given command line arguments.
-	 * @return
-	 */
-	public static final SBProperties analyzeCommandLineArguments(
-		SortedMap<String, Class<? extends KeyProvider>> defFileAndKeys,
-		String args[]) {
-		
-		return analyzeCommandLineArguments(defFileAndKeys, generateUsageString(),
-			args);
-	}
-	
-	/**
 	 * 
 	 * @param defKeys
 	 * @param args
@@ -233,6 +208,64 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 		
 		return analyzeCommandLineArguments(prefs, options, parser, props, usage,
+			args);
+	}
+	
+	private static final SBProperties analyzeCommandLineArguments(
+		SBPreferences[] prefs, Map<Option<?>, Object> options, ArgParser parser,
+		SBProperties props, String usage, String args[]) {
+		
+		// Do the actual parsing
+		parser.matchAllArgs(args);
+		putAll(props, options);
+		
+		// Now all command line arguments must be made persistent:
+		String k, property, value;
+		for (int i = 0; i < prefs.length; i++) {
+			if (prefs[i] == null) continue;
+			for (Object key : prefs[i].keySetFull()) {
+				k = key.toString();
+				if (props.containsKey(k)) {
+					property = props.getProperty(k);
+					value = prefs[i].getString(k);
+					if (!value.equals(property)) {
+						prefs[i].put(k, property);
+					}
+				}
+			}
+			try {
+				prefs[i].flush();
+			} catch (BackingStoreException e) {
+				Exception exc = new Exception(String.format(
+					"Could not persistently store the user configuration for %s.",
+					prefs[i].getKeyProvider().getName()), e);
+				exc.printStackTrace();
+			}
+		}
+		
+		return props;
+	}
+	
+	/**
+	 * Automatically builds the usage string.
+	 * 
+	 * @param defFileAndKeys
+	 *        This {@link List} is supposed to contain the relative paths of the
+	 *        configuration files with default preferences as first value and each
+	 *        corresponding second value must be the full class name of the
+	 *        corresponding keyProvider class, i.e., the name of some
+	 *        {@link Class} object that contains as many static final fields of
+	 *        {@link Option} instances as the corresponding defaults option file
+	 *        contains entries.
+	 * @param args
+	 *        The given command line arguments.
+	 * @return
+	 */
+	public static final SBProperties analyzeCommandLineArguments(
+		SortedMap<String, Class<? extends KeyProvider>> defFileAndKeys,
+		String args[]) {
+		
+		return analyzeCommandLineArguments(defFileAndKeys, generateUsageString(),
 			args);
 	}
 	
@@ -283,100 +316,6 @@ public class SBPreferences implements Map<Object, Object> {
 		
 		return analyzeCommandLineArguments(prefs, options, parser, props, usage,
 			args);
-	}
-	
-	private static final SBProperties analyzeCommandLineArguments(
-		SBPreferences[] prefs, Map<Option<?>, Object> options, ArgParser parser,
-		SBProperties props, String usage, String args[]) {
-		
-		// Do the actual parsing
-		parser.matchAllArgs(args);
-		putAll(props, options);
-		
-		// Now all command line arguments must be made persistent:
-		String k, property, value;
-		for (int i = 0; i < prefs.length; i++) {
-			if (prefs[i] == null) continue;
-			for (Object key : prefs[i].keySetFull()) {
-				k = key.toString();
-				if (props.containsKey(k)) {
-					property = props.getProperty(k);
-					value = prefs[i].getString(k);
-					if (!value.equals(property)) {
-						prefs[i].put(k, property);
-					}
-				}
-			}
-			try {
-				prefs[i].flush();
-			} catch (BackingStoreException e) {
-				Exception exc = new Exception(String.format(
-					"Could not persistently store the user configuration for %s.",
-					prefs[i].getKeyProvider().getName()), e);
-				exc.printStackTrace();
-			}
-		}
-		
-		return props;
-	}
-	
-	/**
-	 * Generates a usage/synopsis string for the given mainClass. Looks if the
-	 * class is inside a jar. If yes, "java -jar [NAME].jar" is the usage string.
-	 * Else "java package.ClassName" is the usage string.
-	 * 
-	 * @param mainClass
-	 *        of your project
-	 * @return usage String
-	 */
-	public static String generateUsageString(Class<?> mainClass) {
-		String synopsis = "java ";
-		
-		String jarName = Utils.getNameOfJar(mainClass);
-		if (jarName != null && jarName.length() > 0) {
-			synopsis += "-jar " + jarName;
-		} else {
-			// class.getName() also returns the package prefix.
-			synopsis += mainClass.getName();
-		}
-		
-		return synopsis;
-	}
-	
-	/**
-	 * Automatically generates a usage string, based on the main class that has
-	 * been called. Automatically detects, if the main class is in a jar file or
-	 * not and builds the usage string.
-	 * 
-	 * @return usage String (also called synopsis).
-	 */
-	public static String generateUsageString() {
-		Class<?> mainClass = null;
-		
-		// Get the main class from the stackTrace
-		final Throwable t = new Throwable();
-		for (StackTraceElement e : t.getStackTrace()) {
-			// Search the main class
-			if (e.getMethodName().equalsIgnoreCase("main")) {
-				// Get it's name
-				try {
-					mainClass = Class.forName(e.getClassName());
-					break;
-				} catch (ClassNotFoundException e1) {
-					// Not possible, because class is in StackTrace
-				}
-			}
-		}
-		
-		String usage;
-		if (mainClass == null) {
-			// Should never happen...
-			usage = "java [program_name]";
-		} else {
-			usage = generateUsageString(mainClass) + " [options]";
-		}
-		
-		return usage;
 	}
 	
 	/**
@@ -432,15 +371,62 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
-	 * @param keyProvider
-	 * @param relPath
-	 * @return
-	 * @throws IOException
+	 * Automatically generates a usage string, based on the main class that has
+	 * been called. Automatically detects, if the main class is in a jar file or
+	 * not and builds the usage string.
+	 * 
+	 * @return usage String (also called synopsis).
 	 */
-	public static SBPreferences getPreferencesFor(
-		Class<? extends KeyProvider> keyProvider, String relPath)
-		throws IOException {
-		return new SBPreferences(keyProvider, relPath);
+	public static String generateUsageString() {
+		Class<?> mainClass = null;
+		
+		// Get the main class from the stackTrace
+		final Throwable t = new Throwable();
+		for (StackTraceElement e : t.getStackTrace()) {
+			// Search the main class
+			if (e.getMethodName().equalsIgnoreCase("main")) {
+				// Get it's name
+				try {
+					mainClass = Class.forName(e.getClassName());
+					break;
+				} catch (ClassNotFoundException e1) {
+					// Not possible, because class is in StackTrace
+				}
+			}
+		}
+		
+		String usage;
+		if (mainClass == null) {
+			// Should never happen...
+			usage = "java [program_name]";
+		} else {
+			usage = generateUsageString(mainClass) + " [options]";
+		}
+		
+		return usage;
+	}
+	
+	/**
+	 * Generates a usage/synopsis string for the given mainClass. Looks if the
+	 * class is inside a jar. If yes, "java -jar [NAME].jar" is the usage string.
+	 * Else "java package.ClassName" is the usage string.
+	 * 
+	 * @param mainClass
+	 *        of your project
+	 * @return usage String
+	 */
+	public static String generateUsageString(Class<?> mainClass) {
+		String synopsis = "java ";
+		
+		String jarName = Utils.getNameOfJar(mainClass);
+		if (jarName != null && jarName.length() > 0) {
+			synopsis += "-jar " + jarName;
+		} else {
+			// class.getName() also returns the package prefix.
+			synopsis += mainClass.getName();
+		}
+		
+		return synopsis;
 	}
 	
 	/**
@@ -453,6 +439,35 @@ public class SBPreferences implements Map<Object, Object> {
 	public static SBPreferences getPreferencesFor(
 		Class<? extends KeyProvider> keyProvider) {
 		return new SBPreferences(keyProvider);
+	}
+	
+	/**
+	 * @param keyProvider
+	 * @param relPath
+	 * @return
+	 * @throws IOException
+	 */
+	public static SBPreferences getPreferencesFor(
+		Class<? extends KeyProvider> keyProvider, String relPath)
+		throws IOException {
+		return new SBPreferences(keyProvider, relPath);
+	}
+	
+	/**
+	 * Parses the keyProvider for defaults values or loads the defaults from
+	 * memory.
+	 * 
+	 * @param keyProvider
+	 * @return
+	 */
+	private static SBProperties loadDefaults(
+		Class<? extends KeyProvider> keyProvider) {
+		try {
+			return loadDefaults(keyProvider, null);
+		} catch (IOException e) {
+			// Can never happen
+		}
+		return null;
 	}
 	
 	/**
@@ -521,23 +536,6 @@ public class SBPreferences implements Map<Object, Object> {
 			defaults = allDefaults.get(path);
 		}
 		return defaults;
-	}
-	
-	/**
-	 * Parses the keyProvider for defaults values or loads the defaults from
-	 * memory.
-	 * 
-	 * @param keyProvider
-	 * @return
-	 */
-	private static SBProperties loadDefaults(
-		Class<? extends KeyProvider> keyProvider) {
-		try {
-			return loadDefaults(keyProvider, null);
-		} catch (IOException e) {
-			// Can never happen
-		}
-		return null;
 	}
 	
 	/**
@@ -610,6 +608,16 @@ public class SBPreferences implements Map<Object, Object> {
 	
 	/**
 	 * @param keyProvider
+	 */
+	public SBPreferences(Class<? extends KeyProvider> keyProvider) {
+		System.out.println(keyProvider);
+		this.keyProvider = keyProvider;
+		this.prefs = Preferences.userNodeForPackage(keyProvider);
+		this.defaults = loadDefaults(keyProvider);
+	}
+	
+	/**
+	 * @param keyProvider
 	 *        A class that should contain instances of {@link Option} defined as
 	 *        public static field members. The package name of this class
 	 *        identifies precisely the location of the user-specific settings.
@@ -626,16 +634,6 @@ public class SBPreferences implements Map<Object, Object> {
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
 		this.defaults = loadDefaults(keyProvider, relPath);
-	}
-	
-	/**
-	 * @param keyProvider
-	 */
-	public SBPreferences(Class<? extends KeyProvider> keyProvider) {
-		System.out.println(keyProvider);
-		this.keyProvider = keyProvider;
-		this.prefs = Preferences.userNodeForPackage(keyProvider);
-		this.defaults = loadDefaults(keyProvider);
 	}
 	
 	/**
@@ -1084,6 +1082,50 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public int size() {
 		return keys().length;
+	}
+	
+	/**
+	 * Stores the content of this {@link SBPreferences} object in an
+	 * {@link OutputStream}. However, it is much better to use the method
+	 * {@link #flush()} to automatically store these {@link SBPreferences} in an
+	 * operating-system dependent way.
+	 * 
+	 * @param out
+	 * @param comment
+	 * @throws IOException
+	 */
+	public void store(OutputStream out, String comment) throws IOException {
+		toProperties().storeToXML(out, comment);
+	}
+	
+	/**
+	 * Stores the content of this {@link SBPreferences} object in an XML-formatted
+	 * {@link OutputStream}. However, it is much better to use the method
+	 * {@link #flush()} to automatically store these {@link SBPreferences} in an
+	 * operating-system dependent way.
+	 * 
+	 * @param out
+	 * @param comment
+	 * @throws IOException
+	 */
+	public void storeToXML(OutputStream out, String comment) throws IOException {
+		toProperties().storeToXML(out, comment);
+	}
+	
+	/**
+	 * Stores the content of this {@link SBPreferences} object in an XML-formatted
+	 * {@link OutputStream}. However, it is much better to use the method
+	 * {@link #flush()} to automatically store these {@link SBPreferences} in an
+	 * operating-system dependent way.
+	 * 
+	 * @param out
+	 * @param comment
+	 * @param encoding
+	 * @throws IOException
+	 */
+	public void storeToXML(OutputStream out, String comment, String encoding)
+		throws IOException {
+		toProperties().storeToXML(out, comment, encoding);
 	}
 	
 	/**
