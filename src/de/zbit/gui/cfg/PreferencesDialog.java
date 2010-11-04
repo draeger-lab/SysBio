@@ -84,7 +84,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		return exitStatus;
 	}
 	
-	public static final boolean showPreferencesDialog(KeyProvider provider) {
+	public static final boolean showPreferencesDialog(Class<? extends KeyProvider> provider) {
 		PreferencesDialog dialog = new PreferencesDialog();
 		boolean exitStatus;
 		if (provider != null) {
@@ -359,7 +359,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		return exitStatus;
 	}
 	
-	public boolean showPrefsDialog(KeyProvider kp) {
+	public boolean showPrefsDialog(Class<? extends KeyProvider> kp) {
 		PreferencesPanel panel;
 		try {
 			panel = new PreferencesPanelForKeyProvider(kp);

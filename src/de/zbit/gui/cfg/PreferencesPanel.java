@@ -98,13 +98,13 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * A list of {@link ChangeListener}s to be notified in case that values
 	 * change on this {@link PreferencesPanel}.
 	 */
-	private final List<ChangeListener> changeListeners;
+	private List<ChangeListener> changeListeners;
 
 	/**
 	 * A list of {@link ItemListener}s to be notified when switching items on
 	 * this {@link PreferencesPanel}.
 	 */
-	private final List<ItemListener> itemListeners;
+	private List<ItemListener> itemListeners;
 	/**
 	 * These are the persistently saved user-preferences of which some ore all
 	 * elements are possibly to be changed in this panel. But only if the user
@@ -131,6 +131,20 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 */
 	public PreferencesPanel() throws IOException {
 		super();
+		/*
+		 * We have to move this into a separate method, because it calls
+		 * abstract functions and they may require an initilization first,
+		 * by extending methds (e.g. see PreferencesPanelForKeyProvider).
+		 */
+		initializePrefPanel();
+	}
+
+	/**
+	 * The main initialization method, that must be called by
+	 * every constructor.
+	 * @throws IOException
+	 */
+	protected void initializePrefPanel() throws IOException {
 		changeListeners = new LinkedList<ChangeListener>();
 		itemListeners = new LinkedList<ItemListener>();
 		properties = new SBProperties(new SBProperties());
@@ -618,8 +632,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		if (source instanceof Component) {
 			Component c = (Component) source;
 			String name = c.getName();
-			System.out.println(name);
-			if ((name != null) && (properties.containsKey(name))) {
+			boolean suc = false;
+			System.out.print("DEBUG - try to change property of "+ name);
+			if ((name != null) && (properties.containsKey(name))) { // XXX: Q: Don't we have to use preferences here?
 				String value = null;
 				if (c instanceof AbstractButton) {
 					value = Boolean.toString(((AbstractButton) c).isSelected());
@@ -639,7 +654,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				} else if (c instanceof FileSelector) {
 					try {
 						value = ((FileSelector)c).getSelectedFile().getPath();
-						System.out.println(value);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -651,6 +665,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 					value = ((JTextComponent) c).getText();
 				}
 				properties.setProperty(name, value);
+				System.out.println(" - " + "changed to '" + value.toString() + "'.");
+			} else {
+				System.out.println(" - " + "failed: properties contains no key with that name.");
 			}
 		}
 	}

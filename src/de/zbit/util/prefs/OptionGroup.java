@@ -166,7 +166,6 @@ public class OptionGroup<T> implements ActionCommand,
 	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	@Override
 	public int compareTo(OptionGroup<T> optionGroup) {
 		return Integer.valueOf(getOptions().hashCode()).compareTo(
 			Integer.valueOf(optionGroup.getOptions().hashCode()));

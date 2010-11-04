@@ -307,14 +307,27 @@ public class Range<Type> {
 	
 	/**
 	 * Checks, if the given value is in range of all ranges.
+	 * See also {@link #castAndCheckIsInRange(Object)}.
 	 * @param value
 	 * @return
 	 */
 	public boolean isInRange(Type value) {
 		for (SubRange r : ranges) {
-			if (!r.isInRange(value)) return false;
+			if (r.isInRange(value)) return true;
 		}
-		return true;
+		return false;
+	}
+	
+	/**
+	 * A convenient wrapper method, that calls {@link Option#parseOrCast(Class, Object)}
+	 * before calling {@link #isInRange(Object)}.
+	 * @param value
+	 * @return
+	 */
+	public boolean castAndCheckIsInRange(Object value) {
+		Type value2 = Option.parseOrCast(typee, value);
+		if (value2==null) return false;
+		return isInRange(value2);
 	}
 	
 
