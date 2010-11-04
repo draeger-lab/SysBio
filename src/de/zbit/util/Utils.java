@@ -1166,8 +1166,7 @@ public class Utils {
    * @return
    */
   public static boolean isInteger(Class<?> clazz) {
-  	// Speeup possilble, if one could check the Number subclass...
-  	//if (!(clazz.((Number.class)))) return false;
+  	if (!(Number.class.isAssignableFrom(clazz))) return false;
   	if (clazz.equals(AtomicInteger.class)) return true;
   	else if (clazz.equals(AtomicLong.class)) return true;
   	else if (clazz.equals(BigInteger.class)) return true;

@@ -5,6 +5,7 @@ package de.zbit.gui;
 
 import java.io.File;
 
+import de.zbit.util.Directory;
 import de.zbit.util.KeyProvider;
 import de.zbit.util.Option;
 
@@ -37,14 +38,14 @@ public interface GUIOptions extends KeyProvider {
 	/**
 	 * Standard directory where user files can be found.
 	 */
-	public static final Option<File> OPEN_DIR = new Option<File>("OPEN_DIR",
-		File.class, "Standard directory where user files can be found.", new File(
+	public static final Option<Directory> OPEN_DIR = new Option<Directory>("OPEN_DIR",
+			Directory.class, "Standard directory where user files can be found.", new Directory(
 			System.getProperty("user.dir")));
 	/**
 	 * Standard directory where the user may save some files.
 	 */
-	public static final Option<File> SAVE_DIR = new Option<File>("SAVE_DIR",
-		File.class, "Standard directory where the user may save some files.",
-		new File(System.getProperty("user.dir")));
+	public static final Option<Directory> SAVE_DIR = new Option<Directory>("SAVE_DIR",
+			Directory.class, "Standard directory where the user may save some files.",
+		new Directory(System.getProperty("user.dir")));
 	
 }
