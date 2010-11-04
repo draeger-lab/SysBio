@@ -9,7 +9,6 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -203,7 +202,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 
 		// search for OptionGroups first
 		TreeMap<Option<?>, OptionGroup<?>> option2group = new TreeMap<Option<?>, OptionGroup<?>>();
-		HashMap<OptionGroup<?>, List<Option<?>>> group2option = new HashMap<OptionGroup<?>, List<Option<?>>>();
+		List<OptionGroup<?>> groups = new LinkedList<OptionGroup<?>>();
 		for (Field field : keyProvider.getDeclaredFields()) {
 			try {
 				fieldValue = field.get(keyProvider);
@@ -211,10 +210,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 					og = (OptionGroup<?>) fieldValue;
 					for (Option<?> o : og.getOptions()) {
 						option2group.put(o, og);
-						if (!group2option.containsKey(og)) {
-							group2option.put(og, new LinkedList<Option<?>>());
+						if (!groups.contains(og)) {
+							groups.add(og);
 						}
-						group2option.get(og).add(o);
 					}
 				} else if (fieldValue instanceof Option<?>) {
 					opt = (Option<?>) fieldValue;
@@ -231,10 +229,10 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		LayoutHelper groupsLayout;
 		JPanel groupPanel;
 		String title;
-		for (OptionGroup<?> optGrp : group2option.keySet()) {
+		for (OptionGroup<?> optGrp : groups) {
 			groupPanel = new JPanel();
 			groupsLayout = new LayoutHelper(groupPanel);
-			unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions()));
+			unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(), option2group));
 			if (optGrp.isSetName()) {
 				title = StringUtil.concat(" ", optGrp.getName().trim(), " ").toString();
 				groupPanel.setBorder(BorderFactory.createTitledBorder(title));
@@ -245,7 +243,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		}
 		
 		// Now we consider what is left
-		unprocessedOptions.addAll(addOptions(lh, option2group.keySet()));
+		unprocessedOptions.addAll(addOptions(lh, option2group.keySet(), null));
 		
 		return unprocessedOptions;
 	}
@@ -254,15 +252,25 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * 
 	 * @param lh
 	 * @param options
+	 * @param deleteFromHere Processed options will be deleted from this {@link Map}.
 	 * @return
 	 */
-	private List<Option<?>> addOptions(LayoutHelper lh, Iterable<? extends Option<?>> options) {
+	private List<Option<?>> addOptions(LayoutHelper lh,
+		Iterable<? extends Option<?>> options,
+		Map<Option<?>, OptionGroup<?>> deleteFromHere) {
 		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
 		for (Option<?> option : options) {
 			// Create swing option based on field type
 			JComponent jc = getJComponentForOption(option);
 			if (jc != null) {
-				lh.add(jc);
+				if (jc instanceof FileSelector) {
+					FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
+				} else {
+					lh.add(jc);
+				}
+				if (deleteFromHere != null) {
+					deleteFromHere.remove(option);
+				}
 			} else {
 				// Remember unprocessed options
 				unprocessedOptions.add(option);

@@ -15,7 +15,8 @@ import de.zbit.gui.ActionCommand;
  * @author draeger
  * @date 2010-11-04
  */
-public class OptionGroup<T> implements ActionCommand {
+public class OptionGroup<T> implements ActionCommand,
+		Comparable<OptionGroup<T>> {
 	
 	/**
 	 * 
@@ -158,6 +159,17 @@ public class OptionGroup<T> implements ActionCommand {
 		}
 		sb.append(options.toString());
 		return sb.toString();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(OptionGroup<T> optionGroup) {
+		return Integer.valueOf(getOptions().hashCode()).compareTo(
+			Integer.valueOf(optionGroup.getOptions().hashCode()));
 	}
 	
 }
