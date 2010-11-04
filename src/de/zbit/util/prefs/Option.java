@@ -13,6 +13,7 @@ import argparser.FloatHolder;
 import argparser.IntHolder;
 import argparser.LongHolder;
 import argparser.StringHolder;
+import de.zbit.gui.ActionCommand;
 import de.zbit.util.Reflect;
 
 /**
@@ -23,7 +24,7 @@ import de.zbit.util.Reflect;
  * @author Clemens Wrzodek
  * @date 2010-10-24
  */
-public class Option<Type> implements Comparable<Option<Type>> {
+public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	/**
 	 * A short description what the purpose of this option is.
 	 */
@@ -402,7 +403,8 @@ public class Option<Type> implements Comparable<Option<Type>> {
 	protected static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
 		if (ret == null) return null;
 		
-		if (requiredType.isAssignableFrom(ret.getClass())) return requiredType.cast(ret);
+		if (requiredType.isAssignableFrom(ret.getClass()))
+			return requiredType.cast(ret);
 		
 		if (Reflect.containsParser(requiredType))
 			ret = Reflect.invokeParser(requiredType, ret);
@@ -411,7 +413,7 @@ public class Option<Type> implements Comparable<Option<Type>> {
 			ret = ((Character) ret.toString().charAt(0));
 		}
 		try {
-		  return (Type) ret;
+			return (Type) ret;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -420,6 +422,7 @@ public class Option<Type> implements Comparable<Option<Type>> {
 	
 	/**
 	 * See {@link #parseOrCast(Class, Object)}.
+	 * 
 	 * @param ret
 	 * @return
 	 */
@@ -561,12 +564,31 @@ public class Option<Type> implements Comparable<Option<Type>> {
 	public String toString() {
 		return optionName;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(Option<Type> option) {
 		return toString().compareTo(option.toString());
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.ActionCommand#getName()
+	 */
+	public String getName() {
+		return getOptionName();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.ActionCommand#getToolTip()
+	 */
+	public String getToolTip() {
+		return getDescription();
 	}
 }
