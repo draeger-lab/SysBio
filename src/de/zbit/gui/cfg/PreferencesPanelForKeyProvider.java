@@ -5,11 +5,12 @@
 package de.zbit.gui.cfg;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.LinkedList;
 import java.util.List;
 
-import com.sun.net.ssl.internal.ssl.Provider;
-
 import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
@@ -23,14 +24,15 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	/**
 	 * The KeyProvider, that determines this panel.
 	 */
-	private KeyProvider provider;
+	private Class<? extends KeyProvider> provider;
 
 	/**
 	 * @throws IOException
 	 */
-	public PreferencesPanelForKeyProvider(KeyProvider provider) throws IOException {
-		super();
+	public PreferencesPanelForKeyProvider(Class<? extends KeyProvider> provider) throws IOException {
+		super(); // calls init, before provider is set => many null-pointer-exceptions.
 		this.provider = provider;
+		initializePrefPanel();
 	}
 
 	/* (non-Javadoc)
@@ -46,8 +48,36 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public List<String> checkPreferences() {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> errors = new LinkedList<String>();
+		Object fieldValue;
+		Option<?> o;
+		
+		for (Field field : provider.getDeclaredFields()) {
+			try {
+				fieldValue = field.get(provider);
+				if (fieldValue instanceof Option<?>) {
+					o = (Option<?>) fieldValue;
+					Object val = o.getValue(preferences);
+					if (val==null) {
+						errors.add("Could not determine value of " + o);
+					} else {
+						if (o.isSetRangeSpecification()) {
+							if (!o.getRange().castAndCheckIsInRange(val)) {
+								errors.add(o + " is out of range. Please select one out of " + o.getRangeSpecifiaction() + ".");
+							}
+						} else {
+							if (o.parseOrCast(val)==null) {
+								errors.add(o + " is of invalid type. Please specify an instance of " + o.getRequiredType().getSimpleName());
+							}
+							// TODO: Additional checks( e.g. file.canRead, etc.).
+						}
+					}
+				}
+			} catch (Exception exc) {
+				// ignore non-static fields
+			}
+		}
+		return errors;
 	}
 	
 	/* (non-Javadoc)
@@ -55,7 +85,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public String getTitle() {
-		return PreferencesPanel.formatOptionName(provider.getClass().getSimpleName());
+		return PreferencesPanel.formatOptionName(provider.getSimpleName());
 	}
 	
 	/* (non-Javadoc)
@@ -63,6 +93,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public void init() {
+		if (provider==null) return;
 		autoBuildPanel();
 	}
 	
@@ -71,7 +102,8 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	protected SBPreferences loadPreferences() throws IOException {
-		return SBPreferences.getPreferencesFor(provider.getClass());
+		if (provider==null) return null;
+		return SBPreferences.getPreferencesFor(provider);
 	}
 	
 }

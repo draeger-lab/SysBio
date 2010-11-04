@@ -5,8 +5,6 @@ package de.zbit.util.prefs;
 
 import java.text.ParseException;
 
-import de.zbit.util.Reflect;
-
 import argparser.ArgParser;
 import argparser.BooleanHolder;
 import argparser.CharHolder;
@@ -15,6 +13,7 @@ import argparser.FloatHolder;
 import argparser.IntHolder;
 import argparser.LongHolder;
 import argparser.StringHolder;
+import de.zbit.util.Reflect;
 
 /**
  * An {@link Option} defines a key in a key-provider class and can also be used
@@ -402,14 +401,30 @@ public class Option<Type> implements Comparable<Option<Type>> {
 	@SuppressWarnings("unchecked")
 	protected static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
 		if (ret == null) return null;
+		
+		if (requiredType.isAssignableFrom(ret.getClass())) return requiredType.cast(ret);
+		
 		if (Reflect.containsParser(requiredType))
 			ret = Reflect.invokeParser(requiredType, ret);
 		
 		if (requiredType.equals(Character.class)) {
 			ret = ((Character) ret.toString().charAt(0));
 		}
-		
-		return (Type) ret;
+		try {
+		  return (Type) ret;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	 * See {@link #parseOrCast(Class, Object)}.
+	 * @param ret
+	 * @return
+	 */
+	public Type parseOrCast(Object ret) {
+		return parseOrCast(requiredType, ret);
 	}
 	
 	/**
@@ -551,7 +566,6 @@ public class Option<Type> implements Comparable<Option<Type>> {
 	 * (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	@Override
 	public int compareTo(Option<Type> option) {
 		return toString().compareTo(option.toString());
 	}
