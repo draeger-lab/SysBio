@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
-import javax.swing.text.StyleContext.SmallAttributeSet;
-
 /**
  * This class loads other classes that implement certain interfaces or extend
  * certain super types. With this method it becomes possible to load and

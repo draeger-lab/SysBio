@@ -137,9 +137,8 @@ public class FileSelector extends JPanel implements ActionListener {
 		 * @return
 		 */
 		public String getLabelText() {
-			return String.format(acceptOnlyFiles() ? "%s file: "
-					: "%s file directory: ", command.getType() == Type.OPEN ? "Open"
-					: "Save");
+			return String.format(acceptOnlyFiles() ? "%s file: " : "%s directory: ",
+				command.getType() == Type.OPEN ? "Open" : "Save");
 		}
 		
 		/*
