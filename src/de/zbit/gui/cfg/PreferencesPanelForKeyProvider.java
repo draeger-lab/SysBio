@@ -9,8 +9,8 @@ import java.util.List;
 
 import com.sun.net.ssl.internal.ssl.Provider;
 
-import de.zbit.util.KeyProvider;
-import de.zbit.util.SBPreferences;
+import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * Automatically build an options panel.

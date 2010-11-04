@@ -9,6 +9,7 @@ import java.util.StringTokenizer;
  * 
  * @author Florian Mittag
  * @author wrzodek
+ * @author draeger
  */
 public class StringUtil {
 	
@@ -16,11 +17,13 @@ public class StringUtil {
 	 * 
 	 * @param sb
 	 * @param whatToAppend
+	 * @return
 	 */
-	public static void append(StringBuilder sb, Object... whatToAppend) {
+	public static StringBuilder append(StringBuilder sb, Object... whatToAppend) {
 		for (Object o : whatToAppend) {
 			sb.append(o.toString());
 		}
+		return sb;
 	}
 	
 	/**
@@ -418,6 +421,15 @@ public class StringUtil {
 			sb.append("</body></html>");
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * 
+	 * @param objects
+	 * @return
+	 */
+	public static StringBuilder concat(Object... objects) {
+		return append(new StringBuilder(), objects);
 	}
 	
 }

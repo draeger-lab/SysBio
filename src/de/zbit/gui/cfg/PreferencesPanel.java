@@ -9,14 +9,17 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
@@ -35,13 +38,15 @@ import javax.swing.text.JTextComponent;
 import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.cfg.FileSelector.Type;
-import de.zbit.util.Directory;
-import de.zbit.util.Option;
+import de.zbit.io.Directory;
 import de.zbit.util.Reflect;
-import de.zbit.util.SBPreferences;
-import de.zbit.util.SBProperties;
 import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
+import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.OptionGroup;
+import de.zbit.util.prefs.SBPreferences;
+import de.zbit.util.prefs.SBProperties;
 
 /**
  * Abstract super class for any {@link PreferencesPanel}s, i.e., a GUI element
@@ -190,31 +195,79 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 */
 	public List<Option<?>> autoBuildPanel() {
 		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
-		Class<?> keyProvider = preferences.getKeyProvider();
+		Class<? extends KeyProvider> keyProvider = preferences.getKeyProvider();
 		LayoutHelper lh = new LayoutHelper(this);
+		Object fieldValue;
+		Option<?> opt;
+		OptionGroup<?> og;
 
+		// search for OptionGroups first
+		TreeMap<Option<?>, OptionGroup<?>> option2group = new TreeMap<Option<?>, OptionGroup<?>>();
+		HashMap<OptionGroup<?>, List<Option<?>>> group2option = new HashMap<OptionGroup<?>, List<Option<?>>>();
 		for (Field field : keyProvider.getDeclaredFields()) {
 			try {
-				Object fieldValue = field.get(keyProvider);
-				if (fieldValue instanceof Option<?>) {
-					Option<?> o = (Option<?>) fieldValue;
-
-					// Create swing option based on field type
-					JComponent jc = getJComponentForOption(o);
-					if (jc != null) {
-						lh.add(jc);
-					} else {
-						// Remember unprocessed options
-						unprocessedOptions.add(o);
+				fieldValue = field.get(keyProvider);
+				if (fieldValue instanceof OptionGroup<?>) {
+					og = (OptionGroup<?>) fieldValue;
+					for (Option<?> o : og.getOptions()) {
+						option2group.put(o, og);
+						if (!group2option.containsKey(og)) {
+							group2option.put(og, new LinkedList<Option<?>>());
+						}
+						group2option.get(og).add(o);
 					}
-
+				} else if (fieldValue instanceof Option<?>) {
+					opt = (Option<?>) fieldValue;
+					if (!option2group.containsKey(opt)) {
+						option2group.put(opt, null);
+					}
 				}
 			} catch (Exception exc) {
-				exc.printStackTrace();
 				// ignore non-static fields
 			}
 		}
+		
+		// First we create GUI elements for all groups
+		LayoutHelper groupsLayout;
+		JPanel groupPanel;
+		String title;
+		for (OptionGroup<?> optGrp : group2option.keySet()) {
+			groupPanel = new JPanel();
+			groupsLayout = new LayoutHelper(groupPanel);
+			unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions()));
+			if (optGrp.isSetName()) {
+				title = StringUtil.concat(" ", optGrp.getName().trim(), " ").toString();
+				groupPanel.setBorder(BorderFactory.createTitledBorder(title));
+			} else {
+				groupPanel.setBorder(BorderFactory.createEtchedBorder());
+			}
+			lh.add(groupPanel);
+		}
+		
+		// Now we consider what is left
+		unprocessedOptions.addAll(addOptions(lh, option2group.keySet()));
+		
+		return unprocessedOptions;
+	}
 
+	/**
+	 * 
+	 * @param lh
+	 * @param options
+	 * @return
+	 */
+	private List<Option<?>> addOptions(LayoutHelper lh, Iterable<? extends Option<?>> options) {
+		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
+		for (Option<?> option : options) {
+			// Create swing option based on field type
+			JComponent jc = getJComponentForOption(option);
+			if (jc != null) {
+				lh.add(jc);
+			} else {
+				// Remember unprocessed options
+				unprocessedOptions.add(option);
+			}
+		}
 		return unprocessedOptions;
 	}
 

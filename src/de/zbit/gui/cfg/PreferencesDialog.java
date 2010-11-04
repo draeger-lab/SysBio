@@ -26,8 +26,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.GUITools;
-import de.zbit.util.KeyProvider;
 import de.zbit.util.StringUtil;
+import de.zbit.util.prefs.KeyProvider;
 
 /**
  * A specialized {@link JDialog} that shows several configuration options in a

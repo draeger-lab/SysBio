@@ -1,4 +1,4 @@
-package de.zbit.util;
+package de.zbit.util.prefs;
 
 /**
  * @author draeger

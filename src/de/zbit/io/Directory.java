@@ -1,4 +1,4 @@
-package de.zbit.util;
+package de.zbit.io;
 
 import java.io.File;
 

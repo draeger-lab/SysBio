@@ -17,7 +17,7 @@ import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.GUITools;
 import de.zbit.util.Reflect;
-import de.zbit.util.SBPreferences;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * A {@link JPanel} containing a {@link JTabbedPane} with several options for
