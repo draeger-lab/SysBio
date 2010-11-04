@@ -38,6 +38,7 @@ import de.zbit.util.Option;
 import de.zbit.util.Reflect;
 import de.zbit.util.SBPreferences;
 import de.zbit.util.SBProperties;
+import de.zbit.util.StringUtil;
 
 /**
  * Abstract super class for any {@link PreferencesPanel}s, i.e., a GUI element
@@ -192,7 +193,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		for (Field field : keyProvider.getDeclaredFields()) {
 			try {
 				Object fieldValue = field.get(keyProvider);
-				if (fieldValue instanceof Option) {
+				if (fieldValue instanceof Option<?>) {
 					Option<?> o = (Option<?>) fieldValue;
 
 					// Create swing option based on field type
@@ -264,42 +265,43 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		
 		// If a range is specified, get all possible values.
 		String[] values = null;
-		{
-			if (o.getRange()!=null) {
-				List<?> val = o.getRange().getAllAcceptableValues();
-				if (val!=null) {
-					values = new String[val.size()];
-					for (int i=0; i<val.size(); i++)
-						values[i]=val.get(i).toString();
+		
+		if (o.getRange() != null) {
+			List<?> val = o.getRange().getAllAcceptableValues();
+			if (val != null) {
+				values = new String[val.size()];
+				for (int i = 0; i < val.size(); i++) {
+					values[i] = val.get(i).toString();
 				}
 			}
 		}
 		
 		// TODO: Guppieren, Testen, Accept automatieren
-		if (o.getRequiredType() == Boolean.class) {
+		Class<?> clazz = o.getRequiredType();
+		if (Boolean.class.isAssignableFrom(clazz)) {
 			jc = new JCheckBox();
 			((AbstractButton) jc).setSelected(((Option<Boolean>)o).getValue(preferences));
 			
 			//((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
 			//		.get(o.getOptionName()).toString()));
-		} else if (o.getRequiredType() == File.class) {
+		} else if (File.class.isAssignableFrom(clazz)) {
 			// XXX: Is it possible to store the extension or
 			// "only directories" in o.getRangeSpecifiaction()?
 			// TODO: Infere arguments.
 			jc = new FileSelector(Type.OPEN);
 			
-		} else if (o.getRequiredType() == Character.class) {
+		} else if (Character.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
 			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
 			//JComponent cs = ((JColumnChooser)jc).getColumnChooser();
 			// TODO: Limit maximum size to one (don't accept inputs after that).
 			
-		} else if (o.getRequiredType() == String.class) {
+		} else if (String.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
 			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
-		} else if (o.getRequiredType() == Number.class) {
+		} else if (Number.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
 		}
@@ -316,7 +318,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			Reflect.invokeIfContains(jc, "addItemListener", ItemListener.class, this);
 		  Reflect.invokeIfContains(jc, "addChangeListener", ChangeListener.class, this);
 			jc.setName(o.getOptionName());
-			jc.setToolTipText(o.getDescription());
+			jc.setToolTipText(StringUtil.toHTML(o.getDescription(), 60));
 			jc.addKeyListener(this);
 			
 			//jc.setBorder(new TitledBorder("test"));
