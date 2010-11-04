@@ -29,16 +29,19 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.cfg.FileSelector.Type;
+import de.zbit.util.Directory;
 import de.zbit.util.Option;
 import de.zbit.util.Reflect;
 import de.zbit.util.SBPreferences;
 import de.zbit.util.SBProperties;
 import de.zbit.util.StringUtil;
+import de.zbit.util.Utils;
 
 /**
  * Abstract super class for any {@link PreferencesPanel}s, i.e., a GUI element
@@ -79,7 +82,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @param optionName
 	 * @return reformatted option string
 	 */
-	private static final String formatOptionName(String optionName) {
+	protected static final String formatOptionName(String optionName) {
 		String ret = optionName;
 		ret = ret.replace("_", " ");
 		ret = ret.toLowerCase().trim();
@@ -285,10 +288,25 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			//((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
 			//		.get(o.getOptionName()).toString()));
 		} else if (File.class.isAssignableFrom(clazz)) {
-			// XXX: Is it possible to store the extension or
-			// "only directories" in o.getRangeSpecifiaction()?
-			// TODO: Infere arguments.
-			jc = new FileSelector(Type.OPEN);
+			// Infere type
+			Type ty;
+			String check = optionTitle.toLowerCase();
+			if (check.contains("open")  || check.contains("load")
+					|| check.contains("input") ) {
+				ty = Type.OPEN;
+			} else {
+				ty = Type.SAVE;
+			}
+			
+			// Get default value
+			String defPath=null;
+			Object def = o.getValue(preferences);
+			if (def==null) defPath=null;
+			else if (def instanceof File) defPath = ((File)def).getPath();
+			else defPath = def.toString();
+			
+			jc = new FileSelector(ty, defPath, (o.getRequiredType() != Directory.class),(FileFilter[]) null);
+			((FileSelector)jc).setLabelText(optionTitle);
 			
 		} else if (Character.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
@@ -301,8 +319,14 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			jc = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
 			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
+
 		} else if (Number.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
+			if (!Utils.isInteger(o.getRequiredType())) {
+   			// TODO: implement Box for doubles.
+				// For doulbes, we need to allow ',' and '.'.
+				((JColumnChooser)jc).setAcceptOnlyIntegers(false);
+			}
 			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
 		}
 
@@ -533,6 +557,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		if (source instanceof Component) {
 			Component c = (Component) source;
 			String name = c.getName();
+			System.out.println(name);
 			if ((name != null) && (properties.containsKey(name))) {
 				String value = null;
 				if (c instanceof AbstractButton) {
@@ -550,6 +575,13 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 					value = Integer.toString(((JSlider) c).getValue());
 				} else if (c instanceof JSpinner) {
 					value = ((JSpinner) c).getValue().toString();
+				} else if (c instanceof FileSelector) {
+					try {
+						value = ((FileSelector)c).getSelectedFile().getPath();
+						System.out.println(value);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				} else if (c instanceof JTable) {
 					JTable tab = (JTable) c;
 					value = tab.getModel().getValueAt(tab.getSelectedRow(),

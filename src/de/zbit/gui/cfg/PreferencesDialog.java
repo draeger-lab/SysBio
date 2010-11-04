@@ -9,6 +9,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.prefs.BackingStoreException;
@@ -25,6 +26,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.GUITools;
+import de.zbit.util.KeyProvider;
 import de.zbit.util.StringUtil;
 
 /**
@@ -63,7 +65,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @return
 	 */
 	public static final boolean showPreferencesDialog() {
-		return showPreferencesDialog(null);
+		return showPreferencesDialog((PreferencesPanel)null);
 	}
 	
 	/**
@@ -76,6 +78,17 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		boolean exitStatus;
 		if (panel != null) {
 			exitStatus = dialog.showPrefsDialog(panel);
+		} else {
+			exitStatus = dialog.showPrefsDialog();
+		}
+		return exitStatus;
+	}
+	
+	public static final boolean showPreferencesDialog(KeyProvider provider) {
+		PreferencesDialog dialog = new PreferencesDialog();
+		boolean exitStatus;
+		if (provider != null) {
+			exitStatus = dialog.showPrefsDialog(provider);
 		} else {
 			exitStatus = dialog.showPrefsDialog();
 		}
@@ -341,6 +354,20 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 *         the user.
 	 */
 	public boolean showPrefsDialog(PreferencesPanel panel) {
+		setPreferencesPanel(panel);
+		setVisible(true);
+		return exitStatus;
+	}
+	
+	public boolean showPrefsDialog(KeyProvider kp) {
+		PreferencesPanel panel;
+		try {
+			panel = new PreferencesPanelForKeyProvider(kp);
+		} catch (IOException e) {
+			// May happen only if defaults are loaded from XML
+			e.printStackTrace();
+			return false;
+		}
 		setPreferencesPanel(panel);
 		setVisible(true);
 		return exitStatus;

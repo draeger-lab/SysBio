@@ -177,8 +177,10 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 							settingsPanel,
 							JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 							JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+				} catch (NoSuchMethodException exc) {
+					// Do nothing.
 				} catch (Exception exc) {
-					GUITools.showErrorMessage(this, exc);
+						GUITools.showErrorMessage(this, exc);
 				}
 			}
 		}
