@@ -102,7 +102,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @throws BackingStoreException
 	 */
 	public static final SBProperties analyzeCommandLineArguments(
-			Class<?> keyProvider, String relPath, boolean persist,
+			Class<? extends KeyProvider> keyProvider, String relPath, boolean persist,
 			String usage, String args[]) throws IOException,
 			BackingStoreException {
 		SBPreferences prefs = getPreferencesFor(keyProvider, relPath);
@@ -116,7 +116,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public static final SBProperties analyzeCommandLineArguments(
-			Class<?> keyProvider, String usage, String args[]) {
+			Class<? extends KeyProvider> keyProvider, String usage, String args[]) {
 		return analyzeCommandLineArguments(keyProvider, usage, args, null);
 	}
 
@@ -128,7 +128,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public static final SBProperties analyzeCommandLineArguments(
-			Class<?> keyProvider, String usage, String args[],
+			Class<? extends KeyProvider> keyProvider, String usage, String args[],
 			Map<Object, Object> defaults) {
 		SBProperties props;
 		if (defaults != null) {
@@ -153,7 +153,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public static final SBProperties analyzeCommandLineArguments(
-			Class<?> keyProvider, String relPath, String usage, String args[]) {
+			Class<? extends KeyProvider> keyProvider, String relPath, String usage, String args[]) {
 		try {
 			return analyzeCommandLineArguments(keyProvider, relPath, false,
 					usage, args);
@@ -179,7 +179,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public static final SBProperties analyzeCommandLineArguments(
-			SortedMap<String, Class<?>> defFileAndKeys, String args[]) {
+			SortedMap<String, Class<? extends KeyProvider>> defFileAndKeys, String args[]) {
 
 		return analyzeCommandLineArguments(defFileAndKeys,
 				generateUsageString(), args);
@@ -191,8 +191,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param args
 	 * @return
 	 */
-	public static SBProperties analyzeCommandLineArguments(Class<?> defKeys, String[] args) {
-		List<Class<?>> l = new ArrayList<Class<?>>(1);
+	public static SBProperties analyzeCommandLineArguments(Class<? extends KeyProvider> defKeys, String[] args) {
+		List<Class<? extends KeyProvider>> l = new ArrayList<Class<? extends KeyProvider>>(1);
 		l.add(defKeys);
 		
 		return analyzeCommandLineArguments(l, args);
@@ -202,7 +202,7 @@ public class SBPreferences implements Map<Object, Object> {
    * @param args
    * @return
    */
-	public static SBProperties analyzeCommandLineArguments(List<Class<?>> defKeys, String[] args) {
+	public static SBProperties analyzeCommandLineArguments(List<Class<? extends KeyProvider>> defKeys, String[] args) {
 		String usage = generateUsageString();
     SBPreferences prefs[] = new SBPreferences[defKeys.size()];
     Map<Option<?>, Object> options = new HashMap<Option<?>, Object>();
@@ -211,8 +211,9 @@ public class SBPreferences implements Map<Object, Object> {
 
 		// Configure argument parser by passing all possible option definitions
 		// to it.
-		int i = 0;
-		for (Class<?> entry : defKeys) {
+    Class<? extends KeyProvider> entry;
+		for (int i = 0; i<defKeys.size(); i++) {
+			entry = defKeys.get(i);
 			try {
 				prefs[i] = getPreferencesFor(entry);
 				options.putAll(configureArgParser(parser, options, entry, props, 
@@ -224,8 +225,6 @@ public class SBPreferences implements Map<Object, Object> {
 										"Could not load properties for %s.",
 										entry.getName()), e);
 				exc.printStackTrace();
-			} finally {
-				i++;
 			}
 		}
 
@@ -249,7 +248,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public static final SBProperties analyzeCommandLineArguments(
-			SortedMap<String, Class<?>> defFileAndKeys, String usage,
+			SortedMap<String, Class<? extends KeyProvider>> defFileAndKeys, String usage,
 			String args[]) {
 
     SBPreferences prefs[] = new SBPreferences[defFileAndKeys.size()];
@@ -260,7 +259,7 @@ public class SBPreferences implements Map<Object, Object> {
 		// Configure argument parser by passing all possible option definitions
 		// to it.
 		int i = 0;
-		for (Map.Entry<String, Class<?>> entry : defFileAndKeys.entrySet()) {
+		for (Map.Entry<String, Class<? extends KeyProvider>> entry : defFileAndKeys.entrySet()) {
 			try {
 				prefs[i] = getPreferencesFor(entry.getValue(), entry.getKey());
 				options.putAll(configureArgParser(parser, options, entry.getValue(), props, 
@@ -384,7 +383,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	private static Map<Option<?>, Object> configureArgParser(ArgParser parser,
-			Map<Option<?>, Object> options, Class<?> keyProvider,
+			Map<Option<?>, Object> options, Class<? extends KeyProvider> keyProvider,
 			SBProperties props, Map<Object, Object> defaults) {
 		Object fieldValue, argHolder;
 		Option<?> option;
@@ -435,7 +434,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 * @throws IOException
 	 */
-	public static SBPreferences getPreferencesFor(Class<?> keyProvider,
+	public static SBPreferences getPreferencesFor(Class<? extends KeyProvider> keyProvider,
 			String relPath) throws IOException {
 		return new SBPreferences(keyProvider, relPath);
 	}
@@ -447,7 +446,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 * @throws IOException
 	 */
-	public static SBPreferences getPreferencesFor(Class<?> keyProvider) {
+	public static SBPreferences getPreferencesFor(Class<? extends KeyProvider> keyProvider) {
 		return new SBPreferences(keyProvider);
 	}
 
@@ -460,26 +459,26 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 * @throws IOException
 	 */
-	private static SBProperties loadDefaults(Class<?> keyProvider,
+	private static SBProperties loadDefaults(Class<? extends KeyProvider> keyProvider,
 			String relPath) throws IOException {
 		SBProperties defaults;
 		String path;
 		boolean loadFromXML;
-		if (relPath!=null && relPath.length()>0) {
+		if ((relPath!=null) && (relPath.length()>0)) {
 		  path = keyProvider.getPackage().getName().replace('.', '/')
 				+ '/' + relPath;
 		  loadFromXML = true;
 		} else {
-			path = keyProvider.getClass().getName();
+			path = keyProvider.getName();
 			loadFromXML=false;
 		}
 		if (!allDefaults.containsKey(path)) {
 			defaults = new SBProperties();
 			
-			if (loadFromXML)
-			  defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));
-			else
-				defaults.loadFromKeyProvider(keyProvider);
+			if (loadFromXML){
+			  defaults.loadFromXML(keyProvider.getResourceAsStream(relPath));}
+			else{
+				defaults.loadFromKeyProvider(keyProvider);}
 			
 			Set<String> options = new HashSet<String>();
 			Object fieldValue;
@@ -531,7 +530,7 @@ public class SBPreferences implements Map<Object, Object> {
    * @param keyProvider
    * @return
    */
-  private static SBProperties loadDefaults(Class<?> keyProvider) {
+  private static SBProperties loadDefaults(Class<? extends KeyProvider> keyProvider) {
     try {
 			return loadDefaults(keyProvider, null);
 		} catch (IOException e) {
@@ -608,7 +607,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * the node in the user preferences to persist all key-value pairs of user
 	 * settings.
 	 */
-	private final Class<?> keyProvider;
+	private final Class<? extends KeyProvider> keyProvider;
 
 	/**
 	 * User-defined values that may change and may be stored persistently.
@@ -630,7 +629,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 *            the keyProvider class.
 	 * @throws IOException
 	 */
-	public SBPreferences(Class<?> keyProvider, String relPath)
+	public SBPreferences(Class<? extends KeyProvider> keyProvider, String relPath)
 			throws IOException {
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
@@ -640,7 +639,7 @@ public class SBPreferences implements Map<Object, Object> {
 	/**
 	 * @param keyProvider
 	 */
-	public SBPreferences(Class<?> keyProvider) {
+	public SBPreferences(Class<? extends KeyProvider> keyProvider) {
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
 		this.defaults = loadDefaults(keyProvider);
@@ -868,7 +867,7 @@ public class SBPreferences implements Map<Object, Object> {
 	/**
 	 * @return the keyProvider
 	 */
-	public Class<?> getKeyProvider() {
+	public Class<? extends KeyProvider> getKeyProvider() {
 		return keyProvider;
 	}
 
