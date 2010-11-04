@@ -753,17 +753,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#get(java.lang.Object)
 	 */
-	public Object get(Object key) {
-		// Why returning a string and later on parsing the
-		// double or whatever? Directly returning the
-		// value is much better.
+	public String get(Object key) {
 		return getString(key);
-		
-		
-		//String k = key.toString();
-		//Object v = prefs.get(k, getDefaultString(k));
-		
-		//return v;
 	}
 
 	/**
