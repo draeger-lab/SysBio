@@ -130,13 +130,25 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @see #accepts(Object)
 	 */
 	public PreferencesPanel() throws IOException {
+		this(true);
+	}
+	
+	/**
+	 * If you decidie not to initialize the panel imideately, you HAVE TO
+	 * call {@link #initializePrefPanel()} in the calling constructor.
+	 * @param init_Panel
+	 * @throws IOException
+	 */
+	protected PreferencesPanel(boolean init_Panel) throws IOException {
 		super();
 		/*
 		 * We have to move this into a separate method, because it calls
 		 * abstract functions and they may require an initilization first,
 		 * by extending methds (e.g. see PreferencesPanelForKeyProvider).
 		 */
-		initializePrefPanel();
+		if (init_Panel) {
+		  initializePrefPanel();
+		}
 	}
 
 	/**
@@ -155,8 +167,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				if (accepts(key)) {
 					k = key.toString();
 					properties.put(k, preferences.get(k));
-					properties.getDefaults().setProperty(k,
-							preferences.getDefault(k));
+					properties.getDefaults().put(k, 
+						preferences.getDefault(k));
 				}
 			}
 		}
@@ -632,8 +644,12 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		if (source instanceof Component) {
 			Component c = (Component) source;
 			String name = c.getName();
-			boolean suc = false;
-			System.out.print("DEBUG - try to change property of "+ name);
+			//System.out.print("DEBUG - try to change property of "+ name);
+			/*
+			 * Properties is build in initializePrefPanel() -> loadPreferences -> accep(key).
+			 * If a key is missing in properties, it is very likely that one of the above mentioned
+			 * methods doesn't work correctly.
+			 */
 			if ((name != null) && (properties.containsKey(name))) { // XXX: Q: Don't we have to use preferences here?
 				String value = null;
 				if (c instanceof AbstractButton) {
@@ -665,9 +681,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 					value = ((JTextComponent) c).getText();
 				}
 				properties.setProperty(name, value);
-				System.out.println(" - " + "changed to '" + value.toString() + "'.");
+				//System.out.println(" - " + "changed to '" + value.toString() + "'.");
 			} else {
-				System.out.println(" - " + "failed: properties contains no key with that name.");
+				//System.out.println(" - " + "failed: properties contains no key with that name.");
 			}
 		}
 	}

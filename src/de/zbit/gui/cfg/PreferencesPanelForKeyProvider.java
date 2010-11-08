@@ -30,7 +30,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 * @throws IOException
 	 */
 	public PreferencesPanelForKeyProvider(Class<? extends KeyProvider> provider) throws IOException {
-		super(); // calls init, before provider is set => many null-pointer-exceptions.
+		super(false); // calls init, before provider is set => many null-pointer-exceptions.
 		this.provider = provider;
 		initializePrefPanel();
 	}
@@ -40,7 +40,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public boolean accepts(Object key) {
-		return preferences.containsKey(key);
+		return preferences.keySetFull().contains(key);
 	}
 	
 	/* (non-Javadoc)
