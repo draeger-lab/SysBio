@@ -283,7 +283,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		ok.addActionListener(this);
 		ok.setActionCommand(OK);
 		ok.setSize(defaults.getSize());
-		ok.setEnabled(false);
+		ok.setEnabled(true);
 		
 		cancel.setPreferredSize(defaults.getPreferredSize());
 		apply.setPreferredSize(defaults.getPreferredSize());

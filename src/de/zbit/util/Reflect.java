@@ -653,6 +653,42 @@ public class Reflect {
 	}
 	
 	/**
+	 * Checks whether a method with this name and the given parameter type exists
+	 * for the given {@link Object} clazz.
+	 * 
+	 * @param clazz
+	 * @param methodName
+	 * @param parameterType
+	 * @param parameter
+	 * @return
+	 */
+	public static boolean contains(Object clazz, String methodName,
+		Class<?> parameterType) {
+		return contains(clazz, methodName, new Class<?>[] { parameterType });
+	}
+	
+	/**
+	 * Checks whether a method with this name and the given parameter types exists
+	 * for the given {@link Object} clazz.
+	 * 
+	 * @param clazz
+	 * @param methodName
+	 * @param parameterTypes
+	 * @param parameters
+	 * @return
+	 */
+	public static boolean contains(Object clazz, String methodName,
+		Class<?>[] parameterTypes) {
+		try {
+			Method m = clazz.getClass().getMethod(methodName, parameterTypes);
+			return m != null;
+		} catch (SecurityException e) {
+		} catch (NoSuchMethodException e) {
+		}
+		return false;
+	}
+
+	/**
 	 * Checks if a certain method exists and invokes it.
 	 * Just a wrapper for
 	 * {@link #invokeIfContains(Class, String, Class[], Object[])}.

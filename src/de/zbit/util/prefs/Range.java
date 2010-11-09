@@ -24,7 +24,7 @@ public class Range<Type> {
 	 * and 1.0 there are infinite many values, but between integer 0 and 10, there
 	 * only a finite number of values.
 	 */
-	private final static short defaultMaxAcceptableValuesToReturn = 15;
+	private final static short defaultMaxAcceptableValuesToReturn = 50;
 	
 	/**
 	 * A range of any type. Consisting of lower and upper bound and
