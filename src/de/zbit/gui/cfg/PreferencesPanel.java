@@ -235,12 +235,15 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				if (fieldValue instanceof OptionGroup<?>) {
 					og = (OptionGroup<?>) fieldValue;
 					for (Option<?> o : og.getOptions()) {
-						option2group.put(o, og);
-						if (!groups.contains(og)) {
-							groups.add(og);
+						if (properties.containsKey(o)) {
+							option2group.put(o, og);
 						}
 					}
-				} else if (fieldValue instanceof Option<?>) {
+					if (!groups.contains(og)) {
+						groups.add(og);
+					}
+				} else if ((fieldValue instanceof Option<?>)
+						&& properties.containsKey(fieldValue)) {
 					opt = (Option<?>) fieldValue;
 					if (!option2group.containsKey(opt)) {
 						option2group.put(opt, null);
@@ -287,7 +290,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
 		for (Option<?> option : options) {
 			// Create swing option based on field type
-			JComponent jc = getJComponentForOption(option);
+			JComponent jc = properties.containsKey(option) ? getJComponentForOption(option) : null;
 			if (jc != null) {
 				if (jc instanceof FileSelector) {
 					FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
@@ -426,8 +429,13 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				//((JColumnChooser) jc).setDefaultValue(o.getValue(preferences));
 			}
 			
-			Reflect.invokeIfContains(jc, "addItemListener", ItemListener.class, this);
-		  Reflect.invokeIfContains(jc, "addChangeListener", ChangeListener.class, this);
+			if (Reflect.contains(jc, "addItemListener", ItemListener.class)) {
+				Reflect.invokeIfContains(jc, "addItemListener", ItemListener.class,
+					this);
+			} else {
+				Reflect.invokeIfContains(jc, "addChangeListener", ChangeListener.class,
+					this);
+			}
 			jc.setName(o.getOptionName());
 			jc.setToolTipText(StringUtil.toHTML(o.getDescription(), 60));
 			jc.addKeyListener(this);
@@ -650,7 +658,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			 * If a key is missing in properties, it is very likely that one of the above mentioned
 			 * methods doesn't work correctly.
 			 */
-			if ((name != null) && (properties.containsKey(name))) { // XXX: Q: Don't we have to use preferences here?
+			if ((name != null) && (properties.containsKey(name))) { 
+				// XXX: Q: Don't we have to use preferences here?
 				String value = null;
 				if (c instanceof AbstractButton) {
 					value = Boolean.toString(((AbstractButton) c).isSelected());
