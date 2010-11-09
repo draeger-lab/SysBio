@@ -651,7 +651,7 @@ public class GUITools {
 	 */
 	public static void showErrorMessage(Component parent, Throwable exc) {
 		exc.printStackTrace();
-		JOptionPane.showMessageDialog(parent, exc.getMessage(), exc.getClass()
+		JOptionPane.showMessageDialog(parent, StringUtil.toHTML(exc.getMessage(), 60), exc.getClass()
 				.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 	}
 	

@@ -1,6 +1,5 @@
 package de.zbit.util.prefs;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -9,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,6 @@ import argparser.FloatHolder;
 import argparser.IntHolder;
 import argparser.LongHolder;
 import argparser.StringHolder;
-import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Utils;
 
 /**
@@ -141,20 +140,12 @@ public class SBPreferences implements Map<Object, Object> {
 			new HashMap<Option<?>, Object>(), keyProvider, props, defaults);
 		parser.matchAllArgs(args);
 		Option<?> option;
-		String element;
-		GeneralFileFilter filter;
-		// TODO: A similar check should be done when doing flush.
 		for (Map.Entry<Option<?>, Object> entry : options.entrySet()) {
 			option = entry.getKey();
-			if (option.getRequiredType().isAssignableFrom(File.class)
-					&& option.isSetRangeSpecification()
-					&& option.getRange().isSetConstraints()) {
-				filter = (GeneralFileFilter) option.getRange().getConstraints();
-				element = entry.getValue().toString();
-				if (!filter.accept(new File(element))) {
-					parser.printErrorAndExit(String.format(
-						"File %s cannot be accepted as %s.", element, filter
-								.getDescription()));
+			if (option.isSetRangeSpecification()) {
+				if (!option.getRange().castAndCheckIsInRange(entry.getValue())) {
+					parser.printErrorAndExit(String.format("Option %s is not in range.",
+						option));
 				}
 			}
 		}
@@ -698,6 +689,33 @@ public class SBPreferences implements Map<Object, Object> {
 		return props;
 	}
 	
+	/**
+	 * Checks all key-value pairs stored in these {@link SBPreferences} and throws
+	 * a {@link BackingStoreException} for the first {@link Option} whose
+	 * corresponding value is out of {@link Range}. If no {@link Exception} is
+	 * thrown, this method returns true to indicate that all key-value pairs are
+	 * valid.
+	 * 
+	 * @returns true if all key-value pairs are valid.
+	 * @throws BackingStoreException
+	 */
+	public boolean checkPrefs() throws BackingStoreException {
+		Iterator<Option<?>> iterator = optionIterator();
+		Option<?> option;
+		Object value;
+		while (iterator.hasNext()) {
+			option = iterator.next();
+			if (containsKey(option)) {
+				value = get(option);
+				if (option.isSetRangeSpecification()
+						&& !option.getRange().castAndCheckIsInRange(get(option))) { throw new BackingStoreException(
+					String.format("The value %s for option \"%s\" is out of range.", value,
+						option.formatOptionName())); }
+			}
+		}
+		return true;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -752,7 +770,9 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @throws BackingStoreException
 	 */
 	public void flush() throws BackingStoreException {
-		prefs.flush();
+		if (checkPrefs()) {
+			prefs.flush();
+		}
 	}
 	
 	/*
@@ -837,7 +857,9 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public final String getDefaultString(Object key) {
-		String v = defaults.get(key.toString()).toString();
+		String def = defaults.getProperty(key.toString());
+		if (def == null) { return def; }
+		String v = def.toString();
 		if (System.getProperties().containsKey(v)) { return System.getProperty(v); }
 		return v;
 	}
@@ -961,6 +983,69 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public Object[] keysFull() {
 		return keySetFull().toArray(new Object[0]);
+	}
+	
+	/**
+	 * Gives an iterator for all the {@link Option} instances (static fields) in
+	 * the {@link KeyProvider} belonging to this {@link SBPreferences} instance.
+	 * 
+	 * @return
+	 */
+	public Iterator<Option<?>> optionIterator() {
+		return new Iterator<Option<?>>() {
+			
+			private int i = 0;
+			
+			/**
+			 * This tries to obtain the next {@link Option}.
+			 * 
+			 * @param j
+			 * @return
+			 */
+			private Option<?> getOption(int j) {
+				Field field = keyProvider.getFields()[j];
+				Object fieldValue;
+				for (; j < keyProvider.getFields().length; j++) {
+					try {
+						fieldValue = field.get(keyProvider);
+						if (fieldValue instanceof Option<?>) { return (Option<?>) fieldValue; }
+					} catch (Exception exc) {
+					}
+				}
+				return null;
+			}
+			
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.util.Iterator#hasNext()
+			 */
+			public boolean hasNext() {
+				try {
+					return getOption(i + 1) != null;
+				} catch (ArrayIndexOutOfBoundsException exc) {
+					return false;
+				}
+			}
+			
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.util.Iterator#next()
+			 */
+			public Option<?> next() {
+				return getOption(i++);
+			}
+			
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.util.Iterator#remove()
+			 */
+			public void remove() {
+				throw new IllegalAccessError();
+			}
+		};
 	}
 	
 	/**
@@ -1151,7 +1236,9 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @throws BackingStoreException
 	 */
 	public void sync() throws BackingStoreException {
-		prefs.sync();
+		if (checkPrefs()) {
+			prefs.sync();
+		}
 	}
 	
 	/**

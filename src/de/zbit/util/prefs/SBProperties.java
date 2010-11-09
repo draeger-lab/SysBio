@@ -102,7 +102,7 @@ public class SBProperties extends Properties {
 	 */
 	@Override
 	public synchronized Object put(Object key, Object value) {
-		return super.put(key.toString(), value == null ? null : value.toString());
+		return super.put(key.toString(), value == null ? "" : value.toString());
 	}
 
 	/**

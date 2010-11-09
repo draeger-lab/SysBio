@@ -67,7 +67,8 @@ public class FileInputVerifier extends InputVerifier {
 			File file = new File(text);
 			if (((mode == null) && (file.isFile() || file.isDirectory()))
 					|| (file.isFile() && (mode == FileType.FILE))
-					|| (file.isDirectory() && (mode == FileType.DIRECTORY))) { return true; }
+					|| (file.isDirectory() && (mode == FileType.DIRECTORY))) {
+				return true; }
 		}
 		return false;
 	}

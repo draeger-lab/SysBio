@@ -28,6 +28,58 @@ import de.zbit.util.StringUtil;
  */
 public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	/**
+	 * Just a convenient wrapper method for {@link Range#Range(Class, String)},
+	 * that catches the exception.
+	 * 
+	 * @param <Type>
+	 * @param requiredType
+	 * @param rangeSpec
+	 * @return
+	 * @throws ParseException
+	 */
+	public static <Type> Range<Type> buildRange(Class<Type> requiredType,
+		String rangeSpec) {
+		return new Range<Type>(requiredType, rangeSpec);
+	}
+	/**
+	 * Convert 'ret' to {@link #requiredType} by parsing it (e.g.
+	 * Integer.parseInt), or casting it to the desired type.
+	 * 
+	 * @param <Type>
+	 *        - Type
+	 * @param requiredType
+	 *        - Type.class
+	 * @param ret
+	 *        - Object to convert
+	 * @return Type instance of ret.
+	 */
+	@SuppressWarnings("unchecked")
+	protected static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
+		if (ret == null) return null;
+		
+		if (requiredType.isAssignableFrom(ret.getClass()))
+			return requiredType.cast(ret);
+		
+		if (Reflect.containsParser(requiredType))
+			ret = Reflect.invokeParser(requiredType, ret);
+		
+		if (requiredType.equals(Character.class)) {
+			ret = ((Character) ret.toString().charAt(0));
+		}
+		try {
+			return (Type) ret;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	/**
+	 * The default value for this option. May be null, if it is going to be read
+	 * from the XML-file later.
+	 */
+	private final Type defaultValue;
+	
+	/**
 	 * A short description what the purpose of this option is.
 	 */
 	private final String description;
@@ -36,6 +88,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * instance's name into a command line key.
 	 */
 	private final short numLeadingMinus;
+	
 	/**
 	 * The name of this option.
 	 */
@@ -46,18 +99,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * using this {@link Option} on the command line.
 	 */
 	private final Range<Type> range;
+	
 	/**
 	 * The data type that is expected as an associated value in a key-value pair
 	 * of this {@link Option}'s name and a value. For instance, Boolean, Integer,
 	 * String etc.
 	 */
 	private final Class<Type> requiredType;
-	
-	/**
-	 * The default value for this option. May be null, if it is going to be read
-	 * from the XML-file later.
-	 */
-	private final Type defaultValue;
 	
 	/**
 	 * A shorter name for the command line, for instance, in addition to --file
@@ -72,19 +120,6 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	public Option(String optionName, Class<Type> requiredType, String description) {
 		this(optionName, requiredType, description, null, null);
-	}
-	
-	/**
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param numLeadingMinus
-	 * @param shortCmdName
-	 */
-	public Option(String optionName, Class<Type> requiredType,
-		String description, short numLeadingMinus, String shortCmdName) {
-		this(optionName, requiredType, description, null, numLeadingMinus,
-			shortCmdName);
 	}
 	
 	/**
@@ -140,42 +175,25 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param optionName
 	 * @param requiredType
 	 * @param description
-	 * @param defaultValue
-	 */
-	public Option(String optionName, Class<Type> requiredType,
-		String description, Type defaultValue) {
-		this(optionName, requiredType, description, null, defaultValue);
-	}
-	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
+	 * @param Range
+	 *        - see {@link Range#Range(Class, String)} or
+	 *        {@link #buildRange(Class, String)}.
 	 * @param numLeadingMinus
 	 * @param shortCmdName
 	 * @param defaultValue
 	 */
 	public Option(String optionName, Class<Type> requiredType,
-		String description, short numLeadingMinus, String shortCmdName,
-		Type defaultValue) {
-		this(optionName, requiredType, description, null, numLeadingMinus,
-			shortCmdName, defaultValue);
-	}
-	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param Range
-	 *        - see {@link Range#Range(Class, String)} or
-	 *        {@link #buildRange(Class, String)}.
-	 * @param defaultValue
-	 */
-	public Option(String optionName, Class<Type> requiredType,
-		String description, Range<Type> range, Type defaultValue) {
-		this(optionName, requiredType, description, range, (short) 2, defaultValue);
+		String description, Range<Type> range, short numLeadingMinus,
+		String shortCmdName, Type defaultValue) {
+		this.optionName = optionName;
+		this.requiredType = requiredType;
+		this.description = description;
+		this.range = range;
+		this.shortCmdName = shortCmdName;
+		this.defaultValue = defaultValue;
+		if (numLeadingMinus < 0) { throw new IllegalArgumentException(
+			"numLeadingMinus must be a positive number"); }
+		this.numLeadingMinus = numLeadingMinus;
 	}
 	
 	/**
@@ -206,37 +224,61 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param Range
 	 *        - see {@link Range#Range(Class, String)} or
 	 *        {@link #buildRange(Class, String)}.
+	 * @param defaultValue
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+		String description, Range<Type> range, Type defaultValue) {
+		this(optionName, requiredType, description, range, (short) 2, defaultValue);
+	}
+	
+	/**
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param numLeadingMinus
+	 * @param shortCmdName
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+		String description, short numLeadingMinus, String shortCmdName) {
+		this(optionName, requiredType, description, null, numLeadingMinus,
+			shortCmdName);
+	}
+	
+	/**
+	 * 
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
 	 * @param numLeadingMinus
 	 * @param shortCmdName
 	 * @param defaultValue
 	 */
 	public Option(String optionName, Class<Type> requiredType,
-		String description, Range<Type> range, short numLeadingMinus,
-		String shortCmdName, Type defaultValue) {
-		this.optionName = optionName;
-		this.requiredType = requiredType;
-		this.description = description;
-		this.range = range;
-		this.shortCmdName = shortCmdName;
-		this.defaultValue = defaultValue;
-		if (numLeadingMinus < 0) { throw new IllegalArgumentException(
-			"numLeadingMinus must be a positive number"); }
-		this.numLeadingMinus = numLeadingMinus;
+		String description, short numLeadingMinus, String shortCmdName,
+		Type defaultValue) {
+		this(optionName, requiredType, description, null, numLeadingMinus,
+			shortCmdName, defaultValue);
 	}
 	
 	/**
-	 * Just a convenient wrapper method for {@link Range#Range(Class, String)},
-	 * that catches the exception.
 	 * 
-	 * @param <Type>
+	 * @param optionName
 	 * @param requiredType
-	 * @param rangeSpec
-	 * @return
-	 * @throws ParseException
+	 * @param description
+	 * @param defaultValue
 	 */
-	public static <Type> Range<Type> buildRange(Class<Type> requiredType,
-		String rangeSpec) {
-		return new Range<Type>(requiredType, rangeSpec);
+	public Option(String optionName, Class<Type> requiredType,
+		String description, Type defaultValue) {
+		this(optionName, requiredType, description, null, defaultValue);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(Option<Type> option) {
+		return toString().compareTo(option.toString());
 	}
 	
 	/**
@@ -305,6 +347,26 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
+	 * @see StringUtil#formatOptionName(String)
+	 * @return
+	 */
+	public String formatOptionName() {
+		return StringUtil.formatOptionName(getOptionName());
+	}
+	
+	/**
+	 * The default value for this option. If it is null, the cfg packet tries to
+	 * read it from an config.xml.
+	 * 
+	 * If this fails, an exception is thrown.
+	 * 
+	 * @return
+	 */
+	public Type getDefaultValue() {
+		return defaultValue;
+	}
+	
+	/**
 	 * @return the description
 	 */
 	public String getDescription() {
@@ -316,6 +378,15 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		return description;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.ActionCommand#getName()
+	 */
+	public String getName() {
+		return getOptionName();
+	}
+	
 	/**
 	 * @return the numLeadingMinus
 	 */
@@ -324,17 +395,17 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
-	 * @return the range, or null if no range is set.
-	 */
-	public Range<Type> getRange() {
-		return range;
-	}
-	
-	/**
 	 * @return this {@link Option}'s name
 	 */
 	public String getOptionName() {
 		return optionName;
+	}
+	
+	/**
+	 * @return the range, or null if no range is set.
+	 */
+	public Range<Type> getRange() {
+		return range;
 	}
 	
 	/**
@@ -352,89 +423,6 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	public Class<Type> getRequiredType() {
 		return requiredType;
-	}
-	
-	/**
-	 * The default value for this option. If it is null, the cfg packet tries to
-	 * read it from an config.xml.
-	 * 
-	 * If this fails, an exception is thrown.
-	 * 
-	 * @return
-	 */
-	public Type getDefaultValue() {
-		return defaultValue;
-	}
-	
-	/**
-	 * Returns the value for this Option, which must be contained in the given
-	 * SBPreferences.
-	 * 
-	 * @param parentPreferences
-	 * @return
-	 */
-	public Type getValue(SBPreferences parentPreferences) {
-		// Returns a string.
-		Object ret = parentPreferences.get(this.toString());
-		
-		return parseOrCast(requiredType, ret);
-	}
-	
-	/**
-	 * Returns the value for this Option, which must be contained in the given
-	 * SBProperties.
-	 * 
-	 * @param parentPreferences
-	 * @return
-	 */
-	public Type getValue(SBProperties parentProperties) {
-		// Returns a string.
-		Object ret = parentProperties.getProperty(this.toString());
-		
-		return parseOrCast(requiredType, ret);
-	}
-	
-	/**
-	 * Convert 'ret' to {@link #requiredType} by parsing it (e.g.
-	 * Integer.parseInt), or casting it to the desired type.
-	 * 
-	 * @param <Type>
-	 *        - Type
-	 * @param requiredType
-	 *        - Type.class
-	 * @param ret
-	 *        - Object to convert
-	 * @return Type instance of ret.
-	 */
-	@SuppressWarnings("unchecked")
-	protected static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
-		if (ret == null) return null;
-		
-		if (requiredType.isAssignableFrom(ret.getClass()))
-			return requiredType.cast(ret);
-		
-		if (Reflect.containsParser(requiredType))
-			ret = Reflect.invokeParser(requiredType, ret);
-		
-		if (requiredType.equals(Character.class)) {
-			ret = ((Character) ret.toString().charAt(0));
-		}
-		try {
-			return (Type) ret;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	/**
-	 * See {@link #parseOrCast(Class, Object)}.
-	 * 
-	 * @param ret
-	 * @return
-	 */
-	public Type parseOrCast(Object ret) {
-		return parseOrCast(requiredType, ret);
 	}
 	
 	/**
@@ -504,6 +492,43 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see de.zbit.gui.ActionCommand#getToolTip()
+	 */
+	public String getToolTip() {
+		return getDescription();
+	}
+	
+	/**
+	 * Returns the value for this Option, which must be contained in the given
+	 * SBPreferences.
+	 * 
+	 * @param parentPreferences
+	 * @return
+	 */
+	public Type getValue(SBPreferences parentPreferences) {
+		// Returns a string.
+		Object ret = parentPreferences.get(this.toString());
+		
+		return parseOrCast(requiredType, ret);
+	}
+	
+	/**
+	 * Returns the value for this Option, which must be contained in the given
+	 * SBProperties.
+	 * 
+	 * @param parentPreferences
+	 * @return
+	 */
+	public Type getValue(SBProperties parentProperties) {
+		// Returns a string.
+		Object ret = parentProperties.getProperty(this.toString());
+		
+		return parseOrCast(requiredType, ret);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -547,6 +572,16 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
+	 * See {@link #parseOrCast(Class, Object)}.
+	 * 
+	 * @param ret
+	 * @return
+	 */
+	public Type parseOrCast(Object ret) {
+		return parseOrCast(requiredType, ret);
+	}
+	
+	/**
 	 * This creates a command-line argument name from this {@link Option}'s name
 	 * by adding {@link #numLeadingMinus} '-' symbols, converting the name to
 	 * lower case and by replacing all underscores by '-' symbols.
@@ -570,32 +605,5 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	@Override
 	public String toString() {
 		return optionName;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public int compareTo(Option<Type> option) {
-		return toString().compareTo(option.toString());
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.ActionCommand#getName()
-	 */
-	public String getName() {
-		return getOptionName();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.ActionCommand#getToolTip()
-	 */
-	public String getToolTip() {
-		return getDescription();
 	}
 }

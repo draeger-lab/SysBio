@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
@@ -85,7 +86,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public String getTitle() {
-		return PreferencesPanel.formatOptionName(provider.getSimpleName());
+		return StringUtil.formatOptionName(provider.getSimpleName());
 	}
 	
 	/* (non-Javadoc)

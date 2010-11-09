@@ -17,12 +17,13 @@ import de.zbit.util.Utils;
 /**
  * A collection of ranges with a few convenient methods to work with them.
  * @author wrzodek
+ * @author Andreas Dr&auml;ger
  */
 public class Range<Type> {
 	
 	/**
 	 * If {@link #getAllAcceptableValues()} is called, if there are more than
-	 * this much acceptable values, null is returned. E.g. between doulbe 0.0
+	 * this much acceptable values, null is returned. E.g. between {@link Double} 0.0
 	 * and 1.0 there are infinite many values, but between integer 0 and 10, there
 	 * only a finite number of values.
 	 */
@@ -369,14 +370,28 @@ public class Range<Type> {
 	}
 	
 	/**
-	 * Checks, if the given value is in range of all ranges.
-	 * See also {@link #castAndCheckIsInRange(Object)}.
+	 * Checks, if the given value is in range of all ranges. See also
+	 * {@link #castAndCheckIsInRange(Object)}.
+	 * 
 	 * @param value
 	 * @return
 	 */
 	public boolean isInRange(Type value) {
-		for (SubRange r : ranges) {
-			if (r.isInRange(value)) return true;
+		if (isSetConstraints()) {
+			if (constraints instanceof GeneralFileFilter) {
+				// in this case, Type must be a String or a File.
+				File file;
+				if (value instanceof String) {
+					file = new File(value.toString());
+				} else {
+					file = (File) value;
+				}
+				return ((GeneralFileFilter) constraints).accept(file);
+			}
+		} else {
+			for (SubRange r : ranges) {
+				if (r.isInRange(value)) { return true; }
+			}
 		}
 		return false;
 	}
