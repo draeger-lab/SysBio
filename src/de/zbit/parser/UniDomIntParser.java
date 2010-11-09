@@ -9,7 +9,7 @@ import java.text.DecimalFormat;
 
 import de.zbit.io.CSVReader;
 import de.zbit.util.SortedArrayList;
-import de.zbit.util.StringPair;
+import de.zbit.util.ValuePair;
 
 /**
  * 
@@ -49,16 +49,16 @@ import de.zbit.util.StringPair;
 public class UniDomIntParser {
 
   private static SortedArrayList<String> D_ref;
-  private static SortedArrayList<StringPair> I_ref;
-  private static SortedArrayList<StringPair> I_me;
-  private static SortedArrayList<StringPair> I_himap;
-  private static SortedArrayList<StringPair> I_rcdp;
-  private static SortedArrayList<StringPair> I_dima;
-  private static SortedArrayList<StringPair> I_pValue;
-  private static SortedArrayList<StringPair> I_dpea;
-  private static SortedArrayList<StringPair> I_rdff;
-  private static SortedArrayList<StringPair> I_inter;
-  private static SortedArrayList<StringPair> I_lp;
+  private static SortedArrayList<ValuePair<String, String>> I_ref;
+  private static SortedArrayList<ValuePair<String, String>> I_me;
+  private static SortedArrayList<ValuePair<String, String>> I_himap;
+  private static SortedArrayList<ValuePair<String, String>> I_rcdp;
+  private static SortedArrayList<ValuePair<String, String>> I_dima;
+  private static SortedArrayList<ValuePair<String, String>> I_pValue;
+  private static SortedArrayList<ValuePair<String, String>> I_dpea;
+  private static SortedArrayList<ValuePair<String, String>> I_rdff;
+  private static SortedArrayList<ValuePair<String, String>> I_inter;
+  private static SortedArrayList<ValuePair<String, String>> I_lp;
 
   double w_me;
   double w_himap;
@@ -126,7 +126,7 @@ public class UniDomIntParser {
     CSVReader reader = new CSVReader(fileName);
     String[][] data = reader.getData();
     D_ref = new SortedArrayList<String>();
-    I_ref = new SortedArrayList<StringPair>();
+    I_ref = new SortedArrayList<ValuePair<String, String>>();
 
     //    BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
     for(int i=1;i<data.length; i++){
@@ -134,7 +134,7 @@ public class UniDomIntParser {
         D_ref.add(data[i][0]);
       if(!D_ref.contains(data[i][1]))
         D_ref.add(data[i][1]);
-      StringPair sb = new StringPair(data[i][0], data[i][1]);
+      ValuePair<String, String> sb = new ValuePair<String, String>(data[i][0], data[i][1]);
       if(!I_ref.contains(sb)){
         I_ref.add(sb);
       }
@@ -155,12 +155,12 @@ public class UniDomIntParser {
     CSVReader reader = new CSVReader(fileName);
     String[][] data = reader.getData();
     SortedArrayList<String> D = new SortedArrayList<String>();
-    SortedArrayList<StringPair> I = new SortedArrayList<StringPair>();
+    SortedArrayList<ValuePair<String, String>> I = new SortedArrayList<ValuePair<String, String>>();
 
-    SortedArrayList<StringPair> temp = new SortedArrayList<StringPair>();
+    SortedArrayList<ValuePair<String, String>> temp = new SortedArrayList<ValuePair<String, String>>();
 
     for(int i=0;i<data.length; i++){
-      StringPair sb = new StringPair(data[i][0], data[i][1]);
+      ValuePair<String, String> sb = new ValuePair<String, String>(data[i][0], data[i][1]);
       if(!temp.contains(sb))
         temp.add(sb);
       else
@@ -195,12 +195,12 @@ public class UniDomIntParser {
    */
   private double calculateW(SortedArrayList[] me, String networkName) {
     SortedArrayList<String> D_me  = me[0];
-    SortedArrayList<StringPair> I_me  = me[1];
+    SortedArrayList<ValuePair<String, String>> I_me  = me[1];
 
     SortedArrayList<String>   D_ref_D_me = new SortedArrayList<String>();
-    SortedArrayList<StringPair> I_ref_me = new SortedArrayList<StringPair>();
-    SortedArrayList<StringPair> I_me_ref = new SortedArrayList<StringPair>();
-    SortedArrayList<StringPair> intersection_ref_me = new SortedArrayList<StringPair>();
+    SortedArrayList<ValuePair<String, String>> I_ref_me = new SortedArrayList<ValuePair<String, String>>();
+    SortedArrayList<ValuePair<String, String>> I_me_ref = new SortedArrayList<ValuePair<String, String>>();
+    SortedArrayList<ValuePair<String, String>> intersection_ref_me = new SortedArrayList<ValuePair<String, String>>();
 
     // create intersection of domain spaces
     for (String domain : D_me) {
@@ -211,7 +211,7 @@ public class UniDomIntParser {
     // create potentially shared interactions
     for (int i = 0; i < D_ref_D_me.size(); i++) {
       for (int j = 0; j < D_ref_D_me.size(); j++) {
-        StringPair sb = new StringPair(D_ref_D_me.get(i), D_ref_D_me.get(j));
+        ValuePair<String, String> sb = new ValuePair<String, String>(D_ref_D_me.get(i), D_ref_D_me.get(j));
 
         if(I_ref.contains(sb)){
           if (!I_ref_me.contains(sb))
@@ -225,7 +225,7 @@ public class UniDomIntParser {
     }
 
     // create intersection of interaction spaces
-    for (StringPair sb : I_ref) {
+    for (ValuePair<String, String> sb : I_ref) {
       if(I_me.contains(sb) && !intersection_ref_me.contains(sb))
         intersection_ref_me.add(sb);
     }
@@ -258,7 +258,7 @@ public class UniDomIntParser {
    * @param domain2
    */
   private double getreliabilityScore(String domain1, String domain2) {
-    StringPair sb = new StringPair(domain1, domain2);
+    ValuePair<String, String> sb = new ValuePair<String, String>(domain1, domain2);
     double sum = 0.0;
     if(I_me.contains(sb)){
       sum+= w_me;
