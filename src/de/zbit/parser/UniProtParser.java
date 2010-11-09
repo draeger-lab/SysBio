@@ -5,8 +5,7 @@ package de.zbit.parser;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 import de.zbit.dbfetch.UniProtFetcher;
 import de.zbit.util.SortedArrayList;
@@ -20,7 +19,7 @@ import de.zbit.util.SortedArrayList;
  */
 public class UniProtParser {
   
-  public static final Logger log = Logger.getLogger(UniProtParser.class);
+  public static final Logger log = Logger.getLogger(UniProtParser.class.getName());
   UniProtFetcher UniProtManagement = null;
 
   public UniProtParser(UniProtFetcher w) {
