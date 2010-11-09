@@ -13,7 +13,6 @@ import java.io.IOException;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -427,7 +426,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * An editable {@link JTextField} whith the full path of the selected file or
 	 * directory.
 	 */
-	private JFormattedTextField textField;
+	private JTextField textField;
 	
 	/**
 	 * Creates a new empty {@link FileSelector}. All of its properties are
@@ -543,7 +542,7 @@ public class FileSelector extends JPanel implements ActionListener {
 					break;
 			}
 			if (file != null) {
-				textField.setValue(file);
+				textField.setText(file.toString());
 				baseDir = file.getParent();
 			}
 		}
@@ -672,7 +671,9 @@ public class FileSelector extends JPanel implements ActionListener {
 		this.command = getCommand(type);
 		this.baseDir = baseDir != null ? baseDir : System.getProperty("user.dir");
 		this.filter = filter;
-		textField = new JFormattedTextField(new File(this.baseDir));
+		textField = new JTextField();
+		textField.setText(this.baseDir);
+		textField.setColumns(30);
 		textField.setInputVerifier(new FileInputVerifier(
 			acceptOnlyFiles() ? FileInputVerifier.FileType.FILE
 					: FileInputVerifier.FileType.DIRECTORY));

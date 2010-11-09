@@ -427,8 +427,11 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String toHTML(String string, int lineBreak) {
+		if (string == null) {
+			return "<html><body>null</body></html>";
+		}
 		StringBuilder sb = new StringBuilder();
-		if (!string.startsWith("<html><body>")) {
+			if (!string.startsWith("<html><body>")) {
 			sb.insert(0, "<html><body>");
 		}
 		sb.append(insertLineBreaks(string, lineBreak, "<br>"));
@@ -445,6 +448,22 @@ public class StringUtil {
 	 */
 	public static StringBuilder concat(Object... objects) {
 		return append(new StringBuilder(), objects);
+	}
+
+	/**
+	 * Changes an optionName by replacing all underscores with a space, setting
+	 * the whole string to lower case and changing the first letter to upper case.
+	 * E.g., "REMOVE_ORPHANS" => "Remove orphans"
+	 * 
+	 * @param optionName
+	 * @return reformatted option string
+	 */
+	public static String formatOptionName(String optionName) {
+		String ret = optionName;
+		ret = ret.replace("_", " ");
+		ret = ret.toLowerCase().trim();
+		ret = Character.toUpperCase(ret.charAt(0)) + ret.substring(1);
+		return ret;
 	}
 	
 }

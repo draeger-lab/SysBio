@@ -20,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
@@ -269,20 +270,24 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		defaults = new JButton("Defaults");
 		defaults.addActionListener(this);
 		defaults.setActionCommand(DEFAULTS);
+		defaults.setToolTipText(StringUtil.toHTML("Restores the default configuration, i.e., all current preferences will be replaced by the default values.", 60));
 		defaults.setEnabled(!panel.isDefaultConfiguration());
 		JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(this);
 		cancel.setActionCommand(CANCEL);
 		cancel.setSize(defaults.getSize());
+		cancel.setToolTipText(StringUtil.toHTML("Closes this dialog without saving, i.e., all preferences will get lost.", 60));
 		apply = new JButton("Apply");
 		apply.setSize(defaults.getSize());
 		apply.addActionListener(this);
 		apply.setActionCommand(APPLY);
+		apply.setToolTipText(StringUtil.toHTML("Persistently saves the current configuration but keeps the dialog open.", 60));
 		apply.setEnabled(false);
 		ok = new JButton("OK");
 		ok.addActionListener(this);
 		ok.setActionCommand(OK);
 		ok.setSize(defaults.getSize());
+		ok.setToolTipText(StringUtil.toHTML("Saves the current configuration and closes this dialog.", 60));
 		ok.setEnabled(true);
 		
 		cancel.setPreferredSize(defaults.getPreferredSize());
@@ -293,7 +298,10 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		p.add(defaults);
 		p.add(apply);
 		p.add(ok);
-		add(p, BorderLayout.SOUTH);
+		JPanel foot = new JPanel(new BorderLayout());
+		foot.add(new JSeparator(), BorderLayout.NORTH);
+		foot.add(p, BorderLayout.SOUTH);
+		getContentPane().add(foot, BorderLayout.SOUTH);
 	}
 	
 	/*

@@ -81,22 +81,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	private static final long serialVersionUID = 1852850798328875230L;
 
 	/**
-	 * Changes an optionName by replacing all underscores with a space, setting
-	 * the whole string to lowercase and changing the first letter to uppercase.
-	 * E.g. "REMOVE_ORPHANS" => "Remove orphans"
-	 * 
-	 * @param optionName
-	 * @return reformatted option string
-	 */
-	protected static final String formatOptionName(String optionName) {
-		String ret = optionName;
-		ret = ret.replace("_", " ");
-		ret = ret.toLowerCase().trim();
-		ret = Character.toUpperCase(ret.charAt(0)) + ret.substring(1);
-		return ret;
-	}
-
-	/**
 	 * A list of {@link ChangeListener}s to be notified in case that values
 	 * change on this {@link PreferencesPanel}.
 	 */
@@ -388,7 +372,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	public JComponent getJComponentForOption(Option<?> option) {
 		// Create swing option based on field type
 		JComponent jc = null;
-		String optionTitle = formatOptionName(option.getOptionName());
+		String optionTitle = option.formatOptionName();
 		
 		// If a range is specified, get all possible values.
 		String[] values = null;
