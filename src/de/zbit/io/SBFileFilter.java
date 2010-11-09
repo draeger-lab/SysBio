@@ -5,6 +5,8 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import de.zbit.util.StringUtil;
+
 /**
  * A file filter implementation for TeX and text files. It also accepts
  * directories. Otherwise one could not browse in the file system.
@@ -13,8 +15,8 @@ import javax.swing.filechooser.FileFilter;
  * @date 2007-08-03
  * 
  */
-public class SBFileFilter extends FileFilter implements java.io.FileFilter {
-
+public class SBFileFilter extends GeneralFileFilter {
+	
 	/**
 	 * 
 	 * @author Andreas Dr&auml;ger
@@ -49,64 +51,78 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 		/**
 		 * True if this filter accepts plain ASCII files
 		 */
-		TEXT_FILES
+		TEXT_FILES,
+		/**
+		 * True if this filter accepts directories only (no files).
+		 */
+		DIRECTORIES_ONLY,
+		/**
+		 * If not specified this is the type.
+		 */
+		UNDEFINED;
 	}
-
+	
 	/**
 	 * A filter for CSV files
 	 */
 	public static SBFileFilter CSV_FILE_FILTER = new SBFileFilter(
-			FileType.CSV_FILES);
-
+		FileType.CSV_FILES);
+	
 	/**
 	 * A filter for joint picture expert group files.
 	 */
 	public static FileFilter JPEG_FILE_FILTER = new SBFileFilter(
-			FileType.JPEG_FILES);
-
+		FileType.JPEG_FILES);
+	
 	/**
 	 * A filter for PDF files.
 	 */
 	public static final SBFileFilter PDF_FILE_FILTER = new SBFileFilter(
-			FileType.PDF_FILES);
-
+		FileType.PDF_FILES);
+	
 	/**
 	 * A filter for portable network graphic files.
 	 */
 	public static SBFileFilter PNG_FILE_FILTER = new SBFileFilter(
-			FileType.PNG_FILES);
-
+		FileType.PNG_FILES);
+	
+	/**
+	 * A filter for directories only.
+	 */
+	public static SBFileFilter DIRECTORY_FILTER = new SBFileFilter(
+		FileType.DIRECTORIES_ONLY);
+	
 	/**
 	 * A filter for SBML files
 	 */
 	public static final SBFileFilter SBML_FILE_FILTER = new SBFileFilter(
-			FileType.SBML_FILES);
-
+		FileType.SBML_FILES);
+	
 	/**
 	 * A filter for TeX files
 	 */
 	public static final SBFileFilter TeX_FILE_FILTER = new SBFileFilter(
-			FileType.TeX_FILES);
-
+		FileType.TeX_FILES);
+	
 	/**
 	 * A filter for Text files.
 	 */
 	public static final SBFileFilter TEXT_FILE_FILTER = new SBFileFilter(
-			FileType.TEXT_FILES);
+		FileType.TEXT_FILES);
 	
 	/**
 	 * Filter for any kind of image file supported by this class.
 	 */
 	public static final MultipleFileFilter IMAGE_FILE_FILTER = new MultipleFileFilter(
-			"image file (*.jpg, *.png)", SBFileFilter.JPEG_FILE_FILTER,
-			SBFileFilter.PNG_FILE_FILTER);
+		"image file (*.jpg, *.png)", SBFileFilter.JPEG_FILE_FILTER,
+		SBFileFilter.PNG_FILE_FILTER);
 	
 	/**
 	 * The {@link FileFilter} for all files.
 	 */
-	public final static FileFilter ALL_FILE_FILTER = (new JFileChooser()).getAcceptAllFileFilter();
+	public final static GeneralFileFilter ALL_FILE_FILTER = new SBFileFilter(
+		(new JFileChooser()).getAcceptAllFileFilter());
 	
-
 	/**
 	 * 
 	 * @param f
@@ -115,7 +131,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public static boolean isCSVFile(File f) {
 		return f.getName().toLowerCase().endsWith(".csv");
 	}
-
+	
 	/**
 	 * 
 	 * @param f
@@ -125,7 +141,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 		String extension = f.getName().toLowerCase();
 		return extension.endsWith(".jpg") || extension.endsWith(".jpeg");
 	}
-
+	
 	/**
 	 * Returns true if the given file is a portable network graphics file.
 	 * 
@@ -135,7 +151,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public static boolean isPNGFile(File f) {
 		return f.getName().toLowerCase().endsWith(".png");
 	}
-
+	
 	/**
 	 * Returns true if the given file is an SBML file.
 	 * 
@@ -146,7 +162,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 		String extension = f.getName().toLowerCase();
 		return extension.endsWith(".xml") || extension.endsWith(".sbml");
 	}
-
+	
 	/**
 	 * Returns true if the given file is a TeX file.
 	 * 
@@ -156,7 +172,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public static boolean isTeXFile(File f) {
 		return f.getName().toLowerCase().endsWith(".tex");
 	}
-
+	
 	/**
 	 * Returns true if the given file is a text file.
 	 * 
@@ -166,23 +182,37 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public static boolean isTextFile(File f) {
 		return f.getName().toLowerCase().endsWith(".txt");
 	}
-
+	
 	/**
 	 * Allowable file type.
 	 */
 	private FileType type;
-
+	
+	/**
+	 * Allows users to initialize this {@link GeneralFileFilter} with another
+	 * {@link FileFilter}.
+	 */
+	private FileFilter filter;
+	
 	/**
 	 * Constructs a file filter that accepts or not accepts the following files
 	 * (defined by the given parameters).
 	 * 
 	 * @param type
-	 *            One of the short numbers defined in this class.
+	 *        One of the short numbers defined in this class.
 	 */
 	public SBFileFilter(FileType type) {
 		this.type = type;
+		if (type == FileType.UNDEFINED) {
+			throw new IllegalArgumentException("FileType must not be UNDEFINED.");
+		}
 	}
-
+	
+	public SBFileFilter(FileFilter filter) {
+		this.filter = filter;
+		this.type = FileType.UNDEFINED;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -190,17 +220,19 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	 */
 	// @Override
 	public boolean accept(File f) {
+		if (filter != null) {
+			return filter.accept(f);
+		}
 		if ((f.isDirectory() || (type == FileType.TEXT_FILES && isTextFile(f)))
 				|| (type == FileType.TeX_FILES && isTeXFile(f))
 				|| (type == FileType.SBML_FILES && isSBMLFile(f))
 				|| (type == FileType.CSV_FILES && isCSVFile(f))
 				|| (type == FileType.PNG_FILES && isPNGFile(f))
 				|| (type == FileType.JPEG_FILES && isJPEGFile(f))
-				|| (type == FileType.PDF_FILES && isPDFFile(f)))
-			return true;
+				|| (type == FileType.PDF_FILES && isPDFFile(f))) return true;
 		return false;
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -208,7 +240,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public boolean acceptsCSVFiles() {
 		return type == FileType.CSV_FILES;
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -216,7 +248,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public boolean acceptsJPEGFiles() {
 		return type == FileType.JPEG_FILES;
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -224,7 +256,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public boolean acceptsPNGFiles() {
 		return type == FileType.PNG_FILES;
 	}
-
+	
 	/**
 	 * Returns true if this file filter accepts SBML files.
 	 * 
@@ -233,7 +265,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public boolean acceptsSBMLFiles() {
 		return type == FileType.SBML_FILES;
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -241,7 +273,7 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public boolean acceptsTeXFiles() {
 		return type == FileType.TeX_FILES;
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -249,33 +281,38 @@ public class SBFileFilter extends FileFilter implements java.io.FileFilter {
 	public boolean acceptsTextFiles() {
 		return type == FileType.TEXT_FILES;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see javax.swing.filechooser.FileFilter#getDescription()
 	 */
 	public String getDescription() {
+		if (filter != null) {
+			return filter.getDescription();
+		}
 		switch (type) {
-		case TEXT_FILES:
-			return "Text files (*.txt)";
-		case TeX_FILES:
-			return "TeX files (*.tex)";
-		case SBML_FILES:
-			return "SBML files (*.sbml, *.xml)";
-		case CSV_FILES:
-			return "Comma separated files (*.csv)";
-		case JPEG_FILES:
-			return "Joint Photographic Experts Group files (*.jpg, *.jpeg)";
-		case PNG_FILES:
-			return "Portable Network Graphics files (*.png)";
-		case PDF_FILES:
-			return "Portable Document Format files (*.pdf)";
-		default:
-			return "";
+			case TEXT_FILES:
+				return "Text files (*.txt)";
+			case TeX_FILES:
+				return "TeX files (*.tex)";
+			case SBML_FILES:
+				return "SBML files (*.sbml, *.xml)";
+			case CSV_FILES:
+				return "Comma separated files (*.csv)";
+			case JPEG_FILES:
+				return "Joint Photographic Experts Group files (*.jpg, *.jpeg)";
+			case PNG_FILES:
+				return "Portable Network Graphics files (*.png)";
+			case PDF_FILES:
+				return "Portable Document Format files (*.pdf)";
+			case DIRECTORIES_ONLY:
+			default:
+				return StringUtil.firstLetterUpperCase(type.toString()
+						.replace('_', ' '));
 		}
 	}
-
+	
 	/**
 	 * @param f
 	 * @return

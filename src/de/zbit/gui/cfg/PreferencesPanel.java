@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
@@ -37,7 +38,8 @@ import javax.swing.text.JTextComponent;
 import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.cfg.FileSelector.Type;
-import de.zbit.io.Directory;
+import de.zbit.io.GeneralFileFilter;
+import de.zbit.io.SBFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
@@ -210,6 +212,15 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	public void addItemListener(ItemListener listener) {
 		itemListeners.add(listener);
 	}
+	
+	/**
+	 * Stores a sorted mapping between {@link Option}s and corresponding {@link OptionGroup}s.
+	 */
+	SortedMap<Option<?>, OptionGroup<?>> option2group;
+	/**
+	 * Stores a (sorted) {@link List} of all {@link OptionGroup}s belonging to this class.
+	 */
+	List<OptionGroup<?>> optionGroups;
 
 	/**
 	 * Automatically builds an option panel, based on the static Option fields
@@ -220,15 +231,60 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 */
 	public List<Option<?>> autoBuildPanel() {
 		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
-		Class<? extends KeyProvider> keyProvider = preferences.getKeyProvider();
 		LayoutHelper lh = new LayoutHelper(this);
+
+		// search for OptionGroups first
+		searchForOptionGroups();
+		
+		// First we create GUI elements for all groups
+		for (OptionGroup<?> optGrp : optionGroups) {
+			lh.add(createGroup(optGrp, unprocessedOptions));
+		}
+		
+		// Now we consider what is left
+		unprocessedOptions.addAll(addOptions(lh, option2group.keySet(), null));
+		
+		return unprocessedOptions;
+	}
+
+	/**
+	 * 
+	 * @param optGrp
+	 * @param unprocessedOptions
+	 *        where to put those options that could not be added to the groups
+	 *        panel.
+	 * @return
+	 */
+	Component createGroup(OptionGroup<?> optGrp,
+		List<Option<?>> unprocessedOptions) {
+		JPanel groupPanel;
+		String title;
+		groupPanel = new JPanel();
+		LayoutHelper groupsLayout = new LayoutHelper(groupPanel);
+		unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(),
+			option2group));
+		if (optGrp.isSetName()) {
+			title = StringUtil.concat(" ", optGrp.getName().trim(), " ").toString();
+			groupPanel.setBorder(BorderFactory.createTitledBorder(title));
+		} else {
+			groupPanel.setBorder(BorderFactory.createEtchedBorder());
+		}
+		if (optGrp.isSetToolTip()) {
+			groupPanel.setToolTipText(StringUtil.toHTML(optGrp.getToolTip(), 60));
+		}
+		return groupPanel;
+	}
+
+	/**
+	 * 
+	 */
+	void searchForOptionGroups() {
 		Object fieldValue;
 		Option<?> opt;
 		OptionGroup<?> og;
-
-		// search for OptionGroups first
-		TreeMap<Option<?>, OptionGroup<?>> option2group = new TreeMap<Option<?>, OptionGroup<?>>();
-		List<OptionGroup<?>> groups = new LinkedList<OptionGroup<?>>();
+		Class<? extends KeyProvider> keyProvider = preferences.getKeyProvider();
+		option2group = new TreeMap<Option<?>, OptionGroup<?>>();
+		optionGroups = new LinkedList<OptionGroup<?>>();
 		for (Field field : keyProvider.getDeclaredFields()) {
 			try {
 				fieldValue = field.get(keyProvider);
@@ -239,8 +295,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 							option2group.put(o, og);
 						}
 					}
-					if (!groups.contains(og)) {
-						groups.add(og);
+					if (!optionGroups.contains(og)) {
+						optionGroups.add(og);
 					}
 				} else if ((fieldValue instanceof Option<?>)
 						&& properties.containsKey(fieldValue)) {
@@ -253,28 +309,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				// ignore non-static fields
 			}
 		}
-		
-		// First we create GUI elements for all groups
-		LayoutHelper groupsLayout;
-		JPanel groupPanel;
-		String title;
-		for (OptionGroup<?> optGrp : groups) {
-			groupPanel = new JPanel();
-			groupsLayout = new LayoutHelper(groupPanel);
-			unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(), option2group));
-			if (optGrp.isSetName()) {
-				title = StringUtil.concat(" ", optGrp.getName().trim(), " ").toString();
-				groupPanel.setBorder(BorderFactory.createTitledBorder(title));
-			} else {
-				groupPanel.setBorder(BorderFactory.createEtchedBorder());
-			}
-			lh.add(groupPanel);
-		}
-		
-		// Now we consider what is left
-		unprocessedOptions.addAll(addOptions(lh, option2group.keySet(), null));
-		
-		return unprocessedOptions;
 	}
 
 	/**
@@ -284,7 +318,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @param deleteFromHere Processed options will be deleted from this {@link Map}.
 	 * @return
 	 */
-	private List<Option<?>> addOptions(LayoutHelper lh,
+	List<Option<?>> addOptions(LayoutHelper lh,
 		Iterable<? extends Option<?>> options,
 		Map<Option<?>, OptionGroup<?>> deleteFromHere) {
 		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
@@ -346,21 +380,21 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * <li>Adding this panel as item-listener</li>
 	 * </ul>
 	 * 
-	 * @param o
+	 * @param option
 	 *            - option to build the JComponent for.
 	 * @return JComponent or NULL if the getRequiredType() is unknown.
 	 */
 	@SuppressWarnings("unchecked")
-	public JComponent getJComponentForOption(Option<?> o) {
+	public JComponent getJComponentForOption(Option<?> option) {
 		// Create swing option based on field type
 		JComponent jc = null;
-		String optionTitle = formatOptionName(o.getOptionName());
+		String optionTitle = formatOptionName(option.getOptionName());
 		
 		// If a range is specified, get all possible values.
 		String[] values = null;
 		
-		if (o.getRange() != null) {
-			List<?> val = o.getRange().getAllAcceptableValues();
+		if (option.getRange() != null) {
+			List<?> val = option.getRange().getAllAcceptableValues();
 			if (val != null) {
 				values = new String[val.size()];
 				for (int i = 0; i < val.size(); i++) {
@@ -369,55 +403,69 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			}
 		}
 		
-		// TODO: Guppieren, Testen, Accept automatieren
-		Class<?> clazz = o.getRequiredType();
+		// TODO: Group, test, and accept automatically
+		Class<?> clazz = option.getRequiredType();
 		if (Boolean.class.isAssignableFrom(clazz)) {
 			jc = new JCheckBox();
-			((AbstractButton) jc).setSelected(((Option<Boolean>)o).getValue(preferences));
+			((AbstractButton) jc).setSelected(((Option<Boolean>)option).getValue(preferences));
 			
 			//((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
 			//		.get(o.getOptionName()).toString()));
 		} else if (File.class.isAssignableFrom(clazz)) {
 			// Infere type
-			Type ty;
+			Type ty = Type.SAVE;
 			String check = optionTitle.toLowerCase();
 			if (check.contains("open")  || check.contains("load")
-					|| check.contains("input") ) {
+					|| check.contains("input")) {
 				ty = Type.OPEN;
-			} else {
-				ty = Type.SAVE;
 			}
 			
 			// Get default value
 			String defPath=null;
-			Object def = o.getValue(preferences);
-			if (def==null) defPath=null;
-			else if (def instanceof File) defPath = ((File)def).getPath();
-			else defPath = def.toString();
+			Object def = option.getValue(preferences);
+			if (def == null) {
+				defPath = null;
+			} else if (def instanceof File) {
+				defPath = ((File) def).getPath();
+			} else {
+				defPath = def.toString();
+			}
 			
-			jc = new FileSelector(ty, defPath, (o.getRequiredType() != Directory.class),(FileFilter[]) null);
+			boolean isDirectory = false;
+			if (option.isSetRangeSpecification()
+					&& option.getRange().isSetConstraints()
+					&& (option.getRange().getConstraints() instanceof GeneralFileFilter)) {
+				GeneralFileFilter filter = (GeneralFileFilter) option.getRange()
+						.getConstraints();
+				if (filter == SBFileFilter.DIRECTORY_FILTER) {
+					isDirectory = true;
+				}
+				jc = new FileSelector(ty, defPath, isDirectory, new GeneralFileFilter[] {filter});
+			} else {
+				jc = new FileSelector(ty, defPath, isDirectory, (FileFilter[]) null);
+			}
 			((FileSelector)jc).setLabelText(optionTitle);
 			
 		} else if (Character.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
-			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
+			((JColumnChooser)jc).setDefaultValue(option.getValue(preferences).toString());
 			//JComponent cs = ((JColumnChooser)jc).getColumnChooser();
 			// TODO: Limit maximum size to one (don't accept inputs after that).
 			
 		} else if (String.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
-			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
+			((JColumnChooser)jc).setDefaultValue(option.getValue(preferences).toString());
 
 		} else if (Number.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
-			if (!Utils.isInteger(o.getRequiredType())) {
+			if (!Utils.isInteger(option.getRequiredType())) {
    			// TODO: implement Box for doubles.
 				// For doulbes, we need to allow ',' and '.'.
 				((JColumnChooser)jc).setAcceptOnlyIntegers(false);
 			}
-			((JColumnChooser)jc).setDefaultValue(o.getValue(preferences).toString());
+			((JColumnChooser)jc).setDefaultValue(option.getValue(preferences).toString());
 		}
 
 		// Check if the option could be converted to a JComponent
@@ -436,8 +484,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				Reflect.invokeIfContains(jc, "addChangeListener", ChangeListener.class,
 					this);
 			}
-			jc.setName(o.getOptionName());
-			jc.setToolTipText(StringUtil.toHTML(o.getDescription(), 60));
+			jc.setName(option.getOptionName());
+			jc.setToolTipText(StringUtil.toHTML(option.getDescription(), 60));
 			jc.addKeyListener(this);
 			
 			//jc.setBorder(new TitledBorder("test"));

@@ -1,5 +1,6 @@
 package de.zbit.util.prefs;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -17,8 +18,6 @@ import java.util.SortedMap;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import de.zbit.util.Utils;
-
 import argparser.ArgParser;
 import argparser.BooleanHolder;
 import argparser.CharHolder;
@@ -27,6 +26,8 @@ import argparser.FloatHolder;
 import argparser.IntHolder;
 import argparser.LongHolder;
 import argparser.StringHolder;
+import de.zbit.io.GeneralFileFilter;
+import de.zbit.util.Utils;
 
 /**
  * @author Andreas Dr&auml;ger
@@ -139,6 +140,24 @@ public class SBPreferences implements Map<Object, Object> {
 		Map<Option<?>, Object> options = configureArgParser(parser,
 			new HashMap<Option<?>, Object>(), keyProvider, props, defaults);
 		parser.matchAllArgs(args);
+		Option<?> option;
+		String element;
+		GeneralFileFilter filter;
+		// TODO: A similar check should be done when doing flush.
+		for (Map.Entry<Option<?>, Object> entry : options.entrySet()) {
+			option = entry.getKey();
+			if (option.getRequiredType().isAssignableFrom(File.class)
+					&& option.isSetRangeSpecification()
+					&& option.getRange().isSetConstraints()) {
+				filter = (GeneralFileFilter) option.getRange().getConstraints();
+				element = entry.getValue().toString();
+				if (!filter.accept(new File(element))) {
+					parser.printErrorAndExit(String.format(
+						"File %s cannot be accepted as %s.", element, filter
+								.getDescription()));
+				}
+			}
+		}
 		putAll(props, options);
 		return props;
 	}

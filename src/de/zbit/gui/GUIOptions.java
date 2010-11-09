@@ -5,9 +5,10 @@ package de.zbit.gui;
 
 import java.io.File;
 
-import de.zbit.io.Directory;
+import de.zbit.io.SBFileFilter;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.Range;
 
 /**
  * A collection of meaningful {@link Option} instances for graphical user
@@ -38,14 +39,16 @@ public interface GUIOptions extends KeyProvider {
 	/**
 	 * Standard directory where user files can be found.
 	 */
-	public static final Option<Directory> OPEN_DIR = new Option<Directory>("OPEN_DIR",
-			Directory.class, "Standard directory where user files can be found.", new Directory(
-			System.getProperty("user.dir")));
+	public static final Option<File> OPEN_DIR = new Option<File>("OPEN_DIR",
+		File.class, "Standard directory where user files can be found.",
+		new Range<File>(File.class, SBFileFilter.DIRECTORY_FILTER), new File(System
+				.getProperty("user.dir")));
 	/**
 	 * Standard directory where the user may save some files.
 	 */
-	public static final Option<Directory> SAVE_DIR = new Option<Directory>("SAVE_DIR",
-			Directory.class, "Standard directory where the user may save some files.",
-		new Directory(System.getProperty("user.dir")));
+	public static final Option<File> SAVE_DIR = new Option<File>("SAVE_DIR",
+		File.class, "Standard directory where the user may save some files.",
+		new Range<File>(File.class, SBFileFilter.DIRECTORY_FILTER), new File(System
+				.getProperty("user.dir")));
 	
 }

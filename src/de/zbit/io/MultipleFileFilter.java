@@ -12,8 +12,7 @@ import javax.swing.filechooser.FileFilter;
  * @date 2010-10-22
  * 
  */
-public class MultipleFileFilter extends FileFilter implements
-		java.io.FileFilter {
+public class MultipleFileFilter extends GeneralFileFilter {
 
 	/**
 	 * 
