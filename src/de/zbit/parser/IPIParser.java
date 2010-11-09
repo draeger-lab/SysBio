@@ -5,8 +5,7 @@ package de.zbit.parser;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import org.apache.log4j.Level;
+import java.util.logging.Level;
 
 import de.zbit.dbfetch.IPIFetcher;
 import de.zbit.util.LogUtil;

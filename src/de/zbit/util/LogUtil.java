@@ -1,38 +1,64 @@
 package de.zbit.util;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.TTCCLayout;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 
 /**
  * Class with helper functions regarding logging.
  * 
- * @author Florian Mittag <florian.mittag@uni-tuebingen.de>
+ * @author Florian Mittag
  */
 public class LogUtil {
 
   /**
-   * Initializes logging using log4j and sets the given Loglevel for all classes
-   * that are in subpackages of de.zbit.
+   * Initializes logging using the Java logger and with log level INFO for
+   * all classes that are in sub-packages of de.zbit.
    * 
-   * @param loglevel
+   * @param packages list of packages for which the logger should be initialized
+   *                 additionally
    */
-  public static void initializeLogging(Level loglevel) {
-    try {
-      //Logger rootLogger = Logger.getRootLogger();
-      Layout layout = new TTCCLayout();
+  public static void initializeLogging(String... packages) {
+    initializeLogging(Level.INFO, packages);
+  }
+  
+  /**
+   * Initializes logging using the Java logger and sets the given log level for
+   * all classes that are in sub-packages of de.zbit.
+   * 
+   * @param loglevel the desired log level
+   * @param packages list of packages for which the logger should be initialized
+   *                 additionally
+   */
+  public static void initializeLogging(Level logLevel, String... packages ) {
+    // initialize logging
+    //if (showLoggingConsole) {
+    //  Logging.enableLoggingConsole();
+    //}
+  
+    for (Handler h : Logger.getLogger("de.zbit").getHandlers()) {
+      h.setLevel(logLevel);
+    }
+    Logger.getLogger("de.zbit").setLevel(logLevel);
+
+    // additional packages to log
+    for (String s : packages) {
+      for (Handler h : Logger.getLogger(s).getHandlers()) {
+        h.setLevel(logLevel);
+      }
+      Logger.getLogger(s).setLevel(logLevel);
       
-      // only set log level for SysBio classes
-      ConsoleAppender consoleAppender = new ConsoleAppender( layout );
-      Logger.getLogger("de.zbit").addAppender( consoleAppender );
-      Logger.getLogger("de.zbit").setLevel(loglevel);
-      
-      
-      
-    } catch( Exception ex ) {
-      System.out.println( ex );
     }
   }
+
+  /*
+  public static void endLogging() {
+    if (Logging.loggingConsoleIsVisible()) {
+      Logging.deactivateLoggingConsole();
+    }
+  }
+  */
+  
 }

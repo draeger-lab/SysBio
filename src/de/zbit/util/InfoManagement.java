@@ -9,8 +9,9 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 
 import de.zbit.exception.UnsuccessfulRetrieveException;
 
@@ -29,7 +30,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   private static final long serialVersionUID = -5172273501517643495L;
   
-  public static final transient Logger log = Logger.getLogger(InfoManagement.class);
+  public static final transient Logger log = Logger.getLogger(InfoManagement.class.getName());
   
   private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;
   private SortedArrayList<IDtype> unsuccessfulQueries; // Remember those separately
@@ -310,12 +311,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       } catch (TimeoutException e) {
         retried++;
         if (retried>=3) {
-          log.debug("3 attempts failed with a TimeoutException");
+          log.info("3 attempts failed with a TimeoutException");
           e.printStackTrace();
           break;
         }
       } catch (UnsuccessfulRetrieveException e) {
-        log.debug("Unsuccessful retrieval, marking this ID as unretrievable", e);
+        log.log(Level.FINE, "Unsuccessful retrieval, marking this ID as unretrievable", e);
         unsuccessfulQueries.add(id);
         cacheChangedSinceLastLoading=true;
         break;
@@ -323,7 +324,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         // do NOT retry and do NOT save anything... simply return the null
         // This may happen e.g. if this class is used to manage db queries
         // and the user or database is offline.
-        log.debug("Catched an unknown exception while fetching informations", t);
+        log.log(Level.WARNING, "Catched an unknown exception while fetching informations", t);
         t.printStackTrace();
         ret=null;
         break;
@@ -379,12 +380,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       } catch (TimeoutException e) {
         retried++;
         if (retried>=3) {
-          log.debug("3 attempts failed for all with a TimeoutException");
+          log.log(Level.INFO, "3 attempts failed for all with a TimeoutException", e);
           e.printStackTrace();
           break;
         }
       } catch (UnsuccessfulRetrieveException e) {
-        log.debug("Unsuccessful retrieval, marking ALL IDs as unretrievable", e);
+        log.log(Level.FINE, "Unsuccessful retrieval, marking ALL IDs as unretrievable", e);
         unsuccessfulQueries.addAll(ids);
         cacheChangedSinceLastLoading=true;
         break;
@@ -392,7 +393,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         // do NOT retry and do NOT save anything... simply return the null
         // This may happen e.g. if this class is used to manage db queries
         // and the user or database is offline.
-        log.debug("Catched an unknown exception while fetching multiple informations", t);
+        log.log(Level.WARNING, "Catched an unknown exception while fetching multiple informations", t);
         t.printStackTrace();
         ret=null;
         break;

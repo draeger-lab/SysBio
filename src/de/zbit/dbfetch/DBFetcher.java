@@ -1,10 +1,11 @@
 package de.zbit.dbfetch;
 
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.apache.axis.AxisFault;
-import org.apache.log4j.Logger;
 
 import uk.ac.ebi.webservices.axis1.WSDbfetchClient;
 import de.zbit.exception.UnsuccessfulRetrieveException;
@@ -54,7 +55,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
   /**
    * 
    */
-  public static Logger log = Logger.getLogger(DBFetcher.class);
+  public static Logger log = Logger.getLogger(DBFetcher.class.getName());
   /**
    * 
    */
@@ -132,12 +133,12 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         else {
           retried++;
           if (retryLimit==retryLimit) e.printStackTrace();
-          log.debug("Attempt " + retried + " to fetch data failed", e);
+          log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
         }
       } catch (Exception e) {
         retried++;
         if (retryLimit==retryLimit) e.printStackTrace();
-        log.debug("Attempt " + retried + " to fetch data failed", e);
+        log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
       }
     }
 
@@ -176,14 +177,14 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         } else {
           retried++;
           if (retryLimit==retryLimit) e.printStackTrace();
-          log.debug("Attempt " + retried + " to fetch data failed", e);
+          log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
         }
       } catch (Exception e) {
         // One of DbfParamsException, DbfConnException, DbfException, 
         // InputException, RemoteException, ServiceException
         retried++;
         if (retryLimit==retryLimit) e.printStackTrace();
-        log.debug("Attempt " + retried + " to fetch data failed", e);
+        log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
       }
     }
     if (retried >= retryLimit && (entriesStr == null || entriesStr.length() == 0)) {
