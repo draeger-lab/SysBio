@@ -64,9 +64,24 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String firstLetterUpperCase(String name) {
+		return changeFirstLetterCase(name, true);
+	}
+	
+	/**
+	 * Returns a lower-case {@link String} who's first letter is now in lower
+	 * case.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static String firstLetterLowerCase(String name) {
+		return changeFirstLetterCase(name, false);
+	}
+	
+	private static String changeFirstLetterCase(String name, boolean upperCase) {
 		char c = name.charAt(0);
 		if (Character.isLetter(c)) {
-			c = Character.toUpperCase(c);
+			c = upperCase ? Character.toUpperCase(c) : Character.toLowerCase(c);
 		}
 		if (name.length() > 1) {
 			name = Character.toString(c) + name.substring(1).toLowerCase();
@@ -422,7 +437,7 @@ public class StringUtil {
 		}
 		return sb.toString();
 	}
-
+	
 	/**
 	 * 
 	 * @param objects

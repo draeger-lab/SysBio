@@ -4,11 +4,13 @@
  */
 package de.zbit.util.prefs;
 
+import java.io.File;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.zbit.io.CSVReader;
+import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.Utils;
 
@@ -38,18 +40,37 @@ public class Range<Type> {
 		private boolean excludingLBound=false;
 		private boolean excludingUBound=false;
 		
+		/**
+		 * 
+		 */
 		private SubRange() {
 			super();
 		}
 		
+		/**
+		 * 
+		 * @param value
+		 */
 		public SubRange (Type value) {
 			this (value, value);
 		}
 		
+		/**
+		 * 
+		 * @param lowerBound
+		 * @param upperBound
+		 */
 		public SubRange (Type lowerBound, Type upperBound) {
 			this (lowerBound, upperBound, false, false);
 		}
 		
+		/**
+		 * 
+		 * @param lowerBound
+		 * @param upperBound
+		 * @param excludingLBound
+		 * @param excludingUBound
+		 */
 		@SuppressWarnings("unchecked")
 		public SubRange (Type lowerBound, Type upperBound, boolean excludingLBound, boolean excludingUBound) {
 			super();
@@ -246,20 +267,62 @@ public class Range<Type> {
    * @param rangeSpec - as defined above.
 	 */
 	public Range(Class<Type> requiredType, String rangeSpec) {
-		super();
-		this.typee = requiredType;
+		this(requiredType);
 		this.rangeString = rangeSpec;
 		try {
 			parseRangeSpec(rangeSpec);
-		} catch (ParseException e) {
+		} catch (ParseException exc) {
 			/*
 			 * We cannot throw this exception because in interfaces it is impossible
-			 * to catch these
+			 * to catch these.
 			 */
-			throw new IllegalArgumentException(rangeSpec);
+			throw new IllegalArgumentException(rangeSpec, exc);
 		}
 	}
 	
+	private Range(Class<Type> requiredType) {
+		super();
+		this.typee = requiredType;
+		this.rangeString = "";
+		this.constraints = null;
+	}
+	
+	/**
+	 * Additional constraints to restrict an input.
+	 */
+	private Object constraints;
+	
+	/**
+	 * @return the constraints
+	 */
+	public Object getConstraints() {
+		return constraints;
+	}
+
+	/**
+	 * 
+	 * @param requiredType
+	 *        must be an instance of {@link File}!
+	 * @param filter
+	 */
+	public Range(Class<Type> requiredType, GeneralFileFilter filter) {
+		this(requiredType);
+		if (!requiredType.isAssignableFrom(File.class)) { throw new IllegalArgumentException(
+			String
+					.format(
+						"When initialized with a %s, the required type must be an instance of %s.",
+						GeneralFileFilter.class.getName(), File.class.getName())); }
+		constraints = filter;
+	}
+	
+	/**
+	 * Checks whether additional side constraints have been set.
+	 * @return
+	 */
+	public boolean isSetConstraints() {
+		return constraints != null;
+	}
+		
 	/**
 	 * The source String that has been used to build this class.
 	 * @return
@@ -326,7 +389,7 @@ public class Range<Type> {
 	 */
 	public boolean castAndCheckIsInRange(Object value) {
 		Type value2 = Option.parseOrCast(typee, value);
-		if (value2==null) return false;
+		if (value2==null) { return false;}
 		return isInRange(value2);
 	}
 	

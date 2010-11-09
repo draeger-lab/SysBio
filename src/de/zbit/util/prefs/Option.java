@@ -14,7 +14,9 @@ import argparser.IntHolder;
 import argparser.LongHolder;
 import argparser.StringHolder;
 import de.zbit.gui.ActionCommand;
+import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Reflect;
+import de.zbit.util.StringUtil;
 
 /**
  * An {@link Option} defines a key in a key-provider class and can also be used
@@ -306,6 +308,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @return the description
 	 */
 	public String getDescription() {
+		if (isSetRangeSpecification() && getRange().isSetConstraints()
+				&& (getRange().getConstraints() instanceof GeneralFileFilter)) { return StringUtil
+				.concat(description, " Accepts ", StringUtil.firstLetterLowerCase(
+					((GeneralFileFilter) getRange().getConstraints()).getDescription()),
+					".").toString(); }
 		return description;
 	}
 	

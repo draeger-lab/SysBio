@@ -773,6 +773,15 @@ public class FileSelector extends JPanel implements ActionListener {
 		autoSetLabelText();
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.swing.JComponent#setToolTipText(java.lang.String)
+	 */
+	@Override
+	public void setToolTipText(String text) {
+		textField.setToolTipText(text);
+	}
+	
 	/**
 	 * 
 	 */
