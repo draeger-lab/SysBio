@@ -5,6 +5,10 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import de.zbit.logging.OneLineFormatter;
+
+import sun.awt.X11.XAWTFormatter;
+
 
 /**
  * Class with helper functions regarding logging.
@@ -38,8 +42,10 @@ public class LogUtil {
     //  Logging.enableLoggingConsole();
     //}
   
-    for (Handler h : Logger.getLogger("de.zbit").getHandlers()) {
+    
+    for (Handler h : Logger.getLogger("").getHandlers()) {
       h.setLevel(logLevel);
+      h.setFormatter(new OneLineFormatter());
     }
     Logger.getLogger("de.zbit").setLevel(logLevel);
 
@@ -47,6 +53,7 @@ public class LogUtil {
     for (String s : packages) {
       for (Handler h : Logger.getLogger(s).getHandlers()) {
         h.setLevel(logLevel);
+        h.setFormatter(new OneLineFormatter());
       }
       Logger.getLogger(s).setLevel(logLevel);
       
