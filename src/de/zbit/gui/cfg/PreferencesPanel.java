@@ -92,13 +92,23 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 */
 	private List<ItemListener> itemListeners;
 	/**
+	 * Stores a sorted mapping between {@link Option}s and corresponding {@link OptionGroup}s.
+	 */
+	SortedMap<Option<?>, OptionGroup<?>> option2group;
+
+	/**
+	 * Stores a (sorted) {@link List} of all {@link OptionGroup}s belonging to this class.
+	 */
+	List<OptionGroup<?>> optionGroups;
+
+	/**
 	 * These are the persistently saved user-preferences of which some ore all
 	 * elements are possibly to be changed in this panel. But only if the user
 	 * wants. Hence, we have to first manipulate the field {@link #properties}
 	 * and can maybe persist these changes.
 	 */
 	protected SBPreferences preferences;
-
+	
 	/**
 	 * The settings to be changed by the user including default settings as a
 	 * backup.
@@ -118,7 +128,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	public PreferencesPanel() throws IOException {
 		this(true);
 	}
-	
+
 	/**
 	 * If you decidie not to initialize the panel imideately, you HAVE TO
 	 * call {@link #initializePrefPanel()} in the calling constructor.
@@ -135,30 +145,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		if (init_Panel) {
 		  initializePrefPanel();
 		}
-	}
-
-	/**
-	 * The main initialization method, that must be called by
-	 * every constructor.
-	 * @throws IOException
-	 */
-	protected void initializePrefPanel() throws IOException {
-		changeListeners = new LinkedList<ChangeListener>();
-		itemListeners = new LinkedList<ItemListener>();
-		properties = new SBProperties(new SBProperties());
-		preferences = loadPreferences();
-		if (preferences != null) {
-			String k;
-			for (Object key : preferences.keySetFull()) {
-				if (accepts(key)) {
-					k = key.toString();
-					properties.put(k, preferences.get(k));
-					properties.getDefaults().put(k, 
-						preferences.getDefault(k));
-				}
-			}
-		}
-		init();
 	}
 
 	/**
@@ -185,7 +171,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	public void addChangeListener(ChangeListener listener) {
 		changeListeners.add(listener);
 	}
-
+	
 	/**
 	 * Adds the given {@link ItemListener} to this element's list of this kind
 	 * of listeners.
@@ -196,15 +182,36 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	public void addItemListener(ItemListener listener) {
 		itemListeners.add(listener);
 	}
-	
 	/**
-	 * Stores a sorted mapping between {@link Option}s and corresponding {@link OptionGroup}s.
+	 * 
+	 * @param lh
+	 * @param options
+	 * @param deleteFromHere Processed options will be deleted from this {@link Map}.
+	 * @return
 	 */
-	SortedMap<Option<?>, OptionGroup<?>> option2group;
-	/**
-	 * Stores a (sorted) {@link List} of all {@link OptionGroup}s belonging to this class.
-	 */
-	List<OptionGroup<?>> optionGroups;
+	List<Option<?>> addOptions(LayoutHelper lh,
+		Iterable<? extends Option<?>> options,
+		Map<Option<?>, OptionGroup<?>> deleteFromHere) {
+		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
+		for (Option<?> option : options) {
+			// Create swing option based on field type
+			JComponent jc = properties.containsKey(option) ? getJComponentForOption(option) : null;
+			if (jc != null) {
+				if (jc instanceof FileSelector) {
+					FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
+				} else {
+					lh.add(jc);
+				}
+				if (deleteFromHere != null) {
+					deleteFromHere.remove(option);
+				}
+			} else {
+				// Remember unprocessed options
+				unprocessedOptions.add(option);
+			}
+		}
+		return unprocessedOptions;
+	}
 
 	/**
 	 * Automatically builds an option panel, based on the static Option fields
@@ -260,86 +267,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	}
 
 	/**
-	 * 
-	 */
-	void searchForOptionGroups() {
-		Object fieldValue;
-		Option<?> opt;
-		OptionGroup<?> og;
-		Class<? extends KeyProvider> keyProvider = preferences.getKeyProvider();
-		option2group = new TreeMap<Option<?>, OptionGroup<?>>();
-		optionGroups = new LinkedList<OptionGroup<?>>();
-		for (Field field : keyProvider.getDeclaredFields()) {
-			try {
-				fieldValue = field.get(keyProvider);
-				if (fieldValue instanceof OptionGroup<?>) {
-					og = (OptionGroup<?>) fieldValue;
-					for (Option<?> o : og.getOptions()) {
-						if (properties.containsKey(o)) {
-							option2group.put(o, og);
-						}
-					}
-					if (!optionGroups.contains(og)) {
-						optionGroups.add(og);
-					}
-				} else if ((fieldValue instanceof Option<?>)
-						&& properties.containsKey(fieldValue)) {
-					opt = (Option<?>) fieldValue;
-					if (!option2group.containsKey(opt)) {
-						option2group.put(opt, null);
-					}
-				}
-			} catch (Exception exc) {
-				// ignore non-static fields
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param lh
-	 * @param options
-	 * @param deleteFromHere Processed options will be deleted from this {@link Map}.
-	 * @return
-	 */
-	List<Option<?>> addOptions(LayoutHelper lh,
-		Iterable<? extends Option<?>> options,
-		Map<Option<?>, OptionGroup<?>> deleteFromHere) {
-		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
-		for (Option<?> option : options) {
-			// Create swing option based on field type
-			JComponent jc = properties.containsKey(option) ? getJComponentForOption(option) : null;
-			if (jc != null) {
-				if (jc instanceof FileSelector) {
-					FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
-				} else {
-					lh.add(jc);
-				}
-				if (deleteFromHere != null) {
-					deleteFromHere.remove(option);
-				}
-			} else {
-				// Remember unprocessed options
-				unprocessedOptions.add(option);
-			}
-		}
-		return unprocessedOptions;
-	}
-
-	/**
-	 * This method checks if all key-value pairs to be configured in this
-	 * {@link PreferencesPanel} are valid and acceptable. For each inappropriate
-	 * key-value pair this method creates one error message and then returns a
-	 * list of all these messages with a statement of how to solve the problem.
-	 * 
-	 * @return An empty {@link List} if all key-value pairs in the
-	 *         {@link #properties} of this {@link PreferencesPanel} are valid
-	 *         and acceptable. Otherwise a list of error messages will be
-	 *         returned.
-	 */
-	public abstract List<String> checkPreferences();
-
-	/**
 	 * The default {@link Properties} are the standard values to be used if the
 	 * user wants to re-initialize this object. With this method you can access
 	 * these elements. Note that the default properties are never filtered and
@@ -352,6 +279,16 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 */
 	public Properties getDefaultProperties() {
 		return properties != null ? properties.getDefaults() : new Properties();
+	}
+	
+	/**
+	 * 
+	 * @param <T>
+	 * @param option
+	 * @return
+	 */
+	public <T> T getProperty(Option<T> option) {
+		return option.parseOrCast(properties.getProperty(option));
 	}
 
 	/**
@@ -514,6 +451,30 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	public abstract void init();
 
 	/**
+	 * The main initialization method, that must be called by
+	 * every constructor.
+	 * @throws IOException
+	 */
+	protected void initializePrefPanel() throws IOException {
+		changeListeners = new LinkedList<ChangeListener>();
+		itemListeners = new LinkedList<ItemListener>();
+		properties = new SBProperties(new SBProperties());
+		preferences = loadPreferences();
+		if (preferences != null) {
+			String k;
+			for (Object key : preferences.keySetFull()) {
+				if (accepts(key)) {
+					k = key.toString();
+					properties.put(k, preferences.get(k));
+					properties.getDefaults().put(k, 
+						preferences.getDefault(k));
+				}
+			}
+		}
+		init();
+	}
+
+	/**
 	 * Method to test whether the current properties equal the default
 	 * configuration.
 	 * 
@@ -651,6 +612,42 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	}
 
 	/**
+	 * 
+	 */
+	void searchForOptionGroups() {
+		Object fieldValue;
+		Option<?> opt;
+		OptionGroup<?> og;
+		Class<? extends KeyProvider> keyProvider = preferences.getKeyProvider();
+		option2group = new TreeMap<Option<?>, OptionGroup<?>>();
+		optionGroups = new LinkedList<OptionGroup<?>>();
+		for (Field field : keyProvider.getDeclaredFields()) {
+			try {
+				fieldValue = field.get(keyProvider);
+				if (fieldValue instanceof OptionGroup<?>) {
+					og = (OptionGroup<?>) fieldValue;
+					for (Option<?> o : og.getOptions()) {
+						if (properties.containsKey(o)) {
+							option2group.put(o, og);
+						}
+					}
+					if (!optionGroups.contains(og)) {
+						optionGroups.add(og);
+					}
+				} else if ((fieldValue instanceof Option<?>)
+						&& properties.containsKey(fieldValue)) {
+					opt = (Option<?>) fieldValue;
+					if (!option2group.containsKey(opt)) {
+						option2group.put(opt, null);
+					}
+				}
+			} catch (Exception exc) {
+				// ignore non-static fields
+			}
+		}
+	}
+
+	/**
 	 * Filters the given properties and only keeps those key-value pairs that
 	 * are accepted by this class. Then it initializes the layout of this GUI
 	 * element and also allows to select non-modifiable but important key-value
@@ -727,6 +724,17 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				//System.out.println(" - " + "failed: properties contains no key with that name.");
 			}
 		}
+	}
+	
+	/**
+	 * Sets the property for the given {@link Option}.
+	 * 
+	 * @param <T>
+	 * @param option
+	 * @param value
+	 */
+	public <T> void setProperty(Option<T> option, T value) {
+		properties.setProperty(option.toString(), value.toString());
 	}
 
 	/*

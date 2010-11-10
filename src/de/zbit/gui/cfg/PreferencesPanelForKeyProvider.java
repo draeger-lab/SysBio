@@ -5,13 +5,9 @@
 package de.zbit.gui.cfg;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.LinkedList;
-import java.util.List;
 
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
-import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
@@ -42,43 +38,6 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	@Override
 	public boolean accepts(Object key) {
 		return preferences.keySetFull().contains(key);
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#checkPreferences()
-	 */
-	@Override
-	public List<String> checkPreferences() {
-		List<String> errors = new LinkedList<String>();
-		Object fieldValue;
-		Option<?> o;
-		
-		for (Field field : provider.getDeclaredFields()) {
-			try {
-				fieldValue = field.get(provider);
-				if (fieldValue instanceof Option<?>) {
-					o = (Option<?>) fieldValue;
-					Object val = o.getValue(preferences);
-					if (val==null) {
-						errors.add("Could not determine value of " + o);
-					} else {
-						if (o.isSetRangeSpecification()) {
-							if (!o.getRange().castAndCheckIsInRange(val)) {
-								errors.add(o + " is out of range. Please select one out of " + o.getRangeSpecifiaction() + ".");
-							}
-						} else {
-							if (o.parseOrCast(val)==null) {
-								errors.add(o + " is of invalid type. Please specify an instance of " + o.getRequiredType().getSimpleName());
-							}
-							// TODO: Additional checks( e.g. file.canRead, etc.).
-						}
-					}
-				}
-			} catch (Exception exc) {
-				// ignore non-static fields
-			}
-		}
-		return errors;
 	}
 	
 	/* (non-Javadoc)
