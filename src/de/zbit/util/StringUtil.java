@@ -15,6 +15,32 @@ public class StringUtil {
 	
 	/**
 	 * 
+	 */
+	private static final String newLine = System.getProperty("line.separator");
+	
+	/**
+	 * 
+	 */
+	private static final char fileSeparator = System.getProperty("file.separator").charAt(0);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static String newLine() {
+		return newLine;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static char fileSeparator() {
+		return fileSeparator;
+	}
+	
+	/**
+	 * 
 	 * @param sb
 	 * @param whatToAppend
 	 * @return
@@ -25,6 +51,108 @@ public class StringUtil {
 		}
 		return sb;
 	}
+	
+	/**
+	 * Returns a {@link String} whose first letter has been changed depending on
+	 * the second argument to an upper or lower case character. Depending on the
+	 * third argument, the rest of the given name {@link String} is turned into a
+	 * lower-case {@link String} or kept the same.
+	 * 
+	 * @param name
+	 * @param upperCase
+	 * @param othersToLowerCase
+	 * @return
+	 */
+	public static String changeFirstLetterCase(String name, boolean upperCase,
+		boolean othersToLowerCase) {
+		char c = name.charAt(0);
+		if (Character.isLetter(c)) {
+			c = upperCase ? Character.toUpperCase(c) : Character.toLowerCase(c);
+		}
+		if (name.length() > 1) {
+			name = Character.toString(c)
+					+ (othersToLowerCase ? name.substring(1).toLowerCase() : name
+							.substring(1));
+		} else {
+			return Character.toString(c);
+		}
+		return name;
+	}
+	
+	/**
+	 * 
+	 * @param objects
+	 * @return
+	 */
+	public static StringBuilder concat(Object... objects) {
+		return append(new StringBuilder(), objects);
+	}
+	
+	/**
+	 * This method introduces left and right quotation marks where we normally
+	 * have straight quotation marks.
+	 * 
+	 * @param text
+	 * @param leftQuotationMark
+	 * @param rightQuotationMark
+	 * @return
+	 */
+	public static String correctQuotationMarks(String text,
+		String leftQuotationMark, String rightQuotationMark) {
+		boolean opening = true;
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) == '"') {
+				if (opening) {
+					text = text.substring(0, i - 1) + leftQuotationMark
+							+ text.substring(i + 1);
+					opening = false;
+				} else {
+					text = text.substring(0, i - 1) + rightQuotationMark
+							+ text.substring(i + 1);
+					opening = true;
+				}
+			}
+		}
+		return text;
+	}
+	
+//	/**
+//	 * Returns the name of a given month.
+//	 * 
+//	 * @param month
+//	 * @return
+//	 */
+//	public static String getMonthName(short month) {
+//		switch (month) {
+//			case 1:
+//				return "January";
+//			case 2:
+//				return "February";
+//			case 3:
+//				return "March";
+//			case 4:
+//				return "April";
+//			case 5:
+//				return "May";
+//			case 6:
+//				return "June";
+//			case 7:
+//				return "July";
+//			case 8:
+//				return "August";
+//			case 9:
+//				return "September";
+//			case 10:
+//				return "October";
+//			case 11:
+//				return "November";
+//			case 12:
+//				return "December";
+//			default:
+//				return "invalid month " + month;
+//		}
+//	}
+	
 	
 	/**
 	 * Return the given string filled up to the given length with the given
@@ -57,17 +185,6 @@ public class StringUtil {
 	}
 	
 	/**
-	 * Returns a lower-case {@link String} who's first letter is now in upper
-	 * case.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static String firstLetterUpperCase(String name) {
-		return changeFirstLetterCase(name, true);
-	}
-	
-	/**
 	 * Returns a lower-case {@link String} who's first letter is now in lower
 	 * case.
 	 * 
@@ -75,20 +192,34 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String firstLetterLowerCase(String name) {
-		return changeFirstLetterCase(name, false);
+		return changeFirstLetterCase(name, false, true);
 	}
 	
-	private static String changeFirstLetterCase(String name, boolean upperCase) {
-		char c = name.charAt(0);
-		if (Character.isLetter(c)) {
-			c = upperCase ? Character.toUpperCase(c) : Character.toLowerCase(c);
-		}
-		if (name.length() > 1) {
-			name = Character.toString(c) + name.substring(1).toLowerCase();
-		} else {
-			return Character.toString(c);
-		}
-		return name;
+	/**
+	 * Returns a lower-case {@link String} who's first letter is now in upper
+	 * case.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static String firstLetterUpperCase(String name) {
+		return changeFirstLetterCase(name, true, true);
+	}
+	
+	/**
+	 * Changes an optionName by replacing all underscores with a space, setting
+	 * the whole string to lower case and changing the first letter to upper case.
+	 * E.g., "REMOVE_ORPHANS" => "Remove orphans"
+	 * 
+	 * @param optionName
+	 * @return reformatted option string
+	 */
+	public static String formatOptionName(String optionName) {
+		String ret = optionName;
+		ret = ret.replace("_", " ");
+		ret = ret.toLowerCase().trim();
+		ret = Character.toUpperCase(ret.charAt(0)) + ret.substring(1);
+		return ret;
 	}
 	
 	/**
@@ -336,6 +467,49 @@ public class StringUtil {
 	}
 	
 	/**
+	 * Returns the number as a word. Zero is converted to "no". Only positive
+	 * numbers from 1 to twelve can be converted. All other numbers are just
+	 * converted to a String containing the number.
+	 * 
+	 * @param number
+	 * @return
+	 */
+	public static String getWordForNumber(int number) {
+		if ((number < Integer.MIN_VALUE) || (Integer.MAX_VALUE < number)) { return Integer
+				.toString(number); }
+		switch (number) {
+			case 0:
+				return "no";
+			case 1:
+				return "one";
+			case 2:
+				return "two";
+			case 3:
+				return "three";
+			case 4:
+				return "four";
+			case 5:
+				return "five";
+			case 6:
+				return "six";
+			case 7:
+				return "seven";
+			case 8:
+				return "eight";
+			case 9:
+				return "nine";
+			case 10:
+				return "ten";
+			case 11:
+				return "eleven";
+			case 12:
+				return "twelve";
+			default:
+				return Integer.toString(number);
+		}
+	}
+	
+	/**
 	 * <p>
 	 * Returns the concatenated strings of the array separated with the given
 	 * delimiter. See {@link #implode(String, String)} for details.
@@ -408,6 +582,17 @@ public class StringUtil {
 	}
 	
 	/**
+	 * 
+	 * @param c
+	 * @return True if the given character is a vocal and false if it is a
+	 *         consonant.
+	 */
+	public static boolean isVocal(char c) {
+		c = Character.toLowerCase(c);
+		return (c == 'a') || (c == 'e') || (c == 'i') || (c == 'o') || (c == 'u');
+	}
+	
+	/**
 	 * Returns a HTML formated String, in which each line is at most lineBreak
 	 * symbols long.
 	 * 
@@ -417,7 +602,7 @@ public class StringUtil {
 	public static String toHTML(String string) {
 		return toHTML(string, Integer.MAX_VALUE);
 	}
-	
+
 	/**
 	 * Returns a HTML formated String, in which each line is at most lineBreak
 	 * symbols long.
@@ -439,31 +624,6 @@ public class StringUtil {
 			sb.append("</body></html>");
 		}
 		return sb.toString();
-	}
-	
-	/**
-	 * 
-	 * @param objects
-	 * @return
-	 */
-	public static StringBuilder concat(Object... objects) {
-		return append(new StringBuilder(), objects);
-	}
-
-	/**
-	 * Changes an optionName by replacing all underscores with a space, setting
-	 * the whole string to lower case and changing the first letter to upper case.
-	 * E.g., "REMOVE_ORPHANS" => "Remove orphans"
-	 * 
-	 * @param optionName
-	 * @return reformatted option string
-	 */
-	public static String formatOptionName(String optionName) {
-		String ret = optionName;
-		ret = ret.replace("_", " ");
-		ret = ret.toLowerCase().trim();
-		ret = Character.toUpperCase(ret.charAt(0)) + ret.substring(1);
-		return ret;
 	}
 	
 }

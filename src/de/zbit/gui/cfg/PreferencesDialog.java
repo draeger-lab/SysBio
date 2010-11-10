@@ -85,6 +85,11 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		return exitStatus;
 	}
 	
+	/**
+	 * 
+	 * @param provider
+	 * @return
+	 */
 	public static final boolean showPreferencesDialog(Class<? extends KeyProvider> provider) {
 		PreferencesDialog dialog = new PreferencesDialog();
 		boolean exitStatus;
