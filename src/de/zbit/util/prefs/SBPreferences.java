@@ -620,7 +620,6 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param keyProvider
 	 */
 	public SBPreferences(Class<? extends KeyProvider> keyProvider) {
-		System.out.println(keyProvider);
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
 		this.defaults = loadDefaults(keyProvider);

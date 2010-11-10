@@ -12,7 +12,7 @@ import de.zbit.gui.ActionCommand;
  * Gathers multiple instances of {@link Option} in a group together with a
  * meaningful tool tip and a label.
  * 
- * @author draeger
+ * @author Andreas Dr&auml;ger
  * @date 2010-11-04
  */
 public class OptionGroup<T> implements ActionCommand,

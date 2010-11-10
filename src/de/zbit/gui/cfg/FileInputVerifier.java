@@ -10,7 +10,7 @@ import javax.swing.text.JTextComponent;
  * This class checks any type of {@link JTextComponent} whether its text
  * represents a valid file or directory. In all other cases it returns false.
  * 
- * @author draeger
+ * @author Andreas Dr&auml;ger
  * @date 2010-11-04
  */
 public class FileInputVerifier extends InputVerifier {

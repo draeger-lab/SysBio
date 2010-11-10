@@ -1,7 +1,3 @@
-/**
- *
- * @author wrzodek
- */
 package de.zbit.util.prefs;
 
 import java.io.File;
