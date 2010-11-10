@@ -5,8 +5,6 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import java.util.prefs.BackingStoreException;
 
@@ -106,20 +104,6 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		for (int i = 0; i < tab.getComponentCount(); i++) {
 			getPreferencesPanel(i).addKeyListener(listener);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.cfg.PreferencesPanel#checkPreferences()
-	 */
-	@Override
-	public List<String> checkPreferences() {
-		List<String> l = new LinkedList<String>();
-		for (int i = 0; i < getPreferencesPanelCount(); i++) {
-			l.addAll(getPreferencesPanel(i).checkPreferences());
-		}
-		return l;
 	}
 
 	/**

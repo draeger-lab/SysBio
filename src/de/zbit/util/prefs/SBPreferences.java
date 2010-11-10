@@ -26,6 +26,7 @@ import argparser.FloatHolder;
 import argparser.IntHolder;
 import argparser.LongHolder;
 import argparser.StringHolder;
+import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Utils;
 
 /**
@@ -706,10 +707,20 @@ public class SBPreferences implements Map<Object, Object> {
 			option = iterator.next();
 			if (containsKey(option)) {
 				value = get(option);
+				if (value == null) { throw new BackingStoreException(String.format(
+					"Could not determine value belonging to option %s.", option)); }
 				if (option.isSetRangeSpecification()
 						&& !option.getRange().castAndCheckIsInRange(get(option))) { throw new BackingStoreException(
-					String.format("The value %s for option \"%s\" is out of range.", value,
-						option.formatOptionName())); }
+					String.format(
+								"The value %s for option \"%s\" is out of range. Please select a value that satisfies the following constraint: %s.",
+								value, option.formatOptionName(), (option.getRange()
+										.isSetConstraints() ? ((GeneralFileFilter) option
+										.getRange().getConstraints()).getDescription() : option
+										.getRangeSpecifiaction()))); }
+				if (option.parseOrCast(value) == null) { throw new BackingStoreException(
+					String.format(
+								"The value of option %s is of invalid type. Please specify an instance of %s.",
+								option, option.getRequiredType().getSimpleName())); }
 			}
 		}
 		return true;
@@ -852,6 +863,15 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	private short getDefaultShort(Object key) {
+		return Short.parseShort(defaults.get(key.toString()).toString());
+	}
+	
+	/**
 	 * @param key
 	 * @return
 	 */
@@ -880,7 +900,7 @@ public class SBPreferences implements Map<Object, Object> {
 		String k = key.toString();
 		return prefs.getFloat(k, getDefaultFloat(k));
 	}
-	
+
 	/**
 	 * @param key
 	 * @return
@@ -904,6 +924,16 @@ public class SBPreferences implements Map<Object, Object> {
 	public long getLong(Object key) {
 		String k = key.toString();
 		return prefs.getLong(k, getDefaultLong(k));
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public short getShort(Object key) {
+		String k = key.toString();
+		return (short) prefs.getInt(k, getDefaultShort(k));
 	}
 	
 	/**

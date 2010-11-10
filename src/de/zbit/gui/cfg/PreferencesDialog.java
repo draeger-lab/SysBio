@@ -10,15 +10,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.util.List;
 import java.util.Properties;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
@@ -177,43 +174,15 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 			validate();
 		} else if (ae.getActionCommand().equals(APPLY)
 				|| ae.getActionCommand().equals(OK)) {
-			List<String> errors = allPrefsPanel.checkPreferences();
-			if (errors.isEmpty()) {
-				try {
-					allPrefsPanel.persist();
-					apply.setEnabled(false);
-					exitStatus = APPROVE_OPTION;
-				} catch (BackingStoreException exc) {
-					GUITools.showErrorMessage(this, exc);
-				}
-				if (ae.getActionCommand().equals(OK)) {
-					dispose();
-				}
-			} else {
-				int lineBreak = 60;
-				String lineBreakSymbol = "<br>";
-				StringBuilder msg = new StringBuilder();
-				msg.append("<html><body>\n");
-				if (errors.size() > 1) {
-					msg.append("The configuration contains the ");
-					msg.append("following errors:\n<ul>");
-				}
-				for (String error : errors) {
-					if (errors.size() > 1) {
-						StringUtil.append(msg, "<li>", StringUtil.insertLineBreaks(error,
-							lineBreak, lineBreakSymbol), "</li>");
-					} else {
-						StringUtil.append(msg, StringUtil.insertLineBreaks(error,
-							lineBreak, lineBreakSymbol));
-					}
-					msg.append("\n");
-				}
-				if (errors.size() > 1) {
-					msg.append("</ul>");
-				}
-				msg.append("</body></html>\n");
-				JOptionPane.showMessageDialog(this, new JLabel(msg.toString()),
-					"Please check your configuration", JOptionPane.WARNING_MESSAGE);
+			try {
+				allPrefsPanel.persist();
+				apply.setEnabled(false);
+				exitStatus = APPROVE_OPTION;
+			} catch (BackingStoreException exc) {
+				GUITools.showErrorMessage(this, exc);
+			}
+			if (ae.getActionCommand().equals(OK)) {
+				dispose();
 			}
 		}
 	}
