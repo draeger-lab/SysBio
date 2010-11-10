@@ -79,8 +79,10 @@ public class KeggTools {
             // Get all Enzymes, that are already contained in the pathway.
             List<Entry> modifier = p.getReactionModifiers(r.getName());
             List<String> contained_enzymes = new LinkedList<String>();
-            for (Entry mod : modifier) {
-              contained_enzymes.addAll(getKeggEnzymeNames(mod, manager));
+            if (modifier!=null && modifier.size()>0) {
+              for (Entry mod : modifier) {
+                contained_enzymes.addAll(getKeggEnzymeNames(mod, manager));
+              }
             }
             // remark: contained_enzymes contains doubles. But this doesn't matter
             
