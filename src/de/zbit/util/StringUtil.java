@@ -103,11 +103,11 @@ public class StringUtil {
 		for (int i = 0; i < text.length(); i++) {
 			if (text.charAt(i) == '"') {
 				if (opening) {
-					text = text.substring(0, i - 1) + leftQuotationMark
+					text = text.substring(0, Math.max(0, i - 1)) + leftQuotationMark
 							+ text.substring(i + 1);
 					opening = false;
 				} else {
-					text = text.substring(0, i - 1) + rightQuotationMark
+					text = text.substring(0, Math.max(0, i - 1)) + rightQuotationMark
 							+ text.substring(i + 1);
 					opening = true;
 				}

@@ -90,6 +90,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * Pointers to avoid senselessly parsing configuration files again and again.
 	 */
 	private static final Map<String, SBProperties> allDefaults = new HashMap<String, SBProperties>();
+
+	private static boolean clean;
 	
 	/**
 	 * @param keyProvider
@@ -543,8 +545,10 @@ public class SBPreferences implements Map<Object, Object> {
 				}
 			}
 			allDefaults.put(path, defaults);
+			clean = true;
 		} else {
 			defaults = allDefaults.get(path);
+			clean = false;
 		}
 		return defaults;
 	}
@@ -624,6 +628,9 @@ public class SBPreferences implements Map<Object, Object> {
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
 		this.defaults = loadDefaults(keyProvider);
+		if (clean) {
+			this.cleanUserPrefs();
+		}
 	}
 	
 	/**
@@ -644,6 +651,9 @@ public class SBPreferences implements Map<Object, Object> {
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
 		this.defaults = loadDefaults(keyProvider, relPath);
+		if (clean) {
+			this.cleanUserPrefs();
+		}
 	}
 	
 	/**
@@ -724,6 +734,19 @@ public class SBPreferences implements Map<Object, Object> {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Removes all those key-value pairs from the user's configuration, for which
+	 * no default values are defined.
+	 */
+	public void cleanUserPrefs() {
+		String keys[] = keys();
+		for (int i = keys.length - 1; i >= 0; i--) {
+			if (!defaults.containsKey(keys[i])) {
+				remove(keys[i]);
+			}
+		}
 	}
 	
 	/*

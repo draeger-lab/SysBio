@@ -3,6 +3,7 @@
  */
 package de.zbit.util.prefs;
 
+import java.io.File;
 import java.text.ParseException;
 
 import argparser.ArgParser;
@@ -27,6 +28,7 @@ import de.zbit.util.StringUtil;
  * @date 2010-10-24
  */
 public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
+	
 	/**
 	 * Just a convenient wrapper method for {@link Range#Range(Class, String)},
 	 * that catches the exception.
@@ -41,6 +43,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		String rangeSpec) {
 		return new Range<Type>(requiredType, rangeSpec);
 	}
+	
 	/**
 	 * Convert 'ret' to {@link #requiredType} by parsing it (e.g.
 	 * Integer.parseInt), or casting it to the desired type.
@@ -55,17 +58,23 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	@SuppressWarnings("unchecked")
 	protected static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
-		if (ret == null) return null;
+		if (ret == null) { return null; }
 		
-		if (requiredType.isAssignableFrom(ret.getClass()))
-			return requiredType.cast(ret);
+		if (requiredType.isAssignableFrom(ret.getClass())) { return requiredType
+				.cast(ret); }
 		
-		if (Reflect.containsParser(requiredType))
+		if (Reflect.containsParser(requiredType)) {
 			ret = Reflect.invokeParser(requiredType, ret);
+		}
 		
 		if (requiredType.equals(Character.class)) {
 			ret = ((Character) ret.toString().charAt(0));
 		}
+		
+		if (requiredType.equals(File.class)) {
+			ret = new File(ret.toString());
+		}
+		
 		try {
 			return (Type) ret;
 		} catch (Exception e) {
@@ -73,6 +82,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			return null;
 		}
 	}
+	
 	/**
 	 * The default value for this option. May be null, if it is going to be read
 	 * from the XML-file later.

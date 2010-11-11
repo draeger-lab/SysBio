@@ -29,6 +29,10 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		CSV_FILES,
 		/**
+		 * True if this filter accepts directories only (no files).
+		 */
+		DIRECTORIES_ONLY,
+		/**
 		 * True if this filter accepts JPEG picture files.
 		 */
 		JPEG_FILES,
@@ -53,14 +57,16 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		TEXT_FILES,
 		/**
-		 * True if this filter accepts directories only (no files).
-		 */
-		DIRECTORIES_ONLY,
-		/**
 		 * If not specified this is the type.
 		 */
 		UNDEFINED;
 	}
+	
+	/**
+	 * The {@link FileFilter} for all files.
+	 */
+	public final static GeneralFileFilter ALL_FILE_FILTER = new SBFileFilter(
+		(new JFileChooser()).getAcceptAllFileFilter());
 	
 	/**
 	 * A filter for CSV files
@@ -68,6 +74,12 @@ public class SBFileFilter extends GeneralFileFilter {
 	public static SBFileFilter CSV_FILE_FILTER = new SBFileFilter(
 		FileType.CSV_FILES);
 	
+	/**
+	 * A filter for directories only.
+	 */
+	public static SBFileFilter DIRECTORY_FILTER = new SBFileFilter(
+		FileType.DIRECTORIES_ONLY);
+		
 	/**
 	 * A filter for joint picture expert group files.
 	 */
@@ -85,12 +97,6 @@ public class SBFileFilter extends GeneralFileFilter {
 	 */
 	public static SBFileFilter PNG_FILE_FILTER = new SBFileFilter(
 		FileType.PNG_FILES);
-	
-	/**
-	 * A filter for directories only.
-	 */
-	public static SBFileFilter DIRECTORY_FILTER = new SBFileFilter(
-		FileType.DIRECTORIES_ONLY);
 	
 	/**
 	 * A filter for SBML files
@@ -118,12 +124,6 @@ public class SBFileFilter extends GeneralFileFilter {
 		SBFileFilter.PNG_FILE_FILTER);
 	
 	/**
-	 * The {@link FileFilter} for all files.
-	 */
-	public final static GeneralFileFilter ALL_FILE_FILTER = new SBFileFilter(
-		(new JFileChooser()).getAcceptAllFileFilter());
-	
-	/**
 	 * 
 	 * @param f
 	 * @return
@@ -140,6 +140,14 @@ public class SBFileFilter extends GeneralFileFilter {
 	public static boolean isJPEGFile(File f) {
 		String extension = f.getName().toLowerCase();
 		return extension.endsWith(".jpg") || extension.endsWith(".jpeg");
+	}
+	
+	/**
+	 * @param f
+	 * @return
+	 */
+	public static boolean isPDFFile(File file) {
+		return file.getName().toLowerCase().endsWith(".pdf");
 	}
 	
 	/**
@@ -184,15 +192,20 @@ public class SBFileFilter extends GeneralFileFilter {
 	}
 	
 	/**
-	 * Allowable file type.
-	 */
-	private FileType type;
-	
-	/**
 	 * Allows users to initialize this {@link GeneralFileFilter} with another
 	 * {@link FileFilter}.
 	 */
 	private FileFilter filter;
+	
+	/**
+	 * Allowable file type.
+	 */
+	private FileType type;
+	
+	public SBFileFilter(FileFilter filter) {
+		this.filter = filter;
+		this.type = FileType.UNDEFINED;
+	}
 	
 	/**
 	 * Constructs a file filter that accepts or not accepts the following files
@@ -206,11 +219,6 @@ public class SBFileFilter extends GeneralFileFilter {
 		if (type == FileType.UNDEFINED) {
 			throw new IllegalArgumentException("FileType must not be UNDEFINED.");
 		}
-	}
-	
-	public SBFileFilter(FileFilter filter) {
-		this.filter = filter;
-		this.type = FileType.UNDEFINED;
 	}
 	
 	/*
@@ -311,13 +319,5 @@ public class SBFileFilter extends GeneralFileFilter {
 				return StringUtil.firstLetterUpperCase(type.toString()
 						.replace('_', ' '));
 		}
-	}
-	
-	/**
-	 * @param f
-	 * @return
-	 */
-	public boolean isPDFFile(File file) {
-		return file.getName().toLowerCase().endsWith(".pdf");
 	}
 }

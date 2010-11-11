@@ -172,11 +172,21 @@ public class FileSelector extends JPanel implements ActionListener {
 		}
 	}
 	
-	public void addKeyListener(KeyListener l) {
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.Component#addKeyListener(java.awt.event.KeyListener)
+	 */
+	@Override
+	public synchronized void addKeyListener(KeyListener l) {
 		super.addKeyListener(l);
 		textField.addKeyListener(l);
 	}
-	
+		
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.Component#setName(java.lang.String)
+	 */
+	@Override
 	public void setName(String name) {
 		super.setName(name);
 		textField.setName(name);

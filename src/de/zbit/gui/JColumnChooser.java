@@ -7,6 +7,7 @@ package de.zbit.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -14,6 +15,7 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +38,7 @@ import de.zbit.io.CSVReader;
 /**
  * Column Chooser with a label, a columnChooser and a preview.
  * 
- * Very usefull e.g. to assign column headers of a csv file to
+ * Very usefull, e.g., to assign column headers of a csv file to
  * certain propoerties (e.g. asking the user "in which column
  * are the sequence start coordinates?").
  * 
@@ -116,7 +118,7 @@ public class JColumnChooser extends JPanel {
   /**
    * Creates a new column chooser panel with the given headers.
    * The preview is used to give the user an example of the data
-   * he has choosen. If null, no preview will be given.
+   * he has chosen. If null, no preview will be given.
    * @param title - Label caption for this column chooser
    * @param fieldIsRequired - If not required, this class will add
    * a NoOptionChoosen String at the start of the box.
@@ -163,16 +165,21 @@ public class JColumnChooser extends JPanel {
     this(title, fieldIsRequired, null);
   }
   
+  /**
+   * 
+   */
   private void initGUI() {
-    this.setPreferredSize(new java.awt.Dimension(400, 25));
+    this.setPreferredSize(new Dimension(400, 25));
     //layout = new GridBagLayout();
     GridLayout layout = new GridLayout(1,3,10,2);
     this.setLayout(layout);
   }
   
-  /**
-   * {@inheritDoc}
+  /*
+   * (non-Javadoc)
+   * @see java.awt.Container#setLayout(java.awt.LayoutManager)
    */
+  @Override
   public void setLayout(LayoutManager manager) {
     super.setLayout(manager);
     layoutElements();
@@ -202,7 +209,7 @@ public class JColumnChooser extends JPanel {
 	
 	/**
 	 * Returns the actual column chooser object, which is either
-	 * a JComboBox or a JTextField.
+	 * a {@link JComboBox} or a {@link JTextField}.
 	 * @return
 	 */
 	public JComponent getColumnChooser() {
@@ -210,8 +217,23 @@ public class JColumnChooser extends JPanel {
 	}
 	
 	/**
-   * {@inheritDoc}
-   */
+	 * 
+	 * @param il
+	 */
+	public synchronized void addItemListener(ItemListener il) {
+		JComponent comp = getColumnChooser();
+		if (comp instanceof JComboBox) {
+			((JComboBox) comp).addItemListener(il);
+		} else {
+			// otherwise not possible!
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.swing.JComponent#setToolTipText(java.lang.String)
+	 */
+	@Override
   public void setToolTipText(String s) {
     super.setToolTipText(s);
     if (colChooser!=null) colChooser.setToolTipText(s);
@@ -266,18 +288,33 @@ public class JColumnChooser extends JPanel {
     }
   }
   
-	public void addKeyListener(KeyListener l) {
+  /*
+   * (non-Javadoc)
+   * @see java.awt.Component#addKeyListener(java.awt.event.KeyListener)
+   */
+	@Override
+	public synchronized void addKeyListener(KeyListener l) {
 		super.addKeyListener(l);
-		if (colChooser!=null)
-		  colChooser.addKeyListener(l);
+		if (colChooser != null) {
+			colChooser.addKeyListener(l);
+		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.Component#setName(java.lang.String)
+	 */
+	@Override
 	public void setName(String name) {
 		super.setName(name);
-		if (colChooser!=null)
-		  colChooser.setName(name);
+		if (colChooser != null) colChooser.setName(name);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.Component#getName()
+	 */
+	@Override
 	public String getName() {
 		return super.getName();
 	}
@@ -359,20 +396,21 @@ public class JColumnChooser extends JPanel {
     setHeaders (null, numberOfColumns);
   }
   
-  /**
-   * Set the headers to display in the combo box.
-   * This function will fill empty fields in the combo box
-   * with "(Column i)".
-   * if header is null, behaves like {@link #setHeaders(int)}.
-   * @param header
-   */
-  public void setHeaders(String[] header) {
-    int l = 0;
-    if (header==null || header.length<1) {
-      if (previews!=null) l = previews.length;
-    }
-    setHeaders(header, l);
-  }
+	/**
+	 * Set the headers to display in the combo box. This function will fill empty
+	 * fields in the combo box with "(Column i)". if header is null, behaves like
+	 * {@link #setHeaders(int)}.
+	 * 
+	 * @param header
+	 */
+	public void setHeaders(String[] header) {
+		int l = 0;
+		if ((header == null) || (header.length < 1)) {
+			if (previews != null) l = previews.length;
+		}
+		setHeaders(header, l);
+	}
+  
   /**
    * Set the headers to display in the combo box.
    * This function will fill empty fields in the combo box
@@ -826,6 +864,4 @@ public class JColumnChooser extends JPanel {
     frame.pack();
     frame.setVisible(true);
   }
-  
-  
 }
