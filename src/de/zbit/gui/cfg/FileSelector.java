@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.swing.Icon;
@@ -612,46 +611,58 @@ public class FileSelector extends JPanel implements ActionListener {
 		File file = new File(textField.getText());
 		boolean mode = acceptOnlyFiles();
 		boolean justCreated = false;
-		if (!file.exists() && create) {
-			if (mode) {
-				file.createNewFile();
-			} else {
-				file.mkdir();
+		boolean acceptable = false;
+		for (int i=0; (i<filter.length) && !acceptable; i++) {
+			if (filter[i].accept(file)) {
+				acceptable = true;
 			}
-			justCreated = true;
 		}
-		if (file.exists()) {
-			if (mode && file.isFile()) {
-				switch (command.getType()) {
-					case OPEN:
-						if (file.canRead()) { return file; }
-						throw new IOException(String.format("Cannot read from file %s.",
-							file.getAbsolutePath()));
-					case SAVE:
-						if (file.canWrite()) {
-							if (justCreated || GUITools.overwriteExistingFile(this, file)) { return file; }
-						}
-						throw new IOException(String.format("Cannot write to file %s.",
-							file.getAbsolutePath()));
-					default:
-						break;
+		if (acceptable) {
+			if (!file.exists() && create) {
+				if (mode) {
+					file.createNewFile();
+				} else {
+					file.mkdir();
 				}
-			} else if (!mode && file.isDirectory()) {
-				switch (command.getType()) {
-					case OPEN:
-						if (file.canRead()) { return file; }
-						throw new IOException(String.format(
-							"Cannot read from directory %s.", file.getAbsolutePath()));
-					case SAVE:
-						if (file.canWrite()) { return file; }
-						throw new IOException(String.format(
-							"Cannot write into directory %s.", file.getAbsolutePath()));
-					default:
-						break;
-				}
+				justCreated = true;
 			}
-		} else {
-			throw new FileNotFoundException(file.getAbsolutePath());
+			if (file.exists()) {
+				if (mode && file.isFile()) {
+					switch (command.getType()) {
+						case OPEN:
+							if (file.canRead()) { return file; }
+							//						throw new IOException(String.format("Cannot read from file %s.",
+							//							file.getAbsolutePath()));
+						case SAVE:
+							if (file.canWrite()) {
+								if (justCreated || GUITools.overwriteExistingFile(this, file)) {
+									return file;
+								} else {
+									return null;
+								}
+							}
+							//						throw new IOException(String.format("Cannot write to file %s.",
+							//							file.getAbsolutePath()));
+						default:
+							break;
+					}
+				} else if (!mode && file.isDirectory()) {
+					switch (command.getType()) {
+						case OPEN:
+							if (file.canRead()) { return file; }
+							//						throw new IOException(String.format(
+							//							"Cannot read from directory %s.", file.getAbsolutePath()));
+						case SAVE:
+							if (file.canWrite()) { return file; }
+							//						throw new IOException(String.format(
+							//							"Cannot write into directory %s.", file.getAbsolutePath()));
+						default:
+							break;
+					}
+				}
+			} else {
+				//			throw new FileNotFoundException(file.getAbsolutePath());
+			}
 		}
 		return null;
 	}
