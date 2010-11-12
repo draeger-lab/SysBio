@@ -17,22 +17,19 @@ import java.util.Iterator;
  * @param <T>
  */
 public class SortedArrayList<T> extends java.util.ArrayList<T>{
-  /**
-   * 
-   */
   private static final long serialVersionUID = -5106143068070537940L;
   /**
    * Achtung: bei Not Found gibt er manchmal "0" zurueck!! Das muss gesondert gecheckt werden.
    */
   @SuppressWarnings("unchecked")
-  public static <K> int binarySearch(SortedArrayList<K> a, K x) {
+  public static <K> int binarySearch(SortedArrayList<K> a, Object x) {
     int low = 0;
     int high = a.size() - 1;
     int mid = 1;
-
+    
     while(low <= high) {
       mid = (low + high)/2;
-
+      
       
       if (((Comparable)a.get(mid)).compareTo(x) < 0 )
         low = mid + 1;
@@ -41,7 +38,10 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
       else
         return mid;
     }
-      return -Math.abs(mid);     // NOT_FOUND = -1
+    
+    // Hier nicht -1 statt 0 oder pauschal -1 für not found zurückgeben, da dieser
+    // Wer auch für das Insert benutzt wird.
+    return -Math.abs(mid);     // NOT_FOUND = -1
   }
   /**
    * 
@@ -52,12 +52,13 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    * @return
    */
   @SuppressWarnings("unchecked")
-  private static <K> int compare(SortedArrayList<K> a, K x, int index) {
+  private static <K> int compare(SortedArrayList<K> a, Object x, int index) {
     if (index>=a.size()) return -1; // ...eigentlich error thowen besser.
     return (((Comparable)a.get(index)).compareTo(x));
   }
   
   /**
+   * TESTs
    * @param args
    */
   public static void main(String[] args) {
@@ -82,7 +83,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     
     for (int i=0; i<sal.size(); i++)
       System.out.print(((String[])sal.get(i))[1] + ((String[])sal.get(i))[0] + "-" + a[i] +  "\t");
-
+    
     System.out.println();
     System.out.println(sal.indexOf(new String[]{"fjd", "7"}));
     System.out.println(sal.indexOf(new String[]{"fjd", "5"}));
@@ -112,7 +113,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     sal2.add("o"); a2[9] = "o"; 
     sal2.add("f"); a2[10] = "f";
     sal2.add("n"); a2[11] = "n"; Arrays.sort(a2);
-
+    
     
     for (int i=0; i<sal2.size(); i++)
       System.out.print(sal2.get(i) + "-" + a2[i] +  "\t");
@@ -122,14 +123,15 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     System.out.println(sal2.indexOf("$") + "" + sal2.contains("$"));
     
   }
-
+  
   /**
-   * 
+   * When arrays are being put into this list, this is the index
+   * in the array that is being used to sort this list.
    */
   private int indexToSearch = 0;
   
   /**
-   * 
+   * The index of the last added item.
    */
   private int indexOfLastAddedItem = -1;
   
@@ -183,7 +185,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
       }
     }
     
-   /* for (int i=0; i<this.size(); i++)
+    /* for (int i=0; i<this.size(); i++)
       System.out.print(this.get(i) + "\t");
     System.out.println();*/
     
@@ -206,19 +208,29 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   @Override
   public boolean addAll(Collection<? extends T> c) {
     Iterator<? extends T> it = c.iterator();
-    
-    while(it.hasNext())
-      this.add(it.next());
-
-    return true;
+    return addAll(it);
   }
   
   /**
-   * 
+   * See {@link #addAll(Collection)}
+   * @param it
+   * @return
+   */
+  public boolean addAll(Iterator<? extends T> it) {
+    boolean hasChanged=false;
+    while(it.hasNext())
+      hasChanged = this.add(it.next());
+    
+    return hasChanged;
+  }
+  
+  /**
+   * See {@link #addAll(Collection)}
    * @param c
    * @return
    */
   public boolean addAll(T[] c)  {
+    boolean hasChanged=false;
     int i=-1;
     while (true) {
       i++;
@@ -226,15 +238,15 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
         //Object o = Array.get(c, i);
         //if (!(o instanceof T)) throw new DataFormatException();
         //try {
-          //add((T)o);
+        //add((T)o);
         //} catch (ClassCastException e) {
-        add(c[i]);
+        hasChanged = add(c[i]);
       } catch (ArrayIndexOutOfBoundsException e) {
         break;
       }
     }
     
-    return true;
+    return hasChanged;
   }
   
   /**
@@ -246,14 +258,14 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    * @return
    */
   @SuppressWarnings("unchecked")
-  public <K> int binarySearchNonArrayItemInTabString(SortedArrayList<K> a, int indexToSearch, K x) {
+  public <K> int binarySearchNonArrayItemInTabString(SortedArrayList<K> a, int indexToSearch, Object x) {
     int low = 0;
     int high = a.size() - 1;
     int mid = 1;
-
+    
     while(low <= high) {
       mid = (low + high)/2;
-
+      
       if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(x) < 0 )
         low = mid + 1;
       else if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(x) > 0 )
@@ -261,10 +273,10 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
       else
         return mid;
     }
-      return -Math.abs(mid);     // NOT_FOUND = -1
+    return -Math.abs(mid);     // NOT_FOUND = -1
   }
-
-
+  
+  
   /**
    * 
    * @param <K>
@@ -274,14 +286,14 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    * @return
    */
   @SuppressWarnings("unchecked")
-  public <K> int binarySearchTabString(SortedArrayList<K> a, int indexToSearch, K x) {
+  public <K> int binarySearchTabString(SortedArrayList<K> a, int indexToSearch, Object x) {
     int low = 0;
     int high = a.size() - 1;
     int mid = 1;
-
+    
     while(low <= high) {
       mid = (low + high)/2;
-
+      
       if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(Array.get(x, indexToSearch)) < 0 )
         low = mid + 1;
       else if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(Array.get(x, indexToSearch)) > 0 )
@@ -289,9 +301,9 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
       else
         return mid;
     }
-      return -Math.abs(mid);     // NOT_FOUND = -1
+    return -Math.abs(mid);     // NOT_FOUND = -1
   }
-
+  
   /*
    * (non-Javadoc)
    * @see java.util.ArrayList#contains(java.lang.Object)
@@ -299,7 +311,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   @Override
   public boolean contains(Object o) {
     if (this.size()==0) return false;
-
+    
     int pos = this.indexOf(o);
     if (pos>=0) return true; else return false;
   }
@@ -312,12 +324,11 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     return indexOfLastAddedItem;
   }
   
-
+  
   /*
    * (non-Javadoc)
    * @see java.util.ArrayList#indexOf(java.lang.Object)
    */
-  @SuppressWarnings("unchecked")
   @Override
   public int indexOf(Object o) {
     if (this.size()==0) return -1;
@@ -326,16 +337,16 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     
     if (s.getClass().isArray()) {
       if (!o.getClass().isArray()) {
-        pos = binarySearchNonArrayItemInTabString(this, indexToSearch, (T)o);
+        pos = binarySearchNonArrayItemInTabString(this, indexToSearch, o);
         if (pos==0 && !Array.get(this.get(0), indexToSearch).equals(o)) return -1;
       } else {
-        pos = binarySearchTabString(this, indexToSearch, (T)o);
+        pos = binarySearchTabString(this, indexToSearch, o);
         if (pos==0 && !Array.get(this.get(0), indexToSearch).equals(Array.get(o, indexToSearch))) return -1;
       }
     } else {
       if (!o.getClass().isArray())
-        pos = binarySearch(this, (T)o);
-      if (pos==0 && compare(this, (T)o, 0)!=0) {
+        pos = binarySearch(this, o);
+      if (pos==0 && compare(this, o, 0)!=0) {
         return -1; //((T)o).equals(this.get(0)) && !((T)o).equals(this.get(0).toString())) return -1;
       }
     }
@@ -345,7 +356,9 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   }
   
   /**
-   * 
+   * Returns true if and only if there is an element in this list, such that
+   * the String representation of this element is contained in s.
+   * I.e. "s.contains.( get(i).toString)".
    * @param s
    * @return
    */
