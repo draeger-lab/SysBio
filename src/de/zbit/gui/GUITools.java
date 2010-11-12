@@ -34,6 +34,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -187,14 +188,20 @@ public class GUITools {
 	 * @param text
 	 * @param mnemonic
 	 * @param menuItems
+	 *        instances of {@link JMenuItem} or {@link JSeparator}. Other
+	 *        {@link Object}s are ignored.
 	 * @return
 	 */
 	public static JMenu createJMenu(String text, char mnemonic,
-		JMenuItem... menuItems) {
+		Object... menuItems) {
 		JMenu fileMenu = new JMenu(text);
 		fileMenu.setMnemonic(mnemonic);
-		for (JMenuItem item : menuItems) {
-			fileMenu.add(item);
+		for (Object item : menuItems) {
+			if (item instanceof JMenuItem) {
+				fileMenu.add((JMenuItem) item);
+			} else if (item instanceof JSeparator) {
+				fileMenu.add((JSeparator) item);
+			}
 		}
 		return fileMenu;
 	}
@@ -207,7 +214,7 @@ public class GUITools {
 	 * @param menuItems
 	 * @return
 	 */
-	public static JMenu createJMenu(String text, JMenuItem... menuItems) {
+	public static JMenu createJMenu(String text, Object... menuItems) {
 		return createJMenu(text, text.charAt(0), menuItems);
 	}
 	
@@ -293,7 +300,7 @@ public class GUITools {
 		}
 		if (command != null) {
 			item.setText(command.getName());
-			item.setToolTipText(command.getToolTip());
+			item.setToolTipText(StringUtil.toHTML(command.getToolTip(), 60));
 			item.setActionCommand(command.toString());
 		}
 		if (icon != null) {
@@ -470,7 +477,7 @@ public class GUITools {
 	 */
 	public static File saveFileDialog(Component parent, String dir,
 		boolean allFilesAcceptable, boolean multiSelectionAllowed,
-		boolean checkFile, int mode, FileFilter[] filter) {
+		boolean checkFile, int mode, FileFilter... filter) {
 		JFileChooser fc = createJFileChooser(dir, allFilesAcceptable,
 			multiSelectionAllowed, mode, filter);
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
@@ -651,8 +658,9 @@ public class GUITools {
 	 */
 	public static void showErrorMessage(Component parent, Throwable exc) {
 		exc.printStackTrace();
-    JOptionPane.showMessageDialog(parent, StringUtil.insertLineBreaks(exc.getMessage(), 60, "\n"), exc.getClass()
-      .getSimpleName(), JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(parent, StringUtil.insertLineBreaks(exc
+				.getMessage(), 60, "\n"), exc.getClass().getSimpleName(),
+			JOptionPane.ERROR_MESSAGE);
 	}
 	
 	/**
