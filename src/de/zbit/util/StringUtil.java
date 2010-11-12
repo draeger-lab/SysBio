@@ -567,6 +567,7 @@ public class StringUtil {
 			sb.append(st.nextElement().toString());
 		}
 		int length = sb.length();
+		int pos;
 		while (st.hasMoreElements()) {
 			if ((length >= lineBreak) && (lineBreak < Integer.MAX_VALUE)) {
 				sb.append(lineBreakSymbol);
@@ -574,9 +575,17 @@ public class StringUtil {
 			} else {
 				sb.append(' ');
 			}
+			
+			// Append current element
 			String tmp = st.nextElement().toString();
-			length += tmp.length() + 1;
 			sb.append(tmp);
+			
+			// Change length
+			if ((pos=tmp.indexOf(lineBreakSymbol))>=0) {
+			  length = tmp.length()-pos-lineBreakSymbol.length();
+			} else {
+			  length += tmp.length() + 1;
+			}
 		}
 		return sb;
 	}
@@ -602,27 +611,49 @@ public class StringUtil {
 	public static String toHTML(String string) {
 		return toHTML(string, Integer.MAX_VALUE);
 	}
-
+	
+  /**
+   * Returns a HTML formated String, in which each line is at most lineBreak
+   * symbols long.
+   * 
+   * @param string
+   * @param lineBreak
+   * @return
+   */
+	public static String toHTML(String string, int lineBreak) {
+	  return toHTML(string, lineBreak, true);
+	}
+	
 	/**
-	 * Returns a HTML formated String, in which each line is at most lineBreak
-	 * symbols long.
-	 * 
-	 * @param string
-	 * @param lineBreak
+   * Returns a HTML formated String, in which each line is at most lineBreak
+   * symbols long.
+   * 
+   * @param string
+   * @param lineBreak
+	 * @param preserveExistingLinebreaks
 	 * @return
 	 */
-	public static String toHTML(String string, int lineBreak) {
+	public static String toHTML(String string, int lineBreak, boolean preserveExistingLinebreaks) {
+	  String lineBreakSymbol = "<br>";
 		if (string == null) {
 			return "<html><body>null</body></html>";
 		}
+		
+		// Preserve existing linebreaks.
+		if (preserveExistingLinebreaks) {
+		  string = string.replace("\r", "").replace("\n", lineBreakSymbol);
+		}
+		
 		StringBuilder sb = new StringBuilder();
 			if (!string.startsWith("<html><body>")) {
 			sb.insert(0, "<html><body>");
 		}
-		sb.append(insertLineBreaks(string, lineBreak, "<br>"));
+		sb.append(insertLineBreaks(string, lineBreak, lineBreakSymbol));
 		if (!string.endsWith("</body></html>")) {
 			sb.append("</body></html>");
 		}
+		
+		
 		return sb.toString();
 	}
 	
