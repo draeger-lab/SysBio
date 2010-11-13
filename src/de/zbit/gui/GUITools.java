@@ -53,6 +53,10 @@ import de.zbit.util.StringUtil;
  */
 public class GUITools {
 	
+	static {
+		ImageTools.initImages(GUITools.class.getResource("img"));
+	}
+	
 	/**
 	 * Checks whether the first container contains the second one.
 	 * 
@@ -194,16 +198,16 @@ public class GUITools {
 	 */
 	public static JMenu createJMenu(String text, char mnemonic,
 		Object... menuItems) {
-		JMenu fileMenu = new JMenu(text);
-		fileMenu.setMnemonic(mnemonic);
+		JMenu menu = new JMenu(text);
+		menu.setMnemonic(mnemonic);
 		for (Object item : menuItems) {
 			if (item instanceof JMenuItem) {
-				fileMenu.add((JMenuItem) item);
+				menu.add((JMenuItem) item);
 			} else if (item instanceof JSeparator) {
-				fileMenu.add((JSeparator) item);
+				menu.add((JSeparator) item);
 			}
 		}
-		return fileMenu;
+		return menu;
 	}
 	
 	/**
@@ -569,11 +573,21 @@ public class GUITools {
 				setEnabled(state, (Container) inside, command);
 			} else if (inside instanceof AbstractButton) {
 				String com = ((AbstractButton) inside).getActionCommand();
-				if ((com != null) && (com.equals(command.toString()))) {
+				if ((com != null) && (com.toString().equals(command.toString()))) {
 					inside.setEnabled(state);
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @param state
+	 * @param menuBar
+	 * @param command
+	 */
+	public static void setEnabled(boolean state, JMenuBar menuBar, Object command) {
+		setEnabled(state, menuBar, new Object[] {command});
 	}
 	
 	/**
@@ -591,9 +605,10 @@ public class GUITools {
 		JToolBar toolbar, Object... commands) {
 		int i, j;
 		Set<String> setOfCommands = new HashSet<String>();
-		for (Object command : commands)
+		for (Object command : commands) {
 			setOfCommands.add(command.toString());
-		if (menuBar != null)
+		}
+		if (menuBar != null) {
 			for (i = 0; i < menuBar.getMenuCount(); i++) {
 				JMenu menu = menuBar.getMenu(i);
 				for (j = 0; j < menu.getItemCount(); j++) {
@@ -611,11 +626,13 @@ public class GUITools {
 						}
 						if (containsCommand) m.setEnabled(state);
 					}
-					if (item != null && item.getActionCommand() != null
-							&& setOfCommands.contains(item.getActionCommand()))
+					if ((item != null) && (item.getActionCommand() != null)
+							&& setOfCommands.contains(item.getActionCommand())) {
 						item.setEnabled(state);
+					}
 				}
 			}
+		}
 		if (toolbar != null) for (i = 0; i < toolbar.getComponentCount(); i++) {
 			Object o = toolbar.getComponent(i);
 			if (o instanceof JButton) {

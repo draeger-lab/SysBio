@@ -1,0 +1,34 @@
+
+   Protokoll
+   =========
+
+1. Protokoll vom letzten Mal wurde durchgegangen:
+   - parser-Paket wurde mit uniprot-Paket zusammengeführt.
+   - KEGG-Converter wurde ausgegliedert, der Parser ist noch im SysBio.
+   - Wichtiger Stichtag: 31. Dezember 2010 für Special Issue on 
+     Web Server in Nucleic Acids Research; 
+     - Johannes Eichner erklärt, dass die Konkurrenz sehr hoch ist.
+     - Hannes Planatscher schlägt vor, die Thematik für eine Publikation
+       besser auf unsere Programme zuzuschneiden.
+
+2. Das Track-System wurde getestet:
+   - Es gibt Schwierigkeiten beim Zugriff auf das Track-System.
+   - Wir möchten Klaus oder Karsten bitten, Zugriff über https
+     und über rarepos zugreifen zu können sowie jedem einen Zugang
+     zu geben.
+  
+3. Die Struktur des Projektes wurde durchgesprochen:
+   - Licenses-Verzeichnis enthält:
+     1. Lizenzen von Dritt-Jars
+     2. Datei mit Details zu Autoren dies SysBio-Projektes
+  
+   - Hannes Planatscher regt an, für jede externe Bibliothek genau
+     zu überprüfen, ob diese tatsächlich benötigt wird.
+     
+   - Funktionen der Klasse StringUtil angeschaut
+   - Florian erklärt LogUtil im de.zbit.util-Paket inklusive der Idee 
+     vom Logging. Hannes Planatscher warnt, dass unterschiedliche log4j-
+     Versionen ggf. nicht kompatibel sind und es dann Probleme beim 
+     Einbinden von SysBio in andere Projekte geben könnte.
+   - Logging-Möglichkeiten mit dem im Standard-Java enthaltenen Logging
+     sollen überprüft werden, um ggf. das Projekt kleiner zu halten.

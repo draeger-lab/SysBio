@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.zbit.gui.cfg;
+package de.zbit.gui.prefs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,19 +33,19 @@ import de.zbit.util.StringUtil;
  * {@link Icon} such as a folder or a disk symbol, please put these icons under
  * the following keys into the {@link UIManager}:
  * <ul>
- * <li>ICON_OPEN</li>
- * <li>ICON_SAVE</li>
+ * <li>ICON_OPEN_16</li>
+ * <li>ICON_SAVE_16</li>
  * </ul>
  * To this end, please proceed as follows:
  * 
  * <pre>
- * UIManager.put(&quot;ICON_OPEN&quot;, myOpenIcon);
+ * UIManager.put(&quot;ICON_OPEN_16&quot;, myOpenIcon);
  * </pre>
  * 
  * or
  * 
  * <pre>
- * UIManager.put(&quot;ICON_SAVE&quot;, mySaveIcon);
+ * UIManager.put(&quot;ICON_SAVE_16&quot;, mySaveIcon);
  * </pre>
  * 
  * where
@@ -699,7 +699,7 @@ public class FileSelector extends JPanel implements ActionListener {
 			acceptOnlyFiles() ? FileInputVerifier.FileType.FILE
 					: FileInputVerifier.FileType.DIRECTORY));
 		button = GUITools.createButton("Browse", UIManager
-				.getIcon(type == Type.OPEN ? "ICON_OPEN" : "ICON_SAVE"), this, type,
+				.getIcon(type == Type.OPEN ? "ICON_OPEN_16" : "ICON_SAVE_16"), this, type,
 			command.getToolTip());
 		label = new JLabel();
 		autoSetLabelText();

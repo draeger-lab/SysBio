@@ -29,7 +29,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * It is recommended to generate a new ID when extending this class.
    */
   private static final long serialVersionUID = -5172273501517643495L;
-  
+  // initialize the logger for this class:
   public static final transient Logger log = Logger.getLogger(InfoManagement.class.getName());
   
   private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;

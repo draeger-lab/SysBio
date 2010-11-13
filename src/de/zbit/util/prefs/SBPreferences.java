@@ -91,6 +91,9 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	private static final Map<String, SBProperties> allDefaults = new HashMap<String, SBProperties>();
 
+	/**
+	 * Indicates whether to clean invalid user prefs for when loading defaults.
+	 */
 	private static boolean clean;
 	
 	/**
@@ -235,7 +238,9 @@ public class SBPreferences implements Map<Object, Object> {
 		// Now all command line arguments must be made persistent:
 		String k, property, value;
 		for (int i = 0; i < prefs.length; i++) {
-			if (prefs[i] == null) continue;
+			if (prefs[i] == null) {
+				continue;
+			}
 			for (Object key : prefs[i].keySetFull()) {
 				k = key.toString();
 				if (props.containsKey(k)) {
@@ -604,6 +609,30 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
+	 * Tries to persistently save all key-value pairs in the given
+	 * {@link Properties} for the given {@link KeyProvider}.
+	 * 
+	 * @param keyProvider
+	 * @param properties
+	 * @throws BackingStoreException 
+	 */
+	public static void saveProperties(Class<? extends KeyProvider> keyProvider,
+		Properties properties) throws BackingStoreException {
+		Set<Option<?>> optionSet = KeyProvider.Tools.optionSet(keyProvider);
+		Set<String> keySet = new HashSet<String>();
+		for (Option<?> o : optionSet) {
+			keySet.add(o.toString());
+		}
+		SBPreferences prefs = getPreferencesFor(keyProvider);
+		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+			if (keySet.contains(entry.getKey().toString())) {
+				prefs.put(entry.getKey(), entry.getValue());
+			}
+		}
+		prefs.flush();
+	}
+	
+	/**
 	 * The default values that cannot change!
 	 */
 	private SBProperties defaults;
@@ -914,7 +943,7 @@ public class SBPreferences implements Map<Object, Object> {
 		String k = key.toString();
 		return prefs.getDouble(k, getDefaultDouble(k));
 	}
-	
+
 	/**
 	 * @param key
 	 * @return
@@ -923,7 +952,7 @@ public class SBPreferences implements Map<Object, Object> {
 		String k = key.toString();
 		return prefs.getFloat(k, getDefaultFloat(k));
 	}
-
+	
 	/**
 	 * @param key
 	 * @return
@@ -1044,60 +1073,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public Iterator<Option<?>> optionIterator() {
-		return new Iterator<Option<?>>() {
-			
-			private int i = 0;
-			
-			/**
-			 * This tries to obtain the next {@link Option}.
-			 * 
-			 * @param j
-			 * @return
-			 */
-			private Option<?> getOption(int j) {
-				Field field = keyProvider.getFields()[j];
-				Object fieldValue;
-				for (; j < keyProvider.getFields().length; j++) {
-					try {
-						fieldValue = field.get(keyProvider);
-						if (fieldValue instanceof Option<?>) { return (Option<?>) fieldValue; }
-					} catch (Exception exc) {
-					}
-				}
-				return null;
-			}
-			
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.util.Iterator#hasNext()
-			 */
-			public boolean hasNext() {
-				try {
-					return getOption(i + 1) != null;
-				} catch (ArrayIndexOutOfBoundsException exc) {
-					return false;
-				}
-			}
-			
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.util.Iterator#next()
-			 */
-			public Option<?> next() {
-				return getOption(i++);
-			}
-			
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.util.Iterator#remove()
-			 */
-			public void remove() {
-				throw new IllegalAccessError();
-			}
-		};
+		return KeyProvider.Tools.optionIterator(keyProvider);
 	}
 	
 	/**
@@ -1318,7 +1294,7 @@ public class SBPreferences implements Map<Object, Object> {
 	public String toString() {
 		return prefs.toString();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
