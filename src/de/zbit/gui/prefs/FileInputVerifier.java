@@ -1,4 +1,4 @@
-package de.zbit.gui.cfg;
+package de.zbit.gui.prefs;
 
 import java.io.File;
 

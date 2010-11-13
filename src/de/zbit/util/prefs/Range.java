@@ -305,8 +305,7 @@ public class Range<Type> {
 	public Range(Class<Type> requiredType, GeneralFileFilter filter) {
 		this(requiredType);
 		if (!requiredType.isAssignableFrom(File.class)) { throw new IllegalArgumentException(
-			String
-					.format(
+			String.format(
 						"When initialized with a %s, the required type must be an instance of %s.",
 						GeneralFileFilter.class.getName(), File.class.getName())); }
 		constraints = filter;

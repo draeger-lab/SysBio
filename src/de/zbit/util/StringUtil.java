@@ -8,8 +8,8 @@ import java.util.StringTokenizer;
  * Class containing frequently used utility functions for String processing.
  * 
  * @author Florian Mittag
- * @author wrzodek
- * @author draeger
+ * @author Clemens Wrzodek
+ * @author Andreas Dr&auml;ger
  */
 public class StringUtil {
 	

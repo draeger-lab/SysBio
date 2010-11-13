@@ -1,9 +1,11 @@
    Protokoll
    =========
 
-0. Zugriff auf das Track-System:
+0. Zugriff auf das Trac-System:
 
 - Siehe: http://rarepos:8080/SysBio
+
+- Ticket-System nutzen
 
 1. Wie ist das Projekt organisiert?
 
@@ -26,7 +28,9 @@
 
 2. Wofür gibt es bisher Code im SysBio-Projekt?
 
-- dbfetch-Paket
+- dbfetch-Paket (Finja, Florian und Clemens):
+  UniProt, Ensembl und andere Online-Datenbanken können hiermit 
+  abgefragt werden.
 - parser-Paket wird mit uniprot-Paket zusammengeführt.
 - Pakete durchgeschaut: KEGG-Parser sollte in ein eigenes Paket
   überführt und möglichst bald publiziert werden.

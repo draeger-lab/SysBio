@@ -1,4 +1,4 @@
-package de.zbit.gui.cfg;
+package de.zbit.gui.prefs;
 
 import java.awt.Component;
 import java.awt.Panel;
@@ -37,7 +37,7 @@ import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.LayoutHelper;
-import de.zbit.gui.cfg.FileSelector.Type;
+import de.zbit.gui.prefs.FileSelector.Type;
 import de.zbit.io.GeneralFileFilter;
 import de.zbit.io.SBFileFilter;
 import de.zbit.util.Reflect;

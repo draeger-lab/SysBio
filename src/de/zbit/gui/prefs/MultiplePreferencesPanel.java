@@ -1,4 +1,4 @@
-package de.zbit.gui.cfg;
+package de.zbit.gui.prefs;
 
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
