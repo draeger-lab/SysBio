@@ -9,6 +9,7 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -195,7 +196,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
 		for (Option<?> option : options) {
 			// Create swing option based on field type
-			JComponent jc = properties.containsKey(option) ? getJComponentForOption(option) : null;
+			JComponent jc = properties.containsKey(option) ? getJComponentForOption(option, preferences, this) : null;
 			if (jc != null) {
 				if (jc instanceof FileSelector) {
 					FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
@@ -288,25 +289,66 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @return
 	 */
 	public <T> T getProperty(Option<T> option) {
-		return option.parseOrCast(properties.getProperty(option));
+	  return option.parseOrCast(properties.getProperty(option));
 	}
-
+	
+	/**
+	 * Initializes a Option type specific JComponent without any listeners and default
+	 * values.
+	 * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener, KeyListener)
+	 * @param option
+	 * @return
+	 */
+	public static JComponent getJComponentForOption(Option<?> option) {
+	  return getJComponentForOption(option, null, null);
+	}
+	
+	/**
+	 * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener, KeyListener)
+	 * @param option
+	 * @param preferences
+	 * @param l
+	 * @return
+	 */
+	public static JComponent getJComponentForOption(Option<?> option, SBPreferences preferences, EventListener l) {
+	  Object def = preferences!=null?option.getValue(preferences):null;
+	  return getJComponentForOption(option, def, l);
+	}
+	
+	/**
+	 * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener, KeyListener)
+	 * @param option
+	 * @param def
+	 * @param l
+	 * @return
+	 */
+	public static JComponent getJComponentForOption(Option<?> option, Object def, EventListener l) {
+	  return getJComponentForOption(option, def, 
+	    (l instanceof ItemListener?(ItemListener)l:null),
+	    (l instanceof ChangeListener?(ChangeListener)l:null),
+	    (l instanceof KeyListener?(KeyListener)l:null)  );
+	}
+	
+	
 	/**
 	 * Automatically generates a JComponent for the given option. This includes:
 	 * <ul>
 	 * <li>Setting the text</li>
 	 * <li>Setting the name</li>
-	 * <li>Setting the tool tip text</li>
-	 * <li>Setting the default value</li>
-	 * <li>Adding this panel as item-listener</li>
-	 * </ul>
-	 * 
-	 * @param option
-	 *            - option to build the JComponent for.
-	 * @return JComponent or NULL if the getRequiredType() is unknown.
-	 */
-	@SuppressWarnings("unchecked")
-	public JComponent getJComponentForOption(Option<?> option) {
+   * <li>Setting the tool tip text</li>
+   * <li>Setting the default value</li>
+   * <li>Adding this panel as item-listener</li>
+   * </ul>
+   * 
+   * @param option
+   *            - option to build the JComponent for.
+   * @param def - default value (should be same class as the "?" in Option<?> (optional)
+   * @param il - ItemListener (optional)
+   * @param cl - ChangeListener (optional)
+   * @param kl - KeyListener (optional)
+   * @return JComponent or NULL if the getRequiredType() is unknown.
+   */
+	public static JComponent getJComponentForOption(Option<?> option, Object def, ItemListener il, ChangeListener cl, KeyListener kl) {
 		// Create swing option based on field type
 		JComponent jc = null;
 		String optionTitle = option.formatOptionName();
@@ -324,11 +366,15 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			}
 		}
 		
+    // Get default value
+    String defPath=null;
+    //Object def = preferences!=null?option.getValue(preferences):null;
+    
 		// TODO: Group, test, and accept automatically
 		Class<?> clazz = option.getRequiredType();
 		if (Boolean.class.isAssignableFrom(clazz)) {
 			jc = new JCheckBox();
-			((AbstractButton) jc).setSelected(((Option<Boolean>)option).getValue(preferences));
+			if (def!=null) ((AbstractButton) jc).setSelected((Boolean) def);
 			
 			//((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
 			//		.get(o.getOptionName()).toString()));
@@ -341,9 +387,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				ty = Type.OPEN;
 			}
 			
-			// Get default value
-			String defPath=null;
-			Object def = option.getValue(preferences);
+      // Get default value
 			if (def == null) {
 				defPath = null;
 			} else if (def instanceof File) {
@@ -370,14 +414,12 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		} else if (Character.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
-			((JColumnChooser)jc).setDefaultValue(option.getValue(preferences).toString());
 			//JComponent cs = ((JColumnChooser)jc).getColumnChooser();
 			// TODO: Limit maximum size to one (don't accept inputs after that).
 			
 		} else if (String.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
-			((JColumnChooser)jc).setDefaultValue(option.getValue(preferences).toString());
 
 		} else if (Number.class.isAssignableFrom(clazz)) {
 			jc = new JColumnChooser(optionTitle, true, values);
@@ -386,28 +428,27 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				// For doulbes, we need to allow ',' and '.'.
 				((JColumnChooser)jc).setAcceptOnlyIntegers(false);
 			}
-			((JColumnChooser)jc).setDefaultValue(option.getValue(preferences).toString());
 		}
 
 		// Check if the option could be converted to a JComponent
 		if (jc != null) {
 			if (jc instanceof AbstractButton) {
 				((AbstractButton) jc).setText(optionTitle);
-			//} else if (jc instanceof JColumnChooser) {
-				//((JColumnChooser) jc).setTitle(optionTitle);
-				//((JColumnChooser) jc).setDefaultValue(o.getValue(preferences));
+			} else if (jc instanceof JColumnChooser) {
+				((JColumnChooser) jc).setTitle(optionTitle);
+				if (def!=null) ((JColumnChooser)jc).setDefaultValue(def.toString());
 			}
 			
-			if (Reflect.contains(jc, "addItemListener", ItemListener.class)) {
+			if (il!=null && Reflect.contains(jc, "addItemListener", ItemListener.class)) {
 				Reflect.invokeIfContains(jc, "addItemListener", ItemListener.class,
-					this);
-			} else {
+					il);
+			} else if (cl!=null) {
 				Reflect.invokeIfContains(jc, "addChangeListener", ChangeListener.class,
-					this);
+					cl);
 			}
 			jc.setName(option.getOptionName());
 			jc.setToolTipText(StringUtil.toHTML(option.getDescription(), 60));
-			jc.addKeyListener(this);
+			if (kl!=null) jc.addKeyListener(kl);
 			
 			//jc.setBorder(new TitledBorder("test"));
 		}
