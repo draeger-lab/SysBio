@@ -35,6 +35,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -813,4 +815,23 @@ public class GUITools {
 			}
 		}
 	}
+	
+	/**
+	 * Recursively set opaque to a value for p and all JComoponents on p.
+	 * @param p
+	 * @param val - false means transparent, true means object has a background.
+	 */
+  public static void setOpaqueForAllElements(JComponent p, boolean val) {
+    if (p instanceof JTextField || p instanceof JTextArea) return;
+    p.setOpaque(val);
+    
+    for (Component c: p.getComponents()) {
+      if (c instanceof JComponent) {
+        setOpaqueForAllElements((JComponent) c, val);
+      }
+    }
+      
+  }
+  
+  
 }

@@ -1237,5 +1237,16 @@ public class Utils {
     // They are equal.
     return 0;
   }
+
+  /**
+   * @param old_m
+   * @param old_cgs
+   * @param m
+   * @param cgs
+   * @return the weighted mean.
+   */
+  public static double weightedAverage(double val, double weight, double val2, double weight2) {
+    return (val*weight/(weight2+weight)) +  (val2 * weight2/(weight2+weight));
+  }
   
 }
