@@ -467,6 +467,7 @@ public class GUITools {
 			multiSelectionAllowed, true, mode, filter);
 	}
 	
+	
 	/**
 	 * 
 	 * @param parent
@@ -716,6 +717,16 @@ public class GUITools {
 	}
 	
 	/**
+	 * Shows a simple message with a given title and an ok button.
+	 * @param message
+	 * @param title
+	 * @return
+	 */
+  public static void showMessage(String message, String title) {
+    JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+  }
+	
+	/**
 	 * @param path
 	 * @param title
 	 * @param owner
@@ -832,6 +843,7 @@ public class GUITools {
     }
       
   }
+
   
   
 }

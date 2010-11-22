@@ -255,13 +255,13 @@ public class JColumnChooser extends JPanel {
     
     if (label!=null) l.removeLayoutComponent(label);
     if (colChooser!=null) l.removeLayoutComponent(colChooser);
-    if (preview!=null) l.removeLayoutComponent(preview);
+    if (preview!=null && preview.isVisible()) l.removeLayoutComponent(preview);
     
     if (l instanceof BorderLayout) {
       BorderLayout c = (BorderLayout) l;
       if (label!=null) c.addLayoutComponent(label, BorderLayout.WEST);
       if (colChooser!=null) c.addLayoutComponent(colChooser, BorderLayout.CENTER);
-      if (preview!=null) c.addLayoutComponent(preview, BorderLayout.EAST);
+      if (preview!=null && preview.isVisible()) c.addLayoutComponent(preview, BorderLayout.EAST);
       
     } else if (l instanceof GridBagLayout) {
       GridBagLayout c = (GridBagLayout) l;
@@ -277,14 +277,14 @@ public class JColumnChooser extends JPanel {
         gbc.gridx=1;
         c.addLayoutComponent(colChooser, gbc);
       }
-      if (preview!=null) {
+      if (preview!=null && preview.isVisible()) {
         gbc.gridx=2;
         c.addLayoutComponent(preview, gbc);      
       }
     } else {
       if (label!=null) l.addLayoutComponent("Titel", label);
       if (colChooser!=null) l.addLayoutComponent("ColChooser", colChooser);
-      if (preview!=null) l.addLayoutComponent("Preview", preview);
+      if (preview!=null && preview.isVisible()) l.addLayoutComponent("Preview", preview);
     }
   }
   

@@ -20,6 +20,7 @@ public class SBFileFilter extends GeneralFileFilter {
 	/**
 	 * 
 	 * @author Andreas Dr&auml;ger
+	 * @author wrzodek
 	 * @since 1.4
 	 * 
 	 */
@@ -57,10 +58,36 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		TEXT_FILES,
 		/**
+		 * True if this filter accepts GraphML files.
+		 */
+		GRAPHML_FILES,
+		/**
+		 * True if this filter accepts GML files.
+		 */
+		GML_FILES,
+		/**
+		 * True if this filter accepts GIF files.
+		 */
+		GIF_FILES,
+		/**
+		 * True if this filter accepts YGF (Y Graph Format) files.
+		 */
+		YGF_FILES,
+		/**
+		 * True if this filter accepts TGF (trivial graph format) files.
+		 */
+		TGF_FILES,
+		
+		/**
 		 * If not specified this is the type.
 		 */
 		UNDEFINED;
 	}
+	
+	/*
+	 * TODO: Remove the static constructors. They take memory, even if somebody
+	 * does not even use this class! Be careful with initilizaing objects static.
+	 */
 	
 	/**
 	 * The {@link FileFilter} for all files.
@@ -83,7 +110,7 @@ public class SBFileFilter extends GeneralFileFilter {
 	/**
 	 * A filter for joint picture expert group files.
 	 */
-	public static FileFilter JPEG_FILE_FILTER = new SBFileFilter(
+	public static SBFileFilter JPEG_FILE_FILTER = new SBFileFilter(
 		FileType.JPEG_FILES);
 	
 	/**
@@ -114,14 +141,27 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * A filter for Text files.
 	 */
 	public static final SBFileFilter TEXT_FILE_FILTER = new SBFileFilter(
-		FileType.TEXT_FILES);
+	  FileType.TEXT_FILES);
 	
+	public static final SBFileFilter GRAPHML_FILE_FILTER = new SBFileFilter(
+	  FileType.GRAPHML_FILES);
+	
+	public static final SBFileFilter GML_FILE_FILTER = new SBFileFilter(
+	  FileType.GML_FILES);
+	public static final SBFileFilter GIF_FILE_FILTER = new SBFileFilter(
+	  FileType.GIF_FILES);
+	public static final SBFileFilter YGF_FILE_FILTER = new SBFileFilter(
+	  FileType.YGF_FILES);
+	public static final SBFileFilter TGF_FILE_FILTER = new SBFileFilter(
+	  FileType.TGF_FILES);
+	
+  
 	/**
 	 * Filter for any kind of image file supported by this class.
 	 */
 	public static final MultipleFileFilter IMAGE_FILE_FILTER = new MultipleFileFilter(
-		"image files (*.jpg, *.png)", SBFileFilter.JPEG_FILE_FILTER,
-		SBFileFilter.PNG_FILE_FILTER);
+		"image files (*.jpg, *.png, *.gif)", SBFileFilter.JPEG_FILE_FILTER,
+		SBFileFilter.PNG_FILE_FILTER, SBFileFilter.GIF_FILE_FILTER);
 	
 	/**
 	 * 
@@ -192,6 +232,18 @@ public class SBFileFilter extends GeneralFileFilter {
 	}
 	
 	/**
+	 * 
+	 * @param f
+	 * @param extension
+	 * @return
+	 */
+	public static boolean checkExtension(File f, String extension) {
+	  if (!extension.startsWith(".")) extension = "." + extension;
+	  return f.getName().toLowerCase().endsWith(extension.toLowerCase());
+	}
+	
+	
+	/**
 	 * Allows users to initialize this {@link GeneralFileFilter} with another
 	 * {@link FileFilter}.
 	 */
@@ -221,6 +273,7 @@ public class SBFileFilter extends GeneralFileFilter {
 		}
 	}
 	
+  
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -237,6 +290,11 @@ public class SBFileFilter extends GeneralFileFilter {
 				|| (type == FileType.CSV_FILES && isCSVFile(f))
 				|| (type == FileType.PNG_FILES && isPNGFile(f))
 				|| (type == FileType.JPEG_FILES && isJPEGFile(f))
+				|| (type == FileType.GRAPHML_FILES && checkExtension(f, ".graphml"))
+				|| (type == FileType.GML_FILES && checkExtension(f, ".gml"))
+				|| (type == FileType.GIF_FILES && checkExtension(f, ".gif"))
+				|| (type == FileType.YGF_FILES && checkExtension(f, ".ygf"))
+				|| (type == FileType.TGF_FILES && checkExtension(f, ".tgf"))
 				|| (type == FileType.PDF_FILES && isPDFFile(f))) return true;
 		return false;
 	}
@@ -314,6 +372,18 @@ public class SBFileFilter extends GeneralFileFilter {
 				return "Portable Network Graphics files (*.png)";
 			case PDF_FILES:
 				return "Portable Document Format files (*.pdf)";
+				
+      case GRAPHML_FILES:
+        return "GraphML files (*.GraphML)";
+      case GML_FILES:
+        return "Graph Modeling Language files (*.gml)";
+      case GIF_FILES:
+        return "Graphics Interchange Format files (*.gif)";
+      case YGF_FILES:
+        return "Y Graph Format files (*.ygf)";
+      case TGF_FILES:
+        return "Trivial graph format files (*.tgf)";
+				
 			case DIRECTORIES_ONLY:
 			default:
 				return StringUtil.firstLetterUpperCase(type.toString()
