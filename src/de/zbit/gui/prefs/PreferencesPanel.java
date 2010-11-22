@@ -1,6 +1,7 @@
 package de.zbit.gui.prefs;
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Panel;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -437,14 +438,16 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			} else if (jc instanceof JColumnChooser) {
 				((JColumnChooser) jc).setTitle(optionTitle);
 				if (def!=null) ((JColumnChooser)jc).setDefaultValue(def.toString());
+				// Remove preview and reset predefined JColumnChooser layout.
+				((JColumnChooser)jc).hidePreview();
+				((JColumnChooser)jc).setPreferredSize(null);
+				((JColumnChooser)jc).setLayout(new FlowLayout());
 			}
 			
 			if (il!=null && Reflect.contains(jc, "addItemListener", ItemListener.class)) {
-				Reflect.invokeIfContains(jc, "addItemListener", ItemListener.class,
-					il);
+				Reflect.invokeIfContains(jc, "addItemListener", ItemListener.class, il);
 			} else if (cl!=null) {
-				Reflect.invokeIfContains(jc, "addChangeListener", ChangeListener.class,
-					cl);
+				Reflect.invokeIfContains(jc, "addChangeListener", ChangeListener.class, cl);
 			}
 			jc.setName(option.getOptionName());
 			jc.setToolTipText(StringUtil.toHTML(option.getDescription(), 60));
