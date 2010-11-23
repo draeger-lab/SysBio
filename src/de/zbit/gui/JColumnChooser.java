@@ -255,13 +255,13 @@ public class JColumnChooser extends JPanel {
     
     if (label!=null) l.removeLayoutComponent(label);
     if (colChooser!=null) l.removeLayoutComponent(colChooser);
-    if (preview!=null && preview.isVisible()) l.removeLayoutComponent(preview);
+    if (preview!=null && usePreview) l.removeLayoutComponent(preview);
     
     if (l instanceof BorderLayout) {
       BorderLayout c = (BorderLayout) l;
       if (label!=null) c.addLayoutComponent(label, BorderLayout.WEST);
       if (colChooser!=null) c.addLayoutComponent(colChooser, BorderLayout.CENTER);
-      if (preview!=null && preview.isVisible()) c.addLayoutComponent(preview, BorderLayout.EAST);
+      if (preview!=null && usePreview) c.addLayoutComponent(preview, BorderLayout.EAST);
       
     } else if (l instanceof GridBagLayout) {
       GridBagLayout c = (GridBagLayout) l;
@@ -277,14 +277,14 @@ public class JColumnChooser extends JPanel {
         gbc.gridx=1;
         c.addLayoutComponent(colChooser, gbc);
       }
-      if (preview!=null && preview.isVisible()) {
+      if (preview!=null && usePreview) {
         gbc.gridx=2;
         c.addLayoutComponent(preview, gbc);      
       }
     } else {
       if (label!=null) l.addLayoutComponent("Titel", label);
       if (colChooser!=null) l.addLayoutComponent("ColChooser", colChooser);
-      if (preview!=null && preview.isVisible()) l.addLayoutComponent("Preview", preview);
+      if (preview!=null && usePreview) l.addLayoutComponent("Preview", preview);
     }
   }
   
@@ -648,7 +648,7 @@ public class JColumnChooser extends JPanel {
       // Remove and add preview to keep ordering (e.g. in gridlayout).
       if (preview!=null) remove(preview);
       add(colChooser); // e.g. GridLayout
-      if (preview!=null) add(preview);
+      if (preview!=null && usePreview) add(preview);
     } 
     
     if (id>=0) setSelectedValue(id);
@@ -742,7 +742,7 @@ public class JColumnChooser extends JPanel {
   
   private void refreshPreview() {
     // Create it
-    if (this.preview==null) {
+    if (this.preview==null && usePreview) {
       preview = new JLabel();
       if (getLayout() instanceof GridBagLayout) {
         addComponent(this, preview, 2, 0, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
@@ -853,12 +853,18 @@ public class JColumnChooser extends JPanel {
   }
   public static void addSelectorsToLayout(LayoutHelper lh, JColumnChooser jc,
     boolean addSpace) {
-    lh.add(jc.label, 0, lh.getRow(), 1, 1, 0d, 0d);
-    lh.add(new JPanel(), 1, lh.getRow(), 1, 1, 0d, 0d);
-    lh.add(jc.colChooser, 2, 1, 1, 0d, 0d);
+    int i=0;
+    lh.add(jc.label, (i++), lh.getRow(), 1, 1, 0d, 0d);
+    lh.add(new JPanel(), (i++), lh.getRow(), 1, 1, 0d, 0d);
+    lh.add(jc.colChooser, (i++), jc.usePreview?lh.getRow():1, 1, 0d, 0d);
+    
+    if (jc.usePreview) {
+      lh.add(new JPanel(), (i++), lh.getRow(), 1, 1, 0d, 0d);
+      lh.add(jc.preview, (i++), 1, 1, 0d, 0d);
+    }
     
     if (addSpace) {
-      lh.add(new JPanel(), 0, 3, 1, 0d, 0d);
+      lh.add(new JPanel(), 0, (i++), 1, 0d, 0d);
     }
   }
   
