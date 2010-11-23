@@ -616,11 +616,12 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param properties
 	 * @throws BackingStoreException 
 	 */
+	@SuppressWarnings("unchecked")
 	public static void saveProperties(Class<? extends KeyProvider> keyProvider,
 		Properties properties) throws BackingStoreException {
-		Set<Option<?>> optionSet = KeyProvider.Tools.optionSet(keyProvider);
+		Set<Option> optionSet = KeyProvider.Tools.optionSet(keyProvider);
 		Set<String> keySet = new HashSet<String>();
-		for (Option<?> o : optionSet) {
+		for (Option o : optionSet) {
 			keySet.add(o.toString());
 		}
 		SBPreferences prefs = getPreferencesFor(keyProvider);
@@ -738,8 +739,9 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @returns true if all key-value pairs are valid.
 	 * @throws BackingStoreException
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean checkPrefs() throws BackingStoreException {
-		Iterator<Option<?>> iterator = optionIterator();
+		Iterator<Option> iterator = optionIterator();
 		Option<?> option;
 		Object value;
 		while (iterator.hasNext()) {
@@ -995,7 +997,9 @@ public class SBPreferences implements Map<Object, Object> {
 	public String getString(Object key) {
 		String k = key.toString();
 		String v = prefs.get(k, getDefaultString(k));
-		if (System.getProperties().containsKey(v)) { return System.getProperty(v); }
+		if (System.getProperties().containsKey(v)) { 
+			return System.getProperty(v); 
+		}
 		return v;
 	}
 	
@@ -1072,7 +1076,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @return
 	 */
-	public Iterator<Option<?>> optionIterator() {
+	@SuppressWarnings("unchecked")
+	public Iterator<Option> optionIterator() {
 		return KeyProvider.Tools.optionIterator(keyProvider);
 	}
 	
