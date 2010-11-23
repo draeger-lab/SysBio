@@ -12,6 +12,9 @@ import de.zbit.gui.ActionCommand;
  * Gathers multiple instances of {@link Option} in a group together with a
  * meaningful tool tip and a label.
  * 
+ * Remark by wrzodek: By using "? extends T" one can have an OptionGroup of
+ * mixed type options.
+ * 
  * @author Andreas Dr&auml;ger
  * @date 2010-11-04
  */
@@ -25,7 +28,7 @@ public class OptionGroup<T> implements ActionCommand,
 	/**
 	 * 
 	 */
-	private List<Option<T>> options;
+	private List<Option<? extends T>> options;
 	
 	/**
 	 * 
@@ -40,10 +43,10 @@ public class OptionGroup<T> implements ActionCommand,
 	 * @param toolTip
 	 * @param option
 	 */
-	public OptionGroup(String name, String toolTip, Option<T>... option) {
+	public OptionGroup(String name, String toolTip, Option<? extends T>... option) {
 		this.name = name;
 		this.toolTip = toolTip;
-		this.options = new LinkedList<Option<T>>();
+		this.options = new LinkedList<Option<? extends T>>();
 		setOptions(option);
 	}
 	
@@ -53,7 +56,7 @@ public class OptionGroup<T> implements ActionCommand,
 	 * @return
 	 * @see List#add(Object)
 	 */
-	public boolean add(Option<T> option) {
+	public boolean add(Option<? extends T> option) {
 		return options.add(option);
 	}
 	
@@ -69,7 +72,7 @@ public class OptionGroup<T> implements ActionCommand,
 	/**
 	 * @return the options
 	 */
-	public List<Option<T>> getOptions() {
+	public List<Option<? extends T>> getOptions() {
 		return options;
 	}
 	
@@ -120,7 +123,7 @@ public class OptionGroup<T> implements ActionCommand,
 	 * @param options
 	 *        the options to set
 	 */
-	public void setOptions(List<Option<T>> options) {
+	public void setOptions(List<Option<? extends T>> options) {
 		this.options = options;
 	}
 	
@@ -128,10 +131,10 @@ public class OptionGroup<T> implements ActionCommand,
 	 * 
 	 * @param option
 	 */
-	public void setOptions(Option<T>... option) {
+	public void setOptions(Option<? extends T>... option) {
 		options.clear();
 		if (option != null) {
-			for (Option<T> opt : option) {
+			for (Option<? extends T> opt : option) {
 				add(opt);
 			}
 		}
