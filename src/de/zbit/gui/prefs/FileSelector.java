@@ -538,7 +538,7 @@ public class FileSelector extends JPanel implements ActionListener {
 			switch (Type.valueOf(e.getActionCommand())) {
 				case OPEN:
 					file = GUITools.openFileDialog(this, baseDir, allFilesAcceptable,
-						false, mode ? JFileChooser.FILES_ONLY
+						mode ? JFileChooser.FILES_ONLY
 								: JFileChooser.DIRECTORIES_ONLY, filter);
 					break;
 				case SAVE:

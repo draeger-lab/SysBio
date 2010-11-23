@@ -847,6 +847,20 @@ public class JColumnChooser extends JPanel {
         anchor, fill, insets, 0, 0);
     container.add(component, gbc);
   }
+
+  public static void addSelectorsToLayout(LayoutHelper lh, JColumnChooser jc) {
+    addSelectorsToLayout(lh, jc, false);
+  }
+  public static void addSelectorsToLayout(LayoutHelper lh, JColumnChooser jc,
+    boolean addSpace) {
+    lh.add(jc.label, 0, lh.getRow(), 1, 1, 0d, 0d);
+    lh.add(new JPanel(), 1, lh.getRow(), 1, 1, 0d, 0d);
+    lh.add(jc.colChooser, 2, 1, 1, 0d, 0d);
+    
+    if (addSpace) {
+      lh.add(new JPanel(), 0, 3, 1, 0d, 0d);
+    }
+  }
   
   /**
    * Just for testing purposes.

@@ -515,22 +515,56 @@ public class GUITools {
 	 * @return null if for some reason the no {@link File} has been selected or
 	 *         the {@link File} cannot be read, else the selected {@link File}.
 	 */
-	public static File openFileDialog(final Component parent, String dir,
+	public static File[] openFileDialog(final Component parent, String dir,
 		boolean allFilesAcceptable, boolean multiSelectionAllowed, int mode,
 		FileFilter... filter) {
+	  File[] ret=null;
 		JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
 			multiSelectionAllowed, mode, filter);
 		if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-			File f = chooser.getSelectedFile();
-			if (!f.canRead()) {
-				JOptionPane.showMessageDialog(parent, StringUtil.toHTML(
-					"Cannot read file " + f.getAbsolutePath() + ".", 60),
-					"Unable to read file", JOptionPane.WARNING_MESSAGE);
-			} else {
-				return f;
-			}
+		  if (multiSelectionAllowed) {
+		    ret = chooser.getSelectedFiles();
+		  } else {
+		    ret = new File[]{chooser.getSelectedFile()};
+		  }
+		  for (File f: ret) {
+		    if (!f.canRead()) {
+		      JOptionPane.showMessageDialog(parent, StringUtil.toHTML(
+		        "Cannot read file " + f.getAbsolutePath() + ".", 60),
+		        "Unable to read file", JOptionPane.WARNING_MESSAGE);
+		      return null;
+		    }
+		  }
 		}
-		return null;
+		return ret;
+	}
+	
+  /**
+   * @param parent
+   * @param dir
+   * @param allFilesAcceptable
+   * @param multiSelectionAllowed
+   * @param mode
+   * @param filter
+   * @return null if for some reason the no {@link File} has been selected or
+   *         the {@link File} cannot be read, else the selected {@link File}.
+   */
+	public static File openFileDialog(final Component parent, String dir,
+	  boolean allFilesAcceptable, int mode,
+	  FileFilter... filter) {
+	  JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
+	    false, mode, filter);
+	  if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+	    File f = chooser.getSelectedFile();
+	    if (!f.canRead()) {
+	      JOptionPane.showMessageDialog(parent, StringUtil.toHTML(
+	        "Cannot read file " + f.getAbsolutePath() + ".", 60),
+	        "Unable to read file", JOptionPane.WARNING_MESSAGE);
+	    } else {
+	      return f;
+	    }
+	  }
+	  return null;
 	}
 	
 	/**

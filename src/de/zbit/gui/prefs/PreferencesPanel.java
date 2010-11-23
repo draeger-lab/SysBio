@@ -1,6 +1,7 @@
 package de.zbit.gui.prefs;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Panel;
 import java.awt.event.ItemEvent;
@@ -201,6 +202,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			if (jc != null) {
 				if (jc instanceof FileSelector) {
 					FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
+				} else if (jc instanceof JColumnChooser) {
+				  JColumnChooser.addSelectorsToLayout(lh, (JColumnChooser) jc);
 				} else {
 					lh.add(jc);
 				}
