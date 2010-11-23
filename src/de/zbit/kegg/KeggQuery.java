@@ -2,6 +2,8 @@ package de.zbit.kegg;
 
 import java.io.Serializable;
 
+import keggapi.Definition;
+
 /**
  * This class is used by KeggFunctionManagement. It determines which function
  * should be executed and what are the parameters for this function.
@@ -31,6 +33,12 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	 * Returns: ArrayList<String> kegg identifiers in an arrayList e.g. "hsa:7529"
 	 */
 	public final static int getKEGGIdentifierForAGeneSymbol = 3;
+	
+	/**
+	 * Input: none.
+	 * Retiurns: Definition[]
+	 */
+	public final static int getOrganisms = 4;
 
 	/**
 	 * 
