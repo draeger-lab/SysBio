@@ -390,4 +390,21 @@ public class SBFileFilter extends GeneralFileFilter {
 						.replace('_', ' '));
 		}
 	}
+
+  /**
+   * Returns the file extension.
+   */
+  public String getExtension() {
+    if (type==FileType.JPEG_FILES) {
+      return "jpg";
+    } else if (type==FileType.SBML_FILES) {
+      return "sbml.xml";
+    } else if (type==FileType.TEXT_FILES) {
+      return "txt";
+    } else if (type.toString().contains("_")) {
+      return type.toString().substring(0, type.toString().indexOf("_")).toLowerCase();
+    } else {
+      return "";
+    }
+  }
 }
