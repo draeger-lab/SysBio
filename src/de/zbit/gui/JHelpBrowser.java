@@ -99,6 +99,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 					helpBrowser.scroll, "This is the main online help.", 0);
 				tabs.addTab("Command line arguments", component);
 				tabs.setSelectedIndex(0);
+				helpBrowser.getContentPane().add(tabs, BorderLayout.CENTER);
 			}
 		}
 		helpBrowser.addWindowListener(wl);
