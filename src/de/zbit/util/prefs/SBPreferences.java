@@ -619,9 +619,9 @@ public class SBPreferences implements Map<Object, Object> {
 	@SuppressWarnings("unchecked")
 	public static void saveProperties(Class<? extends KeyProvider> keyProvider,
 		Properties properties) throws BackingStoreException {
-		Set<Option> optionSet = KeyProvider.Tools.optionSet(keyProvider);
+		List<Option> optionList = KeyProvider.Tools.optionList(keyProvider);
 		Set<String> keySet = new HashSet<String>();
-		for (Option o : optionSet) {
+		for (Option o : optionList) {
 			keySet.add(o.toString());
 		}
 		SBPreferences prefs = getPreferencesFor(keyProvider);
