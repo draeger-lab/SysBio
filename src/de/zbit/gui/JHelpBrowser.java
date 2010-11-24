@@ -1,20 +1,20 @@
 /*
- *  SBMLsqueezer creates rate equations for reactions in SBML files
- *  (http://sbml.org).
- *  Copyright (C) 2009 ZBIT, University of Tübingen, Andreas Dräger
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * SBMLsqueezer creates rate equations for reactions in SBML files
+ * (http://sbml.org). Copyright (C) 2009 ZBIT, University of Tübingen, Andreas
+ * Dräger
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.zbit.gui;
 
@@ -33,6 +33,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
@@ -51,9 +52,9 @@ import javax.swing.event.HyperlinkListener;
  */
 public class JHelpBrowser extends JDialog implements ActionListener,
 		HyperlinkListener {
-
+	
 	private JButton backButton, nextButton;
-
+	
 	/**
    * 
    */
@@ -68,20 +69,54 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 	 * @param fileLocation
 	 */
 	public static void showOnlineHelp(Frame owner, WindowListener wl,
-			String title, URL fileLocation) {
+		String title, URL fileLocation) {
+		showOnlineHelp(owner, wl, title, fileLocation, null);
+	}
+	
+	/**
+	 * 
+	 * @param owner
+	 * @param wl
+	 * @param title
+	 * @param fileLocation
+	 * @param component
+	 */
+	public static void showOnlineHelp(Frame owner, WindowListener wl,
+		String title, URL fileLocation, JComponent component) {
 		JHelpBrowser helpBrowser = new JHelpBrowser(owner, title, fileLocation);
+		if (component != null) {
+			helpBrowser.getLayout().removeLayoutComponent(helpBrowser.scroll);
+			if (component instanceof JTabbedPane) {
+				((JTabbedPane) component).insertTab("Online Help", UIManager
+						.getIcon("ICON_HELP_16"), helpBrowser.scroll,
+					"This is the main online help.", 0);
+				((JTabbedPane) component).setSelectedIndex(0);
+				helpBrowser.getContentPane().add(component, BorderLayout.CENTER);
+			} else {
+				//helpBrowser.
+				JTabbedPane tabs = new JTabbedPane();
+				tabs.insertTab("Online Help", UIManager.getIcon("ICON_HELP_16"),
+					helpBrowser.scroll, "This is the main online help.", 0);
+				tabs.addTab("Command line arguments", component);
+				tabs.setSelectedIndex(0);
+			}
+		}
 		helpBrowser.addWindowListener(wl);
-		helpBrowser.setLocationRelativeTo(null);
+		helpBrowser.setLocationRelativeTo(owner);
 		helpBrowser.setSize(640, 640);
 		helpBrowser.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		helpBrowser.setVisible(true);
 	}
-
+	
 	/**
 	 * The actual browser.
 	 */
 	private JBrowserPane browser;
-
+	/**
+	 * The {@link JScrollPane} that contains the actual browser.
+	 */
+	private JScrollPane scroll;
+	
 	/**
 	 * Creates a new JDialog that shows a browser and a toolbar to display a help
 	 * web site.
@@ -97,10 +132,9 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		super(owner, title);
 		init(startPage);
 	}
-
+	
 	/**
-	 * Creates a new JDialog that shows a browser and a toolbar to display a
-	 * help.
+	 * Creates a new JDialog that shows a browser and a toolbar to display a help.
 	 * 
 	 * @param owner
 	 * @param title
@@ -110,7 +144,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		super(owner, title);
 		init(startPage);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -124,25 +158,21 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 			if (name.equals("back") && (browser != null)) {
 				if (!browser.back()) {
 					button.setEnabled(false);
-					if (browser.getNumPagesVisited() > 1
-							&& !nextButton.isEnabled())
+					if (browser.getNumPagesVisited() > 1 && !nextButton.isEnabled())
 						nextButton.setEnabled(true);
-				} else if (!nextButton.isEnabled())
-					nextButton.setEnabled(true);
+				} else if (!nextButton.isEnabled()) nextButton.setEnabled(true);
 			} else if (name.equals("next") && (browser != null)) {
 				if (!browser.next()) {
 					button.setEnabled(false);
-					if (browser.getNumPagesVisited() > 1
-							&& !backButton.isEnabled())
+					if (browser.getNumPagesVisited() > 1 && !backButton.isEnabled())
 						backButton.setEnabled(true);
-				} else if (!backButton.isEnabled())
-					backButton.setEnabled(true);
+				} else if (!backButton.isEnabled()) backButton.setEnabled(true);
 			}
 		} else {
 			dispose();
 		}
 	}
-
+	
 	/**
 	 * Initialize this Window.
 	 * 
@@ -158,10 +188,10 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		browser = new JBrowserPane(helpFile);
 		browser.addHyperlinkListener(this);
 		JPanel content = new JPanel(new BorderLayout());
-		content.add(new JScrollPane(browser,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-				BorderLayout.CENTER);
+		scroll = new JScrollPane(browser,
+			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		content.add(scroll, BorderLayout.CENTER);
 		JToolBar toolbar = new JToolBar();
 		// image = image.getScaledInstance(22, 22, Image.SCALE_SMOOTH);
 		backButton = new JButton(UIManager.getIcon("ICON_ARROW_LEFT_16"));
@@ -170,7 +200,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		backButton.addActionListener(this);
 		backButton.setEnabled(false);
 		toolbar.add(backButton);
-
+		
 		Icon icon = UIManager.getIcon("ICON_ARROW_RIGHT_16");
 		if (icon != null) {
 			nextButton = new JButton(icon);
@@ -193,17 +223,15 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		setDefaultLookAndFeelDecorated(true);
 		setLocationByPlatform(true);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event
+	 * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event
 	 * .HyperlinkEvent)
 	 */
 	public void hyperlinkUpdate(HyperlinkEvent event) {
 		if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED
-				&& !backButton.isEnabled())
-			backButton.setEnabled(true);
+				&& !backButton.isEnabled()) backButton.setEnabled(true);
 	}
 }
