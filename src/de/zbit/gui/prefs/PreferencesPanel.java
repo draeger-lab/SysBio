@@ -1,7 +1,6 @@
 package de.zbit.gui.prefs;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Panel;
 import java.awt.event.ItemEvent;
@@ -561,7 +560,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
 	public void itemStateChanged(ItemEvent e) {
-		setProperty(e.getSource());
+		setProperty(properties, e.getSource());
 		for (ItemListener i : itemListeners) {
 			i.itemStateChanged(e);
 		}
@@ -573,7 +572,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
 	public void keyPressed(KeyEvent e) {
-		setProperty(e.getSource());
+		setProperty(properties, e.getSource());
 		for (KeyListener i : getKeyListeners()) {
 			i.keyPressed(e);
 		}
@@ -585,7 +584,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	public void keyReleased(KeyEvent e) {
-		setProperty(e.getSource());
+		setProperty(properties, e.getSource());
 		for (KeyListener kl : getKeyListeners()) {
 			kl.keyReleased(e);
 		}
@@ -597,7 +596,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	public void keyTyped(KeyEvent e) {
-		setProperty(e.getSource());
+		setProperty(properties, e.getSource());
 		for (KeyListener kl : getKeyListeners()) {
 			kl.keyTyped(e);
 		}
@@ -716,15 +715,23 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		init();
 	}
 
-	/**
-	 * Attempts to set the new value of the changed element in this panel's
-	 * properties. To this end, it is required that the name property is set for
-	 * each graphical component that may change.
+
+  /**
+   * Attempts to set the new value of the changed element in this panel's
+   * properties. To this end, it is required that the name property is set for
+   * each graphical component that may change.
+   * 
+   * This static method may be used by all methods using elements from
+   * {@link #getJComponentForOption(Option)} (and similar) to change the
+   * respective properties.
+   * 
+   * @param properties - should be either SBPrerences or SBProperties.
+   * @param source
+   *            The element whose value has been changed (e.g. in events,
+   *            this should be e.getSource()).
 	 * 
-	 * @param source
-	 *            The element whose value has been changed.
 	 */
-	private void setProperty(Object source) {
+	public static void setProperty(Map<Object, Object> properties, Object source) {
 		if (source instanceof Component) {
 			Component c = (Component) source;
 			String name = c.getName();
@@ -765,7 +772,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				} else if (c instanceof JTextComponent) {
 					value = ((JTextComponent) c).getText();
 				}
-				properties.setProperty(name, value);
+				
+				properties.put(name, value);
 				//System.out.println(" - " + "changed to '" + value.toString() + "'.");
 			} else {
 				//System.out.println(" - " + "failed: properties contains no key with that name.");

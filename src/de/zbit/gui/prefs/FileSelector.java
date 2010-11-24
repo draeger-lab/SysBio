@@ -5,6 +5,7 @@ package de.zbit.gui.prefs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
@@ -550,9 +551,12 @@ public class FileSelector extends JPanel implements ActionListener {
 					file = null;
 					break;
 			}
+			
 			if (file != null) {
 				textField.setText(file.toString());
 				baseDir = file.getParent();
+	      // Notify KeyListeners of texfield change
+	      dispatchEvent(new KeyEvent(this, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED , KeyEvent.CHAR_UNDEFINED));
 			}
 		}
 	}
