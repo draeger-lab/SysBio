@@ -6,7 +6,6 @@ package de.zbit.gui.prefs;
 
 import java.io.IOException;
 
-import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
 
@@ -45,7 +44,8 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public String getTitle() {
-		return StringUtil.formatOptionName(provider.getSimpleName());
+		return KeyProvider.Tools.createTitle(provider);
+		//StringUtil.formatOptionName(provider.getSimpleName());
 	}
 	
 	/* (non-Javadoc)

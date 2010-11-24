@@ -397,8 +397,9 @@ public class Reflect {
 		int cntAdded = 0;
 		
 		packageName = packageName.replaceAll("\\.", "/");
-		if (TRACE)
+		if (TRACE) {
 			System.out.printf("Jar %s looking for %s\n", jarName, packageName);
+		}
 		try {
 			JarInputStream jarFile = new JarInputStream(new FileInputStream(jarName));
 			JarEntry jarEntry;

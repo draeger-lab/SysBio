@@ -94,23 +94,14 @@ public interface KeyProvider {
 		public static String createDocumentation(
 			Class<? extends KeyProvider> keyProvider) {
 			StringBuilder sb = new StringBuilder();
-			String title = keyProvider.getSimpleName();
-			StringBuilder headLine = new StringBuilder();
-			headLine.append(title.charAt(0));
-			for (int i = 1; i < title.length(); i++) {
-				if ((Character.isLowerCase(title.charAt(i - 1)) && Character
-						.isUpperCase(title.charAt(i)))
-						|| (title.substring(i).startsWith("Option"))) {
-					headLine.append(' ');
-				}
-				headLine.append(title.charAt(i));
-			}
-			title = headLine.toString();
+			String title = createTitle(keyProvider);
 			
 			sb.append("<!DOCTYPE html");
 			sb.append(" PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
-			sb.append(" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
-			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n");
+			sb
+					.append(" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
+			sb
+					.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n");
 			sb.append("  <head>\n");
 			sb.append("    <style type=\"text/css\">\n      <!--\n");
 			sb.append("        .typewriter {\n");
@@ -154,6 +145,31 @@ public interface KeyProvider {
 		}
 		
 		/**
+		 * Creates a human-readable title from the class name of some {@link Class}.
+		 * 
+		 * @param clazz
+		 * @return
+		 */
+		public static String createTitle(Class<?> clazz) {
+			String title = clazz.getSimpleName();
+			StringBuilder headLine = new StringBuilder();
+			headLine.append(title.charAt(0));
+			for (int i = 1; i < title.length(); i++) {
+				if ((Character.isLowerCase(title.charAt(i - 1)) && Character
+						.isUpperCase(title.charAt(i)))
+						|| (title.substring(i).startsWith("Option"))) {
+					headLine.append(' ');
+				}
+				if (title.charAt(i) == '_') {
+					headLine.append(' ');
+				} else {
+					headLine.append(title.charAt(i));
+				}
+			}
+			return headLine.toString();
+		}
+		
+		/**
 		 * 
 		 * @param sb
 		 * @param options
@@ -172,7 +188,8 @@ public interface KeyProvider {
 				sb.append("        <tr>\n");
 				sb.append("          <td colspan=\"2\" class=\"typewriter-blue\">");
 				String shortName = option.getShortCmdName();
-				String requiredType = StringUtil.concat("&#60;", option.getRequiredType().getSimpleName(), "&#62;").toString();
+				String requiredType = StringUtil.concat("&#60;",
+					option.getRequiredType().getSimpleName(), "&#62;").toString();
 				if (shortName != null) {
 					sb.append(shortName);
 					sb.append(requiredType);
