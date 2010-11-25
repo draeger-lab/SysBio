@@ -5,6 +5,7 @@ package de.zbit.util.prefs;
 
 import java.io.File;
 import java.text.ParseException;
+import java.util.List;
 
 import argparser.ArgParser;
 import argparser.BooleanHolder;
@@ -42,6 +43,12 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	public static <Type> Range<Type> buildRange(Class<Type> requiredType,
 		String rangeSpec) {
 		return new Range<Type>(requiredType, rangeSpec);
+	}
+
+	public static <Type> Range<Type> buildRange(Class<Type> requiredType,
+	          List<Type> acceptedObjects) {
+	  // TODO: Implement this.
+	  return new Range<Type>(requiredType, rangeSpec);
 	}
 	
 	/**
