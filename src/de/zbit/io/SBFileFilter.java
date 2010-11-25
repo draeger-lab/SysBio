@@ -34,6 +34,22 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		DIRECTORIES_ONLY,
 		/**
+		 * True if this filter accepts GIF files.
+		 */
+		GIF_FILES,
+		/**
+		 * True if this filter accepts GML files.
+		 */
+		GML_FILES,
+		/**
+		 * True if this filter accepts GraphML files.
+		 */
+		GRAPHML_FILES,
+		/**
+		 * A file filter type for HTML files.
+		 */
+		HTML_FILES,
+		/**
 		 * True if this filter accepts JPEG picture files.
 		 */
 		JPEG_FILES,
@@ -58,37 +74,24 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		TEXT_FILES,
 		/**
-		 * True if this filter accepts GraphML files.
-		 */
-		GRAPHML_FILES,
-		/**
-		 * True if this filter accepts GML files.
-		 */
-		GML_FILES,
-		/**
-		 * True if this filter accepts GIF files.
-		 */
-		GIF_FILES,
-		/**
-		 * True if this filter accepts YGF (Y Graph Format) files.
-		 */
-		YGF_FILES,
-		/**
 		 * True if this filter accepts TGF (trivial graph format) files.
 		 */
 		TGF_FILES,
-		
 		/**
 		 * If not specified this is the type.
 		 */
-		UNDEFINED;
+		UNDEFINED,
+		/**
+		 * True if this filter accepts YGF (Y Graph Format) files.
+		 */
+		YGF_FILES;
 	}
 	
 	/*
 	 * TODO: Remove the static constructors. They take memory, even if somebody
 	 * does not even use this class! Be careful with initilizaing objects static.
 	 */
-	
+
 	/**
 	 * The {@link FileFilter} for all files.
 	 */
@@ -106,7 +109,22 @@ public class SBFileFilter extends GeneralFileFilter {
 	 */
 	public static SBFileFilter DIRECTORY_FILTER = new SBFileFilter(
 		FileType.DIRECTORIES_ONLY);
-		
+	
+	public static final SBFileFilter GIF_FILE_FILTER = new SBFileFilter(
+		FileType.GIF_FILES);
+	
+	public static final SBFileFilter GML_FILE_FILTER = new SBFileFilter(
+		FileType.GML_FILES);
+	
+	public static final SBFileFilter GRAPHML_FILE_FILTER = new SBFileFilter(
+		FileType.GRAPHML_FILES);
+	
+	/**
+	 * 
+	 */
+	public static final FileFilter HTML_FILE_FILTER = new SBFileFilter(
+		FileType.HTML_FILES);
+	
 	/**
 	 * A filter for joint picture expert group files.
 	 */
@@ -124,38 +142,27 @@ public class SBFileFilter extends GeneralFileFilter {
 	 */
 	public static SBFileFilter PNG_FILE_FILTER = new SBFileFilter(
 		FileType.PNG_FILES);
-	
 	/**
 	 * A filter for SBML files
 	 */
 	public static final SBFileFilter SBML_FILE_FILTER = new SBFileFilter(
 		FileType.SBML_FILES);
-	
 	/**
 	 * A filter for TeX files
 	 */
 	public static final SBFileFilter TeX_FILE_FILTER = new SBFileFilter(
 		FileType.TeX_FILES);
-	
 	/**
 	 * A filter for Text files.
 	 */
 	public static final SBFileFilter TEXT_FILE_FILTER = new SBFileFilter(
-	  FileType.TEXT_FILES);
+		FileType.TEXT_FILES);
 	
-	public static final SBFileFilter GRAPHML_FILE_FILTER = new SBFileFilter(
-	  FileType.GRAPHML_FILES);
-	
-	public static final SBFileFilter GML_FILE_FILTER = new SBFileFilter(
-	  FileType.GML_FILES);
-	public static final SBFileFilter GIF_FILE_FILTER = new SBFileFilter(
-	  FileType.GIF_FILES);
-	public static final SBFileFilter YGF_FILE_FILTER = new SBFileFilter(
-	  FileType.YGF_FILES);
 	public static final SBFileFilter TGF_FILE_FILTER = new SBFileFilter(
-	  FileType.TGF_FILES);
+		FileType.TGF_FILES);
 	
-  
+	public static final SBFileFilter YGF_FILE_FILTER = new SBFileFilter(
+		FileType.YGF_FILES);
 	/**
 	 * Filter for any kind of image file supported by this class.
 	 */
@@ -166,10 +173,30 @@ public class SBFileFilter extends GeneralFileFilter {
 	/**
 	 * 
 	 * @param f
+	 * @param extension
+	 * @return
+	 */
+	public static boolean checkExtension(File f, String extension) {
+		if (!extension.startsWith(".")) extension = "." + extension;
+		return f.getName().toLowerCase().endsWith(extension.toLowerCase());
+	}
+	
+	/**
+	 * 
+	 * @param f
 	 * @return
 	 */
 	public static boolean isCSVFile(File f) {
 		return f.getName().toLowerCase().endsWith(".csv");
+	}
+	
+	/**
+	 * @param file
+	 * @return
+	 */
+	public static boolean isHTMLFile(File file) {
+		String name = file.getName().toLowerCase();
+		return name.endsWith(".html") || name.endsWith(".htm");
 	}
 	
 	/**
@@ -232,18 +259,6 @@ public class SBFileFilter extends GeneralFileFilter {
 	}
 	
 	/**
-	 * 
-	 * @param f
-	 * @param extension
-	 * @return
-	 */
-	public static boolean checkExtension(File f, String extension) {
-	  if (!extension.startsWith(".")) extension = "." + extension;
-	  return f.getName().toLowerCase().endsWith(extension.toLowerCase());
-	}
-	
-	
-	/**
 	 * Allows users to initialize this {@link GeneralFileFilter} with another
 	 * {@link FileFilter}.
 	 */
@@ -268,12 +283,10 @@ public class SBFileFilter extends GeneralFileFilter {
 	 */
 	public SBFileFilter(FileType type) {
 		this.type = type;
-		if (type == FileType.UNDEFINED) {
-			throw new IllegalArgumentException("FileType must not be UNDEFINED.");
-		}
+		if (type == FileType.UNDEFINED) { throw new IllegalArgumentException(
+			"FileType must not be UNDEFINED."); }
 	}
 	
-  
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -281,13 +294,12 @@ public class SBFileFilter extends GeneralFileFilter {
 	 */
 	// @Override
 	public boolean accept(File f) {
-		if (filter != null) {
-			return filter.accept(f);
-		}
+		if (filter != null) { return filter.accept(f); }
 		if ((f.isDirectory() || (type == FileType.TEXT_FILES && isTextFile(f)))
 				|| (type == FileType.TeX_FILES && isTeXFile(f))
 				|| (type == FileType.SBML_FILES && isSBMLFile(f))
 				|| (type == FileType.CSV_FILES && isCSVFile(f))
+				|| (type == FileType.HTML_FILES && isHTMLFile(f))
 				|| (type == FileType.PNG_FILES && isPNGFile(f))
 				|| (type == FileType.JPEG_FILES && isJPEGFile(f))
 				|| (type == FileType.GRAPHML_FILES && checkExtension(f, ".graphml"))
@@ -354,9 +366,7 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * @see javax.swing.filechooser.FileFilter#getDescription()
 	 */
 	public String getDescription() {
-		if (filter != null) {
-			return filter.getDescription();
-		}
+		if (filter != null) { return filter.getDescription(); }
 		switch (type) {
 			case TEXT_FILES:
 				return "Text files (*.txt)";
@@ -372,17 +382,18 @@ public class SBFileFilter extends GeneralFileFilter {
 				return "Portable Network Graphics files (*.png)";
 			case PDF_FILES:
 				return "Portable Document Format files (*.pdf)";
-				
-      case GRAPHML_FILES:
-        return "GraphML files (*.GraphML)";
-      case GML_FILES:
-        return "Graph Modeling Language files (*.gml)";
-      case GIF_FILES:
-        return "Graphics Interchange Format files (*.gif)";
-      case YGF_FILES:
-        return "Y Graph Format files (*.ygf)";
-      case TGF_FILES:
-        return "Trivial graph format files (*.tgf)";
+			case HTML_FILES:
+				return "Hypertext markup language files (*.html, *.htm)";
+			case GRAPHML_FILES:
+				return "GraphML files (*.GraphML)";
+			case GML_FILES:
+				return "Graph Modeling Language files (*.gml)";
+			case GIF_FILES:
+				return "Graphics Interchange Format files (*.gif)";
+			case YGF_FILES:
+				return "Y Graph Format files (*.ygf)";
+			case TGF_FILES:
+				return "Trivial graph format files (*.tgf)";
 				
 			case DIRECTORIES_ONLY:
 			default:
@@ -390,21 +401,22 @@ public class SBFileFilter extends GeneralFileFilter {
 						.replace('_', ' '));
 		}
 	}
-
-  /**
-   * Returns the file extension.
-   */
-  public String getExtension() {
-    if (type==FileType.JPEG_FILES) {
-      return "jpg";
-    } else if (type==FileType.SBML_FILES) {
-      return "sbml.xml";
-    } else if (type==FileType.TEXT_FILES) {
-      return "txt";
-    } else if (type.toString().contains("_")) {
-      return type.toString().substring(0, type.toString().indexOf("_")).toLowerCase();
-    } else {
-      return "";
-    }
-  }
+	
+	/**
+	 * Returns the file extension.
+	 */
+	public String getExtension() {
+		if (type == FileType.JPEG_FILES) {
+			return "jpg";
+		} else if (type == FileType.SBML_FILES) {
+			return "sbml.xml";
+		} else if (type == FileType.TEXT_FILES) {
+			return "txt";
+		} else if (type.toString().contains("_")) {
+			return type.toString().substring(0, type.toString().indexOf("_"))
+					.toLowerCase();
+		} else {
+			return "";
+		}
+	}
 }
