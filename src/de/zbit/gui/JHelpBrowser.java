@@ -19,18 +19,26 @@
 package de.zbit.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -41,6 +49,11 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+
+import de.zbit.gui.prefs.CommandLineHelp;
+import de.zbit.io.SBFileFilter;
+import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * This is a specialized dialog that displays HTML pages and contains a toolbar
@@ -53,7 +66,7 @@ import javax.swing.event.HyperlinkListener;
 public class JHelpBrowser extends JDialog implements ActionListener,
 		HyperlinkListener {
 	
-	private JButton backButton, nextButton;
+	private JButton backButton, nextButton, saveButton;
 	
 	/**
    * 
@@ -67,45 +80,36 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 	 * @param wl
 	 * @param title
 	 * @param fileLocation
-	 */
-	public static void showOnlineHelp(Frame owner, WindowListener wl,
-		String title, URL fileLocation) {
-		showOnlineHelp(owner, wl, title, fileLocation, null);
-	}
-	
-	/**
-	 * 
-	 * @param owner
-	 * @param wl
-	 * @param title
-	 * @param fileLocation
 	 * @param component
 	 */
 	public static void showOnlineHelp(Frame owner, WindowListener wl,
-		String title, URL fileLocation, JComponent component) {
+		String title, URL fileLocation, Class<? extends KeyProvider>... clazz) {
 		JHelpBrowser helpBrowser = new JHelpBrowser(owner, title, fileLocation);
-		if (component != null) {
-			helpBrowser.getLayout().removeLayoutComponent(helpBrowser.scroll);
+		if ((clazz != null) && (clazz.length > 0)) {
+			JComponent component = CommandLineHelp.createHelpComponent(clazz);
+			helpBrowser.getLayout().removeLayoutComponent(helpBrowser.mainPart);
 			if (component instanceof JTabbedPane) {
 				((JTabbedPane) component).insertTab("Online Help", UIManager
-						.getIcon("ICON_HELP_16"), helpBrowser.scroll,
+						.getIcon("ICON_HELP_16"), helpBrowser.mainPart,
 					"This is the main online help.", 0);
 				((JTabbedPane) component).setSelectedIndex(0);
 				helpBrowser.getContentPane().add(component, BorderLayout.CENTER);
+				helpBrowser.mainPart = component;
 			} else {
 				//helpBrowser.
 				JTabbedPane tabs = new JTabbedPane();
 				tabs.insertTab("Online Help", UIManager.getIcon("ICON_HELP_16"),
-					helpBrowser.scroll, "This is the main online help.", 0);
+					helpBrowser.mainPart, "This is the main online help.", 0);
 				tabs.addTab("Command line arguments", component);
 				tabs.setSelectedIndex(0);
+				helpBrowser.mainPart = tabs;
 				helpBrowser.getContentPane().add(tabs, BorderLayout.CENTER);
 			}
 		}
 		helpBrowser.addWindowListener(wl);
-		helpBrowser.setLocationRelativeTo(owner);
 		helpBrowser.setSize(640, 640);
 		helpBrowser.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		helpBrowser.setLocationRelativeTo(owner);
 		helpBrowser.setVisible(true);
 	}
 	
@@ -114,9 +118,9 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 	 */
 	private JBrowserPane browser;
 	/**
-	 * The {@link JScrollPane} that contains the actual browser.
+	 * The main element in this dialog.
 	 */
-	private JScrollPane scroll;
+	private JComponent mainPart;
 	
 	/**
 	 * Creates a new JDialog that shows a browser and a toolbar to display a help
@@ -156,18 +160,59 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		if (e.getSource() instanceof JButton) {
 			JButton button = (JButton) e.getSource();
 			String name = button.getName();
-			if (name.equals("back") && (browser != null)) {
-				if (!browser.back()) {
-					button.setEnabled(false);
-					if (browser.getNumPagesVisited() > 1 && !nextButton.isEnabled())
-						nextButton.setEnabled(true);
-				} else if (!nextButton.isEnabled()) nextButton.setEnabled(true);
-			} else if (name.equals("next") && (browser != null)) {
-				if (!browser.next()) {
-					button.setEnabled(false);
-					if (browser.getNumPagesVisited() > 1 && !backButton.isEnabled())
+			if (browser != null) {
+				if (name.equals(backButton.getName())) {
+					if (!browser.back()) {
+						button.setEnabled(false);
+						if ((browser.getNumPagesVisited() > 1) && !nextButton.isEnabled()) {
+							nextButton.setEnabled(true);
+						}
+					} else if (!nextButton.isEnabled()) nextButton.setEnabled(true);
+				} else if (name.equals(nextButton.getName())) {
+					if (!browser.next()) {
+						button.setEnabled(false);
+						if ((browser.getNumPagesVisited() > 1) && !backButton.isEnabled()) {
+							backButton.setEnabled(true);
+						}
+					} else if (!backButton.isEnabled()) {
 						backButton.setEnabled(true);
-				} else if (!backButton.isEnabled()) backButton.setEnabled(true);
+					}
+				} else if (name.equals(saveButton.getName())) {
+					SBPreferences prefs = SBPreferences
+							.getPreferencesFor(GUIOptions.class);
+					File file = GUITools.saveFileDialog(this, prefs
+							.get(GUIOptions.OPEN_DIR), false, false, true,
+						JFileChooser.FILES_ONLY, SBFileFilter.HTML_FILE_FILTER);
+					if (file != null) {
+						JEditorPane editor = null;
+						if (mainPart instanceof JScrollPane) {
+							editor = browser;
+						} else if (mainPart instanceof JTabbedPane) {
+							JTabbedPane tabs = (JTabbedPane) mainPart;
+							Component component = tabs.getSelectedComponent();
+							if (component instanceof JScrollPane) {
+								component =((JScrollPane) component).getViewport()
+										.getComponent(0);
+								if (component instanceof JEditorPane) {
+									editor = (JEditorPane) component;
+								}
+							}
+						}
+						if (editor != null) {
+							try {
+								BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+								bw.append(editor.getText());
+								bw.close();
+								prefs.put(GUIOptions.SAVE_DIR, file.getParent());
+								prefs.flush();
+							} catch (IOException exc) {
+								GUITools.showErrorMessage(this, exc);
+							} catch (BackingStoreException exc) {
+								prefs.remove(GUIOptions.SAVE_DIR);
+							}
+						}
+					}
+				}
 			}
 		} else {
 			dispose();
@@ -189,9 +234,10 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		browser = new JBrowserPane(helpFile);
 		browser.addHyperlinkListener(this);
 		JPanel content = new JPanel(new BorderLayout());
-		scroll = new JScrollPane(browser,
+		JScrollPane scroll = new JScrollPane(browser,
 			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.mainPart = scroll;
 		content.add(scroll, BorderLayout.CENTER);
 		JToolBar toolbar = new JToolBar();
 		// image = image.getScaledInstance(22, 22, Image.SCALE_SMOOTH);
@@ -213,14 +259,22 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		nextButton.addActionListener(this);
 		nextButton.setEnabled(false);
 		toolbar.add(nextButton);
+		
+		icon = UIManager.getIcon("ICON_SAVE_16");
+		if (icon != null) {
+			saveButton = new JButton(icon);
+		} else {
+			saveButton = new JButton("Save");
+		}
+		saveButton.setToolTipText("Save the current page as HTML file.");
+		saveButton.setName("save");
+		saveButton.addActionListener(this);
+		saveButton.setEnabled(true);
+		toolbar.add(saveButton);
+		
 		content.add(toolbar, BorderLayout.NORTH);
 		setContentPane(content);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception exc) {
-			exc.printStackTrace();
-		}
 		setDefaultLookAndFeelDecorated(true);
 		setLocationByPlatform(true);
 	}
