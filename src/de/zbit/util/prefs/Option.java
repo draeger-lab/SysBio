@@ -4,7 +4,6 @@
 package de.zbit.util.prefs;
 
 import java.io.File;
-import java.text.ParseException;
 import java.util.List;
 
 import argparser.ArgParser;
@@ -38,19 +37,26 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param requiredType
 	 * @param rangeSpec
 	 * @return
-	 * @throws ParseException
 	 */
 	public static <Type> Range<Type> buildRange(Class<Type> requiredType,
 		String rangeSpec) {
 		return new Range<Type>(requiredType, rangeSpec);
 	}
 
+	/**
+	 * Just a convenient wrapper method for {@link Range#Range(Class, List)},
+   * that catches the exception.
+	 * 
+	 * @param <Type>
+	 * @param requiredType
+	 * @param acceptedObjects
+	 * @return
+	 */
 	public static <Type> Range<Type> buildRange(Class<Type> requiredType,
 	          List<Type> acceptedObjects) {
-	  // TODO: Implement this.
-	  return new Range<Type>(requiredType, rangeSpec);
+	  return new Range<Type>(requiredType, acceptedObjects);
 	}
-	
+		
 	/**
 	 * Convert 'ret' to {@link #requiredType} by parsing it (e.g.
 	 * Integer.parseInt), or casting it to the desired type.

@@ -8,6 +8,7 @@ import java.util.List;
 import de.zbit.io.CSVReader;
 import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Reflect;
+import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
 
 /**
@@ -312,6 +313,19 @@ public class Range<Type> {
 	}
 	
 	/**
+	 * This is a convenient constructors that builds a range string from
+	 * a list of all acceptable object automatically.
+	 * 
+	 * See {@link #Range(Class, String)} for more information.
+	 * 
+   * @param requiredType
+   * @param acceptedObjects
+   */
+  public Range(Class<Type> requiredType, List<Type> acceptedObjects) {
+    this(requiredType, Range.toRangeString(acceptedObjects));
+  }
+
+  /**
 	 * Checks whether additional side constraints have been set.
 	 * @return
 	 */
@@ -469,6 +483,20 @@ public class Range<Type> {
 		}
 
   }
+  
+  /**
+   * Returns a List of type String, that is parsable as Range by the
+   * Range class.
+   * @param <Type>
+   * @param acceptedObjects - a simple list of all acceptable objects.
+   * @return String
+   */
+  public static <Type> String toRangeString(List<Type> acceptedObjects) {
+    return "{" + StringUtil.implode(
+      StringUtil.addPrefixAndSuffix(acceptedObjects, "\"", "\"")
+      , ",") + "}";
+  }
+
   
   
 }
