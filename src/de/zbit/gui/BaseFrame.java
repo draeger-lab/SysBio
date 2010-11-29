@@ -340,8 +340,8 @@ public abstract class BaseFrame extends JFrame {
 		JMenuItem items[] = additionalEditMenuItems();
 		// Speed up the GUI by loading the preferences classes at the beginning
 		// and add this menu only if there is at least one preference panel defined.
-		int numPrefs = MultiplePreferencesPanel.getClasses().length;
-		if ((numPrefs > 2) || ((items != null) && (items.length > 0))) {
+		int numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
+		if ((numPrefs > 0) || ((items != null) && (items.length > 0))) {
 			menuBar.add(GUITools.createJMenu("Edit", items, (items != null)
 					&& (items.length > 0) && (numPrefs > 0) ? new JSeparator() : null,
 				numPrefs > 0 ? preferences : null));

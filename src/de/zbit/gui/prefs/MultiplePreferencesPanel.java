@@ -50,6 +50,33 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	};
 
 	/**
+	 * Counts how many tabs can be created inside of this
+	 * {@link MultiplePreferencesPanel} due to the number of
+	 * {@link PreferencesPanel} classes found in this package.
+	 * 
+	 * @return The number of tabs that will be automatically created and added to
+	 *         this {@link MultiplePreferencesPanel} when initializing.
+	 */
+	public static int getPossibleTabCount() {
+		int tabCount = 0;
+		for (int i = 0; i < classes.length; i++) {
+			if (!classes[i].equals(MultiplePreferencesPanel.class)) {
+				try {
+					Class<PreferencesPanel> c = classes[i];
+					for (Constructor<?> constructor : c.getConstructors()) {
+						if (constructor.getParameterTypes().length == 0) {
+							tabCount++;
+							break;
+						}
+					}
+				} catch (Exception exc) {
+				}
+			}
+		}
+		return tabCount;
+	}
+
+	/**
 	 * Needed to structure this {@link PreferencesPanel}.
 	 */
 	private JTabbedPane tab;
@@ -148,7 +175,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	public String getTitle() {
 		return "User preferences";
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
