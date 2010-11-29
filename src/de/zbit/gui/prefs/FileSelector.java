@@ -369,10 +369,9 @@ public class FileSelector extends JPanel implements ActionListener {
 		GUITools.initLaF("FileSelector test");
 		JPanel p = new JPanel();
 		FileSelector selectors[] = createOpenSavePanel(new LayoutHelper(p), System
-				.getProperty("user.dir"), false,
-			new SBFileFilter[] { SBFileFilter.SBML_FILE_FILTER }, System
-					.getProperty("user.dir"), false,
-			new SBFileFilter[] { SBFileFilter.TeX_FILE_FILTER });
+				.getProperty("user.dir"), false, new SBFileFilter[] { SBFileFilter
+				.createSBMLFileFilter() }, System.getProperty("user.dir"), false,
+			new SBFileFilter[] { SBFileFilter.createTeXFileFilter() });
 		if (JOptionPane.showConfirmDialog(null, p, "Test",
 			JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 			for (FileSelector fs : selectors) {
@@ -472,7 +471,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * @param type
 	 * @param filter
 	 *        - if null, only directories are permitted. If you want to be able to
-	 *        select all Files, use e.g. {@link SBFileFilter#ALL_FILE_FILTER}.
+	 *        select all Files, use e.g. {@link SBFileFilter#getAllFileFilter}.
 	 */
 	public FileSelector(Type type, FileFilter... filter) {
 		this(type, null, filter);

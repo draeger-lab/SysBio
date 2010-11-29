@@ -182,7 +182,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 							.getPreferencesFor(GUIOptions.class);
 					File file = GUITools.saveFileDialog(this, prefs
 							.get(GUIOptions.OPEN_DIR), false, false, true,
-						JFileChooser.FILES_ONLY, SBFileFilter.HTML_FILE_FILTER);
+						JFileChooser.FILES_ONLY, SBFileFilter.createHTMLFileFilter());
 					if (file != null) {
 						JEditorPane editor = null;
 						if (mainPart instanceof JScrollPane) {
@@ -191,7 +191,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 							JTabbedPane tabs = (JTabbedPane) mainPart;
 							Component component = tabs.getSelectedComponent();
 							if (component instanceof JScrollPane) {
-								component =((JScrollPane) component).getViewport()
+								component = ((JScrollPane) component).getViewport()
 										.getComponent(0);
 								if (component instanceof JEditorPane) {
 									editor = (JEditorPane) component;
@@ -226,6 +226,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 	 * 
 	 */
 	private void init(URL helpFile) {
+		//		setIconImage((UIManager.getIcon("ICON_HELP_16")));
 		
 		KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 		getRootPane().registerKeyboardAction(this, stroke,

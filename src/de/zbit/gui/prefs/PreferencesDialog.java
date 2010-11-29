@@ -276,6 +276,8 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		foot.add(new JSeparator(), BorderLayout.NORTH);
 		foot.add(p, BorderLayout.SOUTH);
 		getContentPane().add(foot, BorderLayout.SOUTH);
+		
+		pack();
 	}
 	
 	/*

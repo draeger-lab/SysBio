@@ -25,11 +25,11 @@ public interface KeyProvider {
 		/**
 		 * 
 		 */
-		private int index;
+		private T element;
 		/**
 		 * 
 		 */
-		private T element;
+		private int index;
 		
 		public Entry() {
 			this(-1, null);
@@ -46,11 +46,10 @@ public interface KeyProvider {
 		}
 		
 		/**
-		 * @param index
-		 *        the index to set
+		 * @return the element
 		 */
-		public void setIndex(int index) {
-			this.index = index;
+		public T getElement() {
+			return element;
 		}
 		
 		/**
@@ -69,10 +68,11 @@ public interface KeyProvider {
 		}
 		
 		/**
-		 * @return the element
+		 * @param index
+		 *        the index to set
 		 */
-		public T getElement() {
-			return element;
+		public void setIndex(int index) {
+			this.index = index;
 		}
 	}
 	
@@ -170,6 +170,202 @@ public interface KeyProvider {
 		}
 		
 		/**
+		 * This tries to obtain the next element of the desired {@link Class}.
+		 * 
+		 * @param <T>
+		 *        The type of the desired element
+		 * @param keyProvider
+		 *        The {@link KeyProvider} holding the keys
+		 * @param clazz
+		 *        The class of the desired element.
+		 * @param n
+		 *        The index of the element to get.
+		 * @return null if no such element exists or the desired element.
+		 */
+		@SuppressWarnings("unchecked")
+		public static <T> Entry<T> getField(
+			Class<? extends KeyProvider> keyProvider, Class<T> clazz, int n) {
+			Field fields[] = keyProvider.getFields();
+			Object fieldValue;
+			for (; n < fields.length; n++) {
+				try {
+					fieldValue = fields[n].get(keyProvider);
+					if (fieldValue.getClass().isAssignableFrom(clazz)) { return new Entry<T>(
+						n, (T) fieldValue); }
+				} catch (Exception exc) {
+				}
+			}
+			return null;
+		}
+		
+		/**
+		 * @param keyProvider
+		 * @param optionName
+		 * @param class1
+		 * @return
+		 */
+		@SuppressWarnings("unchecked")
+		private static <T> T getField(Class<? extends KeyProvider> keyProvider,
+			String name, Class<T> clazz) {
+			try {
+				Field field = keyProvider.getField(name);
+				if (field != null) {
+					Object fieldValue = field.get(keyProvider);
+					if (fieldValue.getClass().isAssignableFrom(clazz)) { return (T) fieldValue; }
+				}
+			} catch (Exception e) {
+			}
+			return null;
+		}
+		
+		/**
+		 * Checks the given {@link KeyProvider} for a {@link Field} of the given
+		 * name and if such a {@link Field} exists, it tries to get the associated
+		 * value. If this is successful it then checks whether this {@link Field}'s
+		 * value is an instance of {@link Option}. If so, it will return this
+		 * {@link Option}. Otherwise null is returned.
+		 * 
+		 * @param keyProvider
+		 *        The {@link KeyProvider} in which an {@link Option} is searched.
+		 * @param optionName
+		 *        The name of the desired {@link Option}, i.e., the name of a
+		 *        {@link Field} variable that is an instance of {@link Option}.
+		 * @return an instance of {@link Option} with the given name from the given
+		 *         {@link KeyProvider} class or null if no such {@link Field} exists
+		 *         in this {@link KeyProvider}.
+		 */
+		public static Option<?> getOption(Class<? extends KeyProvider> keyProvider,
+			String optionName) {
+			return getField(keyProvider, optionName, Option.class);
+		}
+		
+		/**
+		 * 
+		 * @param keyProvider
+		 * @param optionGroupName
+		 * @return
+		 * @see #getOption(Class, String)
+		 */
+		public static OptionGroup<?> getOptionGroup(
+			Class<? extends KeyProvider> keyProvider, String optionGroupName) {
+			return getField(keyProvider, optionGroupName, OptionGroup.class);
+		}
+		
+		/**
+		 * Returns an {@link Iterator} over all {@link Option} instances defined by
+		 * the given {@link KeyProvider}.
+		 * 
+		 * @param keyProvider
+		 * @return
+		 */
+		public static <T> Iterator<T> iterator(
+			final Class<? extends KeyProvider> keyProvider,
+			final Class<? extends T> clazz) {
+			return new Iterator<T>() {
+				
+				private int i = -1;
+				
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see java.util.Iterator#hasNext()
+				 */
+				public boolean hasNext() {
+					try {
+						return getField(keyProvider, clazz, i + 1) != null;
+					} catch (ArrayIndexOutOfBoundsException exc) {
+						return false;
+					}
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see java.util.Iterator#next()
+				 */
+				public T next() {
+					Entry<? extends T> entry = getField(keyProvider, clazz, ++i);
+					if (entry == null) {
+						i = keyProvider.getFields().length;
+						return null;
+					}
+					i = entry.getIndex();
+					return entry.getElement();
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see java.util.Iterator#remove()
+				 */
+				public void remove() {
+					throw new IllegalAccessError();
+				}
+			};
+		}
+		
+		/**
+		 * 
+		 * @param <T>
+		 * @param keyProvider
+		 * @param clazz
+		 * @return
+		 */
+		public static <T> List<T> list(Class<? extends KeyProvider> keyProvider,
+			Class<T> clazz) {
+			List<T> optionList = new LinkedList<T>();
+			for (Iterator<T> iterator = iterator(keyProvider, clazz); iterator
+					.hasNext();) {
+				optionList.add(iterator.next());
+			}
+			return optionList;
+		}
+		
+		/**
+		 * 
+		 * @param keyProvider
+		 * @return
+		 */
+		@SuppressWarnings("unchecked")
+		public static Iterator<OptionGroup> optionGroupIterator(
+			final Class<? extends KeyProvider> keyProvider) {
+			return iterator(keyProvider, OptionGroup.class);
+		}
+		
+		/**
+		 * 
+		 * @param keyProvider
+		 * @return
+		 */
+		@SuppressWarnings("unchecked")
+		public static List<OptionGroup> optionGroupList(
+			Class<? extends KeyProvider> keyProvider) {
+			return list(keyProvider, OptionGroup.class);
+		}
+		
+		/**
+		 * 
+		 * @param keyProvider
+		 * @return
+		 */
+		@SuppressWarnings("unchecked")
+		public static Iterator<Option> optionIterator(
+			final Class<? extends KeyProvider> keyProvider) {
+			return iterator(keyProvider, Option.class);
+		}
+		
+		/**
+		 * 
+		 * @param keyProvider
+		 * @return
+		 */
+		@SuppressWarnings("unchecked")
+		public static List<Option> optionList(
+			Class<? extends KeyProvider> keyProvider) {
+			return list(keyProvider, Option.class);
+		}
+		
+		/**
 		 * 
 		 * @param sb
 		 * @param options
@@ -253,149 +449,6 @@ public interface KeyProvider {
 				}
 			}
 			sb.append("    </table>\n");
-		}
-		
-		/**
-		 * This tries to obtain the next element of the desired {@link Class}.
-		 * 
-		 * @param <T>
-		 *        The type of the desired element
-		 * @param keyProvider
-		 *        The {@link KeyProvider} holding the keys
-		 * @param clazz
-		 *        The class of the desired element.
-		 * @param n
-		 *        The index of the element to get.
-		 * @return null if no such element exists or the desired element.
-		 */
-		@SuppressWarnings("unchecked")
-		public static <T> Entry<T> getField(
-			Class<? extends KeyProvider> keyProvider, Class<T> clazz, int n) {
-			Field fields[] = keyProvider.getFields();
-			Object fieldValue;
-			for (; n < fields.length; n++) {
-				try {
-					fieldValue = fields[n].get(keyProvider);
-					if (fieldValue.getClass().isAssignableFrom(clazz)) { return new Entry<T>(
-						n, (T) fieldValue); }
-				} catch (Exception exc) {
-				}
-			}
-			return null;
-		}
-		
-		/**
-		 * 
-		 * @param keyProvider
-		 * @return
-		 */
-		@SuppressWarnings("unchecked")
-		public static Iterator<Option> optionIterator(
-			final Class<? extends KeyProvider> keyProvider) {
-			return iterator(keyProvider, Option.class);
-		}
-		
-		/**
-		 * 
-		 * @param keyProvider
-		 * @return
-		 */
-		@SuppressWarnings("unchecked")
-		public static Iterator<OptionGroup> optionGroupIterator(
-			final Class<? extends KeyProvider> keyProvider) {
-			return iterator(keyProvider, OptionGroup.class);
-		}
-		
-		/**
-		 * Returns an {@link Iterator} over all {@link Option} instances defined by
-		 * the given {@link KeyProvider}.
-		 * 
-		 * @param keyProvider
-		 * @return
-		 */
-		public static <T> Iterator<T> iterator(
-			final Class<? extends KeyProvider> keyProvider,
-			final Class<? extends T> clazz) {
-			return new Iterator<T>() {
-				
-				private int i = -1;
-				
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see java.util.Iterator#hasNext()
-				 */
-				public boolean hasNext() {
-					try {
-						return getField(keyProvider, clazz, i + 1) != null;
-					} catch (ArrayIndexOutOfBoundsException exc) {
-						return false;
-					}
-				}
-				
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see java.util.Iterator#next()
-				 */
-				public T next() {
-					Entry<? extends T> entry = getField(keyProvider, clazz, ++i);
-					if (entry == null) {
-						i = keyProvider.getFields().length;
-						return null;
-					}
-					i = entry.getIndex();
-					return entry.getElement();
-				}
-				
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see java.util.Iterator#remove()
-				 */
-				public void remove() {
-					throw new IllegalAccessError();
-				}
-			};
-		}
-		
-		/**
-		 * 
-		 * @param keyProvider
-		 * @return
-		 */
-		@SuppressWarnings("unchecked")
-		public static List<Option> optionList(
-			Class<? extends KeyProvider> keyProvider) {
-			return list(keyProvider, Option.class);
-		}
-		
-		/**
-		 * 
-		 * @param keyProvider
-		 * @return
-		 */
-		@SuppressWarnings("unchecked")
-		public static List<OptionGroup> optionGroupList(
-			Class<? extends KeyProvider> keyProvider) {
-			return list(keyProvider, OptionGroup.class);
-		}
-		
-		/**
-		 * 
-		 * @param <T>
-		 * @param keyProvider
-		 * @param clazz
-		 * @return
-		 */
-		public static <T> List<T> list(Class<? extends KeyProvider> keyProvider,
-			Class<T> clazz) {
-			List<T> optionList = new LinkedList<T>();
-			for (Iterator<T> iterator = iterator(keyProvider, clazz); iterator
-					.hasNext();) {
-				optionList.add(iterator.next());
-			}
-			return optionList;
 		}
 	}
 	
