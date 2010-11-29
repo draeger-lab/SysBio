@@ -4,11 +4,9 @@
 package de.zbit.gui;
 
 import java.awt.Component;
+import java.io.File;
 import java.net.URL;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import de.zbit.util.prefs.KeyProvider;
@@ -45,37 +43,61 @@ public class BaseGUI extends BaseFrame {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#additionalEditMenuItems()
+	 * @see de.zbit.gui.BaseFrame#exit()
+	 */
+	public void exit() {
+		System.exit(0);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#createJToolBar()
 	 */
 	@Override
-	protected JMenuItem[] additionalEditMenuItems() {
+	protected JToolBar createJToolBar() {
+		return createDefaultToolBar();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#createMainComponent()
+	 */
+	@Override
+	protected Component createMainComponent() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#additionalFileMenuItems()
+	 * @see de.zbit.gui.BaseFrame#getCommandLineOptions()
 	 */
 	@Override
-	protected JMenuItem[] additionalFileMenuItems() {
+	public Class<? extends KeyProvider>[] getCommandLineOptions() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#additionalHelpMenuItems()
+	 * @see de.zbit.gui.BaseFrame#getURLAboutMessage()
 	 */
 	@Override
-	protected JMenuItem[] additionalHelpMenuItems() {
+	public URL getURLAboutMessage() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#additionalMenus()
+	 * @see de.zbit.gui.BaseFrame#getURLLicense()
 	 */
 	@Override
-	protected JMenu[] additionalMenus() {
+	public URL getURLLicense() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getURLOnlineHelp()
+	 */
+	@Override
+	public URL getURLOnlineHelp() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -90,78 +112,21 @@ public class BaseGUI extends BaseFrame {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#createJToolBar()
-	 */
-	protected JToolBar createJToolBar() {
-		return createDefaultToolBar();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#createMainComponent()
-	 */
-	protected Component createMainComponent() {
-		return new JPanel();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#exit()
-	 */
-	public void exit() {
-		System.exit(0);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#getCommandLineOptions()
-	 */
-	@Override
-	public Class<? extends KeyProvider>[] getCommandLineOptions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#getAboutMessageLocation()
-	 */
-	@Override
-	public URL getURLAboutMessage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#getLicenseURL()
-	 */
-	@Override
-	public URL getURLLicense() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#getOnlineHelpLocation()
-	 */
-	@Override
-	public URL getURLOnlineHelp() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#openFile()
 	 */
 	@Override
-	public void openFile() {
+	public File openFile() {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#saveFile()
 	 */
 	@Override
-	public void saveFile() {
+	public File saveFile() {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 	
 }

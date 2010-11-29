@@ -147,8 +147,6 @@ public abstract class BaseFrame extends JFrame {
 	private static final long serialVersionUID = -6533854985804740883L;
 	
 	static {
-		// speed up the GUI by loading the preferences classes at the beginning.
-		MultiplePreferencesPanel.getClasses();
 		GUITools.initLaF(APPLICATION_NAME);
 	}
 	
@@ -263,6 +261,9 @@ public abstract class BaseFrame extends JFrame {
 				if (item != null) {
 					try {
 						action = BaseAction.valueOf(item.getActionCommand());
+						if (action == BaseAction.EXIT) {
+							action = null;
+						}
 					} catch (Throwable exc) {
 						action = null;
 					}
@@ -337,8 +338,14 @@ public abstract class BaseFrame extends JFrame {
 			UIManager.getIcon("ICON_PREFS_16"), KeyStroke.getKeyStroke('E',
 				InputEvent.ALT_GRAPH_DOWN_MASK), 'P', true);
 		JMenuItem items[] = additionalEditMenuItems();
-		menuBar.add(GUITools.createJMenu("Edit", items, (items != null)
-				&& (items.length > 0) ? new JSeparator() : null, preferences));
+		// Speed up the GUI by loading the preferences classes at the beginning
+		// and add this menu only if there is at least one preference panel defined.
+		int numPrefs = MultiplePreferencesPanel.getClasses().length;
+		if ((numPrefs > 2) || ((items != null) && (items.length > 0))) {
+			menuBar.add(GUITools.createJMenu("Edit", items, (items != null)
+					&& (items.length > 0) && (numPrefs > 0) ? new JSeparator() : null,
+				numPrefs > 0 ? preferences : null));
+		}
 		
 		/*
 		 * Additional menus
@@ -359,20 +366,31 @@ public abstract class BaseFrame extends JFrame {
 			ActionListener.class, this, "showOnlineHelp"), BaseAction.ONLINE_HELP,
 			UIManager.getIcon("ICON_HELP_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F1,
 				0), 'H', true);
+		if (getURLOnlineHelp() == null) {
+			help = null;
+		}
 		JMenuItem about = GUITools.createJMenuItem(EventHandler.create(
 			ActionListener.class, this, "showAboutMessage"), BaseAction.HELP_ABOUT,
 			UIManager.getIcon("ICON_INFO_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F2,
 				0), 'I', true);
+		if (getURLAboutMessage() == null) {
+			about = null;
+		}
 		JMenuItem license = GUITools.createJMenuItem(EventHandler.create(
 			ActionListener.class, this, "showLicense"), BaseAction.HELP_LICENSE,
 			UIManager.getIcon("ICON_LICENSE_16"), KeyStroke.getKeyStroke(
 				KeyEvent.VK_F3, 0), 'L', true);
+		if (getURLLicense() == null) {
+			license = null;
+		}
 		JMenu helpMenu = GUITools.createJMenu("Help", help, about, license,
 			additionalHelpMenuItems());
-		try {
-			menuBar.setHelpMenu(helpMenu);
-		} catch (Error exc) {
-			menuBar.add(helpMenu);
+		if (helpMenu.getItemCount() > 0) {
+			try {
+				menuBar.setHelpMenu(helpMenu);
+			} catch (Error exc) {
+				menuBar.add(helpMenu);
+			}
 		}
 		
 		return menuBar;
@@ -394,6 +412,7 @@ public abstract class BaseFrame extends JFrame {
 	/**
 	 * Method that is called on exit, i.e.,when this window is closing.
 	 */
+	
 	public abstract void exit();
 	
 	/**
@@ -419,7 +438,7 @@ public abstract class BaseFrame extends JFrame {
 	/**
 	 * 
 	 */
-	public void init() {
+	protected void init() {
 		
 		// init GUI
 		// Do nothing is important! The actual closing is handled in "windowClosing()"
@@ -436,7 +455,10 @@ public abstract class BaseFrame extends JFrame {
 		if (toolBar != null) {
 			container.add(toolBar, BorderLayout.NORTH);
 		}
-		container.add(createMainComponent(), BorderLayout.CENTER);
+		Component component = createMainComponent();
+		if (component != null) {
+			container.add(component, BorderLayout.CENTER);
+		}
 		
 		pack();
 		setMinimumSize(new Dimension(640, 480));
@@ -446,8 +468,9 @@ public abstract class BaseFrame extends JFrame {
 	/**
 	 * Opens some {@link File}.
 	 * 
+	 * @return
 	 */
-	public abstract void openFile();
+	public abstract File openFile();
 	
 	/**
 	 * Displays the configuration for the {@link PreferencesDialog}.
@@ -458,8 +481,10 @@ public abstract class BaseFrame extends JFrame {
 	
 	/**
 	 * Saves some {@link File}.
+	 * 
+	 * @return
 	 */
-	public abstract void saveFile();
+	public abstract File saveFile();
 	
 	/**
 	 * 
