@@ -47,7 +47,7 @@ public class ImageTools {
 			File dir = new File(directory.toURI());
 			if (dir.canRead() && dir.isDirectory()) {
 				String key;
-				for (File file : dir.listFiles(SBFileFilter.IMAGE_FILE_FILTER)) {
+				for (File file : dir.listFiles(SBFileFilter.createImageFileFilter())) {
 					key = file.getName().substring(0,
 							file.getName().lastIndexOf('.'));
 					try {

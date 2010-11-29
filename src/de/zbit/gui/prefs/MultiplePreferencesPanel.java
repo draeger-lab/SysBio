@@ -40,7 +40,14 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	/**
 	 * Generated serial version identifier.
 	 */
-	private static final long serialVersionUID = 3189416350182046246L;;
+	private static final long serialVersionUID = 3189416350182046246L;
+
+	/**
+	 * @return the classes
+	 */
+	public static Class<PreferencesPanel>[] getClasses() {
+		return classes;
+	};
 
 	/**
 	 * Needed to structure this {@link PreferencesPanel}.
@@ -147,7 +154,6 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * 
 	 * @see de.zbit.gui.cfg.PreferencesPanel#init()
 	 */
-	@Override
 	public void init() {
 		tab = new JTabbedPane();
 		PreferencesPanel settingsPanel;

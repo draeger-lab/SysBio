@@ -42,14 +42,14 @@ public interface GUIOptions extends KeyProvider {
 	 */
 	public static final Option<File> OPEN_DIR = new Option<File>("OPEN_DIR",
 		File.class, "Standard directory where user files can be found.",
-		new Range<File>(File.class, SBFileFilter.DIRECTORY_FILTER), new File(System
+		new Range<File>(File.class, SBFileFilter.createDirectoryFilter()), new File(System
 				.getProperty("user.dir")));
 	/**
 	 * Standard directory where the user may save some files.
 	 */
 	public static final Option<File> SAVE_DIR = new Option<File>("SAVE_DIR",
 		File.class, "Standard directory where the user may save some files.",
-		new Range<File>(File.class, SBFileFilter.DIRECTORY_FILTER), new File(System
+		new Range<File>(File.class, SBFileFilter.createDirectoryFilter()), new File(System
 				.getProperty("user.dir")));
 	/**
 	 * Define the default directories to open and save files. These directories

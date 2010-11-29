@@ -93,84 +93,6 @@ public class SBFileFilter extends GeneralFileFilter {
 	 */
 
 	/**
-	 * The {@link FileFilter} for all files.
-	 */
-	public final static GeneralFileFilter ALL_FILE_FILTER = new SBFileFilter(
-		(new JFileChooser()).getAcceptAllFileFilter());
-	
-	/**
-	 * A filter for CSV files
-	 */
-	public static SBFileFilter CSV_FILE_FILTER = new SBFileFilter(
-		FileType.CSV_FILES);
-	
-	/**
-	 * A filter for directories only.
-	 */
-	public static SBFileFilter DIRECTORY_FILTER = new SBFileFilter(
-		FileType.DIRECTORIES_ONLY);
-	
-	public static final SBFileFilter GIF_FILE_FILTER = new SBFileFilter(
-		FileType.GIF_FILES);
-	
-	public static final SBFileFilter GML_FILE_FILTER = new SBFileFilter(
-		FileType.GML_FILES);
-	
-	public static final SBFileFilter GRAPHML_FILE_FILTER = new SBFileFilter(
-		FileType.GRAPHML_FILES);
-	
-	/**
-	 * 
-	 */
-	public static final FileFilter HTML_FILE_FILTER = new SBFileFilter(
-		FileType.HTML_FILES);
-	
-	/**
-	 * A filter for joint picture expert group files.
-	 */
-	public static SBFileFilter JPEG_FILE_FILTER = new SBFileFilter(
-		FileType.JPEG_FILES);
-	
-	/**
-	 * A filter for PDF files.
-	 */
-	public static final SBFileFilter PDF_FILE_FILTER = new SBFileFilter(
-		FileType.PDF_FILES);
-	
-	/**
-	 * A filter for portable network graphic files.
-	 */
-	public static SBFileFilter PNG_FILE_FILTER = new SBFileFilter(
-		FileType.PNG_FILES);
-	/**
-	 * A filter for SBML files
-	 */
-	public static final SBFileFilter SBML_FILE_FILTER = new SBFileFilter(
-		FileType.SBML_FILES);
-	/**
-	 * A filter for TeX files
-	 */
-	public static final SBFileFilter TeX_FILE_FILTER = new SBFileFilter(
-		FileType.TeX_FILES);
-	/**
-	 * A filter for Text files.
-	 */
-	public static final SBFileFilter TEXT_FILE_FILTER = new SBFileFilter(
-		FileType.TEXT_FILES);
-	
-	public static final SBFileFilter TGF_FILE_FILTER = new SBFileFilter(
-		FileType.TGF_FILES);
-	
-	public static final SBFileFilter YGF_FILE_FILTER = new SBFileFilter(
-		FileType.YGF_FILES);
-	/**
-	 * Filter for any kind of image file supported by this class.
-	 */
-	public static final MultipleFileFilter IMAGE_FILE_FILTER = new MultipleFileFilter(
-		"image files (*.jpg, *.png, *.gif)", SBFileFilter.JPEG_FILE_FILTER,
-		SBFileFilter.PNG_FILE_FILTER, SBFileFilter.GIF_FILE_FILTER);
-	
-	/**
 	 * 
 	 * @param f
 	 * @param extension
@@ -179,6 +101,125 @@ public class SBFileFilter extends GeneralFileFilter {
 	public static boolean checkExtension(File f, String extension) {
 		if (!extension.startsWith(".")) extension = "." + extension;
 		return f.getName().toLowerCase().endsWith(extension.toLowerCase());
+	}
+	
+	/**
+	 * The {@link FileFilter} for all files.
+	 */
+	public final static GeneralFileFilter createAllFileFilter() {
+		return new SBFileFilter((new JFileChooser()).getAcceptAllFileFilter());
+	}
+	
+	/**
+	 * A filter for CSV files
+	 */
+	public static SBFileFilter createCSVFileFilter() {
+		return new SBFileFilter(FileType.CSV_FILES);
+	}
+	
+	/**
+	 * A filter for directories only.
+	 */
+	public static SBFileFilter createDirectoryFilter() {
+		return new SBFileFilter(FileType.DIRECTORIES_ONLY);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static final SBFileFilter createGIFFileFilter() {
+		return new SBFileFilter(FileType.GIF_FILES);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static final SBFileFilter createGMLFileFilter() {
+		return new SBFileFilter(FileType.GML_FILES);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static final SBFileFilter createGraphMLFileFilter() {
+		return new SBFileFilter(FileType.GRAPHML_FILES);
+	}
+	
+	/**
+	 * 
+	 */
+	public static final FileFilter createHTMLFileFilter() {
+		return new SBFileFilter(FileType.HTML_FILES);
+	}
+	
+	/**
+	 * Filter for any kind of image file supported by this class.
+	 */
+	public static final MultipleFileFilter createImageFileFilter() {
+		return new MultipleFileFilter("image files (*.jpg, *.png, *.gif)",
+			SBFileFilter.createJPEGFileFilter(), SBFileFilter.createPNGFileFilter(),
+			SBFileFilter.createGIFFileFilter());
+	}
+	
+	/**
+	 * A filter for joint picture expert group files.
+	 */
+	public static SBFileFilter createJPEGFileFilter() {
+		return new SBFileFilter(FileType.JPEG_FILES);
+	}
+	
+	/**
+	 * A filter for PDF files.
+	 */
+	public static final SBFileFilter createPDFFileFilter() {
+		return new SBFileFilter(FileType.PDF_FILES);
+	}
+	
+	/**
+	 * A filter for portable network graphic files.
+	 */
+	public static SBFileFilter createPNGFileFilter() {
+		return new SBFileFilter(FileType.PNG_FILES);
+	}
+	
+	/**
+	 * A filter for SBML files
+	 */
+	public static final SBFileFilter createSBMLFileFilter() {
+		return new SBFileFilter(FileType.SBML_FILES);
+	}
+	
+	/**
+	 * A filter for TeX files
+	 */
+	public static final SBFileFilter createTeXFileFilter() {
+		return new SBFileFilter(FileType.TeX_FILES);
+	}
+	
+	/**
+	 * A filter for Text files.
+	 */
+	public static final SBFileFilter createTextFileFilter() {
+		return new SBFileFilter(FileType.TEXT_FILES);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static final SBFileFilter createTGFFileFilter() {
+		return new SBFileFilter(FileType.TGF_FILES);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static final SBFileFilter createYGFFileFilter() {
+		return new SBFileFilter(FileType.YGF_FILES);
 	}
 	
 	/**

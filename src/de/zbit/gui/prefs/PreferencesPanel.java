@@ -405,7 +405,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 					&& (option.getRange().getConstraints() instanceof GeneralFileFilter)) {
 				GeneralFileFilter filter = (GeneralFileFilter) option.getRange()
 						.getConstraints();
-				if (filter == SBFileFilter.DIRECTORY_FILTER) {
+				if (filter == SBFileFilter.createDirectoryFilter()) {
 					isDirectory = true;
 				}
 				jc = new FileSelector(ty, defPath, isDirectory, new GeneralFileFilter[] {filter});
@@ -716,19 +716,20 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	}
 
 
-  /**
-   * Attempts to set the new value of the changed element in this panel's
-   * properties. To this end, it is required that the name property is set for
-   * each graphical component that may change.
-   * 
-   * This static method may be used by all methods using elements from
-   * {@link #getJComponentForOption(Option)} (and similar) to change the
-   * respective properties.
-   * 
-   * @param properties - should be either SBPrerences or SBProperties.
-   * @param source
-   *            The element whose value has been changed (e.g. in events,
-   *            this should be e.getSource()).
+	/**
+	 * Attempts to set the new value of the changed element in this panel's
+	 * properties. To this end, it is required that the name property is set for
+	 * each graphical component that may change.
+	 * 
+	 * This static method may be used by all methods using elements from
+	 * {@link #getJComponentForOption(Option)} (and similar) to change the
+	 * respective properties.
+	 * 
+	 * @param properties
+	 *        - should be either {@link SBPreferences} or {@link SBProperties}.
+	 * @param source
+	 *        The element whose value has been changed (e.g., in events, this
+	 *        should be e.getSource()).
 	 * 
 	 */
 	public static void setProperty(Map<Object, Object> properties, Object source) {

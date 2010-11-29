@@ -743,39 +743,77 @@ public class SBPreferences implements Map<Object, Object> {
 	public boolean checkPrefs() throws BackingStoreException {
 		Iterator<Option> iterator = optionIterator();
 		Option<?> option;
-		Object value;
 		while (iterator.hasNext()) {
 			option = iterator.next();
-			if (containsKey(option)) {
-				value = get(option);
-				if (value == null) { throw new BackingStoreException(String.format(
-					"Could not determine value belonging to option %s.", option)); }
-				if (option.isSetRangeSpecification()
-						&& !option.getRange().castAndCheckIsInRange(get(option))) { throw new BackingStoreException(
-					String.format(
-								"The value %s for option \"%s\" is out of range. Please select a value that satisfies the following constraint: %s.",
-								value, option.formatOptionName(), (option.getRange()
-										.isSetConstraints() ? ((GeneralFileFilter) option
-										.getRange().getConstraints()).getDescription() : option
-										.getRangeSpecifiaction()))); }
-				if (option.parseOrCast(value) == null) { throw new BackingStoreException(
-					String.format(
-								"The value of option %s is of invalid type. Please specify an instance of %s.",
-								option, option.getRequiredType().getSimpleName())); }
-			}
+			checkPref(option);
 		}
 		return true;
 	}
 	
+	/**
+	 * Checks whether this instance of {@link SBPreferences} contains the given
+	 * {@link Option} as a key and if its associated value satisfies all
+	 * {@link Range} constraints.
+	 * 
+	 * @param option
+	 *        The option which is to be checked and whose associated value is to
+	 *        be checked.
+	 * @return true if this instance of {@link SBPreferences} contains the given
+	 *         option and if the value belonging to this option is valid with
+	 *         respect to given constraints stored in a {@link Range} object
+	 *         associated to the {@link Option}. Returns false if this option is
+	 *         not contained as a key in this {@link SBPreferences}.
+	 * @throws BackingStoreException
+	 *         If this object contains the given option but its associated value
+	 *         does not satisfy the given {@link Range} if there is any.
+	 */
+	public boolean checkPref(Option<?> option) throws BackingStoreException {
+		if (containsKey(option)) {
+			Object value = get(option);
+			if (value == null) { throw new BackingStoreException(String.format(
+				"Could not determine value belonging to option %s.", option)); }
+			if (option.isSetRangeSpecification()
+					&& !option.getRange().castAndCheckIsInRange(get(option))) { throw new BackingStoreException(
+				String.format(
+							"The value %s for option \"%s\" is out of range. Please select a value that satisfies the following constraint: %s.",
+							value, option.formatOptionName(), (option.getRange()
+									.isSetConstraints() ? ((GeneralFileFilter) option
+									.getRange().getConstraints()).getDescription() : option
+									.getRangeSpecifiaction()))); }
+			if (option.parseOrCast(value) == null) { throw new BackingStoreException(
+				String.format(
+							"The value of option %s is of invalid type. Please specify an instance of %s.",
+							option, option.getRequiredType().getSimpleName())); }
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Removes all those key-value pairs from the user's configuration, for which
 	 * no default values are defined.
 	 */
 	public void cleanUserPrefs() {
 		String keys[] = keys();
+		Object value;
+		boolean remove;
 		for (int i = keys.length - 1; i >= 0; i--) {
+			remove = false;
 			if (!defaults.containsKey(keys[i])) {
-				remove(keys[i]);
+				remove = true;
+			} else {
+				try {
+					if (!checkPref(KeyProvider.Tools.getOption(keyProvider, keys[i]))) {
+						remove = true;
+					}
+				} catch (BackingStoreException exc) {
+					remove = true;
+				}
+			}
+			if (remove) {
+				value = remove(keys[i]);
+				System.err.printf("Removing invalid key-value pair %s:%s\n", keys[i],
+					value == null ? "null" : value.toString());
 			}
 		}
 	}

@@ -53,8 +53,9 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public void init() {
-		if (provider==null) return;
-		autoBuildPanel();
+		if (provider != null) {
+			autoBuildPanel();
+		}
 	}
 	
 	/* (non-Javadoc)
