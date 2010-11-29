@@ -18,6 +18,7 @@ import java.io.File;
 import java.net.URL;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -269,8 +270,10 @@ public abstract class BaseFrame extends JFrame {
 					}
 					if ((item.getIcon() != null) && (action != null)
 							&& (item.getActionListeners().length > 0)) {
-						toolBar.add(GUITools.createButton(item.getIcon(), item
-								.getActionListeners()[0], action, action.getToolTip()));
+						JButton button = GUITools.createButton(item.getIcon(), item
+								.getActionListeners()[0], action, action.getToolTip());
+						button.setEnabled(item.isEnabled());
+						toolBar.add(button);
 					}
 				}
 			}
