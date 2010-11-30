@@ -478,7 +478,7 @@ public abstract class BaseFrame extends JFrame {
 	/**
 	 * Displays the configuration for the {@link PreferencesDialog}.
 	 */
-	public final void preferences() {
+	public void preferences() {
 		PreferencesDialog.showPreferencesDialog();
 	}
 	

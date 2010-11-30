@@ -31,26 +31,17 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 		initializePrefPanel();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#accepts(java.lang.Object)
-	 */
 	@Override
 	public boolean accepts(Object key) {
 		return preferences.keySetFull().contains(key);
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#getTitle()
-	 */
 	@Override
 	public String getTitle() {
 		return KeyProvider.Tools.createTitle(provider);
 		//StringUtil.formatOptionName(provider.getSimpleName());
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#init()
-	 */
 	@Override
 	public void init() {
 		if (provider != null) {
@@ -58,9 +49,6 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#loadPreferences()
-	 */
 	@Override
 	protected SBPreferences loadPreferences() throws IOException {
 		if (provider==null) return null;
