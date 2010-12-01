@@ -1,7 +1,3 @@
-/**
- *
- * @author wrzodek
- */
 package de.zbit.gui;
 
 import java.awt.BorderLayout;
@@ -815,6 +811,7 @@ public class JColumnChooser extends JPanel {
         tf =CSVReaderOptionPanel.buildIntegerBox(Integer.toString(defaultValue), l);
       } else {
       	tf = new JTextField(defaultValue);
+      	tf.setColumns(30);
       	tf.addActionListener(l);
       }
       ret = tf;

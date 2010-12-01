@@ -492,6 +492,11 @@ public class Range<Type> {
    * @return String
    */
   public static <Type> String toRangeString(List<Type> acceptedObjects) {
+    String s = "{" + StringUtil.implode(
+              acceptedObjects
+//              StringUtil.addPrefixAndSuffix(acceptedObjects, "\"", "\"")
+              , ",") + "}";
+    System.out.println(s);
     return "{" + StringUtil.implode(
       StringUtil.addPrefixAndSuffix(acceptedObjects, "\"", "\"")
       , ",") + "}";

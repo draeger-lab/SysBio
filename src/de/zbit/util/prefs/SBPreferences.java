@@ -775,7 +775,7 @@ public class SBPreferences implements Map<Object, Object> {
 			if (option.isSetRangeSpecification()
 					&& !option.getRange().castAndCheckIsInRange(get(option))) { throw new BackingStoreException(
 				String.format(
-							"The value %s for option \"%s\" is out of range. Please select a value that satisfies the following constraint: %s.",
+							"The value \"%s\" for option \"%s\" is out of range. Please select a value that satisfies the following constraint: %s",
 							value, option.formatOptionName(), (option.getRange()
 									.isSetConstraints() ? ((GeneralFileFilter) option
 									.getRange().getConstraints()).getDescription() : option

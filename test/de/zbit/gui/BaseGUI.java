@@ -128,5 +128,14 @@ public class BaseGUI extends BaseFrame {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+  /* (non-Javadoc)
+   * @see de.zbit.gui.BaseFrame#getTitle()
+   */
+  @Override
+  public String getTitle() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 	
 }
