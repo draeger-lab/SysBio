@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
@@ -101,7 +100,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	/**
 	 * Stores a (sorted) {@link List} of all {@link OptionGroup}s belonging to this class.
 	 */
-	List<OptionGroup<?>> optionGroups;
+	@SuppressWarnings("unchecked")
+  List<OptionGroup> optionGroups;
 
 	/**
 	 * These are the persistently saved user-preferences of which some ore all
@@ -132,7 +132,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	}
 
 	/**
-	 * If you decidie not to initialize the panel imideately, you HAVE TO
+	 * If you decide not to initialize the panel imideately, you HAVE TO
 	 * call {@link #initializePrefPanel()} in the calling constructor.
 	 * @param init_Panel
 	 * @throws IOException
@@ -302,19 +302,19 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @param option
 	 * @return
 	 */
-	public static JComponent getJComponentForOption(Option<?> option) {
-	  return getJComponentForOption(option, null, null);
+	public JComponent getJComponentForOption(Option<?> option) {
+	  return getJComponentForOption(option, preferences, this);
 	}
 	
 	/**
 	 * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener, KeyListener)
 	 * @param option
-	 * @param preferences
+	 * @param prefs
 	 * @param l
 	 * @return
 	 */
-	public static JComponent getJComponentForOption(Option<?> option, SBPreferences preferences, EventListener l) {
-	  Object def = preferences!=null?option.getValue(preferences):null;
+	public JComponent getJComponentForOption(Option<?> option, SBPreferences prefs, EventListener l) {
+	  Object def = prefs != null ? option.getValue(prefs) : null;
 	  return getJComponentForOption(option, def, l);
 	}
 	
@@ -325,7 +325,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @param l
 	 * @return
 	 */
-	public static JComponent getJComponentForOption(Option<?> option, Object def, EventListener l) {
+	public JComponent getJComponentForOption(Option<?> option, Object def, EventListener l) {
 	  return getJComponentForOption(option, def, 
 	    (l instanceof ItemListener?(ItemListener)l:null),
 	    (l instanceof ChangeListener?(ChangeListener)l:null),
@@ -345,15 +345,17 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * 
    * @param option
    *            - option to build the JComponent for.
-   * @param def - default value (should be same class as the "?" in Option<?> (optional)
-   * @param il - ItemListener (optional)
-   * @param cl - ChangeListener (optional)
-   * @param kl - KeyListener (optional)
+   * @param defaultValue - default value (should be same class as the "?" in Option<?> (optional)
+   * @param itemListener - ItemListener (optional)
+   * @param changeListener - ChangeListener (optional)
+   * @param keyListener - KeyListener (optional)
    * @return JComponent or NULL if the getRequiredType() is unknown.
    */
-	public static JComponent getJComponentForOption(Option<?> option, Object def, ItemListener il, ChangeListener cl, KeyListener kl) {
+	public static JComponent getJComponentForOption(Option<?> option, Object defaultValue,
+            ItemListener itemListener, ChangeListener changeListener,
+            KeyListener keyListener) {
 		// Create swing option based on field type
-		JComponent jc = null;
+		JComponent component = null;
 		String optionTitle = option.formatOptionName();
 		
 		// If a range is specified, get all possible values.
@@ -370,14 +372,14 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		}
 		
     // Get default value
-    String defPath=null;
+    String defPath = null;
     //Object def = preferences!=null?option.getValue(preferences):null;
     
 		// TODO: Group, test, and accept automatically
 		Class<?> clazz = option.getRequiredType();
 		if (Boolean.class.isAssignableFrom(clazz)) {
-			jc = new JCheckBox();
-			if (def!=null) ((AbstractButton) jc).setSelected((Boolean) def);
+			component = new JCheckBox();
+			if (defaultValue!=null) ((AbstractButton) component).setSelected((Boolean) defaultValue);
 			
 			//((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
 			//		.get(o.getOptionName()).toString()));
@@ -391,12 +393,12 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			}
 			
       // Get default value
-			if (def == null) {
+			if (defaultValue == null) {
 				defPath = null;
-			} else if (def instanceof File) {
-				defPath = ((File) def).getPath();
+			} else if (defaultValue instanceof File) {
+				defPath = ((File) defaultValue).getPath();
 			} else {
-				defPath = def.toString();
+				defPath = defaultValue.toString();
 			}
 			
 			boolean isDirectory = false;
@@ -408,57 +410,59 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				if (filter == SBFileFilter.createDirectoryFilter()) {
 					isDirectory = true;
 				}
-				jc = new FileSelector(ty, defPath, isDirectory, new GeneralFileFilter[] {filter});
+				component = new FileSelector(ty, defPath, isDirectory, new GeneralFileFilter[] {filter});
 			} else {
-				jc = new FileSelector(ty, defPath, isDirectory, (FileFilter[]) null);
+				component = new FileSelector(ty, defPath, isDirectory, (FileFilter[]) null);
 			}
-			((FileSelector)jc).setLabelText(optionTitle);
+			((FileSelector)component).setLabelText(optionTitle);
 			
 		} else if (Character.class.isAssignableFrom(clazz)) {
-			jc = new JColumnChooser(optionTitle, true, values);
-			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
+			component = new JColumnChooser(optionTitle, true, values);
+			((JColumnChooser)component).setAcceptOnlyIntegers(false);
 			//JComponent cs = ((JColumnChooser)jc).getColumnChooser();
 			// TODO: Limit maximum size to one (don't accept inputs after that).
 			
 		} else if (String.class.isAssignableFrom(clazz)) {
-			jc = new JColumnChooser(optionTitle, true, values);
-			((JColumnChooser)jc).setAcceptOnlyIntegers(false);
+			component = new JColumnChooser(optionTitle, true, values);
+			((JColumnChooser)component).setAcceptOnlyIntegers(false);
 
 		} else if (Number.class.isAssignableFrom(clazz)) {
-			jc = new JColumnChooser(optionTitle, true, values);
+			component = new JColumnChooser(optionTitle, true, values);
 			if (!Utils.isInteger(option.getRequiredType())) {
    			// TODO: implement Box for doubles.
 				// For doulbes, we need to allow ',' and '.'.
-				((JColumnChooser)jc).setAcceptOnlyIntegers(false);
+				((JColumnChooser)component).setAcceptOnlyIntegers(false);
 			}
 		}
 
 		// Check if the option could be converted to a JComponent
-		if (jc != null) {
-			if (jc instanceof AbstractButton) {
-				((AbstractButton) jc).setText(optionTitle);
-			} else if (jc instanceof JColumnChooser) {
-				((JColumnChooser) jc).setTitle(optionTitle);
-				if (def!=null) ((JColumnChooser)jc).setDefaultValue(def.toString());
+		if (component != null) {
+			if (component instanceof AbstractButton) {
+				((AbstractButton) component).setText(optionTitle);
+			} else if (component instanceof JColumnChooser) {
+				((JColumnChooser) component).setTitle(optionTitle);
+				if (defaultValue!=null) ((JColumnChooser)component).setDefaultValue(defaultValue.toString());
 				// Remove preview and reset predefined JColumnChooser layout.
-				((JColumnChooser)jc).hidePreview();
-				((JColumnChooser)jc).setPreferredSize(null);
-				((JColumnChooser)jc).setLayout(new FlowLayout());
+				((JColumnChooser)component).hidePreview();
+				((JColumnChooser)component).setPreferredSize(null);
+				((JColumnChooser)component).setLayout(new FlowLayout());
 			}
 			
-			if (il!=null && Reflect.contains(jc, "addItemListener", ItemListener.class)) {
-				Reflect.invokeIfContains(jc, "addItemListener", ItemListener.class, il);
-			} else if (cl!=null) {
-				Reflect.invokeIfContains(jc, "addChangeListener", ChangeListener.class, cl);
+			if ((itemListener!=null) && Reflect.contains(component, "addItemListener", ItemListener.class)) {
+				Reflect.invokeIfContains(component, "addItemListener", ItemListener.class, itemListener);
+			} else if (changeListener!=null) {
+				Reflect.invokeIfContains(component, "addChangeListener", ChangeListener.class, changeListener);
 			}
-			jc.setName(option.getOptionName());
-			jc.setToolTipText(StringUtil.toHTML(option.getDescription(), 60));
-			if (kl!=null) jc.addKeyListener(kl);
+			component.setName(option.getOptionName());
+			component.setToolTipText(StringUtil.toHTML(option.getDescription(), 60));
+			if (keyListener != null) {
+        component.addKeyListener(keyListener);
+      }
 			
 			//jc.setBorder(new TitledBorder("test"));
 		}
 
-		return jc;
+		return component;
 	}
 
 	/**
@@ -661,35 +665,12 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * 
 	 */
 	void searchForOptionGroups() {
-		Object fieldValue;
-		Option<?> opt;
-		OptionGroup<?> og;
-		Class<? extends KeyProvider> keyProvider = preferences.getKeyProvider();
 		option2group = new TreeMap<Option<?>, OptionGroup<?>>();
-		optionGroups = new LinkedList<OptionGroup<?>>();
-		for (Field field : keyProvider.getDeclaredFields()) {
-			try {
-				fieldValue = field.get(keyProvider);
-				if (fieldValue instanceof OptionGroup<?>) {
-					og = (OptionGroup<?>) fieldValue;
-					for (Option<?> o : og.getOptions()) {
-						if (properties.containsKey(o)) {
-							option2group.put(o, og);
-						}
-					}
-					if (!optionGroups.contains(og)) {
-						optionGroups.add(og);
-					}
-				} else if ((fieldValue instanceof Option<?>)
-						&& properties.containsKey(fieldValue)) {
-					opt = (Option<?>) fieldValue;
-					if (!option2group.containsKey(opt)) {
-						option2group.put(opt, null);
-					}
-				}
-			} catch (Exception exc) {
-				// ignore non-static fields
-			}
+		optionGroups = KeyProvider.Tools.optionGroupList(preferences.getKeyProvider());
+		for (OptionGroup<?> group : optionGroups) {
+		  for (Option<?> option : group.getOptions()) {
+		    option2group.put(option, group);
+		  }
 		}
 	}
 

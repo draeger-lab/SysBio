@@ -550,12 +550,13 @@ public class FileSelector extends JPanel implements ActionListener {
 					file = null;
 					break;
 			}
-			
 			if (file != null) {
 				textField.setText(file.toString());
 				baseDir = file.getParent();
 	      // Notify KeyListeners of texfield change
-	      dispatchEvent(new KeyEvent(this, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED , KeyEvent.CHAR_UNDEFINED));
+        processKeyEvent(new KeyEvent(this, KeyEvent.KEY_RELEASED, System
+                  .currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED,
+                  KeyEvent.CHAR_UNDEFINED));
 			}
 		}
 	}
@@ -684,17 +685,17 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * 
 	 * @param fileSelector
 	 * @param type
-	 * @param baseDir
+	 * @param baseFileDir
 	 * @param allFilesAreAcceptable
-	 * @param filter
+	 * @param filters
 	 */
-	private void init(LayoutHelper lh, Type type, String baseDir,
-		boolean allFilesAreAcceptable, FileFilter... filter) {
+	private void init(LayoutHelper lh, Type type, String baseFileDir,
+		boolean allFilesAreAcceptable, FileFilter... filters) {
 		this.create = true;
 		this.allFilesAcceptable = allFilesAreAcceptable;
 		this.command = getCommand(type);
-		this.baseDir = baseDir != null ? baseDir : System.getProperty("user.dir");
-		this.filter = filter;
+		this.baseDir = baseFileDir != null ? baseFileDir : System.getProperty("user.dir");
+		this.filter = filters;
 		textField = new JTextField();
 		textField.setText(this.baseDir);
 		textField.setColumns(30);

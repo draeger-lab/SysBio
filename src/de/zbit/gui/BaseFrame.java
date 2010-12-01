@@ -140,24 +140,11 @@ public abstract class BaseFrame extends JFrame {
 		}
 	}
 	
-	public static String APPLICATION_NAME = "Base GUI";
-	
 	/**
 	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = -6533854985804740883L;
-	
-	static {
-		GUITools.initLaF(APPLICATION_NAME);
-	}
-	
-	/**
-	 * @return
-	 */
-	public static final String getApplicationName() {
-		return APPLICATION_NAME;
-	}
-	
+		
 	/**
 	 * A tool bar
 	 */
@@ -167,7 +154,7 @@ public abstract class BaseFrame extends JFrame {
 	 * @throws HeadlessException
 	 */
 	public BaseFrame() throws HeadlessException {
-		super(APPLICATION_NAME);
+		super();
 		init();
 	}
 	
@@ -418,6 +405,13 @@ public abstract class BaseFrame extends JFrame {
 	
 	public abstract void exit();
 	
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.Frame#getTitle()
+	 */
+	@Override
+  public abstract String getTitle();
+	
 	/**
 	 * @return
 	 */
@@ -442,6 +436,7 @@ public abstract class BaseFrame extends JFrame {
 	 * 
 	 */
 	protected void init() {
+	  GUITools.initLaF(getTitle());
 		
 		// init GUI
 		// Do nothing is important! The actual closing is handled in "windowClosing()"
@@ -467,8 +462,8 @@ public abstract class BaseFrame extends JFrame {
 		setMinimumSize(new Dimension(640, 480));
 		setLocationRelativeTo(null);
 	}
-	
-	/**
+
+  /**
 	 * Opens some {@link File}.
 	 * 
 	 * @return
@@ -510,11 +505,11 @@ public abstract class BaseFrame extends JFrame {
 	 * 
 	 */
 	public final void showOnlineHelp() {
-		GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.ONLINE_HELP);
-		JHelpBrowser.showOnlineHelp(this, EventHandler.create(WindowListener.class,
-			this, "activateOnlineHelpCommand", null, "windowClosed"),
-			getApplicationName() + " - Online Help", getURLOnlineHelp(),
-			getCommandLineOptions());
-	}
+    GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.ONLINE_HELP);
+    JHelpBrowser.showOnlineHelp(this, EventHandler.create(WindowListener.class,
+              this, "activateOnlineHelpCommand", null, "windowClosed"),
+              getTitle() + " - Online Help", getURLOnlineHelp(),
+              getCommandLineOptions());
+  }
 	
 }

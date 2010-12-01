@@ -582,41 +582,57 @@ public class StringUtil {
 	}
 	
 	/**
-	 * @param string
+	 * @param message
 	 * @param lineBreak
-	 * @param string2
+	 * @param lineBreakSymbol
 	 * @param sb
 	 */
-	public static StringBuilder insertLineBreaks(String string, int lineBreak,
+	public static String insertLineBreaks(String message, int lineBreak,
 		String lineBreakSymbol) {
-		StringBuilder sb = new StringBuilder();
-		StringTokenizer st = new StringTokenizer(string != null ? string : "", " ");
-		if (st.hasMoreElements()) {
-			sb.append(st.nextElement().toString());
-		}
-		int length = sb.length();
-		int pos;
-		while (st.hasMoreElements()) {
-			if ((length >= lineBreak) && (lineBreak < Integer.MAX_VALUE)) {
-				sb.append(lineBreakSymbol);
-				length = 0;
-			} else {
-				sb.append(' ');
-			}
-			
-			// Append current element
-			String tmp = st.nextElement().toString();
-			sb.append(tmp);
-			
-			// Change length
-			if ((pos=tmp.indexOf(lineBreakSymbol))>=0) {
-			  length = tmp.length()-pos-lineBreakSymbol.length();
-			} else {
-			  length += tmp.length() + 1;
-			}
-		}
-		return sb;
+		return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol).getA();
 	}
+	
+  /**
+   * @param message
+   * @param lineBreak
+   * @param lineBreakSymbol
+   * @return
+   */
+  public static ValuePair<String, Integer> insertLineBreaksAndCount(
+            String message, int lineBreak, String lineBreakSymbol) {
+    StringBuilder sb = new StringBuilder();
+    StringTokenizer st = new StringTokenizer(message != null ? message : "",
+              " ");
+    if (st.hasMoreElements()) {
+      sb.append(st.nextElement().toString());
+    }
+    int length = sb.length();
+    int pos;
+    int count = 0;
+    while (st.hasMoreElements()) {
+      if ((length >= lineBreak) && (lineBreak < Integer.MAX_VALUE)) {
+        sb.append(lineBreakSymbol);
+        count++;
+        length = 0;
+      }
+      else {
+        sb.append(' ');
+      }
+
+      // Append current element
+      String tmp = st.nextElement().toString();
+      sb.append(tmp);
+
+      // Change length
+      if ((pos = tmp.indexOf(lineBreakSymbol)) >= 0) {
+        length = tmp.length() - pos - lineBreakSymbol.length();
+      }
+      else {
+        length += tmp.length() + 1;
+      }
+    }
+    return new ValuePair<String, Integer>(sb.toString(), Integer.valueOf(count));
+  }
 	
 	/**
 	 * 

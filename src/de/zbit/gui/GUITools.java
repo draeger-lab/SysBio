@@ -28,6 +28,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -45,6 +46,7 @@ import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
 import de.zbit.util.StringUtil;
+import de.zbit.util.ValuePair;
 
 /**
  * This class contains various GUI tools.
@@ -706,15 +708,36 @@ public class GUITools {
 	}
 	
 	/**
-	 * Displayes the error message on a {@link JOptionPane}.
+	 * Displays the error message on a {@link JOptionPane}.
 	 * 
 	 * @param exc
 	 */
 	public static void showErrorMessage(Component parent, Throwable exc) {
-		exc.printStackTrace();
-		JOptionPane.showMessageDialog(parent, StringUtil.insertLineBreaks(exc
-				.getMessage(), 60, "\n"), exc.getClass().getSimpleName(),
-			JOptionPane.ERROR_MESSAGE);
+    exc.printStackTrace();
+    ValuePair<String, Integer> messagePair = StringUtil
+              .insertLineBreaksAndCount(exc.getMessage(), 60, "\n");
+    Object message;
+    if (messagePair.getB().intValue() > 30) {
+      JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
+      pane.setEditable(false);
+      pane.setPreferredSize(new Dimension(480, 240));
+      message = new JScrollPane(pane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    }
+    else {
+      message = messagePair.getA();
+    }
+    JOptionPane.showMessageDialog(parent, message, exc.getClass()
+              .getSimpleName(), JOptionPane.ERROR_MESSAGE);
+  }
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param message
+	 */
+	public static void showErrorMessage(Component parent, String message) {
+	  showErrorMessage(parent, null, message);
 	}
 	
 	/**
@@ -726,15 +749,17 @@ public class GUITools {
 	 * @param defaultMessage
 	 */
 	public static void showErrorMessage(Component parent, Throwable exc,
-		String defaultMessage) {
-		if ((exc.getMessage() == null) || (exc.getMessage().length() == 0)) {
-			exc.printStackTrace();
-			JOptionPane.showMessageDialog(parent, defaultMessage, exc.getClass()
-					.getSimpleName(), JOptionPane.ERROR_MESSAGE);
-		} else {
-			showErrorMessage(parent, exc);
-		}
-	}
+            String defaultMessage) {
+    if ((exc == null) || (exc.getMessage() == null)
+              || (exc.getMessage().length() == 0)) {
+      exc.printStackTrace();
+      JOptionPane.showMessageDialog(parent, defaultMessage, exc.getClass()
+                .getSimpleName(), JOptionPane.ERROR_MESSAGE);
+    }
+    else {
+      showErrorMessage(parent, exc);
+    }
+  }
 	
 	/**
 	 * Displays a message on a message dialog window, i.e., an HTML document.
