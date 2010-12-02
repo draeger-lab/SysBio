@@ -127,7 +127,7 @@ public abstract class BaseFrame extends JFrame {
 				return name;
 			}
 			return StringUtil.firstLetterUpperCase(key.toLowerCase().substring(
-				key.lastIndexOf('_')));
+				key.lastIndexOf('_') + 1));
 		}
 		
 		/*
@@ -472,14 +472,14 @@ public abstract class BaseFrame extends JFrame {
 		
 		try {
 			Properties defaults = new Properties();
-			defaults.loadFromXML(getClass().getResourceAsStream(
+			defaults.loadFromXML(BaseFrame.class.getResourceAsStream(
 				"BaseActionEnglish.xml"));
 			BaseAction.nameProperties.setDefaults(defaults);
 			String location = getLocationOfBaseActionProperties();
 			if (location != null) {
 				Properties properties = new Properties();
 				try {
-					properties.loadFromXML(getClass().getResourceAsStream(location));
+					properties.loadFromXML(BaseFrame.class.getResourceAsStream(location));
 					if (properties != null) {
 						BaseAction.nameProperties.putAll(properties);
 					}
