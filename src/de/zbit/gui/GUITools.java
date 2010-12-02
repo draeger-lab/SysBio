@@ -209,6 +209,10 @@ public class GUITools {
 				menu.add((JMenuItem) item);
 			} else if (item instanceof JSeparator) {
 				menu.add((JSeparator) item);
+			} else if (item instanceof JMenuItem[]) {
+			  for (JMenuItem i : (JMenuItem[]) item) {
+			    menu.add(i);
+			  }
 			}
 		}
 		return menu;
