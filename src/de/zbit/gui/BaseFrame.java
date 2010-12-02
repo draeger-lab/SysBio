@@ -336,6 +336,8 @@ public abstract class BaseFrame extends JFrame {
 			for (int j = 0; j < menu.getItemCount(); j++) {
 				item = menu.getItem(j);
 				if (item != null) {
+				  
+				  //BaseAction part
 					try {
 						action = BaseAction.valueOf(item.getActionCommand());
 						System.out.print("Action: " + action + "...");
@@ -353,6 +355,40 @@ public abstract class BaseFrame extends JFrame {
 						button.setEnabled(item.isEnabled());
 						toolBar.add(button);
 					}
+					
+					//BaseFileAction part
+					BaseFileActions fAction = null;
+					try {
+            fAction = BaseFileActions.valueOf(item.getActionCommand());
+            System.out.print("Action: " + fAction + "...");
+          } catch (Throwable exc) {
+            fAction = null;
+          }
+          System.out.println("ActionCommand: " + item.getActionCommand() + "...");
+          if ((item.getIcon() != null) && (fAction != null)
+              && (item.getActionListeners().length > 0)) {
+            JButton button = GUITools.createButton(item.getIcon(), item
+                .getActionListeners()[0], fAction, fAction.getToolTip());
+            button.setEnabled(item.isEnabled());
+            toolBar.add(button);
+          }
+          
+        //BaseFileAction part
+          BaseHelpActions hAction = null;
+          try {
+            hAction = BaseHelpActions.valueOf(item.getActionCommand());
+            System.out.print("Action: " + hAction + "...");
+          } catch (Throwable exc) {
+            hAction = null;
+          }
+          System.out.println("ActionCommand: " + item.getActionCommand() + "...");
+          if ((item.getIcon() != null) && (hAction != null)
+              && (item.getActionListeners().length > 0)) {
+            JButton button = GUITools.createButton(item.getIcon(), item
+                .getActionListeners()[0], hAction, hAction.getToolTip());
+            button.setEnabled(item.isEnabled());
+            toolBar.add(button);
+          }
 				}
 			}
 			if (i < getJMenuBar().getMenuCount() - 1) {
