@@ -312,7 +312,10 @@ public class GUITools {
 		}
 		if (command != null) {
 			item.setText(command.getName());
-			item.setToolTipText(StringUtil.toHTML(command.getToolTip(), 60));
+			String toolTip = command.getToolTip();
+			if (toolTip != null) {
+				item.setToolTipText(StringUtil.toHTML(toolTip, 60));
+			}
 			item.setActionCommand(command.toString());
 		}
 		if (icon != null) {

@@ -16,6 +16,7 @@ import java.awt.event.WindowListener;
 import java.beans.EventHandler;
 import java.io.File;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -35,164 +36,81 @@ import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.SBProperties;
 
 /**
  * @author Andreas Dr&auml;ger
  * @date 2010-11-28
  */
 public abstract class BaseFrame extends JFrame {
-  
-  /**
-   * Defines base actions that can be performed when dealing with files.
-   * 
-   * @author Andreas Dr&auml;ger
-   * @author Finja B&uml;chel
-   * @date 2010-12-02
-   */
-  public enum BaseFileActions implements ActionCommand {
-    /**
-     * {@link BaseAction} to closes the currently opened file.
-     */
-    CLOSE_FILE,
-    /**
-     * {@link BaseAction} to saves the currently opened file or the result of a computation in one of the available formats.
-     */
-    SAVE_FILE,
-    /**
-     * {@link BaseAction} to open a file.
-     */
-    OPEN_FILE;
-    
-    private static String names[] = null;
-    private static String toolTips[] = null;
-
-    /**
-     * @param n the names to set
-     */
-    public static void setNames(String[] n) {
-      names = n;
-    }
-
-    /**
-     * @param tt the toolTips to set
-     */
-    public static void setToolTips(String[] tt) {
-      toolTips = tt;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.zbit.gui.ActionCommand#getName()
-     */
-    public String getName() {
-      if ((names != null)
-                && ((0 < this.ordinal()) && (this.ordinal() < names.length))) {
-        return names[this.ordinal()];
-      }
-      return StringUtil.firstLetterUpperCase(this.toString().replace('_', ' ')
-                .toLowerCase());
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.zbit.gui.ActionCommand#getToolTip()
-     */
-    public String getToolTip() {
-      if ((toolTips != null)
-                && ((0 < this.ordinal()) && (this.ordinal() < toolTips.length))) {
-        return toolTips[this.ordinal()];
-      }
-      return null;
-    }
-
-  }
-  
-  /**
-   * Defines base actions that can be performed when dealing with files.
-   * 
-   * @author Andreas Dr&auml;ger
-   * @author Finja B&uml;chel
-   * @date 2010-12-02
-   */
-  public enum BaseHelpActions implements ActionCommand {
-    /**
-     * This {@link BaseAction} shows the imprint of this program and also
-     * explains who to contact if you encounter any problems with this program..
-     */
-    HELP_ABOUT,
-    /**
-     * {@link BaseAction} that displays the license terms under which this
-     * program is distributed.
-     */
-    HELP_LICENSE,
-    /**
-     * {@link BaseAction} that show the online help in a web browser.
-     */
-    ONLINE_HELP;
-    
-    private static String names[] = null;
-    private static String toolTips[] = null;
-
-    /**
-     * @param n the names to set
-     */
-    public static void setNames(String[] n) {
-      names = n;
-    }
-
-    /**
-     * @param tt the toolTips to set
-     */
-    public static void setToolTips(String[] tt) {
-      toolTips = tt;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.zbit.gui.ActionCommand#getName()
-     */
-    public String getName() {
-      if ((names != null)
-                && ((0 < this.ordinal()) && (this.ordinal() < names.length))) {
-        return names[this.ordinal()];
-      }
-      return StringUtil.firstLetterUpperCase(this.toString().replace('_', ' ')
-                .toLowerCase());
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.zbit.gui.ActionCommand#getToolTip()
-     */
-    public String getToolTip() {
-      if ((toolTips != null)
-                && ((0 < this.ordinal()) && (this.ordinal() < toolTips.length))) {
-        return toolTips[this.ordinal()];
-      }
-      return null;
-    }
-  }
-  
+	
 	/**
 	 * 
 	 * @author Andreas Dr&auml;ger
+	 * @author Finja B&uuml;chel
 	 * @date 2010-11-12
 	 */
 	public static enum BaseAction implements ActionCommand {
 		/**
+		 * 
+		 */
+		EDIT,
+		/**
+		 * {@link BaseAction} to configure the user's preferences in a dialog
+		 * window.
+		 */
+		EDIT_PREFERENCES,
+		/**
+		 * 
+		 */
+		FILE,
+		/**
+		 * {@link BaseAction} to closes the currently opened file.
+		 */
+		FILE_CLOSE,
+		/**
 		 * {@link BaseAction} that closes the program and saves all user-defined
 		 * preferences.
 		 */
-		EXIT,
+		FILE_EXIT,
 		/**
-     * {@link BaseAction} to configure the user's preferences in a dialog
-     * window.
-     */
-		PREFERENCES;
+		 * {@link BaseAction} to open a file.
+		 */
+		FILE_OPEN,
+		/**
+		 * {@link BaseAction} to saves the currently opened file or the result of a
+		 * computation in one of the available formats.
+		 */
+		FILE_SAVE,
+		/**
+		 * 
+		 */
+		HELP,
+		/**
+		 * This {@link BaseAction} shows the imprint of this program and also
+		 * explains who to contact if you encounter any problems with this program..
+		 */
+		HELP_ABOUT,
+		/**
+		 * {@link BaseAction} that displays the license terms under which this
+		 * program is distributed.
+		 */
+		HELP_LICENSE,
+		/**
+		 * {@link BaseAction} that show the online help in a web browser.
+		 */
+		HELP_ONLINE;
+		
+		/**
+		 * Contains the names and tool tips for the current language belonging to
+		 * these {@link BaseAction}s.
+		 */
+		private static SBProperties nameProperties = new SBProperties();
+		/**
+		 * The separator between the short name of an action and its corresponding
+		 * tool tip.
+		 */
+		private static final String separator = ";";
 		
 		/*
 		 * (non-Javadoc)
@@ -200,11 +118,16 @@ public abstract class BaseFrame extends JFrame {
 		 * @see de.zbit.gui.ActionCommand#getName()
 		 */
 		public String getName() {
-			switch (this) {
-				default:
-					return StringUtil.firstLetterUpperCase(toString().toLowerCase()
-							.replace('_', ' '));
+			String key = toString();
+			String name = nameProperties.getProperty(key);
+			if (name != null) {
+				if (name.contains(separator)) {
+					name = name.split(separator)[0];
+				}
+				return name;
 			}
+			return StringUtil.firstLetterUpperCase(key.toLowerCase().substring(
+				key.lastIndexOf('_')));
 		}
 		
 		/*
@@ -213,22 +136,24 @@ public abstract class BaseFrame extends JFrame {
 		 * @see de.zbit.gui.ActionCommand#getToolTip()
 		 */
 		public String getToolTip() {
-			switch (this) {
-				case PREFERENCES:
-					return "Opens a dialog to configure all options for this program.";
-				case EXIT:
-					return "Closes this program and saves all user-defined preferences.";
-				default:
-					return "Unknown";
+			String key = toString();
+			String toolTip = nameProperties.getProperty(key);
+			if (toolTip != null) {
+				if (toolTip.contains(separator)) {
+					toolTip = toolTip.split(separator)[1];
+				}
+				return toolTip;
 			}
+			return null;
 		}
+		
 	}
 	
 	/**
 	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = -6533854985804740883L;
-		
+	
 	/**
 	 * A tool bar
 	 */
@@ -243,8 +168,8 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	public BaseFrame(boolean loadDefaultFileMenuEntries) {
-	  super();
-	  init();
+		super();
+		init();
 	}
 	
 	/**
@@ -277,8 +202,8 @@ public abstract class BaseFrame extends JFrame {
 	 * 
 	 */
 	public final void activateOnlineHelpCommand() {
-		GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseHelpActions.ONLINE_HELP,
-			BaseHelpActions.HELP_LICENSE);
+		GUITools.setEnabled(true, getJMenuBar(), toolBar,
+			BaseAction.HELP_ONLINE, BaseAction.HELP_LICENSE);
 	}
 	
 	/**
@@ -329,66 +254,28 @@ public abstract class BaseFrame extends JFrame {
 	public JToolBar createDefaultToolBar() {
 		JMenu menu;
 		JMenuItem item;
-		BaseAction action = null;
+		Object action = null;
 		JToolBar toolBar = new JToolBar("Tools");
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
 			menu = getJMenuBar().getMenu(i);
 			for (int j = 0; j < menu.getItemCount(); j++) {
 				item = menu.getItem(j);
 				if (item != null) {
-				  
-				  //BaseAction part
 					try {
 						action = BaseAction.valueOf(item.getActionCommand());
-						System.out.print("Action: " + action + "...");
-						if (action == BaseAction.EXIT) {
+						if (action == BaseAction.FILE_EXIT) {
 							action = null;
 						}
 					} catch (Throwable exc) {
-						action = null;
+						action = item.getActionCommand();
 					}
-					System.out.println("ActionCommand: " + item.getActionCommand() + "...");
 					if ((item.getIcon() != null) && (action != null)
 							&& (item.getActionListeners().length > 0)) {
 						JButton button = GUITools.createButton(item.getIcon(), item
-								.getActionListeners()[0], action, action.getToolTip());
+								.getActionListeners()[0], action, item.getToolTipText());
 						button.setEnabled(item.isEnabled());
 						toolBar.add(button);
 					}
-					
-					//BaseFileAction part
-					BaseFileActions fAction = null;
-					try {
-            fAction = BaseFileActions.valueOf(item.getActionCommand());
-            System.out.print("Action: " + fAction + "...");
-          } catch (Throwable exc) {
-            fAction = null;
-          }
-          System.out.println("ActionCommand: " + item.getActionCommand() + "...");
-          if ((item.getIcon() != null) && (fAction != null)
-              && (item.getActionListeners().length > 0)) {
-            JButton button = GUITools.createButton(item.getIcon(), item
-                .getActionListeners()[0], fAction, fAction.getToolTip());
-            button.setEnabled(item.isEnabled());
-            toolBar.add(button);
-          }
-          
-        //BaseFileAction part
-          BaseHelpActions hAction = null;
-          try {
-            hAction = BaseHelpActions.valueOf(item.getActionCommand());
-            System.out.print("Action: " + hAction + "...");
-          } catch (Throwable exc) {
-            hAction = null;
-          }
-          System.out.println("ActionCommand: " + item.getActionCommand() + "...");
-          if ((item.getIcon() != null) && (hAction != null)
-              && (item.getActionListeners().length > 0)) {
-            JButton button = GUITools.createButton(item.getIcon(), item
-                .getActionListeners()[0], hAction, hAction.getToolTip());
-            button.setEnabled(item.isEnabled());
-            toolBar.add(button);
-          }
 				}
 			}
 			if (i < getJMenuBar().getMenuCount() - 1) {
@@ -420,42 +307,46 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
-	 * @param loadDefaultFileMenuEntries  Switch to decide weather or not to load the default entries in the File menu for Open, Save, and Close.
+	 * @param loadDefaultFileMenuEntries
+	 *        Switch to decide weather or not to load the default entries in the
+	 *        File menu for Open, Save, and Close.
 	 * @return
 	 */
 	protected JMenuBar createJMenuBar(boolean loadDefaultFileMenuEntries) {
 		JMenuBar menuBar = new JMenuBar();
+		String title;
 		
 		/*
 		 * File menu
 		 */
-		JMenuItem openFile = loadDefaultFileMenuEntries ? GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "openFile"), BaseFileActions.OPEN_FILE, UIManager
-				.getIcon("ICON_OPEN_16"), KeyStroke.getKeyStroke('O',
-			InputEvent.CTRL_DOWN_MASK), 'O', true) : null;
-		JMenuItem saveFile = loadDefaultFileMenuEntries ?GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "saveFile"), BaseFileActions.SAVE_FILE, UIManager
-				.getIcon("ICON_SAVE_16"), KeyStroke.getKeyStroke('S',
-			InputEvent.CTRL_DOWN_MASK), 'S', false) : null;
-		JMenuItem close = loadDefaultFileMenuEntries ? GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "closeFile"), BaseFileActions.CLOSE_FILE,
-			UIManager.getIcon("ICON_TRASH_16"), KeyStroke.getKeyStroke('W',
-				InputEvent.CTRL_DOWN_MASK), 'W', false) : null;
+		JMenuItem openFile = loadDefaultFileMenuEntries ? GUITools.createJMenuItem(
+			EventHandler.create(ActionListener.class, this, "openFile"),
+			BaseAction.FILE_OPEN, UIManager.getIcon("ICON_OPEN_16"), KeyStroke
+					.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK), 'O', true) : null;
+		JMenuItem saveFile = loadDefaultFileMenuEntries ? GUITools.createJMenuItem(
+			EventHandler.create(ActionListener.class, this, "saveFile"),
+			BaseAction.FILE_SAVE, UIManager.getIcon("ICON_SAVE_16"), KeyStroke
+					.getKeyStroke('S', InputEvent.CTRL_DOWN_MASK), 'S', false) : null;
+		JMenuItem close = loadDefaultFileMenuEntries ? GUITools.createJMenuItem(
+			EventHandler.create(ActionListener.class, this, "closeFile"),
+			BaseAction.FILE_CLOSE, UIManager.getIcon("ICON_TRASH_16"), KeyStroke
+					.getKeyStroke('W', InputEvent.CTRL_DOWN_MASK), 'W', false) : null;
 		JMenuItem exit = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "exit"), BaseAction.EXIT, UIManager
+			ActionListener.class, this, "exit"), BaseAction.FILE_EXIT, UIManager
 				.getIcon("ICON_EXIT_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F4,
 			InputEvent.ALT_DOWN_MASK));
 		JMenuItem items[] = additionalFileMenuItems();
-    boolean addSeparator = (openFile != null) || (saveFile != null)
-              || ((items != null) && (items.length > 0)) || (close != null);
-    menuBar.add(GUITools.createJMenu("File", openFile, saveFile, items, close,
-              addSeparator ? new JSeparator() : null, exit));
+		boolean addSeparator = (openFile != null) || (saveFile != null)
+				|| ((items != null) && (items.length > 0)) || (close != null);
+		title = BaseAction.nameProperties.getProperty(BaseAction.FILE);
+		menuBar.add(GUITools.createJMenu(title == null ? "File" : title, openFile,
+			saveFile, items, close, addSeparator ? new JSeparator() : null, exit));
 		
 		/*
 		 * Edit menu
 		 */
 		JMenuItem preferences = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "preferences"), BaseAction.PREFERENCES,
+			ActionListener.class, this, "preferences"), BaseAction.EDIT_PREFERENCES,
 			UIManager.getIcon("ICON_PREFS_16"), KeyStroke.getKeyStroke('E',
 				InputEvent.ALT_GRAPH_DOWN_MASK), 'P', true);
 		items = additionalEditMenuItems();
@@ -463,7 +354,8 @@ public abstract class BaseFrame extends JFrame {
 		// and add this menu only if there is at least one preference panel defined.
 		int numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
 		if ((numPrefs > 0) || ((items != null) && (items.length > 0))) {
-			menuBar.add(GUITools.createJMenu("Edit", items, (items != null)
+			title = BaseAction.nameProperties.getProperty(BaseAction.EDIT);
+			menuBar.add(GUITools.createJMenu(title == null ? "Edit" : title, items, (items != null)
 					&& (items.length > 0) && (numPrefs > 0) ? new JSeparator() : null,
 				numPrefs > 0 ? preferences : null));
 		}
@@ -484,28 +376,29 @@ public abstract class BaseFrame extends JFrame {
 		 * Help menu
 		 */
 		JMenuItem help = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "showOnlineHelp"), BaseHelpActions.ONLINE_HELP,
-			UIManager.getIcon("ICON_HELP_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F1,
-				0), 'H', true);
+			ActionListener.class, this, "showOnlineHelp"),
+			BaseAction.HELP_ONLINE, UIManager.getIcon("ICON_HELP_16"), KeyStroke
+					.getKeyStroke(KeyEvent.VK_F1, 0), 'H', true);
 		if (getURLOnlineHelp() == null) {
 			help = null;
 		}
 		JMenuItem about = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "showAboutMessage"), BaseHelpActions.HELP_ABOUT,
-			UIManager.getIcon("ICON_INFO_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F2,
-				0), 'I', true);
+			ActionListener.class, this, "showAboutMessage"),
+			BaseAction.HELP_ABOUT, UIManager.getIcon("ICON_INFO_16"), KeyStroke
+					.getKeyStroke(KeyEvent.VK_F2, 0), 'I', true);
 		if (getURLAboutMessage() == null) {
 			about = null;
 		}
 		JMenuItem license = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "showLicense"), BaseHelpActions.HELP_LICENSE,
+			ActionListener.class, this, "showLicense"), BaseAction.HELP_LICENSE,
 			UIManager.getIcon("ICON_LICENSE_16"), KeyStroke.getKeyStroke(
 				KeyEvent.VK_F3, 0), 'L', true);
 		if (getURLLicense() == null) {
 			license = null;
 		}
-		JMenu helpMenu = GUITools.createJMenu("Help", help, about, license,
-			additionalHelpMenuItems());
+		title = BaseAction.nameProperties.get(BaseAction.HELP);
+		JMenu helpMenu = GUITools.createJMenu(title == null ? "Help" : title, help,
+			about, license, additionalHelpMenuItems());
 		if (helpMenu.getItemCount() > 0) {
 			try {
 				menuBar.setHelpMenu(helpMenu);
@@ -541,12 +434,19 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	public abstract Class<? extends KeyProvider>[] getCommandLineOptions();
 	
-	/*
-	 * (non-Javadoc)
-	 * @see java.awt.Frame#getTitle()
+	/**
+	 * 
+	 * @return
 	 */
-	@Override
-  public abstract String getTitle();
+	protected String getLocationOfBaseActionProperties() {
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public abstract String getApplicationName();
 	
 	/**
 	 * @return
@@ -563,26 +463,33 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	public abstract URL getURLOnlineHelp();
 	
-	/**
-	 * 
-	 */
-	protected void init() {
-	  GUITools.initLaF(getTitle());
-	  
-	  if (fileMenuNames() != null) {
-	    BaseFileActions.setNames(fileMenuNames());
-	  }
-	  if (fileMenuToolTips() != null) {
-	    BaseFileActions.setToolTips(fileMenuToolTips());
-	  }
-	  
-	  if (helpMenuNames() != null) {
-      BaseHelpActions.setNames(helpMenuNames());
-    }
-    if (helpMenuToolTips() != null) {
-      BaseHelpActions.setToolTips(helpMenuToolTips());
-    }
 		
+	/**
+ * 
+ */
+	protected void init() {
+		GUITools.initLaF(getApplicationName());
+		
+		try {
+			Properties defaults = new Properties();
+			defaults.loadFromXML(getClass().getResourceAsStream(
+				"BaseActionEnglish.xml"));
+			BaseAction.nameProperties.setDefaults(defaults);
+			String location = getLocationOfBaseActionProperties();
+			if (location != null) {
+				Properties properties = new Properties();
+				try {
+					properties.loadFromXML(getClass().getResourceAsStream(location));
+					if (properties != null) {
+						BaseAction.nameProperties.putAll(properties);
+					}
+				} catch (Exception exc) {
+				}
+			}
+		} catch (Exception exc) {
+			GUITools.showErrorMessage(this, exc);
+		}
+				
 		// init GUI
 		// Do nothing is important! The actual closing is handled in "windowClosing()"
 		// which is not called on other close operations!
@@ -608,66 +515,21 @@ public abstract class BaseFrame extends JFrame {
 		setLocationRelativeTo(null);
 	}
 
-  /**
-   * This method returns an array of {@link String}, in which there is precisely one entry for each member of the enum {@link BaseFileActions}. This will then
-   * be the name to be displayed to the user in the File menu of this {@link BaseFrame}. Overriding this method may be useful to, for instance, support for
-   * international languages.
-   * 
-   * @return An array of {@link String}, whose length precisely matches the number of entries in the enum {@link BaseFileActions}.
-   */
-  protected String[] fileMenuToolTips() {
-    return new String[] { "Opens a file for processing.",
-        "Closes the currently opened file.",
-        "Saves the current work in one of the available formats." };
-  }
-
-  /**
-   * This method returns an array of {@link String}, in which there is precisely one entry for each member of the enum {@link BaseFileActions}. This will then
-   * be the tool tip to be displayed to the user in the File menu of this {@link BaseFrame}. Overriding this method may be useful to, for instance, support for
-   * international languages.
-   * 
-   * @return An array of {@link String}, whose length precisely matches the number of entries in the enum {@link BaseFileActions}.
-   */
-  protected String[] helpMenuNames() {
-    return new String[] {"Online Help", "About","License"};
-  }
-  
-  /**
-   * This method returns an array of {@link String}, in which there is precisely one entry for each member of the enum {@link BaseFileActions}. This will then
-   * be the name to be displayed to the user in the File menu of this {@link BaseFrame}. Overriding this method may be useful to, for instance, support for
-   * international languages.
-   * 
-   * @return An array of {@link String}, whose length precisely matches the number of entries in the enum {@link BaseFileActions}.
-   */
-  protected String[] helpMenuToolTips() {
-    return new String[] {"Displays the online help in a web browser.", 
-              "This shows the imprint of this program and also explains who to contact if you encounter any problems with this program.",
-              "Here you can see the license terms under which this program is distributed."};
-  }
-
-  /**
-   * This method returns an array of {@link String}, in which there is precisely one entry for each member of the enum {@link BaseFileActions}. This will then
-   * be the tool tip to be displayed to the user in the File menu of this {@link BaseFrame}. Overriding this method may be useful to, for instance, support for
-   * international languages.
-   * 
-   * @return An array of {@link String}, whose length precisely matches the number of entries in the enum {@link BaseFileActions}.
-   */
-  protected String[] fileMenuNames() {
-    return new String[] { "Open", "Close", "Save" };
-  }
-
-  /**
-   * This method decides whether or not the file menu should already be equipped with the default entries for "open", "save", and "close". By default, this
-   * method returns <code>true</code>, i.e., the default File menu already contains all these three items. You may want to override this method and to return
-   * <code>false</code> instead to switch this behavior off.
-   * 
-   * @return Whether or not to equip the file menu with the three entries "open", "save", and "close". By default <code>true</code>
-   */
-  protected boolean loadsDefaultFileMenuEntries() {
-    return true;
-  }
-
-  /**
+	/**
+	 * This method decides whether or not the file menu should already be equipped
+	 * with the default entries for "open", "save", and "close". By default, this
+	 * method returns <code>true</code>, i.e., the default File menu already
+	 * contains all these three items. You may want to override this method and to
+	 * return <code>false</code> instead to switch this behavior off.
+	 * 
+	 * @return Whether or not to equip the file menu with the three entries
+	 *         "open", "save", and "close". By default <code>true</code>
+	 */
+	protected boolean loadsDefaultFileMenuEntries() {
+		return true;
+	}
+	
+	/**
 	 * Opens some {@link File}.
 	 * 
 	 * @return
@@ -709,11 +571,11 @@ public abstract class BaseFrame extends JFrame {
 	 * 
 	 */
 	public final void showOnlineHelp() {
-    GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseHelpActions.ONLINE_HELP);
-    JHelpBrowser.showOnlineHelp(this, EventHandler.create(WindowListener.class,
-              this, "activateOnlineHelpCommand", null, "windowClosed"),
-              getTitle() + " - Online Help", getURLOnlineHelp(),
-              getCommandLineOptions());
-  }
+		GUITools.setEnabled(false, getJMenuBar(), toolBar,
+			BaseAction.HELP_ONLINE);
+		JHelpBrowser.showOnlineHelp(this, EventHandler.create(WindowListener.class,
+			this, "activateOnlineHelpCommand", null, "windowClosed"), getTitle()
+				+ " - Online Help", getURLOnlineHelp(), getCommandLineOptions());
+	}
 	
 }
