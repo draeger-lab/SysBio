@@ -469,7 +469,9 @@ public abstract class BaseFrame extends JFrame {
  */
 	protected void init() {
 		GUITools.initLaF(getApplicationName());
-		
+		if ((getTitle() == null) || (getTitle().length() == 0)) {
+			setTitle(getApplicationName());
+		}
 		try {
 			Properties defaults = new Properties();
 			defaults.loadFromXML(BaseFrame.class.getResourceAsStream(
