@@ -232,8 +232,11 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 *        The element to be put on the content pane.
 	 */
 	public void setPreferencesPanel(PreferencesPanel panel) {
-		KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-		getRootPane().registerKeyboardAction(this, stroke,
+		getRootPane().registerKeyboardAction(this, CANCEL,
+			KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+			JComponent.WHEN_IN_FOCUSED_WINDOW);
+		getRootPane().registerKeyboardAction(this, OK,
+			KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
 			JComponent.WHEN_IN_FOCUSED_WINDOW);
 		
 		allPrefsPanel = panel;
@@ -242,22 +245,26 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		JPanel p = new JPanel();
 		defaults = new JButton("Defaults");
+		defaults.setMnemonic('D');
 		defaults.addActionListener(this);
 		defaults.setActionCommand(DEFAULTS);
 		defaults.setToolTipText(StringUtil.toHTML("Restores the default configuration, i.e., all current preferences will be replaced by the default values.", 60));
 		defaults.setEnabled(!panel.isDefaultConfiguration());
 		JButton cancel = new JButton("Cancel");
+		cancel.setMnemonic('C');
 		cancel.addActionListener(this);
 		cancel.setActionCommand(CANCEL);
 		cancel.setSize(defaults.getSize());
 		cancel.setToolTipText(StringUtil.toHTML("Closes this dialog without saving, i.e., all preferences will get lost.", 60));
 		apply = new JButton("Apply");
+		apply.setMnemonic('A');
 		apply.setSize(defaults.getSize());
 		apply.addActionListener(this);
 		apply.setActionCommand(APPLY);
 		apply.setToolTipText(StringUtil.toHTML("Persistently saves the current configuration but keeps the dialog open.", 60));
 		apply.setEnabled(false);
 		ok = new JButton("OK");
+		ok.setMnemonic('O');
 		ok.addActionListener(this);
 		ok.setActionCommand(OK);
 		ok.setSize(defaults.getSize());

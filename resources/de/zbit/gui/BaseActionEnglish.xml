@@ -25,4 +25,6 @@
 	 <entry key="HELP_LICENSE">License;Here you can see the license terms under which
 		 this program is distributed.</entry>
 	 <entry key="HELP_ONLINE">Online Help;Displays the online help in a web browser.</entry>
+	 <entry key="HELP_UPDATE">Online Update;Checks for a newer version of this 
+	     program on the project's web site.</entry>
 </properties>
