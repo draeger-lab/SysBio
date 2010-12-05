@@ -57,6 +57,11 @@ import de.zbit.util.ValuePair;
  */
 public class GUITools {
 	
+	/**
+	 * 
+	 */
+	private static int TOOLTIP_LINE_LENGTH = 60;
+
 	static {
 		ImageTools.initImages(GUITools.class.getResource("img"));
 	}
@@ -81,7 +86,7 @@ public class GUITools {
 	
 	/**
 	 * Creates a JButton with the given properties. The tool tip becomes an HTML
-	 * formatted string with a line break after 40 symbols.
+	 * formatted string with a line break after {@link #TOOLTIP_LINE_LENGTH} symbols.
 	 * 
 	 * @param icon
 	 * @param listener
@@ -102,7 +107,7 @@ public class GUITools {
 			button.setActionCommand(command.toString());
 		}
 		if (toolTip != null) {
-			button.setToolTipText(StringUtil.toHTML(toolTip, 40));
+			button.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH ));
 		}
 		return button;
 	}
@@ -142,7 +147,7 @@ public class GUITools {
 		for (ItemListener l : listener) {
 			chkbx.addItemListener(l);
 		}
-		chkbx.setToolTipText(StringUtil.toHTML(toolTip, 40));
+		chkbx.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
 		return chkbx;
 	}
 	
@@ -314,7 +319,7 @@ public class GUITools {
 			item.setText(command.getName());
 			String toolTip = command.getToolTip();
 			if (toolTip != null) {
-				item.setToolTipText(StringUtil.toHTML(toolTip, 60));
+				item.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
 			}
 			item.setActionCommand(command.toString());
 		}
@@ -393,7 +398,7 @@ public class GUITools {
 	public static int overwriteExistingFileDialog(Component parent, File out) {
 		return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(out
 				.getName()
-				+ " already exists. Do you really want to overwrite it?", 40),
+				+ " already exists. Do you really want to overwrite it?", TOOLTIP_LINE_LENGTH),
 			"Overwrite existing file?", JOptionPane.YES_NO_OPTION,
 			JOptionPane.QUESTION_MESSAGE);
 	}
@@ -501,7 +506,7 @@ public class GUITools {
 			if (f.exists()) {
 				if (checkFile && !f.canWrite()) {
 					JOptionPane.showMessageDialog(parent, StringUtil.toHTML(
-						"Cannot write to file " + f.getAbsolutePath() + ".", 60),
+						"Cannot write to file " + f.getAbsolutePath() + ".", TOOLTIP_LINE_LENGTH),
 						"No writing access", JOptionPane.WARNING_MESSAGE);
 				} else if (f.isDirectory()
 						|| (checkFile && GUITools.overwriteExistingFile(parent, f))) {
@@ -539,7 +544,7 @@ public class GUITools {
 		  for (File f: ret) {
 		    if (!f.canRead()) {
 		      JOptionPane.showMessageDialog(parent, StringUtil.toHTML(
-		        "Cannot read file " + f.getAbsolutePath() + ".", 60),
+		        "Cannot read file " + f.getAbsolutePath() + ".", TOOLTIP_LINE_LENGTH),
 		        "Unable to read file", JOptionPane.WARNING_MESSAGE);
 		      return null;
 		    }
@@ -567,7 +572,7 @@ public class GUITools {
 	    File f = chooser.getSelectedFile();
 	    if (!f.canRead()) {
 	      JOptionPane.showMessageDialog(parent, StringUtil.toHTML(
-	        "Cannot read file " + f.getAbsolutePath() + ".", 60),
+	        "Cannot read file " + f.getAbsolutePath() + ".", TOOLTIP_LINE_LENGTH),
 	        "Unable to read file", JOptionPane.WARNING_MESSAGE);
 	    } else {
 	      return f;
@@ -722,7 +727,7 @@ public class GUITools {
 	public static void showErrorMessage(Component parent, Throwable exc) {
     exc.printStackTrace();
     ValuePair<String, Integer> messagePair = StringUtil
-              .insertLineBreaksAndCount(exc.getMessage(), 60, "\n");
+              .insertLineBreaksAndCount(exc.getMessage(), TOOLTIP_LINE_LENGTH, "\n");
     Object message;
     if (messagePair.getB().intValue() > 30) {
       JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
@@ -887,7 +892,7 @@ public class GUITools {
 				
 			} catch (Exception exc) {
 				JOptionPane.showMessageDialog(null, StringUtil.toHTML(exc.getMessage(),
-					40), exc.getClass().getName(), JOptionPane.WARNING_MESSAGE);
+					TOOLTIP_LINE_LENGTH), exc.getClass().getName(), JOptionPane.WARNING_MESSAGE);
 				exc.printStackTrace();
 			}
 		}

@@ -26,4 +26,6 @@
 		 veröffentlicht wurde.</entry>
 	 <entry key="HELP_ONLINE">Hilfe-Webseite;Öffnet ein Browserfenster, das die Hilfeseiten
 	  zu diesem Programm anzeigt.</entry>
+	 <entry key="HELP_UPDATE">Online Aktualisierung;Sucht im Internat nach einer neueren 
+	  Version dieses Programms.</entry>
 </properties>

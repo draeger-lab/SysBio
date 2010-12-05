@@ -5,7 +5,9 @@ package de.zbit.gui;
 
 import java.awt.Component;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 import javax.swing.JToolBar;
 
@@ -26,21 +28,10 @@ public class BaseGUI extends BaseFrame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		System.setProperty("user.language", Locale.ENGLISH.getLanguage());
 		new BaseGUI();
 	}
 	
-	
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#getLocationOfBaseActionProperties()
-	 */
-	@Override
-	protected String getLocationOfBaseActionProperties() {
-		return "BaseActionGerman.xml";
-	}
-
-
-
 	public BaseGUI() {
 		super();
 		setVisible(true);
@@ -66,6 +57,7 @@ public class BaseGUI extends BaseFrame {
 	@Override
 	public void exit() {
 		dispose();
+		System.exit(0);
 	}
 
 	@Override
@@ -109,5 +101,30 @@ public class BaseGUI extends BaseFrame {
 	@Override
 	public String getApplicationName() {
 		return "Simple GUI";
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getDottedVersionNumber()
+	 */
+	@Override
+	public String getDottedVersionNumber() {
+		return "1.1";
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getURLOnlineUpdate()
+	 */
+	@Override
+	public URL getURLOnlineUpdate() {
+		try {
+			return new URL("http://www.ra.cs.uni-tuebingen.de/software/SBMLsqueezer/downloads/");
+		} catch (MalformedURLException exc) {
+			GUITools.showErrorMessage(this, exc);
+		}
+		return null;
 	}
 }

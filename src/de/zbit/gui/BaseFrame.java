@@ -15,7 +15,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowListener;
 import java.beans.EventHandler;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -36,6 +38,7 @@ import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
 /**
@@ -99,7 +102,11 @@ public abstract class BaseFrame extends JFrame {
 		/**
 		 * {@link BaseAction} that show the online help in a web browser.
 		 */
-		HELP_ONLINE;
+		HELP_ONLINE,
+		/**
+		 * {@link BaseAction} to check for a newer version of this program on the web.
+		 */
+		HELP_UPDATE;
 		
 		/**
 		 * Contains the names and tool tips for the current language belonging to
@@ -124,7 +131,7 @@ public abstract class BaseFrame extends JFrame {
 				if (name.contains(separator)) {
 					name = name.split(separator)[0];
 				}
-				return name;
+				return name.trim();
 			}
 			return StringUtil.firstLetterUpperCase(key.toLowerCase().substring(
 				key.lastIndexOf('_') + 1));
@@ -142,7 +149,7 @@ public abstract class BaseFrame extends JFrame {
 				if (toolTip.contains(separator)) {
 					toolTip = toolTip.split(separator)[1];
 				}
-				return toolTip;
+				return toolTip.trim();
 			}
 			return null;
 		}
@@ -154,6 +161,11 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	private static final long serialVersionUID = -6533854985804740883L;
 	
+	/**
+	 * Switch to avoid checking for updates multiple times.
+	 */
+	private static boolean UPDATE_CHECKED = false;
+
 	/**
 	 * A tool bar
 	 */
@@ -213,7 +225,7 @@ public abstract class BaseFrame extends JFrame {
 	protected JMenuItem[] additionalEditMenuItems() {
 		// empty method
 		return null;
-	}
+	} 
 	
 	/**
 	 * Additional items to be added to the file menu.
@@ -233,7 +245,7 @@ public abstract class BaseFrame extends JFrame {
 		// empty method
 		return null;
 	}
-	
+
 	/**
 	 * @return
 	 */
@@ -241,7 +253,7 @@ public abstract class BaseFrame extends JFrame {
 		// empty method
 		return null;
 	}
-	
+
 	/**
 	 * Closes a {@link File} that is currently open.
 	 */
@@ -375,30 +387,30 @@ public abstract class BaseFrame extends JFrame {
 		/*
 		 * Help menu
 		 */
-		JMenuItem help = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "showOnlineHelp"),
-			BaseAction.HELP_ONLINE, UIManager.getIcon("ICON_HELP_16"), KeyStroke
-					.getKeyStroke(KeyEvent.VK_F1, 0), 'H', true);
-		if (getURLOnlineHelp() == null) {
-			help = null;
-		}
-		JMenuItem about = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "showAboutMessage"),
-			BaseAction.HELP_ABOUT, UIManager.getIcon("ICON_INFO_16"), KeyStroke
-					.getKeyStroke(KeyEvent.VK_F2, 0), 'I', true);
-		if (getURLAboutMessage() == null) {
-			about = null;
-		}
-		JMenuItem license = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "showLicense"), BaseAction.HELP_LICENSE,
-			UIManager.getIcon("ICON_LICENSE_16"), KeyStroke.getKeyStroke(
-				KeyEvent.VK_F3, 0), 'L', true);
-		if (getURLLicense() == null) {
-			license = null;
-		}
-		title = BaseAction.nameProperties.get(BaseAction.HELP);
-		JMenu helpMenu = GUITools.createJMenu(title == null ? "Help" : title, help,
-			about, license, additionalHelpMenuItems());
+		JMenuItem help = (getURLOnlineHelp() == null) ? null : GUITools
+				.createJMenuItem(EventHandler.create(ActionListener.class, this,
+					"showOnlineHelp"), BaseAction.HELP_ONLINE, UIManager
+						.getIcon("ICON_HELP_16"),
+					KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), 'H', true);
+		JMenuItem about = (getURLAboutMessage() == null) ? null : GUITools
+				.createJMenuItem(EventHandler.create(ActionListener.class, this,
+					"showAboutMessage"), BaseAction.HELP_ABOUT, UIManager
+						.getIcon("ICON_INFO_16"),
+					KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 'I', true);
+		JMenuItem license = (getURLLicense() == null) ? null : GUITools
+				.createJMenuItem(EventHandler.create(ActionListener.class, this,
+					"showLicense"), BaseAction.HELP_LICENSE, UIManager
+						.getIcon("ICON_LICENSE_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F3,
+					0), 'L', true);
+		JMenuItem update = ((getURLOnlineUpdate() == null)
+				|| (getDottedVersionNumber() == null) || (getDottedVersionNumber()
+				.length() == 0)) ? null : GUITools.createJMenuItem(EventHandler.create(
+			ActionListener.class, this, "onlineUpdate"), BaseAction.HELP_UPDATE,
+			UIManager.getIcon("ICON_GLOBE_16"), KeyStroke.getKeyStroke(
+				KeyEvent.VK_F4, 0), 'U', true);
+		title = BaseAction.nameProperties.getProperty(BaseAction.HELP);
+		JMenu helpMenu = GUITools.createJMenu((title == null) ? "Help" : title, help,
+			about, license, update, additionalHelpMenuItems());
 		if (helpMenu.getItemCount() > 0) {
 			try {
 				menuBar.setHelpMenu(helpMenu);
@@ -406,7 +418,7 @@ public abstract class BaseFrame extends JFrame {
 				menuBar.add(helpMenu);
 			}
 		}
-		
+
 		return menuBar;
 	}
 	
@@ -430,9 +442,20 @@ public abstract class BaseFrame extends JFrame {
 	public abstract void exit();
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public abstract String getApplicationName();
+	
+	/**
 	 * @return
 	 */
 	public abstract Class<? extends KeyProvider>[] getCommandLineOptions();
+
+	/**
+	 * @return
+	 */
+	public abstract String getDottedVersionNumber();
 	
 	/**
 	 * 
@@ -441,12 +464,6 @@ public abstract class BaseFrame extends JFrame {
 	protected String getLocationOfBaseActionProperties() {
 		return null;
 	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public abstract String getApplicationName();
 	
 	/**
 	 * @return
@@ -463,10 +480,14 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	public abstract URL getURLOnlineHelp();
 	
-		
 	/**
- * 
- */
+	 * @return
+	 */
+	public abstract URL getURLOnlineUpdate();
+	
+	/**
+	 * 
+	 */
 	protected void init() {
 		GUITools.initLaF(getApplicationName());
 		if ((getTitle() == null) || (getTitle().length() == 0)) {
@@ -474,8 +495,13 @@ public abstract class BaseFrame extends JFrame {
 		}
 		try {
 			Properties defaults = new Properties();
-			defaults.loadFromXML(BaseFrame.class.getResourceAsStream(
-				"BaseActionEnglish.xml"));
+			if (System.getProperty("user.language").equals(Locale.GERMAN.getLanguage())) { 
+				defaults.loadFromXML(BaseFrame.class
+						.getResourceAsStream("BaseActionGerman.xml"));
+			} else {
+				defaults.loadFromXML(BaseFrame.class
+						.getResourceAsStream("BaseActionEnglish.xml"));
+			}
 			BaseAction.nameProperties.setDefaults(defaults);
 			String location = getLocationOfBaseActionProperties();
 			if (location != null) {
@@ -516,7 +542,7 @@ public abstract class BaseFrame extends JFrame {
 		setMinimumSize(new Dimension(640, 480));
 		setLocationRelativeTo(null);
 	}
-
+	
 	/**
 	 * This method decides whether or not the file menu should already be equipped
 	 * with the default entries for "open", "save", and "close". By default, this
@@ -532,12 +558,39 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * 
+	 */
+	public void onlineUpdate() {
+		onlineUpdate(false);
+	}
+	
+	/**
+	 * @param hideErrorMessages
+	 */
+	private void onlineUpdate(boolean hideErrorMessages) {
+		try {
+			GUITools
+					.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
+			UpdateMessage update = new UpdateMessage(getApplicationName(),
+				getURLOnlineUpdate());
+			update.addWindowListener(EventHandler.create(WindowListener.class, this,
+				"setOnlineUpdateEnabled", null, "windowClosed"));
+			update.checkForUpdate(true, getDottedVersionNumber());
+		} catch (IOException exc) {
+			if (!hideErrorMessages) {
+				GUITools.showErrorMessage(this, exc);
+			}
+		}
+	}
+	
+		
+	/**
 	 * Opens some {@link File}.
 	 * 
 	 * @return
 	 */
 	public abstract File openFile();
-	
+
 	/**
 	 * Displays the configuration for the {@link PreferencesDialog}.
 	 */
@@ -551,6 +604,37 @@ public abstract class BaseFrame extends JFrame {
 	 * @return
 	 */
 	public abstract File saveFile();
+	
+	/**
+	 * 
+	 */
+	public final void setOnlineUpdateEnabled() {
+		GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
+	}
+	
+	/**
+	 * 
+	 */
+	public void setVisible(boolean b) {
+		super.setVisible(b);
+		if (!UPDATE_CHECKED) {
+			new Thread(new Runnable() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see java.lang.Runnable#run()
+				 */
+				public void run() {
+					SBPreferences prefs = SBPreferences
+							.getPreferencesFor(GUIOptions.class);
+					if (prefs.getBoolean(GUIOptions.CHECK_FOR_UPDATES)) {
+						onlineUpdate(true);
+						UPDATE_CHECKED = true;
+					}
+				}
+			}).start();
+		}
+	}
 	
 	/**
 	 * 
