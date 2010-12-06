@@ -453,6 +453,9 @@ public abstract class BaseFrame extends JFrame {
 	public abstract Class<? extends KeyProvider>[] getCommandLineOptions();
 
 	/**
+	 * For instance, 0.5 or 1.2.3. This number must have at minimum one dot and at
+	 * maximum two dots. All other symbols in this {@link String} must be digits.
+	 * 
 	 * @return
 	 */
 	public abstract String getDottedVersionNumber();
@@ -481,6 +484,17 @@ public abstract class BaseFrame extends JFrame {
 	public abstract URL getURLOnlineHelp();
 	
 	/**
+	 * The web address or other directory address where we can find at least the
+	 * following two files:
+	 * <ul>
+	 * <li>latest.txt</li>
+	 * <li>releaseNotesX.Y.Z.htm</li>
+	 * </ul>
+	 * The file latest.txt contains exactly the dotted version number of the
+	 * latest release of this software; nothing else! The release notes file
+	 * contains HTML code describing the latest changes and the file name MUST end
+	 * with the latest version number of the release.
+	 * 
 	 * @return
 	 */
 	public abstract URL getURLOnlineUpdate();
