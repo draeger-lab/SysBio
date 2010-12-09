@@ -60,7 +60,7 @@ public class GUITools {
 	/**
 	 * 
 	 */
-	private static int TOOLTIP_LINE_LENGTH = 60;
+	public static int TOOLTIP_LINE_LENGTH = 60;
 
 	static {
 		ImageTools.initImages(GUITools.class.getResource("img"));
