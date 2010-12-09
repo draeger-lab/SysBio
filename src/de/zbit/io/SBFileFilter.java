@@ -26,6 +26,10 @@ public class SBFileFilter extends GeneralFileFilter {
 	 */
 	public static enum FileType {
 		/**
+		 * A filter for assoc files
+		 */
+	  ASSOC_FILES,
+	  /**
 		 * To be selected if CSV files (comma separated files) can be chosen.
 		 */
 		CSV_FILES,
@@ -50,6 +54,10 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		HTML_FILES,
 		/**
+		 * Filter for hwe files
+		 */
+		HWE_FILES,
+		/**
 		 * True if this filter accepts JPEG picture files.
 		 */
 		JPEG_FILES,
@@ -57,6 +65,10 @@ public class SBFileFilter extends GeneralFileFilter {
 		 * A file filter for portable document format files.
 		 */
 		PDF_FILES,
+		/**
+		 * File filter for PED_FILES
+		 */
+		PED_FILES, 
 		/**
 		 * True if this filter accepts portable network graphic files.
 		 */
@@ -116,6 +128,27 @@ public class SBFileFilter extends GeneralFileFilter {
 	public static SBFileFilter createCSVFileFilter() {
 		return new SBFileFilter(FileType.CSV_FILES);
 	}
+	
+	/**
+   * A filter for association files
+   */
+  public static SBFileFilter createASSOCFileFilter() {
+    return new SBFileFilter(FileType.ASSOC_FILES);
+  }
+  
+  /**
+   * A filter for ped files
+   */
+  public static SBFileFilter createPEDFileFilter() {
+    return new SBFileFilter(FileType.PED_FILES);
+  }
+  
+  /**
+   * A filter for hwe files
+   */
+  public static SBFileFilter createHWEFileFilter() {
+    return new SBFileFilter(FileType.HWE_FILES);
+  }
 	
 	/**
 	 * A filter for directories only.
@@ -289,6 +322,36 @@ public class SBFileFilter extends GeneralFileFilter {
 		return f.getName().toLowerCase().endsWith(".tex");
 	}
 	
+	 /**
+   * Returns true if the given file is a hwe file.
+   * 
+   * @param f
+   * @return
+   */
+  public static boolean isHWEFile(File f) {
+    return f.getName().toLowerCase().endsWith(".hwe");
+  }
+  
+  /**
+   * Returns true if the given file is a assoc file.
+   * 
+   * @param f
+   * @return
+   */
+  public static boolean isASSOCFile(File f) {
+    return f.getName().toLowerCase().endsWith(".assoc");
+  }
+  
+  /**
+   * Returns true if the given file is a ped file.
+   * 
+   * @param f
+   * @return
+   */
+  public static boolean isPEDFile(File f) {
+    return f.getName().toLowerCase().endsWith(".ped");
+  }
+	
 	/**
 	 * Returns true if the given file is a text file.
 	 * 
@@ -343,6 +406,9 @@ public class SBFileFilter extends GeneralFileFilter {
 				|| (type == FileType.HTML_FILES && isHTMLFile(f))
 				|| (type == FileType.PNG_FILES && isPNGFile(f))
 				|| (type == FileType.JPEG_FILES && isJPEGFile(f))
+				|| (type == FileType.PED_FILES && isPEDFile(f))
+				|| (type == FileType.HWE_FILES && isHWEFile(f))
+				|| (type == FileType.ASSOC_FILES && isASSOCFile(f))				
 				|| (type == FileType.GRAPHML_FILES && checkExtension(f, ".graphml"))
 				|| (type == FileType.GML_FILES && checkExtension(f, ".gml"))
 				|| (type == FileType.GIF_FILES && checkExtension(f, ".gif"))
