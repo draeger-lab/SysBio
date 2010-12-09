@@ -860,8 +860,7 @@ public class GUITools {
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name",
 				title);
 		}
-		try {
-			
+		try {			
 			UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
 			String osName = System.getProperty("os.name");
 			if (osName.equals("Linux") || osName.equals("FreeBSD")) {

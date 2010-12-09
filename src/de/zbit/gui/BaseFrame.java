@@ -46,7 +46,7 @@ import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
 /**
- * This class provides a basic and easily extandable implementation of a
+ * This class provides a basic and easily extendable implementation of a
  * graphical user interface, which already contains some actions and nice
  * features. In this way, this class can serve as a multi-purpose element for
  * any user interface.
@@ -83,7 +83,7 @@ public abstract class BaseFrame extends JFrame {
 		FILE_CLOSE,
 		/**
 		 * {@link BaseAction} that closes the program and saves all user-defined
-		 * preferences.
+		 * preferences. All opened files might also be closed and or saved.
 		 */
 		FILE_EXIT,
 		/**
@@ -455,9 +455,7 @@ public abstract class BaseFrame extends JFrame {
 		int numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
 		if ((numPrefs > 0) || ((items != null) && (items.length > 0))) {
 			title = BaseAction.nameProperties.getProperty(BaseAction.EDIT);
-			menuBar
-					.add(GUITools
-							.createJMenu(
+			menuBar.add(GUITools.createJMenu(
 								title == null ? "Edit" : title,
 								items,
 								(items != null) && (items.length > 0) && (numPrefs > 0) ? new JSeparator()
@@ -582,6 +580,31 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * This method creates a title from the values of
+	 * {@link #getApplicationName()} and {@link #getDottedVersionNumber()}. The
+	 * value returned may be an empty {@link String} but never null. In case
+	 * neither an application name nor a dotted version number are defined, an
+	 * empty {@link String} will be returned. If both values are defined, the
+	 * returned value will be application name white space version number. In case
+	 * that one of the values is missing, the returned {@link String} will be
+	 * shorter.
+	 * 
+	 * @return Creates and returns a {@link String} that combines the value
+	 *         returned by {@link #getApplicationName()} and
+	 *         {@link #getDottedVersionNumber()} to identify this program.
+	 */
+	public final String getProgramNameAndVersion() {
+		String name = getApplicationName() != null ? getApplicationName() : "";
+		if ((getDottedVersionNumber() == null)
+				|| (getDottedVersionNumber().length() == 0)) {
+			return name;
+		} else {
+			return name.length() == 0 ? getDottedVersionNumber() : String.format(
+				"%s %s", getApplicationName(), getDottedVersionNumber());
+		}
+	}
+	
+	/**
 	 * The {@link URL} where the about message for this program is located, i.e.,
 	 * an HTML file containing information about the people in charge for this
 	 * program.
@@ -606,29 +629,28 @@ public abstract class BaseFrame extends JFrame {
 	public abstract URL getURLOnlineHelp();
 	
 	/**
-<<<<<<< .mine
-	 * The {@link URL} to some directory where to look for the online update. The
-	 * online update expects to find a file called <code>latest.txt</code>
+	 * <p>
+	 * The online update expects to find a file called <code>latest.txt</code>
 	 * containing only the version number of the latest release of this program as
 	 * a {@link String} of digits that contains exactly one dot or at most two
 	 * dots. Furthermore, on the given destination must be a second file, called
 	 * <code>releaseNotes&lt;VersionNumber&gt;.htm[l]</code> which contains more
-	 * detailled information about the latest release.
-	 * 
-=======
-	 * The web address or other directory address where we can find at least the
-	 * following two files:
+	 * detailed information about the latest release.
+	 * </p>
+	 * <p>
+	 * Summarizing, the web address or other directory address where we can find
+	 * at least the following two files:
 	 * <ul>
 	 * <li>latest.txt</li>
 	 * <li>releaseNotesX.Y.Z.htm</li>
 	 * </ul>
-	 * The file latest.txt contains exactly the dotted version number of the
-	 * latest release of this software; nothing else! The release notes file
-	 * contains HTML code describing the latest changes and the file name MUST end
-	 * with the latest version number of the release.
+	 * The file <code>latest.txt</code> contains exactly the dotted version number
+	 * of the latest release of this software; nothing else! The release notes
+	 * file contains HTML code describing the latest changes and the file name
+	 * MUST end with the latest version number of the release.
+	 * </p>
 	 * 
->>>>>>> .r300
-	 * @return
+	 * @return The {@link URL} to some directory where to look for the online update.
 	 */
 	public abstract URL getURLOnlineUpdate();
 	
@@ -636,10 +658,11 @@ public abstract class BaseFrame extends JFrame {
 	 * Initializes this graphical user interface.
 	 */
 	protected void init() {
-		GUITools.initLaF(getApplicationName());
 		if ((getTitle() == null) || (getTitle().length() == 0)) {
-			setTitle(getApplicationName());
+			setTitle(getProgramNameAndVersion());
 		}
+		GUITools.initLaF(getTitle());
+		setDefaultLookAndFeelDecorated(true);
 		try {
 			Properties defaults = new Properties();
 			if (System.getProperty("user.language").equals(
@@ -690,7 +713,7 @@ public abstract class BaseFrame extends JFrame {
 		setMinimumSize(new Dimension(640, 480));
 		setLocationRelativeTo(null);
 	}
-	
+
 	/**
 	 * This method decides whether or not the file menu should already be equipped
 	 * with the default entries for "open", "save", and "close". By default, this
@@ -807,7 +830,8 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	public final void showAboutMessage() {
 		JOptionPane.showMessageDialog(this, createJBrowser(getURLAboutMessage(),
-			380, 220, false), "About", JOptionPane.INFORMATION_MESSAGE);
+			380, 220, false), String.format("About %s", getProgramNameAndVersion()),
+			JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	/**
@@ -816,8 +840,8 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	public final void showLicense() {
 		JOptionPane.showMessageDialog(this, createJBrowser(getURLLicense(), 640,
-			480, true), "License", JOptionPane.INFORMATION_MESSAGE, UIManager
-				.getIcon("ICON_LICENSE_64"));
+			480, true), String.format("%s - License", getProgramNameAndVersion()),
+			JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("ICON_LICENSE_64"));
 	}
 	
 	/**
@@ -826,8 +850,9 @@ public abstract class BaseFrame extends JFrame {
 	public final void showOnlineHelp() {
 		GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_ONLINE);
 		JHelpBrowser.showOnlineHelp(this, EventHandler.create(WindowListener.class,
-			this, "activateOnlineHelpCommand", null, "windowClosed"), getTitle()
-				+ " - Online Help", getURLOnlineHelp(), getCommandLineOptions());
+			this, "activateOnlineHelpCommand", null, "windowClosed"), String.format(
+			"%s - Online Help", getProgramNameAndVersion()), getURLOnlineHelp(),
+			getCommandLineOptions());
 	}
 	
 }
