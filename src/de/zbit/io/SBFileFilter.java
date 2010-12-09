@@ -62,6 +62,10 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		JPEG_FILES,
 		/**
+		 * A file filter for map files
+		 */
+		MAP_FILES,
+		/**
 		 * A file filter for portable document format files.
 		 */
 		PDF_FILES,
@@ -142,6 +146,14 @@ public class SBFileFilter extends GeneralFileFilter {
   public static SBFileFilter createPEDFileFilter() {
     return new SBFileFilter(FileType.PED_FILES);
   }
+  
+  
+  /**
+  * Filter for map files
+  */
+ public static SBFileFilter createMAPFileFilter() {
+   return new SBFileFilter(FileType.MAP_FILES);
+ }
   
   /**
    * A filter for hwe files
@@ -333,6 +345,16 @@ public class SBFileFilter extends GeneralFileFilter {
   }
   
   /**
+   * Returns true if the given file is a map file.
+   * 
+   * @param f
+   * @return
+   */
+  private boolean isMAPFile(File f) {
+    return f.getName().toLowerCase().endsWith(".map");
+  }
+  
+  /**
    * Returns true if the given file is a assoc file.
    * 
    * @param f
@@ -407,6 +429,7 @@ public class SBFileFilter extends GeneralFileFilter {
 				|| (type == FileType.PNG_FILES && isPNGFile(f))
 				|| (type == FileType.JPEG_FILES && isJPEGFile(f))
 				|| (type == FileType.PED_FILES && isPEDFile(f))
+				|| (type == FileType.MAP_FILES && isMAPFile(f))
 				|| (type == FileType.HWE_FILES && isHWEFile(f))
 				|| (type == FileType.ASSOC_FILES && isASSOCFile(f))				
 				|| (type == FileType.GRAPHML_FILES && checkExtension(f, ".graphml"))
@@ -417,8 +440,8 @@ public class SBFileFilter extends GeneralFileFilter {
 				|| (type == FileType.PDF_FILES && isPDFFile(f))) return true;
 		return false;
 	}
-	
-	/**
+
+  /**
 	 * 
 	 * @return
 	 */
