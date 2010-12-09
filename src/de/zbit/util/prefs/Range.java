@@ -278,6 +278,10 @@ public class Range<Type> {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param requiredType
+	 */
 	private Range(Class<Type> requiredType) {
 		super();
 		this.typee = requiredType;
@@ -324,8 +328,8 @@ public class Range<Type> {
   public Range(Class<Type> requiredType, List<Type> acceptedObjects) {
     this(requiredType, Range.toRangeString(acceptedObjects));
   }
-
-  /**
+  
+	/**
 	 * Checks whether additional side constraints have been set.
 	 * @return
 	 */
@@ -501,7 +505,27 @@ public class Range<Type> {
       StringUtil.addPrefixAndSuffix(acceptedObjects, "\"", "\"")
       , ",") + "}";
   }
-
   
+	/**
+	 * 
+	 * @param <T>
+	 * @param cazz
+	 * @return
+	 */
+	public static <T extends Enum<?>> String toRangeString(Class<T> cazz) {
+		StringBuilder sb = new StringBuilder();
+		sb.append('{');
+		T constants[] = cazz.getEnumConstants();
+		int i = 0;
+		for (T element : constants) {
+			sb.append(element.toString());
+			if (i < constants.length) {
+				sb.append(',');
+			}
+			i++;
+		}
+		sb.append('}');
+		return null;
+	}
   
 }

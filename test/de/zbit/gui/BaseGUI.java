@@ -4,7 +4,6 @@
 package de.zbit.gui;
 
 import java.awt.Component;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
