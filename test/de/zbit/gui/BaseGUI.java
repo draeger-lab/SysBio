@@ -18,7 +18,7 @@ import de.zbit.util.prefs.KeyProvider;
  * @date 2010-11-28
  */
 public class BaseGUI extends BaseFrame {
-		
+	
 	/**
 	 * Generated serial version identifier.
 	 */
@@ -32,96 +32,130 @@ public class BaseGUI extends BaseFrame {
 		new BaseGUI();
 	}
 	
+	/**
+	 * 
+	 */
 	public BaseGUI() {
 		super();
 		setVisible(true);
 	}
-
-	@Override
-	public void closeFile() {
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#closeFile()
+	 */
+	public boolean closeFile() {
 		// TODO Auto-generated method stub
-		
+		return false;
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#createJToolBar()
+	 */
 	protected JToolBar createJToolBar() {
 		return createDefaultToolBar();
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#createMainComponent()
+	 */
 	protected Component createMainComponent() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#exit()
+	 */
 	public void exit() {
 		dispose();
 		System.exit(0);
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getCommandLineOptions()
+	 */
 	public Class<? extends KeyProvider>[] getCommandLineOptions() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getURLAboutMessage()
+	 */
 	public URL getURLAboutMessage() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getURLLicense()
+	 */
 	public URL getURLLicense() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getURLOnlineHelp()
+	 */
 	public URL getURLOnlineHelp() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public File openFile() {
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.BaseFrame#openFile()
+	 */
+	public void openFile() {
 		// TODO Auto-generated method stub
-		return null;
 	}
-
-	@Override
-	public File saveFile() {
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.BaseFrame#saveFile()
+	 */
+	public void saveFile() {
 		// TODO Auto-generated method stub
-		return null;
 	}
-
-
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.zbit.gui.BaseFrame#getApplicationName()
+	 */
 	public String getApplicationName() {
 		return "Simple GUI";
 	}
-
-
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.zbit.gui.BaseFrame#getDottedVersionNumber()
 	 */
-	@Override
 	public String getDottedVersionNumber() {
 		return "1.1";
 	}
-
-
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.zbit.gui.BaseFrame#getURLOnlineUpdate()
 	 */
-	@Override
 	public URL getURLOnlineUpdate() {
 		try {
-			return new URL("http://www.ra.cs.uni-tuebingen.de/software/SBMLsqueezer/downloads/");
+			return new URL(
+				"http://www.ra.cs.uni-tuebingen.de/software/SBMLsqueezer/downloads/");
 		} catch (MalformedURLException exc) {
 			GUITools.showErrorMessage(this, exc);
 		}

@@ -9,6 +9,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
+import java.awt.MenuItem;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -21,6 +22,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -36,18 +38,26 @@ import javax.swing.UIManager;
 
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
+import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
 /**
+ * This class provides a basic and easily extandable implementation of a
+ * graphical user interface, which already contains some actions and nice
+ * features. In this way, this class can serve as a multi-purpose element for
+ * any user interface.
+ * 
  * @author Andreas Dr&auml;ger
  * @date 2010-11-28
  */
 public abstract class BaseFrame extends JFrame {
 	
 	/**
+	 * This enum contains very basic actions of a graphical user interface.
 	 * 
 	 * @author Andreas Dr&auml;ger
 	 * @author Finja B&uuml;chel
@@ -104,7 +114,8 @@ public abstract class BaseFrame extends JFrame {
 		 */
 		HELP_ONLINE,
 		/**
-		 * {@link BaseAction} to check for a newer version of this program on the web.
+		 * {@link BaseAction} to check for a newer version of this program on the
+		 * web.
 		 */
 		HELP_UPDATE;
 		
@@ -165,13 +176,15 @@ public abstract class BaseFrame extends JFrame {
 	 * Switch to avoid checking for updates multiple times.
 	 */
 	private static boolean UPDATE_CHECKED = false;
-
+	
 	/**
 	 * A tool bar
 	 */
 	protected JToolBar toolBar;
 	
 	/**
+	 * Creates a new {@link BaseFrame}.
+	 * 
 	 * @throws HeadlessException
 	 */
 	public BaseFrame() throws HeadlessException {
@@ -179,12 +192,22 @@ public abstract class BaseFrame extends JFrame {
 		init();
 	}
 	
+	/**
+	 * Creates a new {@link BaseFrame}, for which it can be decided whether or not
+	 * to include {@link BaseAction#FILE_OPEN}, {@link BaseAction#FILE_SAVE}, and
+	 * {@link BaseAction#FILE_CLOSE} to the File menu. Default: true.
+	 * 
+	 * @param loadDefaultFileMenuEntries
+	 */
 	public BaseFrame(boolean loadDefaultFileMenuEntries) {
 		super();
 		init();
 	}
 	
 	/**
+	 * Creates a new {@link BaseFrame} with the given
+	 * {@link GraphicsConfiguration}.
+	 * 
 	 * @param gc
 	 */
 	public BaseFrame(GraphicsConfiguration gc) {
@@ -193,6 +216,8 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * Creates a new {@link BaseFrame} with the given title.
+	 * 
 	 * @param title
 	 * @throws HeadlessException
 	 */
@@ -202,8 +227,12 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * Creates a new {@link BaseFrame} with the given title and the given
+	 * {@link GraphicsConfiguration}.
+	 * 
 	 * @param title
 	 * @param gc
+	 * 
 	 */
 	public BaseFrame(String title, GraphicsConfiguration gc) {
 		super(title, gc);
@@ -211,24 +240,34 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
-	 * 
+	 * This method enables the {@link JMenuItem} that displays the online help and
+	 * also enables the {@link JButton} in the {@link JToolBar} linked to this
+	 * action. If these elements don't exist, nothing will happen.
 	 */
 	public final void activateOnlineHelpCommand() {
-		GUITools.setEnabled(true, getJMenuBar(), toolBar,
-			BaseAction.HELP_ONLINE, BaseAction.HELP_LICENSE);
+		GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.HELP_ONLINE,
+			BaseAction.HELP_LICENSE);
 	}
 	
 	/**
+	 * Override this method to add additional {@link JMenuItem}s to the Edit menu
+	 * (if this exists, otherwise the given {@link JMenuItem} will define the Edit
+	 * menu). If the {@link BaseAction#EDIT_PREFERENCES} is present in the Edit
+	 * menu, these items will be placed on top of it and there will be a
+	 * {@link JSeparator} over the preferences item.
 	 * 
 	 * @return
 	 */
 	protected JMenuItem[] additionalEditMenuItems() {
 		// empty method
 		return null;
-	} 
+	}
 	
 	/**
-	 * Additional items to be added to the file menu.
+	 * Override this method to add additional {@link JMenuItem}s to the File menu.
+	 * These will be placed after the command {@link BaseAction#FILE_CLOSE} (if
+	 * this entry exists, otherwise more to the top) and before the following
+	 * {@link JSeparator} over the {@link BaseAction#FILE_EXIT}.
 	 * 
 	 * @return
 	 */
@@ -238,6 +277,9 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * Override this method to add additional {@link JMenuItem}s to the help menu.
+	 * These will be placed under the {@link JMenuItem} for the online update (if
+	 * this one exists, otherwise in a higher position).
 	 * 
 	 * @return
 	 */
@@ -245,21 +287,37 @@ public abstract class BaseFrame extends JFrame {
 		// empty method
 		return null;
 	}
-
+	
 	/**
+	 * Override this method to add any additional {@link JMenu} to this
+	 * {@link BaseFrame}'s {@link JMenuBar}. The ordering of the additional
+	 * {@link JMenu}s will not be changed and they will be placed between the Edit
+	 * and Help menu (if these exist, otherwise more to the left).
+	 * 
 	 * @return
 	 */
 	protected JMenu[] additionalMenus() {
 		// empty method
 		return null;
 	}
-
-	/**
-	 * Closes a {@link File} that is currently open.
-	 */
-	public abstract void closeFile();
 	
 	/**
+	 * Closes a {@link File} that is currently open.
+	 * 
+	 * @return Whether or not calling this method lead to any change on this
+	 *         {@link BaseFrame}.
+	 */
+	public abstract boolean closeFile();
+	
+	/**
+	 * This method runs over all {@link JMenu}s in this {@link BaseFrame}'s
+	 * {@link JMenuBar} and looks on every {@link JMenuItem}. If the current
+	 * {@link JMenuItem} contains an {@link Icon}, a new {@link JButton} will be
+	 * created and added to a newly created {@link JToolBar}. After visiting an
+	 * entire {@link JMenu}, a {@link JSeparator} is added to the {@link JToolBar}
+	 * . The only {@link JMenuItem} that is definitely excluded from the
+	 * {@link JToolBar} is an item whose associated {@link ActionCommand} is
+	 * {@link BaseAction#FILE_EXIT}.
 	 * 
 	 * @return
 	 */
@@ -298,12 +356,22 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * This creates a new {@link JBrowserPane} which can be embedded in a
+	 * {@link JScrollPane} depending on the value of the boolean parameter.
 	 * 
 	 * @param url
+	 *        The {@link URL} of the HTML file to be displayed in the
+	 *        {@link JBrowserPane}.
 	 * @param preferedWidth
+	 *        the width dimension of the {@link JBrowserPane}.
 	 * @param preferedHeight
+	 *        the height dimension of the {@link JBrowserPane}.
 	 * @param scorll
-	 * @return
+	 *        whether or not to embed the created {@link JBrowserPane} in a
+	 *        {@link JScrollPane}.
+	 * @return Either an instance of {@link JBrowserPane} that displays the HTML
+	 *         file located at the given {@link URL}, or a {@link JScrollPane}
+	 *         containing such a {@link JBrowserPane}.
 	 */
 	private final JComponent createJBrowser(URL url, int preferedWidth,
 		int preferedHeight, boolean scroll) {
@@ -319,6 +387,26 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * Creates the default {@link JMenuBar} for this {@link BaseFrame}. You can
+	 * override this method to customize it more extensively for your purposes.
+	 * However, there are methods such as {@link #additionalFileMenuItems()},
+	 * {@link #additionalEditMenuItems()}, {@link #additionalHelpMenuItems()} and
+	 * also {@link #additionalMenus()} to insert more elements to the
+	 * {@link JMenuBar}. You can also switch most of the entries in the File menu
+	 * off by passing false to this method (this is actually done by overriding
+	 * the method {@link #loadsDefaultFileMenuEntries()}, which returns
+	 * <code>true</code> by default). If you don't implement the methods
+	 * {@link #getURLOnlineHelp}, {@link #getURLAboutMessage()},
+	 * {@link #getURLLicense()} or {@link #getURLOnlineUpdate()}, there will be,
+	 * for instance no Help menu in this element's {@link JMenuBar}. Similarly, no
+	 * Edit menu will occur if there are no instances of {@link PreferencesPanel}
+	 * in package <code>de.zbit.gui.prefs</code>. Hence, this method will at least
+	 * create a {@link JMenuBar} containing a single menu (File) which will at
+	 * least contain the entry for Exit. Everything else depends on either if all
+	 * methods mentioned above return a value distinct from null or if
+	 * user-defined {@link MenuItem}s or {@link JMenu}s have been declared by
+	 * overriding the dedicated methods.
+	 * 
 	 * @param loadDefaultFileMenuEntries
 	 *        Switch to decide weather or not to load the default entries in the
 	 *        File menu for Open, Save, and Close.
@@ -367,9 +455,13 @@ public abstract class BaseFrame extends JFrame {
 		int numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
 		if ((numPrefs > 0) || ((items != null) && (items.length > 0))) {
 			title = BaseAction.nameProperties.getProperty(BaseAction.EDIT);
-			menuBar.add(GUITools.createJMenu(title == null ? "Edit" : title, items, (items != null)
-					&& (items.length > 0) && (numPrefs > 0) ? new JSeparator() : null,
-				numPrefs > 0 ? preferences : null));
+			menuBar
+					.add(GUITools
+							.createJMenu(
+								title == null ? "Edit" : title,
+								items,
+								(items != null) && (items.length > 0) && (numPrefs > 0) ? new JSeparator()
+										: null, numPrefs > 0 ? preferences : null));
 		}
 		
 		/*
@@ -409,8 +501,8 @@ public abstract class BaseFrame extends JFrame {
 			UIManager.getIcon("ICON_GLOBE_16"), KeyStroke.getKeyStroke(
 				KeyEvent.VK_F4, 0), 'U', true);
 		title = BaseAction.nameProperties.getProperty(BaseAction.HELP);
-		JMenu helpMenu = GUITools.createJMenu((title == null) ? "Help" : title, help,
-			about, license, update, additionalHelpMenuItems());
+		JMenu helpMenu = GUITools.createJMenu((title == null) ? "Help" : title,
+			help, about, license, update, additionalHelpMenuItems());
 		if (helpMenu.getItemCount() > 0) {
 			try {
 				menuBar.setHelpMenu(helpMenu);
@@ -418,7 +510,7 @@ public abstract class BaseFrame extends JFrame {
 				menuBar.add(helpMenu);
 			}
 		}
-
+		
 		return menuBar;
 	}
 	
@@ -431,36 +523,57 @@ public abstract class BaseFrame extends JFrame {
 	protected abstract JToolBar createJToolBar();
 	
 	/**
-	 * @return
+	 * This creates the main element on the center of this {@link BaseFrame}. This
+	 * can be any instance of {@link Component}. It might be helpful to add a
+	 * field variable to your instance of {@link BaseFrame} to easily access and
+	 * manipulate this element later on. Please note that this method is called by
+	 * the constructor and therefore you should not set your main
+	 * {@link Component} to null in your derived constructor. The intention of
+	 * this method is that you here create some empty {@link Component} and at any
+	 * later state you fill it with some content.
+	 * 
+	 * @return An instance of {@link Component}, which should not be null. It is
+	 *         advisable to let this method initialize a field member of a derived
+	 *         {@link Object}, which is manipulated at later states in the
+	 *         program.
 	 */
 	protected abstract Component createMainComponent();
 	
 	/**
 	 * Method that is called on exit, i.e.,when this window is closing.
 	 */
-	
 	public abstract void exit();
 	
 	/**
+	 * The name of this program.
 	 * 
 	 * @return
 	 */
 	public abstract String getApplicationName();
 	
 	/**
+	 * This is required to automatically include a list of possible command-line
+	 * options into the online help. The array of {@link KeyProvider} classes
+	 * contains all those {@link KeyProvider}s whose {@link Option} entries are
+	 * valid keys for the command line.
+	 * 
 	 * @return
 	 */
 	public abstract Class<? extends KeyProvider>[] getCommandLineOptions();
-
+	
 	/**
-	 * For instance, 0.5 or 1.2.3. This number must have at minimum one dot and at
-	 * maximum two dots. All other symbols in this {@link String} must be digits.
+	 * The version number of this program. This must be a {@link String}
+	 * containing only digits and at least one dot or at most two dots. For
+	 * instance 1.2 or 1.2.3.
 	 * 
 	 * @return
 	 */
 	public abstract String getDottedVersionNumber();
 	
 	/**
+	 * Override this message to change the texts of some or all {@link JMenuItem}s
+	 * including their tool tips and also of {@link JButton}s and so on. The
+	 * location given here must be a path relative to the location of this class.
 	 * 
 	 * @return
 	 */
@@ -469,21 +582,40 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * The {@link URL} where the about message for this program is located, i.e.,
+	 * an HTML file containing information about the people in charge for this
+	 * program.
+	 * 
 	 * @return
 	 */
 	public abstract URL getURLAboutMessage();
 	
 	/**
+	 * The {@link URL} of the license file under which this application is
+	 * distributed.
+	 * 
 	 * @return
 	 */
 	public abstract URL getURLLicense();
 	
 	/**
+	 * The {@link URL} of the online help file.
+	 * 
 	 * @return
 	 */
 	public abstract URL getURLOnlineHelp();
 	
 	/**
+<<<<<<< .mine
+	 * The {@link URL} to some directory where to look for the online update. The
+	 * online update expects to find a file called <code>latest.txt</code>
+	 * containing only the version number of the latest release of this program as
+	 * a {@link String} of digits that contains exactly one dot or at most two
+	 * dots. Furthermore, on the given destination must be a second file, called
+	 * <code>releaseNotes&lt;VersionNumber&gt;.htm[l]</code> which contains more
+	 * detailled information about the latest release.
+	 * 
+=======
 	 * The web address or other directory address where we can find at least the
 	 * following two files:
 	 * <ul>
@@ -495,12 +627,13 @@ public abstract class BaseFrame extends JFrame {
 	 * contains HTML code describing the latest changes and the file name MUST end
 	 * with the latest version number of the release.
 	 * 
+>>>>>>> .r300
 	 * @return
 	 */
 	public abstract URL getURLOnlineUpdate();
 	
 	/**
-	 * 
+	 * Initializes this graphical user interface.
 	 */
 	protected void init() {
 		GUITools.initLaF(getApplicationName());
@@ -509,7 +642,8 @@ public abstract class BaseFrame extends JFrame {
 		}
 		try {
 			Properties defaults = new Properties();
-			if (System.getProperty("user.language").equals(Locale.GERMAN.getLanguage())) { 
+			if (System.getProperty("user.language").equals(
+				Locale.GERMAN.getLanguage())) {
 				defaults.loadFromXML(BaseFrame.class
 						.getResourceAsStream("BaseActionGerman.xml"));
 			} else {
@@ -531,7 +665,7 @@ public abstract class BaseFrame extends JFrame {
 		} catch (Exception exc) {
 			GUITools.showErrorMessage(this, exc);
 		}
-				
+		
 		// init GUI
 		// Do nothing is important! The actual closing is handled in "windowClosing()"
 		// which is not called on other close operations!
@@ -572,14 +706,23 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
-	 * 
+	 * Starts a search for an online update and shows error messages if no update
+	 * can be performed for some reason.
 	 */
 	public void onlineUpdate() {
 		onlineUpdate(false);
 	}
 	
 	/**
+	 * This actually performs the online update, i.e., this method looks if an
+	 * update is available and shows a message if this is the case. If the option
+	 * hideErrorMessages is set to <code>false</code>, a message will also be
+	 * shown if no update can be found or if an error occurs when searching for
+	 * the update. Otherwise, there will be no such method in case of failure.
+	 * 
 	 * @param hideErrorMessages
+	 *        if <code>true</code> no messages will be displayed to the user in
+	 *        case of an unsuccessful search for an update.
 	 */
 	private void onlineUpdate(boolean hideErrorMessages) {
 		try {
@@ -589,7 +732,13 @@ public abstract class BaseFrame extends JFrame {
 				getURLOnlineUpdate());
 			update.addWindowListener(EventHandler.create(WindowListener.class, this,
 				"setOnlineUpdateEnabled", null, "windowClosed"));
-			update.checkForUpdate(true, getDottedVersionNumber());
+			if (!update.checkForUpdate(true, getDottedVersionNumber())
+					&& !hideErrorMessages) {
+				GUITools.showMessage(String.format(
+										"You are using the latest version %s of %s. No newer version could be found.",
+										getDottedVersionNumber(), getApplicationName()),
+							"No update available");
+			}
 		} catch (IOException exc) {
 			if (!hideErrorMessages) {
 				GUITools.showErrorMessage(this, exc);
@@ -597,14 +746,13 @@ public abstract class BaseFrame extends JFrame {
 		}
 	}
 	
-		
 	/**
 	 * Opens some {@link File}.
 	 * 
 	 * @return
 	 */
-	public abstract File openFile();
-
+	public abstract void openFile();
+	
 	/**
 	 * Displays the configuration for the {@link PreferencesDialog}.
 	 */
@@ -615,19 +763,22 @@ public abstract class BaseFrame extends JFrame {
 	/**
 	 * Saves some {@link File}.
 	 * 
-	 * @return
 	 */
-	public abstract File saveFile();
+	public abstract void saveFile();
 	
 	/**
-	 * 
+	 * Enables the {@link JButton} in the {@link JToolBar} (if there is any) and
+	 * the entry in the {@link JMenu} that allows the user to search for an online
+	 * update.
 	 */
 	public final void setOnlineUpdateEnabled() {
 		GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
 	}
 	
-	/**
+	/*
+	 * (non-Javadoc)
 	 * 
+	 * @see java.awt.Window#setVisible(boolean)
 	 */
 	public void setVisible(boolean b) {
 		super.setVisible(b);
@@ -651,7 +802,8 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
-	 * 
+	 * Shows the about message, i.e., information about the authors of this
+	 * program in a {@link JOptionPane} of size 380x220.
 	 */
 	public final void showAboutMessage() {
 		JOptionPane.showMessageDialog(this, createJBrowser(getURLAboutMessage(),
@@ -659,7 +811,8 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
-	 * 
+	 * Displays the license under which this program is distributed in a
+	 * {@link JOptionPane} of size 640x480.
 	 */
 	public final void showLicense() {
 		JOptionPane.showMessageDialog(this, createJBrowser(getURLLicense(), 640,
@@ -668,11 +821,10 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
-	 * 
+	 * Displays the online help in a {@link JHelpBrowser}.
 	 */
 	public final void showOnlineHelp() {
-		GUITools.setEnabled(false, getJMenuBar(), toolBar,
-			BaseAction.HELP_ONLINE);
+		GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_ONLINE);
 		JHelpBrowser.showOnlineHelp(this, EventHandler.create(WindowListener.class,
 			this, "activateOnlineHelpCommand", null, "windowClosed"), getTitle()
 				+ " - Online Help", getURLOnlineHelp(), getCommandLineOptions());

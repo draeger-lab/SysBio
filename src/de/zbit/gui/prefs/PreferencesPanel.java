@@ -313,7 +313,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @param l
 	 * @return
 	 */
-	public JComponent getJComponentForOption(Option<?> option, SBPreferences prefs, EventListener l) {
+	public static JComponent getJComponentForOption(Option<?> option, SBPreferences prefs, EventListener l) {
 	  Object def = prefs != null ? option.getValue(prefs) : null;
 	  return getJComponentForOption(option, def, l);
 	}
@@ -325,7 +325,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @param l
 	 * @return
 	 */
-	public JComponent getJComponentForOption(Option<?> option, Object def, EventListener l) {
+	public static JComponent getJComponentForOption(Option<?> option, Object def, EventListener l) {
 	  return getJComponentForOption(option, def, 
 	    (l instanceof ItemListener?(ItemListener)l:null),
 	    (l instanceof ChangeListener?(ChangeListener)l:null),

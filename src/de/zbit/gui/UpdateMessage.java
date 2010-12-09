@@ -202,9 +202,14 @@ public class UpdateMessage {
 	 *        otherwise the message is printed on the console.
 	 * 
 	 * @param dottedVersionNumber
+	 * @return <code>true</code> if an update is available <code>false</code>
+	 *         otherwise.
 	 * @throws IOException
+	 *         If the {@link URL} to the update is incorrect or if there is
+	 *         neither a file with the name <code>releaseNotes&lt;latestVersion&gt;.htm</code>
+	 *         or <code>releaseNotes&lt;latestVersion&gt;.html</code>.
 	 */
-	public void checkForUpdate(boolean gui, String dottedVersionNumber)
+	public boolean checkForUpdate(boolean gui, String dottedVersionNumber)
 		throws IOException {
 		URL url = new URL(urlPrefix + "latest.txt");
 		latestVersion = (new Scanner(url.openStream())).next();
@@ -214,8 +219,14 @@ public class UpdateMessage {
 		}
 		this.dottedVersionNumber = dottedVersionNumber;
 		if (compareVersionNumbers(dottedVersionNumber, latestVersion)) {
-			showUpdateMessage(gui, urlPrefix + notes + ".htm");
+			try {
+				showUpdateMessage(gui, urlPrefix + notes + ".htm");
+			} catch (IOException exc) {
+				showUpdateMessage(gui, urlPrefix + notes + ".html");
+			}
+			return true;
 		}
+		return false;
 	}
 	
 	/**
