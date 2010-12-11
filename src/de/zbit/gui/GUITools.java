@@ -218,7 +218,24 @@ public class GUITools {
 			  for (JMenuItem i : (JMenuItem[]) item) {
 			    menu.add(i);
 			  }
+			} else if (item instanceof JMenu) {
+				menu.add((JMenu) item);
 			}
+		}
+		return menu;
+	}
+	
+	/**
+	 * 
+	 * @param text
+	 * @param tooltip
+	 * @param menuItems
+	 * @return
+	 */
+	public static JMenu createJMenu(String text, String tooltip, Object... menuItems) {
+		JMenu menu = createJMenu(text, menuItems);
+		if ((tooltip != null) && (tooltip.length() > 0) && (!tooltip.equals(text))) {
+			menu.setToolTipText(StringUtil.toHTML(tooltip, TOOLTIP_LINE_LENGTH));
 		}
 		return menu;
 	}
@@ -913,6 +930,27 @@ public class GUITools {
     }
       
   }
+
+	/**
+	 * @param jMenuBar
+	 * @param fileOpenRecent
+	 * @return
+	 */
+	public static JMenuItem getJMenuItem(JMenuBar menuBar, Object command) {
+		JMenu menu;
+		JMenuItem item;
+		for (int i = 0; i < menuBar.getMenuCount(); i++) {
+			menu = menuBar.getMenu(i);
+			if ((menu.getActionCommand() != null)
+					&& (menu.getActionCommand().equals(command.toString()))) { return menu; }
+			for (int j = 0; j < menu.getItemCount(); j++) {
+				item = menu.getItem(j);
+				if ((item != null) && (item.getActionCommand() != null)
+						&& (item.getActionCommand().equals(command.toString()))) { return item; }
+			}
+		}
+		return null;
+	}
 
   
   

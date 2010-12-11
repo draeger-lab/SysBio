@@ -889,11 +889,27 @@ public class CSVReaderOptionPanel extends JPanel {
     jd.add(c);
     // Close dialog with ESC button.
 		jd.getRootPane().registerKeyboardAction(new ActionListener() {
+			/*
+			 * (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
 			public void actionPerformed(ActionEvent e) {
 				c.buttonPressed = JOptionPane.CANCEL_OPTION;
 				jd.dispose();
 			}
 		}, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+			JComponent.WHEN_IN_FOCUSED_WINDOW);
+  	// Close dialog with ENTER button.
+		jd.getRootPane().registerKeyboardAction(new ActionListener() {
+			/*
+			 * (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent e) {
+				c.buttonPressed = JOptionPane.OK_OPTION;
+				jd.dispose();
+			}
+		}, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
 			JComponent.WHEN_IN_FOCUSED_WINDOW);
 		
 		// Set close operations

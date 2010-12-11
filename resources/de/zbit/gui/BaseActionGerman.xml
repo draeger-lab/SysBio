@@ -10,22 +10,24 @@
   </comment>
   <entry key="EDIT">Bearbeiten</entry>
 	 <entry key="EDIT_PREFERENCES">Einstellungen; Öffnet einen Dialog, mit dem
-	 alle Programmoptionen konfiguriert werden können.</entry>
+	     alle Programmoptionen konfiguriert werden können.</entry>
 	 <entry key="FILE">Datei</entry>
 	 <entry key="FILE_CLOSE">Schließen;Schließt die ausgewählte Datei.</entry>
 	 <entry key="FILE_EXIT">Beenden;Beendet dieses Programm und speichert die gesamte
-	  Nutzerkonfiguration.</entry>
+	     Nutzerkonfiguration.</entry>
 	 <entry key="FILE_OPEN">Öffnen;Öffnet eine Eingabedatei zur Bearbeitung.</entry>
+	 <entry key="FILE_OPEN_RECENT">Zuletzt verwendet;Die Einträge dieses Untermenüs
+	     ermöglichen es, direkt eine zuletzt bearbeitete Datei erneut zu öffnen.</entry>
 	 <entry key="FILE_SAVE">Speichern;Speichert die aktuelle Arbeit in einem der 
 	  verfügbaren Formate.</entry>
 	 <entry key="HELP">Hilfe</entry>
 	 <entry key="HELP_ABOUT">Impressum;Dieser Eintrag zeigt, wer dieses Programm erstellt
-	  hat und an wen man sich wenden kann, falls Probleme mit diesem Programm 
-	  auftreten.</entry>
+	     hat und an wen man sich wenden kann, falls Probleme mit diesem Programm 
+	     auftreten.</entry>
 	 <entry key="HELP_LICENSE">Lizenz;Zeigt die Bedingungen, unter denen dieses Programm
 		 veröffentlicht wurde.</entry>
 	 <entry key="HELP_ONLINE">Hilfe-Webseite;Öffnet ein Browserfenster, das die Hilfeseiten
-	  zu diesem Programm anzeigt.</entry>
+         zu diesem Programm anzeigt.</entry>
 	 <entry key="HELP_UPDATE">Online Aktualisierung;Sucht im Internat nach einer neueren 
 	  Version dieses Programms.</entry>
 </properties>

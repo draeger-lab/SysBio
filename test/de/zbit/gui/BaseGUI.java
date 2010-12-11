@@ -4,13 +4,17 @@
 package de.zbit.gui;
 
 import java.awt.Component;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Locale;
 
+import javax.swing.JFileChooser;
 import javax.swing.JToolBar;
 
 import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * @author Andreas Dr&auml;ger
@@ -112,11 +116,17 @@ public class BaseGUI extends BaseFrame {
 	
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.BaseFrame#openFile()
+	 * @see de.zbit.gui.BaseFrame#openFile(java.io.File[])
 	 */
-	public void openFile() {
-		// TODO Auto-generated method stub
+	public File[] openFile(File... files) {
+		if ((files != null) && (files.length > 0)) {
+			System.out.printf("files opened:%s\n", Arrays.toString(files));
+		} else {
+			SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+			files = GUITools.openFileDialog(this, prefs.get(GUIOptions.OPEN_DIR),
+				true, true, JFileChooser.FILES_ONLY);
+		}
+		return files;
 	}
 	
 	/*
@@ -159,5 +169,12 @@ public class BaseGUI extends BaseFrame {
 			GUITools.showErrorMessage(this, exc);
 		}
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getMaximalFileHistorySize()
+	 */
+	public short getMaximalFileHistorySize() {
+		return 5;
 	}
 }
