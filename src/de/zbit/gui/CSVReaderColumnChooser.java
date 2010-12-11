@@ -131,9 +131,11 @@ public class CSVReaderColumnChooser extends JPanel {
     add(optionalPanel);
   }
   
-  /**
-   * {@inheritDoc}
+  /*
+   * (non-Javadoc)
+   * @see java.awt.Component#repaint()
    */
+  @Override
   public void repaint() {
     if (optionalPanel!=null) optionalPanel.setVisible(optionalPanel.getComponentCount()>0);
     if (requiredPanel!=null) requiredPanel.setVisible(requiredPanel.getComponentCount()>0);

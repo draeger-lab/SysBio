@@ -16,6 +16,8 @@
 	 <entry key="FILE_EXIT">Exit;Closes this program and saves all user-defined
 		 preferences.</entry>
 	 <entry key="FILE_OPEN">Open;Opens a file for processing.</entry>
+	 <entry key="FILE_OPEN_RECENT">Recent files;The entries of this menu item allow
+	     you to directly load a recently opened file again.</entry>
 	 <entry key="FILE_SAVE">Save;Saves the current work in one of the available
 		 formats.</entry>
 	 <entry key="HELP">Help</entry>

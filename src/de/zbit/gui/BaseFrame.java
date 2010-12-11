@@ -10,6 +10,8 @@ import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
 import java.awt.MenuItem;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -18,8 +20,11 @@ import java.beans.EventHandler;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -36,6 +41,9 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
+import com.sun.xml.internal.bind.v2.runtime.property.Property;
+
+import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
@@ -46,7 +54,7 @@ import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
 /**
- * This class provides a basic and easily extendable implementation of a
+ * This class provides a basic and easily extendible implementation of a
  * graphical user interface, which already contains some actions and nice
  * features. In this way, this class can serve as a multi-purpose element for
  * any user interface.
@@ -57,7 +65,7 @@ import de.zbit.util.prefs.SBProperties;
 public abstract class BaseFrame extends JFrame {
 	
 	/**
-	 * This enum contains very basic actions of a graphical user interface.
+	 * This {@link Enum} contains very basic actions of a graphical user interface.
 	 * 
 	 * @author Andreas Dr&auml;ger
 	 * @author Finja B&uuml;chel
@@ -65,7 +73,7 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	public static enum BaseAction implements ActionCommand {
 		/**
-		 * 
+		 * The {@link ActionCommand} for the Edit menu.
 		 */
 		EDIT,
 		/**
@@ -74,7 +82,7 @@ public abstract class BaseFrame extends JFrame {
 		 */
 		EDIT_PREFERENCES,
 		/**
-		 * 
+		 * The {@link ActionCommand} for the File menu.
 		 */
 		FILE,
 		/**
@@ -91,12 +99,16 @@ public abstract class BaseFrame extends JFrame {
 		 */
 		FILE_OPEN,
 		/**
+		 * {@link BaseAction} to access the history of previously opened files.
+		 */
+		FILE_OPEN_RECENT,
+		/**
 		 * {@link BaseAction} to saves the currently opened file or the result of a
 		 * computation in one of the available formats.
 		 */
 		FILE_SAVE,
 		/**
-		 * 
+		 * The {@link ActionCommand} for the help menu. 
 		 */
 		HELP,
 		/**
@@ -142,7 +154,10 @@ public abstract class BaseFrame extends JFrame {
 				if (name.contains(separator)) {
 					name = name.split(separator)[0];
 				}
-				return name.trim();
+				name = name.trim();
+				if (name.length() > 0) {
+					return name;
+				}
 			}
 			return StringUtil.firstLetterUpperCase(key.toLowerCase().substring(
 				key.lastIndexOf('_') + 1));
@@ -160,7 +175,10 @@ public abstract class BaseFrame extends JFrame {
 				if (toolTip.contains(separator)) {
 					toolTip = toolTip.split(separator)[1];
 				}
-				return toolTip.trim();
+				toolTip = toolTip.trim();
+				if (toolTip.length() > 0) {
+					return toolTip;
+				}
 			}
 			return null;
 		}
@@ -171,12 +189,11 @@ public abstract class BaseFrame extends JFrame {
 	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = -6533854985804740883L;
-	
 	/**
 	 * Switch to avoid checking for updates multiple times.
 	 */
 	private static boolean UPDATE_CHECKED = false;
-	
+
 	/**
 	 * A tool bar
 	 */
@@ -184,7 +201,7 @@ public abstract class BaseFrame extends JFrame {
 	
 	/**
 	 * Creates a new {@link BaseFrame}.
-	 * 
+	 *  
 	 * @throws HeadlessException
 	 */
 	public BaseFrame() throws HeadlessException {
@@ -195,8 +212,8 @@ public abstract class BaseFrame extends JFrame {
 	/**
 	 * Creates a new {@link BaseFrame}, for which it can be decided whether or not
 	 * to include {@link BaseAction#FILE_OPEN}, {@link BaseAction#FILE_SAVE}, and
-	 * {@link BaseAction#FILE_CLOSE} to the File menu. Default: true.
-	 * 
+	 * {@link BaseAction#FILE_CLOSE} to the File menu. Default: <code>true</code>.
+	 *  
 	 * @param loadDefaultFileMenuEntries
 	 */
 	public BaseFrame(boolean loadDefaultFileMenuEntries) {
@@ -232,7 +249,6 @@ public abstract class BaseFrame extends JFrame {
 	 * 
 	 * @param title
 	 * @param gc
-	 * 
 	 */
 	public BaseFrame(String title, GraphicsConfiguration gc) {
 		super(title, gc);
@@ -256,7 +272,9 @@ public abstract class BaseFrame extends JFrame {
 	 * menu, these items will be placed on top of it and there will be a
 	 * {@link JSeparator} over the preferences item.
 	 * 
-	 * @return
+	 * @return An array of {@link JMenuItem}s that are added to the Edit menu
+	 *         above of the preferences entry if it exists. This method may return
+	 *         null.
 	 */
 	protected JMenuItem[] additionalEditMenuItems() {
 		// empty method
@@ -269,7 +287,8 @@ public abstract class BaseFrame extends JFrame {
 	 * this entry exists, otherwise more to the top) and before the following
 	 * {@link JSeparator} over the {@link BaseAction#FILE_EXIT}.
 	 * 
-	 * @return
+	 * @return An array of {@link JMenuItem}s that are added to the File menu
+	 *         above of the exit entry. This method may return null.
 	 */
 	protected JMenuItem[] additionalFileMenuItems() {
 		// empty method
@@ -281,7 +300,8 @@ public abstract class BaseFrame extends JFrame {
 	 * These will be placed under the {@link JMenuItem} for the online update (if
 	 * this one exists, otherwise in a higher position).
 	 * 
-	 * @return
+	 * @return An array of {@link JMenuItem}s that are added to the Help menu.
+	 *         This method may return null.
 	 */
 	protected JMenuItem[] additionalHelpMenuItems() {
 		// empty method
@@ -294,7 +314,9 @@ public abstract class BaseFrame extends JFrame {
 	 * {@link JMenu}s will not be changed and they will be placed between the Edit
 	 * and Help menu (if these exist, otherwise more to the left).
 	 * 
-	 * @return
+	 * @return An array of {@link JMenu}s that are to be placed in this
+	 *         {@link BaseFrame}'s {@link JMenuBar} left of the Help menu if it
+	 *         exists. This method may return null.
 	 */
 	protected JMenu[] additionalMenus() {
 		// empty method
@@ -319,7 +341,12 @@ public abstract class BaseFrame extends JFrame {
 	 * {@link JToolBar} is an item whose associated {@link ActionCommand} is
 	 * {@link BaseAction#FILE_EXIT}.
 	 * 
-	 * @return
+	 * @return a {@link JToolBar} that contains one {@link JButton} for each
+	 *         {@link JMenuItem} in this {@link BaseFrame}'s {@link JMenuBar} that
+	 *         contains an {@link Icon} and groups all these buttons according to
+	 *         the {@link JMenu} they belong to. Each one of these {@link JButton}s
+	 *         refers to the identical {@link ActionListener} and has the identical
+	 *         action command as the corresponding {@link JMenuItem}.
 	 */
 	public JToolBar createDefaultToolBar() {
 		JMenu menu;
@@ -387,6 +414,7 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * <p>
 	 * Creates the default {@link JMenuBar} for this {@link BaseFrame}. You can
 	 * override this method to customize it more extensively for your purposes.
 	 * However, there are methods such as {@link #additionalFileMenuItems()},
@@ -406,11 +434,28 @@ public abstract class BaseFrame extends JFrame {
 	 * methods mentioned above return a value distinct from null or if
 	 * user-defined {@link MenuItem}s or {@link JMenu}s have been declared by
 	 * overriding the dedicated methods.
+	 * </p>
+	 * <p>
+	 * All predefined {@link JMenu}s and {@link JMenuItem}s in this
+	 * {@link JMenuBar} are also equipped with an action command {@link String},
+	 * which is taken from {@link BaseAction#toString()}. This allows to query for
+	 * desired {@link JMenuItem}s or {@link JMenu}s using the method
+	 * {@link GUITools#getJMenuItem(JMenuBar, Object)}. This means, it is not
+	 * necessary to memorize any {@link JMenu}s or {@link JMenuItem} instances as
+	 * field variables.
+	 * </p>
+	 * <p>
+	 * The texts, i.e., labels, for all {@link JMenuItem}s in this {@link JMenu}
+	 * are taken from a configuration file depending on the language properties of
+	 * the {@link System}.
+	 * </p>
 	 * 
 	 * @param loadDefaultFileMenuEntries
 	 *        Switch to decide weather or not to load the default entries in the
 	 *        File menu for Open, Save, and Close.
-	 * @return
+	 * @return A {@link JMenuBar} that already contains some predefined menus.
+	 * @see #getLocationOfBaseActionProperties()
+	 * @see GUITools#getJMenuItem(JMenuBar, Object)
 	 */
 	protected JMenuBar createJMenuBar(boolean loadDefaultFileMenuEntries) {
 		JMenuBar menuBar = new JMenuBar();
@@ -419,29 +464,51 @@ public abstract class BaseFrame extends JFrame {
 		/*
 		 * File menu
 		 */
-		JMenuItem openFile = loadDefaultFileMenuEntries ? GUITools.createJMenuItem(
-			EventHandler.create(ActionListener.class, this, "openFile"),
-			BaseAction.FILE_OPEN, UIManager.getIcon("ICON_OPEN_16"), KeyStroke
-					.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK), 'O', true) : null;
-		JMenuItem saveFile = loadDefaultFileMenuEntries ? GUITools.createJMenuItem(
-			EventHandler.create(ActionListener.class, this, "saveFile"),
-			BaseAction.FILE_SAVE, UIManager.getIcon("ICON_SAVE_16"), KeyStroke
-					.getKeyStroke('S', InputEvent.CTRL_DOWN_MASK), 'S', false) : null;
-		JMenuItem close = loadDefaultFileMenuEntries ? GUITools.createJMenuItem(
-			EventHandler.create(ActionListener.class, this, "closeFile"),
-			BaseAction.FILE_CLOSE, UIManager.getIcon("ICON_TRASH_16"), KeyStroke
-					.getKeyStroke('W', InputEvent.CTRL_DOWN_MASK), 'W', false) : null;
+		JMenuItem openFile = null, saveFile = null, closeFile = null;
+		if (loadDefaultFileMenuEntries) {
+			openFile = GUITools.createJMenuItem(EventHandler.create(
+				ActionListener.class, this, "openFileAndLogHistory"),
+				BaseAction.FILE_OPEN, UIManager.getIcon("ICON_OPEN_16"), KeyStroke
+						.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK), 'O', true);
+			saveFile = GUITools.createJMenuItem(EventHandler.create(
+				ActionListener.class, this, "saveFile"), BaseAction.FILE_SAVE,
+				UIManager.getIcon("ICON_SAVE_16"), KeyStroke.getKeyStroke('S',
+					InputEvent.CTRL_DOWN_MASK), 'S', false);
+			closeFile = GUITools.createJMenuItem(EventHandler.create(
+				ActionListener.class, this, "closeFile"), BaseAction.FILE_CLOSE,
+				UIManager.getIcon("ICON_TRASH_16"), KeyStroke.getKeyStroke('W',
+					InputEvent.CTRL_DOWN_MASK), 'W', false);
+		}
 		JMenuItem exit = GUITools.createJMenuItem(EventHandler.create(
 			ActionListener.class, this, "exit"), BaseAction.FILE_EXIT, UIManager
 				.getIcon("ICON_EXIT_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F4,
 			InputEvent.ALT_DOWN_MASK));
 		JMenuItem items[] = additionalFileMenuItems();
 		boolean addSeparator = (openFile != null) || (saveFile != null)
-				|| ((items != null) && (items.length > 0)) || (close != null);
-		title = BaseAction.nameProperties.getProperty(BaseAction.FILE);
-		menuBar.add(GUITools.createJMenu(title == null ? "File" : title, openFile,
-			saveFile, items, close, addSeparator ? new JSeparator() : null, exit));
-		
+				|| ((items != null) && (items.length > 0)) || (closeFile != null);
+		JMenu fileHistory = null;
+		if (getMaximalFileHistorySize() > 0) {
+			fileHistory = new JMenu(BaseAction.FILE_OPEN_RECENT.getName());
+			fileHistory.setActionCommand(BaseAction.FILE_OPEN_RECENT.toString());
+			fileHistory.setEnabled(false);
+			String tooltip = BaseAction.FILE_OPEN_RECENT.getToolTip();
+			if (tooltip != null) {
+				fileHistory.setToolTipText(StringUtil.toHTML(tooltip,
+					GUITools.TOOLTIP_LINE_LENGTH, false));
+			}
+			SBPreferences history = SBPreferences
+					.getPreferencesFor(getFileHistoryKeyProvider());
+			String fileList = (history != null) ? history
+					.get(FileHistory.LAST_OPENED) : null;
+			updateFileHistory(fileHistory, FileHistory.Tools.parseList(fileList));
+		}
+		title = BaseAction.FILE.getName();
+		JMenu fileMenu = GUITools.createJMenu(title == null ? "File" : title,
+				BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
+				closeFile, addSeparator ? new JSeparator() : null, exit);
+		fileMenu.setActionCommand(BaseAction.FILE.toString());
+		menuBar.add(fileMenu);
+
 		/*
 		 * Edit menu
 		 */
@@ -454,12 +521,13 @@ public abstract class BaseFrame extends JFrame {
 		// and add this menu only if there is at least one preference panel defined.
 		int numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
 		if ((numPrefs > 0) || ((items != null) && (items.length > 0))) {
-			title = BaseAction.nameProperties.getProperty(BaseAction.EDIT);
-			menuBar.add(GUITools.createJMenu(
-								title == null ? "Edit" : title,
-								items,
-								(items != null) && (items.length > 0) && (numPrefs > 0) ? new JSeparator()
-										: null, numPrefs > 0 ? preferences : null));
+			title = BaseAction.EDIT.getName();
+			JMenu editMenu = GUITools.createJMenu(
+				title == null ? "Edit" : title, BaseAction.EDIT.getToolTip(), items,
+						(items != null) && (items.length > 0) && (numPrefs > 0) ? new JSeparator()
+								: null, numPrefs > 0 ? preferences : null);
+			editMenu.setActionCommand(BaseAction.EDIT.toString());
+			menuBar.add(editMenu);
 		}
 		
 		/*
@@ -498,10 +566,12 @@ public abstract class BaseFrame extends JFrame {
 			ActionListener.class, this, "onlineUpdate"), BaseAction.HELP_UPDATE,
 			UIManager.getIcon("ICON_GLOBE_16"), KeyStroke.getKeyStroke(
 				KeyEvent.VK_F4, 0), 'U', true);
-		title = BaseAction.nameProperties.getProperty(BaseAction.HELP);
+		title = BaseAction.HELP.getName();
 		JMenu helpMenu = GUITools.createJMenu((title == null) ? "Help" : title,
-			help, about, license, update, additionalHelpMenuItems());
+			BaseAction.HELP.getToolTip(), help, about, license, update,
+			additionalHelpMenuItems());
 		if (helpMenu.getItemCount() > 0) {
+			helpMenu.setActionCommand(BaseAction.HELP.toString());
 			try {
 				menuBar.setHelpMenu(helpMenu);
 			} catch (Error exc) {
@@ -516,10 +586,11 @@ public abstract class BaseFrame extends JFrame {
 	 * By default this method simply returns null. You can override it to create
 	 * your own tool bar.
 	 * 
-	 * @return
+	 * @return an instance of {@link JToolBar} or null if no tool bar is desired.
+	 * @see #createDefaultToolBar()
 	 */
 	protected abstract JToolBar createJToolBar();
-	
+
 	/**
 	 * This creates the main element on the center of this {@link BaseFrame}. This
 	 * can be any instance of {@link Component}. It might be helpful to add a
@@ -536,9 +607,10 @@ public abstract class BaseFrame extends JFrame {
 	 *         program.
 	 */
 	protected abstract Component createMainComponent();
-	
+
 	/**
-	 * Method that is called on exit, i.e.,when this window is closing.
+	 * Method that is called on exit, i.e., when this {@link BaseFrame}
+	 * {@link Window} is closing.
 	 */
 	public abstract void exit();
 	
@@ -569,15 +641,47 @@ public abstract class BaseFrame extends JFrame {
 	public abstract String getDottedVersionNumber();
 	
 	/**
+	 * Returns the {@link KeyProvider} that provides an {@link Option} to
+	 * persistently store the history of previously opened files.
+	 * 
+	 * @return By default, this method returns an instance of {@link Class} for
+	 *         the {@link FileHistory} interface. To avoid that multiple
+	 *         applications that implement this {@link BaseFrame} override each
+	 *         other's file history, implementing classes should override this
+	 *         method and return a class file corresponding to something that is
+	 *         derived from {@link FileHistory} and that is located in a different
+	 *         package.
+	 */
+	public Class<? extends FileHistory> getFileHistoryKeyProvider() {
+		return FileHistory.class;
+	}
+	
+	/**
 	 * Override this message to change the texts of some or all {@link JMenuItem}s
 	 * including their tool tips and also of {@link JButton}s and so on. The
 	 * location given here must be a path relative to the location of this class.
 	 * 
-	 * @return
+	 * @return By default, this method returns null, i.e., the default texts will
+	 *         be set for all menu items depending on the {@link System}'s
+	 *         {@link Property} with the key <code>user.language</code>.
 	 */
 	protected String getLocationOfBaseActionProperties() {
 		return null;
 	}
+	
+	/**
+	 * Gives the number of files to be memorized and displayed in the file
+	 * history. This will be made persistent using an instance of
+	 * {@link FileHistory}.
+	 * 
+	 * @return If this method returns a value between 1 and 10, every item in the
+	 *         file history will also be accessible with a {@link KeyStroke} by
+	 *         pushing {@link InputEvent#ALT_DOWN_MASK} and a number from 0
+	 *         through 9. For larger values no such combination will be created
+	 *         for any item. By returning 0 or less you can switch the file
+	 *         history function completely off.
+	 */
+	public abstract short getMaximalFileHistorySize();
 	
 	/**
 	 * This method creates a title from the values of
@@ -770,11 +874,114 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
-	 * Opens some {@link File}.
+	 * <p>
+	 * This method is linked to the {@link BaseAction#FILE_OPEN} and will be
+	 * called when ever any element associated with this action command is
+	 * activated. The intention of this method is that the user can either choose
+	 * which file to open or that one or multiple instances of {@link File} are
+	 * passed to this method. In both cases this method knows what to do with
+	 * these {@link File}s or their content. For instance, it might be necessary
+	 * to change the content of this {@link BaseFrame}'s main component according
+	 * to the content of the selected or given {@link File}(s).
+	 * </p>
+	 * <p>
+	 * However, this method will not be called directly in this case, it is rather
+	 * wrapped in {@link #openFileAndLogHistory(File...)}. This method tries to
+	 * memorize all opened files to make them accessible to the user more easily
+	 * in the {@link JMenuBar} of this {@link BaseFrame}. Therefore, it is
+	 * necessary that this method returns all {@link File} instances that are
+	 * selected by the user when executing this method.
+	 * </p>
+	 * <p>
+	 * In case that one or multiple instances of {@link File} are passed to this
+	 * method, here is the correct location to decide whether these {@link File}
+	 * objects can be processed. Maybe a warning must be displayed to the user or
+	 * maybe invalid input {@link File}s are simply to be ignored.
+	 * </p>
 	 * 
-	 * @return
+	 * @return An array of all those {@link File} instances that are either
+	 *         selected by the user or the left over from the given arguments,
+	 *         i.e., the subset of valid input files from the given {@link File}
+	 *         arguments.
+	 * @see #createMainComponent()
+	 * @see #openFileAndLogHistory(File...)
 	 */
-	public abstract void openFile();
+	protected abstract File[] openFile(File... files);
+	
+	/**
+	 * This method wraps {@link #openFileAndLogHistory(File...)} and simply
+	 * provides a way to call this other method without the necessity to pass any
+	 * arguments to it.
+	 * 
+	 * @return An array of {@link File} objects that have been selected by the
+	 *         user or null if the user cancels the operation.
+	 * @see #openFileAndLogHistory(File...)
+	 * @see #openFile(File...)
+	 */
+	public final File[] openFileAndLogHistory() {
+		return openFileAndLogHistory(new File[0]);
+	}
+	
+	/**
+	 * This method passes the given files to the method {@link #openFile(File...)}
+	 * and then memorizes the files returned by this method in the file history,
+	 * which is then made accessible to the user via the {@link JMenuBar}. It also
+	 * tries to store the open directory for the next access. This is only
+	 * possible if all files returned by {@link #openFile(File...)} have the same
+	 * parent directory. In case that an error occurs while making the new base
+	 * directory persistent, a dialog will be displayed to the user that shows the
+	 * precise error message.
+	 * 
+	 * @param files
+	 *        any number of files that should be passed to the method
+	 *        {@link #openFile(File...)}.
+	 * @return the files that originate from the method {@link #openFile(File...)}
+	 *         .
+	 */
+	protected final File[] openFileAndLogHistory(File... files) {
+		files = openFile(files);
+		if ((files != null) && (files.length > 0)
+				&& (getMaximalFileHistorySize() > 0)) {
+			List<File> fileList = new LinkedList<File>();
+			// Process all those files that have just been opened.
+			String baseDir = null;
+			boolean sameBaseDir = true;
+			for (File file : files) {
+				if (file.exists() && file.canRead() && !fileList.contains(file)) {
+					if (baseDir == null) {
+						baseDir = file.getParent();
+					} else if (!baseDir.equals(file.getParent())) {
+						sameBaseDir = false;
+					}
+					fileList.add(file);
+				}
+			}
+			// Memorize the default open directory.
+			if (sameBaseDir && (baseDir != null)) {
+				SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+				prefs.put(GUIOptions.OPEN_DIR, baseDir);
+				try {
+					prefs.flush();
+				} catch (BackingStoreException exc) {
+					GUITools.showErrorMessage(this, exc);
+				}
+			}
+			// Create the list of files to update the file history in the menu.
+			// In addition to the files that have just been opened (above), we
+			// also have to consider older files.
+			File file;
+			JMenu fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
+				BaseAction.FILE_OPEN_RECENT);
+			for (int i = 0; i < fileHistory.getItemCount(); i++) {
+				file = new File(fileHistory.getItem(i).getToolTipText());
+				if (file.exists() && file.canRead() && !fileList.contains(file)) {
+					fileList.add(file);
+				}
+			}
+			updateFileHistory(fileHistory, fileList);
+		}
+		return files;
+	}
 	
 	/**
 	 * Displays the configuration for the {@link PreferencesDialog}.
@@ -782,10 +989,9 @@ public abstract class BaseFrame extends JFrame {
 	public void preferences() {
 		PreferencesDialog.showPreferencesDialog();
 	}
-	
+
 	/**
-	 * Saves some {@link File}.
-	 * 
+	 * Saves some results or the current work in some {@link File}.
 	 */
 	public abstract void saveFile();
 	
@@ -853,6 +1059,63 @@ public abstract class BaseFrame extends JFrame {
 			this, "activateOnlineHelpCommand", null, "windowClosed"), String.format(
 			"%s - Online Help", getProgramNameAndVersion()), getURLOnlineHelp(),
 			getCommandLineOptions());
+	}
+	
+	/**
+	 * Updates the list of previously opened files in the {@link JMenuBar}. This
+	 * method is private because it relies on the correctness of the given
+	 * {@link JMenu} and also the given {@link List} of {@link File}s. This method
+	 * also makes the file history persistent. If this fails, a dialog with a
+	 * precise error message will be displayed to the user.
+	 * 
+	 * @param fileHistory
+	 *        The {@link JMenu}, whose items will be removed and replaced by
+	 *        references to the files given in the other argument. If the item
+	 *        count of this {@link JMenu} is zero at the end of this method, it
+	 *        will be disabled.
+	 * @param listOfFiles
+	 *        A {@link List} of those {@link File}s that have been opened
+	 *        previously.
+	 */
+	private final void updateFileHistory(JMenu fileHistory, List<File> listOfFiles) {
+		fileHistory.removeAll();
+		JMenuItem fileItem;
+		List<File> keepFiles = new LinkedList<File>();
+		short maximum = getMaximalFileHistorySize();
+		for (int i = 0; i < Math.min(listOfFiles.size(), maximum); i++) {
+			final File file = listOfFiles.get(i);
+			if (file.exists() && file.canRead()) {
+				fileItem = new JMenuItem(file.getName());
+				fileItem.setToolTipText(file.getAbsolutePath());
+				if (maximum <= 10) {
+					fileItem.setAccelerator(KeyStroke.getKeyStroke(String.valueOf(
+						(i + 1 < 10) ? i + 1 : 0).charAt(0), InputEvent.ALT_DOWN_MASK));
+				}
+				fileItem.addActionListener(new ActionListener() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.
+					 * ActionEvent)
+					 */
+					public void actionPerformed(ActionEvent e) {
+						openFileAndLogHistory(file);
+					}
+				});
+				fileHistory.add(fileItem);
+				keepFiles.add(file);
+			}
+		}
+		fileHistory.setEnabled(fileHistory.getItemCount() > 0);
+		// This removes files that cannot be read from the history.
+		SBPreferences history = SBPreferences
+				.getPreferencesFor(getFileHistoryKeyProvider());
+		history.put(FileHistory.LAST_OPENED, FileHistory.Tools.toString(keepFiles));
+		try {
+			history.flush();
+		} catch (BackingStoreException exc) {
+			GUITools.showErrorMessage(this, exc);
+		}
 	}
 	
 }
