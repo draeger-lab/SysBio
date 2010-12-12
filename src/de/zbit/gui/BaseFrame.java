@@ -940,8 +940,7 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	protected final File[] openFileAndLogHistory(File... files) {
 		files = openFile(files);
-		if ((files != null) && (files.length > 0)
-				&& (getMaximalFileHistorySize() > 0)) {
+		if ((files != null) && (files.length > 0)) {
 			List<File> fileList = new LinkedList<File>();
 			// Process all those files that have just been opened.
 			String baseDir = null;
@@ -966,19 +965,21 @@ public abstract class BaseFrame extends JFrame {
 					GUITools.showErrorMessage(this, exc);
 				}
 			}
-			// Create the list of files to update the file history in the menu.
-			// In addition to the files that have just been opened (above), we
-			// also have to consider older files.
-			File file;
-			JMenu fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
-				BaseAction.FILE_OPEN_RECENT);
-			for (int i = 0; i < fileHistory.getItemCount(); i++) {
-				file = new File(fileHistory.getItem(i).getToolTipText());
-				if (file.exists() && file.canRead() && !fileList.contains(file)) {
-					fileList.add(file);
+			if (getMaximalFileHistorySize() > 0) {
+				// Create the list of files to update the file history in the menu.
+				// In addition to the files that have just been opened (above), we
+				// also have to consider older files.
+				File file;
+				JMenu fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
+					BaseAction.FILE_OPEN_RECENT);
+				for (int i = 0; i < fileHistory.getItemCount(); i++) {
+					file = new File(fileHistory.getItem(i).getToolTipText());
+					if (file.exists() && file.canRead() && !fileList.contains(file)) {
+						fileList.add(file);
+					}
 				}
+				updateFileHistory(fileHistory, fileList);
 			}
-			updateFileHistory(fileHistory, fileList);
 		}
 		return files;
 	}
