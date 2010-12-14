@@ -30,6 +30,9 @@ import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Utils;
 
 /**
+ * This class is a wrapper for {@link Preferences}, which provides a lot of
+ * additional functionality.
+ * 
  * @author Andreas Dr&auml;ger
  * @date 2010-10-24
  */
@@ -68,8 +71,9 @@ public class SBPreferences implements Map<Object, Object> {
 			return key;
 		}
 		
-		/**
-		 * 
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map.Entry#getValue()
 		 */
 		public Object getValue() {
 			return value;
