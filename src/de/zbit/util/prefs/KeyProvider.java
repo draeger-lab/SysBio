@@ -366,6 +366,20 @@ public interface KeyProvider {
 		}
 		
 		/**
+		 * Checks whether or not the given {@link KeyProvider} contains a field with
+		 * the given key name of type {@link Option}.
+		 * 
+		 * @param keyProvider
+		 * @param key
+		 *        the name of the {@link Option} to check.
+		 * @return
+		 */
+		public static boolean providesOption(
+			Class<? extends KeyProvider> keyProvider, String key) {
+			return getField(keyProvider, key, Option.class) != null;
+		}
+
+		/**
 		 * 
 		 * @param sb
 		 * @param options
