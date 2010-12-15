@@ -438,7 +438,7 @@ public class Range<Type> {
 			// Be carefull with " and '
 			//String[] items = range.split(Pattern.quote(","));
 			List<Character> stringSep = new LinkedList<Character>();
-			stringSep.add('\''); stringSep.add('\"');
+			stringSep.add('\''); stringSep.add('"');
 			String[] items = CSVReader.getSplits(range, ',', true, true, stringSep);
 			
 			SubRange r = null;
@@ -518,14 +518,14 @@ public class Range<Type> {
 		T constants[] = cazz.getEnumConstants();
 		int i = 0;
 		for (T element : constants) {
-			sb.append(element.toString());
-			if (i < constants.length) {
+			if (i > 0) {
 				sb.append(',');
 			}
+			sb.append(element.toString());
 			i++;
 		}
 		sb.append('}');
-		return null;
+		return sb.toString();
 	}
   
 }
