@@ -1,5 +1,10 @@
 package de.zbit.util.prefs;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -88,20 +93,121 @@ public interface KeyProvider {
 		/**
 		 * 
 		 * @param keyProvider
+		 * @param headerRank
 		 * @return
 		 */
 		@SuppressWarnings("unchecked")
+		private static StringBuilder createDocumantationContent(
+			Class<? extends KeyProvider> keyProvider, int headerRank) {
+			StringBuilder sb = new StringBuilder();
+			List<OptionGroup> groupList = optionGroupList(keyProvider);
+			List<Option> optionList = optionList(keyProvider);
+			if (groupList.size() > 0) {
+				for (OptionGroup<?> group : groupList) {
+					sb.append(String.format("    <h%d> %s </h%d>\n      <p>", headerRank,
+						group.getName(), headerRank));
+					sb.append(StringUtil.insertLineBreaks(group.getToolTip(), 70,
+						"\n      "));
+					sb.append("</p>\n");
+					writeOptionsToHTMLTable(sb, group.getOptions(), optionList);
+				}
+			}
+			if (optionList.size() > 0) {
+				sb.append("    <h");
+				sb.append(headerRank);
+				sb.append("> Additional options </h");
+				sb.append(headerRank);
+				sb.append(">\n");
+				writeOptionsToHTMLTable(sb, optionList, null);
+			}
+			return sb;
+		}
+		
+		/**
+		 * 
+		 * @return
+		 */
+		private static StringBuilder createDocumantationFooter() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("  </body>\n");
+			sb.append("</html>\n");
+			return sb;
+		}
+		
+		/**
+		 * 
+		 * @param keyProvider
+		 * @return
+		 */
 		public static String createDocumentation(
 			Class<? extends KeyProvider> keyProvider) {
 			StringBuilder sb = new StringBuilder();
-			String title = createTitle(keyProvider);
-			
-			sb.append("<!DOCTYPE html");
-			sb.append(" PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
-			sb
-					.append(" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
-			sb
-					.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n");
+			sb.append(createDocumentationHeader(createTitle(keyProvider)));
+			sb.append(createDocumantationContent(keyProvider, 2));
+			sb.append(createDocumantationFooter());			
+			return sb.toString();
+		}
+		
+		/**
+		 * 
+		 * @param keyProviders
+		 * @return
+		 */
+		public static String createDocumentation(String applicationName,
+			Class<? extends KeyProvider>... keyProviders) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(createDocumentationHeader(applicationName
+					+ " command line arguments"));
+			sb.append("\n");
+			for (Class<? extends KeyProvider> keyProvider : keyProviders) {
+				sb.append(String.format("    <h2> %s </h2>\n\n",
+					createTitle(keyProvider)));
+				sb.append(createDocumantationContent(keyProvider, 3));
+				sb.append("\n");
+			}
+			sb.append(createDocumantationFooter());
+			return sb.toString();
+		}
+
+		/**
+		 * Writes the complete command line documentation for an application into
+		 * a {@link File}.
+		 * 
+		 * @param applicationName
+		 * @param targetFile
+		 * @param keyProviders
+		 * @throws IOException
+		 */
+		public static void createDocumentation(String applicationName,
+			File targetFile, Class<? extends KeyProvider>... keyProviders)
+			throws IOException {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(targetFile));
+			createDocumentation(applicationName, bw, keyProviders);
+			bw.close();
+		}
+		
+		/**
+		 * Doesn't close the writer.
+		 * @param file
+		 * @throws IOException
+		 */
+		public static void createDocumentation(String applicationName,
+			Writer writer, Class<? extends KeyProvider>... keyProviders)
+			throws IOException {
+			writer.append(KeyProvider.Tools.createDocumentation(applicationName,
+				keyProviders));
+		}
+
+		/**
+		 * 
+		 * @param title
+		 * @return
+		 */
+		private static StringBuilder createDocumentationHeader(String title) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
+			sb.append(" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
+			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n");
 			sb.append("  <head>\n");
 			sb.append("    <style type=\"text/css\">\n      <!--\n");
 			sb.append("        .typewriter {\n");
@@ -119,31 +225,9 @@ public interface KeyProvider {
 			sb.append("    <h1> ");
 			sb.append(title);
 			sb.append(" </h1>\n");
-			
-			List<OptionGroup> groupList = optionGroupList(keyProvider);
-			List<Option> optionList = optionList(keyProvider);
-			if (groupList.size() > 0) {
-				for (OptionGroup<?> group : groupList) {
-					sb.append("    <h2> ");
-					sb.append(group.getName());
-					sb.append(" </h2>\n      <p>");
-					sb.append(StringUtil.insertLineBreaks(group.getToolTip(), 70,
-						"\n      "));
-					sb.append("</p>\n");
-					writeOptionsToHTMLTable(sb, group.getOptions(), optionList);
-				}
-			}
-			if (optionList.size() > 0) {
-				sb.append("    <h2> Additional options </h2>\n");
-				writeOptionsToHTMLTable(sb, optionList, null);
-			}
-			
-			sb.append("  </body>\n");
-			sb.append("</html>\n");
-			
-			return sb.toString();
+			return sb;
 		}
-		
+
 		/**
 		 * Creates a human-readable title from the class name of some {@link Class}.
 		 * 
@@ -388,15 +472,14 @@ public interface KeyProvider {
 		@SuppressWarnings("unchecked")
 		private static void writeOptionsToHTMLTable(StringBuilder sb,
 			List<?> options, List<Option> removeFromHere) {
-			sb
-					.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
+			sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
 			for (Object o : options) {
 				if (!(o instanceof Object)) {
 					continue;
 				}
 				Option<?> option = (Option<?>) o;
-				sb.append("        <tr>\n");
-				sb.append("          <td colspan=\"2\" class=\"typewriter-blue\">");
+				sb.append("        <tr>\n          ");
+				sb.append("<td colspan=\"2\" class=\"typewriter-blue\">");
 				String shortName = option.getShortCmdName();
 				String requiredType = StringUtil.concat("&#60;",
 					option.getRequiredType().getSimpleName(), "&#62;").toString();
@@ -408,8 +491,8 @@ public interface KeyProvider {
 				sb.append(option.toCommandLineOptionKey());
 				sb.append("[ |=]");
 				sb.append(requiredType);
-				sb.append("</td>\n");
-				sb.append("        </tr>\n        <tr><td width=\"6%\"> </td>\n");
+				sb.append("</td>\n        ");
+				sb.append("</tr>\n        <tr><td width=\"6%\"> </td>\n");
 				sb.append("        <td>\n          ");
 				sb.append(StringUtil.insertLineBreaks(option.getToolTip(), 60,
 					"\n          "));
