@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -45,6 +46,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
+import de.zbit.resources.Resource;
 import de.zbit.util.StringUtil;
 import de.zbit.util.ValuePair;
 
@@ -63,7 +65,34 @@ public class GUITools {
 	public static int TOOLTIP_LINE_LENGTH = 60;
 
 	static {
-		ImageTools.initImages(GUITools.class.getResource("img"));
+    // ImageTools.initImages(GUITools.class.getResource("img"));
+
+	  String iconPaths[] = {
+	      "ICON_ARROW_LEFT_16.png",
+	      "ICON_ARROW_LEFT_32.png",
+	      "ICON_ARROW_RIGHT_16.png",
+	      "ICON_ARROW_RIGHT_32.png",
+	      "ICON_EXIT_16.png",
+	      "ICON_GEAR_16.png",
+	      "ICON_GEAR_64.png",
+	      "ICON_GLOBE_16.png",
+	      "ICON_GLOBE_64.png",
+	      "ICON_HELP_16.png",
+	      "ICON_HELP_64.png",
+	      "ICON_INFO_16.png",
+	      "ICON_INFO_64.png",
+	      "ICON_LICENSE_16.png",
+	      "ICON_LICENSE_64.png",
+	      "ICON_OPEN_16.png",
+	      "ICON_PREFS_16.png",
+	      "ICON_SAVE_16.png",
+	      "ICON_TICK_16.png",
+	      "ICON_TRASH_16.png"
+	  };
+    for (String path : iconPaths) {
+      UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(
+          GUITools.class.getResource("img/" + path)));
+    }
 	}
 	
 	/**
