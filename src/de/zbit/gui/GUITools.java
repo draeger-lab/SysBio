@@ -46,7 +46,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
-import de.zbit.resources.Resource;
 import de.zbit.util.StringUtil;
 import de.zbit.util.ValuePair;
 
