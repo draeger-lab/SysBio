@@ -42,7 +42,7 @@ public class ImageTools {
 	 *            A {@link URL} representing a directory with image files.
 	 * @throws URISyntaxException
 	 */
-	public static void initImages(URL directory) {
+	public static void initImages(URL directory) {	  
 		try {
 			File dir = new File(directory.toURI());
 			if (dir.canRead() && dir.isDirectory()) {
