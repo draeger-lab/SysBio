@@ -17,6 +17,22 @@ import javax.swing.TransferHandler;
 
 /**
  * This class allows the user to drag and drop files to a target.
+ * 
+ * <p>Usage Example on a JFrame:
+ * <pre>
+    // Make this panel responsive to drag'n drop events.
+    FileDropHandler dragNdrop = new FileDropHandler(
+      new ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+          File file = ((File) event.getSource());
+          // Do something (e.g. openFile(file)).
+        }
+      }
+    );
+    
+    this.setTransferHandler(dragNdrop);
+    </pre>
+    </p>
  * @author wrzodek
  */
 public class FileDropHandler extends TransferHandler {
@@ -34,7 +50,8 @@ public class FileDropHandler extends TransferHandler {
   
   /**
    * Creates a new FileDropHandler, that fires the given listener on drop.
-   * @param l
+   * @param l - an ActionListener which will recive the following event(s):
+   * "new ActionEvent(file, FILE_DROPPED, "FILE_DROPPED")".
    */
   public FileDropHandler(ActionListener l) {
     listener = l;
