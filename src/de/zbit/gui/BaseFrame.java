@@ -221,6 +221,7 @@ public abstract class BaseFrame extends JFrame {
 		init();
 	}
 	
+	
 	/**
 	 * Creates a new {@link BaseFrame} with the given
 	 * {@link GraphicsConfiguration}.
@@ -801,6 +802,11 @@ public abstract class BaseFrame extends JFrame {
 			null, "windowClosing"));
 		setJMenuBar(createJMenuBar(loadsDefaultFileMenuEntries()));
 		
+		// If the user whishes a OPEN FILE entry, also create openFile by Drag'n Drop.
+		if (loadsDefaultFileMenuEntries()) {
+		  createDragNDropFunctionality();
+		}
+		
 		Container container = getContentPane();
 		container.setLayout(new BorderLayout());
 		
@@ -819,6 +825,26 @@ public abstract class BaseFrame extends JFrame {
 	}
 
 	/**
+   * Adds a drag'n drop functionality to this panel. This should
+   * be called, whenever the user decides to have a "File Open"
+   * option on his menu bar.
+   * It uses the {@link #openFileAndLogHistory(File...)} method
+   * to open the file(s).
+   */
+  private void createDragNDropFunctionality() {
+    // Make this panel responsive to drag'n drop events.
+    FileDropHandler dragNdrop = new FileDropHandler(
+      new ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+          openFileAndLogHistory((File) event.getSource());
+        }
+      }
+    );
+    
+    this.setTransferHandler(dragNdrop);
+  }
+
+  /**
 	 * This method decides whether or not the file menu should already be equipped
 	 * with the default entries for "open", "save", and "close". By default, this
 	 * method returns <code>true</code>, i.e., the default File menu already
@@ -940,47 +966,48 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	protected final File[] openFileAndLogHistory(File... files) {
 		files = openFile(files);
-		if ((files != null) && (files.length > 0)) {
-			List<File> fileList = new LinkedList<File>();
-			// Process all those files that have just been opened.
-			String baseDir = null;
-			boolean sameBaseDir = true;
-			for (File file : files) {
-				if (file.exists() && file.canRead() && !fileList.contains(file)) {
-					if (baseDir == null) {
-						baseDir = file.getParent();
-					} else if (!baseDir.equals(file.getParent())) {
-						sameBaseDir = false;
-					}
-					fileList.add(file);
-				}
-			}
-			// Memorize the default open directory.
-			if (sameBaseDir && (baseDir != null)) {
-				SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-				prefs.put(GUIOptions.OPEN_DIR, baseDir);
-				try {
-					prefs.flush();
-				} catch (BackingStoreException exc) {
-					GUITools.showErrorMessage(this, exc);
-				}
-			}
-			if (getMaximalFileHistorySize() > 0) {
-				// Create the list of files to update the file history in the menu.
-				// In addition to the files that have just been opened (above), we
-				// also have to consider older files.
-				File file;
-				JMenu fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
-					BaseAction.FILE_OPEN_RECENT);
-				for (int i = 0; i < fileHistory.getItemCount(); i++) {
-					file = new File(fileHistory.getItem(i).getToolTipText());
-					if (file.exists() && file.canRead() && !fileList.contains(file)) {
-						fileList.add(file);
-					}
-				}
-				updateFileHistory(fileHistory, fileList);
-			}
-		}
+		// Remember the baseDir and put files into history.
+    if ((files != null) && (files.length > 0)) {
+      List<File> fileList = new LinkedList<File>();
+      // Process all those files that have just been opened.
+      String baseDir = null;
+      boolean sameBaseDir = true;
+      for (File file : files) {
+        if (file.exists() && file.canRead() && !fileList.contains(file)) {
+          if (baseDir == null) {
+            baseDir = file.getParent();
+          } else if (!baseDir.equals(file.getParent())) {
+            sameBaseDir = false;
+          }
+          fileList.add(file);
+        }
+      }
+      // Memorize the default open directory.
+      if (sameBaseDir && (baseDir != null)) {
+        SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+        prefs.put(GUIOptions.OPEN_DIR, baseDir);
+        try {
+          prefs.flush();
+        } catch (BackingStoreException exc) {
+          GUITools.showErrorMessage(this, exc);
+        }
+      }
+      if (getMaximalFileHistorySize() > 0) {
+        // Create the list of files to update the file history in the menu.
+        // In addition to the files that have just been opened (above), we
+        // also have to consider older files.
+        File file;
+        JMenu fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
+          BaseAction.FILE_OPEN_RECENT);
+        for (int i = 0; i < fileHistory.getItemCount(); i++) {
+          file = new File(fileHistory.getItem(i).getToolTipText());
+          if (file.exists() && file.canRead() && !fileList.contains(file)) {
+            fileList.add(file);
+          }
+        }
+        updateFileHistory(fileHistory, fileList);
+      }
+    }
 		return files;
 	}
 	

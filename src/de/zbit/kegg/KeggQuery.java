@@ -2,8 +2,6 @@ package de.zbit.kegg;
 
 import java.io.Serializable;
 
-import keggapi.Definition;
-
 /**
  * This class is used by KeggFunctionManagement. It determines which function
  * should be executed and what are the parameters for this function.
@@ -66,7 +64,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	 */
 	@Override
 	public KeggQuery clone() {
-		KeggQuery clone = new KeggQuery(this.jobToDo, new String(query));
+		KeggQuery clone = new KeggQuery(this.jobToDo, query);
 		return clone;
 	}
 
@@ -79,7 +77,12 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 		else if (jobToDo > o.getJobToDo())
 			return 1;
 		else { // Same job to do
-			return query.compareTo(o.getQuery());
+		  if (query==null && o.getQuery()==null)
+		    return 0;
+		  else if (query==null || o.getQuery()==null)
+		    return -1;
+		  else
+			  return query.compareTo(o.getQuery());
 		}
 	}
 
@@ -121,7 +124,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		int hc = (int) (jobToDo + query.hashCode());
+		int hc = (int) (jobToDo + query==null?0:query.hashCode());
 		return (hc);
 	}
 
