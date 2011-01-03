@@ -25,7 +25,7 @@ public interface FileHistory extends KeyProvider {
 	/**
 	 * The separator symbol within lists of files.
 	 */
-	public static final String FILE_SEPARATOR = System
+	public static final String SEPARATOR = System
 			.getProperty("path.separator");
 	
 	/**
@@ -49,6 +49,9 @@ public interface FileHistory extends KeyProvider {
 	public static class Tools {
 		
 		/**
+		 * Creates a {@link String} representation of a list of file, which 
+		 * is surrounded with square brackets, and contains absolute paths to
+		 * files separated with the given symbol (SEPARATOR).
 		 * 
 		 * @param listOfFiles
 		 * @return
@@ -59,7 +62,7 @@ public interface FileHistory extends KeyProvider {
 			int i = 0;
 			for (File file : listOfFiles) {
 				if (i > 0) {
-					sb.append(FILE_SEPARATOR);
+					sb.append(SEPARATOR);
 				}
 				sb.append(file.getAbsolutePath());
 				i++;
@@ -69,9 +72,10 @@ public interface FileHistory extends KeyProvider {
 		}
 		
 		/**
-		 * 
+		 * Parses a list of files from a given {@link String}.
 		 * @param fileList can be empty but never null.
 		 * @return
+		 * @see #toString(List)
 		 */
 		public static List<File> parseList(String fileList) {
 			List<File> listOfFiles = new LinkedList<File>();
@@ -82,7 +86,7 @@ public interface FileHistory extends KeyProvider {
 				if (fileList.endsWith("]")) {
 					fileList = fileList.substring(0, fileList.length() - 1);
 				}
-				String files[] = fileList.split(FileHistory.FILE_SEPARATOR);
+				String files[] = fileList.split(FileHistory.SEPARATOR);
 				File file;
 				for (String filePath : files) {
 					file = new File(filePath);

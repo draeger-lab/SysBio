@@ -20,7 +20,7 @@
 3. Die Struktur des Projektes wurde durchgesprochen:
    - Licenses-Verzeichnis enthält:
      1. Lizenzen von Dritt-Jars
-     2. Datei mit Details zu Autoren dies SysBio-Projektes
+     2. Datei mit Details zu Autoren des SysBio-Projektes
   
    - Hannes Planatscher regt an, für jede externe Bibliothek genau
      zu überprüfen, ob diese tatsächlich benötigt wird.

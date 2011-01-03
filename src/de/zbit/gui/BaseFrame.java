@@ -635,7 +635,7 @@ public abstract class BaseFrame extends JFrame {
 	/**
 	 * The version number of this program. This must be a {@link String}
 	 * containing only digits and at least one dot or at most two dots. For
-	 * instance 1.2 or 1.2.3.
+	 * instance "1.2" or "1.2.3".
 	 * 
 	 * @return
 	 */

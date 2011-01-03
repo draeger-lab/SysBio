@@ -47,14 +47,15 @@ public class LogUtil {
     Logger.getLogger("de.zbit").setLevel(logLevel);
 
     // additional packages to log
-    for (String s : packages) {
-      for (Handler h : Logger.getLogger(s).getHandlers()) {
-        h.setLevel(logLevel);
-        h.setFormatter(new OneLineFormatter());
-      }
-      Logger.getLogger(s).setLevel(logLevel);
-      
-    }
+		if (packages != null) {
+			for (String s : packages) {
+				for (Handler h : Logger.getLogger(s).getHandlers()) {
+					h.setLevel(logLevel);
+					h.setFormatter(new OneLineFormatter());
+				}
+				Logger.getLogger(s).setLevel(logLevel);
+			}
+		}
   }
 
   /*
