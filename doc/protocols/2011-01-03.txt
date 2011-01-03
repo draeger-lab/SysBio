@@ -1,0 +1,23 @@
+
+   Protokoll
+   =========
+
+1. Änderungen in BaseFrame wurden durchgesprochen und
+   neue Tickets im Track eingepflegt zur Verbesserung
+   des Online-Updaters
+
+2. Diskussion der Lizens
+   - SysBio kommt unter die LGPL Version 3.
+   - Entsprechend werden Haftungsausschluss und Lizenzen
+     von Dritt-Bibliotheken eingefügt
+
+3. Das Protokoll vom 8. November wurde durchgegangen.
+   - Zugriff auf das SysBio-Trac-System funktioniert über
+     https.
+   - Karsten oder Klaus mögen uns bitte ein Admin-Konto
+     einrichten.
+   - LogUtil wurde von log4j auf das in Java eingebaute
+     logging umgestellt.
+   - Florian Mittag erklärt Neurungen im Logging inklusive
+     der Abkehr von Log4J.
+     
