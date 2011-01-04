@@ -226,7 +226,7 @@ public class OpenFile {
    * b) in the same jar / same project
    * c) relative to the user dir.
    * @param infile - the file name and path to search for.
-   * @return InputStream of the given file.
+   * @return InputStream of the given file or null, if not found.
    * @throws IOException 
    */
   public static InputStream searchFileAndGetInputStream(String infile) throws IOException {

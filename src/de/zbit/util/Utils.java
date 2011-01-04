@@ -2,12 +2,14 @@ package de.zbit.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -1247,6 +1249,29 @@ public class Utils {
    */
   public static double weightedAverage(double val, double weight, double val2, double weight2) {
     return (val*weight/(weight2+weight)) +  (val2 * weight2/(weight2+weight));
+  }
+
+  /**
+   * This function creates a new file / overwrites an existing one (without warning) and puts
+   * the given content into the file. The required directory structure to write the file
+   * will be created.
+   * @param filename - File path and name.
+   * @param content - content to write to file.
+   * @throws IOException 
+   */
+  public static void writeFile(String filename, String content) throws IOException {
+    // Create directory
+    File parentFolder = new File(new File(filename).getParent());
+    if (!parentFolder.exists()) {
+      parentFolder.mkdirs();
+    }
+    
+    // Write file
+    FileWriter fw = new FileWriter(filename);
+    BufferedWriter writer = new BufferedWriter (fw);
+    writer.write(content);
+    writer.close();
+    fw.close();
   }
   
 }

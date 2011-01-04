@@ -22,7 +22,8 @@ public class FileDownload {
   /**
    * 
    * @param address
-   * @return
+   * @return the path and filename of the downloaded file,
+   * relative to the current folder. NOT the file content. 
    */
   public static String download(String address) {
     String localFile = getLocalFilenameForURL(address);
@@ -59,8 +60,9 @@ public class FileDownload {
    * 
    * @param address
    * @param out
+   * @throws IOException 
    */
-  public static void download(String address, OutputStream out) {
+  public static void download(String address, OutputStream out) throws IOException {
     if (out==null) return;
     URLConnection conn = null;
     InputStream  in = null;
@@ -71,70 +73,57 @@ public class FileDownload {
     if (ProgressBar!=null && ProgressBar instanceof AbstractProgressBar)
       progress = (AbstractProgressBar) ProgressBar;
     
-    int retry = 0;
-    while (true) {
-      try {
-        URL url = new URL(address);
-        int status = 0;
-        if (address.toLowerCase().startsWith("http:"))
-          status = ((HttpURLConnection) url.openConnection()).getResponseCode();
-        else //if (address.toLowerCase().startsWith("ftp:"))
-          url.openConnection(); //status = ((URLConnection) url.openConnection()).getResponseCode();
+    try {
+      URL url = new URL(address);
+      int status = 0;
+      if (address.toLowerCase().startsWith("http:"))
+        status = ((HttpURLConnection) url.openConnection()).getResponseCode();
+      else //if (address.toLowerCase().startsWith("ftp:"))
+        url.openConnection(); //status = ((URLConnection) url.openConnection()).getResponseCode();
+      
+      if (status>=400) {
+        System.err.println("Failed: HTTP error (code " + status + ").");
         
-        if (status>=400) {
-          System.err.println("Failed: HTTP error (code " + status + ").");
-          
-          break; //404 und sowas ... >400 nur error codes. Normal:200 =>OK
-        }
-        
-        conn = url.openConnection();
-        
-        in = conn.getInputStream();
-        byte[] buffer = new byte[1024];
-        int numRead;
-        long numWritten = 0;
-        
-        final int reportEveryXKB = 50; // Set progressbar every X kb.
-        //guiOperations.SetProgressBarMAXThreadlike(Math.max(conn.getContentLength(), in.available()), ProgressBar);
-        if (progress!=null) progress.setNumberOfTotalCalls(Math.max(conn.getContentLength(), in.available()));
-        
-        int calls = 0;
-        while ((numRead = in.read(buffer)) != -1) {
-          if (progress!=null &&  (calls%reportEveryXKB) == 0) {
-            if (Thread.currentThread().isInterrupted()) break;
-            double mb = (Math.round(numWritten/1024.0/1024.0*10.0)/10.0);
-            //if (ProgressBar!=null) guiOperations.SetProgressBarVALUEThreadlike((int)numWritten, true, ProgressBar);
-        	  //if (StatusLabel!=null) guiOperations.SetStatusLabelThreadlike(statusLabelText + "(" + mb + " MB)", StatusLabel);
-            //System.out.println(statusLabelText + "(" + mb + " MB)");
-            //System.out.println((Math.round(numWritten/1024/1024)));
-            
-            progress.setCallNr(numWritten);
-            progress.DisplayBar("(" + mb + " MB)");
-          }
-          
-          out.write(buffer, 0, numRead);
-          numWritten += numRead;
-          calls++;
-        }
-        //System.out.println(address + " \t " + calls  + " \t " + (numWritten/1024.0/1024.0));
-        
-        break;
-      } catch (Exception exception) {
-        exception.printStackTrace();
-        if (retry >=2) {
-          exception.printStackTrace();
-          break;
-        }
-        retry++;
-        
-      } finally {
-        try {
-          if (in != null) in.close();
-          if (out != null) out.close();
-          if (conn != null) conn = null;
-        } catch (IOException ioe) {}
-        if (retry >=2) break;
+        return; //404 und sowas ... >400 nur error codes. Normal:200 =>OK
       }
+      
+      conn = url.openConnection();
+      
+      in = conn.getInputStream();
+      byte[] buffer = new byte[1024];
+      int numRead;
+      long numWritten = 0;
+      
+      final int reportEveryXKB = 50; // Set progressbar every X kb.
+      //guiOperations.SetProgressBarMAXThreadlike(Math.max(conn.getContentLength(), in.available()), ProgressBar);
+      if (progress!=null) progress.setNumberOfTotalCalls(Math.max(conn.getContentLength(), in.available()));
+      
+      int calls = 0;
+      while ((numRead = in.read(buffer)) != -1) {
+        if (progress!=null &&  (calls%reportEveryXKB) == 0) {
+          if (Thread.currentThread().isInterrupted()) break;
+          double mb = (Math.round(numWritten/1024.0/1024.0*10.0)/10.0);
+          //if (ProgressBar!=null) guiOperations.SetProgressBarVALUEThreadlike((int)numWritten, true, ProgressBar);
+          //if (StatusLabel!=null) guiOperations.SetStatusLabelThreadlike(statusLabelText + "(" + mb + " MB)", StatusLabel);
+          //System.out.println(statusLabelText + "(" + mb + " MB)");
+          //System.out.println((Math.round(numWritten/1024/1024)));
+          
+          progress.setCallNr(numWritten);
+          progress.DisplayBar("(" + mb + " MB)");
+        }
+        
+        out.write(buffer, 0, numRead);
+        numWritten += numRead;
+        calls++;
+      }
+      //System.out.println(address + " \t " + calls  + " \t " + (numWritten/1024.0/1024.0));
+      
+    } finally {
+      try {
+        if (in != null) in.close();
+        if (out != null) out.close();
+        if (conn != null) conn = null;
+      } catch (IOException ioe) {}
     }
     return;
   }
@@ -143,7 +132,7 @@ public class FileDownload {
    * 
    * @param address
    * @param localFileName
-   * @return
+   * @return localFileName
    */
   public static String download(String address, String localFileName) {
     OutputStream out = null;
@@ -176,9 +165,31 @@ public class FileDownload {
       }
     }
     
-    download(address, out);
+    downloadWithoutErrors(address, out);
     
     return localFileName;
+  }
+  
+  private static void downloadWithoutErrors(String address, OutputStream out) {
+    int retry = 0;
+    while (retry<3) {
+      try {
+        
+        download(address, out);
+        break;
+        
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+        break;
+      } catch (Exception exception) {
+        exception.printStackTrace();
+        if (retry >=2) {
+          exception.printStackTrace();
+          break;
+        }
+        retry++;
+      }
+    }
   }
   
   /**
@@ -238,7 +249,7 @@ public class FileDownload {
     
     return ret;
   }
-
+  
   /**
    * 
    * @param args
@@ -250,7 +261,7 @@ public class FileDownload {
     
     
     download("http://rsat.ulb.ac.be/rsat/data/genomes/Arabidopsis_thaliana/oligo-frequencies/5nt_upstream-noorf_Arabidopsis_thaliana-ovlp-2str.freq.gz");
-
+    
     for (int i = 0; i < args.length; i++) {
       download(args[i]);
     }
@@ -263,7 +274,7 @@ public class FileDownload {
   public static void setProgressBar(Object o) {
     ProgressBar = o;
   }
-
+  
   /**
    * 
    * @param o

@@ -700,5 +700,18 @@ public class StringUtil {
 		
 		return sb.toString();
 	}
+
+  /**
+   * Removes all non-digit chars from input string.
+   * @param input - input string
+   * @return  input string with only digits.
+   */
+  public static String removeAllNonDigits(String input) {
+    StringBuffer ret = new StringBuffer();
+    for (char c:  input.toCharArray()) {
+      if (Character.isDigit(c)) ret.append(c);
+    }
+    return ret.toString();
+  }
 	
 }

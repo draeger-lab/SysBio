@@ -13,6 +13,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 
 	/**
 	 * Input: Organism id (e.g. "hsa")
+	 * Returns: Definition[]
 	 */
 	public final static int getPathways = 0; // returns: Definition[] (alt:
 	// ArrayList<String>)
@@ -34,7 +35,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	
 	/**
 	 * Input: none.
-	 * Retiurns: Definition[]
+	 * Returns: Definition[]
 	 */
 	public final static int getOrganisms = 4;
 

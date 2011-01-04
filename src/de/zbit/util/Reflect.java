@@ -653,6 +653,26 @@ public class Reflect {
 		}
 	}
 	
+	 /**
+   * Checks, if a class contains a certain Method. If it does, this
+   * Method is executed and the return value is returned. If the
+   * Method does not exists, or an Exception occurs, null is returned.
+   * @param clazz - Class instance to check for methods.
+   * @param methodName - Name of the Method to invoke.
+   * @return null if something failed, or the return value of the
+   * invoked Method instead.
+   */
+  public static Object invokeIfContains(Object clazz, String methodName) {
+    
+    try {
+      Method m = clazz.getClass().getMethod(methodName);
+      return m.invoke(clazz);
+    } catch (Exception e) {
+      // Mostly java.lang.NoSuchMethodException
+      return null;
+    }
+  }
+	
 	/**
 	 * Checks whether a method with this name and the given parameter type exists
 	 * for the given {@link Object} clazz.
