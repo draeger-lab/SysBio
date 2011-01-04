@@ -2,7 +2,6 @@ package de.zbit.io;
 
 import java.io.File;
 
-import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.util.StringUtil;
@@ -21,7 +20,6 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * 
 	 * @author Andreas Dr&auml;ger
 	 * @author wrzodek
-	 * @since 1.4
 	 * 
 	 */
 	public static enum FileType {
@@ -123,7 +121,7 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * The {@link FileFilter} for all files.
 	 */
 	public final static GeneralFileFilter createAllFileFilter() {
-		return new SBFileFilter((new JFileChooser()).getAcceptAllFileFilter());
+		return new SBAcceptAllFileFilter();
 	}
 	
 	/**
