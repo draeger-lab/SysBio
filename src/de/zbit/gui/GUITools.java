@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
+import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.io.BufferedReader;
@@ -46,6 +47,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
+import de.zbit.util.Reflect;
 import de.zbit.util.StringUtil;
 import de.zbit.util.ValuePair;
 
@@ -687,6 +689,26 @@ public class GUITools {
 	}
 	
 	/**
+	 * Checks, if all elements on c are enabled.
+	 * @param c
+	 * @return true if and only if c and all components on c are enabled.
+	 */
+	public static boolean isEnabled(Container c) {
+	  Component inside;
+	  boolean enabled = c.isEnabled();
+	  for (int i = 0; i < c.getComponentCount(); i++) {
+	    inside = c.getComponent(i);
+	    enabled &= inside.isEnabled();
+	    if (!enabled) return false; // shortcut.
+	    if (inside instanceof Container) {
+	      enabled&=isEnabled((Container) inside);
+	    }
+	    if (!enabled) return false; // shortcut.
+	  }
+	  return enabled;
+	}
+	
+	/**
 	 * Enables or disables actions that can be performed by SBMLsqueezer, i.e.,
 	 * all menu items and buttons that are associated with the given actions are
 	 * enabled or disabled.
@@ -979,6 +1001,149 @@ public class GUITools {
 		}
 		return null;
 	}
+
+  /**
+   * Checks if this "c" contains a #{@link javax.swing.AbstractButton} which
+   * is called "Ok" and enables this button if and only if it a) exists and is
+   * disabled and b) all other elements on this container and all
+   * contained containers are enabled.
+   * @param c
+   * @return true if and only if an ok-button has been enabled. Else, false.
+   */
+  public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c) {
+    // Seach for parent window
+    // Do NOT uncomment it. Leads to unexpected behaviour.
+    /*while (c!=null) {
+      if (c instanceof Window) {
+        //((Window)c).pack();
+        break;
+      }
+      c = c.getParent();
+    }*/
+    
+    // Search for ok button and check if all other are enabled.
+    if (c!=null) {
+      // c is now a Window.
+      Component okButton = searchFor(c, AbstractButton.class, "getText", "Ok");
+      if (okButton!=null) {
+        boolean previousState = okButton.isEnabled();
+        okButton.setEnabled(true);
+        if (isEnabled(c)) {
+          return true;
+        } else {
+          okButton.setEnabled(previousState);
+          return false;
+        }
+      }
+    }
+    return false;
+  }
+  
+  /**
+   * Simply checks if all elements on "c" are enabled and if yes, the given "okButton" will
+   * be enabled. Else, the current state stays untouched.
+   * 
+   * In opposite to {@link #enableOkButtonIfAllComponentsReady(Component)}, this function 
+   * uses the given okButton.
+   * @param c
+   * @param okButton
+   * @return
+   */
+  public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c, AbstractButton okButton) {
+    boolean previousState = okButton.isEnabled();
+    okButton.setEnabled(true);
+    if (isEnabled(c)) {
+      return true;
+    } else {
+      okButton.setEnabled(previousState);
+      return false;
+    }
+  }
+  
+  /**
+   * Searches for the parent #{@link java.awt.Window} of the given component c.
+   * Checks if this Window contains a #{@link javax.swing.AbstractButton} which
+   * is called "Ok" and disables this button.
+   * @param c
+   * @return true if and only if an ok-button has been disabled. Else, false.
+   */
+  public static boolean disableOkButton(Component c) {
+    // Seach for parent window
+    while (c!=null) {
+      if (c instanceof Window) {
+        //((Window)c).pack();
+        break;
+      }
+      c = c.getParent();
+    }
+    
+    // Search for ok button and check if all other are enabled.
+    if (c!=null) {
+      // c is now a Window.
+      Component okButton = searchFor((Window)c, AbstractButton.class, "getText", "OK");
+      if (okButton!=null) {
+        okButton.setEnabled(false);
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  /**
+   * Searches recursively on "parent" and all components on "parent" for a component of
+   * class "searchFor", with a Method (without inputs) called "methodName", that returns an
+   * object that equals "retVal".
+   * If "methodName" is null, this function will simply return the first instance of "searchFor"
+   * on "parent".
+   * @param parent
+   * @param searchFor
+   * @param methodName
+   * @param retVal
+   * @return the component, if found.
+   */
+  public static Component searchFor(Container parent, Class<?> searchFor, String methodName, Object retVal) {
+    for (int i=0; i<parent.getComponentCount(); i++) {
+      Component c = parent.getComponent(i);
+      
+      // Is c the component we are looking for?
+      if (searchFor.isAssignableFrom(c.getClass())) {
+        if (methodName!=null) {
+          Object ret = Reflect.invokeIfContains(c, methodName);
+          if (ret==null && retVal==null || ret.equals(retVal)) {
+            return c;
+          } else if (ret!=null && retVal!=null && ret instanceof String
+            && ((String)ret).equalsIgnoreCase(retVal.toString())) {
+            return c;
+          }
+        } else {
+          return c;
+        }
+      }
+      
+      // Recurse further.
+      if (c instanceof Container) {
+        Component c2 = searchFor((Container)c, searchFor, methodName, retVal);
+        if (c2!=null) return c2;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Recursively looks for the first parent window of the
+   * given component and calls the "pack()" method on it.
+   * @param parent
+   */
+  public static void packParentWindow(Component parent) {
+    Component c = parent;
+    while (c!=null) {
+      if (c instanceof Window) {
+        ((Window)c).pack();
+        //break;
+      }
+      c = c.getParent();
+    }
+  }
 
   
   

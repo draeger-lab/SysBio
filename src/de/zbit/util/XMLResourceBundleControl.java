@@ -23,6 +23,13 @@ import java.util.ResourceBundle.Control;
  * {@link ResourceBundle} from an XML formatted file (for the specification of
  * the document see {@link Properties}).
  * 
+ * Example usage:
+ * <pre>
+ * ResourceBundle resource = ResourceBundle.getBundle(
+      "de.zbit.locales.Labels", new XMLResourceBundleControl());
+   String myString = resource.getString("MY_KEY");
+ * </pre>
+ * 
  * @author Andreas Dr&auml;ger
  * @date 2011-01-04
  */
