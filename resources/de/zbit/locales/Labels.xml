@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>
+		This configuration provides locale-dependent names for labels in
+		a (graphical) user interface.
+  </comment>
+  <entry key="ACCEPT_ALL_FILES">All files (*)</entry>
+</properties>

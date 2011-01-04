@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
@@ -41,13 +42,12 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
-import com.sun.xml.internal.bind.v2.runtime.property.Property;
-
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.util.StringUtil;
+import de.zbit.util.XMLResourceBundleControl;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
@@ -660,11 +660,17 @@ public abstract class BaseFrame extends JFrame {
 	/**
 	 * Override this message to change the texts of some or all {@link JMenuItem}s
 	 * including their tool tips and also of {@link JButton}s and so on. The
-	 * location given here must be a path relative to the location of this class.
+	 * location given here must be a path that includes the package name, for
+	 * instance <code>de.zbit.locales.MyTexts</code>, where the file extension
+	 * <code>xml</code> is omitted, but the resource file is required to be an XML
+	 * file in the format defined for {@link Properties}. The naming convention
+	 * for the resource file says that it should contain a suffix consisting of
+	 * underscore, language name, underscore, country name, e.g.,
+	 * <code>MyTexts_de_DE.xml</code>. You may omit this suffix.
 	 * 
 	 * @return By default, this method returns null, i.e., the default texts will
-	 *         be set for all menu items depending on the {@link System}'s
-	 *         {@link Property} with the key <code>user.language</code>.
+	 *         be set for all menu items depending on the {@link System}'s default
+	 *         {@link Locale}.
 	 */
 	protected String getLocationOfBaseActionProperties() {
 		return null;
@@ -769,24 +775,14 @@ public abstract class BaseFrame extends JFrame {
 		GUITools.initLaF(getTitle());
 		setDefaultLookAndFeelDecorated(true);
 		try {
-			Properties defaults = new Properties();
-			if (System.getProperty("user.language").equals(
-				Locale.GERMAN.getLanguage())) {
-				defaults.loadFromXML(BaseFrame.class
-						.getResourceAsStream("BaseActionGerman.xml"));
-			} else {
-				defaults.loadFromXML(BaseFrame.class
-						.getResourceAsStream("BaseActionEnglish.xml"));
-			}
-			BaseAction.nameProperties.setDefaults(defaults);
+			XMLResourceBundleControl xmlControl = new XMLResourceBundleControl();
+			BaseAction.nameProperties.setDefaults(ResourceBundle.getBundle(
+				"de.zbit.locales.BaseAction", xmlControl));
 			String location = getLocationOfBaseActionProperties();
 			if (location != null) {
-				Properties properties = new Properties();
 				try {
-					properties.loadFromXML(BaseFrame.class.getResourceAsStream(location));
-					if (properties != null) {
-						BaseAction.nameProperties.putAll(properties);
-					}
+					BaseAction.nameProperties.putAll(ResourceBundle.getBundle(location,
+						xmlControl));
 				} catch (Exception exc) {
 				}
 			}
