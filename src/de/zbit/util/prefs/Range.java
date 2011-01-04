@@ -528,4 +528,15 @@ public class Range<Type> {
 		return sb.toString();
 	}
   
+	/**
+	 * Returns a range specification for boolean values. This can be used to
+	 * specifiy that a boolean option expects an argument that is either "true" or
+	 * "false".
+	 * 
+	 * @return a range specification for boolean values
+	 */
+	public static Range<Boolean> booleanRange() {
+	  return new Range<Boolean>(Boolean.class, "{\"true\", \"false\"}");
+	}
+	
 }
