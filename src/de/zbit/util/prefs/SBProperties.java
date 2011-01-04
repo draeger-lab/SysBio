@@ -5,6 +5,7 @@ package de.zbit.util.prefs;
 
 import java.lang.reflect.Field;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 /**
  * This extension of {@link Properties} can only contain key-value pairs of type
@@ -239,6 +240,18 @@ public class SBProperties extends Properties {
 	}
 	
 	/**
+	 * Fills this {@link SBProperties} with all key-value pairs from a given
+	 * {@link ResourceBundle}.
+	 * 
+	 * @param resources
+	 */
+	public synchronized void putAll(ResourceBundle resources) {
+		for (String key : resources.keySet()) {
+			put(key, resources.getString(key));
+		}
+	}
+	
+	/**
 	 * @param defaults
 	 */
 	public void setDefaults(Properties defaults) {
@@ -246,6 +259,21 @@ public class SBProperties extends Properties {
 			this.defaults = new Properties();
 		}
 		this.defaults.putAll(defaults);
+	}
+	
+	/**
+	 * Copies all key-value pairs from the given {@link ResourceBundle} into this
+	 * {@link SBProperties}'s defaults element.
+	 * 
+	 * @param defaults
+	 */
+	public void setDefaults(ResourceBundle defaults) {
+		if (this.defaults == null) {
+			this.defaults = new Properties();
+		}
+		for (String key : defaults.keySet()) {
+			this.defaults.put(key, defaults.getString(key));
+		}
 	}
 	
 }

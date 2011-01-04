@@ -4,6 +4,9 @@
 package de.zbit.io;
 
 import java.io.File;
+import java.util.ResourceBundle;
+
+import de.zbit.util.XMLResourceBundleControl;
 
 /**
  * A {@link GeneralFileFilter} that accepts any kind of file or directory.
@@ -30,7 +33,9 @@ public class SBAcceptAllFileFilter extends GeneralFileFilter {
 	 * @see javax.swing.filechooser.FileFilter#getDescription()
 	 */
 	public String getDescription() {
-		return "All files (*)";
+		ResourceBundle resource = ResourceBundle.getBundle(
+			"de.zbit.locales.Labels", new XMLResourceBundleControl());
+		return resource.getString("ACCEPT_ALL_FILES");
 	}
 	
 }
