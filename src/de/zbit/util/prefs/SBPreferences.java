@@ -599,16 +599,16 @@ public class SBPreferences implements Map<Object, Object> {
 				value = ((StringHolder) options.get(key)).value;
 				if (value != null) value = value.toString();
 			}
-			if (props.isSetDefaults()) {
+			/*if (props.isSetDefaults()) {
 				v = props.getProperty(k);
 				if (v == null) { throw new IllegalArgumentException(String.format(
 					"No default value defined for property %s.", k)); }
 				if (!v.equals(value)) {
 					props.setProperty(k, value);
 				}
-			} else {
+			} else {*/
 				props.setProperty(k, value);
-			}
+			//}
 		}
 	}
 	
