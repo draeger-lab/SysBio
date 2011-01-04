@@ -494,7 +494,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		} else if (requiredType.equals(Long.class)) {
 			sb.append('d');
 		} else if (requiredType.equals(Boolean.class)) {
-			sb.append('v');
+		  // special handling for boolean parameters, because ArgParser has two ways
+		  // of handling this: "%v" without parameter or "%b" with "true" or "false"
+		  if (isSetRangeSpecification()) {
+		    sb.append('b');
+		  } else {
+		    sb.append('v');
+		  }
 		} else if (requiredType.equals(Character.class)) {
 			sb.append('c');
 		} else if (requiredType.equals(String.class)) {
@@ -503,7 +509,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			// some other Object
 			sb.append('s');
 		}
-		if (isSetRangeSpecification()) {
+		if (isSetRangeSpecification() && !requiredType.equals(Boolean.class)) {
 			sb.append(' ');
 			sb.append(range.getRangeSpecString());
 		}
