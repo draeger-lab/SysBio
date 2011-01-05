@@ -25,8 +25,7 @@ import java.util.ResourceBundle.Control;
  * 
  * Example usage:
  * <pre>
- * ResourceBundle resource = ResourceBundle.getBundle(
-      "de.zbit.locales.Labels", new XMLResourceBundleControl());
+ * ResourceBundle resource = ResourceManager.getBundle("de.zbit.locales.Labels");
    String myString = resource.getString("MY_KEY");
  * </pre>
  * 
@@ -40,7 +39,7 @@ public class XMLResourceBundleControl extends Control {
 	 * @author Andreas Dr&auml;ger
 	 * @date 2011-01-04
 	 */
-	public static class XMLResourceBundle extends ResourceBundle {
+	private static class XMLResourceBundle extends ResourceBundle {
 		
 		/**
 		 * 
@@ -67,13 +66,6 @@ public class XMLResourceBundleControl extends Control {
 		public Enumeration<String> getKeys() {
 			Set<String> key = properties.stringPropertyNames();
 			return Collections.enumeration(key);
-		}
-		
-		/**
-		 * @return the properties
-		 */
-		public Properties toProperties() {
-			return properties;
 		}
 		
 		/*
