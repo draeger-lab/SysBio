@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -198,6 +199,17 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
+	 * 
+	 * @param defKeys
+	 * @param args
+	 * @return
+	 */
+	public static SBProperties analyzeCommandLineArguments(
+		Class<? extends KeyProvider>[] defKeys, String[] args) {
+		return analyzeCommandLineArguments(Arrays.asList(defKeys), args);
+	}
+	
+	/**
 	 * @param defKeys
 	 * @param args
 	 * @return
@@ -231,6 +243,16 @@ public class SBPreferences implements Map<Object, Object> {
 			args);
 	}
 	
+	/**
+	 * 
+	 * @param prefs
+	 * @param options
+	 * @param parser
+	 * @param props
+	 * @param usage
+	 * @param args
+	 * @return
+	 */
 	private static final SBProperties analyzeCommandLineArguments(
 		SBPreferences[] prefs, Map<Option<?>, Object> options, ArgParser parser,
 		SBProperties props, String usage, String args[]) {
@@ -574,7 +596,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 *        for the desired values.
 	 */
 	private static void putAll(SBProperties props, Map<Option<?>, Object> options) {
-		String k, v, value;
+		String k, value;
+		// String v;
 		for (Option<?> key : options.keySet()) {
 			
 			// try {
@@ -734,27 +757,6 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
-	 * Checks all key-value pairs stored in these {@link SBPreferences} and throws
-	 * a {@link BackingStoreException} for the first {@link Option} whose
-	 * corresponding value is out of {@link Range}. If no {@link Exception} is
-	 * thrown, this method returns true to indicate that all key-value pairs are
-	 * valid.
-	 * 
-	 * @returns true if all key-value pairs are valid.
-	 * @throws BackingStoreException
-	 */
-	@SuppressWarnings("unchecked")
-	public boolean checkPrefs() throws BackingStoreException {
-		Iterator<Option> iterator = optionIterator();
-		Option<?> option;
-		while (iterator.hasNext()) {
-			option = iterator.next();
-			checkPref(option);
-		}
-		return true;
-	}
-	
-	/**
 	 * Checks whether this instance of {@link SBPreferences} contains the given
 	 * {@link Option} as a key and if its associated value satisfies all
 	 * {@link Range} constraints.
@@ -791,6 +793,27 @@ public class SBPreferences implements Map<Object, Object> {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Checks all key-value pairs stored in these {@link SBPreferences} and throws
+	 * a {@link BackingStoreException} for the first {@link Option} whose
+	 * corresponding value is out of {@link Range}. If no {@link Exception} is
+	 * thrown, this method returns true to indicate that all key-value pairs are
+	 * valid.
+	 * 
+	 * @returns true if all key-value pairs are valid.
+	 * @throws BackingStoreException
+	 */
+	@SuppressWarnings("unchecked")
+	public boolean checkPrefs() throws BackingStoreException {
+		Iterator<Option> iterator = optionIterator();
+		Option<?> option;
+		while (iterator.hasNext()) {
+			option = iterator.next();
+			checkPref(option);
+		}
+		return true;
 	}
 
 	/**

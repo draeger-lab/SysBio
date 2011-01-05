@@ -496,7 +496,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		} else if (requiredType.equals(Boolean.class)) {
 		  // special handling for boolean parameters, because ArgParser has two ways
 		  // of handling this: "%v" without parameter or "%b" with "true" or "false"
-		  if (isSetRangeSpecification()) {
+		  if (Boolean.parseBoolean(defaultValue.toString())) {//(isSetRangeSpecification()) {
 		    sb.append('b');
 		  } else {
 		    sb.append('v');
