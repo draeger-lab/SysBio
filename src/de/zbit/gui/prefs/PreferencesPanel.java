@@ -311,10 +311,14 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @return
 	 */
 	public JComponent getJComponentForOption(Option<?> option) {
-	  return getJComponentForOption(option, preferences, this);
+	  return getJComponentForOption(option, properties, this);
 	}
 	
 	/**
+	 * With this method it is possible to create a {@link JComponent} based on the persistently saved user 
+	 * preferences, i.e., here an instance of {@link SBPreferences}. This is in contrast to {@link SBProperties},
+	 * i.e., a current in-memory user-configuration.
+	 * 
 	 * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener, KeyListener)
 	 * @param option
 	 * @param prefs
@@ -322,12 +326,23 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @return
 	 */
 	public static JComponent getJComponentForOption(Option<?> option, SBPreferences prefs, EventListener l) {
-	  Object def = prefs != null ? option.getValue(prefs) : null;
+	  Object def = prefs != null ? option.getValue(prefs) : option.getDefaultValue();
 	  return getJComponentForOption(option, def, l);
 	}
 	
+	/**
+	 * With this method it is possible to create a {@link JComponent} based on the current in-memory 
+	 * preferences, i.e., here an instance of {@link SBProperties}. This is in contrast to {@link SBPreferences},
+	 * i.e., a persistently saved user-configuration.
+	 * 
+	 * @param option
+	 * @param probs
+	 * @param l
+	 * @return
+	 * @see #getJComponentForOption(Option, SBPreferences, EventListener)
+	 */
 	public static JComponent getJComponentForOption(Option<?> option, SBProperties probs, EventListener l) {
-	  Object def = probs != null ? probs.get(option) : null;
+	  Object def = probs != null ? probs.get(option) : option.getDefaultValue();
 	  return getJComponentForOption(option, def, l);
 	}
 	
