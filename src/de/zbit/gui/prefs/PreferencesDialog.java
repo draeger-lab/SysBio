@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.JButton;
@@ -24,6 +25,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.GUITools;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 
@@ -40,11 +42,14 @@ import de.zbit.util.prefs.KeyProvider;
 public class PreferencesDialog extends JDialog implements ActionListener,
 		ItemListener, ChangeListener, KeyListener {
 	
+	private static final ResourceBundle resource = ResourceManager
+			.getBundle("de.zbit.locales.Labels");
+
 	/**
 	 * Texts for the {@link JButton}s.
 	 */
-	private static final String APPLY = "Apply", CANCEL = "Cancel",
-			DEFAULTS = "Defaults", OK = "OK";
+	private static final String APPLY = "APPLY", CANCEL = "CANCEL",
+			DEFAULTS = "DEFAULTS", OK = "OK";
 	/**
 	 * Return types for the dialog.
 	 */
@@ -52,7 +57,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	/**
 	 * 
 	 */
-	private static final String DEFAULT_TITLE = "Preferences";
+	private static final String DEFAULT_TITLE = resource.getString("PREFERENCES");
 	/**
 	 * Generated serial version id.
 	 */
@@ -244,36 +249,12 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		getContentPane().add(allPrefsPanel, BorderLayout.CENTER);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		JPanel p = new JPanel();
-		defaults = new JButton("Defaults");
-		defaults.setMnemonic('D');
-		defaults.addActionListener(this);
-		defaults.setActionCommand(DEFAULTS);
-		defaults.setToolTipText(StringUtil.toHTML("Restores the default configuration, i.e., all current preferences will be replaced by the default values.", 60));
-		defaults.setEnabled(!panel.isDefaultConfiguration());
-		JButton cancel = new JButton("Cancel");
-		cancel.setMnemonic('C');
-		cancel.addActionListener(this);
-		cancel.setActionCommand(CANCEL);
-		cancel.setSize(defaults.getSize());
-		cancel.setToolTipText(StringUtil.toHTML("Closes this dialog without saving, i.e., all preferences will get lost.", 60));
-		apply = new JButton("Apply");
-		apply.setMnemonic('A');
-		apply.setSize(defaults.getSize());
-		apply.addActionListener(this);
-		apply.setActionCommand(APPLY);
-		apply.setToolTipText(StringUtil.toHTML("Persistently saves the current configuration but keeps the dialog open.", 60));
-		apply.setEnabled(false);
-		ok = new JButton("OK");
-		ok.setMnemonic('O');
-		ok.addActionListener(this);
-		ok.setActionCommand(OK);
-		ok.setSize(defaults.getSize());
-		ok.setToolTipText(StringUtil.toHTML("Saves the current configuration and closes this dialog.", 60));
-		ok.setEnabled(true);
+		defaults = createButton(DEFAULTS, !panel.isDefaultConfiguration());
+		JButton cancel = createButton(CANCEL, true);
+		apply = createButton(APPLY, false);
+		ok = createButton(OK, true);
 		
-		cancel.setPreferredSize(defaults.getPreferredSize());
-		apply.setPreferredSize(defaults.getPreferredSize());
-		ok.setPreferredSize(defaults.getPreferredSize());
+		GUITools.calculateAndSetMaxWidth(defaults, cancel, apply, ok);
 		
 		p.add(cancel);
 		p.add(defaults);
@@ -286,7 +267,25 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		
 		pack();
 	}
-	
+
+	/**
+	 * 
+	 * @param command
+	 * @param enabled
+	 * @return
+	 */
+	private JButton createButton(String command, boolean enabled) {
+		String separator = ";";
+		String labels[] = resource.getString(command).split(separator);
+		JButton button = new JButton(labels[0]);
+		button.setMnemonic(labels[0].charAt(0));
+		button.addActionListener(this);
+		button.setActionCommand(command);
+		button.setToolTipText(StringUtil.toHTML(labels[1], GUITools.TOOLTIP_LINE_LENGTH));
+		button.setEnabled(enabled);
+		return button;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -6,4 +6,10 @@
 		a (graphical) user interface.
   </comment>
   <entry key="ACCEPT_ALL_FILES">All files (*)</entry>
+  <entry key="APPLY">Apply;Persistently saves the current configuration but keeps the dialog open.</entry>
+  <entry key="BROWSE">Browse</entry>
+  <entry key="CANCEL">Cancel;Closes this dialog without saving, i.e., all preferences will get lost.</entry>
+  <entry key="DEFAULTS">Defaults;Restores the default configuration, i.e., all current preferences will be replaced by the default values.</entry>
+  <entry key="OK">OK;Saves the current configuration and closes this dialog.</entry>
+  <entry key="PREFERENCES">Preferences</entry>
 </properties>
