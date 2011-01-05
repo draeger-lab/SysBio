@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>
+		This configuration provides locale-dependent names for warnings
+		and error messages in a (graphical) user interface.
+  </comment>
+  <!-- <entry key="ERROR_CODE_0">Error message</entry> -->
+</properties>
