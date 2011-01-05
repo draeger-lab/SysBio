@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -24,6 +25,7 @@ import de.zbit.gui.ActionCommand;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.io.SBFileFilter;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
@@ -702,7 +704,8 @@ public class FileSelector extends JPanel implements ActionListener {
 		textField.setInputVerifier(new FileInputVerifier(
 			acceptOnlyFiles() ? FileInputVerifier.FileType.FILE
 					: FileInputVerifier.FileType.DIRECTORY));
-		button = GUITools.createButton("Browse", UIManager
+		ResourceBundle resource = ResourceManager.getBundle("de.zbit.locales.Labels");
+		button = GUITools.createButton(resource.getString("BROWSE"), UIManager
 				.getIcon(type == Type.OPEN ? "ICON_OPEN_16" : "ICON_SAVE_16"), this, type,
 			command.getToolTip());
 		label = new JLabel();

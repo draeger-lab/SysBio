@@ -114,6 +114,30 @@ public class GUITools {
 	}
 	
 	/**
+	 * Sets the dimension of all given {@link JButton} instances to the maximal
+	 * size, i.e., all buttons will be set to equal size, which is the maximal
+	 * preferred size of one of the buttons.
+	 * 
+	 * @param buttons
+	 */
+	public static void calculateAndSetMaxWidth(JButton... buttons) {
+		double maxWidth = 0d, maxHeight = 0d;
+		Dimension curr;
+		for (JButton button : buttons) {
+			curr = button.getPreferredSize();
+			if (curr.getWidth() > maxWidth) {
+				maxWidth = curr.getWidth();
+			}
+			if (curr.getHeight() > maxHeight) {
+				maxHeight = curr.getHeight();
+			}
+		}
+		for (JButton button : buttons) {
+			button.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
+		}
+	}
+	
+	/**
 	 * Creates a JButton with the given properties. The tool tip becomes an HTML
 	 * formatted string with a line break after {@link #TOOLTIP_LINE_LENGTH} symbols.
 	 * 

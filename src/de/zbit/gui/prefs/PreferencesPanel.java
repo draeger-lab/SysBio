@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
 
@@ -96,6 +98,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * Stores a sorted mapping between {@link Option}s and corresponding {@link OptionGroup}s.
 	 */
 	SortedMap<Option<?>, OptionGroup<?>> option2group;
+	/**
+	 * Stores those options that do not belong to any {@link OptionGroup}.
+	 */
+	@SuppressWarnings("unchecked")
+	SortedSet<Option> ungroupedOptions;
 
 	/**
 	 * Stores a (sorted) {@link List} of all {@link OptionGroup}s belonging to this class.
@@ -191,13 +198,14 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @param deleteFromHere Processed options will be deleted from this {@link Map}.
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	List<Option<?>> addOptions(LayoutHelper lh,
-		Iterable<? extends Option<?>> options,
+		Iterable<? extends Option> options,
 		Map<Option<?>, OptionGroup<?>> deleteFromHere) {
 		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
 		for (Option<?> option : options) {
 			// Create swing option based on field type
-			JComponent jc = properties.containsKey(option) ? getJComponentForOption(option, preferences, this) : null;
+			JComponent jc = properties.containsKey(option) ? getJComponentForOption(option, properties, this) : null;
 			if (jc != null) {
 				if (jc instanceof FileSelector) {
 					FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
@@ -237,7 +245,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		}
 		
 		// Now we consider what is left
-		unprocessedOptions.addAll(addOptions(lh, option2group.keySet(), null));
+		unprocessedOptions.addAll(addOptions(lh, ungroupedOptions, null));
 		
 		return unprocessedOptions;
 	}
@@ -318,6 +326,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	  return getJComponentForOption(option, def, l);
 	}
 	
+	public static JComponent getJComponentForOption(Option<?> option, SBProperties probs, EventListener l) {
+	  Object def = probs != null ? probs.get(option) : null;
+	  return getJComponentForOption(option, def, l);
+	}
+	
 	/**
 	 * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener, KeyListener)
 	 * @param option
@@ -379,7 +392,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		Class<?> clazz = option.getRequiredType();
 		if (Boolean.class.isAssignableFrom(clazz)) {
 			component = new JCheckBox();
-			if (defaultValue!=null) ((AbstractButton) component).setSelected((Boolean) defaultValue);
+			if (defaultValue!=null) {
+				((AbstractButton) component).setSelected(Boolean.parseBoolean(defaultValue.toString()));
+			}
 			
 			//((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
 			//		.get(o.getOptionName()).toString()));
@@ -664,12 +679,17 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	/**
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	void searchForOptionGroups() {
 		option2group = new TreeMap<Option<?>, OptionGroup<?>>();
-		optionGroups = KeyProvider.Tools.optionGroupList(preferences.getKeyProvider());
+		ungroupedOptions = new TreeSet<Option>();
+		Class<? extends KeyProvider> keyProvider = preferences.getKeyProvider();
+		ungroupedOptions.addAll(KeyProvider.Tools.optionList(keyProvider));
+		optionGroups = KeyProvider.Tools.optionGroupList(keyProvider);
 		for (OptionGroup<?> group : optionGroups) {
 		  for (Option<?> option : group.getOptions()) {
 		    option2group.put(option, group);
+		    ungroupedOptions.remove(option);
 		  }
 		}
 	}
