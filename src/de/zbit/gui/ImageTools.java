@@ -42,8 +42,16 @@ public class ImageTools {
 	 *            A {@link URL} representing a directory with image files.
 	 * @throws URISyntaxException
 	 */
-	public static void initImages(URL directory) {	  
+	public static void initImages(URL directory) {
+	  /*
+	   * You can not create File objects or list directories from places
+	   * inside a jar. Using this code will make it impossible to ever release
+	   * this class + images inside a jar file.
+	   * TODO: Change the code to use getResourceAsStream().
+	   */
 		try {
+		  // The following lines throws an IllegalArgumentException if called
+		  // from inside a jar
 			File dir = new File(directory.toURI());
 			if (dir.canRead() && dir.isDirectory()) {
 				String key;
@@ -60,6 +68,9 @@ public class ImageTools {
 					}
 				}
 			}
+		} catch (IllegalArgumentException e) {
+      System.err.println(String.format(
+        "Could not load icons from directory %s.", directory));
 		} catch (URISyntaxException e) {
 			System.err.println(String.format(
 					"Could not load icons from directory %s.", directory));
