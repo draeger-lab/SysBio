@@ -9,7 +9,7 @@
   <entry key="APPLY">Übernehmen;Speichert die aktuelle Konfiguration persistent ab, schließt aber nicht diesen Dialog.</entry>
   <entry key="BROWSE">Durchsuchen</entry>
   <entry key="CANCEL">Abbrechen;Schließt diesen Dialog ohne Änderungen zu speichern, d.h., alle Einstellungen werden verworfen.</entry>
-  <entry key="DEFAULTS">Standard;Stellt die Standardkonfiguration wieder her, d.h., alle aktuellen Einstellungen werden durch die Standardwerte ersetzt.</entry>
+  <entry key="DEFAULTS">Zurücksetzen;Stellt die Standardkonfiguration wieder her, d.h., alle aktuellen Einstellungen werden durch die Standardwerte ersetzt.</entry>
   <entry key="OK">OK;Speichert die aktuelle Konfiguration und schließt diesen Dialog.</entry>
   <entry key="PREFERENCES">Einstellungen</entry>
 </properties>
