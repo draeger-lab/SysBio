@@ -20,7 +20,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.swing.AbstractButton;
@@ -918,7 +917,7 @@ public class GUITools {
 	 *        - Name of your application.
 	 */
 	public static void initLaF(String title) {
-		Locale.setDefault(Locale.ENGLISH);
+		// Locale.setDefault(Locale.ENGLISH);
 		// For MacOS X
 		boolean isMacOSX = false;
 		if (System.getProperty("mrj.version") != null) {

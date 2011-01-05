@@ -8,13 +8,13 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Locale;
 
 import javax.swing.JFileChooser;
 import javax.swing.JToolBar;
 
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
+import de.zbit.util.prefs.SBProperties;
 
 /**
  * @author Andreas Dr&auml;ger
@@ -31,7 +31,10 @@ public class BaseGUI extends BaseFrame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.setProperty("user.language", Locale.ENGLISH.getLanguage());
+		SBProperties props = SBPreferences.analyzeCommandLineArguments(
+			GUIOptions.class, args);
+		SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+		prefs.putAll(props);
 		new BaseGUI();
 	}
 	
