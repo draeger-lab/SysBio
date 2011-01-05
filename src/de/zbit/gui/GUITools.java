@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.swing.AbstractButton;
@@ -47,6 +48,7 @@ import javax.swing.filechooser.FileFilter;
 
 import de.zbit.io.OpenFile;
 import de.zbit.util.Reflect;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.ValuePair;
 
@@ -60,10 +62,15 @@ import de.zbit.util.ValuePair;
 public class GUITools {
 	
 	/**
-	 * 
+	 * The location for texts of labels. 
+	 */
+	public static final String RESOURCE_LOCATION_FOR_LABELS = "de.zbit.locales.Labels";
+	
+	/**
+	 * The number of symbols per line in tool tip texts.
 	 */
 	public static int TOOLTIP_LINE_LENGTH = 60;
-
+	
 	static {
     // ImageTools.initImages(GUITools.class.getResource("img"));
 
@@ -96,6 +103,30 @@ public class GUITools {
 	}
 	
 	/**
+	 * Sets the dimension of all given {@link JComponent} instances to the maximal
+	 * size, i.e., all components will be set to equal size, which is the maximal
+	 * preferred size of one of the components.
+	 * 
+	 * @param components
+	 */
+	public static void calculateAndSetMaxWidth(JComponent... components) {
+		double maxWidth = 0d, maxHeight = 0d;
+		Dimension curr;
+		for (JComponent component : components) {
+			curr = component.getPreferredSize();
+			if (curr.getWidth() > maxWidth) {
+				maxWidth = curr.getWidth();
+			}
+			if (curr.getHeight() > maxHeight) {
+				maxHeight = curr.getHeight();
+			}
+		}
+		for (JComponent component : components) {
+			component.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
+		}
+	}
+	
+	/**
 	 * Checks whether the first container contains the second one.
 	 * 
 	 * @param c
@@ -111,30 +142,6 @@ public class GUITools {
 				else contains |= contains(c1, insight);
 			}
 		return contains;
-	}
-	
-	/**
-	 * Sets the dimension of all given {@link JButton} instances to the maximal
-	 * size, i.e., all buttons will be set to equal size, which is the maximal
-	 * preferred size of one of the buttons.
-	 * 
-	 * @param buttons
-	 */
-	public static void calculateAndSetMaxWidth(JButton... buttons) {
-		double maxWidth = 0d, maxHeight = 0d;
-		Dimension curr;
-		for (JButton button : buttons) {
-			curr = button.getPreferredSize();
-			if (curr.getWidth() > maxWidth) {
-				maxWidth = curr.getWidth();
-			}
-			if (curr.getHeight() > maxHeight) {
-				maxHeight = curr.getHeight();
-			}
-		}
-		for (JButton button : buttons) {
-			button.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
-		}
 	}
 	
 	/**
@@ -279,6 +286,18 @@ public class GUITools {
 	}
 	
 	/**
+	 * Creates a new {@link JMenu} with the given menu items and sets the first
+	 * letter in the menu's name as mnemonic.
+	 * 
+	 * @param text
+	 * @param menuItems
+	 * @return
+	 */
+	public static JMenu createJMenu(String text, Object... menuItems) {
+		return createJMenu(text, text.charAt(0), menuItems);
+	}
+	
+	/**
 	 * 
 	 * @param text
 	 * @param tooltip
@@ -291,18 +310,6 @@ public class GUITools {
 			menu.setToolTipText(StringUtil.toHTML(tooltip, TOOLTIP_LINE_LENGTH));
 		}
 		return menu;
-	}
-	
-	/**
-	 * Creates a new {@link JMenu} with the given menu items and sets the first
-	 * letter in the menu's name as mnemonic.
-	 * 
-	 * @param text
-	 * @param menuItems
-	 * @return
-	 */
-	public static JMenu createJMenu(String text, Object... menuItems) {
-		return createJMenu(text, text.charAt(0), menuItems);
 	}
 	
 	/**
@@ -428,6 +435,99 @@ public class GUITools {
 	}
 	
 	/**
+	   * Searches for the parent #{@link java.awt.Window} of the given component c.
+	   * Checks if this Window contains a #{@link javax.swing.AbstractButton} which
+	   * is called "Ok" and disables this button.
+	   * @param c
+	   * @return true if and only if an ok-button has been disabled. Else, false.
+	   */
+	  public static boolean disableOkButton(Component c) {
+	    // Seach for parent window
+	    while (c!=null) {
+	      if (c instanceof Window) {
+	        //((Window)c).pack();
+	        break;
+	      }
+	      c = c.getParent();
+	    }
+	    
+	    // Search for ok button and check if all other are enabled.
+			if (c != null) {
+				// c is now a Window.
+				ResourceBundle resource = ResourceManager
+						.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+				Component okButton = searchFor((Window) c, AbstractButton.class,
+					"getText", resource.getString("OK").split(";")[0]);
+				if (okButton != null) {
+					okButton.setEnabled(false);
+					return true;
+				}
+			}
+	    return false;
+	  }
+	
+	/**
+	   * Checks if this "c" contains a #{@link javax.swing.AbstractButton} which
+	   * is called "OK" and enables this button if and only if it a) exists and is
+	   * disabled and b) all other elements on this container and all
+	   * contained containers are enabled.
+	   * @param c
+	   * @return true if and only if an ok-button has been enabled. Else, false.
+	   */
+	  public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c) {
+	    // Seach for parent window
+	    // Do NOT uncomment it. Leads to unexpected behaviour.
+	    /*while (c!=null) {
+	      if (c instanceof Window) {
+	        //((Window)c).pack();
+	        break;
+	      }
+	      c = c.getParent();
+	    }*/
+	    
+	    // Search for ok button and check if all other are enabled.
+	    if (c!=null) {
+	      // c is now a Window.
+				ResourceBundle resource = ResourceManager
+						.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+				Component okButton = searchFor(c, AbstractButton.class, "getText",
+					resource.getString("OK").split(";")[0]);
+	      if (okButton!=null) {
+	        boolean previousState = okButton.isEnabled();
+	        okButton.setEnabled(true);
+	        if (isEnabled(c)) {
+	          return true;
+	        } else {
+	          okButton.setEnabled(previousState);
+	          return false;
+	        }
+	      }
+	    }
+	    return false;
+	  }
+	
+	/**
+	   * Simply checks if all elements on "c" are enabled and if yes, the given "okButton" will
+	   * be enabled. Else, the current state stays untouched.
+	   * 
+	   * In opposite to {@link #enableOkButtonIfAllComponentsReady(Component)}, this function 
+	   * uses the given okButton.
+	   * @param c
+	   * @param okButton
+	   * @return
+	   */
+	  public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c, AbstractButton okButton) {
+	    boolean previousState = okButton.isEnabled();
+	    okButton.setEnabled(true);
+	    if (isEnabled(c)) {
+	      return true;
+	    } else {
+	      okButton.setEnabled(previousState);
+	      return false;
+	    }
+	  }
+	
+	/**
 	 * Computes and returns the dimension, i.e., the size of a given icon.
 	 * 
 	 * @param icon
@@ -440,12 +540,165 @@ public class GUITools {
 	}
 	
 	/**
+	 * @param jMenuBar
+	 * @param fileOpenRecent
+	 * @return
+	 */
+	public static JMenuItem getJMenuItem(JMenuBar menuBar, Object command) {
+		JMenu menu;
+		JMenuItem item;
+		for (int i = 0; i < menuBar.getMenuCount(); i++) {
+			menu = menuBar.getMenu(i);
+			if ((menu.getActionCommand() != null)
+					&& (menu.getActionCommand().equals(command.toString()))) { return menu; }
+			for (int j = 0; j < menu.getItemCount(); j++) {
+				item = menu.getItem(j);
+				if ((item != null) && (item.getActionCommand() != null)
+						&& (item.getActionCommand().equals(command.toString()))) { return item; }
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * @param g
 	 * @param incrementBy
 	 * @return
 	 */
 	public static Font incrementFontSize(Font g, int incrementBy) {
 		return g.deriveFont((float) (g.getSize() + incrementBy));
+	}
+	
+	/**
+	 * Initializes the look and feel.
+	 * 
+	 * @param title
+	 *        - Name of your application.
+	 */
+	public static void initLaF(String title) {
+		// Locale.setDefault(Locale.ENGLISH);
+		// For MacOS X
+		boolean isMacOSX = false;
+		if (System.getProperty("mrj.version") != null) {
+			isMacOSX = true;
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+				title);
+		}
+		try {			
+			UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
+			String osName = System.getProperty("os.name");
+			if (osName.equals("Linux") || osName.equals("FreeBSD")) {
+				UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+				// UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+			} else if (isMacOSX) {
+				UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+			} else if (osName.contains("Windows")) {
+				UIManager
+						.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
+			} else {
+				// UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			}
+			
+		} catch (Exception e) {
+			// If Nimbus is not available, you can set the GUI to another look
+			// and feel.
+			// Native look and feel for Windows, MacOS X. GTK look and
+			// feel for Linux, FreeBSD
+			try {
+				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+					if ("Nimbus".equals(info.getName())) {
+						UIManager.setLookAndFeel(info.getClassName());
+						break;
+					}
+				}
+				
+			} catch (Exception exc) {
+				JOptionPane.showMessageDialog(null, StringUtil.toHTML(exc.getMessage(),
+					TOOLTIP_LINE_LENGTH), exc.getClass().getName(), JOptionPane.WARNING_MESSAGE);
+				exc.printStackTrace();
+			}
+		}
+	}
+	
+	
+	/**
+	 * Checks, if all elements on c are enabled.
+	 * @param c
+	 * @return true if and only if c and all components on c are enabled.
+	 */
+	public static boolean isEnabled(Container c) {
+	  Component inside;
+	  boolean enabled = c.isEnabled();
+	  for (int i = 0; i < c.getComponentCount(); i++) {
+	    inside = c.getComponent(i);
+	    enabled &= inside.isEnabled();
+	    if (!enabled) return false; // shortcut.
+	    if (inside instanceof Container) {
+	      enabled&=isEnabled((Container) inside);
+	    }
+	    if (!enabled) return false; // shortcut.
+	  }
+	  return enabled;
+	}
+	
+	/**
+	 * @param parent
+	 * @param dir
+	 * @param allFilesAcceptable
+	 * @param multiSelectionAllowed
+	 * @param mode
+	 * @param filter
+	 * @return null if for some reason the no {@link File} has been selected or
+	 *         the {@link File} cannot be read, else the selected {@link File}.
+	 */
+	public static File[] openFileDialog(final Component parent, String dir,
+		boolean allFilesAcceptable, boolean multiSelectionAllowed, int mode,
+		FileFilter... filter) {
+	  File[] ret=null;
+		JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
+			multiSelectionAllowed, mode, filter);
+		if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+		  if (multiSelectionAllowed) {
+		    ret = chooser.getSelectedFiles();
+		  } else {
+		    ret = new File[]{chooser.getSelectedFile()};
+		  }
+		  for (File f: ret) {
+				if (!f.canRead()) {
+					showNowReadingAccessWarning(parent, f);
+					return null;
+				}
+		  }
+		}
+		return ret;
+	}
+
+	/**
+   * @param parent
+   * @param dir
+   * @param allFilesAcceptable
+   * @param multiSelectionAllowed
+   * @param mode
+   * @param filter
+   * @return null if for some reason the no {@link File} has been selected or
+   *         the {@link File} cannot be read, else the selected {@link File}.
+   */
+	public static File openFileDialog(final Component parent, String dir,
+	  boolean allFilesAcceptable, int mode,
+	  FileFilter... filter) {
+	  JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
+	    false, mode, filter);
+	  if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+	    File f = chooser.getSelectedFile();
+			if (!f.canRead()) {
+				showNowReadingAccessWarning(parent, f);
+			} else {
+				return f;
+			}
+	  }
+	  return null;
 	}
 	
 	/**
@@ -466,12 +719,32 @@ public class GUITools {
 	 * @return An integer representing the user's choice.
 	 */
 	public static int overwriteExistingFileDialog(Component parent, File out) {
-		return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(out
-				.getName()
-				+ " already exists. Do you really want to overwrite it?", TOOLTIP_LINE_LENGTH),
-			"Overwrite existing file?", JOptionPane.YES_NO_OPTION,
+		ResourceBundle resource = ResourceManager
+				.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+		return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(String
+				.format(resource.getString("OVERRIDE_EXISTING_FILE_QUESTION"),
+					StringUtil.changeFirstLetterCase(resource
+							.getString(out.isFile() ? "THE_FILE" : "THE_DIRECTORY"), true,
+						false), out.getName()), TOOLTIP_LINE_LENGTH), resource
+				.getString("OVERRIDE_EXISTING_FILE_TITLE"), JOptionPane.YES_NO_OPTION,
 			JOptionPane.QUESTION_MESSAGE);
 	}
+	
+	/**
+	   * Recursively looks for the first parent window of the
+	   * given component and calls the "pack()" method on it.
+	   * @param parent
+	   */
+	  public static void packParentWindow(Component parent) {
+	    Component c = parent;
+	    while (c!=null) {
+	      if (c instanceof Window) {
+	        ((Window)c).pack();
+	        //break;
+	      }
+	      c = c.getParent();
+	    }
+	  }
 	
 	/**
 	 * Replaces two components. Tries to preserve the layout while replacing the
@@ -535,24 +808,6 @@ public class GUITools {
 	}
 	
 	/**
-	 * @param parent
-	 * @param dir
-	 * @param allFilesAcceptable
-	 * @param multiSelectionAllowed
-	 * @param mode
-	 * @param filter
-	 * @return null if no {@link File} has been selected for any reason or the
-	 *         selected {@link File}.
-	 */
-	public static File saveFileDialog(Component parent, String dir,
-		boolean allFilesAcceptable, boolean multiSelectionAllowed, int mode,
-		FileFilter... filter) {
-		return saveFileDialog(parent, dir, allFilesAcceptable,
-			multiSelectionAllowed, true, mode, filter);
-	}
-	
-	
-	/**
 	 * 
 	 * @param parent
 	 * @param dir
@@ -575,9 +830,7 @@ public class GUITools {
 			File f = fc.getSelectedFile();
 			if (f.exists()) {
 				if (checkFile && !f.canWrite()) {
-					JOptionPane.showMessageDialog(parent, StringUtil.toHTML(
-						"Cannot write to file " + f.getAbsolutePath() + ".", TOOLTIP_LINE_LENGTH),
-						"No writing access", JOptionPane.WARNING_MESSAGE);
+					showNowWritingAccessWarning(parent, f);
 				} else if (f.isDirectory()
 						|| (checkFile && GUITools.overwriteExistingFile(parent, f))) {
 					return f;
@@ -596,60 +849,55 @@ public class GUITools {
 	 * @param multiSelectionAllowed
 	 * @param mode
 	 * @param filter
-	 * @return null if for some reason the no {@link File} has been selected or
-	 *         the {@link File} cannot be read, else the selected {@link File}.
+	 * @return null if no {@link File} has been selected for any reason or the
+	 *         selected {@link File}.
 	 */
-	public static File[] openFileDialog(final Component parent, String dir,
+	public static File saveFileDialog(Component parent, String dir,
 		boolean allFilesAcceptable, boolean multiSelectionAllowed, int mode,
 		FileFilter... filter) {
-	  File[] ret=null;
-		JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
-			multiSelectionAllowed, mode, filter);
-		if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-		  if (multiSelectionAllowed) {
-		    ret = chooser.getSelectedFiles();
-		  } else {
-		    ret = new File[]{chooser.getSelectedFile()};
-		  }
-		  for (File f: ret) {
-		    if (!f.canRead()) {
-		      JOptionPane.showMessageDialog(parent, StringUtil.toHTML(
-		        "Cannot read file " + f.getAbsolutePath() + ".", TOOLTIP_LINE_LENGTH),
-		        "Unable to read file", JOptionPane.WARNING_MESSAGE);
-		      return null;
-		    }
-		  }
-		}
-		return ret;
+		return saveFileDialog(parent, dir, allFilesAcceptable,
+			multiSelectionAllowed, true, mode, filter);
 	}
 	
-  /**
-   * @param parent
-   * @param dir
-   * @param allFilesAcceptable
-   * @param multiSelectionAllowed
-   * @param mode
-   * @param filter
-   * @return null if for some reason the no {@link File} has been selected or
-   *         the {@link File} cannot be read, else the selected {@link File}.
-   */
-	public static File openFileDialog(final Component parent, String dir,
-	  boolean allFilesAcceptable, int mode,
-	  FileFilter... filter) {
-	  JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
-	    false, mode, filter);
-	  if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-	    File f = chooser.getSelectedFile();
-	    if (!f.canRead()) {
-	      JOptionPane.showMessageDialog(parent, StringUtil.toHTML(
-	        "Cannot read file " + f.getAbsolutePath() + ".", TOOLTIP_LINE_LENGTH),
-	        "Unable to read file", JOptionPane.WARNING_MESSAGE);
-	    } else {
-	      return f;
+	/**
+	   * Searches recursively on "parent" and all components on "parent" for a component of
+	   * class "searchFor", with a Method (without inputs) called "methodName", that returns an
+	   * object that equals "retVal".
+	   * If "methodName" is null, this function will simply return the first instance of "searchFor"
+	   * on "parent".
+	   * @param parent
+	   * @param searchFor
+	   * @param methodName
+	   * @param retVal
+	   * @return the component, if found.
+	   */
+	  public static Component searchFor(Container parent, Class<?> searchFor, String methodName, Object retVal) {
+	    for (int i=0; i<parent.getComponentCount(); i++) {
+	      Component c = parent.getComponent(i);
+	      
+	      // Is c the component we are looking for?
+	      if (searchFor.isAssignableFrom(c.getClass())) {
+	        if (methodName!=null) {
+	          Object ret = Reflect.invokeIfContains(c, methodName);
+	          if (ret==null && retVal==null || ret.equals(retVal)) {
+	            return c;
+	          } else if (ret!=null && retVal!=null && ret instanceof String
+	            && ((String)ret).equalsIgnoreCase(retVal.toString())) {
+	            return c;
+	          }
+	        } else {
+	          return c;
+	        }
+	      }
+	      
+	      // Recurse further.
+	      if (c instanceof Container) {
+	        Component c2 = searchFor((Container)c, searchFor, methodName, retVal);
+	        if (c2!=null) return c2;
+	      }
 	    }
+	    return null;
 	  }
-	  return null;
-	}
 	
 	/**
 	 * @param c
@@ -699,36 +947,6 @@ public class GUITools {
 				}
 			}
 		}
-	}
-	
-	/**
-	 * 
-	 * @param state
-	 * @param menuBar
-	 * @param command
-	 */
-	public static void setEnabled(boolean state, JMenuBar menuBar, Object command) {
-		setEnabled(state, menuBar, new Object[] {command});
-	}
-	
-	/**
-	 * Checks, if all elements on c are enabled.
-	 * @param c
-	 * @return true if and only if c and all components on c are enabled.
-	 */
-	public static boolean isEnabled(Container c) {
-	  Component inside;
-	  boolean enabled = c.isEnabled();
-	  for (int i = 0; i < c.getComponentCount(); i++) {
-	    inside = c.getComponent(i);
-	    enabled &= inside.isEnabled();
-	    if (!enabled) return false; // shortcut.
-	    if (inside instanceof Container) {
-	      enabled&=isEnabled((Container) inside);
-	    }
-	    if (!enabled) return false; // shortcut.
-	  }
-	  return enabled;
 	}
 	
 	/**
@@ -790,6 +1008,16 @@ public class GUITools {
 	}
 	
 	/**
+	 * 
+	 * @param state
+	 * @param menuBar
+	 * @param command
+	 */
+	public static void setEnabled(boolean state, JMenuBar menuBar, Object command) {
+		setEnabled(state, menuBar, new Object[] {command});
+	}
+	
+	/**
 	 * @param state
 	 * @param menuBar
 	 * @param commands
@@ -810,184 +1038,6 @@ public class GUITools {
 	}
 	
 	/**
-	 * Displays the error message on a {@link JOptionPane}.
-	 * 
-	 * @param exc
-	 */
-	public static void showErrorMessage(Component parent, Throwable exc) {
-    exc.printStackTrace();
-    ValuePair<String, Integer> messagePair = StringUtil
-              .insertLineBreaksAndCount(exc.getMessage(), TOOLTIP_LINE_LENGTH, "\n");
-    Object message;
-    if (messagePair.getB().intValue() > 30) {
-      JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
-      pane.setEditable(false);
-      pane.setPreferredSize(new Dimension(480, 240));
-      message = new JScrollPane(pane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    }
-    else {
-      message = messagePair.getA();
-    }
-    JOptionPane.showMessageDialog(parent, message, exc.getClass()
-              .getSimpleName(), JOptionPane.ERROR_MESSAGE);
-  }
-	
-	/**
-	 * 
-	 * @param parent
-	 * @param message
-	 */
-	public static void showErrorMessage(Component parent, String message) {
-	  showErrorMessage(parent, null, message);
-	}
-	
-	/**
-	 * Shows an error dialog with the given message in case the exception does not
-	 * provide any detailed message.
-	 * 
-	 * @param parent
-	 * @param exc
-	 * @param defaultMessage
-	 */
-	public static void showErrorMessage(Component parent, Throwable exc,
-            String defaultMessage) {
-    if ((exc == null) || (exc.getMessage() == null)
-              || (exc.getMessage().length() == 0)) {
-      exc.printStackTrace();
-      JOptionPane.showMessageDialog(parent, defaultMessage, exc.getClass()
-                .getSimpleName(), JOptionPane.ERROR_MESSAGE);
-    }
-    else {
-      showErrorMessage(parent, exc);
-    }
-  }
-	
-	/**
-	 * Displays a message on a message dialog window, i.e., an HTML document.
-	 * 
-	 * @param path
-	 *        the URL of an HTML document.
-	 * @param title
-	 *        the title of the dialog to be displayed
-	 * @param owner
-	 *        the parent of the dialog or null.
-	 */
-	public static void showMessage(URL path, String title, Component owner) {
-		showMessage(path, title, owner, null);
-	}
-	
-	/**
-	 * Shows a simple message with a given title and an ok button.
-	 * @param message
-	 * @param title
-	 * @return
-	 */
-  public static void showMessage(String message, String title) {
-    JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
-  }
-	
-	/**
-	 * @param path
-	 * @param title
-	 * @param owner
-	 * @param icon
-	 */
-	public static void showMessage(URL path, String title, Component owner,
-		Icon icon) {
-		JBrowserPane browser = new JBrowserPane(path);
-		browser.removeHyperlinkListener(browser);
-		browser.addHyperlinkListener(new SystemBrowser());
-		browser.setBorder(BorderFactory.createEtchedBorder());
-		
-		try {
-			File f = new File(OpenFile.doDownload(path.toString()));
-			BufferedReader br;
-			br = new BufferedReader(new FileReader(f));
-			String line;
-			int rowCount = 0, maxLine = 0;
-			while (br.ready()) {
-				line = br.readLine();
-				if (line.length() > maxLine) {
-					maxLine = line.length();
-				}
-				rowCount++;
-			}
-			
-			if ((rowCount > 100) || (maxLine > 250)) {
-				JScrollPane scroll = new JScrollPane(browser,
-					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-				// TODO: Calculate required size using the font size.
-				scroll.setMaximumSize(new Dimension(470, 470));
-				Dimension prefered = new Dimension(450, 450);
-				browser.setPreferredSize(prefered);
-				JOptionPane.showMessageDialog(owner, scroll, title,
-					JOptionPane.INFORMATION_MESSAGE, icon);
-			} else {
-				JOptionPane.showMessageDialog(owner, browser, title,
-					JOptionPane.INFORMATION_MESSAGE, icon);
-			}
-		} catch (IOException exc) {
-			exc.printStackTrace();
-			showErrorMessage(owner, exc);
-		}
-	}
-	
-	/**
-	 * Initializes the look and feel.
-	 * 
-	 * @param title
-	 *        - Name of your application.
-	 */
-	public static void initLaF(String title) {
-		// Locale.setDefault(Locale.ENGLISH);
-		// For MacOS X
-		boolean isMacOSX = false;
-		if (System.getProperty("mrj.version") != null) {
-			isMacOSX = true;
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-				title);
-		}
-		try {			
-			UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
-			String osName = System.getProperty("os.name");
-			if (osName.equals("Linux") || osName.equals("FreeBSD")) {
-				UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-				// UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-			} else if (isMacOSX) {
-				UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
-			} else if (osName.contains("Windows")) {
-				UIManager
-						.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
-			} else {
-				// UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			}
-			
-		} catch (Exception e) {
-			// If Nimbus is not available, you can set the GUI to another look
-			// and feel.
-			// Native look and feel for Windows, MacOS X. GTK look and
-			// feel for Linux, FreeBSD
-			try {
-				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-					if ("Nimbus".equals(info.getName())) {
-						UIManager.setLookAndFeel(info.getClassName());
-						break;
-					}
-				}
-				
-			} catch (Exception exc) {
-				JOptionPane.showMessageDialog(null, StringUtil.toHTML(exc.getMessage(),
-					TOOLTIP_LINE_LENGTH), exc.getClass().getName(), JOptionPane.WARNING_MESSAGE);
-				exc.printStackTrace();
-			}
-		}
-	}
-	
-	/**
 	 * Recursively set opaque to a value for p and all JComoponents on p.
 	 * @param p
 	 * @param val - false means transparent, true means object has a background.
@@ -1005,169 +1055,158 @@ public class GUITools {
   }
 
 	/**
-	 * @param jMenuBar
-	 * @param fileOpenRecent
-	 * @return
+	 * 
+	 * @param parent
+	 * @param message
 	 */
-	public static JMenuItem getJMenuItem(JMenuBar menuBar, Object command) {
-		JMenu menu;
-		JMenuItem item;
-		for (int i = 0; i < menuBar.getMenuCount(); i++) {
-			menu = menuBar.getMenu(i);
-			if ((menu.getActionCommand() != null)
-					&& (menu.getActionCommand().equals(command.toString()))) { return menu; }
-			for (int j = 0; j < menu.getItemCount(); j++) {
-				item = menu.getItem(j);
-				if ((item != null) && (item.getActionCommand() != null)
-						&& (item.getActionCommand().equals(command.toString()))) { return item; }
-			}
-		}
-		return null;
+	public static void showErrorMessage(Component parent, String message) {
+	  showErrorMessage(parent, null, message);
 	}
 
   /**
-   * Checks if this "c" contains a #{@link javax.swing.AbstractButton} which
-   * is called "Ok" and enables this button if and only if it a) exists and is
-   * disabled and b) all other elements on this container and all
-   * contained containers are enabled.
-   * @param c
-   * @return true if and only if an ok-button has been enabled. Else, false.
-   */
-  public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c) {
-    // Seach for parent window
-    // Do NOT uncomment it. Leads to unexpected behaviour.
-    /*while (c!=null) {
-      if (c instanceof Window) {
-        //((Window)c).pack();
-        break;
-      }
-      c = c.getParent();
-    }*/
-    
-    // Search for ok button and check if all other are enabled.
-    if (c!=null) {
-      // c is now a Window.
-      Component okButton = searchFor(c, AbstractButton.class, "getText", "Ok");
-      if (okButton!=null) {
-        boolean previousState = okButton.isEnabled();
-        okButton.setEnabled(true);
-        if (isEnabled(c)) {
-          return true;
-        } else {
-          okButton.setEnabled(previousState);
-          return false;
-        }
-      }
-    }
-    return false;
+ * Displays the error message on a {@link JOptionPane}.
+ * 
+ * @param exc
+ */
+public static void showErrorMessage(Component parent, Throwable exc) {
+   exc.printStackTrace();
+   ValuePair<String, Integer> messagePair = StringUtil
+      .insertLineBreaksAndCount(exc.getMessage(), TOOLTIP_LINE_LENGTH, "\n");
+   Object message;
+   if (messagePair.getB().intValue() > 30) {
+     JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
+     pane.setEditable(false);
+     pane.setPreferredSize(new Dimension(480, 240));
+     message = new JScrollPane(pane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+   }
+   else {
+     message = messagePair.getA();
+   }
+   JOptionPane.showMessageDialog(parent, message, exc.getClass()
+      .getSimpleName(), JOptionPane.ERROR_MESSAGE);
   }
   
   /**
-   * Simply checks if all elements on "c" are enabled and if yes, the given "okButton" will
-   * be enabled. Else, the current state stays untouched.
-   * 
-   * In opposite to {@link #enableOkButtonIfAllComponentsReady(Component)}, this function 
-   * uses the given okButton.
-   * @param c
-   * @param okButton
-   * @return
-   */
-  public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c, AbstractButton okButton) {
-    boolean previousState = okButton.isEnabled();
-    okButton.setEnabled(true);
-    if (isEnabled(c)) {
-      return true;
-    } else {
-      okButton.setEnabled(previousState);
-      return false;
-    }
+ * Shows an error dialog with the given message in case the exception does not
+ * provide any detailed message.
+ * 
+ * @param parent
+ * @param exc
+ * @param defaultMessage
+ */
+public static void showErrorMessage(Component parent, Throwable exc,
+    String defaultMessage) {
+   if ((exc == null) || (exc.getMessage() == null)
+      || (exc.getMessage().length() == 0)) {
+     exc.printStackTrace();
+     JOptionPane.showMessageDialog(parent, defaultMessage, exc.getClass()
+        .getSimpleName(), JOptionPane.ERROR_MESSAGE);
+   }
+   else {
+     showErrorMessage(parent, exc);
+   }
   }
   
   /**
-   * Searches for the parent #{@link java.awt.Window} of the given component c.
-   * Checks if this Window contains a #{@link javax.swing.AbstractButton} which
-   * is called "Ok" and disables this button.
-   * @param c
-   * @return true if and only if an ok-button has been disabled. Else, false.
-   */
-  public static boolean disableOkButton(Component c) {
-    // Seach for parent window
-    while (c!=null) {
-      if (c instanceof Window) {
-        //((Window)c).pack();
-        break;
-      }
-      c = c.getParent();
-    }
-    
-    // Search for ok button and check if all other are enabled.
-    if (c!=null) {
-      // c is now a Window.
-      Component okButton = searchFor((Window)c, AbstractButton.class, "getText", "OK");
-      if (okButton!=null) {
-        okButton.setEnabled(false);
-        return true;
-      }
-    }
-    return false;
+ * Shows a simple message with a given title and an ok button.
+ * @param message
+ * @param title
+ * @return
+ */
+  public static void showMessage(String message, String title) {
+   JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
   }
   
   /**
-   * Searches recursively on "parent" and all components on "parent" for a component of
-   * class "searchFor", with a Method (without inputs) called "methodName", that returns an
-   * object that equals "retVal".
-   * If "methodName" is null, this function will simply return the first instance of "searchFor"
-   * on "parent".
-   * @param parent
-   * @param searchFor
-   * @param methodName
-   * @param retVal
-   * @return the component, if found.
-   */
-  public static Component searchFor(Container parent, Class<?> searchFor, String methodName, Object retVal) {
-    for (int i=0; i<parent.getComponentCount(); i++) {
-      Component c = parent.getComponent(i);
-      
-      // Is c the component we are looking for?
-      if (searchFor.isAssignableFrom(c.getClass())) {
-        if (methodName!=null) {
-          Object ret = Reflect.invokeIfContains(c, methodName);
-          if (ret==null && retVal==null || ret.equals(retVal)) {
-            return c;
-          } else if (ret!=null && retVal!=null && ret instanceof String
-            && ((String)ret).equalsIgnoreCase(retVal.toString())) {
-            return c;
-          }
-        } else {
-          return c;
-        }
-      }
-      
-      // Recurse further.
-      if (c instanceof Container) {
-        Component c2 = searchFor((Container)c, searchFor, methodName, retVal);
-        if (c2!=null) return c2;
-      }
-    }
-    return null;
-  }
+ * Displays a message on a message dialog window, i.e., an HTML document.
+ * 
+ * @param path
+ *        the URL of an HTML document.
+ * @param title
+ *        the title of the dialog to be displayed
+ * @param owner
+ *        the parent of the dialog or null.
+ */
+public static void showMessage(URL path, String title, Component owner) {
+	showMessage(path, title, owner, null);
+}
 
   /**
-   * Recursively looks for the first parent window of the
-   * given component and calls the "pack()" method on it.
-   * @param parent
-   */
-  public static void packParentWindow(Component parent) {
-    Component c = parent;
-    while (c!=null) {
-      if (c instanceof Window) {
-        ((Window)c).pack();
-        //break;
-      }
-      c = c.getParent();
-    }
-  }
+ * @param path
+ * @param title
+ * @param owner
+ * @param icon
+ */
+public static void showMessage(URL path, String title, Component owner,
+	Icon icon) {
+	JBrowserPane browser = new JBrowserPane(path);
+	browser.removeHyperlinkListener(browser);
+	browser.addHyperlinkListener(new SystemBrowser());
+	browser.setBorder(BorderFactory.createEtchedBorder());
+	
+	try {
+		File f = new File(OpenFile.doDownload(path.toString()));
+		BufferedReader br;
+		br = new BufferedReader(new FileReader(f));
+		String line;
+		int rowCount = 0, maxLine = 0;
+		while (br.ready()) {
+			line = br.readLine();
+			if (line.length() > maxLine) {
+				maxLine = line.length();
+			}
+			rowCount++;
+		}
+		
+		if ((rowCount > 100) || (maxLine > 250)) {
+			JScrollPane scroll = new JScrollPane(browser,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			// TODO: Calculate required size using the font size.
+			scroll.setMaximumSize(new Dimension(470, 470));
+			Dimension prefered = new Dimension(450, 450);
+			browser.setPreferredSize(prefered);
+			JOptionPane.showMessageDialog(owner, scroll, title,
+				JOptionPane.INFORMATION_MESSAGE, icon);
+		} else {
+			JOptionPane.showMessageDialog(owner, browser, title,
+				JOptionPane.INFORMATION_MESSAGE, icon);
+		}
+	} catch (IOException exc) {
+		exc.printStackTrace();
+		showErrorMessage(owner, exc);
+	}
+}
 
-  
-  
+	/**
+	 * 
+	 * @param parent
+	 * @param file
+	 */
+	public static void showNowReadingAccessWarning(Component parent, File file) {
+		ResourceBundle resource = ResourceManager
+				.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+		JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
+			resource.getString("NO_READ_ACCESS_MESSAGE"), resource.getString(file
+					.isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
+			TOOLTIP_LINE_LENGTH), resource.getString("NO_READ_ACCESS_MESSAGE"),
+			JOptionPane.WARNING_MESSAGE);
+	}
+
+	/**
+	 * 
+	 * @param parent
+	 * @param file
+	 */
+	public static void showNowWritingAccessWarning(Component parent, File file) {
+		ResourceBundle resource = ResourceManager
+				.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+		JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
+			resource.getString("NO_WRITE_ACCESS_MESSAGE"), resource.getString(file
+					.isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
+			TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
+			JOptionPane.WARNING_MESSAGE);
+	}
+	
 }

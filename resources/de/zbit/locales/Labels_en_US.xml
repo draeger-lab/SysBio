@@ -1,15 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-	<comment>
+	 <comment>
 		This configuration provides locale-dependent names for labels in
-		a (graphical) user interface.
+		a (graphical) user interface. The separator ";" can be used to
+		separate actual labels from associated tool tips.
   </comment>
+  
+  <!-- File filter -->
+  
   <entry key="ACCEPT_ALL_FILES">All files (*)</entry>
+  
+  <!-- Preferences dialog -->
+  
   <entry key="APPLY">Apply;Persistently saves the current configuration but keeps the dialog open.</entry>
   <entry key="BROWSE">Browse</entry>
   <entry key="CANCEL">Cancel;Closes this dialog without saving, i.e., all preferences will get lost.</entry>
   <entry key="DEFAULTS">Defaults;Restores the default configuration, i.e., all current preferences will be replaced by the default values.</entry>
   <entry key="OK">OK;Saves the current configuration and closes this dialog.</entry>
   <entry key="PREFERENCES">Preferences</entry>
+  
+  <!-- GUI tools -->
+  
+  <entry key="NO_READ_ACCESS_MESSAGE">Cannot read %s %s.</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
+  <entry key="NO_READ_ACCESS_TITLE">No reading access</entry>
+  <entry key="NO_WRITE_ACCESS_MESSAGE">Cannot write to %s %s.</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
+  <entry key="NO_WRITE_ACCESS_TITLE">No writing access</entry>
+  <entry key="OVERRIDE_EXISTING_FILE_QUESTION">%s %s already exists. Do you really want to overwrite it?</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
+  <entry key="OVERRIDE_EXISTING_FILE_TITLE">Overwrite existing file?</entry>
+  <entry key="THE_DIRECTORY">the directory</entry>
+  <entry key="THE_FILE">the file</entry>
+  
 </properties>

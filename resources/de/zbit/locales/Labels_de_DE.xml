@@ -1,15 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-	<comment>
+	 <comment>
 		This configuration provides locale-dependent names for labels in
-		a (graphical) user interface.
+		a (graphical) user interface. The separator ";" can be used to
+		separate actual labels from associated tool tips.
   </comment>
+  
+  <!-- File filter -->
+  
   <entry key="ACCEPT_ALL_FILES">Alle Dateien (*)</entry>
+    
+  <!-- Preferences dialog -->
+  
   <entry key="APPLY">Übernehmen;Speichert die aktuelle Konfiguration persistent ab, schließt aber nicht diesen Dialog.</entry>
   <entry key="BROWSE">Durchsuchen</entry>
   <entry key="CANCEL">Abbrechen;Schließt diesen Dialog ohne Änderungen zu speichern, d.h., alle Einstellungen werden verworfen.</entry>
   <entry key="DEFAULTS">Zurücksetzen;Stellt die Standardkonfiguration wieder her, d.h., alle aktuellen Einstellungen werden durch die Standardwerte ersetzt.</entry>
   <entry key="OK">OK;Speichert die aktuelle Konfiguration und schließt diesen Dialog.</entry>
   <entry key="PREFERENCES">Einstellungen</entry>
+  
+  <!-- GUI tools -->
+  
+  <entry key="NO_READ_ACCESS_MESSAGE">Der Lesezugriff auf %s %s ist leider nicht möglich.</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
+  <entry key="NO_READ_ACCESS_TITLE">Kein Lesezugriff möglich</entry>
+  <entry key="NO_WRITE_ACCESS_MESSAGE">Der Schreibzugriff auf %s %s ist leider nicht möglich.</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
+  <entry key="NO_WRITE_ACCESS_TITLE">Kein Schreibzugriff möglich</entry>
+  <entry key="OVERRIDE_EXISTING_FILE_QUESTION">%s %s existiert bereits. Sind Sie sicher, dass alle Inhalte überschrieben werden sollen?</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
+  <entry key="OVERRIDE_EXISTING_FILE_TITLE">Überschreiben bestätigen</entry>
+  <entry key="THE_DIRECTORY">das Verzeichnis</entry>
+  <entry key="THE_FILE">die Datei</entry>
+  
 </properties>
