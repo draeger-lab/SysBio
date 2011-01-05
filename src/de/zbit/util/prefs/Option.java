@@ -494,9 +494,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		} else if (requiredType.equals(Long.class)) {
 			sb.append('d');
 		} else if (requiredType.equals(Boolean.class)) {
-		  // special handling for boolean parameters, because ArgParser has two ways
-		  // of handling this: "%v" without parameter or "%b" with "true" or "false"
-		  if (Boolean.parseBoolean(defaultValue.toString())) {//(isSetRangeSpecification()) {
+		  /* special handling for boolean parameters, because ArgParser has two ways
+		   * of handling this:
+		   * 1) if the default value is "true" or a range was set, it expects the
+		   *    option plus "true" or "false" (%b) 
+		   * 2) otherwise it only uses the presence or absence of the option (%v)
+		   */
+		  if (Boolean.parseBoolean(defaultValue.toString()) || isSetRangeSpecification()) {
 		    sb.append('b');
 		  } else {
 		    sb.append('v');
