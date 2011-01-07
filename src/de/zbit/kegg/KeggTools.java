@@ -271,12 +271,16 @@ public class KeggTools {
   /**
    * Iterates through all entries and removes all nodes that are
    * not contained in any reaction.
+   * <p> For graphical outputs you should set considerRelations to true and
+   * considerReactions to false. For function output via versa.</p>
    * @param p - Parent pathway.
    * @param considerRelations - if true, only removes the node if
    * it is also not contained in any relation. If false, relations
    * are getting ignored.
+   * @param considerReactions - if true, reactions will be considered
+   * as well.
    */
-  public static void removeOrphans(Pathway p, boolean considerRelations) {
+  public static void removeOrphans(Pathway p, boolean considerRelations, boolean considerReactions) {
     for (int i=0; i<p.getEntries().size(); i++) {
       Entry entry = p.getEntries().get(i);
       // Look if it is NOT an enzyme (or other reaction modifier)
@@ -284,20 +288,22 @@ public class KeggTools {
         
         // Loop through all reactions and look for the node.
         boolean found = false;
-        for (Reaction r : p.getReactions()) {
-          for (ReactionComponent rc : r.getProducts())
-            if (rc.getName().equalsIgnoreCase(entry.getName())) {
-              found = true;
-              break;
-            }
-          if (!found) {
-            for (ReactionComponent rc : r.getSubstrates())
+        if (considerReactions) {
+          for (Reaction r : p.getReactions()) {
+            for (ReactionComponent rc : r.getProducts())
               if (rc.getName().equalsIgnoreCase(entry.getName())) {
                 found = true;
                 break;
               }
+            if (!found) {
+              for (ReactionComponent rc : r.getSubstrates())
+                if (rc.getName().equalsIgnoreCase(entry.getName())) {
+                  found = true;
+                  break;
+                }
+            }
+            if (found) break;
           }
-          if (found) break;
         }
         
         // Loop through all relations and look for the node.
