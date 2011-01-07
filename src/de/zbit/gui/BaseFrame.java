@@ -17,15 +17,14 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowListener;
 import java.beans.EventHandler;
+import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
@@ -43,7 +42,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 import de.zbit.gui.prefs.FileHistory;
@@ -876,42 +874,16 @@ public abstract class BaseFrame extends JFrame {
 	 *        if <code>true</code> no messages will be displayed to the user in
 	 *        case of an unsuccessful search for an update.
 	 */
-	private void onlineUpdate(final boolean hideErrorMessages) {
-	  GUITools
-	  .setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
-	  final UpdateMessage update = new UpdateMessage(getApplicationName(),
-	    getURLOnlineUpdate());
-	  update.addWindowListener(EventHandler.create(WindowListener.class, this,
-	    "setOnlineUpdateEnabled", null, "windowClosed"));
-	  
-	  SwingWorker<Boolean, Void> updateChecker = new SwingWorker<Boolean, Void>() {
-	    
-	    @Override
-	    protected Boolean doInBackground() throws Exception {
-	      return update.checkForUpdate(true, getDottedVersionNumber());
-	    }
-	    
-	    protected void done() {
-	      try {
-	        if (!get() && !hideErrorMessages) {
-	          ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
-	          GUITools.showMessage(String.format(
-	            resources.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE"),
-	            getDottedVersionNumber(), getApplicationName()),
-	            resources.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE"));
-	          
-	        }
-	      } catch (Exception e) {
-	        if (!hideErrorMessages) {
-	          GUITools.showErrorMessage(null, e);
-	        }
-	      }
-	      GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
-	    }
-	    
-	  };
-	  
-	  updateChecker.execute();
+	private void onlineUpdate(boolean hideErrorMessages) {
+		GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
+		UpdateMessage update = new UpdateMessage(true, getApplicationName(),
+			getURLOnlineUpdate(), getDottedVersionNumber(), hideErrorMessages);
+		update.addWindowListener(EventHandler.create(WindowListener.class, this,
+			"setOnlineUpdateEnabled", null, "windowClosed"));
+		update.addPropertyChangeListener(EventHandler.create(
+			PropertyChangeListener.class, this, "setOnlineUpdateEnabled",
+			"getPropertyName"));
+		update.execute();
 	}
 	
 	/**
@@ -1047,30 +1019,36 @@ public abstract class BaseFrame extends JFrame {
 		GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
 	}
 	
+	/**
+	 * Enables the {@link JButton} in the {@link JToolBar} (if there is any) and
+	 * the entry in the {@link JMenu} that allows the user to search for an online
+	 * update if the given {@link String} equals <code>onlineUpdateExecuted</code>
+	 * .
+	 * 
+	 * @param command
+	 *        If this command equals <code>onlineUpdateExecuted</code> the online
+	 *        update button will be enabled.
+	 */
+	public final void setOnlineUpdateEnabled(String command) {
+		if (command.equals("onlineUpdateExecuted")) {
+			setOnlineUpdateEnabled();
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see java.awt.Window#setVisible(boolean)
 	 */
 	public void setVisible(boolean b) {
-		super.setVisible(b);
 		if (!UPDATE_CHECKED) {
-			new Thread(new Runnable() {
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see java.lang.Runnable#run()
-				 */
-				public void run() {
-					SBPreferences prefs = SBPreferences
-							.getPreferencesFor(GUIOptions.class);
-					if (prefs.getBoolean(GUIOptions.CHECK_FOR_UPDATES)) {
-						onlineUpdate(true);
-						UPDATE_CHECKED = true;
-					}
-				}
-			}).start();
+			SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+			if (prefs.getBoolean(GUIOptions.CHECK_FOR_UPDATES)) {
+				onlineUpdate(true);
+				UPDATE_CHECKED = true;
+			}
 		}
+		super.setVisible(b);
 	}
 	
 	/**
