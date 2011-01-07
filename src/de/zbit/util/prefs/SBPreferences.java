@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.prefs.BackingStoreException;
@@ -28,6 +29,7 @@ import argparser.IntHolder;
 import argparser.LongHolder;
 import argparser.StringHolder;
 import de.zbit.io.GeneralFileFilter;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.Utils;
 
 /**
@@ -38,6 +40,8 @@ import de.zbit.util.Utils;
  * @date 2010-10-24
  */
 public class SBPreferences implements Map<Object, Object> {
+	
+	public static final String WARNINGS_LOCATION = "de.zbit.locales.Warnings";
 	
 	/**
 	 * @author Andreas Dr&auml;ger
@@ -155,7 +159,8 @@ public class SBPreferences implements Map<Object, Object> {
 			option = entry.getKey();
 			if (option.isSetRangeSpecification()) {
 				if (!option.getRange().castAndCheckIsInRange(entry.getValue())) {
-					parser.printErrorAndExit(String.format("Option %s is not in range.",
+					ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
+					parser.printErrorAndExit(String.format(resources.getString("OPTION_OUT_OF_RANGE"),
 						option));
 				}
 			}
@@ -233,8 +238,9 @@ public class SBPreferences implements Map<Object, Object> {
 					loadDefaults(entry)));
 				
 			} catch (Exception e) {
+				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
 				Exception exc = new Exception(String.format(
-					"Could not load properties for %s.", entry.getName()), e);
+					resources.getString("COULD_NOT_LOAD_PROPERTIES_MESSAGE"), entry.getName()), e);
 				exc.printStackTrace();
 			}
 		}
@@ -257,7 +263,7 @@ public class SBPreferences implements Map<Object, Object> {
 		SBPreferences[] prefs, Map<Option<?>, Object> options, ArgParser parser,
 		SBProperties props, String usage, String args[]) {
 		
-		// Do the actual parsing
+		// Do the actual parsing.
 		parser.matchAllArgs(args);
 		putAll(props, options);
 		
@@ -280,8 +286,9 @@ public class SBPreferences implements Map<Object, Object> {
 			try {
 				prefs[i].flush();
 			} catch (BackingStoreException e) {
+				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
 				Exception exc = new Exception(String.format(
-					"Could not persistently store the user configuration for %s.",
+					resources.getString("BACKING_STORE_EXCEPTION_MESSAGE"),
 					prefs[i].getKeyProvider().getName()), e);
 				exc.printStackTrace();
 			}
@@ -349,8 +356,9 @@ public class SBPreferences implements Map<Object, Object> {
 					props, loadDefaults(entry.getValue(), entry.getKey())));
 				
 			} catch (Exception e) {
+				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
 				Exception exc = new Exception(String.format(
-					"Could not load properties for %s from config file %s.", entry
+					resources.getString("COULD_NOT_LOAD_PROPERTIES_FROM_FILE"), entry
 							.getValue().getName(), entry.getKey()), e);
 				exc.printStackTrace();
 			} finally {
@@ -452,8 +460,8 @@ public class SBPreferences implements Map<Object, Object> {
 	
 	/**
 	 * Generates a usage/synopsis string for the given mainClass. Looks if the
-	 * class is inside a jar. If yes, "java -jar [NAME].jar" is the usage string.
-	 * Else "java package.ClassName" is the usage string.
+	 * class is inside a jar. If yes, <code>java -jar [NAME].jar</code> is the usage string.
+	 * Else <code>java package.ClassName</code> is the usage string.
 	 * 
 	 * @param mainClass
 	 *        of your project
@@ -549,28 +557,33 @@ public class SBPreferences implements Map<Object, Object> {
 			Set<String> options = new HashSet<String>();
 			Object fieldValue;
 			String k, v;
+			ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
 			for (Field field : keyProvider.getFields()) {
 				try {
 					fieldValue = field.get(keyProvider);
 					if (fieldValue instanceof Option<?>) {
 						k = fieldValue.toString();
-						if (defaults.getProperty(k) == null) { throw new IllegalArgumentException(
-							String
-									.format(
-										"No default value available for option %s in file %s.", k,
-										path)); }
+						if (defaults.getProperty(k) == null) {
+							throw new IllegalArgumentException(String.format(resources
+									.getString("NO_DEFAULT_VALUE_FOR_OPTION_IN_FILE"), k, path));
+						}
 						options.add(k);
 					}
 				} catch (Exception exc) {
 					// ignore non-static fields
-					if (exc instanceof IllegalArgumentException) { throw (IllegalArgumentException) exc; }
+					if (exc instanceof IllegalArgumentException) { 
+						throw (IllegalArgumentException) exc; 
+					}
 				}
 			}
 			for (Map.Entry<Object, Object> e : defaults.entrySet()) {
 				k = e.getKey().toString();
 				v = e.getValue().toString();
-				if (!options.contains(k)) { throw new IllegalArgumentException(String
-						.format("No option %s defined by %s.", k, keyProvider.getName())); }
+				if (!options.contains(k)) { 
+					throw new IllegalArgumentException(String
+						.format(resources.getString("NO_SUCH_OPTION_DEFINED_BY_KEYPROVIDER"), 
+							k, keyProvider.getName())); 
+				}
 				if (System.getProperties().containsKey(v)) {
 					defaults.setProperty(k, System.getProperty(v));
 				}
@@ -596,8 +609,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 *        for the desired values.
 	 */
 	private static void putAll(SBProperties props, Map<Option<?>, Object> options) {
-		String k, value;
-		String v;
+		String k, value, v;
 		for (Option<?> key : options.keySet()) {
 			
 			// try {
@@ -626,8 +638,11 @@ public class SBPreferences implements Map<Object, Object> {
 			// given options were explicitly set or just the default value.
 			if (props.isSetDefaults()) {
 				v = props.getProperty(k);
-				if (v == null) { throw new IllegalArgumentException(String.format(
-					"No default value defined for property %s.", k)); }
+				if (v == null) {
+					ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
+					throw new IllegalArgumentException(String.format(
+					resources.getString("NO_VALUE_DEFINED_FOR_PROPERTY"), k)); 
+				}
 				if (!v.equals(value)) {
 					props.setProperty(k, value);
 				}
@@ -778,20 +793,26 @@ public class SBPreferences implements Map<Object, Object> {
 	public boolean checkPref(Option<?> option) throws BackingStoreException {
 		if (containsKey(option)) {
 			Object value = get(option);
-			if (value == null) { throw new BackingStoreException(String.format(
-				"Could not determine value belonging to option %s.", option)); }
+			ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
+			if (value == null) { 
+				throw new BackingStoreException(String.format(
+				resources.getString("VALUE_FOR_OPTION_NOT_AVAILABLE"), option)); 
+			}
 			if (option.isSetRangeSpecification()
-					&& !option.getRange().castAndCheckIsInRange(get(option))) { throw new BackingStoreException(
+					&& !option.getRange().castAndCheckIsInRange(get(option))) { 
+				throw new BackingStoreException(
 				String.format(
-							"The value \"%s\" for option \"%s\" is out of range. Please select a value that satisfies the following constraint: %s",
+							resources.getString("RANGE_CONSTRAINT_VIOLATION_MESSAGE"),
 							value, option.formatOptionName(), (option.getRange()
 									.isSetConstraints() ? ((GeneralFileFilter) option
 									.getRange().getConstraints()).getDescription() : option
-									.getRangeSpecifiaction()))); }
-			if (option.parseOrCast(value) == null) { throw new BackingStoreException(
-				String.format(
-							"The value of option %s is of invalid type. Please specify an instance of %s.",
-							option, option.getRequiredType().getSimpleName())); }
+									.getRangeSpecifiaction()))); 
+			}
+			if (option.parseOrCast(value) == null) { 
+				throw new BackingStoreException(String.format(
+							resources.getString("INVALID_DATA_TYPE_FOR_OPTION"),
+							option, option.getRequiredType().getSimpleName())); 
+			}
 			return true;
 		}
 		return false;
@@ -841,7 +862,8 @@ public class SBPreferences implements Map<Object, Object> {
 			}
 			if (remove) {
 				value = remove(keys[i]);
-				System.err.printf("Removing invalid key-value pair %s:%s\n", keys[i],
+				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
+				System.err.printf(resources.getString("REMOVING_INVALID_ENTRY") + "\n", keys[i],
 					value == null ? "null" : value.toString());
 			}
 		}

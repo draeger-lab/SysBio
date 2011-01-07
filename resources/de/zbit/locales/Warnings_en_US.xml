@@ -5,5 +5,19 @@
 	This configuration provides locale-dependent names for warnings
 	and error messages in a (graphical) user interface.
   </comment>
-  <!-- <entry key="ERROR_CODE_0">Error message</entry> -->
+  
+  <!-- SBPreferences -->
+  
+  <entry key="BACKING_STORE_EXCEPTION_MESSAGE">Could not persistently store the user configuration for %s.</entry> <!-- Requires a KeyProvider name as argument. -->
+  <entry key="COULD_NOT_LOAD_PROPERTIES_MESSAGE">Could not load properties for %s.</entry> <!-- Requires a KeyProvider name as argument. -->
+  <entry key="COULD_NOT_LOAD_PROPERTIES_FROM_FILE">Could not load properties for %s from configuration file %s.</entry> <!-- Requires name of a KeyProvider and absolute path to corresponding configuration file -->
+  <entry key="INVALID_DATA_TYPE_FOR_OPTION">The value of option %s is of invalid type. Please specify an instance of %s.</entry> <!-- Requires a value and an Option name. -->
+  <entry key="NO_DEFAULT_VALUE_FOR_OPTION_IN_FILE">No default value available for option %s in file %s.</entry> <!-- Requires an Option name and an absolute path to a file. -->
+  <entry key="NO_SUCH_OPTION_DEFINED_BY_KEYPROVIDER">No such option %s defined by %s.</entry> <!-- Requires an Option name and a KeyProvider. -->
+  <entry key="NO_VALUE_DEFINED_FOR_PROPERTY">No default value defined for property %s.</entry> <!-- Requires a wrongly used name of a property. -->
+  <entry key="OPTION_OUT_OF_RANGE">Option %s is not in range.</entry> <!-- Requires name of an Option -->
+  <entry key="RANGE_CONSTRAINT_VIOLATION_MESSAGE">The value "%s" for option "%s" is out of range. Please select a value that satisfies the following constraint: %s.</entry> <!-- Requires a value, an Option name, and a Range string. -->
+  <entry key="REMOVING_INVALID_ENTRY">Removing invalid key-value pair %s:%s.</entry>
+  <entry key="VALUE_FOR_OPTION_NOT_AVAILABLE">Could not determine value belonging to option %s.</entry> <!-- Requires the name of an Option. -->
+  
 </properties>
