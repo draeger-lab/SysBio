@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -23,9 +24,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JWindow;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+
+import de.zbit.util.ResourceManager;
 
 /**
  * This class implements a {@link JWindow} object which is shown on the bottom
@@ -37,7 +41,7 @@ import javax.swing.border.TitledBorder;
  * @since This was part of SBMLsqueezer 1.2 and 1.3.
  */
 
-public class UpdateMessage {
+public class UpdateMessage extends SwingWorker<Boolean, Void> {
 	
 	/**
 	 * A small yellow {@link JWindow} without regular window decoration that pops
@@ -71,9 +75,10 @@ public class UpdateMessage {
 		private JButton showHideButton;
 		
 		/**
-		 * Main constructor. Initializes a {@link JWindow} object containing a (at the
-		 * beginning) invisible {@link JEditorPane} which contains the program's release
-		 * notes and two {@link JButtons} for showing them and exiting the {@link Window}.
+		 * Main constructor. Initializes a {@link JWindow} object containing a (at
+		 * the beginning) invisible {@link JEditorPane} which contains the program's
+		 * release notes and two {@link JButtons} for showing them and exiting the
+		 * {@link Window}.
 		 * 
 		 * @param u
 		 * @param applicationName
@@ -162,6 +167,7 @@ public class UpdateMessage {
 					- 30);
 		}
 	}
+	
 	/**
 	 * 
 	 */
@@ -180,58 +186,68 @@ public class UpdateMessage {
 	 * 
 	 */
 	private URL urlPrefix;
-
+	
+	/**
+	 * 
+	 */
+	private String url;
+	
+	/**
+	 * 
+	 */
 	private List<WindowListener> listOfListeners;
 	
 	/**
 	 * 
+	 */
+	private boolean gui, hideErrorMessages;
+	
+	/**
+	 * @param gui
+	 *        If true, a small window is displayed with the update message,
+	 *        otherwise the message is printed on the console.
 	 * @param applicationName
 	 * @param urlPrefix
+	 * @param dottedVersion
+	 *        number
 	 */
-	public UpdateMessage(String applicationName, URL urlPrefix) {
+	public UpdateMessage(boolean gui, String applicationName, URL urlPrefix,
+		String dottedVersionNumber, boolean hideErrorMessages) {
+		super();
+		this.gui = gui;
 		this.applicationName = applicationName;
 		this.urlPrefix = urlPrefix;
+		this.dottedVersionNumber = dottedVersionNumber;
+		this.hideErrorMessages = hideErrorMessages;
 		this.listOfListeners = new LinkedList<WindowListener>();
 	}
 	
 	/**
 	 * Checks if there is an update for a program available.
 	 * 
-	 * @param gui
-	 *        If true, a small window is displayed with the update message,
-	 *        otherwise the message is printed on the console.
-	 * 
-	 * @param dottedVersionNumber
 	 * @return <code>true</code> if an update is available <code>false</code>
 	 *         otherwise.
 	 * @throws IOException
 	 *         If the {@link URL} to the update is incorrect or if there is
-	 *         neither a file with the name <code>releaseNotes&lt;latestVersion&gt;.htm</code>
-	 *         or <code>releaseNotes&lt;latestVersion&gt;.html</code>.
+	 *         neither a file with the name
+	 *         <code>releaseNotes&lt;latestVersion&gt;.htm</code> or
+	 *         <code>releaseNotes&lt;latestVersion&gt;.html</code>.
 	 */
-	public boolean checkForUpdate(boolean gui, String dottedVersionNumber)
-		throws IOException {
+	public boolean checkForUpdate() throws IOException {
 		URL url = new URL(urlPrefix + "latest.txt");
 		latestVersion = (new Scanner(url.openStream())).next();
 		String notes = "releaseNotes" + latestVersion;
 		if (notes.endsWith(".0")) {
 			notes = notes.substring(0, notes.length() - 2);
 		}
-		this.dottedVersionNumber = dottedVersionNumber;
-		if (compareVersionNumbers(dottedVersionNumber, latestVersion)) {
-			try {
-				showUpdateMessage(gui, urlPrefix + notes + ".htm");
-			} catch (IOException exc) {
-				showUpdateMessage(gui, urlPrefix + notes + ".html");
-			}
-			return true;
-		}
+		this.url = urlPrefix.toString() + notes;
+		if (compareVersionNumbers(dottedVersionNumber, latestVersion)) { return true; }
 		return false;
 	}
 	
 	/**
-	 * Compares the version with which this object is initialized and the file "latest.txt" on
-	 * www.
+	 * Compares the version with which this object is initialized and the file
+	 * "latest.txt" on www.
 	 * 
 	 * @param prog
 	 * @param url
@@ -257,6 +273,25 @@ public class UpdateMessage {
 	}
 	
 	/**
+	 * 
+	 */
+	private void showUpdateMessage() {
+		try {
+			showUpdateMessage(gui, url + ".htm");
+		} catch (IOException exc) {
+			try {
+				showUpdateMessage(gui, url + ".html");
+			} catch (IOException e) {
+				if (gui) {
+					GUITools.showErrorMessage(null, e);
+				} else {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Show the update message window.
 	 * 
 	 * @param gui
@@ -274,13 +309,64 @@ public class UpdateMessage {
 			}
 			umw.setVisible(true);
 		} else {
-			System.out.printf(
+			System.out
+					.printf(
 						"\nUpdate notification:\n--------------------\nA new version of %s is available.\nPlease visit %s\nto obtain version %s.\nFor your information: you are now using %s version %s.\n",
 						applicationName, urlPrefix, latestVersion, applicationName,
 						dottedVersionNumber);
 		}
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.SwingWorker#doInBackground()
+	 */
+	protected Boolean doInBackground() throws Exception {
+		return checkForUpdate();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.SwingWorker#done()
+	 */
+	@Override
+	protected void done() {
+		boolean success = false;
+		try {
+			success = get();
+		} catch (Exception e) {
+			if (!hideErrorMessages) {
+				if (gui) {
+					GUITools.showErrorMessage(null, e);
+				} else {
+					e.printStackTrace();
+				}
+			}
+		}
+		if (success) {
+			showUpdateMessage();
+		} else {
+			if (!hideErrorMessages) {
+				ResourceBundle resources = ResourceManager
+						.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+				String message = String.format(resources
+						.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE"),
+					dottedVersionNumber, applicationName);
+				if (gui) {
+					GUITools.showMessage(message, resources
+							.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE"));
+				} else {
+					System.out.println(message);
+				}
+			}
+			if (gui) {
+				firePropertyChange("onlineUpdateExecuted", Boolean.FALSE, Boolean.TRUE);
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @param wl
