@@ -120,19 +120,29 @@ public class ResourceManager {
 	 */
 	private static ResourceBundle loadBundle(String baseName, Locale locale) {
 		ResourceBundle resource = null;
-		MissingResourceException exception = null;
+		Throwable exception = null;
 		try {
 			resource = ResourceBundle.getBundle(baseName, locale,
 				new XMLResourceBundleControl());
-		} catch (MissingResourceException exc) {
+		} catch (Throwable exc) {
 			exception = exc;
 			try {
 				resource = ResourceBundle.getBundle(baseName, locale);
-			} catch (MissingResourceException e) {
+			} catch (Throwable e) {
 				exception = e;
 			}
 		}
-		if (exception != null) { throw exception; }
+		if (exception != null) {
+			if (exception instanceof MissingResourceException) {
+				throw (MissingResourceException) exception;
+			} else if (exception instanceof NullPointerException) {
+				throw (NullPointerException) exception;
+			} else if (exception instanceof IllegalArgumentException) {
+				throw (IllegalArgumentException) exception;
+			} else {
+				throw new IllegalArgumentException(exception);
+			}
+		}
 		return resource;
 	}
 	

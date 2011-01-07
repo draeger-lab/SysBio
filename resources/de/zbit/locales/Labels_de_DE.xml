@@ -36,7 +36,7 @@
   <entry key="ABOUT_THE_PROGRAM">Über %s</entry>
   <entry key="DEFAULT_TOOL_BAR_TITLE">Werkzeuge</entry>
   <entry key="LICENSE_OF_THE_PROGRAM">%s - Nutzungsvereinbarung</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">Sie verwenden die neueste Version %s des Programms %s. Es konnte keine neuere Version gefunden werden.</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">Sie verwenden bereits die neueste Version %s des Programms %s. Es konnte keine neuere Version gefunden werden.</entry>
   <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">Keine Aktualisierungen verfügbar</entry>
   <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Hilfe-Webseite</entry>
   

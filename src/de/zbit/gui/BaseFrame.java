@@ -50,7 +50,6 @@ import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
-import de.zbit.util.XMLResourceBundleControl;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
@@ -779,14 +778,12 @@ public abstract class BaseFrame extends JFrame {
 		GUITools.initLaF(getTitle());
 		setDefaultLookAndFeelDecorated(true);
 		try {
-			XMLResourceBundleControl xmlControl = new XMLResourceBundleControl();
-			BaseAction.nameProperties.setDefaults(ResourceBundle.getBundle(
-				"de.zbit.locales.BaseAction", xmlControl));
+			BaseAction.nameProperties.setDefaults(ResourceManager
+					.getBundle("de.zbit.locales.BaseAction"));
 			String location = getLocationOfBaseActionProperties();
 			if (location != null) {
 				try {
-					BaseAction.nameProperties.putAll(ResourceBundle.getBundle(location,
-						xmlControl));
+					BaseAction.nameProperties.putAll(ResourceManager.getBundle(location));
 				} catch (Exception exc) {
 				}
 			}
@@ -898,6 +895,7 @@ public abstract class BaseFrame extends JFrame {
 				GUITools.showErrorMessage(this, exc);
 			}
 		}
+		GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
 	}
 	
 	/**

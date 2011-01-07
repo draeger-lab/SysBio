@@ -1111,15 +1111,17 @@ public static void showErrorMessage(Component parent, Throwable exc,
    }
   }
   
-  /**
- * Shows a simple message with a given title and an ok button.
- * @param message
- * @param title
- * @return
- */
-  public static void showMessage(String message, String title) {
-   JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
-  }
+	/**
+	 * Shows a simple message with a given title and an ok button.
+	 * 
+	 * @param message
+	 * @param title
+	 * @return
+	 */
+	public static void showMessage(String message, String title) {
+		JOptionPane.showMessageDialog(null, StringUtil.toHTML(message,
+			TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
+	}
   
   /**
  * Displays a message on a message dialog window, i.e., an HTML document.
