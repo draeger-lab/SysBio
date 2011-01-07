@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
@@ -42,6 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 import de.zbit.gui.prefs.FileHistory;
@@ -874,28 +876,42 @@ public abstract class BaseFrame extends JFrame {
 	 *        if <code>true</code> no messages will be displayed to the user in
 	 *        case of an unsuccessful search for an update.
 	 */
-	private void onlineUpdate(boolean hideErrorMessages) {
-		try {
-			GUITools
-					.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
-			UpdateMessage update = new UpdateMessage(getApplicationName(),
-				getURLOnlineUpdate());
-			update.addWindowListener(EventHandler.create(WindowListener.class, this,
-				"setOnlineUpdateEnabled", null, "windowClosed"));
-			if (!update.checkForUpdate(true, getDottedVersionNumber())
-					&& !hideErrorMessages) {
-				ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
-				GUITools.showMessage(String.format(
-										resources.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE"),
-										getDottedVersionNumber(), getApplicationName()),
-							resources.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE"));
-			}
-		} catch (IOException exc) {
-			if (!hideErrorMessages) {
-				GUITools.showErrorMessage(this, exc);
-			}
-		}
-		GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
+	private void onlineUpdate(final boolean hideErrorMessages) {
+	  GUITools
+	  .setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
+	  final UpdateMessage update = new UpdateMessage(getApplicationName(),
+	    getURLOnlineUpdate());
+	  update.addWindowListener(EventHandler.create(WindowListener.class, this,
+	    "setOnlineUpdateEnabled", null, "windowClosed"));
+	  
+	  SwingWorker<Boolean, Void> updateChecker = new SwingWorker<Boolean, Void>() {
+	    
+	    @Override
+	    protected Boolean doInBackground() throws Exception {
+	      return update.checkForUpdate(true, getDottedVersionNumber());
+	    }
+	    
+	    protected void done() {
+	      try {
+	        if (!get() && !hideErrorMessages) {
+	          ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+	          GUITools.showMessage(String.format(
+	            resources.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE"),
+	            getDottedVersionNumber(), getApplicationName()),
+	            resources.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE"));
+	          
+	        }
+	      } catch (Exception e) {
+	        if (!hideErrorMessages) {
+	          GUITools.showErrorMessage(null, e);
+	        }
+	      }
+	      GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
+	    }
+	    
+	  };
+	  
+	  updateChecker.execute();
 	}
 	
 	/**
