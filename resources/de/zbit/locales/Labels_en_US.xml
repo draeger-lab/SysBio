@@ -36,7 +36,7 @@
   <entry key="ABOUT_THE_PROGRAM">About %s</entry>
   <entry key="DEFAULT_TOOL_BAR_TITLE">Tools</entry>
   <entry key="LICENSE_OF_THE_PROGRAM">%s - License</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">You are using the latest version %s of %s. No newer version could be found.</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">You are already using the latest version %s of %s. No newer version could be found.</entry>
   <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">No update available</entry>
   <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Online Help</entry>
   
