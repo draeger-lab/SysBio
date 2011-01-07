@@ -17,7 +17,7 @@
   <entry key="NO_VALUE_DEFINED_FOR_PROPERTY">Für die Eigenschaft %s gibt es keinen Standardwert.</entry> <!-- Requires a wrongly used name of a property. -->
   <entry key="OPTION_OUT_OF_RANGE">Der Wert der Option %s entspricht nicht seinem Wertebereich.</entry> <!-- Requires name of an Option -->
   <entry key="RANGE_CONSTRAINT_VIOLATION_MESSAGE">Der Wert "%s" der Option "%s" entspricht nicht seinem Wertebereich. Wählen Sie bitte einen Wert, der folgender Beschränkung genügt: %s.</entry> <!-- Requires a value, an Option name, and a Range string. -->
-  <entry key="REMOVING_INVALID_ENTRY">Das ungültige Schlüssel-Wert-Par %s:%s wirde gelöscht.</entry>
+  <entry key="REMOVING_INVALID_ENTRY">Das ungültige Schlüssel-Wert-Paar %s:%s wird gelöscht.</entry>
   <entry key="VALUE_FOR_OPTION_NOT_AVAILABLE">Kein zur Option %s gehörender Wert konnte ermittelt werden.</entry> <!-- Requires the name of an Option. -->
   
 </properties>

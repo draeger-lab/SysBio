@@ -46,15 +46,18 @@ public class CommandLineHelp {
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		} else if (clazz.length > 1) {
-			JTabbedPane tabs = new JTabbedPane();
-			for (Class<? extends KeyProvider> keyProvider : clazz) {
-				if (keyProvider.getFields().length > 0) {
-					tabs.add(KeyProvider.Tools.createTitle(keyProvider), new JScrollPane(
-						initJEditor(keyProvider), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-				}
-			}
-			return tabs;
+			//			JTabbedPane tabs = new JTabbedPane();
+			//			for (Class<? extends KeyProvider> keyProvider : clazz) {
+			//				if (keyProvider.getFields().length > 0) {
+			//					tabs.add(KeyProvider.Tools.createTitle(keyProvider), new JScrollPane(
+			//						initJEditor(keyProvider), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			//						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+			//				}
+			//			}
+			//			return tabs;
+			return new JScrollPane(initJEditor(clazz),
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		}
 		return null;
 	}
@@ -82,6 +85,19 @@ public class CommandLineHelp {
 	private static JEditorPane initJEditor(Class<? extends KeyProvider> clazz) {
 		JEditorPane editor = new JEditorPane("text/html", KeyProvider.Tools
 				.createDocumentation(clazz));
+		editor.setEditable(false);
+		editor.setEnabled(true);
+		return editor;
+	}
+	
+	/**
+	 * 
+	 * @param clazzes
+	 * @return
+	 */
+	private static JEditorPane initJEditor(Class<? extends KeyProvider>... clazzes) {
+		JEditorPane editor = new JEditorPane("text/html", KeyProvider.Tools
+				.createDocumentation(clazzes));
 		editor.setEditable(false);
 		editor.setEnabled(true);
 		return editor;

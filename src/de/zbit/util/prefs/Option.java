@@ -4,6 +4,8 @@
 package de.zbit.util.prefs;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import argparser.ArgParser;
@@ -73,8 +75,9 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	protected static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
 		if (ret == null) { return null; }
 		
-		if (requiredType.isAssignableFrom(ret.getClass())) { return requiredType
-				.cast(ret); }
+		if (requiredType.isAssignableFrom(ret.getClass())) {
+			return requiredType.cast(ret); 
+		}
 		
 		if (Reflect.containsParser(requiredType)) {
 			ret = Reflect.invokeParser(requiredType, ret);
@@ -86,6 +89,10 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		
 		if (requiredType.equals(File.class)) {
 			ret = new File(ret.toString());
+		}
+		
+		if (Enum.class.isAssignableFrom(requiredType)) {
+			ret = Reflect.invokeIfContains(requiredType, "valueOf", new Object[]{ret.toString()});
 		}
 		
 		try {
