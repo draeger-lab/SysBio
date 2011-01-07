@@ -46,6 +46,7 @@ import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.XMLResourceBundleControl;
 import de.zbit.util.prefs.KeyProvider;
@@ -353,7 +354,8 @@ public abstract class BaseFrame extends JFrame {
 		JMenu menu;
 		JMenuItem item;
 		Object action = null;
-		JToolBar toolBar = new JToolBar("Tools");
+		ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Labels");
+		JToolBar toolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
 			menu = getJMenuBar().getMenu(i);
 			for (int j = 0; j < menu.getItemCount(); j++) {
@@ -883,10 +885,11 @@ public abstract class BaseFrame extends JFrame {
 				"setOnlineUpdateEnabled", null, "windowClosed"));
 			if (!update.checkForUpdate(true, getDottedVersionNumber())
 					&& !hideErrorMessages) {
+				ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Labels");
 				GUITools.showMessage(String.format(
-										"You are using the latest version %s of %s. No newer version could be found.",
+										resources.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE"),
 										getDottedVersionNumber(), getApplicationName()),
-							"No update available");
+							resources.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE"));
 			}
 		} catch (IOException exc) {
 			if (!hideErrorMessages) {
@@ -1059,9 +1062,12 @@ public abstract class BaseFrame extends JFrame {
 	 * program in a {@link JOptionPane} of size 380x220.
 	 */
 	public final void showAboutMessage() {
+		ResourceBundle resources = ResourceManager
+				.getBundle("de.zbit.locales.Labels");
 		JOptionPane.showMessageDialog(this, createJBrowser(getURLAboutMessage(),
-			380, 220, false), String.format("About %s", getProgramNameAndVersion()),
-			JOptionPane.INFORMATION_MESSAGE);
+			380, 220, false), String.format(resources.getString("ABOUT_THE_PROGRAM"),
+			getProgramNameAndVersion()), JOptionPane.INFORMATION_MESSAGE, UIManager
+				.getIcon("UT_BM_Rot_RGB_tr_36x64"));
 	}
 	
 	/**
@@ -1069,8 +1075,10 @@ public abstract class BaseFrame extends JFrame {
 	 * {@link JOptionPane} of size 640x480.
 	 */
 	public final void showLicense() {
+		ResourceBundle resources = ResourceManager
+		.getBundle("de.zbit.locales.Labels");
 		JOptionPane.showMessageDialog(this, createJBrowser(getURLLicense(), 640,
-			480, true), String.format("%s - License", getProgramNameAndVersion()),
+			480, true), String.format(resources.getString("LICENSE_OF_THE_PROGRAM"), getProgramNameAndVersion()),
 			JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("ICON_LICENSE_64"));
 	}
 	
@@ -1079,10 +1087,12 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	public final void showOnlineHelp() {
 		GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_ONLINE);
+		ResourceBundle resources = ResourceManager
+				.getBundle("de.zbit.locales.Labels");
 		JHelpBrowser.showOnlineHelp(this, EventHandler.create(WindowListener.class,
 			this, "activateOnlineHelpCommand", null, "windowClosed"), String.format(
-			"%s - Online Help", getProgramNameAndVersion()), getURLOnlineHelp(),
-			getCommandLineOptions());
+			resources.getString("ONLINE_HELP_FOR_THE_PROGRAM"),
+			getProgramNameAndVersion()), getURLOnlineHelp(), getCommandLineOptions());
 	}
 	
 	/**
