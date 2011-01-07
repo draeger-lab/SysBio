@@ -5,5 +5,19 @@
 	This configuration provides locale-dependent names for warnings
 	and error messages in a (graphical) user interface.
   </comment>
-  <!-- <entry key="ERROR_CODE_0">Error message</entry> -->
+  
+  <!-- SBPreferences -->
+  
+  <entry key="BACKING_STORE_EXCEPTION_MESSAGE">Die Benutzereinstellungen für %s konnten nicht persistent gespeichert werden.</entry> <!-- Requires a KeyProvider name as argument. -->
+  <entry key="COULD_NOT_LOAD_PROPERTIES_MESSAGE">Die Eigenschaften für %s konnten nicht geladen werden.</entry> <!-- Requires a KeyProvider name as argument. -->
+  <entry key="COULD_NOT_LOAD_PROPERTIES_FROM_FILE">Die Eigenschaften für %s konnten nicht aus der Konfigurationsdatei %s geladen werden.</entry> <!-- Requires name of a KeyProvider and absolute path to corresponding configuration file -->
+  <entry key="INVALID_DATA_TYPE_FOR_OPTION">Der Wert der Option %s entspricht nicht dem geforderten Datentyp. Geben Sie bitte einen Wert des Typs %s an.</entry> <!-- Requires a value and an Option name. -->
+  <entry key="NO_DEFAULT_VALUE_FOR_OPTION_IN_FILE">Für die Option %s hält die Konfigurationsdatei %s keinen Standardwert bereit.</entry> <!-- Requires an Option name and an absolute path to a file. -->
+  <entry key="NO_SUCH_OPTION_DEFINED_BY_KEYPROVIDER">Die Option %s wird nicht durch %s definiert.</entry> <!-- Requires an Option name and a KeyProvider. -->
+  <entry key="NO_VALUE_DEFINED_FOR_PROPERTY">Für die Eigenschaft %s gibt es keinen Standardwert.</entry> <!-- Requires a wrongly used name of a property. -->
+  <entry key="OPTION_OUT_OF_RANGE">Der Wert der Option %s entspricht nicht seinem Wertebereich.</entry> <!-- Requires name of an Option -->
+  <entry key="RANGE_CONSTRAINT_VIOLATION_MESSAGE">Der Wert "%s" der Option "%s" entspricht nicht seinem Wertebereich. Wählen Sie bitte einen Wert, der folgender Beschränkung genügt: %s.</entry> <!-- Requires a value, an Option name, and a Range string. -->
+  <entry key="REMOVING_INVALID_ENTRY">Das ungültige Schlüssel-Wert-Par %s:%s wirde gelöscht.</entry>
+  <entry key="VALUE_FOR_OPTION_NOT_AVAILABLE">Kein zur Option %s gehörender Wert konnte ermittelt werden.</entry> <!-- Requires the name of an Option. -->
+  
 </properties>
