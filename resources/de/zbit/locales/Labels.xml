@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-	 <comment>
-		This configuration provides locale-dependent names for labels in
-		a (graphical) user interface. The separator ";" can be used to
-		separate actual labels from associated tool tips.
+  <comment>
+	This configuration provides locale-dependent names for labels in
+	a (graphical) user interface. The separator ";" can be used to
+	separate actual labels from associated tool tips.
   </comment>
   
-  <!-- File filter -->
+  <!-- SBAcceptAllFileFilter -->
   
   <entry key="ACCEPT_ALL_FILES">All files (*)</entry>
   
-  <!-- Preferences dialog -->
+  <!-- PreferencesDialog -->
   
   <entry key="APPLY">Apply;Persistently saves the current configuration but keeps the dialog open.</entry>
   <entry key="BROWSE">Browse</entry>
@@ -20,7 +20,7 @@
   <entry key="OK">OK;Saves the current configuration and closes this dialog.</entry>
   <entry key="PREFERENCES">Preferences</entry>
   
-  <!-- GUI tools -->
+  <!-- GUITools -->
   
   <entry key="NO_READ_ACCESS_MESSAGE">Cannot read %s %s.</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
   <entry key="NO_READ_ACCESS_TITLE">No reading access</entry>
@@ -30,5 +30,14 @@
   <entry key="OVERRIDE_EXISTING_FILE_TITLE">Overwrite existing file?</entry>
   <entry key="THE_DIRECTORY">the directory</entry>
   <entry key="THE_FILE">the file</entry>
+  
+  <!-- BaseFrame -->
+  
+  <entry key="ABOUT_THE_PROGRAM">About %s</entry>
+  <entry key="DEFAULT_TOOL_BAR_TITLE">Tools</entry>
+  <entry key="LICENSE_OF_THE_PROGRAM">%s - License</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">You are using the latest version %s of %s. No newer version could be found.</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">No update available</entry>
+  <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Online Help</entry>
   
 </properties>
