@@ -153,11 +153,24 @@ public interface KeyProvider {
 		 * @param keyProviders
 		 * @return
 		 */
+		public static String createDocumentation(Class<? extends KeyProvider>... keyProviders) {
+			return createDocumentation(null, keyProviders);
+		}
+		
+		/**
+		 * 
+		 * @param keyProviders
+		 * @return
+		 */
 		public static String createDocumentation(String applicationName,
 			Class<? extends KeyProvider>... keyProviders) {
 			StringBuilder sb = new StringBuilder();
-			sb.append(createDocumentationHeader(applicationName
-					+ " command line arguments"));
+			if (applicationName != null) {
+				sb.append(createDocumentationHeader(applicationName));
+				sb.append(" command line arguments");
+			} else {
+				sb.append(createDocumentationHeader("Command line arguments"));
+			}
 			sb.append("\n");
 			for (Class<? extends KeyProvider> keyProvider : keyProviders) {
 				sb.append(String.format("    <h2> %s </h2>\n\n",

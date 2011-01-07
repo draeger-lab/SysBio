@@ -452,10 +452,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			//JComponent cs = ((JColumnChooser)jc).getColumnChooser();
 			// TODO: Limit maximum size to one (don't accept inputs after that).
 			
-		} else if (String.class.isAssignableFrom(clazz)) {
+		} else if (String.class.isAssignableFrom(clazz) ||
+				(Enum.class.isAssignableFrom(clazz))) {
 			component = new JColumnChooser(optionTitle, true, values);
 			((JColumnChooser)component).setAcceptOnlyIntegers(false);
-
+			
 		} else if (Number.class.isAssignableFrom(clazz)) {
 			component = new JColumnChooser(optionTitle, true, values);
 			if (!Utils.isInteger(option.getRequiredType())) {
