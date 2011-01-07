@@ -97,7 +97,7 @@ public class GUITools {
 	      "ICON_TRASH_16.png",
 	      "UT_BM_Rot_RGB_tr_36x64.png",
 	      "UT_WBMS_Rot_RGB_tr_64x62.png",
-	      "UT_WBMW_mathnat_4C_640x75.png"
+	      "UT_WBMW_mathnat_4C_380x45.png"
 	  };
     for (String path : iconPaths) {
       UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(

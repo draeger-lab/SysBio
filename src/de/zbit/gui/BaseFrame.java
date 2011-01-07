@@ -4,6 +4,7 @@
 package de.zbit.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -32,10 +33,12 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
@@ -194,7 +197,7 @@ public abstract class BaseFrame extends JFrame {
 	 * Switch to avoid checking for updates multiple times.
 	 */
 	private static boolean UPDATE_CHECKED = false;
-
+	
 	/**
 	 * A tool bar
 	 */
@@ -354,7 +357,7 @@ public abstract class BaseFrame extends JFrame {
 		JMenu menu;
 		JMenuItem item;
 		Object action = null;
-		ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Labels");
+		ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 		JToolBar toolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
 			menu = getJMenuBar().getMenu(i);
@@ -885,7 +888,7 @@ public abstract class BaseFrame extends JFrame {
 				"setOnlineUpdateEnabled", null, "windowClosed"));
 			if (!update.checkForUpdate(true, getDottedVersionNumber())
 					&& !hideErrorMessages) {
-				ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Labels");
+				ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 				GUITools.showMessage(String.format(
 										resources.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE"),
 										getDottedVersionNumber(), getApplicationName()),
@@ -1063,11 +1066,19 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	public final void showAboutMessage() {
 		ResourceBundle resources = ResourceManager
-				.getBundle("de.zbit.locales.Labels");
-		JOptionPane.showMessageDialog(this, createJBrowser(getURLAboutMessage(),
-			380, 220, false), String.format(resources.getString("ABOUT_THE_PROGRAM"),
-			getProgramNameAndVersion()), JOptionPane.INFORMATION_MESSAGE, UIManager
-				.getIcon("UT_BM_Rot_RGB_tr_36x64"));
+				.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+		JPanel panel = new JPanel(new BorderLayout());
+		JLabel label = new JLabel();
+		label.setIcon(UIManager.getIcon("UT_WBMW_mathnat_4C_380x45"));
+		Dimension dimension = label.getPreferredSize();
+		dimension.setSize(dimension.getWidth(), dimension.getHeight() + 10);
+		label.setPreferredSize(dimension);
+		panel.add(label, BorderLayout.NORTH);
+		panel.add(createJBrowser(getURLAboutMessage(), 380, 220, true),
+			BorderLayout.CENTER);
+		JOptionPane.showMessageDialog(this, panel, String.format(resources
+				.getString("ABOUT_THE_PROGRAM"), getProgramNameAndVersion()),
+			JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	/**
@@ -1076,10 +1087,11 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	public final void showLicense() {
 		ResourceBundle resources = ResourceManager
-		.getBundle("de.zbit.locales.Labels");
+				.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 		JOptionPane.showMessageDialog(this, createJBrowser(getURLLicense(), 640,
-			480, true), String.format(resources.getString("LICENSE_OF_THE_PROGRAM"), getProgramNameAndVersion()),
-			JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("ICON_LICENSE_64"));
+			480, true), String.format(resources.getString("LICENSE_OF_THE_PROGRAM"),
+			getProgramNameAndVersion()), JOptionPane.INFORMATION_MESSAGE, UIManager
+				.getIcon("ICON_LICENSE_64"));
 	}
 	
 	/**
@@ -1088,7 +1100,7 @@ public abstract class BaseFrame extends JFrame {
 	public final void showOnlineHelp() {
 		GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_ONLINE);
 		ResourceBundle resources = ResourceManager
-				.getBundle("de.zbit.locales.Labels");
+				.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 		JHelpBrowser.showOnlineHelp(this, EventHandler.create(WindowListener.class,
 			this, "activateOnlineHelpCommand", null, "windowClosed"), String.format(
 			resources.getString("ONLINE_HELP_FOR_THE_PROGRAM"),
