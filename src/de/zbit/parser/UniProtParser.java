@@ -155,10 +155,10 @@ public class UniProtParser {
    *  
    */
   public ArrayList<String>[] getGeneBlocks(String[] identifier) {
-    log.info("getGene identifier.length(): " + identifier.length);
+    log.fine("getGene identifier.length(): " + identifier.length);
     
     String[] proteinBlock = UniProtManagement.getInformations(identifier);
-    log.info("proteins.length; " + proteinBlock.length);
+    log.fine("proteins.length; " + proteinBlock.length);
     ArrayList<String>[] result = new ArrayList[identifier.length];
     
     
