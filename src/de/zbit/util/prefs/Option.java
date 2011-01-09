@@ -4,8 +4,6 @@
 package de.zbit.util.prefs;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 import argparser.ArgParser;

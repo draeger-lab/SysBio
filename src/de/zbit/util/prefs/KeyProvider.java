@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.zbit.gui.GUITools;
 import de.zbit.util.StringUtil;
 
 /**
@@ -507,7 +508,7 @@ public interface KeyProvider {
 				sb.append("</td>\n        ");
 				sb.append("</tr>\n        <tr><td width=\"6%\"> </td>\n");
 				sb.append("        <td>\n          ");
-				sb.append(StringUtil.insertLineBreaks(option.getToolTip(), 60,
+				sb.append(StringUtil.insertLineBreaks(option.getToolTip(), GUITools.TOOLTIP_LINE_LENGTH,
 					"\n          "));
 				Range range = option.getRange();
 				if (range != null) {
@@ -522,7 +523,7 @@ public interface KeyProvider {
 						for (int i = 0; i < list.size(); i++) {
 							if ((i > 0) && (list.size() > 2)) {
 								sb.append(',');
-								if (lineLength > 60) {
+								if (lineLength > GUITools.TOOLTIP_LINE_LENGTH) {
 									sb.append("\n          ");
 									lineLength = 0;
 								} else {
@@ -530,7 +531,7 @@ public interface KeyProvider {
 								}
 							}
 							if (i == list.size() - 1) {
-								sb.append("and ");
+								sb.append(" and ");
 							}
 							value = list.get(i).toString();
 							sb.append("<span class=typewriter>");
