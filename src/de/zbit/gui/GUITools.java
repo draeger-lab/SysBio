@@ -1066,29 +1066,28 @@ public class GUITools {
 	  showErrorMessage(parent, null, message);
 	}
 
-  /**
- * Displays the error message on a {@link JOptionPane}.
- * 
- * @param exc
- */
-public static void showErrorMessage(Component parent, Throwable exc) {
-   exc.printStackTrace();
-   ValuePair<String, Integer> messagePair = StringUtil
-      .insertLineBreaksAndCount(exc.getMessage(), TOOLTIP_LINE_LENGTH, "\n");
-   Object message;
-   if (messagePair.getB().intValue() > 30) {
-     JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
-     pane.setEditable(false);
-     pane.setPreferredSize(new Dimension(480, 240));
-     message = new JScrollPane(pane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-   }
-   else {
-     message = messagePair.getA();
-   }
-   JOptionPane.showMessageDialog(parent, message, exc.getClass()
-      .getSimpleName(), JOptionPane.ERROR_MESSAGE);
-  }
+	/**
+	 * Displays the error message on a {@link JOptionPane}.
+	 * 
+	 * @param exc
+	 */
+	public static void showErrorMessage(Component parent, Throwable exc) {
+		exc.printStackTrace();
+		ValuePair<String, Integer> messagePair = StringUtil
+				.insertLineBreaksAndCount(exc.getMessage(), TOOLTIP_LINE_LENGTH, "\n");
+		Object message;
+		if (messagePair.getB().intValue() > 30) {
+			JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
+			pane.setEditable(false);
+			pane.setPreferredSize(new Dimension(480, 240));
+			message = new JScrollPane(pane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		} else {
+			message = messagePair.getA();
+		}
+		JOptionPane.showMessageDialog(parent, message, exc.getClass()
+				.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+	}
   
   /**
  * Shows an error dialog with the given message in case the exception does not
@@ -1098,18 +1097,17 @@ public static void showErrorMessage(Component parent, Throwable exc) {
  * @param exc
  * @param defaultMessage
  */
-public static void showErrorMessage(Component parent, Throwable exc,
-    String defaultMessage) {
-   if ((exc == null) || (exc.getMessage() == null)
-      || (exc.getMessage().length() == 0)) {
-     exc.printStackTrace();
-     JOptionPane.showMessageDialog(parent, defaultMessage, exc.getClass()
-        .getSimpleName(), JOptionPane.ERROR_MESSAGE);
-   }
-   else {
-     showErrorMessage(parent, exc);
-   }
-  }
+	public static void showErrorMessage(Component parent, Throwable exc,
+		String defaultMessage) {
+		if ((exc == null) || (exc.getMessage() == null)
+				|| (exc.getMessage().length() == 0)) {
+			exc.printStackTrace();
+			JOptionPane.showMessageDialog(parent, defaultMessage, exc.getClass()
+					.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+		} else {
+			showErrorMessage(parent, exc);
+		}
+	}
   
 	/**
 	 * Shows a simple message with a given title and an ok button.
@@ -1123,19 +1121,19 @@ public static void showErrorMessage(Component parent, Throwable exc,
 			TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
 	}
   
-  /**
- * Displays a message on a message dialog window, i.e., an HTML document.
- * 
- * @param path
- *        the URL of an HTML document.
- * @param title
- *        the title of the dialog to be displayed
- * @param owner
- *        the parent of the dialog or null.
- */
-public static void showMessage(URL path, String title, Component owner) {
-	showMessage(path, title, owner, null);
-}
+	/**
+	 * Displays a message on a message dialog window, i.e., an HTML document.
+	 * 
+	 * @param path
+	 *        the URL of an HTML document.
+	 * @param title
+	 *        the title of the dialog to be displayed
+	 * @param owner
+	 *        the parent of the dialog or null.
+	 */
+	public static void showMessage(URL path, String title, Component owner) {
+		showMessage(path, title, owner, null);
+	}
 
   /**
  * @param path
