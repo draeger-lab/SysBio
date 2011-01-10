@@ -459,6 +459,7 @@ public class Pathway {
    * @param index - index of the entry to remove.
    */
   public void removeEntry(int index) {
+    // Comment [wrzodek 2010-07-01]: Entry may still be in other entries compound (group node) list.
     if (index<0) return;
     Entry e = entries.get(index);
     
