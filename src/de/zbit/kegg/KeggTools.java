@@ -283,57 +283,103 @@ public class KeggTools {
   public static void removeOrphans(Pathway p, boolean considerRelations, boolean considerReactions) {
     for (int i=0; i<p.getEntries().size(); i++) {
       Entry entry = p.getEntries().get(i);
-      // Look if it is NOT an enzyme (or other reaction modifier)
-      if (entry.getReaction() == null || entry.getReaction().length() < 1) {
-        
-        // Loop through all reactions and look for the node.
-        boolean found = false;
-        if (considerReactions) {
-          for (Reaction r : p.getReactions()) {
-            for (ReactionComponent rc : r.getProducts())
-              if (rc.getName().equalsIgnoreCase(entry.getName())) {
-                found = true;
-                break;
-              }
-            if (!found) {
-              for (ReactionComponent rc : r.getSubstrates())
-                if (rc.getName().equalsIgnoreCase(entry.getName())) {
-                  found = true;
-                  break;
-                }
-            }
-            if (found) break;
+      
+      
+      // Remove it
+      if (isOrphan(p, entry, considerRelations, considerReactions)) {
+        p.removeEntry(i);
+        i--;
+      }
+    }
+    
+  }
+  
+  /**
+   * Returns true if and only if entry is an orphan in p.
+   * @param p
+   * @param entry
+   * @param considerRelations
+   * @param considerReactions
+   * @return
+   */
+  public static boolean isOrphan(Pathway p, Entry entry, boolean considerRelations, boolean considerReactions) {
+    
+    // Look if it is an enzyme (or other reaction modifier)
+    if (considerReactions && entry.getReaction() != null && entry.getReaction().length() > 0) {
+      return false;
+    }
+    
+    // Loop through all reactions and look for the node.
+    boolean found = false;
+    if (considerReactions) {
+      for (Reaction r : p.getReactions()) {
+        for (ReactionComponent rc : r.getProducts())
+          if (rc.getName().equalsIgnoreCase(entry.getName())) {
+            found = true;
+            break;
           }
-        }
-        
-        // Loop through all relations and look for the node.
-        if (considerRelations && !found) {
-          for (Relation r : p.getRelations()) {
-            if (r.getEntry1() == entry.getId() || r.getEntry2() == entry.getId()) {
+        if (!found) {
+          for (ReactionComponent rc : r.getSubstrates())
+            if (rc.getName().equalsIgnoreCase(entry.getName())) {
               found = true;
               break;
             }
-            for (SubType st : r.getSubtypes()) {
-              try {
-                if (Integer.parseInt(st.getValue()) == entry.getId()) {
-                  found = true;
-                  break;
-                }
-              } catch (Exception e) {}
-            }
-            if (found) break;
-          }
         }
-        
-        // It is an orphan!
-        if (!found) {
-          //return null; //continue;
-          p.removeEntry(i);
-          i--;
-        }
-        
+        if (found) break;
       }
     }
+    
+    // Loop through all relations and look for the node.
+    if (considerRelations && !found) {
+      for (Relation r : p.getRelations()) {
+        if (r.getEntry1() == entry.getId() || r.getEntry2() == entry.getId()) {
+          found = true;
+          break;
+        }
+        for (SubType st : r.getSubtypes()) {
+          try {
+            if (Integer.parseInt(st.getValue()) == entry.getId()) {
+              found = true;
+              break;
+            }
+          } catch (Exception e) {}
+        }
+        if (found) break;
+      }
+    }
+    
+    // It is an orphan!
+    if (!found) {
+      boolean orphan=true;
+      
+      // Look if it is an component (i.e. a member of a group which is not an orphan)!
+      for (Entry e2:p.getEntries()) {
+        if (e2.hasComponents() && e2.getComponents().contains(entry.getId())) {
+          // Look if the parent group node itself is an orphan.
+          if (!isOrphan(p, e2, considerRelations, considerReactions)) {
+            orphan=false;
+            break;
+          }
+        }
+      }
+      
+      // Make an exception for pathway titles
+      // Do not remove name="path:*" & graphics.name="TITLE:*" node (Pathway description)
+      try {
+        if (entry.getName().startsWith("path:") && entry.getGraphics().getName().startsWith("TITLE:")) {
+          orphan = false;
+        }
+      } catch (Exception e) {
+        // Entry has no graphics or such. Not important.
+      }
+      
+      return orphan;
+      
+    } else {
+      // The node has been found in another reaction or relation.
+      return false;
+    }
   }
+
   
 }

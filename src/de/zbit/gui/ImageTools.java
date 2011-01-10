@@ -11,6 +11,8 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
+import java.awt.image.CropImageFilter;
+import java.awt.image.FilteredImageSource;
 import java.awt.image.Kernel;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -121,7 +123,26 @@ public class ImageTools {
 			return image2BufferedImage(img, false);
 		}
 	}
-
+	
+	
+ /**
+   * Crops an image.
+	 * @param img - image to resize
+	 * @param x - new x
+	 * @param y - new y
+	 * @param w - desired with
+	 * @param h - desired height
+	 * @return cropped image
+	 */
+  public static Image cropImage(Image img, int x, int y, int w, int h) {
+    Image image = Toolkit.getDefaultToolkit().createImage(
+      new FilteredImageSource(img.getSource(),
+      new CropImageFilter(x, y, w, h)));
+    
+    return image;
+  }
+  
+  
 	/**
 	 * Convert an Image to an BufferedImage.
 	 * 
@@ -219,7 +240,7 @@ public class ImageTools {
 	 * @param bufferedImage
 	 * @return
 	 */
-	public BufferedImage blur(BufferedImage bufferedImage) {
+	public static BufferedImage blur(BufferedImage bufferedImage) {
 		if (bufferedImage == null)
 			return bufferedImage;
 		if (bufferedImage.getType() == BufferedImage.TYPE_CUSTOM) {
