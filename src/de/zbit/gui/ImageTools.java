@@ -14,6 +14,7 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.Kernel;
+import java.awt.image.RescaleOp;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -163,8 +164,8 @@ public class ImageTools {
 	 */
 	public static BufferedImage image2BufferedImage(Image img,
 			boolean drawBorder) {
-		BufferedImage bmage = new BufferedImage(img.getWidth(null), img
-				.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bmage = new BufferedImage(img.getWidth(null), 
+		  img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
 		Graphics g = bmage.getGraphics();
 		g.drawImage(img, 0, 0, null);
 
@@ -234,6 +235,46 @@ public class ImageTools {
 		return new Color(red, green, blue);
 	}
 
+  /**
+   * Brightens an image by the given percentage.
+   * @param image - image to brighten
+   * @param percent a value between 0 and 1 (0 to 100 percent).
+   * @return brightened image
+   */
+	public static BufferedImage brightenImage(BufferedImage image, float percent) {
+    if (percent<0 || percent>1) {
+      System.err.println("Wrong percentage in brightenImage: " + percent);
+      return image;
+    }
+  	// Brighten the image by given percentage
+	  float scaleFactor = 1.0f + percent;
+	  RescaleOp op = new RescaleOp(scaleFactor, 0, null);
+	  BufferedImage bufferedImage = op.filter(image, null);
+	  
+	  return bufferedImage;
+	}
+	
+	/**
+	 * Darkens an image by the given percentage.
+	 * @param image - image to darken
+	 * @param percent a value between 0 and 1 (0 to 100 percent).
+	 * @return darkened image
+	 */
+  public static BufferedImage darkenImage(BufferedImage image, float percent) {
+    if (percent<0 || percent>1) {
+      System.err.println("Wrong percentage in darkenImage: " + percent);
+      return image;
+    }
+    
+    // Darken the image by given percentage
+    float scaleFactor = 1.0f - percent;
+    RescaleOp op = new RescaleOp(scaleFactor, 0, null);
+    BufferedImage bufferedImage = op.filter(image, null);
+    
+    return bufferedImage;
+  }
+
+	
 	/**
 	 * Blur ("unsharpen") the given image.
 	 * 
