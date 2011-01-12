@@ -259,7 +259,7 @@ public class KeggTools {
   public static void removeWhiteNodes(Pathway p) {
     for (int i=0; i<p.getEntries().size(); i++) {
       Entry entry = p.getEntries().get(i);
-      if (entry.hasGraphics() && entry.getGraphics().isBGcolorSet() &&
+      if (entry.hasGraphics() && entry.getGraphics().isBGcolorSet() &&          
           entry.getGraphics().getBgcolor().toLowerCase().trim().endsWith("ffffff")
           && (entry.getType() == EntryType.gene || entry.getType() == EntryType.ortholog)) {
         p.removeEntry(i);
@@ -281,6 +281,8 @@ public class KeggTools {
    * as well.
    */
   public static void removeOrphans(Pathway p, boolean considerRelations, boolean considerReactions) {
+    //TODO: weg
+    System.out.println("in remove Orphans");
     for (int i=0; i<p.getEntries().size(); i++) {
       Entry entry = p.getEntries().get(i);
       

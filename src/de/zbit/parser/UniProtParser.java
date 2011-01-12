@@ -34,8 +34,10 @@ public class UniProtParser {
         UniProtManagement = (UniProtFetcher) UniProtManagement.loadFromFilesystem("uniprot.dat");
     } catch (Throwable e) {
     }
-    if (UniProtManagement == null)
+    if (UniProtManagement == null) {
+      log.fine("Initialize new and empty cache UniprotFetcher cache.");
       UniProtManagement = new UniProtFetcher(80000);
+    }
   }
   
   public String getGeneName(String block){
