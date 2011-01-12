@@ -169,22 +169,30 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         if (dbfetch==null) restoreUnserializableObject();
         entriesStr = dbfetch.fetchBatch(getDbName(), queryString, getFormat(),getStyleString());
       } catch (AxisFault e) {
-        if (e!=null && e.getMessage()!=null && e.getMessage().contains("DbfNoEntryFoundException")) {
+        if (e!=null && e.dumpToString()!=null && e.dumpToString().contains("DbfNoEntryFoundException")) {
           // Propagate to caller.
           for (int index = startID; index <= endID; index++)
             ret[index] = null;
           return;
         } else {
           retried++;
-          if (retryLimit==retryLimit) e.printStackTrace();
-          log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
+          if (retried==retryLimit) {
+            e.printStackTrace();
+            log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
+          } else {
+            log.log(Level.FINE, "Attempt " + retried + " to fetch data failed");
+          }
         }
       } catch (Exception e) {
         // One of DbfParamsException, DbfConnException, DbfException, 
         // InputException, RemoteException, ServiceException
         retried++;
-        if (retryLimit==retryLimit) e.printStackTrace();
-        log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
+        if (retried==retryLimit) {
+          e.printStackTrace();
+          log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
+        } else {
+          log.log(Level.FINE, "Attempt " + retried + " to fetch data failed");
+        }
       }
     }
     if (retried >= retryLimit && (entriesStr == null || entriesStr.length() == 0)) {

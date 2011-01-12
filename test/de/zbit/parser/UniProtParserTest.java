@@ -3,8 +3,10 @@ package de.zbit.parser;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import de.zbit.util.InfoManagement;
+import de.zbit.util.LogUtil;
 
 public class UniProtParserTest {
 
@@ -13,8 +15,11 @@ public class UniProtParserTest {
    */
   public static void main(String[] args) {
     System.out.println("llmmm");
+    LogUtil.initializeLogging(Level.FINEST);
     UniProtParser uw = new UniProtParser();
     ArrayList<String>[] blocks = uw.getGeneBlocks(new String[]{"1433B_MOUSE", "SER1_DROME"});
+    
+    
     System.out.println("blocks.length " + blocks.length);
     for (int i = 0; i < blocks.length; i++) {
       if(i==0){
