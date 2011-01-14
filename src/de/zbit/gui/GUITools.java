@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
+import java.awt.SplashScreen;
 import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -128,6 +129,22 @@ public class GUITools {
 			component.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
 		}
 	}
+	
+	 
+  /**
+   * The JVM command line allows to show splash screens. If the user made
+   * use of this functionality, the following code will hide the screen.
+   * Otherwise, this function does nothing.
+   */
+  public static void hideSplashScreen() {
+    try {
+      final SplashScreen splash = SplashScreen.getSplashScreen();
+      if (splash == null) {
+        return;
+      }
+      splash.close();
+    } catch (Throwable t) {}
+  }
 	
 	/**
 	 * Checks whether the first container contains the second one.

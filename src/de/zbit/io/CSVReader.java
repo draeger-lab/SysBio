@@ -545,6 +545,7 @@ public class CSVReader implements Serializable, Cloneable {
   
   /**
    * Display a progress, while reading the file.
+   * Does only work properly on uncompressed files.
    * @param b
    */
   public void setDisplayProgress(boolean b) {
