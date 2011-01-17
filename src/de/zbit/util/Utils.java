@@ -1,6 +1,7 @@
 package de.zbit.util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
 
 /**
  * Various utils, which I need quite often.
@@ -1273,5 +1276,31 @@ public class Utils {
     writer.close();
     fw.close();
   }
+  
+  /**
+   * Copy a stream to a file. This enables e.g. copying of
+   * resources inside jar-files to files.
+   * 
+   * Note: It's a good idea to buffer the input stream.
+   * 
+   * @param is - resource to read
+   * @param f - file to write
+   * @return true, if everything went fine.
+   */
+  public static void copyStream(final InputStream is, final File f) throws IOException {
+    
+      OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+      // Copy from input to output-stream.
+      byte[] buffer = new byte[4096];
+      int length;
+      while ((length = is.read(buffer)) > 0) {
+          os.write(buffer, 0, length);
+      }
+      os.close();
+      is.close();
+
+  }
+
+
   
 }
