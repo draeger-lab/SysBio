@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.ResourceBundle;
@@ -43,6 +44,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
@@ -463,13 +465,7 @@ public class GUITools {
 	   */
 	  public static boolean disableOkButton(Component c) {
 	    // Seach for parent window
-	    while (c!=null) {
-	      if (c instanceof Window) {
-	        //((Window)c).pack();
-	        break;
-	      }
-	      c = c.getParent();
-	    }
+	    c = getParentWindow(c);
 	    
 	    // Search for ok button and check if all other are enabled.
 			if (c != null) {
@@ -477,15 +473,31 @@ public class GUITools {
 				ResourceBundle resource = ResourceManager
 						.getBundle(RESOURCE_LOCATION_FOR_LABELS);
 				Component okButton = searchFor((Window) c, AbstractButton.class,
-					"getText", resource.getString("OK").split(";")[0]);
+				  "getText", resource.getString("OK").split(";")[0]);
 				if (okButton != null) {
-					okButton.setEnabled(false);
-					return true;
+				  okButton.setEnabled(false);
+				  return true;
 				}
 			}
-	    return false;
+			return false;
 	  }
-	
+	  
+	  
+	  /**
+	   * Searches for the parent #{@link java.awt.Window} of the given component c.
+	   * @param c
+	   * @return the window if found, or null if not found.
+	   */
+	  public static Window getParentWindow(Component c) {
+	    while (c!=null) {
+	      if (c instanceof Window) {
+	        return (Window) c;
+	      }
+	      c = c.getParent();
+	    }
+	    return null;
+	  }
+	  
 	/**
 	   * Checks if this "c" contains a #{@link javax.swing.AbstractButton} which
 	   * is called "OK" and enables this button if and only if it a) exists and is
@@ -1228,5 +1240,105 @@ public static void showMessage(URL path, String title, Component owner,
 			TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
 			JOptionPane.WARNING_MESSAGE);
 	}
+	
+	/**
+	 * Show the component in an information message context, but does
+	 * not wait until the user clicks ok, but simply invokes this
+	 * message dialog in a new thread.
+	 * 
+	 * Simply executes {@link javax.swing.JOptionPane#showMessageDialog(Component, Object, String, int)}
+	 * in a new thread.
+	 * 
+	 * @param component - the component to show
+	 * @param caption - the caption of the dialog
+	 */
+	public static void showMessageDialogInNewThred(final Component component, final String caption) {
+	  SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+      @Override
+      protected Void doInBackground() throws Exception {
+        JOptionPane.showMessageDialog(null, component,
+          caption, JOptionPane.INFORMATION_MESSAGE);
+        return null;
+      }
+	  };
+	  worker.execute();
+	  
+	  // Wait until the dialog is painted, before continuing
+	  while (worker.getState()==SwingWorker.StateValue.PENDING) {
+	    try {
+        Thread.sleep(100);
+	    } catch (InterruptedException e) {}
+	  }
+	  
+	}
+	
+	
+	/**
+   * Shows the output of a process inside a textarea.
+   * Autoscrolls as the process genereates output and
+   * automatically disables the ok-button as long as
+   * the process is running and enables it, as soon
+   * as the process terminates.
+   * 
+   * Hint: Consider setting {@link ProcessBuilder#redirectErrorStream()}
+   * to true.
+   * 
+	 * @param p - the process to monitor.
+	 * @param caption - the caption of the window
+	 * @param closeWindowAutomaticallyWhenDone - if set to
+	 * true, the window will be closed, as soon as the
+	 * process finished.
+	 * @return JTextArea
+	 */
+	public static JTextArea showProcessOutputInTextArea(final Process p, final String caption,
+	  final boolean closeWindowAutomaticallyWhenDone) {
+	  final JTextArea area = new JTextArea();
+	  SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+	    @Override
+	    protected Void doInBackground() throws Exception {
+	      
+	      // Show a JTextArea in an information message in background
+	      area.setEditable(false);
+	      JScrollPane pane = new JScrollPane(
+          area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	      pane.setPreferredSize(new Dimension(480, 240));
+	      
+	      GUITools.showMessageDialogInNewThred(pane, caption);
+	      
+	      // Disable the ok-Button of the area
+	      GUITools.disableOkButton(area);
+	      
+	      // Update the window, as the process is executing
+	      String line;
+	      BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+	      while ((line = in.readLine()) != null) {
+	        area.append(line+"\n");
+	        // Scroll down
+	        area.setCaretPosition(area.getDocument().getLength()); 
+	      }
+	      
+	      // As soon as the process is done, enable the ok button again
+	      Window w = getParentWindow(area);
+	      if (closeWindowAutomaticallyWhenDone) {
+	        if (w!=null) w.dispose();
+	      } else {
+	        enableOkButtonIfAllComponentsReady(w);
+	      }
+	      
+	      return null;
+	    }
+	  };
+	  worker.execute();
+	  
+    // Wait until the dialog is painted, before continuing
+    while (worker.getState()==SwingWorker.StateValue.PENDING) {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {}
+    }
+    
+    return area;
+	}
+	
 	
 }
