@@ -14,6 +14,13 @@ import de.zbit.gui.GUITools;
 import de.zbit.util.StringUtil;
 
 /**
+ * Base class for all those elements that provide a collection of {@link Option}
+ * instances to be used in key-value pairs, e.g., in {@link SBPreferences} or
+ * {@link SBProperties}. Note that there must not be more than one class that is
+ * derived from {@link KeyProvider} in the same package because the package name
+ * is the path to the position where user options are stored in the local
+ * configuration.
+ * 
  * @author Andreas Dr&auml;ger
  * @date 2010-11-04
  */
@@ -145,7 +152,7 @@ public interface KeyProvider {
 			StringBuilder sb = new StringBuilder();
 			sb.append(createDocumentationHeader(createTitle(keyProvider)));
 			sb.append(createDocumantationContent(keyProvider, 2));
-			sb.append(createDocumantationFooter());			
+			sb.append(createDocumantationFooter());
 			return sb.toString();
 		}
 		
@@ -154,7 +161,8 @@ public interface KeyProvider {
 		 * @param keyProviders
 		 * @return
 		 */
-		public static String createDocumentation(Class<? extends KeyProvider>... keyProviders) {
+		public static String createDocumentation(
+			Class<? extends KeyProvider>... keyProviders) {
 			return createDocumentation(null, keyProviders);
 		}
 		
@@ -182,10 +190,10 @@ public interface KeyProvider {
 			sb.append(createDocumantationFooter());
 			return sb.toString();
 		}
-
+		
 		/**
-		 * Writes the complete command line documentation for an application into
-		 * a {@link File}.
+		 * Writes the complete command line documentation for an application into a
+		 * {@link File}.
 		 * 
 		 * @param applicationName
 		 * @param targetFile
@@ -202,6 +210,7 @@ public interface KeyProvider {
 		
 		/**
 		 * Doesn't close the writer.
+		 * 
 		 * @param file
 		 * @throws IOException
 		 */
@@ -211,7 +220,7 @@ public interface KeyProvider {
 			writer.append(KeyProvider.Tools.createDocumentation(applicationName,
 				keyProviders));
 		}
-
+		
 		/**
 		 * 
 		 * @param title
@@ -219,9 +228,12 @@ public interface KeyProvider {
 		 */
 		private static StringBuilder createDocumentationHeader(String title) {
 			StringBuilder sb = new StringBuilder();
-			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
-			sb.append(" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
-			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n");
+			sb
+					.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
+			sb
+					.append(" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
+			sb
+					.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n");
 			sb.append("  <head>\n");
 			sb.append("    <style type=\"text/css\">\n      <!--\n");
 			sb.append("        .typewriter {\n");
@@ -241,7 +253,7 @@ public interface KeyProvider {
 			sb.append(" </h1>\n");
 			return sb;
 		}
-
+		
 		/**
 		 * Creates a human-readable title from the class name of some {@link Class}.
 		 * 
@@ -476,7 +488,7 @@ public interface KeyProvider {
 			Class<? extends KeyProvider> keyProvider, String key) {
 			return getField(keyProvider, key, Option.class) != null;
 		}
-
+		
 		/**
 		 * 
 		 * @param sb
@@ -486,7 +498,8 @@ public interface KeyProvider {
 		@SuppressWarnings("unchecked")
 		private static void writeOptionsToHTMLTable(StringBuilder sb,
 			List<?> options, List<Option> removeFromHere) {
-			sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
+			sb
+					.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
 			for (Object o : options) {
 				if (!(o instanceof Object)) {
 					continue;
@@ -508,8 +521,8 @@ public interface KeyProvider {
 				sb.append("</td>\n        ");
 				sb.append("</tr>\n        <tr><td width=\"6%\"> </td>\n");
 				sb.append("        <td>\n          ");
-				sb.append(StringUtil.insertLineBreaks(option.getToolTip(), GUITools.TOOLTIP_LINE_LENGTH,
-					"\n          "));
+				sb.append(StringUtil.insertLineBreaks(option.getToolTip(),
+					GUITools.TOOLTIP_LINE_LENGTH, "\n          "));
 				Range range = option.getRange();
 				if (range != null) {
 					List<?> list = range.getAllAcceptableValues();
