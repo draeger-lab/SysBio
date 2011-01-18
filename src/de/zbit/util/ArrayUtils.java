@@ -1,5 +1,6 @@
 package de.zbit.util;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,6 +58,47 @@ public class ArrayUtils {
     }
     
     return ret.toArray(new String[0][]);
+  }
+
+
+  /**
+   * Creates a new generic array and fills it with the
+   * given default value.
+   * 
+   * @param string
+   * @param size
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static <T extends Object> T[] createArray(T defaultValue, int size) {
+    T[] ret = (T[]) createNewArray(defaultValue,size);
+    Arrays.fill(ret, defaultValue);
+    
+    return ret;
+  }
+  
+  /**
+   * Creates a new array, uses reflection methods, so this method is save
+   * to use with generics.
+   * @param type - the method will infere the class of the object from this
+   * given sample. Just give any sample of the class you want to create a new
+   * array from. The sample won't be touched.
+   * @param size
+   * @return new array of the class of the given type, with the given size.
+   */
+  @SuppressWarnings("unchecked")
+  private static Object createNewArray(Object type, int size) {
+    Class elementType=null;
+    if (type instanceof Class)
+      elementType = (Class) type;
+    else if (type.getClass().isArray())
+      elementType = type.getClass().getComponentType();
+    
+    // If oldArray was in fact no array, then elementType==null here.
+    if (elementType==null) elementType = type.getClass();
+    Object newArray = java.lang.reflect.Array.newInstance(elementType, size);
+    
+    return newArray;
   }
   
 }

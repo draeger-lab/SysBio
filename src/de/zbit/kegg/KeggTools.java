@@ -76,6 +76,9 @@ public class KeggTools {
           
           // Add missing enzymes
           if (infos.getEnzymes()!=null) {
+            if (r.getName().contains("R01061")) {
+              System.out.println("Debug me");
+            }
             // Get all Enzymes, that are already contained in the pathway.
             List<Entry> modifier = p.getReactionModifiers(r.getName());
             List<String> contained_enzymes = new LinkedList<String>();
