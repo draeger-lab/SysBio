@@ -470,10 +470,8 @@ public class GUITools {
 	    // Search for ok button and check if all other are enabled.
 			if (c != null) {
 				// c is now a Window.
-				ResourceBundle resource = ResourceManager
-						.getBundle(RESOURCE_LOCATION_FOR_LABELS);
 				Component okButton = searchFor((Window) c, AbstractButton.class,
-				  "getText", resource.getString("OK").split(";")[0]);
+				  "getText", getOkButtonText());
 				if (okButton != null) {
 				  okButton.setEnabled(false);
 				  return true;
@@ -520,10 +518,8 @@ public class GUITools {
 	    // Search for ok button and check if all other are enabled.
 	    if (c!=null) {
 	      // c is now a Window.
-				ResourceBundle resource = ResourceManager
-						.getBundle(RESOURCE_LOCATION_FOR_LABELS);
 				Component okButton = searchFor(c, AbstractButton.class, "getText",
-					resource.getString("OK").split(";")[0]);
+				  getOkButtonText());
 	      if (okButton!=null) {
 	        boolean previousState = okButton.isEnabled();
 	        okButton.setEnabled(true);
@@ -1339,6 +1335,73 @@ public static void showMessage(URL path, String title, Component owner,
     
     return area;
 	}
+
+
+  /**
+   * Tries to get the lokalized ok Button Message, as it occurs
+   * in the UIManager (e.g. JOptionPane).
+   * @return
+   */
+  public static String getOkButtonText() {
+    
+    // First, get it from the UI Manager
+    Object ok = UIManager.get("OptionPane.okButtonText");
+    if (ok!=null) return ok.toString();
+    
+    // Second, try to get it from the internal resources
+    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+    ok = resource.getString("OK");
+    if (ok!=null) {
+      if (ok.toString().contains(";")) return ok.toString().split(";")[0];
+      else return ok.toString();
+    }
+    
+    return "OK";
+  }
+  
+  /**
+   * Tries to get the lokalized cancel Button Message, as it occurs
+   * in the UIManager (e.g. JOptionPane).
+   * @return
+   */
+  public static String getCancelButtonText() {
+    
+    // First, get it from the UI Manager
+    Object cancel = UIManager.get("OptionPane.cancelButtonText");
+    if (cancel!=null) return cancel.toString();
+    
+    // Second, try to get it from the internal resources
+    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+    cancel = resource.getString("CANCEL");
+    if (cancel!=null) {
+      if (cancel.toString().contains(";")) return cancel.toString().split(";")[0];
+      else return cancel.toString();
+    }
+    
+    return "Cancel";
+  }
+  
+  /**
+   * Create a panel for a component and adds a title to it. 
+   */
+  public static JComponent createTitledPanel(JComponent content, String title) {
+    /*JPanel panel = new JPanel();
+    JLabel label = new JLabel(title);
+    label.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+    label.setBackground(new Color(231, 219,182));
+    label.setOpaque(true);
+    label.setForeground(Color.DARK_GRAY);
+    label.setFont(label.getFont().deriveFont(Font.BOLD));
+    label.setFont(label.getFont().deriveFont(13.0f));
+    panel.setLayout(new BorderLayout());
+    panel.add(label, BorderLayout.NORTH);
+    panel.add(content, BorderLayout.CENTER);*/
+    //return panel;
+    
+    content.setBorder(BorderFactory.createTitledBorder(title));
+    
+    return content;
+  }
 	
 	
 }

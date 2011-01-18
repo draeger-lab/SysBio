@@ -294,10 +294,7 @@ public class CSVReaderOptionPanel extends JPanel {
     FlowLayout fr = new FlowLayout();
     fr.setAlignment(FlowLayout.RIGHT);
     JPanel se = new JPanel(fr);
-    String text = UIManager.getString("OptionPane.okButtonText");
-    if (text == null) {
-    	text = "Ok";
-    }
+    String text = GUITools.getOkButtonText();
     JButton ok = new JButton(text);
     if (this.defaultFont!=null) ok.setFont(defaultFont);
     se.add(ok);
@@ -307,10 +304,7 @@ public class CSVReaderOptionPanel extends JPanel {
     FlowLayout fl = new FlowLayout();
     fl.setAlignment(FlowLayout.LEFT);
     JPanel sw = new JPanel(fl);
-    text = UIManager.getString("OptionPane.cancelButtonText");
-    if (text == null) {
-    	text = "Cancel";
-    }
+    text = GUITools.getCancelButtonText();
     JButton cancel = new JButton(text);
     if (this.defaultFont!=null) cancel.setFont(defaultFont);
     sw.add(cancel);
