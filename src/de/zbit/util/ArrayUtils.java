@@ -100,5 +100,14 @@ public class ArrayUtils {
     
     return newArray;
   }
+
+
+  /**
+   * Simply concatenates each element of the array with a tab.
+   * @param line
+   */
+  public static String toTabbedString(String[] line) {
+    return implode(line, "\t");
+  }
   
 }

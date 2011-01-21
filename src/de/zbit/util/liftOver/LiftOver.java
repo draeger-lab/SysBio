@@ -442,4 +442,22 @@ public class LiftOver {
       + ") using chain " + chainId + " ; pct matched " + percentLiftedOver;
     }
   }
+
+  /**
+   * LiftsOver a location (e.g. "chr5:1234-1345").
+   * @param string
+   * @return
+   */
+  public Interval liftOver(String locationString) throws NumberFormatException {
+    int dp = locationString.lastIndexOf(':');
+    int mi = locationString.lastIndexOf('-');
+    
+    String chr = locationString.substring(0, dp);
+    
+    int start = Integer.parseInt(locationString.substring(dp+1, (mi<=0?locationString.length():mi)));
+    
+    int end = (mi<=0?start:Integer.parseInt(locationString.substring(mi+1)));
+    
+    return liftOver(chr, start, end);
+  }
 }
