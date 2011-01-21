@@ -76,9 +76,6 @@ public class KeggTools {
           
           // Add missing enzymes
           if (infos.getEnzymes()!=null) {
-            if (r.getName().contains("R01061")) {
-              System.out.println("Debug me");
-            }
             // Get all Enzymes, that are already contained in the pathway.
             List<Entry> modifier = p.getReactionModifiers(r.getName());
             List<String> contained_enzymes = new LinkedList<String>();
@@ -284,8 +281,6 @@ public class KeggTools {
    * as well.
    */
   public static void removeOrphans(Pathway p, boolean considerRelations, boolean considerReactions) {
-    //TODO: weg
-    System.out.println("in remove Orphans");
     for (int i=0; i<p.getEntries().size(); i++) {
       Entry entry = p.getEntries().get(i);
       
