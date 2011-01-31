@@ -134,37 +134,22 @@ public class GUITools {
 	
 	 
   /**
-   * The JVM command line allows to show splash screens. If the user made
-   * use of this functionality, the following code will hide the screen.
-   * Otherwise, this function does nothing.
-   */
-  public static void hideSplashScreen() {
-    try {
-      final SplashScreen splash = SplashScreen.getSplashScreen();
-      if (splash == null) {
-        return;
-      }
-      splash.close();
-    } catch (Throwable t) {}
-  }
-	
-	/**
-	 * Checks whether the first container contains the second one.
-	 * 
-	 * @param c
-	 * @param insight
-	 * @return True if c contains insight.
-	 */
-	public static boolean contains(Component c, Component insight) {
-		boolean contains = c.equals(insight);
-		if ((c instanceof Container) && !contains)
-			for (Component c1 : ((Container) c).getComponents()) {
-				if (c1.equals(insight))
-					return true;
-				else contains |= contains(c1, insight);
-			}
-		return contains;
-	}
+ * Checks whether the first container contains the second one.
+ * 
+ * @param c
+ * @param insight
+ * @return True if c contains insight.
+ */
+public static boolean contains(Component c, Component insight) {
+	boolean contains = c.equals(insight);
+	if ((c instanceof Container) && !contains)
+		for (Component c1 : ((Container) c).getComponents()) {
+			if (c1.equals(insight))
+				return true;
+			else contains |= contains(c1, insight);
+		}
+	return contains;
+}
 	
 	/**
 	 * Creates a JButton with the given properties. The tool tip becomes an HTML
@@ -457,6 +442,28 @@ public class GUITools {
 	}
 	
 	/**
+	   * Create a panel for a component and adds a title to it. 
+	   */
+	  public static JComponent createTitledPanel(JComponent content, String title) {
+	    /*JPanel panel = new JPanel();
+	    JLabel label = new JLabel(title);
+	    label.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+	    label.setBackground(new Color(231, 219,182));
+	    label.setOpaque(true);
+	    label.setForeground(Color.DARK_GRAY);
+	    label.setFont(label.getFont().deriveFont(Font.BOLD));
+	    label.setFont(label.getFont().deriveFont(13.0f));
+	    panel.setLayout(new BorderLayout());
+	    panel.add(label, BorderLayout.NORTH);
+	    panel.add(content, BorderLayout.CENTER);*/
+	    //return panel;
+	    
+	    content.setBorder(BorderFactory.createTitledBorder(title));
+	    
+	    return content;
+	  }
+	
+	/**
 	   * Searches for the parent #{@link java.awt.Window} of the given component c.
 	   * Checks if this Window contains a #{@link javax.swing.AbstractButton} which
 	   * is called "Ok" and disables this button.
@@ -482,21 +489,6 @@ public class GUITools {
 	  
 	  
 	  /**
-	   * Searches for the parent #{@link java.awt.Window} of the given component c.
-	   * @param c
-	   * @return the window if found, or null if not found.
-	   */
-	  public static Window getParentWindow(Component c) {
-	    while (c!=null) {
-	      if (c instanceof Window) {
-	        return (Window) c;
-	      }
-	      c = c.getParent();
-	    }
-	    return null;
-	  }
-	  
-	/**
 	   * Checks if this "c" contains a #{@link javax.swing.AbstractButton} which
 	   * is called "OK" and enables this button if and only if it a) exists and is
 	   * disabled and b) all other elements on this container and all
@@ -533,7 +525,7 @@ public class GUITools {
 	    }
 	    return false;
 	  }
-	
+	  
 	/**
 	   * Simply checks if all elements on "c" are enabled and if yes, the given "okButton" will
 	   * be enabled. Else, the current state stays untouched.
@@ -553,6 +545,28 @@ public class GUITools {
 	      okButton.setEnabled(previousState);
 	      return false;
 	    }
+	  }
+	
+	/**
+	   * Tries to get the lokalized cancel Button Message, as it occurs
+	   * in the UIManager (e.g. JOptionPane).
+	   * @return
+	   */
+	  public static String getCancelButtonText() {
+	    
+	    // First, get it from the UI Manager
+	    Object cancel = UIManager.get("OptionPane.cancelButtonText");
+	    if (cancel!=null) return cancel.toString();
+	    
+	    // Second, try to get it from the internal resources
+	    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+	    cancel = resource.getString("CANCEL");
+	    if (cancel!=null) {
+	      if (cancel.toString().contains(";")) return cancel.toString().split(";")[0];
+	      else return cancel.toString();
+	    }
+	    
+	    return "Cancel";
 	  }
 	
 	/**
@@ -589,6 +603,59 @@ public class GUITools {
 	}
 	
 	/**
+	   * Tries to get the lokalized ok Button Message, as it occurs
+	   * in the UIManager (e.g. JOptionPane).
+	   * @return
+	   */
+	  public static String getOkButtonText() {
+	    
+	    // First, get it from the UI Manager
+	    Object ok = UIManager.get("OptionPane.okButtonText");
+	    if (ok!=null) return ok.toString();
+	    
+	    // Second, try to get it from the internal resources
+	    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+	    ok = resource.getString("OK");
+	    if (ok!=null) {
+	      if (ok.toString().contains(";")) return ok.toString().split(";")[0];
+	      else return ok.toString();
+	    }
+	    
+	    return "OK";
+	  }
+	
+	/**
+	   * Searches for the parent #{@link java.awt.Window} of the given component c.
+	   * @param c
+	   * @return the window if found, or null if not found.
+	   */
+	  public static Window getParentWindow(Component c) {
+	    while (c!=null) {
+	      if (c instanceof Window) {
+	        return (Window) c;
+	      }
+	      c = c.getParent();
+	    }
+	    return null;
+	  }
+	
+	
+	/**
+	   * The JVM command line allows to show splash screens. If the user made
+	   * use of this functionality, the following code will hide the screen.
+	   * Otherwise, this function does nothing.
+	   */
+	  public static void hideSplashScreen() {
+	    try {
+	      final SplashScreen splash = SplashScreen.getSplashScreen();
+	      if (splash == null) {
+	        return;
+	      }
+	      splash.close();
+	    } catch (Throwable t) {}
+	  }
+	
+	/**
 	 * @param g
 	 * @param incrementBy
 	 * @return
@@ -596,7 +663,7 @@ public class GUITools {
 	public static Font incrementFontSize(Font g, int incrementBy) {
 		return g.deriveFont((float) (g.getSize() + incrementBy));
 	}
-	
+
 	/**
 	 * Initializes the look and feel.
 	 * 
@@ -609,9 +676,13 @@ public class GUITools {
 		boolean isMacOSX = false;
 		if (System.getProperty("mrj.version") != null) {
 			isMacOSX = true;
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty("java.library.path", System.getProperty("java.library.path") + File.pathSeparator + System.getProperty("user.dir") + "lib/MacOS/libquaqua.jnilib" + File.pathSeparator+ System.getProperty("user.dir") + "lib/MacOS/libquaqua64.jnilib");
+			System.out.println(System.getProperty("java.library.path"));
+			System.setProperty("com.apple.macos.smallTabs", "true");
+			System.setProperty("com.apple.mrj.application.live-resize", "true");
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-				title);
+					title);
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
 		try {			
 			UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
@@ -649,7 +720,6 @@ public class GUITools {
 			}
 		}
 	}
-	
 	
 	/**
 	 * Checks, if all elements on c are enabled.
@@ -702,7 +772,7 @@ public class GUITools {
 		}
 		return ret;
 	}
-
+	
 	/**
    * @param parent
    * @param dir
@@ -1044,7 +1114,7 @@ public class GUITools {
 	public static void setEnabled(boolean state, JMenuBar menuBar, Object command) {
 		setEnabled(state, menuBar, new Object[] {command});
 	}
-	
+
 	/**
 	 * @param state
 	 * @param menuBar
@@ -1054,7 +1124,7 @@ public class GUITools {
 		Object... commands) {
 		setEnabled(state, menuBar, null, commands);
 	}
-	
+
 	/**
 	 * @param state
 	 * @param toolbar
@@ -1064,24 +1134,24 @@ public class GUITools {
 		Object... commands) {
 		setEnabled(state, null, toolbar, commands);
 	}
-	
-	/**
-	 * Recursively set opaque to a value for p and all JComoponents on p.
-	 * @param p
-	 * @param val - false means transparent, true means object has a background.
-	 */
+  
+  /**
+ * Recursively set opaque to a value for p and all JComoponents on p.
+ * @param p
+ * @param val - false means transparent, true means object has a background.
+ */
   public static void setOpaqueForAllElements(JComponent p, boolean val) {
-    if (p instanceof JTextField || p instanceof JTextArea) return;
-    p.setOpaque(val);
-    
-    for (Component c: p.getComponents()) {
-      if (c instanceof JComponent) {
-        setOpaqueForAllElements((JComponent) c, val);
-      }
-    }
-      
-  }
+if (p instanceof JTextField || p instanceof JTextArea) return;
+p.setOpaque(val);
 
+for (Component c: p.getComponents()) {
+  if (c instanceof JComponent) {
+    setOpaqueForAllElements((JComponent) c, val);
+  }
+}
+  
+  }
+  
 	/**
 	 * 
 	 * @param parent
@@ -1090,7 +1160,7 @@ public class GUITools {
 	public static void showErrorMessage(Component parent, String message) {
 	  showErrorMessage(parent, null, message);
 	}
-
+  
 	/**
 	 * Displays the error message on a {@link JOptionPane}.
 	 * 
@@ -1113,7 +1183,7 @@ public class GUITools {
 		JOptionPane.showMessageDialog(parent, message, exc.getClass()
 				.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 	}
-  
+
   /**
  * Shows an error dialog with the given message in case the exception does not
  * provide any detailed message.
@@ -1133,7 +1203,7 @@ public class GUITools {
 			showErrorMessage(parent, exc);
 		}
 	}
-  
+
 	/**
 	 * Shows a simple message with a given title and an ok button.
 	 * 
@@ -1145,7 +1215,7 @@ public class GUITools {
 		JOptionPane.showMessageDialog(null, StringUtil.toHTML(message,
 			TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
 	}
-  
+
 	/**
 	 * Displays a message on a message dialog window, i.e., an HTML document.
 	 * 
@@ -1159,83 +1229,54 @@ public class GUITools {
 	public static void showMessage(URL path, String title, Component owner) {
 		showMessage(path, title, owner, null);
 	}
-
-  /**
- * @param path
- * @param title
- * @param owner
- * @param icon
- */
-public static void showMessage(URL path, String title, Component owner,
-	Icon icon) {
-	JBrowserPane browser = new JBrowserPane(path);
-	browser.removeHyperlinkListener(browser);
-	browser.addHyperlinkListener(new SystemBrowser());
-	browser.setBorder(BorderFactory.createEtchedBorder());
 	
-	try {
-		File f = new File(OpenFile.doDownload(path.toString()));
-		BufferedReader br;
-		br = new BufferedReader(new FileReader(f));
-		String line;
-		int rowCount = 0, maxLine = 0;
-		while (br.ready()) {
-			line = br.readLine();
-			if (line.length() > maxLine) {
-				maxLine = line.length();
-			}
-			rowCount++;
-		}
+	/**
+	 * @param path
+	 * @param title
+	 * @param owner
+	 * @param icon
+	 */
+	public static void showMessage(URL path, String title, Component owner,
+		Icon icon) {
+		JBrowserPane browser = new JBrowserPane(path);
+		browser.removeHyperlinkListener(browser);
+		browser.addHyperlinkListener(new SystemBrowser());
+		browser.setBorder(BorderFactory.createEtchedBorder());
 		
-		if ((rowCount > 100) || (maxLine > 250)) {
-			JScrollPane scroll = new JScrollPane(browser,
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			// TODO: Calculate required size using the font size.
-			scroll.setMaximumSize(new Dimension(470, 470));
-			Dimension prefered = new Dimension(450, 450);
-			browser.setPreferredSize(prefered);
-			JOptionPane.showMessageDialog(owner, scroll, title,
-				JOptionPane.INFORMATION_MESSAGE, icon);
-		} else {
-			JOptionPane.showMessageDialog(owner, browser, title,
-				JOptionPane.INFORMATION_MESSAGE, icon);
+		try {
+			File f = new File(OpenFile.doDownload(path.toString()));
+			BufferedReader br;
+			br = new BufferedReader(new FileReader(f));
+			String line;
+			int rowCount = 0, maxLine = 0;
+			while (br.ready()) {
+				line = br.readLine();
+				if (line.length() > maxLine) {
+					maxLine = line.length();
+				}
+				rowCount++;
+			}
+			
+			if ((rowCount > 100) || (maxLine > 250)) {
+				JScrollPane scroll = new JScrollPane(browser,
+					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				// TODO: Calculate required size using the font size.
+				scroll.setMaximumSize(new Dimension(470, 470));
+				Dimension prefered = new Dimension(450, 450);
+				browser.setPreferredSize(prefered);
+				JOptionPane.showMessageDialog(owner, scroll, title,
+					JOptionPane.INFORMATION_MESSAGE, icon);
+			} else {
+				JOptionPane.showMessageDialog(owner, browser, title,
+					JOptionPane.INFORMATION_MESSAGE, icon);
+			}
+		} catch (IOException exc) {
+			exc.printStackTrace();
+			showErrorMessage(owner, exc);
 		}
-	} catch (IOException exc) {
-		exc.printStackTrace();
-		showErrorMessage(owner, exc);
 	}
-}
-
-	/**
-	 * 
-	 * @param parent
-	 * @param file
-	 */
-	public static void showNowReadingAccessWarning(Component parent, File file) {
-		ResourceBundle resource = ResourceManager
-				.getBundle(RESOURCE_LOCATION_FOR_LABELS);
-		JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
-			resource.getString("NO_READ_ACCESS_MESSAGE"), resource.getString(file
-					.isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
-			TOOLTIP_LINE_LENGTH), resource.getString("NO_READ_ACCESS_MESSAGE"),
-			JOptionPane.WARNING_MESSAGE);
-	}
-
-	/**
-	 * 
-	 * @param parent
-	 * @param file
-	 */
-	public static void showNowWritingAccessWarning(Component parent, File file) {
-		ResourceBundle resource = ResourceManager
-				.getBundle(RESOURCE_LOCATION_FOR_LABELS);
-		JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
-			resource.getString("NO_WRITE_ACCESS_MESSAGE"), resource.getString(file
-					.isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
-			TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
-			JOptionPane.WARNING_MESSAGE);
-	}
+	
 	
 	/**
 	 * Show the component in an information message context, but does
@@ -1267,9 +1308,39 @@ public static void showMessage(URL path, String title, Component owner,
 	  }
 	  
 	}
-	
-	
-	/**
+
+
+  /**
+ * 
+ * @param parent
+ * @param file
+ */
+public static void showNowReadingAccessWarning(Component parent, File file) {
+	ResourceBundle resource = ResourceManager
+			.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+	JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
+		resource.getString("NO_READ_ACCESS_MESSAGE"), resource.getString(file
+				.isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
+		TOOLTIP_LINE_LENGTH), resource.getString("NO_READ_ACCESS_MESSAGE"),
+		JOptionPane.WARNING_MESSAGE);
+}
+  
+  /**
+ * 
+ * @param parent
+ * @param file
+ */
+public static void showNowWritingAccessWarning(Component parent, File file) {
+	ResourceBundle resource = ResourceManager
+			.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+	JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
+		resource.getString("NO_WRITE_ACCESS_MESSAGE"), resource.getString(file
+				.isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
+		TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
+		JOptionPane.WARNING_MESSAGE);
+}
+  
+  /**
    * Shows the output of a process inside a textarea.
    * Autoscrolls as the process genereates output and
    * automatically disables the ok-button as long as
@@ -1279,129 +1350,62 @@ public static void showMessage(URL path, String title, Component owner,
    * Hint: Consider setting {@link ProcessBuilder#redirectErrorStream()}
    * to true.
    * 
-	 * @param p - the process to monitor.
-	 * @param caption - the caption of the window
-	 * @param closeWindowAutomaticallyWhenDone - if set to
-	 * true, the window will be closed, as soon as the
-	 * process finished.
-	 * @return JTextArea
-	 */
-	public static JTextArea showProcessOutputInTextArea(final Process p, final String caption,
-	  final boolean closeWindowAutomaticallyWhenDone) {
-	  final JTextArea area = new JTextArea();
-	  SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-	    @Override
-	    protected Void doInBackground() throws Exception {
-	      
-	      // Show a JTextArea in an information message in background
-	      area.setEditable(false);
-	      JScrollPane pane = new JScrollPane(
-          area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	      pane.setPreferredSize(new Dimension(480, 240));
-	      
-	      GUITools.showMessageDialogInNewThred(pane, caption);
-	      
-	      // Disable the ok-Button of the area
-	      GUITools.disableOkButton(area);
-	      
-	      // Update the window, as the process is executing
-	      String line;
-	      BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-	      while ((line = in.readLine()) != null) {
-	        area.append(line+"\n");
-	        // Scroll down
-	        area.setCaretPosition(area.getDocument().getLength()); 
-	      }
-	      
-	      // As soon as the process is done, enable the ok button again
-	      Window w = getParentWindow(area);
-	      if (closeWindowAutomaticallyWhenDone) {
-	        if (w!=null) w.dispose();
-	      } else {
-	        enableOkButtonIfAllComponentsReady(w);
-	      }
-	      
-	      return null;
-	    }
-	  };
-	  worker.execute();
-	  
-    // Wait until the dialog is painted, before continuing
-    while (worker.getState()==SwingWorker.StateValue.PENDING) {
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e) {}
+ * @param p - the process to monitor.
+ * @param caption - the caption of the window
+ * @param closeWindowAutomaticallyWhenDone - if set to
+ * true, the window will be closed, as soon as the
+ * process finished.
+ * @return JTextArea
+ */
+public static JTextArea showProcessOutputInTextArea(final Process p, final String caption,
+  final boolean closeWindowAutomaticallyWhenDone) {
+  final JTextArea area = new JTextArea();
+  SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+    @Override
+    protected Void doInBackground() throws Exception {
+      
+      // Show a JTextArea in an information message in background
+      area.setEditable(false);
+      JScrollPane pane = new JScrollPane(
+      area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+      pane.setPreferredSize(new Dimension(480, 240));
+      
+      GUITools.showMessageDialogInNewThred(pane, caption);
+      
+      // Disable the ok-Button of the area
+      GUITools.disableOkButton(area);
+      
+      // Update the window, as the process is executing
+      String line;
+      BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      while ((line = in.readLine()) != null) {
+        area.append(line+"\n");
+        // Scroll down
+        area.setCaretPosition(area.getDocument().getLength()); 
+      }
+      
+      // As soon as the process is done, enable the ok button again
+      Window w = getParentWindow(area);
+      if (closeWindowAutomaticallyWhenDone) {
+        if (w!=null) w.dispose();
+      } else {
+        enableOkButtonIfAllComponentsReady(w);
+      }
+      
+      return null;
     }
-    
-    return area;
-	}
-
-
-  /**
-   * Tries to get the lokalized ok Button Message, as it occurs
-   * in the UIManager (e.g. JOptionPane).
-   * @return
-   */
-  public static String getOkButtonText() {
-    
-    // First, get it from the UI Manager
-    Object ok = UIManager.get("OptionPane.okButtonText");
-    if (ok!=null) return ok.toString();
-    
-    // Second, try to get it from the internal resources
-    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
-    ok = resource.getString("OK");
-    if (ok!=null) {
-      if (ok.toString().contains(";")) return ok.toString().split(";")[0];
-      else return ok.toString();
-    }
-    
-    return "OK";
-  }
+  };
+  worker.execute();
   
-  /**
-   * Tries to get the lokalized cancel Button Message, as it occurs
-   * in the UIManager (e.g. JOptionPane).
-   * @return
-   */
-  public static String getCancelButtonText() {
-    
-    // First, get it from the UI Manager
-    Object cancel = UIManager.get("OptionPane.cancelButtonText");
-    if (cancel!=null) return cancel.toString();
-    
-    // Second, try to get it from the internal resources
-    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
-    cancel = resource.getString("CANCEL");
-    if (cancel!=null) {
-      if (cancel.toString().contains(";")) return cancel.toString().split(";")[0];
-      else return cancel.toString();
-    }
-    
-    return "Cancel";
-  }
-  
-  /**
-   * Create a panel for a component and adds a title to it. 
-   */
-  public static JComponent createTitledPanel(JComponent content, String title) {
-    /*JPanel panel = new JPanel();
-    JLabel label = new JLabel(title);
-    label.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-    label.setBackground(new Color(231, 219,182));
-    label.setOpaque(true);
-    label.setForeground(Color.DARK_GRAY);
-    label.setFont(label.getFont().deriveFont(Font.BOLD));
-    label.setFont(label.getFont().deriveFont(13.0f));
-    panel.setLayout(new BorderLayout());
-    panel.add(label, BorderLayout.NORTH);
-    panel.add(content, BorderLayout.CENTER);*/
-    //return panel;
-    
-    content.setBorder(BorderFactory.createTitledBorder(title));
-    
-    return content;
-  }
+// Wait until the dialog is painted, before continuing
+while (worker.getState()==SwingWorker.StateValue.PENDING) {
+  try {
+    Thread.sleep(100);
+  } catch (InterruptedException e) {}
+}
+
+return area;
+}
 	
 	
 }

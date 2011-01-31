@@ -109,7 +109,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	@Override
 	public void addChangeListener(ChangeListener listener) {
-		for (int i = 0; i < tab.getComponentCount(); i++) {
+		for (int i = 0; i < tab.getTabCount(); i++) {
 			getPreferencesPanel(i).addChangeListener(listener);
 		}
 	}
@@ -123,7 +123,10 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	@Override
 	public void addItemListener(ItemListener listener) {
-		for (int i = 0; i < tab.getComponentCount(); i++) {
+		System.out.println(tab.getComponentCount());
+		System.out.println(tab.getTabCount());
+		for (int i = 0; i < tab.getTabCount(); i++) {
+			//System.out.println(i + "\t" + tab.getComponentAt(i).getClass().getName());
 			getPreferencesPanel(i).addItemListener(listener);
 		}
 	}
@@ -135,7 +138,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	@Override
 	public void addKeyListener(KeyListener listener) {
-		for (int i = 0; i < tab.getComponentCount(); i++) {
+		for (int i = 0; i < tab.getTabCount(); i++) {
 			getPreferencesPanel(i).addKeyListener(listener);
 		}
 	}
