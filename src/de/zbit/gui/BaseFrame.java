@@ -211,18 +211,6 @@ public abstract class BaseFrame extends JFrame {
 		init();
 	}
 	
-	/**
-	 * Creates a new {@link BaseFrame}, for which it can be decided whether or not
-	 * to include {@link BaseAction#FILE_OPEN}, {@link BaseAction#FILE_SAVE}, and
-	 * {@link BaseAction#FILE_CLOSE} to the File menu. Default: <code>true</code>.
-	 *  
-	 * @param loadDefaultFileMenuEntries
-	 */
-	public BaseFrame(boolean loadDefaultFileMenuEntries) {
-		super();
-		init();
-	}
-	
 	
 	/**
 	 * Creates a new {@link BaseFrame} with the given
