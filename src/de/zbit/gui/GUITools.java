@@ -676,8 +676,6 @@ public static boolean contains(Component c, Component insight) {
 		boolean isMacOSX = false;
 		if (System.getProperty("mrj.version") != null) {
 			isMacOSX = true;
-			System.setProperty("java.library.path", System.getProperty("java.library.path") + File.pathSeparator + System.getProperty("user.dir") + "lib/MacOS/libquaqua.jnilib" + File.pathSeparator+ System.getProperty("user.dir") + "lib/MacOS/libquaqua64.jnilib");
-			System.out.println(System.getProperty("java.library.path"));
 			System.setProperty("com.apple.macos.smallTabs", "true");
 			System.setProperty("com.apple.mrj.application.live-resize", "true");
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name",

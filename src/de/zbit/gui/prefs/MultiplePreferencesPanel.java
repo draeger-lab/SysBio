@@ -123,10 +123,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	@Override
 	public void addItemListener(ItemListener listener) {
-		System.out.println(tab.getComponentCount());
-		System.out.println(tab.getTabCount());
 		for (int i = 0; i < tab.getTabCount(); i++) {
-			//System.out.println(i + "\t" + tab.getComponentAt(i).getClass().getName());
 			getPreferencesPanel(i).addItemListener(listener);
 		}
 	}
