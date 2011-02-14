@@ -12,13 +12,46 @@
   <entry key="ABOUT_THE_PROGRAM">About %s</entry>
   <entry key="DEFAULT_TOOL_BAR_TITLE">Tools</entry>
   <entry key="LICENSE_OF_THE_PROGRAM">%s - License</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">You are already using the latest version %s of %s. No newer version could be found.</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">No update available</entry>
   <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Online Help</entry>
   
   <!-- CSVImporter -->
   
   <entry key="COULD_NOT_IDENTIFY_COLUMNS">%d data columns from the given input file could not be automatically assigned to expected columns. Please manually assign these columns here.</entry>
+  <entry key="COLUMN_ASSIGNMENT">Column assignment</entry>
+  
+  <!-- CSVReaderColumnChooser -->
+  
+  <entry key="REQUIRED_COLUMNS">Required columns </entry>
+  <entry key="OPTIONAL_COLUMNS">Optional columns </entry>
+  <entry key="ASSIGN_THESE_COLUMNS">Please assign the following columns:</entry>
+  
+  <!-- CSVReaderOptionPanel -->
+  
+  <entry key="COLUMN">Column </entry>
+  <entry key="CSV_OPTIONS">CSV Options</entry>
+  <entry key="FILE_PREVIEW">File preview</entry>
+  <entry key="FILE_CONTAINS_HEADERS">File contains headers</entry>
+  <entry key="INDICATE_IF_COLUMN_DESCRIPTIONS_ARE_GIVEN">Indicate whether a file contains column descriptions or not.</entry>
+  <entry key="SEPARATOR_CHAR">Separator char </entry>
+  <entry key="SEPARATOR_CHAR_TOOLTIP">The separator character that is used to split the columns.</entry>
+  <entry key="TREAT_CONSECUTIVE_SEPARATORS_AS_ONE">Treat consecutive separators as one</entry>
+  <entry key="TREAT_CONSECUTIVE_SEPARATORS_AS_ONE_TOOLTIP">Indicate whether multiple consecutive separators should be treated as one.</entry>
+  <entry key="SKIP_THIS_NUMBER_OF_LEADING_LINES">Skip that much lines at the beginning of the file.</entry>
+  <entry key="SKIP_LINES">Skip lines</entry>
+  
+  <!-- FileHistory -->
+  
+  <entry key="LAST_OPENED">This memorizes the last files that have been opened by the program.</entry>
+  
+  <!-- GUIOptions -->
+  
+  <entry key="CHECK_FOR_UPDATES">Decide whether or not this program should search for updates at start-up.</entry>
+  <entry key="GUI">Can be used in combination with = true or = false or just --gui. Specifies whether or not a program should display its graphical user interface.</entry>
+  <entry key="LANGUAGE">The language for the user interface, error messages and so on.</entry>
+  <entry key="OPEN_DIR">Standard directory where user files can be found.</entry>
+  <entry key="SAVE_DIR">Standard directory where the user may save some files.</entry>
+  <entry key="DEFAULT_DIRECTORIES">Default directories</entry>
+  <entry key="DEFAULT_DIRECTORIES_TOOLTIP">Define the default directories to open and save files. These directories will be used as the first search target when selecting files in this graphical user interface.</entry>
   
   <!-- GUITools -->
   
@@ -31,6 +64,23 @@
   <entry key="THE_DIRECTORY">the directory</entry>
   <entry key="THE_FILE">the file</entry>
   
+  <!-- JColumnChooser -->
+  
+  <entry key="EG">E.g., </entry>
+  <entry key="NOT_AVAILABLE">Not available</entry>
+  <entry key="INVALID_COLUMN">Invalid column</entry>
+  
+  <!-- JHelpBrowser -->
+  
+  <entry key="ONLINE_HELP">Online Help</entry>
+  <entry key="ONLINE_HELP_TOOLTIP">This is the main online help.</entry>
+  <entry key="COMMAND_LINE_ARGUMENTS">Command line arguments</entry>
+  <entry key="LAST_PAGE">Last Page</entry>
+  <entry key="NEXT">Next</entry>
+  <entry key="NEXT_PAGE">Next Page</entry>
+  <entry key="SAVE">Save</entry>
+  <entry key="SAVE_TOOLTIP">Save the current page as HTML file.</entry>
+    
   <!-- PreferencesDialog -->
   
   <entry key="APPLY">Apply;Persistently saves the current configuration but keeps the dialog open.</entry>
@@ -43,5 +93,14 @@
   <!-- SBAcceptAllFileFilter -->
   
   <entry key="ACCEPT_ALL_FILES">All files (*)</entry>
+  
+  <!-- UpdateMessage -->
+  
+  <entry key="SHOW_RELEASE_NOTES">show release notes</entry>
+  <entry key="HIDE_RELEASE_NOTES">hide release notes</entry>
+  <entry key="UPDATE_IS_AVAILABLE">An update for %s is available.</entry>
+  <entry key="COMMAND_LINE_UPDATE_MESSAGE">\nUpdate notification:\n--------------------\nA new version of %s is available.\nPlease visit %s\nto obtain version %s.\nFor your information: you are now using %s version %s.\n</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">You are already using the latest version %s of %s. No newer version could be found.</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">No update available</entry> 
   
 </properties>

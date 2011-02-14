@@ -6,6 +6,21 @@
 	and error messages in a (graphical) user interface.
   </comment>
   
+  <!-- CSVReaderColumnCooser -->
+  
+  <entry key="INVALID_CSV-FILE">Ungültige oder leere CSV-Datei.</entry>
+  <entry key="NO_SUCH_COLUMN_CHOOSER">Kein Spaltenelement namens "%d".</entry>
+  
+  <!-- ImageTools -->
+  
+  <entry key="COULD_NOT_LOAD_IMAGE">"Konnte Bild %s nicht laden.\n"</entry>
+  <entry key="COULD_NOT_LOAD_ICONS_FROM_DIR">Konte keine Piktogramme aus dem Verzeichnis %s laden.</entry>
+  <entry key="WRONG_PERCENTAGE_IN_IMAGE">Falsche Prozentangabe in %s: %f.</entry>
+  
+  <!-- JBrowserPane -->
+  
+  <entry key="CANNOT_FOLLOW_LINK">Es ist nicht möglich, folgendem Verweis nachzugehen: </entry>
+  
   <!-- SBPreferences -->
   
   <entry key="BACKING_STORE_EXCEPTION_MESSAGE">Die Benutzereinstellungen für %s konnten nicht persistent gespeichert werden.</entry> <!-- Requires a KeyProvider name as argument. -->

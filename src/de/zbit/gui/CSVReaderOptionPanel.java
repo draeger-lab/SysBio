@@ -46,6 +46,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.io.CSVReader;
+import de.zbit.util.ResourceManager;
 
 /**
  * 
@@ -166,11 +167,13 @@ public class CSVReaderOptionPanel extends JPanel {
    * The default font to use for the Titles in the Borders
    * @param defaultTitleFont
    */
-  public void setDefaultTitleFont(Font defaultTitleFont) {
-    this.defaultTitleFont = defaultTitleFont;
-    setBorder(currentOptions, "CSV Options");
-    setBorder(currentPreview, "File preview");
-  }
+	public void setDefaultTitleFont(Font defaultTitleFont) {
+		this.defaultTitleFont = defaultTitleFont;
+		setBorder(currentOptions, ResourceManager.getBundle(
+			"de.zbit.locales.Labels").getString("CSV_OPTIONS"));
+		setBorder(currentPreview, ResourceManager.getBundle(
+			"de.zbit.locales.Labels").getString("FILE_PREVIEW"));
+	}
   
   /**
    * See {@link #setDefaultPreviewFont(Font)}
@@ -265,8 +268,10 @@ public class CSVReaderOptionPanel extends JPanel {
     currentPreview = buildPreview(numDataLinesForPreview);
     
     // Add borders
-    setBorder(currentOptions, "CSV Options");
-    setBorder(currentPreview, "File preview");
+		setBorder(currentOptions, ResourceManager.getBundle(
+			"de.zbit.locales.Labels").getString("CSV_OPTIONS"));
+		setBorder(currentPreview, ResourceManager.getBundle(
+			"de.zbit.locales.Labels").getString("FILE_PREVIEW"));
     
     // Create Panel
     this.setLayout(new BorderLayout());
@@ -360,9 +365,11 @@ public class CSVReaderOptionPanel extends JPanel {
     // Do NOT change the names. They are used in the buildPreviewPanel function.
     
     // Contains headers
-    final JCheckBox head = new JCheckBox("File contains headers");
+		final JCheckBox head = new JCheckBox(ResourceManager.getBundle(
+			"de.zbit.locales.Labels").getString("FILE_CONTAINS_HEADERS"));
     if (defaultFont!=null) head.setFont(defaultFont);
-    head.setToolTipText("Indicate whether a file contains column descriptions or not.");
+		head.setToolTipText(ResourceManager.getBundle("de.zbit.locales.Labels")
+				.getString("INDICATE_IF_COLUMN_DESCRIPTIONS_ARE_GIVEN"));
     head.setSelected(r.getContainsHeaders());
     head.setName(FIELD_CONTAINS_HEADERS);
     head.addActionListener(new ActionListener() {
@@ -374,7 +381,8 @@ public class CSVReaderOptionPanel extends JPanel {
     addComponent(currentPanel, head, 0, 0, 2, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
     
     // Separator char
-    JLabel d0 = new JLabel("Separator char ");
+		JLabel d0 = new JLabel(ResourceManager.getBundle("de.zbit.locales.Labels")
+				.getString("SEPARATOR_CHAR"));
     if (defaultFont!=null) d0.setFont(defaultFont);
     final JComboBox sep = buildSeparatorCharChooser();
     sep.setName(FIELD_SEPARATOR_CHAR);
@@ -385,9 +393,9 @@ public class CSVReaderOptionPanel extends JPanel {
     
 
     // Treat multi as one
-    final JCheckBox mult = new JCheckBox("Treat consecutive separators as one");
+    final JCheckBox mult = new JCheckBox(ResourceManager.getBundle("de.zbit.locales.Labels").getString("TREAT_CONSECUTIVE_SEPARATORS_AS_ONE"));
     if (defaultFont!=null) mult.setFont(defaultFont);
-    mult.setToolTipText("Indicate whether multiple consecutive separators should be treated as one.");
+    mult.setToolTipText(ResourceManager.getBundle("de.zbit.locales.Labels").getString("TREAT_CONSECUTIVE_SEPARATORS_AS_ONE_TOOLTIP"));
     mult.setSelected(r.getTreatMultipleConsecutiveSeparatorsAsOne());
     mult.setName(FIELD_TREAT_MULTI_AS_ONE);
     mult.addActionListener(new ActionListener() {
@@ -400,8 +408,8 @@ public class CSVReaderOptionPanel extends JPanel {
     
     
     // Skip lines (=> set via Skip)
-    String contentStartTT = "Skip that much lines at the beginning of the file.";
-    JLabel d1 = new JLabel("Skip lines");
+    String contentStartTT = ResourceManager.getBundle("de.zbit.locales.Labels").getString("SKIP_THIS_NUMBER_OF_LEADING_LINES");
+    JLabel d1 = new JLabel(ResourceManager.getBundle("de.zbit.locales.Labels").getString("SKIP_LINES"));
     if (defaultFont!=null) d1.setFont(defaultFont);
     d1.setToolTipText(contentStartTT);
     
@@ -456,7 +464,7 @@ public class CSVReaderOptionPanel extends JPanel {
     final JComboBox sep = new JComboBox(m);
     if (defaultFont!=null) sep.setFont(defaultFont);
     sep.setEditable(true);
-    sep.setToolTipText("The separator character that is used to split the columns.");
+    sep.setToolTipText(ResourceManager.getBundle("de.zbit.locales.Labels").getString("SEPARATOR_CHAR_TOOLTIP"));
     final JTextField editorcomp = (JTextField) sep.getEditor().getEditorComponent();
     
     // Set currently selected char
@@ -674,11 +682,17 @@ public class CSVReaderOptionPanel extends JPanel {
     // For correct sizing, at least a space is required in each header column.
     String[] newHeader=header;
     newHeader = new String[maxColCount];
-    if (header!=null) System.arraycopy(header, 0, newHeader, 0, Math.min(newHeader.length, header.length));
-    for (int i=0; i<newHeader.length; i++) {
-      if (!r.getContainsHeaders()) newHeader[i] = "Column " + (i+1);
-      else if (newHeader[i]==null || newHeader[i].length()<1) newHeader[i]= " ";
-    }
+		if (header != null)
+			System.arraycopy(header, 0, newHeader, 0, Math.min(newHeader.length,
+				header.length));
+		String column = ResourceManager.getBundle("de.zbit.locales.Labels")
+				.getString("COLUMN");
+		for (int i = 0; i < newHeader.length; i++) {
+			if (!r.getContainsHeaders())
+				newHeader[i] = column + (i + 1);
+			else if (newHeader[i] == null || newHeader[i].length() < 1)
+				newHeader[i] = " ";
+		}
       
     
     // Build the table
@@ -753,7 +767,7 @@ public class CSVReaderOptionPanel extends JPanel {
     if (currentPreview!=null) remove(currentPreview);
     currentPreview = buildPreview(numDataLinesForPreview);
     
-    setBorder(currentPreview, "File preview");
+    setBorder(currentPreview, ResourceManager.getBundle("de.zbit.locales.Labels").getString("FILE_PREVIEW"));
     add(currentPreview, BorderLayout.CENTER);
     
     validate();
@@ -767,7 +781,7 @@ public class CSVReaderOptionPanel extends JPanel {
     if (currentOptions!=null) remove(currentOptions);
     currentOptions = buildCSVOptionsPanel();
     
-    setBorder(currentOptions, "CSV Options");
+    setBorder(currentOptions, ResourceManager.getBundle("de.zbit.locales.Labels").getString("CSV_OPTIONS"));
     add(currentOptions, BorderLayout.NORTH);
     
     validate();
@@ -939,16 +953,20 @@ public class CSVReaderOptionPanel extends JPanel {
   /**
    * Just for testing purposes.
    */
-  public static void main(String[] args) {
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      JFrame parent = new JFrame();
-      parent.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      System.out.println(showDialog(parent, "files/sample.csv.txt", "CSV Options").getNumberOfDataLines());
-      System.exit(0);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
+	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			JFrame parent = new JFrame();
+			parent.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			System.out.println(showDialog(
+				parent,
+				"files/sample.csv.txt",
+				ResourceManager.getBundle("de.zbit.locales.Labels").getString(
+					"CSV_OPTIONS")).getNumberOfDataLines());
+			System.exit(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
   
 }

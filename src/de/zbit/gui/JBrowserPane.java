@@ -29,6 +29,8 @@ import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import de.zbit.util.ResourceManager;
+
 /**
  * A Browser like Editor pane.
  * 
@@ -144,9 +146,10 @@ public class JBrowserPane extends JEditorPane implements HyperlinkListener {
 				currentPosition = history.indexOf(url);
 			}
 		} catch (IOException exc) {
-			JOptionPane.showMessageDialog(this, "Can't follow link to "
+			JOptionPane.showMessageDialog(this, ResourceManager.getBundle(
+				"de.zbit.locales.Warnings").getString("CANNOT_FOLLOW_LINK")
 					+ url.toExternalForm(), exc.getClass().getName(),
-					JOptionPane.ERROR_MESSAGE);
+				JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

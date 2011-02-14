@@ -173,14 +173,14 @@ public class CSVImporter {
 			}
 
 			if ((c.getColumnChoosers().size() < 1)
-					|| (JOptionPane.showConfirmDialog(parent, panel,
-							"Column assignment", JOptionPane.OK_CANCEL_OPTION,
-							JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION)) {
+					|| (JOptionPane.showConfirmDialog(parent, panel, ResourceManager
+							.getBundle("de.zbit.locales.Labels").getString(
+								"COLUMN_ASSIGNMENT"), JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION)) {
 				List<String> newHead = new LinkedList<String>();
 				for (i = 0; i < sortedExpectedHead.length; i++) {
 					if (assignment[i] < 0) {
-						assignment[i] = c
-								.getSelectedValue(sortedExpectedHead[i]);
+						assignment[i] = c.getSelectedValue(sortedExpectedHead[i]);
 					}
 					if (assignment[i] >= 0) {
 						newHead.add(sortedExpectedHead[i]);

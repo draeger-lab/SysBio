@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.zbit.gui.GUITools;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 
@@ -36,7 +38,7 @@ public interface FileHistory extends KeyProvider {
 	@SuppressWarnings("unchecked")
 	public static Option<List<File>> LAST_OPENED = new Option<List<File>>(
 		"LAST_OPENED", (Class<List<File>>) emptyList.getClass(),
-		"This memorizes the last files that have been opened by the program.",
+		ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS).getString("LAST_OPENED"),
 		emptyList);
 	
 	/**

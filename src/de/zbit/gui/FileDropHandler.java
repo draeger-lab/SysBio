@@ -51,7 +51,7 @@ public class FileDropHandler extends TransferHandler {
   /**
    * Creates a new FileDropHandler, that fires the given listener on drop.
    * @param l - an ActionListener which will recive the following event(s):
-   * "new ActionEvent(file, FILE_DROPPED, "FILE_DROPPED")".
+   * <code>new ActionEvent(file, FILE_DROPPED, "FILE_DROPPED")</code>.
    */
   public FileDropHandler(ActionListener l) {
     listener = l;

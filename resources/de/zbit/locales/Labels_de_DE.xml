@@ -12,14 +12,47 @@
   <entry key="ABOUT_THE_PROGRAM">Über %s</entry>
   <entry key="DEFAULT_TOOL_BAR_TITLE">Werkzeuge</entry>
   <entry key="LICENSE_OF_THE_PROGRAM">%s - Nutzungsvereinbarung</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">Sie verwenden bereits die neueste Version %s des Programms %s. Es konnte keine neuere Version gefunden werden.</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">Keine Aktualisierungen verfügbar</entry>
   <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Hilfe-Webseite</entry>
   
   <!-- CSVImporter -->
   
   <entry key="COULD_NOT_IDENTIFY_COLUMNS">%d Datenspalten der gegebenen Eingabedatei konnten nicht automatisch den erwarteten Spalten zugewiesen werden. Bitte führen Sie diese Zuweisung nun manuell durch.</entry>
+  <entry key="COLUMN_ASSIGNMENT">Spaltenzuweisung</entry>
   
+  <!-- CSVReaderColumnChooser -->
+  
+  <entry key="REQUIRED_COLUMNS">Erforderliche Spalten </entry>
+  <entry key="OPTIONAL_COLUMNS">Optionale Spalten </entry>
+  <entry key="ASSIGN_THESE_COLUMNS">Weisen Sie bitte folgende Spalten zu:</entry>
+  
+  <!-- CSVReaderOptionPanel -->
+  
+  <entry key="COLUMN">Spalte </entry>
+  <entry key="CSV_OPTIONS">CSV-Optionen</entry>
+  <entry key="FILE_PREVIEW">Dateivorschau</entry>
+  <entry key="FILE_CONTAINS_HEADERS">Die Datei enthält einen Kopfeintrag.</entry>
+  <entry key="INDICATE_IF_COLUMN_DESCRIPTIONS_ARE_GIVEN">Die Datei enthält Spaltenbeschreibungen.</entry>
+  <entry key="SEPARATOR_CHAR">Trennzeichen </entry>
+  <entry key="SEPARATOR_CHAR_TOOLTIP">Das Trennzeichen, das dazu genutzt wird, Spalten zu separieren.</entry>
+  <entry key="TREAT_CONSECUTIVE_SEPARATORS_AS_ONE">Behandle aufeinanderfolgende Trennzeichen als eines.</entry>
+  <entry key="TREAT_CONSECUTIVE_SEPARATORS_AS_ONE_TOOLTIP">Geben Sie an, ob mehrere aufeinanderfolgende Trennzeichen als ein einziges behandelt werden sollen.</entry>
+  <entry key="SKIP_THIS_NUMBER_OF_LEADING_LINES">Überspringe soviele Zeilen am Dateianfang.</entry>
+  <entry key="SKIP_LINES">Überspringe Zeilen</entry>
+  
+  <!-- FileHistory -->
+  
+  <entry key="LAST_OPENED">Diese Liste speichert die zuletzt geöffneten Dateien.</entry>
+  
+  <!-- GUIOptions -->
+  
+  <entry key="CHECK_FOR_UPDATES">Entscheiden Sie, ob dieses beim Starten im Internet nach Aktualisierungen gesucht werden soll.</entry>
+  <entry key="GUI">Kann in Verbindung mit =true oder =false oder einfach --gui genutzt werden. Spezifiziert, ob eine graphische Nutzeroberflache angezeigt werden soll.</entry>
+  <entry key="LANGUAGE">Die Sprache für die Nutzeroberfläche, Fehlermeldungen etc.</entry>
+  <entry key="OPEN_DIR">Standardverzeichnis, in dem nach Dateien gesucht werden soll.</entry>
+  <entry key="SAVE_DIR">Standardverzeichnis, in dem Dateien abgespeichert werden sollen.</entry>
+  <entry key="DEFAULT_DIRECTORIES">Standardverzeichnisse</entry>
+  <entry key="DEFAULT_DIRECTORIES_TOOLTIP">Geben Sie die Standardverzeichnisse an, aus denen Dateien geladen oder in denen Dateien abgespeichert werden sollen. Diese Verzeichnisse werden zuerst geöffnet, wann immer in der graphischen Nutzeroberfläche nach Dateien gesucht werden soll.</entry>
+    
   <!-- GUITools -->
   
   <entry key="NO_READ_ACCESS_MESSAGE">Der Lesezugriff auf %s %s ist leider nicht möglich.</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
@@ -30,6 +63,18 @@
   <entry key="OVERRIDE_EXISTING_FILE_TITLE">Überschreiben bestätigen</entry>
   <entry key="THE_DIRECTORY">das Verzeichnis</entry>
   <entry key="THE_FILE">die Datei</entry>
+  
+  <!-- JColumnChooser -->
+  
+  <entry key="EG">Z.B. </entry>
+  <entry key="NOT_AVAILABLE">Nicht verfügbar</entry>
+  <entry key="INVALID_COLUMN">Ungültige Spalte</entry>
+  
+  <!-- JHelpBrowser -->
+  
+  <entry key="ONLINE_HELP">Online-Hilfe</entry>
+  <entry key="ONLINE_HELP_TOOLTIP">Dies ist die Hauptseite der Online-Hilfe.</entry>
+  <entry key="COMMAND_LINE_ARGUMENTS">Kommandozeilenargumente</entry>
   
   <!-- PreferencesDialog -->
   
@@ -43,5 +88,14 @@
   <!-- SBAcceptAllFileFilter -->
   
   <entry key="ACCEPT_ALL_FILES">Alle Dateien (*)</entry>
+  
+  <!-- UpdateMessage -->
+  
+  <entry key="SHOW_RELEASE_NOTES">zeige Versionsinfos</entry>
+  <entry key="HIDE_RELEASE_NOTES">verbirg Versionsinfos</entry>
+  <entry key="UPDATE_IS_AVAILABLE">Eine Aktualisierung für %s steht zur Verfügung.</entry>
+  <entry key="COMMAND_LINE_UPDATE_MESSAGE">\nAktualisierungsbenachrichtigung:\n--------------------\nEine neuere Version von %s ist verfügbar.\nBesuchen Sie bitte %s\num Version %s zu erhalten.\nZu Ihrer Information: Sie benutzen gerade %s Version %s.\n</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">Sie benutzen bereits die neueste Version %s von %s. Es konnte keine neuere Version gefunden werden.</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">Keine Aktualisierung verfügbar</entry> 
   
 </properties>

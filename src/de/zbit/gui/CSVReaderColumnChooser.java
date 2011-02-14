@@ -23,6 +23,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
 import de.zbit.io.CSVReader;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
@@ -111,7 +112,10 @@ public class CSVReaderColumnChooser extends JPanel {
         firstLine=r.getNextLine();
         r.close();
     }
-    if (firstLine==null) throw new IOException("Invalid or empty CSV file.");
+		if (firstLine == null) { 
+			throw new IOException(ResourceManager.getBundle(
+			  "de.zbit.locales.Warnings").getString("INVALID_CSV-FILE")); 
+		}
     
     // Init the panel
     // Don't set the preferred size. This breaks the layouts of implementing
@@ -322,7 +326,8 @@ public class CSVReaderColumnChooser extends JPanel {
         }
       }
     }
-    throw new NoSuchElementException("No column chooser named '" + title + "'.");
+		throw new NoSuchElementException(String.format(ResourceManager.getBundle(
+			"de.zbit.locales.Warnings").getString("NO_SUCH_COLUMN_CHOOSER"), title));
   }
   
   /**
@@ -408,8 +413,8 @@ public class CSVReaderColumnChooser extends JPanel {
    */
   public void setSplitRequiredAndOptional(boolean b) {
     if (b) {
-      setBorder(requiredPanel, "Required columns ");
-      setBorder(optionalPanel, "Optional columns ");
+      setBorder(requiredPanel, ResourceManager.getBundle("de.zbit.locales.Labels").getString("REQUIRED_COLUMNS"));
+      setBorder(optionalPanel, ResourceManager.getBundle("de.zbit.locales.Labels").getString("OPTIONAL_COLUMNS"));
     } else {
       requiredPanel.setBorder(null);
       optionalPanel.setBorder(null);
@@ -570,14 +575,14 @@ public class CSVReaderColumnChooser extends JPanel {
 	public static int showAsDialog(CSVReaderColumnChooser c) {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(new JLabel(StringUtil.toHTML(String
-				.format("Please assign the following columns:"), 60)),
+				.format(ResourceManager.getBundle("de.zbit.locales.Labels").getString("ASSIGN_THESE_COLUMNS")), 60)),
 				BorderLayout.NORTH);
 		panel.add(c, BorderLayout.CENTER);
 
 		if (c.getColumnChoosers().size() > 0) {
-			return JOptionPane.showConfirmDialog(null, panel,
-					"Column assignment", JOptionPane.OK_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE);
+			return JOptionPane.showConfirmDialog(null, panel, ResourceManager
+					.getBundle("de.zbit.locales.Labels").getString("COLUMN_ASSIGNMENT"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		} else {
 			return JOptionPane.OK_OPTION;
 		}

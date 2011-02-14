@@ -15,6 +15,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ResourceBundle;
 import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
@@ -30,6 +31,7 @@ import javax.swing.WindowConstants;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.io.CSVReader;
+import de.zbit.util.ResourceManager;
 
 /**
  * Column Chooser with a label, a columnChooser and a preview.
@@ -82,8 +84,9 @@ public class JColumnChooser extends JPanel {
    */
   private boolean sortHeaders=false;
   
-  private static String noOptionChoosen="Not available";
-  private static String exampleError="Invalid column";
+  private static ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+  private static String noOptionChoosen=bundle.getString("NOT_AVAILABLE");
+  private static String exampleError=bundle.getString("INVALID_COLUMN");
   private static String noSelection="n/a";
   
   /**
@@ -424,13 +427,16 @@ public class JColumnChooser extends JPanel {
     int maxSize = newHeader!=null?newHeader.length:previews!=null?previews.length:numberOfColumns;
     maxSize = Math.max(numberOfColumns, maxSize);
     newHeader = new String[maxSize];
-    if (header!=null) System.arraycopy(header, 0, newHeader, 0, header.length);      
-    for (int i=0; i<newHeader.length; i++) {
-      // Completely empty array
-      if (header==null) newHeader[i] = "Column " + (i+1);
-      // Just fill missing gaps
-      else if (newHeader[i]==null || newHeader[i].trim().length()<1) newHeader[i]= "(Column " + (i+1)+")";
-    }
+    if (header!=null) System.arraycopy(header, 0, newHeader, 0, header.length);
+		String column = bundle.getString("COLUMN");
+		for (int i = 0; i < newHeader.length; i++) {
+			// Completely empty array
+			if (header == null)
+				newHeader[i] = column + (i + 1);
+			// Just fill missing gaps
+			else if (newHeader[i] == null || newHeader[i].trim().length() < 1)
+				newHeader[i] = "(" + column + (i + 1) + ")";
+		}
     
     // Remember required headers and build model
     headers = newHeader;
@@ -758,7 +764,8 @@ public class JColumnChooser extends JPanel {
     if (previews==null || previews.length<1) {
       preview.setText("");
     } else if (defaultValue>=0 && defaultValue<previews.length) {
-      preview.setText("E.g., \""+previews[defaultValue]+"\"");
+			preview.setText(bundle.getString("EG")
+					+ "\"" + previews[defaultValue] + "\"");
     } else if (defaultValue<0) {
       preview.setText(noSelection);
     } else {

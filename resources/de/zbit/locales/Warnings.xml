@@ -6,6 +6,21 @@
 	and error messages in a (graphical) user interface.
   </comment>
   
+  <!-- CSVReaderColumnCooser -->
+  
+  <entry key="INVALID_CSV-FILE">Invalid or empty CSV file.</entry>
+  <entry key="NO_SUCH_COLUMN_CHOOSER">No column chooser named "%d".</entry>
+  
+  <!-- ImageTools -->
+  
+  <entry key="COULD_NOT_LOAD_IMAGE">"Could not load image %s.\n"</entry>
+  <entry key="COULD_NOT_LOAD_ICONS_FROM_DIR">Could not load icons from directory %s.</entry>
+  <entry key="WRONG_PERCENTAGE_IN_IMAGE">Wrong percentage in %s: %f.</entry>
+  
+  <!-- JBrowserPane -->
+  
+  <entry key="CANNOT_FOLLOW_LINK">Can't follow link to </entry>
+  
   <!-- SBPreferences -->
   
   <entry key="BACKING_STORE_EXCEPTION_MESSAGE">Could not persistently store the user configuration for %s.</entry> <!-- Requires a KeyProvider name as argument. -->
