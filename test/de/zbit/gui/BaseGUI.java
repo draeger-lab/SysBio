@@ -96,7 +96,7 @@ public class BaseGUI extends BaseFrame {
 	 */
 	public URL getURLAboutMessage() {
 		// TODO Auto-generated method stub
-		return null;
+			return getClass().getResource("package.html");
 	}
 	
 	/*

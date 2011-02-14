@@ -1271,8 +1271,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @see java.util.Map#putAll(java.util.Map)
 	 */
 	public void putAll(Map<? extends Object, ? extends Object> m) {
-		for (Object key : m.keySet()) {
-			put(key, m.get(key));
+		for (Map.Entry<? extends Object, ? extends Object> entry : m.entrySet()) {
+			put(entry.getKey(), entry.getValue());
 		}
 	}
 	
