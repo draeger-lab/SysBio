@@ -1,0 +1,17 @@
+
+   Protokoll
+   =========
+
+1. Für neue Mitarbeiter wurden kurz einige wichtige Elemente
+   wie Logging und grundlegende GUI-Elemente durchgesprochen.
+
+2. Log4j wurde endgültig aus SysBio entfernt.
+
+3. Florian Mittag kümmert sich um das von Klaus einzurichtende
+   Admin-Konto.
+   
+4. Andreas Dräger will einen Dateikopf und Haftungsausschluss
+   rumschicken und in alle Dateien einfügen.
+   
+5. Erstes Release soll bis Ende der Woche (18. Februar 2011) 
+   erfolgen.
