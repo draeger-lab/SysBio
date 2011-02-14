@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import de.zbit.io.CSVReader;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
@@ -82,13 +83,6 @@ public class CSVImporter {
 	 * entries in the table head given by the CSV file.
 	 */
 	private String sortedExpectedHead[];
-
-	/**
-	 * The message to be displayed to the user in case that not all columns from
-	 * the parsed input file can be automatically assigned to expected column
-	 * head entries.
-	 */
-	private static final String MESSAGE_STRING = "%d data columns from the given input file could not be automatically assigned to expected columns. Please manually assign these collumns here.";
 
 	/**
 	 * Memorizes the {@link CSVReader} object to grant access to this later on.
@@ -158,8 +152,10 @@ public class CSVImporter {
 		 */
 		if (numProblems > 0) {
 			JPanel panel = new JPanel(new BorderLayout());
-			panel.add(new JLabel(StringUtil.toHTML(String.format(
-					MESSAGE_STRING, numProblems), 60)), BorderLayout.NORTH);
+			panel.add(new JLabel(StringUtil.toHTML(String.format(ResourceManager
+					.getBundle("de.zbit.locales.Labels").getString(
+						"COULD_NOT_IDENTIFY_COLUMNS"), numProblems), 60)),
+				BorderLayout.NORTH);
 			if ((c.getPreferredSize().getWidth() > 450)
 					|| (c.getPreferredSize().getHeight() > 450)) {
 				JScrollPane scroll = new JScrollPane(c,

@@ -7,18 +7,18 @@
 	separate actual labels from associated tool tips.
   </comment>
   
-  <!-- SBAcceptAllFileFilter -->
+  <!-- BaseFrame -->
   
-  <entry key="ACCEPT_ALL_FILES">All files (*)</entry>
+  <entry key="ABOUT_THE_PROGRAM">About %s</entry>
+  <entry key="DEFAULT_TOOL_BAR_TITLE">Tools</entry>
+  <entry key="LICENSE_OF_THE_PROGRAM">%s - License</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">You are already using the latest version %s of %s. No newer version could be found.</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">No update available</entry>
+  <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Online Help</entry>
   
-  <!-- PreferencesDialog -->
+  <!-- CSVImporter -->
   
-  <entry key="APPLY">Apply;Persistently saves the current configuration but keeps the dialog open.</entry>
-  <entry key="BROWSE">Browse</entry>
-  <entry key="CANCEL">Cancel;Closes this dialog without saving, i.e., all preferences will get lost.</entry>
-  <entry key="DEFAULTS">Defaults;Restores the default configuration, i.e., all current preferences will be replaced by the default values.</entry>
-  <entry key="OK">OK;Saves the current configuration and closes this dialog.</entry>
-  <entry key="PREFERENCES">Preferences</entry>
+  <entry key="COULD_NOT_IDENTIFY_COLUMNS">%d data columns from the given input file could not be automatically assigned to expected columns. Please manually assign these columns here.</entry>
   
   <!-- GUITools -->
   
@@ -31,13 +31,17 @@
   <entry key="THE_DIRECTORY">the directory</entry>
   <entry key="THE_FILE">the file</entry>
   
-  <!-- BaseFrame -->
+  <!-- PreferencesDialog -->
   
-  <entry key="ABOUT_THE_PROGRAM">About %s</entry>
-  <entry key="DEFAULT_TOOL_BAR_TITLE">Tools</entry>
-  <entry key="LICENSE_OF_THE_PROGRAM">%s - License</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">You are already using the latest version %s of %s. No newer version could be found.</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">No update available</entry>
-  <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Online Help</entry>
+  <entry key="APPLY">Apply;Persistently saves the current configuration but keeps the dialog open.</entry>
+  <entry key="BROWSE">Browse</entry>
+  <entry key="CANCEL">Cancel;Closes this dialog without saving, i.e., all preferences will get lost.</entry>
+  <entry key="DEFAULTS">Defaults;Restores the default configuration, i.e., all current preferences will be replaced by the default values.</entry>
+  <entry key="OK">OK;Saves the current configuration and closes this dialog.</entry>
+  <entry key="PREFERENCES">Preferences</entry>
+  
+  <!-- SBAcceptAllFileFilter -->
+  
+  <entry key="ACCEPT_ALL_FILES">All files (*)</entry>
   
 </properties>

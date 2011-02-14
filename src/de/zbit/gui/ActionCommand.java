@@ -1,7 +1,7 @@
 package de.zbit.gui;
 
 /**
- * @author draeger
+ * @author Andreas Dr&auml;ger
  * @date 2010-10-28
  */
 public interface ActionCommand {

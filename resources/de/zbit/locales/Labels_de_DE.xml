@@ -7,18 +7,18 @@
 	separate actual labels from associated tool tips.
   </comment>
   
-  <!-- SBAcceptAllFileFilter -->
+  <!-- BaseFrame -->
   
-  <entry key="ACCEPT_ALL_FILES">Alle Dateien (*)</entry>
-    
-  <!-- PreferencesDialog -->
+  <entry key="ABOUT_THE_PROGRAM">Über %s</entry>
+  <entry key="DEFAULT_TOOL_BAR_TITLE">Werkzeuge</entry>
+  <entry key="LICENSE_OF_THE_PROGRAM">%s - Nutzungsvereinbarung</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">Sie verwenden bereits die neueste Version %s des Programms %s. Es konnte keine neuere Version gefunden werden.</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">Keine Aktualisierungen verfügbar</entry>
+  <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Hilfe-Webseite</entry>
   
-  <entry key="APPLY">Übernehmen;Speichert die aktuelle Konfiguration persistent ab, schließt aber nicht diesen Dialog.</entry>
-  <entry key="BROWSE">Durchsuchen</entry>
-  <entry key="CANCEL">Abbrechen;Schließt diesen Dialog ohne Änderungen zu speichern, d.h., alle Einstellungen werden verworfen.</entry>
-  <entry key="DEFAULTS">Zurücksetzen;Stellt die Standardkonfiguration wieder her, d.h., alle aktuellen Einstellungen werden durch die Standardwerte ersetzt.</entry>
-  <entry key="OK">OK;Speichert die aktuelle Konfiguration und schließt diesen Dialog.</entry>
-  <entry key="PREFERENCES">Einstellungen</entry>
+  <!-- CSVImporter -->
+  
+  <entry key="COULD_NOT_IDENTIFY_COLUMNS">%d Datenspalten der gegebenen Eingabedatei konnten nicht automatisch den erwarteten Spalten zugewiesen werden. Bitte führen Sie diese Zuweisung nun manuell durch.</entry>
   
   <!-- GUITools -->
   
@@ -31,13 +31,17 @@
   <entry key="THE_DIRECTORY">das Verzeichnis</entry>
   <entry key="THE_FILE">die Datei</entry>
   
-  <!-- BaseFrame -->
+  <!-- PreferencesDialog -->
   
-  <entry key="ABOUT_THE_PROGRAM">Über %s</entry>
-  <entry key="DEFAULT_TOOL_BAR_TITLE">Werkzeuge</entry>
-  <entry key="LICENSE_OF_THE_PROGRAM">%s - Nutzungsvereinbarung</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">Sie verwenden bereits die neueste Version %s des Programms %s. Es konnte keine neuere Version gefunden werden.</entry>
-  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">Keine Aktualisierungen verfügbar</entry>
-  <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Hilfe-Webseite</entry>
+  <entry key="APPLY">Übernehmen;Speichert die aktuelle Konfiguration persistent ab, schließt aber nicht diesen Dialog.</entry>
+  <entry key="BROWSE">Durchsuchen</entry>
+  <entry key="CANCEL">Abbrechen;Schließt diesen Dialog ohne Änderungen zu speichern, d.h., alle Einstellungen werden verworfen.</entry>
+  <entry key="DEFAULTS">Zurücksetzen;Stellt die Standardkonfiguration wieder her, d.h., alle aktuellen Einstellungen werden durch die Standardwerte ersetzt.</entry>
+  <entry key="OK">OK;Speichert die aktuelle Konfiguration und schließt diesen Dialog.</entry>
+  <entry key="PREFERENCES">Einstellungen</entry>
+  
+  <!-- SBAcceptAllFileFilter -->
+  
+  <entry key="ACCEPT_ALL_FILES">Alle Dateien (*)</entry>
   
 </properties>
