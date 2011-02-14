@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ResourceBundle;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.Icon;
@@ -52,6 +53,7 @@ import javax.swing.event.HyperlinkListener;
 
 import de.zbit.gui.prefs.CommandLineHelp;
 import de.zbit.io.SBFileFilter;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
 
@@ -86,21 +88,22 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		String title, URL fileLocation, Class<? extends KeyProvider>... clazz) {
 		JHelpBrowser helpBrowser = new JHelpBrowser(owner, title, fileLocation);
 		if ((clazz != null) && (clazz.length > 0)) {
+			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 			JComponent component = CommandLineHelp.createHelpComponent(clazz);
 			helpBrowser.getLayout().removeLayoutComponent(helpBrowser.mainPart);
 			if (component instanceof JTabbedPane) {
-				((JTabbedPane) component).insertTab("Online Help", UIManager
+				((JTabbedPane) component).insertTab(bundle.getString("ONLINE_HELP"), UIManager
 						.getIcon("ICON_HELP_16"), helpBrowser.mainPart,
-					"This is the main online help.", 0);
+					bundle.getString("ONLINE_HELP_TOOLTIP"), 0);
 				((JTabbedPane) component).setSelectedIndex(0);
 				helpBrowser.getContentPane().add(component, BorderLayout.CENTER);
 				helpBrowser.mainPart = component;
 			} else {
 				//helpBrowser.
 				JTabbedPane tabs = new JTabbedPane();
-				tabs.insertTab("Online Help", UIManager.getIcon("ICON_HELP_16"),
-					helpBrowser.mainPart, "This is the main online help.", 0);
-				tabs.addTab("Command line arguments", component);
+				tabs.insertTab(bundle.getString("ONLINE_HELP"), UIManager.getIcon("ICON_HELP_16"),
+					helpBrowser.mainPart, bundle.getString("ONLINE_HELP_TOOLTIP"), 0);
+				tabs.addTab(bundle.getString("COMMAND_LINE_ARGUMENTS"), component);
 				tabs.setSelectedIndex(0);
 				helpBrowser.mainPart = tabs;
 				helpBrowser.getContentPane().add(tabs, BorderLayout.CENTER);
@@ -240,10 +243,13 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.mainPart = scroll;
 		content.add(scroll, BorderLayout.CENTER);
+		
+		ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+		
 		JToolBar toolbar = new JToolBar();
 		// image = image.getScaledInstance(22, 22, Image.SCALE_SMOOTH);
 		backButton = new JButton(UIManager.getIcon("ICON_ARROW_LEFT_16"));
-		backButton.setToolTipText("Last Page");
+		backButton.setToolTipText(bundle.getString("LAST_PAGE"));
 		backButton.setName("back");
 		backButton.addActionListener(this);
 		backButton.setEnabled(false);
@@ -253,9 +259,9 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		if (icon != null) {
 			nextButton = new JButton(icon);
 		} else {
-			nextButton = new JButton("Next");
+			nextButton = new JButton(bundle.getString("NEXT"));
 		}
-		nextButton.setToolTipText("Next Page");
+		nextButton.setToolTipText(bundle.getString("NEXT_PAGE"));
 		nextButton.setName("next");
 		nextButton.addActionListener(this);
 		nextButton.setEnabled(false);
@@ -265,9 +271,9 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		if (icon != null) {
 			saveButton = new JButton(icon);
 		} else {
-			saveButton = new JButton("Save");
+			saveButton = new JButton(bundle.getString("SAVE"));
 		}
-		saveButton.setToolTipText("Save the current page as HTML file.");
+		saveButton.setToolTipText(bundle.getString("SAVE_TOOLTIP"));
 		saveButton.setName("save");
 		saveButton.addActionListener(this);
 		saveButton.setEnabled(true);

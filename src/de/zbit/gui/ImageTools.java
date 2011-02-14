@@ -18,12 +18,14 @@ import java.awt.image.RescaleOp;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
 import de.zbit.io.SBFileFilter;
+import de.zbit.util.ResourceManager;
 
 /**
  * This class contains tools for java.awt.image, java.awt.image.BufferedImage,
@@ -34,6 +36,9 @@ import de.zbit.io.SBFileFilter;
  */
 public class ImageTools {
 
+	private static ResourceBundle bundle = ResourceManager
+			.getBundle("de.zbit.locales.Warnings");
+	
 	/**
 	 * Loads all image files that can be found in the directory referenced by
 	 * the given {@link URL} into the dedicated hash table in {@link UIManager}.
@@ -67,16 +72,19 @@ public class ImageTools {
 									new ImageIcon(ImageIO.read(file)));
 						}
 					} catch (Exception exc) {
-						System.err.printf("Could not load image %s.\n", file);
+						// TODO: Logging
+						System.err.printf(bundle.getString("COULD_NOT_LOAD_IMAGE"), file);
 					}
 				}
 			}
 		} catch (IllegalArgumentException e) {
-      System.err.println(String.format(
-        "Could not load icons from directory %s.", directory));
+			// TODO: Logging
+			System.err.println(String.format(bundle
+					.getString("COULD_NOT_LOAD_ICONS_FROM_DIR"), directory));
 		} catch (URISyntaxException e) {
-			System.err.println(String.format(
-					"Could not load icons from directory %s.", directory));
+			// TODO: Logging
+			System.err.println(String.format(bundle
+					.getString("COULD_NOT_LOAD_ICONS_FROM_DIR"), directory));
 		}
 	}
 
@@ -242,8 +250,9 @@ public class ImageTools {
    * @return brightened image
    */
 	public static BufferedImage brightenImage(BufferedImage image, float percent) {
-    if (percent<0 || percent>1) {
-      System.err.println("Wrong percentage in brightenImage: " + percent);
+		if ((percent < 0) || (percent > 1)) {
+    	// TODO: Logging
+      System.err.printf(bundle.getString("WRONG_PERCENTAGE_IN_IMAGE"), "brightenImage", percent);
       return image;
     }
   	// Brighten the image by given percentage
@@ -261,10 +270,12 @@ public class ImageTools {
 	 * @return darkened image
 	 */
   public static BufferedImage darkenImage(BufferedImage image, float percent) {
-    if (percent<0 || percent>1) {
-      System.err.println("Wrong percentage in darkenImage: " + percent);
-      return image;
-    }
+		if ((percent < 0) || (percent > 1)) {
+			// TODO: Logging
+			System.err.printf(bundle.getString("WRONG_PERCENTAGE_IN_IMAGE"),
+				"darkenImage", percent);
+			return image;
+		}
     
     // Darken the image by given percentage
     float scaleFactor = 1.0f - percent;

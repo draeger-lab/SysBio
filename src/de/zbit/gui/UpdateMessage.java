@@ -40,7 +40,6 @@ import de.zbit.util.ResourceManager;
  * @author Andreas Dr&auml;ger
  * @since This was part of SBMLsqueezer 1.2 and 1.3.
  */
-
 public class UpdateMessage extends SwingWorker<Boolean, Void> {
 	
 	/**
@@ -94,9 +93,11 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 			JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			buttonPanel.setBackground(getBackground());
 			
-			okButton = new JButton("OK");
+			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+			okButton = new JButton(GUITools.getOkButtonText());
 			okButton.addActionListener(this);
-			showHideButton = new JButton("show release notes");
+			showHideButton = new JButton(bundle.getString("SHOW_RELEASE_NOTES"));
+			showHideButton.setName("showReleaseNotes");
 			showHideButton.setIcon(UIManager.getIcon("ICON_ARROW_RIGHT"));
 			showHideButton.setIconTextGap(5);
 			showHideButton.setBorderPainted(false);
@@ -124,7 +125,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 			JPanel mainPanel = new JPanel(new BorderLayout());
 			mainPanel.setBackground(getBackground());
 			mainPanel.setBorder(BorderFactory.createTitledBorder(new LineBorder(
-				Color.BLACK), String.format("An update for %s is available.",
+				Color.BLACK), String.format(bundle.getString("UPDATE_IS_AVAILABLE"),
 				applicationName), TitledBorder.CENTER, TitledBorder.BELOW_TOP));
 			mainPanel.add(contentPanel, BorderLayout.CENTER);
 			mainPanel.add(buttonPanel, BorderLayout.PAGE_END);
@@ -142,13 +143,15 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 		 */
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() instanceof JButton) {
-				String buttonText = ((JButton) e.getSource()).getText();
-				if (buttonText.equals("show release notes")) {
+				ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+				String buttonText = ((JButton) e.getSource()).getName();
+				if (buttonText.equals("showReleaseNotes")) {
 					contentPanel.setVisible(true);
-					showHideButton.setText("hide release notes");
-				} else if (buttonText.equals("hide release notes")) {
+					showHideButton.setName("hideReleaseNotes");
+					showHideButton.setText(bundle.getString("HIDE_RELEASE_NOTES"));
+				} else if (buttonText.equals("hideReleaseNotes")) {
 					contentPanel.setVisible(false);
-					showHideButton.setText("show release notes");
+					showHideButton.setText(bundle.getString("SHOW_RELEASE_NOTES"));
 				} else {
 					dispose();
 				}
@@ -309,11 +312,10 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 			}
 			umw.setVisible(true);
 		} else {
-			System.out
-					.printf(
-						"\nUpdate notification:\n--------------------\nA new version of %s is available.\nPlease visit %s\nto obtain version %s.\nFor your information: you are now using %s version %s.\n",
-						applicationName, urlPrefix, latestVersion, applicationName,
-						dottedVersionNumber);
+			System.out.printf(ResourceManager.getBundle(
+				GUITools.RESOURCE_LOCATION_FOR_LABELS).getString(
+				"COMMAND_LINE_UPDATE_MESSAGE"), applicationName, urlPrefix,
+				latestVersion, applicationName, dottedVersionNumber);
 		}
 	}
 	
