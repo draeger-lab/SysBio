@@ -632,7 +632,7 @@ public class SBPreferences implements Map<Object, Object> {
 				value = ((StringHolder) options.get(key)).value;
 			} else {
 				value = ((StringHolder) options.get(key)).value;
-				if (value != null) value = value.toString();
+				if (value != null) { value = value.toString(); }
 			}
 			// This is necessary, because at this point it can't be deduced if the
 			// given options were explicitly set or just the default value.

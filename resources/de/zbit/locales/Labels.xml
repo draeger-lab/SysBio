@@ -43,6 +43,17 @@
   
   <entry key="LAST_OPENED">This memorizes the last files that have been opened by the program.</entry>
   
+  <!-- FileSelector -->
+  
+  <entry key="FILE">file</entry>
+  <entry key="DIRECTORY">directory</entry>
+  <entry key="OPEN">open</entry>
+  <entry key="SAVE">save</entry>
+  <entry key="SELECT_TARGET_FILE">Select the file to be %s.</entry>
+  <entry key="TO_BE_OPENED">opened</entry>
+  <entry key="TO_BE_SAVED">saved</entry>
+  <entry key="SELECT_TARGET_DIRECTORY">Select the default directory to %s various kinds of files.</entry>
+  
   <!-- GUIOptions -->
   
   <entry key="CHECK_FOR_UPDATES">Decide whether or not this program should search for updates at start-up.</entry>
@@ -80,6 +91,23 @@
   <entry key="NEXT_PAGE">Next Page</entry>
   <entry key="SAVE">Save</entry>
   <entry key="SAVE_TOOLTIP">Save the current page as HTML file.</entry>
+  
+  <!-- KeyProvider -->
+  
+  <entry key="ADDITIONAL_OPTIONS">Additional options</entry>
+  <entry key="ALL_POSSIBLE_VALUES_FOR_TYPE">All possible values for type</entry>
+  <entry key="ARE">are</entry>
+  <entry key="AND">and</entry>
+  <entry key="ARGS_MUST_FIT_INTO_RANGE">Arguments must fit into the range %s.</entry>
+  <entry key="DEFAULT_VALUE">Default value</entry>
+  
+  <!-- MultiplePreferencesPanel -->
+  
+  <entry key="USER_PREFERENCES">User preferences</entry>
+  
+  <!-- Option -->
+  
+  <entry key="ACCEPTS">Accepts</entry>
     
   <!-- PreferencesDialog -->
   
@@ -89,6 +117,25 @@
   <entry key="DEFAULTS">Defaults;Restores the default configuration, i.e., all current preferences will be replaced by the default values.</entry>
   <entry key="OK">OK;Saves the current configuration and closes this dialog.</entry>
   <entry key="PREFERENCES">Preferences</entry>
+  
+  <!-- SBFileFilter -->
+  
+  <entry key="IMAGE_FILES">Image files</entry>
+  <entry key="TEXT_FILES">Text files</entry>
+  <entry key="TeX_FILES">TeX files</entry>
+  <entry key="SBML_FILES">SBML files</entry>
+  <entry key="CSV_FILES">Comma separated files</entry>
+  <entry key="JPEG_FILES">Joint Photographic Experts Group files</entry>
+  <entry key="PNG_FILES">Portable Network Graphics files</entry>
+  <entry key="PDF_FILES">Portable Document Format files</entry>
+  <entry key="HTML_FILES">Hypertext markup language files</entry>
+  <entry key="GRAPHML_FILES">GraphML files</entry>
+  <entry key="GML_FILES">Graph Modeling Language files</entry>
+  <entry key="GIF_FILES">Graphics Interchange Format files</entry>
+  <entry key="YGF_FILES">Y Graph Format files</entry>
+  <entry key="TGF_FILES">Trivial graph format files</entry>
+  <entry key="DIRECTORIES_ONLY">Directories only</entry>
+  
   
   <!-- SBAcceptAllFileFilter -->
   

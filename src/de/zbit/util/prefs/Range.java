@@ -8,6 +8,7 @@ import java.util.List;
 import de.zbit.io.CSVReader;
 import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Reflect;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
 
@@ -121,7 +122,9 @@ public class Range<Type> {
 					return false;
 				}
 			} else {
-				System.err.println("Cannot compare class " + value.getClass().getName() + ". Please implement the Comparable interface.");
+				// TODO: Logging
+				System.err.printf(ResourceManager.getBundle("de.zbit.locales.Warnings")
+						.getString("CLASS_NOT_COMPARABLE"), value.getClass().getName());
 				return false;
 			}
 		}
@@ -309,10 +312,12 @@ public class Range<Type> {
 	 */
 	public Range(Class<Type> requiredType, GeneralFileFilter filter) {
 		this(requiredType);
-		if (!requiredType.isAssignableFrom(File.class)) { throw new IllegalArgumentException(
-			String.format(
-						"When initialized with a %s, the required type must be an instance of %s.",
-						GeneralFileFilter.class.getName(), File.class.getName())); }
+		if (!requiredType.isAssignableFrom(File.class)) { 
+      throw new IllegalArgumentException(
+			  String.format(ResourceManager.getBundle("de.zbit.locales.Warnings")
+				  	.getString("REQUIRED_TYPE_FOR_X_MUST_BE"), GeneralFileFilter.class
+					  .getName(), File.class.getName()));
+		}
 		constraints = filter;
 	}
 	
@@ -482,7 +487,9 @@ public class Range<Type> {
 			// Erase it, so that other methods can see that it is invalid.
 			if (range.equals(this.rangeString)) this.rangeString=null;
 			
-			throw new ParseException("Range in wrong format: '" + (range==null?"null":range) + "'.", positionTracker);
+			throw new ParseException(String.format(ResourceManager.getBundle(
+				"de.zbit.locales.Warnings").getString("RANGE_IN_WRONG_FORMAT"),
+				(range == null ? "null" : range)), positionTracker);
 			//e.printStackTrace();
 		}
 
@@ -530,8 +537,8 @@ public class Range<Type> {
   
 	/**
 	 * Returns a range specification for boolean values. This can be used to
-	 * specifiy that a boolean option expects an argument that is either "true" or
-	 * "false".
+	 * specifiy that a boolean option expects an argument that is either <code>true</code> or
+	 * <code>false</code>.
 	 * 
 	 * @return a range specification for boolean values
 	 */

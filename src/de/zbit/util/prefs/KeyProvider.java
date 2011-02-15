@@ -9,8 +9,11 @@ import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import de.zbit.gui.GUITools;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
@@ -123,7 +126,11 @@ public interface KeyProvider {
 			if (optionList.size() > 0) {
 				sb.append("    <h");
 				sb.append(headerRank);
-				sb.append("> Additional options </h");
+				sb.append("> ");
+				sb.append(ResourceManager.getBundle(
+					GUITools.RESOURCE_LOCATION_FOR_LABELS)
+						.getString("ADDITIONAL_OPTIONS"));
+				sb.append(" </h");
 				sb.append(headerRank);
 				sb.append(">\n");
 				writeOptionsToHTMLTable(sb, optionList, null);
@@ -136,10 +143,7 @@ public interface KeyProvider {
 		 * @return
 		 */
 		private static StringBuilder createDocumantationFooter() {
-			StringBuilder sb = new StringBuilder();
-			sb.append("  </body>\n");
-			sb.append("</html>\n");
-			return sb;
+			return new StringBuilder("  </body>\n</html>\n");
 		}
 		
 		/**
@@ -174,18 +178,21 @@ public interface KeyProvider {
 		public static String createDocumentation(String applicationName,
 			Class<? extends KeyProvider>... keyProviders) {
 			StringBuilder sb = new StringBuilder();
+			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+			String cmdArgs = bundle.getString("COMMAND_LINE_ARGUMENTS");
 			if (applicationName != null) {
 				sb.append(createDocumentationHeader(applicationName));
-				sb.append(" command line arguments");
+				sb.append(' ');
+				sb.append(StringUtil.firstLetterLowerCase(cmdArgs));
 			} else {
-				sb.append(createDocumentationHeader("Command line arguments"));
+				sb.append(createDocumentationHeader(cmdArgs));
 			}
-			sb.append("\n");
+			sb.append('\n');
 			for (Class<? extends KeyProvider> keyProvider : keyProviders) {
 				sb.append(String.format("    <h2> %s </h2>\n\n",
 					createTitle(keyProvider)));
 				sb.append(createDocumantationContent(keyProvider, 3));
-				sb.append("\n");
+				sb.append('\n');
 			}
 			sb.append(createDocumantationFooter());
 			return sb.toString();
@@ -228,12 +235,14 @@ public interface KeyProvider {
 		 */
 		private static StringBuilder createDocumentationHeader(String title) {
 			StringBuilder sb = new StringBuilder();
-			sb
-					.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
-			sb
-					.append(" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
-			sb
-					.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n");
+			String lang = Locale.getDefault().getLanguage();
+			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
+			sb.append(" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
+			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"");
+			sb.append(lang);
+			sb.append("\" lang=\"");
+			sb.append(lang);
+			sb.append("\">\n");
 			sb.append("  <head>\n");
 			sb.append("    <style type=\"text/css\">\n      <!--\n");
 			sb.append("        .typewriter {\n");
@@ -498,8 +507,7 @@ public interface KeyProvider {
 		@SuppressWarnings("unchecked")
 		private static void writeOptionsToHTMLTable(StringBuilder sb,
 			List<?> options, List<Option> removeFromHere) {
-			sb
-					.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
+			sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
 			for (Object o : options) {
 				if (!(o instanceof Object)) {
 					continue;
@@ -524,15 +532,19 @@ public interface KeyProvider {
 				sb.append(StringUtil.insertLineBreaks(option.getToolTip(),
 					GUITools.TOOLTIP_LINE_LENGTH, "\n          "));
 				Range range = option.getRange();
+				ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 				if (range != null) {
 					List<?> list = range.getAllAcceptableValues();
 					String value;
 					int lineLength = 0;
 					if ((list != null) && (list.size() > 0)) {
-						sb.append("<br>\n          All possible values for type ");
-						sb.append("<span class=typewriter>");
+						sb.append("<br>\n          ");
+						sb.append(bundle.getString("ALL_POSSIBLE_VALUES_FOR_TYPE"));
+						sb.append(" <span class=typewriter>");
 						sb.append(requiredType);
-						sb.append("</span> are:\n          ");
+						sb.append("</span> ");
+						sb.append(bundle.getString("ARE"));
+						sb.append(":\n          ");
 						for (int i = 0; i < list.size(); i++) {
 							if ((i > 0) && (list.size() > 2)) {
 								sb.append(',');
@@ -544,7 +556,9 @@ public interface KeyProvider {
 								}
 							}
 							if (i == list.size() - 1) {
-								sb.append(" and ");
+								sb.append(' ');
+								sb.append(bundle.getString("AND"));
+								sb.append(' ');
 							}
 							value = list.get(i).toString();
 							sb.append("<span class=typewriter>");
@@ -555,14 +569,17 @@ public interface KeyProvider {
 						sb.append('.');
 					} else if ((range.getRangeSpecString() != null)
 							&& !range.isSetConstraints()) {
-						sb.append("<br>\n          Arguments must fit into the range ");
-						sb.append(range.getRangeSpecString());
-						sb.append('.');
+						sb.append("<br>\n          ");
+						sb.append(String.format(bundle
+								.getString("ARGS_MUST_FIT_INTO_RANGE"), range
+								.getRangeSpecString()));
 					}
 				}
 				Object defaultValue = option.getDefaultValue();
 				if (defaultValue != null) {
-					sb.append("<br>\n          Default value: <span class=typewriter> ");
+					sb.append("<br>\n          ");
+					sb.append(bundle.getString("DEFAULT_VALUE"));
+					sb.append(": <span class=typewriter> ");
 					sb.append(defaultValue);
 					sb.append(" </span>");
 				}

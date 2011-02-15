@@ -1,9 +1,11 @@
 package de.zbit.io;
 
 import java.io.File;
+import java.util.ResourceBundle;
 
 import javax.swing.filechooser.FileFilter;
 
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
@@ -113,7 +115,9 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * @return
 	 */
 	public static boolean checkExtension(File f, String extension) {
-		if (!extension.startsWith(".")) extension = "." + extension;
+		if (!extension.startsWith(".")) {
+			extension = "." + extension;
+		}
 		return f.getName().toLowerCase().endsWith(extension.toLowerCase());
 	}
 	
@@ -202,9 +206,10 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * Filter for any kind of image file supported by this class.
 	 */
 	public static final MultipleFileFilter createImageFileFilter() {
-		return new MultipleFileFilter("image files (*.jpg, *.png, *.gif)",
-			SBFileFilter.createJPEGFileFilter(), SBFileFilter.createPNGFileFilter(),
-			SBFileFilter.createGIFFileFilter());
+		ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
+		return new MultipleFileFilter(String.format("%s (*.jpg, *.png, *.gif)",
+			bundle.getString("IMAGE_FILES")), SBFileFilter.createJPEGFileFilter(),
+			SBFileFilter.createPNGFileFilter(), SBFileFilter.createGIFFileFilter());
 	}
 	
 	/**
@@ -407,8 +412,11 @@ public class SBFileFilter extends GeneralFileFilter {
 	 */
 	public SBFileFilter(FileType type) {
 		this.type = type;
-		if (type == FileType.UNDEFINED) { throw new IllegalArgumentException(
-			"FileType must not be UNDEFINED."); }
+		if (type == FileType.UNDEFINED) { 
+			throw new IllegalArgumentException(
+			  ResourceManager.getBundle("de.zbit.locales.Warnings").getString(
+				  "FILE_TYPE_MUST_NOT_BE_UNDEFINED")); 
+		}
 	}
 	
 	/*
@@ -494,36 +502,39 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * @see javax.swing.filechooser.FileFilter#getDescription()
 	 */
 	public String getDescription() {
-		if (filter != null) { return filter.getDescription(); }
+		if (filter != null) { 
+			return filter.getDescription(); 
+		}
+		ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
 		switch (type) {
 			case TEXT_FILES:
-				return "Text files (*.txt)";
+				return String.format("%s (*.txt)", bundle.getString("TEXT_FILES"));
 			case TeX_FILES:
-				return "TeX files (*.tex)";
+				return String.format("%s (*.tex)", bundle.getString("TeX_FILES"));
 			case SBML_FILES:
-				return "SBML files (*.sbml, *.xml)";
+				return String.format("%s (*.sbml, *.xml)", bundle.getString("SBML_FILES"));
 			case CSV_FILES:
-				return "Comma separated files (*.csv)";
+				return String.format("%s (*.csv)", bundle.getString("CSV_FILES"));
 			case JPEG_FILES:
-				return "Joint Photographic Experts Group files (*.jpg, *.jpeg)";
+				return String.format("%s (*.jpg, *.jpeg)", bundle.getString("JPEG_FILES"));
 			case PNG_FILES:
-				return "Portable Network Graphics files (*.png)";
+				return String.format("%s (*.png)", bundle.getString("PNG_FILES"));
 			case PDF_FILES:
-				return "Portable Document Format files (*.pdf)";
+				return String.format("%s (*.pdf)", bundle.getString("PDF_FILES"));
 			case HTML_FILES:
-				return "Hypertext markup language files (*.html, *.htm)";
+				return String.format("%s (*.html, *.htm)", bundle.getString("HTML_FILES"));
 			case GRAPHML_FILES:
-				return "GraphML files (*.GraphML)";
+				return String.format("%s (*.GraphML)", bundle.getString("GRAPHML_FILES"));
 			case GML_FILES:
-				return "Graph Modeling Language files (*.gml)";
+				return String.format("%s (*.gml)", bundle.getString("GML_FILES"));
 			case GIF_FILES:
-				return "Graphics Interchange Format files (*.gif)";
+				return String.format("%s (*.gif)", bundle.getString("GIF_FILES"));
 			case YGF_FILES:
-				return "Y Graph Format files (*.ygf)";
+				return String.format("%s (*.ygf)", bundle.getString("YGF_FILES"));
 			case TGF_FILES:
-				return "Trivial graph format files (*.tgf)";
-				
+				return String.format("%s (*.tgf)", bundle.getString("TGF_FILES"));
 			case DIRECTORIES_ONLY:
+				return bundle.getString("DIRECTORIES_ONLY");
 			default:
 				return StringUtil.firstLetterUpperCase(type.toString()
 						.replace('_', ' '));

@@ -42,6 +42,17 @@
   <!-- FileHistory -->
   
   <entry key="LAST_OPENED">Diese Liste speichert die zuletzt geöffneten Dateien.</entry>
+    
+  <!-- FileSelector -->
+  
+  <entry key="FILE">Datei</entry>
+  <entry key="DIRECTORY">Verzeichnis</entry>
+  <entry key="OPEN">öffnen</entry>
+  <entry key="SAVE">speichern</entry>
+  <entry key="SELECT_TARGET_FILE">Wählen Sie bitte die zu %s Datei.</entry>
+  <entry key="TO_BE_OPENED">öffnende</entry>
+  <entry key="TO_BE_SAVED">speichernde</entry>
+  <entry key="SELECT_TARGET_DIRECTORY">Wählen Sie bitte das Standardverzeichnis, um vielfältige Arten von Dateien zu %s.</entry>
   
   <!-- GUIOptions -->
   
@@ -75,6 +86,23 @@
   <entry key="ONLINE_HELP">Online-Hilfe</entry>
   <entry key="ONLINE_HELP_TOOLTIP">Dies ist die Hauptseite der Online-Hilfe.</entry>
   <entry key="COMMAND_LINE_ARGUMENTS">Kommandozeilenargumente</entry>
+    
+  <!-- KeyProvider -->
+  
+  <entry key="ADDITIONAL_OPTIONS">Weitere Einstellungen</entry>
+  <entry key="ALL_POSSIBLE_VALUES_FOR_TYPE">Alle möglichen Werte des Typs</entry>
+  <entry key="ARE">sind</entry>
+  <entry key="AND">und</entry>
+  <entry key="ARGS_MUST_FIT_INTO_RANGE">Argumente müssen aus dem Bereich %s gewählt werden.</entry>
+  <entry key="DEFAULT_VALUE">Standardwert</entry>
+  
+  <!-- MultiplePreferencesPanel -->
+  
+  <entry key="USER_PREFERENCES">Nutzerkonfiguration</entry>
+    
+  <!-- Option -->
+  
+  <entry key="ACCEPTS">Akzeptiert</entry>
   
   <!-- PreferencesDialog -->
   
@@ -84,6 +112,24 @@
   <entry key="DEFAULTS">Zurücksetzen;Stellt die Standardkonfiguration wieder her, d.h., alle aktuellen Einstellungen werden durch die Standardwerte ersetzt.</entry>
   <entry key="OK">OK;Speichert die aktuelle Konfiguration und schließt diesen Dialog.</entry>
   <entry key="PREFERENCES">Einstellungen</entry>
+  
+  <!-- SBFileFilter -->
+  
+  <entry key="IMAGE_FILES">Bilddateien</entry>
+  <entry key="TEXT_FILES">Textdateien</entry>
+  <entry key="TeX_FILES">TeX-Dateien</entry>
+  <entry key="SBML_FILES">SBML-Dateien</entry>
+  <entry key="CSV_FILES">kommasepararierte Dateien</entry>
+  <entry key="JPEG_FILES">Joint-Photographic-Experts-Group-Dateien</entry>
+  <entry key="PNG_FILES">Portable Netzwerkgraphik-Dateien</entry>
+  <entry key="PDF_FILES">Portable Dokumentformat-Dateien</entry>
+  <entry key="HTML_FILES">Hypertext-Auszeichnungssprache-Dateien</entry>
+  <entry key="GRAPHML_FILES">GraphML-Dateien</entry>
+  <entry key="GML_FILES">Graphmodellierungssprache-Dateien</entry>
+  <entry key="GIF_FILES">Graphikaustauschformat-Dateien</entry>
+  <entry key="YGF_FILES">Y-Graphformat-Dateien</entry>
+  <entry key="TGF_FILES">Triviale Graphformat-Dateien</entry>
+  <entry key="DIRECTORIES_ONLY">Ausschließlich Verzeichnisse</entry>
   
   <!-- SBAcceptAllFileFilter -->
   

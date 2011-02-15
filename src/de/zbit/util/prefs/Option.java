@@ -17,6 +17,7 @@ import argparser.StringHolder;
 import de.zbit.gui.ActionCommand;
 import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Reflect;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
@@ -219,8 +220,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		this.range = range;
 		this.shortCmdName = shortCmdName;
 		this.defaultValue = defaultValue;
-		if (numLeadingMinus < 0) { throw new IllegalArgumentException(
-			"numLeadingMinus must be a positive number"); }
+		if (numLeadingMinus < 0) { 
+			throw new IllegalArgumentException(String
+				.format(ResourceManager.getBundle("de.zbit.loales.Warnings").getString(
+					"VALUE_MUST_BE_POSITIVE"), "numLeadingMinus")); 
+		}
 		this.numLeadingMinus = numLeadingMinus;
 	}
 	
@@ -399,10 +403,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	public String getDescription() {
 		if (isSetRangeSpecification() && getRange().isSetConstraints()
-				&& (getRange().getConstraints() instanceof GeneralFileFilter)) { return StringUtil
-				.concat(description, " Accepts ", StringUtil.firstLetterLowerCase(
-					((GeneralFileFilter) getRange().getConstraints()).getDescription()),
-					".").toString(); }
+				&& (getRange().getConstraints() instanceof GeneralFileFilter)) { 
+        return StringUtil.concat(description," ",
+					ResourceManager.getBundle("de.zbit.locales.Labels").getString(
+						"ACCEPTS")," ",
+					StringUtil.changeFirstLetterCase(((GeneralFileFilter) getRange()
+							.getConstraints()).getDescription(), false, false), ".").toString(); 
+		}
 		return description;
 	}
 	
