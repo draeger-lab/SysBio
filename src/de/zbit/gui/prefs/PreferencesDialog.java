@@ -43,7 +43,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		ItemListener, ChangeListener, KeyListener {
 	
 	private static final ResourceBundle resource = ResourceManager
-			.getBundle("de.zbit.locales.Labels");
+			.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 
 	/**
 	 * Texts for the {@link JButton}s.

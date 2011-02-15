@@ -15,6 +15,7 @@ import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.GUITools;
 import de.zbit.util.Reflect;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
@@ -173,7 +174,8 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	@Override
 	public String getTitle() {
-		return "User preferences";
+		return ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS)
+				.getString("USER_PREFERENCES");
 	}
 	
 	/*

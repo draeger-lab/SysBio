@@ -20,6 +20,20 @@
   <!-- JBrowserPane -->
   
   <entry key="CANNOT_FOLLOW_LINK">Es ist nicht möglich, folgendem Verweis nachzugehen: </entry>
+    
+  <!-- Option -->
+  
+  <entry key="VALUE_MUST_BE_POSITIVE">%s muss eine positive Zahl sein.</entry>
+    
+  <!-- Range -->
+  
+  <entry key="CLASS_NOT_COMPARABLE">Klasse %s kann nicht verglichen werden. Implementieren Sie bitte die Schnittstelle "Comparable".</entry>
+  <entry key="REQUIRED_TYPE_FOR_X_MUST_BE">Wird mit %s initialisiert, so muss der Typ eine Instanz von %s sein.</entry>
+  <entry key="RANGE_IN_WRONG_FORMAT">Bereichsangabe hat ein ungültiges Format: '%s'.</entry>
+    
+  <!-- SBFileFilter -->
+  
+  <entry key="FILE_TYPE_MUST_NOT_BE_UNDEFINED">FileType darf nicht UNDEFINIERT sein.</entry>
   
   <!-- SBPreferences -->
   

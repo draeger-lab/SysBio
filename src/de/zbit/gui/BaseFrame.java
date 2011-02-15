@@ -766,11 +766,6 @@ public abstract class BaseFrame extends JFrame {
 		GUITools.initLaF(getTitle());
 		setDefaultLookAndFeelDecorated(true);
 		
-		SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-		String userLanguage = prefs.get(GUIOptions.LANGUAGE);
-		if (!userLanguage.equals(System.getProperty("user.language"))) {
-			Locale.setDefault(new Locale(userLanguage));
-		}
 		try {
 			BaseAction.nameProperties.setDefaults(ResourceManager
 					.getBundle("de.zbit.locales.BaseAction"));

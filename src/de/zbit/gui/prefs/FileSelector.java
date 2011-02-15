@@ -102,14 +102,14 @@ import de.zbit.util.StringUtil;
  * }
  * </pre>
  * 
- * @author draeger
+ * @author Andreas Dr&auml;ger
  * @date 2010-11-02
  */
 public class FileSelector extends JPanel implements ActionListener {
 	
 	/**
 	 * 
-	 * @author draeger
+	 * @author Andreas Dr&auml;ger
 	 * @date 2010-11-03
 	 */
 	public class Command implements ActionCommand {
@@ -139,8 +139,11 @@ public class FileSelector extends JPanel implements ActionListener {
 		 * @return
 		 */
 		public String getLabelText() {
-			return String.format(acceptOnlyFiles() ? "%s file: " : "%s directory: ",
-				command.getType() == Type.OPEN ? "Open" : "Save");
+			ResourceBundle bundle = ResourceManager
+					.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+			return String.format("%s %s: ", bundle
+					.getString(acceptOnlyFiles() ? "FILE" : "DIRECTORY"), bundle
+							.getString(command.getType() == Type.OPEN ? "OPEN" : "SAVE"));
 		}
 		
 		/*
@@ -158,11 +161,15 @@ public class FileSelector extends JPanel implements ActionListener {
 		 * @see de.zbit.gui.ActionCommand#getToolTip()
 		 */
 		public String getToolTip() {
-			if (acceptOnlyFiles()) { return String.format(
-				"Select the file to be %s.", type == Type.OPEN ? "opened" : "saved"); }
+			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+			if (acceptOnlyFiles()) { 
+				return String.format(bundle
+					.getString("SELECT_TARGET_FILE"), bundle
+					.getString(type == Type.OPEN ? "TO_BE_OPENED" : "TO_BE_SAVED")); 
+			}
 			return String.format(
-				"Select the default directory to %s various kinds of files.",
-				type == Type.OPEN ? "open" : "save");
+				bundle.getString("SELECT_TARGET_DIRECTORY"),
+				bundle.getString(type == Type.OPEN ? "OPEN" : "SAVE"));
 		}
 		
 		/**
@@ -455,7 +462,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	/**
 	 * Creates a new {@link FileSelector} of the desired type, i.e., to
 	 * {@link Type#OPEN} or {@link Type#SAVE}, for directories. The base directory
-	 * of browsing will be given by the {@link System} property "user.dir".
+	 * of browsing will be given by the {@link System} property <code>user.dir</code>.
 	 * 
 	 * @param type
 	 */
@@ -466,7 +473,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	/**
 	 * Creates a new {@link FileSelector} of the desired type, i.e., to
 	 * {@link Type#OPEN} or {@link Type#SAVE}, whose selection starts at the
-	 * directory specified by the {@link System} property "user.dir" as the base
+	 * directory specified by the {@link System} property <code>user.dir</code> as the base
 	 * directory. The filters can be null or empty. In this case this object will
 	 * allow to select directories only.
 	 * 
@@ -568,7 +575,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	 * {@link FileSelector} has been configured to select files, or the selected
 	 * directory itself otherwise. If no change has been performed by the user,
 	 * the returned directory path is the one that was specified when initializing
-	 * this object, i.e., either given by the {@link System} property "user.dir"
+	 * this object, i.e., either given by the {@link System} property <code>user.dir</code>
 	 * or directly specified.
 	 * 
 	 * @return the baseDir
@@ -704,7 +711,7 @@ public class FileSelector extends JPanel implements ActionListener {
 		textField.setInputVerifier(new FileInputVerifier(
 			acceptOnlyFiles() ? FileInputVerifier.FileType.FILE
 					: FileInputVerifier.FileType.DIRECTORY));
-		ResourceBundle resource = ResourceManager.getBundle("de.zbit.locales.Labels");
+		ResourceBundle resource = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 		button = GUITools.createButton(resource.getString("BROWSE"), UIManager
 				.getIcon(type == Type.OPEN ? "ICON_OPEN_16" : "ICON_SAVE_16"), this, type,
 			command.getToolTip());
@@ -753,7 +760,7 @@ public class FileSelector extends JPanel implements ActionListener {
 	
 	/**
 	 * Define the directory where the selection should be start. By default this
-	 * will be given by the {@link System} property "user.dir", i.e., the working
+	 * will be given by the {@link System} property <code>user.dir</code>, i.e., the working
 	 * directory of this program.
 	 * 
 	 * @param baseDir
