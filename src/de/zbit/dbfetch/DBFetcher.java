@@ -41,10 +41,10 @@ import de.zbit.util.Utils;
  * <li><a href="http://ws.apache.org/axis/">http://ws.apache.org/axis/</a></li>
  * </ul>
  *
- * @author Finja B&uuml;chel: finja.buechel@uni-tuebingen.de
- * @author Clemens Wrzodek: clemens.wrzodek@uni-tuebingen.de
- * @author Florian Mittag: florian.mittag@uni-tuebingen.de
- * 
+ * @author Finja B&uuml;chel
+ * @author Clemens Wrzodek
+ * @author Florian Mittag
+ * @version $Rev$
  */
 public abstract class DBFetcher extends InfoManagement<String, String> {
   
