@@ -58,7 +58,6 @@
   
   <entry key="CHECK_FOR_UPDATES">Entscheiden Sie, ob dieses beim Starten im Internet nach Aktualisierungen gesucht werden soll.</entry>
   <entry key="GUI">Kann in Verbindung mit =true oder =false oder einfach --gui genutzt werden. Spezifiziert, ob eine graphische Nutzeroberflache angezeigt werden soll.</entry>
-  <entry key="LANGUAGE">Die Sprache für die Nutzeroberfläche, Fehlermeldungen etc.</entry>
   <entry key="OPEN_DIR">Standardverzeichnis, in dem nach Dateien gesucht werden soll.</entry>
   <entry key="SAVE_DIR">Standardverzeichnis, in dem Dateien abgespeichert werden sollen.</entry>
   <entry key="DEFAULT_DIRECTORIES">Standardverzeichnisse</entry>

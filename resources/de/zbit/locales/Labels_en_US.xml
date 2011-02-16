@@ -58,7 +58,6 @@
   
   <entry key="CHECK_FOR_UPDATES">Decide whether or not this program should search for updates at start-up.</entry>
   <entry key="GUI">Can be used in combination with = true or = false or just --gui. Specifies whether or not a program should display its graphical user interface.</entry>
-  <entry key="LANGUAGE">The language for the user interface, error messages and so on.</entry>
   <entry key="OPEN_DIR">Standard directory where user files can be found.</entry>
   <entry key="SAVE_DIR">Standard directory where the user may save some files.</entry>
   <entry key="DEFAULT_DIRECTORIES">Default directories</entry>
