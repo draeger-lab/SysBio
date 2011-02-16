@@ -1,5 +1,5 @@
 /*
- * $$Id:  ${file_name} ${time} ${user} $$
+ * $Id$
  * $$URL: ${file_name} $$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
@@ -44,7 +44,7 @@ import de.zbit.util.Utils;
  * @author Finja B&uuml;chel
  * @author Clemens Wrzodek
  * @author Florian Mittag
- * @version $Rev$
+ * @version $Rev: 352 $
  */
 public abstract class DBFetcher extends InfoManagement<String, String> {
   
