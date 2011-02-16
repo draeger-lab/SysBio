@@ -1,6 +1,6 @@
 /*
- * $$Id:  ${file_name} ${time} ${user} $$
- * $$URL: ${file_name} $$
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -21,7 +21,7 @@ package de.zbit.dbfetch;
  * @author unknown
  * 
  * Fetches uniprot data, but doesn't save it like the UniProtWrapper! 
- * 
+ * @version $Rev$
  */
 public class UniProtFetcher extends DBFetcher {
 

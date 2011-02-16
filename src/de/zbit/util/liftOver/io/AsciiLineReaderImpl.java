@@ -38,6 +38,7 @@ import java.io.InputStream;
  * instead of this class, it will detect the OS and delegate to the preferred implementation for that platform.
  *
  * @author alecw@broadinstitute.org
+ * @version $Rev$
  */
 public class AsciiLineReaderImpl implements LineReader {
     private static final char LINEFEED = '\n';

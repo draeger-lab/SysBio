@@ -1,3 +1,19 @@
+/*
+ * $Id$
+ * $URL$
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
+ */
 package de.zbit.util;
 
 import java.io.File;
@@ -23,6 +39,7 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
  * A better name for this class is maybe "Cache".
  * 
  * @author wrzodek
+ * @version $Rev$
  */
 public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable, INFOtype extends Serializable> implements Serializable {
   /**

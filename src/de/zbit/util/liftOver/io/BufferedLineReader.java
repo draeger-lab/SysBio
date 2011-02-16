@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
  * and delegate to the preferred implementation.
  *
  * @author alecw@broadinstitute.org
+ * @version $Rev$
  */
 public class BufferedLineReader implements LineReader {
 

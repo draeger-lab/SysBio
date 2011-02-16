@@ -30,6 +30,7 @@ import java.util.Collection;
  *
  * @author Tim Fennell
  * @author Clenens Wrzodek
+ * @version $Rev$
  */
 public class Interval implements Comparable<Interval>, Cloneable {
   private final String sequence;

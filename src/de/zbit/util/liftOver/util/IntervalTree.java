@@ -36,6 +36,7 @@ import java.util.NoSuchElementException;
  * handling coordinates (end-inclusive).
  *
  * @author tsharpe
+ * @version $Rev$
  */
 public class IntervalTree<V> implements Iterable<IntervalTree.Node<V>>
 {
