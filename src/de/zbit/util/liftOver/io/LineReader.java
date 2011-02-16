@@ -25,6 +25,7 @@ package de.zbit.util.liftOver.io;
 
 /**
  * Interface allows for implementations that read lines from a String, an ASCII file, or somewhere else.
+ * @version $Rev$
  */
 public interface LineReader {
 

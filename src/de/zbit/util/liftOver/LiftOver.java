@@ -53,6 +53,7 @@ import de.zbit.util.liftOver.util.OverlapDetector;
  *
  * @author alecw@broadinstitute.org
  * @author Clemens Wrzodek
+ * @version $Rev$
  */
 public class LiftOver {
   //private static final Log LOG = Log.getInstance(LiftOver.class);

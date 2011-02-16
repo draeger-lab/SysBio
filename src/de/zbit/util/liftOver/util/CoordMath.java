@@ -26,6 +26,7 @@ package de.zbit.util.liftOver.util;
 /**
  * Static methods that encapsulate the standard SAM way of storing ranges: one-based, with both ends
  * inclusive.
+ * @version $Rev$
  */
 public class CoordMath {
 

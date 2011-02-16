@@ -1,3 +1,19 @@
+/*
+ * $Id$
+ * $URL$
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
+ */
 package de.zbit.util;
 
 import java.lang.reflect.Array;
@@ -15,6 +31,7 @@ import java.util.Iterator;
  * Beispiel: ArrayList<String[]> - Elemente: String[a,z]; String[b,a] ; String[c,h] in der Reihenfolge.  
  *
  * @param <T>
+ * @version $Rev$
  */
 public class SortedArrayList<T> extends java.util.ArrayList<T>{
   private static final long serialVersionUID = -5106143068070537940L;

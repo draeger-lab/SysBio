@@ -43,6 +43,7 @@ import java.util.zip.GZIPOutputStream;
  * A class for utility methods that wrap or aggregate functionality in Java IO.
  *
  * @author Tim Fennell
+ * @version $Rev$
  */
 public class IoUtil {
     /**

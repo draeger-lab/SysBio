@@ -1,5 +1,18 @@
-/**
- * 
+/*
+ * $Id$
+ * $URL$
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
  */
 package de.zbit.parser;
 
@@ -24,6 +37,7 @@ import de.zbit.io.OpenFile;
  * 006L_IIV6 PF04383 19  126
  * 007R_IIV3 PF10927 181 430
  * 029R_IIV6 PF12299 1 100
+ * @version $Rev$
  */
 public class SwisspfamParser {
 

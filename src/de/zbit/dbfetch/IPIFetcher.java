@@ -1,6 +1,6 @@
 /*
- * $$Id:  ${file_name} ${time} ${user} $$
- * $$URL: ${file_name} $$
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -25,7 +25,7 @@ import de.zbit.util.LogUtil;
 /**
  * 
  * @author Florian Mittag
- * 
+ * @version $Rev$
  */
 public class IPIFetcher extends DBFetcher {
 

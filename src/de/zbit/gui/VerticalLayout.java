@@ -1,7 +1,18 @@
-/**
- * Gefunden unter
- * http://www.java2s.com/Code/Java/Swing-JFC/AverticallayoutmanagersimilartojavaawtFlowLayout.htm
- * @author wrzodek
+/*
+ * $Id$
+ * $URL$
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
  */
 package de.zbit.gui;
 
@@ -26,6 +37,9 @@ import java.util.Hashtable;
  * @author Colin Mummery  e-mail: colin_mummery@yahoo.com Homepage:www.kagi.com/equitysoft -
  * Based on 'FlexLayout' in Java class libraries Vol 2 Chan/Lee Addison-Wesley 1998
  * @author Clemens Wrzodek - Many bugfixes...
+ * @version $Rev$
+ * @link http://www.java2s.com/Code/Java/Swing-JFC/AverticallayoutmanagersimilartojavaawtFlowLayout.htm
+ * 
  */
 
 public class VerticalLayout implements LayoutManager{

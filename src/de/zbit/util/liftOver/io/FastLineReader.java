@@ -33,6 +33,7 @@ import java.io.InputStream;
  * Implementation detail: All public methods must leave the input buffer in a non-empty state, unless at EOF.
  *
  * @author alecw@broadinstitute.org
+ * @version $Rev$
  */
 public class FastLineReader {
     private InputStream in;
