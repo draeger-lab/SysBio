@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $$URL: ${file_name} $$
+ * $Id: DBFetcher.java 354 2011-02-16 07:08:12Z draeger $
+ * $UR$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
