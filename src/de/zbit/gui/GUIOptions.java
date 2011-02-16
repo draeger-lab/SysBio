@@ -29,39 +29,6 @@ public interface GUIOptions extends KeyProvider {
 	ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
 	
 	/**
-	 * An enumeration of supported language codes.
-	 * 
-	 * @author Andreas Dr&auml;ger
-	 * @date 2011-01-09
-	 */
-	public static enum Language {
-		/**
-		 * German
-		 */
-		de,
-		/**
-		 * English
-		 */
-		en;
-		
-		/**
-		 * Checks the {@link System} for its default user language and returns the
-		 * corresponding {@link Enum} element.
-		 * 
-		 * @return
-		 */
-		public static Language getDefault() {
-			Language language = en;
-			try {
-				language = valueOf(System.getProperty("user.language"));
-			} catch (Throwable exc) {
-				// TODO: Logging, no support for the user's language.
-			}
-			return language;
-		}
-	}
-	
-	/**
 	 * Decide whether or not this program should search for updates at start-up.
 	 */
 	public static final Option<Boolean> CHECK_FOR_UPDATES = new Option<Boolean>(
@@ -79,15 +46,6 @@ public interface GUIOptions extends KeyProvider {
 		Boolean.class,
 		bundle.getString("GUI"),
 		Boolean.TRUE);
-	
-	/**
-	 * The language for the user interface, error messages and so on.
-	 */
-	public static final Option<Language> LANGUAGE = new Option<Language>(
-		"LANGUAGE", Language.class,
-		bundle.getString("LANGUAGE"),
-		new Range<Language>(Language.class, Range.toRangeString(Language.class)),
-		Language.getDefault());
 	
 	/**
 	 * Standard directory where user files can be found.
