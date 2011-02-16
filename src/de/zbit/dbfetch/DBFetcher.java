@@ -1,5 +1,5 @@
 /*
- * $Id: DBFetcher.java 354 2011-02-16 07:08:12Z draeger $
+ * $Id$
  * $UR$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
@@ -44,7 +44,7 @@ import de.zbit.util.Utils;
  * @author Finja B&uuml;chel
  * @author Clemens Wrzodek
  * @author Florian Mittag
- * @version $Rev: 352 $
+ * @version $Rev$
  */
 public abstract class DBFetcher extends InfoManagement<String, String> {
   
