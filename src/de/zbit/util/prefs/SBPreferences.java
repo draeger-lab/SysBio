@@ -53,6 +53,7 @@ import de.zbit.util.Utils;
  * additional functionality.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2010-10-24
  * @version $Rev$
  * @since 1.0
@@ -285,7 +286,7 @@ public class SBPreferences implements Map<Object, Object> {
 		parser.matchAllArgs(args);
 		putAll(props, options);
 		
-		// Now all command line arguments must be made persistent:
+		// Now all command-line arguments must be made persistent:
 		String k, property, value;
 		for (int i = 0; i < prefs.length; i++) {
 			if (prefs[i] == null) {
@@ -327,7 +328,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 *        {@link Option} instances as the corresponding defaults option file
 	 *        contains entries.
 	 * @param args
-	 *        The given command line arguments.
+	 *        The given command-line arguments.
 	 * @return
 	 */
 	public static final SBProperties analyzeCommandLineArguments(
@@ -351,7 +352,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 *        A String describing how to invoke the class that is calling this
 	 *        method.
 	 * @param args
-	 *        The given command line arguments.
+	 *        The given command-line arguments.
 	 * @return
 	 */
 	public static final SBProperties analyzeCommandLineArguments(

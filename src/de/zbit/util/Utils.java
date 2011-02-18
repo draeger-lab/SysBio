@@ -774,8 +774,8 @@ public class Utils {
   }
   
   /**
-   * Usefull for parsing command line arguments.
-   * @param args - Command line arguments.
+   * Usefull for parsing command-line arguments.
+   * @param args - Command-line arguments.
    * @param searchForCommand - Command to search for
    * @param hasArgument - Has the command an argument? If yes, the Argument will be returned.
    * @return The Argument, if {@link hasArgument} is set.
