@@ -25,6 +25,7 @@ import java.io.Serializable;
  * @author Andreas Dr&auml;ger
  * @date 2010-09-01
  * @version $Rev$
+ * @since 1.0
  */
 public class ValuePair<S extends Comparable<S>, T extends Comparable<T>>
 		implements Comparable<ValuePair<S, T>>, Serializable {

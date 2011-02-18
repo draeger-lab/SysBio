@@ -26,6 +26,7 @@ import de.zbit.util.LogUtil;
  * 
  * @author Florian Mittag
  * @version $Rev$
+ * @since 1.0
  */
 public class IPIFetcher extends DBFetcher {
 

@@ -31,6 +31,7 @@ import java.net.URLConnection;
  * Download files from a url (http/ftp).
  * @author wrzodek (heavily modified by a template from Marco Schmidt).
  * @version $Rev$
+ * @since 1.0
  */
 public class FileDownload {
   public static Object ProgressBar;

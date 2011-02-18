@@ -38,9 +38,8 @@ import java.util.Arrays;
  * <p>
  * You should never have a need to access this class directly.
  * TarBuffers are created by Tar IO Streams.
- *
+ * @since 1.0
  */
-
 public class TarBuffer {
 
     /** Default record size */

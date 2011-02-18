@@ -29,6 +29,7 @@ import javax.swing.text.JTextComponent;
  * @author Andreas Dr&auml;ger
  * @date 2010-11-04
  * @version $Rev$
+ * @since 1.0
  */
 public class FileInputVerifier extends InputVerifier {
 	

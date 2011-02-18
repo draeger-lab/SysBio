@@ -42,6 +42,7 @@ import java.util.concurrent.TimeUnit;
  * </pre></p>
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class ThreadManager {
   /**

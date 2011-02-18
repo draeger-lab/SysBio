@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
  * 
  * @author Florian Mittag
  * @version $Rev$
+ * @since 1.0
  */
 public class RegExpFileFilter implements FileFilter {
 

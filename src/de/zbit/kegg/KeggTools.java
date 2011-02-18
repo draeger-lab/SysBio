@@ -32,6 +32,7 @@ import de.zbit.kegg.parser.pathway.SubType;
 /**
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class KeggTools {
   

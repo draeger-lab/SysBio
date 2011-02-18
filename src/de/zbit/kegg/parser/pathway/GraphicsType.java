@@ -20,6 +20,7 @@ package de.zbit.kegg.parser.pathway;
  * Corresponding to the possible Kegg Graphics-Types (see {@link http://www.genome.jp/kegg/xml/docs/})
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public enum GraphicsType {
   /**

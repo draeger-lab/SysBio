@@ -54,6 +54,7 @@ import de.zbit.util.prefs.KeyProvider;
  * @author Andreas Dr&auml;ger
  * @date 2009-09-06
  * @version $Rev$
+ * @since 1.0
  */
 public class PreferencesDialog extends JDialog implements ActionListener,
 		ItemListener, ChangeListener, KeyListener {

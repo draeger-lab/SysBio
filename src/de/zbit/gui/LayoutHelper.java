@@ -32,6 +32,7 @@ import javax.swing.JPanel;
  * @author Andreas Dr&auml;ger
  * @date 2005-07-29
  * @version $Rev$
+ * @since 1.0
  */
 public class LayoutHelper {
 	

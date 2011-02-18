@@ -34,6 +34,7 @@ import de.zbit.util.prefs.Option;
  * @author Andreas Dr&auml;ger
  * @date 2010-12-10
  * @version $Rev$
+ * @since 1.0
  */
 public interface FileHistory extends KeyProvider {
 	

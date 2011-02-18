@@ -28,6 +28,7 @@ import de.zbit.util.LogUtil;
  * 
  * Parse information out of the text it gets from the IPIFetcher
  * @version $Rev$
+ * @since 1.0
  */
 public class IPIParser {
 

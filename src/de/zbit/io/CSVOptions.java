@@ -28,6 +28,7 @@ import de.zbit.util.prefs.Option;
  * @author Andreas Dr&auml;ger
  * @date 2010-10-22
  * @version $Rev$
+ * @since 1.0
  */
 public interface CSVOptions extends KeyProvider {
 	/**

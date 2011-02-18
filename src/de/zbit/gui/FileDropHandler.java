@@ -47,6 +47,7 @@ import javax.swing.TransferHandler;
     </p>
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class FileDropHandler extends TransferHandler {
   private static final long serialVersionUID = -2874307479020044075L;

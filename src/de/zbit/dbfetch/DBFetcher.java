@@ -45,6 +45,7 @@ import de.zbit.util.Utils;
  * @author Clemens Wrzodek
  * @author Florian Mittag
  * @version $Rev$
+ * @since 1.0
  */
 public abstract class DBFetcher extends InfoManagement<String, String> {
   

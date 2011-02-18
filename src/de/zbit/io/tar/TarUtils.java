@@ -25,7 +25,7 @@ package de.zbit.io.tar;
 
 /**
  * This class provides static utility methods to work with byte streams.
- *
+ * @since 1.0
  */
 // CheckStyle:HideUtilityClassConstructorCheck OFF (bc)
 public class TarUtils {

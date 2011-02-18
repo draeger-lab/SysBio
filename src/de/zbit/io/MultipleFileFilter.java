@@ -24,6 +24,7 @@ import javax.swing.filechooser.FileFilter;
  * @author Andreas Dr&auml;ger
  * @date 2010-10-22
  * @version $Rev$
+ * @since 1.0
  */
 public class MultipleFileFilter extends GeneralFileFilter {
 

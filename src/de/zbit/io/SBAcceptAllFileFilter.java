@@ -27,6 +27,7 @@ import de.zbit.util.ResourceManager;
  * @author Andreas Dr&auml;ger
  * @date 2011-01-04
  * @version $Rev$
+ * @since 1.0
  */
 public class SBAcceptAllFileFilter extends GeneralFileFilter {
 	

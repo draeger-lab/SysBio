@@ -39,6 +39,7 @@ import de.zbit.util.CustomObject;
  * This will show a panel to choose one of Kegg's supported organisms.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class OrganismSelector extends JPanel {
   private static final long serialVersionUID = -45232441769930121L;

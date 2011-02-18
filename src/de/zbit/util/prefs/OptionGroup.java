@@ -31,6 +31,7 @@ import de.zbit.gui.ActionCommand;
  * @author Andreas Dr&auml;ger
  * @date 2010-11-04
  * @version $Rev$
+ * @since 1.0
  */
 public class OptionGroup<T> implements ActionCommand,
 		Comparable<OptionGroup<T>> {

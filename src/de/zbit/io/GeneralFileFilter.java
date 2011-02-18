@@ -24,6 +24,7 @@ import javax.swing.filechooser.FileFilter;
  * @author Andreas Dr&auml;ger
  * @date 2010-11-09
  * @version $Rev$
+ * @since 1.0
  */
 public abstract class GeneralFileFilter extends FileFilter implements
 		java.io.FileFilter {

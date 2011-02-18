@@ -57,9 +57,8 @@ import de.zbit.util.ValuePair;
  *             
  * @author Finja B&uml;chel
  * @version $Rev$
+ * @since 1.0
  */
-
-
 public class UniDomIntParser {
 
   private static SortedArrayList<String> D_ref;

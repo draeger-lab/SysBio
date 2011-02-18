@@ -24,6 +24,7 @@ import java.io.Serializable;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	private static final long serialVersionUID = -2970366298298913439L;

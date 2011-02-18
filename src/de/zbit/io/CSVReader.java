@@ -65,6 +65,7 @@ import de.zbit.util.StringUtil;
  * </pre></p>
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class CSVReader implements Serializable, Cloneable {
   private static final long serialVersionUID = 7784651184371604357L;

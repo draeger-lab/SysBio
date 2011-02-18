@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
  * This class acts just like the linux or unix which command.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class FileTools {
   

@@ -38,6 +38,7 @@ import de.zbit.io.OpenFile;
  * 007R_IIV3 PF10927 181 430
  * 029R_IIV6 PF12299 1 100
  * @version $Rev$
+ * @since 1.0
  */
 public class SwisspfamParser {
 

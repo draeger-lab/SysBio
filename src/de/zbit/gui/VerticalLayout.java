@@ -39,7 +39,7 @@ import java.util.Hashtable;
  * @author Clemens Wrzodek - Many bugfixes...
  * @version $Rev$
  * @link http://www.java2s.com/Code/Java/Swing-JFC/AverticallayoutmanagersimilartojavaawtFlowLayout.htm
- * 
+ * @since 1.0
  */
 
 public class VerticalLayout implements LayoutManager{

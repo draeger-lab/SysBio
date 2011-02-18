@@ -37,6 +37,7 @@ import java.util.NoSuchElementException;
  *
  * @author tsharpe
  * @version $Rev$
+ * @since 1.0
  */
 public class IntervalTree<V> implements Iterable<IntervalTree.Node<V>>
 {

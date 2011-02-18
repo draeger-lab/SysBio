@@ -77,6 +77,7 @@ import de.zbit.util.prefs.SBProperties;
  * @author Andreas Dr&auml;ger
  * @date 2010-11-28
  * @version $Rev$
+ * @since 1.0
  */
 public abstract class BaseFrame extends JFrame {
 	

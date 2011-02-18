@@ -29,6 +29,7 @@ import javax.swing.JPanel;
  * a gradient background).
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class GradientPanel extends JPanel {
   private static final long serialVersionUID = -3813858288052450021L;

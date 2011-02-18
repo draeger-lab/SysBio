@@ -34,6 +34,7 @@ import java.io.Reader;
  * @author alecw
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class AsciiLineReader extends Reader implements LineReader {
 

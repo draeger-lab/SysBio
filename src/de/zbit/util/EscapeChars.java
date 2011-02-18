@@ -53,6 +53,7 @@ import java.util.regex.Matcher;
 * 
 * @author modified by Wrzodek
 * @version $Rev$
+* @since 1.0
 *  1. ä = \u00e4
    2. Ä = \u00c4
    3. ö = \u00f6

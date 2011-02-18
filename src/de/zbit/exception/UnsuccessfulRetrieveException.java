@@ -22,6 +22,7 @@ package de.zbit.exception;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class UnsuccessfulRetrieveException extends Exception {
 	/**

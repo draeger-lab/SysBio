@@ -30,6 +30,7 @@ import java.util.logging.LogRecord;
  * 
  * @author Florian Mittag
  * @version $Rev$
+ * @since 1.0
  */
 public class OneLineFormatter extends Formatter {
 

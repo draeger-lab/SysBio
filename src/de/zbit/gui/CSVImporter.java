@@ -50,6 +50,7 @@ import de.zbit.util.StringUtil;
  * @author Clemens Wrzodek
  * @date 2010-09-03
  * @version $Rev$
+ * @since 1.0
  */
 public class CSVImporter {
 

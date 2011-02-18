@@ -39,7 +39,7 @@ import de.zbit.util.prefs.SBPreferences;
  * the configuration of the {@link Properties} in a GUI.
  * 
  * @author Andreas Dr&auml;ger
- * @since This was part of SBMLsqueezer 1.3
+ * @since 1.0 (originates from SBMLsqueezer 1.3)
  * @date 2009-09-22
  * @version $Rev$
  */

@@ -29,6 +29,7 @@ import de.zbit.util.SortedArrayList;
  * Parse information out of the Strings it gets from the UniProtWrapper
  * 
  * @version $Rev$
+ * @since 1.0
  */
 public class UniProtParser {
   

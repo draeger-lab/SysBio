@@ -34,6 +34,7 @@ import de.zbit.util.prefs.Range;
  * @author wrzodek
  * @date 2010-10-22
  * @version $Rev$
+ * @since 1.0
  */
 public interface GUIOptions extends KeyProvider {
 	

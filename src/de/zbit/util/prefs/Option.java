@@ -41,6 +41,7 @@ import de.zbit.util.StringUtil;
  * @author Clemens Wrzodek
  * @date 2010-10-24
  * @version $Rev$
+ * @since 1.0
  */
 public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	

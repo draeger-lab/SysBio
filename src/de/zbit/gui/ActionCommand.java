@@ -20,6 +20,7 @@ package de.zbit.gui;
  * @author Andreas Dr&auml;ger
  * @date 2010-10-28
  * @version $Rev$
+ * @since 1.0
  */
 public interface ActionCommand {
 

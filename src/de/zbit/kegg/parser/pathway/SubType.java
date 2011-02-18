@@ -22,6 +22,7 @@ package de.zbit.kegg.parser.pathway;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class SubType {
 	// SubType is for RELATION

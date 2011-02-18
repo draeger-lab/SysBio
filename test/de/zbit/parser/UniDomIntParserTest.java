@@ -20,6 +20,7 @@ package de.zbit.parser;
 /**
  * @author Finja B&uml;chel
  * @version $Rev$
+ * @since 1.0
  */
 public class UniDomIntParserTest {
 

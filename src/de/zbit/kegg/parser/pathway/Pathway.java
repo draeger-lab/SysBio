@@ -28,6 +28,7 @@ import java.util.Map;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class Pathway {
 	/* see http://www.genome.jp/kegg/xml/docs/ */

@@ -73,7 +73,7 @@ import java.util.Locale;
  * char devminor[8];
  * } header;
  * </pre>
- *
+ * @since 1.0
  */
 public class TarEntry implements TarConstants {
     /** The entry's name. */

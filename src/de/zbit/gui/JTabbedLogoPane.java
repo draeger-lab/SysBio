@@ -29,6 +29,7 @@ import javax.swing.JTabbedPane;
  * that the TabbedPane without any tabs contains a centered logo image.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class JTabbedLogoPane extends JTabbedPane {
   private static final long serialVersionUID = 6977541013827456374L;

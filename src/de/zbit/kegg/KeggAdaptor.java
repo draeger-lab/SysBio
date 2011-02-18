@@ -42,6 +42,7 @@ import keggapi.SSDBRelation;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class KeggAdaptor {
   /**

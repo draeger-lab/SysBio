@@ -26,6 +26,7 @@ import de.zbit.util.ValuePair;
 /**
  * @author Finja B&uml;chel
  * @version $Rev$
+ * @since 1.0
  */
 public class ValuePairTest {
   ValuePair<String, String> r1, r2, r3;

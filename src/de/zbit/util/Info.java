@@ -28,7 +28,8 @@ import java.io.Serializable;
  *            Type of the id (int or string,...) must be comparable.
  * @param <INFOtype>
  *            Type of information (arbitrary)
- *            @version $Rev$
+ * @version $Rev$
+ * @since 1.0
  */
 @SuppressWarnings("unchecked")
 public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Serializable {

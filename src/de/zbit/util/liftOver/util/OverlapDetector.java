@@ -36,6 +36,7 @@ import java.util.Set;
  * Utility class to efficiently do in memory overlap detection between a large
  * set of mapping like objects, and one or more candidate mappings.
  * @version $Rev$
+ * @since 1.0
  */
 public class OverlapDetector<T> {
     private Map<Object, IntervalTree<Set<T>>> cache = new HashMap<Object, IntervalTree<Set<T>>>();

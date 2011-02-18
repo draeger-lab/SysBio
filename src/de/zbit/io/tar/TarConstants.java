@@ -25,7 +25,7 @@ package de.zbit.io.tar;
 
 /**
  * This interface contains all the definitions used in the package.
- *
+ * @since 1.0
  */
 // CheckStyle:InterfaceIsTypeCheck OFF (bc)
 public interface TarConstants {

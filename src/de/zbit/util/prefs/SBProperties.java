@@ -30,6 +30,7 @@ import java.util.ResourceBundle;
  * @author Andreas Dr&auml;ger
  * @date 2010-10-22
  * @version $Rev$
+ * @since 1.0
  */
 public class SBProperties extends Properties {
 	

@@ -42,6 +42,7 @@ import java.io.IOException;
  * buffered source stream.</p>
  * 
  * <p>Instances of this class are not threadsafe.</p>
+ * @since 1.0
  */
 public class CBZip2InputStream extends InputStream implements BZip2Constants {
 

@@ -24,6 +24,7 @@ import de.zbit.kegg.parser.pathway.EntryType;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class KeggInfos {
 	/**
