@@ -26,6 +26,7 @@ import java.util.Iterator;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class DirectoryParser implements Iterator<String> {
 	/**

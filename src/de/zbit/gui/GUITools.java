@@ -75,6 +75,7 @@ import de.zbit.util.ValuePair;
  * @author Hannes Borch
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class GUITools {
 	

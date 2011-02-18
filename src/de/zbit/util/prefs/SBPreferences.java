@@ -55,6 +55,7 @@ import de.zbit.util.Utils;
  * @author Andreas Dr&auml;ger
  * @date 2010-10-24
  * @version $Rev$
+ * @since 1.0
  */
 public class SBPreferences implements Map<Object, Object> {
 	

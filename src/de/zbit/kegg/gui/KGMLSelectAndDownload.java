@@ -29,6 +29,7 @@ import de.zbit.util.FileDownload;
 /**
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class KGMLSelectAndDownload {
   

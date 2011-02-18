@@ -47,6 +47,7 @@ import de.zbit.util.StringUtil;
  * This will show a panel to choose one of Kegg's pathways.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class PathwaySelector extends JPanel {
   private static final long serialVersionUID = -7398698588689150610L;

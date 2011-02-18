@@ -22,6 +22,7 @@ package de.zbit.util;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 @SuppressWarnings("unchecked")
 public class Mergesort{

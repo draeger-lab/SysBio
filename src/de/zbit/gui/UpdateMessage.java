@@ -54,7 +54,7 @@ import de.zbit.util.ResourceManager;
  * 
  * @author Hannes Borch
  * @author Andreas Dr&auml;ger
- * @since This was part of SBMLsqueezer 1.2 and 1.3.
+ * @since 1.0 (originates from SBMLsqueezer 1.2 and 1.3)
  * @version $Rev$
  */
 public class UpdateMessage extends SwingWorker<Boolean, Void> {

@@ -45,6 +45,7 @@ import javax.swing.table.TableCellRenderer;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class JTableUtils implements Serializable {
   private static final long serialVersionUID = 3645923028183309376L;

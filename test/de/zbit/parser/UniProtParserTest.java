@@ -27,6 +27,7 @@ import de.zbit.util.LogUtil;
 /**
  * 
  * @version $Rev$
+ * @since 1.0
  */
 public class UniProtParserTest {
 

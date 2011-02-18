@@ -27,6 +27,7 @@ import de.zbit.kegg.parser.KeggParser;
  * Includes the Kegg "alt" class.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class ReactionComponent {
   

@@ -30,6 +30,7 @@ import de.zbit.util.InfoManagement;
  * Think of this class as a cache.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObject<Object>>{
   private static final long serialVersionUID = -4559358395869823899L;

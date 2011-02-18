@@ -23,7 +23,7 @@ package de.zbit.util;
  * simply outputs percentages in this case.
  * @author wrzodek
  * @version $Rev$
- * 
+ * @since 1.0
  */
 public class ProgressBar extends AbstractProgressBar {
   private static final long serialVersionUID = 2073719565121276629L;

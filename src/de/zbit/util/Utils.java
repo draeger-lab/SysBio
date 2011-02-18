@@ -50,6 +50,7 @@ import java.util.zip.GZIPOutputStream;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class Utils {
 

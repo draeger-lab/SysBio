@@ -54,6 +54,7 @@ import de.zbit.util.StringUtil;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class CSVReaderColumnChooser extends JPanel {
   private static final long serialVersionUID = -7944793539696555890L;

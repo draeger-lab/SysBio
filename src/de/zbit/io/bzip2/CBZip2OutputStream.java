@@ -32,6 +32,7 @@ import java.io.IOException;
  * header chars) into another stream.
  *
  * TODO:    Update to BZip2 1.0.1
+ * @since 1.0
  */
 public class CBZip2OutputStream extends OutputStream implements BZip2Constants {
     protected static final int SETMASK = (1 << 21);

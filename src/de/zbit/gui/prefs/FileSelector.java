@@ -118,6 +118,7 @@ import de.zbit.util.StringUtil;
  * @author Andreas Dr&auml;ger
  * @date 2010-11-02
  * @version $Rev$
+ * @since 1.0
  */
 public class FileSelector extends JPanel implements ActionListener {
 	

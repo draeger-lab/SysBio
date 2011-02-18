@@ -77,6 +77,7 @@ import de.zbit.util.ResourceManager;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class CSVReaderOptionPanel extends JPanel {
   private static final long serialVersionUID = -3459654748893049315L;

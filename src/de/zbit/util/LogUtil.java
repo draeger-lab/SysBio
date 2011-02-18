@@ -28,6 +28,7 @@ import de.zbit.logging.OneLineFormatter;
  * 
  * @author Florian Mittag
  * @version $Rev$
+ * @since 1.0
  */
 public class LogUtil {
 

@@ -39,6 +39,7 @@ import java.io.Serializable;
  * 
  * @author wrzodek 
  * @version $Rev$
+ * @since 1.0
  */
 public abstract class AbstractProgressBar implements Serializable {
   private static final long serialVersionUID = 6447054832080673569L;

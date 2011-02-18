@@ -29,6 +29,7 @@ import de.zbit.util.Utils;
  * many kegg IDs simultaneously.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class KeggInfoManagement extends InfoManagement<String, String> implements Serializable {
   private static final long serialVersionUID = -2621701345149317801L;

@@ -39,6 +39,7 @@ import de.zbit.util.ResourceManager;
  *       http://www.galileocomputing.de/openbook/javainsel6/javainsel_14_016.htm#
  *       Xxx1001419
  * @version $Rev$
+ * @since 1.0
  */
 public class JBrowserPane extends JEditorPane implements HyperlinkListener {
 

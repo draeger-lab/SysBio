@@ -60,6 +60,7 @@ import de.zbit.io.tar.TarInputStream;
  * @author Clemens Wrzodek
  * @contens -Zipping / Unzipping /GZipping
  * @version $Rev$
+ * @since 1.0
  */
 public class ZIPUtils {
 

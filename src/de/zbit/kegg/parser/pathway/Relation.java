@@ -29,6 +29,7 @@ import de.zbit.kegg.parser.KeggParser;
  * Corresponding to the Kegg Relation class (see {@link http://www.genome.jp/kegg/xml/docs/})
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class Relation {
   /**

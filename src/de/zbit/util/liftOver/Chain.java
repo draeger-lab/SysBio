@@ -60,6 +60,7 @@ import de.zbit.util.liftOver.util.OverlapDetector;
  * @author alecw@broadinstitute.org
  * @author Clemens Wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 class Chain {
   // For parsing chain file

@@ -40,6 +40,7 @@ import de.zbit.util.SortedArrayList;
  * Class to Handle file inputs. No matter where (URL, FileSystem, Internet,... ) or what (raw,txt,gz,tar.gz,zip,...) they are.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class OpenFile {
   /**

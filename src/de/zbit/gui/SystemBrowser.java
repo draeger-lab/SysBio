@@ -31,7 +31,7 @@ import javax.swing.text.html.HTMLFrameHyperlinkEvent;
  * 
  * @author Andreas Dr&auml;ger
  * @author Hannes Borch
- * @since 1.2
+ * @since 1.0 (originates from SBMLsqueezer 1.2)
  * @version $Rev$
  */
 public class SystemBrowser implements HyperlinkListener {

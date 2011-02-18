@@ -44,6 +44,7 @@ import java.util.List;
  * @author Marco Schmidt
  * @author Clemens Wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class FormatIdentification {
   private static List<FormatDescription> descriptions;

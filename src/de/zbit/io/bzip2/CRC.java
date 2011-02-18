@@ -27,7 +27,7 @@ package de.zbit.io.bzip2;
 /**
  * A simple class the hold and calculate the CRC for sanity checking
  * of the data.
- *
+ * @since 1.0
  */
 final class CRC {
     static final int crc32Table[] = {

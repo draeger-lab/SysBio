@@ -31,6 +31,7 @@ package de.zbit.io.bzip2;
  * This interface is public for historical purposes.
  * You should have no need to use it.
  * </p>
+ * @since 1.0
  */
 public interface BZip2Constants {
 

@@ -91,6 +91,7 @@ import de.zbit.util.prefs.SBProperties;
  * @author Clemens Wrzodek
  * @date 2010-04-13
  * @version $Rev$
+ * @since 1.0
  */
 public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		ItemListener, ChangeListener {

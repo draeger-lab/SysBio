@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
  * @author Clemens Wrzodek
  * @author Andreas Dr&auml;ger
  * @version $Rev$
+ * @since 1.0
  */
 public class StringUtil {
 	

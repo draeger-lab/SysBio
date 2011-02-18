@@ -21,6 +21,7 @@ import de.zbit.gui.GUIOptions;
 /**
  * @author Andreas Dr&auml;ger
  * @version $Rev$
+ * @since 1.0
  */
 public class HTMLDocumentation {
 	

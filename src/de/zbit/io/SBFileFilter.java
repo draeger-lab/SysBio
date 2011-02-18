@@ -31,6 +31,7 @@ import de.zbit.util.StringUtil;
  * @author Andreas Dr&auml;ger
  * @date 2007-08-03
  * @version $Rev$
+ * @since 1.0
  */
 public class SBFileFilter extends GeneralFileFilter {
 	

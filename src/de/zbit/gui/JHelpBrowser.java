@@ -62,6 +62,7 @@ import de.zbit.util.prefs.SBPreferences;
  * 
  * @author Andreas Dr&auml;ger
  * @version $Rev$
+ * @since 1.0
  */
 public class JHelpBrowser extends JDialog implements ActionListener,
 		HyperlinkListener {

@@ -22,6 +22,7 @@ import java.io.Serializable;
  * Neccessary for extending supertypes. They can not be extended by Object directly.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class CustomObject<T> implements Serializable {
   /**

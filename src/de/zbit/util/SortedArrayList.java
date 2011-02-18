@@ -32,6 +32,7 @@ import java.util.Iterator;
  *
  * @param <T>
  * @version $Rev$
+ * @since 1.0
  */
 public class SortedArrayList<T> extends java.util.ArrayList<T>{
   private static final long serialVersionUID = -5106143068070537940L;

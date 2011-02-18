@@ -25,6 +25,7 @@ import java.io.Reader;
  * Read {@link metadata.FormatDescription} objects from a semicolon-separated text file.
  * @author Marco Schmidt
  * @version $Rev$
+ * @since 1.0
  */
 public class FormatDescriptionReader
 {

@@ -41,7 +41,7 @@ import java.util.jar.JarInputStream;
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
  * @date 2009-09-22
- * @since This class was part of SBMLsqueezer version 1.3.
+ * @since 1.0 (originates from SBMLsqueezer version 1.3 and EvA2)
  * @version $Rev$
  */
 public class Reflect {

@@ -26,6 +26,7 @@ import de.zbit.util.Utils;
  * AbstractProgressBar around a JProgressBar.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class ProgressBarSwing extends AbstractProgressBar {
   private static final long serialVersionUID = 2754375775367568812L;

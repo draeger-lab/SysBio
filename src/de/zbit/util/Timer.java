@@ -20,6 +20,7 @@ package de.zbit.util;
  * Useful for timing certain procedures.
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class Timer {
   /**

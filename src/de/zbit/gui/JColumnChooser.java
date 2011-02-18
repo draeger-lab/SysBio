@@ -58,6 +58,7 @@ import de.zbit.util.ResourceManager;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class JColumnChooser extends JPanel {
   private static final long serialVersionUID = -9026612128266336630L;

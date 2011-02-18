@@ -33,7 +33,7 @@ import java.io.OutputStream;
  * methods are provided to position at each successive entry in
  * the archive, and the read each entry as a normal input stream
  * using read().
- *
+ * @since 1.0
  */
 public class TarInputStream extends FilterInputStream {
 	/**

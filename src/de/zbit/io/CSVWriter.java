@@ -31,6 +31,7 @@ import javax.swing.table.TableModel;
  * @author Andreas Dr&auml;ger
  * @date 2010-09-02
  * @version $Rev$
+ * @since 1.0
  */
 public class CSVWriter {
 

@@ -47,6 +47,7 @@ import de.zbit.kegg.parser.pathway.RelationType;
  * Parses a Kegg Pathway (in KGML (*.xml) format).
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class KeggParser extends DefaultHandler {
   /**

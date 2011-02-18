@@ -33,6 +33,7 @@ import de.zbit.util.prefs.KeyProvider;
  * @author Andreas Dr&auml;ger
  * @date 2010-11-24
  * @version $Rev$
+ * @since 1.0
  */
 public class CommandLineHelp {
 	

@@ -30,6 +30,7 @@ import de.zbit.kegg.parser.KeggParser;
  * <a href="http://www.genome.jp/kegg/xml/docs/">KeggAPI</a>)
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public class Entry {
   /**

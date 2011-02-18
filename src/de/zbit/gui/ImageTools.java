@@ -46,6 +46,7 @@ import de.zbit.util.ResourceManager;
  * @author wrzodek
  * @author Andreas Dr&auml;ger
  * @version $Rev$
+ * @since 1.0
  */
 public class ImageTools {
 

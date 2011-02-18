@@ -34,6 +34,7 @@ import java.io.InputStream;
  *
  * @author alecw@broadinstitute.org
  * @version $Rev$
+ * @since 1.0
  */
 public class FastLineReader {
     private InputStream in;

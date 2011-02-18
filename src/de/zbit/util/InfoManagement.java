@@ -40,6 +40,7 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
  * 
  * @author wrzodek
  * @version $Rev$
+ * @since 1.0
  */
 public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable, INFOtype extends Serializable> implements Serializable {
   /**
