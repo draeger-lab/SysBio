@@ -163,11 +163,12 @@ public class Reflect {
 		if (classes == null || classes.length == 0) {
 			HashSet<Class<T>> set = new HashSet<Class<T>>();
 			boolean tryDir = true;
-			if (tryDir) {
+			if (tryDir && jarPath!=null) {
 				File f = new File(jarPath);
 				if (f.isDirectory()) {
 					String[] pathElements = f.list();
 					for (String entry : pathElements) {
+					  // Only works with jar files. Check file extension before calling it?
 						Reflect.getClassesFromJarFltr(set, jarPath + entry, packageName,
 							true, superClass);
 					}
@@ -362,8 +363,7 @@ public class Reflect {
 			String dir = null;
 			try {
 				ClassLoader cld = ClassLoader.getSystemClassLoader();
-				if (cld == null) { throw new ClassNotFoundException(
-					"Can't get class loader."); }
+				if (cld == null) { throw new ClassNotFoundException("Can't get class loader."); }
 				dir = path + "/" + pckgname.replace(".", "/");
 				
 				if (TRACE) {
@@ -382,8 +382,7 @@ public class Reflect {
 			}
 			if (directory.exists()) {
 				// Get the list of the files contained in the package
-				return getClassesFromDirFltr(set, directory, pckgname, includeSubs,
-					reqSuperCls);
+				return getClassesFromDirFltr(set, directory, pckgname, includeSubs, reqSuperCls);
 			} else {
 				if (TRACE) {
 					System.err.printf("%s does not exist in %s, dir was %s.\n", directory
@@ -413,7 +412,7 @@ public class Reflect {
 		boolean isInSubPackage = true;
 		int cntAdded = 0;
 		
-		packageName = packageName.replaceAll("\\.", "/");
+		packageName = packageName.replace('.', '/');
 		if (TRACE) {
 			System.out.printf("Jar %s looking for %s\n", jarName, packageName);
 		}
@@ -462,13 +461,11 @@ public class Reflect {
 			}
 		} catch (IOException e) {
 			missedJarsOnClassPath++;
-			if (missedJarsOnClassPath == 0) {
-				System.err.printf("Could not open jar from class path: %s.\n", e
-						.getMessage());
+			if (missedJarsOnClassPath <2) {
+				System.err.printf("Could not open jar from class path: %s.\n", e.getMessage());
 				System.err.println("Dirty class path?");
 			} else if (missedJarsOnClassPath == 2) {
-				System.err
-						.println("Could not open jar from class path more than once...");
+				System.err.println("Could not open jar from class path more than once...");
 			}
 			// e.printStackTrace();
 		}
@@ -486,11 +483,16 @@ public class Reflect {
 		}
 		return getClassesFromClassPath(className);
 	}
-	
+
+  
 	/**
 	 * Collect classes from a given package on the classpath which have the given
 	 * Class as superclass or superinterface. If includeSubs is true, the
 	 * sub-packages are listed as well.
+	 * 
+	 * <p>NOTE (wrzodek,2011): This method does not work in java web-start
+	 * applications, because no (valid) class path is defined here and it is not
+	 * possible to get the actual location of the currently running jar file.</p> 
 	 * 
 	 * @param <T>
 	 * @see Class.assignableFromClass(Class cls)
@@ -499,19 +501,67 @@ public class Reflect {
 	 */
 	public static <T> Class<T>[] getClassesInPackageFltr(HashSet<Class<T>> set,
 		String pckg, boolean includeSubs, boolean bSort, Class<T> reqSuperCls) {
-		String classPath = null;
-		if (!useFilteredClassPath || (dynCP == null)) {
-			classPath = System.getProperty("java.class.path", ".");
-			if (useFilteredClassPath) {
-				try {
-					dynCP = getValidCPArray();
-				} catch (Exception e) {
-					System.err.println(e.getMessage());
-				}
-			} else {
-				dynCP = getClassPathElements();
-			}
+	  String classPath = null;
+	  
+	   if (!useFilteredClassPath || (dynCP == null)) {
+	      classPath = System.getProperty("java.class.path", ".");
+	      if (useFilteredClassPath) {
+	        try {
+	          dynCP = getValidCPArray();
+	        } catch (Exception e) {
+	          System.err.println(e.getMessage());
+	        }
+	      } else {
+	        dynCP = getClassPathElements();
+	      }
+	    }
+	   
+	  /*
+	   * Alternative Method to marcel's one (by Wrzodek). This is much faster, because the
+	   * current classLoader is used, instead of using the system-class path. But not already
+	   * loaded classes are missing (which might be a good/wanted effect or not)!
+	   */
+	  /*
+	  List<String> dirs = new ArrayList<String>();
+		try {
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    assert classLoader != null;
+    String path = pckg.replace('.', '/');
+    Enumeration<URL> resources = classLoader.getResources(path);
+    path='/'+path;
+    while (resources.hasMoreElements()) {
+        URL resource = resources.nextElement();
+        String fileName = resource.getFile();
+        String fileNameDecoded = URLDecoder.decode(fileName, "UTF-8");
+        
+        // E.g., http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/KEGGtranslator.jar!/de/zbit/gui/prefs
+        // - Remove the package extension from the string and remove eventual "!"'s and "file:/" prefixes. 
+         
+        if (fileNameDecoded.endsWith(path)) {
+          fileNameDecoded = fileNameDecoded.substring(0, fileNameDecoded.length()-path.length());
+        }
+        if (fileNameDecoded.endsWith(".jar!")) {
+          fileNameDecoded = fileNameDecoded.substring(0, fileNameDecoded.length()-1);
+        }
+        if (fileNameDecoded.startsWith("file://")) {
+          fileNameDecoded = fileNameDecoded.substring(7);
+        }
+        if (fileNameDecoded.startsWith("file:/")) {
+          fileNameDecoded = fileNameDecoded.substring(6);
+        }
+        
+        System.out.println(fileNameDecoded);
+        
+        dirs.add((fileNameDecoded));
+    }
+		} catch (Exception e) {
+		  e.printStackTrace();
 		}
+		dynCP = dirs.toArray(new String[0]);
+
+		 * 
+		 */
+		
 		
 		if (TRACE) {
 			System.out.println("classpath is " + classPath);
