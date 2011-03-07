@@ -1,107 +1,168 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!-- Author: Hannes Planatscher -->
-<project name="SysBio" basedir=".">
-	<description>This ANT build file helps to set up the SysBio framework.</description>
-	
-	<!-- Directory variables -->
-	<property name="src.dir"	value="src" />
-	<property name="build.dir"	value="build" />
-	<property name="lib.dir"	value="lib" />
-	<property name="dist.dir"	value="dist" />
-	<property name="tmp.dir"	value="tmp" />
-	
-	<!-- Sourcepaths for the various systems -->
-	<path id="base.srcpath">
-		<pathelement location="${src.dir}"/>
-	</path>
-	
-	
-	<!-- Classpaths for the various systems -->
-	<path id="base.cp">
-		<pathelement location="${build.dir}"/>
-		<fileset dir="lib">
-		        <include name="**/*.jar"/>
-		 </fileset>
-	</path>
-	
-	
-	<!-- Initializing the build process -->
-	<target name="init-build" description="Prepare for compilation">
-		<echo>Preparing for compilation</echo>
-		<mkdir dir="${build.dir}"/>
-	</target>
-	
-	<target name="init-dist" description="Prepare for building distributable jar-files">
-		<tstamp/>
-		<mkdir dir="${dist.dir}"/>
-		<mkdir dir="${tmp.dir}"/>
-	</target>
-	
-	<!-- Here come the various compilation tasks -->
-	
-	<target name="build" description="Compiles the base API of the SysBio framework"
-		depends="init-build">
-		<echo>Compiling the base API</echo>
-		<javac srcdir="${src.dir}/"
-			   destdir="${build.dir}"
-			   classpathref="base.cp"
-			   sourcepathref="base.srcpath"
-			   includeantruntime="false">
-		</javac>
-	</target>
-	
-	<!-- Here come the various (bin-) distribution tasks -->
-	<target name="dist" description="Builds the binary jar-file "
-		depends="build,init-dist">
-		<echo>Building the distributable jar-file</echo>
-		<jar destfile="${dist.dir}/SysBio.jar"
-			 basedir="${build.dir}"
-			 index="true">
-		</jar>
-	</target>
-	
-	<target name="dist-fat" description="Builds the binary jar-file including all jar in the lib directory"
-		depends="build,init-dist">
-		<echo>Building the distributable jar-file</echo>
-		<jar destfile="${dist.dir}/SysBioFat.jar"
-			 basedir="${build.dir}"
-			 index="true">
-			 <zipgroupfileset dir="lib/" includes="**/*.jar"  excludes="*.properties" />
-		</jar>
-	</target>
-	
-	<!-- Src distribution tasks -->
-	<target name="dist-src" description="Builds a source zip-file for the base API"
-		depends="init-dist">
-		<echo>Generating distributable zip-file containing the source code</echo>
-		<zip destfile="${dist.dir}/sysbio-src-${DSTAMP}.zip"
-			 basedir="${src.dir}"
-			 update="true" roundup="false">
-			<include name="de/**"/>
-		</zip>
-		<antcall target="clean-tmp"/>
-	</target>
-	
-	<!-- Tasks for cleaning up the directory -->
-	<target name="clean" description="Remove all compiled and distribution files">
-		<echo>Cleaning up directory tree</echo>
-		<delete includeemptydirs="true" failonerror="false">
-			<fileset dir="${build.dir}"/>
-			<fileset dir="${dist.dir}"/>
-			<fileset dir="${tmp.dir}"/>
-		</delete>
-	</target>
-	<target name="clean-tmp" description="Removes temporary files after various tasks">
-		<delete includeemptydirs="true" failonerror="false">
-			<fileset dir="${tmp.dir}"/>
-		</delete>
-	</target>
-	
-	<target name="javadoc" description="Creates Javadoc for the SysBio Framework">
-		<javadoc sourcepath="${src.dir}/"
-            destdir="javadoc"
-            packagenames="de.zbit.*"
-             />
-	</target>	
-
+<?xml version="1.0"?>
+<project name="FatJar sysbio.jar (experimental)" default="main" basedir=".">
+    <!-- this file was created by Fat-Jar Eclipse Plug-in -->
+    <!-- the ANT-Export is in a very early stage, so this -->
+    <!-- is only experimental, ANT 1.6 or above is        -->
+    <!-- required, feedback is always welcome:            -->
+    <!--       http://sourceforge.net/projects/fjep       -->
+    <!-- uncomment the following lines if using ANT outside Eclipse -->
+    <!--
+        <property name="fjepPath" value="reference:file:plugins/net.sf.fjep.fatjar_0.0.31/fatjar.jar"/>
+        <taskdef name="fatjar.build" classname="net.sf.fjep.anttask.FJBuildTask" classpath="${fjepPath}"/>
+        <typedef name="fatjar.manifest" classname="net.sf.fjep.anttask.FJManifestType" classpath="${fjepPath}"/>
+        <typedef name="fatjar.exclude" classname="net.sf.fjep.anttask.FJExcludeType" classpath="${fjepPath}"/>
+        <typedef name="fatjar.jarsource" classname="net.sf.fjep.anttask.FJJarSourceType" classpath="${fjepPath}"/>
+        <typedef name="fatjar.filesource" classname="net.sf.fjep.anttask.FJFileSourceType" classpath="${fjepPath}"/>
+    -->
+    <!-- uncomment the above lines to use ANT outside of Eclipse -->
+    <target name="main">
+        <fatjar.build output="sysbio.jar">
+            <fatjar.manifest/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/bin" relpath=""/>
+            <fatjar.jarsource file="/local/draeger/workspace/SysBio/lib/argparser.jar" relpath=""/>
+            <fatjar.jarsource file="/local/draeger/workspace/SysBio/lib/axis.jar" relpath=""/>
+            <fatjar.jarsource file="/local/draeger/workspace/SysBio/lib/commons-cli-1.1.jar" relpath=""/>
+            <fatjar.jarsource file="/local/draeger/workspace/SysBio/lib/commons-discovery.jar" relpath=""/>
+            <fatjar.jarsource file="/local/draeger/workspace/SysBio/lib/commons-logging.jar" relpath=""/>
+            <fatjar.jarsource file="/local/draeger/workspace/SysBio/lib/jaxrpc.jar" relpath=""/>
+            <fatjar.jarsource file="/local/draeger/workspace/SysBio/lib/keggapi.jar" relpath=""/>
+            <fatjar.jarsource file="/local/draeger/workspace/SysBio/lib/WSDbfetch.jar" relpath=""/>
+            <fatjar.jarsource file="/local/draeger/workspace/SysBio/lib/wsdl4j.jar" relpath=""/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/Licenses/" relpath=""/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/exception/package.html" relpath="de/zbit/exception/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/exception/UnsuccessfulRetrieveException.java" relpath="de/zbit/exception/UnsuccessfulRetrieveException.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/prefs/Range.java" relpath="de/zbit/util/prefs/Range.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/prefs/SBPreferences.java" relpath="de/zbit/util/prefs/SBPreferences.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/prefs/KeyProvider.java" relpath="de/zbit/util/prefs/KeyProvider.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/prefs/Option.java" relpath="de/zbit/util/prefs/Option.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/prefs/SBProperties.java" relpath="de/zbit/util/prefs/SBProperties.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/prefs/OptionGroup.java" relpath="de/zbit/util/prefs/OptionGroup.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/liftOver/" relpath="de/zbit/util/liftOver/"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/CustomObject.java" relpath="de/zbit/util/CustomObject.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/ValuePair.java" relpath="de/zbit/util/ValuePair.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/Mergesort.java" relpath="de/zbit/util/Mergesort.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/SortedArrayList.java" relpath="de/zbit/util/SortedArrayList.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/FileDownload.java" relpath="de/zbit/util/FileDownload.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/ThreadManager.java" relpath="de/zbit/util/ThreadManager.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/ProcessExecutioner.java" relpath="de/zbit/util/ProcessExecutioner.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/DirectoryParser.java" relpath="de/zbit/util/DirectoryParser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/StringUtil.java" relpath="de/zbit/util/StringUtil.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/FileReadProgress.java" relpath="de/zbit/util/FileReadProgress.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/LogUtil.java" relpath="de/zbit/util/LogUtil.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/ResourceManager.java" relpath="de/zbit/util/ResourceManager.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/Utils.java" relpath="de/zbit/util/Utils.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/AbstractProgressBar.java" relpath="de/zbit/util/AbstractProgressBar.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/package.html" relpath="de/zbit/util/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/InfoManagement.java" relpath="de/zbit/util/InfoManagement.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/ProgressBar.java" relpath="de/zbit/util/ProgressBar.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/EscapeChars.java" relpath="de/zbit/util/EscapeChars.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/ArrayUtils.java" relpath="de/zbit/util/ArrayUtils.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/FileTools.java" relpath="de/zbit/util/FileTools.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/Info.java" relpath="de/zbit/util/Info.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/XMLResourceBundleControl.java" relpath="de/zbit/util/XMLResourceBundleControl.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/isTTY_Java16only.java" relpath="de/zbit/util/isTTY_Java16only.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/Reflect.java" relpath="de/zbit/util/Reflect.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/util/Timer.java" relpath="de/zbit/util/Timer.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/parser/UniProtParser.java" relpath="de/zbit/parser/UniProtParser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/parser/UniDomIntParser.java" relpath="de/zbit/parser/UniDomIntParser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/parser/package.html" relpath="de/zbit/parser/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/parser/SwisspfamParser.java" relpath="de/zbit/parser/SwisspfamParser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/parser/IPIParser.java" relpath="de/zbit/parser/IPIParser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/dbfetch/package.html" relpath="de/zbit/dbfetch/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/dbfetch/IPIFetcher.java" relpath="de/zbit/dbfetch/IPIFetcher.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/dbfetch/DBFetcher.java" relpath="de/zbit/dbfetch/DBFetcher.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/dbfetch/UniProtFetcher.java" relpath="de/zbit/dbfetch/UniProtFetcher.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/SubType.java" relpath="de/zbit/kegg/parser/pathway/SubType.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/Graphics.java" relpath="de/zbit/kegg/parser/pathway/Graphics.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/ReactionType.java" relpath="de/zbit/kegg/parser/pathway/ReactionType.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/package.html" relpath="de/zbit/kegg/parser/pathway/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/GraphicsType.java" relpath="de/zbit/kegg/parser/pathway/GraphicsType.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/Reaction.java" relpath="de/zbit/kegg/parser/pathway/Reaction.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/RelationType.java" relpath="de/zbit/kegg/parser/pathway/RelationType.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/Pathway.java" relpath="de/zbit/kegg/parser/pathway/Pathway.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/Relation.java" relpath="de/zbit/kegg/parser/pathway/Relation.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/EntryType.java" relpath="de/zbit/kegg/parser/pathway/EntryType.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/ReactionComponent.java" relpath="de/zbit/kegg/parser/pathway/ReactionComponent.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/pathway/Entry.java" relpath="de/zbit/kegg/parser/pathway/Entry.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/KeggParser.java" relpath="de/zbit/kegg/parser/KeggParser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/parser/package.html" relpath="de/zbit/kegg/parser/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/gui/OrganismSelector.java" relpath="de/zbit/kegg/gui/OrganismSelector.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/gui/package.html" relpath="de/zbit/kegg/gui/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/gui/PathwaySelector.java" relpath="de/zbit/kegg/gui/PathwaySelector.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/gui/KGMLSelectAndDownload.java" relpath="de/zbit/kegg/gui/KGMLSelectAndDownload.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/KeggInfoManagement.java" relpath="de/zbit/kegg/KeggInfoManagement.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/KeggTools.java" relpath="de/zbit/kegg/KeggTools.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/package.html" relpath="de/zbit/kegg/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/KeggFunctionManagement.java" relpath="de/zbit/kegg/KeggFunctionManagement.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/KeggAdaptor.java" relpath="de/zbit/kegg/KeggAdaptor.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/KeggQuery.java" relpath="de/zbit/kegg/KeggQuery.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/kegg/KeggInfos.java" relpath="de/zbit/kegg/KeggInfos.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/resources/package.html" relpath="de/zbit/resources/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/resources/Resource.java" relpath="de/zbit/resources/Resource.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/bzip2/CBZip2InputStream.java" relpath="de/zbit/io/bzip2/CBZip2InputStream.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/bzip2/CRC.java" relpath="de/zbit/io/bzip2/CRC.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/bzip2/package.html" relpath="de/zbit/io/bzip2/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/bzip2/CBZip2OutputStream.java" relpath="de/zbit/io/bzip2/CBZip2OutputStream.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/bzip2/BZip2Constants.java" relpath="de/zbit/io/bzip2/BZip2Constants.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/tar/TarEntry.java" relpath="de/zbit/io/tar/TarEntry.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/tar/TarConstants.java" relpath="de/zbit/io/tar/TarConstants.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/tar/package.html" relpath="de/zbit/io/tar/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/tar/TarInputStream.java" relpath="de/zbit/io/tar/TarInputStream.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/tar/TarUtils.java" relpath="de/zbit/io/tar/TarUtils.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/tar/TarOutputStream.java" relpath="de/zbit/io/tar/TarOutputStream.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/tar/TarBuffer.java" relpath="de/zbit/io/tar/TarBuffer.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/FormatDescription.java" relpath="de/zbit/io/FormatDescription.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/CSVWriter.java" relpath="de/zbit/io/CSVWriter.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/FormatDescriptionReader.java" relpath="de/zbit/io/FormatDescriptionReader.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/MultipleFileFilter.java" relpath="de/zbit/io/MultipleFileFilter.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/CSVOptions.java" relpath="de/zbit/io/CSVOptions.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/RegExpFileFilter.java" relpath="de/zbit/io/RegExpFileFilter.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/package.html" relpath="de/zbit/io/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/OpenFile.java" relpath="de/zbit/io/OpenFile.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/SBAcceptAllFileFilter.java" relpath="de/zbit/io/SBAcceptAllFileFilter.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/ZIPUtils.java" relpath="de/zbit/io/ZIPUtils.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/GeneralFileFilter.java" relpath="de/zbit/io/GeneralFileFilter.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/FormatIdentification.java" relpath="de/zbit/io/FormatIdentification.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/CSVReader.java" relpath="de/zbit/io/CSVReader.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/io/SBFileFilter.java" relpath="de/zbit/io/SBFileFilter.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/prefs/PreferencesPanel.java" relpath="de/zbit/gui/prefs/PreferencesPanel.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/prefs/CommandLineHelp.java" relpath="de/zbit/gui/prefs/CommandLineHelp.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/prefs/package.html" relpath="de/zbit/gui/prefs/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/prefs/FileInputVerifier.java" relpath="de/zbit/gui/prefs/FileInputVerifier.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/prefs/FileSelector.java" relpath="de/zbit/gui/prefs/FileSelector.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/prefs/PreferencesDialog.java" relpath="de/zbit/gui/prefs/PreferencesDialog.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/prefs/PreferencesPanelForKeyProvider.java" relpath="de/zbit/gui/prefs/PreferencesPanelForKeyProvider.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/prefs/MultiplePreferencesPanel.java" relpath="de/zbit/gui/prefs/MultiplePreferencesPanel.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/prefs/FileHistory.java" relpath="de/zbit/gui/prefs/FileHistory.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/VerticalLayout.java" relpath="de/zbit/gui/VerticalLayout.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/CSVReaderColumnChooser.java" relpath="de/zbit/gui/CSVReaderColumnChooser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/JColumnChooser.java" relpath="de/zbit/gui/JColumnChooser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/ActionCommand.java" relpath="de/zbit/gui/ActionCommand.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/GradientPanel.java" relpath="de/zbit/gui/GradientPanel.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/ImageTools.java" relpath="de/zbit/gui/ImageTools.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/GUITools.java" relpath="de/zbit/gui/GUITools.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/ProgressBarSwing.java" relpath="de/zbit/gui/ProgressBarSwing.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/JTableUtils.java" relpath="de/zbit/gui/JTableUtils.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/package.html" relpath="de/zbit/gui/package.html"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/LayoutHelper.java" relpath="de/zbit/gui/LayoutHelper.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/CSVImporter.java" relpath="de/zbit/gui/CSVImporter.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/GUIOptions.java" relpath="de/zbit/gui/GUIOptions.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/JTabbedLogoPane.java" relpath="de/zbit/gui/JTabbedLogoPane.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/BaseFrame.java" relpath="de/zbit/gui/BaseFrame.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/SystemBrowser.java" relpath="de/zbit/gui/SystemBrowser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/UpdateMessage.java" relpath="de/zbit/gui/UpdateMessage.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/JHelpBrowser.java" relpath="de/zbit/gui/JHelpBrowser.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/JBrowserPane.java" relpath="de/zbit/gui/JBrowserPane.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/CSVReaderOptionPanel.java" relpath="de/zbit/gui/CSVReaderOptionPanel.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/gui/FileDropHandler.java" relpath="de/zbit/gui/FileDropHandler.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/src/de/zbit/logging/OneLineFormatter.java" relpath="de/zbit/logging/OneLineFormatter.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/test/de/zbit/util/prefs/HTMLDocumentation.java" relpath="de/zbit/util/prefs/HTMLDocumentation.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/test/de/zbit/util/ValuePairTest.java" relpath="de/zbit/util/ValuePairTest.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/test/de/zbit/util/FileReadProgressTest.java" relpath="de/zbit/util/FileReadProgressTest.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/test/de/zbit/parser/UniDomIntParserTest.java" relpath="de/zbit/parser/UniDomIntParserTest.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/test/de/zbit/parser/UniProtParserTest.java" relpath="de/zbit/parser/UniProtParserTest.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/test/de/zbit/io/CSVReaderTest.java" relpath="de/zbit/io/CSVReaderTest.java"/>
+            <fatjar.filesource path="/local/draeger/workspace/SysBio/test/de/zbit/gui/BaseGUI.java" relpath="de/zbit/gui/BaseGUI.java"/>
+        </fatjar.build>
+    </target>
 </project>
