@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+	This configuration provides locale-dependent names for labels in
+	a (graphical) user interface. The separator ";" can be used to
+	separate actual labels from associated tool tips.
+  </comment>
+  
+  <!-- BaseFrame -->
+  
+  <entry key="ABOUT_THE_PROGRAM">关于 %s</entry>
+  <entry key="DEFAULT_TOOL_BAR_TITLE">工具</entry>
+  <entry key="LICENSE_OF_THE_PROGRAM">%s - 许可</entry>
+  <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - 在线帮助</entry>
+  
+  <!-- CSVImporter -->
+  
+  <entry key="COULD_NOT_IDENTIFY_COLUMNS">%d 给定输入文件里的数据行并不会自动被分配到期望的行中。请在此手动输入这些数据行。</entry>
+  <entry key="COLUMN_ASSIGNMENT">行分配</entry>
+  
+  <!-- CSVReaderColumnChooser -->
+  
+  <entry key="REQUIRED_COLUMNS">需要的行 </entry>
+  <entry key="OPTIONAL_COLUMNS">可选的行 </entry>
+  <entry key="ASSIGN_THESE_COLUMNS">请分配下列行:</entry>
+  
+  <!-- CSVReaderOptionPanel -->
+  
+  <entry key="COLUMN">行</entry>
+  <entry key="CSV_OPTIONS">CSV 选项</entry>
+  <entry key="FILE_PREVIEW">文件预览</entry>
+  <entry key="FILE_CONTAINS_HEADERS">包含了文件头的文件</entry>
+  <entry key="INDICATE_IF_COLUMN_DESCRIPTIONS_ARE_GIVEN">指示文件是否包含了行描述。</entry>
+  <entry key="SEPARATOR_CHAR">分隔符 </entry>
+  <entry key="SEPARATOR_CHAR_TOOLTIP">用于分隔这些行的分隔字符。</entry>
+  <entry key="TREAT_CONSECUTIVE_SEPARATORS_AS_ONE">将连续的分隔符处理为一个</entry>
+  <entry key="TREAT_CONSECUTIVE_SEPARATORS_AS_ONE_TOOLTIP">指示是否应该将连续的分隔符处理为一个。</entry>
+  <entry key="SKIP_THIS_NUMBER_OF_LEADING_LINES">在文件开始部分跳过这么多的行。</entry>
+  <entry key="SKIP_LINES">跳过行</entry>
+  
+  <!-- FileHistory -->
+  
+  <entry key="LAST_OPENED">记录程序打开过的最后一个文件。</entry>
+  
+  <!-- FileSelector -->
+  
+  <entry key="FILE">文件</entry>
+  <entry key="DIRECTORY">文件夹</entry>
+  <entry key="OPEN">打开</entry>
+  <entry key="SAVE">保存</entry>
+  <entry key="SELECT_TARGET_FILE">选择目标文件 %s.</entry>
+  <entry key="TO_BE_OPENED">打开的</entry>
+  <entry key="TO_BE_SAVED">保存的</entry>
+  <entry key="SELECT_TARGET_DIRECTORY">选择默认文件夹的 %s 种不同的文件。</entry>
+  
+  <!-- GUIOptions -->
+  
+  <entry key="CHECK_FOR_UPDATES">判断在程序启动时是否要检查更新。</entry>
+  <entry key="GUI">可以以混合= true 或者= false或者只是--gui的形式使用。设定程序是否应显示其图形用户界面。</entry>
+  <entry key="OPEN_DIR">打开用户文件的标准文件夹。</entry>
+  <entry key="SAVE_DIR">用户可以保存一些文件的标准文件夹。</entry>
+  <entry key="DEFAULT_DIRECTORIES">默认文件夹</entry>
+  <entry key="DEFAULT_DIRECTORIES_TOOLTIP">定义打开和保存文件的默认文件夹。这些文件夹将作为在图形用户界面中选择文件的首选目标。</entry>
+  
+  <!-- GUITools -->
+  
+  <entry key="NO_READ_ACCESS_MESSAGE">无法读取 %s %s.</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
+  <entry key="NO_READ_ACCESS_TITLE">无读取入口</entry>
+  <entry key="NO_WRITE_ACCESS_MESSAGE">无法写入到 %s %s.</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
+  <entry key="NO_WRITE_ACCESS_TITLE">五无写入入后</entry>
+  <entry key="OVERRIDE_EXISTING_FILE_QUESTION">%s %s 已经存在。您真想覆盖它吗?</entry> <!-- first %s will be replaced by THE_FILE or THE_DIRECTORY and the second %s by the absolute path -->
+  <entry key="OVERRIDE_EXISTING_FILE_TITLE">覆盖已经存在的文件?</entry>
+  <entry key="THE_DIRECTORY">文件夹</entry>
+  <entry key="THE_FILE">文件</entry>
+  
+  <!-- JColumnChooser -->
+  
+  <entry key="EG">例如, </entry>
+  <entry key="NOT_AVAILABLE">不存在</entry>
+  <entry key="INVALID_COLUMN">无效行</entry>
+  
+  <!-- JHelpBrowser -->
+  
+  <entry key="ONLINE_HELP">在线帮助</entry>
+  <entry key="ONLINE_HELP_TOOLTIP">这是主要的在线帮助。</entry>
+  <entry key="COMMAND_LINE_ARGUMENTS">命令行参数</entry>
+  <entry key="LAST_PAGE">最后一页</entry>
+  <entry key="NEXT">下一个</entry>
+  <entry key="NEXT_PAGE">下一页</entry>
+  <entry key="SAVE">保存</entry>
+  <entry key="SAVE_TOOLTIP">保存当前文件为HTML文件。</entry>
+  
+  <!-- KeyProvider -->
+  
+  <entry key="ADDITIONAL_OPTIONS">附加选项</entry>
+  <entry key="ALL_POSSIBLE_VALUES_FOR_TYPE">可输入的所有可能值</entry>
+  <entry key="ARE">是</entry>
+  <entry key="AND">和</entry>
+  <entry key="ARGS_MUST_FIT_INTO_RANGE">参数必须符合值域 %s。</entry>
+  <entry key="DEFAULT_VALUE">默认值</entry>
+  
+  <!-- MultiplePreferencesPanel -->
+  
+  <entry key="USER_PREFERENCES">用户喜好</entry>
+    
+  <!-- Option -->
+  
+  <entry key="ACCEPTS">接受</entry>
+  
+  <!-- PreferencesDialog -->
+  
+  <entry key="APPLY">应用;保存当前配置但保持对话框打开。</entry>
+  <entry key="BROWSE">浏览</entry>
+  <entry key="CANCEL">取消;关闭对话框且不保存,也就是说,将丢失所有的喜好。</entry>
+  <entry key="DEFAULTS">还原为默认;回复默认配置，也就是说，所有的当前喜好将被替换为默认值。</entry>
+  <entry key="OK">确定;保存当前配置并关闭对话框。</entry>
+  <entry key="PREFERENCES">喜好</entry>
+  
+  <!-- SBFileFilter -->
+  
+  <entry key="IMAGE_FILES">Image文件</entry>
+  <entry key="TEXT_FILES">Text文件</entry>
+  <entry key="TeX_FILES">TeX文件</entry>
+  <entry key="SBML_FILES">SBML文件</entry>
+  <entry key="CSV_FILES">Comma分隔文件</entry>
+  <entry key="JPEG_FILES">Joint Photographic Experts Group文件</entry>
+  <entry key="PNG_FILES">Portable Network Graphics文件</entry>
+  <entry key="PDF_FILES">Portable Document Format文件</entry>
+  <entry key="HTML_FILES">Hypertext markup language文件</entry>
+  <entry key="GRAPHML_FILES">GraphML文件</entry>
+  <entry key="GML_FILES">Graph Modeling Language文件</entry>
+  <entry key="GIF_FILES">Graphics Interchange Format文件</entry>
+  <entry key="YGF_FILES">Y Graph Format文件</entry>
+  <entry key="TGF_FILES">Trivial图形格式文件</entry>
+  <entry key="DIRECTORIES_ONLY">仅目录</entry>
+  
+  <!-- SBAcceptAllFileFilter -->
+  
+  <entry key="ACCEPT_ALL_FILES">所有文件(*)</entry>
+  
+  <!-- UpdateMessage -->
+  
+  <entry key="SHOW_RELEASE_NOTES">显示发布记录</entry>
+  <entry key="HIDE_RELEASE_NOTES">隐藏发布记录</entry>
+  <entry key="UPDATE_IS_AVAILABLE">存在一个为 %s 更新。</entry>
+  <entry key="COMMAND_LINE_UPDATE_MESSAGE">\n更新通知:\n--------------------\n存在一个为 %s 的更新。\n请访问 %s\n以获得 %s版本。\n提示: 您正在使用 %s 版本 %s.\n</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">您已经正在使用最新版本 %s of %s. 无法找到更新的版本。</entry>
+  <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">没有可用的更新。</entry> 
+  
+</properties>

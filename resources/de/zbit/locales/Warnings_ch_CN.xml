@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+	This configuration provides locale-dependent names for warnings
+	and error messages in a (graphical) user interface.
+  </comment>
+  
+  <!-- CSVReaderColumnCooser -->
+  
+  <entry key="INVALID_CSV-FILE">无效或空白的CSV文件。</entry>
+  <entry key="NO_SUCH_COLUMN_CHOOSER">没有叫做 "%d"的行选择器。</entry>
+  
+  <!-- ImageTools -->
+  
+  <entry key="COULD_NOT_LOAD_IMAGE">"无法载入图像 %s.\n"</entry>
+  <entry key="COULD_NOT_LOAD_ICONS_FROM_DIR">无法从文件夹 %s载入图标。</entry>
+  <entry key="WRONG_PERCENTAGE_IN_IMAGE"> %s: %f中的错误的百分率。</entry>
+  
+  <!-- JBrowserPane -->
+  
+  <entry key="CANNOT_FOLLOW_LINK">无法连接到</entry>
+    
+  <!-- Option -->
+  
+  <entry key="VALUE_MUST_BE_POSITIVE">%s必须为一个正数。</entry>
+    
+  <!-- Range -->
+  
+  <entry key="CLASS_NOT_COMPARABLE">无法比较类型 %s. 请应用一个可比较的接口。</entry>
+  <entry key="REQUIRED_TYPE_FOR_X_MUST_BE">当以一个 %s初始化时, 需求的类型必须为 %s的一个实例.</entry>
+  <entry key="RANGE_IN_WRONG_FORMAT">值域为错误的格式: '%s'.</entry>
+    
+  <!-- SBFileFilter -->
+  
+  <entry key="FILE_TYPE_MUST_NOT_BE_UNDEFINED">必须定义文件类型。</entry>
+  
+  <!-- SBPreferences -->
+  
+  <entry key="BACKING_STORE_EXCEPTION_MESSAGE">不能以 %s存储用户配置.</entry> <!-- Requires a KeyProvider name as argument. -->
+  <entry key="COULD_NOT_LOAD_PROPERTIES_MESSAGE">不能以 %s加载属性.</entry> <!-- Requires a KeyProvider name as argument. -->
+  <entry key="COULD_NOT_LOAD_PROPERTIES_FROM_FILE">不能以 %s 从配置文件 %s加载属性.</entry> <!-- Requires name of a KeyProvider and absolute path to corresponding configuration file -->
+  <entry key="INVALID_DATA_TYPE_FOR_OPTION">选项 %s 的值的类型无效. 必须指定一个 %s的实例.</entry> <!-- Requires a value and an Option name. -->
+  <entry key="NO_DEFAULT_VALUE_FOR_OPTION_IN_FILE">没有为选项 %s的默认值（在文件 %s中）.</entry> <!-- Requires an Option name and an absolute path to a file. -->
+  <entry key="NO_SUCH_OPTION_DEFINED_BY_KEYPROVIDER">没有 %s 这样的选项由 %s所定义.</entry> <!-- Requires an Option name and a KeyProvider. -->
+  <entry key="NO_VALUE_DEFINED_FOR_PROPERTY">没有为属性 %s定义的默认值.</entry> <!-- Requires a wrongly used name of a property. -->
+  <entry key="OPTION_OUT_OF_RANGE">选项 %s 在值域之外.</entry> <!-- Requires name of an Option -->
+  <entry key="RANGE_CONSTRAINT_VIOLATION_MESSAGE">值 "%s" 已经超出选项 "%s" 的值域. 请选择一个值满足如下限制: %s.</entry> <!-- Requires a value, an Option name, and a Range string. -->
+  <entry key="REMOVING_INVALID_ENTRY">去掉无效的key-数值对 %s:%s.</entry>
+  <entry key="VALUE_FOR_OPTION_NOT_AVAILABLE">无法确定属于选项 %s的值.</entry> <!-- Requires the name of an Option. -->
+  
+</properties>

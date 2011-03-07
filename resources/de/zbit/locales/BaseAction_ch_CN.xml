@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+	This configuration describes the names of buttons and menu
+	items in base graphical user interfaces. To change the configuration
+	note that the key is the same as the enum type in BaseFrame.BaseAction
+	and the given value consists of the actual short name and - separated
+	by a semicolon ";" the corresponding tool tip.
+
+  </comment>
+  <entry key="EDIT">编辑</entry>
+  <entry key="EDIT_PREFERENCES">喜好;打开一个对话框以配置该程序的所有选项。
+</entry>
+  <entry key="FILE">文件</entry>
+  <entry key="FILE_CLOSE">关闭;关闭当前打开的文件。</entry>
+  <entry key="FILE_EXIT">退出;关闭该程序并保存所有用户定义的喜好。</entry>
+  <entry key="FILE_OPEN">打开;打开一个要处理的文件。</entry>
+  <entry key="FILE_OPEN_RECENT">最近的文件;该菜单选项入口允许您直接再次加载一个最近打开的文件。</entry>
+  <entry key="FILE_SAVE">保存;以一种存在的格式保存当前的工作。</entry>
+  <entry key="HELP">帮助</entry>
+  <entry key="HELP_ABOUT">关于;显示该程序的标记并解释当您使用该程序遇到问题时应该联系谁。</entry>
+  <entry key="HELP_LICENSE">许可;您可以在这里看到用于散布该程序的许可证书。</entry>
+  <entry key="HELP_ONLINE">在线帮助;在浏览器中显示在线帮助。</entry>
+  <entry key="HELP_UPDATE">在线升级;在项目网站里检查该程序的新版本。</entry>
+</properties>
