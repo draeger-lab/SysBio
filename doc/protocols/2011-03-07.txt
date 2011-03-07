@@ -1,0 +1,15 @@
+
+   Protokoll
+   =========
+
+1. Es wurde durchgesprochen, wie eine neue Version in das tags-
+   Verzeichnis kopiert wird.
+
+2. Florian Mittag kümmert sich um das von Klaus einzurichtende
+   Admin-Konto.
+   
+4. Andreas Dräger hat einen Dateikopf und Haftungsausschluss
+   rumgeschickt, in alle Dateien eingefügt und überall auch einen
+   @since-Eintrag hinzugefügt.
+   
+5. Erstes Release erfolgt heute.
