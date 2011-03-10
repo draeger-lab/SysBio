@@ -532,12 +532,10 @@ public class KeggInfos {
 	}
 
 	/**
-	 * 
+	 * Of REFENRECED pathways. not the actual queried one (if one queries a PW)
 	 * @return
 	 */
 	public String getPathwayDescriptions() {
-		// Of REFENRECED pathways. not the actual queried one (if one queries a
-		// PW).
 		return pathwayDescs;
 	}
 
@@ -721,7 +719,7 @@ public class KeggInfos {
 			pathways = "";
 			pathwayDescs = "";
 			for (String s : splitt) {
-				if (!s.startsWith(" ") && (pathwayDescs.length() != 0)) {
+				if (s.startsWith(" ") && (pathwayDescs.length() != 0)) {
 					/*
 					 * Continuation of last line.
 					 */
