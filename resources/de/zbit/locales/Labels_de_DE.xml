@@ -93,7 +93,10 @@
   <entry key="ARE">sind</entry>
   <entry key="AND">und</entry>
   <entry key="ARGS_MUST_FIT_INTO_RANGE">Argumente müssen aus dem Bereich %s gewählt werden.</entry>
+  <entry key="COMMAND_LINE_HELP">Zeigt alle verfügbaren %s an.</entry> <!-- COMMAND_LINE_ARGUMENTS -->
   <entry key="DEFAULT_VALUE">Standardwert</entry>
+  <entry key="PROGRAM_USAGE">Programmbenutzung</entry>
+  <entry key="STARTS_PROGRAM">Startet das Programm %s.</entry> <!-- Program name -->
   
   <!-- MultiplePreferencesPanel -->
   
@@ -111,6 +114,10 @@
   <entry key="DEFAULTS">Zurücksetzen;Stellt die Standardkonfiguration wieder her, d.h., alle aktuellen Einstellungen werden durch die Standardwerte ersetzt.</entry>
   <entry key="OK">OK;Speichert die aktuelle Konfiguration und schließt diesen Dialog.</entry>
   <entry key="PREFERENCES">Einstellungen</entry>
+  
+  <!-- SBPreferences -->
+  
+  <entry key="OPTIONS">Optionen</entry>
   
   <!-- SBFileFilter -->
   
