@@ -85,7 +85,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @return
 	 */
 	public static final boolean showPreferencesDialog() {
-		return showPreferencesDialog((PreferencesPanel)null);
+		return showPreferencesDialog((PreferencesPanel) null);
 	}
 	
 	/**
@@ -95,13 +95,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 */
 	public static final boolean showPreferencesDialog(PreferencesPanel panel) {
 		PreferencesDialog dialog = new PreferencesDialog();
-		boolean exitStatus;
-		if (panel != null) {
-			exitStatus = dialog.showPrefsDialog(panel);
-		} else {
-			exitStatus = dialog.showPrefsDialog();
-		}
-		return exitStatus;
+		return (panel != null) ? dialog.showPrefsDialog(panel) : dialog.showPrefsDialog();
 	}
 	
 	/**
