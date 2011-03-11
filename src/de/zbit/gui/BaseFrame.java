@@ -777,9 +777,11 @@ public abstract class BaseFrame extends JFrame {
 	protected void init() {
 		if ((getTitle() == null) || (getTitle().length() == 0)) {
 			setTitle(getProgramNameAndVersion());
-			// Set this as property for static classes.
-			System.setProperty("APP_NAME", getApplicationName());
 		}
+		
+		// Set this as property for static classes.
+		System.setProperty("app.name", getApplicationName());
+		
 		GUITools.initLaF(getTitle());
 		setDefaultLookAndFeelDecorated(true);
 		
