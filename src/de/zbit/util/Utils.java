@@ -542,13 +542,32 @@ public class Utils {
    */
   public static int getNumberFromString(int startAtPos, String toParse) {
     int i = startAtPos;
-    if (i<=0) return -1; // Schlechte R�ckgabe... aber was sonst? Exception throwen ist schei�e
+    if (i<0) return -1; // Schlechte Rueckgabe... aber was sonst? Exception throwen ist scheisse
     
     String ret = "";
-    while (Character.isDigit(toParse.charAt(i)))
+    while (i<toParse.length() && Character.isDigit(toParse.charAt(i)))
       ret += toParse.charAt(i++);
     
     return Integer.parseInt(ret);
+  }
+  
+  /**
+   * Parse Number reverse. Starts at (startAtPos -1).
+   * E.g. "Hall-24-xyz" startAtPos = indexOf(x) Return value is 24.
+   * WARNING, startPos = indexOf(4) would return 2 !
+   * @param startAtPos
+   * @param toParse
+   * @return
+   */
+  public static int getNumberFromStringRev(int startAtPos, String toParse) {
+    int i = startAtPos;
+    if (i<=0) return -1; // Schlechte Rueckgabe... aber was sonst? Exception throwen ist scheisse
+    
+    StringBuffer ret = new StringBuffer();
+    while (i>0 && Character.isDigit(toParse.charAt(i-1)))
+      ret.append( toParse.charAt(i--) );
+    
+    return Integer.parseInt(ret.reverse().toString());
   }
   
   /**
