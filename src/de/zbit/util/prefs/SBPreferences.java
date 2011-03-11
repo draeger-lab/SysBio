@@ -63,6 +63,11 @@ public class SBPreferences implements Map<Object, Object> {
 	public static final String WARNINGS_LOCATION = "de.zbit.locales.Warnings";
 	
 	/**
+	 * The main class, used to start the application.
+	 */
+	private static Class<?> mainClass = null;
+	
+	/**
 	 * @author Andreas Dr&auml;ger
 	 * @date 2010-10-24
 	 */
@@ -449,21 +454,21 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return usage String (also called synopsis).
 	 */
 	public static String generateUsageString() {
-		Class<?> mainClass = null;
-		
-		// Get the main class from the stackTrace
-		final Throwable t = new Throwable();
-		for (StackTraceElement e : t.getStackTrace()) {
-			// Search the main class
-			if (e.getMethodName().equalsIgnoreCase("main")) {
-				// Get it's name
-				try {
-					mainClass = Class.forName(e.getClassName());
-					break;
-				} catch (ClassNotFoundException e1) {
-					// Not possible, because class is in StackTrace
-				}
-			}
+		if (mainClass==null) {
+		  // Get the main class from the stackTrace
+		  final Throwable t = new Throwable();
+		  for (StackTraceElement e : t.getStackTrace()) {
+		    // Search the main class
+		    if (e.getMethodName().equalsIgnoreCase("main")) {
+		      // Get it's name
+		      try {
+		        mainClass = Class.forName(e.getClassName());
+		        break;
+		      } catch (ClassNotFoundException e1) {
+		        // Not possible, because class is in StackTrace
+		      }
+		    }
+		  } 
 		}
 		
 		String usage;
