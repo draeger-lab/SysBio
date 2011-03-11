@@ -52,7 +52,7 @@ public interface KeyProvider {
 	 * 
 	 * @author Andreas Dr&auml;ger
 	 * @date 2010-11-23
-	 * 
+	 * @since 1.0
 	 * @param <T>
 	 */
 	public static class Entry<T> {
@@ -116,6 +116,7 @@ public interface KeyProvider {
 	 * 
 	 * @author Andreas Dr&auml;ger
 	 * @date 2010-11-13
+	 * @since 1.0
 	 */
 	public static class Tools {
 		
@@ -129,12 +130,14 @@ public interface KeyProvider {
 		private static StringBuilder createDocumantationContent(
 			Class<? extends KeyProvider> keyProvider, int headerRank) {
 			StringBuilder sb = new StringBuilder();
+			ResourceBundle bundle = ResourceManager
+					.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);						
 			List<OptionGroup> groupList = optionGroupList(keyProvider);
 			List<Option> optionList = optionList(keyProvider);
 			if (groupList.size() > 0) {
 				for (OptionGroup<?> group : groupList) {
-					sb.append(String.format("    <h%d> %s </h%d>\n      <p>", headerRank,
-						group.getName(), headerRank));
+					sb.append(createHeadline(headerRank, group.getName()));
+					sb.append("      <p>");
 					sb.append(StringUtil.insertLineBreaks(group.getToolTip(), 70,
 						"\n      "));
 					sb.append("</p>\n");
@@ -145,9 +148,7 @@ public interface KeyProvider {
 				sb.append("    <h");
 				sb.append(headerRank);
 				sb.append("> ");
-				sb.append(ResourceManager.getBundle(
-					GUITools.RESOURCE_LOCATION_FOR_LABELS)
-						.getString("ADDITIONAL_OPTIONS"));
+				sb.append(bundle.getString("ADDITIONAL_OPTIONS"));
 				sb.append(" </h");
 				sb.append(headerRank);
 				sb.append(">\n");
@@ -156,6 +157,17 @@ public interface KeyProvider {
 			return sb;
 		}
 		
+		/**
+		 * Creates a headline with the given title and the given rank.
+		 * 
+		 * @param headerRank
+		 * @param string
+		 * @return
+		 */
+		private static Object createHeadline(int headerRank, String string) {
+			return String.format("<h%d> %s </h%d>\n", headerRank, string, headerRank);
+		}
+
 		/**
 		 * 
 		 * @return
@@ -173,11 +185,38 @@ public interface KeyProvider {
 			Class<? extends KeyProvider> keyProvider) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(createDocumentationHeader(createTitle(keyProvider)));
+			sb.append(createProgramUsage(2, ""));
 			sb.append(createDocumantationContent(keyProvider, 2));
 			sb.append(createDocumantationFooter());
 			return sb.toString();
 		}
 		
+		/**
+		 * 
+		 * @param headerRank
+		 * @return
+		 */
+		private static String createProgramUsage(int headerRank, String programName) {
+			StringBuilder sb = new StringBuilder();
+			ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
+			sb.append(createHeadline(headerRank, bundle
+				.getString("PROGRAM_USAGE")));
+			sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\" width=\"100%\">\n");
+			sb.append("        <tr>\n          <td colspan=\"2\" class=\"typewriter-blue\">");
+			sb.append(SBPreferences.generateUsageString());
+			sb.append("</td>\n        </tr>\n        <tr><td width=\"6%\"> </td>\n");
+			sb.append(String.format(bundle.getString("STARTS_PROGRAM"),
+				programName != null ? programName : ""));
+			sb.append("\n        </td>\n      </tr>\n");
+			sb.append("        <tr>\n          <td colspan=\"2\" class=\"typewriter-blue\">");
+			sb.append("-?, -help");
+			sb.append("</td>\n        </tr>\n        <tr><td width=\"6%\"> </td>\n");
+			sb.append(String.format(bundle.getString("COMMAND_LINE_HELP"), bundle
+					.getString("OPTIONS")));
+			sb.append("\n        </td>\n      </tr>\n    </table>\n  \n");
+			return sb.toString();
+		}
+
 		/**
 		 * 
 		 * @param keyProviders
@@ -206,6 +245,7 @@ public interface KeyProvider {
 				sb.append(createDocumentationHeader(cmdArgs));
 			}
 			sb.append('\n');
+			sb.append(createProgramUsage(2, applicationName));
 			for (Class<? extends KeyProvider> keyProvider : keyProviders) {
 				sb.append(String.format("    <h2> %s </h2>\n\n",
 					createTitle(keyProvider)));

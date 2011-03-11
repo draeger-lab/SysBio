@@ -98,7 +98,10 @@
   <entry key="ARE">are</entry>
   <entry key="AND">and</entry>
   <entry key="ARGS_MUST_FIT_INTO_RANGE">Arguments must fit into the range %s.</entry>
+  <entry key="COMMAND_LINE_HELP">Lists all available %.</entry> <!-- COMMAND_LINE_ARGUMENTS -->
   <entry key="DEFAULT_VALUE">Default value</entry>
+  <entry key="PROGRAM_USAGE">Program usage</entry>
+  <entry key="STARTS_PROGRAM">Starts the program %s.</entry> <!-- Program name -->
   
   <!-- MultiplePreferencesPanel -->
   
@@ -116,6 +119,10 @@
   <entry key="DEFAULTS">Defaults;Restores the default configuration, i.e., all current preferences will be replaced by the default values.</entry>
   <entry key="OK">OK;Saves the current configuration and closes this dialog.</entry>
   <entry key="PREFERENCES">Preferences</entry>
+  
+  <!-- SBPreferences -->
+  
+  <entry key="OPTIONS">options</entry>
   
   <!-- SBFileFilter -->
   

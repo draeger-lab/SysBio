@@ -471,7 +471,9 @@ public class SBPreferences implements Map<Object, Object> {
 			// Should never happen...
 			usage = "java [program_name]";
 		} else {
-			usage = generateUsageString(mainClass) + " [options]";
+			usage = generateUsageString(mainClass)
+					+ String.format(" [%s]", ResourceManager.getBundle(
+						"de.zbit.locales.Labels").getString("OPTIONS"));
 		}
 		
 		return usage;
