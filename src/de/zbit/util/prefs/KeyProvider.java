@@ -254,7 +254,9 @@ public interface KeyProvider {
 		 */
 		public static String createDocumentation(
 			Class<? extends KeyProvider>... keyProviders) {
-			return createDocumentation(null, keyProviders);
+		  String appName = System.getProperty("APP_NAME");
+		  // appName must be set manually and is null if not set.
+			return createDocumentation(appName, keyProviders);
 		}
 		
 		/**
@@ -267,7 +269,7 @@ public interface KeyProvider {
 			StringBuilder sb = new StringBuilder();
 			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 			String cmdArgs = bundle.getString("COMMAND_LINE_ARGUMENTS");
-			if (applicationName != null) {
+			if (applicationName != null && applicationName.length()>0) {
 				sb.append(createDocumentationHeader(applicationName));
 				sb.append(' ');
 				sb.append(StringUtil.firstLetterLowerCase(cmdArgs));

@@ -535,14 +535,16 @@ public class Utils {
   }
   
   /**
-   * 
+   * Parse unsigned integer number from string.
+   * E.g. toParse="X134HA",startAtPos=1
+   * would return '134'.
    * @param startAtPos
    * @param toParse
-   * @return
+   * @return -1 if failed, else the parsed number.
    */
   public static int getNumberFromString(int startAtPos, String toParse) {
     int i = startAtPos;
-    if (i<0) return -1; // Schlechte Rueckgabe... aber was sonst? Exception throwen ist scheisse
+    if (i<0 || i>=toParse.length()) return -1;
     
     String ret = "";
     while (i<toParse.length() && Character.isDigit(toParse.charAt(i)))
@@ -552,20 +554,20 @@ public class Utils {
   }
   
   /**
-   * Parse Number reverse. Starts at (startAtPos -1).
+   * Parse unsigned integer number reverse. Starts at (startAtPos -1).
    * E.g. "Hall-24-xyz" startAtPos = indexOf(x) Return value is 24.
    * WARNING, startPos = indexOf(4) would return 2 !
    * @param startAtPos
    * @param toParse
-   * @return
+   * @return -1 if failed, else the parsed number.
    */
   public static int getNumberFromStringRev(int startAtPos, String toParse) {
     int i = startAtPos;
-    if (i<=0) return -1; // Schlechte Rueckgabe... aber was sonst? Exception throwen ist scheisse
+    if (i<=0 || i>toParse.length()) return -1;
     
     StringBuffer ret = new StringBuffer();
     while (i>0 && Character.isDigit(toParse.charAt(i-1)))
-      ret.append( toParse.charAt(i--) );
+      ret.append( toParse.charAt(--i) );
     
     return Integer.parseInt(ret.reverse().toString());
   }

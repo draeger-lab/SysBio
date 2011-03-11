@@ -118,6 +118,7 @@ public class CommandLineHelp {
 				.createDocumentation(clazzes));
 		editor.setEditable(false);
 		editor.setEnabled(true);
+		editor.setCaretPosition(0); // Set Scrollbars to top of Frame.
 		return editor;
 	}
 	
