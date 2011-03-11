@@ -198,18 +198,23 @@ public interface KeyProvider {
 		 */
 		private static String createProgramUsage(int headerRank, String programName) {
 			StringBuilder sb = new StringBuilder();
-			ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
-			sb.append(createHeadline(headerRank, bundle
-				.getString("PROGRAM_USAGE")));
+			ResourceBundle bundle = ResourceManager
+					.getBundle("de.zbit.locales.Labels");
+			sb.append(createHeadline(headerRank, bundle.getString("PROGRAM_USAGE")));
 			sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\" width=\"100%\">\n");
 			sb.append("        <tr>\n          <td colspan=\"2\" class=\"typewriter-blue\">");
 			sb.append(SBPreferences.generateUsageString());
 			sb.append("</td>\n        </tr>\n        <tr><td width=\"6%\"> </td>\n");
-			sb.append(String.format(bundle.getString("STARTS_PROGRAM"),
-				programName != null ? programName : ""));
+			String explanation = String.format(bundle.getString("STARTS_PROGRAM"),
+				programName != null ? programName : "");
+			if (explanation.endsWith(" .")) {
+				explanation = explanation.substring(0, explanation.length() - 2) + '.';
+			}
+			sb.append(explanation);
 			sb.append("\n        </td>\n      </tr>\n");
-			sb.append("        <tr>\n          <td colspan=\"2\" class=\"typewriter-blue\">");
-			sb.append("-?, -help");
+			sb
+					.append("        <tr>\n          <td colspan=\"2\" class=\"typewriter-blue\">");
+			sb.append("-help, -?");
 			sb.append("</td>\n        </tr>\n        <tr><td width=\"6%\"> </td>\n");
 			sb.append(String.format(bundle.getString("COMMAND_LINE_HELP"), bundle
 					.getString("OPTIONS")));
