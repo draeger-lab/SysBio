@@ -213,7 +213,6 @@ public interface KeyProvider {
 			sb.append(createTableLine("-help, -?", String.format(bundle.getString("COMMAND_LINE_HELP"), bundle
 				.getString("OPTIONS")), indentation));
 			sb.append("</table>\n\n");
-			System.out.println(sb);
 			return sb.toString();
 		}
 		
