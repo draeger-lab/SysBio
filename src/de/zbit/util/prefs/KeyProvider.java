@@ -209,8 +209,8 @@ public interface KeyProvider {
 			StringBuilder sb = new StringBuilder();
 			sb.append(createHeadline(headerRank, bundle.getString("PROGRAM_USAGE")));
 			sb.append("<table cellspacing=\"1\" cellpadding=\"1\" border=\"0\" width=\"100%\">\n");
-			sb.append(createTableLine(SBPreferences.generateUsageString(), explanation, indentation));
-			sb.append(createTableLine("-help, -?", String.format(bundle.getString("COMMAND_LINE_HELP"), bundle
+			sb.append(createHTMLTableLine(SBPreferences.generateUsageString(), explanation, indentation));
+			sb.append(createHTMLTableLine("-help, -?", String.format(bundle.getString("COMMAND_LINE_HELP"), bundle
 				.getString("OPTIONS")), indentation));
 			sb.append("</table>\n\n");
 			return sb.toString();
@@ -221,7 +221,7 @@ public interface KeyProvider {
 		 * 
 		 * @return
 		 */
-		private static String createTableLine(String typeWriterText,
+		private static String createHTMLTableLine(String typeWriterText,
 			String explanation, int indent) {
 			StringBuilder sb = new StringBuilder();
 			String indentation1 = StringUtil.fill("", indent, ' ', false);
@@ -254,7 +254,7 @@ public interface KeyProvider {
 		 */
 		public static String createDocumentation(
 			Class<? extends KeyProvider>... keyProviders) {
-		  String appName = System.getProperty("APP_NAME");
+		  String appName = System.getProperty("app.name");
 		  // appName must be set manually and is null if not set.
 			return createDocumentation(appName, keyProviders);
 		}
@@ -270,9 +270,8 @@ public interface KeyProvider {
 			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 			String cmdArgs = bundle.getString("COMMAND_LINE_ARGUMENTS");
 			if (applicationName != null && applicationName.length()>0) {
-				sb.append(createDocumentationHeader(applicationName));
-				sb.append(' ');
-				sb.append(StringUtil.firstLetterLowerCase(cmdArgs));
+				sb.append(createDocumentationHeader(StringUtil.concat(applicationName,
+					" - ", cmdArgs).toString()));
 			} else {
 				sb.append(createDocumentationHeader(cmdArgs));
 			}
