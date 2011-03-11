@@ -98,7 +98,7 @@
   <entry key="ARE">是</entry>
   <entry key="AND">和</entry>
   <entry key="ARGS_MUST_FIT_INTO_RANGE">参数必须符合值域 %s。</entry>
-  <entry key="COMMAND_LINE_HELP">所有列表 %.</entry> <!-- COMMAND_LINE_ARGUMENTS --> 
+  <entry key="COMMAND_LINE_HELP">所有列表 %s.</entry> <!-- COMMAND_LINE_ARGUMENTS --> 
   <entry key="DEFAULT_VALUE">默认值</entry>
   <entry key="PROGRAM_USAGE">程序用法</entry> 
   <entry key="STARTS_PROGRAM">开始程序 %s.</entry> <!-- Program name --> 
