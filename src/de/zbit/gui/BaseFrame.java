@@ -805,10 +805,11 @@ public abstract class BaseFrame extends JFrame {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(EventHandler.create(WindowListener.class, this, "exit",
 			null, "windowClosing"));
-		setJMenuBar(createJMenuBar(loadsDefaultFileMenuEntries()));
+		boolean loadsDefaultFileMenuEntries = loadsDefaultFileMenuEntries();
+		setJMenuBar(createJMenuBar(loadsDefaultFileMenuEntries));
 		
-		// If the user whishes a OPEN FILE entry, also create openFile by Drag'n Drop.
-		if (loadsDefaultFileMenuEntries()) {
+		// If the user wishes a OPEN FILE entry, also create openFile by Drag'n Drop.
+		if (loadsDefaultFileMenuEntries) {
 		  createDragNDropFunctionality();
 		}
 		
@@ -1008,9 +1009,11 @@ public abstract class BaseFrame extends JFrame {
 	
 	/**
 	 * Displays the configuration for the {@link PreferencesDialog}.
+	 * 
+	 * @return 
 	 */
-	public void preferences() {
-		PreferencesDialog.showPreferencesDialog();
+	public boolean preferences() {
+		return PreferencesDialog.showPreferencesDialog();
 	}
 
 	/**
