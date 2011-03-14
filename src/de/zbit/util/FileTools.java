@@ -75,6 +75,8 @@ public class FileTools {
       
     for (String path: paths) {
       String[] files = new File(path).list();
+      if (files==null) continue; // In webstart sometimes null
+      
       for (String file:files) {
         File fullFile = new File(Utils.ensureSlash(path) + file);
         if (fullFile.isDirectory()) continue;

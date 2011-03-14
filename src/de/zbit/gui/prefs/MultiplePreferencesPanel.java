@@ -280,11 +280,13 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 				try {
 					Class<PreferencesPanel> c = getClasses()[i];
 					Constructor<PreferencesPanel> con = c.getConstructor();
-					settingsPanel = con.newInstance();
-					tab.addTab(settingsPanel.getTitle(), new JScrollPane(
-							settingsPanel,
-							JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-							JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+					if (c!=null) {
+					  settingsPanel = con.newInstance();
+					  tab.addTab(settingsPanel.getTitle(), new JScrollPane(
+					    settingsPanel,
+					    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+					    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+					}
 				} catch (NoSuchMethodException exc) {
 					// Do nothing.
 				} catch (Exception exc) {

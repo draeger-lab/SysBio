@@ -235,7 +235,8 @@ public class SBProperties extends Properties {
 					this.put(k, ((Option<?>) fieldValue).getDefaultValue());
 				}
 			} catch (Exception exc) {
-				exc.printStackTrace(); // XXX: Remove me.
+			  // Due to non-static fields
+				//exc.printStackTrace();
 				// ignore non-static fields
 			}
 		}

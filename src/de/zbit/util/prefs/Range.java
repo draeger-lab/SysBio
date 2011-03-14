@@ -447,7 +447,7 @@ public class Range<Type> {
 
   /**
    * Parse the range specification string into a more convenient
-   * data structute. See {@link #getRangeSpecifiaction()} for
+   * data structute. See {@link #getRangeSpecification()} for
    * more information on possible Strings.
    * @param range
    * @return rangeCollection<Type>

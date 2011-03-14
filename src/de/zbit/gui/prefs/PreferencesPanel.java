@@ -39,7 +39,6 @@ import java.util.prefs.BackingStoreException;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -424,7 +423,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		// TODO: Group, test, and accept automatically
 		Class<?> clazz = option.getRequiredType();
 		if (Boolean.class.isAssignableFrom(clazz)) {
-			component = new JCheckBox();
+			component = new OptionCheckBox();
 			if (defaultValue!=null) {
 				((AbstractButton) component).setSelected(Boolean.parseBoolean(defaultValue.toString()));
 			}
@@ -507,6 +506,10 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			if (keyListener != null) {
         component.addKeyListener(keyListener);
       }
+			if (component instanceof JComponentForOption) {
+			  // Should always be true.
+			  ((JComponentForOption)component).setOption(option);
+			}
 			
 			//jc.setBorder(new TitledBorder("test"));
 		}
@@ -759,9 +762,18 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * This static method may be used by all methods using elements from
 	 * {@link #getJComponentForOption(Option)} (and similar) to change the
 	 * respective properties.
-	 * 
+	 * <p>
+	 * Remark: This method performs automatic Range checks, if and only if
+	 * source, or the parent of source is an instance of {@link JComponentForOption}.
+	 * The value will only  be stored if the Range check returns true.
+	 * <br/>
+	 * If source is NOT an instance of {@link JComponentForOption} this
+	 * method does NOT perform any Range check. This has to be
+	 * done before calling this method. Else, you may end up having invalid
+	 * properties in the HashSet.
+	 * </p>
 	 * @param properties
-	 *        - should be either {@link SBPreferences} or {@link SBProperties}.
+	 *        Should be either {@link SBPreferences} or {@link SBProperties}.
 	 * @param source
 	 *        The element whose value has been changed (e.g., in events, this
 	 *        should be e.getSource()).
@@ -773,12 +785,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			String name = c.getName();
 			//System.out.print("DEBUG - try to change property of "+ name);
 			/*
-			 * Properties is build in initializePrefPanel() -> loadPreferences -> accep(key).
+			 * Properties is build in initializePrefPanel() -> loadPreferences -> accept(key).
 			 * If a key is missing in properties, it is very likely that one of the above mentioned
 			 * methods doesn't work correctly.
 			 */
 			if ((name != null) && (properties.containsKey(name))) { 
-				// XXX: Q: Don't we have to use preferences here?
 				String value = null;
 				if (c instanceof AbstractButton) {
 					value = Boolean.toString(((AbstractButton) c).isSelected());
@@ -809,8 +820,24 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 					value = ((JTextComponent) c).getText();
 				}
 				
-				properties.put(name, value);
-				//System.out.println(" - " + "changed to '" + value.toString() + "'.");
+				// Check before saving
+				boolean isInRange=true;
+				if (source instanceof JComponentForOption) {
+				  isInRange = ((JComponentForOption) source).getOption().
+				    getRange().castAndCheckIsInRange(value);
+				} else if (c.getParent() instanceof JComponentForOption) {
+				  // In case if FileSelector or JColumnChooser, the parent
+				  // holds the option.
+          isInRange = ((JComponentForOption) c.getParent()).getOption().
+            getRange().castAndCheckIsInRange(value);
+				}
+				
+				if (isInRange) {
+				  properties.put(name, value);
+  				//System.out.println(" - " + "changed to '" + value.toString() + "'.");
+				} else {
+  				//System.out.println(" - " + "out of Range.");
+				}
 			} else {
 				//System.out.println(" - " + "failed: properties contains no key with that name.");
 			}
