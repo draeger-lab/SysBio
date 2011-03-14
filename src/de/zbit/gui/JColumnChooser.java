@@ -46,8 +46,11 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.gui.prefs.JComponentForOption;
 import de.zbit.io.CSVReader;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * Column Chooser with a label, a columnChooser and a preview.
@@ -60,7 +63,7 @@ import de.zbit.util.ResourceManager;
  * @version $Rev$
  * @since 1.0
  */
-public class JColumnChooser extends JPanel {
+public class JColumnChooser extends JPanel implements JComponentForOption {
   private static final long serialVersionUID = -9026612128266336630L;
   
   // Label options
@@ -81,6 +84,12 @@ public class JColumnChooser extends JPanel {
   private boolean usePreview=true;
   private String[] previews=null;
   private JLabel preview;
+  
+  /**
+   * Only necessary for using this class in Combination with
+   * {@link SBPreferences} and {@link Option}s.
+   */
+  private Option<?> option=null;
   
   /**
    * This should always be true. Just if you want to use this
@@ -905,5 +914,25 @@ public class JColumnChooser extends JPanel {
     }
     frame.pack();
     frame.setVisible(true);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.JComponentForOption#getOption()
+   */
+  public Option<?> getOption() {
+    return option;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.JComponentForOption#isSetOption()
+   */
+  public boolean isSetOption() {
+    return option!=null;
+  }
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.JComponentForOption#setOption(de.zbit.util.prefs.Option)
+   */
+  public void setOption(Option<?> option) {
+    this.option=option;
   }
 }

@@ -697,6 +697,9 @@ public class SBPreferences implements Map<Object, Object> {
 		SBPreferences prefs = getPreferencesFor(keyProvider);
 		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 			if (keySet.contains(entry.getKey().toString())) {
+			  /* XXX: To avoid BackingStoreExceptions, one could check the
+			   * Range here, before flusing.
+			   */
 				prefs.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -832,7 +835,7 @@ public class SBPreferences implements Map<Object, Object> {
 							value, option.formatOptionName(), (option.getRange()
 									.isSetConstraints() ? ((GeneralFileFilter) option
 									.getRange().getConstraints()).getDescription() : option
-									.getRangeSpecifiaction()))); 
+									.getRangeSpecification()))); 
 			}
 			if (option.parseOrCast(value) == null) { 
 				throw new BackingStoreException(String.format(

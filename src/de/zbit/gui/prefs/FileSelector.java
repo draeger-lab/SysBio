@@ -40,6 +40,8 @@ import de.zbit.gui.LayoutHelper;
 import de.zbit.io.SBFileFilter;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
+import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * This is a special {@link JPanel} that displays a {@link JTextField} together
@@ -120,7 +122,8 @@ import de.zbit.util.StringUtil;
  * @version $Rev$
  * @since 1.0
  */
-public class FileSelector extends JPanel implements ActionListener {
+public class FileSelector extends JPanel implements ActionListener,
+  JComponentForOption{
 	
 	/**
 	 * 
@@ -321,6 +324,12 @@ public class FileSelector extends JPanel implements ActionListener {
 	 */
 	private static final long serialVersionUID = 2479909701477969474L;
 	
+  /**
+   * Only necessary for using this class in Combination with
+   * {@link SBPreferences} and {@link Option}s.
+   */
+  private Option<?> option=null;
+  
 	/**
 	 * 
 	 * @param lh
@@ -761,6 +770,14 @@ public class FileSelector extends JPanel implements ActionListener {
 	}
 	
 	/**
+	 * Removes the {@link javax.swing.InputVerifier} to allow a change of
+	 * focus, even if no valid directory/ files is selected.
+	 */
+	public void removeInputVerifier() {
+	  textField.setInputVerifier(null);
+	}
+	
+	/**
 	 * Decide whether or not the additional {@link FileFilter} for all files (*)
 	 * should be available when selecting {@link File} instances (note that
 	 * although it may be set to true this feature is ignored for directories).
@@ -844,5 +861,25 @@ public class FileSelector extends JPanel implements ActionListener {
 			label.setText(command.getLabelText());
 		}
 	}
+
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.JComponentForOption#getOption()
+   */
+  public Option<?> getOption() {
+    return option;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.JComponentForOption#isSetOption()
+   */
+  public boolean isSetOption() {
+    return option!=null;
+  }
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.JComponentForOption#setOption(de.zbit.util.prefs.Option)
+   */
+  public void setOption(Option<?> option) {
+    this.option=option;
+  }
 	
 }

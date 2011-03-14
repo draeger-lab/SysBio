@@ -464,7 +464,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * 
 	 * @return
 	 */
-	public String getRangeSpecifiaction() {
+	public String getRangeSpecification() {
 		return range == null ? null : range.getRangeSpecString();
 	}
 	
