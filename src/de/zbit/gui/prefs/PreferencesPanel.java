@@ -36,6 +36,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -362,12 +363,16 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	  Object def = probs != null ? probs.get(option) : option.getDefaultValue();
 	  return getJComponentForOption(option, def, l);
 	}
-	
+	 
 	/**
+	 * This Method will generate a {@link JComponent}, based on the given option.
+	 * 
+	 * May be called as getJComponentForOption(Option, null, null).
 	 * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener, KeyListener)
 	 * @param option
-	 * @param def
-	 * @param l
+	 * @param def - default value. May be null.
+	 * @param l - Listener to listen for changes. One of ItemListener, ChangeListener, 
+	 * KeyListener or null.
 	 * @return
 	 */
 	public static JComponent getJComponentForOption(Option<?> option, Object def, EventListener l) {
@@ -755,31 +760,47 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 
 
 	/**
-	 * Attempts to set the new value of the changed element in this panel's
-	 * properties. To this end, it is required that the name property is set for
-	 * each graphical component that may change.
+	 * Calls {@link #setProperty(Map, Object, boolean)} WITHOUT performing
+	 * range checks (to keep compatibility).
 	 * 
-	 * This static method may be used by all methods using elements from
-	 * {@link #getJComponentForOption(Option)} (and similar) to change the
-	 * respective properties.
-	 * <p>
-	 * Remark: This method performs automatic Range checks, if and only if
-	 * source, or the parent of source is an instance of {@link JComponentForOption}.
-	 * The value will only  be stored if the Range check returns true.
-	 * <br/>
-	 * If source is NOT an instance of {@link JComponentForOption} this
-	 * method does NOT perform any Range check. This has to be
-	 * done before calling this method. Else, you may end up having invalid
-	 * properties in the HashSet.
-	 * </p>
+	 * @see #setProperty(Map, Object, boolean)
 	 * @param properties
-	 *        Should be either {@link SBPreferences} or {@link SBProperties}.
 	 * @param source
-	 *        The element whose value has been changed (e.g., in events, this
-	 *        should be e.getSource()).
-	 * 
 	 */
 	public static void setProperty(Map<Object, Object> properties, Object source) {
+	  setProperty(properties, source, false);
+	}
+	
+	/**
+   * Attempts to set the new value of the changed element in this panel's
+   * properties. To this end, it is required that the name property is set for
+   * each graphical component that may change.
+   * 
+   * This static method may be used by all methods using elements from
+   * {@link #getJComponentForOption(Option)} (and similar) to change the
+   * respective properties.
+   * <p>
+   * Remark: This method performs automatic Range checks, if and only if
+   * source, or the parent of source is an instance of {@link JComponentForOption}.
+   * The value will only  be stored if the Range check returns true.
+   * <br/>
+   * If source is NOT an instance of {@link JComponentForOption} this
+   * method does NOT perform any Range check. This has to be
+   * done before calling this method. Else, you may end up having invalid
+   * properties in the HashSet.
+   * </p>
+   * @param properties
+   *        Should be either {@link SBPreferences} or {@link SBProperties}.
+   * @param source
+   *        The element whose value has been changed (e.g., in events, this
+   *        should be e.getSource()).
+   * @param checkRange
+   *        Decides, wether the method should try to perform a range check before
+   *        storing the property. If false, the property will be stored without
+   *        any further check.
+   *        This should always be true, when working with {@link Preferences}.
+   */
+	public static void setProperty(Map<Object, Object> properties, Object source, boolean checkRange) {
 		if (source instanceof Component) {
 			Component c = (Component) source;
 			String name = c.getName();
@@ -823,13 +844,17 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				// Check before saving
 				boolean isInRange=true;
 				if (source instanceof JComponentForOption) {
-				  isInRange = ((JComponentForOption) source).getOption().
-				    getRange().castAndCheckIsInRange(value);
+				  Option<?> o = ((JComponentForOption) source).getOption();
+				  if (o!=null && o.isSetRangeSpecification()) {
+				    isInRange = o.getRange().castAndCheckIsInRange(value);
+				  }
 				} else if (c.getParent() instanceof JComponentForOption) {
 				  // In case if FileSelector or JColumnChooser, the parent
 				  // holds the option.
-          isInRange = ((JComponentForOption) c.getParent()).getOption().
-            getRange().castAndCheckIsInRange(value);
+				  Option<?> o = ((JComponentForOption) c.getParent()).getOption();
+				  if (o!=null && o.isSetRangeSpecification()) {
+				    isInRange = o.getRange().castAndCheckIsInRange(value);
+				  }
 				}
 				
 				if (isInRange) {

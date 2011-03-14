@@ -47,7 +47,8 @@ public class FileTools {
     
     // Get paths from envivronment variable
     String path = System.getenv("PATH");
-    String[] paths = path.split(Pattern.quote(File.pathSeparator));
+    String[] paths = path==null?new String[0]:
+       path.split(Pattern.quote(File.pathSeparator));
     
     // Append the current working directory
     String[] morePaths = new String[paths.length+1];
