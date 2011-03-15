@@ -97,8 +97,13 @@ public class Utils {
   }
   
   /**
-   * Mittelwertberechnung.
-   * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
+   * Returns the average of all non-NaN and non-infinite values in the given
+   * array. Internally, it first tries to use the faster implementation and if
+   * that doesn't work, it falls back to the slower alternative.
+   * 
+   * @param d an array of double values
+   * @return the average of all non-NaN and non-infinite values in the given
+   *         array.
    */
   public static double average(double[] d){
     double average = average1(d);
@@ -121,9 +126,14 @@ public class Utils {
   }
   
   /**
+   * Returns the average of all non-NaN and non-infinite values in the given
+   * array. This implementation first sums up all values and then divides by the
+   * number of values. If too many too large values are given, this could lead
+   * to a double sum overflow.
    * 
-   * @param d
-   * @return
+   * @param d an array of double values
+   * @return the average of all non-NaN and non-infinite values in the given
+   *         array.
    */
   public static double average1(double[] d){ // Schneller
     if (d==null || d.length<1) return Double.NaN;
@@ -167,9 +177,14 @@ public class Utils {
   }
 
   /**
+   * Returns the average of all non-NaN and non-infinite values in the given
+   * array. This implementation performs an iterative calculation of the mean,
+   * making it slower and possibly less accurate, but avoid double sum overflows
+   * when too many too large values are given.
    * 
-   * @param d
-   * @return
+   * @param d an array of double values
+   * @return the average of all non-NaN and non-infinite values in the given
+   *         array.
    */
   public static double average2(double[] d){ // Keine to-large-numbers
     if (d.length<1) return Double.NaN;
