@@ -37,6 +37,8 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -73,7 +75,7 @@ import de.zbit.util.ValuePair;
  * 
  * @author Andreas Dr&auml;ger
  * @author Hannes Borch
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
@@ -83,6 +85,11 @@ public class GUITools {
 	 * The location for texts of labels. 
 	 */
 	public static final String RESOURCE_LOCATION_FOR_LABELS = "de.zbit.locales.Labels";
+	
+	/**
+	 * 
+	 */
+	private static final Logger logger = Logger.getLogger(GUITools.class.getName());
 	
 	/**
 	 * The number of symbols per line in tool tip texts.
@@ -729,7 +736,7 @@ public static boolean contains(Component c, Component insight) {
 			} catch (Exception exc) {
 				JOptionPane.showMessageDialog(null, StringUtil.toHTML(exc.getMessage(),
 					TOOLTIP_LINE_LENGTH), exc.getClass().getName(), JOptionPane.WARNING_MESSAGE);
-				exc.printStackTrace();
+				logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
 			}
 		}
 	}
@@ -1180,7 +1187,7 @@ for (Component c: p.getComponents()) {
 	 * @param exc
 	 */
 	public static void showErrorMessage(Component parent, Throwable exc) {
-		exc.printStackTrace();
+		logger.log(Level.WARNING, exc.getMessage(), exc);
 		ValuePair<String, Integer> messagePair = StringUtil
 				.insertLineBreaksAndCount(exc.getMessage(), TOOLTIP_LINE_LENGTH, "\n");
 		Object message;
@@ -1209,7 +1216,7 @@ for (Component c: p.getComponents()) {
 		String defaultMessage) {
 		if ((exc == null) || (exc.getMessage() == null)
 				|| (exc.getMessage().length() == 0)) {
-			exc.printStackTrace();
+			logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
 			JOptionPane.showMessageDialog(parent, defaultMessage, exc.getClass()
 					.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 		} else {
@@ -1285,7 +1292,6 @@ for (Component c: p.getComponents()) {
 					JOptionPane.INFORMATION_MESSAGE, icon);
 			}
 		} catch (IOException exc) {
-			exc.printStackTrace();
 			showErrorMessage(owner, exc);
 		}
 	}
