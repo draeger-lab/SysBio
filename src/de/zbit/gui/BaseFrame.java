@@ -988,6 +988,8 @@ public abstract class BaseFrame extends JFrame {
           GUITools.showErrorMessage(this, exc);
         }
       }
+      // Allow users to close the file(s) again
+      GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.FILE_CLOSE);
       if (getMaximalFileHistorySize() > 0) {
         // Create the list of files to update the file history in the menu.
         // In addition to the files that have just been opened (above), we
