@@ -634,12 +634,14 @@ public class CSVReader implements Serializable, Cloneable {
    * If column headers have been read, this function will return the column
    * number, containing string @param s case INsensitive.
    * 
-   * If no headers have been read or if the string can not be found in any
-   * column, returns -1
+   * <p>If multiple Strings are specified, then an AND search is performed.</p>
+   * 
+   * <p>If no headers have been read or if the string can not be found in any
+   * column, returns -1</p>
    *  
    * @return integer, column number
    */
-  public int getColumnContaining(String s) {
+  public int getColumnContaining(String... s) {
     if (!isInitialized) {
       try {
         initialize();
@@ -651,7 +653,17 @@ public class CSVReader implements Serializable, Cloneable {
     if (headers==null) return -1;
     for (int i=0; i<headers.length;i++) {
       String c = new String(headers[i]).toLowerCase();
-      if (c.toLowerCase().contains(s.toLowerCase())) return i;
+      
+      // Check if all words that should be contained are actually contained.
+      boolean allContained=true;
+      for (int si=0; si<s.length; si++) {
+        if (!c.toLowerCase().contains(s[si].toLowerCase())) {
+          allContained=false;
+          break;
+        }
+      }
+      if (allContained) return i;
+      
     }
     return -1;
   }
