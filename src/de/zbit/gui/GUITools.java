@@ -1038,8 +1038,9 @@ public static boolean contains(Component c, Component insight) {
 	public static void setAllEnabled(Container c, boolean enabled) {
 		Component children[] = c.getComponents();
 		for (int i = 0; i < children.length; i++) {
-			if (children[i] instanceof Container)
+			if (children[i] instanceof Container) {
 				setAllEnabled((Container) children[i], enabled);
+			}
 			children[i].setEnabled(enabled);
 		}
 	}

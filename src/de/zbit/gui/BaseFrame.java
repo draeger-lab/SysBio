@@ -390,6 +390,26 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+   * Adds a drag'n drop functionality to this panel. This should
+   * be called, whenever the user decides to have a "File Open"
+   * option on his menu bar.
+   * It uses the {@link #openFileAndLogHistory(File...)} method
+   * to open the file(s).
+   */
+  private void createDragNDropFunctionality() {
+    // Make this panel responsive to drag'n drop events.
+    FileDropHandler dragNdrop = new FileDropHandler(
+      new ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+          openFileAndLogHistory((File) event.getSource());
+        }
+      }
+    );
+    
+    this.setTransferHandler(dragNdrop);
+  }
+	
+	/**
 	 * This creates a new {@link JBrowserPane} which can be embedded in a
 	 * {@link JScrollPane} depending on the value of the boolean parameter.
 	 * 
@@ -588,7 +608,7 @@ public abstract class BaseFrame extends JFrame {
 		
 		return menuBar;
 	}
-	
+
 	/**
 	 * By default this method simply returns null. You can override it to create
 	 * your own tool bar.
@@ -614,7 +634,7 @@ public abstract class BaseFrame extends JFrame {
 	 *         program.
 	 */
 	protected abstract Component createMainComponent();
-
+	
 	/**
 	 * Method that is called on exit, i.e., when this {@link BaseFrame}
 	 * {@link Window} is closing.
@@ -697,6 +717,16 @@ public abstract class BaseFrame extends JFrame {
 	public abstract short getMaximalFileHistorySize();
 	
 	/**
+	 * Returns the default directory to open {@link File}s.
+	 * 
+	 * @return
+	 */
+	public File getOpenDir() {
+		SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+		return new File(prefs.get(GUIOptions.OPEN_DIR));
+	}
+	
+	/**
 	 * This method creates a title from the values of
 	 * {@link #getApplicationName()} and {@link #getDottedVersionNumber()}. The
 	 * value returned may be an empty {@link String} but never null. In case
@@ -722,6 +752,16 @@ public abstract class BaseFrame extends JFrame {
 	}
 	
 	/**
+	 * Returns the default directory to save {@link File}s.
+	 * 
+	 * @return
+	 */
+	public File getSaveDir() {
+		SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+		return new File(prefs.get(GUIOptions.SAVE_DIR));
+	}
+	
+	/**
 	 * The {@link URL} where the about message for this program is located, i.e.,
 	 * an HTML file containing information about the people in charge for this
 	 * program.
@@ -737,39 +777,39 @@ public abstract class BaseFrame extends JFrame {
 	 * @return
 	 */
 	public abstract URL getURLLicense();
-	
+
 	/**
 	 * The {@link URL} of the online help file.
 	 * 
 	 * @return
 	 */
 	public abstract URL getURLOnlineHelp();
-	
-	/**
-	 * <p>
-	 * The online update expects to find a file called <code>latest.txt</code>
-	 * containing only the version number of the latest release of this program as
-	 * a {@link String} of digits that contains exactly one dot or at most two
-	 * dots. Furthermore, on the given destination must be a second file, called
-	 * <code>releaseNotes&lt;VersionNumber&gt;.htm[l]</code> which contains more
-	 * detailed information about the latest release.
-	 * </p>
-	 * <p>
-	 * Summarizing, the web address or other directory address where we can find
-	 * at least the following two files:
-	 * <ul>
-	 * <li>latest.txt</li>
-	 * <li>releaseNotesX.Y.Z.htm</li>
-	 * </ul>
-	 * The file <code>latest.txt</code> contains exactly the dotted version number
-	 * of the latest release of this software; nothing else! The release notes
-	 * file contains HTML code describing the latest changes and the file name
-	 * MUST end with the latest version number of the release.
-	 * </p>
-	 * 
-	 * @return The {@link URL} to some directory where to look for the online update.
-	 */
-	public abstract URL getURLOnlineUpdate();
+
+  /**
+ * <p>
+ * The online update expects to find a file called <code>latest.txt</code>
+ * containing only the version number of the latest release of this program as
+ * a {@link String} of digits that contains exactly one dot or at most two
+ * dots. Furthermore, on the given destination must be a second file, called
+ * <code>releaseNotes&lt;VersionNumber&gt;.htm[l]</code> which contains more
+ * detailed information about the latest release.
+ * </p>
+ * <p>
+ * Summarizing, the web address or other directory address where we can find
+ * at least the following two files:
+ * <ul>
+ * <li>latest.txt</li>
+ * <li>releaseNotesX.Y.Z.htm</li>
+ * </ul>
+ * The file <code>latest.txt</code> contains exactly the dotted version number
+ * of the latest release of this software; nothing else! The release notes
+ * file contains HTML code describing the latest changes and the file name
+ * MUST end with the latest version number of the release.
+ * </p>
+ * 
+ * @return The {@link URL} to some directory where to look for the online update.
+ */
+public abstract URL getURLOnlineUpdate();
 	
 	/**
 	 * Initializes this graphical user interface.
@@ -829,40 +869,20 @@ public abstract class BaseFrame extends JFrame {
 		setMinimumSize(new Dimension(640, 480));
 		setLocationRelativeTo(null);
 	}
-
+	
 	/**
-   * Adds a drag'n drop functionality to this panel. This should
-   * be called, whenever the user decides to have a "File Open"
-   * option on his menu bar.
-   * It uses the {@link #openFileAndLogHistory(File...)} method
-   * to open the file(s).
-   */
-  private void createDragNDropFunctionality() {
-    // Make this panel responsive to drag'n drop events.
-    FileDropHandler dragNdrop = new FileDropHandler(
-      new ActionListener() {
-        public void actionPerformed(ActionEvent event) {
-          openFileAndLogHistory((File) event.getSource());
-        }
-      }
-    );
-    
-    this.setTransferHandler(dragNdrop);
-  }
-
-  /**
-	 * This method decides whether or not the file menu should already be equipped
-	 * with the default entries for "open", "save", and "close". By default, this
-	 * method returns <code>true</code>, i.e., the default File menu already
-	 * contains all these three items. You may want to override this method and to
-	 * return <code>false</code> instead to switch this behavior off.
-	 * 
-	 * @return Whether or not to equip the file menu with the three entries
-	 *         "open", "save", and "close". By default <code>true</code>
-	 */
-	protected boolean loadsDefaultFileMenuEntries() {
-		return true;
-	}
+		 * This method decides whether or not the file menu should already be equipped
+		 * with the default entries for "open", "save", and "close". By default, this
+		 * method returns <code>true</code>, i.e., the default File menu already
+		 * contains all these three items. You may want to override this method and to
+		 * return <code>false</code> instead to switch this behavior off.
+		 * 
+		 * @return Whether or not to equip the file menu with the three entries
+		 *         "open", "save", and "close". By default <code>true</code>
+		 */
+		protected boolean loadsDefaultFileMenuEntries() {
+			return true;
+		}
 	
 	/**
 	 * Starts a search for an online update and shows error messages if no update
@@ -960,7 +980,7 @@ public abstract class BaseFrame extends JFrame {
 	 * @return the files that originate from the method {@link #openFile(File...)}
 	 *         .
 	 */
-	protected final File[] openFileAndLogHistory(File... files) {
+	File[] openFileAndLogHistory(File... files) {
 		files = openFile(files);
 		// Remember the baseDir and put files into history.
     if ((files != null) && (files.length > 0)) {
