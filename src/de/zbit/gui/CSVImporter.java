@@ -124,6 +124,20 @@ public class CSVImporter {
 	 */
 	public CSVImporter(Component parent, boolean hideExactColumnNames,
 			String pathname, String... expectedHead) throws IOException {
+		this(parent, hideExactColumnNames, pathname, false, expectedHead);
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param hideExactColumnNames
+	 * @param pathname
+	 * @param acceptWithoutEdit
+	 * @param expectedHead
+	 * @throws IOException
+	 */
+	public CSVImporter(Component parent, boolean hideExactColumnNames,
+			String pathname, boolean acceptWithoutEdit, String... expectedHead) throws IOException {
 		/*
 		 * Initialize (field) variables.
 		 */
@@ -140,8 +154,8 @@ public class CSVImporter {
 		 * Read data field and try to automatically map columns from the data
 		 * file to expected column header entries.
 		 */
-		if (reader == CSVReaderOptionPanel.showDialog(parent, reader,
-				"Data import")) {
+		if (acceptWithoutEdit || (reader == CSVReaderOptionPanel.showDialog(parent, reader,
+				"Data import"))) {
 			c.setSortHeaders(true);
 			// if (reader.getContainsHeaders()) {
 			for (i = 0; i < sortedExpectedHead.length; i++) {
@@ -166,38 +180,44 @@ public class CSVImporter {
 		 * automatically.
 		 */
 		if (numProblems > 0) {
-			JPanel panel = new JPanel(new BorderLayout());
-			panel.add(new JLabel(StringUtil.toHTML(String.format(ResourceManager
-					.getBundle("de.zbit.locales.Labels").getString(
-						"COULD_NOT_IDENTIFY_COLUMNS"), numProblems), 60)),
-				BorderLayout.NORTH);
-			if ((c.getPreferredSize().getWidth() > 450)
-					|| (c.getPreferredSize().getHeight() > 450)) {
-				JScrollPane scroll = new JScrollPane(c,
-						JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-				// scroll.setPreferredSize(new Dimension(250, Math.min(
-				// 35 * numProblems + 20, 400)));
-				scroll.setPreferredSize(new Dimension((int) Math.round(Math
-						.min(470, panel.getPreferredSize().getWidth())),
-						(int) Math.round(Math.min(c.getPreferredSize()
-								.getHeight(), 470))));
-				panel.add(scroll);
-			} else {
-				panel.add(c, BorderLayout.CENTER);
+			JPanel panel = null;
+			if (!acceptWithoutEdit) {
+				panel = new JPanel(new BorderLayout());
+				panel.add(
+						new JLabel(StringUtil.toHTML(String.format(
+								ResourceManager.getBundle(
+										"de.zbit.locales.Labels").getString(
+										"COULD_NOT_IDENTIFY_COLUMNS"),
+								numProblems), 60)), BorderLayout.NORTH);
+				if ((c.getPreferredSize().getWidth() > 450)
+						|| (c.getPreferredSize().getHeight() > 450)) {
+					JScrollPane scroll = new JScrollPane(c,
+							JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+							JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+					// scroll.setPreferredSize(new Dimension(250, Math.min(
+					// 35 * numProblems + 20, 400)));
+					scroll.setPreferredSize(new Dimension((int) Math.round(Math
+							.min(470, panel.getPreferredSize().getWidth())),
+							(int) Math.round(Math.min(c.getPreferredSize()
+									.getHeight(), 470))));
+					panel.add(scroll);
+				} else {
+					panel.add(c, BorderLayout.CENTER);
+				}
 			}
-
-			if ((c.getColumnChoosers().size() < 1)
-					|| (JOptionPane.showConfirmDialog(parent, panel, ResourceManager
-							.getBundle("de.zbit.locales.Labels").getString(
-								"COLUMN_ASSIGNMENT"), JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION)) {
+			if(acceptWithoutEdit||(c.getColumnChoosers().size() < 1)
+					|| (JOptionPane.showConfirmDialog(parent, panel,
+							ResourceManager.getBundle("de.zbit.locales.Labels")
+									.getString("COLUMN_ASSIGNMENT"),
+							JOptionPane.OK_CANCEL_OPTION,
+							JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION)) {
 				List<String> newHead = new LinkedList<String>();
 				for (i = 0; i < sortedExpectedHead.length; i++) {
-					if (assignment[i] < 0) {
-						assignment[i] = c.getSelectedValue(sortedExpectedHead[i]);
+					if(assignment[i]<0) {
+						assignment[i] = c
+						.getSelectedValue(sortedExpectedHead[i]);
 					}
-					else {
+					if(assignment[i]>=0) {
 						newHead.add(sortedExpectedHead[i]);
 					}
 					this.newHead = newHead.toArray(new String[0]);
@@ -205,7 +225,8 @@ public class CSVImporter {
 			} else {
 				newHead = new String[0];
 			}
-		} else {
+		}
+		else {
 			newHead = sortedExpectedHead;
 		}
 
