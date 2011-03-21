@@ -197,7 +197,7 @@ public class CSVImporter {
 					if (assignment[i] < 0) {
 						assignment[i] = c.getSelectedValue(sortedExpectedHead[i]);
 					}
-					if (assignment[i] >= 0) {
+					else {
 						newHead.add(sortedExpectedHead[i]);
 					}
 					this.newHead = newHead.toArray(new String[0]);
