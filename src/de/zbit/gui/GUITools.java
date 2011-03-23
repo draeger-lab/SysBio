@@ -734,7 +734,7 @@ public static boolean contains(Component c, Component insight) {
 				}
 				
 			} catch (Exception exc) {
-				JOptionPane.showMessageDialog(null, StringUtil.toHTML(exc.getMessage(),
+				JOptionPane.showMessageDialog(null, StringUtil.toHTML(exc.getLocalizedMessage(),
 					TOOLTIP_LINE_LENGTH), exc.getClass().getName(), JOptionPane.WARNING_MESSAGE);
 				logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
 			}
@@ -1188,9 +1188,13 @@ for (Component c: p.getComponents()) {
 	 * @param exc
 	 */
 	public static void showErrorMessage(Component parent, Throwable exc) {
-		logger.log(Level.WARNING, exc.getMessage(), exc);
+		String msg = exc.getLocalizedMessage();
+		if ((msg == null) && (exc.getCause() != null)) {
+			msg = exc.getCause().getLocalizedMessage();
+		}
+		logger.log(Level.WARNING, msg, exc);
 		ValuePair<String, Integer> messagePair = StringUtil
-				.insertLineBreaksAndCount(exc.getMessage(), TOOLTIP_LINE_LENGTH, "\n");
+				.insertLineBreaksAndCount(msg, TOOLTIP_LINE_LENGTH, "\n");
 		Object message;
 		if (messagePair.getB().intValue() > 30) {
 			JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
@@ -1201,8 +1205,10 @@ for (Component c: p.getComponents()) {
 		} else {
 			message = messagePair.getA();
 		}
-		JOptionPane.showMessageDialog(parent, message, exc.getClass()
-				.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+		Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause()
+				.getClass() : exc.getClass();
+		JOptionPane.showMessageDialog(parent, message, clazz.getSimpleName(),
+			JOptionPane.ERROR_MESSAGE);
 	}
 
   /**
@@ -1215,8 +1221,8 @@ for (Component c: p.getComponents()) {
  */
 	public static void showErrorMessage(Component parent, Throwable exc,
 		String defaultMessage) {
-		if ((exc == null) || (exc.getMessage() == null)
-				|| (exc.getMessage().length() == 0)) {
+		if ((exc == null) || (exc.getLocalizedMessage() == null)
+				|| (exc.getLocalizedMessage().length() == 0)) {
 			logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
 			JOptionPane.showMessageDialog(parent, defaultMessage, exc.getClass()
 					.getSimpleName(), JOptionPane.ERROR_MESSAGE);

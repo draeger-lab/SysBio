@@ -24,11 +24,15 @@ import de.zbit.util.prefs.SBPreferences;
 /**
  * Automatically build an options panel.
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
 public class PreferencesPanelForKeyProvider extends PreferencesPanel {
+	
+	/**
+	 * Generated serial version identifer.
+	 */
 	private static final long serialVersionUID = -3293205475880841303L;
 	
 	/**
@@ -45,17 +49,28 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 		initializePrefPanel();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.prefs.PreferencesPanel#accepts(java.lang.Object)
+	 */
 	@Override
 	public boolean accepts(Object key) {
 		return preferences.keySetFull().contains(key);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.prefs.PreferencesPanel#getTitle()
+	 */
 	@Override
 	public String getTitle() {
 		return KeyProvider.Tools.createTitle(provider);
-		//StringUtil.formatOptionName(provider.getSimpleName());
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.prefs.PreferencesPanel#init()
+	 */
 	@Override
 	public void init() {
 		if (provider != null) {
@@ -63,10 +78,13 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.gui.prefs.PreferencesPanel#loadPreferences()
+	 */
 	@Override
 	protected SBPreferences loadPreferences() throws IOException {
-		if (provider==null) return null;
-		return SBPreferences.getPreferencesFor(provider);
+		return provider == null ? null : SBPreferences.getPreferencesFor(provider);
 	}
 	
 }
