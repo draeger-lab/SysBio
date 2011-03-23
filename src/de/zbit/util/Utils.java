@@ -1141,6 +1141,23 @@ public class Utils {
     return false;
   }
   
+  /**
+   * The same as {@link #saveGZippedObject(String, Object)} but does not catch
+   * any errors.
+   * @param filename
+   * @param obj
+   * @throws IOException 
+   */
+  public static void saveGZippedObjectAndThrowErrors(String filename, Object obj) throws IOException {
+    FileOutputStream fileOut = new FileOutputStream(filename);
+    GZIPOutputStream gzOut = new GZIPOutputStream(fileOut);
+    ObjectOutputStream out = new ObjectOutputStream(gzOut);
+    out.writeObject(obj);
+    out.close();
+    gzOut.close();
+    fileOut.close();
+  }
+  
   
   /**
    * Saves a serializable object.

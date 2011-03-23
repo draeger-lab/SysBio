@@ -84,6 +84,7 @@ public class StringUtil {
 	 */
 	public static String changeFirstLetterCase(String name, boolean upperCase,
 		boolean othersToLowerCase) {
+	  if (name.length()<1) return name;
 		char c = name.charAt(0);
 		if (Character.isLetter(c)) {
 			c = upperCase ? Character.toUpperCase(c) : Character.toLowerCase(c);
