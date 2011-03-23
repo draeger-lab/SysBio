@@ -235,6 +235,52 @@ public class CSVImporter {
 			expectedNameToColIndex.put(sortedExpectedHead[i], Integer
 					.valueOf(assignment[i]));
 		}
+		
+		/*If no editing is supposed to be done, we do not allow assignments of more than one element to the same column.
+		*/
+		if(acceptWithoutEdit) {
+			List<Integer> equalElements=new LinkedList<Integer>();
+			List<String> elementsToRemove = new LinkedList<String>();
+			for(i=0;i!=sortedExpectedHead.length;i++) {
+				if(assignment[i]>=0) {
+					equalElements.clear();
+					equalElements.add(i);
+					for(int j=i+1;j!=sortedExpectedHead.length;j++) {
+						if(assignment[i]==assignment[j]) {
+							equalElements.add(j);
+						}
+					}
+					if(equalElements.size()>1) {
+						int max=0;
+						int maxElement=-1;
+						for(int number:equalElements) {
+							int length=sortedExpectedHead[number].length();
+							if(length>=max) {
+								max=length;
+								maxElement=number;
+							}
+						}
+						for(int number:equalElements) {
+							if(maxElement!=number) {
+								assignment[i]=-1;
+								elementsToRemove.add(sortedExpectedHead[i]);
+							}
+						}
+					}
+					
+				}
+				
+			}
+			if(elementsToRemove.size()>0) {
+				List<String> newHeadList = new LinkedList<String>();
+				for(String element:newHead) {
+					if(!elementsToRemove.contains(element)) {
+						newHeadList.add(element);
+					}
+				}
+				this.newHead = newHeadList.toArray(new String[0]);
+			}
+		}
 	}
 
 	/**
