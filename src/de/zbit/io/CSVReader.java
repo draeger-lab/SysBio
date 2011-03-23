@@ -670,6 +670,42 @@ public class CSVReader implements Serializable, Cloneable {
   
   /**
    * If column headers have been read, this function will return the column
+   * number, containing string @param s case sensitive.
+   * 
+   * <p>If multiple Strings are specified, then an AND search is performed.</p>
+   * 
+   * <p>If no headers have been read or if the string can not be found in any
+   * column, returns -1</p>
+   *  
+   * @return integer, column number
+   */
+  public int getColumnContainingSensitive(String... s) {
+    if (!isInitialized) {
+      try {
+        initialize();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
+    if (headers==null) return -1;
+    for (int i=0; i<headers.length;i++) {
+      // Check if all words that should be contained are actually contained.
+      boolean allContained=true;
+      for (int si=0; si<s.length; si++) {
+        if (!headers[i].contains(s[si])) {
+          allContained=false;
+          break;
+        }
+      }
+      if (allContained) return i;
+      
+    }
+    return -1;
+  }
+  
+  /**
+   * If column headers have been read, this function will return the column
    * number, that equals string @param s case INsensitive.
    * 
    * If no headers have been read or if the string does not equal any
@@ -689,6 +725,31 @@ public class CSVReader implements Serializable, Cloneable {
     if (headers==null) return -1;
     for (int i=0; i<headers.length;i++) {
       if (headers[i].equalsIgnoreCase(s)) return i;
+    }
+    return -1;
+  }
+  
+  /**
+   * If column headers have been read, this function will return the column
+   * number, that equals string @param s case sensitive.
+   * 
+   * If no headers have been read or if the string does not equal any
+   * column, returns -1
+   *  
+   * @return integer, column number
+   */
+  public int getColumnSensitive(String s) {
+    if (!isInitialized) {
+      try {
+        initialize();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
+    if (headers==null) return -1;
+    for (int i=0; i<headers.length;i++) {
+      if (headers[i].equals(s)) return i;
     }
     return -1;
   }
