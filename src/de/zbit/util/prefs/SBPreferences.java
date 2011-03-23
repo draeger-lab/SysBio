@@ -996,7 +996,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public final double getDefaultDouble(Object key) {
-		return Double.parseDouble(defaults.get(key.toString()).toString());
+		return Double.parseDouble(defaults.get(key.toString()));
 	}
 	
 	/**
@@ -1004,7 +1004,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public final float getDefaultFloat(Object key) {
-		return Float.parseFloat(defaults.get(key.toString()).toString());
+		return Float.parseFloat(defaults.get(key.toString()));
 	}
 	
 	/**
@@ -1012,7 +1012,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public final int getDefaultInt(Object key) {
-		return Integer.parseInt(defaults.get(key.toString()).toString());
+		return Integer.parseInt(defaults.get(key.toString()));
 	}
 	
 	/**
@@ -1020,7 +1020,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public final long getDefaultLong(Object key) {
-		return Long.parseLong(defaults.get(key.toString()).toString());
+		return Long.parseLong(defaults.get(key.toString()));
 	}
 	
 	/**
