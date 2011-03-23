@@ -102,6 +102,12 @@ public class CSVReader implements Serializable, Cloneable {
   private boolean useOpenFileMethod=true;
   
   /**
+   * If true, empty lines will be skipped. If false, a String[0]
+   * will be created from empty lines. Default: true.
+   */
+  private boolean skipEmptyLines=true;
+  
+  /**
    * Removes " symbol at cell start and end.
    * WARNING: You should use " for strings. Using ' is delicate because of terms
    * like "it's".
@@ -443,6 +449,21 @@ public class CSVReader implements Serializable, Cloneable {
       this.autoDetectTreatMultipleConsecutiveSeparatorsAsOne) isInitialized=false;
     
     this.autoDetectTreatMultipleConsecutiveSeparatorsAsOne = autoDetectTreatMultipleConsecutiveSeparatorsAsOne;
+  }
+  
+  /**
+   * @see #skipEmptyLines
+   * @return the skipEmptyLines
+   */
+  public boolean isSkipEmptyLines() {
+    return skipEmptyLines;
+  }
+  /**
+   * @see #skipEmptyLines
+   * @param skipEmptyLines the skipEmptyLines to set
+   */
+  public void setSkipEmptyLines(boolean skipEmptyLines) {
+    this.skipEmptyLines = skipEmptyLines;
   }
   /**
    * Set wether you want to remove the char " or ' when it occurs at the start and end of a cell.
@@ -1128,9 +1149,24 @@ public class CSVReader implements Serializable, Cloneable {
     }
     
     // Read next line, draw progress, split into columns
-    String line = currentOpenFile.readLine();
-    if (displayProgress && progress!=null) progress.progress(line);
-    if (trimLinesAfterReading) line = line.trim();
+    String line=null;
+    while(currentOpenFile.ready()) {
+      line = currentOpenFile.readLine();
+      if (displayProgress && progress!=null) progress.progress(line);
+      if (trimLinesAfterReading) line = line.trim();
+      if (line.length()==0 && skipEmptyLines) {
+        line=null;
+        continue;
+      } else {
+        break; // the usual case
+      }
+    }
+    if (line==null) { // Equal to !currentOpenFile.ready()
+      close();
+      return null;
+    }
+    
+    // Split
     String [] data;
     data = getSplits(line);
     

@@ -19,6 +19,8 @@ Johannes Eichner (1)
 #  Contributors   #
 ###################
 
+Shaowu Yang (1)
+  shaowu.yang@uni-tuebingen.de
 Andreas Zell (1)
   andreas.zell@uni-tuebingen.de
 

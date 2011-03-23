@@ -1367,17 +1367,17 @@ public static void showNowWritingAccessWarning(Component parent, File file) {
 		TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
 		JOptionPane.WARNING_MESSAGE);
 }
-  
-  /**
-   * Shows the output of a process inside a textarea.
-   * Autoscrolls as the process genereates output and
-   * automatically disables the ok-button as long as
-   * the process is running and enables it, as soon
-   * as the process terminates.
-   * 
-   * Hint: Consider setting {@link ProcessBuilder#redirectErrorStream()}
-   * to true.
-   * 
+
+/**
+ * Shows the output of a process inside a textarea.
+ * Autoscrolls as the process genereates output and
+ * automatically disables the ok-button as long as
+ * the process is running and enables it, as soon
+ * as the process terminates.
+ * 
+ * Hint: Consider setting {@link ProcessBuilder#redirectErrorStream()}
+ * to true.
+ * 
  * @param p - the process to monitor.
  * @param caption - the caption of the window
  * @param closeWindowAutomaticallyWhenDone - if set to
@@ -1395,7 +1395,7 @@ public static JTextArea showProcessOutputInTextArea(final Process p, final Strin
       // Show a JTextArea in an information message in background
       area.setEditable(false);
       JScrollPane pane = new JScrollPane(
-      area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
       pane.setPreferredSize(new Dimension(480, 240));
       
       GUITools.showMessageDialogInNewThred(pane, caption);
@@ -1425,15 +1425,28 @@ public static JTextArea showProcessOutputInTextArea(final Process p, final Strin
   };
   worker.execute();
   
-// Wait until the dialog is painted, before continuing
-while (worker.getState()==SwingWorker.StateValue.PENDING) {
-  try {
-    Thread.sleep(100);
-  } catch (InterruptedException e) {}
+  // Wait until the dialog is painted, before continuing
+  while (worker.getState()==SwingWorker.StateValue.PENDING) {
+    try {
+      Thread.sleep(100);
+    } catch (InterruptedException e) {}
+  }
+  
+  return area;
 }
 
-return area;
-}
+
+
+  /**
+   * Disabled or enables the given components.
+   * @param enabled
+   * @param components
+   */
+  public static void setAllEnabled(boolean enabled, Component...components) {
+    for (Component component: components) {
+      component.setEnabled(enabled);
+    }
+  }
 	
 	
 }

@@ -427,7 +427,7 @@ public abstract class BaseFrame extends JFrame {
 	 *         file located at the given {@link URL}, or a {@link JScrollPane}
 	 *         containing such a {@link JBrowserPane}.
 	 */
-	private final JComponent createJBrowser(URL url, int preferedWidth,
+	public final static JComponent createJBrowser(URL url, int preferedWidth,
 		int preferedHeight, boolean scroll) {
 		JBrowserPane browser = new JBrowserPane(url);
 		browser.removeHyperlinkListener(browser);
