@@ -137,7 +137,7 @@ public class CSVImporter {
 	 * @throws IOException
 	 */
 	public CSVImporter(Component parent, boolean hideExactColumnNames,
-			String pathname, boolean acceptWithoutEdit, String... expectedHead) throws IOException {
+			String pathname, boolean acceptWithoutEdit, boolean caseSensitive, String... expectedHead) throws IOException {
 		/*
 		 * Initialize (field) variables.
 		 */
@@ -159,12 +159,26 @@ public class CSVImporter {
 			c.setSortHeaders(true);
 			// if (reader.getContainsHeaders()) {
 			for (i = 0; i < sortedExpectedHead.length; i++) {
-				int col = reader.getColumn(sortedExpectedHead[i]);
+				int col=-1;
+				if(caseSensitive) {
+					col=reader.getColumnSensitive(sortedExpectedHead[i]);
+				}
+				if(col<0) {
+					col=reader.getColumn(sortedExpectedHead[i]);
+				}
 				if (col >= 0) {
 					assignment[i] = col;
 					c.setHeaderVisible(col, !hideExactColumnNames);
 				} else {
-					col = reader.getColumnContaining(sortedExpectedHead[i]);
+					if(caseSensitive) {
+						col = reader.getColumnContainingSensitive(sortedExpectedHead[i]);
+					}
+					if(col<0) {
+						col=reader.getColumnContaining(sortedExpectedHead[i]);
+					}
+					if(acceptWithoutEdit) {
+						assignment[i]=col;
+					}
 					c.addColumnChooser(sortedExpectedHead[i], col, false, true);
 					numProblems++;
 				}
@@ -262,8 +276,8 @@ public class CSVImporter {
 						}
 						for(int number:equalElements) {
 							if(maxElement!=number) {
-								assignment[i]=-1;
-								elementsToRemove.add(sortedExpectedHead[i]);
+								assignment[number]=-1;
+								elementsToRemove.add(sortedExpectedHead[number]);
 							}
 						}
 					}
@@ -281,6 +295,20 @@ public class CSVImporter {
 				this.newHead = newHeadList.toArray(new String[0]);
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param hideExactColumnNames
+	 * @param pathname
+	 * @param acceptWithoutEdit
+	 * @param expectedHead
+	 * @throws IOException
+	 */
+	public CSVImporter(Component parent, boolean hideExactColumnNames,
+			String pathname, boolean acceptWithoutEdit, String... expectedHead) throws IOException {
+		this(parent,hideExactColumnNames,pathname,acceptWithoutEdit,false,expectedHead);
 	}
 
 	/**
