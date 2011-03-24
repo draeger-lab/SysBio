@@ -127,8 +127,10 @@ public class GUITools {
 	      "UT_WBMW_mathnat_4C_380x45.png"
 	  };
     for (String path : iconPaths) {
-      UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(
-          GUITools.class.getResource("img/" + path)));
+      URL u = GUITools.class.getResource("img/" + path);
+      if (u!=null) {
+        UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(u));
+      }
     }
 	}
 	
@@ -584,7 +586,7 @@ public static boolean contains(Component c, Component insight) {
 	    
 	    // Second, try to get it from the internal resources
 	    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
-	    cancel = resource.getString("CANCEL");
+	    cancel = resource==null?null: resource.getString("CANCEL");
 	    if (cancel!=null) {
 	      if (cancel.toString().contains(";")) return cancel.toString().split(";")[0];
 	      else return cancel.toString();
@@ -639,7 +641,7 @@ public static boolean contains(Component c, Component insight) {
 	    
 	    // Second, try to get it from the internal resources
 	    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
-	    ok = resource.getString("OK");
+	    ok = resource==null?null: resource.getString("OK");
 	    if (ok!=null) {
 	      if (ok.toString().contains(";")) return ok.toString().split(";")[0];
 	      else return ok.toString();
