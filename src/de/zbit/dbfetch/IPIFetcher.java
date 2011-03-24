@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import de.zbit.util.LogUtil;
+import de.zbit.util.logging.LogUtil;
 
 /**
  * 

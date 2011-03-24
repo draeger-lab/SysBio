@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import de.zbit.util.InfoManagement;
-import de.zbit.util.LogUtil;
+import de.zbit.util.logging.LogUtil;
 
 /**
  * 

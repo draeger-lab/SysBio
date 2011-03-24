@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import de.zbit.dbfetch.IPIFetcher;
-import de.zbit.util.LogUtil;
+import de.zbit.util.logging.LogUtil;
 
 /**
  * @author Finja B&uml;chel
