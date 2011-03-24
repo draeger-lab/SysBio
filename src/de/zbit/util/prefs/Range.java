@@ -20,6 +20,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.zbit.io.CSVReader;
 import de.zbit.io.GeneralFileFilter;
@@ -36,6 +37,11 @@ import de.zbit.util.Utils;
  * @since 1.0
  */
 public class Range<Type> {
+	
+	/**
+	 * The {@link Logger} of this {@link Class}.
+	 */
+	public static final Logger logger = Logger.getLogger(Range.class.getName());
 	
 	/**
 	 * If {@link #getAllAcceptableValues()} is called, if there are more than
@@ -140,9 +146,8 @@ public class Range<Type> {
 					return false;
 				}
 			} else {
-				// TODO: Logging
-				System.err.printf(ResourceManager.getBundle("de.zbit.locales.Warnings")
-						.getString("CLASS_NOT_COMPARABLE"), value.getClass().getName());
+				logger.warning(String.format(ResourceManager.getBundle("de.zbit.locales.Warnings")
+						.getString("CLASS_NOT_COMPARABLE"), value.getClass().getName()));
 				return false;
 			}
 		}
@@ -525,7 +530,7 @@ public class Range<Type> {
               acceptedObjects
 //              StringUtil.addPrefixAndSuffix(acceptedObjects, "\"", "\"")
               , ",") + "}";
-    System.out.println(s);
+    logger.info(s);
     return "{" + StringUtil.implode(
       StringUtil.addPrefixAndSuffix(acceptedObjects, "\"", "\"")
       , ",") + "}";
