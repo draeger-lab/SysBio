@@ -33,6 +33,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -60,7 +61,15 @@ import de.zbit.util.Utils;
  */
 public class SBPreferences implements Map<Object, Object> {
 	
+	/**
+	 * The location of the localized warnings messages.
+	 */
 	public static final String WARNINGS_LOCATION = "de.zbit.locales.Warnings";
+	
+	/**
+	 * The logger of this {@link Class}.
+	 */
+	public static final Logger logger = Logger.getLogger(SBPreferences.class.getName());
 	
 	/**
 	 * The main class, used to start the application.
@@ -892,8 +901,9 @@ public class SBPreferences implements Map<Object, Object> {
 			if (remove) {
 				value = remove(keys[i]);
 				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
-				System.err.printf(resources.getString("REMOVING_INVALID_ENTRY") + "\n", keys[i],
-					value == null ? "null" : value.toString());
+				logger.warning(String.format(resources
+						.getString("REMOVING_INVALID_ENTRY"), keys[i],
+					value == null ? "null" : value.toString()));
 			}
 		}
 	}
@@ -1051,7 +1061,9 @@ public class SBPreferences implements Map<Object, Object> {
 		String def = defaults.getProperty(key.toString());
 		if (def == null) { return def; }
 		String v = def.toString();
-		if (System.getProperties().containsKey(v)) { return System.getProperty(v); }
+		if (System.getProperties().containsKey(v)) { 
+			return System.getProperty(v); 
+		}
 		return v;
 	}
 	

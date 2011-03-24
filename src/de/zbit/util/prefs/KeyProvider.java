@@ -65,6 +65,9 @@ public interface KeyProvider {
 		 */
 		private int index;
 		
+		/**
+		 * 
+		 */
 		public Entry() {
 			this(-1, null);
 		}
@@ -145,13 +148,15 @@ public interface KeyProvider {
 				}
 			}
 			if (optionList.size() > 0) {
-				sb.append("    <h");
-				sb.append(headerRank);
-				sb.append("> ");
-				sb.append(bundle.getString("ADDITIONAL_OPTIONS"));
-				sb.append(" </h");
-				sb.append(headerRank);
-				sb.append(">\n");
+				if (groupList.size() > 0) {
+					sb.append("    <h");
+					sb.append(headerRank);
+					sb.append("> ");
+					sb.append(bundle.getString("ADDITIONAL_OPTIONS"));
+					sb.append(" </h");
+					sb.append(headerRank);
+					sb.append(">\n");
+				}
 				writeOptionsToHTMLTable(sb, optionList, null);
 			}
 			return sb;
