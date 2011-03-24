@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.logging;
+package de.zbit.util.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

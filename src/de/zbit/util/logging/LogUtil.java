@@ -14,13 +14,12 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.util;
+package de.zbit.util.logging;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zbit.logging.OneLineFormatter;
 
 
 /**
