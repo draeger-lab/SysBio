@@ -49,9 +49,20 @@ import de.zbit.util.ResourceManager;
  * @since 1.0
  */
 public class ImageTools {
-
-	private static ResourceBundle bundle = ResourceManager
-			.getBundle("de.zbit.locales.Warnings");
+  /**
+   * This bundle is initialized in the static constructor
+   */
+	private static ResourceBundle bundle = null;
+	
+	static {
+	  // Allow using these tools, without localized warnings!
+	  try {
+	    bundle = ResourceManager.getBundle("de.zbit.locales.Warnings");
+	  } catch (Throwable t) {
+	    System.err.println("WARNING: Could not load bundle with warning locales in ImageTools.");
+	  }
+	}
+	
 	
 	/**
 	 * Loads all image files that can be found in the directory referenced by
