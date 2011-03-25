@@ -1196,7 +1196,9 @@ for (Component c: p.getComponents()) {
 		if ((msg == null) && (exc.getCause() != null)) {
 			msg = exc.getCause().getLocalizedMessage();
 		}
-		logger.log(Level.WARNING, msg, exc);
+		if (msg == null) msg = exc.getMessage();
+		
+		if (logger!=null) logger.log(Level.WARNING, msg, exc);
 		ValuePair<String, Integer> messagePair = StringUtil
 				.insertLineBreaksAndCount(msg, TOOLTIP_LINE_LENGTH, "\n");
 		Object message;
