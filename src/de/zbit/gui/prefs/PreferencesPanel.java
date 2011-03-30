@@ -421,6 +421,10 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			}
 		}
 		
+		if (option.isSetDisplayName()) {
+			optionTitle = option.getDisplayName();
+		}
+		
     // Get default value
     String defPath = null;
     //Object def = preferences!=null?option.getValue(preferences):null;
