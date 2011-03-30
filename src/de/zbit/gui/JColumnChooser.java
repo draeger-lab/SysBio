@@ -598,7 +598,6 @@ public class JColumnChooser extends JPanel implements JComponentForOption {
       for (int j=0; j<model.getSize(); j++) {
         if (model.getElementAt(j).equals(headers[i])) {
           i=j;
-          System.out.println(i);
           break;
         }
       }
