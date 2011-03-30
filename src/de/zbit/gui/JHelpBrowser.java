@@ -108,7 +108,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 				helpBrowser.getContentPane().add(tabs, BorderLayout.CENTER);
 			}
 		}
-		helpBrowser.addWindowListener(wl);
+		if (wl!=null) helpBrowser.addWindowListener(wl);
 		helpBrowser.setSize(640, 640);
 		helpBrowser.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		helpBrowser.setLocationRelativeTo(owner);
