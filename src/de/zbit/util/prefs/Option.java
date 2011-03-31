@@ -18,7 +18,6 @@ package de.zbit.util.prefs;
 
 import java.io.File;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import argparser.ArgParser;
 import argparser.BooleanHolder;
@@ -159,41 +158,12 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	private final String shortCmdName;
 	
 	/**
-	 * 
-	 */
-	private final String displayName;
-
-	/**
-	 * @return the displayName
-	 */
-	public final String getDisplayName() {
-		return displayName;
-	}
-
-	/**
-	 * The resource bundle that contains all warnings messages.
-	 */
-	private static final ResourceBundle warningsBundle = ResourceManager
-			.getBundle("de.zbit.loales.Warnings");
-
-	/**
 	 * @param optionName
 	 * @param requiredType
 	 * @param description
 	 */
 	public Option(String optionName, Class<Type> requiredType, String description) {
-		this(optionName, requiredType, description, (String) null);
-	}
-	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param displayName
-	 */
-	public Option(String optionName, Class<Type> requiredType, String description, String displayName) {
-		this(optionName, requiredType, description, null, null, displayName);
+		this(optionName, requiredType, description, null, null);
 	}
 	
 	/**
@@ -206,12 +176,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range) {
-		this(optionName, requiredType, description, range, (String) null);
-	}
-	
-	public Option(String optionName, Class<Type> requiredType,
-		String description, Range<Type> range, String displayName) {
-		this(optionName, requiredType, description, range, (short) 2, displayName);
+		this(optionName, requiredType, description, range, (short) 2);
 	}
 	
 	/**
@@ -255,7 +220,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param requiredType
 	 * @param description
 	 * @param Range
-	 *        see {@link Range#Range(Class, String)} or
+	 *        - see {@link Range#Range(Class, String)} or
 	 *        {@link #buildRange(Class, String)}.
 	 * @param numLeadingMinus
 	 * @param shortCmdName
@@ -264,38 +229,15 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
 		String shortCmdName, Type defaultValue) {
-		this(optionName, requiredType, description, range, numLeadingMinus, shortCmdName, defaultValue, null);
-	}
-	
-
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param range
-	 *        see {@link Range#Range(Class, String)} or
-	 *        {@link #buildRange(Class, String)}.
-	 * @param numLeadingMinus
-	 * @param shortCmdName
-	 * @param defaultValue
-	 * @param displayName
-	 *        A human-readable name to be displayed in graphical user interfaces
-	 *        or help texts.
-	 */
-	public Option(String optionName, Class<Type> requiredType,
-		String description, Range<Type> range, short numLeadingMinus,
-		String shortCmdName, Type defaultValue, String displayName) {
 		this.optionName = optionName;
 		this.requiredType = requiredType;
 		this.description = description;
 		this.range = range;
 		this.shortCmdName = shortCmdName;
 		this.defaultValue = defaultValue;
-		this.displayName = displayName;
 		if (numLeadingMinus < 0) { 
 			throw new IllegalArgumentException(String
-				.format(warningsBundle .getString(
+				.format(ResourceManager.getBundle("de.zbit.loales.Warnings").getString(
 					"VALUE_MUST_BE_POSITIVE"), "numLeadingMinus")); 
 		}
 		this.numLeadingMinus = numLeadingMinus;
@@ -374,37 +316,9 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Type defaultValue) {
-		this(optionName, requiredType, description, null, defaultValue, null);
+		this(optionName, requiredType, description, null, defaultValue);
 	}
 	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param defaultValue
-	 * @param displayName
-	 */
-	public Option(String optionName, Class<Type> requiredType,
-		String description, Type defaultValue, String displayName) {
-		this(optionName, requiredType, description, null, defaultValue, displayName);
-	}
-	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param range
-	 * @param defaultValue
-	 * @param displayName
-	 */
-	public Option(String optionName, Class<Type> requiredType,
-		String description, Range<Type> range, Type defaultValue, String displayName) {
-		this(optionName, requiredType, description, range, (short) 2, null,
-			defaultValue, displayName);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -520,15 +434,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @see de.zbit.gui.ActionCommand#getName()
 	 */
 	public String getName() {
-		return displayName != null ? displayName : getOptionName();
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isSetDisplayName() {
-		return displayName != null;
+		return getOptionName();
 	}
 	
 	/**
