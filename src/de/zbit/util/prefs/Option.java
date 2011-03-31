@@ -194,7 +194,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param description
 	 */
 	public Option(String optionName, Class<Type> requiredType, String description) {
-		this(optionName, requiredType, description, null, null);
+		this(optionName, requiredType, description, null, (Type) null);
 	}
 	
 	/**
@@ -224,7 +224,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus) {
 		this(optionName, requiredType, description, range, numLeadingMinus, null,
-			null);
+			(Type) null);
 	}
 	
 	/**
@@ -242,7 +242,26 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		String description, Range<Type> range, short numLeadingMinus,
 		String shortCmdName) {
 		this(optionName, requiredType, description, range, numLeadingMinus, null,
-			null);
+			(Type) null);
+	}
+
+	/**
+	 * 
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param Range
+	 *        - see {@link Range#Range(Class, String)} or
+	 *        {@link #buildRange(Class, String)}.
+	 * @param numLeadingMinus
+	 * @param shortCmdName
+	 * @param defaultValue
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+		String description, Range<Type> range, short numLeadingMinus,
+		String shortCmdName, Type defaultValue) {
+		this(optionName, requiredType, description, range, numLeadingMinus,
+			shortCmdName, defaultValue, null);
 	}
 	
 	/**
@@ -259,7 +278,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
-		String shortCmdName, Type defaultValue) {
+		String shortCmdName, Type defaultValue, String displayName) {
 		this.optionName = optionName;
 		this.requiredType = requiredType;
 		this.description = description;
@@ -272,6 +291,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 					"VALUE_MUST_BE_POSITIVE"), "numLeadingMinus")); 
 		}
 		this.numLeadingMinus = numLeadingMinus;
+		this.displayName = displayName;
 	}
 	
 	/**
@@ -299,6 +319,23 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param optionName
 	 * @param requiredType
 	 * @param description
+	 * @param range
+	 * @param numLeadingMinus
+	 * @param defaultValue
+	 * @param displayName
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+		String description, Range<Type> range, short numLeadingMinus,
+		Type defaultValue, String displayName) {
+		this(optionName, requiredType, description, range, numLeadingMinus, null,
+			defaultValue, displayName);
+	}
+	
+	/**
+	 * 
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
 	 * @param Range
 	 *        - see {@link Range#Range(Class, String)} or
 	 *        {@link #buildRange(Class, String)}.
@@ -307,6 +344,21 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, Type defaultValue) {
 		this(optionName, requiredType, description, range, (short) 2, defaultValue);
+	}
+	
+	/**
+	 * 
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param range
+	 * @param defaultValue
+	 * @param displayName
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+		String description, Range<Type> range, Type defaultValue, String displayName) {
+		this(optionName, requiredType, description, range, (short) 2, defaultValue,
+			displayName);
 	}
 	
 	/**
@@ -348,6 +400,19 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Type defaultValue) {
 		this(optionName, requiredType, description, null, defaultValue);
+	}
+	
+	/**
+	 * 
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param defaultValue
+	 * @param displayName
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+		String description, Type defaultValue, String displayName) {
+		this(optionName, requiredType, description, null, defaultValue, displayName);
 	}
 	
 	/*
