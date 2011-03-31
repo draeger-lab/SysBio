@@ -406,7 +406,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
             KeyListener keyListener) {
 		// Create swing option based on field type
 		JComponent component = null;
-		String optionTitle = option.formatOptionName();
+		String optionTitle = option.isSetDisplayName() ? option.getDisplayName()
+				: option.formatOptionName();
 		
 		// If a range is specified, get all possible values.
 		String[] values = null;
@@ -419,10 +420,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 					values[i] = val.get(i).toString();
 				}
 			}
-		}
-		
-		if (option.isSetDisplayName()) {
-			optionTitle = option.getDisplayName();
 		}
 		
     // Get default value
@@ -441,11 +438,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			//		.get(o.getOptionName()).toString()));
 		} else if (File.class.isAssignableFrom(clazz)) {
 			// Infere type
-			Type ty = Type.SAVE;
-			String check = optionTitle.toLowerCase();
-			if (check.contains("open")  || check.contains("load")
-					|| check.contains("input")) {
-				ty = Type.OPEN;
+			Type ty = Type.OPEN;
+			String check = option.getOptionName().toLowerCase();
+			if (check.contains("save")  || check.contains("store")
+					|| check.contains("output")) {
+				ty = Type.SAVE;
 			}
 			
       // Get default value
