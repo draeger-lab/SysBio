@@ -158,7 +158,6 @@ public class Species implements Serializable, Comparable<Object> {
     this.commonName = commonName;
   }
 
-  @Override
   public int compareTo(Object o) {
     if (o instanceof Species)
       return scientificName.toLowerCase().compareTo(((Species)o).scientificName.toLowerCase());
