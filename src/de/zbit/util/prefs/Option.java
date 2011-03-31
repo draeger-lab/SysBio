@@ -158,6 +158,37 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	private final String shortCmdName;
 	
 	/**
+	 * A short human-readable representation of the purpose of this {@link Option}
+	 * . This {@link String} is intended to be displayed in help texts and
+	 * graphical user interfaces.
+	 */
+	private String displayName;
+	
+	/**
+	 * Checks if a display name for this option has been set.
+	 * 
+	 * @return <code>true</code> if the display name has been set,
+	 *         <code>false</code> otherwise.
+	 */
+	public final boolean isSetDisplayName() {
+		return displayName != null;
+	}
+	
+	/**
+	 * @return the displayName
+	 */
+	public final String getDisplayName() {
+		return displayName;
+	}
+
+	/**
+	 * @param displayName the displayName to set
+	 */
+	public final void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
+	/**
 	 * @param optionName
 	 * @param requiredType
 	 * @param description
@@ -434,7 +465,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @see de.zbit.gui.ActionCommand#getName()
 	 */
 	public String getName() {
-		return getOptionName();
+		return isSetDisplayName() ? getDisplayName() : getOptionName();
 	}
 	
 	/**

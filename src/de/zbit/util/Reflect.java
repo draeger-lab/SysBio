@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import java.util.logging.Logger;
 
 /**
  * This class loads other classes that implement certain interfaces or extend
@@ -45,6 +46,11 @@ import java.util.jar.JarInputStream;
  * @version $Rev$
  */
 public class Reflect {
+	
+	/**
+	 * The {@link Logger}.
+	 */
+	public static Logger logger = Logger.getLogger(Reflect.class.getName());
 	
 	/**
 	 * Compares the string values of given objects.
@@ -94,10 +100,12 @@ public class Reflect {
 	 * @return
 	 */
 	private static <T> int addClass(HashSet<Class<T>> set, Class<T> cls) {
-		if (TRACE) System.out.println("adding class " + cls.getName());
+		if (TRACE) {
+			logger.info("adding class " + cls.getName());
+		}
 		if (set.contains(cls)) {
-			// System.err.printf("warning, Class %s not added twice!\n", cls
-			// .getName());
+			// logger.warn(String.format("warning, Class %s not added twice!\n", cls
+			// .getName()));
 			return 0;
 		} else {
 			set.add(cls);
@@ -218,9 +226,10 @@ public class Reflect {
 	 */
 	public static <T> Class<T>[] getAssignableClassesInPackage(String pckg,
 		Class<T> reqSuperCls, boolean includeSubs, boolean bSort) {
-		if (TRACE)
-			System.out.println("requesting classes assignable from "
+		if (TRACE){
+			logger.info("requesting classes assignable from "
 					+ reqSuperCls.getName());
+		}
 		return getClassesInPackageFltr(new HashSet<Class<T>>(), pckg, includeSubs,
 			bSort, reqSuperCls);
 	}
@@ -239,7 +248,7 @@ public class Reflect {
 		ArrayList<String> classes = new ArrayList<String>();
 		int dotIndex = className.lastIndexOf('.');
 		if (dotIndex <= 0) {
-			System.err.printf("warning: %s is not a package!\n", className);
+			logger.warning(String.format("warning: %s is not a package!\n", className));
 		} else {
 			String pckg = className.substring(0, className.lastIndexOf('.'));
 			Class<?>[] clsArr;
@@ -251,8 +260,8 @@ public class Reflect {
 				clsArr = null;
 			}
 			if (clsArr == null) {
-				System.err.printf("Warning: No configuration property found for %s.",
-					className);
+				logger.warning(String.format(
+					"Warning: No configuration property found for %s.", className));
 				classes.add(className);
 			} else {
 				for (Class<?> class1 : clsArr) {
@@ -262,16 +271,17 @@ public class Reflect {
 						// to be displayed
 						Field f = class1.getDeclaredField("hideFromGOE");
 						if (f.getBoolean(class1) == true) {
-							if (TRACE)
-								System.out.println("Class " + class1
+							if (TRACE) {
+								logger.info("Class " + class1
 										+ " wants to be hidden from GOE, skipping...");
+							}
 							continue;
 						}
 					} catch (Exception e) {
-						
+						// 
 					} catch (Error e) {
-						System.err
-								.printf("Error on checking fields of %s: %s\n", class1, e);
+						logger.warning(String.format(
+							"Error on checking fields of %s: %s\n", class1, e));
 						continue;
 					}
 					// if (f)
@@ -284,8 +294,9 @@ public class Reflect {
 							class1.getConstructor(params);
 							classes.add(class1.getName());
 						} catch (NoSuchMethodException e) {
-							System.err.println("GOE warning: Class " + class1.getName()
-									+ " has no default constructor, skipping...");
+							logger.warning(String.format(
+												"GOE warning: Class %s has no default constructor, skipping...",
+												class1.getName()));
 						}
 					}
 				}
@@ -325,12 +336,12 @@ public class Reflect {
 							cntAdded += addClass(set, cls);
 						}
 					} catch (Exception e) {
-						System.err.printf("%s %s.%s: %s.\n", ERROR_MSG, pckgname.replace(
-							'/', '.'), files[i], e.getMessage());
+						logger.warning(String.format("%s %s.%s: %s.\n", ERROR_MSG, pckgname.replace(
+							'/', '.'), files[i], e.getMessage()));
 						//						e.printStackTrace();
 					} catch (Error e) {
-						System.err.printf("%s %s.%s: %s.\n", ERROR_MSG, pckgname.replace(
-							'/', '.'), files[i], ": ", e.getMessage());
+						logger.warning(String.format("%s %s.%s: %s.\n", ERROR_MSG, pckgname.replace(
+							'/', '.'), files[i], ": ", e.getMessage()));
 						//						e.printStackTrace();
 					}
 				} else if (includeSubs) {
@@ -367,16 +378,16 @@ public class Reflect {
 				dir = path + "/" + pckgname.replace(".", "/");
 				
 				if (TRACE) {
-					System.out.println(".. opening " + path);
+					logger.warning(String.format(".. opening %s", path));
 				}
 				
 				directory = new File(dir);
 				
 			} catch (NullPointerException x) {
 				if (TRACE) {
-					System.err.printf("%s not found in %s.\n", directory.getPath(), path);
-					System.err.printf("directory %s.\n", (directory.exists() ? "exists"
-							: "does nott exist"));
+					logger.warning(String.format("%s not found in %s.\n", directory.getPath(), path));
+					logger.warning(String.format("directory %s.\n", (directory.exists() ? "exists"
+							: "does nott exist")));
 				}
 				return 0;
 			}
@@ -385,13 +396,13 @@ public class Reflect {
 				return getClassesFromDirFltr(set, directory, pckgname, includeSubs, reqSuperCls);
 			} else {
 				if (TRACE) {
-					System.err.printf("%s does not exist in %s, dir was %s.\n", directory
-							.getPath(), path, dir);
+					logger.warning(String.format("%s does not exist in %s, dir was %s.\n", directory
+							.getPath(), path, dir));
 				}
 				return 0;
 			}
 		} catch (ClassNotFoundException e) {
-			System.err.println(e.getMessage());
+			logger.warning(e.getLocalizedMessage());
 			e.printStackTrace();
 			return 0;
 		}
@@ -414,7 +425,7 @@ public class Reflect {
 		
 		packageName = packageName.replace('.', '/');
 		if (TRACE) {
-			System.out.printf("Jar %s looking for %s\n", jarName, packageName);
+			logger.info(String.format("Jar %s looking for %s\n", jarName, packageName));
 		}
 		try {
 			JarInputStream jarFile = new JarInputStream(new FileInputStream(jarName));
@@ -422,7 +433,7 @@ public class Reflect {
 			
 			while ((jarEntry = jarFile.getNextJarEntry()) != null) {
 				String jarEntryName = jarEntry.getName();
-				// if (TRACE) System.out.println("- " + jarEntry.getName());
+				// if (TRACE) { logger.info("- " + jarEntry.getName()); }
 				if ((jarEntryName.startsWith(packageName))
 						&& (jarEntryName.endsWith(".class"))) {
 					// subpackages are hit here as well!
@@ -446,12 +457,12 @@ public class Reflect {
 								}
 							} else cntAdded += addClass(set, cls);
 						} catch (Exception e) {
-							System.err.printf("%s %s: %s\n", ERROR_MSG, clsName, e
-									.getMessage());
+							logger.warning(String.format("%s %s: %s\n", ERROR_MSG, clsName, e
+									.getMessage()));
 							//							e.printStackTrace();
 						} catch (Error e) {
-							System.err.printf("%s %s: %s\n", ERROR_MSG, clsName, e
-									.getMessage());
+							logger.warning(String.format("%s %s: %s\n", ERROR_MSG, clsName, e
+									.getMessage()));
 							// e.printStackTrace();
 						}
 					}
@@ -462,10 +473,11 @@ public class Reflect {
 		} catch (IOException e) {
 			missedJarsOnClassPath++;
 			if (missedJarsOnClassPath <2) {
-				System.err.printf("Could not open jar from class path: %s.\n", e.getMessage());
-				System.err.println("Dirty class path?");
+				logger.warning(String.format(
+					"Could not open jar from class path: %s. - Dirty class path?", e
+							.getLocalizedMessage()));
 			} else if (missedJarsOnClassPath == 2) {
-				System.err.println("Could not open jar from class path more than once...");
+				logger.warning("Could not open jar from class path more than once...");
 			}
 			// e.printStackTrace();
 		}
@@ -478,8 +490,8 @@ public class Reflect {
 	 */
 	public static ArrayList<String> getClassesFromProperties(String className) {
 		if (TRACE) {
-			System.out.printf(
-				"getClassesFromProperties - requesting className: %s\n", className);
+			logger.info(String.format(
+				"getClassesFromProperties - requesting className: %s\n", className));
 		}
 		return getClassesFromClassPath(className);
 	}
@@ -509,7 +521,7 @@ public class Reflect {
 	        try {
 	          dynCP = getValidCPArray();
 	        } catch (Exception e) {
-	          System.err.println(e.getMessage());
+	          logger.warning(e.getLocalizedMessage());
 	        }
 	      } else {
 	        dynCP = getClassPathElements();
@@ -550,7 +562,7 @@ public class Reflect {
           fileNameDecoded = fileNameDecoded.substring(6);
         }
         
-        System.out.println(fileNameDecoded);
+        logger.info(fileNameDecoded);
         
         dirs.add((fileNameDecoded));
     }
@@ -564,17 +576,17 @@ public class Reflect {
 		
 		
 		if (TRACE) {
-			System.out.println("classpath is " + classPath);
+			logger.info("classpath is " + classPath);
 		}
 		for (int i = 0; i < dynCP.length; i++) {
 			if (TRACE) {
-				System.out.println("reading element " + dynCP[i]);
+				logger.info("reading element " + dynCP[i]);
 			}
 			if (dynCP[i].endsWith(".jar")) {
 				getClassesFromJarFltr(set, dynCP[i], pckg, includeSubs, reqSuperCls);
 			} else {
 				if (TRACE) {
-					System.out.printf("reading from files: %s %s\n", dynCP[i], pckg);
+					logger.info(String.format("reading from files: %s %s\n", dynCP[i], pckg));
 				}
 				getClassesFromFilesFltr(set, dynCP[i], pckg, includeSubs, reqSuperCls);
 			}
@@ -587,7 +599,7 @@ public class Reflect {
 	 */
 	public static String[] getClassPathElements() {
 		String classPath = System.getProperty("java.class.path", ".");
-		// System.out.println("classpath: " + classPath);
+		// logger.info("classpath: " + classPath);
 		return classPath.split(File.pathSeparator);
 	}
 	
@@ -612,7 +624,7 @@ public class Reflect {
 		File f;
 		ArrayList<String> valids = new ArrayList<String>(pathElements.length);
 		for (int i = 0; i < pathElements.length; i++) {
-			// System.err.println(pathElements[i]);
+			// logger.warning(pathElements[i]);
 			f = new File(pathElements[i]);
 			// if (f.canRead()) {valids.add(pathElements[i]);}
 			if (f.exists() && f.canRead()) {
