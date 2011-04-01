@@ -403,7 +403,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
           break;
         }
       } catch (UnsuccessfulRetrieveException e) {
-        log.log(Level.FINE, "Unsuccessful retrieval, marking ALL IDs as unretrievable", e);
+        String example = null;
+        if (ids!=null && ids.length>0) {
+          example = (ids[0]==null?"null":ids[0].toString());
+        }
+        log.log(Level.FINE, "Unsuccessful retrieval, marking ALL IDs as unretrievable"+
+            (example!=null?" (e.g., '" +example+"')": ""), e);
         unsuccessfulQueries.addAll(ids);
         cacheChangedSinceLastLoading=true;
         break;
@@ -539,7 +544,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     ArrayList<IDtype> unknownIDs = new ArrayList<IDtype>();
     boolean touched = false; // if true, ids!=filteredIDs
     for (IDtype id: ids) {
-      if (rememberedInfos.indexOf(id)<0 && !unsuccessfulQueries.contains(id)) {
+      if (id!=null && rememberedInfos.indexOf(id)<0 && !unsuccessfulQueries.contains(id)) {
         unknownIDs.add(id);
       } else {
         touched = true;
@@ -563,6 +568,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       for (int i=0; i<filtIDs.length; i++)
         Array.set(filtIDs, i, unknownIDs.get(i));
     } // Else, all ids are unknown.
+    if (filtIDs.length<1) return;
     
     // Query unknown ids
     infos = fetchMultipleInformationWrapper(filtIDs);
