@@ -56,10 +56,21 @@ public class Species implements Serializable, Comparable<Object> {
   }
   
   /**
-   * @param shortName
+   * @param keggAbbr
+   * @param scientificName
+   * @param uniprotExtension
+   */
+  public Species(String keggAbbr, String scientificName,
+            String uniprotExtension) {
+    this(keggAbbr, scientificName, uniprotExtension, null, null);
+  }
+  
+  /**
+   * @param keggAbbr
    * @param scientificName
    * @param uniprotExtension
    * @param commonName
+   * @param synonym
    */
   public Species(String keggAbbr, String scientificName,
             String uniprotExtension, String commonName, String synonym) {
