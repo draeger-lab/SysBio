@@ -734,7 +734,7 @@ public class CSVReader implements Serializable, Cloneable {
    *  
    * @return integer, column number
    */
-  public int getColumn(String s) {
+  public int getColumn(String... s) {
     if (!isInitialized) {
       try {
         initialize();
@@ -745,7 +745,9 @@ public class CSVReader implements Serializable, Cloneable {
     
     if (headers==null) return -1;
     for (int i=0; i<headers.length;i++) {
-      if (headers[i].equalsIgnoreCase(s)) return i;
+      for (String target: s) {
+        if (headers[i].equalsIgnoreCase(target)) return i;
+      }
     }
     return -1;
   }
