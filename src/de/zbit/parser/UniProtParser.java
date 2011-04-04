@@ -18,6 +18,7 @@ package de.zbit.parser;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import de.zbit.dbfetch.UniProtFetcher;
@@ -26,7 +27,7 @@ import de.zbit.util.SortedArrayList;
 /**
  * @author Finja B&uml;chel
  * 
- * Parse information out of the Strings it gets from the UniProtWrapper
+ * Parse information out of the Strings it gets from the UniProtFetcher
  * 
  * @version $Rev$
  * @since 1.0
@@ -34,29 +35,34 @@ import de.zbit.util.SortedArrayList;
 public class UniProtParser {
   
   public static final Logger log = Logger.getLogger(UniProtParser.class.getName());
-  UniProtFetcher UniProtManagement = null;
+  UniProtFetcher UniProtFetcher = null;
 
   public UniProtParser(UniProtFetcher w) {
     super();
-    this.UniProtManagement = w;
+    this.UniProtFetcher = w;
   }
   
   public UniProtParser() {
     super();
     try {
       if (new File("uniprot.dat").exists())
-        UniProtManagement = (UniProtFetcher) UniProtManagement.loadFromFilesystem("uniprot.dat");
+        UniProtFetcher = (UniProtFetcher) UniProtFetcher.loadFromFilesystem("uniprot.dat");
     } catch (Throwable e) {
     }
-    if (UniProtManagement == null) {
+    if (UniProtFetcher == null) {
       log.fine("Initialize new and empty cache UniprotFetcher cache.");
-      UniProtManagement = new UniProtFetcher(80000);
+      UniProtFetcher = new UniProtFetcher(80000);
     }
   }
   
-  public String getGeneName(String block){
+  /**
+   * 
+   * @param geneblock, containing the whole gene block of the uniprot entry, parsed by  {@link #getGeneBlocks(String[])} 
+   * @return the offical gene name of a protein
+   */
+  public String getGeneSymbolName(String geneBlock){
     String name = "";
-    String[] lineSplit = block.split("\n");
+    String[] lineSplit = geneBlock.split("\n");
     
     for (String line : lineSplit) {
       if(line!=null && line.length()>0){
@@ -173,7 +179,7 @@ public class UniProtParser {
   public ArrayList<String>[] getGeneBlocks(String[] identifier) {
     log.fine("getGene identifier.length(): " + identifier.length);
     
-    String[] proteinBlock = UniProtManagement.getInformations(identifier);
+    String[] proteinBlock = UniProtFetcher.getInformations(identifier);
     log.fine("proteins.length; " + proteinBlock.length);
     ArrayList<String>[] result = new ArrayList[identifier.length];
     
@@ -218,7 +224,7 @@ public class UniProtParser {
     ArrayList<String[]> ids = new ArrayList<String[]>();
     String[] uniProtBlockLine, splitLine;
 
-    String[] results = UniProtManagement.getInformations(acs);
+    String[] results = UniProtFetcher.getInformations(acs);
     
     if(results!=null){
       for (int i=0; i<results.length; i++) {
@@ -269,6 +275,61 @@ public class UniProtParser {
    * @return
    */
   public UniProtFetcher getUniprotManager() {
-    return UniProtManagement;
+    return UniProtFetcher;
+  }
+
+  /**
+   * in the DR line the NCBI/RefSeq gene identifier is safed
+   * Format: 
+   * DR   RESOURCE_ABBREVIATION; RESOURCE_IDENTIFIER; OPTIONAL_INFORMATION_1[; OPTIONAL_INFORMATION_2][; OPTIONAL_INFORMATION_3].
+   * RESOURCE_ABBREVIATION = GeneID;
+   * 
+   * @return gene id, defined by NCBI, RefSeq; default = -1;
+   */
+  public int getGeneID(String uniProtID) {
+    int geneID = -1;
+    
+    String result = UniProtFetcher.getInformation(uniProtID);
+    String[] split = result.split("\n");
+    for (String line : split) {
+      if(line.startsWith("DR   GeneID")){
+        String[] splitID = line.split(";");
+        geneID = Integer.parseInt(splitID[1].trim());
+      }
+    }
+    
+    return geneID;
+  }
+  
+  /**
+   * in the DR line the NCBI/RefSeq gene identifier is safed
+   * Format: 
+   * DR   RESOURCE_ABBREVIATION; RESOURCE_IDENTIFIER; OPTIONAL_INFORMATION_1[; OPTIONAL_INFORMATION_2][; OPTIONAL_INFORMATION_3].
+   * RESOURCE_ABBREVIATION = GeneID;
+   * 
+   * @return gene id, defined by NCBI, RefSeq; default = -1;
+   */
+  public int[] getGeneIDs(String[] identifier) {
+    log.fine("getGene identifier.length(): " + identifier.length);
+    
+    String[] proteinBlock = UniProtFetcher.getInformations(identifier);
+    log.fine("proteins.length; " + proteinBlock.length);
+    int[] geneIDs = new int[identifier.length];
+    Arrays.fill(geneIDs, -1);
+    
+    for (int i=0; i<proteinBlock.length; i++) {
+      
+      String[] split = proteinBlock[i].split("\n");
+      for (String line : split) {
+        if(line.startsWith("DR   GeneID")){
+          String[] splitID = line.split(";");
+          geneIDs[i] = Integer.parseInt(splitID[1].trim());
+          continue;
+        }
+      }
+      
+    }
+    
+    return geneIDs;
   }
 }
