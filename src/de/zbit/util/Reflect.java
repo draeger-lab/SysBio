@@ -104,7 +104,7 @@ public class Reflect {
 			logger.info("adding class " + cls.getName());
 		}
 		if (set.contains(cls)) {
-			// logger.warn(String.format("warning, Class %s not added twice!\n", cls
+			// logger.warn(String.format("warning, Class %s not added twice!", cls
 			// .getName()));
 			return 0;
 		} else {
@@ -168,7 +168,7 @@ public class Reflect {
 		boolean includeSubs, boolean bSort, Class<T> superClass, String jarPath) {
 		Class<T> classes[] = Reflect.getAllClassesInPackage(packageName, false,
 			true, superClass);
-		if (classes == null || classes.length == 0) {
+		if ((classes == null) || (classes.length == 0)) {
 			HashSet<Class<T>> set = new HashSet<Class<T>>();
 			boolean tryDir = true;
 			if (tryDir && jarPath!=null) {
@@ -248,7 +248,7 @@ public class Reflect {
 		ArrayList<String> classes = new ArrayList<String>();
 		int dotIndex = className.lastIndexOf('.');
 		if (dotIndex <= 0) {
-			logger.warning(String.format("warning: %s is not a package!\n", className));
+			logger.warning(String.format("warning: %s is not a package!", className));
 		} else {
 			String pckg = className.substring(0, className.lastIndexOf('.'));
 			Class<?>[] clsArr;
@@ -281,7 +281,7 @@ public class Reflect {
 						// 
 					} catch (Error e) {
 						logger.warning(String.format(
-							"Error on checking fields of %s: %s\n", class1, e));
+							"Error on checking fields of %s: %s", class1, e));
 						continue;
 					}
 					// if (f)
@@ -326,23 +326,27 @@ public class Reflect {
 				if (files[i].endsWith(".class")) {
 					// removes the .class extension
 					try {
-						Class<T> cls = (Class<T>) Class.forName(pckgname + '.'
-								+ files[i].substring(0, files[i].length() - 6));
-						if (reqSuperCls != null) {
-							if (reqSuperCls.isAssignableFrom(cls)) {
-								cntAdded += addClass(set, cls);
-							}
-						} else {
-							cntAdded += addClass(set, cls);
+						Class<T> cls = null;
+						String className = StringUtil.concat(pckgname, ".",
+								files[i].substring(0, files[i].length() - 6))
+								.toString();
+						if (!ClassLoader.getSystemClassLoader().loadClass(className).isInterface()) {
+						  cls=(Class<T>) Class.forName(className);
+						  if (reqSuperCls != null) {
+							  if (reqSuperCls.isAssignableFrom(cls)) {
+								  cntAdded += addClass(set, cls);
+							  }
+						  } else {
+							  cntAdded += addClass(set, cls);
+						  }
 						}
-					} catch (Exception e) {
-						logger.warning(String.format("%s %s.%s: %s.\n", ERROR_MSG, pckgname.replace(
-							'/', '.'), files[i], e.getMessage()));
-						//						e.printStackTrace();
+					}
+					catch (Exception e) {
+						logger.warning(String.format("%s %s.%s: %s.", ERROR_MSG, pckgname.replace(
+							'/', '.'), files[i], e.getLocalizedMessage()));
 					} catch (Error e) {
-						logger.warning(String.format("%s %s.%s: %s.\n", ERROR_MSG, pckgname.replace(
-							'/', '.'), files[i], ": ", e.getMessage()));
-						//						e.printStackTrace();
+						logger.warning(String.format("%s %s.%s: %s.", ERROR_MSG, pckgname.replace(
+							'/', '.'), files[i], ": ", e.getLocalizedMessage()));
 					}
 				} else if (includeSubs) {
 					// do a recursive search over subdirs
@@ -385,8 +389,8 @@ public class Reflect {
 				
 			} catch (NullPointerException x) {
 				if (TRACE) {
-					logger.warning(String.format("%s not found in %s.\n", directory.getPath(), path));
-					logger.warning(String.format("directory %s.\n", (directory.exists() ? "exists"
+					logger.warning(String.format("%s not found in %s.", directory.getPath(), path));
+					logger.warning(String.format("directory %s.", (directory.exists() ? "exists"
 							: "does nott exist")));
 				}
 				return 0;
@@ -396,7 +400,7 @@ public class Reflect {
 				return getClassesFromDirFltr(set, directory, pckgname, includeSubs, reqSuperCls);
 			} else {
 				if (TRACE) {
-					logger.warning(String.format("%s does not exist in %s, dir was %s.\n", directory
+					logger.warning(String.format("%s does not exist in %s, dir was %s.", directory
 							.getPath(), path, dir));
 				}
 				return 0;
@@ -425,7 +429,7 @@ public class Reflect {
 		
 		packageName = packageName.replace('.', '/');
 		if (TRACE) {
-			logger.info(String.format("Jar %s looking for %s\n", jarName, packageName));
+			logger.info(String.format("Jar %s looking for %s", jarName, packageName));
 		}
 		try {
 			JarInputStream jarFile = new JarInputStream(new FileInputStream(jarName));
@@ -440,9 +444,9 @@ public class Reflect {
 					if (!includeSubs) { // check if the class belongs to a
 						// subpackage
 						int lastDash = jarEntryName.lastIndexOf('/');
-						if (lastDash > packageName.length() + 1)
+						if (lastDash > packageName.length() + 1) {
 							isInSubPackage = true;
-						else isInSubPackage = false;
+						} else {isInSubPackage = false;}
 					}
 					if (includeSubs || !isInSubPackage) { // take the right
 						// ones
@@ -457,11 +461,11 @@ public class Reflect {
 								}
 							} else cntAdded += addClass(set, cls);
 						} catch (Exception e) {
-							logger.warning(String.format("%s %s: %s\n", ERROR_MSG, clsName, e
+							logger.warning(String.format("%s %s: %s", ERROR_MSG, clsName, e
 									.getMessage()));
 							//							e.printStackTrace();
 						} catch (Error e) {
-							logger.warning(String.format("%s %s: %s\n", ERROR_MSG, clsName, e
+							logger.warning(String.format("%s %s: %s", ERROR_MSG, clsName, e
 									.getMessage()));
 							// e.printStackTrace();
 						}
@@ -491,7 +495,7 @@ public class Reflect {
 	public static ArrayList<String> getClassesFromProperties(String className) {
 		if (TRACE) {
 			logger.info(String.format(
-				"getClassesFromProperties - requesting className: %s\n", className));
+				"getClassesFromProperties - requesting className: %s", className));
 		}
 		return getClassesFromClassPath(className);
 	}
@@ -576,7 +580,7 @@ public class Reflect {
 		
 		
 		if (TRACE) {
-			logger.info("classpath is " + classPath);
+			logger.info(String.format("classpath is %s", classPath));
 		}
 		for (int i = 0; i < dynCP.length; i++) {
 			if (TRACE) {
@@ -586,7 +590,7 @@ public class Reflect {
 				getClassesFromJarFltr(set, dynCP[i], pckg, includeSubs, reqSuperCls);
 			} else {
 				if (TRACE) {
-					logger.info(String.format("reading from files: %s %s\n", dynCP[i], pckg));
+					logger.info(String.format("reading from files: %s %s", dynCP[i], pckg));
 				}
 				getClassesFromFilesFltr(set, dynCP[i], pckg, includeSubs, reqSuperCls);
 			}
