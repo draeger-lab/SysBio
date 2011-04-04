@@ -1,0 +1,30 @@
+
+   Protokoll
+   =========
+
+1. Florian Mittag ist nun Trac-Admin und verwaltet die neue/alte
+   Java-Verwender-Mailingliste.
+   
+2. Erstes Release ist erfolgt.
+
+3. Es wurde auf die Datei files/SysBioCodeStyle.xml hingewiesen,
+   damit die automatische Code-Formatierung einheitlich 
+   funktioniert.
+
+4. Refactoring: Wenn Klassen umbenannt werden oder in andere
+   Pakete verschoben werden, dann soll man eine E-Mail an die
+   Mailing-Liste schicken, um andere Nutzer darauf aufmerksam
+   zu machen.
+   
+5. Es wurde ein Entwurf für ein OptionController erstellt, der
+   Abhängigkeiten zwischen Optionen in GUIs erlauben soll.
+   
+6. Voerst sollen keine Gruppen von Optionsgruppen implementiert
+   werden. Konsistenzüberprüfungen werden vorläufig auch nicht
+   allgemein implementiert.
+   
+   
+7. Der Argparser soll in das SysBio-Projekt integriert werden 
+   und unabhängig von der urspünglichen Version weiterentwickelt
+   werden.
+   
