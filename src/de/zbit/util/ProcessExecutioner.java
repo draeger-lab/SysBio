@@ -16,6 +16,8 @@
  */
 package de.zbit.util;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,11 +48,23 @@ public class ProcessExecutioner {
    * 
    * @param command, i.e. ./convertPathwayFiles.sh 
    * @param processOutput
-   * @return
+   * @return the exit code of the process.
    * @throws IOException
    */
   public static int executeProcess(String command, OutputStream processOutput) throws IOException {
     return executeProcess(Arrays.asList(command.split("\\s+")), processOutput);
+  }
+
+  /**
+   * Using this method, instead of the imploded {@link #executeProcess(String, OutputStream)},
+   * allows to have spaces in arguments (e.g. "hal lo" as argument).
+   * @param command, i.e. ./convertPathwayFiles.sh 
+   * @param processOutput
+   * @return the exit code of the process.
+   * @throws IOException
+   */
+  public static int executeProcess(String[] command, OutputStream processOutput) throws IOException {
+    return executeProcess(Arrays.asList(command), processOutput);
   }
   
   public static int executeProcess(List<String> command, OutputStream processOutput) throws IOException {
@@ -88,6 +102,23 @@ public class ProcessExecutioner {
     }
     return -1; 
   }
+  
+  /**
+   * Executes a simple command and returns the applications output.
+   * If an exception occurs, null is returned.
+   * @param command
+   * @return
+   */
+  public static String executeProcess(String... command) {
+    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    try {
+      ProcessExecutioner.executeProcess(command, new BufferedOutputStream(outStream));
+    } catch (IOException e) {
+      return null;
+    }
+    return outStream.toString();
+  }
+  
   
   public static int executeJavaProcess(String vmargs, String classpath,
       String mainClassName, List<String> command,
