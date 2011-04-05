@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import org.apache.axis.AxisFault;
 
 import uk.ac.ebi.webservices.axis1.WSDbfetchClient;
+import uk.ac.ebi.webservices.axis1.stubs.wsdbfetch.DbfNoEntryFoundException;
 import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
@@ -69,31 +70,32 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
       return name;
     }
   }
-  /**
-   * 
-   */
+
   public static Logger log = Logger.getLogger(DBFetcher.class.getName());
-  /**
-   * 
-   */
   private static final long serialVersionUID = -1996313057043843757L;
 
   /**
-   * 
+   * The actual WSDBFetch client
    */
   private transient WSDbfetchClient dbfetch = new WSDbfetchClient();
-  // TODO: get rid of global variables, this is unclean code
+
   /**
-   * 
+   * Displayes a ProgressBar when fetching multiple identifier.
    */
   public static boolean showProgress = false;
   /**
-   * 
+   * If true, IDs that could not be found by mass query (if fetching multiple
+   * identifier) will be retried one after one, by fetching only a single id
+   * at a time.
+   * Background: Uniprot sometimes gives the new protein for old accessions and
+   * you can't map the old id to the new entry, because it does not occur in the
+   * entry block.
    */
   public static boolean fetchNonMappableIDs = false;
   
   /**
-   *   
+   * The style to fetch. Usually "Style.RAW".
+   * @see Style
    */
   private Style style;
 
@@ -145,7 +147,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
             getFormat(), getStyleString());
         break;
       } catch (AxisFault e) {
-        if (e.getMessage().contains("DbfNoEntryFoundException"))
+        if (e instanceof DbfNoEntryFoundException || e.toString()!=null && e.toString().equalsIgnoreCase("No result found"))
           throw new UnsuccessfulRetrieveException( e );
         else {
           retried++;
@@ -186,7 +188,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         if (dbfetch==null) restoreUnserializableObject();
         entriesStr = dbfetch.fetchBatch(getDbName(), queryString, getFormat(),getStyleString());
       } catch (AxisFault e) {
-        if (e!=null && e.dumpToString()!=null && e.dumpToString().contains("DbfNoEntryFoundException")) {
+        if (e instanceof DbfNoEntryFoundException || e.toString()!=null && e.toString().equalsIgnoreCase("No result found")) {
           // Propagate to caller.
           for (int index = startID; index <= endID; index++)
             ret[index] = null;
@@ -223,14 +225,19 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         }
       }
     } else {
-      // divided by "//"
-      String[] splitt = entriesStr.split(Pattern.quote("\n//\n"));
+      // divided by "//" (in Uniprot, but may be different in other dbs!)
+      String[] splitt = entriesStr.split(getEntrySeparator());
 
       // optimal case: as many answers as requests
       if ((splitt.length - 1) == queryString.split(",").length) { // -1 due to last "\n"
         int j = 0;
         for (int index = startID; index <= endID; index++) {
-          ret[index] = splitt[j]+"\n//\n";
+          if (!splitt[j].endsWith(getAppendAtEnd()))
+            splitt[j]+=getAppendAtEnd();//"\n//\n"
+          if (!splitt[j].startsWith(getAppendAtStart()))
+            splitt[j]=getAppendAtStart()+splitt[j];//""
+          
+          ret[index] = splitt[j];
           j++;
         }
       } else {
@@ -250,7 +257,12 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
 
             // Does the ID or AC line contain this idText?
             if (matchIDtoInfo(ids[index], toCheck)) {
-              ret[index] = info+"\n//\n";
+              if (!info.endsWith(getAppendAtEnd()))
+                info+=getAppendAtEnd();
+              if (!info.startsWith(getAppendAtStart()))
+                info=getAppendAtStart()+info;
+              
+              ret[index] = info;
               
               // Don't break here. 1:n mapping possible. With break,
               // we would make an 1:1 mapping.
@@ -264,6 +276,32 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
     }
   }
   
+  /**
+   * @return the string to append to each entry to fix missing
+   * parts, due to the {@link #getEntrySeparator()}.
+   */
+  public String getAppendAtEnd() {
+    return "\n//\n";
+  }
+  
+  /**
+   * @return the string to append to each entry to fix missing
+   * parts, due to the {@link #getEntrySeparator()}.
+   */
+  public String getAppendAtStart() {
+    return "";
+  }
+
+  /**
+   * @return the separator that is used by the DBFetch Database
+   * to separate multiple fetched entries.
+   * Usually this is a "//", but for some databases (e.g., RefSeq)
+   * another separator is used.
+   */
+  public String getEntrySeparator() {
+    return Pattern.quote("\n//\n");
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -348,6 +386,10 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
   /**
    * Returns the DB name to be used for the dbfetch queries
    * (e.g., uniprot, ipi, ...) 
+   * 
+   * <p>You can find a list of available databases
+   * <a href="http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/dbfetch.databases">
+   * here</a>.</p>
    * 
    * @return the DB name to be used for dbfetch queries
    */
