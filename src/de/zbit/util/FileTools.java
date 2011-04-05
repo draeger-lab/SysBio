@@ -106,5 +106,24 @@ public class FileTools {
     
     return null;
   }
+
+  /**
+   * Trims everything but the file name from a url or path.
+   * e.g. "ftp://asf.com/asf/frg.zip" would return "frg.zip".
+   * or "c:\asg\fgj" would return "fgj".
+   * 
+   * @param downloadurl
+   * @return
+   */
+  public static String getFilename(String downloadurl) {
+    char sep = File.separatorChar;
+    int pos = downloadurl.lastIndexOf(sep);
+    if (sep!='/') {
+      // In windows, BOTH \\ and / can be used as separators.
+      pos = Math.max(downloadurl.lastIndexOf(sep), downloadurl.lastIndexOf('/'));
+    }
+    if (pos<0) return downloadurl;
+    else return downloadurl.substring(pos+1);
+  }
   
 }
