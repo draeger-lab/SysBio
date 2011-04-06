@@ -822,6 +822,9 @@ public abstract URL getURLOnlineUpdate();
 		// Set this as property for static classes.
 		System.setProperty("app.name", getApplicationName());
 		
+    // Use the systems proxy settings to establish connections
+    System.setProperty("java.net.useSystemProxies", "true");
+    
 		GUITools.initLaF(getTitle());
 		setDefaultLookAndFeelDecorated(true);
 		
