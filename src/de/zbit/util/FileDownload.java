@@ -36,6 +36,12 @@ import java.net.URLConnection;
 public class FileDownload {
   public static Object ProgressBar;
   public static Object StatusLabel;
+
+  static {
+    // Use the system proxy.
+    System.setProperty("java.net.useSystemProxies", "true");
+  }
+
   
   /**
    * 
