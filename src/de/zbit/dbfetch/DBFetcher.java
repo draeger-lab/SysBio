@@ -26,6 +26,7 @@ import org.apache.axis.AxisFault;
 import uk.ac.ebi.webservices.axis1.WSDbfetchClient;
 import uk.ac.ebi.webservices.axis1.stubs.wsdbfetch.DbfNoEntryFoundException;
 import de.zbit.exception.UnsuccessfulRetrieveException;
+import de.zbit.gui.GUITools;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
 import de.zbit.util.Utils;
@@ -151,12 +152,12 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
           throw new UnsuccessfulRetrieveException( e );
         else {
           retried++;
-          if (retryLimit==retryLimit) e.printStackTrace();
+          if (retried==retryLimit) e.printStackTrace();
           log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
         }
       } catch (Exception e) {
         retried++;
-        if (retryLimit==retryLimit) e.printStackTrace();
+        if (retried==retryLimit) e.printStackTrace();
         log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
       }
     }

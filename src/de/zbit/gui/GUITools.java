@@ -1197,6 +1197,8 @@ for (Component c: p.getComponents()) {
 			msg = exc.getCause().getLocalizedMessage();
 		}
 		if (msg == null) msg = exc.getMessage();
+		if (msg == null) msg = exc.toString(); // Axis Faults have all messages null
+		if (msg == null) msg = "";
 		
 		if (logger!=null) logger.log(Level.WARNING, msg, exc);
 		ValuePair<String, Integer> messagePair = StringUtil
@@ -1213,7 +1215,7 @@ for (Component c: p.getComponents()) {
 		}
 		Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause()
 				.getClass() : exc.getClass();
-		JOptionPane.showMessageDialog(parent, message, clazz.getSimpleName(),
+		JOptionPane.showMessageDialog(parent, message, clazz!=null?clazz.getSimpleName():"",
 			JOptionPane.ERROR_MESSAGE);
 	}
 
