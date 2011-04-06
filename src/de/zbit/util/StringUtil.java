@@ -615,7 +615,7 @@ public class StringUtil {
    * @param message
    * @param lineBreak
    * @param lineBreakSymbol
-   * @return
+   * @return String with lineBreaks and number of inserted lineBreaks
    */
   public static ValuePair<String, Integer> insertLineBreaksAndCount(
             String message, int lineBreak, String lineBreakSymbol) {
