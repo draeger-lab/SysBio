@@ -103,7 +103,7 @@ public class ProgressBar extends AbstractProgressBar {
     // Nice-and cool looking ANSI ProgressBar ;-)
     String anim= "|/-\\";
     StringBuilder sb = new StringBuilder();
-    int x = percent / 2;
+    int x = percent / (100/kMax); // Number of blocks to visualize percentage
     sb.append("\r\033[K"); // <= clear line, Go to beginning
     sb.append("\033[107m"); // Bright white bg color
     for (int k = 0; k < kMax; k++) {
@@ -119,14 +119,14 @@ public class ProgressBar extends AbstractProgressBar {
         else sb.append(" ");
       }*/
       
-      // %-Angabe zentriert
+      // %-Value centered to 50% of available width
       int pStart = kMax/2-percString.length()/2;
       int pEnd = kMax/2+percString.length()/2;
       if (k>=pStart && k<=pEnd) {
         char c = ' ';
         if (k-pStart<percString.length()) c = percString.charAt(k-pStart);
-        if (x<=k) sb.append("\033[93m"+c); // Foreground colors
-        if (x> k) sb.append("\033[34m"+c); // Text colors
+        if (x<=k) sb.append("\033[93m"+c); // Foreground colors depend on
+        if (x> k) sb.append("\033[34m"+c); // bg color
       } else
         sb.append(" ");
       
