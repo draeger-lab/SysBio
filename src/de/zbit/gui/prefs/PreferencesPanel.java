@@ -54,7 +54,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.JTextComponent;
 
-import de.zbit.gui.JColumnChooser;
+import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.prefs.FileSelector.Type;
 import de.zbit.io.GeneralFileFilter;
@@ -227,8 +227,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			if (jc != null) {
 				if (jc instanceof FileSelector) {
 					FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
-				} else if (jc instanceof JColumnChooser) {
-				  JColumnChooser.addSelectorsToLayout(lh, (JColumnChooser) jc);
+				} else if (jc instanceof JLabeledComponent) {
+				  JLabeledComponent.addSelectorsToLayout(lh, (JLabeledComponent) jc);
 				} else {
 					lh.add(jc);
 				}
@@ -470,38 +470,40 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			((FileSelector)component).setLabelText(optionTitle);
 			
 		} else if (Character.class.isAssignableFrom(clazz)) {
-			component = new JColumnChooser(optionTitle, true, values);
-			((JColumnChooser)component).setAcceptOnlyIntegers(false);
+			component = new JLabeledComponent(optionTitle, true, values);
+			((JLabeledComponent)component).setAcceptOnlyIntegers(false);
 			//JComponent cs = ((JColumnChooser)jc).getColumnChooser();
 			// TODO: Limit maximum size to one (don't accept inputs after that).
 			
 		} else if (String.class.isAssignableFrom(clazz) ||
 				(Enum.class.isAssignableFrom(clazz))) {
-			component = new JColumnChooser(optionTitle, true, values);
-			((JColumnChooser)component).setAcceptOnlyIntegers(false);
+			component = new JLabeledComponent(optionTitle, true, values);
+			((JLabeledComponent)component).setAcceptOnlyIntegers(false);
 			
 		} else if (Number.class.isAssignableFrom(clazz)) {
-			component = new JColumnChooser(optionTitle, true, values);
+			component = new JLabeledComponent(optionTitle, true, values);
 			if (!Utils.isInteger(option.getRequiredType())) {
    			// TODO: implement Box for doubles.
 				// For doulbes, we need to allow ',' and '.'.
-				((JColumnChooser)component).setAcceptOnlyIntegers(false);
+				((JLabeledComponent)component).setAcceptOnlyIntegers(false);
 			}
+		}
+		else if((values!=null) && (values.length!=0)){
+			component = new JLabeledComponent(optionTitle,true,values);
+			((JLabeledComponent)component).setAcceptOnlyIntegers(false);
 		}
 
 		// Check if the option could be converted to a JComponent
 		if (component != null) {
 			if (component instanceof AbstractButton) {
 				((AbstractButton) component).setText(optionTitle);
-			} else if (component instanceof JColumnChooser) {
-				((JColumnChooser) component).setTitle(optionTitle);
-				if (defaultValue!=null) ((JColumnChooser)component).setDefaultValue(defaultValue.toString());
-				// Remove preview and reset predefined JColumnChooser layout.
-				((JColumnChooser)component).hidePreview();
-				((JColumnChooser)component).setPreferredSize(null);
-				((JColumnChooser)component).setLayout(new FlowLayout());
+			} else if (component instanceof JLabeledComponent) {
+				((JLabeledComponent) component).setTitle(optionTitle);
+				if (defaultValue!=null) ((JLabeledComponent)component).setDefaultValue(defaultValue.toString());
+				// Remove preview and reset predefined JLabeledComponent layout.
+				((JLabeledComponent)component).setPreferredSize(null);
+				((JLabeledComponent)component).setLayout(new FlowLayout());
 			}
-			
 			if ((itemListener!=null) && Reflect.contains(component, "addItemListener", ItemListener.class)) {
 				Reflect.invokeIfContains(component, "addItemListener", ItemListener.class, itemListener);
 			} else if (changeListener!=null) {
