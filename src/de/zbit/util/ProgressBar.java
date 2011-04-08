@@ -34,6 +34,13 @@ public class ProgressBar extends AbstractProgressBar {
   private int consoleWidth = (useSimpleStyle?0:ConsoleTools.getColumns());
   
   /**
+   * Only comes into play when {@link #useSimpleStyle} is true.
+   * The ANSI ProgressBar is always in one line.
+   * Disables displaying the ETR and additionalText!
+   */
+  private boolean printInOneLine = false;
+  
+  /**
    * Initialize the progressBar object
    * @param totalCalls - how often you are planning to call the "DisplayBar" method.
    */
@@ -66,7 +73,23 @@ public class ProgressBar extends AbstractProgressBar {
     return useSimpleStyle;
   }
   
-  
+  /**
+   * @return print in one line (if !{@link #useSimpleStyle})
+   */
+  public boolean isPrintInOneLine() {
+    return (!useSimpleStyle || printInOneLine);
+  }
+
+  /**
+   * Only necessary for non-ANSII ({@link #useSimpleStyle}=true) ouputs.
+   * Disables displaying the ETR and additionalText!
+   * @param true, if only one line should be used.
+   * @see #printInOneLine
+   */
+  public void setPrintInOneLine(boolean printInOneLine) {
+    this.printInOneLine = printInOneLine;
+  }
+
   /* (non-Javadoc)
    * @see de.zbit.util.aProgressBar#drawProgressBar(int, double, java.lang.String)
    */
@@ -82,7 +105,13 @@ public class ProgressBar extends AbstractProgressBar {
     // Simples File-out oder Eclipse-Output-Window tool. Windows Console unterstützt leider auch kein ANSI.
     if (useSimpleStyle) {
       if (percent!=lastPerc) {
-        System.out.println(percString + ' ' + ETA + (additionalText!=null && (additionalText.length()>0)? " " + additionalText:"") );
+        if (!printInOneLine) {
+          System.out.println(percString + ' ' + ETA + (additionalText!=null && (additionalText.length()>0)? " " + additionalText:"") );
+        } else {
+          if (percent%10==0) System.out.print(percString);
+          else if (percent%2==0) System.out.print('.');
+          if (percent==100) System.out.print('\n');
+        }
         lastPerc=percent;
       }
       return;
@@ -96,14 +125,14 @@ public class ProgressBar extends AbstractProgressBar {
       int additionalSpace = 2 + ((ETA!=null&&ETA.length()>0)?(ETA.length()+1):0);
       additionalSpace+= ((additionalText!=null&&additionalText.length()>0)?(additionalText.length()+1):0);
       int totalStringWidth = kMax + additionalSpace;
-      if (totalStringWidth>consoleWidth) kMax = consoleWidth-additionalSpace;
+      if (totalStringWidth>=consoleWidth) kMax = consoleWidth-additionalSpace-1;
       kMax = Math.max(kMax, 4); // At least four chars for "100%" are required.
     }
     
     // Nice-and cool looking ANSI ProgressBar ;-)
     String anim= "|/-\\";
     StringBuilder sb = new StringBuilder();
-    int x = percent / (100/kMax); // Number of blocks to visualize percentage
+    int x = (int) Math.round((double)percent / (100.0/(double)kMax)); // Number of blocks to visualize percentage
     sb.append("\r\033[K"); // <= clear line, Go to beginning
     sb.append("\033[107m"); // Bright white bg color
     for (int k = 0; k < kMax; k++) {
@@ -177,6 +206,8 @@ public class ProgressBar extends AbstractProgressBar {
   
   public void finished() {
     if (!useSimpleStyle) System.out.println();
+    else if (printInOneLine && lastPerc!=100) System.out.print('\n');
+    lastPerc=100;
   }
   
 }
