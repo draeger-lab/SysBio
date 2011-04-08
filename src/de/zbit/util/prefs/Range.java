@@ -525,14 +525,28 @@ public class Range<Type> {
    * @param acceptedObjects - a simple list of all acceptable objects.
    * @return String
    */
-  public static <Type> String toRangeString(List<Type> acceptedObjects) {
-    String s = "{" + StringUtil.implode(
-              acceptedObjects
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <Type> String toRangeString(List<Type> acceptedObjects) {
+    List<Type> accObjects=acceptedObjects;
+    
+    //If the range consists of classes, use the simple class names
+  	if((acceptedObjects!=null) && (acceptedObjects.size()!=0) && (acceptedObjects.get(0).getClass().equals(Class.class))) {
+    	List<Type> classStrings = new LinkedList<Type>();
+    	for(Type object:acceptedObjects) {
+    		classStrings.add((Type)((Class)object).getSimpleName());
+    	
+    	}
+    	accObjects=classStrings;
+    }
+    
+    
+  	String s = "{" + StringUtil.implode(
+              accObjects
 //              StringUtil.addPrefixAndSuffix(acceptedObjects, "\"", "\"")
               , ",") + "}";
     logger.info(s);
     return "{" + StringUtil.implode(
-      StringUtil.addPrefixAndSuffix(acceptedObjects, "\"", "\"")
+      StringUtil.addPrefixAndSuffix(accObjects, "\"", "\"")
       , ",") + "}";
   }
   

@@ -221,6 +221,7 @@ public class SBProperties extends Properties {
 	 * 
 	 * @param keyProvider
 	 */
+	@SuppressWarnings("rawtypes")
 	public void loadFromKeyProvider(Class<?> keyProvider) {
 		Object fieldValue;
 		String k;
@@ -232,7 +233,13 @@ public class SBProperties extends Properties {
 					k = fieldValue.toString();
 					// Would be possible to check for already setted values.
 					//if (defaults.getProperty(k) != null) {}
-					this.put(k, ((Option<?>) fieldValue).getDefaultValue());
+					Object defaultValue=((Option<?>) fieldValue).getDefaultValue();
+					if(defaultValue instanceof Class) {
+						this.put(k, ((Class)defaultValue).getSimpleName());
+					}
+					else {
+						this.put(k, defaultValue);
+					}
 				}
 			} catch (Exception exc) {
 			  // Due to non-static fields
