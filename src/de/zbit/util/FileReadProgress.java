@@ -317,7 +317,7 @@ public class FileReadProgress {
       try {
         double d = Double.parseDouble(v.substring(0, 3));
         if (d<1.6) useSimpleStyle = true;
-        else useSimpleStyle = !isTTY_Java16only.isTty();
+        else useSimpleStyle = !ConsoleTools.isTTY();
       } catch (Throwable e) {
         useSimpleStyle = true;
       }
