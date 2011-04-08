@@ -674,7 +674,11 @@ public interface KeyProvider {
 					sb.append("<br>\n          ");
 					sb.append(bundle.getString("DEFAULT_VALUE"));
 					sb.append(": <span class=typewriter> ");
-					sb.append(defaultValue);
+					if (defaultValue instanceof Class<?>) {
+						sb.append(((Class<?>) defaultValue).getSimpleName());
+					} else {
+						sb.append(defaultValue);
+					}
 					sb.append(" </span>");
 				}
 				sb.append("\n        </td>\n");
