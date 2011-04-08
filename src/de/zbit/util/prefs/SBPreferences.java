@@ -695,7 +695,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param properties
 	 * @throws BackingStoreException 
 	 */
-	@SuppressWarnings("unchecked")
+	
+	@SuppressWarnings("rawtypes")
 	public static void saveProperties(Class<? extends KeyProvider> keyProvider,
 		Properties properties) throws BackingStoreException {
 		List<Option> optionList = KeyProvider.Tools.optionList(keyProvider);
@@ -866,7 +867,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @returns true if all key-value pairs are valid.
 	 * @throws BackingStoreException
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public boolean checkPrefs() throws BackingStoreException {
 		Iterator<Option> iterator = optionIterator();
 		Option<?> option;
@@ -1206,7 +1207,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Iterator<Option> optionIterator() {
 		return KeyProvider.Tools.optionIterator(keyProvider);
 	}
