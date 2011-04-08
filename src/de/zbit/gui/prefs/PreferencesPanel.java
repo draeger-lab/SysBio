@@ -423,7 +423,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 *        - KeyListener (optional)
 	 * @return JComponent or NULL if the getRequiredType() is unknown.
 	 */
-	@SuppressWarnings("rawtypes")
 	public static JComponent getJComponentForOption(Option<?> option,
 		Object defaultValue, ItemListener itemListener,
 		ChangeListener changeListener, KeyListener keyListener) {
