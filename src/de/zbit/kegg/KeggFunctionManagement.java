@@ -118,6 +118,8 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
     	  answer = adap.getKEGGIdentifierForAGeneSymbol(id.getQuery(), null);
       } else if (j==KeggQuery.getOrganisms) {
         answer = adap.getOrganisms();
+      } else if (j==KeggQuery.genericFind) {
+      	answer = adap.find(id.getQuery());
       } else {
         System.err.println("Unknown job '" + j + "'.");
         throw new UnsuccessfulRetrieveException(); // don't retry.

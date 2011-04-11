@@ -56,6 +56,11 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	 * Returns: Definition[]
 	 */
 	public final static int getOrganisms = 4;
+	
+	/**
+	 * Generic kegg find string (e.g. "compound Methionine"). 
+	 */
+	public final static int genericFind = 5;
 
 	/**
 	 * 
