@@ -820,7 +820,10 @@ public abstract URL getURLOnlineUpdate();
 		}
 		
 		// Set this as property for static classes.
-		System.setProperty("app.name", getApplicationName());
+		String appName = getApplicationName();
+		if (appName != null) {
+			System.setProperty("app.name", getApplicationName());
+		}
 		
     // Use the systems proxy settings to establish connections
     System.setProperty("java.net.useSystemProxies", "true");
