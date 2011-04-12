@@ -53,6 +53,7 @@ import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
+ * @author Clemens Wrzodek
  * @author Roland Keller
  * @version $Rev$
  */
