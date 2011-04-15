@@ -57,4 +57,11 @@ public class OptionCheckBox extends JCheckBox implements JComponentForOption {
   public void setOption(Option<?> option) {
     this.option=option;
   }
+
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.JComponentForOption#getCurrentValue()
+   */
+  public Object getCurrentValue() {
+    return isSelected();
+  }
 }

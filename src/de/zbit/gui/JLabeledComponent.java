@@ -689,7 +689,6 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	    repaint();
 	  }
 	  
-	  @SuppressWarnings("unused")
 	  protected static JComponent getColumnChooser(ComboBoxModel model) {
 	    return getColumnChooser(model, -1, false, null, true);
 	  }
@@ -805,4 +804,10 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	  public void setOption(Option<?> option) {
 	    this.option=option;
 	  }
+    /* (non-Javadoc)
+     * @see de.zbit.gui.prefs.JComponentForOption#getCurrentValue()
+     */
+    public Object getCurrentValue() {
+      return getSelectedItem();
+    }
 	}
