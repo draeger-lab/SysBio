@@ -54,4 +54,11 @@ public interface JComponentForOption {
    */
   public void setOption(Option<?> option);
   
+  /**
+   * This should always return the current value of the
+   * {@link JComponent} for the {@link Option}.
+   * @return
+   */
+  public Object getCurrentValue();
+  
 }

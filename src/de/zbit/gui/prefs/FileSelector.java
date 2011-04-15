@@ -881,5 +881,17 @@ public class FileSelector extends JPanel implements ActionListener,
   public void setOption(Option<?> option) {
     this.option=option;
   }
+
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.JComponentForOption#getCurrentValue()
+   */
+  public Object getCurrentValue() {
+    try {
+      return getSelectedFile();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
 	
 }

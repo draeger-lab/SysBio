@@ -365,6 +365,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * {@link SBProperties}. This is in contrast to {@link SBPreferences}, i.e., a
 	 * persistently saved user-configuration.
 	 * 
+	 * <p>NOTE: the returned Element is ALWAYS a {@link JComponent} that implements
+	 * the {@link JComponentForOption} interface.</p>
+	 * 
 	 * @param option
 	 * @param probs
 	 * @param l
@@ -410,6 +413,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * <li>Adding this panel as item-listener</li>
 	 * </ul>
 	 * 
+	 * <p>NOTE: the returned Element is ALWAYS a {@link JComponent} that implements
+   * the {@link JComponentForOption} interface.</p>
+   * 
 	 * @param option
 	 *        - option to build the JComponent for.
 	 * @param defaultValue
@@ -557,8 +563,12 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				component.addKeyListener(keyListener);
 			}
 			if (component instanceof JComponentForOption) {
-				// Should always be true.
+				// MUST always be true.
 				((JComponentForOption) component).setOption(option);
+			} else {
+			  // Issue a warning. Programmers should watch that each returned
+			  // JComponent implements the JComponentForOption interface!!!
+			  System.err.println(component.getClass().getName() + " IS NO " + JComponentForOption.class.getName() + "!");
 			}
 			
 			//jc.setBorder(new TitledBorder("test"));
