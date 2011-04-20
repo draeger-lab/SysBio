@@ -665,8 +665,7 @@ public class StringUtil {
 	}
 	
 	/**
-	 * Returns a HTML formated String, in which each line is at most lineBreak
-	 * symbols long.
+	 * Returns a HTML formated String without inserting linebreaks.
 	 * 
 	 * @param string
 	 * @return

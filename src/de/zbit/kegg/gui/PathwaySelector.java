@@ -114,7 +114,7 @@ public class PathwaySelector extends JPanel {
   private void initGui(LayoutHelper lh) throws Exception {
     // Create orgaism selector
     /*
-     *  XXX: It would be possible to accept certain ortganisms and then load
+     *  XXX: It would be possible to accept certain organisms and then load
      *  the pw-list organism specific via the manager (KeggFunctionManagement).
      */
     

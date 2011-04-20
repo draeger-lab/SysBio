@@ -318,6 +318,7 @@ public class UniProtParser {
     Arrays.fill(geneIDs, -1);
     
     for (int i=0; i<proteinBlock.length; i++) {
+      if (proteinBlock[i]==null) continue;
       
       String[] split = proteinBlock[i].split("\n");
       for (String line : split) {
