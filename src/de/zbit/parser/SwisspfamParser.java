@@ -25,6 +25,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -47,13 +49,15 @@ import de.zbit.io.OpenFile;
  */
 public class SwisspfamParser {
 
+  public static final Logger log = Logger.getLogger(SwisspfamParser.class.getName());
   /**
    * 
    * @param in, input file from SwissPfam
    * @param out, output file (tab delimited) <br>
    * containing : UniProt ID, <UniProtAC>, Pfam ID, <domain start in amino acid sequence>, <domain end in amino acid sequence>
    */
-  public void parseFile(String in, String out, boolean includeAC, boolean includeBPNo) {
+  public void parseFile(String in, String out, boolean includeAC, boolean includeBPNo, boolean includePBDomains) {
+    log.info("Start parsing file: " + in + ", outFile: " + out + ", includeAC: " + includeAC + ", includeBPNo: " + includeBPNo);
     String line = "", protein = "", ac = "", pfamID = "";
     try {
       BufferedReader br = OpenFile.openFile(in);
@@ -61,7 +65,8 @@ public class SwisspfamParser {
       int start = -1, end = -1;
 
       line = br.readLine();
-      
+      log.fine("line: '" + line + "'");
+
       //  >006L_IIV6        |============================================| Q91G88.1 352 a.a.
       //  DUF3627          1                             ____________     (216) PF12299.1 Protein of unknown function (DUF3627)  231-324
       //  KilA-N           1   _____________                              (1764) PF04383.6 KilA-N domain  19-126
@@ -69,50 +74,54 @@ public class SwisspfamParser {
       //  >11011_ASFM2      |================================================| P0C9J5.1 286 a.a.
       //  v110             2 __________________         __________________    (87) PF01639.10 Viral family 110  1-111 165-274
 
-      while ((line = br.readLine()) != null && (line.trim().length()>0)){
-          if (line.substring(0, 1).equals(">")) {
-            // get uniprot id
-            start = 0;
-            end = line.indexOf(' ', start + 1);
-            if (end > 0)
-              protein = line.substring(1, end);
-            else
-              protein = "";
+      while ((line = br.readLine()) != null){
+        log.fine("line: '" + line + "'");
+        if(line.isEmpty()){log.fine("in erster if");continue;}
+        if (line.substring(0, 1).equals(">")) {
+          // get uniprot id
+          start = 0;
+          end = line.indexOf(' ', start + 1);
+          if (end > 0)
+            protein = line.substring(1, end);
+          else
+            protein = "";
 
-            // get accession id
-            start = line.indexOf('|', 0);
-            start = line.indexOf('|', start + 1);
-            end = line.indexOf('.', start + 1);
+          // get accession id
+          start = line.indexOf('|', 0);
+          start = line.indexOf('|', start + 1);
+          end = line.indexOf('.', start + 1);
 
-            if (start > 0 && end > 0)
-              ac = line.substring(start + 2, end);
-            else
-              ac = "";
+          if (start > 0 && end > 0)
+            ac = line.substring(start + 2, end);
+          else
+            ac = "";
+          log.fine("uniprotId: '" + protein + "', ac: '" + ac + "'");
+        }
+        else{
+          start = line.indexOf(')', 1);
+          end = line.indexOf('.', start+2); // PF id
+          if (end < 0)
+            end = line.indexOf(' ', start+2); // PB id
+          //            if((start+2 - end) < 0) 
+          //              end = line.indexOf(' ', end); // PB id
+
+          if (start > 0 && end > 0)
+            pfamID = line.substring(start + 2, end);
+          else
+            pfamID = "";
+
+          while(line.indexOf("  ", end+1) > 0){
+            end = line.indexOf("  ", end+1);
           }
-          else{
-            start = line.indexOf(')', 1);
-            end = line.indexOf('.', start+2); // PF id
-            if (end < 0)
-              end = line.indexOf(' ', start+2); // PB id
-//            if((start+2 - end) < 0) 
-//              end = line.indexOf(' ', end); // PB id
 
-            if (start > 0 && end > 0)
-              pfamID = line.substring(start + 2, end);
-            else
-              pfamID = "";
-
-            while(line.indexOf("  ", end+1) > 0){
-              end = line.indexOf("  ", end+1);
-            }
-            
+          if(pfamID.startsWith("PF") || (pfamID.startsWith("PB") && includePBDomains)){            
             if(includeBPNo){
               List<int[]> number = parseNumbers(end, line);
               for (int[] is : number) {
                 bw.append(protein + "\t");  //protein id
                 if(includeAC)
                   bw.append(ac + "\t");     //protein ac
-                
+
                 bw.append(pfamID + "\t");   //pfam id
                 bw.append(is[0] + "\t" + is[1]); // begin \t end
                 bw.append("\n");
@@ -127,6 +136,8 @@ public class SwisspfamParser {
               bw.append("\n");
             }
           }
+          log.fine("else finished");
+        }
       }
 
       br.close();
@@ -135,9 +146,9 @@ public class SwisspfamParser {
       e.printStackTrace();
     }
 
-    System.out.println("Parsing ready");
+    log.info("Parsing ready");
   }
-  
+
   /**
    * 
    * @param in input file
@@ -145,6 +156,7 @@ public class SwisspfamParser {
    * @param species uniprot species identifier, i.e. "_HUMAN", or "_MOUSE"
    */
   public void getSpeciesProtDomFile(String in, String out, String species){
+    log.info("getSpeciesSpecificProtDomFiles");
     try{
       BufferedReader br = new BufferedReader(new FileReader(in));
       BufferedWriter bw = new BufferedWriter(new FileWriter(out));
@@ -158,7 +170,7 @@ public class SwisspfamParser {
       bw.close();
     }
     catch(Exception e){
-      System.err.printf("File could not be generated.", e);
+      log.log(Level.SEVERE, "File could not be generated.", e);
     }
   }
 
@@ -169,6 +181,7 @@ public class SwisspfamParser {
    * @param outFilename 
    */
   public static void reformatProt_Dom_Files(BufferedReader bw, String outFilename) {
+    log.info("reformatiingProt_Dom_File - outFilename: " + outFilename);
     try  {  
       // ZIP
       FileOutputStream f = new FileOutputStream (outFilename) ;             
@@ -177,22 +190,22 @@ public class SwisspfamParser {
       zout.setLevel(9); //0-9. 9 ist Maximum!
 
       zout.putNextEntry(new ZipEntry(outFilename.replace(".zip", "")));
-      
+
       String line;
       String[] splitt;
       while ((line = bw.readLine()) !=null) {
         splitt = line.split("\t");
-        
-       zout.write( (splitt[0]+ '\t' + splitt[1]+ '\n').getBytes() );
+
+        zout.write( (splitt[0]+ '\t' + splitt[1]+ '\n').getBytes() );
       }
-      
+
       zout.close () ;             
     }  
     catch  (Exception e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, "Could not reformat the file.", e);
     }  
   }
-  
+
   /**
    * 
    * @param start
@@ -243,7 +256,7 @@ public class SwisspfamParser {
       i = new int[] { domStart, domEnd };
       list.add(i);
     }
-    
+
     return list;
   }
 }
