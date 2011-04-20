@@ -19,7 +19,7 @@ public class SwissPfamParserTest {
       
       
       SwisspfamParser sp = new SwisspfamParser();
-      sp.parseFile(pfamFile, outTxt, false, false);
+      sp.parseFile(pfamFile, outTxt, false, false, false);
       
       String species = "_HUMAN";
       sp.getSpeciesProtDomFile(outTxt, outHumanTxt, species);

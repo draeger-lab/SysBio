@@ -51,7 +51,7 @@ public class UniProtParserTest {
       
       ArrayList<String> block = blocks[i];
       for (String geneEntry : block) {
-        System.out.println(uw.getGeneName(geneEntry));
+        System.out.println(uw.getGeneID(geneEntry));
         if(uw.getGeneSynonyms(geneEntry).size()>0)
           for (String string : uw.getGeneSynonyms(geneEntry)) {
             System.out.println("Synonyms: " + string);
