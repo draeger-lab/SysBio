@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -695,22 +694,27 @@ public class Reflect {
 	 * @param clazz
 	 * @param toParse
 	 * @return
+	 * @throws Throwable 
 	 */
-	public static Object invokeParser(Class<?> clazz, Object toParse) {
+	public static Object invokeParser(Class<?> clazz, Object toParse) throws Throwable {
 		Method m = getStringParser(clazz);
 		if (m==null) return null;
 		
 		try {
 			return m.invoke(clazz, toParse);
 			
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+		  // IllegalArgumentException, IllegalAccessException, InvocationTargetException
+			if (e.getCause()!=null && 
+			    e.getCause() instanceof java.lang.NumberFormatException) {
+			  // E.g. if Integer.parseInt("Hallo") is Called, thow the NumberFormatException.
+			  throw e.getCause();
+			} else {
+			  throw e;
+			}
 		}
-		return null;
+		
+		//return null;
 	}
 	
 	/**

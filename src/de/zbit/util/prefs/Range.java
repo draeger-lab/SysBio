@@ -214,7 +214,12 @@ public class Range<Type> {
 			if (pos>0) strVal = strVal.substring(0, pos);
 			
 			// Parse it into Type and add it to the list.
-			Object re = Reflect.invokeParser(Type, strVal);
+			Object re;
+      try {
+        re = Reflect.invokeParser(Type, strVal);
+      } catch (Throwable e) {
+        re=null;
+      }
 			if (re==null) {
 				// Character
 				if (Type.equals(Character.class)) {
@@ -525,7 +530,7 @@ public class Range<Type> {
    * @param acceptedObjects - a simple list of all acceptable objects.
    * @return String
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "unchecked" })
 	public static <Type> String toRangeString(List<Type> acceptedObjects) {
     List<Type> accObjects=acceptedObjects;
     

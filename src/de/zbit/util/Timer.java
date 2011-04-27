@@ -63,5 +63,15 @@ public class Timer {
   public void reset() {
     start = System.currentTimeMillis();
   }
+
+  /**
+   * Returns a nice string representation of the passed time.
+   * @return
+   * @see Utils#getPrettyTimeString(long)
+   */
+  public String getNiceAndReset() {
+    long milis = getAndReset(true);
+    return Utils.getPrettyTimeString(milis);
+  }
   
 }

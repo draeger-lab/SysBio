@@ -86,7 +86,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @return Type instance of ret.
 	 */
 	@SuppressWarnings("unchecked")
-	protected static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
+	public static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
 		if (ret == null) { return null; }
 		
 		if (requiredType.isAssignableFrom(ret.getClass())) {
@@ -94,7 +94,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		}
 		
 		if (Reflect.containsParser(requiredType)) {
-			ret = Reflect.invokeParser(requiredType, ret);
+		  try {
+			  ret = Reflect.invokeParser(requiredType, ret);
+		  } catch (Throwable e) {
+		    ret=null;
+		  }
 		}
 		
 		if (requiredType.equals(Character.class)) {

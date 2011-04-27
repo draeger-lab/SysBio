@@ -627,6 +627,7 @@ public class Utils {
    * making the resulting string more "pretty".
    * @param miliseconds
    * @return
+   * @see #getTimeString(long)
    */
   public static String getPrettyTimeString(long miliseconds) {
     double seconds = (miliseconds/1000.0);
