@@ -121,7 +121,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * The default value for this option. May be null, if it is going to be read
 	 * from the XML-file later.
 	 */
-	private final Type defaultValue;
+	private Type defaultValue;
 	
 	/**
 	 * A short description what the purpose of this option is.
@@ -507,6 +507,17 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	public Type getDefaultValue() {
 		return defaultValue;
+	}
+	
+	/**
+	 * Change the default value for this option. Actually, you should do this only
+	 * once right at the start of your main class. This possibility has just been
+	 * added to use the same options with different default values in different
+	 * projects.
+	 * @param def
+	 */
+	public void setDefaultValue(Type def) {
+	  this.defaultValue=def;
 	}
 	
 	/**

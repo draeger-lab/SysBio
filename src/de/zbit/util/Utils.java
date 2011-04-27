@@ -301,7 +301,7 @@ public class Utils {
         double d=0;
         Object o = it.next();
         if (o instanceof Double) d = (Double)o;
-        else d = Double.parseDouble(it.next().toString());
+        else d = Double.parseDouble(o.toString());
         
         if (Double.isNaN(d) || Double.isInfinite(d)) continue;
         countNonNAN++;
@@ -325,7 +325,7 @@ public class Utils {
         double d=0;
         Object o = it.next();
         if (o instanceof Double) d = (Double)o;
-        else d = Double.parseDouble(it.next().toString());
+        else d = Double.parseDouble(o.toString());
         
         if (Double.isNaN(d) || Double.isInfinite(d)) continue;
         countNonNAN++;
@@ -665,7 +665,13 @@ public class Utils {
         if (Character.isDigit(a[i])) continue;
         else if (i==0 && a[i]=='-') continue;
         else if (a[i]=='.' || a[i]==',') continue;
-        else if (a[i]=='E' || a[i]=='e') continue;
+        else if (a[i]=='E' || a[i]=='e') {
+          if (i+1< a.length) {
+            // Detect strings like "2.8E+01" or "2.8E-01"
+            if (a[i+1]=='+' || a[i+1]=='-') i+=1;
+          }
+          continue;
+        }
         //if (a[i]=='-' || a[i]=='.' || a[i]==',' || a[i]=='E' || a[i]=='e') continue;
         return false;
       }
@@ -1372,6 +1378,51 @@ public class Utils {
 
   }
 
+  /**
+   * @param values
+   * @param onlyDigits
+   * @return
+   */
+  public static boolean isNumber(Iterable<?> values, boolean onlyDigits) {
+    boolean ret = true;
+    for (Object val: values) {
+      try {
+        //if (onlyDigits) Long.parseLong(val);
+        //else Double.parseDouble(val);
+        if (!(Number.class.isAssignableFrom(val.getClass()))) {
+          ret = isNumber(val.toString(), onlyDigits);
+        }
+      } catch (NumberFormatException e) {
+        ret = false;
+        break;
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * 
+   * @param <T>
+   * @param values
+   * @param onlyDigits
+   * @return
+   */
+  public static<T> boolean isNumber(T[] values, boolean onlyDigits) {
+    boolean ret = true;
+    for (Object val: values) {
+      try {
+        //if (onlyDigits) Long.parseLong(val);
+        //else Double.parseDouble(val);
+        if (!(Number.class.isAssignableFrom(val.getClass()))) {
+          ret = isNumber(val.toString(), onlyDigits);
+        }
+      } catch (NumberFormatException e) {
+        ret = false;
+        break;
+      }
+    }
+    return ret;
+  }
 
   
 }

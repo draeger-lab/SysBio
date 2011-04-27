@@ -731,6 +731,8 @@ public class CSVReader implements Serializable, Cloneable {
    * 
    * If no headers have been read or if the string does not equal any
    * column, returns -1
+   * 
+   * If multiple @param s are specified, an OR search will be performed.
    *  
    * @return integer, column number
    */
@@ -1289,7 +1291,7 @@ public class CSVReader implements Serializable, Cloneable {
         
         // 2
         prefix[col]  = StringUtil.getLongestCommonPrefix(column, true);
-        suffix[col]  = StringUtil.getLongestCommonPrefix(column, true);
+        suffix[col]  = StringUtil.getLongestCommonSuffix(column, true);
         if (prefix[col].length()>0 || suffix[col].length()>0) {
           for (int i=0; i<column.length; i++) {
             if (column[i]==null) continue;
@@ -1314,6 +1316,8 @@ public class CSVReader implements Serializable, Cloneable {
     int headerMatchesData=0; int headerNOTMatchesData=0;
     for (int col=0; col<headerLine.length; col++) {
       String cell = headerLine[col];
+      boolean b = isNumber(cell, false);
+      boolean checkedAtLeastOneAttribute=false;
       
       // If 90% have a "attribute", it's relevant
       short checkAttribute=0; // 0=attribute seems to be random.
@@ -1321,11 +1325,11 @@ public class CSVReader implements Serializable, Cloneable {
       // Check "isNumber" attribute.
       int perc = isNumber[col]/nonNullLines;
       if (perc>=0.9) checkAttribute=1; // yes
-      if (perc<=0.1) checkAttribute=2; // yes, but the other way round
+      if (perc<=0.1 && b) checkAttribute=2; // yes, but the other way round (header is number, but not content).
       if (checkAttribute!=0) {
-        boolean b = isNumber(cell, false);
+        checkedAtLeastOneAttribute=true;
         if (checkAttribute==1 && b) headerMatchesData++;
-        else if (checkAttribute==2 && !b) headerMatchesData++;
+        else if (checkAttribute==2 && !b) headerMatchesData++; // Eliminated by including && b above.
         else headerNOTMatchesData++;
       }
 
@@ -1334,6 +1338,7 @@ public class CSVReader implements Serializable, Cloneable {
       perc = numPrefix[col]/nonNullLines;
       if (perc>=0.9) checkAttribute=1; // yes
       if (prefix[col].length()>0 && checkAttribute!=0) {
+        checkedAtLeastOneAttribute=true;
         if (cell.startsWith(prefix[col])) headerMatchesData++;
         else headerNOTMatchesData++;
       }
@@ -1343,6 +1348,7 @@ public class CSVReader implements Serializable, Cloneable {
       perc = numSuffix[col]/nonNullLines;
       if (perc>=0.9) checkAttribute=1; // yes
       if (suffix[col].length()>0 && checkAttribute!=0) {
+        checkedAtLeastOneAttribute=true;
         if (cell.endsWith(suffix[col])) headerMatchesData++;
         else headerNOTMatchesData++;
       }
@@ -1352,17 +1358,31 @@ public class CSVReader implements Serializable, Cloneable {
       perc = maxSameLength[col]/nonNullLines;
       if (perc>=0.9) checkAttribute=1; // yes
       if (checkAttribute!=0) {
+        checkedAtLeastOneAttribute=true;
         if (cell.length()==sameLength[col]) headerMatchesData++;
         else headerNOTMatchesData++;
       }
       
-      // Check "binary data" attribute 
+      // Check "binary data" attribute (Enum of length 2)
       checkAttribute=0; // 0=attribute seems to be random.
       if (isBinary[col] && stringOne[col]!=null && stringOne[col].length()>0) checkAttribute=1; // yes
       if (checkAttribute!=0) {
+        checkedAtLeastOneAttribute=true;
         if (cell.equalsIgnoreCase(stringOne[col]) || cell.equalsIgnoreCase(stringTwo[col])) headerMatchesData++;
         else headerNOTMatchesData++;
       }
+      
+      /* Further Idea: Check of common characters in data != common characters in header
+       * Header: miRNA
+       * Conent: ath-miR156a
+       * Conent: bmo-miR-33
+       * Conent: cel-let-7
+       * Common "-" at position 4.
+       */
+      
+      // If none of the above has been checked, column and header
+      // semms to be quite random
+      //if (!checkedAtLeastOneAttribute) headerMatchesData++;
     }
     
     return (headerNOTMatchesData>headerMatchesData);

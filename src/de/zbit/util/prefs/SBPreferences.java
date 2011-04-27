@@ -267,8 +267,7 @@ public class SBPreferences implements Map<Object, Object> {
 			entry = defKeys.get(i);
 			try {
 				prefs[i] = getPreferencesFor(entry);
-				options.putAll(configureArgParser(parser, options, entry, props,
-					loadDefaults(entry)));
+				configureArgParser(parser, options, entry, props, loadDefaults(entry));
 				
 			} catch (Exception e) {
 				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
@@ -297,6 +296,9 @@ public class SBPreferences implements Map<Object, Object> {
 		SBProperties props, String usage, String args[]) {
 		
 		// Do the actual parsing.
+	  // XXX: ArgParser does NOT distinguish between default options and 
+	  // user settet options. Actually, one has to modify the argparser
+	  // and add a new flag to the argument holder, if it is a default value.
 		parser.matchAllArgs(args);
 		putAll(props, options);
 		
@@ -450,6 +452,8 @@ public class SBPreferences implements Map<Object, Object> {
 				// argHolder has been added or created! But this method should
 				// work fine... (I hope). You can check with -? option.
 				// Just ignore...
+			  // TODO: Then catch and ignore only this specific error, but still
+			  // print other errors
 			}
 		}
 		return options;
@@ -678,6 +682,8 @@ public class SBPreferences implements Map<Object, Object> {
 					throw new IllegalArgumentException(String.format(
 					resources.getString("NO_VALUE_DEFINED_FOR_PROPERTY"), k)); 
 				}
+				// XXX: This has the very negative effect that if the command line option was
+				// there and set to default, this information is erased right here.
 				if (!v.equals(value)) {
 					props.setProperty(k, value);
 				}
