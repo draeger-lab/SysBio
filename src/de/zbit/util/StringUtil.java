@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 /**
  * Class containing frequently used utility functions for String processing.
@@ -731,6 +732,26 @@ public class StringUtil {
       if (Character.isDigit(c)) ret.append(c);
     }
     return ret.toString();
+  }
+
+  /**
+   * Matches a regular expression agains a String array and
+   * returns the number of matches.
+   * @param regExpression
+   * @param content
+   * @return number of matches.
+   */
+  public static int matches(String regExpression, String[] content) {
+    Pattern pat = Pattern.compile(regExpression);
+    
+    int matches=0;
+    for (String s: content) {
+      if (pat.matcher(s).matches()) {
+        matches++;
+      }
+    }
+    
+    return matches;
   }
 	
 }

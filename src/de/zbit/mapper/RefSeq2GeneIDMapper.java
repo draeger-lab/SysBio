@@ -1,30 +1,47 @@
+/*
+ * $Id:  GeneIDMapper.java 17:57:03 wrzodek $
+ * $URL: GeneIDMapper.java $
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
+ */
 package de.zbit.mapper;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.io.CSVReader;
+import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileDownload;
 import de.zbit.util.FileTools;
 import de.zbit.util.ProgressBar;
+import de.zbit.util.logging.LogUtil;
 
 /**
  * This class downloads or loads (if available) mapping data
  * to map RefSeq IDs (e.g., NM_X) to NCBI Gene IDs (Entrez).
  * 
  * @author buechel
+ * @author Clemens Wrzodek
+ * @version $Rev$
  */
-public class GeneIDMapper implements Serializable {
+public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> implements Serializable {
   private static final long serialVersionUID = -4951755727304781666L;
 
-  public static final Logger log = Logger.getLogger(GeneIDMapper.class.getName());
+  public static final Logger log = Logger.getLogger(RefSeq2GeneIDMapper.class.getName());
   
   /**
    * The Base url to get the directory listing and search for a file "X2geneid.gz"
@@ -42,11 +59,7 @@ public class GeneIDMapper implements Serializable {
    */
   private static String localFile = "res/" + FileTools.getFilename(downloadURL);
   
-  /**
-   * Contains a mapping from RefSeq to GeneID.
-   * XXX: Hier eventuell eine initial Capacity oder load factor angeben, falls BottleNeck.
-   */
-  Map<String, Integer> mapping = new HashMap<String, Integer>();
+
   
   
   /**
@@ -54,11 +67,17 @@ public class GeneIDMapper implements Serializable {
    * file automatically as required.
    * @throws IOException
    */
-  public GeneIDMapper() throws IOException {
-    super();
-    if (!readMappingData()) mapping=null;
+  public RefSeq2GeneIDMapper() throws IOException {
+    this(new ProgressBar(0));
   }
-  
+  /**
+   * @param progress - a custom progress bar. Can be NULL!
+   * @throws IOException
+   * @see {@link RefSeq2GeneIDMapper#GeneIDMapper()}
+   */
+  public RefSeq2GeneIDMapper(AbstractProgressBar progress) throws IOException {
+    super(String.class, Integer.class, progress);
+  }
   
   public void test() {
     boolean checkLowerVersionExists=true;
@@ -109,7 +128,8 @@ public class GeneIDMapper implements Serializable {
   }
   
   public static void main (String[] args) throws IOException {
-    GeneIDMapper mapper = new GeneIDMapper();
+    LogUtil.initializeLogging(Level.FINEST);
+    RefSeq2GeneIDMapper mapper = new RefSeq2GeneIDMapper();
     mapper.test();
     
     
@@ -151,49 +171,6 @@ public class GeneIDMapper implements Serializable {
     return null;
   }
   
-  /**
-   * Reads the mapping from {@link #localFile} into the {@link #mapping} set.
-   * Downloads data automatically from {@link #downloadURL} as required.
-   * @return true if and only if everything was without critical errors.
-   * @throws IOException
-   */
-  public boolean readMappingData() throws IOException {
-    if (!isCachedDataAvailable()) {
-      downloadData();
-      if (!isCachedDataAvailable()) {
-        return false;
-      }
-    }
-    log.config("Reading RefSeq2GeneID mapping file " + localFile);
-    int geneIDColumn = 1;
-    int refSequColumn = 2;
-    // Read RefSeq <=> Gene ID mapping.
-    CSVReader r = new CSVReader(localFile);
-    String[] line;
-    while ((line = r.getNextLine())!=null) {
-      if (line.length<(Math.max(geneIDColumn, refSequColumn)+1)) {
-        log.severe("Incomplete entry in mapping file '" + localFile + "'. Please try to delete this file and execute this application again.");
-        continue;
-      }
-      
-      // Get gene ID
-      Integer gene_id;
-      try {
-        gene_id = Integer.parseInt(line[geneIDColumn]);
-      } catch (NumberFormatException e) {
-        log.warning("Invalid number format in RefSeq2GeneID mapping file: " + ((line.length>1)?line[geneIDColumn]:"line too short."));
-        continue;
-      }
-      
-      // get RefSeq ID (trim version number from id)
-      String refSeq = trimVersionNumberFromRefSeq(line[refSequColumn]);
-      
-      mapping.put(refSeq, gene_id);
-    }
-    
-    log.config("Finished parsing RefSeq2GeneID mapping file. Read " + ((mapping!=null)?mapping.size():"0") + " mappings.");
-    return (mapping!=null && mapping.size()>0);
-  }
   
   /**
    * Removes the version number from a RefSeq Identifier.
@@ -206,60 +183,58 @@ public class GeneIDMapper implements Serializable {
     return refSeq;
   }
 
-
-  /**
-   * Downloads the {@link #downloadURL} and stores the path of the downloaded
-   * file in {@link #localFile}.
-   * If the download was successfull can be checked with {@link #isCachedDataAvailable()}.
-   */
-  private void downloadData() {
-    FileDownload.ProgressBar = new ProgressBar(0);
-    try {
-      // Create parent directories
-      new File(new File(localFile).getParent()).mkdirs();
-    } catch (Throwable t){};
-    String localf = FileDownload.download(downloadURL, localFile);
-    if (localFile!=null && localFile.length()>0) localFile = localf;
-    ((ProgressBar)FileDownload.ProgressBar).finished();
+  /** {@inheritDoc}*/
+  @Override
+  protected String postProcessSourceID(String source) {
+    // get RefSeq ID (trim version number from id)
+    source = trimVersionNumberFromRefSeq(source);
+    return source;
   }
 
 
-  /**
-   * Returns true if the {@link #localFile} has already been downloaded from
-   * {@link #downloadURL}.
-   * @return
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getLocalFile()
    */
-  public boolean isCachedDataAvailable() {
-    if (localFile==null || localFile.length()<0) {
-      return false;
-    }
-    
-    File f  = new File(localFile);
-    return f.exists() && f.length()>0;
+  @Override
+  public String getLocalFile() {
+    return localFile;
+  }
+
+
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getMappingName()
+   */
+  @Override
+  public String getMappingName() {
+    return "RefSeq2GeneID";
+  }
+
+
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getRemoteURL()
+   */
+  @Override
+  public String getRemoteURL() {
+    return downloadURL;
+  }
+
+
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getSourceColumn()
+   */
+  @Override
+  public int getSourceColumn(CSVReader r) {
+    return 2;
+  }
+
+
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getTargetColumn()
+   */
+  @Override
+  public int getTargetColumn(CSVReader r) {
+    return 1;
   }
   
-  /**
-   * Returns the GeneID for the given RefSeqID.
-   * Returns -1 if no mapping for the RefSeqID is available.
-   * @param RefSeqID
-   * @return NCBI Gene ID (or -1 if none available).
-   * @throws Exception - if mapping data could not be read (in general).
-   */
-  public int map(String RefSeqID) throws Exception {
-    
-    if (!isReady()) throw new Exception("RefSeq2GeneID mapping data has not been read successfully.");
-    String trimmedInput = trimVersionNumberFromRefSeq(RefSeqID).trim();
-    Integer ret = mapping.get(trimmedInput);
-    log.finest("map: " + trimmedInput + ", ret: " + ret);
-    return ret==null?-1:ret;
-  }
-
-  /**
-   * @return true if and only if the data has been read and
-   * mapping data is available.
-   */
-  public boolean isReady() {
-    return mapping!=null && mapping.size()>0;
-  }
 
 }

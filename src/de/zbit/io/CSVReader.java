@@ -21,6 +21,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -973,12 +975,7 @@ public class CSVReader implements Serializable, Cloneable {
    * @throws IOException
    */
   public int getColumnByMatchingContent(String regex, int patternOptions, int maxLinesToCheck) throws IOException {
-    Pattern pat;
-    if (patternOptions>0) {
-      pat = Pattern.compile(regex, patternOptions);
-    } else {
-      pat = Pattern.compile(regex);  
-    }
+    Pattern pat = Pattern.compile(regex, patternOptions);
     int threshold = 25; // Number of lines to match.
     
     FileReadProgress tempProgress = this.progress;;
@@ -1036,6 +1033,42 @@ public class CSVReader implements Serializable, Cloneable {
     }
      
     return matchesMaxId;
+  }
+  
+
+  /**
+   * Reads and returns a complete column.
+   * @param colNumber - column Numer to return
+   * @param maxLinesToRead - maximum number of lines to read. Set to 0 to read all.
+   * @return String[] of the column.
+   * @throws IOException
+   */
+  public String[] getColumn(int colNumber, int maxLinesToRead) throws IOException {
+    open();
+    String[] line;
+    Collection<String> content = new LinkedList<String>();
+    int contentSize = 0;
+    while((line=getNextLine())!=null) {
+      if (line.length>colNumber) {
+        content.add(line[colNumber]);
+        
+        // Count and limit the numer of rows.
+        contentSize++;
+        if (maxLinesToRead>0 && contentSize==maxLinesToRead) {
+          break;
+        }
+      }
+    }
+    close();
+    return content.toArray(new String[0]);
+  }
+  
+  /**
+   * Reads and returns a complete column.
+   * @see #getColumn(int, int)
+   */
+  public String[] getColumn(int colNumber) throws IOException {
+    return getColumn(colNumber, 0);
   }
   
   /**
@@ -1317,6 +1350,7 @@ public class CSVReader implements Serializable, Cloneable {
     for (int col=0; col<headerLine.length; col++) {
       String cell = headerLine[col];
       boolean b = isNumber(cell, false);
+      @SuppressWarnings("unused")
       boolean checkedAtLeastOneAttribute=false;
       
       // If 90% have a "attribute", it's relevant
