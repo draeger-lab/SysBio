@@ -109,6 +109,7 @@ public class CSVWriter {
 		 * @see javax.swing.table.TableModel#getColumnName(int)
 		 */
 		public String getColumnName(int columnIndex) {
+		  if (head==null) return "";
 			return head[columnIndex] != null ? head[columnIndex].toString()
 					: "";
 		}

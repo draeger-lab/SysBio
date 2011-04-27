@@ -350,8 +350,7 @@ public class StringUtil {
 		return a.substring(0, i);
 	}
 	
-	public static String getLongestCommonPrefix(String[] b,
-		boolean ignoreEmptyStrings) {
+	public static String getLongestCommonPrefix(String[] b, boolean ignoreEmptyStrings) {
 		int i;
 		
 		// Get minimum String length in b
@@ -373,7 +372,10 @@ public class StringUtil {
 					continue;
 				}
 				
-				if (c != b[l].charAt(i)) break;
+				if (c != b[l].charAt(i)) {
+				  breakIt=true;
+				  break;
+				}
 			}
 			if (breakIt) break;
 		}
@@ -426,8 +428,7 @@ public class StringUtil {
 		return a.substring(a.length() - i + 1, a.length());
 	}
 	
-	public static String getLongestCommonSuffix(String[] b,
-		boolean ignoreEmptyStrings) {
+	public static String getLongestCommonSuffix(String[] b, boolean ignoreEmptyStrings) {
 		int i;
 		
 		// Get minimum String length in b
