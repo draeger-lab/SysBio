@@ -43,6 +43,31 @@ public class ArrayUtils {
   
   
   /**
+   * If there exists one element in arr such that arr[i].equals(s),
+   * i (the index) is returned.
+   * @param <T>
+   * @param arr
+   * @param s
+   * @return
+   */
+  public static <T> int indexOf(T[] arr, T s) {
+    for (int i=0; i<arr.length; i++)
+        if (arr[i].equals(s)) return i;
+    return -1;
+  }
+  
+  /**
+   * @param multiSourceColumn
+   * @param i
+   * @return
+   */
+  public static int indexOf(int[] arr, int s) {
+    for (int i=0; i<arr.length; i++)
+      if (arr[i]==(s)) return i;
+    return -1;
+  }
+  
+  /**
    * Implodes the given array. (e.g. implode(["a", "b"], " - ") would return "a - b".
    * @param <T>
    * @param arr
@@ -108,7 +133,7 @@ public class ArrayUtils {
    * @return new array of the class of the given type, with the given size.
    */
   @SuppressWarnings("unchecked")
-  private static Object createNewArray(Object type, int size) {
+  public static Object createNewArray(Object type, int size) {
     Class elementType=null;
     if (type instanceof Class)
       elementType = (Class) type;
@@ -129,6 +154,42 @@ public class ArrayUtils {
    */
   public static String toTabbedString(String[] line) {
     return implode(line, "\t");
+  }
+
+
+  /**
+   * Convert an Integer array to an int array.
+   * @param array
+   * @return
+   */
+  public static int[] toIntArray(Integer[] array) {
+    int[] ret = new int[array.length];
+    for (int i=0; i<array.length; i++) {
+      ret[i]=array[i];
+    }
+    return ret;
+  }
+
+
+  /**
+   * Merges two arrays or one array and multiple single instances
+   * of the same type.
+   * @param localFiles
+   * @param localFile
+   * @return a new array, containing all elements.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T[] merge(T[] arr, T... arr2) {
+    // Ensure that bove are not null.
+    if (arr==null) return arr2;
+    if (arr2==null || arr2.length==1 && arr2[0]==null) return arr;
+    
+    // Copy arrays
+    T[] ret = (T[]) createNewArray(arr2, arr.length+arr2.length);
+    System.arraycopy(arr, 0, ret, 0, arr.length);
+    System.arraycopy(arr2, 0, ret, arr.length, arr2.length);
+    
+    return ret;
   }
   
 }

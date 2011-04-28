@@ -38,7 +38,7 @@ import de.zbit.util.logging.LogUtil;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> implements Serializable {
+public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> {
   private static final long serialVersionUID = -4951755727304781666L;
 
   public static final Logger log = Logger.getLogger(RefSeq2GeneIDMapper.class.getName());
@@ -77,6 +77,7 @@ public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> impleme
    */
   public RefSeq2GeneIDMapper(AbstractProgressBar progress) throws IOException {
     super(String.class, Integer.class, progress);
+    init();
   }
   
   public void test() {

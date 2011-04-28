@@ -27,7 +27,7 @@ import de.zbit.util.SortedArrayList;
  * Example: "hsa", "Homo sapiens", "_HUMAN", "Human"
  * 
  * @author Finja B&uml;chel
- * 
+ * @author Clemens Wrzodek
  */
 public class Species implements Serializable, Comparable<Object> {
   private static final long serialVersionUID = 5900817226349012280L;
@@ -60,8 +60,7 @@ public class Species implements Serializable, Comparable<Object> {
    * @param scientificName
    * @param uniprotExtension
    */
-  public Species(String keggAbbr, String scientificName,
-            String uniprotExtension) {
+  public Species(String keggAbbr, String scientificName, String uniprotExtension) {
     this(keggAbbr, scientificName, uniprotExtension, null, null);
   }
   
@@ -160,6 +159,25 @@ public class Species implements Serializable, Comparable<Object> {
    */
   public String getCommonName() {
     return commonName;
+  }
+  
+  /**
+   * The name that is used by ensembl flat files and
+   * biomart queries.
+   * <p>For "Homo sapiens" this is "Hsapiens".
+   * Analogue for other species.</p>
+   * @return
+   */
+  public String getEnsemblName() {
+    int pos = scientificName.indexOf(' ');
+    if (pos<0) return scientificName;
+    else {
+      String ret = scientificName.charAt(0) + scientificName.substring(pos+1).trim();
+      if (ret.contains(" ")) {
+        ret = ret.substring(0, ret.indexOf(' '));
+      }
+      return ret;
+    }
   }
 
   /**
@@ -285,7 +303,7 @@ public class Species implements Serializable, Comparable<Object> {
     String common = "", scientific = "",  uniprot = "_";
     List<String> syns = new ArrayList<String>();
     
-        
+    if (in!=null) {
       boolean startReading=false;
       String line;
       while ((line=in.readLine())!=null) {
@@ -324,38 +342,58 @@ public class Species implements Serializable, Comparable<Object> {
           }
         }
       }
-      in.close();   
+      in.close();
+    }
     
    
     //KeggQuery.getOrganisms
-    KeggFunctionManagement manag = new KeggFunctionManagement();      
+    KeggFunctionManagement manag = null;      
     Definition[] keggOrgs = null;
     try {
       boolean fileExists = new File("kgFct.dat").exists();
-      log.info("File kgFct.dat exists: " + fileExists);
+      log.config("File kgFct.dat exists: " + fileExists);
       if (fileExists){
         manag = (KeggFunctionManagement) KeggFunctionManagement.loadFromFilesystem("kgFct.dat");
       }
     } catch (Throwable e) {
       log.log(Level.WARNING, "Error reading kgFct.dat", e);
     }
+    if (manag==null) manag = new KeggFunctionManagement();
     
-    KeggQuery q = new KeggQuery(KeggQuery.getOrganisms, "speciesCreation");
+    KeggQuery q = new KeggQuery(KeggQuery.getOrganisms, null);
     keggOrgs = (Definition[]) manag.getInformation(q).getObject();
     
     if (keggOrgs!=null)
       for (Definition definition : keggOrgs) {
-        String keggOrg  = definition.getDefinition();
-        int pos = keggOrg.indexOf("(");
-        if(pos>-1)
-          keggOrg = keggOrg.substring(0,pos).trim();
+        // getDefinition() = e.g "Homo sapiens (human)"
+        String scientificName  = definition.getDefinition();
+        String commonName = null;
+        int pos = scientificName.indexOf("(");
+        if(pos>-1) {
+          int pos2 = scientificName.indexOf(")",pos);
+          if (pos2<0) pos2=scientificName.length();
+          commonName = scientificName.substring(pos+1, pos2);
+          
+          scientificName = scientificName.substring(0,pos).trim();
+        }
         String keggAbbr = definition.getEntry_id();
+        boolean contained = false;
         for(int i=0; i<spec.size(); i++){
           String scName = spec.get(i).getScientificName();
-          if(scName.startsWith(keggOrg))
-            spec.get(i).setShortName(keggAbbr); 
-          
-        } 
+          if (spec.get(i).getScientificName().equalsIgnoreCase(scientificName)) contained=true;
+          if(scName.startsWith(scientificName)) {
+            if (spec.get(i).getKeggAbbr()==null || spec.get(i).getKeggAbbr().length()<1) {
+              spec.get(i).setShortName(keggAbbr);
+            }
+          }
+        }
+        // Add not contained species.
+        if (!contained) {
+          String uniprot_ext = null;
+          if (commonName!=null && commonName.trim().length()>0) uniprot_ext = '_'+commonName.trim().toUpperCase();
+          Species new_spec = new Species(keggAbbr, scientificName, uniprot_ext, commonName, null);
+          spec.add(new_spec);
+        }
       }
       
     int counter = 0;
@@ -392,6 +430,55 @@ public class Species implements Serializable, Comparable<Object> {
   @Override
   public int hashCode(){
     return scientificName.hashCode();
+  }
+  
+  @Override
+  public String toString() {
+    return "[Species: " + scientificName + ']';
+  }
+
+  /**
+   * Searches for a specific species in a list of species.
+   * @param all
+   * @param species
+   * @return
+   */
+  public static Species search(List<Species> all, String species) {
+    if (all==null || species==null) return null;
+    for (Species s: all) {
+      if (s.matchesIdentifier(species)) return s;
+    }
+    return null;
+  }
+
+  /**
+   * Searches for a specific species and retrieves a complete list
+   * of species from KEGG.
+   * @param species
+   * @return
+   * @throws IOException 
+   */
+  public static Species search(String species) throws IOException {
+    return search(Species.generateSpeciesDataStructure(), species);
+  }
+
+  /**
+   * Checks all identifiers and returns true if one of them
+   * equals (ignore case) the 'species' string.
+   * @param species
+   * @return
+   */
+  public boolean matchesIdentifier(String species) {
+    if (getScientificName()!=null && getScientificName().equalsIgnoreCase(species)) return true;
+    if (getCommonName()!=null && getCommonName().equalsIgnoreCase(species)) return true;
+    if (getEnsemblName()!=null && getEnsemblName().equalsIgnoreCase(species)) return true;
+    if (getKeggAbbr()!=null && getKeggAbbr().equalsIgnoreCase(species)) return true;
+    if (getSynonyms()!=null) {
+      for (String s1: getSynonyms()) {
+        if (s1!=null && s1.equalsIgnoreCase(species)) return true;
+      }
+    }
+    return false;
   }
   
 }

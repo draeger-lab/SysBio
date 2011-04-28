@@ -25,7 +25,9 @@ import java.util.logging.Logger;
 
 import de.zbit.io.CSVReader;
 import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.ArrayUtils;
 import de.zbit.util.FileDownload;
+import de.zbit.util.FileTools;
 import de.zbit.util.ProgressBar;
 import de.zbit.util.Timer;
 import de.zbit.util.prefs.Option;
@@ -53,6 +55,11 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    */
   private AbstractProgressBar progress=null;
   
+  /**
+   * A boolean flag, wether {@link #readMappingData()} has been
+   * called or not.
+   */
+  private boolean isInizialized=false;
   
   /**
    * Contains a mapping from RefSeq to GeneID.
@@ -79,7 +86,6 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     this.progress = progress;
     this.sourceType=sourceType;
     this.targetType=targetType;
-    if (!readMappingData()) mapping=null;
   }
   
   
@@ -88,11 +94,23 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    * @return
    */
   public abstract String getRemoteURL();
+  
   /**
    * Returns the local file name where the downloaded file should be saved to.
    * @return
    */
   public abstract String getLocalFile();
+  /**
+   * This may be overwritten instead of {@link #getLocalFile()}.
+   * This method is preferred if it does not return null.
+   * 
+   * For eventual downloads, the return value of {@link #getLocalFile()}
+   * is still used!
+   * @return
+   */
+  public String[] getLocalFiles() {
+    return null;
+  }
 
   /**
    * Return a simple name what is mapped to what
@@ -112,6 +130,16 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    */
   public abstract int getSourceColumn(CSVReader r);
   
+  /**
+   * This may be overwritten instead of {@link #getSourceColumn(CSVReader)}.
+   * This method is preferred if it does not return null.
+   * @param r
+   * @return
+   */
+  public int[] getMultiSourceColumn(CSVReader r) {
+    return null;
+  }
+  
 
   
   /**
@@ -120,12 +148,17 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    * @return
    */
   public boolean isCachedDataAvailable() {
-    if (getLocalFile()==null || getLocalFile().length()<0) {
-      return false;
+    // Check multi files
+    if (getLocalFiles()!=null) {
+      for (String localFile: getLocalFiles()) {
+        if (localFile!=null && localFile.length()>0) {
+          if (FileTools.checkInputResource(localFile, this.getClass())) return true;
+        }
+      }
     }
     
-    File f  = new File(getLocalFile());
-    return f.exists() && f.length()>0;
+    // Check single file
+    return (FileTools.checkInputResource(getLocalFile(), this.getClass()));
   }
   
   /**
@@ -135,6 +168,11 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    */
   private void downloadData() {
     String localFile = getLocalFile();
+    if (localFile==null) {
+      if (getLocalFiles()!=null && getLocalFiles().length>0 && getLocalFiles()[0]!=null) {
+        localFile = getLocalFiles()[0];
+      }
+    }
     FileDownload.ProgressBar = progress;
     try {
       // Create parent directories
@@ -155,49 +193,78 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    * @throws IOException
    */
   public boolean readMappingData() throws IOException {
-    String localFile = getLocalFile();
+    isInizialized=true;
+    String[] localFiles = ArrayUtils.merge(getLocalFiles(), getLocalFile());
     
     if (!isCachedDataAvailable()) {
-      downloadData();
+      if (getRemoteURL()!=null) {
+        downloadData();
+      } else {
+        log.severe("Mapping file for " + getMappingName() + " not available and no download URL is known.");
+      }
       if (!isCachedDataAvailable()) {
         return false;
       }
     }
-    log.config("Reading " + getMappingName() + " mapping file " + localFile);
+    
+    // Parse all files.
     Timer t = new Timer();
-    CSVReader r = new CSVReader(localFile);
-    int sourceColumn = getSourceColumn(r);
-    int targetColumn = getTargetColumn(r);
-    // Read RefSeq <=> Gene ID mapping.
-    String[] line;
-    r.open();
-    // XXX: When using a progressBar here with a compressed File, the bar Fails!
-    while ((line = r.getNextLine())!=null) {
-      if (line.length<(Math.max(sourceColumn, targetColumn)+1)) {
-        log.severe("Incomplete entry in mapping file '" + localFile + "'. Please try to delete this file and execute this application again.");
-        continue;
+    for (String localFile: localFiles) {
+      log.config("Reading " + getMappingName() + " mapping file " + localFile);
+      CSVReader r = new CSVReader(localFile);
+      r.setUseParentPackageForOpeningFiles(this.getClass());
+      int[] multiSourceColumn = getMultiSourceColumn(r);
+      if (multiSourceColumn==null || multiSourceColumn.length<1)
+        multiSourceColumn = new int[]{getSourceColumn(r)};
+      int targetColumn = getTargetColumn(r);
+      
+      // Get maximumal col number
+      int maxColumn = targetColumn;
+      for (int sourceColumn: multiSourceColumn)
+        maxColumn = Math.max(maxColumn, sourceColumn);
+      
+      if (targetColumn<0 || ArrayUtils.indexOf(multiSourceColumn, -1)>=0) {
+        log.severe("Could not get columns for '" + localFile + "' mapping file.");
+        return false;
       }
       
-      
-      // Get target ID
-      TargetType target = Option.parseOrCast(targetType, line[targetColumn]);
-      if (target==null) {
-        log.warning("Invalid target content in " + getMappingName() + " mapping file: " + ((line.length>1)?line[targetColumn]:"line too short."));
-        continue;
+      // Read RefSeq <=> Gene ID mapping.
+      String[] line;
+      r.open();
+      // XXX: When using a progressBar here with a compressed File, the bar Fails!
+      while ((line = r.getNextLine())!=null) {
+        if (line.length<=maxColumn) {
+          log.severe("Incomplete entry in mapping file '" + localFile + "'. Please try to delete this file and execute this application again.");
+          continue;
+        }
+        
+        
+        // Get target ID
+        if (line[targetColumn].length()==0) {
+          log.finest("Empty target in " + getMappingName() + " mapping file.");
+          continue;
+        }
+        TargetType target = Option.parseOrCast(targetType, line[targetColumn]);
+        if (target==null) {
+          log.warning("Invalid target content in " + getMappingName() + " mapping file: " + ((line.length>1)?line[targetColumn]:"line too short."));
+          continue;
+        }
+        
+        // Optional method that allow customization.
+        target = postProcessTargetID(target);
+        
+        // Add mapping for all source columns
+        for (int sourceColumn: multiSourceColumn) {
+          // Get source ID
+          SourceType source = Option.parseOrCast(sourceType, line[sourceColumn]);
+          if (source==null) {
+            log.warning("Invalid source content in " + getMappingName() + " mapping file: " + ((line.length>1)?line[sourceColumn]:"line too short."));
+            continue;
+          }
+          source = postProcessSourceID(source);
+          mapping.put(source, target);
+        }
       }
-
-      // Get source ID
-      SourceType source = Option.parseOrCast(sourceType, line[sourceColumn]);
-      if (source==null) {
-        log.warning("Invalid source content in " + getMappingName() + " mapping file: " + ((line.length>1)?line[sourceColumn]:"line too short."));
-        continue;
-      }
-      
-      // Optional methods that allow customization.
-      source = postProcessSourceID(source);
-      target = postProcessTargetID(target);
-      
-      mapping.put(source, target);
     }
     
     log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((mapping!=null)?mapping.size():"0") + " mappings.");
@@ -230,11 +297,16 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    * @throws Exception - if mapping data could not be read (in general).
    */
   public TargetType map(SourceType sourceID) throws Exception {
+    if (!isInizialized) init();
     if (!isReady()) throw new Exception(getMappingName()+" mapping data has not been read successfully.");
     SourceType trimmedInput = postProcessSourceID(sourceID);
     TargetType ret = mapping.get(trimmedInput);
     log.finest("map: " + trimmedInput + ", to: " + ret);
     return ret;
+  }
+
+  protected void init() throws IOException {
+    if (!readMappingData()) mapping=null;
   }
 
   /**

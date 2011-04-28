@@ -27,11 +27,12 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
 import de.zbit.util.FileDownload;
+import de.zbit.util.Reflect;
 import de.zbit.util.SortedArrayList;
 
 /*
  * TODO:
- * Implement retrieve fiel from other jar (hast not been used/implemented yet).
+ * Implement retrieve file from other jar (hast not been used/implemented yet).
  * Should be 5 minutes max: http://www.exampledepot.com/egs/java.net/JarUrl.html
  */
 
@@ -99,12 +100,17 @@ public class OpenFile {
   @SuppressWarnings("unused")
   private static FormatDescription fetchDescription(String filename, File myFile) {
     FormatDescription desc = null;
-    if (myFile==null && (OpenFile.class.getClassLoader().getResource(filename)!=null))
+    if (myFile!=null) desc = FormatIdentification.identify(myFile);
+    else {
       try {
-        desc = FormatIdentification.identify(new BufferedReader(new InputStreamReader(OpenFile.class.getClassLoader().getResource(filename).openStream())));
-      } catch (IOException e1) {e1.printStackTrace();}
-    else
-      if (myFile!=null) desc = FormatIdentification.identify(myFile);
+        InputStream in = searchFileAndGetInputStream(filename);
+        if (in!=null) {
+          desc = FormatIdentification.identify(new BufferedReader(new InputStreamReader(in)));
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
     return desc;
   }
   
@@ -134,7 +140,20 @@ public class OpenFile {
    * @return BufferedReader
    */
   public static BufferedReader openFile(String filename) {
+    return openFile(filename, Reflect.getParentClass());
+  }
+  
+  /**
+   * @param searchInputRelativeToResource - allows giving file names, relative to other
+   * packages inside a jar.
+   * @see #openFile(String)
+   * @return
+   */
+  public static BufferedReader openFile(String filename, Class<?> searchInputRelativeToResource) {
     BufferedReader ret=null;
+    
+    // Ensure consistent behavious with other methods in this class
+    if (searchInputRelativeToResource==null) searchInputRelativeToResource = Reflect.getParentClass();
     
     // Trivial checks
     if (filename==null || filename.trim().length()==0) return ret;
@@ -150,7 +169,7 @@ public class OpenFile {
     // Identify format...
     InputStream myStream=null;
     try {
-      myStream = searchFileAndGetInputStream(filename);
+      myStream = searchFileAndGetInputStream(filename, searchInputRelativeToResource);
     } catch (IOException e1) {
       e1.printStackTrace();
     }
@@ -163,7 +182,7 @@ public class OpenFile {
       // May lead to problems on non http urls (jar urls e.g. "jar:http://xyz.de/my.jar!/com/...")
       filename = filename.replace(File.separator+File.separator, File.separator).replace("//", "/");
       try {
-        myStream = searchFileAndGetInputStream(filename);
+        myStream = searchFileAndGetInputStream(filename, searchInputRelativeToResource);
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -174,9 +193,10 @@ public class OpenFile {
     
     //...  and return Input Stream
     try {
+      ZIPUtils.parentClass=searchInputRelativeToResource;
       if (desc!=null && desc.getShortName().equalsIgnoreCase("GZ") || desc==null && filename.toLowerCase().trim().endsWith(".gz")) {
         // Gzipped files do sadly not always contain the "magic bytes". That's why also the extension is considered if desc=null.
-        ret = ZIPUtils.GUnzipStream(filename);
+        ret = ZIPUtils.GUnzipStream(searchFileAndGetInputStream(filename, searchInputRelativeToResource));
         FormatDescription desc2 = FormatIdentification.identify( ret );
         if (desc2!=null) { // Tar.GZ Archives
           if (desc2.getShortName().equalsIgnoreCase("TAR")){ // Extract GZ completely and return tar stream.
@@ -214,7 +234,8 @@ public class OpenFile {
    * Searches for the file
    * a) directly tries to open it by name.
    * b) in the same jar / same project
-   * c) relative to the user dir.
+   * c) relative to the path inside or outside a jar file of the calling class
+   * d) relative to the user dir.
    * 
    * WARNING: a File object can not be built upon a resource inside a jar. Use the
    * {@link #searchFileAndGetInputStream(String)} method instead.
@@ -226,11 +247,14 @@ public class OpenFile {
   public static File searchFile(String infile) throws URISyntaxException {
     String curDir = System.getProperty("user.dir");
     if (!curDir.endsWith(File.separator)) curDir+=File.separator;
+    Class<?> parentClass = Reflect.getParentClass();
     
     if (new File (infile).exists()) { // Load from Filesystem
       return new File (infile);
     } else if (OpenFile.class.getClassLoader().getResource(infile)!=null) { // Load from jar
       return new File(OpenFile.class.getClassLoader().getResource(infile).toURI());
+    } else if (parentClass!=null && parentClass.getResource(infile)!=null) {
+      return new File(parentClass.getResource(infile).toURI());
     } else if (new File (curDir+infile).exists()) { // Load from Filesystem, relative to program path
       return new File (curDir+infile);
     }
@@ -248,13 +272,23 @@ public class OpenFile {
    * @throws IOException 
    */
   public static InputStream searchFileAndGetInputStream(String infile) throws IOException {
+    return searchFileAndGetInputStream(infile, Reflect.getParentClass());
+  }
+  
+  /**
+   * @see #searchFileAndGetInputStream(String)
+   * @return
+   */
+  public static InputStream searchFileAndGetInputStream(String infile, Class<?> class1) throws IOException {
     String curDir = System.getProperty("user.dir");
     if (!curDir.endsWith(File.separator)) curDir+=File.separator;
     
     if (new File (infile).exists()) { // Load from Filesystem
       return  new FileInputStream (infile);
-    } else if (OpenFile.class.getClassLoader().getResource(infile)!=null) { // Load from jar
-      return (OpenFile.class.getClassLoader().getResource(infile).openStream());
+    } else if (class1.getClassLoader().getResource(infile)!=null) { // Load from jar - root
+      return (class1.getClassLoader().getResource(infile).openStream());
+    } else if (class1.getResource(infile)!=null) { // Load from jar - relative
+      return (class1.getResource(infile).openStream());
     } else if (new File (curDir+infile).exists()) { // Load from Filesystem, relative to program path
       return new FileInputStream (curDir+infile);
     }

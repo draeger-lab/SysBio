@@ -850,4 +850,63 @@ public class Reflect {
 		TRACE = true;
 	}
 
+  /**
+   * @return the name of the parent class of the current calling classe.
+   * i.e. the class the called the method, that is calling this method.
+   * Returns null if no parent is available or an error occurs.
+   */
+  public static Class<?> getParentClass() {
+    // Get the list of classes from the stackTrace
+    final Throwable t = new Throwable();
+    StackTraceElement[] se = t.getStackTrace();
+    
+    /*return Class.forName(se[2].getClassName());
+     *is wrong because multipleMethids from class[1] might be in the stack trace.*/ 
+    
+    int diffClassName=0;
+    String lastClassName="";
+    for (StackTraceElement s: se) {
+      if (!(s.getClassName().equals(lastClassName))) {
+        diffClassName++;
+        lastClassName = s.getClassName();
+      }
+      // 1=this(Reflect), 2=the Caller, 3=the parent of the caller
+      if (diffClassName==3) try {
+        return Class.forName(s.getClassName());
+      } catch (ClassNotFoundException e) {
+        // Not possible, because class is in StackTrace
+        e.printStackTrace();
+        return null;
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * Returns the name of the main Class that has been used to execute this application.
+   * More detailed, the last main class in the current stack trace.
+   * 
+   * <p>This method does NOT work in Java Web Start applications!</p>
+   * @return
+   */
+  public static Class<?> getMainClass() {
+    Class<?> lastMain = null;
+    // Get the main class from the stackTrace
+    final Throwable t = new Throwable();
+    for (StackTraceElement e : t.getStackTrace()) {
+      // Search the main class
+      if (e.getMethodName().equalsIgnoreCase("main")) {
+        // Get it's name
+        try {
+          lastMain = Class.forName(e.getClassName());
+          //break;
+        } catch (ClassNotFoundException e1) {
+          // Not possible, because class is in StackTrace
+        }
+      }
+    }
+    return lastMain;
+  }
+
 }
