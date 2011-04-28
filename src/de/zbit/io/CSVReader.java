@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileReadProgress;
+import de.zbit.util.Reflect;
 import de.zbit.util.StringUtil;
 
 /**
@@ -108,6 +109,14 @@ public class CSVReader implements Serializable, Cloneable {
    * will be created from empty lines. Default: true.
    */
   private boolean skipEmptyLines=true;
+  
+  /**
+   * If this value is set to anything else than null, it is used in
+   * cooperation with {@link OpenFile#openFile(String, Class)}.
+   * This allows to use file names, relative to packages, which will
+   * work in a file system and for resources inside a jar file.
+   */
+  private Class<?> useParentPackageForOpeningFiles=null;
   
   /**
    * Removes " symbol at cell start and end.
@@ -241,6 +250,7 @@ public class CSVReader implements Serializable, Cloneable {
     
     this.filename = filename;
     autoDetectContainsHeaders=true;
+    useParentPackageForOpeningFiles=Reflect.getParentClass();
   }
   
   /**
@@ -528,6 +538,14 @@ public class CSVReader implements Serializable, Cloneable {
   }
   
   /**
+   * @see #useParentPackageForOpeningFiles
+   * @param parent
+   */
+  public void setUseParentPackageForOpeningFiles(Class<?> parent) {
+    useParentPackageForOpeningFiles = parent;
+  }
+  
+  /**
    * If data has already been read - remove the given column
    * (more specific: set it to null. This does not shift indices).
    * If data has not been read, this will permanently set the column to
@@ -788,7 +806,7 @@ public class CSVReader implements Serializable, Cloneable {
     BufferedReader in;
     if (useOpenFileMethod) {
       // Use the OpenFile Method to automatically extract ZIP archives and such.
-      in = OpenFile.openFile(filename);
+      in = OpenFile.openFile(filename, useParentPackageForOpeningFiles);
     } else {
       in = new BufferedReader(new FileReader(filename));
     }

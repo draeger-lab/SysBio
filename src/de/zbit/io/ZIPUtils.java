@@ -80,6 +80,11 @@ public class ZIPUtils {
   public static int BUFFER = 4096;
   
   /**
+   * This is used to search for files, relative to parent packages.
+   */
+  public static Class<?> parentClass = ZIPUtils.class;
+  
+  /**
    * 
    * @param INfilename
    * @return
@@ -87,7 +92,7 @@ public class ZIPUtils {
    */
   public static ByteArrayOutputStream BZ2unCompressData(String INfilename) throws IOException {
     // Now decompress archive
-    InputStream fi = getInStream(INfilename);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return null;
     
     
@@ -119,7 +124,7 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static BufferedReader BZ2unCompressStream(String INfilename) throws IOException {
-    InputStream fi = getInStream(INfilename);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return null;
     
     return new BufferedReader( new InputStreamReader( new CBZip2InputStream(new CheckedInputStream(fi,new CRC32()))));
@@ -244,29 +249,8 @@ public class ZIPUtils {
    * @return
    * @throws IOException
    */
-  public static InputStream getInStream(String infile) throws IOException {
-    String curDir = System.getProperty("user.dir");
-    if (!curDir.endsWith(File.separator)) curDir+=File.separator;
-    
-    InputStream fi = null;
-    if (new File (infile).exists()) // Load from Filesystem
-      fi = new FileInputStream(infile);
-    else if (new File (curDir+infile).exists()) // Load from Filesystem, relative to program path
-      fi = new FileInputStream(curDir+infile);
-    else if (ZIPUtils.class.getClassLoader().getResource(infile)!=null) // Load from same jar
-      fi = ZIPUtils.class.getClassLoader().getResource(infile).openStream();
-    
-    return fi;
-  }
-  
-  /**
-   * 
-   * @param infile
-   * @return
-   * @throws IOException
-   */
   public static String GUnzip(String infile) throws IOException {
-    InputStream fi = getInStream(infile);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(infile, parentClass);
     if (fi==null) return null;
     
     //Asuumes your file ends with ".gz" - returns outFilename
@@ -308,7 +292,11 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static BufferedReader GUnzipStream(String INfilename) throws IOException {
-    InputStream fi = getInStream(INfilename);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
+    return GUnzipStream(fi);
+  }
+  
+  public static BufferedReader GUnzipStream(InputStream fi) throws IOException {
     if (fi==null) return null;
     
     return new BufferedReader( new InputStreamReader( new GZIPInputStream(fi)));
@@ -486,7 +474,7 @@ public class ZIPUtils {
    */
   public static ByteArrayOutputStream TARunCompressData(String INfilename) throws IOException {
     // Now decompress archive
-    InputStream fi = getInStream(INfilename);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return null;
     
     
@@ -538,7 +526,7 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static BufferedReader TARunCompressStream(String INfilename) throws IOException {
-    InputStream fi = getInStream(INfilename);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return null;
     
     return TARunCompressStream(fi);
@@ -587,7 +575,7 @@ public class ZIPUtils {
       String nameInZip = INfilenames[i];
       if (ignorePath) nameInZip = new File(INfilenames[i]).getName();
       //BufferedReader in = new BufferedReader( new FileReader(INfilenames[i])); //<= funzt nur bei ASCII codes.
-      InputStream in = getInStream(INfilenames[i]);
+      InputStream in = OpenFile.searchFileAndGetInputStream(INfilenames[i], parentClass);
       out.putNextEntry(new ZipEntry(nameInZip));
       int c;
       while ((c = in.read()) != -1) out.write(c);
@@ -729,7 +717,7 @@ public class ZIPUtils {
     boolean noErrors=true;
     for (int i=0; i< INfilenames.length; i++) {
       // Now decompress archive
-      InputStream fi = getInStream(INfilenames[i]);
+      InputStream fi = OpenFile.searchFileAndGetInputStream(INfilenames[i], parentClass);
       if (fi==null) {
         System.err.println("Could not get input stream for " + INfilenames[i]);
         noErrors=false;
@@ -797,7 +785,7 @@ public class ZIPUtils {
    */
   public static ByteArrayOutputStream ZIPunCompressData(String INfilename) throws IOException {
     // Now decompress archive
-    InputStream fi = getInStream(INfilename);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return null;
     
     CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
@@ -826,7 +814,7 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static String ZIPunCompressData(String INfilename, String fileInZip) throws IOException {
-    InputStream fi = getInStream(INfilename);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return "";
     
     // Now decompress archive
@@ -855,7 +843,7 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static BufferedReader ZIPunCompressStream(String INfilename) throws IOException {
-    InputStream fi = getInStream(INfilename);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return null;
     
     CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());

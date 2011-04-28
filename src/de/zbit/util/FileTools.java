@@ -19,6 +19,8 @@ package de.zbit.util;
 import java.io.File;
 import java.util.regex.Pattern;
 
+import de.zbit.io.OpenFile;
+
 /**
  * This class acts just like the linux or unix which command.
  * @author wrzodek
@@ -124,6 +126,57 @@ public class FileTools {
     }
     if (pos<0) return downloadurl;
     else return downloadurl.substring(pos+1);
+  }
+
+  /**
+   * Checks wether a input resource (a file in the file system
+   * or a resource in the/a jar file) exists and data is available
+   * (in case of files, checks if the file size is greater than 0).
+   * <p>Note:<br/>
+   * This method should be used in combination with {@link OpenFile},
+   * because both searches for the input resources at the same locations.
+   * </p>
+   * @param localFile
+   * @return true, if the resource is available.
+   */
+  public static boolean checkInputResource(String localFile) {
+    return checkInputResource(localFile, FileTools.class);
+  }
+  
+
+  /**
+   * Checks wether a input resource (a file in the file system
+   * or a resource in the/a jar file) exists and data is available
+   * (in case of files, checks if the file size is greater than 0).
+   * <p>Note:<br/>
+   * This method should be used in combination with {@link OpenFile},
+   * because both searches for the input resources at the same locations.
+   * </p>
+   * @param localFile
+   * @param sourcePackage - if the file is inside a jar, searches for the file,
+   * relative to the given sourcePackage.
+   * @return
+   */
+  public static boolean checkInputResource(String localFile, Class<?> sourcePackage) {
+    if (localFile==null || localFile.length()<1) return false;
+    
+    File f  = new File(localFile);
+    if (f.exists()) {
+      return (f.length()>0);
+    } else if (sourcePackage.getClassLoader().getResource(localFile)!=null) { // Load from jar - root
+      return true;
+    } else if (sourcePackage.getResource(localFile)!=null) { // Load from jar - relative
+      return true;
+    } else { // Load from Filesystem, relative to program path
+      String curDir = System.getProperty("user.dir");
+      if (!curDir.endsWith(File.separator)) curDir+=File.separator;
+      f = new File (curDir+localFile);
+      if (f.exists() && (f.length()>0)){
+        return true;
+      }
+    }
+    
+    return false;
   }
   
 }
