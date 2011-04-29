@@ -54,7 +54,8 @@ public class SwisspfamParser {
    * 
    * @param in, input file from SwissPfam
    * @param out, output file (tab delimited) <br>
-   * containing : UniProt ID, <UniProtAC>, Pfam ID, <domain start in amino acid sequence>, <domain end in amino acid sequence>
+   * containing : UniProt ID, [UniProtAC], Pfam ID, [domain start in amino acid sequence], 
+   * [domain end in amino acid sequence]
    */
   public void parseFile(String in, String out, boolean includeAC, boolean includeBPNo, boolean includePBDomains) {
     log.info("Start parsing file: " + in + ", outFile: " + out + ", includeAC: " + includeAC + ", includeBPNo: " + includeBPNo);
