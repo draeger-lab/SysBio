@@ -16,8 +16,20 @@
  */
 package de.zbit.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.regex.Pattern;
+
+import javax.annotation.processing.Filer;
+import javax.lang.model.element.Element;
+import javax.tools.FileObject;
+import javax.tools.JavaFileObject;
+import javax.tools.JavaFileManager.Location;
 
 import de.zbit.io.OpenFile;
 
@@ -33,6 +45,20 @@ public class FileTools {
    * Just for testing.
    */
   public static void main(String[] args) {
+    
+    try {
+//      FileTools.splitFile("H:/ValidationData/proDGe_DROME_raw.txt", "H:/ValidationData", "proDGe_DROME_raw", ".txt", 8000000);     
+      FileTools.splitFile("H:/ValidationData/proDGe_RAT_raw.txt", "H:/ValidationData", "proDGe_RAT_raw", ".txt", 8000000);
+      FileTools.splitFile("H:/ValidationData/proDGe_MOUSE_raw.txt", "H:/ValidationData", "proDGe_MOUSE_raw_", ".txt", 8000000);
+      FileTools.splitFile("H:/ValidationData/proDGe_HUMAN_raw.txt", "H:/ValidationData", "proDGe_HUMAN_raw", ".txt", 8000000);
+      
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+    if(true)return;
+    
     System.out.println(which("pdflatex"));
   }
   
@@ -109,6 +135,39 @@ public class FileTools {
     return null;
   }
 
+  /**
+   * This method divides a file into several smaller files
+   * 
+   * @param input: file, that should be splitted
+   * @param outputFolder: where to save the file
+   * @param filename: name of the file, followed by a nummer created during splitting
+   * @param fileExtension: ending of the new files 
+   * @param lineSplit: no after how many lines a new file should be created
+   * @throws IOException 
+   */
+  public static void splitFile(String input, String outputFolder, String filename, String fileExtension,  int lineSplit) throws IOException{
+    int fileNo = 1;
+    int lineCounter = 0;
+    String line = "";
+    BufferedReader br = new BufferedReader(new FileReader(input));
+    BufferedWriter bw = new BufferedWriter(new FileWriter(outputFolder + File.separator + filename + 
+                                  String.valueOf(fileNo) + fileExtension));
+    while((line=br.readLine())!=null){
+      bw.append(line + "\n");
+      lineCounter++;
+      if(lineCounter == lineSplit){
+        bw.close();
+        fileNo++;
+        lineCounter = 0;
+        bw = new BufferedWriter(new FileWriter(outputFolder + File.separator + filename + 
+            String.valueOf(fileNo) + fileExtension));
+      }
+    }
+        
+    bw.close();
+    br.close();
+  }
+  
   /**
    * Trims everything but the file name from a url or path.
    * e.g. "ftp://asf.com/asf/frg.zip" would return "frg.zip".
