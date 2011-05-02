@@ -16,20 +16,17 @@
  */
 package de.zbit.util;
 
+
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.regex.Pattern;
-
-import javax.annotation.processing.Filer;
-import javax.lang.model.element.Element;
-import javax.tools.FileObject;
-import javax.tools.JavaFileObject;
-import javax.tools.JavaFileManager.Location;
 
 import de.zbit.io.OpenFile;
 
@@ -236,6 +233,37 @@ public class FileTools {
     }
     
     return false;
+  }
+
+  /**
+   * Writes an Array or a single String to a file.
+   * @param toWrite - may be a one or 2D array, or a simple string.
+   * @param filename - outFile to write.
+   * @throws IOException 
+   */
+  public static void write(Object toWrite, String filename) throws IOException {
+    Appendable out = new BufferedWriter(new FileWriter(filename));
+    if (toWrite.getClass().isArray()) {
+      for (int i=0; i<Array.getLength(toWrite); i++) {
+        if (i>0) out.append('\n');
+        Object o2 = Array.get(toWrite, i);
+        write(o2, out);
+      }
+    } else {
+      write(toWrite, out);
+    }
+    if (out instanceof Closeable)((Closeable)out).close();
+  }
+  private static void write(Object toWrite, Appendable out) throws IOException {
+    if (toWrite.getClass().isArray()) {
+      for (int i=0; i<Array.getLength(toWrite); i++) {
+        if (i>0) out.append('\t');
+        Object o2 = Array.get(toWrite, i);
+        out.append(o2.toString());
+      }
+    } else {
+      out.append(toWrite.toString());
+    }
   }
   
 }

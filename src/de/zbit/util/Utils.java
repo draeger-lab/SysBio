@@ -1132,6 +1132,11 @@ public class Utils {
    */
   public static boolean saveGZippedObject(String filename, Object obj) {
     try {
+      if (filename.contains("/")) {
+        new File(filename.substring(0, filename.lastIndexOf('/'))).mkdirs();
+      }
+    } catch (Throwable t) {};
+    try {
       FileOutputStream fileOut = new FileOutputStream(filename);
       GZIPOutputStream gzOut = new GZIPOutputStream(fileOut);
       ObjectOutputStream out = new ObjectOutputStream(gzOut);
