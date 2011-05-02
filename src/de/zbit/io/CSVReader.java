@@ -17,6 +17,7 @@
 package de.zbit.io;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
@@ -70,7 +71,7 @@ import de.zbit.util.StringUtil;
  * @version $Rev$
  * @since 1.0
  */
-public class CSVReader implements Serializable, Cloneable {
+public class CSVReader implements Serializable, Cloneable, Closeable {
   private static final long serialVersionUID = 7784651184371604357L;
 
   /**
@@ -978,7 +979,7 @@ public class CSVReader implements Serializable, Cloneable {
    * @throws IOException 
    */
   public int getColumnByMatchingContent(String regex, int patternOptions) throws IOException {
-    return getColumnByMatchingContent(regex, patternOptions, 20000);
+    return getColumnByMatchingContent(regex, patternOptions, 25000);
   }
   
   /**
@@ -988,7 +989,7 @@ public class CSVReader implements Serializable, Cloneable {
    * Pattern.CASE_INSENSITIVE. 0 for no options.
    * @param maxLinesToCheck - Maximum number of lines to check. Terminates
    * this search if more lines than this value have been read and no
-   * matching column has been found. 0 to disable. Default: 20,000
+   * matching column has been found. 0 to disable. Default: 25,000
    * @return column number
    * @throws IOException
    */
@@ -1811,6 +1812,7 @@ public class CSVReader implements Serializable, Cloneable {
     return splits.toArray(new String[0]);
   }
   
+  /** {@inheritDoc} **/
   public Object clone() throws CloneNotSupportedException {
     CSVReader clone=(CSVReader)super.clone();
 
@@ -1820,17 +1822,30 @@ public class CSVReader implements Serializable, Cloneable {
   // Nicht ganz korrekt da auch 4.34-5,2.1 als nummer erkannt wird, aber das reicht mir so.
   // macht MIT ABSICHT kein trim!
   public static boolean isNumber(String s, boolean onlyDigits) {
-    if (s==null || s.length()<1) return false;
-    char[] a = s.toCharArray();
+    if (s.trim().length()==0) return false;
+    char[] a = s.trim().toCharArray();
+    boolean atLeastOneDigit=false;
     for (int i=0; i< a.length; i++) {
+      if (!atLeastOneDigit && Character.isDigit(a[i])) atLeastOneDigit = true;
+      
       if (onlyDigits){
         if (Character.isDigit(a[i])) continue; else return false;
       } else {
         if (Character.isDigit(a[i])) continue;
-        if (a[i]=='-' || a[i]=='.' || a[i]==',' || a[i]=='E' || a[i]=='e') continue;
+        else if (i==0 && a[i]=='-') continue;
+        else if (a[i]=='.' || a[i]==',') continue;
+        else if (a[i]=='E' || a[i]=='e') {
+          if (i+1< a.length) {
+            // Detect strings like "2.8E+01" or "2.8E-01"
+            if (a[i+1]=='+' || a[i+1]=='-') i+=1;
+          }
+          continue;
+        }
+        //if (a[i]=='-' || a[i]=='.' || a[i]==',' || a[i]=='E' || a[i]=='e') continue;
         return false;
       }
     }
+    if (!atLeastOneDigit) return false; // Only "-" or "..." is no number.
     return true;
   }
   public static boolean isIntegerNumber(String s) {
