@@ -6,19 +6,25 @@ package de.zbit.parser;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import keggapi.Definition;
+import de.zbit.io.CSVReader;
 import de.zbit.kegg.KeggFunctionManagement;
 import de.zbit.kegg.KeggQuery;
+import de.zbit.resources.Resource;
 import de.zbit.util.InfoManagement;
+import de.zbit.util.ProgressBar;
 import de.zbit.util.SortedArrayList;
+import de.zbit.util.Utils;
 
 /**
  * 
@@ -41,6 +47,14 @@ public class Species implements Serializable, Comparable<Object> {
   
   private List<String> synonyms;
   
+  
+  /**
+   * Official NCBI Species id (which is an int)
+   * http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy
+   * tax_id -- the id of node associated with this name
+   */
+  Integer ncbi_tax_id=null;  
+  
   /**
    * 
    * @param scientificName
@@ -61,7 +75,7 @@ public class Species implements Serializable, Comparable<Object> {
    * @param uniprotExtension
    */
   public Species(String keggAbbr, String scientificName, String uniprotExtension) {
-    this(keggAbbr, scientificName, uniprotExtension, null, null);
+    this(keggAbbr, scientificName, uniprotExtension, null, (String)null);
   }
   
   /**
@@ -71,8 +85,7 @@ public class Species implements Serializable, Comparable<Object> {
    * @param commonName
    * @param synonym
    */
-  public Species(String keggAbbr, String scientificName,
-            String uniprotExtension, String commonName, String synonym) {
+  public Species(String keggAbbr, String scientificName, String uniprotExtension, String commonName, String synonym) {
     this(scientificName);
     this.keggAbbr = keggAbbr;
     this.uniprotExtension = uniprotExtension;
@@ -84,7 +97,20 @@ public class Species implements Serializable, Comparable<Object> {
    * @param scientificName2
    */
   public Species(String scientificName) {
+    super();
     this.scientificName = scientificName;
+  }
+
+  /**
+   * @param scientific
+   * @param uniprot
+   * @param common
+   * @param syns
+   * @param ncbi_taxon_id
+   */
+  public Species(String scientificName, String uniprotExtension, String commonName, List<String> synonyms, Integer ncbi_taxon_id) {
+    this(scientificName, uniprotExtension, commonName, synonyms);
+    this.ncbi_tax_id = ncbi_taxon_id;
   }
 
   /**
@@ -94,7 +120,7 @@ public class Species implements Serializable, Comparable<Object> {
    */
   public boolean addSynonym(String synonym) {
     if (synonym!=null && (synonym.trim().length())>0) {
-      if (this.synonyms==null) synonyms = new SortedArrayList<String>();
+      if (this.synonyms==null) synonyms = new LinkedList<String>();
       if (!synonyms.contains(synonym)) {
         return synonyms.add(synonym);
       }
@@ -188,9 +214,9 @@ public class Species implements Serializable, Comparable<Object> {
   }
 
   public int compareTo(Object o) {
-    if (o instanceof Species)
+    if (o instanceof Species){
       return scientificName.toLowerCase().compareTo(((Species)o).scientificName.toLowerCase());
-    else
+    } else
       return scientificName.toLowerCase().compareTo(o.toString().toLowerCase());
   }
   
@@ -272,7 +298,10 @@ public class Species implements Serializable, Comparable<Object> {
    *  
    */
   public static List<Species> generateSpeciesDataStructure() throws IOException {
-    return generateSpeciesDataStructure(null);
+    BufferedReader in = new BufferedReader(new InputStreamReader(Resource.class.getResourceAsStream("speclist.txt")));
+    List<Species> a = generateSpeciesDataStructure(in);
+    //addNCBItaxonomyIdentifier(a, "C:/Dokumente und Einstellungen/wrzodek/Eigene Dateien/Downloads/names.dmp");
+    return a;
   }
   
   /**
@@ -299,18 +328,20 @@ public class Species implements Serializable, Comparable<Object> {
    * @throws IOException
    */
   public static List<Species> generateSpeciesDataStructure(BufferedReader in) throws IOException {
-    List<Species> spec = new SortedArrayList<Species>();
-    String common = "", scientific = "",  uniprot = "_";
-    List<String> syns = new ArrayList<String>();
+    List<Species> allSpec = new SortedArrayList<Species>();
+    Species spec = null;
     
-    if (in!=null) {
+    if (in!=null) { // Read uniprot species taxon file.
       boolean startReading=false;
       String line;
       while ((line=in.readLine())!=null) {
-        if (line.equalsIgnoreCase("_____ _ _______ _____________________________________________________________")) {
-          startReading = true;
-        } else if (startReading) {
-          if (line.contains("=======================================================================")) break; // done reading.
+        if (line.trim().length()<1) continue;
+        else if (startReading) {
+          if (line.contains("====================================")) {
+            startReading=false;
+            break; // done reading.
+          }
+          
           //          Code    Taxon   N=Official (scientific) name
           //          Node    C=Common name
           //                  S=Synonym
@@ -321,25 +352,34 @@ public class Species implements Serializable, Comparable<Object> {
           //                          C=AAV-2
           //          AAV2S V 648242: N=Adeno-associated virus 2 (isolate Srivastava/1982)
           //                          C=AAV-2
-          if(!line.isEmpty()){
-            if(!uniprot.equals("_"))
-              spec.add(new Species(scientific, uniprot, common, syns));
-            common = "";
-            scientific = ""; 
-            uniprot = "_" + line.substring(0,6).trim();
-            syns = new ArrayList<String>();
-          }  
-
-          if(!line.isEmpty()){
-            String help = line.substring(16, line.length());
-            String[] split = help.split("=");
-            if(split[0].equals("N"))
-              scientific = split[1];
-            else if (split[0].equals("C"))
-              common = split[1];
-            else if (split[0].equals("S"))
-              syns.add(split[1]);
+          
+          // Create the current species object, if a new entry starts here.
+          String uniprot = "_" + line.substring(0,6).trim();
+          if(!uniprot.equals("_")) {
+            spec = (new Species(null));
+            spec.uniprotExtension=uniprot;
+            
+            // Taxon ID is always in line with uniprot species name
+            String taxon_id = line.substring(7, 14).trim();
+            if (taxon_id.length()>0) {
+              spec.ncbi_tax_id = Integer.parseInt(taxon_id);
+            }
           }
+          
+          // Start at position 16 are Common-, Scientific Name and Synonyms.
+          String help = line.substring(16, line.length());
+          String[] split = help.split("=");
+          if(split[0].equals("N"))
+            spec.scientificName=split[1].trim();
+          else if (split[0].equals("C"))
+            spec.commonName=split[1].trim();
+          else if (split[0].equals("S"))
+            spec.addSynonym(split[1].trim());
+          
+          // Add to list here, because the scientific name is required.
+          if(!uniprot.equals("_")) allSpec.add(spec);
+        } else if (line.contains("____________________________________")) {
+          startReading = true;
         }
       }
       in.close();
@@ -363,7 +403,7 @@ public class Species implements Serializable, Comparable<Object> {
     KeggQuery q = new KeggQuery(KeggQuery.getOrganisms, null);
     keggOrgs = (Definition[]) manag.getInformation(q).getObject();
     
-    if (keggOrgs!=null)
+    if (keggOrgs!=null){
       for (Definition definition : keggOrgs) {
         // getDefinition() = e.g "Homo sapiens (human)"
         String scientificName  = definition.getDefinition();
@@ -378,12 +418,12 @@ public class Species implements Serializable, Comparable<Object> {
         }
         String keggAbbr = definition.getEntry_id();
         boolean contained = false;
-        for(int i=0; i<spec.size(); i++){
-          String scName = spec.get(i).getScientificName();
-          if (spec.get(i).getScientificName().equalsIgnoreCase(scientificName)) contained=true;
+        for(int i=0; i<allSpec.size(); i++){
+          String scName = allSpec.get(i).getScientificName();
+          if (allSpec.get(i).getScientificName().equalsIgnoreCase(scientificName)) contained=true;
           if(scName.startsWith(scientificName)) {
-            if (spec.get(i).getKeggAbbr()==null || spec.get(i).getKeggAbbr().length()<1) {
-              spec.get(i).setShortName(keggAbbr);
+            if (allSpec.get(i).getKeggAbbr()==null || allSpec.get(i).getKeggAbbr().length()<1) {
+              allSpec.get(i).setShortName(keggAbbr);
             }
           }
         }
@@ -392,14 +432,15 @@ public class Species implements Serializable, Comparable<Object> {
           String uniprot_ext = null;
           if (commonName!=null && commonName.trim().length()>0) uniprot_ext = '_'+commonName.trim().toUpperCase();
           Species new_spec = new Species(keggAbbr, scientificName, uniprot_ext, commonName, null);
-          spec.add(new_spec);
+          allSpec.add(new_spec);
         }
       }
+    }
       
     int counter = 0;
     List<Species> speciesWithoutKeggAbbr = new SortedArrayList<Species>();
     List<Species> speciesWithKeggAbbr = new SortedArrayList<Species>();
-    for (Species species : spec) {
+    for (Species species : allSpec) {
       if(species.getKeggAbbr()!=null){
         counter++;
         speciesWithKeggAbbr.add(species);
@@ -469,16 +510,105 @@ public class Species implements Serializable, Comparable<Object> {
    * @return
    */
   public boolean matchesIdentifier(String species) {
-    if (getScientificName()!=null && getScientificName().equalsIgnoreCase(species)) return true;
-    if (getCommonName()!=null && getCommonName().equalsIgnoreCase(species)) return true;
-    if (getEnsemblName()!=null && getEnsemblName().equalsIgnoreCase(species)) return true;
-    if (getKeggAbbr()!=null && getKeggAbbr().equalsIgnoreCase(species)) return true;
-    if (getSynonyms()!=null) {
-      for (String s1: getSynonyms()) {
-        if (s1!=null && s1.equalsIgnoreCase(species)) return true;
+    // Integer? => NCBI Taxonomy ID
+    if (ncbi_tax_id!=null && Utils.isNumber(species, true)) {
+      if (ncbi_tax_id.equals(Integer.parseInt(species))) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    // String identifiers
+    for (int i=0; i<2; i++) {
+      if (i==1) {
+        /* First try with exact string. Second try with replacing
+         * spaces and dots. (e.g. "C. elegans" => "Celegans"
+         * => Ensembl name matches). */
+        species = species.replaceAll("\\W", ""); // All no-word-chars
+      }
+      
+      if (getScientificName()!=null && getScientificName().equalsIgnoreCase(species)) return true;
+      if (getCommonName()!=null && getCommonName().equalsIgnoreCase(species)) return true;
+      if (getEnsemblName()!=null && getEnsemblName().equalsIgnoreCase(species)) return true;
+      if (getKeggAbbr()!=null && getKeggAbbr().equalsIgnoreCase(species)) return true;
+      if (getSynonyms()!=null) {
+        for (String s1: getSynonyms()) {
+          if (s1!=null && s1.equalsIgnoreCase(species)) return true;
+        }
       }
     }
     return false;
+  }
+  
+  /**
+   * Annotate a list of species with NCBI Taxonomy Identifiers.
+   * @param all - List of species to annotate with NCBI Tax IDs
+   * @param namesDMPfile -
+   * Download "taxdmp.zip" from "ftp://ftp.ncbi.nih.gov/pub/taxonomy/"
+   * and extract "names.dmp". This is the required filepath.
+   * @throws IOException 
+   */
+  public static void addNCBItaxonomyIdentifier(List<Species> all, String namesDMPfile) throws IOException {
+    System.out.println("Reading NCBI Taxonomy file...");    
+    HashMap<String, Integer> taxFile = new HashMap<String, Integer>(10000);
+    
+    // Fast but memory intensive method. Could be rewritten to slow but memory efficient.
+    
+    // Read file
+    CSVReader in = new CSVReader(namesDMPfile);
+    in.setDisplayProgress(true);
+    String[] line;
+    while ((line=in.getNextLine())!=null) {
+      //line[0] = Taxonomy ID, line[2] = Name, (line[4] = unique name if [Name] not unique), line[6] = Name type
+      String name = line[2].trim();
+      Integer ncbiID = Integer.parseInt(line[0].trim());
+      taxFile.put(name.toUpperCase(), ncbiID);
+    }
+    in.close();
+    
+    // Match species list
+    List<Species> unmatched = new ArrayList<Species>();
+    unmatched.addAll(all);
+    for (int i=0; i<unmatched.size(); i++) {
+      Species spec = unmatched.get(i);
+      
+      Integer r = taxFile.get(spec.getScientificName().toUpperCase());
+      if (r==null && spec.getCommonName()!=null) r = taxFile.get(spec.getCommonName().toUpperCase());
+      if (r!=null) {
+        spec.ncbi_tax_id = r;
+        unmatched.remove(i);
+        i--;
+        System.out.println("Annotate " + spec.ncbi_tax_id  + " => " + spec + " Remaining: " + unmatched.size());
+      }
+    }
+    
+    // Optional: Extensively try every combination.
+    ProgressBar prog = new ProgressBar(unmatched.size());
+    for (int i=0; i<unmatched.size(); i++) {
+      prog.DisplayBar();
+      Species spec = unmatched.get(i);
+      for (String s: taxFile.keySet()) {
+        if (spec.matchesIdentifier(s)) {
+          Integer r = taxFile.get(s);
+          spec.ncbi_tax_id = r;
+          unmatched.remove(i);
+          i--;
+          System.out.println("XAnnotate " + spec.ncbi_tax_id  + " => " + spec + " Remaining: " + unmatched.size());
+        }        
+      }
+
+    }
+    
+    System.out.println("DONE.");
+    /*
+     *   /**
+     *    * if {@link #generateSpeciesDataStructure()} is called (WITHOUT ARGUMENT ONLY)
+     *    * and this (serialized) file exists, it will be loaded and returned.
+     *    * /
+     *   private final static String speciesCacheFile = "resources/" + Species.class.getPackage().getName().replace('.', '/') + "/speciesCache.dat";
+     */
+    //Utils.saveGZippedObject(speciesCacheFile, all);
+    
   }
   
 }
