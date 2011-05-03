@@ -191,5 +191,13 @@ public class ArrayUtils {
     
     return ret;
   }
+
+
+public static double sum(int[] found) {
+	double d = 0;
+	for (int i: found)
+		d+=i;
+	return d;
+}
   
 }
