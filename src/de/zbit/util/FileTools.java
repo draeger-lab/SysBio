@@ -45,9 +45,9 @@ public class FileTools {
     
     try {
 //      FileTools.splitFile("H:/ValidationData/proDGe_DROME_raw.txt", "H:/ValidationData", "proDGe_DROME_raw", ".txt", 8000000);     
-      FileTools.splitFile("H:/ValidationData/proDGe_RAT_raw.txt", "H:/ValidationData", "proDGe_RAT_raw", ".txt", 8000000);
-      FileTools.splitFile("H:/ValidationData/proDGe_MOUSE_raw.txt", "H:/ValidationData", "proDGe_MOUSE_raw_", ".txt", 8000000);
-      FileTools.splitFile("H:/ValidationData/proDGe_HUMAN_raw.txt", "H:/ValidationData", "proDGe_HUMAN_raw", ".txt", 8000000);
+//      FileTools.splitFile("H:/ValidationData/proDGe_RAT_raw.txt", "H:/ValidationData", "proDGe_RAT_raw", ".txt", 8000000);
+      FileTools.splitFile("/home/buechel/ValidationData/proDGe_MOUSE_raw.txt", "/home/buechel/ValidationData", "proDGe_MOUSE_raw_", ".txt", 8000000);
+      FileTools.splitFile("/home/buechel/ValidationData/proDGe_HUMAN_raw.txt", "/home/buechel/ValidationData", "proDGe_HUMAN_raw", ".txt", 8000000);
       
     } catch (IOException e) {
       // TODO Auto-generated catch block
