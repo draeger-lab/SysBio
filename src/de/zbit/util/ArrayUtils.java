@@ -191,13 +191,17 @@ public class ArrayUtils {
     
     return ret;
   }
-
-
-public static double sum(int[] found) {
-	double d = 0;
-	for (int i: found)
-		d+=i;
-	return d;
-}
+  
+  /**
+   * Sums each value in an array.
+   * @param arr
+   * @return
+   */
+  public static double sum(int[] arr) {
+    double d = 0;
+    for (int i: arr)
+      d+=i;
+    return d;
+  }
   
 }
