@@ -140,6 +140,13 @@ public class Species implements Serializable, Comparable<Object> {
   public String getKeggAbbr() {
     return keggAbbr;
   }
+  
+  /**
+   * @return the ncbi_taxon_id or null if it is known / not set.
+   */
+  public Integer getNCBITaxonID() {
+    return ncbi_tax_id;
+  }
 
 
 
