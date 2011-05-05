@@ -40,6 +40,11 @@ public class Species implements Serializable, Comparable<Object> {
   
   public static final Logger log = Logger.getLogger(Species.class.getName());
   
+  public final static int SCIENTIFIC_NAME = 0;
+  public final static int COMMON_NAME = 1;
+  public final static int KEGG_ABBR = 2;
+  public final static int UNIPROT_EXTENSION = 3;
+  
   private String keggAbbr;
   private String scientificName;
   private String uniprotExtension;
@@ -239,11 +244,6 @@ public class Species implements Serializable, Comparable<Object> {
       return false;
     }
   }
-  
-  public final static int SCIENTIFIC_NAME = 0;
-  public final static int COMMON_NAME = 1;
-  public final static int KEGG_ABBR = 2;
-  public final static int UNIPROT_EXTENSION = 3;
   
   public static List<String> getListOfNames(List<Species> list, int type) {
     List<String> retval = new LinkedList<String>();
@@ -489,12 +489,14 @@ public class Species implements Serializable, Comparable<Object> {
    * Searches for a specific species in a list of species.
    * @param all
    * @param species
+   * @param nameTypeToSearch - set to -1 to search in all types, else, one
+   * of the included final static ints.
    * @return
    */
-  public static Species search(List<Species> all, String species) {
+  public static Species search(List<Species> all, String species, int nameTypeToSearch) {
     if (all==null || species==null) return null;
     for (Species s: all) {
-      if (s.matchesIdentifier(species)) return s;
+      if (s.matchesIdentifier(species, nameTypeToSearch)) return s;
     }
     return null;
   }
@@ -507,7 +509,7 @@ public class Species implements Serializable, Comparable<Object> {
    * @throws IOException 
    */
   public static Species search(String species) throws IOException {
-    return search(Species.generateSpeciesDataStructure(), species);
+    return search(Species.generateSpeciesDataStructure(), species, -1);
   }
 
   /**
@@ -517,6 +519,17 @@ public class Species implements Serializable, Comparable<Object> {
    * @return
    */
   public boolean matchesIdentifier(String species) {
+    return matchesIdentifier(species, -1);
+  }
+  
+  /**
+   * @param species
+   * @param nameTypeToSearch - -1 to search all identifiers, else the name type
+   * to search.
+   * @return
+   * @see #matchesIdentifier(String)
+   */
+  private boolean matchesIdentifier(String species, int nameTypeToSearch) {
     // Integer? => NCBI Taxonomy ID
     if (ncbi_tax_id!=null && Utils.isNumber(species, true)) {
       if (ncbi_tax_id.equals(Integer.parseInt(species))) {
@@ -533,6 +546,11 @@ public class Species implements Serializable, Comparable<Object> {
          * => Ensembl name matches). */
         species = species.replaceAll("\\W", ""); // All no-word-chars
       }
+      
+      if (nameTypeToSearch==UNIPROT_EXTENSION || nameTypeToSearch==-1) {
+        if (getUniprotExtension()!=null && getUniprotExtension().equalsIgnoreCase(species)) return true;
+      }
+      // TODO: Implement checls for nameTypeToSearch for other name types.
       
       if (getScientificName()!=null && getScientificName().equalsIgnoreCase(species)) return true;
       if (getCommonName()!=null && getCommonName().equalsIgnoreCase(species)) return true;
