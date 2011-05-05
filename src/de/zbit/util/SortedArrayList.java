@@ -160,12 +160,12 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     super();
   }
   
-  /**
-   * 
-   * @param i
+  /*
+   * (non-Javadoc)
+   * @see java.util.ArrayList#ArrayList(int)
    */
-  public SortedArrayList(int i) {
-    super(i);
+  public SortedArrayList(int initialCapacity) {
+    super(initialCapacity);
   }
   
   /*
