@@ -19,6 +19,8 @@ package de.zbit.util.prefs;
 import java.io.File;
 import java.util.List;
 
+import sun.awt.image.ImageWatched.Link;
+
 import argparser.ArgParser;
 import argparser.BooleanHolder;
 import argparser.CharHolder;
@@ -179,6 +181,9 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
+	 * Returns the display name of this {@link Option}.
+	 * 
+	 * @see #displayName
 	 * @return the displayName
 	 */
 	public final String getDisplayName() {
@@ -186,6 +191,9 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 
 	/**
+	 * Sets the display name of this {@link Option}.
+	 * 
+   * @see #displayName
 	 * @param displayName the displayName to set
 	 */
 	public final void setDisplayName(String displayName) {
@@ -429,7 +437,10 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
-	 * @return
+	 * Creates and returns a new argument holder for the required type of this
+	 * {@link Option}.
+	 * 
+	 * @return an argument holder of the required data type
 	 * @see #createArgumentHolder(Object)
 	 */
 	public Object createArgumentHolder() {
@@ -455,8 +466,12 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
-	 * @param defaultValue
-	 * @return
+   * Creates and returns a new argument holder for the required type of this
+   * {@link Option} with the given object as default value.
+	 * 
+	 * @param defaultValue the default value of this {@link Option}
+	 * @return an argument holder of the required data type with given default
+	 *         value
 	 */
 	public Object createArgumentHolder(Object defaultValue) {
 		String value = defaultValue.toString();
@@ -525,6 +540,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
+	 * Returns a description for this {@link Option}. If the {@link Range} of this
+	 * {@link Option} is a {@link File} with a {@link GeneralFileFilter}
+	 * constraint, the description of the file filter is appended.
+	 * 
+	 * @see #description
 	 * @return the description
 	 */
 	public String getDescription() {

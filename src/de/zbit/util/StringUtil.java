@@ -101,9 +101,11 @@ public class StringUtil {
 	}
 	
 	/**
+	 * Returns a new {@link StringBuilder} object containing the given objects in
+	 * a concatenated form.
 	 * 
-	 * @param objects
-	 * @return
+	 * @param objects the objects to concatenate
+	 * @return the passed objects concatenated in a new {@link StringBuilder}
 	 */
 	public static StringBuilder concat(Object... objects) {
 		return append(new StringBuilder(), objects);

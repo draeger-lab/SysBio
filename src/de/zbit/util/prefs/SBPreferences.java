@@ -283,14 +283,22 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
+	 * Parses the given command line arguments using the {@link ArgParser} and
+	 * returns a {@link SBProperties} object containing those values. The values
+	 * then present in this {@link SBProperties} object will then be made
+	 * persistent for all {@link SBPreferences} that have been given to this
+	 * method.
 	 * 
-	 * @param prefs
-	 * @param options
-	 * @param parser
-	 * @param props
-	 * @param usage
-	 * @param args
-	 * @return
+	 * 
+	 * @param prefs the {@link SBPreferences} for which the parsed values should
+	 *              be stored persistently
+	 * @param options a mapping from {@link Option}s to argument holders
+	 * @param parser the {@link ArgParser}
+	 * @param props the {@link SBProperties} object where the parsed values will
+	 *              be stored
+	 * @param usage the usage string
+	 * @param args the command line arguments
+	 * @return the {@link SBProperties} object where the parsed values are stored
 	 */
 	private static final SBProperties analyzeCommandLineArguments(
 		SBPreferences[] prefs, Map<Option<?>, Object> options, ArgParser parser,
@@ -298,9 +306,11 @@ public class SBPreferences implements Map<Object, Object> {
 		
 		// Do the actual parsing.
 	  // XXX: ArgParser does NOT distinguish between default options and 
-	  // user settet options. Actually, one has to modify the argparser
+	  // user set options. Actually, one has to modify the argparser
 	  // and add a new flag to the argument holder, if it is a default value.
 		parser.matchAllArgs(args);
+		
+		// put all read options into this SBProperties object
 		putAll(props, options);
 		
 		// Now all command-line arguments must be made persistent:
@@ -309,17 +319,23 @@ public class SBPreferences implements Map<Object, Object> {
 			if (prefs[i] == null) {
 				continue;
 			}
+			// for each possible key (option) of this SBPreferences object
 			for (Object key : prefs[i].keySetFull()) {
 				k = key.toString();
+				// if the SBProperties object contains a value for this option
 				if (props.containsKey(k)) {
 					property = props.getProperty(k);
 					value = prefs[i].getString(k);
+					// and if the value in SBPreferences differs from the one in the
+					// SBProperties
 					if (!value.equals(property)) {
+					  // override the SBPreferences value with the SBProperties one
 						prefs[i].put(k, property);
 					}
 				}
 			}
 			try {
+			  // make all preferences persistent
 				prefs[i].flush();
 			} catch (BackingStoreException e) {
 				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
@@ -407,25 +423,36 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
-	 * @param parser
-	 * @param options
-	 * @param keyProvider
-	 * @param props
-	 * @param defaults
-	 * @return
+	 * Adds all {@link Option}s of the {@link KeyProvider} to the
+	 * {@link ArgParser}. If default values for the options are passed in a
+	 * {@link Map} with the keys being either the {@link Option} or a
+	 * {@link String} representing the option, the {@link ArgParser} will be
+	 * configured to use these as default values for the argument holders and they
+	 * are stored as default values in the given {@link SBProperties} object.
+	 * 
+	 * Also, the mapping of {@link Option}s to their argument holder is stored in
+	 * the given <code>options</code> map.
+	 * 
+	 * @param parser the {@link ArgParser} to be configured
+	 * @param options a mapping from {@link Option}s to their argument holders
+	 * @param keyProvider the {@link KeyProvider} containing the {@link Option}s
+	 * @param props an {@link SBProperties} object in which the default values
+	 *              will be stored
+	 * @param defaults the default values
+	 * @return the mapping from {@link Option}s to their argument holders
 	 */
 	private static Map<Option<?>, Object> configureArgParser(ArgParser parser,
 		Map<Option<?>, Object> options, Class<? extends KeyProvider> keyProvider,
 		SBProperties props, Map<Object, Object> defaults) {
-		Object fieldValue, argHolder;
-		Option<?> option;
-		String k;
+		// Iterates over all field of the keyProvider
 		for (Field f : keyProvider.getFields()) {
 			try {
-				fieldValue = f.get(keyProvider);
+			  Object fieldValue = f.get(keyProvider);
+			  Object argHolder;
+				// If the current field is an Option, add it to the ArgParser
 				if (fieldValue instanceof Option<?>) {
-					option = (Option<?>) fieldValue;
-					k = option.toString();
+				  Option<?> option = (Option<?>) fieldValue;
+					String key = option.toString();
 					if ((defaults != null) && defaults.containsKey(option)) {
 						// We here set the default value as pre-defined value
 						// if the given Map contains the corresponding key.
@@ -433,11 +460,11 @@ public class SBPreferences implements Map<Object, Object> {
 						// give a command-line argument for this option, we will
 						// stick with the default value:
 						argHolder = option.createArgumentHolder(defaults.get(option));
-						props.getDefaults().put(k, defaults.get(option));
+						props.getDefaults().put(key, defaults.get(option));
 					} else {
-						if ((defaults != null) && defaults.containsKey(k)) {
-							argHolder = option.createArgumentHolder(defaults.get(k));
-							props.getDefaults().put(k, defaults.get(k));
+						if ((defaults != null) && defaults.containsKey(key)) {
+							argHolder = option.createArgumentHolder(defaults.get(key));
+							props.getDefaults().put(key, defaults.get(key));
 						} else {
 							// If there is no default value available,
 							// we cannot do anything...
@@ -448,7 +475,7 @@ public class SBPreferences implements Map<Object, Object> {
 					options.put(option, argHolder);
 				}
 			} catch (Exception exc) {
-				// This my happen if there are other fields than static options
+				// This may happen if there are other fields than static options
 				// in the key provider. Also happens if the wrong type of
 				// argHolder has been added or created! But this method should
 				// work fine... (I hope). You can check with -? option.
