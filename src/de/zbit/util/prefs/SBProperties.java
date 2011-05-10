@@ -113,7 +113,10 @@ public class SBProperties extends Properties {
 	}
 	
 	/**
-	 * @return
+	 * Returns the {@link SBProperties} object containing the default values for
+	 * this {@link SBProperties} object.
+	 * 
+	 * @return the {@link SBProperties} object containing the default values
 	 */
 	public SBProperties getDefaults() {
 		return (SBProperties) defaults;
