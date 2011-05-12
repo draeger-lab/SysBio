@@ -38,7 +38,7 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
  * 
  * A better name for this class is maybe "Cache".
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

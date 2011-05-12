@@ -20,7 +20,7 @@ package de.zbit.util;
 /**
  * Implementations of various sorting algorithms
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

@@ -25,7 +25,7 @@ import de.zbit.kegg.parser.KeggParser;
 /**
  * Corresponding to the Kegg ReactionComponent class (see {@link http://www.genome.jp/kegg/xml/docs/})
  * Includes the Kegg "alt" class.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

@@ -26,7 +26,7 @@ import java.util.Map;
  * Main Kegg document. Corresponding to the Kegg Pathway class
  * (see {@link http://www.genome.jp/kegg/xml/docs/})
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

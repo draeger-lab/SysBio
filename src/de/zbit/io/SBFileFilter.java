@@ -38,7 +38,7 @@ public class SBFileFilter extends GeneralFileFilter {
 	/**
 	 * 
 	 * @author Andreas Dr&auml;ger
-	 * @author wrzodek
+	 * @author Clemens Wrzodek
 	 * 
 	 */
 	public static enum FileType {

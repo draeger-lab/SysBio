@@ -29,7 +29,8 @@ import java.net.URLConnection;
 
 /**
  * Download files from a url (http/ftp).
- * @author wrzodek (heavily modified by a template from Marco Schmidt).
+ * <p><i>(heavily modified by a template from Marco Schmidt).</i></p>
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

@@ -48,7 +48,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Various utils, which I need quite often.
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
@@ -1027,6 +1027,24 @@ public class Utils {
   
   /**
    * Load a serializable object.
+   * Does NOT buffer the stream. Make sure to pipe your
+   * stream though a BufferedStream for more performance
+   * (e.g. BufferedInputStream). 
+   * @param inn
+   * @return the loaded object or null if it failed.
+   * @throws IOException 
+   * @throws ClassNotFoundException 
+   */
+  public static Object loadObjectAndThrowExceptions(InputStream inn) throws IOException, ClassNotFoundException {
+    ObjectInputStream in = new ObjectInputStream(inn);
+    Object ret = in.readObject();
+    in.close();
+    inn.close();
+    return ret;
+  }
+  
+  /**
+   * Load a serializable object.
    * @param filename
    * @return the loaded object or null if it failed.
    */
@@ -1114,7 +1132,12 @@ public class Utils {
     // Take directly the source input stream, if it is no GZstream
     if (in==null) in = bin;
     
-    ret = loadObject(in);
+    try {
+      ret = loadObjectAndThrowExceptions(in);
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+      ret=null;
+    }
     
     bin.close();
     fileIn.close();

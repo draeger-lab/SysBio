@@ -18,7 +18,7 @@ package de.zbit.kegg.parser.pathway;
 
 /**
  * Corresponding to the possible Kegg Reaction Types (see {@link http://www.genome.jp/kegg/xml/docs/})
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

@@ -67,7 +67,7 @@ import de.zbit.util.StringUtil;
  *   a.getHeader(); // The header (if available)
  *   a.getPreamble(); // Everything, before actual table start
  * </pre></p>
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

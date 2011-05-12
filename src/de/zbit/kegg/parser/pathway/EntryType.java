@@ -25,7 +25,7 @@ package de.zbit.kegg.parser.pathway;
  * the linked pathway map is treated as a node, a clickable
  * graphics object (round rectangle) in the KEGG Web service."
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

@@ -27,7 +27,7 @@ import javax.swing.JTabbedPane;
 /**
  * This is a {@link javax.swing.JTabbedPane} with the single extension
  * that the TabbedPane without any tabs contains a centered logo image.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

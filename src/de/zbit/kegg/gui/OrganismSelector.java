@@ -37,7 +37,7 @@ import de.zbit.util.CustomObject;
 
 /**
  * This will show a panel to choose one of Kegg's supported organisms.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

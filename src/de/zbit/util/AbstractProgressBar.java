@@ -37,7 +37,7 @@ import java.io.Serializable;
  * }
  * </pre>
  * 
- * @author wrzodek 
+ * @author Clemens Wrzodek 
  * @version $Rev$
  * @since 1.0
  */

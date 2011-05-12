@@ -75,7 +75,7 @@ import de.zbit.util.ResourceManager;
  * </pre>
  * </p>
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

@@ -24,7 +24,7 @@ import java.util.Iterator;
 /**
  * Iterating through a directory (you may include subdirectories).
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

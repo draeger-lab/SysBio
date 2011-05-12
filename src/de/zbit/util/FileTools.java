@@ -32,7 +32,7 @@ import de.zbit.io.OpenFile;
 
 /**
  * This class acts just like the linux or unix which command.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

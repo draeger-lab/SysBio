@@ -20,7 +20,7 @@ package de.zbit.exception;
  * Used in "InfoManagement" to distinct between temporary errors and actual
  * unsuccessfull retrievements.
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

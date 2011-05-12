@@ -27,7 +27,7 @@ import de.zbit.util.Utils;
  * Retrieve and manage Kegg infos. Once retrieved, they are cached and don't have to
  * be retrieved again. Also a "precache" statement is possible, to quickly cache and download
  * many kegg IDs simultaneously.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

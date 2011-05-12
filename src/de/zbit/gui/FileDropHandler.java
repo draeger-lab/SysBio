@@ -45,7 +45,7 @@ import javax.swing.TransferHandler;
     this.setTransferHandler(dragNdrop);
     </pre>
     </p>
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
