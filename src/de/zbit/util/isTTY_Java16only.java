@@ -21,7 +21,7 @@ package de.zbit.util;
  * This class checks whether or not the System's console
  * is of type TTY.
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

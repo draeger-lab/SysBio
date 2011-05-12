@@ -32,7 +32,7 @@ import java.io.Reader;
  * OS and delegates to it. 
  *
  * @author alecw
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

@@ -24,7 +24,7 @@ import de.zbit.util.Utils;
 /**
  * ProgressBarSwing - a swing implementation that wraps the
  * AbstractProgressBar around a JProgressBar.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

@@ -43,7 +43,7 @@ import de.zbit.util.ResourceManager;
  * This class contains tools for java.awt.image, java.awt.image.BufferedImage,
  * etc.
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @author Andreas Dr&auml;ger
  * @version $Rev$
  * @since 1.0

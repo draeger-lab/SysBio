@@ -37,7 +37,7 @@ import javax.swing.WindowConstants;
  * certain propoerties (e.g. asking the user "in which column
  * are the sequence start coordinates?").
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

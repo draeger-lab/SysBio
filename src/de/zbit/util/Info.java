@@ -22,7 +22,7 @@ import java.io.Serializable;
  * Improves data Management when data is associated to an id or descriptor.
  * This class represents one element in the cache.
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * 
  * @param <IDtype>
  *            Type of the id (int or string,...) must be comparable.

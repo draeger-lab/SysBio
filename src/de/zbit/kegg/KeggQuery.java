@@ -22,7 +22,7 @@ import java.io.Serializable;
  * This class is used by KeggFunctionManagement. It determines which function
  * should be executed and what are the parameters for this function.
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

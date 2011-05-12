@@ -43,7 +43,7 @@ import javax.swing.table.TableCellRenderer;
  * </pre>
  * </p> 
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
@@ -54,7 +54,7 @@ public class JTableUtils implements Serializable {
   /**
    * Set as Column renderer on JButton columns in tables to display them
    * properly.
-   * @author wrzodek
+   * @author Clemens Wrzodek
    */
   public class ButtonRenderer extends JButton implements TableCellRenderer {
     private static final long serialVersionUID = 3907152523374459684L;
@@ -91,7 +91,7 @@ public class JTableUtils implements Serializable {
   /**
    * Set as CellEditor on JButton columns in tables to edit them
    * properly.
-   * @author wrzodek
+   * @author Clemens Wrzodek
    */
   public class ButtonEditor extends DefaultCellEditor {
     private static final long serialVersionUID = 3746708554280012094L;

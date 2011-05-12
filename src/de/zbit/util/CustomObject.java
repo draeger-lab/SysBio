@@ -20,7 +20,7 @@ import java.io.Serializable;
 
 /**
  * Neccessary for extending supertypes. They can not be extended by Object directly.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

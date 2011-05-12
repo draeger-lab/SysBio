@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 /**
  * Paints a new Gradient Panel (a simple JPanel with
  * a gradient background).
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

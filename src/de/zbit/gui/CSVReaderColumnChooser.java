@@ -52,7 +52,7 @@ import de.zbit.util.StringUtil;
  *    c.addColumnChooser(new String[]{"sequenceName"}, false, true);
  * </pre>
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

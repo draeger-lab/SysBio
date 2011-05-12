@@ -28,7 +28,7 @@ import de.zbit.kegg.parser.KeggParser;
 /**
  * Corresponding to the Kegg Entry class (see 
  * <a href="http://www.genome.jp/kegg/xml/docs/">KeggAPI</a>)
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

@@ -18,7 +18,7 @@ package de.zbit.util;
 
 /**
  * Useful for timing certain procedures.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

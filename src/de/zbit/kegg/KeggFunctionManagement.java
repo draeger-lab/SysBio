@@ -28,7 +28,7 @@ import de.zbit.util.InfoManagement;
  * for a Kegg ID (what KeggInfoManagement does).
  * 
  * Think of this class as a cache.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

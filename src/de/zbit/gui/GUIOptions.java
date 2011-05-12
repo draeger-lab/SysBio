@@ -31,7 +31,7 @@ import de.zbit.util.prefs.Range;
  * interfaces.
  * 
  * @author Andreas Dr&auml;ger
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @date 2010-10-22
  * @version $Rev$
  * @since 1.0

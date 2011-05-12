@@ -31,7 +31,7 @@ import de.zbit.util.Utils;
 
 /**
  * A collection of ranges with a few convenient methods to work with them.
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @author Andreas Dr&auml;ger
  * @version $Rev$
  * @since 1.0
@@ -55,7 +55,7 @@ public class Range<Type> {
 	 * A range of any type. Consisting of lower and upper bound and
 	 * the information, if the lower/upper bound itself is included
 	 * or not. 
-	 * @author wrzodek
+	 * @author Clemens Wrzodek
 	 */
 	class SubRange {
 		private Type lBound;

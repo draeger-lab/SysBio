@@ -27,7 +27,7 @@ import de.zbit.gui.LayoutHelper;
 import de.zbit.util.FileDownload;
 
 /**
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

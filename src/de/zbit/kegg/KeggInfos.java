@@ -22,7 +22,7 @@ import de.zbit.kegg.parser.pathway.EntryType;
  * Simplyfies parsing KeggInfos from the Adaptor. Stores and handles all kegg
  * infos very conveniently.
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

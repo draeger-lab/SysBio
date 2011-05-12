@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  *  
  *  // You can work with the results here. 
  * </pre></p>
- * @author wrzodek
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
