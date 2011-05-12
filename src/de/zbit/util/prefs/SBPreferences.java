@@ -264,11 +264,14 @@ public class SBPreferences implements Map<Object, Object> {
 		// Configure argument parser by passing all possible option definitions
 		// to it.
 		Class<? extends KeyProvider> entry;
+		// for each KeyProvider
 		for (int i = 0; i < defKeys.size(); i++) {
 			entry = defKeys.get(i);
 			try {
+			  // get the SBPreferences for this KeyProvider and add all of its options
+			  // to the ArgParser
 				prefs[i] = getPreferencesFor(entry);
-				configureArgParser(parser, options, entry, props, loadDefaults(entry));
+				configureArgParser(parser, options, entry, props, prefs[i].getDefaults());
 				
 			} catch (Exception e) {
 				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
@@ -278,10 +281,11 @@ public class SBPreferences implements Map<Object, Object> {
 			}
 		}
 		
-		return analyzeCommandLineArguments(prefs, options, parser, props, usage,
-			args);
+		// Parse the arguments and returns the resulting SBProperties
+		return analyzeCommandLineArguments(prefs, options, parser, props, args);
 	}
 	
+
 	/**
 	 * Parses the given command line arguments using the {@link ArgParser} and
 	 * returns a {@link SBProperties} object containing those values. The values
@@ -302,7 +306,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	private static final SBProperties analyzeCommandLineArguments(
 		SBPreferences[] prefs, Map<Option<?>, Object> options, ArgParser parser,
-		SBProperties props, String usage, String args[]) {
+		SBProperties props, String args[]) {
 		
 		// Do the actual parsing.
 	  // XXX: ArgParser does NOT distinguish between default options and 
@@ -418,8 +422,7 @@ public class SBPreferences implements Map<Object, Object> {
 			}
 		}
 		
-		return analyzeCommandLineArguments(prefs, options, parser, props, usage,
-			args);
+		return analyzeCommandLineArguments(prefs, options, parser, props, args);
 	}
 	
 	/**
@@ -536,11 +539,12 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
+	 * Returns the preferences and their default values for the given
+	 * {@link KeyProvider}.
 	 * 
-	 * @param keyProvider
-	 * @param relPath
-	 * @return
-	 * @throws IOException
+	 * @param keyProvider the {@link KeyProvider} for which the preferences should
+	 *                    be retrieved
+	 * @return the preferences and their default values
 	 */
 	public static SBPreferences getPreferencesFor(
 		Class<? extends KeyProvider> keyProvider) {
@@ -756,6 +760,9 @@ public class SBPreferences implements Map<Object, Object> {
 	private final Preferences prefs;
 	
 	/**
+	 * Constructor. Loads the preferences for the given {@link KeyProvider} if
+	 * they are available and also the default values.
+	 * 
 	 * @param keyProvider
 	 */
 	public SBPreferences(Class<? extends KeyProvider> keyProvider) {
