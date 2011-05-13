@@ -83,7 +83,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 	 * @param fileLocation
 	 * @param component
 	 */
-	public static void showOnlineHelp(Frame owner, WindowListener wl,
+	public static JHelpBrowser showOnlineHelp(Frame owner, WindowListener wl,
 		String title, URL fileLocation, Class<? extends KeyProvider>... clazz) {
 		JHelpBrowser helpBrowser = new JHelpBrowser(owner, title, fileLocation);
 		if ((clazz != null) && (clazz.length > 0)) {
@@ -113,6 +113,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		helpBrowser.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		helpBrowser.setLocationRelativeTo(owner);
 		helpBrowser.setVisible(true);
+		return helpBrowser;
 	}
 	
 	/**
@@ -150,6 +151,57 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 	public JHelpBrowser(Frame owner, String title, URL startPage) {
 		super(owner, title);
 		init(startPage);
+	}
+	
+	/**
+	 * Adds a new tab to this {@link JHelpBrowser}.
+	 * @param url
+	 * @param name
+	 */
+	public void addTab(URL url, String name) {
+	  JBrowserPane browser = new JBrowserPane(url);
+	  browser.addHyperlinkListener(this);
+	  
+	  JScrollPane scroll = new JScrollPane(browser,
+	    ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+	    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	  
+	  this.addTab(scroll, name);
+	}
+  
+	/**
+	 * Adds a new tab to this {@link JHelpBrowser}.
+	 * @param component
+	 * @param name
+	 */
+	public void addTab(Component component, String name) {
+    // Ensure that there is currently a TabbedPane
+    if (!(mainPart instanceof JTabbedPane)) {
+      // Create a new TabbedPane
+      JTabbedPane tabs = new JTabbedPane();
+      // Add previous elements to this tabPane
+      /*if (getContentPane().getComponents().length>0) {
+        for (Component c: getContentPane().getComponents()) {
+          tabs.addTab(c.getName(), c);
+        }
+      }
+      getContentPane().removeAll();*/
+      tabs.add(mainPart);
+      getContentPane().remove(mainPart);
+      
+      // Set the tabbedPane as root object
+      tabs.setSelectedIndex(0);
+      mainPart = tabs;
+      getContentPane().add(mainPart, BorderLayout.CENTER);
+    } else {
+      if (!(mainPart instanceof JTabbedPane)) {
+        mainPart = (JComponent) getContentPane().getComponent(0);
+      }
+    }
+    
+    // Add the new component
+    if (name==null || name.length()<1) name = component.getName();
+    ((JTabbedPane)mainPart).addTab(name, component);
 	}
 	
 	/*
