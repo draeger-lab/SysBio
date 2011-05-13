@@ -1137,6 +1137,7 @@ public abstract URL getURLOnlineUpdate();
 			getProgramNameAndVersion()), getURLOnlineHelp(), getCommandLineOptions());
 	}
 	
+	
 	/**
 	 * Updates the list of previously opened files in the {@link JMenuBar}. This
 	 * method is private because it relies on the correctness of the given
