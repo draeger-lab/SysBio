@@ -31,6 +31,7 @@ import javax.swing.text.html.HTMLFrameHyperlinkEvent;
  * 
  * @author Andreas Dr&auml;ger
  * @author Hannes Borch
+ * @author Clemens Wrzodek
  * @since 1.0 (originates from SBMLsqueezer 1.2)
  * @version $Rev$
  */
