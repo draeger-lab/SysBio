@@ -44,6 +44,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import de.zbit.io.OpenFile;
+
 
 /**
  * Various utils, which I need quite often.
@@ -1104,7 +1106,7 @@ public class Utils {
     // Create input stream
     InputStream fileIn;
     if (serializedFile instanceof String) {
-      fileIn = new FileInputStream((String)serializedFile);
+      fileIn = OpenFile.searchFileAndGetInputStream((String)serializedFile);//new FileInputStream((String)serializedFile);
     } else if (serializedFile instanceof File) {
       fileIn = new FileInputStream((File)serializedFile);
     } else if (serializedFile instanceof FileDescriptor) {
