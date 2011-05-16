@@ -182,7 +182,7 @@ public class BaseGUI extends BaseFrame {
 	public URL getURLOnlineUpdate() {
 		try {
 			return new URL(
-				"http://www.ra.cs.uni-tuebingen.de/software/SBMLsqueezer/downloads/");
+				"http://www.cogsys.cs.uni-tuebingen.de/software/SBMLsqueezer/downloads/");
 		} catch (MalformedURLException exc) {
 			GUITools.showErrorMessage(this, exc);
 		}
