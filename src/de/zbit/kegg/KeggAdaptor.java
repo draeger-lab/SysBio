@@ -26,6 +26,7 @@ import java.util.concurrent.TimeoutException;
 import keggapi.Definition;
 import keggapi.KEGGLocator;
 import keggapi.KEGGPortType;
+import keggapi.LinkDBRelation;
 import keggapi.SSDBRelation;
 
 /**
@@ -69,6 +70,9 @@ public class KeggAdaptor {
   public static void main(String[] args) {
     printEachOutputToScreen = true;
     KeggAdaptor adap = new KeggAdaptor();
+    
+    adap.get_linkdb_by_entry("path:hsa05012", "pathway", 0, 300);
+    if(true) return;
     
     adap.find("genes ENSG00000152413");
     
@@ -468,6 +472,30 @@ public class KeggAdaptor {
     return results;
   }
 
+  /**
+   * 
+   * @param entry_id, i.e. "path:hsa05012"
+   * @param db, database, that should be queried, i.e. "pathway"
+   * @param offset, number which 
+   * @param limit
+   * @return an ArrayOfLinkDBRelations, of the entry_id, if the results are available, else null is returned
+   */
+  public LinkDBRelation[] get_linkdb_by_entry(String entry_id, String db, int offset, int limit){
+   LinkDBRelation[] results = null;
+  try {
+    results = serv.get_linkdb_by_entry(entry_id, db, offset, limit);
+  } catch (RemoteException e) {
+    e.printStackTrace();
+  }
+  if( printEachOutputToScreen && results != null && results.length>0)
+    for (LinkDBRelation res : results) {
+      System.out.println(res.getEntry_id1() + "\t" + res.getEntry_id2() + "\t" + res.getPath() + "\t" + res.getType());
+    }
+   
+   return results;
+  }
+  
+  
   /**
    * 
    * @param id
