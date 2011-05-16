@@ -549,7 +549,7 @@ public class Reflect {
         String fileName = resource.getFile();
         String fileNameDecoded = URLDecoder.decode(fileName, "UTF-8");
         
-        // E.g., http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/KEGGtranslator.jar!/de/zbit/gui/prefs
+        // E.g., http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/KEGGtranslator.jar!/de/zbit/gui/prefs
         // - Remove the package extension from the string and remove eventual "!"'s and "file:/" prefixes. 
          
         if (fileNameDecoded.endsWith(path)) {
