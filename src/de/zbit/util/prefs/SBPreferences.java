@@ -188,10 +188,13 @@ public class SBPreferences implements Map<Object, Object> {
 		Map<Option<?>, Object> options = configureArgParser(parser,
 			new HashMap<Option<?>, Object>(), keyProvider, props, defaults);
 		parser.matchAllArgs(args);
-		Option<?> option;
+
+		// for each option and its 
 		for (Map.Entry<Option<?>, Object> entry : options.entrySet()) {
-			option = entry.getKey();
+		  Option<?> option = entry.getKey();
 			if (option.isSetRangeSpecification()) {
+			  // FIXME: each entry contains a mapping from Option to an argument
+			  //        holder, but this code expects the actual object.
 				if (!option.getRange().castAndCheckIsInRange(entry.getValue())) {
 					ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
 					parser.printErrorAndExit(String.format(resources.getString("OPTION_OUT_OF_RANGE"),
@@ -249,9 +252,14 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
-	 * @param defKeys
-	 * @param args
-	 * @return
+	 * Creates an {@link ArgParser}, configures it using the given
+	 * {@link KeyProvider}s, parses the given command line arguments and returns
+	 * the resulting {@link SBProperties}. This will also <b>make all parsed options
+	 * persistent</b>.
+	 * 
+	 * @param defKeys a list of {@link KeyProvider}s with the options to be parsed
+	 * @param args the command line arguments to be parsed
+	 * @return the resulting {@link SBProperties}
 	 */
 	public static SBProperties analyzeCommandLineArguments(
 		List<Class<? extends KeyProvider>> defKeys, String[] args) {
@@ -281,7 +289,8 @@ public class SBPreferences implements Map<Object, Object> {
 			}
 		}
 		
-		// Parse the arguments and returns the resulting SBProperties
+		// Parse the arguments and return the resulting SBProperties
+		// NOTE: This also makes the parsed options persistent
 		return analyzeCommandLineArguments(prefs, options, parser, props, args);
 	}
 	
@@ -431,8 +440,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * {@link Map} with the keys being either the {@link Option} or a
 	 * {@link String} representing the option, the {@link ArgParser} will be
 	 * configured to use these as default values for the argument holders and they
-	 * are stored as default values in the given {@link SBProperties} object.
-	 * 
+	 * are stored as default values in the given {@link SBProperties} object. 
 	 * Also, the mapping of {@link Option}s to their argument holder is stored in
 	 * the given <code>options</code> map.
 	 * 
