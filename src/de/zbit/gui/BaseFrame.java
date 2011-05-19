@@ -42,6 +42,7 @@ import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -913,6 +914,12 @@ public abstract URL getURLOnlineUpdate();
 		GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_UPDATE);
 		UpdateMessage update = new UpdateMessage(true, getApplicationName(),
 			getURLOnlineUpdate(), getDottedVersionNumber(), hideErrorMessages);
+		
+		// Set the update window to use the same icon as this window.
+		if (this.getIconImage()!=null) {
+		  update.setIcon(new ImageIcon(getIconImage()));
+		}
+		  
 		update.addWindowListener(EventHandler.create(WindowListener.class, this,
 			"setOnlineUpdateEnabled", null, "windowClosed"));
 		update.addPropertyChangeListener(EventHandler.create(

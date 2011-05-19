@@ -149,8 +149,8 @@
   
   <!-- UpdateMessage -->
   
-  <entry key="SHOW_RELEASE_NOTES">show release notes</entry>
-  <entry key="HIDE_RELEASE_NOTES">hide release notes</entry>
+  <entry key="SHOW_RELEASE_NOTES">Show release notes</entry>
+  <entry key="HIDE_RELEASE_NOTES">Hide release notes</entry>
   <entry key="UPDATE_IS_AVAILABLE">An update for %s is available.</entry>
   <entry key="COMMAND_LINE_UPDATE_MESSAGE">\nUpdate notification:\n--------------------\nA new version of %s is available.\nPlease visit %s\nto obtain version %s.\nFor your information: you are now using %s version %s.\n</entry>
   <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">You are already using the latest version %s of %s. No newer version could be found.</entry>

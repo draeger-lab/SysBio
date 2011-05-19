@@ -143,8 +143,8 @@
   
   <!-- UpdateMessage -->
   
-  <entry key="SHOW_RELEASE_NOTES">zeige Versionsinfos</entry>
-  <entry key="HIDE_RELEASE_NOTES">verbirg Versionsinfos</entry>
+  <entry key="SHOW_RELEASE_NOTES">Versionshinweise einblenden</entry>
+  <entry key="HIDE_RELEASE_NOTES">Versionshinweise ausblenden</entry>
   <entry key="UPDATE_IS_AVAILABLE">Eine Aktualisierung für %s steht zur Verfügung.</entry>
   <entry key="COMMAND_LINE_UPDATE_MESSAGE">\nAktualisierungsbenachrichtigung:\n--------------------\nEine neuere Version von %s ist verfügbar.\nBesuchen Sie bitte %s\num Version %s zu erhalten.\nZu Ihrer Information: Sie benutzen gerade %s Version %s.\n</entry>
   <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">Sie benutzen bereits die neueste Version %s von %s. Es konnte keine neuere Version gefunden werden.</entry>
