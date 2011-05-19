@@ -33,9 +33,10 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JWindow;
@@ -43,7 +44,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 
 import de.zbit.util.ResourceManager;
 
@@ -54,6 +54,7 @@ import de.zbit.util.ResourceManager;
  * 
  * @author Hannes Borch
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @since 1.0 (originates from SBMLsqueezer 1.2 and 1.3)
  * @version $Rev$
  */
@@ -65,6 +66,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 	 * 
 	 * @author Hannes Borch
 	 * @author Andreas Dr&auml;ger
+	 * @author Clemens Wrzodek
 	 * 
 	 */
 	private static class UpdateMessageWindow extends JWindow implements
@@ -96,11 +98,20 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 		 * release notes and two {@link JButtons} for showing them and exiting the
 		 * {@link Window}.
 		 * 
-		 * @param u
+		 * @param u - URL of the update.
 		 * @param applicationName
-		 * @throws IOException
+		 * @throws IOException 
 		 */
-		public UpdateMessageWindow(String u, String applicationName)
+		public UpdateMessageWindow(String u, String applicationName) throws IOException {
+		  this(u, applicationName, UIManager.getIcon("ICON_GLOBE_16"));
+		}
+		
+		/**
+		 * See {@link #UpdateMessage(String, String)} for more information.
+		 * @param icon - Icon that is displayed, along with the update message.
+		 * May be null, if no icon is desired.
+		 */
+		public UpdateMessageWindow(String u, String applicationName, Icon icon)
 			throws IOException {
 			super();
 			setBackground(Color.YELLOW);
@@ -138,12 +149,19 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 			scroll.setPreferredSize(new Dimension(550, 400));
 			contentPanel.add(scroll, BorderLayout.CENTER);
 			
+			String updateString = String.format(bundle.getString("UPDATE_IS_AVAILABLE"), applicationName);
 			contentPanel.setVisible(false);
 			JPanel mainPanel = new JPanel(new BorderLayout());
 			mainPanel.setBackground(getBackground());
-			mainPanel.setBorder(BorderFactory.createTitledBorder(new LineBorder(
-				Color.BLACK), String.format(bundle.getString("UPDATE_IS_AVAILABLE"),
-				applicationName), TitledBorder.CENTER, TitledBorder.BELOW_TOP));
+			
+			// wrzodek: Unfortunately, the TitledBorder has no influence on the
+			// window size. Thus, the text almost never fits into the window.
+			// => solution: create a JLabel.
+			//mainPanel.setBorder(BorderFactory.createTitledBorder(new LineBorder(
+			//	Color.BLACK), updateString, TitledBorder.CENTER, TitledBorder.BELOW_TOP));
+			mainPanel.setBorder(new LineBorder(Color.BLACK));
+			mainPanel.add(new JLabel(" " + updateString + " ", icon, JLabel.CENTER), BorderLayout.NORTH);
+			
 			mainPanel.add(contentPanel, BorderLayout.CENTER);
 			mainPanel.add(buttonPanel, BorderLayout.PAGE_END);
 			setContentPane(mainPanel);
@@ -162,14 +180,16 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 			if (e.getSource() instanceof JButton) {
 				ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 				String buttonText = ((JButton) e.getSource()).getName();
+				if (buttonText==null) buttonText=""; // Simply avoid NullPointerExceptions (=> OK Button)
 				if (buttonText.equals("showReleaseNotes")) {
 					contentPanel.setVisible(true);
 					showHideButton.setName("hideReleaseNotes");
 					showHideButton.setText(bundle.getString("HIDE_RELEASE_NOTES"));
 				} else if (buttonText.equals("hideReleaseNotes")) {
 					contentPanel.setVisible(false);
+					showHideButton.setName("showReleaseNotes");
 					showHideButton.setText(bundle.getString("SHOW_RELEASE_NOTES"));
-				} else {
+				} else { // Ok button (buttonText is null)
 					dispose();
 				}
 			}
@@ -183,8 +203,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 		 */
 		private void adjustLocation() {
 			Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-			this.setLocation(d.width - this.getWidth(), d.height - this.getHeight()
-					- 30);
+			this.setLocation(d.width - this.getWidth(), d.height - this.getHeight() - 30);
 		}
 	}
 	
@@ -222,6 +241,13 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 	 */
 	private boolean gui, hideErrorMessages;
 	
+	
+  /**
+   * Icon that is displayed, along with the update message.
+   * Might be null, if no icon is desired.
+   */
+  private Icon icon = UIManager.getIcon("ICON_GLOBE_16");
+  
 	/**
 	 * @param gui
 	 *        If true, a small window is displayed with the update message,
@@ -240,6 +266,16 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 		this.dottedVersionNumber = dottedVersionNumber;
 		this.hideErrorMessages = hideErrorMessages;
 		this.listOfListeners = new LinkedList<WindowListener>();
+	}
+	
+	
+	/**
+   * Icon that is displayed, along with the update message.
+   * Set to null, if no icon is desired.
+	 * @param icon
+	 */
+	public void setIcon(Icon icon) {
+	  this.icon = icon;
 	}
 	
 	/**
@@ -323,7 +359,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 	 */
 	private void showUpdateMessage(boolean gui, String url) throws IOException {
 		if (gui) {
-			JWindow umw = new UpdateMessage.UpdateMessageWindow(url, applicationName);
+			JWindow umw = new UpdateMessage.UpdateMessageWindow(url, applicationName, icon);
 			for (WindowListener wl : listOfListeners) {
 				umw.addWindowListener(wl);
 			}
