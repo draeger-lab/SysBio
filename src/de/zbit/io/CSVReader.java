@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.zbit.exception.CorruptInputStreamException;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileReadProgress;
 import de.zbit.util.Reflect;
@@ -1854,6 +1855,56 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       Integer.parseInt(s);
     } catch (Exception e) {return false;}
     return true;
+  }
+  
+  /**
+   * Read an {@link CSVwriteable} object from a CSV file.
+   * @param inputfile
+   * @return CSVwriteable instance
+   * @throws IOException
+   */
+  public static CSVwriteable read(String inputfile) throws IOException {
+    return read(null, inputfile);
+  }
+  /**
+   * Read an {@link CSVwriteable} object from a CSV file.
+   * @param object - empty template
+   * @param inputfile
+   * @throws IOException
+   */
+  public static CSVwriteable read(CSVwriteable emptyObject, String inputfile) throws IOException {
+    // Init the reader
+    CSVReader r = new CSVReader(inputfile,false);
+    r.open();
+    
+    // Check class name and get version
+    String[] splitt = r.getPreamble().split("\n");
+    for (int i=0;i<splitt.length; i++)
+      splitt[i]=splitt[i].substring(1).trim(); // Remove the #
+    
+    if (emptyObject==null) {
+      // Create new instance
+      try {
+        emptyObject = (CSVwriteable) Class.forName(splitt[0]).newInstance();
+      } catch (Exception e) {
+        throw new CorruptInputStreamException("Could not create source class from CSV file.", e);
+      }
+    } else {
+      if (!emptyObject.getClass().getName().equals(splitt[0])) {
+        System.err.println("WARNING: Trying to read " + splitt[0] + " into " + emptyObject.getClass().getName());
+      }
+    }
+    int CSVversionNumber = Integer.parseInt(splitt[1]);
+    
+    
+    // Read the object
+    int i=0;
+    String[] line;
+    while ((line=r.getNextLine())!=null) {
+      emptyObject.fromCSV(line, i++, CSVversionNumber);
+    }
+    
+    return emptyObject;
   }
   
   

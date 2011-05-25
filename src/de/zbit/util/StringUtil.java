@@ -36,7 +36,8 @@ public class StringUtil {
 	/**
 	 * 
 	 */
-	private static final String newLine = System.getProperty("line.separator");
+  private static final String newLine = java.security.AccessController.doPrivileged(
+    new sun.security.action.GetPropertyAction("line.separator"));
 	
 	/**
 	 * 
