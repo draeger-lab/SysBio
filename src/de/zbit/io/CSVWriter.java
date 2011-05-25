@@ -27,8 +27,11 @@ import java.util.StringTokenizer;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import de.zbit.util.StringUtil;
+
 /**
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2010-09-02
  * @version $Rev$
  * @since 1.0
@@ -177,11 +180,11 @@ public class CSVWriter {
 	private char commentSymbol;
 
 	/**
-	 * Creates a new writer for comma-separated files with a comma as column
+	 * Creates a new writer for tab-separated files with a comma as column
 	 * separator and a sharp symbol to indicate comments.
 	 */
 	public CSVWriter() {
-		separator = ',';
+		separator = '\t';
 		commentSymbol = '#';
 	}
 
@@ -230,6 +233,33 @@ public class CSVWriter {
 	}
 
 	/**
+	 * Write an {@link CSVwriteable} object to a CSV file.
+	 * @param object
+	 * @param outputfile
+	 * @throws IOException
+	 */
+	public static void write(CSVwriteable object, String outputfile) throws IOException {
+	  // init
+	  File out = getOrCreateFile(outputfile);
+	  String lineSep = StringUtil.newLine();
+	  Writer w = initializeWriter(out);
+	  
+	  // Preamble
+	  w.append("#" + object.getClass().getName()+ lineSep);
+	  w.append("#" + object.getCSVOutputVersionNumber()+ lineSep);
+	  
+	  // Write object
+	  int i=0;
+	  String line;
+	  while ((line = object.toCSV((i++)))!=null) {
+	    w.append(line);
+	    w.append(lineSep);
+	  }
+	  
+	  w.close();
+	}
+	
+	/**
 	 * @return the commentSymbol
 	 */
 	public char getCommentSymbol() {
@@ -242,7 +272,7 @@ public class CSVWriter {
 	 * @return
 	 * @throws IOException
 	 */
-	private File getOrCreateFile(String pathname) throws IOException {
+	private static File getOrCreateFile(String pathname) throws IOException {
 		File file = new File(pathname);
 		if (file.exists()) {
 			if (file.isDirectory()) {
@@ -442,8 +472,8 @@ public class CSVWriter {
 	 * @param writer
 	 * @throws IOException
 	 */
-	private BufferedWriter write(String comments, char commentSymbol,
-			BufferedWriter writer) throws IOException {
+	private Writer write(String comments, char commentSymbol,
+			Writer writer) throws IOException {
 		// setCommentSymbol(commentSymbol);
 		StringTokenizer st = new StringTokenizer(comments.replace("\r", ""),
 				"\n");
@@ -451,7 +481,7 @@ public class CSVWriter {
 			writer.append(commentSymbol);
 			writer.append(' ');
 			writer.write(st.nextElement().toString());
-			writer.newLine();
+      writer.write(StringUtil.newLine());
 		}
 		writer.flush();
 		return writer;
@@ -466,7 +496,7 @@ public class CSVWriter {
 	 */
 	private void write(TableModel data, char separator, Writer writer)
 			throws IOException {
-	  String lineSep = System.getProperty ( "line.separator" );
+	  String lineSep = StringUtil.newLine();
 	  
 		// setSeparator(separator);
 		int i, j;
@@ -517,8 +547,18 @@ public class CSVWriter {
 	 */
 	public void write(TableModel data, char separator, File file)
 			throws IOException {
-		write(data, separator, new BufferedWriter(new FileWriter(file)));
+		write(data, separator, initializeWriter(file));
 	}
+
+	/**
+	 * Create a writer from a file.
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+  private static Writer initializeWriter(File file) throws IOException {
+    return new BufferedWriter(new FileWriter(file));
+  }
 
 	/**
 	 * 
@@ -554,7 +594,7 @@ public class CSVWriter {
 	public void write(TableModel data, Object comments, char commentSymbol,
 			char separator, File file) throws IOException {
 		write(data, separator, write(comments.toString(), commentSymbol,
-				new BufferedWriter(new FileWriter(file))));
+				initializeWriter(file)));
 	}
 
 	/**

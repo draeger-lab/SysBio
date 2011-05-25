@@ -203,5 +203,27 @@ public class ArrayUtils {
       d+=i;
     return d;
   }
+
+
+  /**
+   * Reverse the input array. I.e., the first item will be the last and so on.
+   * @param hits
+   * @return
+   */
+  public static <T> void reverse(T[] array) {
+    int max = array.length/2;
+    for (int i=0; i<max; i++) {
+      swap(array, i, array.length-(i+1));
+    }
+  }
+  
+  /**
+   * Swaps the two specified elements in the specified array.
+   */
+  public static <T> void swap(T[] arr, int i, int j) {
+    T tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+  }
   
 }
