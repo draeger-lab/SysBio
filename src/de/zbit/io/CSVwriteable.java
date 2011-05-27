@@ -25,7 +25,7 @@ import de.zbit.exception.CorruptInputStreamException;
  * {@link CSVWriter#write(CSVwriteable, String)}).
  * 
  * <p> An example implementation and usage can be found in the 
- * test folder! ({@link de.zbit.io.CSVwriteableTest}).</p>
+ * test folder! ({@link de.zbit.io.CSVwriteableTest2}).</p>
  * @author Clemens Wrzodek
  * @version $Rev$
  */

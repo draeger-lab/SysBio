@@ -97,6 +97,8 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
   
   /**
    * Returns the local file name where the downloaded file should be saved to.
+   * In most cases, this should be simply:
+   * <pre> return "res/" + FileTools.getFilename(getRemoteURL()); </pre>
    * @return
    */
   public abstract String getLocalFile();
@@ -218,7 +220,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
         multiSourceColumn = new int[]{getSourceColumn(r)};
       int targetColumn = getTargetColumn(r);
       
-      // Get maximumal col number
+      // Get maximal col number
       int maxColumn = targetColumn;
       for (int sourceColumn: multiSourceColumn)
         maxColumn = Math.max(maxColumn, sourceColumn);
@@ -228,7 +230,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
         return false;
       }
       
-      // Read RefSeq <=> Gene ID mapping.
+      // Read Source <=> Target mapping.
       String[] line;
       r.open();
       // XXX: When using a progressBar here with a compressed File, the bar Fails!
@@ -244,7 +246,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
           log.finest("Empty target in " + getMappingName() + " mapping file.");
           continue;
         }
-        TargetType target = Option.parseOrCast(targetType, line[targetColumn]);
+        TargetType target = Option.parseOrCast(targetType, preProcessTargetID(line[targetColumn]));
         if (target==null) {
           log.warning("Invalid target content in " + getMappingName() + " mapping file: " + ((line.length>1)?line[targetColumn]:"line too short."));
           continue;
@@ -256,7 +258,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
         // Add mapping for all source columns
         for (int sourceColumn: multiSourceColumn) {
           // Get source ID
-          SourceType source = Option.parseOrCast(sourceType, line[sourceColumn]);
+          SourceType source = Option.parseOrCast(sourceType, preProcessSourceID(line[sourceColumn]));
           if (source==null) {
             log.warning("Invalid source content in " + getMappingName() + " mapping file: " + ((line.length>1)?line[sourceColumn]:"line too short."));
             continue;
@@ -270,6 +272,27 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((mapping!=null)?mapping.size():"0") + " mappings.");
     return (mapping!=null && mapping.size()>0);
   }
+
+  /**
+   * Allows to modify source IDs directly after reading from input
+   * file and before parsing them into the SourceType.
+   * @param string
+   * @return
+   */
+  protected String preProcessSourceID(String string) {
+    return string;
+  }
+  
+  /**
+   * Allows to modify target IDs directly after reading from input
+   * file and before parsing them into the TargetType.
+   * @param string
+   * @return
+   */
+  protected String preProcessTargetID(String string) {
+    return string;
+  }
+
 
   /**
    * Optional method that allow customizations.
@@ -315,6 +338,13 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    */
   public boolean isReady() {
     return mapping!=null && mapping.size()>0;
+  }
+
+  /**
+   * @return number of available mappings.
+   */
+  public int size() {
+    return mapping.size();
   }
   
 }

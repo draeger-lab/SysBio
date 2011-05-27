@@ -231,33 +231,6 @@ public class CSVWriter {
 			setSeparator(reader.getSeparatorChar());
 		}
 	}
-
-	/**
-	 * Write an {@link CSVwriteable} object to a CSV file.
-	 * @param object
-	 * @param outputfile
-	 * @throws IOException
-	 */
-	public static void write(CSVwriteable object, String outputfile) throws IOException {
-	  // init
-	  File out = getOrCreateFile(outputfile);
-	  String lineSep = StringUtil.newLine();
-	  Writer w = initializeWriter(out);
-	  
-	  // Preamble
-	  w.append("#" + object.getClass().getName()+ lineSep);
-	  w.append("#" + object.getCSVOutputVersionNumber()+ lineSep);
-	  
-	  // Write object
-	  int i=0;
-	  String line;
-	  while ((line = object.toCSV((i++)))!=null) {
-	    w.append(line);
-	    w.append(lineSep);
-	  }
-	  
-	  w.close();
-	}
 	
 	/**
 	 * @return the commentSymbol
@@ -267,12 +240,13 @@ public class CSVWriter {
 	}
 
 	/**
-	 * 
+	 * Converts a String to a File object and checks if this
+	 * File exists and can be overwritten.
 	 * @param pathname
 	 * @return
 	 * @throws IOException
 	 */
-	private static File getOrCreateFile(String pathname) throws IOException {
+	public static File getOrCreateFile(String pathname) throws IOException {
 		File file = new File(pathname);
 		if (file.exists()) {
 			if (file.isDirectory()) {

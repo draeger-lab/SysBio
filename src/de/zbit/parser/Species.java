@@ -9,18 +9,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import keggapi.Definition;
+import de.zbit.exception.CorruptInputStreamException;
 import de.zbit.io.CSVReader;
+import de.zbit.io.CSVwriteable;
+import de.zbit.io.CSVwriteableIO;
 import de.zbit.kegg.KeggFunctionManagement;
 import de.zbit.kegg.KeggQuery;
 import de.zbit.resources.Resource;
+import de.zbit.util.ArrayUtils;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
 import de.zbit.util.SortedArrayList;
@@ -35,7 +41,7 @@ import de.zbit.util.Utils;
  * @author Finja B&uml;chel
  * @author Clemens Wrzodek
  */
-public class Species implements Serializable, Comparable<Object> {
+public class Species implements Serializable, Comparable<Object>, CSVwriteable {
   private static final long serialVersionUID = 5900817226349012280L;
   
   public static final Logger log = Logger.getLogger(Species.class.getName());
@@ -232,6 +238,29 @@ public class Species implements Serializable, Comparable<Object> {
       return scientificName.toLowerCase().compareTo(o.toString().toLowerCase());
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    Species newSpecies = new Species(this.scientificName);
+    
+    newSpecies.keggAbbr = keggAbbr;
+    newSpecies.uniprotExtension = uniprotExtension;
+    newSpecies.commonName = commonName;
+    newSpecies.ncbi_tax_id = ncbi_tax_id;
+    newSpecies.keggAbbr = keggAbbr;
+    newSpecies.keggAbbr = keggAbbr;
+    if (synonyms==null) {
+      newSpecies.synonyms = null;
+    } else {
+      for (String sym: synonyms)
+        newSpecies.addSynonym(sym);
+    }
+
+    return newSpecies;
+  }
+  
   @Override
   public boolean equals(Object o) {
     if (o instanceof Species) {
@@ -423,27 +452,48 @@ public class Species implements Serializable, Comparable<Object> {
           
           scientificName = scientificName.substring(0,pos).trim();
         }
+        
+        // Search all species in allSpec for the current KEGG species.
         String keggAbbr = definition.getEntry_id();
         boolean contained = false;
         for(int i=0; i<allSpec.size(); i++){
           String scName = allSpec.get(i).getScientificName();
-          if (allSpec.get(i).getScientificName().equalsIgnoreCase(scientificName)) contained=true;
+          
+          // Search for the current species
+          if (allSpec.get(i).getScientificName().equalsIgnoreCase(scientificName)) {
+            contained=true;
+          }
+          
+          // Complete missing kegg abbreviations
           if(scName.startsWith(scientificName)) {
             if (allSpec.get(i).getKeggAbbr()==null || allSpec.get(i).getKeggAbbr().length()<1) {
+              /*
+               * Sometimes leads to wrong annotations! E.g. 
+               * [1] zmo - Zymomonas mobilis _ZYMMO    542 
+               * [2] zmo - Zymomonas mobilis subsp. mobilis (strain NCIB 11163)  _ZYMMN    622759  
+               * [3] zmn - Zymomonas mobilis subsp. mobilis NCIMB 11163
+               * 2 & 3 are equal. Thus, the KeggAbbr. should be zmn not zmo!        
+               */
               allSpec.get(i).setShortName(keggAbbr);
+              contained=true;
             }
           }
+          
         }
+        
+        
         // Add not contained species.
         if (!contained) {
           String uniprot_ext = null;
-          if (commonName!=null && commonName.trim().length()>0) uniprot_ext = '_'+commonName.trim().toUpperCase();
+          if (commonName!=null && commonName.trim().length()>0) uniprot_ext = '_'+commonName.trim().toUpperCase().replace(" ", "");
           Species new_spec = new Species(keggAbbr, scientificName, uniprot_ext, commonName, null);
           allSpec.add(new_spec);
         }
       }
     }
-      
+    
+    
+    // Sort and Filter list. Return only Species with KEGG Abbr.
     int counter = 0;
     List<Species> speciesWithoutKeggAbbr = new SortedArrayList<Species>();
     List<Species> speciesWithKeggAbbr = new SortedArrayList<Species>();
@@ -634,6 +684,82 @@ public class Species implements Serializable, Comparable<Object> {
      */
     //Utils.saveGZippedObject(speciesCacheFile, all);
     
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.io.CSVwriteable#fromCSV(java.lang.String[], int, int)
+   */
+  public void fromCSV(String[] elements, int elementNumber, int CSVversionNumber)
+    throws CorruptInputStreamException {
+    
+    keggAbbr = elements[0];
+    scientificName = elements[1];
+    uniprotExtension = elements[2];
+    commonName = elements[3];
+    ncbi_tax_id = elements[4].length()>0?Integer.parseInt(elements[4]):null;
+    synonyms = null;
+    if (elements[5].length()>0) {
+      synonyms = Arrays.asList(elements[5].split(Pattern.quote("|")));
+    }
+    
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.io.CSVwriteable#getCSVOutputVersionNumber()
+   */
+  public int getCSVOutputVersionNumber() {
+    return 0;
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.io.CSVwriteable#toCSV(int)
+   */
+  public String toCSV(int elementNumber) {
+    if (elementNumber==0) {
+      StringBuffer csv = new StringBuffer();
+      appendCSVString(csv,keggAbbr);
+      appendCSVString(csv,scientificName);
+      appendCSVString(csv,uniprotExtension);
+      appendCSVString(csv,commonName);
+      appendCSVString(csv,ncbi_tax_id);
+      
+      if (synonyms!=null && synonyms.size()>0) {
+        csv.append(ArrayUtils.implode(synonyms.toArray(new String[0]), "|"));
+      }
+      return csv.toString();
+    } else return null;
+  }
+  
+  private static void appendCSVString(StringBuffer csv, Object toAppend) {
+    if (toAppend==null) {
+      csv.append("");
+    } else {
+      csv.append(toAppend.toString());
+    }
+    csv.append('\t');
+  }
+  
+  /**
+   * Saves a {@link List}, {@link Collection} or Array of {@link Species}
+   * as CSV file.
+   * @param speciesListOrArray
+   * @param outFile
+   * @throws IOException
+   */
+  public static void saveAsCSV(Object speciesListOrArray, String outFile) throws IOException {
+    CSVwriteableIO.write(speciesListOrArray, outFile);
+  }
+  
+  /**
+   * Loads a CSV file, previously saved with {@link #saveAsCSV(Object, String)}.
+   * Returns the source data structure (which should be either a {@link List} or
+   * an Array).
+   * @param file
+   * @return
+   * @throws IOException
+   */
+  public static Object loadFromCSV(String file) throws IOException {
+    return CSVwriteableIO.read(new Species(null), file);
   }
   
 }
