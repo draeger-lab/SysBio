@@ -344,18 +344,19 @@ public class Utils {
   }
   
   /**
-   * 
-   * @param s
-   * @return
+   * Returns for a DNA sequence the complement sequence.
+   * @param s DNA sequene string
+   * @return complement sequence string
    */
   public static String complement(String s) {
     StringBuffer ret = new StringBuffer(s.length());
     char[] a = s.toLowerCase().toCharArray();
     for (int i=0; i<a.length; i++) {
       if (a[i]=='a') ret.append('t');
-      if (a[i]=='c') ret.append('g');
-      if (a[i]=='g') ret.append('c');
-      if (a[i]=='t') ret.append('a');
+      else if (a[i]=='c') ret.append('g');
+      else if (a[i]=='g') ret.append('c');
+      else if (a[i]=='t') ret.append('a');
+      else ret.append('n');
     }
     return ret.toString();
   }
@@ -429,7 +430,11 @@ public class Utils {
   }
   
   /**
-   * 
+   * Counts for a DNA sequence string the number of xMeres in this string.
+   * E.g., for dimeres (xMeres=2), returns an array of 16 objects, containing
+   * the number of AA, AC, AG,... dinucleotides. See {@link #DNA2Num(char)}
+   * for array position and sequence link.
+   * @see #DNA2Num(String)
    * @param sequence
    * @param xMeres
    * @return
@@ -442,7 +447,7 @@ public class Utils {
   }
   
   /**
-   * Cut at dot. E.g. 1.68 => 1
+   * Cut number at dot. E.g. 1.68 => 1
    * In contrary, decimal format "#" would return 2!
    * @param d
    * @return
@@ -455,7 +460,8 @@ public class Utils {
   }
   
   /**
-   * 
+   * Divide each element in the first array by the 
+   * corresponding element in the second array (same indicies).
    * @param arr1
    * @param arr2
    * @return
@@ -475,7 +481,8 @@ public class Utils {
   }
   
   /**
-   * 
+   * Divide each element in the first array by the 
+   * corresponding element in the second array (same indicies).
    * @param arr1
    * @param arr2
    * @return
@@ -495,9 +502,10 @@ public class Utils {
   }
   
   /**
-   * 
+   * Return a unique number for a DNA char.
+   * @see #Num2DNA(int) for the reverse function.
    * @param a
-   * @return
+   * @return A=0, c=1, g=2, t=3. Else: -1.
    */
   public static int DNA2Num(char a) {
     if (a =='A' || a =='a') return 0;
@@ -510,6 +518,7 @@ public class Utils {
   }
   
   /**
+   * Return a unique number for a DNA String.
    * Example:
    * AA: 0
    * AC: 1
@@ -518,6 +527,9 @@ public class Utils {
    * CA: 4
    * TA: 12
    * TT: 15
+   * @see #Num2DNA(int, int) for the reverse function.
+   * @param a DNA sequence
+   * @return See example above.
    **/
   public static int DNA2Num(String a) {
     int ret = 0;
@@ -590,7 +602,7 @@ public class Utils {
   }
   
   /**
-   * Funzt nur f�r positive, nat�rliche Zahlen!
+   * Funzt nur fuer positive, natuerliche Zahlen!
    */
   public static int getNumberFromString(String behindLastIndexOfString, String toParse) {
     int i = toParse.lastIndexOf(behindLastIndexOfString)+1;
@@ -756,7 +768,8 @@ public class Utils {
   }
   
   /**
-   * 
+   * Reverse of {@link #DNA2Num(char)}. Returns the nucleotide for a number.
+   * @see #Num2DNA(int, int) to get the reverse of {@link #DNA2Num(String)}!
    * @param a
    * @return
    */
@@ -771,7 +784,7 @@ public class Utils {
   }
   
   /**
-   * 
+   * Reverse of {@link #DNA2Num(String)}
    * @param n
    * @param xMeres
    * @return
@@ -845,7 +858,8 @@ public class Utils {
   }
   
   /**
-   * 
+   * Outputs the Minimum, Maximum value of the array and the number of
+   * {@link Double#NaN} and Infinity values.
    * @param arr
    */
   public static void printMinMaxInfNaN(double[] arr) {
@@ -887,7 +901,7 @@ public class Utils {
   }
   
   /**
-   * 
+   * Returns the reverse of a string.
    * @param s
    * @return
    */
@@ -1429,6 +1443,43 @@ public class Utils {
       }
     }
     return ret;
+  }
+  
+  /**
+   * Linear normalize the given value to a distribution from 0 to 1.
+   * @see #normalize(double, double, double, double, double)
+   * @param value
+   * @param minValue
+   * @param maxValue
+   * @return normalized value
+   */
+  public static double normalize(double value, double minValue, double maxValue) {
+    return normalize(value, minValue, maxValue, 0, 1);
+  }
+  
+  /**
+   * Linear normalize the given value to a new distribution.
+   * @param value value to normalize
+   * @param minValue minimum value of your list
+   * @param maxValue maximum value of your list
+   * @param targetMinValue desired new minimum value
+   * @param targetMaxValue desired new maximum value
+   * @return
+   */
+  public static double normalize(double value, double minValue, double maxValue, double targetMinValue, double targetMaxValue) {
+    // Shift new distrubution from 0 to max.
+    targetMaxValue-=targetMinValue;
+    
+    // shift value from old distrubition to 0 to old_max
+    double v = value-minValue;
+    
+    // Normalize v from old_max to new_max
+    v*=((targetMaxValue)/(maxValue-minValue));
+    
+    // Add the new mimum to get to the new distribution
+    v+=targetMinValue;
+    
+    return v;
   }
 
   /**

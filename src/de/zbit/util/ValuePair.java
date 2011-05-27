@@ -22,6 +22,7 @@ import java.io.Serializable;
  * A pair of two values with type parameters. This data object is useful
  * whenever exactly two values are required for a specific task.
  * 
+ * @see ValueTriplet
  * @author Andreas Dr&auml;ger
  * @date 2010-09-01
  * @version $Rev$

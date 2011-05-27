@@ -39,7 +39,7 @@ import de.zbit.util.logging.LogUtil;
 public class Ensembl2GeneIDMapper extends AbstractMapper<String, Integer> {
   private static final long serialVersionUID = 8018776534857742817L;
 
-  public static final Logger log = Logger.getLogger(RefSeq2GeneIDMapper.class.getName());
+  public static final Logger log = Logger.getLogger(Ensembl2GeneIDMapper.class.getName());
   
   /**
    * If true, the NCBI file "ftp://ftp.ncbi.nih.gov/gene/DATA/gene2ensembl.gz"

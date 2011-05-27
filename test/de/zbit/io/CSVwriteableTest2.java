@@ -31,14 +31,14 @@ import de.zbit.util.SortedArrayList;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class CSVwriteableTest {
+public class CSVwriteableTest2 {
   
   /**
    * @param args
    * @throws IOException 
    */
   public static void main(String[] args) throws IOException {
-    CSVwriteableTest test = new CSVwriteableTest();
+    CSVwriteableTest2 test = new CSVwriteableTest2();
     test.CSVwritableTest();
     test.CSVreadableTest();
   }
@@ -57,7 +57,7 @@ public class CSVwriteableTest {
     System.out.println("Initial size: " + t_all.size());
     
     // Write to hard disk as CSV
-    CSVWriter.write(t_all, "test.txt");
+    CSVwriteableIO.write(t_all, "test.txt");
     
     // XXX: Now go ahead and open the file in a text editor!
   }
@@ -69,7 +69,7 @@ public class CSVwriteableTest {
   public void CSVreadableTest() throws IOException {
     // Read class from CSV
     miRNAtargets t_all = new miRNAtargets();
-    t_all = (miRNAtargets) CSVReader.read(t_all, "test.txt");
+    t_all = (miRNAtargets) CSVwriteableIO.read(t_all, "test.txt");
     
     // XXX: REMARK: If miRNAtargets would not be a nested class and
     // contains an ampty constructor, the following is more
