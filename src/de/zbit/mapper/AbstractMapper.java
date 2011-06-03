@@ -19,6 +19,8 @@ package de.zbit.mapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -53,13 +55,13 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    * A progress Bar that is used while downloading a File.
    * If null, no progress will be displayed.
    */
-  private AbstractProgressBar progress=null;
+  protected AbstractProgressBar progress=null;
   
   /**
    * A boolean flag, wether {@link #readMappingData()} has been
    * called or not.
    */
-  private boolean isInizialized=false;
+  protected boolean isInizialized=false;
   
   /**
    * Contains a mapping from RefSeq to GeneID.
@@ -194,6 +196,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    * @return true if and only if everything was without critical errors.
    * @throws IOException
    */
+  @SuppressWarnings("unchecked")
   public boolean readMappingData() throws IOException {
     isInizialized=true;
     String[] localFiles = ArrayUtils.merge(getLocalFiles(), getLocalFile());
@@ -239,6 +242,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
           log.severe("Incomplete entry in mapping file '" + localFile + "'. Please try to delete this file and execute this application again.");
           continue;
         }
+        if (skipLine(line)) continue;
         
         
         // Get target ID
@@ -246,9 +250,17 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
           log.finest("Empty target in " + getMappingName() + " mapping file.");
           continue;
         }
-        TargetType target = Option.parseOrCast(targetType, preProcessTargetID(line[targetColumn]));
+        
+        TargetType target;
+        if (Collection.class.isAssignableFrom(targetType)) {
+          // Mapping from x to a collection.
+           target = (TargetType) new ArrayList();
+          ((Collection)target).add(preProcessTargetID(line[targetColumn]));
+        } else {
+          target = Option.parseOrCast(targetType, preProcessTargetID(line[targetColumn]));
+        }
         if (target==null) {
-          log.warning("Invalid target content in " + getMappingName() + " mapping file: " + ((line.length>1)?line[targetColumn]:"line too short."));
+          log.warning("Invalid target content in " + getMappingName() + " mapping file: " + ((line.length>targetColumn)?line[targetColumn]:"line too short."));
           continue;
         }
         
@@ -258,12 +270,22 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
         // Add mapping for all source columns
         for (int sourceColumn: multiSourceColumn) {
           // Get source ID
-          SourceType source = Option.parseOrCast(sourceType, preProcessSourceID(line[sourceColumn]));
+          SourceType source = null;
+          try {
+            source = Option.parseOrCast(sourceType, preProcessSourceID(line[sourceColumn]));
+          } catch (Throwable e) {}
           if (source==null) {
-            log.warning("Invalid source content in " + getMappingName() + " mapping file: " + ((line.length>1)?line[sourceColumn]:"line too short."));
+            log.warning("Invalid source content in " + getMappingName() + " mapping file: " + ((line.length>sourceColumn)?line[sourceColumn]:"line too short."));
             continue;
           }
           source = postProcessSourceID(source);
+          
+          // Allow multiple target elements in collections
+          if (Collection.class.isAssignableFrom(targetType)) {
+            Collection c = (Collection) mapping.get(source);
+            if (c!=null) ((Collection)target).addAll(c);
+          }
+          
           mapping.put(source, target);
         }
       }
@@ -271,6 +293,15 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     
     log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((mapping!=null)?mapping.size():"0") + " mappings.");
     return (mapping!=null && mapping.size()>0);
+  }
+
+  /**
+   * Allows to skip certain entries while reading the mapping file.
+   * @param line
+   * @return
+   */
+  protected boolean skipLine(String[] line) {
+    return false;
   }
 
   /**

@@ -33,12 +33,16 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
@@ -260,6 +264,62 @@ public class Utils {
   }
   
   /**
+   * Calculates the median of the given values.
+   * The input list is <b>MODIFIED (sorted)</b>.
+   * The median of an empty array is defined to be Double.NaN
+   * 
+   * @see median
+   * @param values
+   * @return median
+   */
+  @SuppressWarnings("unchecked")
+  public static double median(List values) {
+    if (values.size()<1) return Double.NaN;
+    Collections.sort(values);
+    
+    Object median;
+    if (values.size()%2!=0) {
+      median = values.get(values.size()/2);
+      return getDoubleValue(median);
+    } else {
+      int upper = (int) Math.ceil(values.size()/2);
+      double upperMedian = getDoubleValue(values.get(upper));
+      double lowerMedian = getDoubleValue(values.get(upper-1));
+      
+      return (lowerMedian+(upperMedian-lowerMedian)/2);
+    }
+    
+  }
+  
+  /**
+   * Converts the collection to a list and returns the median.
+   * @param values
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static double median(Collection values) {
+    if (values instanceof List) {
+      return median ((List)values);
+    } else {
+      ArrayList list = new ArrayList(values.size());
+      list.addAll(values);
+      return median ((List)list);
+    }
+  }
+
+  /**
+   * Returns the double value of any {@link Number}.
+   * @param o
+   */
+  public static double getDoubleValue(Object o) {
+    double d;
+    if (o instanceof Number || Number.class.isAssignableFrom(o.getClass()) )
+      d = ((Number)o).doubleValue();
+    else d = Double.parseDouble(o.toString());
+    return d;
+  }
+  
+  /**
    * Returns the standard deviation of the given double values.
    * The Standard deviation is the square root of the variance.
    * @param values
@@ -302,8 +362,7 @@ public class Utils {
       try  {
         double d=0;
         Object o = it.next();
-        if (o instanceof Double) d = (Double)o;
-        else d = Double.parseDouble(o.toString());
+        d = getDoubleValue(o);
         
         if (Double.isNaN(d) || Double.isInfinite(d)) continue;
         countNonNAN++;
@@ -326,8 +385,7 @@ public class Utils {
       try  {
         double d=0;
         Object o = it.next();
-        if (o instanceof Double) d = (Double)o;
-        else d = Double.parseDouble(o.toString());
+        d = getDoubleValue(o);
         
         if (Double.isNaN(d) || Double.isInfinite(d)) continue;
         countNonNAN++;
@@ -1481,6 +1539,105 @@ public class Utils {
     
     return v;
   }
+  
+  /**
+   * Binomial distribution (German: Binomialverteilung oder "n über m").
+   * O(n²) implementation for small values. So better use it with a cache...
+   * @param n
+   * @param m
+   * @return
+   */
+  public static long binom(int n, int m) {
+    long[] b = new long[n+1];
+    b[0]=1;
+    for (int i=1; i<=n; i++) {
+      b[i]=1;
+      for (int j=i-1; j>0; j--) {
+        b[j]+=b[j-1];
+      }
+    }
+    return b[m];
+  }
+  
+  /**
+   * binomialCoefficient that also can calculate bigger values, using a {@link BigInteger}.
+   * @param n
+   * @param k
+   * @return
+   */
+  public static BigInteger binomialCoefficient(int n, int k){
+    return binomialCoefficient(BigInteger.valueOf(n), BigInteger.valueOf(k));
+  }
+  /**
+   * binomialCoefficient that also can calculate bigger values, using a {@link BigInteger}.
+   * @param n
+   * @param k
+   * @return
+   */
+  public static BigInteger binomialCoefficient(BigInteger n, BigInteger k){
+    
+    BigInteger n_minus_k=n.subtract(k);
+    if(n_minus_k.compareTo(k)<0){
+      BigInteger temp=k;
+      k=n_minus_k;
+      n_minus_k=temp;
+    }
+    
+    BigInteger numerator=BigInteger.ONE;
+    BigInteger denominator=BigInteger.ONE;
+    
+    for(BigInteger j=BigInteger.ONE; j.compareTo(k)<=0; j=j.add(BigInteger.ONE)){
+      numerator=numerator.multiply(j.add(n_minus_k));
+      denominator=denominator.multiply(j);
+      BigInteger gcd=numerator.gcd(denominator);
+      numerator=numerator.divide(gcd);
+      denominator=denominator.divide(gcd);
+    }
+    
+    return numerator;
+  }
+  
+  /**
+   * The hypergeometric distribution, calculated as<br/>
+   * <img src="http://upload.wikimedia.org/math/7/e/c/7ecd507bdc33dc636fdae2000d9b31fb.png"/>
+   * 
+   * @see <a href="http://en.wikipedia.org/wiki/Hypergeometric_distribution">Wikipedia</a>.
+   * 
+   * @param N total number of objects in urn
+   * @param m number of white objects in urn
+   * @param n number objects to draw without replacement
+   * @param k number of objects to calculate the probability that they are white
+   * @return
+   */
+  public static double hypergeometric_distribution(int N, int m, int n, int k) {
+    // Values are getting really really big in here!
+    BigDecimal zaehler = new BigDecimal(binomialCoefficient(m,k).multiply(binomialCoefficient(N-m,n-k)));
+    BigDecimal nenner  = new BigDecimal(binomialCoefficient(N,n));
+    return (zaehler.divide(nenner, 20, RoundingMode.HALF_UP)).doubleValue();
+  }
+  
+  
+  /**
+   * Calculates a pValue for an enrichment significance (e.g., gene set enrichments
+   * in pathways).
+   * This is a "Hypergeometric Test".
+   * @see <a href="http://nar.oxfordjournals.org/content/37/19/e131.full#disp-formula-1">Publication: "SubpathwayMiner: a software package for flexible identification of pathways"</a>
+   * @param m Total number of genes in the genome.
+   * @param n Total number of genes in the input set (e.g., in the input gene list)
+   * @param t Total number of marked genes (e.g., genes in the current pathway)
+   * @param r Number of genes from t that are in n. (e.g., genes from the input set that are in the current pathway).
+   * @return
+   */
+  public static double enrichment_significance(int m, int n, int t, int r) {
+    double p = 0;
+    
+    for (int x=0; x<r; x++) {
+      p+=hypergeometric_distribution(m,t,n,x);
+    }
+    
+    return 1-p;
+  }
+
 
   /**
    * 
@@ -1505,6 +1662,5 @@ public class Utils {
     }
     return ret;
   }
-
   
 }

@@ -19,8 +19,6 @@ package de.zbit.util.prefs;
 import java.io.File;
 import java.util.List;
 
-import sun.awt.image.ImageWatched.Link;
-
 import argparser.ArgParser;
 import argparser.BooleanHolder;
 import argparser.CharHolder;

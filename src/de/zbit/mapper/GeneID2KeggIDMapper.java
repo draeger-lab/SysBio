@@ -19,7 +19,6 @@ package de.zbit.mapper;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import de.zbit.io.CSVReader;
 import de.zbit.parser.Species;
@@ -146,5 +145,13 @@ public class GeneID2KeggIDMapper extends AbstractMapper<Integer, String> {
     // Cut the "ncbi-geneid:" prefix
     return source.substring(12);
   }
+  
+  /**
+   * @return the KEGG abbreviation for the current species.
+   */
+  public String getSpeciesKEGGabbreviation() {
+    return organism_kegg_abbr;
+  }
+  
   
 }
