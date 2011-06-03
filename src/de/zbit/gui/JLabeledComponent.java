@@ -30,6 +30,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -411,9 +414,6 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	   * @param numberOfColumns
 	   */
 	  public void setHeaders(Object[] header, int numberOfColumns) {
-	    
-	    // TODO: header may NOT be converted to string!
-	    
 	    // Set the header
 	    Object[] newHeader=header;
 	    int maxSize = newHeader!=null?newHeader.length:numberOfColumns;
@@ -451,24 +451,29 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	  	if (newHeader==null || newHeader.length<1) return null;
 	    
 	    // Create a list, hiding all unwanted elements
-	    Vector<Object> headersToDisplay = new Vector<Object>();
+	  	Vector<Object> modelHeaders = new Vector<Object>();
+	    Map<String, Object> headersToDisplay = new HashMap<String, Object>();
 	    for (int i=0; i<newHeader.length; i++) {
 	      if (hideColumns.contains(i)) continue;
-	      headersToDisplay.add(newHeader[i]);
+	      headersToDisplay.put(newHeader[i].toString(), newHeader[i]);
+	      modelHeaders.add(newHeader[i]);
 	    }
 	    
 	    // Sort eventually
-	    //if (sortHeaders) Collections.sort(headersToDisplay);
-	    // TODO: Create a second headers list of strings, sort this one
-	    // and arrage the object array accordingly.
+	    if (sortHeaders) {
+	      ArrayList<String> keys = new ArrayList<String> (headersToDisplay.keySet());
+	      Collections.sort(keys);
+	      for (int i=0; i<keys.size(); i++)
+	        modelHeaders.set(i, headersToDisplay.get(keys.get(i)));
+	    }
 	    
 	    // If not required, add noOptionChoosen
 	    if (!required) {
-	      headersToDisplay.add(0, noOptionChoosen);
+	      modelHeaders.add(0, noOptionChoosen);
 	    }
 	    
 	    // Build the model
-	    return new DefaultComboBoxModel(headersToDisplay);
+	    return new DefaultComboBoxModel(modelHeaders);
 	  }
 	  
 	  

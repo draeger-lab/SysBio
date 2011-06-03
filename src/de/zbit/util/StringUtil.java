@@ -17,6 +17,7 @@
 package de.zbit.util;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -541,13 +542,13 @@ public class StringUtil {
 	 * @param suffix - may be null.
 	 * @return List<String> - the list.
 	 */
-	public static List<String> addPrefixAndSuffix(List<?> list, String prefix, String suffix) {
+	public static List<String> addPrefixAndSuffix(Collection<?> list, String prefix, String suffix) {
 	  List<String> ret = new LinkedList<String>();
 	  // Simply define an empty string is faster than checking in the loop each time if it's null.
 	  if (prefix == null) prefix = "";
 	  if (suffix == null) suffix = "";
-	  for (int i=0; i<list.size(); i++) {
-	    ret.add(prefix + list.get(i).toString() + suffix);
+	  for (Object string : list) {
+	    ret.add(prefix + string.toString() + suffix);
 	  }
 	  return ret;
 	}
@@ -564,17 +565,15 @@ public class StringUtil {
 	 *        the delimiter string between the single strings (the "glue").
 	 * @return the concatenated string separated by the delimiter
 	 */
-	public static String implode(List<?> list, String delim) {
+	public static String implode(Collection<?> list, String delim) {
 	  // This code is too slow.
 		//String[] ary = new String[list.size()];
 		//list.toArray(ary);
 		//return implode(ary, delim);
     StringBuffer out = new StringBuffer();
-    for (int i = 0; i < list.size(); i++) {
-      if (i > 0) {
-        out.append(delim);
-      }
-      out.append(list.get(i).toString());
+    for (Object object : list) {
+      if (out.length()>0) out.append(delim);
+      out.append(object);
     }
     return out.toString();
 	}
