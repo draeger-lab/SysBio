@@ -18,6 +18,7 @@ package de.zbit.util.prefs;
 
 import java.io.File;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -531,15 +532,14 @@ public class Range<Type> {
    * @return String
    */
   @SuppressWarnings({ "unchecked" })
-	public static <Type> String toRangeString(List<Type> acceptedObjects) {
-    List<Type> accObjects=acceptedObjects;
+	public static <Type> String toRangeString(Collection<Type> acceptedObjects) {
+    Collection<Type> accObjects=acceptedObjects;
     
     //If the range consists of classes, use the simple class names
-  	if((acceptedObjects!=null) && (acceptedObjects.size()!=0) && (acceptedObjects.get(0).getClass().equals(Class.class))) {
+  	if((acceptedObjects!=null) && (acceptedObjects.size()!=0) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
     	List<Type> classStrings = new LinkedList<Type>();
     	for(Type object:acceptedObjects) {
     		classStrings.add((Type)((Class)object).getSimpleName());
-    	
     	}
     	accObjects=classStrings;
     }
