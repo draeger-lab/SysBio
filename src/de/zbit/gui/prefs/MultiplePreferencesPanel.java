@@ -126,9 +126,8 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	    // "C:\Programme\Mozilla Firefox" ist und auch sonst nur in Ausnahmefällen
 	    // benötigt wird!
 	    if (classes == null) {
-	      classes = Reflect.getAllClassesInPackage(pckName, true, true, PreferencesPanel.class, System
-	        .getProperty("user.dir")
-	        + File.separatorChar, true);
+	      classes = Reflect.getAllClassesInPackage(pckName, true, true, PreferencesPanel.class,
+	        System.getProperty("user.dir") + File.separatorChar, true);
 	      
 	      if (showDebugMessages) System.out.println("Used reflection to find" +
 	      		"preferences panels: " + Arrays.deepToString(classes));

@@ -25,8 +25,7 @@ import java.io.Serializable;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-@SuppressWarnings("unchecked") // Please do NOT parametrize the comparables.
-public class ValueTriplet <S extends Comparable, T extends Comparable, E extends Comparable>
+public class ValueTriplet <S extends Comparable<? super S>, T extends Comparable<? super T>, E extends Comparable<? super E>>
   implements Comparable<ValueTriplet<S, T, E>>, Serializable {
   
   private static final long serialVersionUID = -5702457060946906428L;
@@ -118,6 +117,7 @@ public class ValueTriplet <S extends Comparable, T extends Comparable, E extends
    * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object o) {
     if (o instanceof ValueTriplet) {

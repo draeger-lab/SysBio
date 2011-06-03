@@ -224,8 +224,8 @@ public class SBProperties extends Properties {
 	 * 
 	 * @param keyProvider
 	 */
-	@SuppressWarnings("rawtypes")
-	public void loadFromKeyProvider(Class<?> keyProvider) {
+	@SuppressWarnings("unchecked")
+  public void loadFromKeyProvider(Class<?> keyProvider) {
 		Object fieldValue;
 		String k;
 		

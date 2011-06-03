@@ -17,6 +17,7 @@
 package de.zbit.util;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * A pair of two values with type parameters. This data object is useful
@@ -28,7 +29,7 @@ import java.io.Serializable;
  * @version $Rev$
  * @since 1.0
  */
-public class ValuePair<S extends Comparable<S>, T extends Comparable<T>>
+public class ValuePair<S extends Comparable<? super S>, T extends Comparable<? super T>>
 		implements Comparable<ValuePair<S, T>>, Serializable {
 
 	/**
@@ -180,6 +181,32 @@ public class ValuePair<S extends Comparable<S>, T extends Comparable<T>>
 	 */
 	public void setB(T b) {
 		this.b = b;
+	}
+	
+	 /**
+   * @return a comparator, that only sorts {@link ValuePair}s by {@link #getA()}.
+   */
+  public Comparator<ValuePair<S, T>> getComparator_OnlyCompareA() {
+    Comparator<ValuePair<S, T>> sortOnlyByA = new Comparator<ValuePair<S, T>>() {
+      public int compare(ValuePair<S, T> o1, ValuePair<S, T> o2) {
+        return o1.getA().compareTo(o2.getA());
+      }
+    };
+
+    return sortOnlyByA;
+  }
+  
+	/**
+	 * @return a comparator, that only sorts {@link ValuePair}s by {@link #getB()}.
+	 */
+	public Comparator<ValuePair<S, T>> getComparator_OnlyCompareB() {
+	  Comparator<ValuePair<S, T>> sortOnlyByB = new Comparator<ValuePair<S, T>>() {
+	    public int compare(ValuePair<S, T> o1, ValuePair<S, T> o2) {
+	      return o1.getB().compareTo(o2.getB());
+	    }
+	  };
+
+	  return sortOnlyByB;
 	}
 
 	/*

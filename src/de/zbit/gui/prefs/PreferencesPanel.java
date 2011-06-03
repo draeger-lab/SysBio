@@ -438,14 +438,14 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				: option.formatOptionName();
 		
 		// If a range is specified, get all possible values.
-		String[] values = null;
+		Object[] values = null;
 		
 		if (option.getRange() != null) {
 			List<?> val = option.getRange().getAllAcceptableValues();
 			if (val != null) {
-				values = new String[val.size()];
+				values = new Object[val.size()];
 				for (int i = 0; i < val.size(); i++) {		
-					values[i] = val.get(i).toString();
+					values[i] = val.get(i);//.toString();
 				}
 			}
 		}
@@ -520,7 +520,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				// For doulbes, we need to allow ',' and '.'.
 				((JLabeledComponent) component).setAcceptOnlyIntegers(false);
 			}
-		} else if ((values != null) && (values.length != 0)) {
+		} else if ((values != null) && (values.length > 0)) {
 			component = new JLabeledComponent(optionTitle, true, values);
 			((JLabeledComponent) component).setAcceptOnlyIntegers(false);
 		}

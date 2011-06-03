@@ -30,7 +30,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -72,7 +71,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	   */
 	  protected boolean useJTextField=false;
 	  protected boolean required;
-	  protected String[] headers=null;
+	  protected Object[] headers=null;
 	  protected ComboBoxModel model=null;
 	  protected JComponent colChooser;
 	  
@@ -140,7 +139,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	   * a NoOptionChoosen String at the start of the box.
 	   * @param columnHeaders - Column Headers
 	   */
-	  public JLabeledComponent(String title, boolean fieldIsRequired, String[] columnHeaders) {
+	  public JLabeledComponent(String title, boolean fieldIsRequired, Object[] columnHeaders) {
 	    super();
 	    initGUI();
 	    
@@ -397,7 +396,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 		 * 
 		 * @param header
 		 */
-		public void setHeaders(String[] header) {
+		public void setHeaders(Object[] header) {
 			setHeaders(header, 0);
 		}
 	  
@@ -411,13 +410,15 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	   * @param header
 	   * @param numberOfColumns
 	   */
-	  public void setHeaders(String[] header, int numberOfColumns) {
+	  public void setHeaders(Object[] header, int numberOfColumns) {
+	    
+	    // TODO: header may NOT be converted to string!
 	    
 	    // Set the header
-	    String[] newHeader=header;
+	    Object[] newHeader=header;
 	    int maxSize = newHeader!=null?newHeader.length:numberOfColumns;
 	    maxSize = Math.max(numberOfColumns, maxSize);
-	    newHeader = new String[maxSize];
+	    newHeader = new Object[maxSize];
 	    if (header!=null) System.arraycopy(header, 0, newHeader, 0, header.length);
 			String column = bundle.getString("COLUMN");
 			for (int i = 0; i < newHeader.length; i++) {
@@ -425,7 +426,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 				if (header == null)
 					newHeader[i] = column + (i + 1);
 				// Just fill missing gaps
-				else if (newHeader[i] == null || newHeader[i].trim().length() < 1)
+				else if (newHeader[i] == null || newHeader[i].toString().trim().length() < 1)
 					newHeader[i] = "(" + column + (i + 1) + ")";
 			}
 	    
@@ -446,18 +447,20 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	    validateRepaint();
 	  }
 	  
-	  protected ComboBoxModel buildComboBoxModel(String[] newHeader) {
+	  protected ComboBoxModel buildComboBoxModel(Object[] newHeader) {
 	  	if (newHeader==null || newHeader.length<1) return null;
 	    
 	    // Create a list, hiding all unwanted elements
-	    Vector<String> headersToDisplay = new Vector<String>();
+	    Vector<Object> headersToDisplay = new Vector<Object>();
 	    for (int i=0; i<newHeader.length; i++) {
 	      if (hideColumns.contains(i)) continue;
 	      headersToDisplay.add(newHeader[i]);
 	    }
 	    
 	    // Sort eventually
-	    if (sortHeaders) Collections.sort(headersToDisplay);
+	    //if (sortHeaders) Collections.sort(headersToDisplay);
+	    // TODO: Create a second headers list of strings, sort this one
+	    // and arrage the object array accordingly.
 	    
 	    // If not required, add noOptionChoosen
 	    if (!required) {
@@ -726,7 +729,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	   * @param toSearch
 	   * @return index if found, -1 else.
 	   */
-	  protected static int indexOf(String[] array, String toSearch) {
+	  protected static int indexOf(Object[] array, Object toSearch) {
 	    for (int i=0; i<array.length; i++) {
 	      if (array[i].equals(toSearch)) return i;
 	    }
