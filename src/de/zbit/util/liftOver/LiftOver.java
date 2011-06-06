@@ -45,11 +45,11 @@ import de.zbit.util.liftOver.util.OverlapDetector;
  * Java port of UCSC liftOver.  Only the most basic liftOver functionality is implemented.
  * Internally coordinates are 0-based, half-open. The API is standard Picard 1-based, inclusive.
  * 
- * This class can lift coordinates between different releases of the human genome.
+ * <p>This class can lift coordinates between different releases of the human genome.
  * It requires lift over annotations that can be optained from UCSC (e.g. for hg16:
  * http://hgdownload.cse.ucsc.edu/goldenPath/hg16/liftOver/ ).
  * 
- * It is suggested to put these chain files in de.zbit.resources.liftover
+ * <p>It is suggested to put these chain files in de.zbit.resources.liftover
  *
  * @author alecw@broadinstitute.org
  * @author Clemens Wrzodek
