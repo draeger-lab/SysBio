@@ -18,6 +18,9 @@ package de.zbit.util;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A pair of two values with type parameters. This data object is useful
@@ -218,4 +221,37 @@ public class ValuePair<S extends Comparable<? super S>, T extends Comparable<? s
 	public String toString() {
 		return String.format("[%s, %s]", getA(), getB());
 	}
+
+  /**
+   * Returns a list, that only contains the {@link #getB()} values of {@link ValuePair}s.
+   * @param values
+   * @return
+   */
+  public static <S extends Comparable<? super S>, T extends Comparable<? super T>> List<T> getListOfB(Iterable<ValuePair<S, T>> values) {
+    List<T> ret = new LinkedList<T>();
+    
+    Iterator<ValuePair<S, T>> it = values.iterator();
+    while (it.hasNext()) {
+      ret.add(it.next().getB());
+    }
+    
+    return ret;
+  }
+  
+  /**
+   * Returns a list, that only contains the {@link #getA()} values of {@link ValuePair}s.
+   * @param values
+   * @return
+   */
+  public static <S extends Comparable<? super S>, T extends Comparable<? super T>> List<S> getListOfA(Iterable<ValuePair<S, T>> values) {
+    List<S> ret = new LinkedList<S>();
+    
+    Iterator<ValuePair<S, T>> it = values.iterator();
+    while (it.hasNext()) {
+      ret.add(it.next().getA());
+    }
+    
+    return ret;
+  }
+  
 }
