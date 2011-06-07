@@ -186,19 +186,19 @@ public class ValuePair<S extends Comparable<? super S>, T extends Comparable<? s
 		this.b = b;
 	}
 	
-	 /**
-   * @return a comparator, that only sorts {@link ValuePair}s by {@link #getA()}.
-   */
-  public Comparator<ValuePair<S, T>> getComparator_OnlyCompareA() {
-    Comparator<ValuePair<S, T>> sortOnlyByA = new Comparator<ValuePair<S, T>>() {
-      public int compare(ValuePair<S, T> o1, ValuePair<S, T> o2) {
-        return o1.getA().compareTo(o2.getA());
-      }
-    };
-
-    return sortOnlyByA;
-  }
-  
+	/**
+	 * @return a comparator, that only sorts {@link ValuePair}s by {@link #getA()}.
+	 */
+	public Comparator<ValuePair<S, T>> getComparator_OnlyCompareA() {
+	  Comparator<ValuePair<S, T>> sortOnlyByA = new Comparator<ValuePair<S, T>>() {
+	    public int compare(ValuePair<S, T> o1, ValuePair<S, T> o2) {
+	      return o1.getA().compareTo(o2.getA());
+	    }
+	  };
+	  
+	  return sortOnlyByA;
+	}
+	
 	/**
 	 * @return a comparator, that only sorts {@link ValuePair}s by {@link #getB()}.
 	 */
@@ -208,7 +208,7 @@ public class ValuePair<S extends Comparable<? super S>, T extends Comparable<? s
 	      return o1.getB().compareTo(o2.getB());
 	    }
 	  };
-
+	  
 	  return sortOnlyByB;
 	}
 
@@ -227,11 +227,12 @@ public class ValuePair<S extends Comparable<? super S>, T extends Comparable<? s
    * @param values
    * @return
    */
-  public static <S extends Comparable<? super S>, T extends Comparable<? super T>> List<T> getListOfB(Iterable<ValuePair<S, T>> values) {
-    List<T> ret = new LinkedList<T>();
-    
-    Iterator<ValuePair<S, T>> it = values.iterator();
-    while (it.hasNext()) {
+	public static <S extends Comparable<? super S>, T extends Comparable<? super T>> 
+	List<T> getListOfB(Iterable<ValuePair<S, T>> values) {
+	  List<T> ret = new LinkedList<T>();
+	  
+	  Iterator<ValuePair<S, T>> it = values.iterator();
+	  while (it.hasNext()) {
       ret.add(it.next().getB());
     }
     
@@ -243,7 +244,8 @@ public class ValuePair<S extends Comparable<? super S>, T extends Comparable<? s
    * @param values
    * @return
    */
-  public static <S extends Comparable<? super S>, T extends Comparable<? super T>> List<S> getListOfA(Iterable<ValuePair<S, T>> values) {
+  public static <S extends Comparable<? super S>, T extends Comparable<? super T>> 
+  List<S> getListOfA(Iterable<ValuePair<S, T>> values) {
     List<S> ret = new LinkedList<S>();
     
     Iterator<ValuePair<S, T>> it = values.iterator();

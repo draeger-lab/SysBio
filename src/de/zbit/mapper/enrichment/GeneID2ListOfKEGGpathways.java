@@ -14,9 +14,10 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.mapper;
+package de.zbit.mapper.enrichment;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -25,6 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.io.CSVReader;
+import de.zbit.mapper.GeneID2KeggIDMapper;
+import de.zbit.mapper.KeggPathwayID2PathwayName;
 import de.zbit.parser.Species;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.Timer;
@@ -38,7 +41,7 @@ import de.zbit.util.Timer;
  * @version $Rev$
  */
 @SuppressWarnings("unchecked")
-public class GeneID2ListOfKEGGpathways extends AbstractMapper<Integer, Collection> {
+public class GeneID2ListOfKEGGpathways extends AbstractEnrichmentMapper<Integer, String>  {
   private static final long serialVersionUID = 2584808521199605644L;
   public static final Logger log = Logger.getLogger(GeneID2ListOfKEGGpathways.class.getName());
   
@@ -64,7 +67,7 @@ public class GeneID2ListOfKEGGpathways extends AbstractMapper<Integer, Collectio
   public GeneID2ListOfKEGGpathways(String speciesKEGGPrefix, AbstractProgressBar progress)
   throws IOException {
     // This constructor is called from every other!
-    super(Integer.class, Collection.class, progress);
+    super(Integer.class, (Class<Collection<String>>) new ArrayList<String>().getClass(), progress);
     organism_kegg_abbr = speciesKEGGPrefix;
     init();
   }
@@ -80,10 +83,9 @@ public class GeneID2ListOfKEGGpathways extends AbstractMapper<Integer, Collectio
     Timer t = new Timer();
     GeneID2KeggIDMapper map1 = new GeneID2KeggIDMapper(organism_kegg_abbr, progress);
     KeggID2PathwayMapper map2 = new KeggID2PathwayMapper(organism_kegg_abbr, progress);
-    //KeggPathwayID2PathwayName map3 = new KeggPathwayID2PathwayName(progress);
-    map2.convertPathwayIDsToPathwayNames(); // This results in a loss of information (kegg pw ids).
     
-    Set<Entry<Integer, String>> gene_ids = map1.mapping.entrySet();
+    // Create an internal mapping from GeneID 2 PathwayList (merge map1 and map2).
+    Set<Entry<Integer, String>> gene_ids = map1.getMapping().entrySet();
     for (Entry<Integer, String> entry : gene_ids) {
       Collection c;
       try {
@@ -93,11 +95,26 @@ public class GeneID2ListOfKEGGpathways extends AbstractMapper<Integer, Collectio
         continue;
       }
       if (c!=null && c.size()>0)
-        mapping.put(entry.getKey(), c);
+        getMapping().put(entry.getKey(), c);
     }
     
-    log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((mapping!=null)?mapping.size():"0") + " mappings.");
-    return (mapping!=null && mapping.size()>0);
+    // Grab the additional Enrichment information from map2
+    this.sumOfCollectionSizes = map2.getGenomeSize();
+    this.genesInPathway = map2.genesInPathway;
+    
+    log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((getMapping()!=null)?getMapping().size():"0") + " mappings.");
+    return (getMapping()!=null && getMapping().size()>0);
+  }
+  
+  /**
+   * Uses the {@link KeggPathwayID2PathwayName} mapper to map all IDs in
+   * this mapping to the pathway name (e.g., "Tight junction" instead
+   * of "path:mmu04530").
+   * @throws IOException 
+   */
+  public void convertPathwayIDsToPathwayNames() throws IOException {
+    KeggPathwayID2PathwayName mapper = new KeggPathwayID2PathwayName();
+    super.convertIDsToNames(mapper);
   }
   
   /**
@@ -107,17 +124,20 @@ public class GeneID2ListOfKEGGpathways extends AbstractMapper<Integer, Collectio
   public static void main(String[] args) throws Exception {
     GeneID2ListOfKEGGpathways mapper = new GeneID2ListOfKEGGpathways("mmu");
     
-    Collection c = mapper.map(11576);
-    if (c==null) System.out.println("null");
-    else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("=================");
-    c = mapper.map(77579); // 3 PWs
-    if (c==null) System.out.println("null");
-    else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("=================");
-    c = mapper.map(16334);
-    if (c==null) System.out.println("null");
-    else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+    for (int i=0; i<2; i++) {
+      Collection c = mapper.map(11576);
+      if (c==null) System.out.println("null");
+      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      System.out.println("=================");
+      c = mapper.map(77579); // 3 PWs
+      if (c==null) System.out.println("null");
+      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      System.out.println("=================");
+      c = mapper.map(16334);
+      if (c==null) System.out.println("null");
+      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      mapper.convertPathwayIDsToPathwayNames();
+    }
     
   }
   

@@ -85,7 +85,7 @@ public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> {
     boolean differentVersionsHaveDifferentTargets=true;
     
     
-    for (String key: mapping.keySet()) {
+    for (String key: getMapping().keySet()) {
       int pos = key.indexOf('.');
       if (pos<0) continue;
       int version = Integer.parseInt(key.substring(pos+1));
@@ -93,7 +93,7 @@ public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> {
       if (checkLowerVersionExists && version>1) {
         for (int i=version-1; i>0; i--) {
           String newKey = key.subSequence(0, pos+1) + Integer.toString(i);
-          if (mapping.containsKey(newKey)) {
+          if (getMapping().containsKey(newKey)) {
             System.out.println("Lower version exists (z.B. " + key + " => " + newKey);
             checkLowerVersionExists = false;
           }
@@ -103,10 +103,10 @@ public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> {
       if (differentVersionsHaveDifferentTargets) {
         for (int i=version-1; i>0; i--) {
           String newKey = key.subSequence(0, pos+1) + Integer.toString(i);
-          if (mapping.containsKey(newKey)) {
+          if (getMapping().containsKey(newKey)) {
             
-            Integer oldVersionTarget = mapping.get(newKey);
-            Integer aktVersionTarget = mapping.get(key);
+            Integer oldVersionTarget = getMapping().get(newKey);
+            Integer aktVersionTarget = getMapping().get(key);
             
             if ( ((int)oldVersionTarget)!=  ((int)aktVersionTarget) ) {
               

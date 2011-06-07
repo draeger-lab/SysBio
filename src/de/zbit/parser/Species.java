@@ -50,6 +50,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable {
   public final static int COMMON_NAME = 1;
   public final static int KEGG_ABBR = 2;
   public final static int UNIPROT_EXTENSION = 3;
+  public final static int NCBI_TAX_ID = 4;
   
   private String keggAbbr;
   private String scientificName;
@@ -560,6 +561,18 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable {
    */
   public static Species search(String species) throws IOException {
     return search(Species.generateSpeciesDataStructure(), species, -1);
+  }
+  
+  /**
+   * Get the given species
+   * @param identifier String identifying the species (e.g. "human" or "homo sapiens" or "hsa)
+   * @param nameTypeToSearch Identifier type to search (-1 for all, else one of the included
+   * final static ints (e.g., {@link #COMMON_NAME}).
+   * @return the species object representing the species, or null if not found.
+   * @throws IOException
+   */
+  public static Species get(String identifier, int nameTypeToSearch) throws IOException {
+    return search(Species.generateSpeciesDataStructure(), identifier, nameTypeToSearch);
   }
 
   /**
