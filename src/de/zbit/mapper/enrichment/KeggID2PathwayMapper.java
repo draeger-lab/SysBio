@@ -14,22 +14,20 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.mapper;
+package de.zbit.mapper.enrichment;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import de.zbit.io.CSVReader;
+import de.zbit.mapper.AbstractMapper;
+import de.zbit.mapper.GeneID2KeggIDMapper;
+import de.zbit.mapper.KeggPathwayID2PathwayName;
 import de.zbit.parser.Species;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileTools;
@@ -37,12 +35,12 @@ import de.zbit.util.logging.LogUtil;
 
 /**
  * Maps the given KEGG gene id (see {@link GeneID2KeggIDMapper}) to
- * a list of KEGG Pathways, in which this gene occurs.
+ * a {@link Collection} of KEGG Pathways, in which this gene occurs.
  * @author Clemens Wrzodek
  * @version $Rev$
  */
 @SuppressWarnings("unchecked")
-public class KeggID2PathwayMapper extends AbstractMapper<String, Collection> {
+public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, String> {
   private static final long serialVersionUID = -3011095040303247890L;
   public static final Logger log = Logger.getLogger(KeggID2PathwayMapper.class.getName());
   
@@ -64,19 +62,6 @@ public class KeggID2PathwayMapper extends AbstractMapper<String, Collection> {
    * @see Species#getKeggAbbr()
    */
   private String organism_kegg_abbr = null;
-  
-  /**
-   * This represents the total number of 1:1 mappings (Key2ElementInCollection),
-   * whereas {@link AbstractMapper#size()} is the number of 1:many (Key2Collection) size.
-   */
-  public int sumOfCollectionSizes;
-  
-  /**
-   * This list counts the number of genes in a pathway.
-   * Thus, the key is the pathway id and the Integer is the
-   * total number of genes in the pathway.
-   */
-  public Map<String, Integer> genesInPathway = new HashMap<String, Integer>();
   
   /**
    * Cache the sourceColumn
@@ -104,8 +89,8 @@ public class KeggID2PathwayMapper extends AbstractMapper<String, Collection> {
   public KeggID2PathwayMapper(String speciesKEGGPrefix, AbstractProgressBar progress)
   throws IOException {
     // This constructor is called from every other!
-    super(String.class, Collection.class, progress);
-    organism_kegg_abbr = speciesKEGGPrefix;
+    super(String.class, (Class<Collection<String>>) new ArrayList<String>().getClass(), progress);
+    this.organism_kegg_abbr = speciesKEGGPrefix;
     init();
   }
   
@@ -117,39 +102,25 @@ public class KeggID2PathwayMapper extends AbstractMapper<String, Collection> {
     LogUtil.initializeLogging(Level.FINE);
     KeggID2PathwayMapper mapper = new KeggID2PathwayMapper("mmu");
     
-    Collection c = mapper.map("mmu:11576");
-    if (c==null) System.out.println("null");
-    else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("=================");
-    c = mapper.map("mmu:77579"); // 3 PWs
-    if (c==null) System.out.println("null");
-    else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("=================");
-    c = mapper.map("mmu:16334");
-    if (c==null) System.out.println("null");
-    else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    
-    System.out.println("NonUnique: " + mapper.getSumOfGenesInAllPathways() + " Unique: " + mapper.size());
-    System.out.println(mapper.getPathwaySize("path:mmu04530"));
-    System.out.println(mapper.getPathwaySize("Tight junction"));
-    
-    mapper.convertPathwayIDsToPathwayNames();
-    
-    c = mapper.map("mmu:11576");
-    if (c==null) System.out.println("null");
-    else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("=================");
-    c = mapper.map("mmu:77579"); // 3 PWs
-    if (c==null) System.out.println("null");
-    else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("=================");
-    c = mapper.map("mmu:16334");
-    if (c==null) System.out.println("null");
-    else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    
-    System.out.println("NonUnique: " + mapper.getSumOfGenesInAllPathways() + " Unique: " + mapper.size());
-    System.out.println(mapper.getPathwaySize("path:mmu04530"));
-    System.out.println(mapper.getPathwaySize("Tight junction"));
+    for (int i=0; i<2; i++) {
+      Collection c = mapper.map("mmu:11576");
+      if (c==null) System.out.println("null");
+      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      System.out.println("=================");
+      c = mapper.map("mmu:77579"); // 3 PWs
+      if (c==null) System.out.println("null");
+      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      System.out.println("=================");
+      c = mapper.map("mmu:16334");
+      if (c==null) System.out.println("null");
+      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      
+      System.out.println("NonUnique: " + mapper.getGenomeSize() + " Unique: " + mapper.size());
+      System.out.println(mapper.getEnrichmentClassSize("path:mmu04530"));
+      System.out.println(mapper.getEnrichmentClassSize("Tight junction"));
+      
+      if (i==0)mapper.convertPathwayIDsToPathwayNames();
+    }
   }
   
   /**
@@ -214,29 +185,6 @@ public class KeggID2PathwayMapper extends AbstractMapper<String, Collection> {
     }
   }
   
-  /* (non-Javadoc)
-   * @see de.zbit.mapper.AbstractMapper#postProcessTargetID(java.lang.Object)
-   */
-  @Override
-  protected Collection postProcessTargetID(Collection target) {
-    // We do no postProcessing here, but fill our private variables.
-    
-    // Is actually always a collection of exactly one element.
-    // But better make it more generic...
-    Iterator it = target.iterator();
-    while (it.hasNext()) {
-      String key = it.next().toString();
-      Integer count = genesInPathway.get(key);
-      if (count==null) count = new Integer(0);
-      
-      
-      genesInPathway.put(key, (++count));
-      sumOfCollectionSizes++;
-    }
-    
-    return super.postProcessTargetID(target);
-  }
-  
   
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#skipLine(java.lang.String[])
@@ -249,24 +197,25 @@ public class KeggID2PathwayMapper extends AbstractMapper<String, Collection> {
   }
   
   /**
-   * Total number of genes, occuring in all pathways
+   * A better name: getSumOfGenesInAllPathways()
+   * <p>Total number of genes, occuring in all pathways
    * including multiples (genes occuring in multiple
    * pathways).
-   * Use {@link AbstractMapper#size()} to get number of
+   * <p>Use {@link AbstractMapper#size()} to get number of
    * unique genes, occuring in all pathways.
    * @return
    */
-  public int getSumOfGenesInAllPathways() {
-    return this.sumOfCollectionSizes;
+  public int getGenomeSize() {
+    return super.getGenomeSize();
   }
   
   /**
+   * Return the number of genes in a pathway (getPathwaySize()).
    * @param pathway
    * @return number of genes in the given pathway.
    */
-  public int getPathwaySize(String pathway) {
-    Integer i = genesInPathway.get(pathway);
-    return i==null?0:i;
+  public int getEnrichmentClassSize(String pathway) {
+    return super.getEnrichmentClassSize(pathway);
   }
   
   /**
@@ -277,32 +226,7 @@ public class KeggID2PathwayMapper extends AbstractMapper<String, Collection> {
    */
   public void convertPathwayIDsToPathwayNames() throws IOException {
     KeggPathwayID2PathwayName mapper = new KeggPathwayID2PathwayName();
-    Set<Entry<String, Collection>>  entries = mapping.entrySet();
-    for (Entry<String, Collection> entry : entries) {
-      Collection c = entry.getValue();
-      if (c!=null && c.size()>0) {
-        Collection cNew = new ArrayList();
-        for (Object object : c) {
-          try {
-            cNew.add(mapper.map(object.toString()));
-          } catch (Exception e) {
-            log.log(Level.WARNING, "Could not map " + object.toString() + " to a Kegg Pathway Name.");
-          }
-        }
-        
-        // Change old 2id mapping to 2name mapping
-        mapping.put(entry.getKey(), cNew);
-      }
-    }
-    
-    // Reflect this change also in private map
-    String[] oldKeys = genesInPathway.keySet().toArray(new String[0]);
-    for (String key : oldKeys) {
-      try {
-        genesInPathway.put(mapper.map(key), genesInPathway.remove(key));
-      } catch (Exception e) {}
-    }  
-    
+    super.convertIDsToNames(mapper);
   }
   
   

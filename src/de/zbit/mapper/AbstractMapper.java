@@ -43,9 +43,8 @@ import de.zbit.util.prefs.Option;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public abstract class AbstractMapper<SourceType, TargetType> implements Serializable {
+public abstract class AbstractMapper<SourceType, TargetType> implements Serializable, Mapper<SourceType, TargetType> {
   private static final long serialVersionUID = -1940567043534334136L;
-  
   public static final Logger log = Logger.getLogger(AbstractMapper.class.getName());
   
   private Class<TargetType> targetType;
@@ -67,7 +66,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    * Contains a mapping from RefSeq to GeneID.
    * XXX: Hier eventuell eine initial Capacity oder load factor angeben, falls BottleNeck.
    */
-  protected Map<SourceType, TargetType> mapping = new HashMap<SourceType, TargetType>();
+  private Map<SourceType, TargetType> mapping = new HashMap<SourceType, TargetType>();
 
   /**
    * Inintializes the mapper. Downloads and reads the mapping
@@ -116,10 +115,8 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     return null;
   }
 
-  /**
-   * Return a simple name what is mapped to what
-   * (e.g. "RefSeq2GeneID").
-   * @return
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.Mapper#getMappingName()
    */
   public abstract String getMappingName();
   
@@ -255,6 +252,9 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
         if (Collection.class.isAssignableFrom(targetType)) {
           // Mapping from x to a collection.
            target = (TargetType) new ArrayList();
+           // Remark: This works also for non-Strings, since the type of the collection is
+           // erased on runtime. Thus, postProcessTargetID() should re-convert to desired
+           // real target type.
           ((Collection)target).add(preProcessTargetID(line[targetColumn]));
         } else {
           target = Option.parseOrCast(targetType, preProcessTargetID(line[targetColumn]));
@@ -282,17 +282,17 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
           
           // Allow multiple target elements in collections
           if (Collection.class.isAssignableFrom(targetType)) {
-            Collection c = (Collection) mapping.get(source);
+            Collection c = (Collection) getMapping().get(source);
             if (c!=null) ((Collection)target).addAll(c);
           }
           
-          mapping.put(source, target);
+          getMapping().put(source, target);
         }
       }
     }
     
-    log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((mapping!=null)?mapping.size():"0") + " mappings.");
-    return (mapping!=null && mapping.size()>0);
+    log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((getMapping()!=null)?getMapping().size():"0") + " mappings.");
+    return (getMapping()!=null && getMapping().size()>0);
   }
 
   /**
@@ -344,17 +344,14 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
   }
   
 
-  /**
-   * Returns the TargetID for the given SourceID.
-   * @param sourceID
-   * @return TargetType targetID
-   * @throws Exception - if mapping data could not be read (in general).
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.Mapper#map(SourceType)
    */
   public TargetType map(SourceType sourceID) throws Exception {
     if (!isInizialized) init();
     if (!isReady()) throw new Exception(getMappingName()+" mapping data has not been read successfully.");
     SourceType trimmedInput = postProcessSourceID(sourceID);
-    TargetType ret = mapping.get(trimmedInput);
+    TargetType ret = getMapping().get(trimmedInput);
     log.finest("map: " + trimmedInput + ", to: " + ret);
     return ret;
   }
@@ -363,19 +360,57 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     if (!readMappingData()) mapping=null;
   }
 
-  /**
-   * @return true if and only if the data has been read and
-   * mapping data is available.
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.Mapper#isReady()
    */
   public boolean isReady() {
-    return mapping!=null && mapping.size()>0;
+    return getMapping()!=null && getMapping().size()>0;
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.Mapper#size()
+   */
+  public int size() {
+    return getMapping().size();
+  }
+  
+  
+  /**
+   * This will CLEAR the current {@link #mapping} and take all
+   * entries from the given map and add them with keys and
+   * values reversed.
+   * @param map existing map that should be reversed.
+   */
+  protected void reverse(AbstractMapper<TargetType, SourceType> map) {
+    getMapping().clear();
+    
+    for(Map.Entry<TargetType, SourceType> entry : map.getMapping().entrySet())
+        getMapping().put(entry.getValue(), entry.getKey());
   }
 
   /**
-   * @return number of available mappings.
+   * @return the source type
    */
-  public int size() {
-    return mapping.size();
+  public Class<SourceType> getSourceType() {
+    return sourceType;
   }
+  
+  /**
+   * @return the target type
+   */
+  public Class<TargetType> getTargetType() {
+    return targetType;
+  }
+
+  /**
+   * As this method returns the internal data structure,
+   * use it with caution, or better, avoid using this
+   * method!
+   * @return
+   */
+  public final Map<SourceType, TargetType> getMapping() {
+    return mapping;
+  }
+
   
 }
