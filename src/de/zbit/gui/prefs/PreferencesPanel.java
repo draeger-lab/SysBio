@@ -899,7 +899,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 					// holds the option.
 					Option<?> o = ((JComponentForOption) c.getParent()).getOption();
 					if (o != null && o.isSetRangeSpecification()) {
-						isInRange = o.getRange().castAndCheckIsInRange(value);
+						isInRange = o.castAndCheckIsInRange(value);
 					}
 				}
 				
