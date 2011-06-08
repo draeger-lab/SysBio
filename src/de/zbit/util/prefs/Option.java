@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.List;
 
 import de.zbit.gui.ActionCommand;
+import de.zbit.gui.JLabeledComponent;
 import de.zbit.io.GeneralFileFilter;
 import de.zbit.io.SBFileFilter;
 import de.zbit.util.Reflect;
@@ -121,6 +122,35 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	/**
+	 * This method is special for options of type {@link Class}. It allows to
+	 * get the real class from the {@link #range}, by comparing the
+	 * {@link Class#getSimpleName()} with the given simple name.
+	 * <p>Since {@link JLabeledComponent}s and command-line arguments are string
+	 * based, this method is the easiest was to get to the class, represented
+	 * by a string.
+	 * @param option an option of type {@link Class}, with a restricted {@link #range}.
+	 * @param simpleName the {@link Class#getSimpleName()} of the class to
+	 * return from the {@link #range}
+	 * @return the class for the given simpleName
+	 */
+  @SuppressWarnings("unchecked")
+  public static Class getClassFromRange(Option<Class> option, String simpleName) {
+	  if (option!=null && option.getRange()!=null) {
+	    
+	    List<Class> l = option.getRange().getAllAcceptableValues();
+	    if (l!=null) {
+	      for(Class c: l) {
+	        if (c.getSimpleName().equals(simpleName)) {
+	          return c;
+	        }
+	      }
+	    }
+	  }
+	  
+	  return null;
 	}
 	
 	/**
