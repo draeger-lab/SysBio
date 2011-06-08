@@ -274,7 +274,7 @@ public class StringUtil {
 	 * @return an integer array of size 2. [0]=The longest common String length
 	 *         [1]=The number of strings in b with that length.
 	 */
-	public static int[] getLongestCommonLength(String[] b) {
+	public static int[] getLongestCommonLength(String... b) {
 		/*
 		 * Can be implemented in o(n*n) runtime and o(1) memory usage OR o(n)
 		 * runtime and o(n) memory usage. This is the later implementation.

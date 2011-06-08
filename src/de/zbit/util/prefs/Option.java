@@ -633,12 +633,19 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			sb.append(',');
 		}
 		String cmd = toCommandLineOptionKey();
-		String separators[] = { "=", " ", "" };
-		for (int i = 0; i < separators.length; i++) {
+		if (requiredType.equals(Boolean.class)
+				&& !(Boolean.parseBoolean(defaultValue.toString()) || isSetRangeSpecification())) {
+			// Special treatment of boolean arguments whose presents only is already sufficient
+			// to switch some feature on.
 			sb.append(cmd);
-			sb.append(separators[i]);
-			if (i < separators.length - 1) {
-				sb.append(',');
+		} else {
+			String separators[] = { "=", " ", "" };
+			for (int i = 0; i < separators.length; i++) {
+				sb.append(cmd);
+				sb.append(separators[i]);
+				if (i < separators.length - 1) {
+					sb.append(',');
+				}
 			}
 		}
 		sb.append('%');
