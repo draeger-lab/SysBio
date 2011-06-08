@@ -141,6 +141,13 @@ public class Range<Type> {
 			} else if (lBound.equals(uBound)) {
 				// Check absolute value
 				if (!excludingLBound && !excludingUBound) {
+				  // Special treatment for classes
+				  if (value instanceof Class) {
+				    if (((Class)value).getSimpleName().equals(lBound)) {
+				      return true;
+				    }
+				  }
+				  //---
 				  if (value.equals(lBound)) return true;
 				  else return false;
 				} else {
@@ -327,6 +334,13 @@ public class Range<Type> {
 	private Object constraints;
 	
 	/**
+	 * If this Range has been initialized with
+	 * {@link #Range(Class, Collection)}, this is the original
+	 * list of acceptable values.
+	 */
+  private List<Type> listOfAccpetedObjects=null;
+	
+	/**
 	 * @return the constraints
 	 */
 	public Object getConstraints() {
@@ -361,9 +375,19 @@ public class Range<Type> {
    */
   public Range(Class<Type> requiredType, List<Type> acceptedObjects) {
     this(requiredType, Range.toRangeString(acceptedObjects));
+    this.setListOfAccpetedObjects(acceptedObjects);
   }
   
 	/**
+	 * Preserve the original list, if this range has been initialized with
+	 * {@link #Range(Class, Collection)} !
+   * @param acceptedObjects
+   */
+  private void setListOfAccpetedObjects(List<Type> acceptedObjects) {
+    this.listOfAccpetedObjects = acceptedObjects;
+  }
+
+  /**
 	 * Checks whether additional side constraints have been set.
 	 * @return
 	 */
@@ -403,6 +427,7 @@ public class Range<Type> {
 	 * @return
 	 */
 	public List<Type> getAllAcceptableValues(int maximumToReturn) {
+	  if (listOfAccpetedObjects!=null) return listOfAccpetedObjects;
 		List<Type> ret = new LinkedList<Type>();
 		for (SubRange r : ranges) {
 			List<Type> newItems = r.getAllAcceptableValues(maximumToReturn);
@@ -436,6 +461,10 @@ public class Range<Type> {
 				return ((GeneralFileFilter) constraints).accept(file);
 			}
 		} else {
+		  // Special treament for concrete lists (e.g., for classes).
+		  if (listOfAccpetedObjects!=null) {
+		    return listOfAccpetedObjects.contains(value);
+		  }
 			for (SubRange r : ranges) {
 				if (r.isInRange(value)) { return true; }
 			}
@@ -446,10 +475,14 @@ public class Range<Type> {
 	/**
 	 * A convenient wrapper method, that calls {@link Option#parseOrCast(Class, Object)}
 	 * before calling {@link #isInRange(Object)}.
+	 * 
+	 * @see Option#castAndCheckIsInRange(Object)
 	 * @param value
 	 * @return
 	 */
-	public boolean castAndCheckIsInRange(Object value) {
+	@SuppressWarnings("unused")
+  @Deprecated
+	private boolean castAndCheckIsInRange(Object value) {
 		Type value2 = Option.parseOrCast(typee, value);
 		if (value2==null) { return false;}
 		return isInRange(value2);
@@ -532,27 +565,24 @@ public class Range<Type> {
    * @return String
    */
   @SuppressWarnings({ "unchecked" })
-	public static <Type> String toRangeString(Collection<Type> acceptedObjects) {
+  public static <Type> String toRangeString(Collection<Type> acceptedObjects) {
     Collection<Type> accObjects=acceptedObjects;
     
     //If the range consists of classes, use the simple class names
-  	if((acceptedObjects!=null) && (acceptedObjects.size()!=0) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
-    	List<Type> classStrings = new LinkedList<Type>();
-    	for(Type object:acceptedObjects) {
-    		classStrings.add((Type)((Class)object).getSimpleName());
-    	}
-    	accObjects=classStrings;
+    if((acceptedObjects!=null) && (acceptedObjects.size()!=0) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
+      List<Type> classStrings = new LinkedList<Type>();
+      for(Type object:acceptedObjects) {
+        classStrings.add((Type)((Class)object).getSimpleName());
+      }
+      accObjects=classStrings;
     }
     
-    
-  	String s = "{" + StringUtil.implode(
-              accObjects
-//              StringUtil.addPrefixAndSuffix(acceptedObjects, "\"", "\"")
-              , ",") + "}";
-    logger.info(s);
-    return "{" + StringUtil.implode(
+    String s ="{" + StringUtil.implode(
       StringUtil.addPrefixAndSuffix(accObjects, "\"", "\"")
       , ",") + "}";
+    
+    logger.finer(String.format("Created a new range-string from a collection: %s", s));
+    return s;
   }
   
 	/**
