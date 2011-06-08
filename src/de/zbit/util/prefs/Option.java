@@ -21,9 +21,11 @@ import java.util.List;
 
 import de.zbit.gui.ActionCommand;
 import de.zbit.io.GeneralFileFilter;
+import de.zbit.io.SBFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
+import de.zbit.util.argparser.ArgHolder;
 import de.zbit.util.argparser.ArgParser;
 import de.zbit.util.argparser.BooleanHolder;
 import de.zbit.util.argparser.CharHolder;
@@ -32,7 +34,6 @@ import de.zbit.util.argparser.FloatHolder;
 import de.zbit.util.argparser.IntHolder;
 import de.zbit.util.argparser.LongHolder;
 import de.zbit.util.argparser.StringHolder;
-import de.zbit.util.argparser.ArgHolder;
 
 /**
  * An {@link Option} defines a key in a key-provider class and can also be used
@@ -550,12 +551,21 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	public String getDescription() {
 		if (isSetRangeSpecification() && getRange().isSetConstraints()
-				&& (getRange().getConstraints() instanceof GeneralFileFilter)) { 
-        return StringUtil.concat(description," ",
-					ResourceManager.getBundle("de.zbit.locales.Labels").getString(
-						"ACCEPTS")," ",
-					StringUtil.changeFirstLetterCase(((GeneralFileFilter) getRange()
-							.getConstraints()).getDescription(), false, false), ".").toString(); 
+				&& (getRange().getConstraints() instanceof GeneralFileFilter)) {
+		  GeneralFileFilter gf = (GeneralFileFilter) getRange().getConstraints();
+		  // Get a description for the option with correct case
+		  // (in the middle of a sentence => lowercase, but keep uppercase if
+		  // description is, e.g., "SBML")
+		  String desc;
+		  if (gf instanceof SBFileFilter) {
+		    desc = ((SBFileFilter)gf).getDescription(true);
+		  } else {
+		    desc = gf.getDescription();
+		  }
+		  
+		  return StringUtil.concat(description," ",
+		    ResourceManager.getBundle("de.zbit.locales.Labels").getString(
+		    "ACCEPTS")," ", desc, ".").toString(); 
 		}
 		return description;
 	}

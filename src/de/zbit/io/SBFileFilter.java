@@ -519,13 +519,28 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * @see javax.swing.filechooser.FileFilter#getDescription()
 	 */
 	public String getDescription() {
+	  return getDescription(false);
+	}
+	/**
+	 * @see #getDescription()
+	 * @param inTheMiddleOfASentece if true, will return a string that
+	 * can be used "in the middle of a sentece". Else, a string that
+	 * stands at the start of a sentence or by itself will be returned.
+	 * E.g., if true, "directories only" if false "Directories only".
+	 * @return
+	 */
+	public String getDescription(boolean inTheMiddleOfASentece) {
 		if (filter != null) { 
 			return filter.getDescription(); 
 		}
 		ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
 		switch (type) {
 			case TEXT_FILES:
-				return String.format("%s (*.txt)", bundle.getString("TEXT_FILES"));
+				String s = String.format("%s (*.txt)", bundle.getString("TEXT_FILES"));
+				if (inTheMiddleOfASentece) {
+		      s = StringUtil.changeFirstLetterCase(s, false, false);
+				}
+				return s;
 			case TeX_FILES:
 				return String.format("%s (*.tex)", bundle.getString("TeX_FILES"));
 			case SBML_FILES:
@@ -551,7 +566,11 @@ public class SBFileFilter extends GeneralFileFilter {
 			case TGF_FILES:
 				return String.format("%s (*.tgf)", bundle.getString("TGF_FILES"));
 			case DIRECTORIES_ONLY:
-				return bundle.getString("DIRECTORIES_ONLY");
+				String s2 = bundle.getString("DIRECTORIES_ONLY");
+        if (inTheMiddleOfASentece) {
+          s2 = StringUtil.changeFirstLetterCase(s2, false, false);
+        }
+        return s2;
 			default:
 				return StringUtil.firstLetterUpperCase(type.toString()
 						.replace('_', ' '));
