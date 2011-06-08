@@ -37,18 +37,19 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import argparser.ArgParser;
-import argparser.BooleanHolder;
-import argparser.CharHolder;
-import argparser.DoubleHolder;
-import argparser.FloatHolder;
-import argparser.IntHolder;
-import argparser.LongHolder;
-import argparser.StringHolder;
 import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.Utils;
+import de.zbit.util.argparser.ArgParser;
+import de.zbit.util.argparser.ArgHolder;
+import de.zbit.util.argparser.BooleanHolder;
+import de.zbit.util.argparser.CharHolder;
+import de.zbit.util.argparser.DoubleHolder;
+import de.zbit.util.argparser.FloatHolder;
+import de.zbit.util.argparser.IntHolder;
+import de.zbit.util.argparser.LongHolder;
+import de.zbit.util.argparser.StringHolder;
 
 /**
  * This class is a wrapper for {@link Preferences}, which provides a lot of
@@ -459,7 +460,7 @@ public class SBPreferences implements Map<Object, Object> {
 		for (Field f : keyProvider.getFields()) {
 			try {
 			  Object fieldValue = f.get(keyProvider);
-			  Object argHolder;
+			  ArgHolder<?> argHolder;
 				// If the current field is an Option, add it to the ArgParser
 				if (fieldValue instanceof Option<?>) {
 				  Option<?> option = (Option<?>) fieldValue;
@@ -681,23 +682,23 @@ public class SBPreferences implements Map<Object, Object> {
 			// try {
 			k = key.toString();
 			if (key.getRequiredType().equals(Float.class)) {
-				value = Float.toString(((FloatHolder) options.get(key)).value);
+				value = Float.toString(((FloatHolder) options.get(key)).getValue());
 			} else if (key.getRequiredType().equals(Double.class)) {
-				value = Double.toString(((DoubleHolder) options.get(key)).value);
+				value = Double.toString(((DoubleHolder) options.get(key)).getValue());
 			} else if (key.getRequiredType().equals(Short.class)) {
-				value = Short.toString((short) ((IntHolder) options.get(key)).value);
+				value = Short.toString(((IntHolder) options.get(key)).getValue().shortValue());
 			} else if (key.getRequiredType().equals(Integer.class)) {
-				value = Integer.toString(((IntHolder) options.get(key)).value);
+				value = Integer.toString(((IntHolder) options.get(key)).getValue());
 			} else if (key.getRequiredType().equals(Long.class)) {
-				value = Long.toString(((LongHolder) options.get(key)).value);
+				value = Long.toString(((LongHolder) options.get(key)).getValue());
 			} else if (key.getRequiredType().equals(Boolean.class)) {
-				value = Boolean.toString(((BooleanHolder) options.get(key)).value);
+				value = Boolean.toString(((BooleanHolder) options.get(key)).getValue());
 			} else if (key.getRequiredType().equals(Character.class)) {
-				value = Character.toString(((CharHolder) options.get(key)).value);
+				value = Character.toString(((CharHolder) options.get(key)).getValue());
 			} else if (key.getRequiredType().equals(String.class)) {
-				value = ((StringHolder) options.get(key)).value;
+				value = ((StringHolder) options.get(key)).getValue();
 			} else {
-				value = ((StringHolder) options.get(key)).value;
+				value = ((StringHolder) options.get(key)).getValue();
 				if (value != null) { value = value.toString(); }
 			}
 			// This is necessary, because at this point it can't be deduced if the

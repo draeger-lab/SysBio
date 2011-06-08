@@ -19,19 +19,20 @@ package de.zbit.util.prefs;
 import java.io.File;
 import java.util.List;
 
-import argparser.ArgParser;
-import argparser.BooleanHolder;
-import argparser.CharHolder;
-import argparser.DoubleHolder;
-import argparser.FloatHolder;
-import argparser.IntHolder;
-import argparser.LongHolder;
-import argparser.StringHolder;
 import de.zbit.gui.ActionCommand;
 import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
+import de.zbit.util.argparser.ArgParser;
+import de.zbit.util.argparser.BooleanHolder;
+import de.zbit.util.argparser.CharHolder;
+import de.zbit.util.argparser.DoubleHolder;
+import de.zbit.util.argparser.FloatHolder;
+import de.zbit.util.argparser.IntHolder;
+import de.zbit.util.argparser.LongHolder;
+import de.zbit.util.argparser.StringHolder;
+import de.zbit.util.argparser.ArgHolder;
 
 /**
  * An {@link Option} defines a key in a key-provider class and can also be used
@@ -441,7 +442,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @return an argument holder of the required data type
 	 * @see #createArgumentHolder(Object)
 	 */
-	public Object createArgumentHolder() {
+	public ArgHolder<?> createArgumentHolder() {
 		if (requiredType.equals(Float.class)) {
 			return new FloatHolder();
 		} else if (requiredType.equals(Double.class)) {
@@ -467,32 +468,34 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
    * Creates and returns a new argument holder for the required type of this
    * {@link Option} with the given object as default value.
 	 * 
-	 * @param defaultValue the default value of this {@link Option}
+	 * @param object the default value of this {@link Option}
 	 * @return an argument holder of the required data type with given default
 	 *         value
 	 */
-	public Object createArgumentHolder(Object defaultValue) {
-		String value = defaultValue.toString();
+	public ArgHolder<?> createArgumentHolder(Object object) {
+		String value = object.toString();
 		if (requiredType.equals(Float.class)) {
-			return new FloatHolder(Float.parseFloat(value));
+			return new FloatHolder(Float.valueOf(value));
 		} else if (requiredType.equals(Double.class)) {
-			return new DoubleHolder(Double.parseDouble(value));
+			return new DoubleHolder(Double.valueOf(value));
 		} else if (requiredType.equals(Short.class)) {
-			return new IntHolder(Short.parseShort(value));
+			return new IntHolder(Integer.valueOf(value));
 		} else if (requiredType.equals(Integer.class)) {
-			return new IntHolder(Integer.parseInt(value));
+			return new IntHolder(Integer.valueOf(value));
 		} else if (requiredType.equals(Long.class)) {
-			return new LongHolder(Long.parseLong(value));
+			return new LongHolder(Long.valueOf(value));
 		} else if (requiredType.equals(Boolean.class)) {
-			return new BooleanHolder(Boolean.parseBoolean(value));
+			return new BooleanHolder(Boolean.valueOf(value));
 		} else if (requiredType.equals(Character.class)) {
-			if (value.length() != 1) { throw new IllegalArgumentException(
-				"Invalid char symbol " + value); }
-			return new CharHolder(value.charAt(0));
+			if (value.length() != 1) { 
+				throw new IllegalArgumentException(
+				"Invalid char symbol " + value); 
+			}
+			return new CharHolder(Character.valueOf(value.charAt(0)));
 		} else if (requiredType.equals(String.class)) {
 			return new StringHolder(value);
 		} else {
-			return new StringHolder(defaultValue.toString());
+			return new StringHolder(value);
 		}
 	}
 	
