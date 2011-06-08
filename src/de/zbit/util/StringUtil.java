@@ -593,13 +593,13 @@ public class StringUtil {
 	 *        the delimiter string between the single strings (the "glue").
 	 * @return the concatenated string separated by the delimiter
 	 */
-	public static String implode(String[] ary, String delim) {
+	public static String implode(Object[] ary, String delim) {
 		StringBuffer out = new StringBuffer();
 		for (int i = 0; i < ary.length; i++) {
 			if (i > 0) {
 			  out.append(delim);
 			}
-			out.append(ary[i]);
+			out.append(ary[i].toString());
 		}
 		return out.toString();
 	}
