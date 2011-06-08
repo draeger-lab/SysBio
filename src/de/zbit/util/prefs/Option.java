@@ -112,6 +112,12 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			ret = new File(ret.toString());
 		}
 		
+    if (requiredType.equals(Class.class) && (ret instanceof String)) {
+      try {
+        ret = Class.forName((String) ret);
+      } catch (ClassNotFoundException e) {}
+    }
+		
 		if (Enum.class.isAssignableFrom(requiredType)) {
 			ret = Reflect.invokeIfContains(requiredType, "valueOf", new Object[]{ret.toString()});
 		}
@@ -321,7 +327,10 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
 		String shortCmdName, Type defaultValue, String displayName) {
-		this.optionName = optionName;
+		
+	  // Ensure that the option name contains no whitespaces.
+	  this.optionName = optionName.replaceAll("\\s", "_");
+		
 		this.requiredType = requiredType;
 		this.description = description;
 		this.range = range;
@@ -816,9 +825,27 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param ret
 	 * @return
 	 */
-	public Type parseOrCast(Object ret) {
+	@SuppressWarnings("unchecked")
+  public Type parseOrCast(Object ret) {
+	  if (Class.class.isAssignableFrom(requiredType) &&
+	      (ret instanceof String) ) {
+	    return (Type) Option.getClassFromRange((Option<Class>)this, ret.toString());
+	  }
 		return parseOrCast(requiredType, ret);
 	}
+	
+	/**
+	 * Does nearly the same as {@link Range#castAndCheckIsInRange(Object)},
+	 * but has some enhancements, e.g., when using Class as type.
+	 * @param value
+	 * @return
+	 */
+  public boolean castAndCheckIsInRange(Object value) {
+    Type value2 = parseOrCast(value);
+    if (value2==null) { return false;}
+    if (!isSetRangeSpecification()) return true;
+    return range.isInRange(value2);
+  }
 	
 	/**
 	 * This creates a command-line argument name from this {@link Option}'s name

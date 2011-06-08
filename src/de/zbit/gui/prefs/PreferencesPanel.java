@@ -892,7 +892,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				if (source instanceof JComponentForOption) {
 					Option<?> o = ((JComponentForOption) source).getOption();
 					if (o != null && o.isSetRangeSpecification()) {
-						isInRange = o.getRange().castAndCheckIsInRange(value);
+						isInRange = o.castAndCheckIsInRange(value);
 					}
 				} else if (c.getParent() instanceof JComponentForOption) {
 					// In case if FileSelector or JColumnChooser, the parent
