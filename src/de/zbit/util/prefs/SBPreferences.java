@@ -186,12 +186,12 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 		// create the parser and specify the allowed options ...
 		ArgParser parser = new ArgParser(usage);
-		Map<Option<?>, Object> options = configureArgParser(parser,
-			new HashMap<Option<?>, Object>(), keyProvider, props, defaults);
+		Map<Option<?>, ArgHolder<?>> options = configureArgParser(parser,
+			new HashMap<Option<?>, ArgHolder<?>>(), keyProvider, props, defaults);
 		parser.matchAllArgs(args);
 
 		// for each option and its 
-		for (Map.Entry<Option<?>, Object> entry : options.entrySet()) {
+		for (Map.Entry<Option<?>, ArgHolder<?>> entry : options.entrySet()) {
 		  Option<?> option = entry.getKey();
 			if (option.isSetRangeSpecification()) {
 			  // FIXME: each entry contains a mapping from Option to an argument
@@ -266,7 +266,7 @@ public class SBPreferences implements Map<Object, Object> {
 		List<Class<? extends KeyProvider>> defKeys, String[] args) {
 		String usage = generateUsageString();
 		SBPreferences prefs[] = new SBPreferences[defKeys.size()];
-		Map<Option<?>, Object> options = new HashMap<Option<?>, Object>();
+		Map<Option<?>, ArgHolder<?>> options = new HashMap<Option<?>, ArgHolder<?>>();
 		ArgParser parser = new ArgParser(usage);
 		SBProperties props = new SBProperties(new SBProperties());
 		
@@ -315,7 +315,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return the {@link SBProperties} object where the parsed values are stored
 	 */
 	private static final SBProperties analyzeCommandLineArguments(
-		SBPreferences[] prefs, Map<Option<?>, Object> options, ArgParser parser,
+		SBPreferences[] prefs, Map<Option<?>, ArgHolder<?>> options, ArgParser parser,
 		SBProperties props, String args[]) {
 		
 		// Do the actual parsing.
@@ -407,7 +407,7 @@ public class SBPreferences implements Map<Object, Object> {
 		String usage, String args[]) {
 		
 		SBPreferences prefs[] = new SBPreferences[defFileAndKeys.size()];
-		Map<Option<?>, Object> options = new HashMap<Option<?>, Object>();
+		Map<Option<?>, ArgHolder<?>> options = new HashMap<Option<?>, ArgHolder<?>>();
 		ArgParser parser = new ArgParser(usage);
 		SBProperties props = new SBProperties(new SBProperties());
 		
@@ -453,8 +453,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param defaults the default values
 	 * @return the mapping from {@link Option}s to their argument holders
 	 */
-	private static Map<Option<?>, Object> configureArgParser(ArgParser parser,
-		Map<Option<?>, Object> options, Class<? extends KeyProvider> keyProvider,
+	private static Map<Option<?>, ArgHolder<?>> configureArgParser(ArgParser parser,
+		Map<Option<?>, ArgHolder<?>> options, Class<? extends KeyProvider> keyProvider,
 		SBProperties props, Map<Object, Object> defaults) {
 		// Iterates over all field of the keyProvider
 		for (Field f : keyProvider.getFields()) {
@@ -675,7 +675,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 *        A map between {@link Option} instances and {@link ArgParser} holders
 	 *        for the desired values.
 	 */
-	private static void putAll(SBProperties props, Map<Option<?>, Object> options) {
+	private static void putAll(SBProperties props, Map<Option<?>, ArgHolder<?>> options) {
 		String k, value, v;
 		for (Option<?> key : options.keySet()) {
 			
@@ -729,8 +729,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param properties
 	 * @throws BackingStoreException 
 	 */
-	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public static void saveProperties(Class<? extends KeyProvider> keyProvider,
 		Properties properties) throws BackingStoreException {
 		List<Option> optionList = KeyProvider.Tools.optionList(keyProvider);

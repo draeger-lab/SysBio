@@ -603,23 +603,33 @@ public interface KeyProvider {
 			List<?> options, List<Option> removeFromHere) {
 			sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
 			for (Object o : options) {
-				if (!(o instanceof Object)) {
+				if (!(o instanceof Option<?>)) {
 					continue;
 				}
 				Option<?> option = (Option<?>) o;
 				sb.append("        <tr>\n          ");
 				sb.append("<td colspan=\"2\" class=\"typewriter-blue\">");
 				String shortName = option.getShortCmdName();
-				String requiredType = StringUtil.concat("&#60;",
-					option.getRequiredType().getSimpleName(), "&#62;").toString();
+				String requiredType = String.format("&#60;%s&#62;", option
+						.getRequiredType().getSimpleName());
+				/*
+				 * Special treatment of boolean arguments whose presents only is already sufficient to switch some feature on.
+				 */
+				boolean switchOnOnlyOption = option.getRequiredType().equals(Boolean.class)
+						&& !(Boolean.parseBoolean(option.getDefaultValue().toString()) || option
+								.isSetRangeSpecification());
 				if (shortName != null) {
 					sb.append(shortName);
-					sb.append(requiredType);
+					if (!switchOnOnlyOption) {
+						sb.append(requiredType);
+					}
 					sb.append(", ");
 				}
 				sb.append(option.toCommandLineOptionKey());
-				sb.append("[ |=]");
-				sb.append(requiredType);
+				if (!switchOnOnlyOption) {
+					sb.append("[ |=]");
+					sb.append(requiredType);
+				}
 				sb.append("</td>\n        ");
 				sb.append("</tr>\n        <tr><td width=\"6%\"> </td>\n");
 				sb.append("        <td>\n          ");
