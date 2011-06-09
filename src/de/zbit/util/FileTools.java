@@ -26,6 +26,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 import de.zbit.io.OpenFile;
@@ -163,6 +167,67 @@ public class FileTools {
         
     bw.close();
     br.close();
+  }
+  
+  /**
+   * Shuffles the lines in the file with the given filename. This method first
+   * writes the shuffled lines into a temporary file and then renames it back to
+   * it original name to prevent data loss.
+   * 
+   * @param fileName
+   * @param rnd
+   * @throws IOException
+   */
+  public static void shuffleFile(String fileName, Random rnd) throws IOException {
+    File f = new File(fileName);
+    File tmpFile = File.createTempFile(f.getName(), "shuffle.tmp", f.getParentFile().getAbsoluteFile());
+    shuffleFile(fileName, tmpFile.getAbsolutePath(), rnd);
+    if( !f.delete() ) {
+      throw new IOException("Failed to replace the original file with the shuffled one, because it couldn't be deleted");
+    }
+    if( !tmpFile.renameTo(f) ) {
+      throw new IOException("Failed to rename the shuffled file '" + tmpFile.getAbsolutePath() + "' to its original name '" + f.getAbsolutePath() + "'");
+    }
+  }
+  
+  /**
+   * Shuffles the lines in the file with the given filename. This method first
+   * reads the whole infile into memory, shuffles it, and then writes it again.
+   * This means that input and output file may be the same, but this could lead
+   * to data loss when overwriting has already started but is then aborted
+   * somehow.
+   * 
+   * @param inFileName
+   * @param outFileName
+   * @param rnd
+   * @throws IOException
+   */
+  public static void shuffleFile(String inFileName, String outFileName, Random rnd) throws IOException {
+    
+    // if no random number generator was given, create one
+    if( rnd == null ) {
+      rnd = new Random();
+    }
+    
+    String line = "";
+    List<String> lines = new LinkedList<String>();
+    BufferedReader br = new BufferedReader(new FileReader(inFileName));
+    
+    // read the file
+    while( (line = br.readLine()) != null ) {
+      lines.add(line);
+    }
+    br.close();
+    
+    // shuffle lines
+    Collections.shuffle(lines, rnd);
+    
+    // write the file
+    BufferedWriter bw = new BufferedWriter(new FileWriter(outFileName));
+    for( String s : lines ) {
+      bw.append(s).append('\n');
+    }
+    bw.close();
   }
   
   /**
