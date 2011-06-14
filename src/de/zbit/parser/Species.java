@@ -706,7 +706,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable {
     throws CorruptInputStreamException {
     
     keggAbbr = elements[0];
-    scientificName = elements[1];
+    scientificName = elements[1].trim();
     uniprotExtension = elements[2];
     commonName = elements[3];
     ncbi_tax_id = elements[4].length()>0?Integer.parseInt(elements[4]):null;

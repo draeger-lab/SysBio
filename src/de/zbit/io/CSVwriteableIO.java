@@ -189,6 +189,7 @@ public class CSVwriteableIO {
   public static Object read(CSVwriteable emptyObject, String inputfile) throws IOException {
     // Init the reader
     CSVReader r = new CSVReader(inputfile,false);
+    //r.setSeparatorChar('\t');
     r.open();
     
     // Check class name and get version

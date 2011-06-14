@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.zbit.exception.CorruptInputStreamException;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileReadProgress;
 import de.zbit.util.Reflect;

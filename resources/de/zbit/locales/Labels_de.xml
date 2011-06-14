@@ -30,7 +30,7 @@
   <entry key="COLUMN">Spalte </entry>
   <entry key="CSV_OPTIONS">CSV-Optionen</entry>
   <entry key="FILE_PREVIEW">Dateivorschau</entry>
-  <entry key="FILE_CONTAINS_HEADERS">Die Datei enthält einen Kopfeintrag.</entry>
+  <entry key="FILE_CONTAINS_HEADERS">Die Datei enthält eine Überschriftenzeile.</entry>
   <entry key="INDICATE_IF_COLUMN_DESCRIPTIONS_ARE_GIVEN">Die Datei enthält Spaltenbeschreibungen.</entry>
   <entry key="SEPARATOR_CHAR">Trennzeichen </entry>
   <entry key="SEPARATOR_CHAR_TOOLTIP">Das Trennzeichen, das dazu genutzt wird, Spalten zu separieren.</entry>

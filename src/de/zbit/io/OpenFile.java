@@ -277,7 +277,11 @@ public class OpenFile {
   
   /**
    * @see #searchFileAndGetInputStream(String)
+   * @param infile
+   * @param class1 use the classLoader from this class and search the infile path relative to the
+   * path of this class.
    * @return
+   * @throws IOException
    */
   public static InputStream searchFileAndGetInputStream(String infile, Class<?> class1) throws IOException {
     String curDir = System.getProperty("user.dir");
