@@ -63,15 +63,16 @@ public class CSVImporter {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		if (args.length > 0) {
-			String expectedHead[] = new String[args.length - 1];
-			System.arraycopy(args, 0, expectedHead, 0, args.length - 1);
-			CSVImporter converter = new CSVImporter(args[args.length - 1],
-					expectedHead);
-			System.out
-					.println(Arrays.toString(converter.getColumnAssignment()));
-			System.out.println(converter.getNewHead());
+		if (args.length < 1) {
+		  args = new String[]{"A","B","C", "files/sample.csv.txt"};
+		  System.out.println("Using a demo file.");
 		}
+		
+		String expectedHead[] = new String[args.length - 1];
+		System.arraycopy(args, 0, expectedHead, 0, args.length - 1);
+		CSVImporter converter = new CSVImporter(args[args.length - 1],expectedHead);
+		System.out.println(Arrays.toString(converter.getColumnAssignment()));
+		System.out.println(Arrays.toString(converter.getNewHead()));
 	}
 
 	/**

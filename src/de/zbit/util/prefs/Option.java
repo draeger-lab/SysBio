@@ -144,7 +144,14 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
   @SuppressWarnings("unchecked")
   public static Class getClassFromRange(Option<Class> option, String simpleName) {
-	  if (option!=null && option.getRange()!=null) {
+    // For absolute class strings (e.g., "class de.zbit.io.mRNAReader").
+    try {
+      if (simpleName.startsWith("class ")) simpleName = simpleName.substring(6);
+      return Class.forName(simpleName);
+    } catch (ClassNotFoundException e) {}
+    
+    // For simple-name class strings (e.g., "mRNAReader").
+    if (option!=null && option.getRange()!=null) {
 	    
 	    List<Class> l = option.getRange().getAllAcceptableValues();
 	    if (l!=null) {

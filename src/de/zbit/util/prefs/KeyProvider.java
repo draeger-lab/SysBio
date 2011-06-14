@@ -448,9 +448,24 @@ public interface KeyProvider {
 		 *         in this {@link KeyProvider}.
 		 */
 		public static Option<?> getOption(Class<? extends KeyProvider> keyProvider,
-			String optionName) {
-			return getField(keyProvider, optionName, Option.class);
+		  String optionName) {
+		  //return getField(keyProvider, optionName, Option.class);
+		  
+		  // Wrzodek, 9.6.2011 - Removed the constraint the options must have the same
+		  // names as the variable containing the options.
+		  for (Field f : keyProvider.getFields()) {
+		    Object fieldValue;
+		    try {
+		      fieldValue = f.get(keyProvider);
+		      if (fieldValue.getClass().isAssignableFrom(Option.class)) {
+		        if (((Option)fieldValue).getOptionName().equals(optionName))
+		          return (Option) fieldValue;
+		      }
+		    } catch (Exception e) {}
+		  }
+		  return null;
 		}
+		
 		
 		/**
 		 * 
@@ -460,8 +475,8 @@ public interface KeyProvider {
 		 * @see #getOption(Class, String)
 		 */
 		public static OptionGroup<?> getOptionGroup(
-			Class<? extends KeyProvider> keyProvider, String optionGroupName) {
-			return getField(keyProvider, optionGroupName, OptionGroup.class);
+		  Class<? extends KeyProvider> keyProvider, String optionGroupName) {
+		  return getField(keyProvider, optionGroupName, OptionGroup.class);
 		}
 		
 		/**
