@@ -20,16 +20,27 @@ package de.zbit.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,14 +49,17 @@ import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.prefs.JComponentForOption;
@@ -104,6 +118,11 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	   * they are sorted alphabetically.
 	   */
 	  protected boolean sortHeaders=false;
+
+	  /**
+	   * If true, the user may edit the given header strings.
+	   */
+    private boolean editHeaderAlllowed=false;
 	  
 	  protected static ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 	  protected static String noOptionChoosen=bundle.getString("NOT_AVAILABLE");
@@ -164,10 +183,20 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	   * a NoOptionChoosen String at the start of the box.
 	   */
 	  public JLabeledComponent(String title, boolean fieldIsRequired) {
-	    this(title, fieldIsRequired, null);
+	    this(title, fieldIsRequired, (Object[])null);
 	  }
 	  
 	  /**
+     * @param title
+     * @param fieldIsRequired
+     * @param organisms
+     */
+    @SuppressWarnings("unchecked")
+    public JLabeledComponent(String title, boolean fieldIsRequired,
+      Collection columnHeaders) {
+      this(title, fieldIsRequired, columnHeaders.toArray());
+    }
+    /**
 	   * 
 	   */
 	  protected void initGUI() {
@@ -591,6 +620,9 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	    
 	    // Column chooser
 	    colChooser = getColumnChooser(useJTextField?null:model, -1, required, null, acceptOnlyIntegers);
+      if (colChooser instanceof JComboBox) {
+        ((JComboBox)colChooser).setEditable(this.editHeaderAlllowed);
+      }
 	    colChooser.setToolTipText(getToolTipText());
 	    if (getLayout() instanceof GridBagLayout) {
 	      addComponent(this, colChooser, 1, 0, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
@@ -776,23 +808,6 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	    }
 	  }
 	  
-	  /**
-	   * Just for testing purposes.
-	   */
-	  public static void main (String[] args) {
-	    JFrame frame = new JFrame();
-	    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-	    try {
-	      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	      JLabeledComponent c = new JLabeledComponent("test", false, new String[]{"header1", "header2"});
-	      frame.getContentPane().add(c);
-	    } catch (Exception e) {
-	      e.printStackTrace();
-	    }
-	    frame.pack();
-	    frame.setVisible(true);
-	  }
-	  
 	  /* (non-Javadoc)
 	   * @see de.zbit.gui.prefs.JComponentForOption#getOption()
 	   */
@@ -818,4 +833,141 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
     public Object getCurrentValue() {
       return getSelectedItem();
     }
+
+    /**
+     * Show a dialog with multiple {@link JLabeledComponent}s. Each component
+     * hat the label given in fields and the selections from suggestions.
+     * @param parent the parent to which this dialog is modal
+     * @param title  title for this dialog
+     * @param fields labels for {@link JLabeledComponent}s
+     * @param suggestions available choices for {@link JLabeledComponent}s (same indices as fields)
+     * @param fixedSuggestions if true, only choices from the given selections arrays are allowed.
+     * If false, users may enter custom strings.
+     * @return array with selected values for each field
+     */
+    public static String[] showDialog(Component parent, String title, String[] fields, String[][] suggestions, boolean fixedSuggestions) {
+
+      // Initialize the dialog
+      final JDialog jd;
+      if (parent!=null && parent instanceof Frame) {
+        jd = new JDialog((Frame)parent, title, true);
+      } else if (parent!=null && parent instanceof Dialog) {
+        jd = new JDialog((Dialog)parent, title, true);
+      } else {
+        jd = new JDialog();
+        jd.setTitle(title);
+        jd.setModal(true);
+      }
+      jd.setLayout(new BorderLayout());
+      
+      // Initialize the panel
+      final JPanel c = new JPanel(new VerticalLayout());
+      for (int i=0; i<fields.length; i++) {
+        JLabeledComponent l = new JLabeledComponent(fields[i],true, suggestions[i]);
+        if (!fixedSuggestions) l.setEditHeaderAllowed(true);
+        // Make a flexible layout
+        l.setLayout(new FlowLayout());
+        l.setPreferredSize(null);
+        c.add(l);
+      }
+      c.setBorder(new TitledBorder(title));
+      jd.add(c, BorderLayout.CENTER);
+      
+      final JPanel buttonPanel = GUITools.buildOkCancelButtons(jd);
+      jd.add(buttonPanel, BorderLayout.SOUTH);
+      
+      // Close dialog with ESC button.
+      jd.getRootPane().registerKeyboardAction(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          // deselect the OK button
+          ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).setSelected(false);
+          jd.dispose();
+        }
+      }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+      // Close dialog with ENTER button.
+      jd.getRootPane().registerKeyboardAction(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          // select the OK button
+          ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).setSelected(true);
+          jd.dispose();
+        }
+      }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+      
+      // Set close operations
+      jd.addWindowListener(new WindowAdapter() {
+        public void windowClosing(WindowEvent e) {
+          jd.setVisible(false);
+        }
+      });
+      c.addComponentListener(new ComponentListener() {
+        public void componentHidden(ComponentEvent e) {
+          jd.setVisible(false);
+        }
+        public void componentMoved(ComponentEvent e) {}
+        public void componentResized(ComponentEvent e) {}
+        public void componentShown(ComponentEvent e) {}
+      });
+      
+      // Set size
+      jd.pack();
+      jd.setLocationRelativeTo(parent);
+      
+      // Set visible and wait until invisible
+      jd.setVisible(true);
+      
+      // Dispose and return reader.
+      jd.dispose();
+      
+      // OK Pressed?
+      boolean okPressed = (((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).isSelected());
+      if (!okPressed) return null;
+      else {
+        String[] ret = new String[fields.length];
+        for (int i=0; i<fields.length; i++) {
+          ret[i] = ((JLabeledComponent)c.getComponent(i)).getSelectedItem().toString();
+        }
+        return ret;
+      }
+    }
+    
+    /**
+     * @param b if true, the given {@link #headers} may be edited
+     * and customized by the user!
+     */
+    public void setEditHeaderAllowed(boolean b) {
+      this.editHeaderAlllowed=true;
+      if (colChooser instanceof JComboBox) {
+        ((JComboBox)colChooser).setEditable(b);
+      }
+    }
+    /**
+     * Just for testing purposes.
+     */
+    public static void main(String[] args) {
+      String[][] sug = new String[][]{{"A","B","C"}, {"A","D","E"}, {"A","F","G"}};
+      try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        JFrame parent = new JFrame();
+        parent.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        String[] ret = showDialog(parent,"My title", new String[]{"1.", "2.", "3."}, sug, false);
+        if (ret==null) System.out.println("Cancelled");
+        else System.out.println(Arrays.deepToString(ret));
+        System.exit(0);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      
+      /*JFrame frame = new JFrame();
+      frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+      try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        JLabeledComponent c = new JLabeledComponent("test", false, new String[]{"header1", "header2"});
+        frame.getContentPane().add(c);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      frame.pack();
+      frame.setVisible(true);*/
+    }
+    
 	}
