@@ -42,7 +42,7 @@ public class MappingUtils {
    * @author Clemens Wrzodek
    */
   public static enum IdentifierType {
-    Unknown, GeneID, RefSeq, Ensembl, KeggGenes, Symbol;
+    Unknown, NCBI_GeneID, RefSeq, Ensembl, KeggGenes, GeneSymbol;
   }
   
   
@@ -61,7 +61,7 @@ public class MappingUtils {
       mapper = new RefSeq2GeneIDMapper(progress);
     } else if (targetIDtype.equals(IdentifierType.Ensembl)) {
       mapper = new Ensembl2GeneIDMapper(species.getCommonName(), progress);
-    } else if (targetIDtype.equals(IdentifierType.Symbol)) {
+    } else if (targetIDtype.equals(IdentifierType.GeneSymbol)) {
       mapper = new GeneSymbol2GeneIDMapper(species.getCommonName(), progress);
     } else if (targetIDtype.equals(IdentifierType.KeggGenes)) {
       mapper = new KeggGenesID2GeneID(species.getKeggAbbr(), progress);

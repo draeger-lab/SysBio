@@ -20,16 +20,23 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.SplashScreen;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -49,6 +56,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -900,11 +908,11 @@ public class GUITools {
       ((GridBagLayout) lm).addLayoutComponent(newOne, c);
       
     } else {
-      // Layouts have no contstraints. Just set the correct index.
+      // Layouts have no constraints. Just set the correct index.
       boolean replaced = false;
       for (int i = 0; i < target.getComponents().length; i++) {
-        if (target.getComponents()[i].equals(oldOne)) {
-          target.remove(oldOne);
+        if (target.getComponent(i).equals(oldOne)) {
+          target.remove(i);
           target.add(newOne, i);
           replaced = true;
           break;
@@ -1195,13 +1203,7 @@ public class GUITools {
    * @param exc
    */
   public static void showErrorMessage(Component parent, Throwable exc) {
-    String msg = exc.getLocalizedMessage();
-    if ((msg == null) && (exc.getCause() != null)) {
-      msg = exc.getCause().getLocalizedMessage();
-    }
-    if (msg == null) msg = exc.getMessage();
-    if (msg == null) msg = exc.toString(); // Axis Faults have all messages null
-    if (msg == null) msg = "";
+    String msg = getMessage(exc);
     
     if (logger!=null) logger.log(Level.WARNING, msg, exc);
     ValuePair<String, Integer> messagePair = StringUtil
@@ -1221,6 +1223,27 @@ public class GUITools {
         JOptionPane.showMessageDialog(parent, message, clazz!=null?clazz.getSimpleName():"",
             JOptionPane.ERROR_MESSAGE);
   }
+
+
+  /**
+   * Return a best suited string to describe this {@link Throwable}.
+   * Prefers in this order: <ol><li>LocalizedMessage
+   * <li>LocalizedMessage of the Cause
+   * <li>message<li>toString()<li>NULL</ol>
+   * @param exc
+   * @return
+   */
+  private static String getMessage(Throwable exc) {
+    if (exc==null) return "NULL";
+    String msg = exc.getLocalizedMessage();
+    if ((msg == null) && (exc.getCause() != null)) {
+      msg = exc.getCause().getLocalizedMessage();
+    }
+    if (msg == null) msg = exc.getMessage();
+    if (msg == null) msg = exc.toString(); // Axis Faults have all messages null
+    if (msg == null) msg = "NULL";
+    return msg;
+  }
   
   /**
    * Shows an error dialog with the given message in case the exception does not
@@ -1230,13 +1253,13 @@ public class GUITools {
    * @param exc
    * @param defaultMessage
    */
-  public static void showErrorMessage(Component parent, Throwable exc,
-    String defaultMessage) {
+  public static void showErrorMessage(Component parent, Throwable exc, String defaultMessage) {
     if ((exc == null) || (exc.getLocalizedMessage() == null)
         || (exc.getLocalizedMessage().length() == 0)) {
-      logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
-      JOptionPane.showMessageDialog(parent, defaultMessage, exc.getClass()
-        .getSimpleName(), JOptionPane.ERROR_MESSAGE);
+      
+      logger.log(Level.WARNING, defaultMessage, exc);
+      String name = (exc!=null?exc.getClass().getSimpleName():"Error");
+      JOptionPane.showMessageDialog(parent, defaultMessage, name, JOptionPane.ERROR_MESSAGE);
     } else {
       showErrorMessage(parent, exc);
     }
@@ -1450,6 +1473,7 @@ public class GUITools {
    * When any button is pressed, it will trigger setVisible(false).
    * <p>You can check if ok has been pressed with
    * <pre> ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).isSelected()</pre>
+   * @param parentDialog the dialog to close (hide) with ok and cancel.
    * @return
    */
   public static JPanel buildOkCancelButtons(final Component parentDialog) {
@@ -1483,14 +1507,14 @@ public class GUITools {
       public void actionPerformed(ActionEvent arg0) {
         ok.setSelected(true);
         cancel.setSelected(false);
-        parentDialog.setVisible(false);
+        if (parentDialog!=null) parentDialog.setVisible(false);
       }      
     });
     cancel.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {
         ok.setSelected(false);
         cancel.setSelected(true);
-        parentDialog.setVisible(false);
+        if (parentDialog!=null) parentDialog.setVisible(false);
       }      
     });
     
@@ -1508,6 +1532,116 @@ public class GUITools {
     for (Component component: components) {
       component.setEnabled(enabled);
     }
+  }
+  
+  /**
+   * Show a {@link JPanel} as {@link Dialog}.
+   * @param parent optional parent Frame or Dialog
+   * @param c the panel to display
+   * @param title a title that should be used for the window
+   * @param addOkAndCancel if true, will add additional OK and CANCEL buttons
+   * at the bottom of the dialog 
+   * @return if ok has been pressed. More formarlly: either {@link JOptionPane#OK_OPTION} or
+   * {@link JOptionPane#CANCEL_OPTION} or -2 if unknown (external closing, e.g., by your own
+   * ok button).
+   */
+  public static int showAsDialog(Component parent, JPanel c, String title, final boolean addOkAndCancel) {
+
+    // Initialize the dialog
+    final JDialog jd;
+    if (parent!=null && parent instanceof Frame) {
+      jd = new JDialog((Frame)parent, title, true);
+    } else if (parent!=null && parent instanceof Dialog) {
+      jd = new JDialog((Dialog)parent, title, true);
+    } else {
+      jd = new JDialog();
+      jd.setTitle(title);
+      jd.setModal(true);
+    }
+    jd.setName(""); // The Name encodes the ok and cancel options!
+    jd.setLayout(new BorderLayout());
+    
+    // Create ok and cancel buttons
+    final JPanel okAndCancel;
+    if (addOkAndCancel) {
+      okAndCancel = buildOkCancelButtons(jd);
+    } else { 
+      okAndCancel = null;
+    }
+    
+    // Initialize the panel
+    jd.add(c, BorderLayout.CENTER);
+    if (addOkAndCancel) jd.add(okAndCancel, BorderLayout.SOUTH);
+    
+    // Close dialog with ESC button.
+    jd.getRootPane().registerKeyboardAction(new ActionListener() {
+      public synchronized void actionPerformed(ActionEvent e) {
+        // deselect the OK button
+        if (addOkAndCancel) {
+          ((JButton) ((JPanel) okAndCancel.getComponent(0)).getComponent(0)).setSelected(false);
+        }
+        jd.setName(Integer.toString(JOptionPane.CANCEL_OPTION));
+        jd.dispose();
+      }
+    }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+    // Close dialog with ENTER button.
+    jd.getRootPane().registerKeyboardAction(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        // select the OK button
+        if (addOkAndCancel) {
+          ((JButton) ((JPanel) okAndCancel.getComponent(0)).getComponent(0)).setSelected(true);
+        }
+        jd.setName(Integer.toString(JOptionPane.OK_OPTION));
+        jd.dispose();
+      }
+    }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+    
+    // Set close operations
+    jd.addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e) {
+        jd.setVisible(false);
+      }
+    });
+    c.addComponentListener(new ComponentListener() {
+      public void componentHidden(ComponentEvent e) {
+        jd.setVisible(false);
+      }
+      public void componentMoved(ComponentEvent e) {}
+      public void componentResized(ComponentEvent e) {}
+      public void componentShown(ComponentEvent e) {}
+    });
+    
+    // Set size
+    jd.pack();
+    jd.setLocationRelativeTo(parent);
+    
+    // Set visible and wait until invisible
+    jd.setVisible(true);
+    
+    // Dispose and return reader.
+    jd.dispose();
+    
+    // Get the button/closing method that closed the dialog
+    int retVal;
+    if (jd.getName()=="") {
+      // Exit with a button
+      if (addOkAndCancel) {
+        // Button from this method
+        if (((JButton) ((JPanel) okAndCancel.getComponent(0)).getComponent(0)).isSelected()) {
+          retVal = JOptionPane.OK_OPTION;
+        } else {
+          retVal = JOptionPane.CANCEL_OPTION;
+        }
+      } else {
+        // External closing...
+        retVal = -2; // Unknown
+      }
+    } else {
+      // Exit with either Enter or Escape key
+      retVal = Integer.parseInt(jd.getName());
+    }
+    
+    return retVal;
   }
   
   

@@ -588,8 +588,8 @@ public class CSVReaderColumnChooser extends JPanel {
    */
 	public static int showAsDialog(CSVReaderColumnChooser c) {
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(new JLabel(StringUtil.toHTML(String
-				.format(ResourceManager.getBundle("de.zbit.locales.Labels").getString("ASSIGN_THESE_COLUMNS")), 60)),
+		panel.add(new JLabel(StringUtil.toHTML(String.format(
+		  ResourceManager.getBundle("de.zbit.locales.Labels").getString("ASSIGN_THESE_COLUMNS")), 60)),
 				BorderLayout.NORTH);
 		panel.add(c, BorderLayout.CENTER);
 

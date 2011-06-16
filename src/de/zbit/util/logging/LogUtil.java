@@ -26,10 +26,16 @@ import java.util.logging.Logger;
  * Class with helper functions regarding logging.
  * 
  * @author Florian Mittag
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
 public class LogUtil {
+  
+  /**
+   * This package is always considered when performing any logging operations here.
+   */
+  public final static String basePackage = "de.zbit";
 
   /**
    * Initializes logging using the Java logger and with log level INFO for
@@ -61,7 +67,7 @@ public class LogUtil {
       h.setLevel(logLevel);
       h.setFormatter(new OneLineFormatter());
     }
-    Logger.getLogger("de.zbit").setLevel(logLevel);
+    Logger.getLogger(basePackage).setLevel(logLevel);
 
     // additional packages to log
 		if (packages != null) {
@@ -73,6 +79,38 @@ public class LogUtil {
 				Logger.getLogger(s).setLevel(logLevel);
 			}
 		}
+  }
+  
+  /**
+   * Add a new handler
+   * @param h
+   * @param packages
+   */
+  public static void addHandler(Handler h, String... packages ) {
+    Logger.getLogger(basePackage).addHandler(h);
+
+    // additional packages to handle
+    if (packages != null) {
+      for (String s : packages) {
+        Logger.getLogger(s).addHandler(h);
+      }
+    }
+  }
+  
+  /**
+   * Remove a handler
+   * @param h
+   * @param packages
+   */
+  public static void removeHandler(Handler h, String... packages ) {
+    Logger.getLogger(basePackage).removeHandler(h);
+
+    // additional packages to handle
+    if (packages != null) {
+      for (String s : packages) {
+        Logger.getLogger(s).removeHandler(h);
+      }
+    }
   }
 
   /*

@@ -199,6 +199,48 @@ public class ExpectedColumn {
   public Object getName() {
     return name;
   }
+  /**
+   * This is a convenient wrapper the returns directly the assigned
+   * type.
+   * 
+   * <p>Note:<br/>This method does only work if {@link #multiSelectionAllowed}=false!
+   * @return <pre>{@link #type}[{@link #getAssignedTypeForEachColumn()}.get(0)]</pre>
+   */
+  public Object getAssignedType() {
+    return getAssignedType(0);
+  }
+  
+  public Object getAssignedType(int assignedColumnIndex) {
+    if (type!=null && assignedTypeForEachColumn!=null &&
+        assignedTypeForEachColumn.size()>0) {
+      int idx = assignedTypeForEachColumn.get(assignedColumnIndex);
+      if (idx<type.length) return type[idx];
+    }
+    return null;
+  }
+  
+  
+  /**
+   * This is a convenient wrapper that returns directly the
+   * assigned column or -1 if none has been assigned. 
+   * 
+   * <p>Note:<br/>This method does only work if {@link #multiSelectionAllowed}=false!
+   * @return <pre>{@link #getAssignedColumns()}.get(0)</pre>
+   */
+  public int getAssignedColumn() {
+    if (assignedColumns!=null && assignedColumns.size()>0) {
+      return assignedColumns.get(0);
+    }
+    return -1;
+  }
+  /**
+   * For optional columns, this returns wether this {@link ExpectedColumn}
+   * has assigned columns or not.
+   * @return true if and only if {@link #getAssignedColumns()}.size()>0
+   */
+  public boolean hasAssignedColumns() {
+    return assignedColumns!=null && assignedColumns.size()>0;
+  }
   
   
 }
