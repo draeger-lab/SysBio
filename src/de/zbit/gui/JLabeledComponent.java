@@ -20,24 +20,16 @@ package de.zbit.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,15 +41,13 @@ import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
@@ -847,19 +837,6 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
      */
     public static String[] showDialog(Component parent, String title, String[] fields, String[][] suggestions, boolean fixedSuggestions) {
 
-      // Initialize the dialog
-      final JDialog jd;
-      if (parent!=null && parent instanceof Frame) {
-        jd = new JDialog((Frame)parent, title, true);
-      } else if (parent!=null && parent instanceof Dialog) {
-        jd = new JDialog((Dialog)parent, title, true);
-      } else {
-        jd = new JDialog();
-        jd.setTitle(title);
-        jd.setModal(true);
-      }
-      jd.setLayout(new BorderLayout());
-      
       // Initialize the panel
       final JPanel c = new JPanel(new VerticalLayout());
       for (int i=0; i<fields.length; i++) {
@@ -871,55 +848,12 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
         c.add(l);
       }
       c.setBorder(new TitledBorder(title));
-      jd.add(c, BorderLayout.CENTER);
       
-      final JPanel buttonPanel = GUITools.buildOkCancelButtons(jd);
-      jd.add(buttonPanel, BorderLayout.SOUTH);
-      
-      // Close dialog with ESC button.
-      jd.getRootPane().registerKeyboardAction(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          // deselect the OK button
-          ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).setSelected(false);
-          jd.dispose();
-        }
-      }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-      // Close dialog with ENTER button.
-      jd.getRootPane().registerKeyboardAction(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          // select the OK button
-          ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).setSelected(true);
-          jd.dispose();
-        }
-      }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-      
-      // Set close operations
-      jd.addWindowListener(new WindowAdapter() {
-        public void windowClosing(WindowEvent e) {
-          jd.setVisible(false);
-        }
-      });
-      c.addComponentListener(new ComponentListener() {
-        public void componentHidden(ComponentEvent e) {
-          jd.setVisible(false);
-        }
-        public void componentMoved(ComponentEvent e) {}
-        public void componentResized(ComponentEvent e) {}
-        public void componentShown(ComponentEvent e) {}
-      });
-      
-      // Set size
-      jd.pack();
-      jd.setLocationRelativeTo(parent);
-      
-      // Set visible and wait until invisible
-      jd.setVisible(true);
-      
-      // Dispose and return reader.
-      jd.dispose();
+      // Show as Dialog
+      int button = GUITools.showAsDialog(parent, c, title, true);
       
       // OK Pressed?
-      boolean okPressed = (((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).isSelected());
+      boolean okPressed = (button==JOptionPane.OK_OPTION);
       if (!okPressed) return null;
       else {
         String[] ret = new String[fields.length];

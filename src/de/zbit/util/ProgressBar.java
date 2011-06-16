@@ -28,7 +28,6 @@ package de.zbit.util;
 public class ProgressBar extends AbstractProgressBar {
   private static final long serialVersionUID = 2073719565121276629L;
   
-  private int lastPerc=-1;
   private static boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"))?true:false;
   protected boolean useSimpleStyle = useSimpleStyle();
   private int consoleWidth = (useSimpleStyle?0:ConsoleTools.getColumns());
@@ -104,7 +103,7 @@ public class ProgressBar extends AbstractProgressBar {
 
     // Simples File-out oder Eclipse-Output-Window tool. Windows Console unterstützt leider auch kein ANSI.
     if (useSimpleStyle) {
-      if (percent!=lastPerc) {
+      if (percent!=lastPercentage) {
         if (!printInOneLine) {
           System.out.println(percString + ' ' + ETA + (additionalText!=null && (additionalText.length()>0)? " " + additionalText:"") );
         } else {
@@ -112,7 +111,7 @@ public class ProgressBar extends AbstractProgressBar {
           else if (percent%2==0) System.out.print('.');
           if (percent==100) System.out.print('\n');
         }
-        lastPerc=percent;
+        lastPercentage=percent;
       }
       return;
     }
@@ -204,10 +203,10 @@ public class ProgressBar extends AbstractProgressBar {
     return useSimpleStyle;
   }
   
-  public void finished() {
+  public void finished_impl() {
     if (!useSimpleStyle) System.out.println();
-    else if (printInOneLine && lastPerc!=100) System.out.print('\n');
-    lastPerc=100;
+    else if (printInOneLine && lastPercentage!=100) System.out.print('\n');
+    lastPercentage=100;
   }
   
 }

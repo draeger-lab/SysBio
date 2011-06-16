@@ -699,7 +699,7 @@ public class CSVReaderOptionPanel extends JPanel {
 		final JTable table = buildPreviewTable(previewContent, newHeader);
 		
     // Put all on a scroll  pane
-    final JScrollPane scrollPane = new JScrollPane(table , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    final JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     
     // When resizing, try to optimize table size.
     final int numberOfcols = newHeader.length;
@@ -847,14 +847,24 @@ public class CSVReaderOptionPanel extends JPanel {
    * Recreates the option panel and replaces the old one.
    */
   public void refreshOptionsPanel() {
-    if (currentOptions!=null) remove(currentOptions);
-    currentOptions = buildCSVOptionsPanel();
+    if (currentOptions!=null) {
+      JPanel newOptions = buildCSVOptionsPanel();
+      setBorder(newOptions, ResourceManager.getBundle("de.zbit.locales.Labels").getString("CSV_OPTIONS"));
+      GUITools.replaceComponent(currentOptions, newOptions);
+      currentOptions = newOptions;
     
-    setBorder(currentOptions, ResourceManager.getBundle("de.zbit.locales.Labels").getString("CSV_OPTIONS"));
-    add(currentOptions, BorderLayout.NORTH);
-    
-    validate();
-    repaint();
+      validate();
+      repaint();
+    }
+  }
+  
+  /**
+   * Use this method with caution, as it returns unchecked internal
+   * data structures!
+   * @return the current options panel.
+   */
+  public JComponent getOptionalPanel() {
+    return currentOptions;
   }
   
   

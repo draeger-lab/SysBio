@@ -17,6 +17,9 @@
 package de.zbit.util;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * <p>
@@ -41,7 +44,7 @@ import java.io.Serializable;
  * @version $Rev$
  * @since 1.0
  */
-public abstract class AbstractProgressBar implements Serializable {
+public abstract class AbstractProgressBar implements Serializable, ProgressListener {
   private static final long serialVersionUID = 6447054832080673569L;
   
   /*
@@ -54,6 +57,7 @@ public abstract class AbstractProgressBar implements Serializable {
    * Internal variables (not to set by user).
    */
   private long callNr=0;
+  protected int lastPercentage=-1;
   
   /*
    * for time duration estimations
@@ -62,6 +66,11 @@ public abstract class AbstractProgressBar implements Serializable {
   private int numMeasurements = 0;
   private long lastCallTime=0;//System.currentTimeMillis();
   private boolean callNumbersInSyncWithTimeMeasurements=true;
+  
+  /**
+   * Listeners that are informed of progress changes.
+   */
+  Set<ProgressListener> listeners = null;
   
   public void reset() {
     callNr=0;
@@ -180,6 +189,12 @@ public abstract class AbstractProgressBar implements Serializable {
       lastCallTime = System.currentTimeMillis();
     }
     
+    // Inform listeners
+    if (perc!=lastPercentage) {
+      fireListeners(perc, miliSecsRemaining, additionalText);
+      lastPercentage = perc;
+    }
+    
     // Draw the bar
     drawProgressBar(perc, miliSecsRemaining, additionalText);
     
@@ -187,11 +202,21 @@ public abstract class AbstractProgressBar implements Serializable {
     if (callNr == totalCalls) finished();
   }
   
+
   /**
    * This method is called automatically, when all calculations are finished (callNr=TotalCalls).
    * Please implement it SYNCHRONIZED. Only call it manually, when you finish before reaching 100%.
    */
-  public abstract void finished();
+  protected abstract void finished_impl();
+
+  /**
+   * This method is called automatically, when all calculations are finished (callNr=TotalCalls).
+   * Please implement it SYNCHRONIZED. Only call it manually, when you finish before reaching 100%.
+   */
+  public synchronized void finished() {
+    fireListeners(100, 0, null);
+    finished_impl();
+  }
   
   /**
    * Implement this function. Avoid calling it manually.
@@ -210,6 +235,32 @@ public abstract class AbstractProgressBar implements Serializable {
     callNumbersInSyncWithTimeMeasurements=false;
     
     this.callNr = callNr;
+  }
+
+  /**
+   * @param statusBar
+   */
+  public void addProgressListener(ProgressListener listener) {
+    if (listener.equals(this)) return;
+    if (listeners==null) listeners = new HashSet<ProgressListener>();
+    listeners.add(listener);
+  }
+  
+  /**
+   * @param perc
+   */
+  private void fireListeners(int percent, double miliSecondsRemaining, String additionalText) {
+    if (listeners==null || listeners.size()<1) return;
+    for (ProgressListener listener : listeners) {
+      listener.percentageChanged(percent, miliSecondsRemaining, additionalText);
+    }
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.util.ProgressListener#percentageChanged(int, double, java.lang.String)
+   */
+  public void percentageChanged(int percent, double miliSecondsRemaining, String additionalText) {
+    drawProgressBar(percent, miliSecondsRemaining, additionalText);
   }
   
 }

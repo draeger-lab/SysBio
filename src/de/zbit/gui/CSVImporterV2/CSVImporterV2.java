@@ -65,6 +65,7 @@ import de.zbit.gui.CSVImporterV2.JComponentJTable.JComponentTableRenderer;
 import de.zbit.gui.CSVImporterV2.JComponentJTable.JTableRowBased;
 import de.zbit.io.CSVReader;
 import de.zbit.util.ArrayUtils;
+import de.zbit.util.FileTools;
 import de.zbit.util.ResourceManager;
 
 /**
@@ -282,6 +283,14 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     // Disallow dragging columns
     table.getTableHeader().setReorderingAllowed(false);
     
+    // Resize columns to a reasonable width
+    if (table.getColumnModel().getColumnCount()>0)  {
+      int width = table.getColumnModel().getColumn(0).getWidth();
+      width = Math.max(width, 120);
+      for (int i=0; i<table.getColumnModel().getColumnCount(); i++)
+        table.getColumnModel().getColumn(i).setPreferredWidth(width); 
+    }
+    
     return table;
   }
   
@@ -290,6 +299,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
    * @return
    */
   private Object[][] prependColumnSelectors(String[][] data) {
+    if (data.length<1) return new Object[][]{{"Invalid settings."}};
     
     // Create Column Selectors
     JComponent[][] colSel=buildColumnSelectors(data[0].length);
@@ -467,16 +477,25 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
   }
 
   /**
-   * Show a dialog to choose the main CSVReader options AND to let the user
-   * assign columns for the {@link ExpectedColumn}s.
-   * @param parent - the parent to which this dialog is modal. 
-   * @param r - the current CSV Reader
-   * @param title - title for this dialog
-   * @return copy of original (cancel button pressed) or modified (ok) reader.
-   * Ok has been pressed if and only if (returnedReader==sourceReader).
-   * @throws IOException - if input file is not readable or invalid.
+   * @see #showDialog(Component, String, CSVImporterV2)
+   * @param parent
+   * @param c
+   * @return
+   * @throws IOException
    */
-  public static CSVImporterV2 showDialog(Component parent, String inFile, String title, ExpectedColumn... cols) throws IOException {
+  public static boolean showDialog(Component parent, final CSVImporterV2 c) throws IOException {
+    return showDialog(parent, String.format("Data import for '%s'", FileTools.getFilename(c.getCSVReader().getFilename())), c);
+  }
+  
+  /**
+   * Show a dialog for the {@link CSVImporterV2} panel.
+   * @param parent - the parent to which this dialog is modal. 
+   * @param title - title for this dialog
+   * @param c - {@link CSVImporterV2} panel to display as dialog
+   * @return true if and only if the dialog has been confirmed by the user.
+   * @throws IOException - if input file is not readable or invalid. 
+   */
+  public static boolean showDialog(Component parent, String title, final CSVImporterV2 c) throws IOException {
 
     // Initialize the dialog
     final JDialog jd;
@@ -491,7 +510,6 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     }
     
     // Initialize the panel
-    final CSVImporterV2 c = new CSVImporterV2(inFile, cols);
     c.setName(title);
     jd.add(c);
     // Close dialog with ESC button.
@@ -529,13 +547,30 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     // Set size
     jd.setPreferredSize(c.getPreferredSize());
     jd.setSize(c.getPreferredSize());
+    //jd.pack();
     jd.setLocationRelativeTo(parent);
     
     // Set visible and wait until invisible
     jd.setVisible(true);
     
-    // Dispose and return reader.
+    // Dispose and return if dialog has been confirmed.
     jd.dispose();
+    return (c.getButtonPressed()==JOptionPane.OK_OPTION);
+  }
+  
+  /**
+   * Show a dialog to choose the main CSVReader options AND to let the user
+   * assign columns for the {@link ExpectedColumn}s.
+   * @param parent - the parent to which this dialog is modal. 
+   * @param r - the current CSV Reader
+   * @param title - title for this dialog
+   * @return copy of original (cancel button pressed) or modified (ok) reader.
+   * Ok has been pressed if and only if (returnedReader==sourceReader).
+   * @throws IOException - if input file is not readable or invalid.
+   */
+  public static CSVImporterV2 showDialog(Component parent, String inFile, String title, ExpectedColumn... cols) throws IOException {
+    final CSVImporterV2 c = new CSVImporterV2(inFile, cols);
+    showDialog(parent, title, c);
     return c;
   }
   
@@ -595,6 +630,12 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
       // get CSV file headers for initial suggestions
       String[] headers = getCSVReader().getHeader();
       if (headers==null) headers = new String[0];
+      else {
+        // Trim to maximum 40 chars
+        for (int i=0; i<headers.length; i++) {
+          if (headers[i].length()>40)headers[i] = headers[i].substring(0, 40);
+        }
+      }
       
       // Create expected array with fields and suggestions
       List<String> fields = new ArrayList<String>();

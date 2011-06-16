@@ -217,6 +217,11 @@ public abstract class BaseFrame extends JFrame {
 	 */
 	protected JToolBar toolBar;
 	
+  /**
+   * A status bar...
+   */
+	protected StatusBar statusBar;
+	
 	/**
 	 * Creates a new {@link BaseFrame}.
 	 *  
@@ -262,6 +267,13 @@ public abstract class BaseFrame extends JFrame {
 		init();
 	}
 	
+	 /**
+   * @return the current {@link StatusBar}.
+   */
+  public StatusBar getStatusBar() {
+    return statusBar;
+  }
+  
 	/**
 	 * This method enables the {@link JMenuItem} that displays the online help and
 	 * also enables the {@link JButton} in the {@link JToolBar} linked to this
@@ -860,9 +872,11 @@ public abstract URL getURLOnlineUpdate();
 		  createDragNDropFunctionality();
 		}
 		
+		// Set layout
 		Container container = getContentPane();
 		container.setLayout(new BorderLayout());
 		
+		// Create toolbar and main component
 		toolBar = createJToolBar();
 		if (toolBar != null) {
 			container.add(toolBar, BorderLayout.NORTH);
@@ -871,6 +885,9 @@ public abstract URL getURLOnlineUpdate();
 		if (component != null) {
 			container.add(component, BorderLayout.CENTER);
 		}
+		
+		// Create and put statusBar in south
+		statusBar = StatusBar.addStatusBar(this);
 		
 		pack();
 		setMinimumSize(new Dimension(640, 480));

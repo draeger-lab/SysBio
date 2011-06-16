@@ -31,6 +31,9 @@ import de.zbit.util.Utils;
 public class ProgressBarSwing extends AbstractProgressBar {
   private static final long serialVersionUID = 2754375775367568812L;
   
+  /**
+   * The actual component that is used to draw the progress.
+   */
   private JProgressBar progressBar;
   
   /**
@@ -91,10 +94,10 @@ public class ProgressBarSwing extends AbstractProgressBar {
   }
 
   /* (non-Javadoc)
-   * @see de.zbit.util.AbstractProgressBar#finished()
+   * @see de.zbit.util.AbstractProgressBar#finished_impl()
    */
   @Override
-  public void finished() {
+  public void finished_impl() {
     // Set Progressbar to 100%
     drawProgressBar(100,0,"");
   }

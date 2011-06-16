@@ -17,6 +17,7 @@
 package de.zbit.util;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * A triplet of three values with type parameters. This data object is useful
@@ -217,6 +218,45 @@ public class ValueTriplet <S extends Comparable<? super S>, T extends Comparable
     this.c = c;
   }
 
+  /**
+   * @return a comparator, that only sorts {@link ValueTriplet}s by {@link #getA()}.
+   */
+  public Comparator<ValueTriplet<S, T, E>> getComparator_OnlyCompareA() {
+    Comparator<ValueTriplet<S, T, E>> sortOnlyByA = new Comparator<ValueTriplet<S, T, E>>() {
+      public int compare(ValueTriplet<S, T, E> o1, ValueTriplet<S, T, E> o2) {
+        return o1.getA().compareTo(o2.getA());
+      }
+    };
+    
+    return sortOnlyByA;
+  }
+  
+  /**
+   * @return a comparator, that only sorts {@link ValueTriplet}s by {@link #getB()}.
+   */
+  public Comparator<ValueTriplet<S, T, E>> getComparator_OnlyCompareB() {
+    Comparator<ValueTriplet<S, T, E>> sortOnlyByB = new Comparator<ValueTriplet<S, T, E>>() {
+      public int compare(ValueTriplet<S, T, E> o1, ValueTriplet<S, T, E> o2) {
+        return o1.getB().compareTo(o2.getB());
+      }
+    };
+    
+    return sortOnlyByB;
+  }
+  
+  /**
+   * @return a comparator, that only sorts {@link ValueTriplet}s by {@link #getC()}.
+   */
+  public Comparator<ValueTriplet<S, T, E>> getComparator_OnlyCompareC() {
+    Comparator<ValueTriplet<S, T, E>> sortOnlyCyC = new Comparator<ValueTriplet<S, T, E>>() {
+      public int compare(ValueTriplet<S, T, E> o1, ValueTriplet<S, T, E> o2) {
+        return o1.getC().compareTo(o2.getC());
+      }
+    };
+    
+    return sortOnlyCyC;
+  }
+  
   /*
    * (non-Javadoc)
    * 

@@ -594,7 +594,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * Allows to override the progressBar.
    * Warning: A progressBar is only initialized if
    * 1 displayProgress is enabled (by setDisplayProgress(boolean b) )
-   * 2 the "open" method
+   * 2 the "open" method has been called
    */
   public void setProgressBar(AbstractProgressBar progress) {
     progressBar = progress;
@@ -838,6 +838,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     
     // Number of lines, a separator char needs to have static occurences in-a-row.
     int threshold = 25; // So oft müssen Zeilen mit einem trennzeichen getrennt werden, dass es als offizielles trennzeichen gilt.
+    int cancelAfterXLines = 1000; // Do not try to search a consistent table below 1000 lines.
     
     // Make a list of separator chars to analyze
     char[] separatorChars;
@@ -864,7 +865,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     int max=0; // If file had less then "threshold" consistent lines in total; Take the max.
     int j = -1 + this.skipLines;
     String firstConsistentLineStringOfMax=null;
-    while (in.ready() && max<=threshold) { //  && separatorChar=='\u0000'
+    while (in.ready() && max<=threshold && j<(cancelAfterXLines+skipLines)) { //  && separatorChar=='\u0000'
       j++;
       String line = in.readLine();
       if (trimLinesAfterReading && line!=null) line = line.trim();
@@ -1156,11 +1157,13 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     if (!isInitialized) initialize();
     
     // Initialize a progress bar
-    if (displayProgress) {
+    if (displayProgress && progress==null) {
       progress = new FileReadProgress(filename);
       if (this.progressBar!=null) { // Custom progress bar
         this.progress.setProgressBar(progressBar);
       }
+    } else if (displayProgress) {
+      progress.reset();
     }
     
     // Finally... get the data
