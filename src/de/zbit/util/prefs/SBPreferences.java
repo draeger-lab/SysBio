@@ -41,8 +41,8 @@ import de.zbit.io.GeneralFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.Utils;
-import de.zbit.util.argparser.ArgParser;
 import de.zbit.util.argparser.ArgHolder;
+import de.zbit.util.argparser.ArgParser;
 import de.zbit.util.argparser.BooleanHolder;
 import de.zbit.util.argparser.CharHolder;
 import de.zbit.util.argparser.DoubleHolder;
@@ -924,9 +924,13 @@ public class SBPreferences implements Map<Object, Object> {
 		boolean remove;
 		for (int i = keys.length - 1; i >= 0; i--) {
 			remove = false;
-			if (!defaults.containsKey(keys[i])) {
-				remove = true;
-			} else {
+			// Removed because not yet loded options may still have keys in the same
+			// package. Thus, do not remove unknown keys! Just check known ones.
+			// An example for this issue is the FileHistory wich is just loaded on demand.
+			//if (!defaults.containsKey(keys[i])) {
+			//	remove = true;
+			//} else {
+			if (defaults.containsKey(keys[i])) {
 				try {
 					if (!checkPref(KeyProvider.Tools.getOption(keyProvider, keys[i]))) {
 						remove = true;

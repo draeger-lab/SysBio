@@ -685,12 +685,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * persistently store the history of previously opened files.
 	 * 
 	 * @return By default, this method returns an instance of {@link Class} for
-	 *         the {@link FileHistory} interface. To avoid that multiple
-	 *         applications that implement this {@link BaseFrame} override each
-	 *         other's file history, implementing classes should override this
-	 *         method and return a class file corresponding to something that is
-	 *         derived from {@link FileHistory} and that is located in a different
-	 *         package.
+	 *         the {@link FileHistory} interface. This must be added to the list
+	 *         of values returned by {@link #getCommandLineOptions()}.
 	 */
 	public Class<? extends FileHistory> getFileHistoryKeyProvider() {
 		return getClass();

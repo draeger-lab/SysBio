@@ -421,6 +421,14 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 		public void setHeaders(Object[] header) {
 			setHeaders(header, 0);
 		}
+		
+		/**
+		 * @see #setHeaders(Object[])
+		 * @param header
+		 */
+    public void setHeaders(Collection<?> header) {
+      setHeaders(header.toArray(), 0);
+    }
 	  
 	  /**
 	   * Set the headers to display in the combo box.
