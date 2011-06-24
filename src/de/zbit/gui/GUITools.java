@@ -1277,6 +1277,7 @@ public class GUITools {
       TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
   }
   
+  
   /**
    * Displays a message on a message dialog window, i.e., an HTML document.
    * 
@@ -1289,6 +1290,19 @@ public class GUITools {
    */
   public static void showMessage(URL path, String title, Component owner) {
     showMessage(path, title, owner, null);
+  }
+  
+  /**
+   * Show a Question Dialog
+   * @param parent may be null
+   * @param message question to display
+   * @param title dialog title
+   * @param choices different choices
+   * @return choosen index or JOptionPane static ints
+   */
+  public static int showQuestionMessage(Component parent, String message, String title, Object[] choices) {
+    return JOptionPane.showOptionDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
+      title, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
   }
   
   /**

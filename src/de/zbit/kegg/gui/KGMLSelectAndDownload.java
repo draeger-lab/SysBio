@@ -85,22 +85,36 @@ public class KGMLSelectAndDownload {
   }
   
   public static String evaluateOKButton(final PathwaySelector selector) {
-    String localFile=null;
-    
     // Create pathway to orthologous or organism specific pathway.
     String org = selector.getOrganismSelector().getSelectedOrganismAbbreviation();
     if (org==null || org.equals("ko")) org="ko";
     
+    return downloadPathway(org, selector.getSelectedPathwayID(), true);
+  }
+
+  /**
+   * Download a pathway from KEGGs public FTP server.
+   * @param org Organism kegg abbreviation (e.g., "mmu")
+   * @param pwID pathway identifier (e.g., "mmu00010")
+   * @param askUserBeforeUsingCache if true (default), the user will be asked if a 
+   * file with the same name has already been downloaded. If false, this method will
+   * simply return the path to the already existing file.
+   * @return the local file path of the downloaded pathway.
+   */
+  public static String downloadPathway(String org, String pwID, boolean askUserBeforeUsingCache) {
+    String localFile=null;
+    
     // Metabolic
     String metaURL = baseKGMLurl + "metabolic/" + 
     (org.equals("ko")?"":"organisms/") +
-    org + '/' + selector.getSelectedPathwayID() + ".xml";
+    org + '/' + pwID + ".xml";
+    
     
     // Non-Metabolic
     String nonMetaURL = metaURL.replace("metabolic/", "non-metabolic/");
     
     // Try to download
-    localFile = downloadKGML(metaURL, nonMetaURL);
+    localFile = downloadKGML(metaURL, nonMetaURL, askUserBeforeUsingCache);
     if (localFile!=null) {
       //break;
     } else {
@@ -111,14 +125,25 @@ public class KGMLSelectAndDownload {
     return localFile;
   }
   
-  
-  private static String downloadKGML(String metaURL, String nonMetaURL) {
+  /**
+   * 
+   * @param metaURL url for metabolic pathway
+   * @param nonMetaURL url for non-metabolic pathway
+   * @param askUserBeforeUsingCache if true (default), the user will be asked if a 
+   * file with the same name has already been downloaded. If false, this method will
+   * simply return the path to the already existing file.
+   * @return
+   */
+  private static String downloadKGML(String metaURL, String nonMetaURL, boolean askUserBeforeUsingCache) {
     // Check if file already exists and ask user to reuse or overwrite or cancel.
     String localFile = FileDownload.getLocalFilenameForURL(metaURL);
     if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>0) {
-      String[] options = new String[]{"Open already existing file", "Redownload file", "Cancel"};
-      int a = JOptionPane.showOptionDialog(null, "The file '" + localFile + "' already exists. How do you want to proceed?",
+      int a=0;
+      if (askUserBeforeUsingCache) {
+        String[] options = new String[]{"Open already existing file", "Redownload file", "Cancel"};
+        a = JOptionPane.showOptionDialog(null, "The file '" + localFile + "' already exists. How do you want to proceed?",
         "Download KGML", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+      }
       if (a == 0) {
         return localFile;
       } else if (a==2) {
