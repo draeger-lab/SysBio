@@ -80,7 +80,7 @@ import de.zbit.util.prefs.SBProperties;
  * @version $Rev$
  * @since 1.0
  */
-public abstract class BaseFrame extends JFrame {
+public abstract class BaseFrame extends JFrame implements FileHistory {
 	
 	/**
 	 * This {@link Enum} contains very basic actions of a graphical user interface.
@@ -693,7 +693,7 @@ public abstract class BaseFrame extends JFrame {
 	 *         package.
 	 */
 	public Class<? extends FileHistory> getFileHistoryKeyProvider() {
-		return FileHistory.class;
+		return getClass();
 	}
 	
 	/**
@@ -886,13 +886,23 @@ public abstract URL getURLOnlineUpdate();
 			container.add(component, BorderLayout.CENTER);
 		}
 		
-		// Create and put statusBar in south
-		statusBar = StatusBar.addStatusBar(this);
+		// Init status bar
+		statusBar = initializeStatusBar();
 		
 		pack();
 		setMinimumSize(new Dimension(640, 480));
 		setLocationRelativeTo(null);
 	}
+
+
+	/**
+	 * Initialize the status bar. This method can be overwritten
+	 * and if null is returned, the status bar is disabled.
+	 */
+  protected StatusBar initializeStatusBar() {
+    // Create and put statusBar in south
+		return StatusBar.addStatusBar(this);
+  }
 	
 	/**
 		 * This method decides whether or not the file menu should already be equipped

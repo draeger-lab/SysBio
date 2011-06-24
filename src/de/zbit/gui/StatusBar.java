@@ -67,7 +67,7 @@ public class StatusBar extends JPanel implements ProgressListener {
   /**
    * This is the default status message text.
    */
-  public static String defaultText = "Ready.";
+  public static String defaultText = " Ready.";
   
   /**
    * A log handler that is used to catch and display log messages.
@@ -84,13 +84,28 @@ public class StatusBar extends JPanel implements ProgressListener {
     }
     @Override
     public void publish(LogRecord record) {
-      // TODO: Make a little nicer, e.g., color in red if it is a warning or sever message.
+      // Initial space (a little distance to the border)
+      StringBuffer message = new StringBuffer(" ");
+      
+      // Append Warning message and make red for warnings
+      if (record.getLevel().intValue()>=Level.WARNING.intValue()) {
+        message.append(record.getLevel().getLocalizedName());
+        message.append(": ");
+        statusLabel.setForeground(Color.RED);
+      } else if (!statusLabel.getForeground().equals(Color.BLACK)) {
+        statusLabel.setForeground(Color.BLACK);
+      }
+      
+      // Append localized message
       if (getFormatter()!=null) {
         // This will e.g., localize the message!
-        statusLabel.setText(getFormatter().formatMessage(record));
+        message.append(getFormatter().formatMessage(record));
       } else {
-        statusLabel.setText(record.getMessage());
+        message.append(record.getMessage());
       }
+      
+      // Set the status label text.
+      statusLabel.setText(message.toString());
     }
   };
   
