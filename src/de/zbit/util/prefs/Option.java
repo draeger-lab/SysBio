@@ -26,6 +26,7 @@ import de.zbit.io.SBFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
+import de.zbit.util.Utils;
 import de.zbit.util.argparser.ArgHolder;
 import de.zbit.util.argparser.ArgParser;
 import de.zbit.util.argparser.BooleanHolder;
@@ -100,10 +101,26 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		  try {
 			  ret = Reflect.invokeParser(requiredType, ret);
 		  } catch (Throwable e) {
-		    ret=null;
+		    // Do NOT set to null, e.g., java.awt.Color contains a
+		    // decode method for "BLUE" and such, but will fail to decode
+		    // any Color.toString(). Thus, below is a special parser for
+		    // Colors, but ret must not be null to function correctly!
+		    //ret=null;
 		  }
 		}
 		
+		// Parse color from string. Alpha is being lost...
+    if (requiredType.equals(java.awt.Color.class)) {
+      if (ret!=null && !ret.getClass().equals(java.awt.Color.class) && // May be already decoded
+          ret.toString().startsWith("java.awt.Color[r=")) {
+        String parse = ret.toString();
+        int r = Utils.getNumberFromString(parse.indexOf("r=")+2, parse);
+        int g = Utils.getNumberFromString(parse.indexOf("g=")+2, parse);
+        int b = Utils.getNumberFromString(parse.indexOf("b=")+2, parse);
+        return (Type) new java.awt.Color(r,g,b);
+      }
+	  }
+	
 		if (requiredType.equals(Character.class)) {
 			ret = ((Character) ret.toString().charAt(0));
 		}

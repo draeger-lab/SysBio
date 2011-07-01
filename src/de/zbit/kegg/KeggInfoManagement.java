@@ -50,6 +50,10 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     this.adap = new KeggAdaptor();
   }
   
+  public KeggInfoManagement (int maxListSize) {
+    this (maxListSize, new KeggAdaptor());
+  }
+    
   /**
    * 
    * @param maxListSize

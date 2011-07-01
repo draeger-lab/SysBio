@@ -755,5 +755,14 @@ public class StringUtil {
     
     return matches;
   }
+
+  /**
+   * Removes XML annotations such as &lt;HTML&gt; from any string.
+   * @param string
+   * @return string without any xml annotations.
+   */
+  public static String removeXML(String string) {
+    return string.replaceAll("\\<.*?\\>", "");
+  }
 	
 }

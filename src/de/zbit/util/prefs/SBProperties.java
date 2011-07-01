@@ -19,6 +19,8 @@ package de.zbit.util.prefs;
 import java.lang.reflect.Field;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This extension of {@link Properties} can only contain key-value pairs of type
@@ -33,6 +35,7 @@ import java.util.ResourceBundle;
  * @since 1.0
  */
 public class SBProperties extends Properties {
+  public static final transient Logger log = Logger.getLogger(SBProperties.class.getName());
 	
 	/**
 	 * Generated serial version identifier
@@ -224,7 +227,6 @@ public class SBProperties extends Properties {
 	 * 
 	 * @param keyProvider
 	 */
-	@SuppressWarnings("unchecked")
   public void loadFromKeyProvider(Class<?> keyProvider) {
 		Object fieldValue;
 		String k;
@@ -238,7 +240,7 @@ public class SBProperties extends Properties {
 					//if (defaults.getProperty(k) != null) {}
 					Object defaultValue=((Option<?>) fieldValue).getDefaultValue();
 					if(defaultValue instanceof Class) {
-						this.put(k, ((Class)defaultValue).getSimpleName());
+						this.put(k, ((Class<?>)defaultValue).getSimpleName());
 					}
 					else {
 						this.put(k, defaultValue);
@@ -246,7 +248,7 @@ public class SBProperties extends Properties {
 				}
 			} catch (Exception exc) {
 			  // Due to non-static fields
-				//exc.printStackTrace();
+			  log.log(Level.INFO,"Could not read field or value from keyprovider.",exc);
 				// ignore non-static fields
 			}
 		}

@@ -15,6 +15,7 @@
  */
 package de.zbit.gui.prefs;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Panel;
@@ -34,6 +35,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -53,6 +55,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.gui.ColorChooserWithPreview;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.prefs.FileSelector.Type;
@@ -94,6 +97,7 @@ import de.zbit.util.prefs.SBProperties;
  */
 public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		ItemListener, ChangeListener {
+  public static final transient Logger log = Logger.getLogger(PreferencesPanel.class.getName());
 	
 	/**
 	 * Generated serial version identifier
@@ -523,6 +527,26 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		} else if ((values != null) && (values.length > 0)) {
 			component = new JLabeledComponent(optionTitle, true, values);
 			((JLabeledComponent) component).setAcceptOnlyIntegers(false);
+		} else if (java.awt.Color.class.isAssignableFrom(clazz)) {
+		  // Create color chooser with defaultValue or white as initial color.
+		  Color initial = null;
+		  if (defaultValue instanceof Color) {
+		    initial = (Color) defaultValue;
+		  } else if (defaultValue instanceof String){
+		    initial = Option.parseOrCast(Color.class, defaultValue);
+		  }
+		  if (initial==null) {
+		    log.warning("Invalid default value for color " + defaultValue.getClass()+": " + defaultValue);
+		    initial = Color.WHITE;
+		  }
+		  ColorChooserWithPreview colChooser = new ColorChooserWithPreview(initial);
+		  if (changeListener!=null) {
+		    colChooser.addChangeListener(changeListener);
+		  }
+		  component = new JLabeledComponent(optionTitle, true, colChooser);
+		  
+		} else {
+		  log.severe("Please implement JComponent for " + clazz + ".");
 		}
 		
 		// Check if the option could be converted to a JComponent
@@ -532,6 +556,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			} else if (component instanceof JLabeledComponent) {
 				((JLabeledComponent) component).setTitle(optionTitle);
 				if (defaultValue != null) {
+				  // Set default value
 					if(defaultValue.toString().startsWith("class ")) {
 						for(Object value: option.getRange().getAllAcceptableValues()) {
 							if(defaultValue.toString().contains(value.toString())) {
@@ -541,8 +566,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 						}
 					}
 					else {
-					((JLabeledComponent) component).setDefaultValue(defaultValue
-							.toString());
+					((JLabeledComponent) component).setDefaultValue(defaultValue.toString());
 					}
 				}
 				// Remove preview and reset predefined JLabeledComponent layout.
@@ -551,11 +575,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			}
 			if ((itemListener != null)
 					&& Reflect.contains(component, "addItemListener", ItemListener.class)) {
-				Reflect.invokeIfContains(component, "addItemListener",
-					ItemListener.class, itemListener);
+				Reflect.invokeIfContains(component, "addItemListener", ItemListener.class, itemListener);
 			} else if (changeListener != null) {
-				Reflect.invokeIfContains(component, "addChangeListener",
-					ChangeListener.class, changeListener);
+				Reflect.invokeIfContains(component, "addChangeListener", ChangeListener.class, changeListener);
 			}
 			component.setName(option.getOptionName());
 			component.setToolTipText(StringUtil.toHTML(option.getDescription(), 60));
@@ -861,9 +883,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				if (c instanceof AbstractButton) {
 					value = Boolean.toString(((AbstractButton) c).isSelected());
 				} else if (c instanceof JColorChooser) {
-					value = ((JColorChooser) c).getColor().toString();
+				  value = ((JColorChooser) c).getColor().toString();
+				} else if (c instanceof ColorChooserWithPreview) {
+				  value = ((ColorChooserWithPreview) c).getColor().toString();
 				} else if (c instanceof JComboBox) {
-					value = ((JComboBox) c).getSelectedItem().toString();
+				  value = ((JComboBox) c).getSelectedItem().toString();
 				} else if (c instanceof JFileChooser) {
 					value = ((JFileChooser) c).getSelectedFile().getAbsolutePath();
 				} else if (c instanceof JList) {
@@ -934,6 +958,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * )
 	 */
 	public void stateChanged(ChangeEvent e) {
+	  setProperty(properties, e.getSource());
 		for (ChangeListener cl : changeListeners) {
 			cl.stateChanged(e);
 		}

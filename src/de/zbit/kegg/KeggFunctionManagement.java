@@ -49,6 +49,10 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
     this.adap = new KeggAdaptor();
   }
   
+  public KeggFunctionManagement (int maxListSize) {
+    this(maxListSize, new KeggAdaptor());
+  }
+  
   /**
    * 
    * @param maxListSize

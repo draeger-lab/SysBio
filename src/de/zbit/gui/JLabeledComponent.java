@@ -18,6 +18,7 @@
 package de.zbit.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -38,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -65,7 +67,7 @@ import de.zbit.util.prefs.SBPreferences;
  */
 
 public class JLabeledComponent extends JPanel implements JComponentForOption{
-	  
+  public static final transient Logger log = Logger.getLogger(JLabeledComponent.class.getName());
 	protected static final long serialVersionUID = -9026612128266336630L;
 	  
 	  // Label options
@@ -186,6 +188,20 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
       Collection columnHeaders) {
       this(title, fieldIsRequired, columnHeaders.toArray());
     }
+    /**
+     * @param optionTitle
+     * @param fieldIsRequired
+     * @param colorChooserWithPreview
+     */
+    public JLabeledComponent(String optionTitle, boolean fieldIsRequired,
+      JComponent c) {
+      this (optionTitle, fieldIsRequired, new Object[]{c});
+      GUITools.replaceComponent(colChooser, c);
+      colChooser = c;
+      label.setLabelFor(c);
+    }
+    
+    
     /**
 	   * 
 	   */
@@ -648,11 +664,13 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	      } else {
 	        return indexOf(headers, getSelectedItem().toString());
 	      }
-	    } else {
+	    } else if (colChooser instanceof JTextComponent) {
 	      String s = ((JTextComponent)colChooser).getText().trim();
 	      
 	      if (CSVReader.isNumber(s, true)) return Integer.parseInt(s);
 	      else return -1;
+	    } else {
+	      return -1; // Unknown
 	    }
 	  }
 	  
@@ -664,9 +682,14 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	  public Object getSelectedItem() {
 	    if (colChooser instanceof JComboBox) {
 	      return ((JComboBox)colChooser).getSelectedItem();
-	    } else {
+	    } else if (colChooser instanceof JTextComponent) {
 	      String s = ((JTextComponent)colChooser).getText();
 	      return s;
+	    } else if (colChooser instanceof ColorChooserWithPreview) {
+	      return colChooser.getBackground();
+	    } else {
+	      log.severe("Please implement getSelectedItem() for " + colChooser.getClass() + " in JLabeledComponent.");
+	      return null;
 	    }
 	  }
 	  
@@ -680,8 +703,10 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	    if (colChooser instanceof JComboBox) {
 	      if (i>=0 && i<((JComboBox)colChooser).getModel().getSize())
 	        ((JComboBox)colChooser).setSelectedIndex(i);
-	    } else {
+	    } else if (colChooser instanceof JTextComponent) {
 	      ((JTextComponent)colChooser).setText(Integer.toString(i));
+	    } else {
+	      log.warning("Cannot set selected integer value on " + colChooser.getClass());
 	    }
 	  }
 	  
@@ -692,7 +717,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	  public void setSelectedItem(Object string) {
 	    if (colChooser instanceof JComboBox) {
 	      ((JComboBox)colChooser).setSelectedItem(string);
-	    } else {
+	    } else if (colChooser instanceof JTextComponent) {
 	      int pos = indexOf(headers, string.toString());
 	      if (pos<0) {
 	        if (CSVReader.isNumber(string.toString(), false)) {
@@ -701,6 +726,12 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 	      } else {
 	        ((JTextComponent)colChooser).setText(Integer.toString(pos));
 	      }
+	    } else if (colChooser instanceof ColorChooserWithPreview) {
+	      if (string instanceof java.awt.Color) {
+	      ((ColorChooserWithPreview) colChooser).setColor((Color)string);
+	      }
+	    } else {
+	      log.warning("Please implement setSelectedItem for" + colChooser.getClass());
 	    }
 	  }
 	  
