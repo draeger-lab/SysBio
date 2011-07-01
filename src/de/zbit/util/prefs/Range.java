@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.io.CSVReader;
@@ -129,6 +130,7 @@ public class Range<Type> {
 		@SuppressWarnings("unchecked")
 		public boolean isInRange(Type value) {
 			if (value instanceof Comparable) {
+			  try {
 				// Check lower bound
 				int r = ((Comparable)value).compareTo(((Comparable)lBound));
 				if (r<0 || (r==0 && excludingLBound) ) return false;
@@ -136,10 +138,15 @@ public class Range<Type> {
 				// Check upper bound
 				r = ((Comparable)value).compareTo(((Comparable)uBound));
 				if (r>0 || (r==0 && excludingUBound) ) return false;
-				
-				return true;
+			  } catch (Exception e) {
+			    // E.g. when a float is expected and value is "Hallo", a
+			    // Float cannot be cast to String Exception is raised when
+			    // casting to comparable
+			    return false;
+			  }
+			  return true;
 			} else if (lBound.equals(uBound)) {
-				// Check absolute value
+			  // Check absolute value
 				if (!excludingLBound && !excludingUBound) {
 				  // Special treatment for classes
 				  if (value instanceof Class) {
@@ -290,7 +297,7 @@ public class Range<Type> {
    *
    * <p>A range spec of <code>{[-1.0,1.0]}</code> for a floating
    * point value will allow any floating point number in the
-   * range -1.0 to 1.0.
+   * range (including) -1.0 to 1.0.
    * 
    * <p>A range spec of <code>{(-88,100],1000}</code> for an integer
    * value will allow values > -88 and <= 100, as well as 1000.
@@ -548,6 +555,7 @@ public class Range<Type> {
 		} catch (Exception e) {
 			// Erase it, so that other methods can see that it is invalid.
 			if (range.equals(this.rangeString)) this.rangeString=null;
+			logger.log(Level.SEVERE, "Invalid range string.", e);
 			
 			throw new ParseException(String.format(ResourceManager.getBundle(
 				"de.zbit.locales.Warnings").getString("RANGE_IN_WRONG_FORMAT"),

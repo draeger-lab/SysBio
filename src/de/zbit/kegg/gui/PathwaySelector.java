@@ -18,13 +18,7 @@ package de.zbit.kegg.gui;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,11 +30,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
+import keggapi.Definition;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
-import de.zbit.io.OpenFile;
 import de.zbit.kegg.KeggFunctionManagement;
-import de.zbit.util.FileDownload;
+import de.zbit.kegg.KeggQuery;
+import de.zbit.util.CustomObject;
 import de.zbit.util.StringUtil;
 
 /**
@@ -56,13 +51,13 @@ public class PathwaySelector extends JPanel {
    * This is the url that is used to download the pathway list, if the local
    * file does not exist.
    */
-  private final static String pathwayListUrl = "ftp://ftp.genome.jp/pub/kegg/pathway/map_title.tab";
+  //private final static String pathwayListUrl = "ftp://ftp.genome.jp/pub/kegg/pathway/map_title.tab";
   
   /**
    * This is the local file that will be used as cache for the
    * pathway list and will be opened first.
    */
-  private final static String pathwayListLocal = "de/zbit/kegg/map_title.tab";
+  //private final static String pathwayListLocal = "de/zbit/kegg/map_title.tab";
   
   /**
    * The manager that is used to retrieve the organisms from kegg. (NOT the pathways).
@@ -197,11 +192,46 @@ public class PathwaySelector extends JPanel {
     lh.add("Select pathway", pathwaySelector, true);
     worker.execute();
   }
-  
+
   /**
    * @return all kegg pathways (multi-organism).
    * @throws IOException 
    */
+  private HashMap<String, String> getPathways() throws IOException {
+    try {
+      KeggQuery query = new KeggQuery(KeggQuery.getPathways, "map");
+        CustomObject<Object> answer = manag.getInformation(query);
+        Definition[] pathways = (Definition[]) answer.getObject();
+        
+        if (pathways == null || pathways.length<1) {
+          GUITools.showErrorMessage(this, "Could not retrieve list of pathways from KEGG.");
+          return null;
+        }
+        
+        
+        pathwayMap = new HashMap<String, String>(pathways.length);
+        for (int i = 0; i < pathways.length; i++) {
+          // Put e.g. Key: "04614", Value: "Renin-angiotensin system"
+          // "path:map04614" => "04614"
+          String idNum = pathways[i].getEntry_id();
+          int pos = idNum.indexOf("map");
+          if (pos>=0) idNum = idNum.substring(pos+3).trim();
+          pathwayMap.put(idNum, pathways[i].getDefinition().replace(" - Reference pathway", ""));
+        }
+      return pathwayMap;
+      
+    } catch (Exception e) {
+      GUITools.showErrorMessage(this, e);
+      return null;
+    }
+    
+  }
+  /**
+   * @return all kegg pathways (multi-organism).
+   * @throws IOException 
+   */
+  /*
+   * Methods to get pathway lists before 2011-07-01
   private HashMap<String, String> getPathways() throws IOException {
     
     // Try to retrieve pwlist from resources and download if it fails.
@@ -256,6 +286,7 @@ public class PathwaySelector extends JPanel {
     } catch (IOException t) {} // Not that important. Just a cache.
     return pwlist;
   }
+  */
   
   
   /**

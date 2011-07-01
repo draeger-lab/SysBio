@@ -196,6 +196,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 				exitStatus = APPROVE_OPTION;
 			} catch (BackingStoreException exc) {
 				GUITools.showErrorMessage(this, exc);
+				return; // Do NOT close dialog with invalid values.
 			}
 			if (ae.getActionCommand().equals(OK)) {
 				dispose();

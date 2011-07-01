@@ -275,28 +275,31 @@ public class DirectoryParser implements Iterator<String> {
 	 */
 	private ArrayList<String> readDir(String path) {
 		path = appendSlash(path);
-		if (!new File(path).isDirectory()) {
+		File fPath = new File(path);
+		if (!fPath.isDirectory()) {
 			System.err.println("'" + path + "' is not a directory.");
 			return null;
 		}
-		String[] allFiles = new File(path).list();
+		String[] allFiles = fPath.list();
 
 		// Add all files which match extension and recurse into subdirs
 		// (appending the right path).
 		String pathPrefix = path.replace(this.path, "");
 		ArrayList<String> myFiles = new ArrayList<String>();
-		for (String file : allFiles) {
-			if (recurseIntoSubdirectories
-					&& new File(path + file).isDirectory()) {
-				myFiles.addAll(readDir(path + file));
-			} else {
-				if (extension == null || extension.trim().length() == 0) {
-					myFiles.add(pathPrefix + file);
-				} else {
-					if (file.toLowerCase().endsWith(extension.toLowerCase()))
-						myFiles.add(pathPrefix + file);
-				}
-			}
+		if (allFiles!=null) {
+		  for (String file : allFiles) {
+		    if (recurseIntoSubdirectories
+		        && new File(path + file).isDirectory()) {
+		      myFiles.addAll(readDir(path + file));
+		    } else {
+		      if (extension == null || extension.trim().length() == 0) {
+		        myFiles.add(pathPrefix + file);
+		      } else {
+		        if (file.toLowerCase().endsWith(extension.toLowerCase()))
+		          myFiles.add(pathPrefix + file);
+		      }
+		    }
+		  }
 		}
 
 		// To designated Array.

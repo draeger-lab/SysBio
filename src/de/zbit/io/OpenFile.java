@@ -45,10 +45,25 @@ import de.zbit.util.SortedArrayList;
  */
 public class OpenFile {
   /**
-   * 
+   * A cache that provides already downloaded files and saves the user from having to readownload them.
    */
   private static SortedArrayList<String[]> downloadedFiles = new SortedArrayList<String[]>();
+  
+  /**
+   * Contains <code>System.getProperty("user.dir")</code>
+   */
+  public final static String curDir;;
+  
+  /**
+   * Initializes the <code>curDir</code> variable.
+   */
+  static {
+    String cd = System.getProperty("user.dir");
+    if (!cd.endsWith(File.separator)) cd+=File.separator;
+    curDir = cd;
+  }
 
+  
   /**
    * 
    * @param URL
@@ -245,8 +260,6 @@ public class OpenFile {
    * @throws URISyntaxException  - if the resource is inside a jar-file.
    */
   public static File searchFile(String infile) throws URISyntaxException {
-    String curDir = System.getProperty("user.dir");
-    if (!curDir.endsWith(File.separator)) curDir+=File.separator;
     Class<?> parentClass = Reflect.getParentClass();
     
     if (new File (infile).exists()) { // Load from Filesystem
@@ -284,9 +297,6 @@ public class OpenFile {
    * @throws IOException
    */
   public static InputStream searchFileAndGetInputStream(String infile, Class<?> class1) throws IOException {
-    String curDir = System.getProperty("user.dir");
-    if (!curDir.endsWith(File.separator)) curDir+=File.separator;
-    
     if (new File (infile).exists()) { // Load from Filesystem
       return  new FileInputStream (infile);
     } else if (class1.getClassLoader().getResource(infile)!=null) { // Load from jar - root

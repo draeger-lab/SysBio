@@ -30,7 +30,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	private static final long serialVersionUID = -2970366298298913439L;
 
 	/**
-	 * Input: Organism id (e.g. "hsa")
+	 * Input: Organism id (e.g. "hsa"), or "map" for reference pathways.
 	 * Returns: Definition[]
 	 */
 	public final static int getPathways = 0; // returns: Definition[] (alt:
@@ -138,6 +138,9 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	 * @return
 	 */
 	public String getQuery() {
+	  if (jobToDo==getPathways && (query==null || query.length()<1)) {
+	    query = "map";
+	  }
 		return query;
 	}
 
@@ -175,7 +178,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "Job:" + jobToDo + " Query:" + query;
+		return "Job:" + jobToDo + " Query:" + getQuery();
 	}
 
 }
