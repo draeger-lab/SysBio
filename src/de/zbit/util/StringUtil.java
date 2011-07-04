@@ -761,7 +761,7 @@ public class StringUtil {
    * @param string
    * @return string without any xml annotations.
    */
-  public String removeXML(String string) {
+  public static String removeXML(String string) {
     return string.replaceAll("\\<.*?\\>", "");
   }
 	
