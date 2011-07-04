@@ -93,21 +93,20 @@ public class KGMLSelectAndDownload {
   public static String evaluateOKButton(final PathwaySelector selector) {
     // Create pathway to orthologous or organism specific pathway.
     String org = selector.getOrganismSelector().getSelectedOrganismAbbreviation();
-    if (org==null || org.equals("ko")) org="ko";
+    if (org==null || org.equals("map")) org="ko";
     
-    return downloadPathway(org, selector.getSelectedPathwayID(), true);
+    return downloadPathway(selector.getSelectedPathwayID(), true);
   }
 
   /**
    * Download a pathway from KEGGs public FTP server.
-   * @param org Organism kegg abbreviation (e.g., "mmu")
    * @param pwID pathway identifier (e.g., "mmu00010")
    * @param askUserBeforeUsingCache if true (default), the user will be asked if a 
    * file with the same name has already been downloaded. If false, this method will
    * simply return the path to the already existing file.
    * @return the local file path of the downloaded pathway.
    */
-  public static String downloadPathway(String org, String pwID, boolean askUserBeforeUsingCache) {
+  public static String downloadPathway(String pwID, boolean askUserBeforeUsingCache) {
     String localFile=null;
     
     // OLD FTP-Based procedure before 2011-07-01
@@ -131,6 +130,9 @@ public class KGMLSelectAndDownload {
     }*/
     
     // ----
+    
+    // Generic maps must be fetched for the general orthologous organism (ko).
+    if (pwID.startsWith("map")) pwID="ko"+pwID.substring(3);
     
     // Try to download with new url
     localFile = downloadKGML(pwID, askUserBeforeUsingCache);
@@ -217,7 +219,7 @@ public class KGMLSelectAndDownload {
     
     // TODO: Put download in separate thread and check for timeouts.
     String newUrl = String.format("http://www.genome.jp/kegg-bin/download?entry=%s&format=kgml", pwID);
-    localFile = FileDownload.download(newUrl);
+    localFile = FileDownload.download(newUrl, pwID + ".xml");
     
     if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>1) {
       return localFile;

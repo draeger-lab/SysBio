@@ -52,7 +52,7 @@ public class OpenFile {
   /**
    * Contains <code>System.getProperty("user.dir")</code>
    */
-  public final static String curDir;;
+  public final static String curDir;
   
   /**
    * Initializes the <code>curDir</code> variable.
@@ -62,7 +62,6 @@ public class OpenFile {
     if (!cd.endsWith(File.separator)) cd+=File.separator;
     curDir = cd;
   }
-
   
   /**
    * 
