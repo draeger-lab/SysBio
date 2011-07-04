@@ -649,14 +649,24 @@ public class Utils {
    * @return -1 if failed, else the parsed number.
    */
   public static int getNumberFromStringRev(int startAtPos, String toParse) {
+    return Integer.parseInt(getNumberFromStringRevAsString(startAtPos, toParse));
+  }
+  
+  /**
+   * @see #getNumberFromStringRev(int, String)
+   * @param startAtPos
+   * @param toParse
+   * @return number as String (with eventually leading zeros).
+   */
+  public static String getNumberFromStringRevAsString(int startAtPos, String toParse) {
     int i = startAtPos;
-    if (i<=0 || i>toParse.length()) return -1;
+    if (i<=0 || i>toParse.length()) return "-1";
     
     StringBuffer ret = new StringBuffer();
     while (i>0 && Character.isDigit(toParse.charAt(i-1)))
       ret.append( toParse.charAt(--i) );
     
-    return Integer.parseInt(ret.reverse().toString());
+    return ret.reverse().toString();
   }
   
   /**
