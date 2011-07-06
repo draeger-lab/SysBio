@@ -145,10 +145,25 @@ public class Reaction {
       String name = node.getNodeName().trim();
       
       NamedNodeMap att = node.getAttributes();
+      ReactionComponent rc = null;
       if (name.equalsIgnoreCase("substrate")) {
-        substrate.add(new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes()));
+        rc = new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes());
+        substrate.add(rc);
       } else if(name.equals("product")) {
-        product.add(new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes()));
+        rc = new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes());
+        product.add(rc);
+      }
+      
+      // Attribute id is since 7.1
+      try {
+        String id = KeggParser.getNodeValue(att, "id");
+        rc.setId(Integer.parseInt(id));
+      } catch (Exception e) {
+        /* Possible conflicts:
+         * - id attribute might not be set (old KGML document)
+         * - Integer.parseInt might fail
+         * - rc may be null.
+         */
       }
     }
   }

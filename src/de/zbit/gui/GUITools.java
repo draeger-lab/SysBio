@@ -79,6 +79,7 @@ import de.zbit.io.OpenFile;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
+import de.zbit.util.Utils;
 import de.zbit.util.ValuePair;
 
 /**
@@ -259,8 +260,7 @@ public class GUITools {
    * @param dir
    * @param allFilesAcceptable
    * @param multiSelectionAllowed
-   * @param mode
-   *        - e.g. JFileChooser.FILES_ONLY
+   * @param mode e.g., JFileChooser.FILES_ONLY
    * @return
    */
   public static JFileChooser createJFileChooser(String dir,
@@ -276,8 +276,7 @@ public class GUITools {
    * @param dir
    * @param allFilesAcceptable
    * @param multiSelectionAllowed
-   * @param mode
-   *        - e.g. JFileChooser.FILES_ONLY
+   * @param mode e.g., JFileChooser.FILES_ONLY
    * @param filter
    * @return
    */
@@ -296,6 +295,55 @@ public class GUITools {
       }
     }
     return chooser;
+  }
+  
+  /**
+   * Shows a {@link JFileChooser} to the user, appends the selected file extension to the
+   * selected file and checks weather the selected file is writable. If the file already
+   * exists, the user will be asked if he wants to overwrite the file. If the file is not
+   * writable, an error message id displayed to the user.
+   * @param parent parent component for makeing a modal dialog. May be null.
+   * @param saveDir initial directory for the {@link JFileChooser}. May be null.
+   * @param filter {@link FileFilter} the user may choose from. May be null.
+   * @return a file selected by the user if and only if this file is writable and the user
+   * confirmed every warning. Else, null is returned. 
+   */
+  public static File showSaveFileChooser(Component parent, String saveDir, FileFilter... filter) {
+    JFileChooser fc = GUITools.createJFileChooser(saveDir, (filter==null || filter.length<1),
+      false, JFileChooser.FILES_ONLY, filter);
+    if (fc.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION) return null;
+    
+    // Get selected file and try to prepend extension
+    File f = fc.getSelectedFile();
+    
+    // Eventually append file extension
+    if (!f.getName().contains(".")) {
+      String extension = fc.getFileFilter().getDescription();
+      int pos = extension.lastIndexOf("*.");
+      if (pos>=0) {
+        extension = Utils.getWord(extension, pos+2, false);
+        // *.* => (extension.length()==0)
+        if (extension!=null && extension.length()>0) {
+          f = new File(f.getPath() + "." + extension);
+        }
+      }
+    }
+    
+    // Check if file exists and is writable
+    boolean fileExists = f.exists();
+    if (!fileExists) try {
+      f.createNewFile();
+    } catch (IOException e) {
+      GUITools.showErrorMessage(parent, e);
+      return null;
+    }
+    if (!f.canWrite() || f.isDirectory()) {
+      GUITools.showNowWritingAccessWarning(parent, f);
+    } else if (!fileExists || (fileExists && GUITools.overwriteExistingFile(parent, f))) {
+      // This is the usual case
+      return f;
+    }
+    return null;
   }
   
   /**
@@ -476,6 +524,53 @@ public class GUITools {
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, KeyStroke keyStroke) {
     return createJMenuItem(listener, command, null, keyStroke);
+  }
+  
+  
+  /**
+   * Creates a new {@link JButton} with action listeners that invoke
+   * a specific method.
+   * @param listener the ActionListener to be added
+   * @param command the action command for this button, i.e., the item
+   *        in the menu. This will be converted to a {@link String} using 
+   *        the {@link String.#toString()} method.
+   * @param icon the icon of the JButton (can be null)
+   * @return A new {@link JButton} with the given features.
+   */
+  public static JButton createJButton(ActionListener listener,
+    ActionCommand command, Icon icon) {
+    return createJButton(listener, command, icon, null);
+  }
+  
+  /**
+   * Creates a {@link JButton}.
+   * @param listener
+   * @param command
+   * @param icon
+   * @param mnemonic
+   * @return
+   */
+  public static JButton createJButton(ActionListener listener,
+    ActionCommand command, Icon icon, Character mnemonic) {
+    JButton button = new JButton();
+    if (listener != null) {
+      button.addActionListener(listener);
+    }
+    if (mnemonic != null) {
+      button.setMnemonic(mnemonic.charValue());
+    }
+    if (command != null) {
+      button.setText(command.getName());
+      String toolTip = command.getToolTip();
+      if (toolTip != null) {
+        button.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
+      }
+      button.setActionCommand(command.toString());
+    }
+    if (icon != null) {
+      button.setIcon(icon);
+    }
+    return button;
   }
   
   /**

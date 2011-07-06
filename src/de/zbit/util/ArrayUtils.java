@@ -51,8 +51,12 @@ public class ArrayUtils {
    * @return
    */
   public static <T> int indexOf(T[] arr, T s) {
-    for (int i=0; i<arr.length; i++)
-        if (arr[i].equals(s)) return i;
+    if (arr==null) return -1;
+    if (s==null) return -1;
+    for (int i=0; i<arr.length; i++) {
+      if (arr[i]==null) continue;
+      if (arr[i].equals(s)) return i;
+    }
     return -1;
   }
   
@@ -132,7 +136,7 @@ public class ArrayUtils {
    * @param size
    * @return new array of the class of the given type, with the given size.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes" })
   public static Object createNewArray(Object type, int size) {
     Class elementType=null;
     if (type instanceof Class)
@@ -289,6 +293,26 @@ public class ArrayUtils {
    */
   public static <T> T[] resize(T[] array, int size, T defaultValue) {
     return resize(array, size, defaultValue, false);
+  }
+
+
+  /**
+   * @param arr
+   * @return null if all elements in arr are null, else, all
+   * elements that are not null.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T[] removeNull(T[] arr) {
+    LinkedList<T> nonNull = new LinkedList<T>();
+    T sample=null;
+    for (T t : arr) {
+      if (t!=null) {
+        nonNull.add(t);
+        sample=t;
+      }
+    }
+    if (nonNull.size()<1) return null;
+    return (T[]) nonNull.toArray((T[]) createNewArray(sample, nonNull.size()));
   }
   
 }

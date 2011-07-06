@@ -605,6 +605,7 @@ public class StringUtil {
 	}
 	
 	/**
+	 * @see #insertLineBreaksAndCount(String, int, String, boolean)
 	 * @param message
 	 * @param lineBreak
 	 * @param lineBreakSymbol
@@ -612,20 +613,36 @@ public class StringUtil {
 	 */
 	public static String insertLineBreaks(String message, int lineBreak,
 		String lineBreakSymbol) {
-		return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol).getA();
+		return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, false).getA();
 	}
-	
+
+	/**
+	 * @see #insertLineBreaksAndCount(String, int, String, boolean)
+	 * @param message
+	 * @param lineBreak breaks AFTER this number of characters is exceeded.
+	 * @param lineBreakSymbol
+	 * @return String with lineBreaks and number of inserted lineBreaks
+	 */
+  public static ValuePair<String, Integer> insertLineBreaksAndCount(
+    String message, int lineBreak, String lineBreakSymbol) {
+    return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, false);
+  }
+  
   /**
    * @param message
    * @param lineBreak
    * @param lineBreakSymbol
+   * @param breakBeforeLineBreak if false, breaks after a line is longer than
+   * <code>lineBreak</code> characters. If true, ensures that no line is longer
+   * than <code>lineBreak</code> characters, i.e., breaks before that number
+   * of chars.
    * @return String with lineBreaks and number of inserted lineBreaks
    */
   public static ValuePair<String, Integer> insertLineBreaksAndCount(
-            String message, int lineBreak, String lineBreakSymbol) {
+            String message, int lineBreak, String lineBreakSymbol, boolean
+            breakBeforeLineBreak) {
     StringBuilder sb = new StringBuilder();
-    StringTokenizer st = new StringTokenizer(message != null ? message : "",
-              " ");
+    StringTokenizer st = new StringTokenizer(message != null ? message : ""," ");
     if (st.hasMoreElements()) {
       sb.append(st.nextElement().toString());
     }
@@ -633,7 +650,11 @@ public class StringUtil {
     int pos;
     int count = 0;
     while (st.hasMoreElements()) {
-      if ((length >= lineBreak) && (lineBreak < Integer.MAX_VALUE)) {
+      String tmp = st.nextElement().toString();
+      
+      if ((lineBreak < Integer.MAX_VALUE) && (
+          (length >= lineBreak) || 
+          (breakBeforeLineBreak && (length + tmp.length()) >= lineBreak) )) {
         sb.append(lineBreakSymbol);
         count++;
         length = 0;
@@ -643,7 +664,6 @@ public class StringUtil {
       }
 
       // Append current element
-      String tmp = st.nextElement().toString();
       sb.append(tmp);
 
       // Change length
@@ -658,7 +678,6 @@ public class StringUtil {
   }
 	
 	/**
-	 * 
 	 * @param c
 	 * @return True if the given character is a vocal and false if it is a
 	 *         consonant.

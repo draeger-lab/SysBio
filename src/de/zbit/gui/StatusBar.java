@@ -212,6 +212,16 @@ public class StatusBar extends JPanel implements ProgressListener {
   }
   
   /**
+   * Hide the {@link #progressBar} if it is visible.
+   */
+  public synchronized void hideProgress() {
+    if (progressBar!=null) {
+      progressBar.getProgressBar().setVisible(false);
+    }
+    return;
+  }
+  
+  /**
    * Attach the statusBar to an existing progressbar. This will display
    * the progress in the status bar and hide it automatically, as soon
    * as the operation is done (100%).

@@ -41,6 +41,11 @@ public class ReactionComponent {
   ReactionComponent alt = null;
   
   /**
+   * A rather new attribute.
+   */
+  Integer id=null;
+  
+  /**
    * 
    * @param name
    */
@@ -107,6 +112,27 @@ public class ReactionComponent {
    */
   public void setName(String name) {
     this.name = name;
+  }
+
+  /**
+   * @param id
+   */
+  public void setId(Integer id) {
+    this.id = id;
+  }
+  
+  /**
+   * @return id
+   */
+  public Integer getId() {
+    return this.id;
+  }
+
+  /**
+   * @return
+   */
+  public boolean hasId() {
+    return id!=null && id.intValue()>0;
   }
 
 }

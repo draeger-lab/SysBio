@@ -17,6 +17,7 @@
 package de.zbit.mapper;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import de.zbit.parser.Species;
 import de.zbit.util.AbstractProgressBar;
@@ -31,6 +32,7 @@ import de.zbit.util.AbstractProgressBar;
  * @version $Rev$
  */
 public class MappingUtils {
+  public static final transient Logger log = Logger.getLogger(MappingUtils.class.getName());
   
   
   /**
@@ -48,22 +50,23 @@ public class MappingUtils {
   
   /**
    * Initializes an X to GeneID mapper.
-   * @param targetIDtype - see {@link IdentifierType}
+   * @param sourceIDtype - see {@link IdentifierType}
    * @param progress - Optional progress bar, used for downloading or reading the mapping flatfile. May be null.
    * @param speciesCommonName - For Ensembl or GeneSymbol, the species common name (e.g., "human") is required.
    * @return
    * @throws IOException
    */
-  public static AbstractMapper<String, Integer> initialize2GeneIDMapper(IdentifierType targetIDtype, AbstractProgressBar progress, Species species) throws IOException {
+  public static AbstractMapper<String, Integer> initialize2GeneIDMapper(IdentifierType sourceIDtype, AbstractProgressBar progress, Species species) throws IOException {
+    log.info("Initializing 2GeneID mapper...");
     // Init mapper based on targetIDtype
     AbstractMapper<String, Integer> mapper = null;
-    if (targetIDtype.equals(IdentifierType.RefSeq)) {
+    if (sourceIDtype.equals(IdentifierType.RefSeq)) {
       mapper = new RefSeq2GeneIDMapper(progress);
-    } else if (targetIDtype.equals(IdentifierType.Ensembl)) {
+    } else if (sourceIDtype.equals(IdentifierType.Ensembl)) {
       mapper = new Ensembl2GeneIDMapper(species.getCommonName(), progress);
-    } else if (targetIDtype.equals(IdentifierType.GeneSymbol)) {
+    } else if (sourceIDtype.equals(IdentifierType.GeneSymbol)) {
       mapper = new GeneSymbol2GeneIDMapper(species.getCommonName(), progress);
-    } else if (targetIDtype.equals(IdentifierType.KeggGenes)) {
+    } else if (sourceIDtype.equals(IdentifierType.KeggGenes)) {
       mapper = new KeggGenesID2GeneID(species.getKeggAbbr(), progress);
     }
     return mapper;
