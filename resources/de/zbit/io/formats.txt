@@ -14,6 +14,7 @@
 # (8) Minimum valid file size for this format
 
 binary;SER;Serialized java object;application/x-java-serialized-object;ser,dat;0;aced;20;
+binary;BED;Binary PLINK genotype data;application/octet-stream;bed;0;6c1b;3;
 archive;BZ2;Bzip2 (bz2);application/x-bzip2;bz2,tbz2;0;425a683931;20;
 archive;GZ;GNU Zip (gz);application/x-gzip;gz,tgz;0;1f8b;20;
 archive;GZ;GNU Zip (gz);application/x-gzip;gz,tgz;0;8b1f;20;
