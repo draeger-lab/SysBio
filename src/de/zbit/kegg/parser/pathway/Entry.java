@@ -220,6 +220,14 @@ public class Entry {
   public boolean hasGraphics() {
     return (graph!=null);
   }
+  
+  /**
+   * @return true if this is a modifier for a certain reaction and the reaction
+   * is set.
+   */
+  public boolean hasReaction() {
+    return (getReaction() != null && getReaction().trim().length() != 0);
+  }
 
   /**
    * 

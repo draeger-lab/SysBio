@@ -29,6 +29,7 @@ import de.zbit.util.StringUtil;
  * directories. Otherwise one could not browse in the file system.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2007-08-03
  * @version $Rev$
  * @since 1.0
@@ -47,9 +48,17 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 	  ASSOC_FILES,
 	  /**
-		 * To be selected if CSV files (comma separated files) can be chosen.
+		 * To be selected if CSV files (comma/character separated files) can be chosen.
 		 */
 		CSV_FILES,
+    /**
+     * To be selected if TSV files (tab separated text files) can be chosen.
+     */
+    TSV_FILES,
+    /**
+     * To be selected if SVG files (Scalable Vector Graphics) can be chosen.
+     */
+    SVG_FILES,
 		/**
 		 * True if this filter accepts directories only (no files).
 		 */
@@ -150,6 +159,20 @@ public class SBFileFilter extends GeneralFileFilter {
 	 */
 	public static SBFileFilter createCSVFileFilter() {
 		return new SBFileFilter(FileType.CSV_FILES);
+	}
+	
+	/**
+	 * A filter for TSV files (tab separated text files)
+	 */
+	public static SBFileFilter createTSVFileFilter() {
+	  return new SBFileFilter(FileType.TSV_FILES);
+	}
+	
+	/**
+	 * A filter for SVG files (Scalable Vector Graphics)
+	 */
+	public static FileFilter createSVGFileFilter() {
+	  return new SBFileFilter(FileType.SVG_FILES);
 	}
 	
 	/**
@@ -448,6 +471,7 @@ public class SBFileFilter extends GeneralFileFilter {
 				|| (type == FileType.TeX_FILES && isTeXFile(f))
 				|| (type == FileType.SBML_FILES && isSBMLFile(f))
 				|| (type == FileType.CSV_FILES && isCSVFile(f))
+				|| (type == FileType.TSV_FILES)
 				|| (type == FileType.HTML_FILES && isHTMLFile(f))
 				|| (type == FileType.PNG_FILES && isPNGFile(f))
 				|| (type == FileType.JPEG_FILES && isJPEGFile(f))
@@ -460,6 +484,7 @@ public class SBFileFilter extends GeneralFileFilter {
 				|| (type == FileType.GIF_FILES && checkExtension(f, ".gif"))
 				|| (type == FileType.YGF_FILES && checkExtension(f, ".ygf"))
 				|| (type == FileType.TGF_FILES && checkExtension(f, ".tgf"))
+				|| (type == FileType.SVG_FILES && checkExtension(f, ".svg"))
 				|| (type == FileType.PDF_FILES && isPDFFile(f))) return true;
 		return false;
 	}
@@ -471,6 +496,22 @@ public class SBFileFilter extends GeneralFileFilter {
 	public boolean acceptsCSVFiles() {
 		return type == FileType.CSV_FILES;
 	}
+	
+  /**
+   * 
+   * @return
+   */
+  public boolean acceptsTSVFiles() {
+    return type == FileType.TSV_FILES;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public boolean acceptsSVGFiles() {
+    return type == FileType.SVG_FILES;
+  }
 	
 	/**
 	 * 
@@ -547,6 +588,10 @@ public class SBFileFilter extends GeneralFileFilter {
 				return String.format("%s (*.sbml, *.xml)", bundle.getString("SBML_FILES"));
 			case CSV_FILES:
 				return String.format("%s (*.csv)", bundle.getString("CSV_FILES"));
+      case TSV_FILES:
+        return String.format("%s (*.txt)", bundle.getString("TSV_FILES"));
+      case SVG_FILES:
+        return String.format("%s (*.svg)", bundle.getString("SVG_FILES"));
 			case JPEG_FILES:
 				return String.format("%s (*.jpg, *.jpeg)", bundle.getString("JPEG_FILES"));
 			case PNG_FILES:
@@ -585,7 +630,7 @@ public class SBFileFilter extends GeneralFileFilter {
 			return "jpg";
 		} else if (type == FileType.SBML_FILES) {
 			return "sbml.xml";
-		} else if (type == FileType.TEXT_FILES) {
+		} else if (type == FileType.TEXT_FILES || type == FileType.TSV_FILES) {
 			return "txt";
 		} else if (type.toString().contains("_")) {
 			return type.toString().substring(0, type.toString().indexOf("_"))
@@ -594,4 +639,5 @@ public class SBFileFilter extends GeneralFileFilter {
 			return "";
 		}
 	}
+
 }

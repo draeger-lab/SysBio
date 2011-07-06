@@ -54,6 +54,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -62,6 +63,7 @@ import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
+import de.zbit.util.ArrayUtils;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
@@ -342,6 +344,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		return null;
 	}
 	
+  /**
+   * @return the {@link #toolBar} if it has been initialized in {@link #createJToolBar()}.
+   * Else, <code>null</code> is returned.
+   */
+  public JToolBar getJToolBar() {
+    return toolBar;
+  }
+	
 	/**
 	 * Closes a {@link File} that is currently open.
 	 * 
@@ -526,22 +536,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		JMenuItem items[] = additionalFileMenuItems();
 		boolean addSeparator = (openFile != null) || (saveFile != null)
 				|| ((items != null) && (items.length > 0)) || (closeFile != null);
-		JMenu fileHistory = null;
-		if (getMaximalFileHistorySize() > 0) {
-			fileHistory = new JMenu(BaseAction.FILE_OPEN_RECENT.getName());
-			fileHistory.setActionCommand(BaseAction.FILE_OPEN_RECENT.toString());
-			fileHistory.setEnabled(false);
-			String tooltip = BaseAction.FILE_OPEN_RECENT.getToolTip();
-			if (tooltip != null) {
-				fileHistory.setToolTipText(StringUtil.toHTML(tooltip,
-					GUITools.TOOLTIP_LINE_LENGTH, false));
-			}
-			SBPreferences history = SBPreferences
-					.getPreferencesFor(getFileHistoryKeyProvider());
-			String fileList = (history != null) ? history
-					.get(FileHistory.LAST_OPENED) : null;
-			updateFileHistory(fileHistory, FileHistory.Tools.parseList(fileList));
-		}
+		JMenu fileHistory = createFileHistory();
 		title = BaseAction.FILE.getName();
 		JMenu fileMenu = GUITools.createJMenu(title == null ? "File" : title,
 				BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
@@ -621,6 +616,30 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		
 		return menuBar;
 	}
+
+	/**
+	 * Create a {@link JMenu} with recently opened files.
+	 * @return
+	 */
+	protected JMenu createFileHistory() {
+    JMenu fileHistory = null;
+    if (getMaximalFileHistorySize() > 0) {
+			fileHistory = new JMenu(BaseAction.FILE_OPEN_RECENT.getName());
+			fileHistory.setActionCommand(BaseAction.FILE_OPEN_RECENT.toString());
+			fileHistory.setEnabled(false);
+			String tooltip = BaseAction.FILE_OPEN_RECENT.getToolTip();
+			if (tooltip != null) {
+				fileHistory.setToolTipText(StringUtil.toHTML(tooltip,
+					GUITools.TOOLTIP_LINE_LENGTH, false));
+			}
+			SBPreferences history = SBPreferences
+					.getPreferencesFor(getFileHistoryKeyProvider());
+			String fileList = (history != null) ? history
+					.get(FileHistory.LAST_OPENED) : null;
+			updateFileHistory(FileHistory.Tools.parseList(fileList), fileHistory);
+		}
+    return fileHistory;
+  }
 
 	/**
 	 * By default this method simply returns null. You can override it to create
@@ -793,32 +812,32 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * @return
 	 */
 	public abstract URL getURLOnlineHelp();
-
-  /**
- * <p>
- * The online update expects to find a file called <code>latest.txt</code>
- * containing only the version number of the latest release of this program as
- * a {@link String} of digits that contains exactly one dot or at most two
- * dots. Furthermore, on the given destination must be a second file, called
- * <code>releaseNotes&lt;VersionNumber&gt;.htm[l]</code> which contains more
- * detailed information about the latest release.
- * </p>
- * <p>
- * Summarizing, the web address or other directory address where we can find
- * at least the following two files:
- * <ul>
- * <li>latest.txt</li>
- * <li>releaseNotesX.Y.Z.htm</li>
- * </ul>
- * The file <code>latest.txt</code> contains exactly the dotted version number
- * of the latest release of this software; nothing else! The release notes
- * file contains HTML code describing the latest changes and the file name
- * MUST end with the latest version number of the release.
- * </p>
- * 
- * @return The {@link URL} to some directory where to look for the online update.
- */
-public abstract URL getURLOnlineUpdate();
+	
+	/**
+	 * <p>
+	 * The online update expects to find a file called <code>latest.txt</code>
+	 * containing only the version number of the latest release of this program as
+	 * a {@link String} of digits that contains exactly one dot or at most two
+	 * dots. Furthermore, on the given destination must be a second file, called
+	 * <code>releaseNotes&lt;VersionNumber&gt;.htm[l]</code> which contains more
+	 * detailed information about the latest release.
+	 * </p>
+	 * <p>
+	 * Summarizing, the web address or other directory address where we can find
+	 * at least the following two files:
+	 * <ul>
+	 * <li>latest.txt</li>
+	 * <li>releaseNotesX.Y.Z.htm</li>
+	 * </ul>
+	 * The file <code>latest.txt</code> contains exactly the dotted version number
+	 * of the latest release of this software; nothing else! The release notes
+	 * file contains HTML code describing the latest changes and the file name
+	 * MUST end with the latest version number of the release.
+	 * </p>
+	 * 
+	 * @return The {@link URL} to some directory where to look for the online update.
+	 */
+	public abstract URL getURLOnlineUpdate();
 	
 	/**
 	 * Initializes this graphical user interface.
@@ -899,28 +918,28 @@ public abstract URL getURLOnlineUpdate();
     // Create and put statusBar in south
 		return StatusBar.addStatusBar(this);
   }
-	
-	/**
-		 * This method decides whether or not the file menu should already be equipped
-		 * with the default entries for "open", "save", and "close". By default, this
-		 * method returns <code>true</code>, i.e., the default File menu already
-		 * contains all these three items. You may want to override this method and to
-		 * return <code>false</code> instead to switch this behavior off.
-		 * 
-		 * @return Whether or not to equip the file menu with the three entries
-		 *         "open", "save", and "close". By default <code>true</code>
-		 */
-		protected boolean loadsDefaultFileMenuEntries() {
-			return true;
-		}
-	
-	/**
-	 * Starts a search for an online update and shows error messages if no update
-	 * can be performed for some reason.
-	 */
-	public void onlineUpdate() {
-		onlineUpdate(false);
-	}
+  
+  /**
+   * This method decides whether or not the file menu should already be equipped
+   * with the default entries for "open", "save", and "close". By default, this
+   * method returns <code>true</code>, i.e., the default File menu already
+   * contains all these three items. You may want to override this method and to
+   * return <code>false</code> instead to switch this behavior off.
+   * 
+   * @return Whether or not to equip the file menu with the three entries
+   *         "open", "save", and "close". By default <code>true</code>
+   */
+  protected boolean loadsDefaultFileMenuEntries() {
+    return true;
+  }
+  
+  /**
+   * Starts a search for an online update and shows error messages if no update
+   * can be performed for some reason.
+   */
+  public void onlineUpdate() {
+    onlineUpdate(false);
+  }
 	
 	/**
 	 * This actually performs the online update, i.e., this method looks if an
@@ -1046,24 +1065,45 @@ public abstract URL getURLOnlineUpdate();
       }
       // Allow users to close the file(s) again
       GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.FILE_CLOSE);
-      if (getMaximalFileHistorySize() > 0) {
-        // Create the list of files to update the file history in the menu.
-        // In addition to the files that have just been opened (above), we
-        // also have to consider older files.
-        File file;
-        JMenu fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
-          BaseAction.FILE_OPEN_RECENT);
-        for (int i = 0; i < fileHistory.getItemCount(); i++) {
-          file = new File(fileHistory.getItem(i).getToolTipText());
-          if (file.exists() && file.canRead() && !fileList.contains(file)) {
-            fileList.add(file);
-          }
-        }
-        updateFileHistory(fileHistory, fileList);
-      }
+      addToFileHistory(fileList);
     }
 		return files;
 	}
+	
+	protected void addToFileHistory(List<File> fileList, JMenu... fileHistory) {
+    if (getMaximalFileHistorySize() > 0) {
+      // Create the list of files to update the file history in the menu.
+      // In addition to the files that have just been opened (above), we
+      // also have to consider older files.
+      
+      // Ensure that the current FileHistory is in the list.
+      JMenu c_fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
+        BaseAction.FILE_OPEN_RECENT);
+      if (ArrayUtils.indexOf(fileHistory, c_fileHistory)<0) {
+        fileHistory = ArrayUtils.removeNull(fileHistory);
+        if (fileHistory==null) {
+          fileHistory = new JMenu[]{c_fileHistory};
+        } else {
+          JMenu[] histories = new JMenu[fileHistory.length+1];
+          histories[0] = c_fileHistory;
+          System.arraycopy(fileHistory, 0, histories, 1, fileHistory.length);
+          fileHistory = histories;
+        }
+      }
+      
+      // Add previous files to history
+      File file;
+      for (int i = 0; i < c_fileHistory.getItemCount(); i++) {
+        file = new File(c_fileHistory.getItem(i).getToolTipText());
+        if (file.exists() && file.canRead() && !fileList.contains(file)) {
+          fileList.add(file);
+        }
+      }
+      // update
+      updateFileHistory(fileList, fileHistory);
+    }
+	}
+	
 	
 	/**
 	 * Displays the configuration for the {@link PreferencesDialog}.
@@ -1076,6 +1116,9 @@ public abstract URL getURLOnlineUpdate();
 
 	/**
 	 * Saves some results or the current work in some {@link File}.
+	 * If you use a {@link JTabbedPane}, it is recommended to let your tabs
+	 * implement the {@link BaseFrameTab} interface and simply call
+	 * {@link BaseFrameTab#saveToFile()}.
 	 */
 	public abstract void saveFile();
 	
@@ -1175,45 +1218,54 @@ public abstract URL getURLOnlineUpdate();
 	 * also makes the file history persistent. If this fails, a dialog with a
 	 * precise error message will be displayed to the user.
 	 * 
-	 * @param fileHistory
-	 *        The {@link JMenu}, whose items will be removed and replaced by
-	 *        references to the files given in the other argument. If the item
-	 *        count of this {@link JMenu} is zero at the end of this method, it
-	 *        will be disabled.
 	 * @param listOfFiles
 	 *        A {@link List} of those {@link File}s that have been opened
 	 *        previously.
+   * @param fileHistory
+   *        The {@link JMenu}, whose items will be removed and replaced by
+   *        references to the files given in the other argument. If the item
+   *        count of this {@link JMenu} is zero at the end of this method, it
+   *        will be disabled.
 	 */
-	private final void updateFileHistory(JMenu fileHistory, List<File> listOfFiles) {
-		fileHistory.removeAll();
+	private final void updateFileHistory(List<File> listOfFiles, JMenu... fileHistory) {
+	  for (JMenu jMenu : fileHistory) {
+	    jMenu.removeAll(); 
+    }
 		JMenuItem fileItem;
 		List<File> keepFiles = new LinkedList<File>();
 		short maximum = getMaximalFileHistorySize();
 		for (int i = 0; i < Math.min(listOfFiles.size(), maximum); i++) {
 			final File file = listOfFiles.get(i);
 			if (file.exists() && file.canRead()) {
-				fileItem = new JMenuItem(file.getName());
-				fileItem.setToolTipText(file.getAbsolutePath());
-				if (maximum <= 10) {
-					fileItem.setAccelerator(KeyStroke.getKeyStroke(String.valueOf(
-						(i + 1 < 10) ? i + 1 : 0).charAt(0), InputEvent.ALT_DOWN_MASK));
-				}
-				fileItem.addActionListener(new ActionListener() {
-					/*
-					 * (non-Javadoc)
-					 * 
-					 * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.
-					 * ActionEvent)
-					 */
-					public void actionPerformed(ActionEvent e) {
-						openFileAndLogHistory(file);
-					}
-				});
-				fileHistory.add(fileItem);
-				keepFiles.add(file);
+			  for (JMenu jMenu : fileHistory) {
+			    // One JMenuItem can only have one parent, thus, create it multiple times
+			    // ie for every fileHistory once.
+			    fileItem = new JMenuItem(file.getName());
+			    fileItem.setToolTipText(file.getAbsolutePath());
+			    if (maximum <= 10) {
+			      fileItem.setAccelerator(KeyStroke.getKeyStroke(String.valueOf(
+			        (i + 1 < 10) ? i + 1 : 0).charAt(0), InputEvent.ALT_DOWN_MASK));
+			    }
+			    fileItem.addActionListener(new ActionListener() {
+			      /*
+			       * (non-Javadoc)
+			       * 
+			       * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.
+			       * ActionEvent)
+			       */
+			      public void actionPerformed(ActionEvent e) {
+			        openFileAndLogHistory(file);
+			      }
+			    });
+			    
+			    jMenu.add(fileItem);
+			  }
+			  keepFiles.add(file);
 			}
 		}
-		fileHistory.setEnabled(fileHistory.getItemCount() > 0);
+    for (JMenu jMenu : fileHistory) {
+      jMenu.setEnabled(jMenu.getItemCount() > 0);
+    }
 		// This removes files that cannot be read from the history.
 		SBPreferences history = SBPreferences
 				.getPreferencesFor(getFileHistoryKeyProvider());

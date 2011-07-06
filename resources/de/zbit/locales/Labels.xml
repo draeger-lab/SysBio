@@ -131,6 +131,8 @@
   <entry key="TeX_FILES">TeX files</entry>
   <entry key="SBML_FILES">SBML files</entry>
   <entry key="CSV_FILES">Comma separated files</entry>
+  <entry key="TSV_FILES">Text (Tab-separated)</entry>
+  <entry key="SVG_FILES">Scalable Vector Graphics files</entry>
   <entry key="JPEG_FILES">Joint Photographic Experts Group files</entry>
   <entry key="PNG_FILES">Portable Network Graphics files</entry>
   <entry key="PDF_FILES">Portable Document Format files</entry>

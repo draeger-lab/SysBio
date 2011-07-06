@@ -153,11 +153,12 @@ public class KGMLSelectAndDownload {
    * simply return the path to the already existing file.
    * @return
    */
+  @SuppressWarnings("unused")
   @Deprecated
   private static String downloadKGML(String metaURL, String nonMetaURL, boolean askUserBeforeUsingCache) {
     // Check if file already exists and ask user to reuse or overwrite or cancel.
     String localFile = FileDownload.getLocalFilenameForURL(metaURL);
-    if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>0) {
+    if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>1) {
       int a=0;
       if (askUserBeforeUsingCache) {
         String[] options = new String[]{"Open already existing file", "Redownload file", "Cancel"};
@@ -202,7 +203,7 @@ public class KGMLSelectAndDownload {
   private static String downloadKGML(String pwID, boolean askUserBeforeUsingCache) {
     // Check if file already exists and ask user to reuse or overwrite or cancel.
     String localFile = pwID + ".xml";
-    if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>0) {
+    if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>1) {
       int a=0;
       if (askUserBeforeUsingCache) {
         String[] options = new String[]{"Open already existing file", "Redownload file", "Cancel"};

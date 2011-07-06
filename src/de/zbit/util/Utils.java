@@ -272,7 +272,8 @@ public class Utils {
    * @param values
    * @return median
    */
-  @SuppressWarnings("unchecked")
+  
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public static double median(List values) {
     if (values.size()<1) return Double.NaN;
     Collections.sort(values);
@@ -296,7 +297,8 @@ public class Utils {
    * @param values
    * @return
    */
-  @SuppressWarnings("unchecked")
+  
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public static double median(Collection values) {
     if (values instanceof List) {
       return median ((List)values);
@@ -344,14 +346,14 @@ public class Utils {
    * Mittelwertberechnung.
    * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public static double average(Collection d){
     double average = average1(d);
     if (Double.isNaN(average) || Double.isInfinite(average)) 
         return average2(d);
     return average;
   }
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   private static double average1(Collection doubles){ // Schneller
     if (doubles==null || doubles.size()<1) return Double.NaN;
     double retVal= 0;
@@ -374,7 +376,8 @@ public class Utils {
     if (countNonNAN<=0) return Double.NaN;
     return (retVal/countNonNAN);
   }
-  @SuppressWarnings("unchecked")
+  
+  @SuppressWarnings("rawtypes")
   private static double average2(Collection doubles){ // Keine to-large-numbers
     if (doubles==null || doubles.size()<1) return Double.NaN;
     double retVal= 0;
@@ -809,6 +812,32 @@ public class Utils {
       if (rechtsOK && leftOK) return true;
     }
     return false;
+  }
+  
+  /**
+   * @param containingLine
+   * @param startPosition
+   * @param ignoreDigits
+   * @return the next word in <code>containingLine</code>, starting from <code>startPosition</code>
+   * only including letters and if <code>ignoreDigits</code> is false, also digits.
+   */
+  public static String getWord(String containingLine, int startPosition, boolean ignoreDigits) {
+    // get next word
+    int pos = startPosition;
+    if (pos<0) return null;
+    
+    StringBuffer ret = new StringBuffer();
+    while (pos<=containingLine.length()) {
+      char c = containingLine.charAt(pos);
+      if (Character.isLetter(c)) ret.append(c);
+      else if (!ignoreDigits && Character.isDigit(c)) ret.append(c);
+      else {
+        // End of word
+        break;
+      }
+      pos++;
+    }
+    return ret.toString();
   }
   
   /**
@@ -1388,7 +1417,7 @@ public class Utils {
    * @return a value, <0 if the first array is "lower" or null, compared to the second one.
    * A value >0 if it is the other way round and 0 if both arrays are deepEqual.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public static int deepCompareTo(Object[] arr1, Object[] arr2) {
     if (arr1==null && arr2==null) return 0;
     if (arr1==null) return -1;

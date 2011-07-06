@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.StringTokenizer;
 
+import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
@@ -619,4 +620,13 @@ public class CSVWriter {
 	public void write(TableModel data, String pathname) throws IOException {
 		write(data, separator, pathname);
 	}
+
+  /**
+   * @param table
+   * @param absolutePath
+   * @throws IOException 
+   */
+  public void write(JTable table, File file) throws IOException {
+    write (table.getModel(), this.separator, file);
+  }
 }

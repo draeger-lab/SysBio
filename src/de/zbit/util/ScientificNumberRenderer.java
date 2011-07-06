@@ -27,15 +27,54 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class ScientificNumberRenderer extends DefaultTableCellRenderer {
   private static final long serialVersionUID = 6924185889211247242L;
-
+  
+  /**
+   * The actual formatter
+   */
   NumberFormat formatter;
-  public ScientificNumberRenderer() { super(); }
+  
+  /**
+   * A boundary that defines when to use the formatter
+   */
+  double boundary;
+  
+  public ScientificNumberRenderer() { 
+    this(0);
+  }
+  
+  /**
+   * @param boundary a boundary when to apply the {@link ScientificNumberRenderer}.
+   * If the value is greater than or equal to this value, or smaller than
+   * 1/<code>boundary</code>, the {@link ScientificNumberRenderer} is applied.
+   * Set to <code>0</code> to always apply this renderer.
+   */
+  public ScientificNumberRenderer(double boundary) {
+    super();
+    this.boundary = boundary;
+  }
   
   public void setValue(Object value) {
     if (formatter == null) {
       formatter = getScientificNumberFormat();
     }
-    setText((value == null) ? "" : formatter.format(value));
+    
+    // Format number
+    String text = value.toString();
+    try {
+      if (value instanceof Number) {
+        double d = Math.abs(((Number)value).doubleValue());
+        if (d>=boundary || d<=1/boundary) {
+          text = (value == null) ? "" : formatter.format(value);
+        }
+      }
+    } catch (Exception e) {
+      
+    }
+    
+    // Ausnahmen
+    if (text.endsWith("E0")) text = text.substring(0, text.length()-2);
+    
+    setText(text);
   }
 
   /**
