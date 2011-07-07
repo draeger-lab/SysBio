@@ -21,60 +21,55 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.io.CSVReader;
-import de.zbit.parser.Species;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.logging.LogUtil;
 
 /**
- * Maps KEGG GENES IDs to NCBI Gene IDs (Entrez, previously Lokuslink).
- * The kegg genes id is often simply organism:gene_id, but unfortunately not always.
- * See <a href="http://www.genome.jp/kegg/kegg3.html">http://www.genome.jp/kegg/kegg3.html</a>
- * 
- * <p>Quote:<br/>"Entry names of the KEGG GENES database are usually locus_tags
- * given by the International Nucleotide Sequence Database Collaboration
- * (INSDC). The major sequence databases such as NCBI and UniProt/Swiss-Prot
- * use different sets of gene/protein identifiers."</p>
- * 
- * <p>HINT:<br/>If you can't map something, try to use organism:gene_id as heuristic.
- * This should work in 90% of all cases.</p>
+ * NCBI GeneID 2 GeneSymbol mapping.
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class KeggGenesID2GeneID extends AbstractMapper<String, Integer> {
-  private static final long serialVersionUID = -3452034234430740721L;
-  public static final Logger log = Logger.getLogger(KeggGenesID2GeneID.class.getName());
+public class GeneID2GeneSymbolMapper extends AbstractMapper<Integer, String> {
+  private static final long serialVersionUID = -2886703519596230180L;
+
+  public static final Logger log = Logger.getLogger(GeneID2GeneSymbolMapper.class.getName());
 
   /**
-   * This is required. (e.g. "mmu" for mouse, or "hsa" for human).
-   * @see Species#getKeggAbbr()
+   * Organism in non-scientific format ("human", "mouse" or "rat").
    */
-  private String organism_kegg_abbr = null;
+  String organism;
   
   /**
-   * @param sourceType
-   * @param targetType
+   * @param organism in non-scientific format ("human", "mouse" or "rat").
    * @throws IOException
    */
-  public KeggGenesID2GeneID(String speciesKEGGPrefix)
-  throws IOException {
-    this(speciesKEGGPrefix, null);
+  public GeneID2GeneSymbolMapper(String organism) throws IOException {
+    this(organism, null);
   }
   
-  public KeggGenesID2GeneID(Species species) throws IOException {
-    this(species.getKeggAbbr());
+  /**
+   * @param organism in non-scientific format ("human", "mouse" or "rat").
+   * @param progress
+   * @throws IOException
+   */
+  public GeneID2GeneSymbolMapper(String organism, AbstractProgressBar progress) throws IOException {
+    super(Integer.class, String.class, progress);
+    this.organism = organism;
   }
   
-  public KeggGenesID2GeneID(Species species, AbstractProgressBar progress) throws IOException {
-    this(species.getKeggAbbr(), progress);
+  
+  /**
+   * @param args
+   * @throws Exception 
+   */
+  public static void main(String[] args) throws Exception {
+    LogUtil.initializeLogging(Level.FINE);
+    GeneID2GeneSymbolMapper mapper = new GeneID2GeneSymbolMapper("human");
+    System.out.println(mapper.map(1576));
+    System.out.println(mapper.map(0));
+    System.out.println(mapper.map(123456236));
   }
   
-  public KeggGenesID2GeneID(String speciesKEGGPrefix, AbstractProgressBar progress)
-  throws IOException {
-    // This constructor is called from every other!
-    super(String.class, Integer.class, progress);
-    organism_kegg_abbr = speciesKEGGPrefix;
-    init();
-  }
   
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#init()
@@ -82,24 +77,12 @@ public class KeggGenesID2GeneID extends AbstractMapper<String, Integer> {
   @Override
   protected void init() throws IOException {
     // Read GeneID 2 KEGG GENES ID mapping
-    GeneID2KeggIDMapper gene2kegg = new GeneID2KeggIDMapper(organism_kegg_abbr, progress);
-    gene2kegg.init();
+    GeneSymbol2GeneIDMapper gs2gi = new GeneSymbol2GeneIDMapper(organism, progress);
+    gs2gi.init();
     
     // Reverse this mapping and use for this class.
-    reverse(gene2kegg);
-    
+    reverse(gs2gi);
     isInizialized = true;
-  }
-  
-  /**
-   * TESTS ONLY!
-   * @throws Exception 
-   */
-  public static void main(String[] args) throws Exception {
-    LogUtil.initializeLogging(Level.FINE);
-    KeggGenesID2GeneID mapper = new KeggGenesID2GeneID("mmu");
-    System.out.println(mapper.map("mmu:13091")); // CYP2B20
-    System.out.println(mapper.map("mmu:11576")); // AFP
   }
 
   /* (non-Javadoc)
@@ -115,7 +98,7 @@ public class KeggGenesID2GeneID extends AbstractMapper<String, Integer> {
    */
   @Override
   public String getMappingName() {
-    return "KeggGenesID2GeneID";
+    return "GeneID2GeneSymbol";
   }
 
   /* (non-Javadoc)
@@ -141,5 +124,5 @@ public class KeggGenesID2GeneID extends AbstractMapper<String, Integer> {
   public int getTargetColumn(CSVReader r) {
     return 0; // Not required. See GeneID2KeggIDMapper.java
   }
-  
+
 }
