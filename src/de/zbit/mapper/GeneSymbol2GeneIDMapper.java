@@ -47,7 +47,7 @@ public class GeneSymbol2GeneIDMapper extends Ensembl2GeneIDMapper {
    */
   
   /**
-   * @param organism - in non-scientific format ("human", "mouse" or "rat").
+   * @param organism in non-scientific format ("human", "mouse" or "rat").
    * @throws IOException
    */
   public GeneSymbol2GeneIDMapper(String organism) throws IOException {
@@ -56,7 +56,7 @@ public class GeneSymbol2GeneIDMapper extends Ensembl2GeneIDMapper {
   }
   
   /**
-   * @param organism - in non-scientific format ("human", "mouse" or "rat").
+   * @param organism in non-scientific format ("human", "mouse" or "rat").
    * @param progress
    * @throws IOException
    */
