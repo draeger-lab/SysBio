@@ -93,20 +93,31 @@ public class PathwaySelector extends JPanel {
   }
   
   public PathwaySelector(KeggFunctionManagement manag, LayoutHelper lh) throws Exception {
+    this(manag,lh,null);
+  }
+  
+  /** 
+   * @param manag cache to use
+   * @param lh LayoutHelper to use
+   * @param fixedOrganismKeggAbbr if not null, will preselect an organism and deactivate the organism selector
+   * @throws Exception
+   */
+  public PathwaySelector(KeggFunctionManagement manag, LayoutHelper lh, String fixedOrganismKeggAbbr) throws Exception {
     super();
     
     if (manag==null) manag = new KeggFunctionManagement();
     if (lh==null) lh = new LayoutHelper(this);
     this.manag = manag;
     
-    initGui(lh);
+    initGui(lh, fixedOrganismKeggAbbr);
   }
   
   /**
    * @param lh
+   * @param fixedOrganismKeggAbbr if not null, will preselect an organism and deactivate the organism selector
    * @throws Exception 
    */
-  private void initGui(LayoutHelper lh) throws Exception {
+  private void initGui(LayoutHelper lh, final String fixedOrganismKeggAbbr) throws Exception {
     // Create orgaism selector
     /*
      *  XXX: It would be possible to accept certain organisms and then load
@@ -128,9 +139,13 @@ public class PathwaySelector extends JPanel {
       }
     }
     
-    //} else {
-    //orgSel = null;
-    //}
+    // Preselect a fixed organism
+    if (fixedOrganismKeggAbbr!=null) {
+      orgSel.setDefeaultSelectionLater(fixedOrganismKeggAbbr);
+      // Since we did not load the reference pathways, deactivate
+      // the organism selector.
+      orgSel.setEnabled(false);
+    }
     
     // Retrieve pathway list
     final String loadingItem = "Loading list of pathways...";
@@ -141,7 +156,7 @@ public class PathwaySelector extends JPanel {
       protected Object doInBackground() {
         HashMap<String, String> orgs=null;
         try {
-          orgs = getPathways();
+          orgs = getPathways(fixedOrganismKeggAbbr);
         } catch (IOException e) {
           GUITools.showErrorMessage(parent, e);
           e.printStackTrace();
@@ -177,6 +192,10 @@ public class PathwaySelector extends JPanel {
           GUITools.packParentWindow(parent);
           GUITools.enableOkButtonIfAllComponentsReady(parent);
           
+          if (fixedOrganismKeggAbbr!=null) {
+            orgSel.getOrganisms(); // Wait to finish the dialog
+            GUITools.enableOkButton(parent);
+          }
           
         }
       }
@@ -194,12 +213,25 @@ public class PathwaySelector extends JPanel {
   }
 
   /**
-   * @return all kegg pathways (multi-organism).
-   * @throws IOException 
+   * @return all reference kegg pathways (multi-organism).
+   * @throws IOException
    */
+  @SuppressWarnings("unused")
   private HashMap<String, String> getPathways() throws IOException {
+    return getPathways("map");
+  }
+  
+  /**
+   * @param organismKeggAbbr e.g. "hsa"
+   * @return all kegg pathways for the given organism
+   * @throws IOException
+   */
+  private HashMap<String, String> getPathways(String organismKeggAbbr) throws IOException {
+    if (organismKeggAbbr==null || organismKeggAbbr.length()!=3) {
+      organismKeggAbbr = "map";
+    }
     try {
-      KeggQuery query = new KeggQuery(KeggQuery.getPathways, "map");
+      KeggQuery query = new KeggQuery(KeggQuery.getPathways, organismKeggAbbr);
         CustomObject<Object> answer = manag.getInformation(query);
         Definition[] pathways = (Definition[]) answer.getObject();
         
@@ -216,7 +248,10 @@ public class PathwaySelector extends JPanel {
           String idNum = pathways[i].getEntry_id();
           int pos = idNum.indexOf("map");
           if (pos>=0) idNum = idNum.substring(pos+3).trim();
-          pathwayMap.put(idNum, pathways[i].getDefinition().replace(" - Reference pathway", ""));
+          //pathwayMap.put(idNum, pathways[i].getDefinition().replace(" - Reference pathway", ""));
+          int trimPos = pathways[i].getDefinition().lastIndexOf('-');
+          pathwayMap.put(idNum, pathways[i].getDefinition().substring(0, trimPos<0?
+              pathways[i].getDefinition().length():trimPos).trim());
         }
       return pathwayMap;
       
