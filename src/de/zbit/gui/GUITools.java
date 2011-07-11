@@ -679,6 +679,19 @@ public class GUITools {
     }
   }
   
+  public static synchronized boolean enableOkButton(Container c) {
+    // Search for ok button and enable.
+    if (c!=null) {
+      // c is now a Window.
+      Component okButton = searchFor(c, AbstractButton.class, "getText", getOkButtonText());
+      if (okButton!=null) {
+        okButton.setEnabled(true);
+        return true;
+      }
+    }
+    return false;
+  }
+  
   /**
    * Tries to get the lokalized cancel Button Message, as it occurs
    * in the UIManager (e.g. JOptionPane).

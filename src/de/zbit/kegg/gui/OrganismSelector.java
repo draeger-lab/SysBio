@@ -52,14 +52,22 @@ public class OrganismSelector extends JPanel {
   /**
    * Our list of organisms. (Static, so they are cached).
    */
-  private static HashMap<String, String> organismMap;
+  private static HashMap<String, String> organismMap=null;
   
   /**
    * The Organism Selector.
    */
   private JComboBox organismSelector;
   
+  /**
+   * A default selection for the ComboBox.
+   */
   public static String defaultSelection = "Homo sapiens (human)";
+  
+  /**
+   * Is set to true when this panel is completely inizialized.
+   */
+  private boolean isInitialized=false;
   
   /**
    * This is a convenient constructor. However, the {@link #OrganismSelector(KeggFunctionManagement)}
@@ -141,13 +149,19 @@ public class OrganismSelector extends JPanel {
               organismSelector.setSelectedItem(org);
             }
           }
-          organismSelector.setEnabled(true);
+          
+          // Might not be desired to enable this dialog.
+          organismSelector.setEnabled(isEnabled());
           
           
           // Try to refresh parent (dialog size can only be changed by calling "pack").
           GUITools.packParentWindow(parent);
-          GUITools.enableOkButtonIfAllComponentsReady(parent);
+          if (isEnabled()) {
+            // Only change dialog ok if this is enabled. Else, do nothing.
+            GUITools.enableOkButtonIfAllComponentsReady(parent);
+          }
           
+          isInitialized=true;
         }
       }
     };
@@ -179,11 +193,50 @@ public class OrganismSelector extends JPanel {
     
   }
   
+  public boolean isInitialized() {
+    return isInitialized;
+  }
+  
+  /**
+   * Set the default selection of this organism selector.
+   * @param organism as given as full name by KEGG e.g. "Homo sapiens (human)".
+   */
+  public void setDefeaultSelection(String organism) {
+    defaultSelection = organism;
+    /* Panel has not yet been initialized and will take
+     * automatically the defaultSelection.
+     */
+    if (organismMap==null) return;
+    
+    // Else, we have to take care by our own.
+    organismSelector.setSelectedItem(organism);
+  }
+  
+  /**
+   * Will convert the given kegg abbreviation (e.g. "hsa") to the
+   * organism name and set this as default value, as soon as the
+   * kegg adaptor has given all organisms from kegg. This will be
+   * executed as new thread!
+   * @param organismKeggAbbr e.g. "hsa"
+   */
+  public void setDefeaultSelectionLater(final String organismKeggAbbr) {
+    Thread r = new Thread() {
+      @Override
+      public void run() {
+        // Wait until we have an answer from KEGG and
+        // then convert to full name
+        String fullName = getOrganisms().get(organismKeggAbbr);
+        setDefeaultSelection(fullName);
+      }
+    };
+    r.start();
+  }
+  
   /**
    * Get organisms via {@link #manag}.
    * @return HashMap<Abbreviation, Description>. E.g. Key: "hsa", Value: "Homo sapiens (human)"
    */
-  private HashMap<String, String> getOrganisms() {
+  public synchronized HashMap<String, String> getOrganisms() {
     try {
       if (organismMap==null || organismMap.size()<1) {
         KeggQuery query = new KeggQuery(KeggQuery.getOrganisms,null);
@@ -210,6 +263,11 @@ public class OrganismSelector extends JPanel {
     }
   }
   
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    organismSelector.setEnabled(enabled);
+  }
   
   /**
    * Just for testing.
@@ -286,5 +344,7 @@ public class OrganismSelector extends JPanel {
     
     return ret;
   }
+
+
   
 }
