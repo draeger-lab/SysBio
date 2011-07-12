@@ -19,6 +19,7 @@ package de.zbit.util;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -175,12 +176,13 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   
   /**
    * <B>WARNING: </B>This contructor does ONLY WORK FOR
-   * SORTED LISTS! Ensure to have called {@link Arrays#sort(Object[])}
+   * SORTED LISTS! Ensure to have called {@link Collections#sort(List)}
    * BEFORE calling this constructor.
    * @param c
    */
   public SortedArrayList(List<? extends T> c) {
     super(c);
+    
   }
   
   /**
