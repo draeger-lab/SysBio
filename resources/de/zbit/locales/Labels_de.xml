@@ -92,6 +92,7 @@
   <entry key="ALL_POSSIBLE_VALUES_FOR_TYPE">Alle möglichen Werte des Typs</entry>
   <entry key="ARE">sind</entry>
   <entry key="AND">und</entry>
+  <entry key="OR">oder</entry>
   <entry key="ARGS_MUST_FIT_INTO_RANGE">Argumente müssen aus dem Bereich %s gewählt werden.</entry>
   <entry key="COMMAND_LINE_HELP">Zeigt alle verfügbaren %s an.</entry> <!-- COMMAND_LINE_ARGUMENTS -->
   <entry key="DEFAULT_VALUE">Standardwert</entry>

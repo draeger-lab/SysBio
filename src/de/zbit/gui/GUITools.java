@@ -55,6 +55,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -134,6 +135,7 @@ public class GUITools {
         "ICON_SAVE_16.png",
         "ICON_TICK_16.png",
         "ICON_TRASH_16.png",
+        "ICON_SEARCH_16.png",
         "UT_BM_Rot_RGB_tr_36x64.png",
         "UT_WBMS_Rot_RGB_tr_64x62.png",
         "UT_WBMW_mathnat_4C_380x45.png"
@@ -474,7 +476,33 @@ public class GUITools {
    */
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic) {
-    JMenuItem item = new JMenuItem();
+    return createJMenuItem(listener, command, icon, ks, mnemonic, JMenuItem.class);
+  }
+
+  /**
+   * Creates an entry for the menu bar.
+   * 
+   * @param listener
+   * @param command
+   * @param icon
+   * @param ks
+   * @param mnemonic
+   * @param type may also be {@link JCheckBoxMenuItem} or other derivates
+   * of {@link JMenuItem}.
+   * @return
+   */
+  public static JMenuItem createJMenuItem(ActionListener listener,
+      ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic,
+      Class<?extends JMenuItem> type) {
+    if (type==null) type = JMenuItem.class;
+    JMenuItem item;
+    try {
+      item = type.newInstance();
+    } catch (Exception e) {
+      logger.log(Level.WARNING, "Cannot instantiate class.", e);
+      item = new JMenuItem();
+    }
+
     if (ks != null) {
       item.setAccelerator(ks);
     }
@@ -1408,7 +1436,7 @@ public class GUITools {
    * @param choices different choices
    * @return choosen index or JOptionPane static ints
    */
-  public static int showQuestionMessage(Component parent, String message, String title, Object[] choices) {
+  public static int showQuestionMessage(Component parent, String message, String title, Object... choices) {
     return JOptionPane.showOptionDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
       title, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
   }
