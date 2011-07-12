@@ -20,6 +20,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * 
@@ -39,7 +40,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   /**
    * Achtung: bei Not Found gibt er manchmal "0" zurueck!! Das muss gesondert gecheckt werden.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public static <K> int binarySearch(SortedArrayList<K> a, Object x) {
     int low = 0;
     int high = a.size() - 1;
@@ -69,7 +70,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    * @param index
    * @return
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   private static <K> int compare(SortedArrayList<K> a, Object x, int index) {
     if (index>=a.size()) return -1; // ...eigentlich error thowen besser.
     return (((Comparable)a.get(index)).compareTo(x));
@@ -96,9 +97,11 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     sal.add(new String[]{"&", "8"}); a[8] = "&"; 
     sal.add(new String[]{"o", "9"}); a[9] = "o"; 
     sal.add(new String[]{"f", "10"}); a[10] = "f";
-    sal.add(new String[]{"n", "11"}); a[11] = "n"; Arrays.sort(a);
+    sal.add(new String[]{"n", "11"}); a[11] = "n"; 
     
+    sal.put(new String[]{"o", "10"}); 
     
+    Arrays.sort(a);
     for (int i=0; i<sal.size(); i++)
       System.out.print(((String[])sal.get(i))[1] + ((String[])sal.get(i))[0] + "-" + a[i] +  "\t");
     
@@ -131,6 +134,8 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     sal2.add("o"); a2[9] = "o"; 
     sal2.add("f"); a2[10] = "f";
     sal2.add("n"); a2[11] = "n"; Arrays.sort(a2);
+    
+    System.out.println("Putting already contained element: "+sal2.put("f"));
     
     
     for (int i=0; i<sal2.size(); i++)
@@ -168,18 +173,25 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     super(initialCapacity);
   }
   
-  /*
-   * (non-Javadoc)
-   * @see java.util.ArrayList#add(java.lang.Object)
+  /**
+   * <B>WARNING: </B>This contructor does ONLY WORK FOR
+   * SORTED LISTS! Ensure to have called {@link Arrays#sort(Object[])}
+   * BEFORE calling this constructor.
+   * @param c
    */
-  @Override
-  @SuppressWarnings("unchecked")
-  public boolean add(T s) {
-    if (this.size()==0) {
-      indexOfLastAddedItem = 0;
-      return super.add(s);
-    }
-    
+  public SortedArrayList(List<? extends T> c) {
+    super(c);
+  }
+  
+  /**
+   * Returns the position where <code>s</code> should
+   * be inserted.
+   * @param s
+   * @return
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private int getInsertPosition(T s) {
+    if (size()<=0) return 0;
     int pos = 0;
     if (s.getClass().isArray()) {
       pos = Math.abs(binarySearchTabString(this, indexToSearch, s));
@@ -202,21 +214,66 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
           pos++;
       }
     }
-    
-    /* for (int i=0; i<this.size(); i++)
-      System.out.print(this.get(i) + "\t");
-    System.out.println();*/
+    return pos;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see java.util.ArrayList#add(java.lang.Object)
+   */
+  @Override
+  public boolean add(T s) {
+    int pos = getInsertPosition(s);
     
     super.add(pos, s);
     indexOfLastAddedItem = pos;
     
-    /*System.out.println(s + "=>" + pos);
+    return true;
+  }
+  
+  /**
+   * Adds <code>s</code> to this list if and only if it is not already
+   * in the list. This is a more efficient method than writing
+   * <pre>if (!contains(s)) add(s)</pre>
+   * <p>Compares the elements based on the compareTo method, and uses
+   * only the {@link #indexToSearch} column in arrays (as always in
+   * this implementation).
+   * @see #add(Object)
+   * @param s
+   * @return true if and only if this item has been added to this list.
+   */
+  public boolean put(T s) {
+    int pos = getInsertPosition(s);
     
-    for (int i=0; i<this.size(); i++)
-      System.out.print(this.get(i) + "\t");
-    System.out.println("\n---------------");*/
+    // Check if not already contained
+    if (pos<size() && equals(get(pos), s)) return false;
+    
+    super.add(pos, s);
+    indexOfLastAddedItem = pos;
     
     return true;
+  }
+  
+  /**
+   * Performs a <code>compareTo==0</code> check with the implemented special treatment
+   * of arrays and using the compareTo, not the equals method!
+   * @param element1
+   * @param element2
+   * @return
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private boolean equals(T element1, T element2) {
+    if (element2.getClass().isArray()) {
+      if (((Comparable)Array.get(element1, indexToSearch)).compareTo(Array.get(element2, indexToSearch))==0) {
+        return true;
+      }
+    } else {
+      if (((Comparable)element1).compareTo((Comparable)element2)==0) {
+        return true;
+      }
+    }
+    
+    return false;
   }
   
   /*
@@ -275,7 +332,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    * @param x
    * @return
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <K> int binarySearchNonArrayItemInTabString(SortedArrayList<K> a, int indexToSearch, Object x) {
     int low = 0;
     int high = a.size() - 1;
@@ -303,7 +360,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    * @param x
    * @return
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <K> int binarySearchTabString(SortedArrayList<K> a, int indexToSearch, Object x) {
     int low = 0;
     int high = a.size() - 1;
@@ -349,6 +406,8 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    */
   @Override
   public int indexOf(Object o) {
+    // TODO: Return FIRST, not any indexOf item to be
+    // Conform with super.indexOf().
     if (this.size()==0) return -1;
     T s  = get(0);
     int pos = -1;
@@ -373,6 +432,13 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     return pos;
   }
   
+  @Override
+  public int lastIndexOf(Object o) {
+    // TODO: Return LAST, not any indexOf item to be
+    // Conform with super.indexOf().
+    return indexOf(o);
+  }
+  
   /**
    * Returns true if and only if there is an element in this list, such that
    * the String representation of this element is contained in s.
@@ -395,12 +461,33 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     return false;
   }
   
+  
   /**
    * 
    * @param indexToSearch
+   * @throws Exception 
    */
-  public void setArrayIndexToSort(int indexToSearch) {
+  public void setArrayIndexToSort(int indexToSearch) throws Exception {
+    if (size()>1) {
+      throw new Exception("Can only change array index to sort in empty list!");
+    }
     this.indexToSearch = indexToSearch;
+  }
+  
+  public T set(int index, T element) {
+    System.err.println("Set not allowed in " + getClass().getSimpleName());
+    return element;
+  };
+  
+  public void add(int index, T element) {
+    System.err.println("Add with specific index not allowed in " + getClass().getSimpleName());
+    add(element);
+  };
+  
+  @Override
+  public boolean addAll(int index, Collection<? extends T> c) {
+    System.err.println("Add with specific index not allowed in " + getClass().getSimpleName());
+    return addAll(c);
   }
   
   /*
