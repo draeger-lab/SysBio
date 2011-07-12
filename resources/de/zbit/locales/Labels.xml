@@ -97,6 +97,7 @@
   <entry key="ALL_POSSIBLE_VALUES_FOR_TYPE">All possible values for type</entry>
   <entry key="ARE">are</entry>
   <entry key="AND">and</entry>
+  <entry key="OR">or</entry>
   <entry key="ARGS_MUST_FIT_INTO_RANGE">Arguments must fit into the range %s.</entry>
   <entry key="COMMAND_LINE_HELP">Lists all available %s.</entry> <!-- COMMAND_LINE_ARGUMENTS -->
   <entry key="DEFAULT_VALUE">Default value</entry>

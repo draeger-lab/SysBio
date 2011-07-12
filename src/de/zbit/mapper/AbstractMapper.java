@@ -30,7 +30,6 @@ import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.FileDownload;
 import de.zbit.util.FileTools;
-import de.zbit.util.ProgressBar;
 import de.zbit.util.Timer;
 import de.zbit.util.prefs.Option;
 
@@ -182,7 +181,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     String localf = FileDownload.download(getRemoteURL(), localFile);
     if (localFile!=null && localFile.length()>0) localFile = localf;
     if (FileDownload.ProgressBar!=null) {
-      ((ProgressBar)FileDownload.ProgressBar).finished();
+      ((AbstractProgressBar)FileDownload.ProgressBar).finished();
     }
   }
 
