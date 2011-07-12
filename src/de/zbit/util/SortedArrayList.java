@@ -476,11 +476,6 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     this.indexToSearch = indexToSearch;
   }
   
-  public T set(int index, T element) {
-    System.err.println("Set not allowed in " + getClass().getSimpleName());
-    return element;
-  };
-  
   public void add(int index, T element) {
     System.err.println("Add with specific index not allowed in " + getClass().getSimpleName());
     add(element);
