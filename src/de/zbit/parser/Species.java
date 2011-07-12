@@ -127,6 +127,20 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable {
 
   /**
    * 
+   * @param scientificName
+   * @param uniprotExtension
+   * @param commonName
+   * @param keggAbbr
+   * @param ncbi_taxon_id
+   */
+  public Species(String scientificName, String uniprotExtension, String commonName, String keggAbbr, int ncbi_taxon_id) {
+    this(scientificName, uniprotExtension, commonName, null);
+    this.keggAbbr = keggAbbr;
+    this.ncbi_tax_id = ncbi_taxon_id;
+  }
+
+  /**
+   * 
    * @param synonym
    * @return as specified by {@link Collection#add(Object)}
    */
