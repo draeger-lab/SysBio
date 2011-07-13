@@ -22,6 +22,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Array;
+import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -55,14 +57,24 @@ public class JTableTools {
         search(0);
       }
       private void search(int rowStart) {
+        /* TODO: A much better solution would be to shift this code
+         * to a new thread and show a loading indicator in the search
+         * field.
+         */
         table.clearSelection();
         String text = searchField.getText();
         if (text.length() <1) { return; }
+        text = text.toLowerCase();
         for (int row = rowStart; row < table.getRowCount(); row++) {
           for (int col = 0; col < table.getColumnCount(); col++) {
             Object val = table.getValueAt(row, col);
-            String value = val != null ? val.toString() : "";
-            if (value.toLowerCase().startsWith(text.toLowerCase())) {
+            
+            if (val==null) continue;
+            if (val.getClass().isArray() || val instanceof Iterable) {
+              val = list2String(val);
+            }
+            String value = val.toString();
+            if (value.toLowerCase().contains(text)) {
               table.changeSelection(row, col, false, false);
               return;
             }
@@ -81,6 +93,7 @@ public class JTableTools {
           if (isDialogVisible) {
             final Search s = new Search();
             s.search(table.getSelectedRow()+1);
+            evt.consume();
           } else {
             showSearchDialog();
           }
@@ -90,6 +103,7 @@ public class JTableTools {
           if (!isDialogVisible) {
             showSearchDialog();
           }
+          evt.consume();
           return;
         }
         
@@ -116,7 +130,7 @@ public class JTableTools {
        */
       private void showSearchDialog() {
         final Search s = new Search();
-        s.search();
+        //s.search();
         
         final JDialog d = new JDialog();
         d.setUndecorated(true);
@@ -190,6 +204,28 @@ public class JTableTools {
         searchField.getActionMap().put("exit", exit);
       }
     });
+  }
+
+  public static String list2String(Object val) {
+    StringBuffer ret = new StringBuffer();
+    
+    if (val.getClass().isArray()) {
+      int size = Array.getLength(val);
+      for (int i=0; i<size; i++) {
+        ret.append(Array.get(val, i));
+        ret.append(" ");
+      }
+    } else if (val instanceof Iterable) {
+      Iterator<?> it = ((Iterable<?>) val).iterator();
+      while (it.hasNext()) {
+        ret.append(it.next().toString());
+        ret.append(" ");
+      }
+    } else {
+      ret.append(val.toString());
+    }
+
+    return ret.toString();
   }
   
 }
