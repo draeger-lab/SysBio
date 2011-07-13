@@ -219,8 +219,8 @@ public class KeggAdaptor {
     if (pos <= 0) { // <=0 because of +1 in line above.
       pos = completeString.toLowerCase().indexOf(startsWith.toLowerCase());
       // Pruefen ob zeichen ausser \t und " " zwischen \n und pos. wenn ja =>
-      // abort. (Beispiel: "  AUTHOR XYZ" m�glich.)
-      if (pos < 0)
+      // abort. (Beispiel: "  AUTHOR XYZ" moeglich.)
+      if (pos < 0 || pos>=completeString.length())
         return null;
       int lPos = completeString.lastIndexOf("\n", pos);
       String toCheck = completeString.substring(Math.max(lPos, 0), pos);
@@ -231,6 +231,7 @@ public class KeggAdaptor {
       if (!Character.isWhitespace(completeString.charAt(pos+startsWith.length())))
         return null;
     }
+    if (pos + startsWith.length()>=completeString.length()) return "";
 
     String ret = "";
     if (endsWith == null || endsWith.length()<1) {
@@ -242,14 +243,13 @@ public class KeggAdaptor {
         nl = completeString.length();
 
       try {
-        ret = completeString.substring(st,
-            nl).trim();
+        ret = completeString.substring(st, nl).trim();
       } catch (Exception e) {
         System.out.println("St: " + st + " \t" + pos + " "
             + startsWith.length());
         System.out.println("Nl: " + nl + " \t" + completeString.length());
         System.out.println(startsWith);
-        System.out.println("--------------\n" + completeString);
+        System.out.println("--------------\n");
         e.printStackTrace();
       }
       while (completeString.length() > (nl + 1)) {
@@ -265,10 +265,12 @@ public class KeggAdaptor {
     } else {
       // Jump to first non-Whitespace Character. Mind the new lines!
       int sPos = pos+startsWith.length();
-      while (Character.isWhitespace(completeString.charAt(sPos)) && completeString.charAt(sPos)!='\n') sPos++;
+      while (sPos<completeString.length() &&
+          Character.isWhitespace(completeString.charAt(sPos)) && completeString.charAt(sPos)!='\n') sPos++;
+      if (sPos>=completeString.length()) return "";
       
       // Search for end position and trim string.
-      int pos2 = completeString.toLowerCase().indexOf(endsWith,sPos);
+      int pos2 = completeString.toLowerCase().indexOf(endsWith.toLowerCase(),sPos);
       if (pos2<=0) return "";
       ret = completeString.substring(sPos, pos2).trim();
     }

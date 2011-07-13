@@ -105,7 +105,9 @@ public class StatusBar extends JPanel implements ProgressListener {
       }
       
       // Set the status label text.
-      statusLabel.setText(message.toString());
+      if (!message.toString().equals(statusLabel.getText())) {
+        statusLabel.setText(message.toString());
+      }
     }
   };
   

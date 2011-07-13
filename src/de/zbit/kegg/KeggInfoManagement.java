@@ -149,7 +149,7 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     String[] splitt = q.split("///");
     
     String[] ret = new String[ids.length];
-    for (int i=0; i<ret.length; i++) ret[i] = null; // Initialite all non-successfull ids.
+    for (int i=0; i<ret.length; i++) ret[i] = null; // Initialize all non-successful ids.
     int numMissing = 0;
     for (int i=0; i<splitt.length; i++) {
       if (splitt[i]==null || splitt[i].trim().length()==0) {splitt[i]=null; continue;}

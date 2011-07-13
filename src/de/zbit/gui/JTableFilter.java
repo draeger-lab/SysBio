@@ -240,11 +240,19 @@ public class JTableFilter extends JPanel {
       // Column contains integers and user types e.g. > "A".
       return ret;
     }
+    
+    // Preprocess: Always c1 must be selected
+    if (c1.equals("") && !c2.equals("")) {
+      c1 = c2;
+      f1 = f2;
+      col1 = col2;
+      c2="";
+    }
 
     // Match all rows and store matcheds rows in list.
     for (int i=0; i<table.getRowCount(); i++) {
       if (Thread.currentThread().isInterrupted()) return null;
-      if (c1!="") {
+      if (!c1.equals("")) {
         Object val = table.getValueAt(i, col1);
         if (matchOperator(c1, val, f1)) {
           if (or) {
@@ -256,10 +264,12 @@ public class JTableFilter extends JPanel {
           continue;
         }
         
-        Object val2 = table.getValueAt(i, col2);
-        if (matchOperator(c2, val2, f2)) {
+        if (c2.equals("") || matchOperator(c2, table.getValueAt(i, col2), f2)) {
           ret.add(i);
         }
+        
+      } else {
+        ret.add(i);
       }
     }
     
@@ -362,8 +372,13 @@ public class JTableFilter extends JPanel {
   
   
   public static JTableFilter showDialog(Component parent, JTable r) {
+    return showDialog(parent, r, null);
+  }
+  public static JTableFilter showDialog(Component parent, JTable r, String title) {
+    if (title==null) title = UIManager.getString("OptionPane.titleText");
+    
     final JTableFilter c = new JTableFilter(r);
-    int ret = JOptionPane.showConfirmDialog(parent, c, UIManager.getString("OptionPane.titleText"), JOptionPane.OK_CANCEL_OPTION);
+    int ret = JOptionPane.showConfirmDialog(parent, c, title, JOptionPane.OK_CANCEL_OPTION);
     if (ret==JOptionPane.OK_OPTION) {
       return c;
     } else {

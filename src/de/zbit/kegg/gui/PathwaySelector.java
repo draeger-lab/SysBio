@@ -363,6 +363,7 @@ public class PathwaySelector extends JPanel {
     // Get the KEY of the selected pathway
     String selID = null;
     String selItem = pathwaySelector.getSelectedItem().toString();
+    if (pathwayMap==null || pathwayMap.entrySet()==null) return null;
     for (Map.Entry<String,String> e: pathwayMap.entrySet()) {
       if (e.getValue().equals(selItem)) selID = e.getKey();
     }
