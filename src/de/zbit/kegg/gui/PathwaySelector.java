@@ -65,9 +65,9 @@ public class PathwaySelector extends JPanel {
   private KeggFunctionManagement manag;
   
   /**
-   * Our list of organisms. (Static, so they are cached).
+   * Our list of pathways. (Static, so they are cached).
    */
-  private static HashMap<String, String> pathwayMap;
+  private static Map<String, String> pathwayMap;
   
   /**
    * The pathway Selector.
@@ -154,14 +154,14 @@ public class PathwaySelector extends JPanel {
     SwingWorker<Object, Void> worker = new SwingWorker<Object, Void>() {
       @Override
       protected Object doInBackground() {
-        HashMap<String, String> orgs=null;
+        Map<String, String> pws=null;
         try {
-          orgs = getPathways(fixedOrganismKeggAbbr);
+          pws = getPathways(fixedOrganismKeggAbbr);
         } catch (IOException e) {
           GUITools.showErrorMessage(parent, e);
           e.printStackTrace();
         }
-        return orgs;
+        return pws;
       }
       
       @SuppressWarnings("unchecked")
@@ -217,7 +217,7 @@ public class PathwaySelector extends JPanel {
    * @throws IOException
    */
   @SuppressWarnings("unused")
-  private HashMap<String, String> getPathways() throws IOException {
+  private Map<String, String> getPathways() throws IOException {
     return getPathways("map");
   }
   
@@ -226,22 +226,35 @@ public class PathwaySelector extends JPanel {
    * @return all kegg pathways for the given organism
    * @throws IOException
    */
-  private HashMap<String, String> getPathways(String organismKeggAbbr) throws IOException {
+  private Map<String, String> getPathways(String organismKeggAbbr) throws IOException {
+    pathwayMap = getPathways(organismKeggAbbr, manag);
+    return pathwayMap;
+  }
+  
+  /**
+   * Be careful with this function. Use it only in SwingWorkers and don't call it
+   * often, since it creates time and memory lasting traffic with KEGG server.
+   * @param organismKeggAbbr e.g. "hsa"
+   * @return all kegg pathways for the given organism (id => name).
+   * @throws IOException
+   */
+  public static Map<String, String> getPathways(String organismKeggAbbr, KeggFunctionManagement manag) throws IOException {
     if (organismKeggAbbr==null || organismKeggAbbr.length()!=3) {
       organismKeggAbbr = "map";
     }
-    try {
-      KeggQuery query = new KeggQuery(KeggQuery.getPathways, organismKeggAbbr);
+    synchronized (organismKeggAbbr) {
+      try {
+        KeggQuery query = new KeggQuery(KeggQuery.getPathways, organismKeggAbbr);
         CustomObject<Object> answer = manag.getInformation(query);
         Definition[] pathways = (Definition[]) answer.getObject();
         
         if (pathways == null || pathways.length<1) {
-          GUITools.showErrorMessage(this, "Could not retrieve list of pathways from KEGG.");
+          GUITools.showErrorMessage(null, "Could not retrieve list of pathways from KEGG.");
           return null;
         }
         
         
-        pathwayMap = new HashMap<String, String>(pathways.length);
+        Map<String, String> pathwayMap = new HashMap<String, String>(pathways.length);
         for (int i = 0; i < pathways.length; i++) {
           // Put e.g. Key: "04614", Value: "Renin-angiotensin system"
           // "path:map04614" => "04614"
@@ -253,14 +266,15 @@ public class PathwaySelector extends JPanel {
           pathwayMap.put(idNum, pathways[i].getDefinition().substring(0, trimPos<0?
               pathways[i].getDefinition().length():trimPos).trim());
         }
-      return pathwayMap;
-      
-    } catch (Exception e) {
-      GUITools.showErrorMessage(this, e);
-      return null;
+        return pathwayMap;
+        
+      } catch (Exception e) {
+        GUITools.showErrorMessage(null, e);
+        return null;
+      }
     }
-    
   }
+  
   /**
    * @return all kegg pathways (multi-organism).
    * @throws IOException 

@@ -459,11 +459,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
    * @see #isSelectionValid()
    */
   private void writeSelectionsToObjects() {
-    // Erase all previous selections
-    for (ExpectedColumn e : exCols) {
-      e.assignedColumns.clear();
-      e.assignedTypeForEachColumn.clear();
-    }
+    removeSelectionsFromObjects();
     
     // Put selections to lists
     for (int i=0; i<exColSelections.length; i++) {
@@ -473,6 +469,19 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
         exCols.get(selectedItem).assignedColumns.add(i);
         exCols.get(selectedItem).assignedTypeForEachColumn.add(selectedType);
       }
+    }
+  }
+
+  /**
+   * Resets all <code>assignedColumns</code> and 
+   * <code>assignedTypeForEachColumn</code> attributes of
+   * all {@link ExpectedColumn}s.
+   */
+  private void removeSelectionsFromObjects() {
+    // Erase all previous selections
+    for (ExpectedColumn e : exCols) {
+      e.assignedColumns.clear();
+      e.assignedTypeForEachColumn.clear();
     }
   }
 
@@ -515,6 +524,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     // Close dialog with ESC button.
     jd.getRootPane().registerKeyboardAction(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
+        c.removeSelectionsFromObjects();
         c.buttonPressed = JOptionPane.CANCEL_OPTION;
         jd.dispose();
       }
@@ -555,6 +565,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     
     // Dispose and return if dialog has been confirmed.
     jd.dispose();
+    
     return (c.getButtonPressed()==JOptionPane.OK_OPTION);
   }
   
@@ -627,6 +638,9 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     String cmd = e.getActionCommand();
     // Show a dialog that let's the user rename the expected column captions
     if (cmd.equals("edit_names")) {
+      // Write initial selections to object for better proposals
+      writeSelectionsToObjects();
+      
       // get CSV file headers for initial suggestions
       String[] headers = getCSVReader().getHeader();
       if (headers==null) headers = new String[0];
@@ -644,9 +658,17 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
       int i=0;
       for (ExpectedColumn ec: exCols) {
         if (ec.renameAllowed) {
-          fields.add((++i)+".");
+          //fields.add((++i)+".");
+          fields.add(ec.getOriginalName().toString()+": ");
           field_ecs.add(ec);
-          suggestions.add(ArrayUtils.merge(ec.name.toString(), headers));
+          
+          // Propose name of selected column for already assigned columns
+          String currentName = ec.name.toString();
+          if (ec.isOriginalName() && ec.getAssignedColumn()>=0 && r.getContainsHeaders()
+              && ec.getAssignedColumn()<r.getHeader().length) {
+            currentName = r.getHeader()[ec.getAssignedColumn()];
+          }
+          suggestions.add(ArrayUtils.merge(currentName, headers));
         }
       }
       

@@ -38,6 +38,11 @@ public class ExpectedColumn {
   Object name;
   
   /**
+   * Original, non-changeable name of the expected column (E.g. "Observation 1")
+   */
+  private final Object originalName;
+  
+  /**
    * If multiple types can be interpreted, a list of acceptable types.
    * E.g. "pValue", "Fold change",...
    */
@@ -92,6 +97,7 @@ public class ExpectedColumn {
   public ExpectedColumn(Object name) {
     super();
     this.name=name;
+    this.originalName = name;
   }
   /**
    * @param name
@@ -193,12 +199,14 @@ public class ExpectedColumn {
   public List<Integer> getAssignedTypeForEachColumn() {
     return assignedTypeForEachColumn;
   }
+  
   /**
    * @return the (maybe modified) name of this expected column
    */
   public Object getName() {
     return name;
   }
+  
   /**
    * This is a convenient wrapper the returns directly the assigned
    * type.
@@ -242,5 +250,25 @@ public class ExpectedColumn {
     return assignedColumns!=null && assignedColumns.size()>0;
   }
   
+  /**
+   * @return true if and only if this {@link ExpectedColumn} has not been
+   * renamed.
+   */
+  public boolean isOriginalName() {
+    return originalName.equals(name);
+  }
+  
+  /**
+   * @return true if this expected column has been renamed.
+   */
+  public boolean isRenamed() {
+    return !isOriginalName();
+  }
+  /**
+   * @return the originally assigned name.
+   */
+  public Object getOriginalName() {
+    return originalName;
+  }
   
 }

@@ -1296,6 +1296,15 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       }
       currentOpenFile.close();
       
+      // File had less than threshold lines to examine.
+      if (j-firstConsistentLine-1<=0) {
+        return false; // file contained only one line!
+      } else if (j-firstConsistentLine-1<dataLine.length) {
+        String[][] dataLineShort = new String[j-firstConsistentLine-1][];
+        System.arraycopy(dataLine, 0, dataLineShort, 0, j-firstConsistentLine-1);
+        dataLine = dataLineShort;
+      }
+      
       return containsHeaders(headerLine, dataLine);
     } catch (Exception ex) {ex.printStackTrace();}
     return false;

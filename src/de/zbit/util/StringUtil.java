@@ -783,5 +783,41 @@ public class StringUtil {
   public static String removeXML(String string) {
     return string.replaceAll("\\<.*?\\>", "");
   }
-	
+
+  /**
+   * Removes all character from the string that are not valid in file names.
+   * @param outFile
+   * @return
+   */
+  public static String removeAllNonFileSystemCharacters(String outFile) {
+    StringBuffer ret = new StringBuffer();
+    for (char c: outFile.toCharArray()) {
+      if (isValidFileSystemCharacter(c)) ret.append(c);
+    }
+    return ret.toString();
+  }
+
+  /**
+   * For simplicity this method returns false if the char is in any operating system
+   * invalid.
+   * @param c
+   * @return true if and only if this character can be used in a file name.
+   */
+  private static boolean isValidFileSystemCharacter(char c) {
+    /*
+     *     if (OS.isWindows()) { invalidChars = "\\/:*?\"<>|";
+     *     } else if (OS.isMacOSX()) { invalidChars = "/:";
+     *     } else { // assume Unix/Linux 
+     *     invalidChars = "/";}
+     */
+    if (c=='/' || c=='\\' || c=='?' || c=='*' || c==':' || c=='<' || c=='>' || c=='|' || c=='"' || c=='\n' )
+      return false;
+    
+    // Furthermore, control characters are not valid.
+    if ((c < '\u0020') || (c > '\u007e' && c < '\u00a0'))
+       return false;
+    
+    return true;
+  }
+  
 }
