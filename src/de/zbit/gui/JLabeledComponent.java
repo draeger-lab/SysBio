@@ -865,7 +865,8 @@ public class JLabeledComponent extends JPanel implements JComponentForOption{
 
     /**
      * Show a dialog with multiple {@link JLabeledComponent}s. Each component
-     * hat the label given in fields and the selections from suggestions.
+     * has the label given in <code>fields</code> and the selections from the
+     * <code>suggestions</code> variable.
      * @param parent the parent to which this dialog is modal
      * @param title  title for this dialog
      * @param fields labels for {@link JLabeledComponent}s

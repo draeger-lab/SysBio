@@ -137,7 +137,7 @@ public class KGMLSelectAndDownload {
     // Try to download with new url
     localFile = downloadKGML(pwID, askUserBeforeUsingCache);
     if (localFile==null) {
-      JOptionPane.showMessageDialog(null, "Could not download the selected pathway for the selected organism.", "Download KGML", JOptionPane.ERROR_MESSAGE);
+      GUITools.showErrorMessage(null, String.format("Could not download the selected pathway for the selected organism (%s).", pwID));
     }
     
     return localFile;

@@ -87,7 +87,7 @@ public class CSVReaderOptionPanel extends JPanel {
 
   // Save original and modified CSV Reader (for the cancel button)
   private final CSVReader original;
-  private final CSVReader r;
+  protected final CSVReader r;
   private int numDataLinesForPreview=5;
   protected int buttonPressed=-1; // Tracks if ok or cancel has been pressed
   private boolean showButtons = true;

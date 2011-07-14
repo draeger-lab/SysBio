@@ -1086,7 +1086,7 @@ public class GUITools {
    *        decides whether to check if the file is writable and if existing
    *        files are to be overwritten. If false, no such check will be
    *        performed.
-   * @param mode
+   * @param mode  e.g., JFileChooser.FILES_ONLY
    * @param filter
    * @return
    */

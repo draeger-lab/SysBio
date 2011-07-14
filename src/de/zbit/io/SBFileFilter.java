@@ -171,7 +171,7 @@ public class SBFileFilter extends GeneralFileFilter {
 	/**
 	 * A filter for SVG files (Scalable Vector Graphics)
 	 */
-	public static FileFilter createSVGFileFilter() {
+	public static SBFileFilter createSVGFileFilter() {
 	  return new SBFileFilter(FileType.SVG_FILES);
 	}
 	
@@ -639,5 +639,14 @@ public class SBFileFilter extends GeneralFileFilter {
 			return "";
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+	  return getDescription();
+	}
+	
 
 }
