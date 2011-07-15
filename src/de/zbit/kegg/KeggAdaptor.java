@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 
 import keggapi.Definition;
@@ -41,7 +42,15 @@ import keggapi.SSDBRelation;
  * {@link http://www.genome.jp/kegg/docs/keggapi_manual.html} and feel
  * free to add new methods to this class.
  * 
- * @author wrzodek
+ * <p>NOTE: As a backup system, there is an URL based mirror at
+ * http://togows.dbcls.jp
+ * That means, the URL determines what is being retrieved.
+ * E.g.
+ * http://togows.dbcls.jp/entry/kegg-reaction/R02750
+ * http://togows.dbcls.jp/entry/kegg-reaction/R02750/equation
+ * </p>
+ * 
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
@@ -71,17 +80,42 @@ public class KeggAdaptor {
     printEachOutputToScreen = true;
     KeggAdaptor adap = new KeggAdaptor();
     
+    System.out.println(Arrays.deepToString("1234 567,890, hallo".split(",|\\s")));
+    if (true) return;
+
+    System.out.println(new KeggInfos("ko:K06625").getEntrez_id());
+    if (true) return;
+    adap.getPathways("map");
+    if (true) return;
+    
+    adap.getPathwayList("hsa");
+    System.out.println("==================");
+    adap.getPathways("hsa");
+    System.out.println("==================");
+    adap.getOrganisms();
+    if (true) return;
+    
+    String query = "HOMER1";
+    
+    // Query should be a standard gene symbol
+    ArrayList<String> kgIds = adap.getKEGGIdentifierForAGeneSymbol(query, "hsa");
+    System.out.println("========= GeneSymbol 2 KGId DONE =========");
+    if(true) return;
+
     adap.get_linkdb_by_entry("path:hsa05012", "pathway", 0, 300);
     if(true) return;
     
     adap.find("genes ENSG00000152413");
     
-    ArrayList<String> kgIds = adap.getKEGGIdentifierForAGeneSymbol("ENSG00000152413", "hsa");
+    // Other way round
+    adap.getIdentifier("mcc:709774");
+    System.out.println("========= KGId 2 GeneSymbol DONE =========");
     
     if (kgIds!=null && kgIds.size()>0)
       adap.getBestNeighborsByGene(kgIds.get(0));
     else
-      System.out.println("No Kegg IDs found for xyz.");
+      System.out.println("No Kegg IDs found for "+query+".");
+    System.out.println("========= Orthologous neighbors for KGId DONE =========");
     if (true) return;
     
     adap.getPathways("hsa");
@@ -618,7 +652,7 @@ public class KeggAdaptor {
   /**
    * z.B."GAPDH; glyceraldehyde-3-phosphate dehydrogenase (EC:1.2.1.12); K00134 glyceraldehyde 3-phosphate dehydrogenase [EC:1.2.1.12]"
    * 
-   * @param ko_id
+   * @param ko_id - Kegg orthologous id STARTING WITH KO.
    * @param org
    * @return
    */
@@ -626,7 +660,7 @@ public class KeggAdaptor {
     Definition[] results = new Definition[0];
 
     try {
-      if (org != null && org.trim().length()!=0)
+      if (org != null && org.trim().length()>0)
         results = serv.get_genes_by_ko(ko_id, org);
       else
         results = serv.get_genes_by_ko(ko_id, "");
@@ -689,8 +723,7 @@ public class KeggAdaptor {
    * @param species - optional. E.g. "hsa". Set to null for all.
    * @return kegg identifiers in an arrayList e.g. "hsa:7529"
    */
-  public ArrayList<String> getKEGGIdentifierForAGeneSymbol(String gene,
-      String species) {
+  public ArrayList<String> getKEGGIdentifierForAGeneSymbol(String gene, String species) {
     ArrayList<String> identifiers = new ArrayList<String>();
     String s = "";
 
