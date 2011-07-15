@@ -132,6 +132,7 @@ public class KGMLSelectAndDownload {
     // ----
     
     // Generic maps must be fetched for the general orthologous organism (ko).
+    // It is not possible to download "map" pathways.
     if (pwID.startsWith("map")) pwID="ko"+pwID.substring(3);
     
     // Try to download with new url

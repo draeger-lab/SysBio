@@ -1210,7 +1210,8 @@ public class GUITools {
       inside = c.getComponent(i);
       if (inside instanceof Container) {
         setEnabled(state, (Container) inside, command);
-      } else if (inside instanceof AbstractButton) {
+      } // Don't do "else if" here. JButtons are containers AND buttons itself! 
+      if (inside instanceof AbstractButton) {
         String com = ((AbstractButton) inside).getActionCommand();
         if ((com != null) && (com.toString().equals(command.toString()))) {
           inside.setEnabled(state);

@@ -1701,5 +1701,62 @@ public class Utils {
     }
     return ret;
   }
+
+  /**
+   * Parses a String that contains multiple numbers (only digits) and returns
+   * an array of all those numbers.
+   * @param stringWithMultipleNumbers e.g. "HSA: 1026(CDKN1A)\nPTR: 747442(CDKN1A)"
+   * @return in the example above, int[]{1026, 1, 747442, 1}
+   */
+  public static List<Integer> getNumbersFromString(String stringWithMultipleNumbers) {
+    return getNumbersFromString(stringWithMultipleNumbers,null,null);
+  }
+  
+  /**
+   * Parses a String that contains multiple numbers (only digits) and returns
+   * an array of all those numbers.
+   * @param stringWithMultipleNumbers e.g. "HSA: 1026(CDKN1A)\nPTR: 747442(CDKN1A)"
+   * @param leftOfEachNumber a string that must be left of each number
+   * @param rightOfEachNumber a string that must be right of each number
+   * @return in the example above, if (<code>leftOfEachNumber</code>=" ") int[]{1026, 747442}
+   */
+  public static List<Integer> getNumbersFromString(String stringWithMultipleNumbers, String leftOfEachNumber, String rightOfEachNumber) {
+    List<Integer> ret = new ArrayList<Integer>();
+    StringBuffer curNum = new StringBuffer();
+    char[] cArr = stringWithMultipleNumbers.toCharArray();
+    boolean jumpToNextNumber = true;
+    for (int i=0; i<cArr.length; i++) {
+      if (jumpToNextNumber) {
+        if (leftOfEachNumber!=null) i = stringWithMultipleNumbers.indexOf(leftOfEachNumber,i);
+        if (i<0) break;
+        else i+=leftOfEachNumber!=null?leftOfEachNumber.length():0;
+        if (i>=cArr.length) break;
+      }
+      
+      char c = cArr[i];
+      if (Character.isDigit(c)) {
+        jumpToNextNumber=false;
+        // append to current number
+        curNum.append(c);
+      } else if (curNum.length()>0) {
+        jumpToNextNumber = true;
+        String num = curNum.toString();
+        curNum = new StringBuffer();
+        if (rightOfEachNumber!=null) {
+          if (i+rightOfEachNumber.length()>cArr.length) break;
+          if (!new String(cArr, i, rightOfEachNumber.length()).equals(rightOfEachNumber)) {
+            continue;
+          }
+        }
+        // Add to list
+        ret.add(Integer.parseInt(num));
+      }
+    }
+    if (curNum.length()>0 && rightOfEachNumber==null) {
+      ret.add(Integer.parseInt(curNum.toString()));
+    }
+    
+    return ret;
+  }
   
 }

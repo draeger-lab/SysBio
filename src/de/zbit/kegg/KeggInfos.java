@@ -17,6 +17,7 @@
 package de.zbit.kegg;
 
 import de.zbit.kegg.parser.pathway.EntryType;
+import de.zbit.util.Utils;
 
 /**
  * Simplyfies parsing KeggInfos from the Adaptor. Stores and handles all kegg
@@ -388,7 +389,8 @@ public class KeggInfos {
 	}
 
 	/**
-	 * 
+	 * Be careful, fails to return the correct information if this class
+	 * holds a string with multiple entrez ids!
 	 * @return
 	 */
 	public String getEntrez_id_with_MiriamURN() {
@@ -673,6 +675,23 @@ public class KeggInfos {
 		hgnc_id = KeggAdaptor.extractInfo(infos, "HGNC:", "\n");
 		omim_id = KeggAdaptor.extractInfo(infos, "OMIM:", "\n");
 		entrez_id = KeggAdaptor.extractInfo(infos, "NCBI-GeneID:", "\n");
+		
+		// For KO orthologous, parse entrez ids of all organisms from "GENES"
+		if (entrez_id==null || entrez_id.length()<1) {
+		  try {
+		    String temp = KeggAdaptor.extractInfo(infos, "\nGENES ");
+		    if (temp!=null && temp.length()>0) {
+		      StringBuffer eId = new StringBuffer();
+		      for (int num: Utils.getNumbersFromString(temp, ": ", null)) {
+		        if (eId.length()>0) eId.append(' ');
+		        eId.append(num);
+		      }
+		      entrez_id = eId.toString();
+		    }
+		  } catch (Throwable t) {
+		    t.printStackTrace();
+		  }
+		}
 
 		// Mainly Glycan specific (eg. "glycan:G00181")
 		/*
@@ -825,8 +844,8 @@ public class KeggInfos {
    * @return
    */
   public static String getGo_id_with_MiriamURN(String go_id) {
-    // So aufgebaut, da GO_id mehrere enth�lt! Eine funktion muss also
-    // dr�ber iterieren und diese aufrugen.
+    // So aufgebaut, da GO_id mehrere enthaelt! Eine funktion muss also
+    // drueber iterieren und diese aufrugen.
     return miriam_urn_geneOntology
         + (go_id.contains(":") ? go_id.trim() : "GO:" + go_id.trim());
   }
