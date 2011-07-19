@@ -96,7 +96,7 @@ public class Range<Type> {
 		 * @param excludingLBound
 		 * @param excludingUBound
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SubRange (Type lowerBound, Type upperBound, boolean excludingLBound, boolean excludingUBound) {
 			super();
 			lBound = lowerBound;
@@ -127,7 +127,7 @@ public class Range<Type> {
 		 * @param value
 		 * @return
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public boolean isInRange(Type value) {
 			if (value instanceof Comparable) {
 			  try {
@@ -277,65 +277,6 @@ public class Range<Type> {
 	private Class<Type> typee;
 	
 	/**
-   * <p><var>rangeSpec</var> is an optional range specification,
-   * placed inside curly braces, consisting of a
-   * comma-separated list of range items each specifying
-   * permissible values for the option. A range item may be an
-   * individual value, or it may itself be a subrange,
-   * consisting of two individual values, separated by a comma,
-   * and enclosed in square or round brackets. Square and round
-   * brackets denote closed and open endpoints of a subrange, indicating
-   * that the associated endpoint value is included or excluded
-   * from the subrange.
-   * The values specified in the range spec need to be
-   * consistent with the type of value expected by the option.
-   *
-   * <p><b>Examples:</b>
-   *
-   * <p>A range spec of <code>{2,4,8,16}</code> for an integer
-   * value will allow the integers 2, 4, 8, or 16.
-   *
-   * <p>A range spec of <code>{[-1.0,1.0]}</code> for a floating
-   * point value will allow any floating point number in the
-   * range (including) -1.0 to 1.0.
-   * 
-   * <p>A range spec of <code>{(-88,100],1000}</code> for an integer
-   * value will allow values > -88 and <= 100, as well as 1000.
-   *
-   * <p>A range spec of <code>{"foo", "bar", ["aaa","zzz")} </code> for a
-   * string value will allow strings equal to <code>"foo"</code> or
-   * <code>"bar"</code>, plus any string lexically greater than or equal
-   * to <code>"aaa"</code> but less then <code>"zzz"</code>.
-   *
-   * @param requiredType - The class object of the Type.
-   * @param rangeSpec - as defined above.
-	 */
-	public Range(Class<Type> requiredType, String rangeSpec) {
-		this(requiredType);
-		this.rangeString = rangeSpec;
-		try {
-			parseRangeSpec(rangeSpec);
-		} catch (ParseException exc) {
-			/*
-			 * We cannot throw this exception because in interfaces it is impossible
-			 * to catch these.
-			 */
-			throw new IllegalArgumentException(rangeSpec, exc);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param requiredType
-	 */
-	private Range(Class<Type> requiredType) {
-		super();
-		this.typee = requiredType;
-		this.rangeString = "";
-		this.constraints = null;
-	}
-	
-	/**
 	 * Additional constraints to restrict an input.
 	 */
 	private Object constraints;
@@ -383,6 +324,65 @@ public class Range<Type> {
   public Range(Class<Type> requiredType, List<Type> acceptedObjects) {
     this(requiredType, Range.toRangeString(acceptedObjects));
     this.setListOfAccpetedObjects(acceptedObjects);
+  }
+  
+  /**
+   * <p><var>rangeSpec</var> is an optional range specification,
+   * placed inside curly braces, consisting of a
+   * comma-separated list of range items each specifying
+   * permissible values for the option. A range item may be an
+   * individual value, or it may itself be a subrange,
+   * consisting of two individual values, separated by a comma,
+   * and enclosed in square or round brackets. Square and round
+   * brackets denote closed and open endpoints of a subrange, indicating
+   * that the associated endpoint value is included or excluded
+   * from the subrange.
+   * The values specified in the range spec need to be
+   * consistent with the type of value expected by the option.
+   *
+   * <p><b>Examples:</b>
+   *
+   * <p>A range spec of <code>{2,4,8,16}</code> for an integer
+   * value will allow the integers 2, 4, 8, or 16.
+   *
+   * <p>A range spec of <code>{[-1.0,1.0]}</code> for a floating
+   * point value will allow any floating point number in the
+   * range (including) -1.0 to 1.0.
+   * 
+   * <p>A range spec of <code>{(-88,100],1000}</code> for an integer
+   * value will allow values > -88 and <= 100, as well as 1000.
+   *
+   * <p>A range spec of <code>{"foo", "bar", ["aaa","zzz")} </code> for a
+   * string value will allow strings equal to <code>"foo"</code> or
+   * <code>"bar"</code>, plus any string lexically greater than or equal
+   * to <code>"aaa"</code> but less then <code>"zzz"</code>.
+   *
+   * @param requiredType - The class object of the Type.
+   * @param rangeSpec - as defined above.
+   */
+  public Range(Class<Type> requiredType, String rangeSpec) {
+    this(requiredType);
+    this.rangeString = rangeSpec;
+    try {
+      parseRangeSpec(rangeSpec);
+    } catch (ParseException exc) {
+      /*
+       * We cannot throw this exception because in interfaces it is impossible
+       * to catch these.
+       */
+      throw new IllegalArgumentException(rangeSpec, exc);
+    }
+  }
+  
+   /**
+   * 
+   * @param requiredType
+   */
+  private Range(Class<Type> requiredType) {
+    super();
+    this.typee = requiredType;
+    this.rangeString = "";
+    this.constraints = null;
   }
   
 	/**
@@ -580,7 +580,7 @@ public class Range<Type> {
     if((acceptedObjects!=null) && (acceptedObjects.size()!=0) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
       List<Type> classStrings = new LinkedList<Type>();
       for(Type object:acceptedObjects) {
-        classStrings.add((Type)((Class)object).getSimpleName());
+        classStrings.add((Type)((Class<?>)object).getSimpleName());
       }
       accObjects=classStrings;
     }
@@ -594,25 +594,47 @@ public class Range<Type> {
   }
   
 	/**
-	 * 
+	 * Builds a range string that accepts exclusively all
+	 * elements in the given {@link Enum}.
 	 * @param <T>
 	 * @param cazz
-	 * @return
+	 * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.
 	 */
 	public static <T extends Enum<?>> String toRangeString(Class<T> cazz) {
-		StringBuilder sb = new StringBuilder();
-		sb.append('{');
-		T constants[] = cazz.getEnumConstants();
-		int i = 0;
-		for (T element : constants) {
-			if (i > 0) {
-				sb.append(',');
-			}
-			sb.append(element.toString());
-			i++;
-		}
-		sb.append('}');
-		return sb.toString();
+		return toRangeString(cazz.getEnumConstants());
+	}
+	
+	/**
+	 * Builds a range string that accepts exclusively all
+	 * given <code>constants</code>.
+	 * @param <T>
+	 * @param constants
+	 * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.
+	 */
+	private static <T> String toRangeString(T... constants) {
+	  StringBuilder sb = new StringBuilder();
+	  sb.append('{');
+	  int i = 0;
+	  for (T element : constants) {
+	    if (i > 0) {
+	      sb.append(',');
+	    }
+	    sb.append(element.toString());
+	    i++;
+	  }
+	  sb.append('}');
+	  return sb.toString();
+	}
+	
+	/**
+   * Builds a range string that accepts exclusively all
+   * elements in the parent Enum of the given {@link Enum} element.
+	 * @param <T>
+	 * @param cazz
+	 * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.
+	 */
+	public static <T extends Enum<?>> String toRangeString(Enum<?> cazz) {
+	  return toRangeString(cazz.getDeclaringClass().getEnumConstants());
 	}
   
 	/**

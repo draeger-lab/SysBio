@@ -101,7 +101,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	/**
 	 * 
 	 * @param provider
-	 * @return
+	 * @return true, if and only if the user approved this dialog.
 	 */
 	public static final boolean showPreferencesDialog(Class<? extends KeyProvider> provider) {
 		PreferencesDialog dialog = new PreferencesDialog();
