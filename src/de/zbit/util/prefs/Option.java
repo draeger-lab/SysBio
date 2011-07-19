@@ -136,7 +136,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
     }
 		
 		if (Enum.class.isAssignableFrom(requiredType)) {
-			ret = Reflect.invokeIfContains(requiredType, "valueOf", new Object[]{ret.toString()});
+		  try {
+			  ret = Reflect.invokeIfContains(requiredType, "valueOf", new Object[]{ret.toString()});
+		  } catch (Throwable t) {
+   		  // ret should be, but is not in enum
+		    t.printStackTrace();
+		    return null;
+		  }
 		}
 		
 		try {
@@ -159,7 +165,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * return from the {@link #range}
 	 * @return the class for the given simpleName
 	 */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes" })
   public static Class getClassFromRange(Option<Class> option, String simpleName) {
     // For absolute class strings (e.g., "class de.zbit.io.mRNAReader").
     try {
@@ -348,13 +354,20 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param shortCmdName
 	 * @param defaultValue
 	 */
-	public Option(String optionName, Class<Type> requiredType,
+	@SuppressWarnings("unchecked")
+  public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
 		String shortCmdName, Type defaultValue, String displayName) {
 		
 	  // Ensure that the option name contains no whitespaces.
 	  this.optionName = optionName.replaceAll("\\s", "_");
-		
+	  
+	  // If declaring for Enums, always set a Range that accepts only
+	  // values from this Enum !
+    if (range==null && Enum.class.isAssignableFrom(requiredType)) {
+      range = new Range<Type>(requiredType, Range.toRangeString((Class<? extends Enum<?>>)requiredType));
+    }
+    
 		this.requiredType = requiredType;
 		this.description = description;
 		this.range = range;
@@ -849,7 +862,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param ret
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
   public Type parseOrCast(Object ret) {
 	  if (Class.class.isAssignableFrom(requiredType) &&
 	      (ret instanceof String) ) {

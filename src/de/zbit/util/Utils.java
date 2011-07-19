@@ -1758,5 +1758,60 @@ public class Utils {
     
     return ret;
   }
+
+  /**
+   * @param values any iterable number collection.
+   * @return minimum value in <code>values</code> or {@link Double#NaN}
+   * if <code>values</code> is <code>null</code> or contains no numbers.
+   */
+  public static <T extends Number> double min(Iterable<T> values) {
+    if (values == null) return Double.NaN;
+    Iterator<T> it = values.iterator();
+    if (!it.hasNext()) return Double.NaN;
+    double min = it.next().doubleValue();
+    while (it.hasNext()) {
+      min = Math.min(min, it.next().doubleValue());
+    }
+    return min;
+  }
+  
+  /**
+   * @param values any iterable number collection.
+   * @return maximum value in <code>values</code> or {@link Double#NaN}
+   * if <code>values</code> is <code>null</code> or contains no numbers.
+   */
+  public static <T extends Number> double max(Iterable<T> values) {
+    if (values == null) return Double.NaN;
+    Iterator<T> it = values.iterator();
+    if (!it.hasNext()) return Double.NaN;
+    double max = it.next().doubleValue();
+    while (it.hasNext()) {
+      max = Math.max(max, it.next().doubleValue());
+    }
+    return max;
+  }
+  
+  /**
+   * @param <T>
+   * @param values
+   * @return value with maximum distance to zero.
+   */
+  public static <T extends Number> double maxDistanceToZero(Iterable<T> values) {
+    if (values == null) return Double.NaN;
+    Iterator<T> it = values.iterator();
+    if (!it.hasNext()) return Double.NaN;
+    
+    double maxVal = it.next().doubleValue();
+    double max = Math.abs(maxVal);
+    
+    while (it.hasNext()) {
+      double val = it.next().doubleValue();
+      if (Math.abs(val)>max) {
+        max = Math.abs(val);
+        maxVal = val;
+      }
+    }
+    return maxVal;
+  }
   
 }

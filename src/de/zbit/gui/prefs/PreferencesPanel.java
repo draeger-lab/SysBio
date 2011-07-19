@@ -123,15 +123,15 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	/**
 	 * Stores those options that do not belong to any {@link OptionGroup}.
 	 */
-	@SuppressWarnings("unchecked")
-	SortedSet<Option> ungroupedOptions;
+	@SuppressWarnings("rawtypes")
+  SortedSet<Option> ungroupedOptions;
 	
 	/**
 	 * Stores a (sorted) {@link List} of all {@link OptionGroup}s belonging to
 	 * this class.
 	 */
-	@SuppressWarnings("unchecked")
-	List<OptionGroup> optionGroups;
+	@SuppressWarnings("rawtypes")
+  List<OptionGroup> optionGroups;
 	
 	/**
 	 * These are the persistently saved user-preferences of which some ore all
@@ -224,8 +224,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 *        Processed options will be deleted from this {@link Map}.
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	List<Option<?>> addOptions(LayoutHelper lh,
+	@SuppressWarnings("rawtypes")
+  List<Option<?>> addOptions(LayoutHelper lh,
 		Iterable<? extends Option> options,
 		Map<Option<?>, OptionGroup<?>> deleteFromHere) {
 		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
@@ -791,8 +791,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	/**
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
-	void searchForOptionGroups() {
+	@SuppressWarnings("rawtypes")
+  void searchForOptionGroups() {
 		option2group = new TreeMap<Option<?>, OptionGroup<?>>();
 		ungroupedOptions = new TreeSet<Option>();
 		Class<? extends KeyProvider> keyProvider = preferences.getKeyProvider();
