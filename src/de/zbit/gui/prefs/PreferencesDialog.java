@@ -229,6 +229,9 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	public void keyReleased(KeyEvent e) {
+    apply.setEnabled(!allPrefsPanel.isUserConfiguration());
+    defaults.setEnabled(!allPrefsPanel.isDefaultConfiguration());
+    ok.setEnabled(true);
 	}
 	
 	/*
@@ -237,9 +240,8 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	public void keyTyped(KeyEvent e) {
-		apply.setEnabled(!allPrefsPanel.isUserConfiguration());
-		defaults.setEnabled(!allPrefsPanel.isDefaultConfiguration());
-		ok.setEnabled(true);
+	  // Do not update buttons here. The KeyEvent is not yet processed
+	  // i.e. the textfield has not yet changed it's value!
 	}
 	
 	/**

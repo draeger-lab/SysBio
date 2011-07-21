@@ -819,5 +819,21 @@ public class StringUtil {
     
     return true;
   }
+
+  /**
+   * @param string
+   * @param toCount
+   * @return number of occurences of <code>toCount</code> in <code>string</code>.
+   */
+  public static int countChar(String string, char toCount) {
+    int counter = 0;
+    if (string!=null) {
+      char[] arr = string.toCharArray();
+      for (char c2: arr) {
+        if (c2==toCount) counter++;
+      }
+    }
+    return counter;
+  }
   
 }

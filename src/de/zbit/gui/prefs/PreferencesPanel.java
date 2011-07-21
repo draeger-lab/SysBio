@@ -647,6 +647,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			String k;
 			for (Object key : preferences.keySetFull()) {
 				if (accepts(key)) {
+				  // TODO: Accept only key from KeyProvider! Don't put all keys in propoerties (also not in preferences) here!
 					k = key.toString();
 					properties.put(k, preferences.get(k));
 					properties.getDefaults().put(k, preferences.getDefault(k));
@@ -913,21 +914,18 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				
 				// Check before saving
 				boolean isInRange = true;
-				if (source instanceof JComponentForOption) {
-					Option<?> o = ((JComponentForOption) source).getOption();
-					if (o != null && o.isSetRangeSpecification()) {
-						isInRange = o.castAndCheckIsInRange(value);
-					}
-				} else if (c.getParent() instanceof JComponentForOption) {
-					// In case if FileSelector or JColumnChooser, the parent
-					// holds the option.
-					Option<?> o = ((JComponentForOption) c.getParent()).getOption();
-					if (o != null && o.isSetRangeSpecification()) {
-						isInRange = o.castAndCheckIsInRange(value);
-					}
+				if (checkRange){
+          Option<?> o = getOptionForJComponent(c);
+          if (o != null && o.isSetRangeSpecification()) {
+            isInRange = o.castAndCheckIsInRange(value);
+          } else if (o==null) {
+            System.out.println("Could not get option for JComponent.");
+          }
 				}
 				
-				if (isInRange) {
+				// When dialog is displayed and changed, error messages with invalid values
+				// are displayed later! Write all options to properties first!
+				if (!checkRange || isInRange) {
 					properties.put(name, value);
 					//System.out.println(" - " + "changed to '" + value.toString() + "'.");
 				} else {
@@ -940,6 +938,20 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	}
 	
 	/**
+   * @param c any {@link Component}
+   * @return the option, associated with this component or any
+   * parent of this component.
+   */
+  public static Option<?> getOptionForJComponent(Component c) {
+    if (c instanceof JComponentForOption || JComponentForOption.class.isAssignableFrom(c.getClass())) {
+      return ((JComponentForOption) c).getOption();
+    } else if (c.getParent()!=null && (!c.getParent().equals(c))) {
+      return getOptionForJComponent(c.getParent());
+    }
+    return null;
+  }
+
+  /**
 	 * Sets the property for the given {@link Option}.
 	 * 
 	 * @param <T>

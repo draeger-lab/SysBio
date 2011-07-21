@@ -198,6 +198,7 @@ public class PathwaySelector extends JPanel {
           }
           
         }
+        repaint();
       }
     };
     

@@ -163,6 +163,7 @@ public class OrganismSelector extends JPanel {
           
           isInitialized=true;
         }
+        repaint();
       }
     };
     

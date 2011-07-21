@@ -66,7 +66,7 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  */
 
-public class JLabeledComponent extends JPanel implements JComponentForOption{
+public class JLabeledComponent extends JPanel implements JComponentForOption {
   public static final transient Logger log = Logger.getLogger(JLabeledComponent.class.getName());
 	protected static final long serialVersionUID = -9026612128266336630L;
 	  
