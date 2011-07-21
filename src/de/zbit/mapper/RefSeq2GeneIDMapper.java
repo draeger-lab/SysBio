@@ -19,7 +19,6 @@ package de.zbit.mapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +27,7 @@ import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileDownload;
 import de.zbit.util.FileTools;
 import de.zbit.util.ProgressBar;
+import de.zbit.util.Timer;
 import de.zbit.util.logging.LogUtil;
 
 /**
@@ -59,8 +59,13 @@ public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> {
    */
   private static String localFile = "res/" + FileTools.getFilename(downloadURL);
   
-
+  /**
+   * Filter data to read for this NCBI Taxon id. If <=0,
+   * the whole file will be read.
+   */
+  private int ncbi_tax_id;
   
+
   
   /**
    * Inintializes the mapper from RefSeq to Gene ids. Downloads and reads the mapping
@@ -76,9 +81,29 @@ public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> {
    * @see {@link RefSeq2GeneIDMapper#GeneIDMapper()}
    */
   public RefSeq2GeneIDMapper(AbstractProgressBar progress) throws IOException {
+    this(progress, -1);
+  }
+  
+  /**
+   * Inintializes the mapper from RefSeq to Gene ids. Downloads and reads the mapping
+   * file automatically as required.
+   * @throws IOException
+   */
+  public RefSeq2GeneIDMapper(int ncbi_tax_id) throws IOException {
+    this(new ProgressBar(0), ncbi_tax_id);
+  }
+  /**
+   * @param progress - a custom progress bar. Can be NULL!
+   * @throws IOException
+   * @see {@link RefSeq2GeneIDMapper#GeneIDMapper()}
+   */
+  public RefSeq2GeneIDMapper(AbstractProgressBar progress, int ncbi_tax_id) throws IOException {
     super(String.class, Integer.class, progress);
+    this.ncbi_tax_id = ncbi_tax_id;
     init();
   }
+  
+  
   
   public void test() {
     boolean checkLowerVersionExists=true;
@@ -130,13 +155,23 @@ public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> {
   
   public static void main (String[] args) throws IOException {
     LogUtil.initializeLogging(Level.FINEST);
+    Timer t = new Timer();
     RefSeq2GeneIDMapper mapper = new RefSeq2GeneIDMapper();
+    System.out.println("Reading took " + t.getNiceAndReset());
     mapper.test();
     
+    double memory_used = Math.round(((Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024.0/1024.0*100.0))/100.0;
+    System.out.println(memory_used);
+    // Species filter for human (9606) improvements against reading whole file:
+    // Time:   31 s     vs. 19 s
+    // Memory: 378.76MB vs. 30.33 MB
     
   }
   
 
+  /**
+   * @return url of the latest releaseXY.accession2geneid.gz file.
+   */
   public static String getLatestReleaseMappingFile() {
     OutputStream out = new ByteArrayOutputStream();
     String baseUrl = downloadBaseURL;
@@ -167,7 +202,7 @@ public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> {
     
     // we could  not find a mapping file on the RegSeq Server (downloadBaseURL) that ends with "2geneid.gz".
     log.severe("Could not find mapping file on RefSeq Server.");
-    System.exit(1);
+//    System.exit(1);
     
     return null;
   }
@@ -235,6 +270,23 @@ public class RefSeq2GeneIDMapper extends AbstractMapper<String, Integer> {
   @Override
   public int getTargetColumn(CSVReader r) {
     return 1;
+  }
+  
+  /**
+   * Skip every line with a non-matching taxonomy ID.
+   */
+  @Override
+  protected boolean skipLine(String[] line) {
+    // Skip everything thats not from this organism
+    if (ncbi_tax_id<=0) return false; // If no filter is set, accept all.
+    try {
+      int taxon_id = Integer.parseInt(line[0]);
+      if (taxon_id==(ncbi_tax_id)) return false;
+    } catch (Throwable t) {
+      log.log(Level.WARNING, String.format("Invalid Taxon identifier in %s mapping file: %s", 
+        getMappingName(), (line!=null&&line.length>0?line[0]:"null") ) , t);
+    }
+    return true;
   }
   
 
