@@ -27,6 +27,7 @@ import de.zbit.gui.LayoutHelper;
 import de.zbit.util.FileDownload;
 
 /**
+ * Class for downloading KEGG Pathways in XML format (KGML-files).
  * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
@@ -90,7 +91,14 @@ public class KGMLSelectAndDownload {
     
   }
   
-  public static String evaluateOKButton(final PathwaySelector selector) {
+  /**
+   * Can be used in combination with the {@link PathwaySelector} to
+   * evaluate the dialog and download the selected pathway.
+   * @param selector
+   * @return local file name of the downloaded pathway.
+   * @throws Exception if the pathway could not be downloaded.
+   */
+  public static String evaluateOKButton(final PathwaySelector selector) throws Exception {
     // Create pathway to orthologous or organism specific pathway.
     String org = selector.getOrganismSelector().getSelectedOrganismAbbreviation();
     if (org==null || org.equals("map")) org="ko";
@@ -105,8 +113,9 @@ public class KGMLSelectAndDownload {
    * file with the same name has already been downloaded. If false, this method will
    * simply return the path to the already existing file.
    * @return the local file path of the downloaded pathway.
+   * @throws Exception if the pathway could not be downloaded.
    */
-  public static String downloadPathway(String pwID, boolean askUserBeforeUsingCache) {
+  public static String downloadPathway(String pwID, boolean askUserBeforeUsingCache) throws Exception {
     return downloadPathway(pwID, null, askUserBeforeUsingCache);
   }
 
@@ -118,8 +127,9 @@ public class KGMLSelectAndDownload {
    * file with the same name has already been downloaded. If false, this method will
    * simply return the path to the already existing file.
    * @return the local file path of the downloaded pathway.
+   * @throws Exception if the pathway could not be downloaded.
    */
-  public static String downloadPathway(String pwID, String localFile, boolean askUserBeforeUsingCache) {
+  public static String downloadPathway(String pwID, String localFile, boolean askUserBeforeUsingCache) throws Exception {
     
     // OLD FTP-Based procedure before 2011-07-01
     
@@ -150,7 +160,8 @@ public class KGMLSelectAndDownload {
     // Try to download with new url
     localFile = downloadKGML(pwID, localFile, askUserBeforeUsingCache);
     if (localFile==null) {
-      GUITools.showErrorMessage(null, String.format("Could not download the selected pathway for the selected organism (%s).", pwID));
+//      GUITools.showErrorMessage(null, String.format("Could not download the selected pathway for the selected organism (%s).", pwID));
+      throw new Exception(String.format("Could not download the selected pathway for the selected organism (%s).", pwID));
     }
     
     return localFile;
