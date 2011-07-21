@@ -107,7 +107,19 @@ public class KGMLSelectAndDownload {
    * @return the local file path of the downloaded pathway.
    */
   public static String downloadPathway(String pwID, boolean askUserBeforeUsingCache) {
-    String localFile=null;
+    return downloadPathway(pwID, null, askUserBeforeUsingCache);
+  }
+
+  /**
+   * Download a pathway from KEGGs public FTP server.
+   * @param pwID pathway identifier (e.g., "mmu00010")
+   * @param localFile specify the local file where the xml should be downloaded to.
+   * @param askUserBeforeUsingCache if true (default), the user will be asked if a 
+   * file with the same name has already been downloaded. If false, this method will
+   * simply return the path to the already existing file.
+   * @return the local file path of the downloaded pathway.
+   */
+  public static String downloadPathway(String pwID, String localFile, boolean askUserBeforeUsingCache) {
     
     // OLD FTP-Based procedure before 2011-07-01
     
@@ -136,7 +148,7 @@ public class KGMLSelectAndDownload {
     if (pwID.startsWith("map")) pwID="ko"+pwID.substring(3);
     
     // Try to download with new url
-    localFile = downloadKGML(pwID, askUserBeforeUsingCache);
+    localFile = downloadKGML(pwID, localFile, askUserBeforeUsingCache);
     if (localFile==null) {
       GUITools.showErrorMessage(null, String.format("Could not download the selected pathway for the selected organism (%s).", pwID));
     }
@@ -154,44 +166,44 @@ public class KGMLSelectAndDownload {
    * simply return the path to the already existing file.
    * @return
    */
-  @SuppressWarnings("unused")
-  @Deprecated
-  private static String downloadKGML(String metaURL, String nonMetaURL, boolean askUserBeforeUsingCache) {
-    // Check if file already exists and ask user to reuse or overwrite or cancel.
-    String localFile = FileDownload.getLocalFilenameForURL(metaURL);
-    if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>1) {
-      int a=0;
-      if (askUserBeforeUsingCache) {
-        String[] options = new String[]{"Open already existing file", "Redownload file", "Cancel"};
-        a = JOptionPane.showOptionDialog(null, "The file '" + localFile + "' already exists. How do you want to proceed?",
-        "Download KGML", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-      }
-      if (a == 0) {
-        return localFile;
-      } else if (a==2) {
-        return null;
-      }
-      // Simply continue if a ==1.
-    }
-    
-    // ToDo: Put download in separate thread and check for timeouts. 
-    if (metaURL!=null) {
-      metaURL = FileDownload.download(metaURL);
-    }
-    
-    if (metaURL!=null && new File(metaURL).exists() && new File(metaURL).length()>1) {
-      return metaURL;
-    } else if (nonMetaURL!=null){
-      nonMetaURL = FileDownload.download(nonMetaURL);
-      if (new File(nonMetaURL).exists() && new File(nonMetaURL).length()>1) {
-        return nonMetaURL;
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }
+//  @SuppressWarnings("unused")
+//  @Deprecated
+//  private static String downloadKGML(String metaURL, String nonMetaURL, boolean askUserBeforeUsingCache) {
+//    // Check if file already exists and ask user to reuse or overwrite or cancel.
+//    String localFile = FileDownload.getLocalFilenameForURL(metaURL);
+//    if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>1) {
+//      int a=0;
+//      if (askUserBeforeUsingCache) {
+//        String[] options = new String[]{"Open already existing file", "Redownload file", "Cancel"};
+//        a = JOptionPane.showOptionDialog(null, "The file '" + localFile + "' already exists. How do you want to proceed?",
+//        "Download KGML", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+//      }
+//      if (a == 0) {
+//        return localFile;
+//      } else if (a==2) {
+//        return null;
+//      }
+//      // Simply continue if a ==1.
+//    }
+//    
+//    // ToDo: Put download in separate thread and check for timeouts. 
+//    if (metaURL!=null) {
+//      metaURL = FileDownload.download(metaURL);
+//    }
+//    
+//    if (metaURL!=null && new File(metaURL).exists() && new File(metaURL).length()>1) {
+//      return metaURL;
+//    } else if (nonMetaURL!=null){
+//      nonMetaURL = FileDownload.download(nonMetaURL);
+//      if (new File(nonMetaURL).exists() && new File(nonMetaURL).length()>1) {
+//        return nonMetaURL;
+//      } else {
+//        return null;
+//      }
+//    } else {
+//      return null;
+//    }
+//  }
   
   /**
    * Download KGML file for a KEGG pathway ID.
@@ -201,9 +213,27 @@ public class KGMLSelectAndDownload {
    * simply return the path to the already existing file.
    * @return path and filename of the downloaded KGML-KEGG Pathway.
    */
+  @SuppressWarnings("unused")
   private static String downloadKGML(String pwID, boolean askUserBeforeUsingCache) {
+    return downloadKGML(pwID, null, askUserBeforeUsingCache);
+  }
+  
+  /**
+   * Download KGML file for a KEGG pathway ID.
+   * @param pwID pathway id for pathway to download. E.g.: "rno00010".
+   * @param localFile OPTIONAL: specify the local file where the xml should be downloaded to. If null,
+   * will be infered automatically.
+   * @param askUserBeforeUsingCache if true (default), the user will be asked if a 
+   * file with the same name has already been downloaded. If false, this method will
+   * simply return the path to the already existing file.
+   * @return path and filename of the downloaded KGML-KEGG Pathway.
+   */
+  private static String downloadKGML(String pwID, String localFile, boolean askUserBeforeUsingCache) {
+    if (localFile==null || localFile.length()<1) {
+      localFile = pwID + ".xml";
+    }
+    
     // Check if file already exists and ask user to reuse or overwrite or cancel.
-    String localFile = pwID + ".xml";
     if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>1) {
       int a=0;
       if (askUserBeforeUsingCache) {
@@ -221,7 +251,7 @@ public class KGMLSelectAndDownload {
     
     // TODO: Put download in separate thread and check for timeouts.
     String newUrl = String.format("http://www.genome.jp/kegg-bin/download?entry=%s&format=kgml", pwID);
-    localFile = FileDownload.download(newUrl, pwID + ".xml");
+    localFile = FileDownload.download(newUrl, localFile);
     
     if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>1) {
       return localFile;
