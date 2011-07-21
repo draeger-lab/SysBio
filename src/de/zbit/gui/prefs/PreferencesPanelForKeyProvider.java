@@ -38,7 +38,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	/**
 	 * The KeyProvider, that determines this panel.
 	 */
-	private Class<? extends KeyProvider> provider;
+	protected Class<? extends KeyProvider> provider;
 
 	/**
 	 * @throws IOException
@@ -55,7 +55,17 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public boolean accepts(Object key) {
-		return preferences.keySetFull().contains(key);
+		//return preferences.keySetFull().contains(key);
+	  // Preferences keyset contains all options from the package.
+	  // Better read fields of actual key-provider. These are the
+	  // Keys we want to have in the properties!!
+	  try {
+      return (provider.getField(key.toString())!=null);
+    } catch (SecurityException e) {
+      return false;
+    } catch (NoSuchFieldException e) {
+      return false;
+    }
 	}
 	
 	/*

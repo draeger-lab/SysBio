@@ -25,12 +25,14 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.zbit.io.OpenFile;
@@ -68,10 +70,24 @@ public class KeggParser extends DefaultHandler {
    * @return all pathways in the given kgml file.
    * Usually, there is only one pathway per file, so the size of the
    * collection should always be 1.
+   * @throws Exception IOException if pathway could not be read from disk,
+   * other exceptions, if errors occur while parsing the xml-document.
    */
-  public static List<Pathway> parse(String filename) {
+  public static List<Pathway> parse(String filename) throws Exception {
     InputSource inS = new InputSource(new BufferedReader(OpenFile.openFile(filename)));
-    List<Pathway> l = parse(inS);
+    List<Pathway> l = null;
+    try {
+      l = parse(inS);
+    } catch (Exception e) {
+      if (!offlineVersion) {
+        // Retry in offline mode
+        offlineVersion = true;
+        inS = new InputSource(new BufferedReader(OpenFile.openFile(filename)));
+        l = parse(inS);
+      } else {
+        throw e;
+      }
+    }
     return l;
   }
   
@@ -79,8 +95,11 @@ public class KeggParser extends DefaultHandler {
    * Parse kgml files.
    * @param inS
    * @return all pathways in the given kgml file.
+   * @throws ParserConfigurationException 
+   * @throws IOException 
+   * @throws SAXException 
    */
-  public static List<Pathway> parse(InputSource inS) {
+  public static List<Pathway> parse(InputSource inS) throws ParserConfigurationException, SAXException, IOException {
     if (inS==null) {
     	return null;
     }
@@ -119,7 +138,7 @@ public class KeggParser extends DefaultHandler {
     
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 
     DocumentBuilder builder;
-    try {
+//    try {
       builder = factory.newDocumentBuilder();
       Document document = builder.parse( inS );
       
@@ -139,10 +158,10 @@ public class KeggParser extends DefaultHandler {
       } catch (Exception e) {} // doesn't matter.
       
       return parseKeggML(document);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return new ArrayList<Pathway>(0);
+//    } catch (Exception e) {
+//      throw e;
+//    }
+//    return new ArrayList<Pathway>(0);
   }
   
 	/**
@@ -418,8 +437,9 @@ public class KeggParser extends DefaultHandler {
   /**
    * Just for testing this parser.
    * @param args
+   * @throws Exception 
    */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     // For simple testing
     if (args==null || args.length<1)
       args = new String[]{"files/kgmlSample.xml"};
