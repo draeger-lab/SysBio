@@ -1435,11 +1435,24 @@ public class GUITools {
    * @param message question to display
    * @param title dialog title
    * @param choices different choices
-   * @return choosen index or JOptionPane static ints
+   * @return chosen index or JOptionPane static ints
    */
   public static int showQuestionMessage(Component parent, String message, String title, Object... choices) {
     return JOptionPane.showOptionDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
       title, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+  }
+  
+  /**
+   * Show a Question Dialog
+   * @param parent may be null
+   * @param message question to display
+   * @param title dialog title
+   * @param optionType e.g. {@link JOptionPane#YES_NO_OPTION}
+   * @return an integer indicating the option selected by the user (e.g. {@link JOptionPane#YES_OPTION})
+   */
+  public static int showQuestionMessage(Component parent, String message, String title, int optionType) {
+    return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
+      title, optionType, JOptionPane.QUESTION_MESSAGE);
   }
   
   /**
