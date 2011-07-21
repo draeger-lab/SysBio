@@ -61,7 +61,7 @@ public class MappingUtils {
     // Init mapper based on targetIDtype
     AbstractMapper<String, Integer> mapper = null;
     if (sourceIDtype.equals(IdentifierType.RefSeq)) {
-      mapper = new RefSeq2GeneIDMapper(progress);
+      mapper = new RefSeq2GeneIDMapper(progress, species.getNCBITaxonID());
     } else if (sourceIDtype.equals(IdentifierType.Ensembl)) {
       mapper = new Ensembl2GeneIDMapper(species.getCommonName(), progress);
     } else if (sourceIDtype.equals(IdentifierType.GeneSymbol)) {

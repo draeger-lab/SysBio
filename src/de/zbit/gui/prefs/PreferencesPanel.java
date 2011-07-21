@@ -524,26 +524,28 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				// For doulbes, we need to allow ',' and '.'.
 				((JLabeledComponent) component).setAcceptOnlyIntegers(false);
 			}
+			
+    } else if (java.awt.Color.class.isAssignableFrom(clazz)) {
+      // Create color chooser with defaultValue or white as initial color.
+      Color initial = null;
+      if (defaultValue instanceof Color) {
+        initial = (Color) defaultValue;
+      } else if (defaultValue instanceof String){
+        initial = Option.parseOrCast(Color.class, defaultValue);
+      }
+      if (initial==null) {
+        log.warning("Invalid default value for color " + defaultValue.getClass()+": " + defaultValue);
+        initial = Color.WHITE;
+      }
+      ColorChooserWithPreview colChooser = new ColorChooserWithPreview(initial);
+      if (changeListener!=null) {
+        colChooser.addChangeListener(changeListener);
+      }
+      component = new JLabeledComponent(optionTitle, true, colChooser);
+      
 		} else if ((values != null) && (values.length > 0)) {
 			component = new JLabeledComponent(optionTitle, true, values);
 			((JLabeledComponent) component).setAcceptOnlyIntegers(false);
-		} else if (java.awt.Color.class.isAssignableFrom(clazz)) {
-		  // Create color chooser with defaultValue or white as initial color.
-		  Color initial = null;
-		  if (defaultValue instanceof Color) {
-		    initial = (Color) defaultValue;
-		  } else if (defaultValue instanceof String){
-		    initial = Option.parseOrCast(Color.class, defaultValue);
-		  }
-		  if (initial==null) {
-		    log.warning("Invalid default value for color " + defaultValue.getClass()+": " + defaultValue);
-		    initial = Color.WHITE;
-		  }
-		  ColorChooserWithPreview colChooser = new ColorChooserWithPreview(initial);
-		  if (changeListener!=null) {
-		    colChooser.addChangeListener(changeListener);
-		  }
-		  component = new JLabeledComponent(optionTitle, true, colChooser);
 		  
 		} else {
 		  log.severe("Please implement JComponent for " + clazz + ".");
