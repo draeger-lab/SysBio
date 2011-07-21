@@ -76,7 +76,7 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
    * @param menu {@link JPopupMenu} to show when the button is pressed.
    */
   public JDropDownButton (JPopupMenu menu) {
-    this(null, null, false, menu);
+    this(menu.getLabel(), null, false, menu);
   }
   
   /**
@@ -86,7 +86,7 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
    * @param menu {@link JPopupMenu} to show when the button is pressed.
    */
   public JDropDownButton(Icon icon, JPopupMenu menu) {
-    this(null, icon, false, menu);
+    this(menu.getLabel(), icon, false, menu);
   }
   
   /**
@@ -128,7 +128,8 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
     }
     super.setSize(getSize().width+50, getSize().height);
   }
-  
+
+
   /**
    * @return the popUpMenu
    */
