@@ -1202,9 +1202,9 @@ public class GUITools {
    * 
    * @param state
    * @param c
-   * @param command
+   * @param command ActionCommand(s) of items to change the enabled state. May NOT be null!
    */
-  public static void setEnabled(boolean state, Container c, Object command) {
+  public static void setEnabled(boolean state, Container c, Object... command) {
     Component inside;
     for (int i = 0; i < c.getComponentCount(); i++) {
       inside = c.getComponent(i);
@@ -1213,8 +1213,12 @@ public class GUITools {
       } // Don't do "else if" here. JButtons are containers AND buttons itself! 
       if (inside instanceof AbstractButton) {
         String com = ((AbstractButton) inside).getActionCommand();
-        if ((com != null) && (com.toString().equals(command.toString()))) {
-          inside.setEnabled(state);
+        if (com==null) continue;
+        for (Object cmd: command) {
+          if (com.toString().equals(cmd.toString())) {
+            inside.setEnabled(state);
+            continue;
+          }
         }
       }
     }
