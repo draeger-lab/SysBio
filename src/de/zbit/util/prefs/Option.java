@@ -29,13 +29,6 @@ import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
 import de.zbit.util.argparser.ArgHolder;
 import de.zbit.util.argparser.ArgParser;
-import de.zbit.util.argparser.BooleanHolder;
-import de.zbit.util.argparser.CharHolder;
-import de.zbit.util.argparser.DoubleHolder;
-import de.zbit.util.argparser.FloatHolder;
-import de.zbit.util.argparser.IntHolder;
-import de.zbit.util.argparser.LongHolder;
-import de.zbit.util.argparser.StringHolder;
 
 /**
  * An {@link Option} defines a key in a key-provider class and can also be used
@@ -165,20 +158,20 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * return from the {@link #range}
 	 * @return the class for the given simpleName
 	 */
-  @SuppressWarnings({ "rawtypes" })
-  public static Class getClassFromRange(Option<Class> option, String simpleName) {
+  @SuppressWarnings("unchecked")
+  public static <T> Class<T> getClassFromRange(Option<Class<T>> option, String simpleName) {
     // For absolute class strings (e.g., "class de.zbit.io.mRNAReader").
     try {
       if (simpleName.startsWith("class ")) simpleName = simpleName.substring(6);
-      return Class.forName(simpleName);
+      return (Class<T>) Class.forName(simpleName);
     } catch (ClassNotFoundException e) {}
     
     // For simple-name class strings (e.g., "mRNAReader").
     if (option!=null && option.getRange()!=null) {
 	    
-	    List<Class> l = option.getRange().getAllAcceptableValues();
+	    List<Class<T>> l = option.getRange().getAllAcceptableValues();
 	    if (l!=null) {
-	      for(Class c: l) {
+	      for(Class<T> c: l) {
 	        if (c.getSimpleName().equals(simpleName)) {
 	          return c;
 	        }
@@ -521,23 +514,20 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	public ArgHolder<?> createArgumentHolder() {
 		if (requiredType.equals(Float.class)) {
-			return new FloatHolder();
+			return new ArgHolder<Float>(Float.class);
 		} else if (requiredType.equals(Double.class)) {
-			return new DoubleHolder();
-		} else if (requiredType.equals(Short.class)) {
-			return new IntHolder();
-		} else if (requiredType.equals(Integer.class)) {
-			return new IntHolder();
+			return new ArgHolder<Double>(Double.class);
+		} else if (requiredType.equals(Short.class)
+				|| requiredType.equals(Integer.class)) {
+			return new ArgHolder<Integer>(Integer.class);
 		} else if (requiredType.equals(Long.class)) {
-			return new LongHolder();
+			return new ArgHolder<Long>(Long.class);
 		} else if (requiredType.equals(Boolean.class)) {
-			return new BooleanHolder();
+			return new ArgHolder<Boolean>(Boolean.class);
 		} else if (requiredType.equals(Character.class)) {
-			return new CharHolder();
-		} else if (requiredType.equals(String.class)) {
-			return new StringHolder();
-		} else {
-			return new StringHolder();
+			return new ArgHolder<Character>(Character.class);
+		} else /*if (requiredType.equals(String.class))*/ {
+			return new ArgHolder<String>(String.class);
 		}
 	}
 	
@@ -552,27 +542,24 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	public ArgHolder<?> createArgumentHolder(Object object) {
 		String value = object.toString();
 		if (requiredType.equals(Float.class)) {
-			return new FloatHolder(Float.valueOf(value));
+			return new ArgHolder<Float>(Float.valueOf(value));
 		} else if (requiredType.equals(Double.class)) {
-			return new DoubleHolder(Double.valueOf(value));
-		} else if (requiredType.equals(Short.class)) {
-			return new IntHolder(Integer.valueOf(value));
-		} else if (requiredType.equals(Integer.class)) {
-			return new IntHolder(Integer.valueOf(value));
+			return new ArgHolder<Double>(Double.valueOf(value));
+		} else if (requiredType.equals(Short.class)
+				|| requiredType.equals(Integer.class)) {
+			return new ArgHolder<Integer>(Integer.valueOf(value));
 		} else if (requiredType.equals(Long.class)) {
-			return new LongHolder(Long.valueOf(value));
+			return new ArgHolder<Long>(Long.valueOf(value));
 		} else if (requiredType.equals(Boolean.class)) {
-			return new BooleanHolder(Boolean.valueOf(value));
+			return new ArgHolder<Boolean>(Boolean.valueOf(value));
 		} else if (requiredType.equals(Character.class)) {
 			if (value.length() != 1) { 
 				throw new IllegalArgumentException(
 				"Invalid char symbol " + value); 
 			}
-			return new CharHolder(Character.valueOf(value.charAt(0)));
-		} else if (requiredType.equals(String.class)) {
-			return new StringHolder(value);
-		} else {
-			return new StringHolder(value);
+			return new ArgHolder<Character>(Character.valueOf(value.charAt(0)));
+		} else /*if (requiredType.equals(String.class))*/ {
+			return new ArgHolder<String>(value);
 		}
 	}
 	
@@ -862,11 +849,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param ret
 	 * @return
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked"})
   public Type parseOrCast(Object ret) {
 	  if (Class.class.isAssignableFrom(requiredType) &&
 	      (ret instanceof String) ) {
-	    return (Type) Option.getClassFromRange((Option<Class>)this, ret.toString());
+	    return (Type) Option.getClassFromRange((Option<Class<Type>>)this, ret.toString());
 	  }
 		return parseOrCast(requiredType, ret);
 	}

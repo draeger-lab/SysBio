@@ -458,8 +458,9 @@ public interface KeyProvider {
 		    try {
 		      fieldValue = f.get(keyProvider);
 		      if (fieldValue.getClass().isAssignableFrom(Option.class)) {
-		        if (((Option)fieldValue).getOptionName().equals(optionName))
-		          return (Option) fieldValue;
+		        if (((Option<?>)fieldValue).getOptionName().equals(optionName)) {
+		          return (Option<?>) fieldValue;
+		        }
 		      }
 		    } catch (Exception e) {}
 		  }

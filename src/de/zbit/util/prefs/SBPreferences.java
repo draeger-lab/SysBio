@@ -43,13 +43,6 @@ import de.zbit.util.ResourceManager;
 import de.zbit.util.Utils;
 import de.zbit.util.argparser.ArgHolder;
 import de.zbit.util.argparser.ArgParser;
-import de.zbit.util.argparser.BooleanHolder;
-import de.zbit.util.argparser.CharHolder;
-import de.zbit.util.argparser.DoubleHolder;
-import de.zbit.util.argparser.FloatHolder;
-import de.zbit.util.argparser.IntHolder;
-import de.zbit.util.argparser.LongHolder;
-import de.zbit.util.argparser.StringHolder;
 
 /**
  * This class is a wrapper for {@link Preferences}, which provides a lot of
@@ -676,30 +669,15 @@ public class SBPreferences implements Map<Object, Object> {
 	 *        for the desired values.
 	 */
 	private static void putAll(SBProperties props, Map<Option<?>, ArgHolder<?>> options) {
-		String k, value, v;
+		String k, value = null, v;
+		Object o;
 		for (Option<?> key : options.keySet()) {
 			
 			// try {
 			k = key.toString();
-			if (key.getRequiredType().equals(Float.class)) {
-				value = Float.toString(((FloatHolder) options.get(key)).getValue());
-			} else if (key.getRequiredType().equals(Double.class)) {
-				value = Double.toString(((DoubleHolder) options.get(key)).getValue());
-			} else if (key.getRequiredType().equals(Short.class)) {
-				value = Short.toString(((IntHolder) options.get(key)).getValue().shortValue());
-			} else if (key.getRequiredType().equals(Integer.class)) {
-				value = Integer.toString(((IntHolder) options.get(key)).getValue());
-			} else if (key.getRequiredType().equals(Long.class)) {
-				value = Long.toString(((LongHolder) options.get(key)).getValue());
-			} else if (key.getRequiredType().equals(Boolean.class)) {
-				value = Boolean.toString(((BooleanHolder) options.get(key)).getValue());
-			} else if (key.getRequiredType().equals(Character.class)) {
-				value = Character.toString(((CharHolder) options.get(key)).getValue());
-			} else if (key.getRequiredType().equals(String.class)) {
-				value = ((StringHolder) options.get(key)).getValue();
-			} else {
-				value = ((StringHolder) options.get(key)).getValue();
-				if (value != null) { value = value.toString(); }
+			o = options.get(key).getValue();
+			if (o != null) { 
+				value = o.toString(); 
 			}
 			// This is necessary, because at this point it can't be deduced if the
 			// given options were explicitly set or just the default value.
@@ -903,7 +881,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @returns true if all key-value pairs are valid.
 	 * @throws BackingStoreException
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public boolean checkPrefs() throws BackingStoreException {
 		Iterator<Option> iterator = optionIterator();
 		Option<?> option;
@@ -1247,7 +1225,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public Iterator<Option> optionIterator() {
 		return KeyProvider.Tools.optionIterator(keyProvider);
 	}
