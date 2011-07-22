@@ -147,40 +147,46 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
-	 * This method is special for options of type {@link Class}. It allows to
-	 * get the real class from the {@link #range}, by comparing the
-	 * {@link Class#getSimpleName()} with the given simple name.
-	 * <p>Since {@link JLabeledComponent}s and command-line arguments are string
-	 * based, this method is the easiest was to get to the class, represented
-	 * by a string.
-	 * @param option an option of type {@link Class}, with a restricted {@link #range}.
-	 * @param simpleName the {@link Class#getSimpleName()} of the class to
-	 * return from the {@link #range}
-	 * @return the class for the given simpleName
-	 */
-  @SuppressWarnings("unchecked")
-  public static <T> Class<T> getClassFromRange(Option<Class<T>> option, String simpleName) {
+   * This method is special for options of type {@link Class}. It allows to
+   * get the real class from the {@link #range}, by comparing the
+   * {@link Class#getSimpleName()} with the given simple name.
+   * <p>Since {@link JLabeledComponent}s and command-line arguments are string
+   * based, this method is the easiest was to get to the class, represented
+   * by a string.
+   * @param option an option of type {@link Class}, with a restricted {@link #range}.
+   * @param simpleName the {@link Class#getSimpleName()} of the class to
+   * return from the {@link #range}
+   * @return the class for the given simpleName
+   */
+  @SuppressWarnings("rawtypes")
+  // Do NOT add a Type parameter here! see below!
+  public static Class getClassFromRange(Option<Class> option, String simpleName) {
+    // Please DO NOT add a TYPE PARAMETER to class. Option<Class<?>> can not be
+    // initialized with a valid range. Thus, adding a type parameter (even a T or
+    // a "?" to this method, renders it useless for many Option<Class>'es!!!
+    
     // For absolute class strings (e.g., "class de.zbit.io.mRNAReader").
     try {
       if (simpleName.startsWith("class ")) simpleName = simpleName.substring(6);
-      return (Class<T>) Class.forName(simpleName);
+      return Class.forName(simpleName);
     } catch (ClassNotFoundException e) {}
     
     // For simple-name class strings (e.g., "mRNAReader").
     if (option!=null && option.getRange()!=null) {
-	    
-	    List<Class<T>> l = option.getRange().getAllAcceptableValues();
-	    if (l!=null) {
-	      for(Class<T> c: l) {
-	        if (c.getSimpleName().equals(simpleName)) {
-	          return c;
-	        }
-	      }
-	    }
-	  }
-	  
-	  return null;
-	}
+      
+      List<Class> l = option.getRange().getAllAcceptableValues();
+      if (l!=null) {
+        for(Class c: l) {
+          if (c.getSimpleName().equals(simpleName)) {
+            return c;
+          }
+        }
+      }
+    }
+    
+    return null;
+  }
+  
 	
 	/**
 	 * The default value for this option. May be null, if it is going to be read
@@ -849,11 +855,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param ret
 	 * @return
 	 */
-	@SuppressWarnings({ "unchecked"})
+	@SuppressWarnings({ "unchecked", "rawtypes"})
   public Type parseOrCast(Object ret) {
 	  if (Class.class.isAssignableFrom(requiredType) &&
 	      (ret instanceof String) ) {
-	    return (Type) Option.getClassFromRange((Option<Class<Type>>)this, ret.toString());
+	    return (Type) Option.getClassFromRange((Option<Class>)this, ret.toString());
 	  }
 		return parseOrCast(requiredType, ret);
 	}
