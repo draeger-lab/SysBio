@@ -579,6 +579,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable {
   
   /**
    * Get the given species
+   * @see #search(List, String, int)
    * @param identifier String identifying the species (e.g. "human" or "homo sapiens" or "hsa)
    * @param nameTypeToSearch Identifier type to search (-1 for all, else one of the included
    * final static ints (e.g., {@link #COMMON_NAME}).
