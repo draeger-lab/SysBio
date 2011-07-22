@@ -239,7 +239,7 @@ public class SBProperties extends Properties {
 					// Would be possible to check for already setted values.
 					//if (defaults.getProperty(k) != null) {}
 					Object defaultValue=((Option<?>) fieldValue).getDefaultValue();
-					if(defaultValue instanceof Class) {
+					if(defaultValue instanceof Class<?>) {
 						this.put(k, ((Class<?>)defaultValue).getSimpleName());
 					}
 					else {

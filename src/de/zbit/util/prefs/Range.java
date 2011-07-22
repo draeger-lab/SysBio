@@ -96,7 +96,7 @@ public class Range<Type> {
 		 * @param excludingLBound
 		 * @param excludingUBound
 		 */
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings("unchecked")
 		public SubRange (Type lowerBound, Type upperBound, boolean excludingLBound, boolean excludingUBound) {
 			super();
 			lBound = lowerBound;
@@ -127,7 +127,7 @@ public class Range<Type> {
 		 * @param value
 		 * @return
 		 */
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings("unchecked")
 		public boolean isInRange(Type value) {
 			if (value instanceof Comparable) {
 			  try {
