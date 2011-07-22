@@ -17,7 +17,9 @@
 package de.zbit.io;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -48,9 +50,21 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 	  ASSOC_FILES,
 	  /**
+     * A filter for bed files
+     */
+    BED_FILES,
+    /**
+     * A filter for bim files
+     */
+    BIM_FILES,
+	  /**
 		 * To be selected if CSV files (comma/character separated files) can be chosen.
 		 */
 		CSV_FILES,
+		/**
+     * A filter for fam files
+     */
+    FAM_FILES,
     /**
      * To be selected if TSV files (tab separated text files) can be chosen.
      */
@@ -127,6 +141,40 @@ public class SBFileFilter extends GeneralFileFilter {
 		 * True if this filter accepts YGF (Y Graph Format) files.
 		 */
 		YGF_FILES;
+	  
+	  /**
+	   * 
+	   * @return
+	   */
+	  public Set<String> getFileExtensions() {
+	    Set<String> extensions = new HashSet<String>();
+	    // TODO: Complete
+	    String string = toString();
+      switch (this) {
+        case HTML_FILES:
+          extensions.add("htm");
+          break;
+        case JPEG_FILES:
+          extensions.add("jpg");
+          break;
+        case SBML_FILES:
+          extensions.add("xml");
+          break;
+        case TEXT_FILES:
+          extensions.add("txt");
+          return extensions;
+        case TSV_FILES:
+          return extensions;
+        default:
+          break;
+      }
+      if (string.contains("_")) {
+        extensions.add(toString().substring(0, toString().indexOf("_"))
+            .toLowerCase());
+      }
+	    return extensions;
+	  }
+    
 	}
 	
 	/*
@@ -189,6 +237,26 @@ public class SBFileFilter extends GeneralFileFilter {
     return new SBFileFilter(FileType.PED_FILES);
   }
   
+  /**
+   * A filter for bed files
+   */
+  public static SBFileFilter createBEDFileFilter() {
+    return new SBFileFilter(FileType.BED_FILES);
+  }
+  
+  /**
+   * A filter for bim files
+   */
+  public static SBFileFilter createBIMFileFilter() {
+    return new SBFileFilter(FileType.BIM_FILES);
+  }
+  
+  /**
+   * A filter for fam files
+   */
+  public static SBFileFilter createFAMFileFilter() {
+    return new SBFileFilter(FileType.FAM_FILES);
+  }
   
   /**
   * Filter for map files
@@ -377,46 +445,6 @@ public class SBFileFilter extends GeneralFileFilter {
 		return f.getName().toLowerCase().endsWith(".tex");
 	}
 	
-	 /**
-   * Returns true if the given file is a hwe file.
-   * 
-   * @param f
-   * @return
-   */
-  public static boolean isHWEFile(File f) {
-    return f.getName().toLowerCase().endsWith(".hwe");
-  }
-  
-  /**
-   * Returns true if the given file is a map file.
-   * 
-   * @param f
-   * @return
-   */
-  private boolean isMAPFile(File f) {
-    return f.getName().toLowerCase().endsWith(".map");
-  }
-  
-  /**
-   * Returns true if the given file is a assoc file.
-   * 
-   * @param f
-   * @return
-   */
-  public static boolean isASSOCFile(File f) {
-    return f.getName().toLowerCase().endsWith(".assoc");
-  }
-  
-  /**
-   * Returns true if the given file is a ped file.
-   * 
-   * @param f
-   * @return
-   */
-  public static boolean isPEDFile(File f) {
-    return f.getName().toLowerCase().endsWith(".ped");
-  }
-	
 	/**
 	 * Returns true if the given file is a text file.
 	 * 
@@ -465,29 +493,29 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
 	 */
 	// @Override
-	public boolean accept(File f) {
-		if (filter != null) { return filter.accept(f); }
-		if ((f.isDirectory() || (type == FileType.TEXT_FILES && isTextFile(f)))
-				|| (type == FileType.TeX_FILES && isTeXFile(f))
-				|| (type == FileType.SBML_FILES && isSBMLFile(f))
-				|| (type == FileType.CSV_FILES && isCSVFile(f))
-				|| (type == FileType.TSV_FILES)
-				|| (type == FileType.HTML_FILES && isHTMLFile(f))
-				|| (type == FileType.PNG_FILES && isPNGFile(f))
-				|| (type == FileType.JPEG_FILES && isJPEGFile(f))
-				|| (type == FileType.PED_FILES && isPEDFile(f))
-				|| (type == FileType.MAP_FILES && isMAPFile(f))
-				|| (type == FileType.HWE_FILES && isHWEFile(f))
-				|| (type == FileType.ASSOC_FILES && isASSOCFile(f))				
-				|| (type == FileType.GRAPHML_FILES && checkExtension(f, ".graphml"))
-				|| (type == FileType.GML_FILES && checkExtension(f, ".gml"))
-				|| (type == FileType.GIF_FILES && checkExtension(f, ".gif"))
-				|| (type == FileType.YGF_FILES && checkExtension(f, ".ygf"))
-				|| (type == FileType.TGF_FILES && checkExtension(f, ".tgf"))
-				|| (type == FileType.SVG_FILES && checkExtension(f, ".svg"))
-				|| (type == FileType.PDF_FILES && isPDFFile(f))) return true;
-		return false;
-	}
+  public boolean accept(File f) {
+    if (filter != null) {
+      return filter.accept(f);
+    }
+    Set<String> extensions = type.getFileExtensions();
+    return (f.isDirectory() || extensions.isEmpty() || extensions
+        .contains(getExtension(f)));
+  }
+  
+  /**
+   * 
+   * @param f
+   * @return
+   */
+  public static String getExtension(File f) {
+    String name = f.getName();
+    if (name.length() > 0) {
+      if (name.contains(".")) {
+        return name.substring(name.lastIndexOf('.') + 1);
+      }
+    }
+    return "";
+  }
 
   /**
 	 * 
@@ -619,24 +647,6 @@ public class SBFileFilter extends GeneralFileFilter {
 			default:
 				return StringUtil.firstLetterUpperCase(type.toString()
 						.replace('_', ' '));
-		}
-	}
-	
-	/**
-	 * Returns the file extension.
-	 */
-	public String getExtension() {
-		if (type == FileType.JPEG_FILES) {
-			return "jpg";
-		} else if (type == FileType.SBML_FILES) {
-			return "sbml.xml";
-		} else if (type == FileType.TEXT_FILES || type == FileType.TSV_FILES) {
-			return "txt";
-		} else if (type.toString().contains("_")) {
-			return type.toString().substring(0, type.toString().indexOf("_"))
-					.toLowerCase();
-		} else {
-			return "";
 		}
 	}
 	
