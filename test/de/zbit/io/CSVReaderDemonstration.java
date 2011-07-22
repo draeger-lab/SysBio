@@ -2,7 +2,7 @@
  *
  * @author Clemens Wrzodek
  */
-package de.zbit;
+package de.zbit.io;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
