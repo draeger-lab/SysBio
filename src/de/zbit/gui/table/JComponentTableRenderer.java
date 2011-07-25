@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.gui.CSVImporterV2.JComponentJTable;
+package de.zbit.gui.table;
 
 import java.awt.Color;
 import java.awt.Component;

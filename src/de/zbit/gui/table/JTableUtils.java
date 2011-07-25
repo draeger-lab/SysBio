@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.gui;
+package de.zbit.gui.table;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;

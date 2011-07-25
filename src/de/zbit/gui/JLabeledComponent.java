@@ -54,6 +54,8 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.gui.csv.CSVReaderOptionPanel;
+import de.zbit.gui.csv.JColumnChooser;
 import de.zbit.gui.prefs.JComponentForOption;
 import de.zbit.io.CSVReader;
 import de.zbit.util.ResourceManager;
