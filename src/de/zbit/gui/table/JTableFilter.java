@@ -1,4 +1,4 @@
-package de.zbit.gui;
+package de.zbit.gui.table;
 
 import java.awt.Component;
 import java.awt.ItemSelectable;
@@ -23,6 +23,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.gui.GUITools;
+import de.zbit.gui.LayoutHelper;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.Option;
@@ -176,7 +178,6 @@ public class JTableFilter extends JPanel {
     };
     preview.setText("Calculating number of objects in current filter group.");
     counter.start();
-          
   }
   
   public int getSelectedRowCount() {

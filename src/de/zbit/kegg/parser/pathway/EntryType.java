@@ -62,10 +62,9 @@ public enum EntryType {
 	map,
 	
   /**
-   * ?
-   * !Added for compatbility for with KeggPathways version <0.7!
-   * Should not be used separately.
-   * Should be trated as 'protein'.
+   * !Added for compatibility for with KeggPathways version <0.7!
+   * <p><b>Should not be used separately.
+   * <p><b>Should be treated as 'protein'.
    */
   genes,
 	

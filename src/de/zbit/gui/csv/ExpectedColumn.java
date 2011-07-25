@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.gui.CSVImporterV2;
+package de.zbit.gui.csv;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -14,13 +14,16 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.gui.CSVImporterV2.JComponentJTable;
+package de.zbit.gui.table;
 
 import java.awt.Component;
 
+import javax.swing.JComponent;
 import javax.swing.table.AbstractTableModel;
 
 /**
+ * A {@link AbstractTableModel} that renders {@link JComponent}s inside a
+ * table, instead of calling the toString() method. 
  * @author Clemens Wrzodek
  * @version $Rev$
  */

@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.gui.CSVImporterV2;
+package de.zbit.gui.csv;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -57,12 +57,11 @@ import javax.swing.UIManager;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
-import de.zbit.gui.CSVReaderOptionPanel;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
-import de.zbit.gui.CSVImporterV2.JComponentJTable.JComponentTableModel;
-import de.zbit.gui.CSVImporterV2.JComponentJTable.JComponentTableRenderer;
-import de.zbit.gui.CSVImporterV2.JComponentJTable.JTableRowBased;
+import de.zbit.gui.table.JComponentTableModel;
+import de.zbit.gui.table.JComponentTableRenderer;
+import de.zbit.gui.table.JTableRowBased;
 import de.zbit.io.CSVReader;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.FileTools;

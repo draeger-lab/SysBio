@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.gui;
+package de.zbit.gui.csv;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -59,6 +59,7 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.gui.GUITools;
 import de.zbit.io.CSVReader;
 import de.zbit.util.ResourceManager;
 
