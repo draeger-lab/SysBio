@@ -37,9 +37,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-
-import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.ProgressListener;
@@ -276,21 +273,19 @@ public class StatusBar extends JPanel implements ProgressListener {
    * JUST FOR TESTING AND DEMONSTRATION
    */
   public static void main(String[] args) throws Exception {
-    UIManager.setLookAndFeel(new WindowsLookAndFeel());
-    
     JFrame frame = new JFrame();
     frame.setBounds(200, 200, 600, 200);
     frame.setTitle("Status bar test");
     
     addStatusBar(frame);
     
-    log.info("Test log message.");
+    log.warning("Test log message.");
     
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setVisible(true);
   }
   
-  
+  @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     
