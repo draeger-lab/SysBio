@@ -79,6 +79,7 @@ public class JTableRowBased extends JTable {
     rm = null;
   }
   
+  @SuppressWarnings("rawtypes")
   public JTableRowBased(final Vector rowData, final Vector columnNames) {
     super(rowData, columnNames);
     rm = null;

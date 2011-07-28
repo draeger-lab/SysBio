@@ -192,7 +192,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    * @return true if and only if everything was without critical errors.
    * @throws IOException
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public boolean readMappingData() throws IOException {
     isInizialized=true;
     String[] localFiles = ArrayUtils.merge(getLocalFiles(), getLocalFile());
@@ -214,6 +214,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
       log.config("Reading " + getMappingName() + " mapping file " + localFile);
       CSVReader r = new CSVReader(localFile);
       r.setUseParentPackageForOpeningFiles(this.getClass());
+      configureReader(r);
       int[] multiSourceColumn = getMultiSourceColumn(r);
       if (multiSourceColumn==null || multiSourceColumn.length<1)
         multiSourceColumn = new int[]{getSourceColumn(r)};
@@ -278,6 +279,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
             continue;
           }
           source = postProcessSourceID(source);
+          if (source==null) continue;
           
           // Allow multiple target elements in collections
           if (Collection.class.isAssignableFrom(targetType)) {
@@ -292,6 +294,15 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     
     log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((getMapping()!=null)?getMapping().size():"0") + " mappings.");
     return (getMapping()!=null && getMapping().size()>0);
+  }
+
+  /**
+   * This method can be overwritten to customize
+   * the {@link CSVReader}.
+   * @param r
+   */
+  protected void configureReader(CSVReader r) {
+    // Intentionally left blank.
   }
 
   /**

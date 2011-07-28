@@ -27,7 +27,9 @@ import java.util.List;
  * whenever exactly two values are required for a specific task.
  * 
  * @see ValueTriplet
+ * @see ValuePairUncomparable
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2010-09-01
  * @version $Rev$
  * @since 1.0
@@ -119,9 +121,12 @@ public class ValuePair<S extends Comparable<? super S>, T extends Comparable<? s
 				boolean equal = true;
 				equal &= isSetA() == v.isSetA();
 				equal &= isSetB() == v.isSetB();
-				if (equal && isSetA() && isSetB()) {
-					equal &= v.getA().equals(getA()) && v.getB().equals(getB());
-				}
+        if (equal && isSetA()) {
+          equal &= v.getA().equals(getA());
+        }
+        if (equal && isSetB()) {
+          equal &= v.getB().equals(getB());
+        }
 				return equal;
 			} catch (ClassCastException exc) {
 				return false;
