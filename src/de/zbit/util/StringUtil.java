@@ -822,7 +822,7 @@ public class StringUtil {
   /**
    * @param string
    * @param toCount
-   * @return number of occurences of <code>toCount</code> in <code>string</code>.
+   * @return number of occurrences of <code>toCount</code> in <code>string</code>.
    */
   public static int countChar(String string, char toCount) {
     int counter = 0;
@@ -830,6 +830,26 @@ public class StringUtil {
       char[] arr = string.toCharArray();
       for (char c2: arr) {
         if (c2==toCount) counter++;
+      }
+    }
+    return counter;
+  }
+
+  /**
+   * @param string
+   * @param toCount
+   * @return number of occurrences of <code>toCount</code> in <code>string</code>.
+   */
+  public static int countString(String string, String toCount) {
+    int counter = 0;
+    int pos = 0;
+    if (string!=null) {
+      while (pos>=0) {
+        pos = string.indexOf(toCount, pos);
+        if (pos>=0) {
+          counter++;
+          pos++;
+        }
       }
     }
     return counter;

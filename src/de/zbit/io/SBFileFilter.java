@@ -177,10 +177,7 @@ public class SBFileFilter extends GeneralFileFilter {
     
 	}
 	
-	/*
-	 * TODO: Remove the static constructors. They take memory, even if somebody
-	 * does not even use this class! Be careful with initilizaing objects static.
-	 */
+
 
 	/**
 	 * 
@@ -657,6 +654,25 @@ public class SBFileFilter extends GeneralFileFilter {
 	public String toString() {
 	  return getDescription();
 	}
+
+  /**
+   * @see {@link #getExtensions()}
+   * @return the first file extension of all acceptable extensions.
+   */
+  public String getExtension() {
+    Set<String> extensions = getExtensions();
+    if (extensions!=null && extensions.size()>0) {
+      return extensions.iterator().next();
+    }
+    return null;
+  }
+  
+  /**
+   * @return all acceptable file extensions.
+   */
+  public Set<String> getExtensions() {
+    return type.getFileExtensions();
+  }
 	
 
 }

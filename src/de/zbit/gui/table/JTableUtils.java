@@ -175,9 +175,9 @@ public class JTableUtils implements Serializable {
       setColEditable(editableColumn, true);
     }
     
-    @SuppressWarnings("unchecked")
-    public Class getColumnClass(int column) {
-      Class returnValue;
+    @Override
+    public Class<?> getColumnClass(int column) {
+      Class<?> returnValue;
       if ((column >= 0) && (column < getColumnCount())) {
         returnValue = getValueAt(0, column).getClass();
       } else {

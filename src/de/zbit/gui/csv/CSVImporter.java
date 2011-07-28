@@ -46,12 +46,15 @@ import de.zbit.util.StringUtil;
  * {@link #getColumnIndex(String)} directly delivers the new column index of the
  * expected table head entry or minus one if no such element exists.
  * 
+ * <p><b>Deprecated since July 2011. Please use {@link CSVImporterV2} instead.</b></p>
+ * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
  * @date 2010-09-03
  * @version $Rev$
  * @since 1.0
  */
+@Deprecated
 public class CSVImporter {
 
 	/**
