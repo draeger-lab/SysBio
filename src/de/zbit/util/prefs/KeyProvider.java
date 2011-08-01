@@ -566,8 +566,8 @@ public interface KeyProvider {
 		 * @param keyProvider
 		 * @return
 		 */
-		@SuppressWarnings("unchecked")
-		public static List<OptionGroup> optionGroupList(
+		@SuppressWarnings("rawtypes")
+    public static List<OptionGroup> optionGroupList(
 			Class<? extends KeyProvider> keyProvider) {
 			return list(keyProvider, OptionGroup.class);
 		}
@@ -577,8 +577,8 @@ public interface KeyProvider {
 		 * @param keyProvider
 		 * @return
 		 */
-		@SuppressWarnings("unchecked")
-		public static Iterator<Option> optionIterator(
+		@SuppressWarnings("rawtypes")
+    public static Iterator<Option> optionIterator(
 			final Class<? extends KeyProvider> keyProvider) {
 			return iterator(keyProvider, Option.class);
 		}

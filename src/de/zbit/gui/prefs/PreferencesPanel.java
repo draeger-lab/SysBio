@@ -649,7 +649,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			String k;
 			for (Object key : preferences.keySetFull()) {
 				if (accepts(key)) {
-				  // TODO: Accept only key from KeyProvider! Don't put all keys in propoerties (also not in preferences) here!
+				  // TODO: Accept only key from KeyProvider! Don't put all keys in properties (also not in preferences) here!
 					k = key.toString();
 					properties.put(k, preferences.get(k));
 					properties.getDefaults().put(k, preferences.getDefault(k));

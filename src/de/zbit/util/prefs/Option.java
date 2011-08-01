@@ -129,6 +129,8 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
     }
 		
 		if (Enum.class.isAssignableFrom(requiredType)) {
+      // Empty strings are never contained in enums
+      if (ret==null || ret.toString().length()<1) return null;
 		  try {
 			  ret = Reflect.invokeIfContains(requiredType, "valueOf", new Object[]{ret.toString()});
 		  } catch (Throwable t) {
