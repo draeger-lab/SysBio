@@ -10,8 +10,7 @@ import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
-import de.zbit.gui.CSVReaderOptionPanel;
-import de.zbit.io.CSVReader;
+import de.zbit.gui.csv.CSVReaderOptionPanel;
 
 /**
  * @author Clemens Wrzodek
