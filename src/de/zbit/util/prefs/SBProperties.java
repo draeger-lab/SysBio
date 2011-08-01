@@ -215,7 +215,11 @@ public class SBProperties extends Properties {
 	}
 	
 	/**
-	 * @return
+	 * Checks whether default values have been initialized.
+	 * 
+	 * @return <code>true</code> if a default {@link Properties} have been
+	 *         initialized for this {@link SBProperties}. This will even hold true
+	 *         in case of empty defaults.
 	 */
 	public boolean isSetDefaults() {
 		return defaults != null;
