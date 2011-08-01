@@ -1060,7 +1060,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
         try {
           prefs.flush();
         } catch (BackingStoreException exc) {
-          GUITools.showErrorMessage(this, exc);
+          //GUITools.showErrorMessage(this, exc);
+          // do NOT show this error, because the user really dosn't know
+          // how to handle a "The value for SAVE_DIR is out of range [...]"
+          // message. Better log it here!
         }
       }
       // Allow users to close the file(s) again

@@ -16,6 +16,7 @@
  */
 package de.zbit.gui.prefs;
 
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -703,6 +704,42 @@ public class FileSelector extends JPanel implements ActionListener,
 		}
 		return null;
 	}
+	
+	/**
+	 * Set the {@link TextField} associated with this instance to the
+	 * AbsolutePath of the given {@link File}.
+	 * <p>This method checks if the given file is accepted by the
+	 * file filters of this instance and if the given file is of
+	 * same mode (i.e. only directories or only files) as configured
+	 * in this instance.
+	 * <p>This method does NOT check if the file is readable or
+	 * writable and it does not create any file.
+	 * @param file
+	 * @return true if the textfield has been changed to the given
+	 * file.
+	 */
+	public boolean setSelectedFile(File file) {
+	  boolean mode = acceptOnlyFiles();
+    boolean acceptable = false;
+    
+    // Is the input file accepted by the file filters?
+    for (int i=0; (i<filter.length) && !acceptable; i++) {
+      if (filter[i].accept(file)) {
+        acceptable = true;
+      }
+    }
+    
+    // Is it a file or directory?
+    acceptable &= (mode && file.isFile()) || (!mode && file.isDirectory());
+    
+    // Set text to file
+    if (acceptable) {
+      textField.setText(file.getAbsolutePath());
+      return true;
+    } else {
+      return false;
+    }
+  }
 	
 	/**
 	 * One of the types defined by the {@link ActionCommand} {@link Type#OPEN} or

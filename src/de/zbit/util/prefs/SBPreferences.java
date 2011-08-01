@@ -313,12 +313,11 @@ public class SBPreferences implements Map<Object, Object> {
 		SBProperties props, String args[]) {
 		
 		// Do the actual parsing.
-	  // XXX: ArgParser does NOT distinguish between default options and 
-	  // user set options. Actually, one has to modify the argparser
-	  // and add a new flag to the argument holder, if it is a default value.
 		parser.matchAllArgs(args);
 		
 		// put all read options into this SBProperties object
+		// also sets the default values, according to the ArgHolders, which
+		// itself are configured accoring to the options.
 		putAll(props, options);
 		
 		// Now all command-line arguments must be made persistent:
@@ -343,6 +342,11 @@ public class SBPreferences implements Map<Object, Object> {
 				}
 			}
 			try {
+			  // Instead of punting an empty value to invalid keys and throwing
+			  // all-the-time these BackingStoreExceptions, set in the initial
+			  // loading all invalid values to their default value.
+			  prefs[i].setInvalidKeysToDefaultValues();
+			  
 			  // make all preferences persistent
 				prefs[i].flush();
 			} catch (BackingStoreException e) {
@@ -706,8 +710,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param properties
 	 * @throws BackingStoreException 
 	 */
-	@SuppressWarnings("unchecked")
-	public static void saveProperties(Class<? extends KeyProvider> keyProvider,
+	@SuppressWarnings("rawtypes")
+  public static void saveProperties(Class<? extends KeyProvider> keyProvider,
 		Properties properties) throws BackingStoreException {
 		List<Option> optionList = KeyProvider.Tools.optionList(keyProvider);
 		Set<String> keySet = new HashSet<String>();
@@ -718,7 +722,7 @@ public class SBPreferences implements Map<Object, Object> {
 		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 			if (keySet.contains(entry.getKey().toString())) {
 			  /* XXX: To avoid BackingStoreExceptions, one could check the
-			   * Range here, before flusing.
+			   * Range here, before flushing.
 			   */
 				prefs.put(entry.getKey(), entry.getValue());
 			}
@@ -816,8 +820,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public SBProperties analyzeCommandLineArguments(String usage, String args[],
 		boolean persist) throws BackingStoreException {
-		SBProperties props = analyzeCommandLineArguments(getKeyProvider(), usage,
-			args, defaults);
+		SBProperties props = analyzeCommandLineArguments(getKeyProvider(), usage, args, defaults);
 		putAll(props);
 		if (persist) {
 			flush();
@@ -880,8 +883,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @returns true if all key-value pairs are valid.
 	 * @throws BackingStoreException
 	 */
-	@SuppressWarnings("unchecked")
-	public boolean checkPrefs() throws BackingStoreException {
+	@SuppressWarnings("rawtypes")
+  public boolean checkPrefs() throws BackingStoreException {
 		Iterator<Option> iterator = optionIterator();
 		Option<?> option;
 		while (iterator.hasNext()) {
@@ -901,9 +904,10 @@ public class SBPreferences implements Map<Object, Object> {
 		boolean remove;
 		for (int i = keys.length - 1; i >= 0; i--) {
 			remove = false;
-			// Removed because not yet loded options may still have keys in the same
+			// Removed because not yet loaded options may still have keys in the same
 			// package. Thus, do not remove unknown keys! Just check known ones.
-			// An example for this issue is the FileHistory wich is just loaded on demand.
+			// An example for this issue is the FileHistory, which is just loaded on demand.
+			// If other options reside in the same package, the file history is cleared!
 			//if (!defaults.containsKey(keys[i])) {
 			//	remove = true;
 			//} else {
@@ -983,6 +987,33 @@ public class SBPreferences implements Map<Object, Object> {
 		if (checkPrefs()) {
 			prefs.flush();
 		}
+	}
+	
+	/**
+	 * This method restores the default value for all keys, for
+	 * which {@link #checkPref(Option)} throws a
+	 * {@link BackingStoreException}.
+	 */
+	@SuppressWarnings("rawtypes")
+	public void setInvalidKeysToDefaultValues() {
+	  Iterator<Option> iterator = optionIterator();
+	  Option<?> option;
+	  while (iterator.hasNext()) {
+	    option = iterator.next();
+	    try {
+	      // if false, key is simply not contained in the provider
+	      checkPref(option);
+	    } catch (Exception e) { // Also IllegalArgumentExceptions possible
+	      Object defaultV = option.getDefaultValue();
+	      if (defaultV!=null) {
+	        logger.log(Level.FINE, String.format("Restored default value \"%s\" for %s in %s", (defaultV==null?"NULL":defaultV) , option, keyProvider), e);
+	        put(option, defaultV);
+	      } else {
+	        logger.log(Level.FINE, String.format("Could NOT restore default value \"%s\" for %s in %s", (defaultV==null?"NULL":defaultV) , option, keyProvider), e);
+	        // What to do? Removing is NOT the right way, because a value might still be set later on!
+	      }
+	    }
+	  }
 	}
 	
 	/*
@@ -1224,8 +1255,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public Iterator<Option> optionIterator() {
+	@SuppressWarnings("rawtypes")
+  public Iterator<Option> optionIterator() {
 		return KeyProvider.Tools.optionIterator(keyProvider);
 	}
 	
@@ -1305,14 +1336,15 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
 	 */
 	public Object put(Object key, Object value) {
+   	// if value is null, a NullPointerException is thrown later.
 		Object o = get(key);
-		put(key, value.toString());
+		put(key, value!=null?value.toString():(String)null);
 		return o;
 	}
 	
 	/**
 	 * @param key
-	 * @param value
+	 * @param value may not be null.
 	 */
 	public String put(Object key, String value) {
 		String k = key.toString();
