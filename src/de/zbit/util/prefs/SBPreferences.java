@@ -33,6 +33,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -669,32 +670,30 @@ public class SBPreferences implements Map<Object, Object> {
 	 *        for the desired values.
 	 */
 	private static void putAll(SBProperties props, Map<Option<?>, ArgHolder<?>> options) {
-		String k, value = null, v;
-		Object o;
+		String k;
 		for (Option<?> key : options.keySet()) {
 			
-			// try {
+			// Set properties value and defaultValue according to ArgHolder
 			k = key.toString();
-			o = options.get(key).getValue();
-			if (o != null) { 
-				value = o.toString(); 
+			ArgHolder<?> holder = options.get(key);
+			if (holder.isSetValue())  {
+				props.setProperty(k, holder.getValue().toString());	
 			}
-			// This is necessary, because at this point it can't be deduced if the
-			// given options were explicitly set or just the default value.
 			if (props.isSetDefaults()) {
-				v = props.getProperty(k);
-				if (v == null) {
-					ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
-					throw new IllegalArgumentException(String.format(
-					resources.getString("NO_VALUE_DEFINED_FOR_PROPERTY"), k)); 
+				if (holder.isSetDefaultValue()) {
+					props.getDefaults().setProperty(k,
+						holder.getDefaultValue().toString());
 				}
-				// XXX: This has the very negative effect that if the command line option was
-				// there and set to default, this information is erased right here.
-				if (!v.equals(value)) {
-					props.setProperty(k, value);
-				}
-			} else {
-				props.setProperty(k, value);
+			}
+			
+			/* Check if for the current key any value has been defined, whether
+			 * a current value or a default value. In case that none of both has
+			 * been set, inform the logger about this.
+			 */			
+			if (props.getProperty(k) == null) {
+				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
+				logger.log(Level.FINE, String.format(resources
+						.getString("NO_VALUE_DEFINED_FOR_PROPERTY"), k));
 			}
 		}
 	}
@@ -834,10 +833,10 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param option
 	 *        The option which is to be checked and whose associated value is to
 	 *        be checked.
-	 * @return true if this instance of {@link SBPreferences} contains the given
+	 * @return <code>true</code> if this instance of {@link SBPreferences} contains the given
 	 *         option and if the value belonging to this option is valid with
 	 *         respect to given constraints stored in a {@link Range} object
-	 *         associated to the {@link Option}. Returns false if this option is
+	 *         associated to the {@link Option}. Returns <code>false</code> if this option is
 	 *         not contained as a key in this {@link SBPreferences}.
 	 * @throws BackingStoreException
 	 *         If this object contains the given option but its associated value
