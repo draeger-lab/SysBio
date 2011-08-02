@@ -185,7 +185,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption {
      * @param fieldIsRequired
      * @param organisms
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes" })
     public JLabeledComponent(String title, boolean fieldIsRequired,
       Collection columnHeaders) {
       this(title, fieldIsRequired, columnHeaders.toArray());
@@ -578,7 +578,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption {
 	  
 	  /**
 	   * Set the default value of the column chooser.
-	   * @param s - set the default index to this value's index.
+	   * @param s set the default index to this value's index.
 	   */
 	  public void setDefaultValue(String s) {
 	    if (model!=null) {
@@ -591,6 +591,18 @@ public class JLabeledComponent extends JPanel implements JComponentForOption {
 	      }
 	    }
 	  }
+	  
+	   /**
+     * Set the default value of the column chooser.
+     * @param s set the default index to this value's index.
+     */
+    public void setDefaultValue(Object defaultV) {
+      if (model!=null) {
+        model.setSelectedItem(defaultV);
+      } else {
+        setDefaultValue(defaultV.toString());
+      }
+    }
 	  
 	  /**
 	   * Do you want to use a JTextField (true) of a JComboBox (false)
@@ -774,6 +786,8 @@ public class JLabeledComponent extends JPanel implements JComponentForOption {
 	      int def = defaultValue+(required?0:1);
 	      if (def<0 || def>=model.getSize()) def=0;
 	      cb.setSelectedIndex(def);
+	      // Configure an improved renderer that allows more customization.
+	      cb.setRenderer(new ActionCommandRenderer());
 	      ret = cb;
 	    } else {
 	      if (defaultValue<0) defaultValue=0;

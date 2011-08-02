@@ -421,18 +421,13 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * <p>NOTE: the returned Element is ALWAYS a {@link JComponent} that implements
    * the {@link JComponentForOption} interface.</p>
    * 
-	 * @param option
-	 *        - option to build the JComponent for.
-	 * @param defaultValue
-	 *        - default value (should be same class as the "?" in Option<?>
+	 * @param option {@link Option} to build the {@link JComponent} for.
+	 * @param defaultValue default value (should be same class as the "?" in Option<?>
 	 *        (optional)
-	 * @param itemListener
-	 *        - ItemListener (optional)
-	 * @param changeListener
-	 *        - ChangeListener (optional)
-	 * @param keyListener
-	 *        - KeyListener (optional)
-	 * @return JComponent or NULL if the getRequiredType() is unknown.
+	 * @param itemListener ItemListener (optional)
+	 * @param changeListener ChangeListener (optional)
+	 * @param keyListener KeyListener (optional)
+	 * @return JComponent or <code>NULL</code> if {@link Option#getRequiredType()} is unknown.
 	 */
 	public static JComponent getJComponentForOption(Option<?> option,
 		Object defaultValue, ItemListener itemListener,
@@ -572,7 +567,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 						}
 					}
 					else {
-					((JLabeledComponent) component).setDefaultValue(defaultValue.toString());
+					((JLabeledComponent) component).setDefaultValue(defaultValue);
 					}
 				}
 				// Remove preview and reset predefined JLabeledComponent layout.
