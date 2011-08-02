@@ -80,22 +80,9 @@ public class KeggAdaptor {
     printEachOutputToScreen = true;
     KeggAdaptor adap = new KeggAdaptor();
     
-    System.out.println(Arrays.deepToString("1234 567,890, hallo".split(",|\\s")));
-    if (true) return;
 
-    System.out.println(new KeggInfos("ko:K06625").getEntrez_id());
-    if (true) return;
-    adap.getPathways("map");
-    if (true) return;
-    
-    adap.getPathwayList("hsa");
-    System.out.println("==================");
-    adap.getPathways("hsa");
-    System.out.println("==================");
-    adap.getOrganisms();
-    if (true) return;
-    
-    String query = "HOMER1";
+    String query = "mghv-miR-M1-1";
+    adap.find("genes "+query);
     
     // Query should be a standard gene symbol
     ArrayList<String> kgIds = adap.getKEGGIdentifierForAGeneSymbol(query, "hsa");
