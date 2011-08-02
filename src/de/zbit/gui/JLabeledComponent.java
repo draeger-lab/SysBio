@@ -27,6 +27,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.ItemSelectable;
 import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -58,17 +59,20 @@ import de.zbit.gui.csv.CSVReaderOptionPanel;
 import de.zbit.gui.csv.JColumnChooser;
 import de.zbit.gui.prefs.JComponentForOption;
 import de.zbit.io.CSVReader;
+import de.zbit.util.ArrayUtils;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
- * @author Clemens Wrzodek
+ * A generic component with a label.
+ * See {@link JColumnChooser} for the original implementation.
+ * 
  * @author Roland Keller
+ * @author Clemens Wrzodek
  * @version $Rev$
  */
-
-public class JLabeledComponent extends JPanel implements JComponentForOption {
+public class JLabeledComponent extends JPanel implements JComponentForOption, ItemSelectable {
   public static final transient Logger log = Logger.getLogger(JLabeledComponent.class.getName());
 	protected static final long serialVersionUID = -9026612128266336630L;
 	  
@@ -267,6 +271,26 @@ public class JLabeledComponent extends JPanel implements JComponentForOption {
 				// otherwise not possible!
 			}
 		}
+		
+    /* (non-Javadoc)
+     * @see java.awt.ItemSelectable#getSelectedObjects()
+     */
+    @Override
+    public Object[] getSelectedObjects() {
+      return ArrayUtils.toArray(getSelectedItem());
+    }
+    /* (non-Javadoc)
+     * @see java.awt.ItemSelectable#removeItemListener(java.awt.event.ItemListener)
+     */
+    @Override
+    public void removeItemListener(ItemListener l) {
+      JComponent comp = getColumnChooser();
+      if (comp instanceof JComboBox) {
+        ((JComboBox) comp).removeItemListener(l);
+      } else {
+        // otherwise not possible!
+      }
+    }
 		
 		/*
 		 * (non-Javadoc)
@@ -833,8 +857,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption {
 	  public static void addSelectorsToLayout(LayoutHelper lh, JLabeledComponent jc) {
 	    addSelectorsToLayout(lh, jc, false);
 	  }
-	  public static void addSelectorsToLayout(LayoutHelper lh, JLabeledComponent jc,
-	    boolean addSpace) {
+	  public static void addSelectorsToLayout(LayoutHelper lh, JLabeledComponent jc, boolean addSpace) {
 	    int i=0;
 	    lh.add(jc.label, (i++), lh.getRow(), 1, 1, 0d, 0d);
 	    lh.add(new JPanel(), (i++), lh.getRow(), 1, 1, 0d, 0d);
@@ -930,6 +953,17 @@ public class JLabeledComponent extends JPanel implements JComponentForOption {
         ((JComboBox)colChooser).setEditable(b);
       }
     }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.JComponent#setEnabled(boolean)
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+      super.setEnabled(enabled);
+      if (label!=null) label.setEnabled(enabled);
+      if (colChooser!=null) colChooser.setEnabled(enabled);
+    }
+    
     /**
      * Just for testing purposes.
      */

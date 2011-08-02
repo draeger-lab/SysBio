@@ -288,6 +288,16 @@ public class JColumnChooser extends JLabeledComponent {
     }
   }
   
+  /* (non-Javadoc)
+   * @see de.zbit.gui.JLabeledComponent#setEnabled(boolean)
+   */
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    if (getUsePreview()) {
+      getPreview().setEnabled(enabled);
+    }
+  }
   
 
   
