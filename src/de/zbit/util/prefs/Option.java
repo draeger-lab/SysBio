@@ -17,7 +17,9 @@
 package de.zbit.util.prefs;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.JLabeledComponent;
@@ -115,6 +117,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	  }
 	
 		if (requiredType.equals(Character.class)) {
+		  if (ret==null || ret.toString().length()<1) return null;
 			ret = ((Character) ret.toString().charAt(0));
 		}
 		
@@ -236,6 +239,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * graphical user interfaces.
 	 */
 	private String displayName;
+	
+	/**
+	 * This allows to configure dependencies for this option. Only if
+	 * for each entry in the map, the value of the option is equal to
+	 * the object, this Option is enabled (e.g., in GUIs). 
+	 */
+	private Map<Option<?>, Object> dependencies=null;
 	
 	/**
 	 * Checks if a display name for this option has been set.
@@ -694,6 +704,58 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	public String getShortCmdName() {
 		return shortCmdName;
 	}
+	
+	/**
+   * This allows to add dependencies for this option. Only if
+   * for all added dependencies, the value of the <code>option</code>
+   * is equal to the <code>condition</code>, this {@link Option}
+   * is enabled (e.g., in GUIs). 
+   * <p>Only one <code>condition</code> is alowed for each
+   * option. 
+	 * @param <E>
+	 * @param option another option, this option depends on
+	 * @param condition only if this condition is equal to the
+	 * <code>option</code>s value, this option is considered enabled.
+	 */
+	public <E> void addDependency(Option<E> option, E condition) {
+	  if (dependencies==null) {
+	    dependencies = new HashMap<Option<?>, Object>();
+	  }
+	  dependencies.put(option, condition);
+	}
+	
+	/**
+	 * Remove an option from the list of dependencies.
+	 * @param <E>
+	 * @param option
+	 */
+	public <E> void removeDependency(Option<E> option) {
+	  if (dependencies==null) {
+	    return;
+	  }
+	  dependencies.remove(option);
+	}
+	
+	/**
+	 * @return true if and only if this Option depends
+	 * on other options.
+	 */
+	public boolean hasDependencies() {
+	  return (dependencies!=null && dependencies.size()>0);
+	}
+	
+	/**
+	 * Remark: Please be careful with this method, as it
+	 * returns a raw internal data structure.
+	 * @return the configured dependencies for this option.
+	 */
+	public Map<Option<?>, Object> getDependencies() {
+    if (dependencies==null) {
+      dependencies = new HashMap<Option<?>, Object>();
+    }
+    return dependencies;
+	}
+	
 	
 	/**
 	 * A {@link String} to be parsed by an {@link ArgParser} to specify the

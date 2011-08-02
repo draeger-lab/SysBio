@@ -1811,6 +1811,31 @@ public class GUITools {
     
     return retVal;
   }
+
+
+  /**
+   * Remove all elements from this container and all childs, that
+   * have a name that is equal to the given one.
+   * @param container
+   * @param nameToRemove
+   * @return true if at least one element has been removed.
+   */
+  public static boolean removeAllComponentsWithName(Container container, String nameToRemove) {
+    boolean removed = false;
+    
+    for (Component c: container.getComponents()) {
+      String name = c.getName();
+      
+      if (name!=null && name.equals(nameToRemove)) {
+        container.remove(c);
+        removed=true;
+      } else if (c instanceof Container) {
+        // Recurse
+        removed|=removeAllComponentsWithName((Container) c,nameToRemove);
+      }
+    }
+    return removed;
+  }
   
   
 }
