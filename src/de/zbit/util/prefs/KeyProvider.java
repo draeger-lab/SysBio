@@ -588,8 +588,8 @@ public interface KeyProvider {
 		 * @param keyProvider
 		 * @return
 		 */
-		@SuppressWarnings("unchecked")
-		public static List<Option> optionList(
+		@SuppressWarnings("rawtypes")
+    public static List<Option> optionList(
 			Class<? extends KeyProvider> keyProvider) {
 			return list(keyProvider, Option.class);
 		}

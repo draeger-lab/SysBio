@@ -225,9 +225,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-  List<Option<?>> addOptions(LayoutHelper lh,
-		Iterable<? extends Option> options,
-		Map<Option<?>, OptionGroup<?>> deleteFromHere) {
+  List<Option<?>> addOptions(LayoutHelper lh, Iterable<? extends Option> options, Map<Option<?>, OptionGroup<?>> deleteFromHere) {
 		List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
 		for (Option<?> option : options) {
 			// Create swing option based on field type
@@ -273,6 +271,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		
 		// Now we consider what is left
 		unprocessedOptions.addAll(addOptions(lh, ungroupedOptions, null));
+		
+		// And finally we create the dependencies
+		PreferencesPanelDependencies.configureDependencies(this);
 		
 		return unprocessedOptions;
 	}
@@ -649,7 +650,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			String k;
 			for (Object key : preferences.keySetFull()) {
 				if (accepts(key)) {
-				  // TODO: Accept only key from KeyProvider! Don't put all keys in properties (also not in preferences) here!
+				  // Accept only key from KeyProvider!
+				  // Don't put all keys in properties (also not in preferences) here!
 					k = key.toString();
 					properties.put(k, preferences.get(k));
 					properties.getDefaults().put(k, preferences.getDefault(k));
@@ -808,6 +810,21 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			}
 		}
 	}
+	
+	/**
+	 * @return the {@link #preferences}.
+	 */
+	public SBPreferences getPreferences() {
+	  return preferences;
+	}
+	
+	/**
+	 * @return the {@link KeyProvider} of the {@link #preferences}.
+	 */
+	public Class<? extends KeyProvider> getKeyProvider() {
+	  return preferences!=null?preferences.getKeyProvider():null;
+	}
+	
 	
 	/**
 	 * Filters the given properties and only keeps those key-value pairs that are
