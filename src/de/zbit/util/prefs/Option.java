@@ -756,8 +756,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
    * for all added dependencies, the value of the <code>option</code>
    * is equal to the <code>condition</code>, this {@link Option}
    * is enabled (e.g., in GUIs). 
-   * <p>Only one <code>condition</code> is alowed for each
-   * option. 
+   * <p>Remarks:<br/><ul>
+   * <li>Only one <code>condition</code> is allowed for each
+   * option.</li>
+   * <li>Multiple dependencies are connected with an
+   * <code>AND</code> operator.</li></ul> 
 	 * @param <E>
 	 * @param option another option, this option depends on
 	 * @param condition only if this condition is equal to the

@@ -33,8 +33,7 @@ import de.zbit.gui.ActionCommand;
  * @version $Rev$
  * @since 1.0
  */
-public class OptionGroup<T> implements ActionCommand,
-		Comparable<OptionGroup<T>> {
+public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>> {
 	
 	/**
 	 * 
