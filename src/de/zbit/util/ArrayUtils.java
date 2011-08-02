@@ -41,6 +41,16 @@ public class ArrayUtils {
     return d;
   }
   
+  /**
+   * Converts any single element into an array of length one.
+   * @param <E>
+   * @param singleElement
+   * @return
+   */
+  public static <E> E[] toArray(E singleElement) {
+    return createArray(singleElement, 1);
+  }
+  
   
   /**
    * If there exists one element in arr such that arr[i].equals(s),

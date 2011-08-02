@@ -40,6 +40,7 @@ import javax.swing.text.JTextComponent;
 import de.zbit.util.Reflect;
 import de.zbit.util.ValuePairUncomparable;
 import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.Range;
 
 /**
  * This class adds automated dependencies to {@link PreferencesPanel}s.
@@ -82,17 +83,19 @@ public class PreferencesPanelDependencies {
    * @version $Rev$
    */
   public class DependencyListener implements EventListener, ActionListener, ItemListener, ChangeListener, DocumentListener {
-    private Iterable<ValuePairUncomparable<JComponentForOption, Object>> toCheck;
+    private Iterable<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck;
     private Component dependant;
-    public DependencyListener(Iterable<ValuePairUncomparable<JComponentForOption, Object>> toCheck, Component dependant) {
+    public DependencyListener(Iterable<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck, Component dependant) {
       this.toCheck = toCheck;
       this.dependant = dependant;
     }
     public void checkAndProcessConditions() {
       // Check all conditions and enable or disable
       boolean enabled=true;
-      for (ValuePairUncomparable<JComponentForOption, Object> valuePairUncomparable : toCheck) {
-        if (!valuePairUncomparable.getA().getCurrentValue().equals(valuePairUncomparable.getB())) {
+      for (ValuePairUncomparable<JComponentForOption, Range<?>> valuePairUncomparable : toCheck) {
+        //if (!valuePairUncomparable.getA().getCurrentValue().equals(valuePairUncomparable.getB())) {
+        JComponentForOption jc = valuePairUncomparable.getA();
+        if (!jc.getOption().castAndCheckRange(jc.getCurrentValue(), valuePairUncomparable.getB())) {
           enabled = false;
           break;
         }
@@ -169,15 +172,15 @@ public class PreferencesPanelDependencies {
     if (!dependant.getOption().hasDependencies()) return;
     
     // Summarize all dependent JComponents and their conditions
-    final List<ValuePairUncomparable<JComponentForOption, Object>> toCheck = 
-      new ArrayList<ValuePairUncomparable<JComponentForOption, Object>>();
+    final List<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck = 
+      new ArrayList<ValuePairUncomparable<JComponentForOption, Range<?>>>();
     
-    Map<Option<?>, Object> dependsOn = dependant.getOption().getDependencies();
+    Map<Option<?>, Range<?>> dependsOn = dependant.getOption().getDependencies();
     for (JComponentForOption jc : jcomponents) {
       Option<?> cur = jc.getOption();
       if (dependsOn.containsKey(cur)) {
-        Object condition = dependsOn.get(cur);
-        toCheck.add(new ValuePairUncomparable<JComponentForOption, Object>(jc, condition));
+        Range<?> condition = dependsOn.get(cur);
+        toCheck.add(new ValuePairUncomparable<JComponentForOption, Range<?>>(jc, condition));
       }
     }
     
@@ -186,7 +189,7 @@ public class PreferencesPanelDependencies {
     DependencyListener listener  = new DependencyListener(toCheck, (Component) dependant);
     
     // Add action listener to all dependents
-    for (ValuePairUncomparable<JComponentForOption, Object> valuePairUncomparable : toCheck) {
+    for (ValuePairUncomparable<JComponentForOption, Range<?>> valuePairUncomparable : toCheck) {
       JComponentForOption dependent = valuePairUncomparable.getA();
       // Add all listener interfaces 
       // For JComboBoxes
@@ -199,10 +202,12 @@ public class PreferencesPanelDependencies {
       }
       // For buttons
       Reflect.invokeIfContains(dependent, "addChangeListener", ChangeListener.class, listener);
-      
-      // Generic
       Reflect.invokeIfContains(dependent, "addActionListener", ActionListener.class, listener);      
     }
+    
+    // Perform an initial check
+    listener.checkAndProcessConditions();
+    
   }
   
   

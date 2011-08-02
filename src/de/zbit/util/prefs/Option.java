@@ -17,14 +17,19 @@
 package de.zbit.util.prefs;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
 
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.io.GeneralFileFilter;
 import de.zbit.io.SBFileFilter;
+import de.zbit.util.ArrayUtils;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
@@ -76,13 +81,10 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * Convert 'ret' to {@link #requiredType} by parsing it (e.g.
 	 * Integer.parseInt), or casting it to the desired type.
 	 * 
-	 * @param <Type>
-	 *        - Type
-	 * @param requiredType
-	 *        - Type.class
-	 * @param ret
-	 *        - Object to convert
-	 * @return Type instance of ret.
+	 * @param <Type> Type
+	 * @param requiredType Type.class
+	 * @param ret Object to convert
+	 * @return Type instance of <code>ret</code>.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
@@ -242,12 +244,28 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	
 	/**
 	 * This allows to configure dependencies for this option. Only if
-	 * for each entry in the map, the value of the option is equal to
-	 * the object, this Option is enabled (e.g., in GUIs). 
+	 * for each entry in the map, the value of the option fulfills
+	 * the condition, this Option is enabled (e.g., in GUIs). 
 	 */
-	private Map<Option<?>, Object> dependencies=null;
+	private Map<Option<?>, Range<?>> dependencies=null;
+
+	/**
+   * This group allows to create a group of buttons. This does only
+   * make sense with {@link Boolean} options. All options on this
+   * group will automatically be converted into a {@link JRadioButton},
+   * when translated into a JComponent.
+	 */
+  private ButtonGroup buttonGroup=null;
 	
 	/**
+	 * @see #setButtonGroup(ButtonGroup)
+   * @return the buttonGroup
+   */
+  public ButtonGroup getButtonGroup() {
+    return buttonGroup;
+  }
+
+  /**
 	 * Checks if a display name for this option has been set.
 	 * 
 	 * @return <code>true</code> if the display name has been set,
@@ -514,7 +532,35 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		this(optionName, requiredType, description, null, defaultValue, displayName);
 	}
 	
-	/*
+	 /**
+   * 
+   * @param optionName
+   * @param requiredType
+   * @param description
+   * @param defaultValue
+   * @param displayName
+   * @param group allows to create a group of buttons. This does only
+   * make sense with {@link Boolean} options. All options on this
+   * group will automatically be converted into a {@link JRadioButton},
+   * when translated into a JComponent.
+   */
+  public Option(String optionName, Class<Type> requiredType,
+    String description, Type defaultValue, String displayName, ButtonGroup group) {
+    this(optionName, requiredType, description, null, defaultValue, displayName);
+    setButtonGroup(group);
+  }
+	
+	/**
+   * @param group allows to create a group of buttons. This does only
+   * make sense with {@link Boolean} options. All options on this
+   * group will automatically be converted into a {@link JRadioButton},
+   * when translated into a JComponent.
+   */
+  public void setButtonGroup(ButtonGroup group) {
+    this.buttonGroup = group;
+  }
+
+  /*
 	 * (non-Javadoc)
 	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
@@ -717,12 +763,19 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param condition only if this condition is equal to the
 	 * <code>option</code>s value, this option is considered enabled.
 	 */
-	public <E> void addDependency(Option<E> option, E condition) {
-	  if (dependencies==null) {
-	    dependencies = new HashMap<Option<?>, Object>();
-	  }
-	  dependencies.put(option, condition);
+	@SuppressWarnings("unchecked")
+  public <E> void addDependency(Option<E> option, E condition) {
+	  // Create a range with a single element.
+	  addDependency(option, new Range<E>((Class<E>)condition.getClass(),
+	      Arrays.asList(ArrayUtils.toArray(condition))));
 	}
+	
+	 public <E> void addDependency(Option<E> option, Range<E> condition) {
+	    if (dependencies==null) {
+	      dependencies = new HashMap<Option<?>, Range<?>>();
+	    }
+	    dependencies.put(option, condition);
+	  }
 	
 	/**
 	 * Remove an option from the list of dependencies.
@@ -749,9 +802,9 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * returns a raw internal data structure.
 	 * @return the configured dependencies for this option.
 	 */
-	public Map<Option<?>, Object> getDependencies() {
+	public Map<Option<?>, Range<?>> getDependencies() {
     if (dependencies==null) {
-      dependencies = new HashMap<Option<?>, Object>();
+      dependencies = new HashMap<Option<?>, Range<?>>();
     }
     return dependencies;
 	}
@@ -939,6 +992,28 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
     if (value2==null) { return false;}
     if (!isSetRangeSpecification()) return true;
     return range.isInRange(value2);
+  }
+  
+  /**
+   * Cast or parse <code>value</code> to <code>Type</code>
+   * and check with the given range constraints.
+   * 
+   * @param value
+   * @param r
+   * @return true if <code>value</code> is in {@link Range} <code>r</code>.
+   */
+  @SuppressWarnings("unchecked")
+  public boolean castAndCheckRange(Object value, Range<?> r) {
+    Type value2 = parseOrCast(value);
+    if (value2==null) { return false;}
+    if (r==null ||  r.getRangeSpecString() == null) return true;
+    // I made the method a bit more generic, expecting a Range<?>
+    // instead a Range<Type>. This improves the usability of the method.
+    try {
+      return ((Range<Type>)r).isInRange(value2);
+    } catch (Throwable t) {
+      return false;
+    }
   }
 	
 	/**
