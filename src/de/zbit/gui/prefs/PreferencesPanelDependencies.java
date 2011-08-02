@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.HashSet;
@@ -37,6 +39,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.gui.JLabeledComponent;
 import de.zbit.util.Reflect;
 import de.zbit.util.ValuePairUncomparable;
 import de.zbit.util.prefs.Option;
@@ -82,7 +85,7 @@ public class PreferencesPanelDependencies {
    * @author Clemens Wrzodek
    * @version $Rev$
    */
-  public class DependencyListener implements EventListener, ActionListener, ItemListener, ChangeListener, DocumentListener {
+  public class DependencyListener implements EventListener, ActionListener, ItemListener, ChangeListener, DocumentListener, KeyListener {
     private Iterable<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck;
     private Component dependant;
     public DependencyListener(Iterable<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck, Component dependant) {
@@ -115,6 +118,15 @@ public class PreferencesPanelDependencies {
     public void itemStateChanged(ItemEvent e) {checkAndProcessConditions();}
     @Override
     public void actionPerformed(ActionEvent e) {checkAndProcessConditions();}
+    @Override
+    public void keyTyped(KeyEvent e) {
+      // Do not update buttons here. The KeyEvent is not yet processed
+      // i.e. the textfield has not yet changed it's value!
+    }
+    @Override
+    public void keyPressed(KeyEvent e) {} // INTENTIONALLY LEFT BLANK
+    @Override
+    public void keyReleased(KeyEvent e) {checkAndProcessConditions();}
   };
   
   
@@ -128,7 +140,13 @@ public class PreferencesPanelDependencies {
 //    List<Option> allOptions = (KeyProvider.Tools.optionList(keyProvider));
     
     // Collect all JComponents for all options
-    Set<? extends JComponentForOption> jcs = getAllJComponentsForOptions(parent);
+    Set<JComponentForOption> jcs = new HashSet<JComponentForOption>();
+    for (JComponent jc : parent.option2component.values()) {
+      if (jc instanceof JComponentForOption) {
+        // Should actually hold true for all items in the source collection.
+        jcs.add((JComponentForOption) jc);
+      }
+    }
    
     // Set dependency listeners
     for (JComponentForOption jco : jcs) {
@@ -139,6 +157,13 @@ public class PreferencesPanelDependencies {
   }
   
   /**
+   * Get all {@link JComponent} that have been created for {@link Option}s.
+   * 
+   * Unfortunately, the {@link JLabeledComponent}s and {@link FileSelector}s
+   * are added in {@link PreferencesPanel#addOptions(de.zbit.gui.LayoutHelper, Iterable, Map)}
+   * with their components only (not as whole objects). Thus, this method
+   * can not identify these components.
+   * 
    * @param c any {@link Container}
    * @return a set of all {@link JComponent}s, implementing the
    * {@link JComponentForOption} interface that are in the given
@@ -153,6 +178,7 @@ public class PreferencesPanelDependencies {
       if (co instanceof JComponentForOption) {
         list.add((JComponentForOption)co);
       }
+      
       if (co instanceof Container) {
         list.addAll(getAllJComponentsForOptions((Container)co));
       }
@@ -200,9 +226,10 @@ public class PreferencesPanelDependencies {
       if (dependent instanceof JTextComponent) {
         ((JTextComponent)dependent).getDocument().addDocumentListener(listener);
       }
-      // For buttons
+      // Others (e.g, for buttons)
       Reflect.invokeIfContains(dependent, "addChangeListener", ChangeListener.class, listener);
-      Reflect.invokeIfContains(dependent, "addActionListener", ActionListener.class, listener);      
+      Reflect.invokeIfContains(dependent, "addActionListener", ActionListener.class, listener);
+      ((Component)dependent).addKeyListener(listener);
     }
     
     // Perform an initial check

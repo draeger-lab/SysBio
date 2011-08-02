@@ -123,8 +123,7 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  * @since 1.0
  */
-public class FileSelector extends JPanel implements ActionListener,
-  JComponentForOption{
+public class FileSelector extends JPanel implements ActionListener, JComponentForOption{
 	
 	/**
 	 * 
@@ -371,6 +370,17 @@ public class FileSelector extends JPanel implements ActionListener,
 		if (addSpace) {
 			lh.add(new JPanel(), 0, 5, 1, 0d, 0d);
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see javax.swing.JComponent#setEnabled(boolean)
+	 */
+	@Override
+	public void setEnabled(boolean enabled) {
+	  super.setEnabled(enabled);
+	  if (label!=null) label.setEnabled(enabled);
+	  if (textField!=null) textField.setEnabled(enabled);
+	  if (button!=null) button.setEnabled(enabled);
 	}
 	
 	/**
