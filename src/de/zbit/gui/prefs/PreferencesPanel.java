@@ -515,6 +515,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			
 		} else if (String.class.isAssignableFrom(clazz)
 				|| (Enum.class.isAssignableFrom(clazz))) {
+		  // TODO: If a ButtonGroup is set on the option, AND
+		  // Number of values <=10 then create radio buttons
+		  // instead of a JComboBox.
 			component = new JLabeledComponent(optionTitle, true, values);
 			((JLabeledComponent) component).setAcceptOnlyIntegers(false);
 			
