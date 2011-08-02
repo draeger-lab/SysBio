@@ -18,6 +18,7 @@ package de.zbit.util.prefs;
 
 import java.io.File;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -96,7 +97,7 @@ public class Range<Type> {
 		 * @param excludingLBound
 		 * @param excludingUBound
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SubRange (Type lowerBound, Type upperBound, boolean excludingLBound, boolean excludingUBound) {
 			super();
 			lBound = lowerBound;
@@ -127,8 +128,8 @@ public class Range<Type> {
 		 * @param value
 		 * @return
 		 */
-		@SuppressWarnings("unchecked")
-		public boolean isInRange(Type value) {
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+    public boolean isInRange(Type value) {
 			if (value instanceof Comparable) {
 			  try {
 				// Check lower bound
@@ -297,8 +298,7 @@ public class Range<Type> {
 
 	/**
 	 * 
-	 * @param requiredType
-	 *        must be an instance of {@link File}!
+	 * @param requiredType must be an instance of {@link File}!
 	 * @param filter
 	 */
 	public Range(Class<Type> requiredType, GeneralFileFilter filter) {
@@ -316,14 +316,24 @@ public class Range<Type> {
 	 * This is a convenient constructors that builds a range string from
 	 * a list of all acceptable object automatically.
 	 * 
-	 * See {@link #Range(Class, String)} for more information.
-	 * 
+	 * @see {@link #Range(Class, String)} for more information.
    * @param requiredType
    * @param acceptedObjects
    */
   public Range(Class<Type> requiredType, List<Type> acceptedObjects) {
     this(requiredType, Range.toRangeString(acceptedObjects));
     this.setListOfAccpetedObjects(acceptedObjects);
+  }
+  
+  /**
+   * This is a convenient constructors that builds a range string from
+   * a list of all acceptable object automatically.
+   * 
+   * @param requiredType
+   * @param acceptedObjects
+   */
+  public Range(Class<Type> requiredType, Type... acceptedObjects) {
+    this (requiredType, Arrays.asList(acceptedObjects));
   }
   
   /**

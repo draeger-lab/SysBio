@@ -551,6 +551,24 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
   }
 	
 	/**
+	 * This constructor adds a dependency to the created option.
+	 * the given <code>dependency</code> must fulfill the given
+	 * <code>condition</code> that this option is considered enabled.
+	 * @param <E>
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param defaultValue
+	 * @param dependency
+	 * @param condition
+	 */
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Type defaultValue, Option<E> dependency, Range<E> condition) {
+    this(optionName, requiredType, description, defaultValue);
+    addDependency(dependency, condition);
+  }
+
+  /**
    * @param group allows to create a group of buttons. This does only
    * make sense with {@link Boolean} options. All options on this
    * group will automatically be converted into a {@link JRadioButton},
