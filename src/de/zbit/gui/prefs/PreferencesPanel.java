@@ -56,6 +56,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.ColorChooserWithPreview;
+import de.zbit.gui.ExpandablePanel;
+import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.prefs.FileSelector.Type;
@@ -296,24 +298,33 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 *        panel.
 	 * @return
 	 */
-	Component createGroup(OptionGroup<?> optGrp,
-		List<Option<?>> unprocessedOptions) {
-		JPanel groupPanel;
-		String title;
-		groupPanel = new JPanel();
+	Component createGroup(OptionGroup<?> optGrp, List<Option<?>> unprocessedOptions) {
+	  
+	  // Create a new panel for the group
+		JPanel groupPanel = new JPanel();
 		LayoutHelper groupsLayout = new LayoutHelper(groupPanel);
-		unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(),
-			option2group));
-		if (optGrp.isSetName()) {
-			title = StringUtil.concat(" ", optGrp.getName().trim(), " ").toString();
-			groupPanel.setBorder(BorderFactory.createTitledBorder(title));
+		// Add all child-options to this panel 
+		unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(), option2group));
+		
+		// Set Border, Name and ToolTip
+		String title = (optGrp.isSetName())?StringUtil.concat(" ", optGrp.getName().trim(), " ").toString():null;
+		String toolTip = (optGrp.isSetToolTip())?StringUtil.toHTML(optGrp.getToolTip(), GUITools.TOOLTIP_LINE_LENGTH):null;
+		groupPanel.setToolTipText(toolTip);
+		if (optGrp.isCollapsable()) {
+		  // Create a collapsible panel
+		  ExpandablePanel parentPanel = new ExpandablePanel(title, groupPanel, optGrp.isInitiallyCollapsed(), true);
+		  parentPanel.setToolTipText(toolTip);
+		  return parentPanel;
+		  
 		} else {
-			groupPanel.setBorder(BorderFactory.createEtchedBorder());
+		  // Set border and return simple panel
+		  if (title!=null) {
+		    groupPanel.setBorder(BorderFactory.createTitledBorder(title));
+		  } else {
+		    groupPanel.setBorder(BorderFactory.createEtchedBorder());
+		  }
+		  return groupPanel;
 		}
-		if (optGrp.isSetToolTip()) {
-			groupPanel.setToolTipText(StringUtil.toHTML(optGrp.getToolTip(), 60));
-		}
-		return groupPanel;
 	}
 	
 	/**
@@ -478,7 +489,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		// TODO: Group, test, and accept automatically
 		Class<?> clazz = option.getRequiredType();
 		if (Boolean.class.isAssignableFrom(clazz)) {
-			component = new OptionCheckBox();
+		  if (option.getButtonGroup()==null) {
+			  component = new OptionCheckBox();
+		  } else {
+		    component = new OptionRadioButton();
+		  }
 			if (defaultValue != null) {
 				((AbstractButton) component).setSelected(Boolean
 						.parseBoolean(defaultValue.toString()));
@@ -530,7 +545,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		} else if (String.class.isAssignableFrom(clazz)
 				|| (Enum.class.isAssignableFrom(clazz))) {
 		  // TODO: If a ButtonGroup is set on the option, AND
-		  // Number of values <=10 then create radio buttons
+		  // Number of values <=10(?) then create multiple radio buttons
 		  // instead of a JComboBox.
 			component = new JLabeledComponent(optionTitle, true, values);
 			((JLabeledComponent) component).setAcceptOnlyIntegers(false);
@@ -542,6 +557,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				// For doulbes, we need to allow ',' and '.'.
 				((JLabeledComponent) component).setAcceptOnlyIntegers(false);
 			}
+//			SpinnerModel myModel = new AbstracSpinnerM
+//			JSpinner spinner = new JSpinner(model)
 			
     } else if (java.awt.Color.class.isAssignableFrom(clazz)) {
       // Create color chooser with defaultValue or white as initial color.
@@ -573,6 +590,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		if (component != null) {
 			if (component instanceof AbstractButton) {
 				((AbstractButton) component).setText(optionTitle);
+	      // Assign button group eventually
+	      if (option.getButtonGroup()!=null) {
+	        option.getButtonGroup().add(((AbstractButton) component));
+	      }
+				
 			} else if (component instanceof JLabeledComponent) {
 				((JLabeledComponent) component).setTitle(optionTitle);
 				if (defaultValue != null) {
@@ -593,6 +615,10 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 				((JLabeledComponent) component).setPreferredSize(null);
 				((JLabeledComponent) component).setLayout(new FlowLayout());
 			}
+			
+			/*
+			 * Add listeners to component and set generic options (name, tooltip, etc.)
+			 */
 			if ((itemListener != null)
 					&& Reflect.contains(component, "addItemListener", ItemListener.class)) {
 				Reflect.invokeIfContains(component, "addItemListener", ItemListener.class, itemListener);
@@ -610,10 +636,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			} else {
 			  // Issue a warning. Programmers should watch that each returned
 			  // JComponent implements the JComponentForOption interface!!!
-			  System.err.println(component.getClass().getName() + " IS NO " + JComponentForOption.class.getName() + "!");
+			  log.warning(component.getClass().getName() + " IS NO " + JComponentForOption.class.getName() + "!");
 			}
 			
-			//jc.setBorder(new TitledBorder("test"));
 		}
 		
 		return component;

@@ -1009,6 +1009,7 @@ public class GUITools {
     while (c!=null) {
       if (c instanceof Window) {
         ((Window)c).pack();
+        //((Window)c).doLayout();
         //break;
       }
       c = c.getParent();

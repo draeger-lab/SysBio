@@ -136,8 +136,6 @@ public class PreferencesPanelDependencies {
    * based on the dependencies.
    */
   private void processDependencies() {
-//    Class<? extends KeyProvider> keyProvider = parent.getKeyProvider();
-//    List<Option> allOptions = (KeyProvider.Tools.optionList(keyProvider));
     
     // Collect all JComponents for all options
     Set<JComponentForOption> jcs = new HashSet<JComponentForOption>();

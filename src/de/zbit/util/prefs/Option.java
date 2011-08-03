@@ -48,34 +48,38 @@ import de.zbit.util.argparser.ArgParser;
  * @since 1.0
  */
 public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
-	
-	/**
-	 * Just a convenient wrapper method for {@link Range#Range(Class, String)},
-	 * that catches the exception.
-	 * 
-	 * @param <Type>
-	 * @param requiredType
-	 * @param rangeSpec
-	 * @return
-	 */
-	public static <Type> Range<Type> buildRange(Class<Type> requiredType,
-		String rangeSpec) {
-		return new Range<Type>(requiredType, rangeSpec);
-	}
 
 	/**
-	 * Just a convenient wrapper method for {@link Range#Range(Class, List)},
-   * that catches the exception.
+	 * Just a convenient wrapper method for {@link Range#Range(Class, List)}.
 	 * 
 	 * @param <Type>
-	 * @param requiredType
 	 * @param acceptedObjects
 	 * @return
 	 */
-	public static <Type> Range<Type> buildRange(Class<Type> requiredType,
-	          List<Type> acceptedObjects) {
-	  return new Range<Type>(requiredType, acceptedObjects);
+	@SuppressWarnings("unchecked")
+  public static <Type> Range<Type> buildRange(List<Type> acceptedObjects) {
+	   if (acceptedObjects==null || acceptedObjects.size()<1) {
+	      throw new IllegalArgumentException("Can not create empty range.");
+	    }
+	  return new Range<Type>((Class<Type>)acceptedObjects.get(0).getClass(), acceptedObjects);
 	}
+	
+	/**
+	 * Just a convenient wrapper method for {@link Range#Range(Class, List)}.
+	 * 
+	 * @param <Type>
+	 * @param acceptedObjects
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+  public static <Type> Range<Type> buildRange(Type... acceptedObjects) {
+	  if (acceptedObjects==null || acceptedObjects.length<1) {
+	    throw new IllegalArgumentException("Can not create empty range.");
+	  }
+	  return new Range<Type>((Class<Type>)acceptedObjects[0].getClass(), Arrays.asList(acceptedObjects));
+	}
+	
+	
 		
 	/**
 	 * Convert 'ret' to {@link #requiredType} by parsing it (e.g.
@@ -542,7 +546,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
    * @param group allows to create a group of buttons. This does only
    * make sense with {@link Boolean} options. All options on this
    * group will automatically be converted into a {@link JRadioButton},
-   * when translated into a JComponent.
+   * when translated into a JComponent!
    */
   public Option(String optionName, Class<Type> requiredType,
     String description, Type defaultValue, String displayName, ButtonGroup group) {
@@ -552,7 +556,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	
 	/**
 	 * This constructor adds a dependency to the created option.
-	 * the given <code>dependency</code> must fulfill the given
+	 * The given <code>dependency</code> must fulfill the given
 	 * <code>condition</code> that this option is considered enabled.
 	 * @param <E>
 	 * @param optionName
@@ -566,6 +570,24 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
     String description, Type defaultValue, Option<E> dependency, Range<E> condition) {
     this(optionName, requiredType, description, defaultValue);
     addDependency(dependency, condition);
+  }
+
+  /**
+   * This constructor adds all given dependencies to the created option.
+   * This is especially usefull for setting the dependencies
+   * of this option to the same dependencies as other options.
+   * @see #getDependencies()
+   * @param <E>
+   * @param optionName
+   * @param requiredType
+   * @param description
+   * @param defaultValue
+   * @param dependencies
+   */
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Type defaultValue, Map<Option<?>, Range<?>> dependencies) {
+    this(optionName, requiredType, description, defaultValue);
+    this.dependencies = dependencies;
   }
 
   /**
