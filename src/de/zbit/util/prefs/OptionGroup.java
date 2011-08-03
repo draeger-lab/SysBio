@@ -16,6 +16,7 @@
  */
 package de.zbit.util.prefs;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -91,13 +92,21 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
   }
   
   /**
-   * 
    * @param option
    * @return
    * @see List#add(Object)
    */
   public boolean add(Option<? extends T> option) {
     return options.add(option);
+  }
+  
+  /**
+   * @param options
+   * @return
+   * @see List#add(Object)
+   */
+  public boolean addAll(Collection<Option<? extends T>> options) {
+    return this.options.addAll(options);
   }
   
   /*

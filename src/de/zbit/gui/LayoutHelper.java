@@ -28,7 +28,6 @@ import javax.swing.JPanel;
  * A helper class that provides several methods for working with a
  * {@link GridBagLayout}.
  * 
- * @since 1.0
  * @author Andreas Dr&auml;ger
  * @date 2005-07-29
  * @version $Rev$
@@ -104,15 +103,18 @@ public class LayoutHelper {
 	private int row;
 	
 	/**
+	 * True if and only if we are currently at the left most position of
+	 * any row.
+	 */
+	private boolean atRowBeginning;
+	
+	/**
 	 * Creates a new GridBaglayout and associates this with the given container.
 	 * 
 	 * @param cont
 	 */
 	public LayoutHelper(Container cont) {
-		this.cont = cont;
-		this.gbl = new GridBagLayout();
-		this.cont.setLayout(gbl);
-		this.row = 0;
+		this(cont, new GridBagLayout());
 	}
 	
 	/**
@@ -136,20 +138,33 @@ public class LayoutHelper {
 	 * @param components
 	 */
 	public void add(boolean sameWidth, Component c, Component... components) {
-		add(c, 0, ++row, 1, 1, sameWidth ? 1 : 0, 0);
+	  ensurePointerIsAtBeginningOfARow();
+		add(c, 0, row, 1, 1, sameWidth ? 1 : 0, 0);
 		for (int i = 0; i < components.length; i++) {
 			add(components[i], i + 1, row, 1, 1, sameWidth ? 1 : 0, 0);
 		}
+		atRowBeginning=false;
 	}
 	
 	/**
-	 * adds this component in the next row.
-	 * 
+	 * Adds this component in the next row.
 	 * @param c
 	 */
 	public void add(Component c) {
-		add(c, 0, ++row, 1, 1, 1d, 1d);
+	  addWithWidth(c,1);
 	}
+	
+	/**
+   * Adds this component in the next row, with
+   * the given width
+   * @param c
+   * @param width
+   */
+  public void addWithWidth(Component c, int width) {
+    ensurePointerIsAtBeginningOfARow();
+    add(c, 0, row, width, 1, 1d, 1d);
+    atRowBeginning=false;
+  }
 	
 	/**
 	 * Add one or many components in one line.
@@ -167,7 +182,8 @@ public class LayoutHelper {
 	 * @param width
 	 */
 	public void add(Component c, int width) {
-		add(c, 0, ++row, width, 1);
+	  ensurePointerIsAtBeginningOfARow();
+		add(c, 0, row, width, 1);
 	}
 	
 	/**
@@ -184,6 +200,7 @@ public class LayoutHelper {
 		double weighty) {
 		add(c, x, row, width, height, weightx, weighty);
 		row++;
+		atRowBeginning=true;
 	}
 	
 	/**
@@ -195,9 +212,10 @@ public class LayoutHelper {
 	 * @param height
 	 */
 	public void add(Component c, int x, int y, int width, int height) {
-		LayoutHelper
-				.addComponent(this.cont, this.gbl, c, x, y, width, height, 0, 0);
+	  // Note: This method does NOT increase the row!
+		LayoutHelper.addComponent(this.cont, this.gbl, c, x, y, width, height, 0, 0);
 		row = y;
+		atRowBeginning=false;
 	}
 	
 	/**
@@ -212,8 +230,10 @@ public class LayoutHelper {
 	 */
 	public void add(Component c, int x, int y, int width, int height,
 		double weightx, double weighty) {
+	  // Note: This method does NOT increase the row!
 		addComponent(this.cont, this.gbl, c, x, y, width, height, weightx, weighty);
 		row = y;
+		atRowBeginning=false;
 	}
 	
 	/**
@@ -230,9 +250,11 @@ public class LayoutHelper {
 	 */
 	public void add(Component c, int x, int y, int width, int height,
 		double weightx, double weighty, int ipadx, int ipady) {
+	  // Note: This method does NOT increase the row!
 		LayoutHelper.addComponent(this.cont, this.gbl, c, x, y, width, height,
 			weightx, weighty, ipadx, ipady);
 		row = y;
+		atRowBeginning=false;
 	}
 	
 	/**
@@ -241,7 +263,9 @@ public class LayoutHelper {
 	 * @param c
 	 */
 	public void add(String label, Component c) {
-		add(label, c, 0, ++row);
+	  ensurePointerIsAtBeginningOfARow();
+		add(label, c, 0, row);
+		atRowBeginning=false;
 	}
 	
 	/**
@@ -252,11 +276,13 @@ public class LayoutHelper {
 	 */
 	public void add(String label, Component... components) {
 		int x = 0;
-		add(new JLabel(label), x, ++row, 1, 1, 0, 0);
+		ensurePointerIsAtBeginningOfARow();
+		add(new JLabel(label), x, row, 1, 1, 0, 0);
 		for (Component component : components) {
 			add(new JPanel(), ++x, row, 1, 1, 0, 0);
 			add(component, ++x, row, 1, 1);
 		}
+		atRowBeginning=false;
 	}
 	
 	/**
@@ -268,10 +294,12 @@ public class LayoutHelper {
 	 *        spacer.
 	 */
 	public void add(String label, Component c, boolean spaceLine) {
-		add(label, c, 0, ++row);
+	  ensurePointerIsAtBeginningOfARow();
+		add(label, c, 0, row);
 		if (spaceLine) {
 			add(new JPanel(), 0, ++row, 3, 1, 0, 0);
 		}
+		atRowBeginning=false;
 	}
 	
 	/**
@@ -286,6 +314,7 @@ public class LayoutHelper {
 		add(new JLabel(label), x, y, 1, 1, 0, 0);
 		add(new JPanel(), x + 1, y, 1, 1, 0, 0);
 		add(c, x + 2, y, 1, 1);
+		atRowBeginning=false;
 	}
 	
 	/**
@@ -299,6 +328,7 @@ public class LayoutHelper {
 	public void add(String label, Component c, int width, int weightx, int weighty) {
 		add(label, c, 0, row, weightx, weighty);
 		row++;
+		atRowBeginning=true;
 	}
 	
 	/**
@@ -316,6 +346,7 @@ public class LayoutHelper {
 		add(new JPanel(), x + 1, y, 1, 1, 0, 0);
 		add(c, x + 2, y, 1, 1, weightx, weighty);
 		this.row = y;
+		atRowBeginning=false;
 	}
 	
 	/**
@@ -342,5 +373,15 @@ public class LayoutHelper {
 	public void incrementRowBy(int increment) {
 		row += increment;
 	}
+
+  /**
+   * Ensures that the next components are being written in a new row.
+   */
+  public void ensurePointerIsAtBeginningOfARow() {
+    if (!atRowBeginning) {
+      row++;
+      atRowBeginning=true;
+    }
+  }
 	
 }

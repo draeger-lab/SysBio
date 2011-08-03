@@ -16,6 +16,7 @@
  */
 package de.zbit.gui.prefs;
 
+import java.awt.Dimension;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -187,6 +188,22 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	@Override
 	public boolean accepts(Object key) {
 		return false;
+	}
+	
+	/* (non-Javadoc)
+	 * @see javax.swing.JComponent#setPreferredSize(java.awt.Dimension)
+	 */
+	@Override
+	public void setPreferredSize(Dimension preferredSize) {
+	  super.setPreferredSize(preferredSize);
+    // Make tab at least as big as this panel.
+	  if (tab!=null) {
+	    Dimension p1 = tab.getPreferredSize();
+	    Dimension p2 = preferredSize;
+	    p1.width = Math.max(p1.width, p2.width);
+	    p1.height = Math.max(p1.height, p2.height);
+	    tab.setPreferredSize(p1);
+	  }
 	}
 
 	/*

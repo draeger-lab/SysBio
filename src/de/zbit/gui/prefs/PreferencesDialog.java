@@ -18,6 +18,7 @@ package de.zbit.gui.prefs;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -278,7 +279,15 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		foot.add(new JSeparator(), BorderLayout.NORTH);
 		foot.add(p, BorderLayout.SOUTH);
 		getContentPane().add(foot, BorderLayout.SOUTH);
-		
+    
+    // Preferences panels look stupid if they are smaller
+    // than the "Ok","Cancel", etc. button panel!
+    Dimension p2 = foot.getPreferredSize();
+    Dimension p1 = panel.getPreferredSize();
+    p1.width = Math.max(p1.width, p2.width);
+    p1.height = Math.max(p1.height, p2.height);
+    panel.setPreferredSize(p1);
+    
 		pack();
 	}
 
