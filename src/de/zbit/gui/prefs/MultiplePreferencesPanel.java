@@ -69,7 +69,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	/**
 	 * @return the classes
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
   public static Class<PreferencesPanel>[] getClasses() {
 	  boolean showDebugMessages=false;
 	  /* Moved the classes initialization to this method. Else, it causes projects using
@@ -78,7 +78,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	  if (!isClassesInitialized) {
 	    
 	    /**
-	     * It is now possible to predefine the classes, istead of using reflections.
+	     * It is now possible to predefine the classes, instead of using reflections.
 	     * Example:<pre>
 	     * package de.zbit.gui.prefs;
        * public class PreferencePanels {

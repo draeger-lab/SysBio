@@ -459,7 +459,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * @param keyListener KeyListener (optional)
 	 * @return JComponent or <code>NULL</code> if {@link Option#getRequiredType()} is unknown.
 	 */
-	public static JComponent getJComponentForOption(Option<?> option,
+	@SuppressWarnings("unchecked")
+  public static JComponent getJComponentForOption(Option<?> option,
 		Object defaultValue, ItemListener itemListener,
 		ChangeListener changeListener, KeyListener keyListener) {
 		// Create swing option based on field type
@@ -544,21 +545,26 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 			
 		} else if (String.class.isAssignableFrom(clazz)
 				|| (Enum.class.isAssignableFrom(clazz))) {
-		  // TODO: If a ButtonGroup is set on the option, AND
-		  // Number of values <=10(?) then create multiple radio buttons
-		  // instead of a JComboBox.
 			component = new JLabeledComponent(optionTitle, true, values);
 			((JLabeledComponent) component).setAcceptOnlyIntegers(false);
 			
 		} else if (Number.class.isAssignableFrom(clazz)) {
-			component = new JLabeledComponent(optionTitle, true, values);
-			if (!Utils.isInteger(option.getRequiredType())) {
-				// TODO: implement Box for doubles.
-				// For doulbes, we need to allow ',' and '.'.
-				((JLabeledComponent) component).setAcceptOnlyIntegers(false);
-			}
-//			SpinnerModel myModel = new AbstracSpinnerM
-//			JSpinner spinner = new JSpinner(model)
+		  // Try to make a spinner
+		  try {
+		    // Get Numeric option and Numeric default value
+		    Option<Number> o2= (Option<Number>)option;
+		    Object defaultV = o2.parseOrCast(defaultValue);
+		    if (defaultV!=null && !Number.class.isAssignableFrom(defaultV.getClass())) defaultV  = null;
+		    // init component with a spinner.
+        component = new JLabeledComponent(optionTitle, true, JLabeledComponent.buildJSpinner(o2, (Number)defaultV));
+		  } catch (Throwable t) {
+		    t.printStackTrace();
+		    // Might occur when dealing with strange Number instances.
+			  component = new JLabeledComponent(optionTitle, true, values);
+	      if (!Utils.isInteger(option.getRequiredType())) {
+	        ((JLabeledComponent) component).setAcceptOnlyIntegers(false);
+	      }
+		  }
 			
     } else if (java.awt.Color.class.isAssignableFrom(clazz)) {
       // Create color chooser with defaultValue or white as initial color.
