@@ -47,8 +47,12 @@ public class ArrayUtils {
    * @param singleElement
    * @return
    */
-  public static <E> E[] toArray(E singleElement) {
-    return createArray(singleElement, 1);
+  public static <E> E[] toArray(E... singleElements) {
+    E[] arr = createArray(singleElements[0], singleElements.length);
+    for (int i=1; i<singleElements.length; i++) {
+      arr[i] = singleElements[i];
+    }
+    return arr;
   }
   
   

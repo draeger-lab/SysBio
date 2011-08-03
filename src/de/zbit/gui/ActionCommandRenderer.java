@@ -21,11 +21,13 @@ import java.io.Serializable;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
@@ -45,12 +47,12 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
   /**
    * Initialize when required.
    */
-  private DefaultTableCellRenderer defaultTableRenderer = null;
+  private TableCellRenderer defaultTableRenderer = null;
   
   /**
    * Initialize when required.
    */
-  private DefaultListCellRenderer defaultListRenderer = null;
+  private ListCellRenderer defaultListRenderer = null;
   
 
   /* (non-Javadoc)
@@ -59,9 +61,6 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
   @Override
   public Component getTableCellRendererComponent(JTable table, Object value,
     boolean isSelected, boolean hasFocus, int row, int column) {
-    if (defaultTableRenderer==null) {
-      defaultTableRenderer = new DefaultTableCellRenderer();
-    }
     
     // Get properties
     String label = value.toString();
@@ -76,6 +75,9 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     
     // Generate component
     if (c==null) {
+      if (defaultTableRenderer==null) {
+        defaultTableRenderer = new DefaultTableCellRenderer();
+      }
       c = defaultTableRenderer.getTableCellRendererComponent(table, label, isSelected, hasFocus, row, column);
     }
     if (toolTip!=null && toolTip.length()>0 && (c instanceof JComponent)) {
@@ -91,9 +93,6 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
   @Override
   public Component getListCellRendererComponent(JList list, Object value,
     int index, boolean isSelected, boolean cellHasFocus) {
-    if (defaultListRenderer==null) {
-      defaultListRenderer = new DefaultListCellRenderer();
-    }
     
     // Get properties
     String label = value.toString();
@@ -108,6 +107,24 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     
     // Generate component
     if (c==null) {
+      /*
+       * Get the systems default renderer.
+       */
+      if (defaultListRenderer==null) {
+        // new DefaultListCellRenderer(); Is not necessarily the default!
+        // even UIManager.get("List.cellRenderer"); returns a different value!
+        try {
+          defaultListRenderer = new JComboBox().getRenderer();
+          if (defaultListRenderer==null) {
+            defaultListRenderer = (ListCellRenderer) UIManager.get("List.cellRenderer");
+          }
+        } catch (Throwable t){t.printStackTrace();}
+        if (defaultListRenderer==null) {
+          defaultListRenderer = new DefaultListCellRenderer();;
+        }
+      }
+      //-------------------
+      
       c = defaultListRenderer.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);
     }
     if (toolTip!=null && toolTip.length()>0 && (c instanceof JComponent)) {

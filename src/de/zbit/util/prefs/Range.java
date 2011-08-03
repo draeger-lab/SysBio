@@ -20,6 +20,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -400,8 +401,17 @@ public class Range<Type> {
 	 * {@link #Range(Class, Collection)} !
    * @param acceptedObjects
    */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   private void setListOfAccpetedObjects(List<Type> acceptedObjects) {
     this.listOfAccpetedObjects = acceptedObjects;
+    // KEEP LIST SORTED!
+    try {
+      if (Comparable.class.isAssignableFrom(typee)) {
+        Collections.sort((List<? extends Comparable>)listOfAccpetedObjects);
+      }
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
   }
 
   /**
@@ -478,7 +488,7 @@ public class Range<Type> {
 				return ((GeneralFileFilter) constraints).accept(file);
 			}
 		} else {
-		  // Special treament for concrete lists (e.g., for classes).
+		  // Special treatment for concrete lists (e.g., for classes).
 		  if (listOfAccpetedObjects!=null) {
 		    return listOfAccpetedObjects.contains(value);
 		  }
@@ -665,4 +675,59 @@ public class Range<Type> {
 	public String toString() {
 	  return getRangeSpecString();
 	}
+
+  /**
+   * @return the minimum acceptable value. Only if {@link #typee} is
+   * an instance of {@link Comparable}. Currently, this implementation
+   * IGNORES the r.excludingLBound option and thus, might return
+   * the first value that is actually out of range!
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public Type getMinimum() {
+    // listOfAccpetedObjects should be sorted, if it implements comparable.
+    Type min = null;
+    if (listOfAccpetedObjects!=null && listOfAccpetedObjects.size()>0) {
+      min = listOfAccpetedObjects.get(0);
+    }
+    
+    if (ranges!=null) {
+      for (SubRange r : ranges) {
+        if (min==null) min = r.lBound;
+        else if (min instanceof Comparable && r.lBound instanceof Comparable) {
+          min = ((Comparable)min).compareTo((Comparable)r.lBound)<0?min:r.lBound;
+        }
+        // Too much effort to process this...
+        //if (r.excludingLBound) {}
+      }
+    }
+    return min;
+  }
+  
+  /**
+   * @return the maximum acceptable value. Only if {@link #typee} is
+   * an instance of {@link Comparable}. Currently, this implementation
+   * IGNORES the r.excludinguBound option and thus, might return
+   * the first value that is actually out of range!
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public Type getMaximum() {
+    // listOfAccpetedObjects should be sorted, if it implements comparable.
+    Type max = null;
+    if (listOfAccpetedObjects!=null && listOfAccpetedObjects.size()>0) {
+      max = listOfAccpetedObjects.get(listOfAccpetedObjects.size()-1);
+    }
+    
+    if (ranges!=null) {
+      for (SubRange r : ranges) {
+        if (max==null) max = r.uBound;
+        else if (max instanceof Comparable && r.uBound instanceof Comparable) {
+          max = ((Comparable)max).compareTo((Comparable)r.uBound)>0?max:r.uBound;
+        }
+        // Too much effort to process this...
+        //if (r.excludinguBound) {}
+      }
+    }
+    return max;
+  }
+  
 }
