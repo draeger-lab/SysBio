@@ -34,158 +34,214 @@ import de.zbit.gui.ActionCommand;
  * @since 1.0
  */
 public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>> {
-	
-	/**
-	 * 
-	 */
-	private String name, toolTip;
-	/**
-	 * 
-	 */
-	private List<Option<? extends T>> options;
-	
-	/**
-	 * 
-	 */
-	public OptionGroup() {
-		this(null, null);
-	}
-	
-	/**
-	 * 
-	 * @param name
-	 * @param toolTip
-	 * @param option
-	 */
-	public OptionGroup(String name, String toolTip, Option<? extends T>... option) {
-		this.name = name;
-		this.toolTip = toolTip;
-		this.options = new LinkedList<Option<? extends T>>();
-		setOptions(option);
-	}
-	
-	/**
-	 * 
-	 * @param option
-	 * @return
-	 * @see List#add(Object)
-	 */
-	public boolean add(Option<? extends T> option) {
-		return options.add(option);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.ActionCommand#getName()
-	 */
-	public String getName() {
-		return isSetName() ? name : getClass().getSimpleName();
-	}
-	
-	/**
-	 * @return the options
-	 */
-	public List<Option<? extends T>> getOptions() {
-		return options;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.ActionCommand#getToolTip()
-	 */
-	public String getToolTip() {
-		return toolTip;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isSetName() {
-		return (name != null) && (name.length() > 0);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isSetToolTip() {
-		return (toolTip != null) && (toolTip.length() > 0);
-	}
-	
-	/**
-	 * 
-	 * @param option
-	 * @return
-	 * @see List#remove(Object)
-	 */
-	public boolean remove(Option<T> option) {
-		return options.remove(option);
-	}
-	
-	/**
-	 * @param name
-	 *        the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	/**
-	 * @param options
-	 *        the options to set
-	 */
-	public void setOptions(List<Option<? extends T>> options) {
-		this.options = options;
-	}
-	
-	/**
-	 * 
-	 * @param option
-	 */
-	public void setOptions(Option<? extends T>... option) {
-		options.clear();
-		if (option != null) {
-			for (Option<? extends T> opt : option) {
-				add(opt);
-			}
-		}
-	}
-	
-	/**
-	 * @param toolTip
-	 *        the toolTip to set
-	 */
-	public void setToolTip(String toolTip) {
-		this.toolTip = toolTip;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		if (isSetName()) {
-			sb.append(name);
-			sb.append(": ");
-		}
-		sb.append(options.toString());
-		return sb.toString();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public int compareTo(OptionGroup<T> optionGroup) {
-		return Integer.valueOf(getOptions().hashCode()).compareTo(
-			Integer.valueOf(optionGroup.getOptions().hashCode()));
-	}
-	
+  
+  /**
+   * 
+   */
+  private String name, toolTip;
+  /**
+   * 
+   */
+  private List<Option<? extends T>> options;
+  
+  /**
+   * If this is set to true, this {@link OptionGroup} should
+   * be visualized collapsable in GUIs.
+   */
+  private boolean collapsable = false;
+  
+  /**
+   * Defines the initial state, if this group is {@link #collapsable}.
+   */
+  private boolean isCollapsed = false;
+  
+  /**
+   * 
+   */
+  public OptionGroup() {
+    this(null, null);
+  }
+  
+  /**
+   * 
+   * @param name
+   * @param toolTip
+   * @param option
+   */
+  public OptionGroup(String name, String toolTip, Option<? extends T>... option) {
+    this(name, toolTip, false, false, option);
+  }
+  
+  /**
+   * Creates a (eventually collapsable) {@link OptionGroup}.
+   * @param name
+   * @param toolTip
+   * @param collapsable
+   * @param isCollapsed initial state
+   * @param option
+   */
+  public OptionGroup(String name, String toolTip, boolean collapsable, boolean isCollapsed, Option<? extends T>... option) {
+    super();
+    this.name = name;
+    this.toolTip = toolTip;
+    this.collapsable=collapsable;
+    this.isCollapsed = isCollapsed;
+    this.options = new LinkedList<Option<? extends T>>();
+    setOptions(option);
+  }
+  
+  /**
+   * 
+   * @param option
+   * @return
+   * @see List#add(Object)
+   */
+  public boolean add(Option<? extends T> option) {
+    return options.add(option);
+  }
+  
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.zbit.gui.ActionCommand#getName()
+   */
+  public String getName() {
+    return isSetName() ? name : getClass().getSimpleName();
+  }
+  
+  /**
+   * @return the options
+   */
+  public List<Option<? extends T>> getOptions() {
+    return options;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.zbit.gui.ActionCommand#getToolTip()
+   */
+  public String getToolTip() {
+    return toolTip;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public boolean isSetName() {
+    return (name != null) && (name.length() > 0);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public boolean isSetToolTip() {
+    return (toolTip != null) && (toolTip.length() > 0);
+  }
+  
+  /**
+   * 
+   * @param option
+   * @return
+   * @see List#remove(Object)
+   */
+  public boolean remove(Option<T> option) {
+    return options.remove(option);
+  }
+  
+  /**
+   * @param name
+   *        the name to set
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
+  
+  /**
+   * @param options
+   *        the options to set
+   */
+  public void setOptions(List<Option<? extends T>> options) {
+    this.options = options;
+  }
+  
+  /**
+   * 
+   * @param option
+   */
+  public void setOptions(Option<? extends T>... option) {
+    options.clear();
+    if (option != null) {
+      for (Option<? extends T> opt : option) {
+        add(opt);
+      }
+    }
+  }
+  
+  
+  
+  /**
+   * @return the collapsable
+   */
+  public boolean isCollapsable() {
+    return collapsable;
+  }
+
+  /**
+   * @param collapsable the collapsable to set
+   */
+  public void setCollapsable(boolean collapsable) {
+    this.collapsable = collapsable;
+  }
+
+  /**
+   * @return the isCollapsed
+   */
+  public boolean isInitiallyCollapsed() {
+    return isCollapsed;
+  }
+
+  /**
+   * @param isCollapsed the isCollapsed to set
+   */
+  public void setInitiallyCollapsed(boolean isCollapsed) {
+    this.isCollapsed = isCollapsed;
+  }
+
+  /**
+   * @param toolTip
+   *        the toolTip to set
+   */
+  public void setToolTip(String toolTip) {
+    this.toolTip = toolTip;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (isSetName()) {
+      sb.append(name);
+      sb.append(": ");
+    }
+    sb.append(options.toString());
+    return sb.toString();
+  }
+  
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(OptionGroup<T> optionGroup) {
+    return Integer.valueOf(getOptions().hashCode()).compareTo(
+      Integer.valueOf(optionGroup.getOptions().hashCode()));
+  }
+  
 }

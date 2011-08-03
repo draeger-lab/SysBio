@@ -658,4 +658,11 @@ public class Range<Type> {
 	  return new Range<Boolean>(Boolean.class, "{\"true\", \"false\"}");
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+	  return getRangeSpecString();
+	}
 }
