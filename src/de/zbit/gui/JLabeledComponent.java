@@ -861,21 +861,23 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     addSelectorsToLayout(lh, jc, false);
   }
   public static void addSelectorsToLayout(LayoutHelper lh, JLabeledComponent jc, boolean addSpace) {
-    int i=0;
-    lh.add(jc.label, (i++), lh.getRow(), 1, 1, 0d, 0d);
-    lh.add(new JPanel(), (i++), lh.getRow(), 1, 1, 0d, 0d);
+    int x=0;
+    lh.ensurePointerIsAtBeginningOfARow();
+    
+    lh.add(jc.label, (x++), lh.getRow(), 1, 1, 0d, 0d);
+    lh.add(new JPanel(), (x++), lh.getRow(), 1, 1, 0d, 0d);
     if(jc instanceof JColumnChooser) {
-      lh.add(jc.colChooser, (i++), ((JColumnChooser)jc).getUsePreview()?lh.getRow():1, 1, 0d, 0d);
+      lh.add(jc.colChooser, (x++), ((JColumnChooser)jc).getUsePreview()?lh.getRow():1, 1, 0d, 0d);
     }
     else {
-      lh.add(jc.colChooser, (i++), 1, 1, 0d, 0d);
+      lh.add(jc.colChooser, (x++), 1, 1, 0d, 0d);
     }
     if (jc instanceof JColumnChooser && ((JColumnChooser)jc).getUsePreview()) {
-      lh.add(new JPanel(), (i++), lh.getRow(), 1, 1, 0d, 0d);
-      lh.add(((JColumnChooser)jc).getPreview(), (i++), 1, 1, 0d, 0d);
+      lh.add(new JPanel(), (x++), lh.getRow(), 1, 1, 0d, 0d);
+      lh.add(((JColumnChooser)jc).getPreview(), (x++), 1, 1, 0d, 0d);
     }
     if (addSpace) {
-      lh.add(new JPanel(), 0, (i++), 1, 0d, 0d);
+      lh.add(new JPanel(), 0, (x++), 1, 0d, 0d);
     }
   }
   

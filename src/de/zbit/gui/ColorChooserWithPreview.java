@@ -17,6 +17,7 @@
 package de.zbit.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -155,6 +156,17 @@ public class ColorChooserWithPreview extends JLabel {
    */
   public Object getColor() {
     return getBackground();
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.JComponent#getPreferredSize()
+   */
+  @Override
+  public Dimension getPreferredSize() {
+    Dimension d = super.getPreferredSize();
+    // at least a square. No width less than square is allowed.
+    d.width=Math.max(d.width, d.height);
+    return d;
   }
   
 }

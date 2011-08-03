@@ -362,6 +362,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 	 */
 	public static void addSelectorsToLayout(LayoutHelper lh, FileSelector fs,
 		boolean addSpace) {
+	  lh.ensurePointerIsAtBeginningOfARow();
 		lh.add(fs.label, 0, lh.getRow(), 1, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, lh.getRow(), 1, 1, 0d, 0d);
 		lh.add(fs.textField, 2, lh.getRow(), 1, 1, 1d, 0d);
@@ -788,6 +789,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 			command.getToolTip());
 		label = new JLabel();
 		autoSetLabelText();
+		lh.ensurePointerIsAtBeginningOfARow();
 		lh.add(label, 0, lh.getRow(), 1, 1, 0, 0);
 		lh.add(new JPanel(), 1, lh.getRow(), 1, 1, 0, 0);
 		lh.add(textField, 2, lh.getRow(), 1, 1, 1, 0);
