@@ -236,14 +236,21 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @return
    */
   @SuppressWarnings("rawtypes")
-  List<Option<?>> addOptions(LayoutHelper lh,
-    Iterable<? extends Option> options,
-    Map<Option<?>, OptionGroup<?>> deleteFromHere) {
+  List<Option<?>> addOptions(LayoutHelper lh, Iterable<? extends Option> options, Map<Option<?>, OptionGroup<?>> deleteFromHere) {
     List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
     for (Option<?> option : options) {
+      
       // Create swing option based on field type
-      JComponent jc = properties.containsKey(option) ? getJComponentForOption(
-        option, properties, this) : null;
+      JComponent jc = null;
+      if (properties.containsKey(option)) {
+        // Check if we already have an element for this option
+        jc = option2component.get(option);
+        if (jc==null) {
+          jc = getJComponentForOption(option, properties, this);
+        }
+      }
+      
+      // Add to layout component
       if (jc != null) {
         if (jc instanceof FileSelector) {
           FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
@@ -259,10 +266,12 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         if (option2component != null) {
           option2component.put(option, jc);
         }
+        
       } else {
         // Remember unprocessed options
         unprocessedOptions.add(option);
       }
+      
     }
     return unprocessedOptions;
   }
@@ -293,8 +302,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
        * Thus, we should keep the one column layout and create a new group for
        * ungrouped options.
        */
-      lh.add(createGroup((Collection<Option>) ungroupedOptions,
-        unprocessedOptions));
+      lh.add(createGroup((Collection<Option>) ungroupedOptions, unprocessedOptions));
     }
     
     // And finally we create the dependencies
@@ -318,19 +326,15 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     JPanel groupPanel = new JPanel();
     LayoutHelper groupsLayout = new LayoutHelper(groupPanel);
     // Add all child-options to this panel 
-    unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(),
-      option2group));
+    unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(), option2group));
     
     // Set Border, Name and ToolTip
-    String title = (optGrp.isSetName()) ? StringUtil.concat(" ",
-      optGrp.getName().trim(), " ").toString() : null;
-    String toolTip = (optGrp.isSetToolTip()) ? StringUtil.toHTML(
-      optGrp.getToolTip(), GUITools.TOOLTIP_LINE_LENGTH) : null;
+    String title = (optGrp.isSetName()) ? StringUtil.concat(" ", optGrp.getName().trim(), " ").toString() : null;
+    String toolTip = (optGrp.isSetToolTip()) ? StringUtil.toHTML(optGrp.getToolTip(), GUITools.TOOLTIP_LINE_LENGTH) : null;
     groupPanel.setToolTipText(toolTip);
     if (optGrp.isCollapsable()) {
       // Create a collapsible panel
-      ExpandablePanel parentPanel = new ExpandablePanel(title, groupPanel,
-        optGrp.isInitiallyCollapsed(), true);
+      ExpandablePanel parentPanel = new ExpandablePanel(title, groupPanel, optGrp.isInitiallyCollapsed(), true);
       parentPanel.setToolTipText(toolTip);
       return parentPanel;
       
@@ -591,19 +595,26 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       
     } else if (Number.class.isAssignableFrom(clazz)) {
       // Try to make a spinner
-      try {
-        // Get Numeric option and Numeric default value
-        Option<Number> o2 = (Option<Number>) option;
-        Object defaultV = o2.parseOrCast(defaultValue);
-        if (defaultV != null
-            && !Number.class.isAssignableFrom(defaultV.getClass()))
-          defaultV = null;
-        // init component with a spinner.
-        component = new JLabeledComponent(optionTitle, true,
-          JLabeledComponent.buildJSpinner(o2, (Number) defaultV));
-      } catch (Throwable t) {
-        t.printStackTrace();
-        // Might occur when dealing with strange Number instances.
+      if (values==null || values.length>15) {
+        // we do not need a spinner if only 15 different values are possible.
+        try {
+          // Get Numeric option and Numeric default value
+          Option<Number> o2 = (Option<Number>) option;
+          Object defaultV = o2.parseOrCast(defaultValue);
+          if (defaultV != null
+              && !Number.class.isAssignableFrom(defaultV.getClass()))
+            defaultV = null;
+          // init component with a spinner.
+          component = new JLabeledComponent(optionTitle, true,
+            JLabeledComponent.buildJSpinner(o2, (Number) defaultV));
+        } catch (Throwable t) {
+          component=null;
+          // Might occur when dealing with strange Number instances.
+        }
+      }
+      
+      // Fallback with regular JTextField or JComboBox
+      if (component==null) {
         component = new JLabeledComponent(optionTitle, true, values);
         if (!Utils.isInteger(option.getRequiredType())) {
           ((JLabeledComponent) component).setAcceptOnlyIntegers(false);

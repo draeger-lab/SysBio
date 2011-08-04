@@ -63,6 +63,7 @@ import de.zbit.gui.csv.JColumnChooser;
 import de.zbit.gui.prefs.JComponentForOption;
 import de.zbit.io.CSVReader;
 import de.zbit.util.ArrayUtils;
+import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
@@ -93,6 +94,10 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   protected ComboBoxModel model=null;
   protected JComponent colChooser;
   
+  /**
+   * Number of columns to define the width of generated textfields.
+   */
+  private final static int TEXTFIELD_COLUMNS = 20;
   
   /**
    * Only necessary for using this class in Combination with
@@ -103,7 +108,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   /**
    * This should always be true. Just if you want to use this
    * class not for "Choosing columns" but other stuff, you may
-   * want to change this behaviour.
+   * want to change this behavior.
    */
   protected boolean acceptOnlyIntegers=true;
   
@@ -178,7 +183,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   
   /**
    * Creates a new column chooser which let's the user choose
-   * columns with JTextFields if no columnHeaders will be given.
+   * columns with {@link JTextField}s if no columnHeaders will be given.
    * @param title - Label caption for this column chooser
    * @param fieldIsRequired - If not required, this class will add
    * a NoOptionChoosen String at the start of the box.
@@ -272,6 +277,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       ((JComboBox) comp).addItemListener(il);
     } else {
       // otherwise not possible!
+      Reflect.invokeIfContains(colChooser, "addItemListener", ItemListener.class, il);
     }
   }
   
@@ -292,6 +298,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       ((JComboBox) comp).removeItemListener(l);
     } else {
       // otherwise not possible!
+      Reflect.invokeIfContains(colChooser, "removeItemListener", ItemListener.class, l);
     }
   }
   
@@ -613,8 +620,8 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     } else {
       if (CSVReader.isNumber(s, true)) {
         setDefaultValue(Integer.parseInt(s));
-      } else if (colChooser instanceof JTextField){
-        ((JTextField) colChooser).setText(s);
+      } else if (colChooser instanceof JTextComponent){
+        ((JTextComponent) colChooser).setText(s);
       }
     }
   }
@@ -632,8 +639,9 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   }
   
   /**
-   * Do you want to use a JTextField (true) of a JComboBox (false)
-   * to choose the column? Default: JComboBox(false).
+   * Do you want to use a {@link JTextField} (true) or
+   * a {@link JComboBox} (false) to choose the column?
+   * Default: {@link JComboBox}(false).
    * @param useTextField
    */
   public void setUseJTextField(boolean useTextField) {
@@ -663,6 +671,8 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       ((JComboBox)colChooser).addActionListener(l);
     } else if (colChooser instanceof JTextField) {
       ((JTextField)colChooser).addActionListener(l);
+    } else {
+      Reflect.invokeIfContains(colChooser, "addActionListener", ActionListener.class, l);
     }
   }
   
@@ -823,7 +833,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
         tf =CSVReaderOptionPanel.buildIntegerBox(Integer.toString(defaultValue), l);
       } else {
         tf = new JTextField(defaultValue);
-        tf.setColumns(30);
+        tf.setColumns(TEXTFIELD_COLUMNS);
         tf.addActionListener(l);
       }
       ret = tf;
@@ -956,6 +966,8 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     this.editHeaderAlllowed=true;
     if (colChooser instanceof JComboBox) {
       ((JComboBox)colChooser).setEditable(b);
+    } else {
+      Reflect.invokeIfContains(colChooser, "setEditable", Boolean.class, b);
     }
   }
   
@@ -1036,7 +1048,14 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     
     // Create a number model with these values
     SpinnerModel myModel = new SpinnerNumberModel((Number)initialValue, (Comparable)minimum, (Comparable)maximum, (Number)stepSize);
-    return new JSpinner(myModel);
+    JSpinner spinner = new JSpinner(myModel);
+    
+    // Set width
+    if (spinner.getEditor() instanceof JSpinner.DefaultEditor) {
+      ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setColumns(TEXTFIELD_COLUMNS);
+    }
+    
+    return spinner;
   }
   
 }
