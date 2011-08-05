@@ -56,6 +56,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.csv.CSVReaderOptionPanel;
@@ -300,6 +301,29 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       // otherwise not possible!
       Reflect.invokeIfContains(colChooser, "removeItemListener", ItemListener.class, l);
     }
+  }
+  
+  /**
+   * Adds a listener to this {@link #colChooser}, if the
+   * current {@link #colChooser} supports {@link ChangeListener}s.
+   * 
+   * @param listener the <code>ChangeListener</code> to add
+   */
+  public void addChangeListener(ChangeListener listener) {
+    // For JSpinners
+    Reflect.invokeIfContains(colChooser, "addChangeListener", ChangeListener.class, listener);
+  }
+  
+
+
+  /**
+   * Removes a <code>ChangeListener</code> from this {@link #colChooser}.
+   *
+   * @param listener the <code>ChangeListener</code> to remove
+   */
+  public void removeChangeListener(ChangeListener listener) {
+    // For JSpinners
+    Reflect.invokeIfContains(colChooser, "removeChangeListener", ChangeListener.class, listener);
   }
   
   /*

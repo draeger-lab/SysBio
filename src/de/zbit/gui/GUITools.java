@@ -1010,7 +1010,7 @@ public class GUITools {
       if (c instanceof Window) {
         ((Window)c).pack();
         //((Window)c).doLayout();
-        //break;
+        break; // Dialogs, shown on top of windows. If no break here, window gets also packed.
       }
       c = c.getParent();
     }
