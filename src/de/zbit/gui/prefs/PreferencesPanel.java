@@ -244,7 +244,10 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       JComponent jc = null;
       if (properties.containsKey(option)) {
         // Check if we already have an element for this option
-        jc = option2component.get(option);
+        // Unfortunately is no good choice: this renderse the
+        // "reset defaults" button useless...
+        //jc = option2component.get(option);
+        
         if (jc==null) {
           jc = getJComponentForOption(option, properties, this);
         }
@@ -439,10 +442,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @return
    * @see #getJComponentForOption(Option, SBPreferences, EventListener)
    */
-  public static JComponent getJComponentForOption(Option<?> option,
-    SBProperties probs, EventListener l) {
+  public static JComponent getJComponentForOption(Option<?> option, SBProperties probs, EventListener l) {
     // Get default value
-    Object def = probs != null ? probs.get(option) : option.getDefaultValue();
+    Object def = (probs != null)? probs.get(option) : option.getDefaultValue();
     if (def != null) {
       try {
         // Try to get the real default value
@@ -535,24 +537,28 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     // TODO: Group, test, and accept automatically
     Class<?> clazz = option.getRequiredType();
     if (Boolean.class.isAssignableFrom(clazz)) {
-      if (option.getButtonGroup() == null) {
-        component = new OptionCheckBox();
-      } else {
-        component = new OptionRadioButton();
-      }
+      boolean boolDefault = false;
       if (defaultValue != null) {
-        ((AbstractButton) component).setSelected(Boolean
-            .parseBoolean(defaultValue.toString()));
+        boolDefault = Boolean.parseBoolean(defaultValue.toString());
       }
       
-      //((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties
-      //		.get(o.getOptionName()).toString()));
+      if (option.getButtonGroup() == null) {
+        component = new OptionCheckBox();
+        ((AbstractButton) component).setSelected(boolDefault);
+      } else {
+        component = new OptionRadioButton();
+        // Only set true. Setting false may deselect others.
+        if (boolDefault) {
+          ((AbstractButton) component).setSelected(boolDefault);
+        }
+      }
+      
+      //((AbstractButton) jc).setSelected(Boolean.parseBoolean(properties.get(o.getOptionName()).toString()));
     } else if (File.class.isAssignableFrom(clazz)) {
       // Infere type
       Type ty = Type.OPEN;
       String check = option.getOptionName().toLowerCase();
-      if (check.contains("save") || check.contains("store")
-          || check.contains("output")) {
+      if (check.contains("save") || check.contains("store") || check.contains("output")) {
         ty = Type.SAVE;
       }
       
@@ -587,6 +593,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       ((JLabeledComponent) component).setAcceptOnlyIntegers(false);
       //JComponent cs = ((JColumnChooser)jc).getColumnChooser();
       // TODO: Limit maximum size to one (don't accept inputs after that).
+      // Can be done in three minutes. see
+      // http://www.daniweb.com/software-development/java/threads/263964
       
     } else if (String.class.isAssignableFrom(clazz)
         || (Enum.class.isAssignableFrom(clazz))) {
@@ -635,9 +643,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         initial = Color.WHITE;
       }
       ColorChooserWithPreview colChooser = new ColorChooserWithPreview(initial);
-      if (changeListener != null) {
-        colChooser.addChangeListener(changeListener);
-      }
       component = new JLabeledComponent(optionTitle, true, colChooser);
       
     } else if ((values != null) && (values.length > 0)) {
@@ -652,9 +657,13 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     if (component != null) {
       if (component instanceof AbstractButton) {
         ((AbstractButton) component).setText(optionTitle);
-        // Assign button group eventually
+        // Assign button group eventually and keep selection
         if (option.getButtonGroup() != null) {
+          boolean restoreSelection = ((AbstractButton) component).isSelected();
           option.getButtonGroup().add(((AbstractButton) component));
+          if (restoreSelection) {
+            option.getButtonGroup().setSelected(((AbstractButton) component).getModel(), true);
+          }
         }
         
       } else if (component instanceof JLabeledComponent) {
@@ -682,13 +691,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
        * Add listeners to component and set generic options (name, tooltip,
        * etc.)
        */
-      if ((itemListener != null)
-          && Reflect.contains(component, "addItemListener", ItemListener.class)) {
-        Reflect.invokeIfContains(component, "addItemListener",
-          ItemListener.class, itemListener);
-      } else if (changeListener != null) {
-        Reflect.invokeIfContains(component, "addChangeListener",
-          ChangeListener.class, changeListener);
+      if (itemListener != null) {
+        Reflect.invokeIfContains(component, "addItemListener", ItemListener.class, itemListener);
+      } // do NOT MAKE ELSE IF (e.g. JLabeledComponent contains both, but actual colChooser must not contain both!) !!! 
+      if (changeListener != null) {
+        Reflect.invokeIfContains(component, "addChangeListener", ChangeListener.class, changeListener);
       }
       component.setName(option.getOptionName());
       component.setToolTipText(StringUtil.toHTML(option.getDescription(), 60));
@@ -897,8 +904,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * the graphical user interface.
    */
   public void restoreDefaults() {
-    setProperties(preferences != null ? preferences.getDefaults()
-        : new SBProperties());
+    setProperties(preferences != null ? preferences.getDefaults() : new SBProperties());
   }
   
   /**
@@ -950,6 +956,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         this.properties.setProperty(key.toString(), map.get(key).toString());
       }
     }
+    
     removeAll();
     init();
   }
@@ -999,7 +1006,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     if (source instanceof Component) {
       Component c = (Component) source;
       String name = c.getName();
-      //System.out.print("DEBUG - try to change property of "+ name);
+//      System.out.print("DEBUG - try to change property of "+ name);
       /*
        * Properties is build in initializePrefPanel() -> loadPreferences ->
        * accept(key). If a key is missing in properties, it is very likely that
@@ -1036,6 +1043,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
               .toString();
         } else if (c instanceof JTextComponent) {
           value = ((JTextComponent) c).getText();
+        } else if (c instanceof JComponentForOption) {
+          value = ((JComponentForOption)c).getCurrentValue().toString();
         }
         
         // Check before saving
@@ -1056,19 +1065,18 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         // are displayed later! Write all options to properties first!
         if (!checkRange || isInRange) {
           properties.put(name, value);
-          //System.out.println(" - " + "changed to '" + value.toString() + "'.");
+//          System.out.println(" - " + "changed to '" + value.toString() + "'.");
         } else {
-          //System.out.println(" - " + "out of Range.");
+//          System.out.println(" - " + "out of Range.");
         }
       } else {
-        //System.out.println(" - " + "failed: properties contains no key with that name.");
+//        System.out.println(" - " + "failed: properties contains no key with that name.");
       }
     }
   }
   
   /**
-   * @param c
-   *        any {@link Component}
+   * @param c any {@link Component}
    * @return the option, associated with this component or any parent of this
    *         component.
    */
@@ -1083,8 +1091,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   }
   
   /**
-   * @param c
-   *        any {@link Component}
+   * @param c any {@link Component}
    * @return the option, associated with this component or any parent of this
    *         component.
    */

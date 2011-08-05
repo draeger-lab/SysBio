@@ -834,7 +834,7 @@ public class Reflect {
 	 * @param methodName
 	 * @param parameterType
 	 * @param parameter
-	 * @return
+	 * @return value of the executed method
 	 */
 	public static Object invokeIfContains(Object clazz, String methodName,
 		Class<?> parameterType, Object parameter) {
