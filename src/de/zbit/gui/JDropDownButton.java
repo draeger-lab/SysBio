@@ -161,6 +161,7 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
     } else {
       arrow = UIManager.getIcon("Table.descendingSortIcon");
     }
+    if (arrow==null) return;
     int x = super.getWidth()-arrow.getIconWidth()-3;
     int y = super.getHeight()/2-arrow.getIconHeight()/2;
     arrow.paintIcon(this, g, x, y);
@@ -170,7 +171,9 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
   private Dimension addArrowWidth(Dimension superClassSize) {
     // Extend space for the arrow icon
     Icon arrow = UIManager.getIcon("Table.ascendingSortIcon");
-    superClassSize.width +=arrow.getIconWidth()+6;
+    if (arrow!=null) {
+      superClassSize.width +=arrow.getIconWidth()+6;
+    }
     return superClassSize;
   }
   
@@ -198,7 +201,9 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
     Rectangle r = super.getBounds();
     
     Icon arrow = UIManager.getIcon("Table.ascendingSortIcon");
-    r.width +=arrow.getIconWidth()+6;
+    if (arrow!=null) {
+      r.width +=arrow.getIconWidth()+6;
+    }
     
     return r;
   }
