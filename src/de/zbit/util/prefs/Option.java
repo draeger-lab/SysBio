@@ -139,23 +139,26 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		
 		if (Enum.class.isAssignableFrom(requiredType)) {
       // Empty strings are never contained in enums
-      if (ret==null || ret.toString().length()<1) return null;
-		  try {
-			  ret = Reflect.invokeIfContains(requiredType, "valueOf", new Object[]{ret.toString()});
-		  } catch (Throwable t) {
-   		  // ret should be, but is not in enum
-		    t.printStackTrace();
-		    return null;
-		  }
-		}
-		
-		try {
-			return (Type) ret;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+	    if ((ret == null) || (ret.toString().length() < 1)) {
+		return null;
+	    }
+	    try {
+		ret = Reflect.invokeIfContains(requiredType, "valueOf",
+		    new Object[] { ret.toString() });
+	    } catch (Throwable t) {
+		// ret should be, but is not in enum
+		t.printStackTrace();
+		return null;
+	    }
 	}
+
+	try {
+	    return (Type) ret;
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    return null;
+	}
+    }
 	
 	/**
    * This method is special for options of type {@link Class}. It allows to
@@ -187,7 +190,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
       
       List<Class> l = option.getRange().getAllAcceptableValues();
       if (l!=null) {
-        for(Class c: l) {
+        for(Class<?> c: l) {
           if (c.getSimpleName().equals(simpleName)) {
             return c;
           }
