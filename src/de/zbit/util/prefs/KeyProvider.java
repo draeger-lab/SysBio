@@ -614,7 +614,6 @@ public interface KeyProvider {
 		 * @param options
 		 * @param removeFromHere
 		 */
-		@SuppressWarnings("unchecked")
 		private static void writeOptionsToHTMLTable(StringBuilder sb,
 			List<?> options, List<Option> removeFromHere) {
 			sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
@@ -623,6 +622,8 @@ public interface KeyProvider {
 					continue;
 				}
 				Option<?> option = (Option<?>) o;
+	      // Hide options that should not be visible.
+	      if (!option.isVisible()) continue;
 				sb.append("        <tr>\n          ");
 				sb.append("<td colspan=\"2\" class=\"typewriter-blue\">");
 				String shortName = option.getShortCmdName();

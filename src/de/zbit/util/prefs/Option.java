@@ -41,6 +41,18 @@ import de.zbit.util.argparser.ArgParser;
  * An {@link Option} defines a key in a key-provider class and can also be used
  * to specify command-line options for a program.
  * 
+ * <p>TODO: Currently the<ul>
+ * <li>{@link #dependencies} are not considered in command-line parsing and
+ * all help texts.</li>
+ * <li>{@link #buttonGroup} is a kind of an XOR dependency for
+ * all options on the same ButtonGroup. Does only seem to make
+ * sense for boolean options. This should be implemented as XOR
+ * dependency in command-line parsing and help texts.</li>
+ * <li>{@link #visible} is not yet considered in command-line parsing.
+ * Intention is, that this option is still parsed on the command-line
+ * but not displayed in the --help description.</li>
+ * </ul>
+ * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
  * @date 2010-10-24
@@ -263,8 +275,31 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
    * when translated into a JComponent.
 	 */
   private ButtonGroup buttonGroup=null;
+  
+  /**
+   * Allows to set a visibility for this option. If this is false,
+   * the option should be hidden from every GUI, command-line,
+   * help, etc.
+   */
+  private boolean visible = true;
 	
 	/**
+   * @return true if this options should be visible to the user
+   */
+  public boolean isVisible() {
+    return visible;
+  }
+
+  /**
+   * @param visible allows to change the desired visibility for
+   * this option.
+   * @see #visible
+   */
+  public void setVisible(boolean visible) {
+    this.visible = visible;
+  }
+
+  /**
 	 * @see #setButtonGroup(ButtonGroup)
    * @return the buttonGroup
    */
@@ -456,12 +491,10 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
-	 * 
 	 * @param optionName
 	 * @param requiredType
 	 * @param description
-	 * @param Range
-	 *        - see {@link Range#Range(Class, String)} or
+	 * @param Range see {@link Range#Range(Class, String)} or
 	 *        {@link #buildRange(Class, String)}.
 	 * @param defaultValue
 	 */
@@ -539,23 +572,44 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		this(optionName, requiredType, description, null, defaultValue, displayName);
 	}
 	
-	 /**
-   * 
-   * @param optionName
-   * @param requiredType
-   * @param description
-   * @param defaultValue
-   * @param displayName
-   * @param group allows to create a group of buttons. This does only
-   * make sense with {@link Boolean} options. All options on this
-   * group will automatically be converted into a {@link JRadioButton},
-   * when translated into a JComponent!
-   */
-  public Option(String optionName, Class<Type> requiredType,
-    String description, Type defaultValue, String displayName, ButtonGroup group) {
-    this(optionName, requiredType, description, null, defaultValue, displayName);
-    setButtonGroup(group);
-  }
+	/**
+	 * 
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param defaultValue
+	 * @param displayName
+	 * @param group allows to create a group of buttons. This does only
+	 * make sense with {@link Boolean} options. All options on this
+	 * group will automatically be converted into a {@link JRadioButton},
+	 * when translated into a JComponent!
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+	  String description, Type defaultValue, String displayName, ButtonGroup group) {
+	  this(optionName, requiredType, description, null, defaultValue, displayName);
+	  setButtonGroup(group);
+	}
+	
+	/**
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param defaultValue
+	 * @param displayName
+	 * @param group allows to create a group of buttons. This does only
+	 * make sense with {@link Boolean} options. All options on this
+	 * group will automatically be converted into a {@link JRadioButton},
+	 * when translated into a JComponent!
+	 * @param visibility allows to hide this option from auto-generated
+	 * GUIs, HELPs, command-lines, etc.
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+	  String description, Type defaultValue, String displayName,
+	  ButtonGroup group, boolean visibility) {
+	  this(optionName, requiredType, description, null, defaultValue, displayName);
+	  setButtonGroup(group);
+	  setVisible(visibility);
+	}
 	
 	/**
 	 * This constructor adds a dependency to the created option.
@@ -591,6 +645,22 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
     String description, Type defaultValue, Map<Option<?>, Range<?>> dependencies) {
     this(optionName, requiredType, description, defaultValue);
     this.dependencies = dependencies;
+  }
+
+  /**
+   * @param optionName
+   * @param requiredType
+   * @param description
+   * @param Range see {@link Range#Range(Class, String)} or
+   *        {@link #buildRange(Class, String)}.
+   * @param defaultValue
+   * @param visibility allows to hide this option from auto-generated
+   */
+  public Option(String optionName, Class<Type> requiredType,
+    String description, Range<Type> range, Type defaultValue,
+    boolean visibility) {
+    this(optionName, requiredType, description, range, (short) 2, defaultValue);
+    setVisible(visibility);
   }
 
   /**
