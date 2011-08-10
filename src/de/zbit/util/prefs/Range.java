@@ -18,12 +18,12 @@ package de.zbit.util.prefs;
 
 import java.io.File;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -322,19 +322,17 @@ public class Range<Type> {
    * @param requiredType
    * @param acceptedObjects
    */
-  public Range(Class<Type> requiredType, List<Type> acceptedObjects) {
+  public Range(Class<Type> requiredType, Iterable<Type> acceptedObjects) {
     this(requiredType, Range.toRangeString(acceptedObjects));
-    this.setListOfAccpetedObjects(acceptedObjects);
-  }
-  
-    /**
-     * @param requiredType
-     * @param acceptedObjects
-     * @see #Range(Class, List)
-     */
-    public Range(Class<Type> requiredType, Set<Type> acceptedObjects) {
-	this(requiredType, new LinkedList<Type>(acceptedObjects));
+    // This requires a list => Convert to list
+    if (!(acceptedObjects instanceof List)) {
+      List<Type> acceptedObjects2 = new ArrayList<Type>();
+      for (Type t: acceptedObjects)
+        acceptedObjects2.add(t);
+      acceptedObjects = acceptedObjects2;
     }
+    this.setListOfAccpetedObjects((List<Type>)acceptedObjects);
+  }
   
   /**
    * This is a convenient constructors that builds a range string from
@@ -603,11 +601,11 @@ public class Range<Type> {
    * @return String
    */
   @SuppressWarnings({ "unchecked" })
-  public static <Type> String toRangeString(Collection<Type> acceptedObjects) {
-    Collection<Type> accObjects=acceptedObjects;
+  public static <Type> String toRangeString(Iterable<Type> acceptedObjects) {
+    Iterable<Type> accObjects=acceptedObjects;
     
     //If the range consists of classes, use the simple class names
-    if((acceptedObjects!=null) && (acceptedObjects.size()!=0) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
+    if((acceptedObjects!=null) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
       List<Type> classStrings = new LinkedList<Type>();
       for(Type object:acceptedObjects) {
         classStrings.add((Type)((Class<?>)object).getSimpleName());

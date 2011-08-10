@@ -541,7 +541,7 @@ public class StringUtil {
 	 * @param suffix - may be null.
 	 * @return List<String> - the list.
 	 */
-	public static List<String> addPrefixAndSuffix(Collection<?> list, String prefix, String suffix) {
+	public static List<String> addPrefixAndSuffix(Iterable<?> list, String prefix, String suffix) {
 	  List<String> ret = new LinkedList<String>();
 	  // Simply define an empty string is faster than checking in the loop each time if it's null.
 	  if (prefix == null) prefix = "";
