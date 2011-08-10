@@ -57,6 +57,7 @@ import javax.swing.UIManager;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import de.zbit.gui.ExpandablePanel;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.table.JComponentTableModel;
@@ -167,6 +168,14 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     
     // display the GUI
     initGUI();
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.csv.CSVReaderOptionPanel#buildCSVOptionsPanel()
+   */
+  @Override
+  public JPanel buildCSVOptionsPanel() {
+    return new ExpandablePanel(getCSVOptionsString(), super.buildCSVOptionsPanel(),true,true);
   }
   
   /* (non-Javadoc)

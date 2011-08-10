@@ -81,6 +81,11 @@ public class ExpandablePanel extends JPanel implements MouseListener {
    */
   private Border intendedBorder=getBorder();
   
+  /**
+   * a special Border for the label.
+   */
+  private Border labelBorder;
+  
   /** A list of event listeners for this component. */
   protected EventListenerList listenerList = new EventListenerList();
   
@@ -146,6 +151,7 @@ public class ExpandablePanel extends JPanel implements MouseListener {
     if(intendedBorder==null) {
       intendedBorder = BorderFactory.createLineBorder(lineColor, 2);
     }
+    labelBorder = BorderFactory.createLineBorder(lineColor, 2);
     
     // Add components
     setLayout(new BorderLayout());
@@ -259,7 +265,7 @@ public class ExpandablePanel extends JPanel implements MouseListener {
     panel.setVisible(newVisibility);
     
     // Paint borders
-    header.setBorder(intendedBorder);
+    header.setBorder(labelBorder!=null?labelBorder:intendedBorder);
     panel.setBorder(panel.isVisible()?intendedBorder:null);
     
     // Pack parent window

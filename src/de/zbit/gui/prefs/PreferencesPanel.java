@@ -239,6 +239,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   List<Option<?>> addOptions(LayoutHelper lh, Iterable<? extends Option> options, Map<Option<?>, OptionGroup<?>> deleteFromHere) {
     List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
     for (Option<?> option : options) {
+      // Hide options that should not be visible.
+      if (!option.isVisible()) continue;
       
       // Create swing option based on field type
       JComponent jc = null;

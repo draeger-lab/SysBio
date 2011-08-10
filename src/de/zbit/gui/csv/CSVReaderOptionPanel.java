@@ -59,6 +59,7 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.gui.ExpandablePanel;
 import de.zbit.gui.GUITools;
 import de.zbit.io.CSVReader;
 import de.zbit.util.ResourceManager;
@@ -190,8 +191,7 @@ public class CSVReaderOptionPanel extends JPanel {
    */
 	public void setDefaultTitleFont(Font defaultTitleFont) {
 		this.defaultTitleFont = defaultTitleFont;
-		setBorder(currentOptions, ResourceManager.getBundle(
-			"de.zbit.locales.Labels").getString("CSV_OPTIONS"));
+		setBorder(currentOptions, getCSVOptionsString());
 		setBorder(currentPreview, ResourceManager.getBundle(
 			"de.zbit.locales.Labels").getString("FILE_PREVIEW"));
 	}
@@ -290,8 +290,9 @@ public class CSVReaderOptionPanel extends JPanel {
     currentPreview = buildPreview(numDataLinesForPreview);
     
     // Add borders
-		setBorder(currentOptions, ResourceManager.getBundle(
-			"de.zbit.locales.Labels").getString("CSV_OPTIONS"));
+    if (!(currentOptions instanceof ExpandablePanel)) {
+		  setBorder(currentOptions, getCSVOptionsString());
+    }
 		setBorder(currentPreview, getFilePreviewCaption());
     
     // Create Panel
@@ -305,6 +306,14 @@ public class CSVReaderOptionPanel extends JPanel {
       add(currentButtons, BorderLayout.SOUTH);
     }
     
+  }
+  
+  /**
+   * @return localized String for "CSV Options"
+   */
+  protected static String getCSVOptionsString() {
+    return ResourceManager.getBundle(
+			"de.zbit.locales.Labels").getString("CSV_OPTIONS");
   }
   
   /**
@@ -850,7 +859,7 @@ public class CSVReaderOptionPanel extends JPanel {
   public void refreshOptionsPanel() {
     if (currentOptions!=null) {
       JPanel newOptions = buildCSVOptionsPanel();
-      setBorder(newOptions, ResourceManager.getBundle("de.zbit.locales.Labels").getString("CSV_OPTIONS"));
+      setBorder(newOptions, getCSVOptionsString());
       GUITools.replaceComponent(currentOptions, newOptions);
       currentOptions = newOptions;
     
@@ -1045,8 +1054,7 @@ public class CSVReaderOptionPanel extends JPanel {
 			JFrame parent = new JFrame();
 			parent.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			System.out.println(showDialog(parent,"files/sample.csv.txt",
-				ResourceManager.getBundle("de.zbit.locales.Labels").
-				getString("CSV_OPTIONS")).getNumberOfDataLines());
+				getCSVOptionsString()).getNumberOfDataLines());
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();
