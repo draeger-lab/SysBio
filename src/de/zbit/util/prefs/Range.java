@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -326,6 +327,15 @@ public class Range<Type> {
     this.setListOfAccpetedObjects(acceptedObjects);
   }
   
+    /**
+     * @param requiredType
+     * @param acceptedObjects
+     * @see #Range(Class, List)
+     */
+    public Range(Class<Type> requiredType, Set<Type> acceptedObjects) {
+	this(requiredType, new LinkedList<Type>(acceptedObjects));
+    }
+  
   /**
    * This is a convenient constructors that builds a range string from
    * a list of all acceptable object automatically.
@@ -395,7 +405,7 @@ public class Range<Type> {
     this.rangeString = "";
     this.constraints = null;
   }
-  
+
 	/**
 	 * Preserve the original list, if this range has been initialized with
 	 * {@link #Range(Class, Collection)} !
