@@ -57,9 +57,9 @@ public class StatusBar extends JPanel implements ProgressListener {
   /**
    * A Label that is used to display status information
    */
-  final JLabel statusLabel;
+  final private JLabel statusLabel;
   
-  ProgressBarSwing progressBar = null;
+  private ProgressBarSwing progressBar = null;
   
   /**
    * This is the default status message text.
@@ -163,8 +163,8 @@ public class StatusBar extends JPanel implements ProgressListener {
   }
   
   /**
-   * This method changes the layout of the frame to a BorderLayout,
-   * creates and returnes a {@link StatusBar} with the icon
+   * This Method changes the layout of the frame to a BorderLayout,
+   * creates and returns a {@link StatusBar} with the icon
    * of the parent frame and displays log messages in the status bar.
    * @param frame
    * @return
