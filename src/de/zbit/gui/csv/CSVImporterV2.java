@@ -123,8 +123,13 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
    */
   private String renameButtonCaption="Edit names";
   
+  private CSVImporterV2(CSVReader reader) throws IOException {
+    super(reader, false);
+    this.inFile = reader.getFilename();
+  }
+  
   private CSVImporterV2(String filepath) throws IOException {
-    super(new CSVReader(filepath), false);
+    this(new CSVReader(filepath));
     this.inFile = filepath;
   }
   
@@ -141,8 +146,17 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     this(filepath, Arrays.asList(expectedColumns));
   }
   
+  public CSVImporterV2(CSVReader reader, ExpectedColumn... expectedColumns) throws IOException {
+    this(reader, Arrays.asList(expectedColumns));
+  }
+  
   public CSVImporterV2(String filepath, Collection<ExpectedColumn> expectedColumns) throws IOException {
     this(filepath);
+    init(expectedColumns);
+  }
+  
+  public CSVImporterV2(CSVReader reader, Collection<ExpectedColumn> expectedColumns) throws IOException {
+    this(reader);
     init(expectedColumns);
   }
   
@@ -158,15 +172,46 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     if (nc>0) {
       exColSelections = new Integer[nc];
       Arrays.fill(exColSelections, 0);
+      exColTypeSelections = new Integer[nc];
+      Arrays.fill(exColTypeSelections, 0);
+      
+      // Put selections to lists
+      /*for (int i=0; i<exColSelections.length; i++) {
+        int selectedItem = exColSelections[i]-1;
+        int selectedType = exColTypeSelections[i];
+        if (selectedItem>=0) {
+          exCols.get(selectedItem).assignedColumns.add(i);
+          exCols.get(selectedItem).assignedTypeForEachColumn.add(selectedType);
+        }
+      }*/
+      
+      
+       // Read eventual initial suggestions from exCols
       int i=0;
       for (ExpectedColumn expectedColumn : expectedColumns) {
-        int sug = expectedColumn.getInitialSuggestion(getCSVReader());
-        if (sug>=0) exColSelections[sug]=i+1; // +1 because "Ignore Column"
+        // Old manual selections
+        if (expectedColumn.hasAssignedColumns()) {
+          for (int j=0; j<expectedColumn.getAssignedColumns().size(); j++) {
+            int idx = expectedColumn.getAssignedColumns().get(j);
+            if (idx>=0 && idx<exColSelections.length) {
+              exColSelections[idx]=i+1;
+              if (j<expectedColumn.getAssignedTypeForEachColumn().size()) {
+                exColTypeSelections[idx]=expectedColumn.getAssignedTypeForEachColumn().get(j);
+              }
+            }
+          }
+          
+        } else {
+          // Auto-inference based on file content patterns
+          int sug = expectedColumn.getInitialSuggestion(getCSVReader());
+          if (sug>=0) exColSelections[sug]=i+1; // +1 because "Ignore Column"
+        }
         i++;
       }
     }
     
     // display the GUI
+    setPreferredSize(new java.awt.Dimension(650, 400));
     initGUI();
   }
   
@@ -176,14 +221,6 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
   @Override
   public JPanel buildCSVOptionsPanel() {
     return new ExpandablePanel(getCSVOptionsString(), super.buildCSVOptionsPanel(),true,true);
-  }
-  
-  /* (non-Javadoc)
-   * @see de.zbit.gui.CSVReaderOptionPanel#getDefaultPreferredSize()
-   */
-  @Override
-  protected Dimension getDefaultPreferredSize() {
-    return new java.awt.Dimension(650, 425);
   }
   
   /* (non-Javadoc)
@@ -227,9 +264,17 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     }
     return false;
   }
+  
+  /**
+   * @return current list of {@link ExpectedColumn}s.
+   */
+  public List<ExpectedColumn> getExpectedColumns() {
+    return exCols;
+  }
 
   /**
-   * @return
+   * @return true if any ExpectedColumn from {@link #exCols}
+   * has set the required attribute to true
    */
   private boolean isAColumnRequired() {
     for (ExpectedColumn exCol : exCols) {
@@ -334,6 +379,9 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     // Build JComboBoxes for each column to let the user select the content.
     JComponent[][] ret = new JComponent[ts_required?2:1][numCols];
     for (int i=0; i<numCols; i++) {
+      if (exColSelections[i]==null)exColSelections[i] = 0;
+      if (exColTypeSelections[i]==null)exColTypeSelections[i] = 0;
+      
       final int i_copy = i;
       final JComboBox box = new JComboBox(getExpectedColsComboBoxModel());
       if (defaultPreviewFont!=null) box.setFont(defaultPreviewFont);

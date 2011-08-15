@@ -17,6 +17,7 @@
 package de.zbit.gui.csv;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,9 @@ import de.zbit.io.CSVReader;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class ExpectedColumn {
+public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> {
+  private static final long serialVersionUID = 110385651572193188L;
+
   /**
    * Name of the expected column (E.g. "Observation 1")
    */
@@ -269,6 +272,13 @@ public class ExpectedColumn {
    */
   public Object getOriginalName() {
     return originalName;
+  }
+  /* (non-Javadoc)
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(ExpectedColumn o) {
+    return originalName.toString().compareTo(o.getOriginalName().toString());
   }
   
 }
