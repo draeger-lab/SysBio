@@ -328,5 +328,35 @@ public class ArrayUtils {
     if (nonNull.size()<1) return null;
     return (T[]) nonNull.toArray((T[]) createNewArray(sample, nonNull.size()));
   }
+
+  /**
+   * Converts a sub-range of an array to a new array.
+   * @param arr array to convert
+   * @param rangeStart index to place as first element in the resulting list
+   * @param rangeEnde stop placing further items in the list, when this
+   * index is reached
+   * @return array, containing all elements of <code>add</code> between
+   * <code>rangeStart</code> and <code>rangeEnde</code> in preserved order.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T[] toSubArray(T[] arr, int rangeStart, int rangeEnde) {
+    int length = rangeEnde-rangeStart;
+    T[] newArr = (T[]) createNewArray(arr[rangeStart], length);
+    System.arraycopy(arr, rangeStart, newArr, 0, length);
+    return newArr;
+  }
+  
+  /**
+   * Allows to convert a sub-range of an array to a list.
+   * @param arr array to convert
+   * @param rangeStart index to place as first element in the resulting list
+   * @param rangeEnde stop placing further items in the list, when this
+   * index is reached
+   * @return list, containing all elements of <code>add</code> between
+   * <code>rangeStart</code> and <code>rangeEnde</code> in preserved order.
+   */
+  public static <T> List<T> asList(T[] arr, int rangeStart, int rangeEnde) {
+    return Arrays.asList(toSubArray(arr, rangeStart, rangeEnde));
+  }
   
 }

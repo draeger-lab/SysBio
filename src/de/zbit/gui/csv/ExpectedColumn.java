@@ -36,7 +36,8 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
   private static final long serialVersionUID = 110385651572193188L;
 
   /**
-   * Name of the expected column (E.g. "Observation 1")
+   * Name of the expected column (E.g. "Observation 1"). Might
+   * get changed by user if {@link #renameAllowed} is true.
    */
   Object name;
   
