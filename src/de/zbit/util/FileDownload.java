@@ -119,9 +119,9 @@ public class FileDownload {
       int numRead;
       long numWritten = 0;
       
-      final int reportEveryXKB = 50; // Set progressbar every X kb.
+      final int reportEveryXKB = 50; // Set progressbar every X kb. = StepSize
       //guiOperations.SetProgressBarMAXThreadlike(Math.max(conn.getContentLength(), in.available()), ProgressBar);
-      if (progress!=null) progress.setNumberOfTotalCalls(Math.max(conn.getContentLength(), in.available()));
+      if (progress!=null) progress.setNumberOfTotalCalls((long)((double)Math.max(conn.getContentLength(), in.available())/(double)(buffer.length*reportEveryXKB)));
       
       int calls = 0;
       while ((numRead = in.read(buffer)) != -1) {
@@ -133,8 +133,7 @@ public class FileDownload {
           //System.out.println(statusLabelText + "(" + mb + " MB)");
           //System.out.println((Math.round(numWritten/1024/1024)));
           
-          progress.setCallNr(numWritten);
-          progress.DisplayBar("(" + mb + " MB)");
+          progress.DisplayBar(String.format("(%s MB)", mb));
         }
         
         out.write(buffer, 0, numRead);
@@ -282,14 +281,14 @@ public class FileDownload {
   public static void main(String[] args) {
     System.out.println(isHTMLcontent("http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE9786"));
     System.out.println(isHTMLcontent("http://rsat.ulb.ac.be/rsat/data/genomes/Arabidopsis_thaliana/oligo-frequencies/5nt_upstream-noorf_Arabidopsis_thaliana-ovlp-2str.freq.gz"));
-    if (true) return;
-    
-    
-    download("http://rsat.ulb.ac.be/rsat/data/genomes/Arabidopsis_thaliana/oligo-frequencies/5nt_upstream-noorf_Arabidopsis_thaliana-ovlp-2str.freq.gz");
-    
-    for (int i = 0; i < args.length; i++) {
-      download(args[i]);
-    }
+//    if (true) return;
+//    
+//    
+//    download("http://rsat.ulb.ac.be/rsat/data/genomes/Arabidopsis_thaliana/oligo-frequencies/5nt_upstream-noorf_Arabidopsis_thaliana-ovlp-2str.freq.gz");
+//    
+//    for (int i = 0; i < args.length; i++) {
+//      download(args[i]);
+//    }
   }
   
   /**

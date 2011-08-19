@@ -195,21 +195,13 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public boolean readMappingData() throws IOException {
     isInizialized=true;
-    String[] localFiles = ArrayUtils.merge(getLocalFiles(), getLocalFile());
     
-    if (!isCachedDataAvailable()) {
-      if (getRemoteURL()!=null) {
-        downloadData();
-      } else {
-        log.severe("Mapping file for " + getMappingName() + " not available and no download URL is known.");
-      }
-      if (!isCachedDataAvailable()) {
-        return false;
-      }
-    }
+    // Download input file, if it is not there
+    ensureLocalFileIsAvailable();
     
     // Parse all files.
     Timer t = new Timer();
+    String[] localFiles = ArrayUtils.merge(getLocalFiles(), getLocalFile());
     for (String localFile: localFiles) {
       log.config("Reading " + getMappingName() + " mapping file " + localFile);
       CSVReader r = new CSVReader(localFile);
@@ -294,6 +286,28 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     
     log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((getMapping()!=null)?getMapping().size():"0") + " mappings.");
     return (getMapping()!=null && getMapping().size()>0);
+  }
+
+  /**
+   * Ensure that {@link #isCachedDataAvailable()} returns true, i.e.,
+   * {@link #getLocalFile()} is available. This method downloads
+   * the {@link #getRemoteURL()} if it is not available.
+   * @return true if {@link #isCachedDataAvailable()}
+   */
+  protected boolean ensureLocalFileIsAvailable() {
+    if (!isCachedDataAvailable()) {
+      if (getRemoteURL()!=null) {
+        downloadData();
+      } else {
+        log.severe("Mapping file for " + getMappingName() + " not available and no download URL is known.");
+      }
+      if (!isCachedDataAvailable()) {
+        return false;
+      }
+      
+      log.info(String.format("Downloaded required mapping file for %s. Reading this file now...", getMappingName()) );
+    }
+    return true;
   }
 
   /**

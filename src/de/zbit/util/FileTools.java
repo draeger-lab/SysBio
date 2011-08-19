@@ -54,11 +54,8 @@ public class FileTools {
       FileTools.splitFile("/home/buechel/ValidationData/proDGe_HUMAN_raw.txt", "/home/buechel/ValidationData", "proDGe_HUMAN_raw", ".txt", 8000000);
       
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
-    if(true)return;
     
     System.out.println(which("pdflatex"));
   }
@@ -329,6 +326,35 @@ public class FileTools {
     } else {
       out.append(toWrite.toString());
     }
+  }
+
+  /**
+   * @param name any filename
+   * @return file extension of <code>name</code>
+   */
+  public static String getExtension(String name) {
+    if (name!=null && name.length() > 0) {
+      int pos = name.lastIndexOf('.');
+      if (pos>=0) {
+        return name.substring(pos + 1);
+      }
+    }
+    return "";
+  }
+  
+  /**
+   * Removes the file extension from any filename.
+   * @param name
+   * @return name without the last dot and everything behind it.
+   */
+  public static String trimExtension(String name) {
+    if (name!=null && name.length() > 0) {
+      int pos = name.lastIndexOf('.');
+      if (pos>=0) {
+        return name.substring(0,pos);
+      }
+    }
+    return name;
   }
   
 }
