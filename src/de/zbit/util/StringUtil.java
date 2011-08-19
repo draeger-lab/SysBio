@@ -718,7 +718,7 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String toHTML(String string, int lineBreak, boolean preserveExistingLinebreaks) {
-	  String lineBreakSymbol = "<br>";
+	  String lineBreakSymbol = "<br/>";
 		if (string == null) {
 			return "<html><body>null</body></html>";
 		}

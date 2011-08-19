@@ -659,7 +659,7 @@ public interface KeyProvider {
 					String value;
 					int lineLength = 0;
 					if ((list != null) && (list.size() > 0)) {
-						sb.append("<br>\n          ");
+						sb.append("<br/>\n          ");
 						sb.append(bundle.getString("ALL_POSSIBLE_VALUES_FOR_TYPE"));
 						sb.append(" <span class=typewriter>");
 						sb.append(requiredType);
@@ -690,7 +690,7 @@ public interface KeyProvider {
 						sb.append('.');
 					} else if ((range.getRangeSpecString() != null)
 							&& !range.isSetConstraints()) {
-						sb.append("<br>\n          ");
+						sb.append("<br/>\n          ");
 						sb.append(String.format(bundle
 								.getString("ARGS_MUST_FIT_INTO_RANGE"), range
 								.getRangeSpecString()));
@@ -698,7 +698,7 @@ public interface KeyProvider {
 				}
 				Object defaultValue = option.getDefaultValue();
 				if (defaultValue != null) {
-					sb.append("<br>\n          ");
+					sb.append("<br/>\n          ");
 					sb.append(bundle.getString("DEFAULT_VALUE"));
 					sb.append(": <span class=typewriter> ");
 					if (defaultValue instanceof Class<?>) {

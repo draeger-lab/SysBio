@@ -29,14 +29,19 @@ public class ScientificNumberRenderer extends DefaultTableCellRenderer {
   private static final long serialVersionUID = 6924185889211247242L;
   
   /**
+   * Default scientific number format
+   */
+  private static NumberFormat scientificFormat = new DecimalFormat("0.###E0");
+  
+  /**
    * The actual formatter
    */
-  NumberFormat formatter;
+  private NumberFormat formatter;
   
   /**
    * A boundary that defines when to use the formatter
    */
-  double boundary;
+  private double boundary;
   
   public ScientificNumberRenderer() { 
     this(0);
@@ -54,6 +59,21 @@ public class ScientificNumberRenderer extends DefaultTableCellRenderer {
   }
   
   public void setValue(Object value) {
+    String text = getNiceString(value, formatter, boundary);
+    
+    setText(text);
+  }
+
+  /**
+   * 
+   * @param value instance of {@link Number}
+   * @param formatter scientific number formatter to use.
+   * Set to <code>NULL</code> to automatically initialize a formatter.
+   * @param boundary defines threshold when to use the scientific formatter.
+   * Set to 0 to always use it. Recommended value: 100.
+   * @return nice number string.
+   */
+  public static String getNiceString(Object value, NumberFormat formatter, double boundary) {
     if (formatter == null) {
       formatter = getScientificNumberFormat();
     }
@@ -65,6 +85,8 @@ public class ScientificNumberRenderer extends DefaultTableCellRenderer {
         double d = Math.abs(((Number)value).doubleValue());
         if (d>=boundary || d<=1/boundary) {
           text = (value == null) ? "" : formatter.format(value);
+        } else {
+          text = Double.toString(Utils.round(d, 4));
         }
       }
     } catch (Exception e) {
@@ -73,15 +95,14 @@ public class ScientificNumberRenderer extends DefaultTableCellRenderer {
     
     // Ausnahmen
     if (text.endsWith("E0")) text = text.substring(0, text.length()-2);
-    
-    setText(text);
+    return text;
   }
 
   /**
    * @return new DecimalFormat("0.###E0");
    */
   public static NumberFormat getScientificNumberFormat() {
-    return new DecimalFormat("0.###E0");
+    return scientificFormat;
   }
   
 }
