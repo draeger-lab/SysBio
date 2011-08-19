@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.logging.Logger;
 
 
 /**
@@ -35,6 +36,7 @@ import java.net.URLConnection;
  * @since 1.0
  */
 public class FileDownload {
+  public static final transient Logger log = Logger.getLogger(FileDownload.class.getName());
   public static Object ProgressBar;
   public static Object StatusLabel;
 
@@ -92,7 +94,7 @@ public class FileDownload {
     URLConnection conn = null;
     InputStream  in = null;
     String statusLabelText = "Downloading '" + address + "' ";
-    System.out.println(statusLabelText);
+    log.info(statusLabelText);
     
     AbstractProgressBar progress = null;
     if (ProgressBar!=null && ProgressBar instanceof AbstractProgressBar)
