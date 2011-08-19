@@ -192,11 +192,15 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
     // Inform listeners
     if (perc!=lastPercentage) {
       fireListeners(perc, miliSecsRemaining, additionalText);
-      lastPercentage = perc;
     }
     
     // Draw the bar
     drawProgressBar(perc, miliSecsRemaining, additionalText);
+    
+    // Remember current percentage
+    if (perc!=lastPercentage) {
+      lastPercentage = perc;
+    }
     
     // Eventually, call the finishing method.
     if (callNr == totalCalls) finished();

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import javax.swing.filechooser.FileFilter;
 
+import de.zbit.util.FileTools;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
@@ -505,13 +506,15 @@ public class SBFileFilter extends GeneralFileFilter {
    * @return
    */
   public static String getExtension(File f) {
-    String name = f.getName();
-    if (name.length() > 0) {
-      if (name.contains(".")) {
-        return name.substring(name.lastIndexOf('.') + 1);
-      }
-    }
-    return "";
+    return getExtension(f.getName());
+  }
+
+  /**
+   * @param name
+   * @return
+   */
+  public static String getExtension(String name) {
+    return FileTools.getExtension(name);
   }
 
   /**
