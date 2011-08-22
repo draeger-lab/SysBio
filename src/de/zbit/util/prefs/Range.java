@@ -17,6 +17,7 @@
 package de.zbit.util.prefs;
 
 import java.io.File;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,9 +42,10 @@ import de.zbit.util.Utils;
  * @version $Rev$
  * @since 1.0
  */
-public class Range<Type> {
-	
-	/**
+public class Range<Type> implements Serializable, Comparable<Range<Type>> {
+  private static final long serialVersionUID = 5376431888251283263L;
+
+  /**
 	 * The {@link Logger} of this {@link Class}.
 	 */
 	public static final Logger logger = Logger.getLogger(Range.class.getName());
@@ -62,8 +64,9 @@ public class Range<Type> {
 	 * or not. 
 	 * @author Clemens Wrzodek
 	 */
-	class SubRange {
-		private Type lBound;
+	class SubRange implements Serializable {
+    private static final long serialVersionUID = 6791332324080634829L;
+    private Type lBound;
 		private Type uBound;
 		private boolean excludingLBound=false;
 		private boolean excludingUBound=false;
@@ -256,7 +259,6 @@ public class Range<Type> {
 			}
 			return false;
 		}
-		
 	 }
 	
 	/*
@@ -282,7 +284,7 @@ public class Range<Type> {
 	/**
 	 * Additional constraints to restrict an input.
 	 */
-	private Object constraints;
+	private Object constraints=null;
 	
 	/**
 	 * If this Range has been initialized with
@@ -444,6 +446,15 @@ public class Range<Type> {
 	 */
 	private void addRange(SubRange range) {
 		ranges.add(range);
+	}
+	
+	/**
+	 * Add a SubRange to this collection of ranges.
+	 * @param lowerBound
+	 * @param upperBound
+	 */
+	private void addRange(Type lowerBound, Type upperBound) {
+	  ranges.add(new SubRange(lowerBound, upperBound));
 	}
 	
 	/**
@@ -621,6 +632,51 @@ public class Range<Type> {
     return s;
   }
   
+  /**
+   * Builds a compact range, that accepts integers. This method automatically
+   * builds {@link SubRange}s with lower and upper bounds, based on the given
+   * values and is thus much more efficient for Integers in terms of space and
+   * time than using other methods that build ranges based on {@link Iterable}s.
+   * (Other methods add each element of the collection as a separate SubRange).
+   * 
+   * <p>This method works only for integer classes, i.e., Byte, Short, Integer,
+   * Long and BigInteger.
+   * @param <Type>
+   * @param acceptedNumbers list of all acceptable numbers
+   * @return instance of {@link Range}, that exclusively accepts all given
+   * <code>acceptedNumbers</code>.
+   */
+  @SuppressWarnings("unchecked")
+  public static <Type extends Number & Comparable<? super Type>> Range<Type> toIntegerRange(Collection<Type> acceptedNumbers) {
+    
+    // Convert to list and sort ascending
+    List<Type> list;
+    if (acceptedNumbers instanceof List) {
+      list = (List<Type>) acceptedNumbers;
+    } else {
+      list = new ArrayList<Type>(acceptedNumbers);
+    }
+    Collections.sort(list);
+    
+    // Create result range
+    Range<Type> result = new Range<Type>((Class<Type>) acceptedNumbers.iterator().next().getClass());
+    
+    // Build ranges. We can summarize all elements with a distance of 1. Others
+    // Must be added as a separate range, each.
+    Type lBound = list.get(0);
+    Type uBound = list.get(0);
+    for (Type cur: list) {
+      if (cur.doubleValue()-lBound.doubleValue()>1) {
+        result.addRange(lBound, uBound);
+        lBound = cur; uBound = cur;
+      }
+      uBound = cur;
+    }
+    result.addRange(lBound, uBound);
+    
+    return result;
+  }
+  
 	/**
 	 * Builds a range string that accepts exclusively all
 	 * elements in the given {@link Enum}.
@@ -737,5 +793,40 @@ public class Range<Type> {
     }
     return max;
   }
+
+  /* (non-Javadoc)
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(Range<Type> other) {
+    // Is only approximative...
+    if (this == other) return 0;
+    if (other == null) return -1;
+    int ret = 0;
+    
+    if (!typee.equals(other.typee)) return -2;
+    
+    if (constraints == null) {
+      if (other.constraints != null) return -3;
+    } else if (other.constraints == null) {
+      if (constraints != null) return -4;
+    } else if (constraints.equals(other.constraints)) {
+      return 0;
+    }
+    
+    if (rangeString != null && other.rangeString!=null) {
+      ret = rangeString.compareTo(other.rangeString);
+      if (ret!=0) return ret;
+    }
+    
+    if (listOfAccpetedObjects != null && other.listOfAccpetedObjects!=null) {
+      ret = listOfAccpetedObjects.size()-other.listOfAccpetedObjects.size();
+      if (ret!=0) return ret;
+    }
+    
+    return ret;
+  }
+  
+  
   
 }
