@@ -669,7 +669,7 @@ public class Utils {
     while (i>0 && Character.isDigit(toParse.charAt(i-1)))
       ret.append( toParse.charAt(--i) );
     
-    return ret.reverse().toString();
+    return ret.length()>0?ret.reverse().toString():"-1";
   }
   
   /**
