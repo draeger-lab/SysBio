@@ -644,9 +644,10 @@ public class KeggInfos {
 			informationFromKeggAdaptor = null;
 			return;
 		}
+		String uInfos = infos.toUpperCase();
 
 		// General
-		names = KeggAdaptor.extractInfo(infos, "NAME");
+		names = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "NAME", null);
 		if (names != null && names.length() != 0) {
 			int pos = names.lastIndexOf(";");
 			if (pos > 0 && pos < (names.length() - 1))
@@ -655,31 +656,31 @@ public class KeggInfos {
 			else
 				name = names;
 		}
-		definition = KeggAdaptor.extractInfo(infos, "DEFINITION");
-		description = KeggAdaptor.extractInfo(infos, "DESCRIPTION");
+		definition = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "DEFINITION", null);
+		description = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "DESCRIPTION", null);
 
 		// Mainly Pathway specific (eg. "path:map00603")
-		go_id = KeggAdaptor.extractInfo(infos, " GO:", "\n"); // DBLINKS GO:
+		go_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, " GO:", "\n"); // DBLINKS GO:
 		// 0006096
 		// 0006094
 
 		// Mainly Organism specific (eg. "GN:hsa")
-		taxonomy = KeggAdaptor.extractInfo(infos, "TAXONOMY", "\n"); // e.g.
+		taxonomy = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "TAXONOMY", "\n"); // e.g.
 		// "TAXONOMY    TAX:9606"
 		// =>
 		// "TAX:9606".
 
 		// Mainly Gene specific (eg. "hsa:12313")
-		ensembl_id = KeggAdaptor.extractInfo(infos, "Ensembl:", "\n");
-		uniprot_id = KeggAdaptor.extractInfo(infos, "UniProt:", "\n");
-		hgnc_id = KeggAdaptor.extractInfo(infos, "HGNC:", "\n");
-		omim_id = KeggAdaptor.extractInfo(infos, "OMIM:", "\n");
-		entrez_id = KeggAdaptor.extractInfo(infos, "NCBI-GeneID:", "\n");
+		ensembl_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "ENSEMBL:", "\n");
+		uniprot_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "UNIPROT:", "\n");
+		hgnc_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "HGNC:", "\n");
+		omim_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "OMIM:", "\n");
+		entrez_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "NCBI-GENEID:", "\n");
 		
 		// For KO orthologous, parse entrez ids of all organisms from "GENES"
 		if (entrez_id==null || entrez_id.length()<1) {
 		  try {
-		    String temp = KeggAdaptor.extractInfo(infos, "\nGENES ");
+		    String temp = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "\nGENES ", null);
 		    if (temp!=null && temp.length()>0) {
 		      StringBuffer eId = new StringBuffer();
 		      for (int num: Utils.getNumbersFromString(temp, ": ", null)) {
@@ -707,31 +708,31 @@ public class KeggInfos {
 		// Ortholog (e.g. "ko:K01204")
 		// DBLINKS (RN, GO); GENES (actual orthologous genes)
 		// //urn:miriam:kegg.reaction (R00100)
-		reaction_id = KeggAdaptor.extractInfo(infos, " RN:", "\n"); // DBLINKS
+		reaction_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, " RN:", "\n"); // DBLINKS
 		// RN:
 		// R05966
 
 		// in small molecules (compound eg. "cpd:C00031")
 		// KNApSAcK, NIKKAJI, (CAS) missing
-		formula = KeggAdaptor.extractInfo(infos, "FORMULA"); // FORMULA C6H12O6
-		mass = KeggAdaptor.extractInfo(infos, "MASS"); // MASS 180.0634
+		formula = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "FORMULA", null); // FORMULA C6H12O6
+		mass = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "MASS", null); // MASS 180.0634
 
-		pubchem = KeggAdaptor.extractInfo(infos, "PubChem:", "\n");
-		PDBeChem = KeggAdaptor.extractInfo(infos, "PDB-CCD:", "\n");
-		chebi = KeggAdaptor.extractInfo(infos, "ChEBI:", "\n");
-		three_dmet = KeggAdaptor.extractInfo(infos, "3DMET:", "\n");
-		cas = KeggAdaptor.extractInfo(infos, " CAS:", "\n");
+		pubchem = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "PUBCHEM:", "\n");
+		PDBeChem = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "PDB-CCD:", "\n");
+		chebi = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "CHEBI:", "\n");
+		three_dmet = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "3DMET:", "\n");
+		cas = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, " CAS:", "\n");
 		
-		GlycomeDB = KeggAdaptor.extractInfo(infos, "GlycomeDB:", "\n");
-		LipidBank = KeggAdaptor.extractInfo(infos, "LipidBank:", "\n");
+		GlycomeDB = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "GLYCOMEDB:", "\n");
+		LipidBank = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "LIPIDBANK:", "\n");
 
 		// Mainly drg (eg. "dr:D00694")
 		// missing: NIKKAJI, LigandBox (CAS)
-		drugbank = KeggAdaptor.extractInfo(infos, "DrugBank:", "\n");
+		drugbank = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "DRUGBANK:", "\n");
 
 		// in reactions:
-		equation = KeggAdaptor.extractInfo(infos, "EQUATION", "\n");
-		String pathwaysTemp = KeggAdaptor.extractInfo(infos, "PATHWAY");
+		equation = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "EQUATION", "\n");
+		String pathwaysTemp = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "PATHWAY", null);
 		if ((pathwaysTemp != null) && (pathwaysTemp.trim().length() != 0)) {
 			pathwaysTemp = pathwaysTemp.replace("PATH:", "");
 			String[] splitt = pathwaysTemp.split("\n");
@@ -757,7 +758,7 @@ public class KeggInfos {
 		if ((pathwayDescs != null) && pathwayDescs.startsWith(",")) {
 			pathwayDescs = pathwayDescs.substring(1);
 		}
-		enzymes = KeggAdaptor.extractInfo(infos, "ENZYME", "\n");
+		enzymes = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "ENZYME", "\n");
 
 		// Free Memory instead of storing empty Strings.
 		if (taxonomy != null && taxonomy.trim().length() == 0)
