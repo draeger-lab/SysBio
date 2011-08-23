@@ -80,7 +80,7 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
    * <p>Methods, overriding this method should at any cost make
    * a reference to this super method!
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   protected Collection postProcessTargetID(Collection target) {
     // Is actually always a collection of exactly one element.
@@ -125,7 +125,7 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
    * of "path:mmu04530").
    * @throws IOException 
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void convertIDsToNames(AbstractMapper<TargetType, String> ID2Name) throws IOException {
     Set<Entry<SourceType, Collection<TargetType>>>  entries = getMapping().entrySet();
     for (Entry<SourceType, Collection<TargetType>> entry : entries) {

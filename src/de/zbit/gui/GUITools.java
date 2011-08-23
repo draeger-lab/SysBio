@@ -48,6 +48,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -917,7 +918,7 @@ public class GUITools {
    * @param dir
    * @param allFilesAcceptable
    * @param multiSelectionAllowed
-   * @param mode
+   * @param mode e.g., JFileChooser.FILES_ONLY
    * @param filter
    * @return null if for some reason the no {@link File} has been selected or
    *         the {@link File} cannot be read, else the selected {@link File}.
@@ -949,7 +950,7 @@ public class GUITools {
    * @param dir
    * @param allFilesAcceptable
    * @param multiSelectionAllowed
-   * @param mode
+   * @param mode e.g., JFileChooser.FILES_ONLY
    * @param filter
    * @return null if for some reason the no {@link File} has been selected or
    *         the {@link File} cannot be read, else the selected {@link File}.
@@ -965,6 +966,49 @@ public class GUITools {
         showNowReadingAccessWarning(parent, f);
       } else {
         return f;
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * Create an open file dialog that let's the user
+   * select any file.
+   * @param parent
+   * @param dialogTitle allows to change the title of the
+   * file dialog.
+   * @param acceptURLs if true, will also accept any http
+   * or ftp url as input and return this url.
+   * @return
+   */
+  public static String openFileDialog(final Component parent,
+    String dialogTitle, boolean acceptURLs) {
+    JFileChooser chooser = createJFileChooser(null, true,
+      false, JFileChooser.FILES_ONLY, (FileFilter)null);
+    if (dialogTitle!=null) chooser.setDialogTitle(dialogTitle);
+    if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+      File f = chooser.getSelectedFile();
+      String fString = f.getPath();
+      if (acceptURLs) {
+        // Stupid dialog converts the url to something like
+        // C:\Users\Documents\http:\www.broadinstitute.org\c3.gmt
+        int pos = fString.indexOf("http:");
+        int pos2 = fString.indexOf("ftp:");
+        pos = Math.max(pos, pos2);
+        if (pos>=0) {
+          String url = fString.substring(pos, fString.length());
+          if (StringUtil.fileSeparator()=='\\') {
+            url = url.replace('\\', '/');
+          }
+          url = url.replaceFirst(Pattern.quote("http:/"), "http://");
+          url = url.replaceFirst(Pattern.quote("ftp:/"), "ftp://");
+          return url;
+        }
+      }
+      if (!f.canRead()) {
+        showNowReadingAccessWarning(parent, f);
+      } else {
+        return f.getPath();
       }
     }
     return null;

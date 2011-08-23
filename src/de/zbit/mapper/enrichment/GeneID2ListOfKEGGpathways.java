@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,6 +75,7 @@ public class GeneID2ListOfKEGGpathways extends AbstractEnrichmentMapper<Integer,
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#readMappingData()
    */
+  @SuppressWarnings("rawtypes")
   @Override
   public boolean readMappingData() throws IOException {
     isInizialized=true;
@@ -121,6 +122,7 @@ public class GeneID2ListOfKEGGpathways extends AbstractEnrichmentMapper<Integer,
    * @param args
    * @throws Exception 
    */
+  @SuppressWarnings("rawtypes")
   public static void main(String[] args) throws Exception {
     GeneID2ListOfKEGGpathways mapper = new GeneID2ListOfKEGGpathways("mmu");
     

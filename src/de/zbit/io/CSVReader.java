@@ -188,6 +188,11 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   private char[] trennzeichen = new char[]{'\t', ',', ';', '|', '/', ' ', '\u0001'};
   
   /**
+   * A common pattern for "any whitespace" that is used in many methods.
+   */
+  private static Pattern whiteSpacePattern = Pattern.compile("\\s");
+  
+  /**
    * First line with "consistent number of separator chars". This is the line, where
    * comments end and headers start (if headers are in the file).
    * Starting from zero!
@@ -356,11 +361,12 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * If greater than 0 skips this number of lines directly after
    * opening the file for all operations.
    * 
-   * This does NOT disalbe autoDetectContentStart. That means, that the
-   * actual table may start SOMEWHERE below this number of lines but not
-   * before that much lines.
+   * <b>This does NOT disable {@link #autoDetectContentStart}.
+   * That means, that the actual table may start SOMEWHERE below
+   * this number of lines but not before that much lines.</b>
    * 
-   * Default: 0.
+   * <p>Default: <code>0</code>
+   * @see #setAutoDetectContentStart(boolean)
    */
   public void setSkipLines(int skipLines) {
     if (skipLines>firstConsistentLine ||
@@ -1226,8 +1232,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     }
     
     // Split
-    String [] data;
-    data = getSplits(line);
+    String [] data = getSplits(line);
     
     // Post Process (trim and remove string indicators).
     for (int i=0; i<data.length; i++) {
@@ -1236,11 +1241,8 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
         continue;
       }
       data[i] = data[i].trim();
-      if (removeStringIndiciatorsAtCellStartEnd && ((data[i].startsWith("\"") && data[i].endsWith("\"")) ||
-          (data[i].startsWith("'") && data[i].endsWith("'")))) {
-        if (data[i].length()>2)
-          data[i] = data[i].substring(1, data[i].length()-1);
-        else data[i] = "";
+      if (removeStringIndiciatorsAtCellStartEnd) {
+        data[i] = removeStringIndicators(data[i]);
       }
     }
     return data;
@@ -1289,9 +1291,10 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
         if (trimLinesAfterReading) line = line.trim();
         if (j==firstConsistentLine) {
           headerLine = getSplits(line);
+          headerLine = removeStringIndicators(headerLine);
         } else if (j>firstConsistentLine) {
           if (j-firstConsistentLine-1>=dataLine.length) break;
-          dataLine[j-firstConsistentLine-1] = getSplits(line);
+          dataLine[j-firstConsistentLine-1] = removeStringIndicators(getSplits(line));
         }
       }
       currentOpenFile.close();
@@ -1308,6 +1311,36 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       return containsHeaders(headerLine, dataLine);
     } catch (Exception ex) {ex.printStackTrace();}
     return false;
+  }
+  
+  /**
+   * Converts "hallo" to hallo.
+   * @param cell with removed " or ' at start and end
+   */
+  private String removeStringIndicators(String cell) {
+    if (cell==null) return cell;
+    if (((cell.startsWith("\"") && cell.endsWith("\"")) ||
+        (cell.startsWith("'") && cell.endsWith("'")))) {
+      if (cell.length()>2)
+        cell = cell.substring(1, cell.length()-1);
+      else cell = "";
+    }
+    return cell;
+  }
+  
+  /**
+   * Remove string indicators from cell start and end
+   * from every cell in <code>row</code>.
+   * @param row
+   * @return
+   * @see #removeStringIndicators(String)
+   */
+  private String[] removeStringIndicators(String[] row) {
+    if (row==null) return row;
+    for (int i=0; i<row.length; i++) {
+      row[i] = removeStringIndicators(row[i]);
+    }
+    return row;
   }
   
   private boolean containsHeaders(String[] headerLine, String[][] dataLine) {
@@ -1497,7 +1530,6 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     int j=-1+skipLines;
     int numDataLines = 0;
     long totalFileLength=0;
-    Pattern whitespace = Pattern.compile("\\s");
     while (in.ready()) {
       j++;
       String line = in.readLine();
@@ -1517,7 +1549,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
         
         int aktCounts=0;
         if (separatorChar=='\u0001') { // = Regex whitespace (Pattern.compile("\\s")).
-          aktCounts = countChar(line, whitespace, treatMultipleConsecutiveSeparatorsAsOne, true);
+          aktCounts = countChar(line, whiteSpacePattern, treatMultipleConsecutiveSeparatorsAsOne, true);
         } else {
           aktCounts = countChar(line, separatorChar, treatMultipleConsecutiveSeparatorsAsOne, true);
         }
@@ -1576,7 +1608,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * @return Occurences of the character in the string text, skipping all occurences in strings.
    */
   private static int countChar(String input, char toCount, boolean treatMultipleConsecutiveCharsAsOne, boolean IgnoreStrings){
-    if (toCount=='\u0001') return countChar(input, Pattern.compile("\\s"), treatMultipleConsecutiveCharsAsOne, IgnoreStrings);
+    if (toCount=='\u0001') return countChar(input, whiteSpacePattern, treatMultipleConsecutiveCharsAsOne, IgnoreStrings);
     int counter = 0;
     boolean skip1 = false, skip2 = false;
     char lastC = '\u0000'; // \u0000 = The null character.
@@ -1670,11 +1702,11 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   }
   
   private static String[] getSplits(String input, char separator, boolean skipConsecutiveMatches, boolean skipMatchesInStrings) {
-    if (separator=='\u0001') return getSplits(input, Pattern.compile("\\s"), skipConsecutiveMatches, skipMatchesInStrings);
+    if (separator=='\u0001') return getSplits(input, whiteSpacePattern, skipConsecutiveMatches, skipMatchesInStrings);
     
     // Move out of here
     ArrayList<Character> stringIndicators = new ArrayList<Character>();
-    stringIndicators.add('\"');
+    stringIndicators.add('"');
     // '\'' is complicated because of terms like "it's"
     //---
     
@@ -1684,7 +1716,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   
   /**
    * Split the given String at the given separator.
-   * Remark: intances if separator, in stringIndicators are ignored, but the
+   * Remark: intances of separator, in stringIndicators are ignored, but the
    * indicators are NOT REMOVED!
    * @param input - String to split
    * @param separator - separator char
@@ -1696,12 +1728,12 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
 	public static String[] getSplits(String input, char separator,
 		boolean skipConsecutiveMatches, boolean skipMatchesInStrings, List<Character> stringIndicators) {
     // Get columns. A little bit more flexible than a simple .split()!
-    ArrayList<String> splits = new ArrayList<String>();
+    List<String> splits = new ArrayList<String>();
     
 		boolean[] skip = new boolean[stringIndicators.size()];
     int activatedSkippers=0;
     
-    String currentColumn = "";
+    StringBuffer currentColumn = new StringBuffer();
     Character lastC='\u0000';
     for(char c: input.toCharArray()){
       // Look for string indicators (that disable the separator).
@@ -1709,7 +1741,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       if (pos>=0 && skipMatchesInStrings) {
         skip[pos] = !skip[pos];
         if (skip[pos]) activatedSkippers++; else activatedSkippers--;
-        currentColumn+=c;
+        currentColumn.append(c); // Append the stringIndicators itself
         lastC=c;
         continue;
       }
@@ -1721,12 +1753,12 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
           continue;
         }
         
-        splits.add(currentColumn);
-        currentColumn="";
+        splits.add(currentColumn.toString());
+        currentColumn = new StringBuffer();
       } else {
         
         // Add char to current column
-        currentColumn+=c;
+        currentColumn.append(c);
       }
       lastC=c;
       
@@ -1734,7 +1766,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     
     // Don't forger the last column
     if (currentColumn.length()>0) {
-      splits.add(currentColumn);
+      splits.add(currentColumn.toString());
     }
     
     // If it ends with a separator, we should add an empty column.

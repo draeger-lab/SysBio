@@ -16,13 +16,10 @@
  */
 package de.zbit.mapper.enrichment;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -34,14 +31,15 @@ import de.zbit.mapper.KeggPathwayID2PathwayName;
 import de.zbit.parser.Species;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileTools;
-import de.zbit.util.Utils;
-import de.zbit.util.ValuePair;
 import de.zbit.util.logging.LogUtil;
-import de.zbit.util.prefs.Range;
 
 /**
  * Maps the given KEGG gene id (see {@link GeneID2KeggIDMapper}) to
  * a {@link Collection} of KEGG Pathways, in which this gene occurs.
+ * 
+ * <p>XXX: KEGG Pathway FTP is no more available. You'll have to use
+ * cached KEGG mapping files for this class to work.
+ * 
  * @author Clemens Wrzodek
  * @version $Rev$
  */
@@ -104,153 +102,29 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
    * TESTS ONLY!
    * @throws Exception 
    */
+  @SuppressWarnings("rawtypes")
   public static void main(String[] args) throws Exception {
     LogUtil.initializeLogging(Level.FINE);
-//    KeggID2PathwayMapper mapper = new KeggID2PathwayMapper("mmu");
-//    
-//    for (int i=0; i<2; i++) {
-//      Collection c = mapper.map("mmu:11576");
-//      if (c==null) System.out.println("null");
-//      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-//      System.out.println("=================");
-//      c = mapper.map("mmu:77579"); // 3 PWs
-//      if (c==null) System.out.println("null");
-//      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-//      System.out.println("=================");
-//      c = mapper.map("mmu:16334");
-//      if (c==null) System.out.println("null");
-//      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-//      
-//      System.out.println("NonUnique: " + mapper.getGenomeSize() + " Unique: " + mapper.size());
-//      System.out.println(mapper.getEnrichmentClassSize("path:mmu04530"));
-//      System.out.println(mapper.getEnrichmentClassSize("Tight junction"));
-//      
-//      if (i==0)mapper.convertPathwayIDsToPathwayNames();
-//    }
-    generateSmallCrypticSerializedFile("../Integrator/res/rno.list","../Integrator/res/mmu.list","../Integrator/res/hsa.list");
-    generateSmallCrypticSerializedFile2("../Integrator/res/rno.list","../Integrator/res/mmu.list","../Integrator/res/hsa.list");
-    generateSmallCrypticSerializedFile3("../Integrator/res/rno.list","../Integrator/res/mmu.list","../Integrator/res/hsa.list");
-  }
-  
-  private static void generateSmallCrypticSerializedFile(String... listFiles) throws IOException {
-    /* Initialize a mapping from kegg_Organism (e.g., "hsa") to
-     * ValuePair<PathwayNumber, GenesInPathway (asRanges)>.
-     */
-    Map<String, List<ValuePair<Integer, Range<Integer>>>> orgPwGeneMap = new HashMap<String, List<ValuePair<Integer, Range<Integer>>>>();
-    for (String currentFile: listFiles) {
-      String organism_kegg_abbr = FileTools.trimExtension(new File(currentFile).getName()).toLowerCase().trim();
-      Map<Integer, List<Integer>> pwToGene = new HashMap<Integer, List<Integer>>();
-      // Create short file
-      CSVReader r = new CSVReader(currentFile);
-      String[] line;
-      while ((line=r.getNextLine())!=null) {
-        // Example for first two columns: path:rno04530 rno:85420
-        // Skip everything thats not a gene (e.g., compounds starting with "CPD:*")
-        if (!line[1].startsWith(organism_kegg_abbr)) continue;
-        
-        // Get pathway and gene number
-        int pathwayNumber = Utils.getNumberFromStringRev(line[0].length(), line[0]);
-        int geneNumber = Utils.getNumberFromStringRev(line[1].length(), line[1]);
-        if (pathwayNumber<=0 || geneNumber<=0) continue;
-        List<Integer> geneIds = pwToGene.get(pathwayNumber);
-        if (geneIds==null) {
-          geneIds = new ArrayList<Integer>();
-          pwToGene.put(pathwayNumber, geneIds);
-        }
-        geneIds.add(geneNumber);
-      }
-      
-      // We now have a mapping from pwNumber to GeneIDs in that pw
-      List<ValuePair<Integer, Range<Integer>>> groupedPWgenes = new ArrayList<ValuePair<Integer, Range<Integer>>>(pwToGene.size());
-      int sumOfGenes=0;
-      for (Integer key : pwToGene.keySet()) {
-        groupedPWgenes.add(new ValuePair<Integer, Range<Integer>>(key, Range.toIntegerRange(pwToGene.get(key))));
-        sumOfGenes+=pwToGene.get(key).size();
-      }
-      
-      // Add to global mapping file
-      orgPwGeneMap.put(organism_kegg_abbr, groupedPWgenes);
-      log.fine(String.format("Added %s pathways, mapping to %s genes for organism %s.", groupedPWgenes.size(), sumOfGenes, organism_kegg_abbr));
-    }
-    // Save as gzipped serialized file
-    Utils.saveGZippedObject("kg2pw.dat", orgPwGeneMap);
-  }
-  
-  private static void generateSmallCrypticSerializedFile2(String... listFiles) throws IOException {
-    /* Initialize a mapping from kegg_Organism (e.g., "hsa") to
-     * ValuePair<PathwayNumber, GenesInPathway (asRanges)>.
-     */
+    KeggID2PathwayMapper mapper = new KeggID2PathwayMapper("mmu");
     
-    for (String currentFile: listFiles) {
-      Map<Integer, List<Integer>> orgPwGeneMap = new HashMap<Integer, List<Integer>>();
-      String organism_kegg_abbr = FileTools.trimExtension(new File(currentFile).getName()).toLowerCase().trim();
-      // Create short file
-      CSVReader r = new CSVReader(currentFile);
-      String[] line;
-      int sumOfGenes=0;
-      while ((line=r.getNextLine())!=null) {
-        // Example for first two columns: path:rno04530 rno:85420
-        // Skip everything thats not a gene (e.g., compounds starting with "CPD:*")
-        if (!line[1].startsWith(organism_kegg_abbr)) continue;
-        
-        // Get pathway and gene number
-        int pathwayNumber = Utils.getNumberFromStringRev(line[0].length(), line[0]);
-        int geneNumber = Utils.getNumberFromStringRev(line[1].length(), line[1]);
-        if (pathwayNumber<=0 || geneNumber<=0) continue;
-        List<Integer> geneIds = orgPwGeneMap.get(pathwayNumber);
-        if (geneIds==null) {
-          geneIds = new ArrayList<Integer>();
-          orgPwGeneMap.put(pathwayNumber, geneIds);
-        }
-        sumOfGenes++;
-        geneIds.add(geneNumber);
-      }
+    for (int i=0; i<2; i++) {
+      Collection c = mapper.map("mmu:11576");
+      if (c==null) System.out.println("null");
+      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      System.out.println("=================");
+      c = mapper.map("mmu:77579"); // 3 PWs
+      if (c==null) System.out.println("null");
+      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      System.out.println("=================");
+      c = mapper.map("mmu:16334");
+      if (c==null) System.out.println("null");
+      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
       
-      // // Save as gzipped serialized file
-      Utils.saveGZippedObject(String.format("kg2pw_%s.dat", organism_kegg_abbr), orgPwGeneMap);
-      log.fine(String.format("Added %s pathways, mapping to %s genes for organism %s.", orgPwGeneMap.size(), sumOfGenes, organism_kegg_abbr));
-    }
-  }
-  
-  private static void generateSmallCrypticSerializedFile3(String... listFiles) throws IOException {
-    /* Initialize a mapping from kegg_Organism (e.g., "hsa") to
-     * ValuePair<PathwayNumber, GenesInPathway (asRanges)>.
-     */
-    
-    for (String currentFile: listFiles) {
-      Map<Integer, Range<Integer>> orgPwGeneMap = new HashMap<Integer, Range<Integer>>();
-      String organism_kegg_abbr = FileTools.trimExtension(new File(currentFile).getName()).toLowerCase().trim();
-      // Create short file
-      CSVReader r = new CSVReader(currentFile);
-      String[] line;
-      int sumOfGenes=0;
-      Map<Integer, List<Integer>> pwToGene = new HashMap<Integer, List<Integer>>();
-      while ((line=r.getNextLine())!=null) {
-        // Example for first two columns: path:rno04530 rno:85420
-        // Skip everything thats not a gene (e.g., compounds starting with "CPD:*")
-        if (!line[1].startsWith(organism_kegg_abbr)) continue;
-        
-        // Get pathway and gene number
-        int pathwayNumber = Utils.getNumberFromStringRev(line[0].length(), line[0]);
-        int geneNumber = Utils.getNumberFromStringRev(line[1].length(), line[1]);
-        if (pathwayNumber<=0 || geneNumber<=0) continue;
-        List<Integer> geneIds = pwToGene.get(pathwayNumber);
-        if (geneIds==null) {
-          geneIds = new ArrayList<Integer>();
-          pwToGene.put(pathwayNumber, geneIds);
-        }
-        geneIds.add(geneNumber);
-        sumOfGenes++;
-      }
+      System.out.println("NonUnique: " + mapper.getGenomeSize() + " Unique: " + mapper.size());
+      System.out.println(mapper.getEnrichmentClassSize("path:mmu04530"));
+      System.out.println(mapper.getEnrichmentClassSize("Tight junction"));
       
-      // We now have a mapping from pwNumber to GeneIDs in that pw
-      for (Integer key : pwToGene.keySet()) {
-        orgPwGeneMap.put(key, Range.toIntegerRange(pwToGene.get(key)));
-      }
-      
-      // // Save as gzipped serialized file
-      Utils.saveGZippedObject(String.format("kg2pw_%s_range.dat", organism_kegg_abbr), orgPwGeneMap);
-      log.fine(String.format("Added %s pathways, mapping to %s genes for organism %s.", orgPwGeneMap.size(), sumOfGenes, organism_kegg_abbr));
+      if (i==0)mapper.convertPathwayIDsToPathwayNames();
     }
   }
   

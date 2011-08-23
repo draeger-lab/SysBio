@@ -20,13 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.io.CSVReader;
-import de.zbit.mapper.AbstractMapper;
 import de.zbit.mapper.GO_ID2GO_NameMapper;
 import de.zbit.parser.Species;
 import de.zbit.util.AbstractProgressBar;
@@ -53,19 +50,6 @@ public class GeneID2GO_ID_Mapper extends AbstractEnrichmentMapper<Integer, Strin
    * @see Species#getNCBITaxonID()
    */
   private int ncbi_tax_id;
-  
-  /**
-   * This represents the total number of 1:1 mappings (Key2ElementInCollection),
-   * whereas {@link AbstractMapper#size()} is the number of 1:many (Key2Collection) size.
-   */
-  public int sumOfCollectionSizes;
-  
-  /**
-   * This list counts the number of genes in a pathway.
-   * Thus, the key is the pathway id and the Integer is the
-   * total number of genes in the pathway.
-   */
-  public Map<Integer, Integer> genesInGoCategory = new HashMap<Integer, Integer>();
   
   
   /**
@@ -99,7 +83,7 @@ public class GeneID2GO_ID_Mapper extends AbstractEnrichmentMapper<Integer, Strin
    * @param args
    * @throws Exception 
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public static void main(String[] args) throws Exception {
     LogUtil.initializeLogging(Level.FINE);
     GeneID2GO_ID_Mapper mapper = new GeneID2GO_ID_Mapper(3702);

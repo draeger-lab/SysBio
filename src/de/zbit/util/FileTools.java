@@ -263,7 +263,7 @@ public class FileTools {
   
 
   /**
-   * Checks wether a input resource (a file in the file system
+   * Checks whether a input resource (a file in the file system
    * or a resource in the/a jar file) exists and data is available
    * (in case of files, checks if the file size is greater than 0).
    * <p>Note:<br/>
@@ -279,8 +279,8 @@ public class FileTools {
     if (localFile==null || localFile.length()<1) return false;
     
     File f  = new File(localFile);
-    if (f.exists()) {
-      return (f.length()>0);
+    if (f.exists() && (f.length()>0)) {
+      return true;
     } else if (sourcePackage.getClassLoader().getResource(localFile)!=null) { // Load from jar - root
       return true;
     } else if (sourcePackage.getResource(localFile)!=null) { // Load from jar - relative

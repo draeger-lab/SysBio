@@ -724,7 +724,13 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
               && ec.getAssignedColumn()<r.getHeader().length) {
             currentName = r.getHeader()[ec.getAssignedColumn()];
           }
-          suggestions.add(ArrayUtils.merge(currentName, headers));
+          // Suggest: currentName/colHeader, originalName, <all other col headers>
+          String[] curSuggestions = headers.clone();
+          if (!currentName.equals(ec.getOriginalName().toString())) {
+            curSuggestions = ArrayUtils.merge(ec.getOriginalName().toString(), curSuggestions);
+          }
+          curSuggestions = ArrayUtils.merge(currentName, curSuggestions);
+          suggestions.add(curSuggestions);
         }
       }
       

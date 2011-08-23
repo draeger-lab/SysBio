@@ -38,6 +38,10 @@ import de.zbit.util.logging.LogUtil;
  * 
  * <p>HINT:<br/>If you can't map something, try to use organism:gene_id as heuristic.
  * This should work in 90% of all cases.</p>
+ * 
+ * <p>XXX: KEGG Pathway FTP is no more available. You'll have to use
+ * cached KEGG mapping files for this class to work.
+ * 
  * @author Clemens Wrzodek
  * @version $Rev$
  */

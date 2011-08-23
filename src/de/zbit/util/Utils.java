@@ -1814,4 +1814,19 @@ public class Utils {
     return maxVal;
   }
   
+  /**
+   * Creates a string that summarizes the given collection by
+   * returning min, max, median and mean.
+   * Example: "Min:0, Mean:4, Median:5, Max:10"
+   * @param <T>
+   * @param values
+   * @return "Min:%s, Mean:%s, Median:%s, Max:%s"
+   */
+  public static <T extends Number> String summary(Collection<T> values) {
+    // Could be realized much more efficient by sorting and getting values manually.
+    // All called methods consinder the whole, unsorted collection!
+    return(String.format("Min:%s, Mean:%s, Median:%s, Max:%s",
+      Utils.min(values), Utils.average(values), Utils.median(values), Utils.max(values) )); 
+  }
+  
 }

@@ -19,9 +19,9 @@ package de.zbit.mapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -215,7 +215,8 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
       // Get maximal col number
       int maxColumn = targetColumn;
       for (int sourceColumn: multiSourceColumn)
-        maxColumn = Math.max(maxColumn, sourceColumn);
+        if (sourceColumn!=Integer.MAX_VALUE)
+          maxColumn = Math.max(maxColumn, sourceColumn);
       
       if (targetColumn<0 || ArrayUtils.indexOf(multiSourceColumn, -1)>=0) {
         log.severe("Could not get columns for '" + localFile + "' mapping file.");
@@ -243,7 +244,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
         TargetType target;
         if (Collection.class.isAssignableFrom(targetType)) {
           // Mapping from x to a collection.
-           target = (TargetType) new ArrayList();
+           target = (TargetType) new HashSet(); // Do not store the same target multiple times
            // Remark: This works also for non-Strings, since the type of the collection is
            // erased on runtime. Thus, postProcessTargetID() should re-convert to desired
            // real target type.
@@ -260,32 +261,61 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
         target = postProcessTargetID(target);
         
         // Add mapping for all source columns
+        int lastSourceColumn=0;
         for (int sourceColumn: multiSourceColumn) {
-          // Get source ID
-          SourceType source = null;
-          try {
-            source = Option.parseOrCast(sourceType, preProcessSourceID(line[sourceColumn]));
-          } catch (Throwable e) {}
-          if (source==null) {
-            log.warning("Invalid source content in " + getMappingName() + " mapping file: " + ((line.length>sourceColumn)?line[sourceColumn]:"line too short."));
-            continue;
+          if (sourceColumn<line.length) {
+            addToMapping(line[sourceColumn], target);
+          } else if (sourceColumn==Integer.MAX_VALUE) {
+            // This is interpreted as "Add all cells from the last one to
+            // the end of the file as source columns".
+            // Don't forget to configureReader() when using this method.
+            // CSVReader fails to autodetect properties of tables with
+            // variable number of columns!
+            for (int col=lastSourceColumn+1;col<line.length; col++) {
+              addToMapping(line[col], target);
+            }
           }
-          source = postProcessSourceID(source);
-          if (source==null) continue;
-          
-          // Allow multiple target elements in collections
-          if (Collection.class.isAssignableFrom(targetType)) {
-            Collection c = (Collection) getMapping().get(source);
-            if (c!=null) ((Collection)target).addAll(c);
-          }
-          
-          getMapping().put(source, target);
+          lastSourceColumn = sourceColumn;
         }
+        
+        
       }
     }
     
     log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((getMapping()!=null)?getMapping().size():"0") + " mappings.");
     return (getMapping()!=null && getMapping().size()>0);
+  }
+
+  /**
+   * Add content of a cell from the CSV file and a target to
+   * the current mapping
+   * @param sourceCell
+   * @param target
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public void addToMapping(String sourceCell, TargetType target) {
+    // Get source ID
+    SourceType source = null;
+    try {
+      source = Option.parseOrCast(sourceType, preProcessSourceID(sourceCell));
+    } catch (Throwable e) {}
+    if (source==null) {
+      log.warning("Invalid source content in " + getMappingName() + " mapping file: " + (sourceCell!=null?sourceCell:"null.") );
+      return;
+    }
+    source = postProcessSourceID(source);
+    if (source==null) return;
+    
+    // Allow multiple target elements in collections
+    if (Collection.class.isAssignableFrom(targetType)) {
+      Collection c = (Collection) getMapping().get(source);
+      if (c!=null) {
+        c.addAll((Collection)target);
+        return;
+      }
+    }
+    
+    getMapping().put(source, target);
   }
 
   /**
@@ -376,7 +406,9 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     if (!isReady()) throw new Exception(getMappingName()+" mapping data has not been read successfully.");
     SourceType trimmedInput = postProcessSourceID(sourceID);
     TargetType ret = getMapping().get(trimmedInput);
-    log.finest("map: " + trimmedInput + ", to: " + ret);
+    // Because log message is created, even if nobody listens to it, dont't
+    // waste resources in this often called method by building a string!
+    //log.finest("map: " + trimmedInput + ", to: " + ret);
     return ret;
   }
 
