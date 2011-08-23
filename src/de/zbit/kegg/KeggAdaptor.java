@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 
 import keggapi.Definition;
@@ -225,60 +224,76 @@ public class KeggAdaptor {
   public static String extractInfo(String completeString, String startsWith) {
     return extractInfo(completeString, startsWith, null);
   }
-
+  
   /**
    * 
    * @param completeString
    * @param startsWith
    * @param endsWith
    * @return
+   * @see #extractInfo(String, String)
    */
   public static String extractInfo(String completeString, String startsWith, String endsWith) {
-    int pos = completeString.toLowerCase().indexOf(
-        "\n" + startsWith.toLowerCase()) + 1; // Prefer hits starting in a new
-                                              // line. // +1 because of \n
+    return extractInfoCaseSensitive(completeString, completeString.toUpperCase(), startsWith.toUpperCase(), endsWith!=null?endsWith.toUpperCase():null);
+  }
+
+  /**
+   * Considering the case once and than calling this method internally is faster
+   * than always performing the case-conversion.
+   * @param completeOriginalString original cased complete string
+   * @param uCaseComplete upper-cased <code>completeOriginalString</code>
+   * @param startsWith upper-cased startswith string
+   * @param endsWith upper-cased endswith string
+   * @return String from <code>completeOriginalString</code> between <code>startsWith</code>
+   * and <code>startsWith</code> (or to the end, if startsWith is null).
+   * @see #extractInfo(String, String)
+   */
+  static String extractInfoCaseSensitive(String completeOriginalString, String uCaseComplete, String startsWith, String endsWith) {
+    // Prefer hits starting in a new line. +1 because of \n
+    int pos = uCaseComplete.indexOf("\n" + startsWith) + 1;
+    
     if (pos <= 0) { // <=0 because of +1 in line above.
-      pos = completeString.toLowerCase().indexOf(startsWith.toLowerCase());
+      pos = uCaseComplete.indexOf(startsWith);
       // Pruefen ob zeichen ausser \t und " " zwischen \n und pos. wenn ja =>
       // abort. (Beispiel: "  AUTHOR XYZ" moeglich.)
-      if (pos < 0 || pos>=completeString.length())
+      if (pos < 0 || pos>=completeOriginalString.length())
         return null;
-      int lPos = completeString.lastIndexOf("\n", pos);
-      String toCheck = completeString.substring(Math.max(lPos, 0), pos);
+      int lPos = completeOriginalString.lastIndexOf("\n", pos);
+      String toCheck = completeOriginalString.substring(Math.max(lPos, 0), pos);
       // Wenn was zwischen unserem Treffer und newLine steht => abort.
-      if (toCheck.replace(" ", "").replace("\t", "").replace("\n", "").length()>0)
+      if (toCheck.replaceAll("\\s", "").length()>0)
         return null;
       // Wenn unser Treffer nicht von einem Whitespace char gefolgt wird => abort.
-      if (!Character.isWhitespace(completeString.charAt(pos+startsWith.length())))
+      if (!Character.isWhitespace(completeOriginalString.charAt(pos+startsWith.length())))
         return null;
     }
-    if (pos + startsWith.length()>=completeString.length()) return "";
+    if (pos + startsWith.length()>=completeOriginalString.length()) return "";
 
     String ret = "";
     if (endsWith == null || endsWith.length()<1) {
-      int st = completeString.indexOf(" ", pos + startsWith.length());
+      int st = completeOriginalString.indexOf(" ", pos + startsWith.length());
       if (st < 0)
         st = pos + startsWith.length(); // +1 wegen "\n"+sw
-      int nl = completeString.indexOf("\n", pos + startsWith.length());
+      int nl = completeOriginalString.indexOf("\n", pos + startsWith.length());
       if (nl < 0)
-        nl = completeString.length();
+        nl = completeOriginalString.length();
 
       try {
-        ret = completeString.substring(st, nl).trim();
+        ret = completeOriginalString.substring(st, nl).trim();
       } catch (Exception e) {
         System.out.println("St: " + st + " \t" + pos + " "
             + startsWith.length());
-        System.out.println("Nl: " + nl + " \t" + completeString.length());
+        System.out.println("Nl: " + nl + " \t" + completeOriginalString.length());
         System.out.println(startsWith);
         System.out.println("--------------\n");
         e.printStackTrace();
       }
-      while (completeString.length() > (nl + 1)) {
-        if (completeString.charAt(nl + 1) == ' ') {
-          int nl2 = completeString.indexOf("\n", nl + 1);
+      while (completeOriginalString.length() > (nl + 1)) {
+        if (completeOriginalString.charAt(nl + 1) == ' ') {
+          int nl2 = completeOriginalString.indexOf("\n", nl + 1);
           if (nl2 < 0)
-            nl2 = completeString.length();
-          ret += "\n" + completeString.substring(nl + 1, nl2).trim();
+            nl2 = completeOriginalString.length();
+          ret += "\n" + completeOriginalString.substring(nl + 1, nl2).trim();
           nl = nl2;
         } else
           break;
@@ -286,18 +301,17 @@ public class KeggAdaptor {
     } else {
       // Jump to first non-Whitespace Character. Mind the new lines!
       int sPos = pos+startsWith.length();
-      while (sPos<completeString.length() &&
-          Character.isWhitespace(completeString.charAt(sPos)) && completeString.charAt(sPos)!='\n') sPos++;
-      if (sPos>=completeString.length()) return "";
+      while (sPos<completeOriginalString.length() &&
+          Character.isWhitespace(completeOriginalString.charAt(sPos)) && completeOriginalString.charAt(sPos)!='\n') sPos++;
+      if (sPos>=completeOriginalString.length()) return "";
       
       // Search for end position and trim string.
-      int pos2 = completeString.toLowerCase().indexOf(endsWith.toLowerCase(),sPos);
+      int pos2 = uCaseComplete.indexOf(endsWith,sPos);
       if (pos2<=0) return "";
-      ret = completeString.substring(sPos, pos2).trim();
+      ret = completeOriginalString.substring(sPos, pos2).trim();
     }
     
     return ret;
-
   }
 
   /**
