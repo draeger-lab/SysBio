@@ -21,11 +21,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.io.CSVReader;
+import de.zbit.kegg.KeggAdaptor;
+import de.zbit.kegg.KeggFunctionManagement;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileTools;
 import de.zbit.util.logging.LogUtil;
 
 /**
+ * A mapping from KEGG pathway identifier to human readable name
+ * for that pathway.
+ * 
+ * <p>XXX: KEGG Pathway FTP is no more available. You'll have to use
+ * cached KEGG mapping files for this class to work. Or you could
+ * simply use the {@link KeggAdaptor} (with Cache:
+ * {@link KeggFunctionManagement}) to get names for pathway ids!
+ * 
  * @author Clemens Wrzodek
  * @version $Rev$
  */

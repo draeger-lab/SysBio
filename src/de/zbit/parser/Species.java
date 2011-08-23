@@ -726,7 +726,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable {
     commonName = elements[3];
     ncbi_tax_id = elements[4].length()>0?Integer.parseInt(elements[4]):null;
     synonyms = null;
-    if (elements[5].length()>0) {
+    if (elements.length>5 && elements[5].length()>0) {
       synonyms = Arrays.asList(elements[5].split(Pattern.quote("|")));
     }
     

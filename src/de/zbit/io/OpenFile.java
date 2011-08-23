@@ -235,7 +235,7 @@ public class OpenFile {
       
       // Native text file OR ret is not ready if file wasn't really a zip file.
       if (ret==null || !ret.ready()) {
-        if (myStream!=null) ret = new BufferedReader(new InputStreamReader(searchFileAndGetInputStream(filename)));
+        if (myStream!=null) ret = new BufferedReader(new InputStreamReader(searchFileAndGetInputStream(filename, searchInputRelativeToResource)));
       }
     } catch (Exception e) {e.printStackTrace();}
     if (ret==null) System.err.println("Error opening file '" + filename + "'. Probably this file does not exist.");    
@@ -296,7 +296,8 @@ public class OpenFile {
    * @throws IOException
    */
   public static InputStream searchFileAndGetInputStream(String infile, Class<?> class1) throws IOException {
-    if (new File (infile).exists()) { // Load from Filesystem
+    File f = new File (infile);
+    if (f.exists() && f.length()>0) { // Load from Filesystem
       return  new FileInputStream (infile);
     } else if (class1.getClassLoader().getResource(infile)!=null) { // Load from jar - root
       return (class1.getClassLoader().getResource(infile).openStream());
@@ -306,7 +307,8 @@ public class OpenFile {
       return new FileInputStream (curDir+infile);
     }
     
-    return null;
+    // Return empty file stream as last alternative to null.
+    return f.exists()?new FileInputStream (infile):null;
   }
 
   /**
