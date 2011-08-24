@@ -61,6 +61,7 @@ import de.zbit.gui.ExpandablePanel;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.LayoutHelper;
+import de.zbit.gui.csv.CSVReaderOptionPanel;
 import de.zbit.gui.prefs.FileSelector.Type;
 import de.zbit.io.GeneralFileFilter;
 import de.zbit.io.SBFileFilter;
@@ -283,18 +284,31 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   
   /**
    * Automatically builds an option panel, based on the static Option fields of
-   * the preferences.keyProvider.
+   * the {@link #preferences#getKeyProvider()}.
    * 
    * @return all options that could not automatically be converted into a
    *         JComponent.
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings("unchecked")
   public List<Option<?>> autoBuildPanel() {
+    return autoBuildPanel(preferences.getKeyProvider());
+  }
+  
+  /**
+   * Automatically builds an option panel, based on the given fields in the
+   * {@link KeyProvider}s.
+   * 
+   * @param keyProviders
+   * @return all options that could not automatically be converted into a
+   *         JComponent.
+   */
+  @SuppressWarnings("rawtypes")
+  protected List<Option<?>> autoBuildPanel(Class<? extends KeyProvider>... keyProviders) {
     List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
     LayoutHelper lh = new LayoutHelper(this);
     
     // search for OptionGroups first
-    searchForOptionGroups();
+    searchForOptionGroups(keyProviders);
     
     // First we create GUI elements for all groups
     for (OptionGroup<?> optGrp : optionGroups) {
@@ -593,10 +607,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     } else if (Character.class.isAssignableFrom(clazz)) {
       component = new JLabeledComponent(optionTitle, true, values);
       ((JLabeledComponent) component).setAcceptOnlyIntegers(false);
-      //JComponent cs = ((JColumnChooser)jc).getColumnChooser();
-      // TODO: Limit maximum size to one (don't accept inputs after that).
-      // Can be done in three minutes. see
-      // http://www.daniweb.com/software-development/java/threads/263964
+      CSVReaderOptionPanel.createCharacterBox(
+        ((JLabeledComponent) component).getJTextComponent());      
       
     } else if (String.class.isAssignableFrom(clazz)
         || (Enum.class.isAssignableFrom(clazz))) {
@@ -675,8 +687,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           if (defaultValue.toString().startsWith("class ")) {
             for (Object value : option.getRange().getAllAcceptableValues()) {
               if (defaultValue.toString().contains(value.toString())) {
-                ((JLabeledComponent) component).setDefaultValue(value
-                    .toString());
+                ((JLabeledComponent) component).setDefaultValue(value.toString());
                 break;
               }
             }
@@ -710,8 +721,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       } else {
         // Issue a warning. Programmers should watch that each returned
         // JComponent implements the JComponentForOption interface!!!
-        log.warning(component.getClass().getName() + " IS NO "
-            + JComponentForOption.class.getName() + "!");
+        log.warning(component.getClass().getName() + " IS NO " + JComponentForOption.class.getName() + "!");
       }
       
     }
@@ -912,13 +922,20 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   /**
 	 * 
 	 */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings("unchecked")
   void searchForOptionGroups() {
+    searchForOptionGroups(preferences.getKeyProvider());
+  }
+  
+  @SuppressWarnings("rawtypes")
+  private void searchForOptionGroups(Class<? extends KeyProvider>... keyProviders) {
     option2group = new TreeMap<Option<?>, OptionGroup<?>>();
     ungroupedOptions = new TreeSet<Option>();
-    Class<? extends KeyProvider> keyProvider = preferences.getKeyProvider();
-    ungroupedOptions.addAll(KeyProvider.Tools.optionList(keyProvider));
-    optionGroups = KeyProvider.Tools.optionGroupList(keyProvider);
+    optionGroups = new LinkedList<OptionGroup>();
+    for (Class<? extends KeyProvider> keyProvider: keyProviders) {
+      ungroupedOptions.addAll(KeyProvider.Tools.optionList(keyProvider));
+      optionGroups.addAll( KeyProvider.Tools.optionGroupList(keyProvider) );
+    }
     for (OptionGroup<?> group : optionGroups) {
       for (Option<?> option : group.getOptions()) {
         option2group.put(option, group);
@@ -959,6 +976,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       }
     }
     
+    // Reset panel
     removeAll();
     init();
   }

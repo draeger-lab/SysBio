@@ -204,13 +204,13 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     this(title, fieldIsRequired, columnHeaders.toArray());
   }
   /**
-   * @param optionTitle
+   * @param title
    * @param fieldIsRequired
    * @param colorChooserWithPreview
    */
-  public JLabeledComponent(String optionTitle, boolean fieldIsRequired,
+  public JLabeledComponent(String title, boolean fieldIsRequired,
     JComponent c) {
-    this (optionTitle, fieldIsRequired, new Object[]{c});
+    this (title, fieldIsRequired, new Object[]{c});
     GUITools.replaceComponent(colChooser, c);
     colChooser = c;
     label.setLabelFor(c);
@@ -1080,6 +1080,21 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     }
     
     return spinner;
+  }
+  
+  
+  /**
+   * @return the {@link JTextComponent} associated with the current {@link #getColumnChooser()}.
+   */
+  public JTextComponent getJTextComponent() {
+    if (colChooser==null) return null;
+    if (colChooser instanceof JComboBox) {
+      return (JTextComponent) ((JComboBox)colChooser).getEditor().getEditorComponent();
+    } else if (colChooser instanceof JTextComponent) {
+      return ((JTextComponent)colChooser);
+    } else {
+      return null; // Unknown
+    }
   }
   
 }

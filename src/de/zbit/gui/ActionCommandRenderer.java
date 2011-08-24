@@ -32,18 +32,26 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 /**
- * A {@link ComboBoxModel} that displays the names and tooltips
+ * A {@link ComboBoxModel} that displays the names and ToolTips
  * of {@link ActionCommand}s.
  * <p>It furthermore displays {@link Component} directly
  * as components and does not generate a {@link JLabel} with
  * the {@link Component#toString()} method.
+ * <p>As last feature, Classes are displayed with
+ * {@link Class#getSimpleName()}.
  * 
  * @author Clemens Wrzodek
  * @version $Rev$
  */
 public class ActionCommandRenderer extends JLabel implements ListCellRenderer, TableCellRenderer, Serializable {
   private static final long serialVersionUID = 6825133145583461124L;
-
+  
+  /**
+   * If this is <code>TRUE</code>, each <code>value</code> of type
+   * {@link Class} will get {@link Class#getName()} as ToolTip.
+   */
+  public static boolean setToolTipToFullClassNameForClasses=true;
+  
   /**
    * Initialize when required.
    */
@@ -54,7 +62,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
    */
   private ListCellRenderer defaultListRenderer = null;
   
-
+  
   /* (non-Javadoc)
    * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
    */
@@ -69,8 +77,13 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     if (value instanceof Component) {
       c = (Component) value;
     } else if (value instanceof ActionCommand) {
-     label = ((ActionCommand)value).getName();
-     toolTip = ((ActionCommand)value).getToolTip();
+      label = ((ActionCommand)value).getName();
+      toolTip = ((ActionCommand)value).getToolTip();
+    } else if (value instanceof Class<?>) {
+      label = ((Class<?>)value).getSimpleName();
+      if (setToolTipToFullClassNameForClasses) {
+        toolTip = ((Class<?>)value).getName();
+      }
     }
     
     // Generate component
@@ -86,7 +99,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     
     return c;
   }
-
+  
   /* (non-Javadoc)
    * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
    */
@@ -101,9 +114,15 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     if (value instanceof Component) {
       c = (Component) value;
     } else if (value instanceof ActionCommand) {
-     label = ((ActionCommand)value).getName();
-     toolTip = ((ActionCommand)value).getToolTip();
+      label = ((ActionCommand)value).getName();
+      toolTip = ((ActionCommand)value).getToolTip();
+    } else if (value instanceof Class<?>) {
+      label = ((Class<?>)value).getSimpleName();
+      if (setToolTipToFullClassNameForClasses) {
+        toolTip = ((Class<?>)value).getName();
+      }
     }
+    
     
     // Generate component
     if (c==null) {
