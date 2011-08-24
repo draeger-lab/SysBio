@@ -41,6 +41,8 @@ import de.zbit.util.argparser.ArgParser;
  * An {@link Option} defines a key in a key-provider class and can also be used
  * to specify command-line options for a program.
  * 
+ * <p>TODOS:</p>
+ * 
  * <p>TODO: Currently the<ul>
  * <li>{@link #dependencies} are not considered in command-line parsing and
  * all help texts.</li>
@@ -52,6 +54,12 @@ import de.zbit.util.argparser.ArgParser;
  * Intention is, that this option is still parsed on the command-line
  * but not displayed in the --help description.</li>
  * </ul>
+ * 
+ * <p>TODO: If {@link Class} is given as option type, test
+ * <ul><li>Command line help text AND auto-generated-gui F1 help text
+ * for readability.</li>
+ * <li>Test if submitting as command-line argument works correctly</li>
+ * <li>Test if default value (if no argument) works correctly</li></ul>
  * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
@@ -199,7 +207,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
     
     // For simple-name class strings (e.g., "mRNAReader").
     if (option!=null && option.getRange()!=null) {
+      // Really take the simple name!
+      int pos = simpleName.lastIndexOf('.');
+      if (pos>=0) simpleName = simpleName.substring(pos+1, simpleName.length());
       
+      // Search simple name in current range
       List<Class> l = option.getRange().getAllAcceptableValues();
       if (l!=null) {
         for(Class<?> c: l) {

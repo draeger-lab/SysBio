@@ -155,8 +155,6 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * 
 	 * @param owner
 	 *        The parent element of this {@link PreferencesDialog}.
-	 * @param defaultProperties
-	 *        The default {@link Properties} to reset all options.
 	 */
 	public PreferencesDialog(Frame owner) {
 		super(owner, DEFAULT_TITLE);

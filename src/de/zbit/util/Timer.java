@@ -47,13 +47,25 @@ public class Timer {
   /**
    * Returns the (mili-)seconds since the last Reset/Initialization.
    * Resets the timer.
-   * @param milis - if true, time will be returned in miliseconds. Otherwise in seconds.
+   * @param milis if true, time will be returned in miliseconds. Otherwise in seconds.
    * @return ms or s since last reset/initialization.
    */
   public long getAndReset(boolean milis) {
     long ret = (System.currentTimeMillis() - start);
     if (!milis) ret/=1000;
     reset();
+    return ret;
+  }
+  
+  /**
+   * Returns the (mili-)seconds since the last Reset/Initialization.
+   * Does NOT reset the timer.
+   * @param milis if true, time will be returned in miliseconds. Otherwise in seconds.
+   * @return ms or s since last reset/initialization.
+   */
+  public long get(boolean milis) {
+    long ret = (System.currentTimeMillis() - start);
+    if (!milis) ret/=1000;
     return ret;
   }
   

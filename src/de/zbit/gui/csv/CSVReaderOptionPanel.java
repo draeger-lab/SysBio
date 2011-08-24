@@ -57,6 +57,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.ExpandablePanel;
@@ -518,7 +519,6 @@ public class CSVReaderOptionPanel extends JPanel {
     if (defaultFont!=null) sep.setFont(defaultFont);
     sep.setEditable(true);
     sep.setToolTipText(ResourceManager.getBundle("de.zbit.locales.Labels").getString("SEPARATOR_CHAR_TOOLTIP"));
-    final JTextField editorcomp = (JTextField) sep.getEditor().getEditorComponent();
     
     // Set currently selected char
     setCurrentSeparator(c, sep);
@@ -528,7 +528,7 @@ public class CSVReaderOptionPanel extends JPanel {
       private char lastQueuedChar = r.getSeparatorChar();
       public void actionPerformed(ActionEvent e) {
         
-        String s = editorcomp.getText();
+        String s = ((JTextComponent)sep.getEditor().getEditorComponent()).getText();
         if (s.length()<1) return;
         separatorAutoDetect = false;
         if (s.equalsIgnoreCase(m.getElementAt(0).toString())) {
@@ -553,6 +553,46 @@ public class CSVReaderOptionPanel extends JPanel {
     };
     sep.addActionListener(seperatorAction);
     
+    // Restrict box to characters only
+    createCharacterBox((JTextComponent)sep.getEditor().getEditorComponent(), seperatorAction);
+    
+    return sep;
+  }
+  
+  public static void createCharacterBox(final JComboBox sep) {
+    createCharacterBox( (JTextField) sep.getEditor().getEditorComponent() );
+  }
+  public static void createCharacterBox(final JTextComponent editorcomp) {
+    createCharacterBox(editorcomp, null);
+  }
+  /**
+   * Adds a {@link KeyListener} to the <code>editorcomp</code> that ensures
+   * a length of one.
+   * 
+   * <p>Please note, that paste-actions are not covered by the KeyListener. For
+   * those, a {@link DocumentListener} should be added to
+   * {@link JTextComponent#getDocument()}.
+   * @param editorcomp
+   * @param fireOnKeyRelease an additional actionlistener (may be <code>NULL</code>)
+   * that will be fired upon key release.
+   */
+  public static void createCharacterBox(final JTextComponent editorcomp, final ActionListener fireOnKeyRelease) {
+    
+    // Create a new document with maximum size of 1
+    // This will really disable all texts with length>1 in the box => no "[Tab]" selection, etc.
+//    editorcomp.setDocument(new PlainDocument() {
+//      private static final long serialVersionUID = 1L;
+//      private int limit=1;
+//      public void insertString (int offset, String str, AttributeSet attr) throws BadLocationException {
+//        if (str == null) return;
+//        
+//        if ((getLength() + str.length()) <= limit) {
+//          super.insertString(offset, str, attr);
+//        }
+//      }
+//    });
+    
+    
     // Ensure that the text field length is always 1
     editorcomp.addKeyListener(new KeyListener() {
       public boolean isValid(char keyChar) {
@@ -572,14 +612,16 @@ public class CSVReaderOptionPanel extends JPanel {
       public void keyReleased(KeyEvent e) {
         if (!isValid(e.getKeyChar())) e.consume();
         // Fire an action event to change the separator accordingly.
-        seperatorAction.actionPerformed(new ActionEvent(sep,ActionEvent.ACTION_PERFORMED, "comboBoxChanged"));
+        if (fireOnKeyRelease!=null) {
+          fireOnKeyRelease.actionPerformed(new ActionEvent(editorcomp,ActionEvent.ACTION_PERFORMED, "textBoxChanged"));
+        }
       }
       public void keyTyped(KeyEvent e) {
         if (!isValid(e.getKeyChar())) e.consume();
       }
     });
     
-    return sep;
+    
   }
   
   /**
