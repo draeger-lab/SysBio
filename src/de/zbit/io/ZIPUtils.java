@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
@@ -299,6 +300,9 @@ public class ZIPUtils {
   public static BufferedReader GUnzipStream(InputStream fi) throws IOException {
     if (fi==null) return null;
     
+    //new GZIPInputStream(fi).
+    //new ZipInputStream(fi).
+    
     return new BufferedReader( new InputStreamReader( new GZIPInputStream(fi)));
   }
   
@@ -307,7 +311,7 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static void GZIP() throws IOException {
-    // M�sste noch in compress und uncompress getrennt werden, bei Bedarf!
+    // Muesste noch in compress und uncompress getrennt werden, bei Bedarf!
     
     // first compress inputfile.txt into out.gz
     BufferedReader in = new BufferedReader(new FileReader("inputfile.txt"));
@@ -858,5 +862,53 @@ public class ZIPUtils {
       in2.close();
       return null;
     }
+  }
+  
+  /**
+   * Returns the file size of ZIP-compressed single files.
+   * @param INfilename
+   * @return Uncompressed file size of the file, that {@link #ZIPunCompressStream(String)} is deflating.
+   * @throws IOException
+   */
+  public static long getUncompressedSizeOf_ZIPunCompressStream(String INfilename) throws IOException {
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
+    if (fi==null) return -1;
+    
+    CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
+    ZipInputStream in2 = new ZipInputStream(new BufferedInputStream(csumi));    
+    //if ((in2.getNextEntry()) != null) { // Liefert NUR DIE ERSTE DATEI!
+    
+    ZipEntry ze;
+    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\")));
+    if (ze!=null) {
+      in2.close();
+      return ze.getSize();
+    } else {
+      in2.close();
+      return -1;
+    }
+  }
+  
+  /**
+   * Returns the file size of ZIP-compressed single files.
+   * <p>LIMITATIONS:<ul>
+   * <li>Does only work for local files (not from a JAR-stream or something).</li>
+   * <li>Does only work for files, less than 4GB of size.</li>
+   * </ul></p>
+   * @param INfilename
+   * @return Uncompressed file size in bytes of any GZipped file.
+   * @throws IOException
+   * @see http://www.abeel.be/content/determine-uncompressed-size-gzip-file
+   */
+  public static long getUncompressedSizeOf_GZIPfile(String INfilename) throws IOException {
+    RandomAccessFile raf = new RandomAccessFile(INfilename, "r");
+    raf.seek(raf.length() - 4);
+    int b4 = raf.read();
+    int b3 = raf.read();
+    int b2 = raf.read();
+    int b1 = raf.read();
+    int val = (b1 << 24) | (b2 << 16) + (b3 << 8) + b4;
+    raf.close();
+    return val;
   }
 }

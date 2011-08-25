@@ -18,7 +18,7 @@ package de.zbit.util;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
+import java.util.logging.Logger;
 
 import de.zbit.io.OpenFile;
 
@@ -35,50 +35,31 @@ import de.zbit.io.OpenFile;
  * @since 1.0
  */
 public class FileReadProgress {
+  public static final transient Logger log = Logger.getLogger(FileReadProgress.class.getName());
 
   /**
-   * 
-   */
-  public static final String anim= "|/-\\";
-  /**
-   * 
+   * Total file length
    */
   private long fileLength=0;
   /**
-   * 
+   * Bytes that have currently been read from the file
    */
   private long bytesRead=0;
   /**
-   * 
-   */
-  private boolean outputPercentage=true;
-  /**
-   * 
+   * If true, output should only take one line
    */
   private boolean printProgressInSameLine = false;
-  /**
-   * 
-   */
-  private int lastOutputtedPercentage = -1;
-  /**
-   * 
-   */
-  private int progressCounter = 0;
-  /**
-   * 
-   */
-  private boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
   
   /**
-   * 
+   * true if the file has \r\n line breaks. False, if the
+   * input file has \n line breaks.
+   * @see #fileUsesWindowsLinebreaks(String)
    */
-  protected boolean useSimpleStyle = useSimpleStyle();
-  
   private boolean fileUsesWindowsLinebreaks=false;
   
   /**
    * This enables a custom progress bar to use.
-   * For example, you may set this to a swint progress bar implementation.
+   * For example, you may set this to a swing progress bar implementation.
    */
   private AbstractProgressBar progressBar;
   
@@ -109,7 +90,9 @@ public class FileReadProgress {
    * @param length the length of the file
    */
   public FileReadProgress(long length) {
-    fileLength = length;
+    super();
+    // This is called from every other constructor.
+    setFileLength(length);
     if (progressBar==null) setProgressBar(new ProgressBar(length));
   }
   
@@ -119,7 +102,8 @@ public class FileReadProgress {
    * @param filepath the file to be read from
    */
   public FileReadProgress(String filepath) {
-    this(new File(filepath));
+    this (getFileLength(filepath));
+    fileUsesWindowsLinebreaks = fileUsesWindowsLinebreaks(filepath);
   }
   
   /**
@@ -153,9 +137,24 @@ public class FileReadProgress {
   public void setProgressBar(AbstractProgressBar a) {
     if (a==null) return;
     progressBar = a;
-    progressBar.setNumberOfTotalCalls(fileLength);
-    progressBar.setCallNr(bytesRead);
-    progressBar.setEstimateTime(true);
+    configureProgressBar(progressBar);
+  }
+
+  /**
+   * Configures the current progress bar. This includes
+   * setting the total number of bytes to read, current
+   * status, setting estimate time to true and setting
+   * the {@link #printProgressInSameLine} flag.
+   */
+  private void configureProgressBar(AbstractProgressBar progressBar) {
+    if (progressBar!=null) {
+      progressBar.setNumberOfTotalCalls(fileLength);
+      progressBar.setCallNr(bytesRead);
+      progressBar.setEstimateTime(true);
+      if (progressBar instanceof ProgressBar) {
+        ((ProgressBar) progressBar).setPrintInOneLine(printProgressInSameLine);
+      }
+    }
   }
   
   /**
@@ -163,86 +162,61 @@ public class FileReadProgress {
    * Does NOT reset the current status (bytes already read).
    */
   public void setFileLength(long l) {
+    if (l<0) {
+      // Finer, because message is issued for many compressed archives, e.g. tar files.
+      log.finer(String.format("Negative file length of %s for %s.", l, getClass().getSimpleName()));
+      l=0;
+    }
     this.fileLength = l;
+    if (progressBar!=null) {
+      progressBar.setNumberOfTotalCalls(l);
+    }
   }
   
   /**
-   * 
-   * @param counter
-   * @param percent
+   * @return total length of the file
+   */
+  public long getFileLength() {
+    return this.fileLength;
+  }
+  
+  /**
+   * Set the file length. Automatically detected uncompressed
+   * file sizes for ZIP or GZIP files and sets the respective
+   * value.
+   * @param inFileName
+   */
+  public void setFileLength(String inFileName) {
+    setFileLength(getFileLength(inFileName));
+  }
+
+  /**
+   * Returns the uncompressed (for zip, gzip) or raw length
+   * of the file, denoted by the given inFileName. 
+   * @param inFileName
    * @return
    */
-  public String getDisplayBarString(int counter, int percent) {
-    // when not in normal console, do not try to use carriage return
-    if (useSimpleStyle) {
-      if( lastOutputtedPercentage == percent ) {
-        return "";
-      } else if( percent % 10 == 0 ) {
-        return percent+"%" + (percent==100?"\n":"");
-      } else {
-        return ".";
-      }      
-    }
-    
-    StringBuilder sb = new StringBuilder();
-    
-    int x = percent / 2;
-    sb.append("\r[");
-    for (int k = 0; k < 50; k++)
-      sb.append(((x <= k) ? " " : "="));
-    sb.append("] " + anim.charAt(counter % anim.length())  + " " + percent + "%");
-    
-    return sb.toString();
+  private static long getFileLength(String inFileName) {
+    return OpenFile.getFileSize(inFileName);
   }
   
   /**
-   * Returns if the current percentage should be put out every time it is updated.
-   * 
-   * @return <code>true</code>, if the current percentage should be put out
-   *         every time it is updated
-   */
-  public boolean getOutputPercentage() {
-    return outputPercentage;
-  }
-  
-  /**
-   * 
+   * Returns the current percentage ({@link #bytesRead} of {@link #fileLength}).
    */
   public int getPercentage() {
     return Math.min((int)(((double)bytesRead/(double)fileLength)*100.0), 100);
   }
   
   /**
-   * 
-   * @param bytesRead
+   * This should be called every time, bytes have been read from the input stream
+   * @param bytesRead number of bytes that have been read
    */
   public void progress(long bytesRead) {
     this.bytesRead += bytesRead;
-    progressCounter++;
     
     // if percentage output should be generated
-    if (outputPercentage) {
-      int perc = getPercentage();   // get the current percentage
-      if ( printProgressInSameLine && (useSimpleStyle||progressBar==null)) {
-        // If NOT useSimpleStyle, then the progress is written in one line anyways.
-        try {
-          System.out.write(getDisplayBarString(progressCounter, perc).getBytes());
-          lastOutputtedPercentage = perc;
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      } else {
-        if (perc != lastOutputtedPercentage) {
-          if (progressBar!=null) {
-            progressBar.setCallNr(this.bytesRead-1);
-            progressBar.DisplayBar(); // Increases counter by 1.
-          } else {
-            System.out.println(perc + "%");
-          }
-          lastOutputtedPercentage = perc;
-        }
-      }
-    }
+    progressBar.setCallNr(this.bytesRead-1);
+    progressBar.DisplayBar(); // Increases counter by 1.
   }
   
   /**
@@ -261,80 +235,46 @@ public class FileReadProgress {
   }
   
   /**
-   * Because using the filelength is only an approximation, calling this method
+   * Because using the file length is only an approximation, calling this method
    * after the whole file has been read may be a good idea.
    * It will display the 100% mark and set all variables to "file fully read".
    */
   public void finished() {
     long missing = (fileLength-bytesRead);
-    if (missing!=0) progress(missing);
+    if (missing>0) progress(missing);
+    progressBar.finished();
   }
   
   /**
    * Resets all counters back to zero.
    */
   public void reset() {
-    lastOutputtedPercentage = -1;
     bytesRead=0;
-    progressCounter = 0;
     progressBar.reset();
   }
   
   /**
-   * Specify whether the current percentage should be put out every time it is
-   * updated. <code>true</code> means, the percentage will be put out every time
-   * it is updated, <code>false</code> means, no output will be automatically
-   * generated, but {@link DiplayBar} has to be called explicitly.
-   * 
-   * @param outputPercentage
-   */
-  public void setOutputPercentage(boolean outputPercentage) {
-    this.outputPercentage = outputPercentage;
-  }
-  
-  /**
-   * Tries to establish a "command line" progress bar. Does not work correctly
-   * if output goes to a file.
+   * If true, the whole progress bar will be painted in one line.
    */
   public void setPrintProgessInSameLine(boolean b) {
     printProgressInSameLine = b;
+    if (progressBar instanceof ProgressBar) {
+      ((ProgressBar) progressBar).setPrintInOneLine(printProgressInSameLine);
+    }
   }
   
   /**
-   * Determins if ANSI compliance console commands can be used, based on java version, os type and outputStream Type.
-   * @return
-   */
-  protected boolean useSimpleStyle() {
-    boolean useSimpleStyle = false;
-    if (isWindows) {
-      useSimpleStyle = true; // MS Windows has (by default) no ANSI capabilities.
-      return useSimpleStyle;
-    }
-    
-    // is TTY Check is only available for java 1.6. So a wrapper to determine java version is needed for Java 1.5 compatibility.
-    String v = System.getProperty("java.version");
-    if (v!=null && v.length()>2) {
-      try {
-        double d = Double.parseDouble(v.substring(0, 3));
-        if (d<1.6) useSimpleStyle = true;
-        else useSimpleStyle = !ConsoleTools.isTTY();
-      } catch (Throwable e) {
-        useSimpleStyle = true;
-      }
-    }
-    
-    return useSimpleStyle;
-  }
-  
-  /**
-   * Determins if a file uses windows (\r\n) or Unix (\n) linebrakes.
-   * @return true for windows, false for unix linebreaks.
+   * Determines if a file uses windows (\r\n) or Unix (\n) line brakes.
+   * @return true for windows, false for Unix line brakes.
    */
   private static boolean fileUsesWindowsLinebreaks(String file) {
     // OpenFile.openFile may be replaced by BufferedReader(new FileReader(file))
     try {
       // Read line with predefined method
+      boolean oldVerbose = OpenFile.verbose;
+      OpenFile.verbose = false;
       BufferedReader inStream = OpenFile.openFile(file);
+      OpenFile.verbose = oldVerbose;
       if (inStream==null || !inStream.ready()) return false;
       String line = inStream.readLine();
       inStream.close();

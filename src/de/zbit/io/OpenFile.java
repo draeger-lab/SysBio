@@ -55,6 +55,12 @@ public class OpenFile {
   public final static String curDir;
   
   /**
+   * If true, messages like "Error opening file 'xyz'. Probably this file does not exist."
+   * will be displayed.
+   */
+  public static boolean verbose=true;
+  
+  /**
    * Initializes the <code>curDir</code> variable.
    */
   static {
@@ -202,6 +208,10 @@ public class OpenFile {
       }
       desc = fetchDescription(myStream);
     }
+    // myStream is not required anymore
+    try {
+      if (myStream!=null) myStream.close();
+    } catch (IOException e1) {}
     //System.out.println(filename + " => " + (desc==null?"null":desc.getShortName()));
     
     
@@ -211,11 +221,14 @@ public class OpenFile {
       if (desc!=null && desc.getShortName().equalsIgnoreCase("GZ") || desc==null && filename.toLowerCase().trim().endsWith(".gz")) {
         // Gzipped files do sadly not always contain the "magic bytes". That's why also the extension is considered if desc=null.
         ret = ZIPUtils.GUnzipStream(searchFileAndGetInputStream(filename, searchInputRelativeToResource));
-        FormatDescription desc2 = FormatIdentification.identify( ret );
-        if (desc2!=null) { // Tar.GZ Archives
-          if (desc2.getShortName().equalsIgnoreCase("TAR")){ // Extract GZ completely and return tar stream.
-            ret.close();
-            ret = ZIPUtils.TARunCompressStream(new ByteArrayInputStream(ZIPUtils.GUnzipData(filename).toByteArray()));
+        if (ret!=null) {
+          FormatDescription desc2 = FormatIdentification.identify( ret );
+          if (desc2!=null) { // Tar.GZ Archives
+            if (desc2.getShortName().equalsIgnoreCase("TAR")){ // Extract GZ completely and return tar stream.
+              ret.close();
+              // ==> Completely decompresses the GZIPPED file in-memory! <==
+              ret = ZIPUtils.TARunCompressStream(new ByteArrayInputStream(ZIPUtils.GUnzipData(filename).toByteArray()));
+            }
           }
         }
       } else if (desc!=null && desc.getShortName().equalsIgnoreCase("ZIP") ) {
@@ -238,7 +251,7 @@ public class OpenFile {
         if (myStream!=null) ret = new BufferedReader(new InputStreamReader(searchFileAndGetInputStream(filename, searchInputRelativeToResource)));
       }
     } catch (Exception e) {e.printStackTrace();}
-    if (ret==null) System.err.println("Error opening file '" + filename + "'. Probably this file does not exist.");    
+    if (ret==null && verbose) System.err.println("Error opening file '" + filename + "'. Probably this file does not exist.");
     
     return ret;
   }
@@ -328,6 +341,72 @@ public class OpenFile {
     if (r!=null && r instanceof Closeable) r.close();
     
     return ret;
+  }
+
+  /**
+   * Get the number of readable bytes of the given <code>filename</code>.
+   * I.e. the uncompressed file size for ZIP or GZIPED files and
+   * the raw file length for other files.
+   * @param filename
+   * @return uncompressed file size in bytes
+   */
+  public static long getFileSize(String filename) {
+    Class<?> searchInputRelativeToResource = Reflect.getParentClass();
+        
+    // Identify format...
+    InputStream myStream=null;
+    FormatDescription desc = null;
+    try {
+      myStream = searchFileAndGetInputStream(filename, searchInputRelativeToResource);
+      desc = fetchDescription(myStream);
+      try {
+        if (myStream!=null) myStream.close();
+      } catch (Exception e1) {}
+    } catch (IOException e1) {
+      e1.printStackTrace();
+    }
+    
+    //...  and return Input Stream
+    try {
+      ZIPUtils.parentClass=searchInputRelativeToResource;
+      if (desc!=null && desc.getShortName().equalsIgnoreCase("GZ") || desc==null && filename.toLowerCase().trim().endsWith(".gz")) {
+        // Gzipped files do sadly not always contain the "magic bytes". That's why also the extension is considered if desc=null.
+        BufferedReader ret = ZIPUtils.GUnzipStream(searchFileAndGetInputStream(filename, searchInputRelativeToResource));
+        if (ret==null) 
+          return -1;
+        FormatDescription desc2 = FormatIdentification.identify( ret );
+        ret.close();
+        if (desc2!=null) { // Tar.GZ Archives
+          return -1;
+        } else {
+          return ZIPUtils.getUncompressedSizeOf_GZIPfile(filename);
+        }
+        
+      } else if (desc!=null && desc.getShortName().equalsIgnoreCase("ZIP") ) {
+        return ZIPUtils.getUncompressedSizeOf_ZIPunCompressStream(filename);
+        
+        // XXX: BZ2 and TAR is not currently implemented
+      } else if (desc!=null && desc.getShortName().equalsIgnoreCase("BZ2") ) {
+        return -1;
+        
+      } else if (desc!=null && desc.getShortName().equalsIgnoreCase("TAR") ) {
+        return -1;
+      }
+      
+      // Native text file OR ret is not ready if file wasn't really a zip file.
+      if (myStream!=null) {
+        InputStream in = searchFileAndGetInputStream(filename, searchInputRelativeToResource);
+        long length = in.available();
+        in.close();
+        
+        File f = searchFile(filename);
+        length = Math.max(length, f!=null?f.length():-1);
+        
+        return length;
+      }
+    } catch (Exception e) {e.printStackTrace();}    
+    
+    return -1;
   }
   
 }

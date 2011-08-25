@@ -1004,9 +1004,9 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     Pattern pat = Pattern.compile(regex, patternOptions);
     int threshold = 25; // Number of lines to match.
     
-    FileReadProgress tempProgress = this.progress;;
+    boolean tempDisplayProgres = displayProgress;
+    displayProgress=false;
     if (this.data==null) {
-      this.progress = null;
       open(); // Open/ Reset the file if not already read in.
     }
     
@@ -1054,10 +1054,10 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     // Reset pointer
     if (this.data==null) {
       close();
-      this.progress=tempProgress;
       open();
     }
-     
+    displayProgress = tempDisplayProgres;
+    
     return matchesMaxId;
   }
   
@@ -1070,6 +1070,10 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * @throws IOException
    */
   public String[] getColumn(int colNumber, int maxLinesToRead) throws IOException {
+    boolean resetProgress = false;
+    if (maxLinesToRead!=0 && displayProgress) {
+      displayProgress=false; resetProgress = true;
+    }
     open();
     String[] line;
     Collection<String> content = new LinkedList<String>();
@@ -1086,6 +1090,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       }
     }
     close();
+    if (resetProgress) displayProgress = true;
     return content.toArray(new String[0]);
   }
   
@@ -1164,10 +1169,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     
     // Initialize a progress bar
     if (displayProgress && progress==null) {
-      progress = new FileReadProgress(filename);
-      if (this.progressBar!=null) { // Custom progress bar
-        this.progress.setProgressBar(progressBar);
-      }
+      initializeFileReadProgress();
     } else if (displayProgress) {
       progress.reset();
     }
@@ -1192,6 +1194,22 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       }
     }
     
+  }
+  
+  /**
+   * Initializes the {@link #progress} as new
+   * {@link FileReadProgress}.
+   * <p>Should only be called if {@link #displayProgress}
+   * is true and {@link #progress} is currently <code>NULL</code>.
+   */
+  private void initializeFileReadProgress() {
+    progress = new FileReadProgress(filename);
+    if (this.progressBar!=null) { // Custom progress bar
+      this.progress.setProgressBar(progressBar);
+    }
+    progress.setPrintProgessInSameLine(true);
+    // Disable if file length is unknown
+    if (progress.getFileLength()<=0) progress = null;
   }
   
   /**
@@ -1256,7 +1274,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     if (currentOpenFile!=null) {
       currentOpenFile.close();
       currentOpenFile=null;
-      if (progress!=null) {
+      if (displayProgress && progress!=null) {
         progress.finished();
         progress=null; // Might not be serializable.
       }

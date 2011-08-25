@@ -206,6 +206,8 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
       log.config("Reading " + getMappingName() + " mapping file " + localFile);
       CSVReader r = new CSVReader(localFile);
       r.setUseParentPackageForOpeningFiles(this.getClass());
+      r.setDisplayProgress(progress!=null);
+      r.setProgressBar(progress);
       configureReader(r);
       int[] multiSourceColumn = getMultiSourceColumn(r);
       if (multiSourceColumn==null || multiSourceColumn.length<1)
@@ -466,6 +468,15 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    */
   public final Map<SourceType, TargetType> getMapping() {
     return mapping;
+  }
+
+  /**
+   * Public method that may be called before {@link #isReady()} to
+   * ensure that the mapper has been inizialized.
+   * @throws IOException 
+   */
+  public void initialize() throws IOException {
+    if (!isInizialized) init();
   }
 
   

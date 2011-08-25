@@ -141,6 +141,7 @@ public class MicroRNAsn2GeneIDMapper  extends AbstractMapper<String, Integer>{
    */
   @Override
   public boolean readMappingData() throws IOException {
+    preMapper.readMappingData();
     boolean success = super.readMappingData();
     preMapper = null; // not required anymore.
     return success;
