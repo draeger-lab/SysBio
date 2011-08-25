@@ -69,6 +69,10 @@ public class Ensembl2GeneIDMapper extends AbstractMapper<String, Integer> {
     // and has to set the organism before initialization.
   }
 
+  /**
+   * @param organism common name (e.g., "mouse")
+   * @throws IOException
+   */
   public Ensembl2GeneIDMapper(String organism) throws IOException {
     this();
     // DO not call init() here. GeneSymbol2GeneIDMapper is using this constructor
@@ -76,6 +80,11 @@ public class Ensembl2GeneIDMapper extends AbstractMapper<String, Integer> {
     this.organism = organism;
   }
   
+  /**
+   * @param organism common name (e.g., "mouse")
+   * @param progress
+   * @throws IOException
+   */
   public Ensembl2GeneIDMapper(String organism, AbstractProgressBar progress) throws IOException {
     this(progress);
     // DO not call init() here. GeneSymbol2GeneIDMapper is using this constructor
