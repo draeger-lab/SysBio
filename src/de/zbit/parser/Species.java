@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import keggapi.Definition;
 import de.zbit.exception.CorruptInputStreamException;
+import de.zbit.gui.ActionCommand;
 import de.zbit.io.CSVReader;
 import de.zbit.io.CSVwriteable;
 import de.zbit.io.CSVwriteableIO;
@@ -41,7 +42,7 @@ import de.zbit.util.Utils;
  * @author Finja B&uml;chel
  * @author Clemens Wrzodek
  */
-public class Species implements Serializable, Comparable<Object>, CSVwriteable {
+public class Species implements Serializable, Comparable<Object>, CSVwriteable, ActionCommand {
   private static final long serialVersionUID = 5900817226349012280L;
   
   public static final Logger log = Logger.getLogger(Species.class.getName());
@@ -555,7 +556,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable {
    * @param all
    * @param species
    * @param nameTypeToSearch - set to -1 to search in all types, else, one
-   * of the included final static ints.
+   * of the included final static integers.
    * @return
    */
   public static Species search(List<Species> all, String species, int nameTypeToSearch) {
@@ -788,6 +789,24 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable {
    */
   public static Object loadFromCSV(String file) throws IOException {
     return CSVwriteableIO.read(new Species(null), file);
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.gui.ActionCommand#getName()
+   */
+  @Override
+  public String getName() {
+    // For a better readability in options and such
+    return getScientificName();
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.gui.ActionCommand#getToolTip()
+   */
+  @Override
+  public String getToolTip() {
+    // no tooltip.
+    return null;
   }
   
 }
