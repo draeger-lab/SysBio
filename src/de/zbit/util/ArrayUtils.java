@@ -187,6 +187,19 @@ public class ArrayUtils {
     }
     return ret;
   }
+  
+  /**
+   * Convert any {@link Number} list to an double array.
+   * @param list
+   * @return
+   */
+  public static <T extends Number> double[] toDoubleArray(List<T> list) {
+    double[] ret = new double[list.size()];
+    for (int i=0; i<list.size(); i++) {
+      ret[i]=list.get(i).doubleValue();
+    }
+    return ret;
+  }
 
 
   /**
