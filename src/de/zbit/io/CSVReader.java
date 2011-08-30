@@ -1336,12 +1336,10 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * @param cell with removed " or ' at start and end
    */
   private String removeStringIndicators(String cell) {
-    if (cell==null) return cell;
+    if (cell==null || cell.length()<2) return cell;
     if (((cell.startsWith("\"") && cell.endsWith("\"")) ||
         (cell.startsWith("'") && cell.endsWith("'")))) {
-      if (cell.length()>2)
         cell = cell.substring(1, cell.length()-1);
-      else cell = "";
     }
     return cell;
   }
@@ -1751,7 +1749,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
 		boolean[] skip = new boolean[stringIndicators.size()];
     int activatedSkippers=0;
     
-    StringBuffer currentColumn = new StringBuffer();
+    StringBuilder currentColumn = new StringBuilder();
     Character lastC='\u0000';
     for(char c: input.toCharArray()){
       // Look for string indicators (that disable the separator).
@@ -1772,7 +1770,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
         }
         
         splits.add(currentColumn.toString());
-        currentColumn = new StringBuffer();
+        currentColumn = new StringBuilder();
       } else {
         
         // Add char to current column

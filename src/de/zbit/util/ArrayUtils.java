@@ -95,7 +95,7 @@ public class ArrayUtils {
   public static <T> String implode(T[] arr, String sep) {
   	if (arr==null || sep==null || arr.length<1) return null;
   	
-  	StringBuffer ret = new StringBuffer();
+  	StringBuilder ret = new StringBuilder();
   	for (int i=0; i<arr.length-1; i++) {
   		ret.append(arr[i]);
   		ret.append(sep);
