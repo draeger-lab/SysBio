@@ -918,12 +918,26 @@ public class Utils {
    * @return
    */
   public static double variance(double[] d, double mean) {
-    if( d.length <= 1 ) {
-      return 0.0;
-    }
+    return variance(d, mean, 2);
+  }
+  
+  /**
+   * Calculates and returns the variance of the given list of double values.
+   * This version of the method also takes the precalculated mean of the values
+   * as parameter to prevent redundant calculations.
+   * 
+   * @param d the list of double values
+   * @param mean the mean of the double values
+   * @param power standard variance has power 2. Other variances can have other
+   * powers.
+   * @return
+   */
+  public static double variance(double[] d, double mean, double power) {
     double sum = 0.0;
+    if( d.length <= 1 ) return sum;
+    
     for (int i = 0; i < d.length; i++) {
-      sum += Math.pow(d[i] - mean, 2);
+      sum += Math.pow(d[i] - mean, power);
     }
     return sum / (d.length - 1);
   }
