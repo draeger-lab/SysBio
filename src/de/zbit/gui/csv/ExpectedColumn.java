@@ -168,7 +168,7 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
     int sug = r.getColumn(name.toString());
     if (sug<0 && isSetRegExPatternForInitialSuggestion()) {
       try {
-        sug = r.getColumnByMatchingContent(regExPatternForInitialSuggestion);
+        sug = r.getColumnByMatchingContent(regExPatternForInitialSuggestion,0,500);
       } catch (IOException e) {}
     }
     return sug;
