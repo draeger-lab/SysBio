@@ -371,5 +371,4 @@ public class ArrayUtils {
   public static <T> List<T> asList(T[] arr, int rangeStart, int rangeEnde) {
     return Arrays.asList(toSubArray(arr, rangeStart, rangeEnde));
   }
-  
 }
