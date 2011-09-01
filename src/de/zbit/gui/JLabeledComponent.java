@@ -36,7 +36,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EventListener;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
@@ -118,7 +120,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * Every integer added here corresponds to one column number. If an
    * integer is added, the column will be hidden in all ColumnChoosers.
    */
-  protected ArrayList<Integer> hideColumns = new ArrayList<Integer>();
+  protected List<Integer> hideColumns = new ArrayList<Integer>();
   
   /**
    * If unsorted, the columns appear as they appear in the file. Else,
@@ -546,7 +548,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   protected void refreshAndRepaint() {
     model = buildComboBoxModel(headers);
     
-    refreshSelector();
+    refreshSelector(true);
     validateRepaint();
   }
   
@@ -701,26 +703,43 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   }
   
   protected void refreshSelector() {
-    int id = -1;
-    if (colChooser!=null) {
-      id = getSelectedValue();;
-      remove(colChooser);
+    refreshSelector(false);
+  }
+  
+  /**
+   * @param onlySetNewModel if true and the colChooser is an already initialized
+   * JComboBox, this method will not create a new box, but simply change the model
+   * of the exiting one.
+   */
+  protected void refreshSelector(boolean onlySetNewModel) {
+    // Remember last selection
+    int id = colChooser!=null?getSelectedValue():-1;
+    
+    // Build column chooser or only change existing model
+    if (onlySetNewModel && model!=null && colChooser!=null && colChooser instanceof JComboBox) {
+      ((JComboBox)colChooser).setModel(model);
+    } else {
+      // Note: replacing an existing colChooser will also remove all existing listeners!
+      if (colChooser!=null) remove(colChooser);
+      colChooser = getColumnChooser(useJTextField?null:model, -1, required, null, acceptOnlyIntegers);
+      
+      // Add to layout
+      if (getLayout() instanceof GridBagLayout) {
+        addComponent(this, colChooser, 1, 0, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
+      } else if (getLayout() instanceof BorderLayout) {
+        add(colChooser, BorderLayout.CENTER);
+      } else {
+        add(colChooser); // e.g. GridLayout
+      } 
     }
     
-    // Column chooser
-    colChooser = getColumnChooser(useJTextField?null:model, -1, required, null, acceptOnlyIntegers);
+    // Set Properties
     if (colChooser instanceof JComboBox) {
       ((JComboBox)colChooser).setEditable(this.editHeaderAlllowed);
     }
     colChooser.setToolTipText(getToolTipText());
-    if (getLayout() instanceof GridBagLayout) {
-      addComponent(this, colChooser, 1, 0, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
-    } else if (getLayout() instanceof BorderLayout) {
-      add(colChooser, BorderLayout.CENTER);
-    } else {
-      add(colChooser); // e.g. GridLayout
-    } 
     
+    // Try to restore old selection
     if (id>=0) setSelectedValue(id);
   }
   

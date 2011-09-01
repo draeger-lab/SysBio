@@ -17,6 +17,7 @@
 package de.zbit.kegg.gui;
 
 import java.awt.Container;
+import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,6 +34,7 @@ import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.kegg.KeggFunctionManagement;
 import de.zbit.kegg.KeggQuery;
+import de.zbit.parser.Species;
 import de.zbit.util.CustomObject;
 
 /**
@@ -51,8 +53,15 @@ public class OrganismSelector extends JPanel {
   
   /**
    * Our list of organisms. (Static, so they are cached).
+   * Key is kegg abbreviation; Value is scientific name
    */
   private static HashMap<String, String> organismMap=null;
+  
+  /**
+   * A current instance of {@link #organismMap}. Allows customizations
+   * without modifying the static list.
+   */
+  private HashMap<String, String> currentOrganismMap=null;
   
   /**
    * The Organism Selector.
@@ -95,22 +104,32 @@ public class OrganismSelector extends JPanel {
    * @throws Exception
    */
   public OrganismSelector(KeggFunctionManagement manag, LayoutHelper lh) throws Exception {
+    this(manag, lh, null);
+  }
+  
+  /**
+   * @param manag
+   * @param lh
+   * @param onlyShowThese
+   * @throws Exception 
+   */
+  public OrganismSelector(KeggFunctionManagement manag, LayoutHelper lh, List<Species> onlyShowThese) throws Exception {
     super();
     
     if (manag==null) manag = new KeggFunctionManagement();
     if (lh==null) lh = new LayoutHelper(this);
     this.manag = manag;
     
-    initGui(lh);
+    initGui(lh, onlyShowThese);
   }
-  
+
   /**
    * Creates the {@link #organismSelector} and puts it on
    * the given layoutHelper.
    * @param lh
    * @throws Exception
    */
-  private void initGui(LayoutHelper lh) throws Exception {
+  private void initGui(LayoutHelper lh, final List<Species> onlyShowThese) throws Exception {
     /*
      * Retrieve organisms via SwingWorker to avoid application "freeze"
      */
@@ -119,7 +138,12 @@ public class OrganismSelector extends JPanel {
     SwingWorker<Object, Void> worker = new SwingWorker<Object, Void>() {
       @Override
       protected Object doInBackground() {
-        HashMap<String, String> orgs = getOrganisms();
+        HashMap<String, String> orgs;
+        if (onlyShowThese!=null && onlyShowThese.size()>0) {
+          orgs = getOrganisms(onlyShowThese);
+        } else {
+          orgs = getOrganisms();
+        }
         return orgs;
       }
       
@@ -135,6 +159,7 @@ public class OrganismSelector extends JPanel {
         if (orgs==null) {
           GUITools.showErrorMessage(parent, "Could not retrieve organisms from KEGG.");
         } else {
+          currentOrganismMap = orgs;
           // Sort
           List<String> organisms = new LinkedList<String>(orgs.values());
           Collections.sort(organisms);
@@ -193,7 +218,7 @@ public class OrganismSelector extends JPanel {
     worker.execute();
     
   }
-  
+
   public boolean isInitialized() {
     return isInitialized;
   }
@@ -207,7 +232,7 @@ public class OrganismSelector extends JPanel {
     /* Panel has not yet been initialized and will take
      * automatically the defaultSelection.
      */
-    if (organismMap==null) return;
+    if (currentOrganismMap==null) return;
     
     // Else, we have to take care by our own.
     organismSelector.setSelectedItem(organism);
@@ -231,6 +256,21 @@ public class OrganismSelector extends JPanel {
       }
     };
     r.start();
+  }
+  
+  /**
+   * Get organisms from <code>onlyShowThese</code>.
+   * @param onlyShowThese
+   * @return HashMap<Abbreviation, Description>. E.g. Key: "hsa", Value: "Homo sapiens (human)"
+   */
+  public HashMap<String, String> getOrganisms (List<Species> onlyShowThese) {
+    HashMap<String, String> localMap = new HashMap<String, String>(onlyShowThese.size());
+    for (int i = 0; i < onlyShowThese.size(); i++) {
+      // Put e.g. Key: "hsa", Value: "Homo sapiens (human)"
+      localMap.put(onlyShowThese.get(i).getKeggAbbr(), onlyShowThese.get(i).getScientificName());
+    }
+    
+    return localMap;
   }
   
   /**
@@ -304,9 +344,10 @@ public class OrganismSelector extends JPanel {
    * @return the kegg abbreviation for the selected organism.
    */
   public String getSelectedOrganismAbbreviation() {
+    if (organismSelector==null || organismSelector.getSelectedItem()==null) return null;
     String selItem = organismSelector.getSelectedItem().toString();
-    if (organismMap==null) return null;
-    for (Map.Entry<String,String> e: organismMap.entrySet()) {
+    if (currentOrganismMap==null) return null;
+    for (Map.Entry<String,String> e: currentOrganismMap.entrySet()) {
       if (e.getValue().equals(selItem)) return e.getKey();
     }
     return null;
@@ -344,6 +385,13 @@ public class OrganismSelector extends JPanel {
     OrganismSelector ret = new OrganismSelector(manag, layoutHelper);
     
     return ret;
+  }
+
+  /**
+   * @param actionListener
+   */
+  public void addActionListener(ActionListener actionListener) {
+    organismSelector.addActionListener(actionListener);
   }
 
 
