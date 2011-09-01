@@ -35,6 +35,7 @@ import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.kegg.KeggFunctionManagement;
 import de.zbit.kegg.KeggQuery;
+import de.zbit.parser.Species;
 import de.zbit.util.CustomObject;
 import de.zbit.util.StringUtil;
 
@@ -93,7 +94,7 @@ public class PathwaySelector extends JPanel {
   }
   
   public PathwaySelector(KeggFunctionManagement manag, LayoutHelper lh) throws Exception {
-    this(manag,lh,null);
+    this(manag,lh,(String)null);
   }
   
   /** 
@@ -104,12 +105,28 @@ public class PathwaySelector extends JPanel {
    */
   public PathwaySelector(KeggFunctionManagement manag, LayoutHelper lh, String fixedOrganismKeggAbbr) throws Exception {
     super();
-    
+    lh = init(manag, lh);
+    initGui(lh, fixedOrganismKeggAbbr, null);
+  }
+  
+  /**
+   * @param manag
+   * @param lh
+   * @param organisms only show these organisms
+   * @throws Exception 
+   */
+  public PathwaySelector(KeggFunctionManagement manag, LayoutHelper lh, List<Species> organisms) throws Exception {
+    super();
+    lh = init(manag, lh);
+    initGui(lh, null, organisms);
+  }
+
+  
+  public LayoutHelper init(KeggFunctionManagement manag, LayoutHelper lh) {
     if (manag==null) manag = new KeggFunctionManagement();
     if (lh==null) lh = new LayoutHelper(this);
     this.manag = manag;
-    
-    initGui(lh, fixedOrganismKeggAbbr);
+    return lh;
   }
   
   /**
@@ -117,7 +134,7 @@ public class PathwaySelector extends JPanel {
    * @param fixedOrganismKeggAbbr if not null, will preselect an organism and deactivate the organism selector
    * @throws Exception 
    */
-  private void initGui(LayoutHelper lh, final String fixedOrganismKeggAbbr) throws Exception {
+  private void initGui(LayoutHelper lh, final String fixedOrganismKeggAbbr, List<Species> onlyShowThese) throws Exception {
     // Create orgaism selector
     /*
      *  XXX: It would be possible to accept certain organisms and then load
@@ -125,17 +142,19 @@ public class PathwaySelector extends JPanel {
      */
     
     //if (organismABBV==null || organismABBV.length()<3) {
-    orgSel = OrganismSelector.createOrganismSelectorPanel(manag, lh);
+    orgSel = new OrganismSelector(manag, lh, onlyShowThese);
     
     // Add "<Generic (Orthologous)>" and make default selection.
-    String defaultItem = "<Generic (Orthologous)>";
-    OrganismSelector.defaultSelection = defaultItem;
-    for (int i=lh.getContainer().getComponentCount()-1; i>=0; i--) {
-      Component c = lh.getContainer().getComponent(i);
-      if (c instanceof JComboBox && c.getName().equals(OrganismSelector.class.getName())) {
-        ((JComboBox)c).addItem(defaultItem);
-        //((JComboBox)c).setSelectedItem(defaultItem);
-        break;
+    if (onlyShowThese==null || onlyShowThese.size()<1) {
+      String defaultItem = "<Generic (Orthologous)>";
+      OrganismSelector.defaultSelection = defaultItem;
+      for (int i=lh.getContainer().getComponentCount()-1; i>=0; i--) {
+        Component c = lh.getContainer().getComponent(i);
+        if (c instanceof JComboBox && c.getName().equals(OrganismSelector.class.getName())) {
+          ((JComboBox)c).addItem(defaultItem);
+          //((JComboBox)c).setSelectedItem(defaultItem);
+          break;
+        }
       }
     }
     

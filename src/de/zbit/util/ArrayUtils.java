@@ -66,12 +66,25 @@ public class ArrayUtils {
    */
   public static <T> int indexOf(T[] arr, T s) {
     if (arr==null) return -1;
-    if (s==null) return -1;
     for (int i=0; i<arr.length; i++) {
+      if (s==null) {
+        // Also detect indexOf null
+        if (arr[i]==null) return i;
+        else continue;
+      }
       if (arr[i]==null) continue;
       if (arr[i].equals(s)) return i;
     }
     return -1;
+  }
+  
+  /**
+   * @param arr
+   * @param s
+   * @return true if <code>s</code> is in <code>arr</code>.
+   */
+  public static <T> boolean contains(T[] arr, T s) {
+    return indexOf(arr, s)>=0;
   }
   
   /**
@@ -371,4 +384,5 @@ public class ArrayUtils {
   public static <T> List<T> asList(T[] arr, int rangeStart, int rangeEnde) {
     return Arrays.asList(toSubArray(arr, rangeStart, rangeEnde));
   }
+
 }
