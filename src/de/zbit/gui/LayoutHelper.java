@@ -292,14 +292,16 @@ public class LayoutHelper {
 	 * @param spaceLine
 	 *        If true, a new line with an empty JPanel will be created as a
 	 *        spacer.
+	 * @return the created {@link JLabel}
 	 */
-	public void add(String label, Component c, boolean spaceLine) {
+	public JLabel add(String label, Component c, boolean spaceLine) {
 	  ensurePointerIsAtBeginningOfARow();
-		add(label, c, 0, row);
+		JLabel ret = add(label, c, 0, row);
 		if (spaceLine) {
 			add(new JPanel(), 0, ++row, 3, 1, 0, 0);
 		}
 		atRowBeginning=false;
+		return ret;
 	}
 	
 	/**
@@ -309,12 +311,16 @@ public class LayoutHelper {
 	 * @param c
 	 * @param x
 	 * @param y
+	 * @return the created {@link JLabel}
 	 */
-	public void add(String label, Component c, int x, int y) {
-		add(new JLabel(label), x, y, 1, 1, 0, 0);
+	public JLabel add(String label, Component c, int x, int y) {
+	  JLabel lab = new JLabel(label);
+	  lab.setLabelFor(c);
+		add(lab, x, y, 1, 1, 0, 0);
 		add(new JPanel(), x + 1, y, 1, 1, 0, 0);
 		add(c, x + 2, y, 1, 1);
 		atRowBeginning=false;
+		return lab;
 	}
 	
 	/**
