@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
@@ -79,6 +80,11 @@ public class PathwaySelector extends JPanel {
    * The organism Selector.
    */
   private OrganismSelector orgSel;
+
+  /**
+   * The label for the organism selector.
+   */
+  private JLabel labelForPWSsel;
   
   
   public PathwaySelector() throws Exception {
@@ -228,7 +234,7 @@ public class PathwaySelector extends JPanel {
     pathwaySelector.addItem(loadingItem);
     pathwaySelector.setEnabled(false);
     
-    lh.add("Select pathway", pathwaySelector, true);
+    labelForPWSsel = lh.add("Select pathway", pathwaySelector, true);
     worker.execute();
   }
 
