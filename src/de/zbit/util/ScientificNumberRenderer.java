@@ -79,7 +79,7 @@ public class ScientificNumberRenderer extends DefaultTableCellRenderer {
     }
     
     // Format number
-    String text = value.toString();
+    String text = value==null?"":value.toString();
     try {
       if (value instanceof Number) {
         double d = Math.abs(((Number)value).doubleValue());

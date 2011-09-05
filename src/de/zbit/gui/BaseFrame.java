@@ -1082,7 +1082,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
       // Ensure that the current FileHistory is in the list.
       JMenu c_fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
         BaseAction.FILE_OPEN_RECENT);
-      if (ArrayUtils.indexOf(fileHistory, c_fileHistory)<0) {
+      if (!ArrayUtils.contains(fileHistory, c_fileHistory)) {
         fileHistory = ArrayUtils.removeNull(fileHistory);
         if (fileHistory==null) {
           fileHistory = new JMenu[]{c_fileHistory};
