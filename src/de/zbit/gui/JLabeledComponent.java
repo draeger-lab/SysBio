@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -538,6 +537,13 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     // Remember required headers and build model
     headers = newHeader;
     refreshAndRepaint();
+  }
+  
+  /**
+   * @return the current {@link #headers}.
+   */
+  public Object[] getHeaders() {
+    return headers;
   }
   
   /**

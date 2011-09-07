@@ -17,6 +17,7 @@
 package de.zbit.kegg.gui;
 
 import java.awt.Container;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,6 +78,17 @@ public class OrganismSelector extends JPanel {
    * Is set to true when this panel is completely inizialized.
    */
   private boolean isInitialized=false;
+
+  /**
+   * Listeners that are informed when this item loaded completely.
+   */
+  private List<ActionListener> listeners = null;
+
+  /**
+   * This is the ActionCommand String of the Event that
+   * is fired to {@link #listeners} when loading is compelte.
+   */
+  public static String LOADING_COMPLETE_ACTION_COMMAND = "ORGANISM_LOADING_COMPLETE";
   
   /**
    * This is a convenient constructor. However, the {@link #OrganismSelector(KeggFunctionManagement)}
@@ -189,6 +201,7 @@ public class OrganismSelector extends JPanel {
           isInitialized=true;
         }
         repaint();
+        fireOrganismBoxLoadedCompletelyListeners();
       }
     };
     
@@ -217,6 +230,20 @@ public class OrganismSelector extends JPanel {
     lh.add("Select organism", organismSelector, true);
     worker.execute();
     
+  }
+
+  public void addOrganismBoxLoadedCompletelyListener(ActionListener l) {
+    if (listeners==null) listeners = new LinkedList<ActionListener>();
+    listeners.add(l);
+  }
+
+  
+  protected void fireOrganismBoxLoadedCompletelyListeners() {
+    if (listeners==null) return;
+    ActionEvent e = new ActionEvent(this, 1, LOADING_COMPLETE_ACTION_COMMAND);
+    for (ActionListener l : listeners) {
+      l.actionPerformed(e);
+    }
   }
 
   public boolean isInitialized() {
