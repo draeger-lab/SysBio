@@ -56,7 +56,6 @@ public class LayoutHelper {
 	}
 	
 	/**
-	 * TODO
 	 * 
 	 * @param cont
 	 * @param gbl
