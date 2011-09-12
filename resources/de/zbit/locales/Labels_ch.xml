@@ -155,4 +155,11 @@
   <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">您已经正在使用最新版本 %s of %s. 无法找到更新的版本。</entry>
   <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">没有可用的更新。</entry> 
   
+  <!-- Wizard -->
+  
+  <entry key="WIZARD_NEXT">下一步</entry>
+  <entry key="WIZARD_BACK">上一步</entry>
+  <entry key="WIZARD_CANCEL">取消</entry>
+  <entry key="WIZARD_FINISH">完成</entry>
+  
 </properties>

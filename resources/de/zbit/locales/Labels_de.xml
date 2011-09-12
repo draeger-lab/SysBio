@@ -152,5 +152,12 @@
   <entry key="COMMAND_LINE_UPDATE_MESSAGE">\nAktualisierungsbenachrichtigung:\n--------------------\nEine neuere Version von %s ist verfügbar.\nBesuchen Sie bitte %s\num Version %s zu erhalten.\nZu Ihrer Information: Sie benutzen gerade %s Version %s.\n</entry>
   <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE">Sie benutzen bereits die neueste Version %s von %s. Es konnte keine neuere Version gefunden werden.</entry>
   <entry key="NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_TITLE">Keine Aktualisierung verfügbar</entry> 
+
+  <!-- Wizard -->
+  
+  <entry key="WIZARD_NEXT">Weiter</entry>
+  <entry key="WIZARD_BACK">Zurück</entry>
+  <entry key="WIZARD_CANCEL">Abbrechen</entry>
+  <entry key="WIZARD_FINISH">Fertigstellen</entry>
   
 </properties>
