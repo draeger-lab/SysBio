@@ -652,7 +652,7 @@ public interface KeyProvider {
 				sb.append("        <td>\n          ");
 				sb.append(StringUtil.insertLineBreaks(option.getToolTip(),
 					GUITools.TOOLTIP_LINE_LENGTH, "\n          "));
-				Range range = option.getRange();
+				Range<?> range = option.getRange();
 				ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 				if (range != null) {
 					List<?> list = range.getAllAcceptableValues();

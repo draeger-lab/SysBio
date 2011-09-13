@@ -36,6 +36,11 @@ public class LogUtil {
    * This package is always considered when performing any logging operations here.
    */
   public final static String basePackage = "de.zbit";
+  
+  /**
+   * Remember packages from last {@link #initializeLogging(String...)} call
+   */
+  private static String packages_to_log[];
 
   /**
    * Initializes logging using the Java logger and with log level INFO for
@@ -61,7 +66,7 @@ public class LogUtil {
     //if (showLoggingConsole) {
     //  Logging.enableLoggingConsole();
     //}
-  
+    packages_to_log = packages;
     
     for (Handler h : Logger.getLogger("").getHandlers()) {
       h.setLevel(logLevel);
@@ -79,6 +84,14 @@ public class LogUtil {
 				Logger.getLogger(s).setLevel(logLevel);
 			}
 		}
+  }
+  
+  /**
+   * @return packages that have been used in the last
+   * call to {@link #initializeLogging(String...)}
+   */
+  public static String[] getInitializedPackages() {
+    return packages_to_log;
   }
   
   /**
