@@ -70,16 +70,25 @@ public class StatusBar extends JPanel implements ProgressListener {
    * A log handler that is used to catch and display log messages.
    */
   private Handler handler = new Handler() {
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see java.util.logging.Handler#close()
+     */
     public void close() throws SecurityException {
       statusLabel.setText(defaultText);
     }
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see java.util.logging.Handler#flush()
+     */
     public void flush() {
       statusLabel.validate();
       statusLabel.repaint();
     }
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see java.util.logging.Handler#publish(java.util.logging.LogRecord)
+     */
     public void publish(LogRecord record) {
       // Initial space (a little distance to the border)
       StringBuffer message = new StringBuffer(" ");
@@ -108,10 +117,17 @@ public class StatusBar extends JPanel implements ProgressListener {
     }
   };
   
+  /**
+   * 
+   */
   public StatusBar() {
     this(null, defaultText);
   }
   
+  /**
+   * 
+   * @param initialMessage
+   */
   public StatusBar(String initialMessage) {
     this(null, initialMessage);
   }
@@ -141,12 +157,13 @@ public class StatusBar extends JPanel implements ProgressListener {
 
   /**
    * Display {@link Level#INFO} log messages, issued in
-   * {@link LogUtil#basePackage} (currently: "de.zbit") in the
+   * {@value LogUtil#basePackage} (currently: "de.zbit") and
+   * {@link LogUtil#getInitializedPackages()} in the
    * {@link #statusLabel}.
    */
   public void displayLogMessagesInStatusBar() {
     // Display with info message in all de.zbit packages.
-    displayLogMessagesInStatusBar(Level.INFO, (String[]) null);
+    displayLogMessagesInStatusBar(Level.INFO, LogUtil.getInitializedPackages());
   }
   /**
    * Display log messages in the status bar.
@@ -285,6 +302,10 @@ public class StatusBar extends JPanel implements ProgressListener {
     frame.setVisible(true);
   }
   
+  /*
+   * (non-Javadoc)
+   * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+   */
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);

@@ -201,7 +201,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    */
   @SuppressWarnings({ "rawtypes" })
   public JLabeledComponent(String title, boolean fieldIsRequired,
-    Collection columnHeaders) {
+    Collection<?> columnHeaders) {
     this(title, fieldIsRequired, columnHeaders.toArray());
   }
   /**

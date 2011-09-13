@@ -161,7 +161,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
   }
   
   private void init(Collection<ExpectedColumn> expectedColumns) throws IOException {
-    if (expectedColumns instanceof List) {
+    if (expectedColumns instanceof List<?>) {
       exCols = (List<ExpectedColumn>) expectedColumns;
     } else {
       exCols = new ArrayList<ExpectedColumn>(expectedColumns);

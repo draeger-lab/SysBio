@@ -78,6 +78,7 @@ import de.zbit.util.prefs.SBProperties;
  * any user interface.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2010-11-28
  * @version $Rev$
  * @since 1.0
@@ -456,9 +457,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		browser.removeHyperlinkListener(browser);
 		browser.addHyperlinkListener(new SystemBrowser());
 		browser.setPreferredSize(new Dimension(preferedWidth, preferedHeight));
-		if (scroll) { return new JScrollPane(browser,
+		if (scroll) { 
+		  return new JScrollPane(browser,
 			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); }
+			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); 
+		}
 		browser.setBorder(BorderFactory.createLoweredBevelBorder());
 		return browser;
 	}
@@ -1073,6 +1076,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		return files;
 	}
 	
+	/**
+	 * 
+	 * @param fileList
+	 * @param fileHistory
+	 */
 	protected void addToFileHistory(List<File> fileList, JMenu... fileHistory) {
     if (getMaximalFileHistorySize() > 0) {
       // Create the list of files to update the file history in the menu.
@@ -1155,6 +1163,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * 
 	 * @see java.awt.Window#setVisible(boolean)
 	 */
+	@Override
 	public void setVisible(boolean b) {
 		if (!UPDATE_CHECKED) {
 			SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);

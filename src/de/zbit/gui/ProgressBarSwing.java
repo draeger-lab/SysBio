@@ -50,10 +50,16 @@ public class ProgressBarSwing extends AbstractProgressBar {
    * Getters and Setters
    *=====================================*/
   
-
+  /**
+   * 
+   */
   public JProgressBar getProgressBar() {
     return progressBar;
   }
+  /**
+   * 
+   * @param progressBar
+   */
   public void setProgressBar(JProgressBar progressBar) {
     this.progressBar = progressBar;
     if (progressBar!=null) initProgressBar();
@@ -76,16 +82,15 @@ public class ProgressBarSwing extends AbstractProgressBar {
   /* (non-Javadoc)
    * @see de.zbit.util.AbstractProgressBar#drawProgressBar(int, double, java.lang.String)
    */
-  @Override
   protected void drawProgressBar(int percent, double miliSecondsRemaining, String additionalText) {
     if (progressBar instanceof JProgressBar) {
       ((JProgressBar)progressBar).setValue(percent);
       
-      String s = percent + "%";
-      if (miliSecondsRemaining>0) {
+      String s = percent + " %";
+      if (miliSecondsRemaining > 0) {
         s +=" ETR: "+ Utils.getPrettyTimeString((long) miliSecondsRemaining);
       }
-      if (additionalText!=null && additionalText.length()>0) {
+      if ((additionalText != null) && (additionalText.length() > 0)) {
         s += " - " + additionalText;
       }
       
@@ -96,7 +101,6 @@ public class ProgressBarSwing extends AbstractProgressBar {
   /* (non-Javadoc)
    * @see de.zbit.util.AbstractProgressBar#finished_impl()
    */
-  @Override
   public void finished_impl() {
     // Set Progressbar to 100%
     drawProgressBar(100,0,"");
