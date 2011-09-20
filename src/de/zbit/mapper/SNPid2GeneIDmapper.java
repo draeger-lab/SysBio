@@ -108,7 +108,7 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
     this.ncbi_tax_id = ncbi_tax_id;
     // TODO: Download im web einrichten
     if (ncbi_tax_id>0) {
-      primaryDownloadURL = String.format("http://cogsys.cs.uni-tuebingenTODO:....%s", ncbi_tax_id);
+      primaryDownloadURL = String.format("http://cogsys.cs.uni-tuebingenTODO:..../%s.SNP2GeneID.gz", ncbi_tax_id);
       tryThisDownloadURL = primaryDownloadURL;
     }
     if (initImmediately) init();
@@ -241,9 +241,11 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
   protected boolean ensureLocalFileIsAvailable() {
     // Implemented a fallBack on "fallBackDownloadURL".
     boolean retVal = super.ensureLocalFileIsAvailable();
-    if (!tryThisDownloadURL.equals(fallBackDownloadURL)) {
-      tryThisDownloadURL = fallBackDownloadURL;
-      retVal = super.ensureLocalFileIsAvailable();
+    if (!retVal) {
+      if (!tryThisDownloadURL.equals(fallBackDownloadURL)) {
+        tryThisDownloadURL = fallBackDownloadURL;
+        retVal = super.ensureLocalFileIsAvailable();
+      }
     }
     return retVal;
   }
