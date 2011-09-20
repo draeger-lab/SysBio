@@ -951,7 +951,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @see java.util.Map#containsKey(java.lang.Object)
 	 */
-	public boolean containsKey(Object key) {
+	public boolean containsKey(Object key) { 
 		return keySet().contains(key);
 	}
 	
@@ -1199,16 +1199,25 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public String[] keys() {
 		try {
+		  // Might be empty set, if initial call and nothing is set!
 			return prefs.keys();
 		} catch (BackingStoreException e) {
-			String keys[] = new String[defaults.size()];
-			int i = 0;
-			for (Object key : defaults.keySet()) {
-				keys[i++] = key.toString();
-			}
-			return keys;
+			return defaultKeys();
 		}
 	}
+
+	/**
+	 * Same as {@link #keys()}, but using the {@link #defaults}.
+	 * @return
+	 */
+  public String[] defaultKeys() {
+    String keys[] = new String[defaults.size()];
+    int i = 0;
+    for (Object key : defaults.keySet()) {
+    	keys[i++] = key.toString();
+    }
+    return keys;
+  }
 	
 	/*
 	 * (non-Javadoc)
@@ -1217,9 +1226,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public Set<Object> keySet() {
 		Set<Object> set = new HashSet<Object>();
-		for (String key : keys()) {
-			set.add(key);
-		}
+		set.addAll(Arrays.asList(keys()));
+		set.addAll(Arrays.asList(defaultKeys()));
 		return set;
 	}
 	

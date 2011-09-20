@@ -180,6 +180,16 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
   public boolean isSetRegExPatternForInitialSuggestion() {
     return regExPatternForInitialSuggestion!=null&&regExPatternForInitialSuggestion.length()>0;
   }
+  
+  /**
+   * Set a regular expression pattern for a columns content
+   * to be assigned as initial suggestion.
+   * @param regEx
+   */
+  public void setRegExPatternForInitialSuggestion (String regEx) {
+    regExPatternForInitialSuggestion = regEx;
+  }
+  
   /* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
