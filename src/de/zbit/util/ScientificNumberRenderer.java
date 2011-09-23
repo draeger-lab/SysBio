@@ -86,7 +86,7 @@ public class ScientificNumberRenderer extends DefaultTableCellRenderer {
         if (d>=boundary || d<=1/boundary) {
           text = (value == null) ? "" : formatter.format(value);
         } else {
-          text = Double.toString(Utils.round(d, 4));
+          text = Double.toString(Utils.round(((Number)value).doubleValue(), 4));
         }
       }
     } catch (Exception e) {
