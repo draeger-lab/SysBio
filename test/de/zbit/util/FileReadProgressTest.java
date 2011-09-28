@@ -44,16 +44,7 @@ public class FileReadProgressTest {
   }
 
   @Test
-  public void testGetSetOutputPercentage() {
-    frp.setOutputPercentage(true);
-    assertTrue(frp.getOutputPercentage());
-    frp.setOutputPercentage(false);
-    assertFalse(frp.getOutputPercentage());
-  }
-
-  @Test
   public void testProgressSameLine() throws InterruptedException {
-    frp.setOutputPercentage(true);
     frp.setPrintProgessInSameLine(true);
     for( int i = 0; i < 150; i++ ) {
       frp.progress(1);
@@ -64,7 +55,6 @@ public class FileReadProgressTest {
 
   @Test
   public void testProgressNewLine() throws InterruptedException {
-    frp.setOutputPercentage(true);
     frp.setPrintProgessInSameLine(false);
     for( int i = 0; i < 150; i++ ) {
       frp.progress(1);
