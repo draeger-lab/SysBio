@@ -118,6 +118,10 @@ public class GUITools {
         "ICON_ARROW_LEFT_32.png",
         "ICON_ARROW_RIGHT_16.png",
         "ICON_ARROW_RIGHT_32.png",
+        "ICON_DOCUMENT_16.png",
+        "ICON_DOCUMENT_32.png",
+        "ICON_DOCUMENT_48.png",
+        "ICON_DOCUMENT_64.png",
         "ICON_EXIT_16.png",
         "ICON_GEAR_16.png",
         "ICON_GEAR_64.png",
@@ -1741,7 +1745,7 @@ public class GUITools {
    * @param enabled
    * @param components
    */
-  public static void setAllEnabled(boolean enabled, Component...components) {
+  public static void setEnabled(boolean enabled, Component...components) {
     for (Component component: components) {
       component.setEnabled(enabled);
     }
