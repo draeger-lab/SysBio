@@ -61,6 +61,11 @@ import de.zbit.io.OpenFile;
 public class Utils {
 
   /**
+   * The natural logarithm of 2.
+   */
+  private final static double ln2 = Math.log(2);
+  
+  /**
    * Returns true if and only if arr contains s (case insensitive).
    * @param arr
    * @param s
@@ -1841,6 +1846,36 @@ public class Utils {
     // All called methods consinder the whole, unsorted collection!
     return(String.format("Min:%s, Mean:%s, Median:%s, Max:%s",
       Utils.min(values), Utils.average(values), Utils.median(values), Utils.max(values) )); 
+  }
+
+  /**
+   * Performs the nasty comparison of two integers, for usage in CompareTo methods.
+   * Performs Nullpointer checks, before performing the actual comparison and
+   * returns -1 if only one is <code>NULL</code>, 0 if both are <code>NULL</code>
+   * and <pre>a-b</pre> if both are not null.
+   * @param a
+   * @param b
+   * @return
+   */
+  public static int compareIntegers(Integer a, Integer b) {
+    if (a==null) {
+      if (b==null) {
+        return 0;
+      }
+      return -1;
+    } else if (b==null) {
+      return -1;
+    } else {
+      return a-b;
+    }
+  }
+  
+  public static double log2(double val) {
+    return Math.log(val)/ln2;
+  }
+  
+  public static <T extends Number> double log2(T val) {
+    return Math.log(val.doubleValue())/ln2;
   }
   
 }

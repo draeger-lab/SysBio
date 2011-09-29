@@ -598,14 +598,19 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   
   /**
    * Allows to override the progressBar.
-   * Warning: A progressBar is only initialized if
-   * 1 displayProgress is enabled (by setDisplayProgress(boolean b) )
-   * 2 the "open" method has been called
+   * <p>NOTE: This method does automatically set {@link #displayProgress}
+   * to <code>TRUE</code> (see {@link #setDisplayProgress(boolean)}).
+   * <p>If this method is called, whilst the FilePointer is not at position zero
+   * (i.e. the file has already been read partially) this will not show
+   * correct values.
    */
   public void setProgressBar(AbstractProgressBar progress) {
     progressBar = progress;
+    this.displayProgress = (progress!=null);
     if (this.progress!=null) {
       this.progress.setProgressBar(progressBar);
+    } else if (displayProgress) {
+      initializeFileReadProgress();
     }
   }
   
@@ -663,6 +668,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * @return
    */
   public String getPreamble() {
+    if (preamble==null) return null;
     return this.preamble.toString();
   }
   
