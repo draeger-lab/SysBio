@@ -1745,7 +1745,7 @@ public class GUITools {
    * @param enabled
    * @param components
    */
-  public static void setEnabled(boolean enabled, Component...components) {
+  public static void setEnabledForAll(boolean enabled, Component...components) {
     for (Component component: components) {
       component.setEnabled(enabled);
     }
