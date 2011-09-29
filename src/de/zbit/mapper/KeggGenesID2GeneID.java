@@ -51,8 +51,8 @@ public class KeggGenesID2GeneID extends AbstractMapper<String, Integer> {
   private String organism_kegg_abbr = null;
   
   /**
-   * @param sourceType
-   * @param targetType
+   * @param speciesKEGGPrefix KEGG species prefix, e.g., "mmu"
+   * for mouse or "hsa" for human.
    * @throws IOException
    */
   public KeggGenesID2GeneID(String speciesKEGGPrefix)

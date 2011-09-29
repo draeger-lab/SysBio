@@ -1026,7 +1026,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     if (source instanceof Component) {
       Component c = (Component) source;
       String name = c.getName();
-      System.out.print("DEBUG - try to change property of "+ name);
+//      System.out.print("DEBUG - try to change property of "+ name);
       /*
        * Properties is build in initializePrefPanel() -> loadPreferences ->
        * accept(key). If a key is missing in properties, it is very likely that
@@ -1077,7 +1077,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           if (o != null && o.isSetRangeSpecification()) {
             isInRange = o.castAndCheckIsInRange(value);
           } else if (o == null) {
-            System.out.println("Could not get option for JComponent.");
+//            System.out.println("Could not get option for JComponent.");
           }
         }
         
@@ -1085,12 +1085,12 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         // are displayed later! Write all options to properties first!
         if (!checkRange || isInRange) {
           properties.put(name, value);
-          System.out.println(" - " + "changed to '" + value.toString() + "'.");
+//          System.out.println(" - " + "changed to '" + value.toString() + "'.");
         } else {
-          System.out.println(" - " + "out of Range.");
+//          System.out.println(" - " + "out of Range.");
         }
       } else {
-        System.out.println(" - " + "failed: properties contains no key with that name.");
+//        System.out.println(" - " + "failed: properties contains no key with that name.");
       }
     }
   }
@@ -1171,4 +1171,14 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       cl.stateChanged(e);
     }
   }
+
+  /**
+   * @param option
+   * @return {@link JComponent} representing this option
+   */
+  public JComponent getComponentForOption(Option<?> option) {
+    return option2component.get(option);
+  }
+  
+  
 }
