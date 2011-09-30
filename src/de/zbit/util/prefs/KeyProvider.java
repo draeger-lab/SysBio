@@ -215,7 +215,7 @@ public interface KeyProvider {
 			sb.append(createHeadline(headerRank, bundle.getString("PROGRAM_USAGE")));
 			sb.append("<table cellspacing=\"1\" cellpadding=\"1\" border=\"0\" width=\"100%\">\n");
 			sb.append(createHTMLTableLine(SBPreferences.generateUsageString(), explanation, indentation));
-			sb.append(createHTMLTableLine("-help, -?", String.format(bundle.getString("COMMAND_LINE_HELP"), bundle
+			sb.append(createHTMLTableLine("--help, -?", String.format(bundle.getString("COMMAND_LINE_HELP"), bundle
 				.getString("OPTIONS")), indentation));
 			sb.append("</table>\n\n");
 			return sb.toString();
