@@ -122,22 +122,25 @@
   
   <!-- SBFileFilter -->
   
-  <entry key="IMAGE_FILES">Image文件</entry>
-  <entry key="TEXT_FILES">Text文件</entry>
-  <entry key="TeX_FILES">TeX文件</entry>
-  <entry key="SBML_FILES">SBML文件</entry>
   <entry key="CSV_FILES">Comma分隔文件</entry>
-  <entry key="JPEG_FILES">Joint Photographic Experts Group文件</entry>
-  <entry key="PNG_FILES">Portable Network Graphics文件</entry>
-  <entry key="PDF_FILES">Portable Document Format文件</entry>
-  <entry key="HTML_FILES">Hypertext markup language文件</entry>
-  <entry key="GRAPHML_FILES">GraphML文件</entry>
-  <entry key="GML_FILES">Graph Modeling Language文件</entry>
-  <entry key="GIF_FILES">Graphics Interchange Format文件</entry>
-  <entry key="YGF_FILES">Y Graph Format文件</entry>
-  <entry key="TGF_FILES">Trivial图形格式文件</entry>
   <entry key="DIRECTORIES_ONLY">仅目录</entry>
-  
+  <entry key="GIF_FILES">Graphics Interchange Format文件</entry>
+  <entry key="GML_FILES">Graph Modeling Language文件</entry>
+  <entry key="GRAPHML_FILES">GraphML文件</entry>
+  <entry key="HTML_FILES">Hypertext markup language文件</entry>
+  <entry key="IMAGE_FILES">Image文件</entry>
+  <entry key="JPEG_FILES">Joint Photographic Experts Group文件</entry>
+  <entry key="KGML_FILES">KGML文件</entry>
+  <entry key="PDF_FILES">Portable Document Format文件</entry>
+  <entry key="PNG_FILES">Portable Network Graphics文件</entry>
+  <entry key="SBML_FILES">SBML文件</entry>
+  <entry key="SVG_FILES">Scalable Vector Graphics文件</entry>
+  <entry key="TeX_FILES">TeX文件</entry>
+  <entry key="TEXT_FILES">Text文件</entry>
+  <entry key="TGF_FILES">Trivial图形格式文件</entry>
+  <entry key="TSV_FILES">Text (Tab-separated)文件</entry>
+  <entry key="YGF_FILES">Y Graph Format文件</entry>
+    
   <!-- SBPreferences -->
   
   <entry key="OPTIONS">选项</entry>
