@@ -298,6 +298,36 @@ public class Utils {
   }
   
   /**
+   * Returns the value at relative (percentage) index <code>quantilke</code>
+   * in the sorted list <code>values</code>.
+   * @param values
+   * @param quantile
+   * @param listIsAlreadySorted in doubt, set to false.
+   * @return
+   */
+  public static double quantile(List values, int quantile, boolean listIsAlreadySorted) {
+    if (values.size()<1) return Double.NaN;
+    if (!listIsAlreadySorted) Collections.sort(values);
+    double valIndex = values.size()/100*quantile;
+    double valFloor = Math.floor(valIndex);
+    // (5 / 100) * 50 = 2.5 => Bei ungrade abrunden
+    // (4 / 100) * 50 = 2 => Bei grade mittel aus idx-1 und idx.
+    
+    if(valFloor != valIndex) {
+      // value is NO integer
+      Object ret = values.get((int) valFloor);
+      return getDoubleValue(ret);
+    } else {
+      // value is an integer
+      double upperMedian = getDoubleValue(values.get((int) valFloor));
+      double lowerMedian = getDoubleValue(values.get((int) (valFloor-1)));
+      
+      return (lowerMedian+(upperMedian-lowerMedian)/2);
+    }
+    
+  }
+  
+  /**
    * Converts the collection to a list and returns the median.
    * @param values
    * @return
