@@ -113,13 +113,6 @@ public class SBasePanel extends JPanel {
   }
 
   /**
-   * @param namesIfAvailable the namesIfAvailable to set
-   */
-  public void setNamesIfAvailable(boolean namesIfAvailable) {
-    this.namesIfAvailable = namesIfAvailable;
-  }
-
-  /**
    * 
    * @param sbase
    * @param namesIfAvailable
@@ -174,15 +167,6 @@ public class SBasePanel extends JPanel {
       addProperties((Event) sbase);
     }
   }
-  
-  /**
-	 * @param sbase
-	 * @throws SBMLException
-	 * @throws IOException
-	 */
-	public SBasePanel(SBase sbase) throws SBMLException, IOException {
-		this(sbase, false);
-	}
 
   /**
 	 * @param c
@@ -237,20 +221,20 @@ public class SBasePanel extends JPanel {
 		lh.add(check, 1, ++row, 3, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		if (e.isSetTrigger()) {
-			lh.add(new SBasePanel(e.getTrigger()), 1, ++row, 3, 1, 1, 1);
+			lh.add(new SBasePanel(e.getTrigger(), namesIfAvailable), 1, ++row, 3, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 		if (e.isSetDelay()) {
-			lh.add(new SBasePanel(e.getDelay()), 1, ++row, 3, 1, 1, 1);
+			lh.add(new SBasePanel(e.getDelay(), namesIfAvailable), 1, ++row, 3, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 		if (e.isSetTimeUnits()) {
-			lh.add(new SBasePanel(e.getTimeUnitsInstance()), 1, ++row, 3, 1, 1,
+			lh.add(new SBasePanel(e.getTimeUnitsInstance(), namesIfAvailable), 1, ++row, 3, 1, 1,
 					1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 		for (EventAssignment ea : e.getListOfEventAssignments()) {
-			lh.add(new SBasePanel(ea), 1, ++row, 3, 1, 1, 1);
+			lh.add(new SBasePanel(ea, namesIfAvailable), 1, ++row, 3, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 	}
@@ -318,18 +302,22 @@ public class SBasePanel extends JPanel {
 					(int) d.getHeight() + 10));
 			lh.add(scroll, 1, ++row, 3, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
-			if (mc instanceof EventAssignment)
+			if (mc instanceof EventAssignment) {
 				lh.add(new SBasePanel(((EventAssignment) mc)
-						.getVariableInstance()), 1, ++row, 3, 1, 1, 1);
-			else if (mc instanceof InitialAssignment)
+						.getVariableInstance(), namesIfAvailable), 1, ++row, 3, 1, 1, 1);
+			}
+			else if (mc instanceof InitialAssignment) {
 				lh.add(new SBasePanel(((InitialAssignment) mc)
-						.getVariableInstance()), 1, ++row, 3, 1, 1, 1);
-			else if (mc instanceof AssignmentRule)
+						.getVariableInstance(), namesIfAvailable), 1, ++row, 3, 1, 1, 1);
+			}
+			else if (mc instanceof AssignmentRule) {
 				lh.add(new SBasePanel(((AssignmentRule) mc)
-						.getVariableInstance()), 1, ++row, 3, 1, 1, 1);
-			else if (mc instanceof RateRule)
-				lh.add(new SBasePanel(((RateRule) mc).getVariableInstance()),
+						.getVariableInstance(), namesIfAvailable), 1, ++row, 3, 1, 1, 1);
+			}
+			else if (mc instanceof RateRule) {
+				lh.add(new SBasePanel(((RateRule) mc).getVariableInstance(), namesIfAvailable),
 						1, ++row, 3, 1, 1, 1);
+			}
 		}
 	}
 
@@ -519,7 +507,7 @@ public class SBasePanel extends JPanel {
 		lh.add(rEqPanel, 1, ++row, 3, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		if (reaction.isSetKineticLaw()) {
-			lh.add(new SBasePanel(reaction.getKineticLaw()), 1, ++row, 3, 1, 1,
+			lh.add(new SBasePanel(reaction.getKineticLaw(), namesIfAvailable), 1, ++row, 3, 1, 1,
 					1);
 		}
 	}
@@ -653,13 +641,15 @@ public class SBasePanel extends JPanel {
 			lh.add(combo, 3, row, 1, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
-		if (ssr instanceof SpeciesReference)
+		if (ssr instanceof SpeciesReference) {
 			addProperties((SpeciesReference) ssr);
-		else if (ssr instanceof ModifierSpeciesReference)
+		} else if (ssr instanceof ModifierSpeciesReference) {
 			addProperties((ModifierSpeciesReference) ssr);
-		if (ssr.isSetSpecies())
-			lh.add(new SBasePanel(ssr.getSpeciesInstance()), 1, ++row, 3, 1, 1,
-					1);
+		}
+    if (ssr.isSetSpecies()) {
+      lh.add(new SBasePanel(ssr.getSpeciesInstance(), namesIfAvailable), 1,
+        ++row, 3, 1, 1, 1);
+    }
 	}
 
 	/**
@@ -846,7 +836,7 @@ public class SBasePanel extends JPanel {
 		lh.add(unitPreview(ud), 3, row, 1, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		for (Unit u : ud.getListOfUnits()) {
-			lh.add(new SBasePanel(u), 1, ++row, 3, 1, 1, 1);
+			lh.add(new SBasePanel(u, namesIfAvailable), 1, ++row, 3, 1, 1, 1);
 		}
 	}
 

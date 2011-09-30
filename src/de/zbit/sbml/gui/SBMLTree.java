@@ -34,6 +34,7 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a
@@ -108,6 +109,15 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 		public SBMLNode(SBase sbase) {
 			super(sbase);
 		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see javax.swing.tree.DefaultMutableTreeNode#getUserObject()
+		 */
+		@Override
+		public TreeNodeWithChangeSupport getUserObject() {
+		  return (TreeNodeWithChangeSupport) super.getUserObject();
+		}
 	}
 	
 	/*
@@ -164,8 +174,8 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) getSelectionPath()
 						.getLastPathComponent();
 				Object userObject = node.getUserObject();
-				if (userObject instanceof Reaction || userObject instanceof Model
-						|| userObject instanceof SBMLDocument) {
+				if ((userObject instanceof Reaction) || (userObject instanceof Model)
+						|| (userObject instanceof SBMLDocument)) {
 					if (userObject instanceof SBMLDocument) {
 						currSBase = ((SBMLDocument) userObject).getModel();
 					} else {

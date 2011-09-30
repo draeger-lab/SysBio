@@ -50,10 +50,11 @@ public class ASTNodePanel extends JPanel {
 
     /**
      * @param node
+     * @param namesIfAvailable 
      * @throws SBMLException
      * @throws IOException
      */
-    public ASTNodePanel(ASTNode node) throws SBMLException, IOException {
+    public ASTNodePanel(ASTNode node, boolean namesIfAvailable) throws SBMLException, IOException {
 	super();
 	LayoutHelper lh = new LayoutHelper(this);
 	boolean enabled = false;
@@ -124,7 +125,7 @@ public class ASTNodePanel extends JPanel {
 	    tf.setEditable(enabled);
 	    lh.add("Name", tf, true);
 	    if (node.getVariable() != null) {
-		lh.add(new SBasePanel(node.getVariable()), 0, lh.getRow() + 1,
+		lh.add(new SBasePanel(node.getVariable(), namesIfAvailable), 0, lh.getRow() + 1,
 		    3, 1);
 		lh.add(new JPanel(), 0, lh.getRow() + 1, 3, 1);
 	    }
