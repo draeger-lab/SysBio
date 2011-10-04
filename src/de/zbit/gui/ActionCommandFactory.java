@@ -15,20 +15,32 @@
  * ---------------------------------------------------------------------
  */
 
-package de.zbit.gui.prefs;
+package de.zbit.gui;
 
-import de.zbit.gui.ActionCommand;
 
 /**
  * @author Florian Mittag
  * @version $Rev$
  */
 
+/**
+ * A factory for creating ActionCommand objects.
+ * 
+ * @author Florian Mittag
+ * @version $Rev$
+ */
 public class ActionCommandFactory implements ActionCommand {
 
   protected final String name;
   protected final String tooltip;
 
+  /**
+   * Creates a new ActionCommand object with the given name and tooltip.
+   * 
+   * @param name the name of the ActionCommand
+   * @param tooltip the tooltip for the ActionCommand
+   * @return the newly created ActionCommand object
+   */
   public static ActionCommand create(String name, String tooltip) {
     return new ActionCommandFactory(name, tooltip);
   }
@@ -38,11 +50,24 @@ public class ActionCommandFactory implements ActionCommand {
     this.tooltip = tooltip;
   }
   
+  /* (non-Javadoc)
+   * @see de.zbit.gui.ActionCommand#getName()
+   */
   public String getName() {
     return name;
   }
 
+  /* (non-Javadoc)
+   * @see de.zbit.gui.ActionCommand#getToolTip()
+   */
   public String getToolTip() {
     return tooltip;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+    return getName();
   }
 }
