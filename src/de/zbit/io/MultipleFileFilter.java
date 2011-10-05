@@ -21,6 +21,11 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 /**
+ * A {@link FileFilter} that combines several other {@link FileFilter} objects.
+ * This {@link FileFilter} accepts a file if one of the member
+ * {@link FileFilter}s accepts the file. It has just one single description that
+ * must explain all of the given {@link FileFilter} instances.
+ * 
  * @author Andreas Dr&auml;ger
  * @date 2010-10-22
  * @version $Rev$
@@ -29,9 +34,13 @@ import javax.swing.filechooser.FileFilter;
 public class MultipleFileFilter extends GeneralFileFilter {
 
 	/**
-	 * 
+	 * The unified description for all {@link FileFilter}s. 
 	 */
 	private String description;
+  /**
+   * All {@link FileFilter} instances that will be checked when calling the
+   * {@link #accept(File)} method.
+   */
 	private FileFilter[] filters;
 
 	/**
@@ -48,6 +57,7 @@ public class MultipleFileFilter extends GeneralFileFilter {
 	 * 
 	 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
 	 */
+	@Override
 	public boolean accept(File f) {
 		for (FileFilter filter : filters) {
 			if (filter.accept(f)) {
@@ -58,6 +68,14 @@ public class MultipleFileFilter extends GeneralFileFilter {
 	}
 
 	/*
+   * (non-Javadoc)
+   * @see de.zbit.io.GeneralFileFilter#clone()
+   */
+  protected MultipleFileFilter clone() throws CloneNotSupportedException {
+    return new MultipleFileFilter(description, filters);
+  }
+
+  /*
 	 * (non-Javadoc)
 	 * 
 	 * @see javax.swing.filechooser.FileFilter#getDescription()
@@ -65,5 +83,18 @@ public class MultipleFileFilter extends GeneralFileFilter {
 	public String getDescription() {
 		return description;
 	}
+
+  /* (non-Javadoc)
+   * @see de.zbit.io.GeneralFileFilter#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 919;
+    int hashCode = super.hashCode();
+    for (FileFilter filter : filters) {
+      hashCode += prime * filter.hashCode();
+    }
+    return hashCode;
+  }
 
 }

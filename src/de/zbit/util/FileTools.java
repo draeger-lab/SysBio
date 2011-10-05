@@ -333,9 +333,9 @@ public class FileTools {
    * @return file extension of <code>name</code>
    */
   public static String getExtension(String name) {
-    if (name!=null && name.length() > 0) {
+    if ((name != null) && (name.length() > 0)) {
       int pos = name.lastIndexOf('.');
-      if (pos>=0) {
+      if (pos >= 0) {
         return name.substring(pos + 1);
       }
     }

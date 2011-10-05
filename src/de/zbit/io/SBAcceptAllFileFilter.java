@@ -35,6 +35,7 @@ public class SBAcceptAllFileFilter extends GeneralFileFilter {
 	 * 
 	 */
 	public SBAcceptAllFileFilter() {
+	  super();
 	}
 	
 	/*
@@ -56,5 +57,13 @@ public class SBAcceptAllFileFilter extends GeneralFileFilter {
 				.getBundle("de.zbit.locales.Labels");
 		return resource.getString("ACCEPT_ALL_FILES");
 	}
+
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.io.GeneralFileFilter#clone()
+   */
+  protected SBAcceptAllFileFilter clone() throws CloneNotSupportedException {
+    return new SBAcceptAllFileFilter();
+  }
 	
 }
