@@ -43,7 +43,7 @@ import de.zbit.util.StringUtil;
  */
 public class SBFileFilter extends GeneralFileFilter {
 	
-	/**
+  /**
 	 * 
 	 * @author Andreas Dr&auml;ger
 	 * @author Clemens Wrzodek
@@ -121,7 +121,35 @@ public class SBFileFilter extends GeneralFileFilter {
 		/**
 		 * To be selected if SBML files (XML files) can be chosen.
 		 */
-		SBML_FILES, 
+		SBML_FILES,
+		/**
+		 * To be selected if SBML files (XML files) of Level 1 Version 1 can be chosen.
+		 */
+		SBML_FILES_L1V1,
+    /**
+     * To be selected if SBML files (XML files) of Level 1 Version 2 can be chosen.
+     */
+    SBML_FILES_L1V2,
+		/**
+     * To be selected if SBML files (XML files) of Level 2 Version 1 can be chosen.
+     */
+    SBML_FILES_L2V1,
+    /**
+     * To be selected if SBML files (XML files) of Level 2 Version 2 can be chosen.
+     */
+    SBML_FILES_L2V2,
+    /**
+     * To be selected if SBML files (XML files) of Level 2 Version 3 can be chosen.
+     */
+    SBML_FILES_L2V3,
+    /**
+     * To be selected if SBML files (XML files) of Level 2 Version 4 can be chosen.
+     */
+    SBML_FILES_L2V4,
+    /**
+     * To be selected if SBML files (XML files) of Level 3 Version 1 can be chosen.
+     */
+    SBML_FILES_L3V1,
 		/**
      * To be selected if SVG files (Scalable Vector Graphics) can be chosen.
      */
@@ -169,6 +197,13 @@ public class SBFileFilter extends GeneralFileFilter {
           extensions.add("xml");
           return extensions;
         case SBML_FILES:
+        case SBML_FILES_L1V1:
+        case SBML_FILES_L1V2:
+        case SBML_FILES_L2V1:
+        case SBML_FILES_L2V2:
+        case SBML_FILES_L2V3:
+        case SBML_FILES_L2V4:
+        case SBML_FILES_L3V1:
           extensions.add("xml");
           break;
         case TEXT_FILES:
@@ -192,45 +227,59 @@ public class SBFileFilter extends GeneralFileFilter {
      */
     public String getLinePattern() {
       String linePattern = null;
-      switch (this) {
-        case KGML_FILES:
-          return "<!DOCTYPE[\\p{ASCII}]*KGML[\\p{ASCII}]*>";
-        case SBML_FILES:
-          return "<sbml[\\p{ASCII}]*level=\"[1-3]\"[\\p{ASCII}]*version=\"[1-4]\"[\\p{ASCII}]*>";
-        default:
-          break;
+      if (this == KGML_FILES) {
+        return "<!DOCTYPE[\\p{ASCII}]*KGML[\\p{ASCII}]*>";
+      }
+      if (this.toString().startsWith(SBML_FILES.toString())) {
+        String anyChar = "[\\s\\w\\p{ASCII}]*";
+        String whiteSpace = "[\\s]+";
+        String number = "[1-9]+[0-9]*";
+        String level = number, version = number;
+        String sbmlDef = "<sbml%s%slevel=\"%s\"%s%sversion=\"%s\"%s>";
+        if (this != SBML_FILES) {
+          level = this.toString().substring(12, 13);
+          version = this.toString().substring(14);
+        }
+        return String.format(sbmlDef, whiteSpace, anyChar, level,
+          whiteSpace, anyChar, version, anyChar);
       }
       return linePattern;
     } 
 	}
-
-	/**
+  
+  /**
    * The maximal number of lines to check for characteristic identifier in
    * files. If the first {@link #MAX_LINES_TO_PARSE} do not contain a defined
    * pattern for the given file type, the file cannot be recognized as a valid
    * file of this type.
    */
   private static final int MAX_LINES_TO_PARSE = 20;
-	
-	/**
+
+  /**
 	 * 
-	 * @param f
+	 * @param file
 	 * @param extension
-	 * @return
+	 * @return The file extension in lower case with a single dot as its prefix.
 	 */
-	public static boolean checkExtension(File f, String extension) {
+	public static boolean checkExtension(File file, String extension) {
 		if (!extension.startsWith(".")) {
 			extension = "." + extension;
 		}
-		return f.getName().toLowerCase().endsWith(extension.toLowerCase());
+		return file.getName().toLowerCase().endsWith(extension.toLowerCase());
 	}
-	
+
 	/**
-	 * 
-	 * @param file
-	 * @param type
-	 * @return
-	 */
+   * This method opens the given file and parses the first
+   * {@link #MAX_LINES_TO_PARSE} lines. If a line pattern for the given expected
+   * {@link FileType} is available (see {@link FileType#getLinePattern()}), it
+   * then tries to match the current line to the pattern. In case it finds the
+   * expected pattern, this method will return <code>true</code>.
+   * 
+   * @param file
+   * @param type
+   * @return <code>true</code> if the given {@link File} matches the line
+   *         pattern of the given {@link FileType}
+   */
   private static boolean checkFileHead(File file, FileType type) {
     String linePattern = type.getLinePattern();
     boolean retVal = linePattern == null;
@@ -261,8 +310,8 @@ public class SBFileFilter extends GeneralFileFilter {
 	public final static GeneralFileFilter createAllFileFilter() {
 		return new SBAcceptAllFileFilter();
 	}
-	
-	/**
+  
+  /**
    * @return A filter for association files
    */
   public static SBFileFilter createASSOCFileFilter() {
@@ -275,15 +324,15 @@ public class SBFileFilter extends GeneralFileFilter {
   public static SBFileFilter createBEDFileFilter() {
     return new SBFileFilter(FileType.BED_FILES);
   }
-  
-  /**
+	
+	/**
    * @return A filter for bim files
    */
   public static SBFileFilter createBIMFileFilter() {
     return new SBFileFilter(FileType.BIM_FILES);
   }
-  
-  /**
+	
+	/**
 	 * @return A filter for CSV files
 	 */
 	public static SBFileFilter createCSVFileFilter() {
@@ -304,6 +353,19 @@ public class SBFileFilter extends GeneralFileFilter {
     return new SBFileFilter(FileType.FAM_FILES);
   }
   
+  public static final SBFileFilter[] createSBMLFileFilterList() {
+    FileType types[] = { FileType.SBML_FILES_L1V1, FileType.SBML_FILES_L1V2,
+        FileType.SBML_FILES_L2V1, FileType.SBML_FILES_L2V2,
+        FileType.SBML_FILES_L2V3, FileType.SBML_FILES_L2V4,
+        FileType.SBML_FILES_L3V1, FileType.SBML_FILES };
+    SBFileFilter filters[] = new SBFileFilter[types.length];
+    int i=0;
+    for (FileType type : types) {
+      filters[i++] = new SBFileFilter(type);
+    }
+	  return filters;
+	}
+  
   /**
 	 * 
 	 * @return
@@ -319,8 +381,8 @@ public class SBFileFilter extends GeneralFileFilter {
 	public static final SBFileFilter createGMLFileFilter() {
 		return new SBFileFilter(FileType.GML_FILES);
 	}
-	
-	/**
+  
+  /**
 	 * 
 	 * @return
 	 */
@@ -402,13 +464,62 @@ public class SBFileFilter extends GeneralFileFilter {
 	}
 	
 	/**
+	 * @return A filter for SBML files in level 1 version 1
+	 */
+	public static final SBFileFilter createSBMLFileFilterL1V1() {
+	  return new SBFileFilter(FileType.SBML_FILES_L1V1);
+	}
+	
+	/**
+   * @return A filter for SBML files in level 1 version 2
+   */
+  public static final SBFileFilter createSBMLFileFilterL1V2() {
+    return new SBFileFilter(FileType.SBML_FILES_L1V2);
+  }
+	
+	/**
+   * @return A filter for SBML files in level 2 version 1
+   */
+  public static final SBFileFilter createSBMLFileFilterL2V1() {
+    return new SBFileFilter(FileType.SBML_FILES_L2V1);
+  }
+	 
+  /**
+   * @return A filter for SBML files in level 2 version 2
+   */
+  public static final SBFileFilter createSBMLFileFilterL2V2() {
+    return new SBFileFilter(FileType.SBML_FILES_L2V2);
+  }
+  
+  /**
+   * @return A filter for SBML files in level 2 version 3
+   */
+  public static final SBFileFilter createSBMLFileFilterL2V3() {
+    return new SBFileFilter(FileType.SBML_FILES_L2V3);
+  }
+  
+  /**
+   * @return A filter for SBML files in level 2 version 4
+   */
+  public static final SBFileFilter createSBMLFileFilterL2V4() {
+    return new SBFileFilter(FileType.SBML_FILES_L2V4);
+  }
+  
+  /**
+   * @return A filter for SBML files in level 3 version 1
+   */
+  public static final SBFileFilter createSBMLFileFilterL3V1() {
+    return new SBFileFilter(FileType.SBML_FILES_L3V1);
+  }
+  
+  /**
 	 * @return A filter for SVG files (Scalable Vector Graphics)
 	 */
 	public static SBFileFilter createSVGFileFilter() {
 	  return new SBFileFilter(FileType.SVG_FILES);
 	}
-	
-	/**
+  
+  /**
 	 * @return A filter for TeX files
 	 */
 	public static final SBFileFilter createTeXFileFilter() {
@@ -447,11 +558,11 @@ public class SBFileFilter extends GeneralFileFilter {
 	
 	/**
    * 
-   * @param f
+   * @param file
    * @return
    */
-  public static String getExtension(File f) {
-    return getExtension(f.getName());
+  public static String getExtension(File file) {
+    return getExtension(file.getName());
   }
 	
 	/**
@@ -464,11 +575,36 @@ public class SBFileFilter extends GeneralFileFilter {
 	
 	/**
 	 * 
-	 * @param f
+	 * @param file
+	 * @param type
 	 * @return
 	 */
-	public static boolean isCSVFile(File f) {
-		return f.getName().toLowerCase().endsWith(".csv");
+	public static boolean hasFileType(File file, FileType type) {
+    return hasFileType(file, type, false);
+	}
+	
+	/**
+	 * 
+	 * @param file
+	 * @param type
+	 * @param caseSensitive
+	 * @return
+	 */
+	public static boolean hasFileType(File file, FileType type, boolean caseSensitive) {
+	  String extension = getExtension(file);
+	  if (!caseSensitive) {
+	    extension = extension.toLowerCase();
+	  }
+	  return type.getFileExtensions().contains(extension);
+	}
+	
+	/**
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static boolean isCSVFile(File file) {
+		return hasFileType(file, FileType.CSV_FILES);
 	}
   
   /**
@@ -476,29 +612,27 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * @return
 	 */
 	public static boolean isHTMLFile(File file) {
-		String name = file.getName().toLowerCase();
-		return name.endsWith(".html") || name.endsWith(".htm");
+		return hasFileType(file, FileType.HTML_FILES);
 	}
   
   /**
 	 * 
-	 * @param f
+	 * @param file
 	 * @return
 	 */
-	public static boolean isJPEGFile(File f) {
-		String extension = f.getName().toLowerCase();
-		return extension.endsWith(".jpg") || extension.endsWith(".jpeg");
+	public static boolean isJPEGFile(File file) {
+		return hasFileType(file, FileType.JPEG_FILES);
 	}
 	
 	/**
    * Checks a) if the file endswith XML and b) if the doctype is KGML.
-   * @param f
+   * @param file
    * @return true if and only if the file is a KGML formatted file.
    */
-  public static boolean isKGML(File f) {
+  public static boolean isKGML(File file) {
     FileType type = FileType.KGML_FILES;
-    if (type.getFileExtensions().contains(getExtension(f))) {
-      return checkFileHead(f, type);
+    if (hasFileType(file, type)) {
+      return checkFileHead(file, type);
     }
     return false;
   }
@@ -508,74 +642,66 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * @return
 	 */
 	public static boolean isPDFFile(File file) {
-		return file.getName().toLowerCase().endsWith(".pdf");
+		return hasFileType(file, FileType.PDF_FILES);
 	}
 
   /**
 	 * Returns true if the given file is a portable network graphics file.
 	 * 
-	 * @param f
+	 * @param file
 	 * @return
 	 */
-	public static boolean isPNGFile(File f) {
-		return f.getName().toLowerCase().endsWith(".png");
+	public static boolean isPNGFile(File file) {
+		return hasFileType(file, FileType.PNG_FILES);
 	}
 	
 	/**
 	 * Returns true if the given file is an SBML file.
 	 * 
-	 * @param f
+	 * @param file
 	 * @return
 	 */
-	public static boolean isSBMLFile(File f) {
-	  FileType type = FileType.SBML_FILES; 
-	  if (type.getFileExtensions().contains(getExtension(f))) {
-	    return checkFileHead(f, type);
-	  }
-	  return false;
-	}
+  public static boolean isSBMLFile(File file) {
+    FileType type = FileType.SBML_FILES;
+    if (hasFileType(file, type)) {
+      return checkFileHead(file, type);
+    }
+    return false;
+  }
 	
 	/**
 	 * Returns true if the given file is a TeX file.
 	 * 
-	 * @param f
+	 * @param file
 	 * @return
 	 */
-	public static boolean isTeXFile(File f) {
-		return f.getName().toLowerCase().endsWith(".tex");
+	public static boolean isTeXFile(File file) {
+		return hasFileType(file, FileType.TeX_FILES);
 	}
 	
 	/**
 	 * Returns true if the given file is a text file.
 	 * 
-	 * @param f
+	 * @param file
 	 * @return
 	 */
-	public static boolean isTextFile(File f) {
-		return f.getName().toLowerCase().endsWith(".txt");
+	public static boolean isTextFile(File file) {
+		return hasFileType(file, FileType.TEXT_FILES);
 	}
 	
 	/**
 	 * Allows users to initialize this {@link GeneralFileFilter} with another
-	 * {@link FileFilter}.
+	 * {@link FileFilter}. In this way, the {@link SBFileFilter} can work as
+	 * an adapter/wrapper.
 	 */
-	private FileFilter filter;
+	private GeneralFileFilter filter;
 	
-  /**
+	/**
 	 * Allowable file type.
 	 */
 	private FileType type;
 	
 	/**
-	 * 
-	 * @param filter
-	 */
-	public SBFileFilter(FileFilter filter) {
-		this.filter = filter;
-		this.type = FileType.UNDEFINED;
-	}
-  
-  /**
 	 * Constructs a file filter that accepts or not accepts the following files
 	 * (defined by the given parameters).
 	 * 
@@ -590,8 +716,19 @@ public class SBFileFilter extends GeneralFileFilter {
 				  "FILE_TYPE_MUST_NOT_BE_UNDEFINED")); 
 		}
 	}
-
-  /*
+	
+  /**
+	 * A constructor that allows using this {@link SBFileFilter} as a wrapper
+	 * for another {@link GeneralFileFilter}.
+	 * 
+	 * @param filter
+	 */
+	public SBFileFilter(GeneralFileFilter filter) {
+		this.filter = filter;
+		this.type = FileType.UNDEFINED;
+	}
+	
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
@@ -604,7 +741,7 @@ public class SBFileFilter extends GeneralFileFilter {
     return (f.isDirectory() || ((extensions.isEmpty() || extensions
         .contains(getExtension(f))) && checkFileHead(f, type)));
   }
-
+  
   /**
 	 * 
 	 * @return
@@ -612,7 +749,7 @@ public class SBFileFilter extends GeneralFileFilter {
 	public boolean acceptsCSVFiles() {
 		return type == FileType.CSV_FILES;
 	}
-	
+
   /**
 	 * 
 	 * @return
@@ -620,7 +757,7 @@ public class SBFileFilter extends GeneralFileFilter {
 	public boolean acceptsJPEGFiles() {
 		return type == FileType.JPEG_FILES;
 	}
-  
+
   /**
 	 * 
 	 * @return
@@ -629,7 +766,7 @@ public class SBFileFilter extends GeneralFileFilter {
 		return type == FileType.PNG_FILES;
 	}
 	
-	/**
+  /**
 	 * Returns true if this file filter accepts SBML files.
 	 * 
 	 * @return
@@ -637,8 +774,8 @@ public class SBFileFilter extends GeneralFileFilter {
 	public boolean acceptsSBMLFiles() {
 		return type == FileType.SBML_FILES;
 	}
-	
-	/**
+  
+  /**
    * 
    * @return
    */
@@ -672,23 +809,36 @@ public class SBFileFilter extends GeneralFileFilter {
 	
 	/*
 	 * (non-Javadoc)
+	 * @see de.zbit.io.GeneralFileFilter#clone()
+	 */
+  @Override
+  protected GeneralFileFilter clone() throws CloneNotSupportedException {
+    if (isSetFileFilter()) {
+      return new SBFileFilter(filter);
+    }
+    return new SBFileFilter(type);
+  }
+	
+	/*
+	 * (non-Javadoc)
 	 * 
 	 * @see javax.swing.filechooser.FileFilter#getDescription()
 	 */
 	public String getDescription() {
 	  return getDescription(false);
 	}
-  
-  /**
-   * @see #getDescription()
-   * @param inTheMiddleOfASentece
-   *        if true, will return a string that can be used
-   *        "in the middle of a sentece". Else, a string that stands at the
-   *        start of a sentence or by itself will be returned. E.g., if true,
-   *        "directories only" if false "Directories only".
+	
+	/**
+   * 
+   * @param inTheMiddleOfASentence
+   *        if <code>true</code>, will return a {@link String} that can be used
+   *        "in the middle of a sentence". Else, a {@link String} that stands at
+   *        the start of a sentence or by itself will be returned. E.g., if
+   *        <code>true</code>, "directories only" if false "Directories only".
    * @return
+   * @see #getDescription()
    */
-  public String getDescription(boolean inTheMiddleOfASentece) {
+  public String getDescription(boolean inTheMiddleOfASentence) {
     if (filter != null) {
       return filter.getDescription();
     }
@@ -706,32 +856,56 @@ public class SBFileFilter extends GeneralFileFilter {
       }
     }
     sb.append(")");
-    if (inTheMiddleOfASentece) {
+    if (inTheMiddleOfASentence) {
       return StringUtil.changeFirstLetterCase(sb.toString(), false, false);
     }
     return sb.toString();
   }
-	
-	/**
+  
+  /**
    * @see {@link #getExtensions()}
    * @return the first file extension of all acceptable extensions.
    */
   public String getExtension() {
     Set<String> extensions = getExtensions();
-    if (extensions!=null && extensions.size()>0) {
+    if ((extensions != null) && (extensions.size() > 0)) {
       return extensions.iterator().next();
     }
     return null;
   }
-
-  /**
+	
+	/**
    * @return all acceptable file extensions.
    */
   public Set<String> getExtensions() {
     return type.getFileExtensions();
   }
-  
+
   /* (non-Javadoc)
+   * @see de.zbit.io.GeneralFileFilter#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 919;
+    int hashCode = super.hashCode();
+    if (isSetFileFilter()) {
+      hashCode += prime * filter.hashCode();
+    }
+    if (isSetFileType()) {
+      hashCode += prime * type.hashCode();
+    }
+    return hashCode;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+	public boolean isSetFileType() {
+    return type != null;
+  }
+
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

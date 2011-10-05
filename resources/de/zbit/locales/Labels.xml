@@ -139,6 +139,13 @@
   <entry key="PDF_FILES">Portable Document Format files</entry>
   <entry key="PNG_FILES">Portable Network Graphics files</entry>
   <entry key="SBML_FILES">SBML files</entry>
+  <entry key="SBML_FILES_L1V1">SBML Level 1 Version 1 files</entry>
+  <entry key="SBML_FILES_L1V2">SBML Level 1 Version 2 files</entry>
+  <entry key="SBML_FILES_L2V1">SBML Level 2 Version 1 files</entry>
+  <entry key="SBML_FILES_L2V2">SBML Level 2 Version 2 files</entry>
+  <entry key="SBML_FILES_L2V3">SBML Level 2 Version 3 files</entry>
+  <entry key="SBML_FILES_L2V4">SBML Level 2 Version 4 files</entry>
+  <entry key="SBML_FILES_L3V1">SBML Level 3 Version 1 files</entry>
   <entry key="SVG_FILES">Scalable Vector Graphics files</entry>
   <entry key="TeX_FILES">TeX files</entry>
   <entry key="TEXT_FILES">Text files</entry>
