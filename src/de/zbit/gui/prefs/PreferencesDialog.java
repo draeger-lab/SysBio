@@ -320,6 +320,11 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 			setLocationRelativeTo(getOwner());
 			setResizable(false);
 			setModal(true);
+			// FIXME: This is a really dirty solution. You should first check,
+			// if this panel is not already registered as listener on allPrefsPanel.
+			// Secondly, if allPrefsPanel changes (see setPreferencesPanel()), this
+			// panel should not listen anymore to the old panel and shoud now listen
+			// to the new panel!
 			allPrefsPanel.addItemListener(this);
 			allPrefsPanel.addChangeListener(this);
 			allPrefsPanel.addKeyListener(this);

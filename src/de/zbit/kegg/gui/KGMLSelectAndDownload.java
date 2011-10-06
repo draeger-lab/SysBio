@@ -24,6 +24,7 @@ import javax.swing.SwingWorker;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
+import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileDownload;
 
 /**
@@ -34,6 +35,11 @@ import de.zbit.util.FileDownload;
  */
 public class KGMLSelectAndDownload {
   
+  /**
+   * This directory will be used as target for downloaded pathways.
+   * This string must end with a "/" and will be prepended to the file.
+   */
+  private final static String localPathwayCacheDir = "res/kgml/";
   
   /**
    * The base path to locate KGML pathways. As of 2011-07-01 this is no more publicly
@@ -161,6 +167,9 @@ public class KGMLSelectAndDownload {
     localFile = downloadKGML(pwID, localFile, askUserBeforeUsingCache);
     if (localFile==null) {
 //      GUITools.showErrorMessage(null, String.format("Could not download the selected pathway for the selected organism (%s).", pwID));
+      if (FileDownload.ProgressBar!=null && FileDownload.ProgressBar instanceof AbstractProgressBar) {
+        ((AbstractProgressBar)FileDownload.ProgressBar).finished();
+      }
       throw new Exception(String.format("Could not download the selected pathway for the selected organism (%s).", pwID));
     }
     
@@ -241,7 +250,7 @@ public class KGMLSelectAndDownload {
    */
   private static String downloadKGML(String pwID, String localFile, boolean askUserBeforeUsingCache) {
     if (localFile==null || localFile.length()<1) {
-      localFile = pwID + ".xml";
+      localFile = localPathwayCacheDir + pwID + ".xml";
     }
     
     // Check if file already exists and ask user to reuse or overwrite or cancel.
@@ -262,6 +271,9 @@ public class KGMLSelectAndDownload {
     
     // TODO: Put download in separate thread and check for timeouts.
     String newUrl = String.format("http://www.genome.jp/kegg-bin/download?entry=%s&format=kgml", pwID);
+    try {
+      new File(new File(localFile).getParent()).mkdirs();
+    } catch (Exception e){};// consequences will be handeled in the download method
     localFile = FileDownload.download(newUrl, localFile);
     
     if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>1) {

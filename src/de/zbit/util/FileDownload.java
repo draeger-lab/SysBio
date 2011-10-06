@@ -168,6 +168,7 @@ public class FileDownload {
       if (new File(localFileName).exists()) {
         URL url = new URL(address);
         int targetFileSize = url.openConnection().getContentLength();
+        // REMARK: targetFileSize is often -1 if server can not give this info
         if (targetFileSize==new File(localFileName).length()) {
           System.out.println("File already exists and file length matches. Not downloading it again.");
           return localFileName;
@@ -183,7 +184,7 @@ public class FileDownload {
     } catch (Throwable t) {
       // Try to open stream in official system tempDir.
       final String tempDir = System.getProperty("java.io.tmpdir");
-      localFileName = tempDir + (tempDir.endsWith(File.separator)?"":File.separator) + localFileName;
+      localFileName = tempDir + (tempDir.endsWith(File.separator)?"":File.separator) + new File(localFileName).getName();
       try {
         out = new BufferedOutputStream(new FileOutputStream(localFileName));
       } catch (FileNotFoundException e) {

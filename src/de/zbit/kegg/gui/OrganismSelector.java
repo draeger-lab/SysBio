@@ -254,7 +254,7 @@ public class OrganismSelector extends JPanel {
    * Set the default selection of this organism selector.
    * @param organism as given as full name by KEGG e.g. "Homo sapiens (human)".
    */
-  public void setDefeaultSelection(String organism) {
+  public void setDefaultSelection(String organism) {
     defaultSelection = organism;
     /* Panel has not yet been initialized and will take
      * automatically the defaultSelection.
@@ -279,7 +279,7 @@ public class OrganismSelector extends JPanel {
         // Wait until we have an answer from KEGG and
         // then convert to full name
         String fullName = getOrganisms().get(organismKeggAbbr);
-        setDefeaultSelection(fullName);
+        setDefaultSelection(fullName);
       }
     };
     r.start();

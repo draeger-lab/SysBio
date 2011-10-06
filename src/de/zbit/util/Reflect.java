@@ -791,21 +791,6 @@ public class Reflect {
   }
 	
 	/**
-	 * Checks whether a method with this name and the given parameter type exists
-	 * for the given {@link Object} clazz.
-	 * 
-	 * @param clazz
-	 * @param methodName
-	 * @param parameterType
-	 * @param parameter
-	 * @return
-	 */
-	public static boolean contains(Object clazz, String methodName,
-		Class<?> parameterType) {
-		return contains(clazz, methodName, new Class<?>[] { parameterType });
-	}
-	
-	/**
 	 * Checks whether a method with this name and the given parameter types exists
 	 * for the given {@link Object} clazz.
 	 * 
@@ -816,15 +801,29 @@ public class Reflect {
 	 * @return
 	 */
 	public static boolean contains(Object clazz, String methodName,
-		Class<?>[] parameterTypes) {
+		Class<?>... parameterTypes) {
 		try {
-			Method m = clazz.getClass().getMethod(methodName, parameterTypes);
+			Method m = getMethod(clazz, methodName, parameterTypes);
 			return m != null;
 		} catch (SecurityException e) {
 		} catch (NoSuchMethodException e) {
 		}
 		return false;
 	}
+
+	/**
+	 * 
+	 * @param clazz
+	 * @param methodName
+	 * @param parameterTypes
+	 * @return
+	 * @throws NoSuchMethodException
+	 */
+  public static Method getMethod(Object clazz, String methodName,
+    Class<?>... parameterTypes) throws NoSuchMethodException {
+    Method m = clazz.getClass().getMethod(methodName, parameterTypes);
+    return m;
+  }
 
 	/**
 	 * Checks if a certain method exists and invokes it.

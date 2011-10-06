@@ -18,9 +18,11 @@ package de.zbit.gui;
 
 import java.awt.Component;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -31,14 +33,17 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import de.zbit.util.Reflect;
+import de.zbit.util.StringUtil;
+
 /**
  * A {@link ComboBoxModel} that displays the names and ToolTips
  * of {@link ActionCommand}s.
  * <p>It furthermore displays {@link Component} directly
  * as components and does not generate a {@link JLabel} with
  * the {@link Component#toString()} method.
- * <p>As last feature, Classes are displayed with
- * {@link Class#getSimpleName()}.
+ * <p>Classes are displayed with {@link Class#getSimpleName()}.
+ * <p>Icons of {@link ActionCommandWithIcon} are also displayed.
  * 
  * @author Clemens Wrzodek
  * @version $Rev$
@@ -62,6 +67,23 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
    */
   private ListCellRenderer defaultListRenderer = null;
   
+  /**
+   * If true tooltips are displayed as HTML-entities.
+   */
+  private boolean showAsHTML = false;
+  
+  public ActionCommandRenderer() {
+    this(false);
+  }
+  
+  /**
+   * @param showAsHTML will show all tooltips as HTML entities.
+   * May be slower than native text!
+   */
+  public ActionCommandRenderer(boolean showAsHTML) {
+    this.showAsHTML = showAsHTML;
+  }
+  
   
   /* (non-Javadoc)
    * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
@@ -74,11 +96,15 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     String label = value.toString();
     String toolTip = null;
     Component c = null;
+    Icon icon = null;
     if (value instanceof Component) {
       c = (Component) value;
     } else if (value instanceof ActionCommand) {
       label = ((ActionCommand)value).getName();
       toolTip = ((ActionCommand)value).getToolTip();
+      if (value instanceof ActionCommandWithIcon) {
+        icon = (((ActionCommandWithIcon)value).getIcon());
+      }
     } else if (value instanceof Class<?>) {
       label = ((Class<?>)value).getSimpleName();
       if (setToolTipToFullClassNameForClasses) {
@@ -93,9 +119,30 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
       }
       c = defaultTableRenderer.getTableCellRendererComponent(table, label, isSelected, hasFocus, row, column);
     }
+    
+    // Set ToolTip
     if (toolTip!=null && toolTip.length()>0 && (c instanceof JComponent)) {
-      ((JComponent)c).setToolTipText(toolTip);
+      if (showAsHTML) {
+        ((JComponent)c).setToolTipText(StringUtil.toHTML(toolTip, GUITools.TOOLTIP_LINE_LENGTH));
+      } else {
+        ((JComponent)c).setToolTipText(toolTip);
+      }
+    } else {
+      ((JComponent)c).setToolTipText(null);
     }
+    
+    // Set Icon
+    // Unfortunately, there is no interface for "setIcon".
+    // Another approach would be, to expect c to be a JLabel.
+    Method iconMethod = null;
+    try {
+      iconMethod = Reflect.getMethod(c, "setIcon", Icon.class);
+    } catch (Exception e) {}
+    if (iconMethod!=null) {
+      try {
+        iconMethod.invoke(c, icon);
+      } catch (Exception e) {}
+    } 
     
     return c;
   }
@@ -110,12 +157,16 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     // Get properties
     String label = value.toString();
     String toolTip = null;
+    Icon icon = null;
     Component c = null;
     if (value instanceof Component) {
       c = (Component) value;
     } else if (value instanceof ActionCommand) {
       label = ((ActionCommand)value).getName();
       toolTip = ((ActionCommand)value).getToolTip();
+      if (value instanceof ActionCommandWithIcon) {
+        icon = (((ActionCommandWithIcon)value).getIcon());
+      }
     } else if (value instanceof Class<?>) {
       label = ((Class<?>)value).getSimpleName();
       if (setToolTipToFullClassNameForClasses) {
@@ -146,9 +197,30 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
       
       c = defaultListRenderer.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);
     }
+    
+    // Set ToolTip
     if (toolTip!=null && toolTip.length()>0 && (c instanceof JComponent)) {
-      ((JComponent)c).setToolTipText(toolTip);
+      if (showAsHTML) {
+        ((JComponent)c).setToolTipText(StringUtil.toHTML(toolTip, GUITools.TOOLTIP_LINE_LENGTH));
+      } else {
+        ((JComponent)c).setToolTipText(toolTip);
+      }
+    } else {
+      ((JComponent)c).setToolTipText(null);
     }
+    
+    // Set Icon
+    // Unfortunately, there is no interface for "setIcon".
+    // Another approach would be, to expect c to be a JLabel.
+    Method iconMethod = null;
+    try {
+      iconMethod = Reflect.getMethod(c, "setIcon", Icon.class);
+    } catch (Exception e) {}
+    if (iconMethod!=null) {
+      try {
+        iconMethod.invoke(c, icon);
+      } catch (Exception e) {}
+    } 
     
     return c;
   }
