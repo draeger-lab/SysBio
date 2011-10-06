@@ -20,9 +20,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.filechooser.FileFilter;
@@ -247,6 +249,8 @@ public class SBFileFilter extends GeneralFileFilter {
     } 
 	}
   
+	public static final Logger log = Logger.getLogger(SBFileFilter.class.getName());
+	
   /**
    * The maximal number of lines to check for characteristic identifier in
    * files. If the first {@link #MAX_LINES_TO_PARSE} do not contain a defined
@@ -845,7 +849,12 @@ public class SBFileFilter extends GeneralFileFilter {
     ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
     Set<String> extensions = type.getFileExtensions();
     StringBuilder sb = new StringBuilder();
-    sb.append(bundle.getString(type.toString()));
+    try {
+      sb.append(bundle.getString(type.toString()));
+    }
+    catch( MissingResourceException e ) {
+      log.warning("No label found for this file type " + type.toString());
+    }
     sb.append(" (");
     Iterator<String> iterator = extensions.iterator();
     while (iterator.hasNext()) {
