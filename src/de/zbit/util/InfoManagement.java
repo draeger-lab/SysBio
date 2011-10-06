@@ -212,7 +212,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   public synchronized void addInformation(Info<IDtype, INFOtype> infoObject) {
     // Ensure constant max list capacity. Remove least frequently used item.
     if (isCacheFull()) {
-      freeCache(Math.max(10, maxListSize/100));
+      freeCache(Math.max(10, (int)(((double)maxListSize)*0.1)));
     }
     
     rememberedInfos.add(infoObject);
@@ -231,10 +231,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * Tries to remove the least used object first and to preserve
    * objects, that are recently added/used.
    * 
-   * You should try to remove a bunch of elements at once,
+   * <p>You should try to remove a bunch of elements at once,
    * because removing elements might take some time O(n).
    * 
-   * @param elements - number of elements to remove.
+   * @param elements number of elements to remove.
    */
   private synchronized void freeCache(int elements) {
     // Sort the list by lastUsage and delete lowest time-stamps.
@@ -484,7 +484,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         
         // Free enough cache for them
         if (isCacheFull())
-          freeCache(Math.max(unknownIDs.size(), maxListSize/100));
+          freeCache(Math.max(Math.max(10, unknownIDs.size()), (int)(((double)maxListSize)*0.1)));
       }
       
       // Big Problem: Java does not permit creating an generic array
@@ -576,7 +576,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     
     // Free enough cache for them
     if (isCacheFull()) {
-      freeCache(Math.max(infos.length, maxListSize/100));
+      freeCache(Math.max(Math.max(10, infos.length), (int)(((double)maxListSize)*0.1)));
     }
     
     // Add retrieved infos

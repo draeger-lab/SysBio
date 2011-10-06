@@ -67,6 +67,7 @@ import de.zbit.io.CSVReader;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.Utils;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 
@@ -1088,10 +1089,15 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       // Initially define 100 steps between minimum and maximum.
       double d = (maximum.doubleValue() - minimum.doubleValue())/100;
       try {
+        // 0.95 is INTEGER paresed to "0" => round before doing that
+        //stepSize = option.parseOrCast(d);
+        if (Utils.isInteger(option.getRequiredType())) {
+          d = Math.ceil(d);
+        }
         stepSize = option.parseOrCast(d);
       } catch (Throwable e) {}
     }
-    if (stepSize==null) {
+    if (stepSize==null || stepSize.doubleValue()==0.0) {
       stepSize=option.parseOrCast("1");
     }
     

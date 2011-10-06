@@ -31,7 +31,7 @@ import java.io.Serializable;
  * @version $Rev$
  * @since 1.0
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Serializable {
 	private static final long serialVersionUID = 3592331552130670620L;
 	/**
@@ -157,7 +157,7 @@ public class Info<IDtype extends Comparable, INFOtype> implements Comparable, Se
   public boolean equals(Object obj) {
     try {
       if (obj instanceof Info)
-        return equals((Info) obj);
+        return equals((Info) obj); // do NOT add <?> => Stack overflow.
     } catch (Exception e) {
     } // Other subtypes. Wrong cast!
     return super.equals(obj);

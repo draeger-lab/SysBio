@@ -17,12 +17,6 @@
 
 package de.zbit.gui;
 
-
-/**
- * @author Florian Mittag
- * @version $Rev$
- */
-
 /**
  * A factory for creating ActionCommand objects.
  * 

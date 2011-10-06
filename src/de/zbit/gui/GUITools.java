@@ -539,7 +539,10 @@ public class GUITools {
     }
     if (icon != null) {
       item.setIcon(icon);
+    } else if (command instanceof ActionCommandWithIcon) {
+      item.setIcon(((ActionCommandWithIcon)command).getIcon());
     }
+    
     return item;
   }
   
@@ -614,6 +617,8 @@ public class GUITools {
     }
     if (icon != null) {
       button.setIcon(icon);
+    } else if (command instanceof ActionCommandWithIcon) {
+      button.setIcon(((ActionCommandWithIcon)command).getIcon());
     }
     return button;
   }
