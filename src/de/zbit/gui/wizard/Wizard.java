@@ -34,6 +34,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.UIManager;
@@ -101,6 +102,9 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
   static Icon NEXT_ICON;
   static Icon FINISH_ICON;
   static Icon CANCEL_ICON;
+  
+  static Icon WARNING_ICON;
+  static Icon ERROR_ICON;
 
   private WizardModel wizardModel;
   private WizardController wizardController;
@@ -111,6 +115,8 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
   private JButton backButton;
   private JButton nextButton;
   private JButton cancelButton;
+  private JPanel warningPanel;
+  private JLabel warningLabel;
 
   private int returnCode;
 
@@ -305,6 +311,8 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
       backButton.setText(evt.getNewValue().toString());
     } else if (evt.getPropertyName().equals(WizardModel.CANCEL_BUTTON_TEXT_PROPERTY)) {
       cancelButton.setText(evt.getNewValue().toString());
+    } else if (evt.getPropertyName().equals(WizardModel.WARNING_MESSAGE_TEXT_PROPERTY)) {
+      warningLabel.setText((String) evt.getNewValue());
     } else if (evt.getPropertyName().equals(WizardModel.NEXT_FINISH_BUTTON_ENABLED_PROPERTY)) {
       nextButton.setEnabled(((Boolean) evt.getNewValue()).booleanValue());
     } else if (evt.getPropertyName().equals(WizardModel.BACK_BUTTON_ENABLED_PROPERTY)) {
@@ -317,6 +325,8 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
       backButton.setIcon((Icon) evt.getNewValue());
     } else if (evt.getPropertyName().equals(WizardModel.CANCEL_BUTTON_ICON_PROPERTY)) {
       cancelButton.setIcon((Icon) evt.getNewValue());
+    } else if (evt.getPropertyName().equals(WizardModel.WARNING_MESSAGE_ICON_PROPERTY)) {
+      warningLabel.setIcon((Icon) evt.getNewValue());
     }
 
   }
@@ -384,6 +394,58 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
   public void setCancelButtonEnabled(boolean newValue) {
     wizardModel.setCancelButtonEnabled(new Boolean(newValue));
   }
+  
+  public void setWarningText(String message) {
+    wizardModel.setWarningText(message);
+  }
+  
+  public void setWarningIcon(Icon icon) {
+    wizardModel.setWarningIcon(icon);
+  }
+  
+  public void clearWarningMessage() {
+    setWarningIcon(null);
+    setWarningText("");
+  }
+
+
+  /**
+   * Sets the visibility of the warning panel.
+   * 
+   * @param visible the new visibility status of the warning panel
+   */
+  public void setWarningVisible(boolean visible) {
+    warningPanel.setVisible(visible);
+  }
+  
+  /**
+   * Returns the visibility of the warning panel.
+   * 
+   * @return the visibility status of the warning panel
+   */
+  public boolean isWarningVisible() {
+    return warningPanel.isVisible();
+  }
+
+  /**
+   * Changes the Next/Finish button availability and the warning/error text and
+   * icon. If the Next/Finish button is enabled and a message, the message along
+   * with a warning icon is displayed. If the Next/Finish button is disabled,
+   * the message is displayed with an error icon.
+   * 
+   * @param enableNext the availability of the next/finish button
+   * @param message the message to be displayed (or <code>null</code> if there
+   *                is no warning or error)
+   */
+  public void setNextButtonAndWarningMessage(boolean enableNext, String message) {
+    setNextFinishButtonEnabled(enableNext);
+    setWarningText(message);
+    if( enableNext ) {
+      setWarningIcon(message != null ? WARNING_ICON : null);
+    } else {
+      setWarningIcon(ERROR_ICON);
+    }
+  }
 
   /**
    * Closes the dialog and sets the return code to the integer parameter.
@@ -414,6 +476,9 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     NEXT_ICON = UIManager.getIcon("ICON_ARROW_RIGHT_16");
     CANCEL_ICON = UIManager.getIcon("ICON_EXIT_16");
     FINISH_ICON = UIManager.getIcon("ICON_TICK_16");
+    
+    WARNING_ICON = UIManager.getIcon("ICON_WARNING_16");
+    ERROR_ICON = UIManager.getIcon("ICON_EXIT_16");
 
     wizardModel.addPropertyChangeListener(this);
     wizardController = new WizardController(this);
@@ -448,13 +513,19 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     nextButton.addActionListener(wizardController);
     cancelButton.addActionListener(wizardController);
 
+    warningPanel = new JPanel();
+    warningPanel.setLayout(new BorderLayout());
+    
+    warningLabel = new JLabel("");
+    warningLabel.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
+    
     //  Create the buttons with a separator above them, then place them
     //  on the east side of the panel with a small amount of space between
     //  the back and the next button, and a larger amount of space between
     //  the next button and the cancel button.
 
     buttonPanel.setLayout(new BorderLayout());
-    buttonPanel.add(separator, BorderLayout.NORTH);
+    buttonPanel.add(new JSeparator(), BorderLayout.NORTH);
 
     buttonBox.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
     buttonBox.add(backButton);
@@ -465,9 +536,14 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
 
     buttonPanel.add(buttonBox, java.awt.BorderLayout.EAST);
 
-    wizardDialog.getContentPane().add(buttonPanel, java.awt.BorderLayout.SOUTH);
-    wizardDialog.getContentPane().add(cardPanel, java.awt.BorderLayout.CENTER);
+    
+    warningPanel.setLayout(new BorderLayout());
+    warningPanel.add(warningLabel, BorderLayout.WEST);
+    warningPanel.add(separator, BorderLayout.SOUTH);
 
+    wizardDialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+    wizardDialog.getContentPane().add(cardPanel, BorderLayout.CENTER);
+    wizardDialog.getContentPane().add(warningPanel, BorderLayout.NORTH);
   }
 
   /**

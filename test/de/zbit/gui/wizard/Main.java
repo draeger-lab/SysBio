@@ -35,6 +35,7 @@ public class Main {
 
     Wizard wizard = new Wizard();
     wizard.getDialog().setTitle("Test Wizard Dialog");
+    wizard.setWarningVisible(false);
 
     WizardPanelDescriptor descriptor1 = new TestPanel1Descriptor();
     wizard.registerWizardPanel(TestPanel1Descriptor.IDENTIFIER, descriptor1);

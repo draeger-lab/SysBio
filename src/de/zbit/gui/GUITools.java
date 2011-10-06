@@ -123,6 +123,7 @@ public class GUITools {
         "ICON_DOCUMENT_48.png",
         "ICON_DOCUMENT_64.png",
         "ICON_EXIT_16.png",
+        "ICON_EXIT_32.png",
         "ICON_GEAR_16.png",
         "ICON_GEAR_64.png",
         "ICON_GLOBE_16.png",
@@ -145,6 +146,10 @@ public class GUITools {
         "ICON_TICK_16.png",
         "ICON_TRASH_16.png",
         "ICON_SEARCH_16.png",
+        "ICON_WARNING_16.png",
+        "ICON_WARNING_32.png",
+        "ICON_WARNING_48.png",
+        "ICON_WARNING_64.png",
         "UT_BM_Rot_RGB_tr_36x64.png",
         "UT_WBMS_Rot_RGB_tr_64x62.png",
         "UT_WBMW_mathnat_4C_380x45.png"
@@ -284,6 +289,9 @@ public class GUITools {
   }
   
   /**
+   * Convenience method that creates a {@link JFileChooser} using the given
+   * arguments.
+   * 
    * @param dir
    * @param allFilesAcceptable
    * @param multiSelectionAllowed
@@ -957,7 +965,6 @@ public class GUITools {
    * @param parent
    * @param dir
    * @param allFilesAcceptable
-   * @param multiSelectionAllowed
    * @param mode e.g., JFileChooser.FILES_ONLY
    * @param filter
    * @return null if for some reason the no {@link File} has been selected or

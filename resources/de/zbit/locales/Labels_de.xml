@@ -122,6 +122,7 @@
   
   <!-- SBFileFilter -->
   
+  <entry key="BED_FILES">binäre PLINK Genotype Dateien</entry>
   <entry key="CSV_FILES">kommasepararierte Dateien</entry>
   <entry key="DIRECTORIES_ONLY">Ausschließlich Verzeichnisse</entry>
   <entry key="GIF_FILES">Graphikaustauschformat-Dateien</entry>
@@ -132,6 +133,7 @@
   <entry key="JPEG_FILES">Joint-Photographic-Experts-Group-Dateien</entry>
   <entry key="KGML_FILES">KGML-Dateien</entry>
   <entry key="PDF_FILES">Portable Dokumentformat-Dateien</entry>
+  <entry key="PED_FILES">Klartext PLINK Genotype Dateien</entry>
   <entry key="PNG_FILES">Portable Netzwerkgraphik-Dateien</entry>
   <entry key="SBML_FILES">SBML-Dateien</entry>
   <entry key="SBML_FILES_L1V1">SBML-Dateien in Level 1 Version 1</entry>
