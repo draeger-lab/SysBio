@@ -37,6 +37,7 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
    * Generated serial version identifer.
    */
   private static final long serialVersionUID = -921160153764089395L;
+  
   /**
    * The KeyProvider, that determines this panel.
    */

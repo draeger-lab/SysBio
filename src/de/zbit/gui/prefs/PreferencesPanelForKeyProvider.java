@@ -39,15 +39,26 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 * The KeyProvider, that determines this panel.
 	 */
 	protected Class<? extends KeyProvider> provider;
-
-	/**
-	 * @throws IOException
-	 */
-	public PreferencesPanelForKeyProvider(Class<? extends KeyProvider> provider) throws IOException {
-		super(false); // calls init, before provider is set => many null-pointer-exceptions.
-		this.provider = provider;
-		initializePrefPanel();
-	}
+	
+  /**
+   * Title of this panel. Will be used as tab-title.
+   */
+  private String title;
+  
+  /**
+   * @throws IOException
+   */
+  public PreferencesPanelForKeyProvider(Class<? extends KeyProvider> provider) throws IOException {
+    this(null, provider);
+  }
+  
+  public PreferencesPanelForKeyProvider(String title, Class<? extends KeyProvider> provider) throws IOException {
+    super(false); // calls init, before provider is set => many null-pointer-exceptions.
+    if (title==null) title = KeyProvider.Tools.createTitle(provider);
+    this.title = title;
+    this.provider = provider;
+    initializePrefPanel();
+  }
 
 	/*
 	 * (non-Javadoc)
@@ -74,7 +85,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 */
 	@Override
 	public String getTitle() {
-		return KeyProvider.Tools.createTitle(provider);
+		return title;
 	}
 	
 	/*
