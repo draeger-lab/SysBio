@@ -1373,7 +1373,25 @@ public class SBPreferences implements Map<Object, Object> {
 		for (Map.Entry<? extends Object, ? extends Object> entry : m.entrySet()) {
 			put(entry.getKey(), entry.getValue());
 		}
+    // FIXME: We are loosing options here, for which there are no
+		// custom set value and just defaults (I.e. values, that are
+		// only stored in "defaults" and not in "prefs" are not copied here).
 	}
+	
+	 /*
+   * (non-Javadoc)
+   * 
+   * @see java.util.Map#putAll(java.util.Map)
+   */
+  public void putAll(SBPreferences prefs) {
+    for (Map.Entry<? extends Object, ? extends Object> entry : prefs.entrySet()) {
+      put(entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<? extends Object, ? extends Object> entry : prefs.defaults.entrySet()) {
+      defaults.put(entry.getKey(), entry.getValue());
+    }
+  }
+	
 	
 	/**
 	 * Removes the key-value pair from the preferences but doesn't affect the
