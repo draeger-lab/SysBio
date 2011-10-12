@@ -855,16 +855,18 @@ public class SBFileFilter extends GeneralFileFilter {
     catch( MissingResourceException e ) {
       log.warning("No label found for this file type " + type.toString());
     }
-    sb.append(" (");
-    Iterator<String> iterator = extensions.iterator();
-    while (iterator.hasNext()) {
-      sb.append("*.");
-      sb.append(iterator.next());
-      if (iterator.hasNext()) {
-        sb.append(", ");
+    if (extensions.iterator().hasNext()) {
+      sb.append(" (");
+      Iterator<String> iterator = extensions.iterator();
+      while (iterator.hasNext()) {
+        sb.append("*.");
+        sb.append(iterator.next());
+        if (iterator.hasNext()) {
+          sb.append(", ");
+        }
       }
+      sb.append(")");
     }
-    sb.append(")");
     if (inTheMiddleOfASentence) {
       return StringUtil.changeFirstLetterCase(sb.toString(), false, false);
     }
