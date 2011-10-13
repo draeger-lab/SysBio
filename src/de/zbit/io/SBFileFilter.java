@@ -237,13 +237,13 @@ public class SBFileFilter extends GeneralFileFilter {
         String whiteSpace = "[\\s]+";
         String number = "[1-9]+[0-9]*";
         String level = number, version = number;
-        String sbmlDef = "<sbml%s%slevel=\"%s\"%s%sversion=\"%s\"%s>";
+        String sbmlDef = "<sbml%s%s((level=\"%s\"%s%sversion=\"%s\")|(version=\"%s\"%s%slevel=\"%s\"))%s>";
         if (this != SBML_FILES) {
           level = this.toString().substring(12, 13);
           version = this.toString().substring(14);
         }
         return String.format(sbmlDef, whiteSpace, anyChar, level,
-          whiteSpace, anyChar, version, anyChar);
+          whiteSpace, anyChar, version, version, whiteSpace, anyChar, level, anyChar);
       }
       return linePattern;
     } 
