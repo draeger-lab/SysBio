@@ -108,6 +108,22 @@ public class Utils {
   }
   
   /**
+   * Returns true if and only if there exists one item in arr
+   * such that arr[i].equals(s) OR arr[i].equalsIgnoreCase(s),
+   * depending on <code>ignoreCase</code>.
+   * @param <T>
+   * @param arr
+   * @param s
+   * @param ignoreCase
+   * @return
+   */
+  public static <T> boolean ArrayContains(String[] arr, String s, boolean ignoreCase) {
+    for (int i=0; i<arr.length; i++)
+        if ((!ignoreCase && arr[i].equals(s)) || (ignoreCase && arr[i].equalsIgnoreCase(s))) return true;
+    return false;
+  }
+  
+  /**
    * Returns the average of all non-NaN and non-infinite values in the given
    * array. Internally, it first tries to use the faster implementation and if
    * that doesn't work, it falls back to the slower alternative.
@@ -1906,6 +1922,25 @@ public class Utils {
   
   public static <T extends Number> double log2(T val) {
     return Math.log(val.doubleValue())/ln2;
+  }
+
+  /**
+   * Returns a {@link String} from <code>arr</code> that is
+   * equal (or equal ignoring case if <code>ignoreCase</code>
+   * is true) to <code>s</code>.
+   * <p>Note: This is usefull, either for<br>-replacing a string
+   * pointer with another pointer that is already available OR<br>
+   * -replace a mixed case string with a defined cases string (e.g.
+   * "HaLLo" with "Hallo").
+   * @param arr
+   * @param s
+   * @param ignoreCase
+   * @return 
+   */
+  public static String returnString(String[] arr, String s, boolean ignoreCase) {
+    for (int i=0; i<arr.length; i++)
+      if ((!ignoreCase && arr[i].equals(s)) || (ignoreCase && arr[i].equalsIgnoreCase(s))) return arr[i];
+    return null;
   }
   
 }
