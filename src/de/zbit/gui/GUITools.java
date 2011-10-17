@@ -646,21 +646,16 @@ public class GUITools {
   }
   
   /**
-   * Searches for the parent #{@link java.awt.Window} of the given component c.
+   * Searches for the parent {@link java.awt.Window} of the given component c.
    * Checks if this Window contains a #{@link javax.swing.AbstractButton} which
    * is called "Ok" and disables this button.
    * @param c
    * @return true if and only if an ok-button has been disabled. Else, false.
    */
-  public static boolean disableOkButton(Component c) {
-    // Seach for parent window
-    c = getParentWindow(c);
-    
+  public static boolean disableOkButton(Container c) {
     // Search for ok button and check if all other are enabled.
     if (c != null) {
-      // c is now a Window.
-      Component okButton = searchFor((Window) c, AbstractButton.class,
-        "getText", getOkButtonText());
+      Component okButton = getOKButton(c, true);
       if (okButton != null) {
         okButton.setEnabled(false);
         return true;
@@ -679,21 +674,24 @@ public class GUITools {
    * @return true if and only if an ok-button has been enabled. Else, false.
    */
   public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c) {
-    // Seach for parent window
-    // Do NOT uncomment it. Leads to unexpected behaviour.
-    /*while (c!=null) {
-	      if (c instanceof Window) {
-	        //((Window)c).pack();
-	        break;
-	      }
-	      c = c.getParent();
-	    }*/
+    return enableOkButtonIfAllComponentsReady(c, false);
+  }
+  
+  /**
+   * Checks if this "c" contains a #{@link javax.swing.AbstractButton} which
+   * is called "OK" and enables this button if and only if it a) exists and is
+   * disabled and b) all other elements on this container and all
+   * contained containers are enabled.
+   * @param c
+   * @param searchInWholeWindow if true, will not only look inside <code>c</code>
+   * for an ok button, but in the whole windows.
+   * @return
+   */
+  public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c, boolean searchInWholeWindow) {
     
     // Search for ok button and check if all other are enabled.
     if (c!=null) {
-      // c is now a Window.
-      Component okButton = searchFor(c, AbstractButton.class, "getText",
-        getOkButtonText());
+      Component okButton = getOKButton(c, searchInWholeWindow);
       if (okButton!=null) {
         boolean previousState = okButton.isEnabled();
         okButton.setEnabled(true);
@@ -719,21 +717,40 @@ public class GUITools {
    * @return
    */
   public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c, AbstractButton okButton) {
-    boolean previousState = okButton.isEnabled();
-    okButton.setEnabled(true);
     if (isEnabled(c)) {
+      okButton.setEnabled(true);
       return true;
     } else {
-      okButton.setEnabled(previousState);
       return false;
     }
   }
   
+  public static AbstractButton getOKButton(Container c, boolean inspectWholeWindow) {
+    // Search for parent window
+    Container oldC = c;
+    if (inspectWholeWindow) c = getParentWindow(c);
+    if (c==null) c = oldC;
+    
+    // Search for ok button and enable.
+    if (c!=null) {
+      return (AbstractButton) searchFor(c, AbstractButton.class, "getText", getOkButtonText());
+    } else {
+      return null;
+    }
+  }
+  
+  /**
+   * Searches for the parent {@link java.awt.Window} of the given component c.
+   * Checks if this Window contains a #{@link javax.swing.AbstractButton} which
+   * is called "Ok" and enables this button.
+   * @param c
+   * @return true if and only if an ok-button has been enabled. Else, false.
+   */
   public static synchronized boolean enableOkButton(Container c) {
     // Search for ok button and enable.
     if (c!=null) {
       // c is now a Window.
-      Component okButton = searchFor(c, AbstractButton.class, "getText", getOkButtonText());
+      Component okButton = getOKButton(c, true);
       if (okButton!=null) {
         okButton.setEnabled(true);
         return true;
@@ -1596,10 +1613,57 @@ public class GUITools {
     // Wait until the dialog is painted, before continuing
     while (worker.getState()==SwingWorker.StateValue.PENDING) {
       try {
-        Thread.sleep(100);
+        Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
       } catch (InterruptedException e) {}
     }
+  }
+  
+  /**
+   * Shows an ok/ cancel dialog in a new thread. You can specify runnables that
+   * are executed, depending if the user confirms the dialog or not.
+   * 
+   * <p>This method has the advantage to allow modifications of the dialog, because
+   * evaulation takes place in a new thread!
+   * 
+   * @param component
+   * @param caption
+   * @param okAction optional, action to be performed after dialog confirmation.
+   * @param cancelAction optional, action to be performed after dialog cancellation.
+   */
+  public static void showOkCancelDialogInNewThred(final Component component, final String caption, final Runnable okAction, final Runnable cancelAction) {
+    SwingWorker<Integer, Void> worker = new SwingWorker<Integer, Void>() {
+      @Override
+      protected Integer doInBackground() throws Exception {
+        return JOptionPane.showConfirmDialog(null, component,
+          caption, JOptionPane.OK_CANCEL_OPTION);
+      }
+      
+      /* (non-Javadoc)
+       * @see javax.swing.SwingWorker#done()
+       */
+      @Override
+      protected void done() {
+        super.done();
+        try {
+          Integer retVal = get();
+          if (retVal==JOptionPane.OK_OPTION && okAction!=null) {
+            okAction.run();
+          } else if (retVal==JOptionPane.CANCEL_OPTION && cancelAction!=null) {
+            cancelAction.run();
+          }
+        } catch (Exception e) {
+          GUITools.showErrorMessage(null, e);
+        }
+      }
+    };
+    worker.execute();
     
+    // Wait until the dialog is painted, before continuing
+    while (worker.getState()==SwingWorker.StateValue.PENDING) {
+      try {
+        Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
+      } catch (InterruptedException e) {}
+    }
   }
   
   

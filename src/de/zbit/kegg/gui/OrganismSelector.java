@@ -162,6 +162,7 @@ public class OrganismSelector extends JPanel {
       @SuppressWarnings("unchecked")
       @Override
       protected void done() {
+        if (Thread.currentThread().isInterrupted()) return; // don't continue
         HashMap<String, String> orgs=null;
         try {
           orgs = (HashMap<String, String>) get();
@@ -195,7 +196,7 @@ public class OrganismSelector extends JPanel {
           GUITools.packParentWindow(parent);
           if (isEnabled()) {
             // Only change dialog ok if this is enabled. Else, do nothing.
-            GUITools.enableOkButtonIfAllComponentsReady(parent);
+            GUITools.enableOkButtonIfAllComponentsReady(parent, true);
           }
           
           isInitialized=true;
@@ -306,24 +307,26 @@ public class OrganismSelector extends JPanel {
    */
   public synchronized HashMap<String, String> getOrganisms() {
     try {
-      if (organismMap==null || organismMap.size()<1) {
-        KeggQuery query = new KeggQuery(KeggQuery.getOrganisms,null);
-        CustomObject<Object> answer = manag.getInformation(query);
-        Definition[] organisms = (Definition[]) answer.getObject();
-        
-        if (organisms == null || organisms.length<1) {
-          GUITools.showErrorMessage(this, "Could not retrieve list of organisms from KEGG.");
-          return null;
+      synchronized (defaultSelection) { // Just anything static and not-null.
+        if (organismMap==null || organismMap.size()<1) {
+          KeggQuery query = new KeggQuery(KeggQuery.getOrganisms,null);
+          CustomObject<Object> answer = manag.getInformation(query);
+          Definition[] organisms = (Definition[]) answer.getObject();
+          
+          if (organisms == null || organisms.length<1) {
+            GUITools.showErrorMessage(this, "Could not retrieve list of organisms from KEGG.");
+            return null;
+          }
+          
+          
+          organismMap = new HashMap<String, String>(organisms.length);
+          for (int i = 0; i < organisms.length; i++) {
+            // Put e.g. Key: "hsa", Value: "Homo sapiens (human)"
+            organismMap.put(organisms[i].getEntry_id(), organisms[i].getDefinition());
+          }
         }
-        
-        
-        organismMap = new HashMap<String, String>(organisms.length);
-        for (int i = 0; i < organisms.length; i++) {
-          // Put e.g. Key: "hsa", Value: "Homo sapiens (human)"
-          organismMap.put(organisms[i].getEntry_id(), organisms[i].getDefinition());
-        }
+        return organismMap;
       }
-      return organismMap;
       
     } catch (Exception e) {
       GUITools.showErrorMessage(this, e);

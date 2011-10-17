@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.AbstractButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
@@ -80,11 +80,11 @@ public class PathwaySelector extends JPanel {
    * The organism Selector.
    */
   private OrganismSelector orgSel;
-
+  
   /**
-   * The label for the organism selector.
+   * Will auto-activate and de-activate the ok button on this component.
    */
-  private JLabel labelForPWSsel;
+  private AbstractButton okButton=null;
   
   
   public PathwaySelector() throws Exception {
@@ -136,12 +136,56 @@ public class PathwaySelector extends JPanel {
   }
   
   /**
+   * Automatically activates or deactiveates the OK button on a
+   * container, depending on the pending API operations of this panel.
+   * I.e. activates the ok button as soon as we have a list of
+   * pathways and organisms and deactivates it in other cases.
+   * <p>Automatically re-enabled the button as soon as lists are
+   * available.
+   * <p>The button is identifies with {@link GUITools#getOkButtonText()}
+   * @param searchHereAndInParentsForOkButton
+   */
+  public void autoActivateOkButton(final AbstractButton okButton) {
+    this.okButton = okButton;
+    
+    // Make an initial activation.
+    final Container thiss = pathwaySelector.getParent();
+    Thread t = new Thread() {
+      @Override
+      public void run() {
+        okButton.setEnabled(false);
+        GUITools.enableOkButtonIfAllComponentsReady(thiss, okButton);
+      }
+    };
+    t.start();
+  }
+  
+
+  /**
+   * Searches on the given container for an ok button and
+   * controls this button.
+   * @param c
+   */
+  public void autoActivateOkButton(Container c) {
+    AbstractButton okButton = GUITools.getOKButton(c, false);
+    if (okButton==null) {
+      // Search whole window
+      okButton = GUITools.getOKButton(c, true);
+    }
+    
+    // Control this button
+    if (okButton!=null) {
+      autoActivateOkButton(okButton);
+    }
+  }
+  
+  /**
    * @param lh
    * @param fixedOrganismKeggAbbr if not null, will preselect an organism and deactivate the organism selector
    * @throws Exception 
    */
   private void initGui(LayoutHelper lh, final String fixedOrganismKeggAbbr, List<Species> onlyShowThese) throws Exception {
-    // Create orgaism selector
+    // Create organism selector
     /*
      *  XXX: It would be possible to accept certain organisms and then load
      *  the pw-list organism specific via the manager (KeggFunctionManagement).
@@ -175,7 +219,7 @@ public class PathwaySelector extends JPanel {
     // Retrieve pathway list
     final String loadingItem = "Loading list of pathways...";
     final Container parent = lh.getContainer();
-    GUITools.disableOkButton(parent);
+    changeOkButtonState(false);
     SwingWorker<Object, Void> worker = new SwingWorker<Object, Void>() {
       @Override
       protected Object doInBackground() {
@@ -192,6 +236,7 @@ public class PathwaySelector extends JPanel {
       @SuppressWarnings("unchecked")
       @Override
       protected void done() {
+        if (Thread.currentThread().isInterrupted()) return; // don't continue
         HashMap<String, String> orgs=null;
         try {
           orgs = (HashMap<String, String>) get();
@@ -219,8 +264,8 @@ public class PathwaySelector extends JPanel {
           
           if (fixedOrganismKeggAbbr!=null) {
             orgSel.getOrganisms(); // Wait to finish the dialog
-            GUITools.enableOkButton(parent);
           }
+          changeOkButtonState(true);
           
         }
         repaint();
@@ -234,8 +279,24 @@ public class PathwaySelector extends JPanel {
     pathwaySelector.addItem(loadingItem);
     pathwaySelector.setEnabled(false);
     
-    labelForPWSsel = lh.add("Select pathway", pathwaySelector, true);
+    lh.add("Select pathway", pathwaySelector, true);
     worker.execute();
+  }
+
+  /**
+   * Set the enabled attribute of an ok-button to true
+   * or false.
+   * @param state
+   */
+  private void changeOkButtonState(boolean state) {
+    if (okButton!=null) okButton.setEnabled(state);
+    else {
+      if (state) {
+        GUITools.enableOkButton(this);
+      } else {
+        GUITools.disableOkButton(this);
+      }
+    }
   }
 
   /**
@@ -460,6 +521,7 @@ public class PathwaySelector extends JPanel {
     
     return ret;
   }
+
   
   
 }
