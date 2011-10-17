@@ -113,6 +113,19 @@ public class Reflect {
 	}
 	
 	/**
+	 * @return true if this instance has been started via Java WebStart.
+	 */
+	public static boolean isWebStart() {
+	  try {
+	    // Note: Java WebStart modifies the class path to only contain one entry:
+	    // the deploy.jar file.
+	    return new File(System.getProperty("java.class.path", ".")).getName().equalsIgnoreCase("deploy.jar");
+	  } catch (Exception e) {
+	    return false;
+	  }
+	}
+	
+	/**
 	 * Collect all classes from a given package on the classpath. If includeSubs
 	 * is true, the sub-packages are listed as well.
 	 * 
@@ -507,7 +520,7 @@ public class Reflect {
 	 * 
 	 * <p>NOTE (wrzodek,2011): This method does not work in java web-start
 	 * applications, because no (valid) class path is defined here and it is not
-	 * possible to get the actual location of the currently running jar file.</p> 
+	 * possible to get the actual location of the currently running jar file!</p> 
 	 * 
 	 * @param <T>
 	 * @see Class.assignableFromClass(Class cls)
@@ -532,9 +545,10 @@ public class Reflect {
 	    }
 	   
 	  /*
-	   * Alternative Method to marcel's one (by Wrzodek). This is much faster, because the
-	   * current classLoader is used, instead of using the system-class path. But not already
-	   * loaded classes are missing (which might be a good/wanted effect or not)!
+	   * Alternative Method to marcel's one (from http://snippets.dzone.com/posts/show/4831).
+	   * This is much faster, because the current classLoader is used, instead of using the
+	   * system-class path. But not already loaded classes are missing (which might be a
+	   * good/wanted effect or not)!
 	   */
 	  /*
 	  List<String> dirs = new ArrayList<String>();

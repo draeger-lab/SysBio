@@ -62,10 +62,22 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
   protected boolean isInizialized=false;
   
   /**
+   * Sometimes, this method can not download a file to a write
+   * protected folder and thus, redirects it to the temp folder.
+   * In this case, this variable holds the path to the file in
+   * the temp folder.
+   * <p>Note: This should be always null, only if there is really
+   * nothing to read/write from {@link #getLocalFile()} OR
+   * {@link #getLocalFiles()}, this should be set to a temp file!
+   */
+  private String tempLocalFile = null;
+  
+  /**
    * Contains a mapping from RefSeq to GeneID.
    * XXX: Hier eventuell eine initial Capacity oder load factor angeben, falls BottleNeck.
    */
   private Map<SourceType, TargetType> mapping = new HashMap<SourceType, TargetType>();
+  
 
   /**
    * Inintializes the mapper. Downloads and reads the mapping
@@ -158,15 +170,30 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     }
     
     // Check single file
-    return (FileTools.checkInputResource(getLocalFile(), this.getClass()));
+    if (FileTools.checkInputResource(getLocalFile(), this.getClass())) {
+      return true;
+    }
+    
+    // Check the fallback temp file
+    if (tempLocalFile!=null && FileTools.checkInputResource(tempLocalFile, this.getClass())) {
+      return true;
+    }
+    
+    return false;
   }
   
   /**
    * Downloads the {@link #downloadURL} and stores the path of the downloaded
    * file in {@link #localFile}.
-   * If the download was successfull can be checked with {@link #isCachedDataAvailable()}.
+   * If the download was successful can be checked with {@link #isCachedDataAvailable()}.
+   * <p>Please note that sometimes the desired {@link #getLocalFile()} is write
+   * protected. In this case, the method downloads the desired file to a temporary
+   * folder. This is why this method returns the path of the downloaded file. It
+   * it a good idea to eventually replace the local file with the string returned
+   * by this method.
+   * @return downloaded local file path and name.
    */
-  private void downloadData() {
+  private String downloadData() {
     String localFile = getLocalFile();
     if (localFile==null) {
       if (getLocalFiles()!=null && getLocalFiles().length>0 && getLocalFiles()[0]!=null) {
@@ -179,10 +206,11 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
       new File(new File(localFile).getParent()).mkdirs();
     } catch (Throwable t){};
     String localf = FileDownload.download(getRemoteURL(), localFile);
-    if (localFile!=null && localFile.length()>0) localFile = localf;
+    localFile = localf;
     if (FileDownload.ProgressBar!=null) {
       ((AbstractProgressBar)FileDownload.ProgressBar).finished();
     }
+    return localFile;
   }
 
   
@@ -197,12 +225,18 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     isInizialized=true;
     
     // Download input file, if it is not there
-    ensureLocalFileIsAvailable();
+    if (!ensureLocalFileIsAvailable()) {
+      throw new IOException("Could not download or read required resources.");
+    }
     
     // Parse all files.
     Timer t = new Timer();
-    String[] localFiles = ArrayUtils.merge(getLocalFiles(), getLocalFile());
+    String[] localFiles = ArrayUtils.merge(getLocalFiles(), getLocalFile(), tempLocalFile);
     for (String localFile: localFiles) {
+      if (!FileTools.checkInputResource(localFile, this.getClass())) {
+        log.config("Skipping " + getMappingName() + " mapping file " + localFile==null?"null":localFile);
+        continue;
+      }
       log.config("Reading " + getMappingName() + " mapping file " + localFile);
       CSVReader r = new CSVReader(localFile);
       r.setUseParentPackageForOpeningFiles(this.getClass());
@@ -329,7 +363,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
   protected boolean ensureLocalFileIsAvailable() {
     if (!isCachedDataAvailable()) {
       if (getRemoteURL()!=null) {
-        downloadData();
+        tempLocalFile  = downloadData();
       } else {
         log.severe("Mapping file for " + getMappingName() + " not available and no download URL is known.");
       }
