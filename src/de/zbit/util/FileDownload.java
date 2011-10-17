@@ -162,19 +162,20 @@ public class FileDownload {
    */
   public static String download(String address, String localFileName) {
     OutputStream out = null;
+    Integer targetFileSize = null;
     
     // If file already exists, look if it is complete and skip re-downloading it.
     try {
       if (new File(localFileName).exists()) {
         URL url = new URL(address);
-        int targetFileSize = url.openConnection().getContentLength();
+        if (targetFileSize==null) targetFileSize = url.openConnection().getContentLength();
         // REMARK: targetFileSize is often -1 if server can not give this info
-        if (targetFileSize==new File(localFileName).length()) {
+        if (targetFileSize!=null && targetFileSize.longValue() ==new File(localFileName).length()) {
           System.out.println("File already exists and file length matches. Not downloading it again.");
           return localFileName;
         }
       }
-    } catch (Throwable t) {
+    } catch (Throwable t2) {
       // Doesn't matter.
     }
     
@@ -185,6 +186,24 @@ public class FileDownload {
       // Try to open stream in official system tempDir.
       final String tempDir = System.getProperty("java.io.tmpdir");
       localFileName = tempDir + (tempDir.endsWith(File.separator)?"":File.separator) + new File(localFileName).getName();
+      
+      // Check if we before performed this fallback to the temp dir
+      // and downloaded the file already
+      // If file already exists, look if it is complete and skip re-downloading it.
+      try {
+        if (new File(localFileName).exists()) {
+          URL url = new URL(address);
+          if (targetFileSize==null) targetFileSize = url.openConnection().getContentLength();
+          // REMARK: targetFileSize is often -1 if server can not give this info
+          if (targetFileSize!=null && targetFileSize.longValue() ==new File(localFileName).length()) {
+            System.out.println("File already exists and file length matches. Not downloading it again.");
+            return localFileName;
+          }
+        }
+      } catch (Throwable t2) {
+        // Doesn't matter.
+      }
+      
       try {
         out = new BufferedOutputStream(new FileOutputStream(localFileName));
       } catch (FileNotFoundException e) {

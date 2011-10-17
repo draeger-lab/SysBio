@@ -273,7 +273,8 @@ public class FileTools {
    * @param localFile
    * @param sourcePackage - if the file is inside a jar, searches for the file,
    * relative to the given sourcePackage.
-   * @return
+   * @return true if and only if the file or URL denoted by <code>localFile</code>
+   * is available and contains data.
    */
   public static boolean checkInputResource(String localFile, Class<?> sourcePackage) {
     if (localFile==null || localFile.length()<1) return false;
