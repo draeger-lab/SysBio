@@ -189,6 +189,8 @@ public class SBFileFilter extends GeneralFileFilter {
 	    Set<String> extensions = new TreeSet<String>();
 	    String string = toString();
       switch (this) {
+        case DIRECTORIES_ONLY:
+          return extensions;
         case HTML_FILES:
           extensions.add("htm");
           break;

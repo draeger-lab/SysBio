@@ -565,8 +565,12 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 	 *         accepted.
 	 */
 	public boolean acceptOnlyFiles() {
-		return !((this.filter == null) || (this.filter.length == 0))
-				|| allFilesAcceptable;
+	  if (this.filter == null || this.filter.length == 0) {
+	    return allFilesAcceptable;
+	  } else {
+	    // at least one filter, check only first one for file filters
+	    return !SBFileFilter.createDirectoryFilter().equals(this.filter[0]);
+	  }
 	}
 	
 	/*
