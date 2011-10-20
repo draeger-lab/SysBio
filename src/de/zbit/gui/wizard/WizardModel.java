@@ -148,6 +148,17 @@ public class WizardModel {
   }
 
   /**
+   * Returns the WizardPanelDescriptor with the given Object-identifier as it
+   * was registered to this model.
+   * 
+   * @param id Object-based identifier
+   * @return WizardPanelDescriptor with the given identifier
+   */
+  WizardPanelDescriptor getPanel(Object id) {
+    return panelHashmap.get(id);
+  }
+  
+  /**
    * Sets the current panel to that identified by the Object passed in.
    * 
    * @param id Object-based panel identifier
