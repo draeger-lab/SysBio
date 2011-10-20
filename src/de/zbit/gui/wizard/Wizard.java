@@ -266,6 +266,17 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
   }
 
   /**
+   * Returns the WizardPanelDescriptor with the given Object-identifier as it
+   * was registered to the model of this wizard.
+   * 
+   * @param id Object-based identifier
+   * @return WizardPanelDescriptor with the given identifier
+   */
+  public WizardPanelDescriptor getPanel(Object id) {
+    return wizardModel.getPanel(id);
+  }
+  
+  /**
    * Displays the panel identified by the object passed in. This is the same
    * Object-based identified used when registering the panel.
    * 
