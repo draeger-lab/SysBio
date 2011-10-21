@@ -118,9 +118,7 @@ public class Utils {
    * @return
    */
   public static <T> boolean ArrayContains(String[] arr, String s, boolean ignoreCase) {
-    for (int i=0; i<arr.length; i++)
-        if ((!ignoreCase && arr[i].equals(s)) || (ignoreCase && arr[i].equalsIgnoreCase(s))) return true;
-    return false;
+    return returnString(arr, s, ignoreCase) != null;
   }
   
   /**
