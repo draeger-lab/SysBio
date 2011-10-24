@@ -197,16 +197,19 @@ public class OpenFile {
     desc = fetchDescription(myStream);
     
     // 2nd try. Bugfixing accidently added slashes (not so seldomly...)
-    if (desc==null) {
+    if (desc==null && myStream==null) {
       // remove accidently added double slashes. Do NOT do this before checking if it's an URL
       // May lead to problems on non http urls (jar urls e.g. "jar:http://xyz.de/my.jar!/com/...")
-      filename = filename.replace(File.separator+File.separator, File.separator).replace("//", "/");
+      String filename2 = filename.replace(File.separator+File.separator, File.separator).replace("//", "/");
       try {
-        myStream = searchFileAndGetInputStream(filename, searchInputRelativeToResource);
+        myStream = searchFileAndGetInputStream(filename2, searchInputRelativeToResource);
       } catch (IOException e) {
         e.printStackTrace();
       }
       desc = fetchDescription(myStream);
+      if (desc!=null) {
+        filename = filename2;
+      }
     }
     // myStream is not required anymore
     try {
