@@ -207,7 +207,7 @@ public class OpenFile {
         e.printStackTrace();
       }
       desc = fetchDescription(myStream);
-      if (desc!=null) {
+      if (myStream!=null) { // take fixed file name
         filename = filename2;
       }
     }

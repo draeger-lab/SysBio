@@ -285,6 +285,16 @@ public class LayoutHelper {
 	}
 	
 	/**
+	 * Add a {@link JLabel} with text <code>label</code> and width
+	 * <code>width</code> to the current {@link Container}.
+	 * @param label
+	 * @param width
+	 */
+	 public void add(String label, int width) {
+	    add(new JLabel(label), width);
+	  }
+	
+	/**
 	 * 
 	 * @param label
 	 * @param c

@@ -491,7 +491,8 @@ public class CSVWriter {
 			// write table head
 			while (i < data.getColumnCount()) {
 				value = data.getColumnName(i++);
-				writer.append(value != null ? value.toString() : "");
+				// Do not write new line terms here. This breaks the CSV file!
+				writer.append(value != null ? value.toString().replace('\n', ' ') : "");
 				if (i < data.getColumnCount()) {
 					writer.append(separator);
 				}
@@ -503,7 +504,8 @@ public class CSVWriter {
 		for (i = 0; i < data.getRowCount(); i++) {
 			for (j = 0; j < data.getColumnCount(); j++) {
 				value = data.getValueAt(i, j);
-				writer.append(value != null ? value.toString() : "");
+  			// Do not write new line terms here. This breaks the CSV file!
+				writer.append(value != null ? value.toString().replace('\n', ' ') : "");
 				if (j < data.getColumnCount() - 1) {
 					writer.append(separator);
 				}
