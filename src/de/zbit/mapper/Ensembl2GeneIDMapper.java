@@ -104,6 +104,8 @@ public class Ensembl2GeneIDMapper extends AbstractMapper<String, Integer> {
     System.out.println(mapper.map("ENSG00000160868"));
     System.out.println(mapper.map("ENST00000336411"));
     System.out.println(mapper.map("ENST00000544160"));
+    
+    System.out.println(mapper.map("ENSMUSG00000021268"));
   }
 
   /* (non-Javadoc)

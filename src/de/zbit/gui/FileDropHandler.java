@@ -53,9 +53,16 @@ public class FileDropHandler extends TransferHandler {
   private static final long serialVersionUID = -2874307479020044075L;
   
   /**
-   * Event for the listener
+   * Event ID for a single file, fired on the listener.
+   * The source object will be a {@link File}.
    */
-  public final static int FILE_DROPPED = 0;
+  public final static int FILE_DROPPED = 1;
+
+  /**
+   * Event ID for a multiple files, fired on the listener.
+   * The source object will be a {@link List} of {@link File}s.
+   */
+  public final static int FILES_DROPPED = 2;
   
   /**
    * This listener will be fired on a drop.
@@ -97,10 +104,18 @@ public class FileDropHandler extends TransferHandler {
       /* data of type javaFileListFlavor is a list of files */
       List<File> fileList = (List<File>)data;
       
-      /* loop through the files in the file list */
-      for (File file : fileList) {
-        ActionEvent e = new ActionEvent(file, FILE_DROPPED, "FILE_DROPPED");
+      // Fire single action per drag and drop.
+      if (fileList.size()>1) {
+        ActionEvent e = new ActionEvent(fileList, FILES_DROPPED, "FILES_DROPPED");
         listener.actionPerformed(e);
+        
+      } else {
+        
+        /* loop through the files in the file list */
+        for (File file : fileList) {
+          ActionEvent e = new ActionEvent(file, FILE_DROPPED, "FILE_DROPPED");
+          listener.actionPerformed(e);
+        }
       }
     } catch (UnsupportedFlavorException e) {
       return false;

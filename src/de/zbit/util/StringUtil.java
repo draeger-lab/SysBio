@@ -855,4 +855,102 @@ public class StringUtil {
     return counter;
   }
   
+  /**
+   * @param   source      the string to search.
+   * @param   str         the substring for which to search.
+   * @return
+   */
+  public static boolean containsIgnoreCase(String source, String str) {
+    return indexOfIgnoreCase(source, str)>=0;
+  }
+  
+  /**
+   *
+   * @param   source      the string to search.
+   * @param   str   any string.
+   * @return  if the string argument occurs as a substring within this
+   *          object, then the index of the first character of the first
+   *          such substring is returned; if it does not occur as a
+   *          substring, <code>-1</code> is returned.
+   */
+  public static int indexOfIgnoreCase(String source, String str) {
+    return indexOfIgnoreCase(source, str, 0);
+  }
+  
+  /**
+   *
+   * @param   source      the string to search.
+   * @param   str         the substring for which to search.
+   * @param   fromIndex   the index from which to start the search.
+   * @return  the index within this string of the first occurrence of the
+   *          specified substring, starting at the specified index.
+   */
+  public static int indexOfIgnoreCase(String source, String str, int fromIndex) {
+    return indexOfIgnoreCase(source.toCharArray(), 0, str.length(),
+      str.toCharArray(), 0, str.length(), fromIndex);
+  }
+  
+  /**
+   * See same method in {@link String}. Helper method used by other methods.
+   * @return
+   */
+  private static int indexOfIgnoreCase(char[] source, int sourceOffset, int sourceCount,
+    char[] target, int targetOffset, int targetCount,
+    int fromIndex) {
+    if (fromIndex >= sourceCount) {
+      return (targetCount == 0 ? sourceCount : -1);
+    }
+    if (fromIndex < 0) {
+      fromIndex = 0;
+    }
+    if (targetCount == 0) {
+      return fromIndex;
+    }
+    
+    char lCaseFirst  = Character.toLowerCase(target[targetOffset]);
+    int max = sourceOffset + (sourceCount - targetCount);
+    
+    for (int i = sourceOffset + fromIndex; i <= max; i++) {
+      /* Look for first character. */
+      if (Character.toLowerCase(source[i]) != lCaseFirst) {
+        while (++i <= max && Character.toLowerCase(source[i]) != lCaseFirst);
+      }
+      
+      /* Found first character, now look at the rest of v2 */
+      if (i <= max) {
+        int j = i + 1;
+        int end = j + targetCount - 1;
+        for (int k = targetOffset + 1; j < end && Character.toLowerCase(source[j]) == Character.toLowerCase(target[k]); j++, k++);
+        
+        if (j == end) {
+          /* Found whole string. */
+          return i - sourceOffset;
+        }
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Checks if <code>parentString</code> contains any of the strings
+   * in <code>strings</code>.
+   * @param strings to search for
+   * @param parentString to search in
+   * @return index of (first) string of <code>strings</code>
+   * that is contained in <code>parentString</code>, or -1. 
+   */
+  public static int containsAny(String[] strings, String parentString) {
+      if (strings==null) return -1;
+      for (int i=0; i<strings.length; i++) {
+        if (parentString==null) {
+          // Also detect indexOf null
+          if (strings[i]==null) return i;
+          else continue;
+        }
+        if (strings[i]==null) continue;
+        if (parentString.contains(strings[i])) return i;
+      }
+      return -1;
+  }
+  
 }

@@ -37,10 +37,13 @@ import de.zbit.util.prefs.Option;
 public class JTableFilter extends JPanel {
   private static final long serialVersionUID = 6976706059419605006L;
 
-  /** bundle to get the localized "COLUMN" String **/
+  /** Bundle to get localized Strings. **/
   protected static ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
   
-  private final static String regexString = "Regular expression";
+  /**
+   * String and identifier for arbitrary regular expressions.
+   */
+  private final static String regexString = bundle.getString("REGULAR_EXPRESSION");
   
   /**
    * The underlying table

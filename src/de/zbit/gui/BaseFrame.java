@@ -424,8 +424,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
     // Make this panel responsive to drag'n drop events.
     FileDropHandler dragNdrop = new FileDropHandler(
       new ActionListener() {
+        @SuppressWarnings("unchecked")
         public void actionPerformed(ActionEvent event) {
-          openFileAndLogHistory((File) event.getSource());
+          if (event.getID()==FileDropHandler.FILE_DROPPED) {
+            openFileAndLogHistory((File) event.getSource());
+          } else if (event.getID()==FileDropHandler.FILES_DROPPED) {
+            openFileAndLogHistory((File[])((List<File>) event.getSource()).toArray());
+          }
         }
       }
     );
