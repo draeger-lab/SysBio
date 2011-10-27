@@ -58,6 +58,7 @@ public class JTableFilter extends JPanel {
   
   JRadioButton and;
   JRadioButton or;
+  JRadioButton andNot;
   
   JComboBox header2;
   JComboBox operator2;
@@ -92,11 +93,14 @@ public class JTableFilter extends JPanel {
         StringUtil.changeFirstLetterCase(bundle.getString("AND"), true, true));
     or = new JRadioButton(
         StringUtil.changeFirstLetterCase(bundle.getString("OR"), true, true));
+    andNot = new JRadioButton(StringUtil.changeFirstLetterCase(
+      String.format("%s %s", bundle.getString("AND"), bundle.getString("NOT")), true, true));
     ButtonGroup group = new ButtonGroup();
     and.setSelected(true);
     group.add(and);
     group.add(or);
-    lh.add(and, or);
+    group.add(andNot);
+    lh.add(and, or, andNot);
     
     header2 = new JComboBox(getHeaders(table));
     operator2 = new JComboBox(getOperators());
@@ -105,7 +109,7 @@ public class JTableFilter extends JPanel {
     
     preview = new JLabel(" ");
     preview.setName("");
-    lh.add(preview);
+    lh.add(preview,3);
     
     // Add listeners to refresh the preview
     ItemListener il = new ItemListener() {
@@ -129,6 +133,7 @@ public class JTableFilter extends JPanel {
       }
     };
     
+    // Add listeners to every item
     for (Component c: getComponents()) {
       if (c instanceof ItemSelectable) {
         // Buttons ands JComboBoxes
@@ -149,7 +154,14 @@ public class JTableFilter extends JPanel {
    */
   private int currentStateIdentifier() {
     int id = 0;
-    id += and.isSelected()?1:0;
+    if (and.isSelected()) {
+      id+=1;
+    } else if (andNot.isSelected()) {
+      id+=2;
+    } else { // or
+      //id+=0; //... not necessary ;-)
+    }
+    
     id += text1.getText().hashCode();
     id += text2.getText().hashCode();
     id += header1.getSelectedIndex()+10;
@@ -202,6 +214,7 @@ public class JTableFilter extends JPanel {
     String filter1 = text1.getText();
     String filter2 = text2.getText();
     boolean or = this.or.isSelected();
+    boolean andNot = this.andNot.isSelected();
 
     // Prepare filter, parse if numeric.
     Object f1=filter1;
@@ -253,23 +266,32 @@ public class JTableFilter extends JPanel {
     // Match all rows and store matcheds rows in list.
     for (int i=0; i<table.getRowCount(); i++) {
       if (Thread.currentThread().isInterrupted()) return null;
-      if (!c1.equals("")) {
+      if (!c1.equals("")) { // Any operator selected
         Object val = table.getValueAt(i, col1);
-        if (matchOperator(c1, val, f1)) {
+        if (matchOperator(c1, val, f1)) { // 1st condition ok
           if (or) {
             ret.add(i);
-            continue;
+            continue; // don't have to check 2nd condition
           }
         } else if (!or) {
           // "and" and first condition does not match.
+          // => don't even look at 2nd one.
           continue;
         }
         
-        if (c2.equals("") || matchOperator(c2, table.getValueAt(i, col2), f2)) {
+        // Check 2nd condition
+        boolean SecondConditionOk = c2.equals("");
+        if (!SecondConditionOk) { // if anything selected
+          SecondConditionOk = matchOperator(c2, table.getValueAt(i, col2), f2);
+          if (andNot) SecondConditionOk = !SecondConditionOk;
+        }
+        if (SecondConditionOk) {
+          // either nothing selected or really ok.
           ret.add(i);
         }
         
       } else {
+        // No condition selected in 1st condition => add all
         ret.add(i);
       }
     }
