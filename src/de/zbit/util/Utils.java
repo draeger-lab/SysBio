@@ -1941,4 +1941,32 @@ public class Utils {
     return null;
   }
   
+  /**
+   * Converts an {@link Iterable} to a {@link List} with the
+   * most effective available method. 
+   * @param <T>
+   * @param it
+   * @return
+   */
+  public static <T> List<T> IterableToList(Iterable<T> it) {
+    List<T> l;
+    if (it instanceof List) {
+      // is already a list
+      l = (List<T>) it;
+    } else if (it instanceof Collection) {
+      // ArrayList simply wraps the collection => O(1) here!
+      l = new ArrayList<T>((Collection<T>)it);
+    } else {
+      // Worst Case... O(n) here.
+      l = new ArrayList<T>();
+      Iterator<T> i = it.iterator();
+      while (i.hasNext()) {
+        l.add(i.next());
+      }
+    }
+    
+    return l;
+  }
+
+  
 }
