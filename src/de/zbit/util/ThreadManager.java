@@ -89,7 +89,7 @@ public class ThreadManager {
    * @return the number of slots that will be used for
    * parallel execution of runnables.
    */
-  public int getNumberOfSplots() {
+  public int getNumberOfSlots() {
     return pool.getCorePoolSize();
   }
   
@@ -137,9 +137,16 @@ public class ThreadManager {
       // Increase sleep timer in a way, that processor performance is
       // not used to simply checking the active count over and over.
       try {Thread.sleep(sleepTime);} catch (InterruptedException e) {
+        // If this thread is interrupted, cancel further executions
         pool.shutdownNow();
         break;
       }
+      
+      if (Thread.currentThread().isInterrupted()) {
+        pool.shutdownNow();
+        break;        
+      }
+      
       if (sleepTime<1000) sleepTime += 10; // Sleep a second at max.
       //else System.out.println(pool.getTaskCount());
     }
@@ -198,7 +205,7 @@ public class ThreadManager {
     int numberOfSlots = Math.max((ThreadManager.NUMBER_OF_PROCESSORS-1),2);
     ThreadManager m = new ThreadManager(numberOfSlots);
     System.out.println("Initialized a new thread manager with " + 
-        m.getNumberOfSplots() + " slots to execute in parallel.");
+        m.getNumberOfSlots() + " slots to execute in parallel.");
     
     // Add a few jobs to execute
     for (int i=0; i<(numberOfSlots*5); i++) {
