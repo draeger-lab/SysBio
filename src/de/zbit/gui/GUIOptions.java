@@ -60,7 +60,7 @@ public interface GUIOptions extends KeyProvider {
 		"GUI",
 		Boolean.class,
 		bundle.getString("GUI"),
-		Boolean.TRUE);
+		Boolean.FALSE);
 	
 	/**
 	 * Standard directory where user files can be found.

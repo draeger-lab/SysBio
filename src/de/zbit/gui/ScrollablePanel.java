@@ -21,31 +21,36 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
- * <p>A panel that implements the Scrollable interface. This class allows you to
- * customize the scrollable features by using newly provided setter methods so
- * you don't have to extend this class every time.
+ * <p>
+ * A panel that implements the {@link Scrollable} interface. This class allows
+ * you to customize the scrollable features by using newly provided setter
+ * methods so you don't have to extend this class every time.
  * 
- * <p>Scrollable amounts can be specifed as a percentage of the viewport size or as
- * an actual pixel value. The amount can be changed for both unit and block
- * scrolling for both horizontal and vertical scrollbars.
+ * <p>
+ * {@link Scrollable} amounts can be specified as a percentage of the viewport
+ * size or as an actual pixel value. The amount can be changed for both unit and
+ * block scrolling for both horizontal and vertical scrollbars.
  * 
- * <p>The Scrollable interface only provides a boolean value for determining
- * whether or not the viewport size (width or height) should be used by the
- * scrollpane when determining if scrollbars should be made visible. This class
- * supports the concept of dynamically changing this value based on the size of
- * the viewport. In this case the viewport size will only be used when it is
- * larger than the panels size. This has the effect of ensuring the viewport is
- * always full as components added to the panel will be size to fill the area
- * available, based on the rules of the applicable layout manager of course.
+ * <p>
+ * The {@link Scrollable} interface only provides a boolean value for
+ * determining whether or not the viewport size (width or height) should be used
+ * by the scrollpane when determining if scrollbars should be made visible. This
+ * class supports the concept of dynamically changing this value based on the
+ * size of the viewport. In this case the viewport size will only be used when
+ * it is larger than the panels size. This has the effect of ensuring the
+ * viewport is always full as components added to the panel will be size to fill
+ * the area available, based on the rules of the applicable layout manager of
+ * course.
  * 
- * <p>This class is taken from and/or largely based on
- * {@linkplain http://tips4java.wordpress.com/2009/12/20/scrollable-panel/} 
+ * <p>
+ * This class is taken from and/or largely based on 
+ * {@linkplain http://tips4java.wordpress.com/2009/12/20/scrollable-panel/}
  * 
  * @author Rob Camick
  * @author Florian Mittag
  * 
  * @version $Rev$
- * @since 1.0
+ * @since 1.1
  */
 public class ScrollablePanel extends JPanel implements Scrollable,
     SwingConstants {

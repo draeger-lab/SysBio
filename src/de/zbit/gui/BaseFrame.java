@@ -59,6 +59,8 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
+import org.apache.log4j.Logger;
+
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
@@ -210,6 +212,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = -6533854985804740883L;
+	/**
+	 * A {@link Logger} for this class.
+	 */
+	private static final Logger logger = Logger.getLogger(BaseFrame.class.getName());
 	/**
 	 * Switch to avoid checking for updates multiple times.
 	 */
@@ -424,6 +430,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
     // Make this panel responsive to drag'n drop events.
     FileDropHandler dragNdrop = new FileDropHandler(
       new ActionListener() {
+      	/*
+      	 * (non-Javadoc)
+      	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+      	 */
         @SuppressWarnings("unchecked")
         public void actionPerformed(ActionEvent event) {
           if (event.getID()==FileDropHandler.FILE_DROPPED) {
@@ -434,7 +444,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
         }
       }
     );
-    
     this.setTransferHandler(dragNdrop);
   }
 	
