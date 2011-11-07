@@ -16,17 +16,18 @@
  */
 package de.zbit;
 
+import java.awt.Window;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
-import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.UpdateMessage;
@@ -36,10 +37,18 @@ import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
 /**
- * A basic implementation of an application launcher.
+ * A basic implementation of an application launcher. If launching a program
+ * using an implementation of this class, the {@link System} will contain the
+ * following new {@link Properties} in order to make these accessible within
+ * other objects, too:
+ * <ul>
+ * <li><code>app.name</code>: the name of the program</li>
+ * <li><code>app.version</code>: the version number of the program</li>
+ * </ul>
  * 
  * @author Andreas Dr&auml;ger
  * @version $Rev$
+ * @since 1.1
  * @date 20:49:11
  */
 public abstract class Launcher implements Serializable {
@@ -73,29 +82,38 @@ public abstract class Launcher implements Serializable {
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
 		
+		System.setProperty("app.name", getApplicationName());
+		System.setProperty("app.version", getVersionNumber());
+		
 	  // Should we start the GUI?
-		if ((args.length < 1) || props.getBooleanProperty(GUIOptions.GUI)) {
+		final boolean guiEnabledByUser = props.getBooleanProperty(GUIOptions.GUI);
+		if ((args.length < 1) || guiEnabledByUser) {
 			SwingUtilities.invokeLater(new Runnable() {
 				/*
 				 * (non-Javadoc)
 				 * @see java.lang.Runnable#run()
 				 */
 				public void run() {
-					logger.info(String.format(
-						"Initializing graphical user interface for %s.",
-						getApplicationName()));
-					BaseFrame ui = initGUI();
+					Window ui = initGUI();
 					if (ui != null) {
 						ui.setVisible(true);
 						GUITools.hideSplashScreen();
 						ui.toFront();
-					} else {
-						logger.info("No graphical user interface supported.");
-					}
+          } else {
+            if (guiEnabledByUser) {
+              logger.fine(String.format(
+                "No graphical user interface supported for %s version %s.",
+                getApplicationName(), getVersionNumber()));
+            } else {
+              logger.fine(String.format(
+                "Incomplete list of command-line arguments. Try to restart %s version %s with the --help option",
+                getApplicationName(), getVersionNumber()));
+            }
+          }
 				}
 			});
 		} else {
-			showAboutMessage();
+			printCopyrightMessage();
 			if (props.getBoolean(GUIOptions.CHECK_FOR_UPDATES)) {
 				try {
 					checkForUpdate();					
@@ -149,11 +167,17 @@ public abstract class Launcher implements Serializable {
 	 */
 	public abstract List<Class<? extends KeyProvider>> getCommandLineOptions();
 	
-	/**
-	 * @return The default log level that is the minimal {@link Level} for log
-	 *         messages to be displayed to the user.
-	 */
-	public abstract Level getLogLevel();
+  /**
+   * This method returns the default log level that is the minimal {@link Level}
+   * for log messages to be displayed to the user.
+   * 
+   * @return By default, this method returns {@link Level#FINE}. If something
+   *         different is desired, this method should be overridden in an
+   *         implementing class.
+   */
+	public Level getLogLevel() {
+	  return Level.FINE;
+	}
 	
 	/**
 	 * @return An array of package names whose log messages should appear.
@@ -183,12 +207,12 @@ public abstract class Launcher implements Serializable {
 	 * @return the graphical user interface for this application or null if no
 	 *         such mode is supported.
 	 */
-	public abstract BaseFrame initGUI();
+	public abstract Window initGUI();
 	
 	/**
 	 * Displays a copyright notice using the logger.
 	 */
-	public void showAboutMessage() {
+	public void printCopyrightMessage() {
 		logger.info(String.format(
 			"%s Copyright \u00A9 %d the University of Tuebingen,",
 			getApplicationName(), Calendar.getInstance().get(Calendar.YEAR)));
