@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
@@ -56,8 +57,7 @@ public abstract class Launcher implements Serializable {
 	/**
 	 * A {@link Logger} for this class.
 	 */
-	public static Logger logger = Logger.getLogger(Launcher.class.getName());
-
+	private static Logger logger = Logger.getLogger(Launcher.class.getName());
 	/**
 	 * Generated serial version identifier.
 	 */
@@ -74,9 +74,6 @@ public abstract class Launcher implements Serializable {
 	 */
 	public Launcher(String args[]) {
 		LogUtil.initializeLogging(getLogLevel(), getLogPackages());
-
-    // Locale.setDefault(Locale.US);
-	  GUIOptions.GUI.setDefaultValue(Boolean.FALSE);
 	  
 	  logger.info("Scanning command line arguments...");
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
@@ -96,6 +93,8 @@ public abstract class Launcher implements Serializable {
 				public void run() {
 					Window ui = initGUI();
 					if (ui != null) {
+						// 15 s for tooltips to be displayed
+						ToolTipManager.sharedInstance().setDismissDelay(15000);
 						ui.setVisible(true);
 						GUITools.hideSplashScreen();
 						ui.toFront();
