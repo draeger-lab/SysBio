@@ -317,7 +317,7 @@ public class SBPreferences implements Map<Object, Object> {
 		
 		// put all read options into this SBProperties object
 		// also sets the default values, according to the ArgHolders, which
-		// itself are configured accoring to the options.
+		// itself are configured according to the options.
 		putAll(props, options);
 		
 		// Now all command-line arguments must be made persistent:
