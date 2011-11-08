@@ -230,8 +230,11 @@ public class KeggParser extends DefaultHandler {
       bin.reset();
       
       s = new String(head);
-      if (s!=null)
-        ret = parseNextDouble(s, s.lastIndexOf('v'),true);
+      if (s!=null) {
+        int pos = s.indexOf("SYSTEM");
+        if (pos>0) s = s.substring(pos);
+        ret = parseNextDouble(s, s.indexOf('v'),true);
+      }
     } catch (Exception e){
       e.printStackTrace();
       if (s!=null) {
@@ -370,7 +373,7 @@ public class KeggParser extends DefaultHandler {
         p.addEntry(e);
       } else if (name.equalsIgnoreCase("reaction")) {
         if (!silent) System.out.println("Parsing Reaction " + getNodeValue(att,"name") + "...");
-        Reaction r = new Reaction(getNodeValue(att, "name"), ReactionType.valueOf(getNodeValue(att,"type")), node.getChildNodes());
+        Reaction r = new Reaction(p, getNodeValue(att, "name"), ReactionType.valueOf(getNodeValue(att,"type")), node.getChildNodes());
         p.addReaction(r);
       } else if (name.equalsIgnoreCase("relation")) {
         if (!silent) System.out.println("Parsing Relation " + getNodeValue(att,"name") + "...");

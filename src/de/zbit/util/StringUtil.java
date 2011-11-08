@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
@@ -886,7 +887,7 @@ public class StringUtil {
    *          specified substring, starting at the specified index.
    */
   public static int indexOfIgnoreCase(String source, String str, int fromIndex) {
-    return indexOfIgnoreCase(source.toCharArray(), 0, str.length(),
+    return indexOfIgnoreCase(source.toCharArray(), 0, source.length(),
       str.toCharArray(), 0, str.length(), fromIndex);
   }
   

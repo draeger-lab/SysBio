@@ -334,7 +334,8 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
           break;
         }
       } catch (UnsuccessfulRetrieveException e) {
-        log.log(Level.FINE, "Unsuccessful retrieval, marking this ID as unretrievable", e);
+        log.log(Level.FINE, "Unsuccessful retrieval, marking " + 
+          (id ==null?"null": id.toString()) + " as unretrievable", e);
         unsuccessfulQueries.add(id);
         cacheChangedSinceLastLoading=true;
         break;

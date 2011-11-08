@@ -16,19 +16,30 @@
  */
 package de.zbit.kegg;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.util.Utils;
 
 /**
- * Simplyfies parsing KeggInfos from the Adaptor. Stores and handles all kegg
- * infos very conveniently.
+ * Simplifies parsing KeggInfos from the Adaptor. Stores and handles all
+ * KEGG infos very conveniently.
  * 
  * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
-public class KeggInfos {
-	/**
+public class KeggInfos implements Serializable {
+  private static final long serialVersionUID = 3436209252181758056L;
+  public static final transient Logger log = Logger.getLogger(KeggInfos.class.getName());
+  
+  /**
    * 
    */
 	private String Kegg_ID;
@@ -48,6 +59,10 @@ public class KeggInfos {
    * 
    */
 	private String description = null;
+  /**
+   * 
+   */
+	private String orthology = null;
 	/**
 	 * multiple synonyms separated by ;
 	 */
@@ -250,15 +265,27 @@ public class KeggInfos {
 	 * DB00001
 	 */
 	public static final String miriam_urn_drugbank = "urn:miriam:drugbank:";
+	
+	/**
+	 * Evidence Code Ontology, e.g. "ECO:0000313"
+	 */
+  public static final String miriam_urn_eco = "urn:miriam:obo.eco:";
+  
+  /**
+   * RegEx Pattern for extracting EC enzyme codes
+   */
+  private final static Pattern ECcodes = Pattern.compile("(\\d+\\.-\\.-\\.-|\\d+\\.\\d+\\.-\\.-|\\d+\\.\\d+\\.\\d+\\.-|\\d+\\.\\d+\\.\\d+\\.(n)?\\d+)"); 
+  
 
 	// GO, kgGenes, hgnc, chebi - require extra prefixes!
 
 	/**
-	 * Same as 'getMiriamURIforKeggID(keggId, null)'. Please submit EntryTyp
-	 * when available.
+	 * Same as 'getMiriamURIforKeggID(keggId, null)'. Please use other
+	 * method and submit {@link EntryType} if available.
 	 * 
 	 * @param keggId
-	 * @return Complete Miriam URN Including the given ID.
+   * @return Complete MIRIAM URN Including the given ID. Or <code>NULL</code>
+   * if no such MIRIAM URN is available!
 	 */
 	public static String getMiriamURIforKeggID(String keggId) {
 		return getMiriamURIforKeggID(keggId, null);
@@ -293,6 +320,9 @@ public class KeggInfos {
 	public KeggInfos(String Kegg_ID, KeggInfoManagement info) {
 	  super();
 		this.Kegg_ID = Kegg_ID;
+		if (this.Kegg_ID.equals("1)")) {
+		  System.out.println("DEbug me now");
+		}
 
 		informationFromKeggAdaptor = info.getInformation(Kegg_ID);
 		// this.adap = info.getKeggAdaptor();
@@ -339,6 +369,13 @@ public class KeggInfos {
 	public String getDefinition() {
 		return definition;
 	}
+	
+  /**
+   * @return
+   */
+  private String getOrthology() {
+    return orthology;
+  }
 
 	/**
 	 * 
@@ -406,7 +443,11 @@ public class KeggInfos {
 	}
 	
 	/**
-	 * 
+	 * Returns the parsed "ENZYME" entry.
+   * <p>This method is mainly for reactions, 
+   * and NOT for genes, compounds, etc. use
+   * {@link #getECcodes()} for genes and such.
+   * @see #getECcodes()
 	 * @return e.g. "5.4.2.1         5.4.2.4"
 	 */
 	public String getEnzymes() {
@@ -485,7 +526,8 @@ public class KeggInfos {
 
 	/**
 	 * 
-	 * @return
+	 * @return may return <code>NULL</code> if no MIRIAM URN
+	 * is available for the current KEGG ID.
 	 */
 	public String getKegg_ID_with_MiriamURN() {
 		return getMiriamURIforKeggID(this.Kegg_ID);
@@ -500,7 +542,8 @@ public class KeggInfos {
 	}
 
 	/**
-	 * Hopefully the most meaningfull name (last in the list of getNames() ).
+	 * Hopefully the most meaningfull name (last in the ";"-dividedlist of getNames()).
+	 * Does NOT remove synonyms, only multiples.
 	 * 
 	 * @return
 	 */
@@ -516,8 +559,58 @@ public class KeggInfos {
 	public String getNames() {
 		return names;
 	}
-
+	
 	/**
+	 * Get EC Numbers (e.g. "EC:2.1.2.10") matching
+	 * to this {@link #Kegg_ID}. Parses the kegg_id itself,
+	 * the definition and the orthology. Does NOT parse the "ENZYME" entry.
+	 * <p>Thus, this method is rather for genes, compounds, etc.
+	 * and NOT for queried reactions. 
+	 * @return non-<code>NULL</code> (but maybe empty) list
+	 * of EC numbers (without ec: prefix) describing this object.
+	 * @see #getEnzymes()
+	 */
+	public Collection<String> getECcodes() {
+	  Set<String> ecCodes = new HashSet<String>();
+	  
+	  // Extract from kegg id (IS an enzyme)
+	  Collection<String> ec = extractECNumbers(getKegg_ID());
+	  if (ec!=null) ecCodes.addAll(ec);
+	  
+	  // Extract from definition (Encodes for an enzyme)
+	  ec = extractECNumbers(getDefinition());
+	  if (ec!=null) ecCodes.addAll(ec);
+	  
+    // Extract from orthology (Encodes for an enzyme)
+	  // e.g. "efa:EF2928" and reaction "rn:R04241"
+    ec = extractECNumbers(getOrthology());
+    if (ec!=null) ecCodes.addAll(ec);
+	  
+	  return ecCodes;
+	}
+
+  /**
+	 * Extract enzyme codes (e.g. "EC:2.1.2.10") from any string.
+   * @param ids any string
+   * @return EC Numbers if found (without ec: prefix) or <code>NULL</code>
+   */
+	public static Set<String> extractECNumbers(String ids) {
+	  Set<String> ecCodes = new HashSet<String>();
+	  
+	  // Extract via regex.
+	  if (ids!=null) {
+	    Matcher matcher = ECcodes.matcher(ids);
+	    int i=-1;
+	    while (matcher.find()) {
+	      i++;
+	      String string = matcher.group(1);
+	      ecCodes.add(string.trim());
+	    }
+	  }
+	  return ecCodes.size()<1?null:ecCodes;
+	}
+
+  /**
 	 * 
 	 * @return
 	 */
@@ -648,16 +741,16 @@ public class KeggInfos {
 
 		// General
 		names = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "NAME", null);
-		if (names != null && names.length() != 0) {
+		if (names != null && names.length() > 0) {
 			int pos = names.lastIndexOf(";");
 			if (pos > 0 && pos < (names.length() - 1))
-				name = names.substring(pos + 1, names.length()).replace("\n",
-						"").trim();
+				name = names.substring(pos + 1, names.length()).replace("\n","").trim();
 			else
 				name = names;
 		}
 		definition = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "DEFINITION", null);
 		description = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "DESCRIPTION", null);
+		orthology = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "ORTHOLOGY", null);
 
 		// Mainly Pathway specific (eg. "path:map00603")
 		go_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, " GO:", "\n"); // DBLINKS GO:
@@ -775,6 +868,8 @@ public class KeggInfos {
 			definition = null;
 		if (description != null && description.trim().length() == 0)
 			description = null;
+    if (orthology != null && orthology.trim().length() == 0)
+      orthology = null;
 		if (names != null && names.trim().length() == 0)
 			names = null;
 		if (name != null && name.trim().length() == 0)
@@ -853,15 +948,24 @@ public class KeggInfos {
 
   /**
    * @param keggId
-   * @return Complete Miriam URN Including the given ID.
+   * @return Complete MIRIAM URN Including the given ID. Or <code>NULL</code>
+   * if no such MIRIAM URN is available!
    */
   public static String getMiriamURIforKeggID(String keggId, EntryType et) {
-    String prefix = keggId.toLowerCase().trim();
     int pos = keggId.indexOf(':');
     if (pos <= 0) {
-      System.err.println("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted:" + keggId);
-      return null;
+      // Try to infere prefix from id.
+      String newKeggId = appendPrefix(keggId);
+      pos = newKeggId.indexOf(':');
+      if (pos>0) {
+        log.info(String.format("Inferred prefix for partial KEGG ID. Was: '%s', is now: '%s'.", keggId, newKeggId));
+        keggId=newKeggId;
+      } else {
+        log.warning(String.format("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted: '%s'.", keggId));
+        return null;
+      }
     }
+    String prefix = keggId.toLowerCase().trim();
     String suffix = keggId.substring(pos + 1).trim();
     String ret = "";
 
@@ -879,15 +983,24 @@ public class KeggInfos {
     } else if (prefix.startsWith("path:")) { // Link to another pathway
       ret = miriam_urn_kgPathway + suffix;
     } else if (prefix.startsWith("ko:")) {
-      // TODO: ist das so korrekt? Oder auch ko:has:234 möglich (s.u.)?
       ret = miriam_urn_kgOrthology + suffix;
+    } else if (prefix.startsWith("br:")) {
+      // KEGG BRITE - no official MIRIAM URN available as of 2011-11-07
+      // if it matches "^K\d+$", we can go with KEGG orthology, else
+      // we will have to skip it.
+      if (suffix.length()>2 && Character.toUpperCase(suffix.charAt(0))=='K' && 
+          Character.isDigit(suffix.charAt(1))) {
+        ret = miriam_urn_kgOrthology + suffix;
+      } else {
+        ret = null;
+      }
     } else if (et == null || et != null
         && (et.equals(EntryType.gene) || et.equals(EntryType.ortholog))) {// z.B. hsa:00123, ko:00123
-      ret = miriam_urn_kgGenes + keggId.trim(); // Be careful here: Don't trim to ':'! (Don't use suffix)
+      ret = miriam_urn_kgGenes + keggId.trim().replace(":", "%3A"); // Be careful here: Don't trim to ':'! (Don't use suffix)
     } else {
-      System.err.println("Please implement MIRIAM urn for: '" + keggId
+      log.warning("Please implement MIRIAM urn for: '" + keggId
           + ((et != null) ? "' (" + et.toString() + ")." : "."));
-      return null;
+      ret = null;
     }
     return ret;
   }
@@ -896,8 +1009,7 @@ public class KeggInfos {
    * If s contains ":" => return values is all chars behind the ":". Else =>
    * return value is s.
    * 
-   * @param s
-   *            - any String.
+   * @param s any String.
    * @return see above. Result is always trimmed.
    */
   public static String suffix(String s) {
@@ -905,6 +1017,109 @@ public class KeggInfos {
       return s.trim();
     }
     return (s.substring(s.indexOf(':') + 1)).trim();
+  }
+  
+  /**
+   * Prepends the KEGG prefix (e.g. "C00123" => "cpd:C00123").
+   * Does not work for organism specific genes.
+   * <p>Note that this is case sensitive and s should NOT be
+   * uppercased or lowercased before usage!
+   * @param s
+   * @return
+   */
+  public static String appendPrefix(String s) {
+    if (s==null) return s;
+    
+    int pos = s.indexOf(':');
+    if (pos>0){
+      return s.trim();
+    } else if (pos==0) {
+      return appendPrefix(s.substring(1));
+    }
+    
+    if (s.length()>2) {
+      char firstChar = s.charAt(0);
+      if (Character.isDigit(s.charAt(1))) {
+        firstChar = Character.toUpperCase(firstChar);
+        
+        if (firstChar=='C') {
+          return "cpd:" + s;
+        } else if (firstChar=='D') {
+          return "dr:" + s;
+        } else if (firstChar=='G') {
+          return "gl:" + s;
+        } else if (firstChar=='K') {
+          return "ko:" + s;
+        } else if (firstChar=='R') {
+          return "rn:" + s;
+        }
+        
+        
+      } else //if (Character.isLetter(firstChar) && Character.isLowerCase(firstChar) 
+          //&& Character.isLetter(s.charAt(1)) && Character.isLetter(s.charAt(2))) {
+        if (Pattern.matches("^\\w{2,3}\\d{5}$", s)) {
+        // e.g. ("path:hsa00010")
+        return "path:" + s;
+      } else {
+        // genes, impossible without knowing the organism ("^\w+:[\w\d\.-]*$")
+        // e.g. "hsa:1738"; also impossible is KEGG brite ("br:*" ids)
+        log.warning(String.format("Warning: can not prepend unknown organism on possibly gene-id %s", s));
+        return s;
+      }
+    } else {
+      log.warning(String.format("Warning: can not prepend prefix to unknown id %s", s));
+    }
+    
+    return s;
+  }
+
+  
+  
+  /**
+   * Examples for all different kegg databases
+   * @param args
+   */
+  public static void main(String[] args) {
+    KeggInfoManagement manag = new KeggInfoManagement();
+    
+    System.out.println("=========SPECIAL TESTS=======");
+    System.out.println(new KeggInfos("hsa:223", manag).getECcodes()); // \n between EC codes
+    System.out.println(new KeggInfos("efa:EF2928", manag).getECcodes()); // EC codes in orthology
+    
+    System.out.println("=========KEGG COMPOUNDS======");
+    System.out.println(new KeggInfos("cpd:C00719", manag).getNames());
+    System.out.println("=============================");
+    
+    System.out.println("=========KEGG DRUG===========");
+    System.out.println(new KeggInfos("dr:D00123", manag).getNames());
+    System.out.println("=============================");
+    
+    System.out.println("=========KEGG PATHWAY=========");
+    System.out.println(new KeggInfos("path:hsa00010", manag).getNames());
+    System.out.println("=============================");
+
+    
+    System.out.println("=========KEGG GENES==========");
+    System.out.println(new KeggInfos("hsa:1738", manag).getNames());
+    System.out.println("=============================");
+
+    
+    System.out.println("=========KEGG GLYCAN=========");
+    System.out.println(new KeggInfos("gl:G02511", manag).getNames());
+    System.out.println("=========KEGG GLYCAN-2=======");
+    System.out.println(new KeggInfos("gl:G00123", manag).getNames());
+    System.out.println("=============================");
+
+    
+    System.out.println("=========KEGG Orthology======");
+    System.out.println(new KeggInfos("ko:K00001", manag).getNames());
+    System.out.println("=============================");
+
+    
+    System.out.println("=========KEGG Reaction=======");
+    System.out.println(new KeggInfos("rn:R00100", manag).getNames());
+    System.out.println("=============================");
+
   }
 
 

@@ -18,6 +18,7 @@ package de.zbit.kegg.parser.pathway;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -64,7 +65,7 @@ public class Entry {
   /**
    * If it is a group node, this list contains the ids of all children.
    */
-  private ArrayList<Integer> components = null;
+  private List<Integer> components = null;
   /**
    * The reverse-argument to the components argument.
    * I.e. if this is contained in a components list, this is
@@ -135,15 +136,17 @@ public class Entry {
   }
 
   /**
-   * 
+   * If it is a group node, this list contains the ids of all children.
    * @return
+   * @see #hasComponents()
    */
-  public ArrayList<Integer> getComponents() {
+  public List<Integer> getComponents() {
     return components==null?new ArrayList<Integer>():components;
   }
   
   /**
    * @return true if and only if the node has children (i.e. if it is a group node).
+   * @see #getComponents()
    */
   public boolean hasComponents() {
     return (components!=null&&components.size()>0);
@@ -198,11 +201,27 @@ public class Entry {
   }
 
   /**
-   * 
+   * Returns the reaction directly annotated in this entry
+   * in the KGML file.
+   * Usually this means that this entry catalyzes the
+   * mentioned reaction!
+   * <p>NOTE: consider using {@link #getReactions()} instead
+   * of this method!
+   * @return kegg rection id (may also be multiple: "rn:R01793 rn:R01794")!
+   * @see #hasReaction()
+   * @see #getReactions()
+   */
+  @Deprecated
+  public String getReactionString() {
+    return reaction;
+  }
+  
+  /**
    * @return
    */
-  public String getReaction() {
-    return reaction;
+  public String[] getReactions() {
+    if (!hasReaction()) return new String[0];
+    return reaction.contains(" ")?reaction.split(" "): new String[]{reaction};
   }
 
   /**
@@ -224,9 +243,10 @@ public class Entry {
   /**
    * @return true if this is a modifier for a certain reaction and the reaction
    * is set.
+   * @see #getReactionString()
    */
   public boolean hasReaction() {
-    return (getReaction() != null && getReaction().trim().length() != 0);
+    return (getReactionString() != null && getReactionString().trim().length() != 0);
   }
 
   /**
@@ -286,8 +306,11 @@ public class Entry {
         && name.charAt(0)=='C' && Character.isDigit(name.charAt(1))) {
       name = "cpd:"+name;
     }
-    parentPathway.nameChange(this, name);
+    //parentPathway has maps containing this nane
+    // => any changes must be reported!
+    parentPathway.removeEntryFromNameMap(this);
     this.name = name;
+    parentPathway.putEntryInNameMap(this);
   }
 
   /**

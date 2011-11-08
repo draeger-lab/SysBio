@@ -17,10 +17,12 @@
 package de.zbit.kegg.parser.pathway;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Main Kegg document. Corresponding to the Kegg Pathway class
@@ -31,7 +33,8 @@ import java.util.Map;
  * @since 1.0
  */
 public class Pathway {
-	/* see http://www.genome.jp/kegg/xml/docs/ */
+  public static final transient Logger log = Logger.getLogger(Pathway.class.getName());
+  
 	/**
 	 * keggid.type the KEGGID of this pathway map
 	 */
@@ -87,22 +90,27 @@ public class Pathway {
 	 */
 
 	/**
-	 * Contains ids of entrys and the entry itself.
+	 * Contains ids of entries and the entry itself.
 	 */
 	private Map<Integer, Entry> idMap = new HashMap<Integer, Entry>();
 	
   /**
-   * Contains names of entrys and the entry itself.
+   * Contains names of entries and the entry itself.
    */
-  private Map<String, Entry> nameMap = new HashMap<String, Entry>();
+  private Map<String, Collection<Entry>> nameMap = new HashMap<String, Collection<Entry>>();
 
   /**
-   * Contains names of reactions and entrys that modify this reactions (usually enzymes).
+   * Contains names of reactions and entries that modify this reactions (usually enzymes).
    */
-  private Map<String, List<Entry>> reactionModifiers = new HashMap<String, List<Entry>>();
+  private Map<String, Collection<Entry>> reactionModifiers = new HashMap<String, Collection<Entry>>();
+  
+  /**
+   * Contains names of entries and reactions in which this entry occurs.
+   */
+  private Map<String, Collection<Reaction>> reactionComponents = new HashMap<String, Collection<Reaction>>();
 	
   /**
-   * The maxmimum id number of an contained entry.
+   * The maximum id number of an contained entry.
    */
   private int maxId=0;
   
@@ -149,7 +157,7 @@ public class Pathway {
 	 */
 	public void addEntry(Entry e) {
 	  idMap.put(e.getId(), e);
-	  nameMap.put(e.getName(), e);
+	  putEntryInNameMap(e);
 	  addReactionModifier(e);
 	  
 	  maxId=Math.max(maxId, e.getId());
@@ -158,27 +166,111 @@ public class Pathway {
 	}
 	
 	/**
+	 * Please call this method whenever adding an {@link Entry}.
+	 * @param e
+	 */
+	void putEntryInNameMap(Entry e) {
+	  // Put whole name
+	  addToSet(nameMap, e.getName(), e);
+	  
+	  // Put splitted name (as whole name may be "hsa:12345 hsa:23456")
+	  if (e.getName().contains(" ")) {
+	    for (String ko_id:e.getName().split(" ")) {
+	      ko_id = ko_id.trim();
+	      if (ko_id.length()>0) {
+	        addToSet(nameMap, ko_id, e);
+	      }
+	    }
+	  }
+	}
+	
+	/**
+	 * Please call this method whenever removing an {@link Entry}.
+	 * @param e
+	 */
+	void removeEntryFromNameMap(Entry e) {
+	  Set<String> toRemove = new HashSet<String>();
+	  // Put whole name
+	  toRemove.add(e.getName());
+	  
+	  // Put splitted name (as whole name may be "hsa:12345 hsa:23456")
+	  for (String ko_id:e.getName().split(" ")) {
+	    ko_id = ko_id.trim();
+	    if (ko_id.length()>0) {
+	      toRemove.add(ko_id);
+	    }
+	  }
+	  
+	  removeFromSet(nameMap, e, toRemove.toArray(new String[0]));
+	}
+	
+	/**
+	 * Add a key value pair to a Hashet of Collections of values!
+	 * (Map<K, Collection<V>>).
+	 * @param <K>
+	 * @param <V>
+	 * @param map
+	 * @param key
+	 * @param listItem
+	 */
+  private static <K, V> void addToSet(Map<K, Collection<V>> map, K key, V listItem) {
+    Collection<V> list = map.get(key);
+    if (list==null) {
+      list = new HashSet<V>();
+      map.put(key, list);
+    }
+    list.add(listItem);
+  }
+  
+  /**
+   * The reverse of {@link #addToSet(Map, Object, Object)}.
+   * @param <K>
+   * @param <V>
+   * @param map
+   * @param listItem
+   * @param keys
+   */
+  private static <K, V> void removeFromSet(Map<K, Collection<V>> map, V listItem, K... keys) {
+    for (K key: keys) {
+      Collection<V> list = map.get(key);
+      if (list!=null) {
+        list.remove(listItem);
+        if (list.size()<1) {
+          map.remove(key);
+        }
+      }
+    }
+  }
+	
+	/**
 	 * If and only if e is a reactionModifier, it is
 	 * added to the list.
 	 * @param e
 	 */
 	private void addReactionModifier(Entry e) {
-	  addReactionModifier(e, e.getReaction());
+	  addReactionModifier(e, e.getReactionString());
 	}
 	/**
    * If and only if e is a reactionModifier, it is
    * added to the list.
 	 * @param e
-	 * @param reactionName
+	 * @param reactionName may also be "rn:R01793 rn:R01794"!
 	 */
 	private void addReactionModifier(Entry e, String reactionName) {
+	  if (reactionName==null || reactionName.length()<1) {
+	    reactionName = e.getReactionString();
+	  }
+	  
     if (reactionName!=null && reactionName.length()>0) {
-      List<Entry> l = reactionModifiers.get(reactionName);
-      if (l==null) {
-        l = new LinkedList<Entry>();
-        reactionModifiers.put(reactionName, l);
+      for (String rName: reactionName.trim().split(" ")) {
+        if (rName.length()<1) continue;
+        Collection<Entry> l = reactionModifiers.get(rName);
+        if (l==null) {
+          l = new HashSet<Entry>();
+          reactionModifiers.put(rName, l);
+        }
+        l.add(e);
       }
-      if (!l.contains(e)) l.add(e);
     }
 	}
 	
@@ -188,9 +280,11 @@ public class Pathway {
    * @param e
    */
   private void removeReactionModifier(Entry entry) {
-    if (entry.getReaction()!=null && entry.getReaction().length()>0) {
-      List<Entry> l = reactionModifiers.get(entry.getReaction());
-      if (l!=null) l.remove(entry);
+    if (entry.hasReaction()) {
+      for (String reaction : entry.getReactions()) {
+        Collection<Entry> l = reactionModifiers.get(reaction);
+        if (l!=null) l.remove(entry);
+      }
     }
   }
 
@@ -250,10 +344,10 @@ public class Pathway {
 	 * equalsIgnoreCase the given name.
 	 * If no entry with this contidion can be found,
 	 * returns null.
-	 * @param name
+	 * @param name WITH prefix ("ko:12345" not "12345").
 	 * @return
 	 */
-	public Entry getEntryForName(String name) {
+	public Collection<Entry> getEntriesForName(String name) {
 		/*for (int i = 0; i < entries.size(); i++)
 			if (entries.get(i).getName().equalsIgnoreCase(name))
 				return entries.get(i);
@@ -267,7 +361,7 @@ public class Pathway {
 	 * @param reactionName - e.g. "rn:R01662"
 	 * @return List<Entry> or null
 	 */
-	public List<Entry> getReactionModifiers(String reactionName) {
+	public Collection<Entry> getReactionModifiers(String reactionName) {
 	  return reactionModifiers.get(reactionName);
 	}
 
@@ -440,18 +534,6 @@ public class Pathway {
       }
     }
   }
-
-  /**
-   * This function has to be called by entries, before their
-   * names change. It does NOT perform the change itself.
-   * @param entry - Entry object BEFORE THE CHANGE
-   * @param name - the new name.
-   */
-  protected void nameChange(Entry entry, String name) {
-    // Change the nameMap
-    nameMap.remove(entry.getName());
-    nameMap.put(name, entry);
-  }
   
   /**
    * This function has to be called by entries, before their
@@ -490,6 +572,119 @@ public class Pathway {
     
     e.setName(Entry.removedNodeName);
     e=null;
+  }
+
+  /**
+   * Get a list with reactions in which this {@link Entry}
+   * is involved as substrate or product. Does NOT return
+   * reactions in which this {@link Entry} is involved
+   * as reaction modifier. Use {@link #getReactionModifiers(String)}
+   * or {@link Entry#getReactionString()} for this purpose.
+   * 
+   * @param entry
+   * @return a list with reactions in which this entry
+   * is involved as substrate or product.
+   */
+  public Collection<Reaction> getReactionsForEntry(Entry entry) {
+    
+    Set<Reaction> ret = new HashSet<Reaction>();
+    Collection<Reaction> comp = reactionComponents.get(entry.getName());
+    if (comp!=null) ret.addAll(comp);
+    
+    // Put splitted name (as whole name may be "hsa:12345 hsa:23456")
+    if (entry.getName().contains(" ")) {
+      for (String name:entry.getName().split(" ")) {
+        name = name.trim();
+        if (name.length()>0) {
+          comp = reactionComponents.get(name);
+          if (comp!=null) ret.addAll(comp);
+        }
+      }
+    }
+    
+    return ret;
+  }
+
+  /**
+   * Registers the {@link ReactionComponent} in internal
+   * HashMaps for faster access.
+   * @param rc
+   * @param reaction
+   */
+  void registerReactionComponent(ReactionComponent rc, Reaction reaction) {
+    // Put whole name
+    addToSet(reactionComponents, rc.getName(), reaction);
+    
+    // Put splitted name (as whole name may be "hsa:12345 hsa:23456")
+    if (rc.getName().contains(" ")) {
+      for (String name:rc.getName().split(" ")) {
+        name = name.trim();
+        if (name.length()>0) {
+          addToSet(reactionComponents, name, reaction);
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns the corresponding {@link Entry} for a
+   * {@link ReactionComponent}.
+   * @param rc
+   * @return {@link Entry} or <code>NULL</code> of none found.
+   */
+  public Entry getEntryForReactionComponent(ReactionComponent rc) {
+    return getEntryForReactionComponent(rc, false);
+  }
+  /**
+   * 
+   * @param rc
+   * @param supressWarning
+   * @return
+   * @see #getEntryForReactionComponent(ReactionComponent)
+   */
+  public Entry getEntryForReactionComponent(ReactionComponent rc, boolean supressWarning) {
+    Entry rcEntry=null;
+    
+    if (rc.hasId()) {
+      // Id is a unique identifier and thus preferred!
+      rcEntry = getEntryForId(rc.getId());
+    } 
+    
+    if (rcEntry==null){ // no id or invalid id.
+      Collection<Entry> c = getEntriesForName(rc.getName());
+      int size = c==null?0:c.size();
+      if (size>1) {
+        /* Actually we don't know which of those entries is really
+         * involved in the reaction and I don't know if this ever
+         * occurs => report a warning.
+         */
+        // Look for exact match with an contained object
+        Set<Entry> exactMatches = new HashSet<Entry>();
+        for (Entry e: c) {
+          if (e.getName().equalsIgnoreCase(rc.getName())) {
+            exactMatches.add(e);
+          }
+        }
+        if (exactMatches.size()==1) {
+          log.fine("Ambiguous reaction component " + rc.getName() + ". Took unique exact id match.");
+          return exactMatches.iterator().next();
+        } else {
+          for (Entry e: exactMatches) {
+            if (e.getCustom()!=null) {
+              log.fine("Ambiguous reaction component " + rc.getName() + ". Took first exact match with custom object.");
+              return e;
+            }
+          }
+        }
+        if (!supressWarning) {
+          log.warning("Ambiguous reaction component: " + rc.getName());
+        }
+      }
+      if (size>0) rcEntry = c.iterator().next();
+      else rcEntry = null;
+    }
+    
+    return rcEntry;
   }
 
 	

@@ -135,4 +135,11 @@ public class ReactionComponent {
     return id!=null && id.intValue()>0;
   }
 
+  /**
+   * @return
+   */
+  public boolean hasName() {
+    return (this.name != null && this.name.length()>0);
+  }
+
 }
