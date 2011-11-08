@@ -301,7 +301,7 @@ public class SBFileFilter extends GeneralFileFilter {
         return false;
       } finally {
         try {
-          br.close();
+          if (br!=null) br.close();
         } catch (IOException e) {
           return false;
         }
