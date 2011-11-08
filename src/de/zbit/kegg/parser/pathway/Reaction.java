@@ -16,8 +16,12 @@
  */
 package de.zbit.kegg.parser.pathway;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
-
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -50,12 +54,18 @@ public class Reaction {
   ArrayList<ReactionComponent> product = new ArrayList<ReactionComponent>(); // 1..*
   
   /**
+   * The parent pathway object.
+   */
+  private Pathway parentPathway = null;
+  
+  /**
    * 
    * @param name
    * @param type
    */
-  private Reaction(String name, ReactionType type) {
+  private Reaction(Pathway parentPathway, String name, ReactionType type) {
     super();
+    this.parentPathway = parentPathway;
     this.Name = name;
     this.type = type;
   }
@@ -66,8 +76,8 @@ public class Reaction {
    * @param type
    * @param childNodes
    */
-  public Reaction(String name, ReactionType type, NodeList childNodes) {
-    this(name, type);
+  public Reaction(Pathway parentPathway, String name, ReactionType type, NodeList childNodes) {
+    this(parentPathway, name, type);
     parseSubNodes(childNodes);
   }
   
@@ -78,8 +88,8 @@ public class Reaction {
    * @param substrate
    * @param product
    */
-  public Reaction(String name, ReactionType type, ReactionComponent substrate, ReactionComponent product) {
-    this (name, type);
+  public Reaction(Pathway parentPathway, String name, ReactionType type, ReactionComponent substrate, ReactionComponent product) {
+    this (parentPathway, name, type);
     addProduct(product);
     addSubstrate(substrate);
   }
@@ -90,6 +100,7 @@ public class Reaction {
    */
   public void addProduct(ReactionComponent product) {
     this.product.add(product);
+    parentPathway.registerReactionComponent(product, this);
   }
 
   /**
@@ -98,6 +109,7 @@ public class Reaction {
    */
   public void addSubstrate(ReactionComponent substrate) {
     this.substrate.add(substrate);
+    parentPathway.registerReactionComponent(substrate, this);
   }
   
   /**
@@ -112,16 +124,16 @@ public class Reaction {
    * 
    * @return
    */
-  public ArrayList<ReactionComponent> getProducts() {
-    return product;
+  public List<ReactionComponent> getProducts() {
+    return Collections.unmodifiableList(product);
   }
   
   /**
    * 
    * @return
    */
-  public ArrayList<ReactionComponent> getSubstrates() {
-    return substrate;
+  public List<ReactionComponent> getSubstrates() {
+    return Collections.unmodifiableList(substrate);
   }
   
   /**
@@ -148,10 +160,10 @@ public class Reaction {
       ReactionComponent rc = null;
       if (name.equalsIgnoreCase("substrate")) {
         rc = new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes());
-        substrate.add(rc);
+        addSubstrate(rc);
       } else if(name.equals("product")) {
         rc = new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes());
-        product.add(rc);
+        addProduct(rc);
       }
       
       // Attribute id is since 7.1
@@ -182,6 +194,58 @@ public class Reaction {
    */
   public void setType(ReactionType type) {
     this.type = type;
+  }
+
+  /**
+   * @return {@link Collection} to iterate over
+   * {@link #substrate}s and {@link #product}s.
+   */
+  public Collection<ReactionComponent> getReactants() {
+    return new AbstractCollection<ReactionComponent> () {
+      @Override
+      public Iterator<ReactionComponent> iterator() {
+        return new Iterator<ReactionComponent>() {
+          int index=-1;
+          @Override
+          public boolean hasNext() {
+            return (index+1)<size();
+          }
+          @Override
+          public ReactionComponent next() {
+            index++;
+            int numSubstrates = substrate.size();
+            if (index<numSubstrates) {
+              return substrate.get(index);
+            } else {
+              try {
+                return product.get(index-numSubstrates);
+              } catch (IndexOutOfBoundsException e) {
+                return null;
+              }
+            }
+          }
+          @Override
+          public void remove() {
+            System.err.println("REMOVE NOT SUPPORTED!");
+          }
+        };
+      }
+      @Override
+      public int size() {
+        return substrate.size() + product.size();
+      }
+    };
+  }
+
+  /**
+   * @param reactantKeggID the name of the reactant, e.g. "cpd:C05922".
+   * @return
+   */
+  public ReactionComponent getReactant(String reactantKeggID) {
+    for (ReactionComponent rc: getReactants()) {
+      if (rc.getName().equalsIgnoreCase(reactantKeggID)) return rc;
+    }
+    return null;
   }
 
 }

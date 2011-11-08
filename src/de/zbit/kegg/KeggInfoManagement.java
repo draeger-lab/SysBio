@@ -157,8 +157,9 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
       // Extract Entry id of current dataset
       String aktEntryID = KeggAdaptor.extractInfo(splitt[i], "ENTRY", "  ");
       if (aktEntryID==null || aktEntryID.length()==0) {
-        // Sollte NIE vorkommen, da kegg immer einen ENTRY-Eintrag mitgiebt.
-        System.err.println("No Entry id found in Text:\n" + splitt[i].substring(0, Math.min(150, splitt[i].length())) + "...\n------------");
+        // Should NEVER happen, because KEGG does always send ENTRY-entries.
+        System.err.println(String.format("No Entry id while fetching '%s'. Returned text was:\n%s\n[...]\n------------",
+          (splitt[i]==null?"null":splitt[i]), splitt[i].substring(0, Math.min(150, splitt[i].length()))));
         continue;
       }
       

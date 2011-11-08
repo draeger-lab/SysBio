@@ -17,6 +17,7 @@
 package de.zbit.util;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -116,6 +117,29 @@ public class ArrayUtils {
   	ret.append(arr[arr.length-1]);
   	
 		return ret.toString();
+  }
+  
+  /**
+   * Implodes the given iterable. (e.g. implode(["a", "b"], " - ") would return "a - b".
+   * @param arr
+   * @param sep
+   * @return
+   */
+  public static <T> String implode(Iterable<T> arr, String sep) {
+    if (arr==null || sep==null || !arr.iterator().hasNext()) return null;
+    
+    StringBuilder ret = new StringBuilder();
+    Iterator<T> it = arr.iterator();
+    while (true) {
+      ret.append(it.next());
+      if (it.hasNext()) {
+        ret.append(sep);
+      } else {
+        break;
+      }
+    }
+    
+    return ret.toString();
   }
 
 

@@ -17,8 +17,10 @@
 package de.zbit.kegg;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import de.zbit.kegg.parser.pathway.Entry;
@@ -30,11 +32,14 @@ import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
 
 /**
+ * Various Tools related to graph-processing and 
+ * translation of the KEGG PATHWAY database.
  * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
 public class KeggTools {
+  public static final transient Logger log = Logger.getLogger(KeggTools.class.getName());
   
   /**
    * Retrieves all Equations and Enzymes for all reactions in the pathway.
@@ -44,6 +49,9 @@ public class KeggTools {
    * @param manager
    */
   public static void autocompleteReactions(Pathway p, KeggInfoManagement manager) {
+    // CRUCIAL: reactions are divided by " + ", not "+". Consider, e.g. rn:R04241:
+    // "C00002 + C03541(n) + C00025 <=> C00008 + C00009 + C03541(n+1)"!
+    final String reactantSeparator = " + ";
     int newEntrysId = p.getMaxEntryId();
     
     for (Reaction r : p.getReactions()) {
@@ -57,36 +65,64 @@ public class KeggTools {
           if (infos.getEquation()!=null) {
             String eq = infos.getEquation();
             int dividerPos = eq.indexOf("<=>");
-            eq = eq.replace("<=>", "+");
+            eq = eq.replace("<=>", reactantSeparator);
             
-            int curPos = eq.indexOf("+");
+            int curPos = eq.indexOf(reactantSeparator);
             int lastPos = 0;
             while (lastPos>=0) {
               String reactant = eq.substring(lastPos, curPos>=0?curPos:eq.length()).trim();
               boolean isSubstrate = (lastPos<dividerPos);
-              if (reactant.contains(" ")) { // e.g. "2 C00103"
+              // Remove prefixes (e.g. "2 C00103")
+              if (reactant.contains(" ")) {
                 reactant = reactant.substring(reactant.indexOf(" ")+1);
               }
-              if (reactant.charAt(0)!='C') {
-                System.err.println("Warning: non-compound reactat: " + reactant);
-              } else if (!reactant.contains(":")) {
-                reactant = "cpd:" + reactant;
+              // Remove suffixes (e.g. "C03541(n+1)")
+              int i=0;
+              boolean digitsFound=false;
+              for (; i<reactant.length(); i++) {
+                char c = reactant.charAt(i);
+                if (Character.isDigit(c)) {
+                  if (!digitsFound) digitsFound = true;
+                } else {
+                  if (digitsFound) break;
+                }
+              }
+              reactant = reactant.substring(0, i);
+              //---
+              
+              // Check entry type and prepend kegg prefix
+              // Check moved to appendPrefix() method.
+              //char firstChar = reactant.charAt(0);
+              //if (firstChar!='C' && firstChar!='G') {
+                //log.warning(String.format("Warning: non-compound and non-glycan reactat: %s", reactant));
+              //} else 
+              if (!reactant.contains(":")) {
+                reactant = KeggInfos.appendPrefix(reactant);
               }
               
-              Entry found = p.getEntryForName(reactant);
+              // Look if we need to add new components
+              ReactionComponent rc=r.getReactant(reactant);
+              if (rc==null) {
+                rc = new ReactionComponent(reactant);
+                if (isSubstrate) r.addSubstrate(rc);
+                else r.addProduct(rc);
+              }
+              
+              // Look if we need to add a new entry and configure linkage (id of ReactionComponent)
+              Entry found = p.getEntryForReactionComponent(rc,true);
               if (found == null) {
                 // Create a new entry
                 newEntrysId++;
-                Entry entry = new Entry(p, newEntrysId,reactant);
+                Entry entry = new Entry(p, newEntrysId, reactant);
+                rc.setId(newEntrysId);
                 
                 autocompleteLinkAndAddToPathway(p, entry);
-                
-                if (isSubstrate) r.addSubstrate(new ReactionComponent(entry.getName()));
-                else r.addProduct(new ReactionComponent(entry.getName()));
+              } else {
+                if (!rc.hasId()) rc.setId(found.getId());
               }
               
-              lastPos = curPos<0?curPos:curPos+1;
-              curPos = eq.indexOf("+", curPos+1);
+              lastPos = curPos<0?curPos:curPos+reactantSeparator.length();
+              curPos = eq.indexOf(" + ", curPos+reactantSeparator.length());
             }
           }
           
@@ -94,8 +130,8 @@ public class KeggTools {
           // Add missing enzymes
           if (infos.getEnzymes()!=null) {
             // Get all Enzymes, that are already contained in the pathway.
-            List<Entry> modifier = p.getReactionModifiers(r.getName());
-            List<String> contained_enzymes = new LinkedList<String>();
+            Collection<Entry> modifier = p.getReactionModifiers(r.getName());
+            Set<String> contained_enzymes = new HashSet<String>();
             if (modifier!=null && modifier.size()>0) {
               for (Entry mod : modifier) {
                 contained_enzymes.addAll(getKeggEnzymeNames(mod, manager));
@@ -164,7 +200,7 @@ public class KeggTools {
           KeggInfos infos = new KeggInfos(ko_id, manager);
 
           if (infos.getEquation()!=null) {
-            String[] reactants = infos.getEquation().replace("<=>", "+").trim().split(Pattern.quote("+"));
+            String[] reactants = infos.getEquation().replace("<=>", " + ").trim().split(Pattern.quote(" + "));
             for (String string : reactants) {
               string = string.trim();
               if (string.contains(" ")) { // e.g. "2 C00103"
@@ -198,31 +234,33 @@ public class KeggTools {
    * @param manager
    * @return List<String> (empty list if none available).
    */
-  public static List<String> getKeggEnzymeNames(Entry entry, KeggInfoManagement manager) {
-    List<String> modifier = new LinkedList<String>();
+  public static Collection<String> getKeggEnzymeNames(Entry entry, KeggInfoManagement manager) {
+    Set<String> modifier = new HashSet<String>();
     
     // Add all KEGG Enzyme ids to the modifier
-    if (entry.getType().equals(EntryType.enzyme)) {
-      modifier.add(entry.getName().contains(":")?
-          entry.getName().substring(entry.getName().indexOf(":")+1):entry.getName());
-    } else {
+//    if (entry.getType().equals(EntryType.enzyme)) {
+//      modifier.add(entry.getName().contains(":")?
+//          entry.getName().substring(entry.getName().indexOf(":")+1):entry.getName());
+//    } else {
       for (String ko_id : entry.getName().split(" ")) {
         KeggInfos infos = new KeggInfos(ko_id, manager);
-        if (infos.queryWasSuccessfull() && infos.getDefinition()!=null) {
-          String def = infos.getDefinition().replace("]", ")");
-          //e.g. "aldehyde dehydrogenase 9 family, member A1 (EC:1.2.1.3 1.2.1.19\n1.2.1.47)"
-          
-          int pos = def.indexOf("EC:");
-          String ECString = pos>0?def.substring(pos+3, def.indexOf(")",pos)):null;
-          if (ECString!=null) {
-            String[] splitt = ECString.split("\\s");
-            for (String string : splitt) {
-              if (!modifier.contains(string)) modifier.add(string);
-            }
-          }
+        if (infos.queryWasSuccessfull() ){
+          modifier.addAll(infos.getECcodes());
+//            && infos.getDefinition()!=null) {
+//          String def = infos.getDefinition().replace("]", ")");
+//          //e.g. "aldehyde dehydrogenase 9 family, member A1 (EC:1.2.1.3 1.2.1.19\n1.2.1.47)"
+//          
+//          int pos = def.indexOf("EC:");
+//          String ECString = pos>0?def.substring(pos+3, def.indexOf(")",pos)):null;
+//          if (ECString!=null) {
+//            String[] splitt = ECString.split("\\s");
+//            for (String string : splitt) {
+//              if (!modifier.contains(string)) modifier.add(string);
+//            }
+//          }
         }
       }
-    }
+//    }
     
     return modifier;
   }
@@ -322,7 +360,7 @@ public class KeggTools {
   public static boolean isOrphan(Pathway p, Entry entry, boolean considerRelations, boolean considerReactions) {
     
     // Look if it is an enzyme (or other reaction modifier)
-    if (considerReactions && entry.getReaction() != null && entry.getReaction().length() > 0) {
+    if (considerReactions && entry.hasReaction()) {
       return false;
     }
     

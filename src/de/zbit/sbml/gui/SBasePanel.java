@@ -574,12 +574,18 @@ public class SBasePanel extends JPanel {
 				    if (!uri.startsWith("urn")) {
 				      url = uri;
 				    } else {
+				      /* Please node for "replace(':', '/')":
+				       * according to the official MIRIAM documentation,
+				       * ':' in identifiers must be replaced by "%3A". So if you think
+				       * here is a problem with replacing all ':', you should rather
+				       * replace ':' in your ids by "%3A" in your code.
+				       */
 				      url = "http://identifiers.org/" + uri.substring(11).replace(':', '/');
 				    }
 					  if (url != null) {
 					    // The old code here was wrong!
 					    cvtString = cvtString.replace(uri,
-					      "<a href=\""+url+"\">"+uri+"</a>\n");
+					      "<a href=\""+url+"\">"+uri.replace("%3A", ":")+"</a>\n");
 					  }
 					}
 				}
