@@ -27,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
 
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
@@ -76,39 +75,22 @@ public abstract class Launcher implements Serializable {
 		LogUtil.initializeLogging(getLogLevel(), getLogPackages());
 	  
 	  logger.info("Scanning command line arguments...");
-		SBProperties props = SBPreferences.analyzeCommandLineArguments(
+		final SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
 		
 		System.setProperty("app.name", getApplicationName());
 		System.setProperty("app.version", getVersionNumber());
 		
 	  // Should we start the GUI?
-		final boolean guiEnabledByUser = props.getBooleanProperty(GUIOptions.GUI);
-		if ((args.length < 1) || guiEnabledByUser) {
+		if ((args.length < 1) || props.getBooleanProperty(GUIOptions.GUI)) {
 			SwingUtilities.invokeLater(new Runnable() {
 				/*
 				 * (non-Javadoc)
+				 * 
 				 * @see java.lang.Runnable#run()
 				 */
 				public void run() {
-					Window ui = initGUI();
-					if (ui != null) {
-						// 15 s for tooltips to be displayed
-						ToolTipManager.sharedInstance().setDismissDelay(15000);
-						ui.setVisible(true);
-						GUITools.hideSplashScreen();
-						ui.toFront();
-          } else {
-            if (guiEnabledByUser) {
-              logger.fine(String.format(
-                "No graphical user interface supported for %s version %s.",
-                getApplicationName(), getVersionNumber()));
-            } else {
-              logger.fine(String.format(
-                "Incomplete list of command-line arguments. Try to restart %s version %s with the --help option",
-                getApplicationName(), getVersionNumber()));
-            }
-          }
+					guiMode(props);
 				}
 			});
 		} else {
@@ -166,22 +148,22 @@ public abstract class Launcher implements Serializable {
 	 */
 	public abstract List<Class<? extends KeyProvider>> getCommandLineOptions();
 	
-  /**
-   * This method returns the default log level that is the minimal {@link Level}
-   * for log messages to be displayed to the user.
-   * 
-   * @return By default, this method returns {@link Level#FINE}. If something
-   *         different is desired, this method should be overridden in an
-   *         implementing class.
-   */
-	public Level getLogLevel() {
-	  return Level.FINE;
-	}
-	
 	/**
-	 * @return An array of package names whose log messages should appear.
-	 */
-	public abstract String[] getLogPackages();
+	   * This method returns the default log level that is the minimal {@link Level}
+	   * for log messages to be displayed to the user.
+	   * 
+	   * @return By default, this method returns {@link Level#FINE}. If something
+	   *         different is desired, this method should be overridden in an
+	   *         implementing class.
+	   */
+		public Level getLogLevel() {
+		  return Level.FINE;
+		}
+	
+  /**
+ * @return An array of package names whose log messages should appear.
+ */
+public abstract String[] getLogPackages();
 	
 	/**
 	 * 
@@ -197,6 +179,33 @@ public abstract class Launcher implements Serializable {
 	 *         quotes). Must not be null.
 	 */
 	public abstract String getVersionNumber();
+	
+	/**
+	 * This method initializes and starts the graphical user interface if
+	 * possible. You can override this method in order to change its behavior.
+	 * 
+	 * @param props
+	 */
+	public void guiMode(SBProperties props) {
+		Window ui = initGUI();
+		if (ui != null) {
+			ui.setVisible(true);
+			GUITools.hideSplashScreen();
+			ui.toFront();
+		} else {
+			if (props.getBooleanProperty(GUIOptions.GUI)) {
+				logger.fine(String.format(
+				  "No graphical user interface supported for %s version %s.",
+				  getApplicationName(),
+				  getVersionNumber()));
+			} else {
+				logger.fine(String.format(
+				  "Incomplete list of command-line arguments. Try to restart %s version %s with the --help option",
+				  getApplicationName(),
+				  getVersionNumber()));
+			}
+		}
+	}
 	
 	/**
 	 * This method does nothing more than creating a new instance of a graphical
