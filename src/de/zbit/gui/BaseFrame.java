@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
@@ -58,8 +59,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-
-import org.apache.log4j.Logger;
 
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
