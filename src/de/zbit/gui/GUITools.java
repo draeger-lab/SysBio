@@ -73,6 +73,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
@@ -883,6 +884,9 @@ public class GUITools {
    *        - Name of your application.
    */
   public static void initLaF(String title) {
+	// 15 s for tooltips to be displayed
+	ToolTipManager.sharedInstance().setDismissDelay(15000);
+	
     // Locale.setDefault(Locale.ENGLISH);
     // For MacOS X
     boolean isMacOSX = false;
