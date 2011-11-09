@@ -320,8 +320,8 @@ public class KeggInfos implements Serializable {
 	  this.informationFromKeggAdaptor = informationFromKeggAdaptor;
 	  parseInfos();
 	  // Clear to save ram, do not set to null to not break queryWasSucessfull().
-	  if (informationFromKeggAdaptor!=null) {
-	    informationFromKeggAdaptor="";
+	  if (this.informationFromKeggAdaptor!=null) {
+	    this.informationFromKeggAdaptor="";
 	  }
 	}
 
@@ -496,9 +496,10 @@ public class KeggInfos implements Serializable {
 	}
 
 	/**
-	 * 
+	 * Deprecated because info is erased after parsing.
 	 * @return
 	 */
+	@Deprecated
 	public String getInformationFromKeggAdaptor() {
 		return informationFromKeggAdaptor;
 	}
