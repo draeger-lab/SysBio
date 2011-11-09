@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -292,44 +293,51 @@ public class KeggInfos implements Serializable {
 	}
 
 	/**
-	 * Please use {@link #KeggInfos(String, KeggInfoManagement)} if
+	 * Please use {@link #KeggInfos(String, KeggAdaptor)} if
 	 * possible.
 	 */
 	public KeggInfos(String Kegg_ID) {
 		this(Kegg_ID, new KeggAdaptor());
 	}
 
-	/**
-	 * Please use {@link #KeggInfos(String, KeggInfoManagement)} if
-	 * possible.
-	 */
-	public KeggInfos(String Kegg_ID, KeggAdaptor adap) {
-	  super();
-		this.Kegg_ID = Kegg_ID;
-		// this.adap = adap;
-
-		informationFromKeggAdaptor = adap.get(Kegg_ID);
-		parseInfos();
-	}
 
 	/**
 	 * 
 	 * @param Kegg_ID
-	 * @param info
+	 * @param adap
 	 */
-	public KeggInfos(String Kegg_ID, KeggInfoManagement info) {
+	public KeggInfos(String Kegg_ID, KeggAdaptor adap) {
+	  this(Kegg_ID, adap.get(Kegg_ID));
+	}
+	
+	/**
+	 * @param Kegg_ID
+	 * @param informationFromKeggAdaptor already fetched info from the KEGG API.
+	 */
+	public KeggInfos(String Kegg_ID, String informationFromKeggAdaptor) {
 	  super();
-		this.Kegg_ID = Kegg_ID;
-		if (this.Kegg_ID.equals("1)")) {
-		  System.out.println("DEbug me now");
-		}
-
-		informationFromKeggAdaptor = info.getInformation(Kegg_ID);
-		// this.adap = info.getKeggAdaptor();
-		parseInfos();
+	  this.Kegg_ID = Kegg_ID;
+	  this.informationFromKeggAdaptor = informationFromKeggAdaptor;
+	  parseInfos();
+	  // Clear to save ram, do not set to null to not break queryWasSucessfull().
+	  if (informationFromKeggAdaptor!=null) {
+	    informationFromKeggAdaptor="";
+	  }
 	}
 
 	/**
+	 * 
+	 * @param ko_id
+	 * @param manager
+	 * @return a non-null {@link KeggInfos} instance.
+	 */
+  public static KeggInfos get(String ko_id, KeggInfoManagement manager) {
+    KeggInfos ret = manager.getInformation(ko_id);
+    if (ret==null) return new KeggInfos(ko_id,(String)null);
+    else return ret;
+  }
+
+  /**
 	 * 
 	 * @return
 	 */
@@ -725,6 +733,7 @@ public class KeggInfos implements Serializable {
 	public String getUniprot_id_with_MiriamURN() {
 		return miriam_urn_uniprot + suffix(uniprot_id);
 	}
+	
 
 	/**
    * 
@@ -917,22 +926,6 @@ public class KeggInfos implements Serializable {
 	public boolean queryWasSuccessfull() {
 		return (informationFromKeggAdaptor != null);
 	}
-
-	/**
-   * 
-   */
-	public void test() {
-		String infos = informationFromKeggAdaptor;
-		taxonomy = KeggAdaptor.extractInfo(infos, "TAXONOMY", "\n");
-		// e.g., "TAXONOMY    TAX:9606" => "TAX:9606".
-		System.out.println(infos + "\n=================================");
-		System.out.println(KeggAdaptor.extractInfo(infos, " CAS:", "\n")
-				+ " \t=> " + cas);
-		System.out.println(KeggAdaptor.extractInfo(infos, "FORMULA", "\n")
-				+ " \t=> " + formula);
-		System.out.println(KeggAdaptor.extractInfo(infos, "MASS", "\n")
-				+ " \t=> " + mass);
-	}
 	
 	 /**
    * 
@@ -1048,7 +1041,8 @@ public class KeggInfos implements Serializable {
           return "dr:" + s;
         } else if (firstChar=='G') {
           return "gl:" + s;
-        } else if (firstChar=='K') {
+        } else if (firstChar=='K' || firstChar=='E') {
+          // "ko:E3.1.4.11" is also possible
           return "ko:" + s;
         } else if (firstChar=='R') {
           return "rn:" + s;
@@ -1060,6 +1054,8 @@ public class KeggInfos implements Serializable {
         if (Pattern.matches("^\\w{2,3}\\d{5}$", s)) {
         // e.g. ("path:hsa00010")
         return "path:" + s;
+      } else if (ECcodes.matcher(s).matches()){
+        return "ec:"+s; // Enzyme codes
       } else {
         // genes, impossible without knowing the organism ("^\w+:[\w\d\.-]*$")
         // e.g. "hsa:1738"; also impossible is KEGG brite ("br:*" ids)
@@ -1072,19 +1068,33 @@ public class KeggInfos implements Serializable {
     
     return s;
   }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return String.format("[KEGGinfos for '%s' name:'%s' ...]", Kegg_ID, names);
+  }
 
   
   
   /**
    * Examples for all different kegg databases
    * @param args
+   * @throws TimeoutException 
    */
   public static void main(String[] args) {
-    KeggInfoManagement manag = new KeggInfoManagement();
+    KeggAdaptor manag = new KeggAdaptor();
     
-    System.out.println("=========SPECIAL TESTS=======");
-    System.out.println(new KeggInfos("hsa:223", manag).getECcodes()); // \n between EC codes
-    System.out.println(new KeggInfos("efa:EF2928", manag).getECcodes()); // EC codes in orthology
+    System.out.println("=========KEGG BRITE==========");
+    System.out.println(new KeggInfos("br:efa00194", manag).getNames());
+    System.out.println(new KeggInfos("br:br08003", manag).getNames());
+    System.out.println("=============================");
+    
+//    System.out.println("=========SPECIAL TESTS=======");
+//    System.out.println(new KeggInfos("hsa:223", manag).getECcodes()); // \n between EC codes
+//    System.out.println(new KeggInfos("efa:EF2928", manag).getECcodes()); // EC codes in orthology
     
     System.out.println("=========KEGG COMPOUNDS======");
     System.out.println(new KeggInfos("cpd:C00719", manag).getNames());
@@ -1120,6 +1130,7 @@ public class KeggInfos implements Serializable {
     System.out.println(new KeggInfos("rn:R00100", manag).getNames());
     System.out.println("=============================");
 
+    
   }
 
 

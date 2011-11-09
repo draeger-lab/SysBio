@@ -21,6 +21,7 @@ import java.util.concurrent.TimeoutException;
 
 import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.util.InfoManagement;
+import de.zbit.util.ThreadManager;
 import de.zbit.util.Utils;
 
 /**
@@ -31,7 +32,7 @@ import de.zbit.util.Utils;
  * @version $Rev$
  * @since 1.0
  */
-public class KeggInfoManagement extends InfoManagement<String, String> implements Serializable {
+public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implements Serializable {
   private static final long serialVersionUID = -2621701345149317801L;
   private boolean hasChanged=false;
   
@@ -78,7 +79,7 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
    * @see de.zbit.util.InfoManagement#fetchInformation(java.lang.Comparable)
    */
   @Override
-  protected String fetchInformation(String id) throws TimeoutException, UnsuccessfulRetrieveException {
+  protected KeggInfos fetchInformation(String id) throws TimeoutException, UnsuccessfulRetrieveException {
     if (offlineMode) throw new TimeoutException();
     hasChanged=true;
     
@@ -86,11 +87,36 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
     String ret = adap.getWithReturnInformation(id);
     if (ret==null || ret.trim().length()==0) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember this one.
     
-    ret = removeUnnecessaryInfos(ret);
+    if (id.startsWith("br:")) {
+      // KEGG Brite unfortunately returns HTML-code
+      ret = transformBRITEOutputToNormal(ret);
+    }
     
-    return ret; // Successfull and "with data" ;-) 
+    ret = removeUnnecessaryInfos(ret);
+    KeggInfos realRet = new KeggInfos(id, ret);
+    
+    
+    return  realRet;// Successfull and "with data" ;-) 
   }
   
+  /**
+   * KEGG Brite gives HTML-code, but luckily the old-text format
+   * as HTML-comment => parse the comment.
+   * @param ret
+   * @return
+   */
+  private String transformBRITEOutputToNormal(String ret) {
+    int ePos = ret.indexOf("ENTRY");
+    if (ePos<0) return ret;
+    int start = ret.lastIndexOf("<!---",ePos);
+    int end = ret.indexOf("--->",ePos);
+    if (start>=0 && end>start) {
+      ret = ret.substring(start+5, end);
+      ret = ret.replace("\n#", "\n");
+    }
+    return ret.trim();
+  }
+
   /*
    * (non-Javadoc)
    * @see de.zbit.util.InfoManagement#fetchMultipleInformations(IDtype[])
@@ -99,33 +125,76 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
    * Wrapper for {@link fetchMultipleInformationsUpTo100AtATime} because Kegg only supports 100 at a time :)
    */
   @Override
-  protected String[] fetchMultipleInformations(String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
-    String[] realRet;
+  protected KeggInfos[] fetchMultipleInformations(final String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
+    String[] APIinfos;
+    final KeggInfos[] realRet = new KeggInfos[ids.length];
+    // If we parse to many string in parallel, we get
+    // out of memory errors! => Limit to 50.
+    ThreadManager APIstringParser = new ThreadManager(50);
     if (ids.length<=100) {
-      realRet = fetchMultipleInformationsUpTo100AtATime(ids);
+      APIinfos = fetchMultipleInformationsUpTo100AtATime(ids);
+      APIinfos = removeUnnecessaryInfos(APIinfos);
+      
+      // Multi-threaded string parsing
+      parseAPI(ids, APIinfos, realRet, APIstringParser,0);
+      // ---
     } else {
-      realRet = new String[ids.length];
+      //APIinfos = new String[ids.length];
 
       // Instead of requesting all objects at once, splitts Queries to 100 max and concatenates the results... that's it.
-      int i=0;
-      while (i<ids.length) {
-        String[] subArr = new String[Math.min(100, ids.length-i)];
-        System.arraycopy(ids, i, subArr, 0, subArr.length);
+      int j=0;
+      while (j<ids.length) {
+        String[] subArr = new String[Math.min(100, ids.length-j)];
+        System.arraycopy(ids, j, subArr, 0, subArr.length);
 
         String[] ret = fetchMultipleInformationsUpTo100AtATime(subArr);
-        System.arraycopy(ret, 0, realRet, i, ret.length);
+        ret = removeUnnecessaryInfos(ret);
+        //System.arraycopy(ret, 0, APIinfos, j, ret.length);
 
-        i+=subArr.length;
+        // Multi-threaded string parsing
+        parseAPI(subArr, ret, realRet, APIstringParser, j);
+        // ---        
+
+        j+=subArr.length;
       }
     }
-    realRet = removeUnnecessaryInfos(realRet);
     
+    APIstringParser.awaitTermination();
     // For Debugging
     //for (int i=0; i<ids.length; i++) {
     //  System.out.println(ids[i] + ": '" + realRet[i].substring(0, 50).replace("\n", "|").replaceAll(" +", " ")+"'");
     //}
     
     return realRet;
+  }
+
+  /**
+   * Parse the return string from the KEGG API to the internal {@link KeggInfos}
+   * data structure.
+   * @param ids queried identifiers
+   * @param APIinfos returned infos from the KEGG API
+   * @param realRet target array to write the {@link KeggInfos}
+   * @param APIstringParser {@link ThreadManager} to handle the threads
+   * @param realRetOffset optional (set to 0 by default) offset between
+   * <code>ids</code> or <code>APIinfos</code> and  <code>realRet</code>.
+   */
+  private void parseAPI(final String[] ids, String[] APIinfos,
+    final KeggInfos[] realRet, ThreadManager APIstringParser, final int realRetOffset) {
+    for (int i=0; i<APIinfos.length; i++) {
+      final int final_i = i;
+      final String apiInfos = APIinfos[final_i];
+      Runnable parser = new Runnable() {
+        @Override
+        public void run() {
+          if (apiInfos==null || apiInfos.length()<1) {
+            realRet[final_i+realRetOffset] = null;
+          } else {
+            realRet[final_i+realRetOffset] = new KeggInfos(ids[final_i], apiInfos);
+          }
+        }
+      };
+      APIstringParser.addToPool(parser);
+    }
   }
 
   /**
@@ -157,9 +226,16 @@ public class KeggInfoManagement extends InfoManagement<String, String> implement
       // Extract Entry id of current dataset
       String aktEntryID = KeggAdaptor.extractInfo(splitt[i], "ENTRY", "  ");
       if (aktEntryID==null || aktEntryID.length()==0) {
+        // Fallback on HTML-processing, somited bGet (e.g. for BRITE) returns HTML-code
+        // and the actual API info in commented-brackets.
+        splitt[i] = transformBRITEOutputToNormal(splitt[i]);
+        // ... and retry
+        aktEntryID = KeggAdaptor.extractInfo(splitt[i], "ENTRY", "  ");
+      }
+      if (aktEntryID==null || aktEntryID.length()==0) {
         // Should NEVER happen, because KEGG does always send ENTRY-entries.
-        System.err.println(String.format("No Entry id while fetching '%s'. Returned text was:\n%s\n[...]\n------------",
-          (splitt[i]==null?"null":splitt[i]), splitt[i].substring(0, Math.min(150, splitt[i].length()))));
+        System.err.println(String.format("No Entry id found in:\n%s\n[...]\n------------",
+          splitt[i].substring(0, Math.min(150, splitt[i].length()))));
         continue;
       }
       
@@ -279,9 +355,11 @@ CLASS       Metabolism; [...]
    * @return every id in the array in one string, separated by a whitespace.
    */
   private static String concatenateKeggIDs(String[] ids) {
-    String ret = "";
-    for (String s: ids)
-      ret+=s.replace(" ", "")+" ";
-    return ret.trim();
+    StringBuilder ret = new StringBuilder();
+    for (String s: ids) {
+      ret.append(s.replace(" ", ""));
+      ret.append(' ');
+    }
+    return ret.toString().trim();
   }
 }

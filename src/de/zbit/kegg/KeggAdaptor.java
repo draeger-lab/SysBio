@@ -250,7 +250,7 @@ public class KeggAdaptor {
    */
   static String extractInfoCaseSensitive(String completeOriginalString, String uCaseComplete, String startsWith, String endsWith) {
     // Prefer hits starting in a new line. +1 because of \n
-    int pos = uCaseComplete.indexOf("\n" + startsWith) + 1;
+    int pos = uCaseComplete.indexOf('\n' + startsWith) + 1;
     
     if (pos <= 0) { // <=0 because of +1 in line above.
       pos = uCaseComplete.indexOf(startsWith);
@@ -258,7 +258,7 @@ public class KeggAdaptor {
       // abort. (Beispiel: "  AUTHOR XYZ" moeglich.)
       if (pos < 0 || pos>=completeOriginalString.length())
         return null;
-      int lPos = completeOriginalString.lastIndexOf("\n", pos);
+      int lPos = completeOriginalString.lastIndexOf('\n', pos);
       String toCheck = completeOriginalString.substring(Math.max(lPos, 0), pos);
       // Wenn was zwischen unserem Treffer und newLine steht => abort.
       if (toCheck.replaceAll("\\s", "").length()>0)
@@ -271,10 +271,10 @@ public class KeggAdaptor {
 
     String ret = "";
     if (endsWith == null || endsWith.length()<1) {
-      int st = completeOriginalString.indexOf(" ", pos + startsWith.length());
+      int st = completeOriginalString.indexOf(' ', pos + startsWith.length());
       if (st < 0)
         st = pos + startsWith.length(); // +1 wegen "\n"+sw
-      int nl = completeOriginalString.indexOf("\n", pos + startsWith.length());
+      int nl = completeOriginalString.indexOf('\n', pos + startsWith.length());
       if (nl < 0)
         nl = completeOriginalString.length();
 
@@ -290,7 +290,7 @@ public class KeggAdaptor {
       }
       while (completeOriginalString.length() > (nl + 1)) {
         if (completeOriginalString.charAt(nl + 1) == ' ') {
-          int nl2 = completeOriginalString.indexOf("\n", nl + 1);
+          int nl2 = completeOriginalString.indexOf('\n', nl + 1);
           if (nl2 < 0)
             nl2 = completeOriginalString.length();
           ret += "\n" + completeOriginalString.substring(nl + 1, nl2).trim();
