@@ -17,13 +17,16 @@
 package de.zbit.kegg.parser.pathway;
 
 
+import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
 
 /**
@@ -61,7 +64,7 @@ public class Entry {
   /**
    * Contains the Graphics information from the KGML
    */
-  private Graphics graph=null;
+  private List<Graphics> graph=null;
   /**
    * If it is a group node, this list contains the ids of all children.
    */
@@ -173,7 +176,7 @@ public class Entry {
    * @return
    */
   public Graphics getGraphics() {
-    return graph;
+    return hasGraphics()?graph.get(0):null;
   }
 
   /**
@@ -237,7 +240,7 @@ public class Entry {
    * @return
    */
   public boolean hasGraphics() {
-    return (graph!=null);
+    return (graph!=null && graph.size()>0);
   }
   
   /**
@@ -265,8 +268,16 @@ public class Entry {
       if (name.equalsIgnoreCase("component")) { // 0 .. *
         if (components==null) components = new ArrayList<Integer>();
         components.add(KeggParser.getNodeValueInt(att, "id"));
-      } else if(name.equals("graphics")) { // 0 .. 1
-        graph = new Graphics(KeggParser.getNodeValue(att, "name"), KeggParser.getNodeValueInt(att, "x"), KeggParser.getNodeValueInt(att, "y"), GraphicsType.valueOf(KeggParser.getNodeValue(att, "type")), KeggParser.getNodeValueInt(att, "width"), KeggParser.getNodeValueInt(att, "height"), KeggParser.getNodeValue(att, "fgcolor"), KeggParser.getNodeValue(att, "bgcolor"), (type==EntryType.gene) || (type==EntryType.genes));
+      } else if(name.equals("graphics")) { // 0 .. 1 unfortunately, kegg itself does not stick to 0..1
+        if (graph==null) graph = new LinkedList<Graphics>();
+        Graphics g = new Graphics(KeggParser.getNodeValue(att, "name"), KeggParser.getNodeValueInt(att, "x"), KeggParser.getNodeValueInt(att, "y"), GraphicsType.valueOf(KeggParser.getNodeValue(att, "type")), KeggParser.getNodeValueInt(att, "width"), KeggParser.getNodeValueInt(att, "height"), KeggParser.getNodeValue(att, "fgcolor"), KeggParser.getNodeValue(att, "bgcolor"), (type==EntryType.gene) || (type==EntryType.genes));
+        String coords = KeggParser.getNodeValue(att, "coords");
+        if (coords!=null && coords.contains(",")) {
+          // e.g. coords="1677,525,1677,616" = x1,y2,x2,y2,...
+          // but also coords="3028,304,3028,327,3028,327,3028,[...]" possible
+          g.setCoordsString(coords);
+        }
+        graph.add(g);
       }
     }
   }
@@ -302,9 +313,8 @@ public class Entry {
    */
   public void setName(String name) {
     // Convenient helper for compounds (add "cpd:" to "C00186")
-    if (name!=null && (name.length()>2) && !name.contains(":")
-        && name.charAt(0)=='C' && Character.isDigit(name.charAt(1))) {
-      name = "cpd:"+name;
+    if (name!=null && (name.length()>2) && !name.contains(":")) {
+      name = KeggInfos.appendPrefix(name); // prepends, e.g. "cpd:"
     }
     //parentPathway has maps containing this nane
     // => any changes must be reported!
@@ -382,13 +392,40 @@ public class Entry {
       return EntryType.group;
     } else if (kgId.startsWith("path:")) { // Link to another pathway
       return EntryType.map;
-    } else if (kgId.startsWith("ko:")) {
+    } else if (kgId.startsWith("ko:") || kgId.startsWith("br:")) {
+      // Actually it's KEGG Brite, but somehow also an ortholog...
       return EntryType.ortholog;
     } else if (kgId.contains(":")) {// z.B. hsa:00123, ko:00123
       return EntryType.gene;
     } else {
       return EntryType.other;
     }
+  }
+
+  /**
+   * @return true if {@link #hasGraphics()} and
+   * size of graphics list is greater than 1.
+   */
+  public boolean hasMultipleGraphics() {
+    return hasGraphics() && graph.size()>1;
+  }
+
+  /**
+   * @return if {@link #hasMultipleGraphics()}, returns
+   * all {@link Graphics} objects other than {@link #getGraphics()}. 
+   */
+  public List<Graphics> getMoreGraphics() {
+    // Same as graph, but without the first element.
+    return new AbstractList<Graphics>() {
+      @Override
+      public Graphics get(int index) {
+        return graph.get(index+1);
+      }
+      @Override
+      public int size() {
+        return graph.size()-1;
+      }
+    };
   }
 
 }

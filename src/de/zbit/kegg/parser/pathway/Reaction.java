@@ -37,19 +37,19 @@ import de.zbit.kegg.parser.KeggParser;
  */
 public class Reaction {
   /**
-   * 
+   * KEGGID of this reaction (e.g. "rn:R00943")
    */
-  String Name;
+  String name;
   /**
-   * 
+   * See {@link ReactionType}. Currently one of reversible or irreversible.
    */
   ReactionType type;
   /**
-   * 
+   * Substrates
    */
   ArrayList<ReactionComponent> substrate = new ArrayList<ReactionComponent>(); // 1..*
   /**
-   * 
+   * Products
    */
   ArrayList<ReactionComponent> product = new ArrayList<ReactionComponent>(); // 1..*
   
@@ -66,7 +66,7 @@ public class Reaction {
   private Reaction(Pathway parentPathway, String name, ReactionType type) {
     super();
     this.parentPathway = parentPathway;
-    this.Name = name;
+    this.name = name;
     this.type = type;
   }
   
@@ -93,7 +93,7 @@ public class Reaction {
     addProduct(product);
     addSubstrate(substrate);
   }
-  
+
   /**
    * 
    * @param product
@@ -117,7 +117,7 @@ public class Reaction {
    * @return
    */
   public String getName() {
-    return Name;
+    return name;
   }
   
   /**
@@ -185,7 +185,7 @@ public class Reaction {
    * @param name
    */
   public void setName(String name) {
-    Name = name;
+    this.name = name;
   }
 
   /**
@@ -246,6 +246,70 @@ public class Reaction {
       if (rc.getName().equalsIgnoreCase(reactantKeggID)) return rc;
     }
     return null;
+  }
+  
+  /**
+   * WARNING: this erases all substrates and products of this
+   * reaction.
+   */
+  public void clearReactants() {
+    for (ReactionComponent rc: getReactants()) {
+      parentPathway.unregisterReactionComponent(rc, this);
+    }
+    
+    this.substrate.clear();
+    this.product.clear();
+  }
+  
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public Reaction clone() {
+    try {
+      Reaction other = new Reaction(this.parentPathway, name, this.type);
+      for (ReactionComponent r: getSubstrates()) {
+        other.addSubstrate(r.clone());
+      }
+      for (ReactionComponent r: getProducts()) {
+        other.addProduct(r.clone());
+      }
+      return other;
+    } catch (Exception e) {
+      // Never happens, because ReactionComponent supports cloning.
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return (String.format("[Raction name:'%s' type:'%s' formula:'%s']", name, type, getEquation()));
+  }
+
+  /**
+   * @return an equation like "C00183 + C00026 <=> C00141 + C00025"
+   */
+  public String getEquation() {
+    StringBuilder b = new StringBuilder();
+    for (int i=0; i<substrate.size(); i++) {
+      if (i>0) b.append(" + ");
+      b.append(substrate.get(i).getName());
+    }
+    if (b.length()>0) {
+      b.append(' ');
+      if (type.equals(ReactionType.reversible)) b.append('<');
+      b.append("=> ");
+    }
+    for (int i=0; i<product.size(); i++) {
+      if (i>0) b.append(" + ");
+      b.append(product.get(i).getName());
+    }
+    return b.toString();
   }
 
 }

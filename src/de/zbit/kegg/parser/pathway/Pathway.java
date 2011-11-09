@@ -625,6 +625,30 @@ public class Pathway {
       }
     }
   }
+  
+  /**
+   * Unregisters the {@link ReactionComponent} in internal
+   * HashMaps for faster access.
+   * @param rc
+   * @param reaction
+   */
+  void unregisterReactionComponent(ReactionComponent rc, Reaction reaction) {
+    Set<String> toRemove = new HashSet<String>();
+    // Put whole name
+    toRemove.add(rc.getName());
+    
+    // Put splitted name (as whole name may be "hsa:12345 hsa:23456")
+    if (rc.getName().contains(" ")) {
+      for (String name:rc.getName().split(" ")) {
+        name = name.trim();
+        if (name.length()>0) {
+          toRemove.add(name);
+        }
+      }
+    }
+    
+    removeFromSet(reactionComponents, reaction, toRemove.toArray(new String[0]));
+  }
 
   /**
    * Returns the corresponding {@link Entry} for a
