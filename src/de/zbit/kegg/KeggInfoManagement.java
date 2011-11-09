@@ -18,6 +18,8 @@ package de.zbit.kegg;
 
 import java.io.Serializable;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.util.InfoManagement;
@@ -231,6 +233,13 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
         splitt[i] = transformBRITEOutputToNormal(splitt[i]);
         // ... and retry
         aktEntryID = KeggAdaptor.extractInfo(splitt[i], "ENTRY", "  ");
+        // Last fallback on regular expression
+        if (aktEntryID==null || aktEntryID.length()==0) {
+          Matcher m = Pattern.compile("\\s?ENTRY\\s+(\\w+)").matcher(splitt[i]);
+          if (m.find()) {
+            aktEntryID = (m.group(2));
+          }
+        }
       }
       if (aktEntryID==null || aktEntryID.length()==0) {
         // Should NEVER happen, because KEGG does always send ENTRY-entries.

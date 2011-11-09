@@ -314,7 +314,9 @@ public class Entry {
   public void setName(String name) {
     // Convenient helper for compounds (add "cpd:" to "C00186")
     if (name!=null && (name.length()>2) && !name.contains(":")) {
-      name = KeggInfos.appendPrefix(name); // prepends, e.g. "cpd:"
+      if (!name.equalsIgnoreCase("undefined")) {
+        name = KeggInfos.appendPrefix(name); // prepends, e.g. "cpd:"
+      }
     }
     //parentPathway has maps containing this nane
     // => any changes must be reported!
