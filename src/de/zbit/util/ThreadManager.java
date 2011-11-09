@@ -58,7 +58,7 @@ public class ThreadManager {
   public final static int NUMBER_OF_PROCESSORS=Runtime.getRuntime().availableProcessors();
   
   /**
-   * Initializies a new ThreadManager with ideal settings(
+   * Initializes a new ThreadManager with ideal settings(
    * NUMBER_OF_PROCESSORS - 1, but minimal 1). So always at least one processor
    * is left for GUI operations and other stuff.
    */
@@ -87,7 +87,7 @@ public class ThreadManager {
   
   /**
    * @return the number of slots that will be used for
-   * parallel execution of runnables.
+   * parallel execution of runnable's.
    */
   public int getNumberOfSlots() {
     return pool.getCorePoolSize();
@@ -184,12 +184,14 @@ public class ThreadManager {
   }
   
   /**
-   * Add a task to the pool and execute it immedeately if
+   * Add a task to the pool and execute it immediately if
    * there is a free slot.
    * @param r - runnable to submit.
    */
   public void addToPool(Runnable r) {
     pool.execute(r);
+    // java.lang.OutOfMemoryError: unable to create new native thread
+    // might happen here!
   }
   
   /**

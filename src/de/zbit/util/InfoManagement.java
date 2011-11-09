@@ -33,7 +33,7 @@ import de.zbit.exception.UnsuccessfulRetrieveException;
 
 /**
  * This class is intended to reduce network traffic or hard disk load, by
- * remembering a certain number of most used elements, indestead of retrieving
+ * remembering a certain number of most used elements, instead of retrieving
  * them each time again and again.
  * 
  * A better name for this class is maybe "Cache".
@@ -255,9 +255,16 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     }
     
     // If some honks set list size to 0 or -1, itemToDelete is -1.
-    if (itemToDelete.size()>=0)
-      for (int i=0; i<Math.min(elements, itemToDelete.size()); i++)
-        rememberedInfos.remove((Object)itemToDelete.get(i));
+    int removedElements =0;
+    if (itemToDelete.size()>=0) {
+      for (int i=0; i<Math.min(elements, itemToDelete.size()); i++) {
+        if (rememberedInfos.remove((Object)itemToDelete.get(i))) {
+          removedElements++;
+        }
+      }
+    }
+    
+    log.fine(String.format("Removed %s elements from %s-Cache.", removedElements, getClass().getName()))
   }
   
   /**
@@ -484,8 +491,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         newItems = fetchMultipleInformationWrapper(filtIDs);
         
         // Free enough cache for them
-        if (isCacheFull())
+        if (isCacheFull()) {
           freeCache(Math.max(Math.max(10, unknownIDs.size()), (int)(((double)maxListSize)*0.1)));
+        }
       }
       
       // Big Problem: Java does not permit creating an generic array

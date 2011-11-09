@@ -16,9 +16,12 @@
  */
 package de.zbit.kegg;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -49,16 +52,67 @@ public class KeggTools {
    * @param manager
    */
   public static void autocompleteReactions(Pathway p, KeggInfoManagement manager) {
+    autocompleteReactions(p, manager, false);
+  }
+  
+  /**
+   * Retrieves all Equations and Enzymes for all reactions in the pathway.
+   * Looks, which of them is already contained in the pathway and adds all
+   * missing reactants and enzymes to the pathway.
+   * @param p
+   * @param manager
+   * @param crateOneReactionForEachID if multiple reactions are summarized
+   * by KEGG (usually same substrate/product, but once with ATP => ADP and
+   * one with ADP => AMP and such), split reactions and add one reaction
+   * for each real reaction (KEGG reaction ID).
+   */
+  public static void autocompleteReactions(Pathway p, KeggInfoManagement manager,
+    boolean crateOneReactionForEachID) {
     // CRUCIAL: reactions are divided by " + ", not "+". Consider, e.g. rn:R04241:
     // "C00002 + C03541(n) + C00025 <=> C00008 + C00009 + C03541(n+1)"!
     final String reactantSeparator = " + ";
     int newEntrysId = p.getMaxEntryId();
     
+    // For splitting reactions
+    Collection<Reaction> novelReactions = new LinkedList<Reaction>();
+    //---
+    
     for (Reaction r : p.getReactions()) {
-      for (String ko_id : r.getName().split(" ")) {
+      String[] reactionIDs = r.getName().trim().split(" ");
+      
+      // Parse IDs of reactants if we plan to split the reaction
+      Map<String, ReactionComponent> nameAndIdOfReactants = new HashMap<String, ReactionComponent>();
+      Reaction toClone = r;
+      boolean hasMultipleReactions = reactionIDs.length>1;
+      if (crateOneReactionForEachID && hasMultipleReactions) {
+        for (ReactionComponent rc: r.getReactants()) {
+          if (rc.hasId()) {
+            nameAndIdOfReactants.put(rc.getName(), rc);
+          }
+        }
+      }
+      int i=-1;
+      //---
+      
+      for (String ko_id : reactionIDs) {
+        i++;
+        
+        // Create one reaction for each reaction identifier
+        if (hasMultipleReactions && crateOneReactionForEachID) {
+          if (i==0) {
+            r.clearReactants();
+            toClone = r.clone();
+            r.setName(ko_id);
+          } else if (i>0){
+            r = toClone.clone();
+            r.setName(ko_id);
+            novelReactions.add(r);
+          }
+        }
+        // ---
         
         // Get the complete reaction from Kegg
-        KeggInfos infos = new KeggInfos(ko_id, manager);
+        KeggInfos infos = KeggInfos.get(ko_id, manager);
         if (infos.queryWasSuccessfull()) {
           
           // Add missing reactants
@@ -72,23 +126,7 @@ public class KeggTools {
             while (lastPos>=0) {
               String reactant = eq.substring(lastPos, curPos>=0?curPos:eq.length()).trim();
               boolean isSubstrate = (lastPos<dividerPos);
-              // Remove prefixes (e.g. "2 C00103")
-              if (reactant.contains(" ")) {
-                reactant = reactant.substring(reactant.indexOf(" ")+1);
-              }
-              // Remove suffixes (e.g. "C03541(n+1)")
-              int i=0;
-              boolean digitsFound=false;
-              for (; i<reactant.length(); i++) {
-                char c = reactant.charAt(i);
-                if (Character.isDigit(c)) {
-                  if (!digitsFound) digitsFound = true;
-                } else {
-                  if (digitsFound) break;
-                }
-              }
-              reactant = reactant.substring(0, i);
-              //---
+              reactant = removeReactantPrefixAndSuffix(reactant);
               
               // Check entry type and prepend kegg prefix
               // Check moved to appendPrefix() method.
@@ -103,7 +141,8 @@ public class KeggTools {
               // Look if we need to add new components
               ReactionComponent rc=r.getReactant(reactant);
               if (rc==null) {
-                rc = new ReactionComponent(reactant);
+                rc = nameAndIdOfReactants.get(reactant);
+                if (rc==null) rc = new ReactionComponent(reactant);
                 if (isSubstrate) r.addSubstrate(rc);
                 else r.addProduct(rc);
               }
@@ -161,6 +200,39 @@ public class KeggTools {
       
     }
     
+    // Add novel reactions
+    Iterator<Reaction> it = novelReactions.iterator();
+    while (it.hasNext()) {
+      p.addReaction(it.next());
+    }
+    
+  }
+
+  /**
+   * Removes prefixes and suffixes from reactants.
+   * @param reactant e.g. "2 C00103(n+1)"
+   * @return e.g. "C00103"
+   */
+  public static String removeReactantPrefixAndSuffix(String reactant) {
+    // Remove prefixes (e.g. "2 C00103")
+    int pos = reactant.indexOf(' ');
+    if (pos>=0) {
+      reactant = reactant.substring(pos+1).trim();
+    }
+    // Remove suffixes (e.g. "C03541(n+1)")
+    int i=0;
+    boolean digitsFound=false;
+    for (; i<reactant.length(); i++) {
+      char c = reactant.charAt(i);
+      if (Character.isDigit(c)) {
+        if (!digitsFound) digitsFound = true;
+      } else {
+        if (digitsFound) break;
+      }
+    }
+    reactant = reactant.substring(0, i);
+    //---
+    return reactant;
   }
   
   /**
@@ -173,7 +245,7 @@ public class KeggTools {
    */
   public static void preFetchInformation(Pathway p, KeggInfoManagement manager, boolean autocompleteReactions) {
     // PreFetch infos. Enormous performance improvement!
-    ArrayList<String> preFetchIDs = new ArrayList<String>();
+    Collection<String> preFetchIDs = new HashSet<String>();
     preFetchIDs.add("GN:" + p.getOrg());
     preFetchIDs.add(p.getName());
     for (Entry entry : p.getEntries()) {
@@ -197,25 +269,27 @@ public class KeggTools {
       preFetchIDs.clear();
       for (Reaction r : p.getReactions()) {
         for (String ko_id : r.getName().split(" ")) {
-          KeggInfos infos = new KeggInfos(ko_id, manager);
+          KeggInfos infos = KeggInfos.get(ko_id, manager);
 
           if (infos.getEquation()!=null) {
             String[] reactants = infos.getEquation().replace("<=>", " + ").trim().split(Pattern.quote(" + "));
-            for (String string : reactants) {
-              string = string.trim();
-              if (string.contains(" ")) { // e.g. "2 C00103"
-                string = string.substring(string.indexOf(" ")+1).trim();
+            for (String reactant : reactants) {
+              reactant = removeReactantPrefixAndSuffix(reactant.trim());
+              
+              if (!reactant.contains(":")) {
+                reactant = KeggInfos.appendPrefix(reactant);
               }
               
-              String toAdd = "cpd:"+string;
-              if (!preFetchIDs.contains(toAdd)) preFetchIDs.add(toAdd);
+              //if (!preFetchIDs.contains(reactant)) 
+              preFetchIDs.add(reactant);
             }
           }
           if (infos.getEnzymes()!=null) {
             String[] enzymes = infos.getEnzymes().trim().replaceAll("\\s+", " ").split(" ");
             for (String string : enzymes) {
               String toAdd = "EC:"+string;
-              if (!preFetchIDs.contains(toAdd)) preFetchIDs.add(toAdd);
+              //if (!preFetchIDs.contains(toAdd))
+              preFetchIDs.add(toAdd);
             }
           }
           
@@ -243,7 +317,7 @@ public class KeggTools {
 //          entry.getName().substring(entry.getName().indexOf(":")+1):entry.getName());
 //    } else {
       for (String ko_id : entry.getName().split(" ")) {
-        KeggInfos infos = new KeggInfos(ko_id, manager);
+        KeggInfos infos = KeggInfos.get(ko_id, manager);
         if (infos.queryWasSuccessfull() ){
           modifier.addAll(infos.getECcodes());
 //            && infos.getDefinition()!=null) {
