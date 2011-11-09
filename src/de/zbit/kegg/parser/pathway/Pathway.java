@@ -409,8 +409,7 @@ public class Pathway {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * @return organism as KEGG abbreviation (e.g. "hsa")
 	 */
 	public String getOrg() {
 		return org;
@@ -474,7 +473,7 @@ public class Pathway {
 
 	/**
 	 * 
-	 * @param org
+	 * @param org organism as KEGG abbreviation (e.g. "hsa")
 	 */
 	public void setOrg(String org) {
 		this.org = org;
