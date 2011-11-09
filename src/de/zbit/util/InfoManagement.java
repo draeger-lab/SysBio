@@ -28,7 +28,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import de.zbit.exception.UnsuccessfulRetrieveException;
 
 /**
@@ -264,7 +263,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       }
     }
     
-    log.fine(String.format("Removed %s elements from %s-Cache.", removedElements, getClass().getName()))
+    log.fine(String.format("Removed %s elements from %s-Cache.", removedElements, getClass().getName()));
   }
   
   /**
