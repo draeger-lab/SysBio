@@ -29,7 +29,7 @@ import de.zbit.kegg.parser.KeggParser;
  * @version $Rev$
  * @since 1.0
  */
-public class ReactionComponent {
+public class ReactionComponent implements Cloneable {
   
   /**
    * 
@@ -142,4 +142,27 @@ public class ReactionComponent {
     return (this.name != null && this.name.length()>0);
   }
 
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  protected ReactionComponent clone() throws CloneNotSupportedException {
+    ReactionComponent other = new ReactionComponent(name);
+    if (id==null) other.setId(null);
+    else other.setId(new Integer(id.intValue()));
+    if (alt!=this) {
+      other.setAlt(alt.clone());
+    }
+    return alt;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return (String.format("[RC name:'%s' id:'%s'%s]", name, id==null?"none":id, alt!=null?" alternative available":""));
+  }
+  
 }

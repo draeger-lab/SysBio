@@ -16,6 +16,9 @@
  */
 package de.zbit.kegg.parser.pathway;
 
+import java.util.LinkedList;
+import java.util.List;
+
 
 /**
  * Corresponding to the Kegg Graphics class (see {@link http://www.genome.jp/kegg/xml/docs/})
@@ -56,7 +59,11 @@ public class Graphics {
    * the backgraound color used by this graphics object
    * "=> for gene products"
    */
-  private String bgcolor = "#FFFFFF"; // "#BFFFBF"; 
+  private String bgcolor = "#FFFFFF"; // "#BFFFBF";
+  /**
+   * Multiple x,y,x,y,... coordinates for a line"
+   */
+  private Integer[] coords = null;
   
   /**
    * Should not be public, because isGeneProduct information is important!
@@ -130,10 +137,11 @@ public class Graphics {
   
   /**
    * The coords attribute specifies a set of coordinates, x1,y1,x2,y2,..., for the line object.
-   * @return new String( x + "," + y + "," + (x+width)+ "," + (y+height) )
+   * @return Integer of X,Y,X,Y,X,Y,...
    */
-  public String getCoords() {
-    return x + "," + y + "," + (x+width)+ "," + (y+height);
+  public Integer[] getCoords() {
+    if (coords!=null) return coords;
+    else return new Integer[]{x, y, (x+width), (y+height)};
   }
   
   /**
@@ -273,6 +281,38 @@ public class Graphics {
    */
   public void setY(int y) {
     this.y = y;
+  }
+
+  /**
+   * Set a coords string as specified by the API. Only makes sense if
+   * {@link #getType()} is a "line"! Should give coordinates for this line.
+   * @param coords
+   */
+  public void setCoordsString(String coords) {
+    String[] splitt = coords.split(",");
+    List<Integer> co = new LinkedList<Integer>();
+    for (String s: splitt) {
+      co.add(Integer.parseInt(s));
+    }
+    this.coords  = co.toArray(new Integer[0]);
+  }
+
+  /**
+   * @return
+   */
+  public boolean isSetCoords() {
+    // at least 2 coordinates
+    return coords!=null && coords.length>1;
+  }
+
+  /**
+   * Returns true if and only if the foreground color has been set.
+   * @return
+   */
+  public boolean isFGcolorSet() {
+    if (fgcolor!=null && fgcolor.length()>0 && !fgcolor.trim().equalsIgnoreCase("none"))
+      return true;
+    return false;
   }
   
 }
