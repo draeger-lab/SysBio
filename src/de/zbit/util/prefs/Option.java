@@ -623,6 +623,25 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	  setVisible(visibility);
 	}
 	
+  /**
+   * This constructor adds a dependency to the created option.
+   * The given <code>dependency</code> must fulfill the given
+   * <code>condition</code> that this option is considered enabled.
+   * @param <E>
+   * @param optionName
+   * @param requiredType
+   * @param description
+   * @param range
+   * @param defaultValue
+   * @param dependency
+   * @param condition
+   */
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Range<Type> range, Type defaultValue, Option<E> dependency, Range<E> condition) {
+    this(optionName, requiredType, description, range, defaultValue);
+    addDependency(dependency, condition);
+  }
+	
 	/**
 	 * This constructor adds a dependency to the created option.
 	 * The given <code>dependency</code> must fulfill the given

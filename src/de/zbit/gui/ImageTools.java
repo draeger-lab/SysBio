@@ -28,6 +28,7 @@ import java.awt.image.FilteredImageSource;
 import java.awt.image.Kernel;
 import java.awt.image.RescaleOp;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -191,22 +192,22 @@ public class ImageTools {
 	 * Convert an Image to an BufferedImage.
 	 * 
 	 * @param img
-	 * @param drawBorder
-	 *            - set to true, if you want to draw a black border
+	 * @param drawBorder set to true, if you want to draw a black border
 	 * @return BufferedImage
 	 */
 	public static BufferedImage image2BufferedImage(Image img,
 			boolean drawBorder) {
 		BufferedImage bmage = new BufferedImage(img.getWidth(null), 
-		  img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		  img.getHeight(null), BufferedImage.TYPE_INT_RGB);
 		Graphics g = bmage.getGraphics();
 		g.drawImage(img, 0, 0, null);
 
 		// Border (upper-, right and left corner)
 		if (drawBorder) {
-			g.setColor(new Color(0, 0, 0));
+			g.setColor(Color.BLACK);
 			g.drawRect(0, 0, img.getWidth(null) - 1, img.getHeight(null));
 		}
+		g.dispose();
 
 		return bmage;
 	}
@@ -226,7 +227,7 @@ public class ImageTools {
 	public static BufferedImage image2BufferedImage(Image img, int targetWith,
 			int targetHeight, boolean autoSetBackgroundColor, boolean drawBorder) {
 		BufferedImage bmage = new BufferedImage(targetWith, targetHeight,
-				BufferedImage.TYPE_INT_ARGB);
+				BufferedImage.TYPE_INT_RGB);
 		Graphics g = bmage.getGraphics();
 
 		// Backgroundcolor as in Pixel (0,0)
@@ -275,7 +276,7 @@ public class ImageTools {
    * @return brightened image
    */
 	public static BufferedImage brightenImage(BufferedImage image, float percent) {
-		if ((percent < 0) || (percent > 1)) {
+		if ((percent < 0) ) { //|| (percent > 1)
     	// TODO: Logging
       System.err.printf(bundle.getString("WRONG_PERCENTAGE_IN_IMAGE"), "brightenImage", percent);
       return image;
@@ -283,9 +284,39 @@ public class ImageTools {
   	// Brighten the image by given percentage
 	  float scaleFactor = 1.0f + percent;
 	  RescaleOp op = new RescaleOp(scaleFactor, 0, null);
-	  BufferedImage bufferedImage = op.filter(image, null);
+	  image = op.filter(image, null);
 	  
-	  return bufferedImage;
+	  return image;
+	}
+	
+	/**
+	 * Replace a color with another.
+	 * @param img
+	 * @param source source {@link Color}
+	 * @param replacement
+	 */
+	public static void replaceColor(BufferedImage img, Color source, Color replacement) {
+	  Graphics g2 = img.getGraphics();
+	  g2.setColor(replacement);
+	  int x, y, clr,red,green,blue;
+
+	  for (x = 0; x < img.getWidth(); x++) {
+	    for (y = 0; y < img.getHeight(); y++) {
+
+	      // For each pixel in the image
+	      // get the red, green and blue value
+	      clr = img.getRGB(x, y);
+
+	      red = (clr & 0x00ff0000) >> 16;
+	      green = (clr & 0x0000ff00) >> 8;
+	      blue = clr & 0x000000ff;
+	      
+	      if (red==source.getRed() &&  green == source.getGreen() && blue == source.getBlue()) {
+          g2.fillRect(x, y, 1, 1);
+	      }
+	      
+	    }
+	  }
 	}
 	
 	/**
@@ -305,9 +336,9 @@ public class ImageTools {
     // Darken the image by given percentage
     float scaleFactor = 1.0f - percent;
     RescaleOp op = new RescaleOp(scaleFactor, 0, null);
-    BufferedImage bufferedImage = op.filter(image, null);
+    image = op.filter(image, null);
     
-    return bufferedImage;
+    return image;
   }
 
 	
@@ -351,5 +382,14 @@ public class ImageTools {
 		return Toolkit.getDefaultToolkit().createImage(
 				bufferedImage.getSource());
 	}
+
+  /**
+   * @param imagePath
+   * @return 
+   * @throws IOException 
+   */
+  public static BufferedImage getImage(URL imagePath) throws IOException {
+    return ImageIO.read(imagePath);
+  }
 
 }
