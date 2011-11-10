@@ -559,14 +559,17 @@ public class Pathway {
    */
   public void removeEntry(int index) {
     // Comment [wrzodek 2010-07-01]: Entry may still be in other entries compound (group node) list.
+    // Also in other relations, reactions, subtype-values,etc.
     if (index<0) return;
     Entry e = entries.get(index);
     
+    // Update internal reference-maps and lists
     idMap.remove(e.getId());
     nameMap.remove(e.getName());
     removeReactionModifier(e);
     if (maxId==e.getId()) resetMaxId(e);
     
+    // Really remove this entry from out list
     entries.remove(index);
     
     e.setName(Entry.removedNodeName);

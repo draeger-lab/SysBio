@@ -120,7 +120,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 		boolean equal = super.equals(o);
 		if (o instanceof KeggQuery) {
 			KeggQuery e = (KeggQuery) o;
-			equal &= e.jobToDo == this.jobToDo;
+			equal = e.jobToDo == this.jobToDo;
 			if (equal) {
 			  if (this.getQuery()==null && e.getQuery()==null) {
 			    equal=true;
@@ -160,7 +160,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		int hc = (int) (jobToDo + (query==null?0:query.hashCode()));
+		int hc = (int) (jobToDo + (query==null?0:getQuery().hashCode()));
 		return (hc);
 	}
 

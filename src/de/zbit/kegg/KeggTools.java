@@ -513,5 +513,20 @@ public class KeggTools {
     }
   }
 
+  /**
+   * Remove all {@link Entry}s that are just references to Pathways
+   * ({@link EntryType#map}).
+   * @param p
+   */
+  public static void removePathwayEntries(Pathway p) {
+    for (int i=0; i<p.getEntries().size(); i++) {
+      Entry e = p.getEntries().get(i);
+      if (e.getType().equals(EntryType.map)) {
+        p.removeEntry(i);
+        i--;
+      }
+    }
+  }
+
   
 }
