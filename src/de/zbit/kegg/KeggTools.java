@@ -33,6 +33,7 @@ import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.util.AbstractProgressBar;
 
 /**
  * Various Tools related to graph-processing and 
@@ -238,12 +239,14 @@ public class KeggTools {
   /**
    * Builds the cache for all reactions and entries in the pathway. This is much
    * faster than fetching each entry one by one.
-   * @param p - The source pathway
-   * @param manager - The cache
-   * @param autocompleteReactions - Set to true, if you plan to call
+   * @param p The source pathway
+   * @param manager The cache
+   * @param autocompleteReactions Set to true, if you plan to call
    * {@link #autocompleteReactions(Pathway, KeggInfoManagement)} afterwars.
+   * @param progress might be null
    */
-  public static void preFetchInformation(Pathway p, KeggInfoManagement manager, boolean autocompleteReactions) {
+  public static void preFetchInformation(Pathway p, KeggInfoManagement manager, boolean autocompleteReactions,
+    AbstractProgressBar progress) {
     // PreFetch infos. Enormous performance improvement!
     Collection<String> preFetchIDs = new HashSet<String>();
     preFetchIDs.add("GN:" + p.getOrg());
@@ -260,7 +263,7 @@ public class KeggTools {
         preFetchIDs.add(ko_id);
       }
     }
-    manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]));
+    manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]), progress);
     
     
     if (autocompleteReactions) {
@@ -295,7 +298,7 @@ public class KeggTools {
           
         }
       }
-      manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]));
+      manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]), progress);
     }
     
     // TODO: Add relations?

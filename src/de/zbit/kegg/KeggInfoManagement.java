@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.zbit.exception.UnsuccessfulRetrieveException;
+import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.ThreadManager;
 import de.zbit.util.Utils;
@@ -36,9 +37,16 @@ import de.zbit.util.Utils;
  */
 public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implements Serializable {
   private static final long serialVersionUID = -2621701345149317801L;
+  /**
+   * True if this class contents have changed since
+   * the last reading/writing of this instance.
+   */
   private boolean hasChanged=false;
-  
+  /**
+   * The adapter to communicate with the KEGG API
+   */
   private KeggAdaptor adap=null;
+  
   
   /**
    * If this flag ist set to true, this class does NOT retrieve any Information, but uses stored information.
@@ -128,8 +136,23 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    */
   @Override
   protected KeggInfos[] fetchMultipleInformations(final String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
+    return fetchMultipleInformations(ids,null);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.util.InfoManagement#fetchMultipleInformations(IDtype[], de.zbit.util.AbstractProgressBar)
+   */
+  /**
+   * Wrapper for {@link fetchMultipleInformationsUpTo100AtATime} because Kegg only supports 100 at a time :)
+   */
+  @Override
+  protected KeggInfos[] fetchMultipleInformations(String[] ids,
+    AbstractProgressBar progress) throws TimeoutException, UnsuccessfulRetrieveException {
     String[] APIinfos;
     final KeggInfos[] realRet = new KeggInfos[ids.length];
+    if (progress!=null) {
+      progress.setNumberOfTotalCalls((long) (ids.length*Math.ceil(((double)ids.length)/100.0)));
+    }
     // If we parse to many string in parallel, we get
     // out of memory errors! => Limit to 50.
     ThreadManager APIstringParser = new ThreadManager(50);
@@ -138,7 +161,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       APIinfos = removeUnnecessaryInfos(APIinfos);
       
       // Multi-threaded string parsing
-      parseAPI(ids, APIinfos, realRet, APIstringParser,0);
+      parseAPI(ids, APIinfos, realRet, APIstringParser,0, progress);
       // ---
     } else {
       //APIinfos = new String[ids.length];
@@ -150,11 +173,16 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
         System.arraycopy(ids, j, subArr, 0, subArr.length);
 
         String[] ret = fetchMultipleInformationsUpTo100AtATime(subArr);
+        if (progress!=null) {
+          synchronized (progress) {
+            progress.setCallNr(progress.getCallNumber()+ids.length);
+          }
+        }
         ret = removeUnnecessaryInfos(ret);
         //System.arraycopy(ret, 0, APIinfos, j, ret.length);
 
         // Multi-threaded string parsing
-        parseAPI(subArr, ret, realRet, APIstringParser, j);
+        parseAPI(subArr, ret, realRet, APIstringParser, j, progress);
         // ---        
 
         j+=subArr.length;
@@ -162,6 +190,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     }
     
     APIstringParser.awaitTermination();
+    progress.finished();
     // For Debugging
     //for (int i=0; i<ids.length; i++) {
     //  System.out.println(ids[i] + ": '" + realRet[i].substring(0, 50).replace("\n", "|").replaceAll(" +", " ")+"'");
@@ -181,7 +210,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    * <code>ids</code> or <code>APIinfos</code> and  <code>realRet</code>.
    */
   private void parseAPI(final String[] ids, String[] APIinfos,
-    final KeggInfos[] realRet, ThreadManager APIstringParser, final int realRetOffset) {
+    final KeggInfos[] realRet, ThreadManager APIstringParser, final int realRetOffset, final AbstractProgressBar progress) {
     for (int i=0; i<APIinfos.length; i++) {
       final int final_i = i;
       final String apiInfos = APIinfos[final_i];
@@ -192,6 +221,11 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
             realRet[final_i+realRetOffset] = null;
           } else {
             realRet[final_i+realRetOffset] = new KeggInfos(ids[final_i], apiInfos);
+          }
+          if (progress!=null) {
+            synchronized (progress) {
+              progress.DisplayBar();
+            }
           }
         }
       };

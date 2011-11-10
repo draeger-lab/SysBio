@@ -101,12 +101,12 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 		else if (jobToDo > o.getJobToDo())
 			return 1;
 		else { // Same job to do
-		  if (query==null && o.getQuery()==null)
+		  if (getQuery()==null && o.getQuery()==null)
 		    return 0;
-		  else if (query==null || o.getQuery()==null)
+		  else if (getQuery()==null || o.getQuery()==null)
 		    return -1;
 		  else
-			  return query.compareTo(o.getQuery());
+			  return getQuery().compareTo(o.getQuery());
 		}
 	}
 
@@ -120,7 +120,16 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 		boolean equal = super.equals(o);
 		if (o instanceof KeggQuery) {
 			KeggQuery e = (KeggQuery) o;
-			equal &= e.jobToDo == this.jobToDo && this.query.equals(e.query);
+			equal &= e.jobToDo == this.jobToDo;
+			if (equal) {
+			  if (this.getQuery()==null && e.getQuery()==null) {
+			    equal=true;
+			  } else if (this.getQuery()==null || e.getQuery()==null) {
+			    equal=false;
+			  } else {
+			    equal &= this.getQuery().equals(e.getQuery());
+			  }
+			}
 		}
 		return equal;
 	}
@@ -151,7 +160,7 @@ public class KeggQuery implements Comparable<KeggQuery>, Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		int hc = (int) (jobToDo + query==null?0:query.hashCode());
+		int hc = (int) (jobToDo + (query==null?0:query.hashCode()));
 		return (hc);
 	}
 
