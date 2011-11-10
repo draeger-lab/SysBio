@@ -24,6 +24,14 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,18 +54,35 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * It is recommended to generate a new ID when extending this class.
    */
   private static final long serialVersionUID = -5172273501517643495L;
-  // initialize the logger for this class:
+  /**
+   * Initialize the logger for this class
+   */
   public static final transient Logger log = Logger.getLogger(InfoManagement.class.getName());
   
-  private SortedArrayList<Info<IDtype, INFOtype>> rememberedInfos;
-  private SortedArrayList<IDtype> unsuccessfulQueries; // Remember those separately
+  /**
+   * Actual cache content
+   */
+  private Map<IDtype, ObjectAndTimestamp<INFOtype>> rememberedInfos;
+  /**
+   * Additional cache to remember unsuccessful queries
+   */
+  private Set<IDtype> unsuccessfulQueries; // Remember those separately
+  
+  /**
+   * Cache size limit
+   */
   private int maxListSize; // Unfortunately serialized in many instances. Don't rename it.
+  
+  /**
+   * If true, the cache has changed since last reading/writing
+   * and should be saved to disk upon exit.
+   */
   private boolean cacheChangedSinceLastLoading=false;
   
   /**
    * Version number of this java class.
    */
-  private final static int latestVersion=1;
+  private final static int latestVersion=2;
   
   /**
    * Allows to change older caches (when reading serialized files)
@@ -76,10 +101,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @param maxCacheSize the maximum number of cached entries
    */
   public InfoManagement(int maxCacheSize) {
-    if (maxCacheSize<1) System.err.println("Initialized a InfoManagement cache with size " + maxCacheSize);
+    if (maxCacheSize<1) {
+      log.warning("Initialized a InfoManagement cache with size of " + maxCacheSize);
+    }
     this.maxListSize = maxCacheSize;
-    rememberedInfos = new SortedArrayList<Info<IDtype, INFOtype>>(Math.max(this.maxListSize+1, 0));
-    unsuccessfulQueries = new SortedArrayList<IDtype>((10*this.maxListSize)+1); // so many, since usually this does not take much memory.
+    rememberedInfos = new HashMap<IDtype, ObjectAndTimestamp<INFOtype>>(Math.max(this.maxListSize+1, 1));
+    unsuccessfulQueries = new HashSet<IDtype>((10*this.maxListSize)+1); // so many, since usually this does not take much memory.
   }
   
   /**
@@ -96,7 +123,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @return Returns the number of remember-infos (no unsuccessful queries).
    */
   public int getNumberOfCachedInfos() {
-    return rememberedInfos.size();
+    return rememberedInfos==null?0:rememberedInfos.size();
   }
   
   /**
@@ -112,71 +139,21 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * without infos) is not affected by the maximum cache size!
    * @param cacheSize
    */
-  public synchronized void setCacheSize(int cacheSize) {
+  public void setCacheSize(int cacheSize) {
     this.maxListSize = cacheSize;
-    rememberedInfos.ensureCapacity(maxListSize);
-    unsuccessfulQueries.ensureCapacity(maxListSize);
-  }
-
-  /**
-   * This method clears the unsuccessfulQueries array. In addition, it removes
-   * all rememberedInfos that have a query(IDtype) or content(INFOtype) that is
-   * a) null, b) .toString().equals("") or c) .toString().equals("0").
-   * 
-   * The intention of this method is to re-fetch empty or unsuccessfulQueries
-   * what may be usefull if the underlying database is updated.
-   */
-  public synchronized void cleanupUnsuccessfulAndEmptyInfos() {
-    if (unsuccessfulQueries.size()>0) {
-      cacheChangedSinceLastLoading=true;
-      unsuccessfulQueries.clear();
-    }
-    
-    for (int i=0; i<rememberedInfos.size(); i++) {
-      Info<IDtype, INFOtype> in = rememberedInfos.get(i);
-      INFOtype info = in.getInformation(false);
-      if (in.getIdentifier()==null || in.getIdentifier().toString().equals("") || in.getIdentifier().toString().equals("0") ||
-          info==null || info.toString().equals("") || info.toString().equals("0") ){
-        rememberedInfos.remove(i);
-        i--;
-        cacheChangedSinceLastLoading=true;
-      }
-    }
-  }
-  
-  /**
-   * This function re-sorts all internal id lists. It is usefull to call this function
-   * if your compareTo (i.e. your sorting) has changed, to keep a consistent sorting of
-   * your lists. It will also remove all duplicate ids. 
-   */
-  public synchronized void resortLists() {
-    SortedArrayList<Info<IDtype, INFOtype>> tempRI = new SortedArrayList<Info<IDtype, INFOtype>>(Math.max(rememberedInfos.size(), maxListSize));
-    SortedArrayList<IDtype> tempU = new SortedArrayList<IDtype>(Math.max(unsuccessfulQueries.size(), maxListSize));
-    
-    // Re-sort rememberedInfos
-    for (Info<IDtype, INFOtype> i: rememberedInfos) {
-      if (!tempRI.contains(i))
-        tempRI.add(i);
-    }
-    
-    // Re-sort unsuccessfulQueries
-    for (IDtype i: unsuccessfulQueries) {
-      if (!tempRI.contains(i) && !tempU.contains(i))
-        tempU.add(i);
-    }
-    
-    rememberedInfos = tempRI;
-    unsuccessfulQueries = tempU;
-    cacheChangedSinceLastLoading = true;
   }
   
   /**
    * Clears the whole cache (rememberedInfos and unsuccessfulQueries).
    */
-  public synchronized void clearCache() {
-    if (unsuccessfulQueries.size()>0 || rememberedInfos.size()>0) cacheChangedSinceLastLoading=true;
-    unsuccessfulQueries.clear();
-    rememberedInfos.clear();
+  public void clearCache() {
+    cacheChangedSinceLastLoading = (unsuccessfulQueries.size()>0 || rememberedInfos.size()>0);
+    synchronized (rememberedInfos) {
+      rememberedInfos.clear();
+    }
+    synchronized (unsuccessfulQueries) {
+      unsuccessfulQueries.clear();
+    }
   }
   
   /**
@@ -199,8 +176,8 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @param id
    * @param info
    */
-  public synchronized void addInformation(IDtype id, INFOtype info) {
-    addInformation(new Info<IDtype, INFOtype>(id, info));
+  public void addInformation(IDtype id, INFOtype info) {
+    addInformation(id, new ObjectAndTimestamp<INFOtype>(info));
   }
   
   /**
@@ -208,13 +185,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * is already available.
    * @param infoObject
    */
-  public synchronized void addInformation(Info<IDtype, INFOtype> infoObject) {
+  private void addInformation(IDtype id, ObjectAndTimestamp<INFOtype> info) {
     // Ensure constant max list capacity. Remove least frequently used item.
     if (isCacheFull()) {
       freeCache(Math.max(10, (int)(((double)maxListSize)*0.1)));
     }
-    
-    rememberedInfos.add(infoObject);
+    synchronized (rememberedInfos) {
+      rememberedInfos.put(id, info);
+    }
     cacheChangedSinceLastLoading=true;
   }
 
@@ -235,30 +213,35 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * 
    * @param elements number of elements to remove.
    */
-  private synchronized void freeCache(int elements) {
+  private void freeCache(int elements) {
     // Sort the list by lastUsage and delete lowest time-stamps.
-    ArrayList<Object> itemToDelete = new ArrayList<Object>(elements+1);
+    List<IDtype> keysToDelete = new ArrayList<IDtype>(elements+1);
     SortedArrayList<Long> minDate = new SortedArrayList<Long>(elements+1);
     long minMaxDate = Long.MIN_VALUE;
-    for (int i=0; i<rememberedInfos.size(); i++)  {
-      long usageDate = rememberedInfos.get(i).getLastUsage();
-      
-      if(usageDate<=minMaxDate || itemToDelete.size() < elements) {
-        minDate.add(usageDate);
-        itemToDelete.add(minDate.getIndexOfLastAddedItem(), rememberedInfos.get(i));
-        minMaxDate = minDate.get(0); // Math.min(elements-1, minDate.size()-1)
-        // XXX: It would be good to have a break condition (i.e. good enough)
-        // here, to speedup the whole process.
-        //if (minMaxDate<1) break;
-      }
-    }
     
-    // If some honks set list size to 0 or -1, itemToDelete is -1.
     int removedElements =0;
-    if (itemToDelete.size()>=0) {
-      for (int i=0; i<Math.min(elements, itemToDelete.size()); i++) {
-        if (rememberedInfos.remove((Object)itemToDelete.get(i))) {
-          removedElements++;
+    synchronized (rememberedInfos) {
+      Iterator<Entry<IDtype, ObjectAndTimestamp<INFOtype>>> it = rememberedInfos.entrySet().iterator();
+      while (it.hasNext()) {
+        Entry<IDtype, ObjectAndTimestamp<INFOtype>> entry = it.next();
+        long usageDate = entry.getValue().getLastUsage();
+        
+        if(usageDate<=minMaxDate || keysToDelete.size() < elements) {
+          minDate.add(usageDate);
+          keysToDelete.add(minDate.getIndexOfLastAddedItem(), entry.getKey());
+          minMaxDate = minDate.get(0);
+          // XXX: It would be good to have a break condition (i.e. good enough)
+          // here, to speedup the whole process.
+          //if (minMaxDate<1) break;
+        }
+      }
+      
+      // If some honks set list size to 0 or -1, itemToDelete is -1.
+      if (keysToDelete.size()>=0) {
+        for (int i=0; i<Math.min(elements, keysToDelete.size()); i++) {
+          if (rememberedInfos.remove(keysToDelete.get(i))!=null) {
+            removedElements++;
+          }
         }
       }
     }
@@ -271,24 +254,15 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @param id
    * @return true, if the element has been found and removed. False instead.
    */
-  public synchronized boolean removeInformation(IDtype id) {
+  public boolean removeInformation(IDtype id) {
     boolean found = false;
-    for (int i=0; i<rememberedInfos.size(); i++) {
-      Info<IDtype, INFOtype> in = rememberedInfos.get(i);
-      if (in.getIdentifier().equals(id)) {
-        rememberedInfos.remove(i);
-        found = true;
-        break;
-      }
+    synchronized (rememberedInfos) {
+      found = rememberedInfos.remove(id)!=null;
     }
     
     if (!found) {
-      for (int i=0; i<unsuccessfulQueries.size(); i++) {
-        if (unsuccessfulQueries.get(i).equals(id)) {
-          unsuccessfulQueries.remove(i);
-          found = true;
-          break;
-        }
+      synchronized (unsuccessfulQueries) {
+        found = unsuccessfulQueries.remove(id);
       }
     }
     
@@ -328,7 +302,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       try {
         ret = fetchInformation(id);
         if (ret==null) {
-          unsuccessfulQueries.add(id);
+          synchronized (unsuccessfulQueries) {
+            unsuccessfulQueries.add(id);
+          }
           cacheChangedSinceLastLoading=true;
         }
         break;
@@ -342,7 +318,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       } catch (UnsuccessfulRetrieveException e) {
         log.log(Level.FINE, "Unsuccessful retrieval, marking " + 
           (id ==null?"null": id.toString()) + " as unretrievable", e);
-        unsuccessfulQueries.add(id);
+        synchronized (unsuccessfulQueries) {
+          unsuccessfulQueries.add(id);
+        }
         cacheChangedSinceLastLoading=true;
         break;
       } catch (Throwable t) {
@@ -373,13 +351,28 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   protected abstract INFOtype[] fetchMultipleInformations(IDtype[] ids) throws TimeoutException, UnsuccessfulRetrieveException;
   
   /**
+   * Overwrite this method if you want to use a {@link AbstractProgressBar}.
+   * @param ids
+   * @param progress
+   * @return
+   * @throws TimeoutException
+   * @throws UnsuccessfulRetrieveException
+   * @see #fetchMultipleInformations(Comparable[])
+   */
+  protected INFOtype[] fetchMultipleInformations(IDtype[] ids, AbstractProgressBar progress) throws TimeoutException, UnsuccessfulRetrieveException {
+    return fetchMultipleInformations(ids);
+  }
+  
+  
+  /**
    * This will fetch all given ids (NOT using cache) and handle the UnsuccessfulRetrieveException
    * and TimeoutException exceptions. It will update the unsuccessfulQueries() collection and
    * return the resulting infos.
    * @param ids
+   * @param progress 
    * @return
    */
-  private INFOtype[] fetchMultipleInformationWrapper(IDtype[] ids) {
+  private INFOtype[] fetchMultipleInformationWrapper(IDtype[] ids, AbstractProgressBar progress) {
     // you should already have checked for "unsuccessfulQueries" when using this function.
     INFOtype[] ret = null;
     if (ids==null) return ret;
@@ -387,16 +380,20 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     int retried=0;
     while (ret==null) {
       try {
-        ret = fetchMultipleInformations(ids);
+        ret = fetchMultipleInformations(ids, progress);
         
         // Cache the unsuccessfulQueries
         if (ret==null) {
-          unsuccessfulQueries.addAll(ids);
+          synchronized (unsuccessfulQueries) {
+            unsuccessfulQueries.addAll(Arrays.asList(ids));
+          }
           cacheChangedSinceLastLoading=true;
         } else {
           for (int i=0; i<ids.length; i++) {
             if (ret[i]==null && ids[i]!=null && !ids[i].equals("")) {
-              unsuccessfulQueries.add(ids[i]);
+              synchronized (unsuccessfulQueries) {
+                unsuccessfulQueries.add(ids[i]);
+              }
               cacheChangedSinceLastLoading=true;
             }
           }
@@ -415,8 +412,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
           example = (ids[0]==null?"null":ids[0].toString());
         }
         log.log(Level.FINE, "Unsuccessful retrieval, marking ALL IDs as unretrievable"+
-            (example!=null?" (e.g., '" +example+"')": ""), e);
-        unsuccessfulQueries.addAll(ids);
+          (example!=null?" (e.g., '" +example+"')": ""), e);
+        synchronized (unsuccessfulQueries) {
+          unsuccessfulQueries.addAll(Arrays.asList(ids));
+        }
         cacheChangedSinceLastLoading=true;
         break;
       } catch (Throwable t) {
@@ -439,9 +438,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @param id - id to query.
    * @return INFOtype - the answer.
    */
-  public synchronized INFOtype getInformation(IDtype id) {
-    int pos = rememberedInfos.indexOf(id);
-    if (pos>=0) return rememberedInfos.get(pos).getInformation();
+  public INFOtype getInformation(IDtype id) {
+    ObjectAndTimestamp<INFOtype> o = rememberedInfos.get(id);
+    if (o!=null) return o.getInformation();
     else {
       // Retrieve object and store it.
       INFOtype info = fetchInformationWrapper(id);
@@ -458,24 +457,36 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @param ids - ids to query.
    * @return INFOtype - array of same size, with same ordering as ids.
    */
+  public INFOtype[] getInformations(IDtype[] ids) {
+    return getInformations(ids, null);
+  }
+  
+  /**
+   * Retrieve multiple informations. This will used the cached information, if available. Else,
+   * it will call the fetchMultipleInformation method and build a cache on the answer. The
+   * returned results use the same indices as the given ids. 
+   * @param ids ids to query.
+   * @param progress optional aditional progress bar (might be null)
+   * @return INFOtype array of same size, with same ordering as ids.
+   */
   @SuppressWarnings("unchecked")
-  public synchronized INFOtype[] getInformations(IDtype[] ids) {
+  public INFOtype[] getInformations(IDtype[] ids, AbstractProgressBar progress) {
     if (ids==null) return null;
-    ArrayList<IDtype> unknownIDs = new ArrayList<IDtype>();
-    boolean touched = false; // if true, ids!=filteredIDs
+    List<IDtype> unknownIDs = new ArrayList<IDtype>();
+    
+    // Look if at least one of the ids is in the cache
     INFOtype anyCachedInfo=null;
     for (IDtype id: ids) {
-      int pos = rememberedInfos.indexOf(id);
-      if (pos<0 && !unsuccessfulQueries.contains(id)) { // Same if-order as below!
+      if (id==null) continue;
+      ObjectAndTimestamp<INFOtype> o = rememberedInfos.get(id);
+      if (o==null && !unsuccessfulQueries.contains(id)) { // Same if-order as below!
         unknownIDs.add(id);
       } else {
-        touched = true;
-        if (anyCachedInfo==null) anyCachedInfo=rememberedInfos.get(pos).getInformation(false);
+        if (anyCachedInfo==null) anyCachedInfo=o.getInformation(false);
       }
     }
     
-    
-    if (touched) {
+    if (anyCachedInfo!=null) {
       // Some elements are already in our cache.
       
       // Retain all elements that have to be fetched
@@ -487,7 +498,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       if (unknownIDs.size()>0) {
         
         // Fetch new items
-        newItems = fetchMultipleInformationWrapper(filtIDs);
+        newItems = fetchMultipleInformationWrapper(filtIDs, progress);
         
         // Free enough cache for them
         if (isCacheFull()) {
@@ -505,14 +516,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       // Iterate in parallel through ids, infos and filteredIDs
       int infos_i=0;
       for (int i=0; i<ids.length; i++) {
-        int pos = rememberedInfos.indexOf(ids[i]);
-        if (pos>=0) { // Same if-order as above!
-          infos[i] = rememberedInfos.get(pos).getInformation();
+        ObjectAndTimestamp<INFOtype> o = rememberedInfos.get(ids[i]);
+        if (o!=null) { // Same if-order as above!
+          infos[i] = o.getInformation();
         } else if (unknownIDs.size()>0 && ids[i].equals(filtIDs[infos_i])){
           // Newly fetched infos (filteredIDs==0 if all in cache).
           if (newItems!=null && newItems.length<infos_i) {
             // should never happen. (=null => unsuccessfulQueries)
-            System.err.println("Something went badly wrong. Your fetchMultipleInformations method must return an array of exactly the same size as the input id array!");
+            log.warning("Something went badly wrong. Your fetchMultipleInformations method must return an array of exactly the same size as the input id array!");
             infos[i] = null;
           } else if (newItems!=null){
             infos[i] = newItems[infos_i];
@@ -530,7 +541,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       return infos;
     } else {
       // No id is cached.
-      INFOtype[] infos = fetchMultipleInformationWrapper(ids);
+      INFOtype[] infos = fetchMultipleInformationWrapper(ids, progress);
       if (infos==null) return null;
       for (int i=0; i<infos.length; i++)
         if (infos[i]!=null && ids[i]!=null) addInformation(ids[i], infos[i]);
@@ -540,29 +551,46 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   
   /**
    * Precache ids, so they are available as soon as you query them.
-   * This is usefull if you know that you are going to query mulitple ids with
+   * This is useful if you know that you are going to query multiple ids with
    * a single query. Than you can precache them here, which results in on fetchMulti
    * query, and later on retrieve them with getInformation().
-   * This will significantly increas performance, since you queried all with one query.
+   * This will significantly increase performance, since you queried all with one query.
    * @param ids
    */
+  public void precacheIDs(IDtype[] ids) {
+    precacheIDs(ids,null);
+  }
+  
+  /**
+   * Precache ids, so they are available as soon as you query them.
+   * This is useful if you know that you are going to query multiple ids with
+   * a single query. Than you can precache them here, which results in on fetchMulti
+   * query, and later on retrieve them with getInformation().
+   * This will significantly increase performance, since you queried all with one query.
+   * @param ids
+   * @param progress optional additional progress bar for this operation.
+   */
   @SuppressWarnings("unchecked")
-  public synchronized void precacheIDs(IDtype[] ids) {
+  public void precacheIDs(IDtype[] ids, AbstractProgressBar progress) {
     if (ids==null || ids.length<1) return;
-    ArrayList<IDtype> unknownIDs = new ArrayList<IDtype>();
-    boolean touched = false; // if true, ids!=filteredIDs
+    List<IDtype> unknownIDs = new ArrayList<IDtype>();
+    
+    // Look if at least one of the ids is in the cache
+    boolean containsAtLeastOneID=false;
     for (IDtype id: ids) {
-      if (id!=null && rememberedInfos.indexOf(id)<0 && !unsuccessfulQueries.contains(id)) {
+      if (id==null) continue;
+      ObjectAndTimestamp<INFOtype> o = rememberedInfos.get(id);
+      if (o==null && !unsuccessfulQueries.contains(id)) { // Same if-order as below!
         unknownIDs.add(id);
       } else {
-        touched = true;
+        containsAtLeastOneID = true;
       }
     }
     if (unknownIDs.size()<1) return; // All ids are known.
     
     INFOtype[] infos;
     IDtype[] filtIDs = ids;
-    if (touched) {
+    if (containsAtLeastOneID) {
       // Some elements are already in our cache.
       
       // Big Problem: Java does not permit creating an generic array
@@ -579,7 +607,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     if (filtIDs.length<1) return;
     
     // Query unknown ids
-    infos = fetchMultipleInformationWrapper(filtIDs);
+    infos = fetchMultipleInformationWrapper(filtIDs, progress);
     if (infos==null) return;
     
     // Free enough cache for them
@@ -591,7 +619,6 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     for (int i=0; i<infos.length; i++) {
       if (infos[i]!=null && filtIDs[i]!=null) addInformation(filtIDs[i], infos[i]);
     }
-    
   }
   
   /**
@@ -600,7 +627,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @return loaded InfoManagement instance.
    * @throws IOException 
    */
-  public static synchronized InfoManagement<?, ?> loadFromFilesystem(File file) throws IOException {
+  public static InfoManagement<?, ?> loadFromFilesystem(File file) throws IOException {
     InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObjectAutoDetectZIP(file);
     return m;
   }
@@ -612,7 +639,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @return loaded InfoManagement instance.
    * @throws IOException 
    */
-  public static synchronized InfoManagement<?, ?> loadFromFilesystem(InputStream in) throws IOException {
+  public static InfoManagement<?, ?> loadFromFilesystem(InputStream in) throws IOException {
     InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObjectAutoDetectZIP(in);
     return m;
   }
@@ -622,7 +649,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @return loaded InfoManagement instance.
    * @throws IOException 
    */
-  public static synchronized InfoManagement<?, ?> loadFromFilesystem(String filepath) throws IOException {
+  public static InfoManagement<?, ?> loadFromFilesystem(String filepath) throws IOException {
     InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObjectAutoDetectZIP(filepath);
     return m;
   }
@@ -633,7 +660,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @param m - object to store.
    * @return true if and only if the file has been successfully saved.
    */
-  public static synchronized boolean saveToFilesystem(String filepath, InfoManagement<?, ?> m) {
+  public static boolean saveToFilesystem(String filepath, InfoManagement<?, ?> m) {
     return Utils.saveGZippedObject(filepath, m);
   }
   
@@ -668,7 +695,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @param size
    * @return new array of the class of the given type, with the given size.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   private static Object createNewArray(Object type, int size) {
     Class elementType=null;
     if (type instanceof Class)
@@ -720,7 +747,11 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @throws ClassNotFoundException
    */
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
+    try {
+      in.defaultReadObject();
+    } catch (Exception e) {
+      throw new IOException("Could not read cache from disk.",e);
+    }
     
     restoreUnserializableObject();
     cacheChangedSinceLastLoading=false;
