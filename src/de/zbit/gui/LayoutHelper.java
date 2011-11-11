@@ -181,8 +181,21 @@ public class LayoutHelper {
 	 * @param width
 	 */
 	public void add(Component c, int width) {
+	  add(c,width,false);
+	}
+	
+	/**
+	 * 
+	 * @param c
+	 * @param width
+	 * @param spaceLine
+	 */
+	public void add(Component c, int width, boolean spaceLine) {
 	  ensurePointerIsAtBeginningOfARow();
-		add(c, 0, row, width, 1);
+	  add(c, 0, row, width, 1);
+	  if (spaceLine) {
+	    add(new JPanel(), 0, ++row, width, 1, 0, 0);
+	  }
 	}
 	
 	/**

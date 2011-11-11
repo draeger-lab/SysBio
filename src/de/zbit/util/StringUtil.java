@@ -18,10 +18,11 @@ package de.zbit.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -952,6 +953,69 @@ public class StringUtil {
         if (parentString.contains(strings[i])) return i;
       }
       return -1;
+  }
+
+  /**
+   * Append or increment a numbered suffix to <code>newString</code> if
+   * it already exists in <code>existingStrings</code>
+   * <p>Example: existingStrings contains "A", "A_1" and "B".
+   * newString is "A". Return value will be "A_2".
+   * <p> Detects the following suffixes (examples):
+   * <ul><li>_1</li><li>[space]1</li><li>1</li>
+   * <li>(_1)</li><li>([space]1)</li><li>(1)</li></ul>and automatically
+   * keeps this style.
+   * @param existingStrings
+   * @param newString
+   * @return unique string
+   */
+  public static String makeUnique(Iterable<String> existingStrings, String newString) {
+    Pattern numberedSuffix = Pattern.compile("(.+?)(\\s|_)?\\(?(\\d+)\\)?$");
+    Iterator<String> it = existingStrings.iterator();
+    int maxNumber = Integer.MIN_VALUE;
+    boolean found = false;
+    String maxNumberMatch = "";
+    String useSeparator = " ";
+    while (it.hasNext()) {
+      String s = it.next();
+      if (s.equals(newString)) {
+        found = true;
+      }
+      Matcher m = numberedSuffix.matcher(s);
+      while (m.find()) {
+        if (m.group(1).equals(newString)) {
+          found = true;
+          if (m.group(3)!=null) {
+            int num = Integer.parseInt(m.group(3));
+            if (num>maxNumber) {
+              maxNumber = num;
+              useSeparator = m.group(2)==null?"":m.group(2);
+              maxNumberMatch = s;
+            }
+          }
+        }
+      }
+    }
+    
+    if (!found) {
+      // This string is not yet contained in existingStrings.
+      return newString;
+    } else {
+      boolean brackets = true; // place number in brackets
+      if (maxNumberMatch.length()>0) { // same style as previous
+        brackets = maxNumberMatch.endsWith(")");
+        maxNumber++;
+      } else {
+        maxNumber=2; // initial second item
+      }
+      
+      // We found a string already with numbered suffix
+      StringBuilder ret = new StringBuilder(newString);
+      ret.append(useSeparator);
+      if (brackets) ret.append('(');
+      ret.append(maxNumber);
+      if (brackets) ret.append(')');
+      return ret.toString();
+    }
   }
   
 }
