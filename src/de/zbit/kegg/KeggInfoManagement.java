@@ -190,7 +190,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     }
     
     APIstringParser.awaitTermination();
-    progress.finished();
+    if (progress!=null) progress.finished();
     // For Debugging
     //for (int i=0; i<ids.length; i++) {
     //  System.out.println(ids[i] + ": '" + realRet[i].substring(0, 50).replace("\n", "|").replaceAll(" +", " ")+"'");
