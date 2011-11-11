@@ -537,7 +537,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 
   /**
    * Parse the range specification string into a more convenient
-   * data structute. See {@link #getRangeSpecification()} for
+   * data structure. See {@link #getRangeSpecification()} for
    * more information on possible Strings.
    * @param range
    * @return rangeCollection<Type>
