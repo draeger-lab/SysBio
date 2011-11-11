@@ -21,11 +21,30 @@ package de.zbit.kegg.parser.pathway;
  * ://www.genome.jp/kegg/xml/docs/})
  * 
  * @author Clemens Wrzodek
+ * @author Florian Mittag
  * @version $Rev$
  * @since 1.0
  */
 public class SubType {
 	// SubType is for RELATION
+  
+  public static final String ACTIVATION = "activation";
+  public static final String INHIBITION = "inhibition";
+  public static final String EXPRESSION = "expression";
+  public static final String REPRESSION = "repression";
+  public static final String INDIRECT_EFFECT = "indirect effect";
+  public static final String STATE_CHANGE = "state change";
+  public static final String BINDING_ASSOCIATION = "binding/association";
+  public static final String BINDING = "binding";
+  public static final String ASSOCIATION = "association";
+  public static final String DISSOCIATION = "dissociation";
+  public static final String MISSING_INTERACTION = "missing interaction";
+  public static final String PHOSPHORYLATION = "phosphorylation";
+  public static final String DEPHOSPHORYLATION = "dephosphorylation";
+  public static final String GLYCOSYLATION = "glycosylation";
+  public static final String UBIQUITINATION = "ubiquitination";
+  public static final String METHYLATION = "methylation";
+  
 	/*
 	 * name and value attributes
 	 * 
@@ -33,20 +52,33 @@ public class SubType {
 	 * information in each of the three types of the generalized protein
 	 * interactions. The correspondence between the type attribute of the
 	 * relation element (ECrel, PPrel or GErel) and the name and value
-	 * attributes of the subtype element is shown below. name value ECrel PPrel
-	 * GErel Explanation compound Entry element id attribute value for compound.
-	 * * * shared with two successive reactions (ECrel) or intermediate of two
-	 * interacting proteins (PPrel) hidden compound Entry element id attribute
-	 * value for hidden compound. * shared with two successive reactions but not
-	 * displayed in the pathway map activation --> * positive and negative
-	 * effects which may be associated with molecular information below
-	 * inhibition --| * expression --> * interactions via DNA binding repression
-	 * --| * indirect effect ..> * * indirect effect without molecular details
-	 * state change ... * state transition binding/association --- * association
-	 * and dissociation dissociation -+- * missing interaction -/- * * missing
-	 * interaction due to mutation, etc. phosphorylation +p * molecular events
-	 * dephosphorylation -p * glycosylation +g * ubiquitination +u * methylation
-	 * +m *
+	 * attributes of the subtype element is shown below.
+	 * 
+	 * name value ECrel PPrel GErel Explanation 
+	 * 
+	 * - compound
+	 *   value for compound. shared with two successive reactions (ECrel)
+	 *   or intermediate of two interacting proteins (PPrel)
+	 * - hidden compound 
+	 *   value for hidden compound. shared with two successive reactions but not
+	 *   displayed in the pathway map
+	 * - activation -->
+	 *   positive and negative effects which may be associated with molecular
+	 *   information below
+	 * - inhibition --|
+	 * - expression -->
+	 * - interactions via DNA binding repression --|
+	 * - indirect effect ..>
+	 *   indirect effect without molecular details state change ...
+	 * - state transition binding/association ---
+	 * - association and dissociation dissociation -+-
+	 * - missing interaction -/-
+	 *   missing interaction due to mutation, etc.
+	 * - phosphorylation +p
+	 * - molecular events dephosphorylation -p
+	 * - glycosylation +g
+	 * - ubiquitination +u
+	 * - methylation +m
 	 */
 
 	/**
@@ -100,37 +132,37 @@ public class SubType {
 		// Values according to http://www.genome.jp/kegg/xml/docs/
 		// compound and hidden compound default to
 		// "Entry element id attribute for (hidden) compound".
-		if (name.equalsIgnoreCase("activation")) {
+		if (name.equalsIgnoreCase(ACTIVATION)) {
 			value = "-->";
-		} else if (name.equalsIgnoreCase("inhibition")) {
+		} else if (name.equalsIgnoreCase(INHIBITION)) {
 			value = "--|";
-		} else if (name.equalsIgnoreCase("expression")) {
+		} else if (name.equalsIgnoreCase(EXPRESSION)) {
 			value = "-->";
-		} else if (name.equalsIgnoreCase("repression")) {
+		} else if (name.equalsIgnoreCase(REPRESSION)) {
 			value = "--|";
-		} else if (name.equalsIgnoreCase("indirect effect")) {
+		} else if (name.equalsIgnoreCase(INDIRECT_EFFECT)) {
 			value = "..>";
-		} else if (name.equalsIgnoreCase("state change")) {
+		} else if (name.equalsIgnoreCase(STATE_CHANGE)) {
 			value = "...";
-		} else if (name.equalsIgnoreCase("binding/association")) {
+		} else if (name.equalsIgnoreCase(BINDING_ASSOCIATION)) {
 			value = "---";
-		} else if (name.equalsIgnoreCase("binding")) {
+		} else if (name.equalsIgnoreCase(BINDING)) {
 			value = "---";
-		} else if (name.equalsIgnoreCase("association")) {
+		} else if (name.equalsIgnoreCase(ASSOCIATION)) {
 			value = "---";
-		} else if (name.equalsIgnoreCase("dissociation")) {
+		} else if (name.equalsIgnoreCase(DISSOCIATION)) {
 			value = "-+-";
-		} else if (name.equalsIgnoreCase("missing interaction")) {
+		} else if (name.equalsIgnoreCase(MISSING_INTERACTION)) {
 			value = "-/-";
-		} else if (name.equalsIgnoreCase("phosphorylation")) {
+		} else if (name.equalsIgnoreCase(PHOSPHORYLATION)) {
 			value = "+p";
-		} else if (name.equalsIgnoreCase("dephosphorylation")) {
+		} else if (name.equalsIgnoreCase(DEPHOSPHORYLATION)) {
 			value = "-p";
-		} else if (name.equalsIgnoreCase("glycosylation")) {
+		} else if (name.equalsIgnoreCase(GLYCOSYLATION)) {
 			value = "+g";
-		} else if (name.equalsIgnoreCase("ubiquitination")) {
+		} else if (name.equalsIgnoreCase(UBIQUITINATION)) {
 			value = "+u";
-		} else if (name.equalsIgnoreCase("methylation")) {
+		} else if (name.equalsIgnoreCase(METHYLATION)) {
 			value = "+m";
 		}
 	}
@@ -196,6 +228,11 @@ public class SubType {
 	public void setValue(String value) {
 		this.value = value.replace("&gt;", ">").trim(); // + HTML Code
 														// korrekturen
+	}
+	
+	@Override
+	public String toString() {
+	  return getName() + "(" + getValue() + ")";
 	}
 
 }
