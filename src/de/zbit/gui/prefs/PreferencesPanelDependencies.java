@@ -25,6 +25,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.HashSet;
@@ -85,7 +87,8 @@ public class PreferencesPanelDependencies {
    * @author Clemens Wrzodek
    * @version $Rev$
    */
-  public class DependencyListener implements EventListener, ActionListener, ItemListener, ChangeListener, DocumentListener, KeyListener {
+  public class DependencyListener implements EventListener, ActionListener, ItemListener, 
+  ChangeListener, DocumentListener, KeyListener, PropertyChangeListener{
     private Iterable<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck;
     private Component dependant;
     public DependencyListener(Iterable<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck, Component dependant) {
@@ -98,7 +101,8 @@ public class PreferencesPanelDependencies {
       for (ValuePairUncomparable<JComponentForOption, Range<?>> valuePairUncomparable : toCheck) {
         //if (!valuePairUncomparable.getA().getCurrentValue().equals(valuePairUncomparable.getB())) {
         JComponentForOption jc = valuePairUncomparable.getA();
-        if (!jc.getOption().castAndCheckRange(jc.getCurrentValue(), valuePairUncomparable.getB())) {
+        if (!jc.getOption().castAndCheckRange(jc.getCurrentValue(), valuePairUncomparable.getB())
+            || !((Component)jc).isEnabled()) { // Novel logic: disabled items propate this to dependents.
           enabled = false;
           break;
         }
@@ -127,6 +131,15 @@ public class PreferencesPanelDependencies {
     public void keyPressed(KeyEvent e) {} // INTENTIONALLY LEFT BLANK
     @Override
     public void keyReleased(KeyEvent e) {checkAndProcessConditions();}
+    /* (non-Javadoc)
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (evt.getPropertyName().equals("enabled")) {
+        checkAndProcessConditions();
+      }
+    }
   };
   
   
@@ -186,11 +199,11 @@ public class PreferencesPanelDependencies {
   
   /**
    * Processes the dependencies of the <code>dependant</code> and adds
-   * listeners to all dependent JComponents from the given list, that
+   * listeners to all dependent JComponents from the given list that
    * automatically enable or disable the <code>dependant</code>, based
    * on the current value of the dependent JComponents.
-   * @param jcomponents
-   * @param dependant
+   * @param jcomponents components that control <code>dependant</code>
+   * @param dependant option and component that depends on <code>jcomponents</code>.
    */
   private void createDependencyActionListeners(Iterable<? extends JComponentForOption> jcomponents, final JComponentForOption dependant) {
     if (!dependant.getOption().hasDependencies()) return;
@@ -228,6 +241,9 @@ public class PreferencesPanelDependencies {
       Reflect.invokeIfContains(dependent, "addChangeListener", ChangeListener.class, listener);
       Reflect.invokeIfContains(dependent, "addActionListener", ActionListener.class, listener);
       ((Component)dependent).addKeyListener(listener);
+      
+      // Propagate enabled changes also to dependent components
+      ((Component)dependent).addPropertyChangeListener("enabled", listener);
     }
     
     // Perform an initial check

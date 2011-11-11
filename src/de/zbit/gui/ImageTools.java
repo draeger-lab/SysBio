@@ -320,6 +320,49 @@ public class ImageTools {
 	}
 	
 	/**
+	 * Custom (and IMHO better) implementation of brighten image.
+	 * @param img image
+	 * @param percentage 0 to 100.
+	 */
+	 public static void brightenImageCustom(BufferedImage img, double percentage) {
+	   if (percentage<0||percentage>100) {
+	     System.err.println("Invalid percentage given: " + percentage);
+	     return;
+	   }
+	    Graphics g2 = img.getGraphics();
+	    int x, y, clr,red,green,blue;
+
+	    for (x = 0; x < img.getWidth(); x++) {
+	      for (y = 0; y < img.getHeight(); y++) {
+
+	        // For each pixel in the image
+	        // get the red, green and blue value
+	        clr = img.getRGB(x, y);
+
+	        red = (clr & 0x00ff0000) >> 16;
+	        green = (clr & 0x0000ff00) >> 8;
+	        blue = clr & 0x000000ff;
+	        
+	        
+	        g2.setColor(new Color(brightenColorPart(red, percentage, true),
+	          brightenColorPart(green, percentage, true),
+	          brightenColorPart(blue, percentage, true)));
+	        g2.fillRect(x, y, 1, 1);
+	        
+	      }
+	    }
+	  }
+	 
+	 
+	 private static int brightenColorPart (int colorPart, double percentage, boolean brighten) {
+	   if (brighten) {
+	     return (int)(colorPart+((255-colorPart)/100.0*percentage));
+	   } else {
+	     return (int)(((colorPart)/100.0*percentage));
+	   }
+	 }
+	
+	/**
 	 * Darkens an image by the given percentage.
 	 * @param image - image to darken
 	 * @param percent a value between 0 and 1 (0 to 100 percent).
