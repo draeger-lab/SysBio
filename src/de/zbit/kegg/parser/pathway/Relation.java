@@ -17,9 +17,7 @@
 package de.zbit.kegg.parser.pathway;
 
 import java.util.ArrayList;
-
-import keggapi.Subtype;
-
+import java.util.List;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -96,7 +94,7 @@ public class Relation {
    * 
    * @return
    */
-  public ArrayList<SubType> getSubtypes() {
+  public List<SubType> getSubtypes() {
     return subtypes;
   }
   
@@ -104,8 +102,8 @@ public class Relation {
    * 
    * @return
    */
-  public ArrayList<String> getSubtypesNames() {
-    ArrayList<String> subTypeNames= new ArrayList<String>();
+  public List<String> getSubtypesNames() {
+    List<String> subTypeNames= new ArrayList<String>();
     for (SubType s : subtypes) {
       if(!subTypeNames.contains(s.getName()))
         subTypeNames.add(s.getName());
