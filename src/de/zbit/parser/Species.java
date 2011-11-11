@@ -280,6 +280,10 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   @Override
   public boolean equals(Object o) {
     if (o instanceof Species) {
+      if (((Species) o).isSetTaxonomyId() && isSetTaxonomyId()) {
+        // most precise is tax id.
+        return ((Species) o).ncbi_tax_id.equals(ncbi_tax_id); 
+      }
       if (((Species) o).scientificName.toLowerCase().equals(scientificName.toLowerCase()))
         return true;
       else
@@ -290,6 +294,13 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     }
   }
   
+  /**
+   * @return true if a valid {@link #ncbi_tax_id} is set.
+   */
+  public boolean isSetTaxonomyId() {
+    return ncbi_tax_id!=null && ncbi_tax_id>0;
+  }
+
   public static List<String> getListOfNames(List<Species> list, int type) {
     List<String> retval = new LinkedList<String>();
     for (int i=0; i<list.size(); i++) {

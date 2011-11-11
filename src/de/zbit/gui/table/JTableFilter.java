@@ -55,6 +55,8 @@ public class JTableFilter extends JPanel {
    */
   private Thread counter = null;
 
+  JLabel description;
+  
   JComboBox header1;
   JComboBox operator1;
   JTextField text1;
@@ -86,6 +88,9 @@ public class JTableFilter extends JPanel {
   
   private void initGUI() {
     LayoutHelper lh = new LayoutHelper(this);
+    
+    description = new JLabel();
+    lh.add(description, 3, true);
     
     header1 = new JComboBox(getHeaders(table));
     operator1 = new JComboBox(getOperators());
@@ -272,7 +277,7 @@ public class JTableFilter extends JPanel {
       if (!c1.equals("")) { // Any operator selected
         Object val = table.getValueAt(i, col1);
         if (matchOperator(c1, val, f1)) { // 1st condition ok
-          if (or) {
+          if (or || c2.equals("")) {
             ret.add(i);
             continue; // don't have to check 2nd condition
           }
@@ -283,12 +288,12 @@ public class JTableFilter extends JPanel {
         }
         
         // Check 2nd condition
-        boolean SecondConditionOk = c2.equals("");
-        if (!SecondConditionOk) { // if anything selected
-          SecondConditionOk = matchOperator(c2, table.getValueAt(i, col2), f2);
-          if (andNot) SecondConditionOk = !SecondConditionOk;
+        boolean secondConditionOk = !c2.equals("");
+        if (secondConditionOk) { // if anything selected
+          secondConditionOk = matchOperator(c2, table.getValueAt(i, col2), f2);
+          if (andNot) secondConditionOk = !secondConditionOk;
         }
-        if (SecondConditionOk) {
+        if (secondConditionOk) {
           // either nothing selected or really ok.
           ret.add(i);
         }
@@ -302,6 +307,12 @@ public class JTableFilter extends JPanel {
     return ret;
   }
 
+  /**
+   * Currently:
+   * "","=", "!=", ">=","<=",">","<"
+        , "|>=|","|<=|","|>|","|<|", regexString
+   * @return
+   */
   public static String[] getOperators() {
     // TODO: Sch�ner w�re ala excep "entspricht", "entspricht nicht",...
     // erm�glicht auch "beginnt mit", etc.
@@ -316,7 +327,7 @@ public class JTableFilter extends JPanel {
     // Assumes a compiled pattern for regex strings
     
     if (operator.equals("")) {
-      return true;
+      return false;
     } else if (operator.equals(regexString)) {
       return ((Pattern)val2).matcher(val1.toString()).matches();
     }
@@ -401,10 +412,19 @@ public class JTableFilter extends JPanel {
     return showDialog(parent, r, null);
   }
   public static JTableFilter showDialog(Component parent, JTable r, String title) {
-    if (title==null) title = UIManager.getString("OptionPane.titleText");
-    
     final JTableFilter c = new JTableFilter(r);
-    int ret = JOptionPane.showConfirmDialog(parent, c, title, JOptionPane.OK_CANCEL_OPTION);
+    return showDialog(parent, c, title);
+  }
+  public static JTableFilter showDialog(Component parent, final JTableFilter c, String title) {
+    if (title==null) title = UIManager.getString("OptionPane.titleText");
+
+    boolean allOk = false;
+    int ret=JOptionPane.OK_OPTION;
+    while(!allOk) {
+      ret = JOptionPane.showConfirmDialog(parent, c, title, JOptionPane.OK_CANCEL_OPTION);
+      allOk = ret!=JOptionPane.OK_OPTION || (ret==JOptionPane.OK_OPTION && c.checkSelectionAndRaiseWarnings());
+    }
+    
     if (ret==JOptionPane.OK_OPTION) {
       return c;
     } else {
@@ -412,7 +432,81 @@ public class JTableFilter extends JPanel {
     }
   }
   
+  /**
+   * Set an initial selection
+   * @param col1Header initial selected column header
+   * @param condition1 see {@link #getOperators()}
+   * @param filter1 a filter string
+   */
+  public void setInitialSelection(String col1Header, String condition1, String filter1) {
+    header1.setSelectedItem(col1Header);
+    operator1.setSelectedItem(condition1);
+    text1.setText(filter1);
+    queueCounter();
+  }
   
+  /**
+   * Show a description on top of the selectors.
+   * @param text
+   */
+  public void setDescribingLabel(String text) {
+    description.setText(text);
+  }
+  
+  /**
+   * Set an initial selection
+   * @param col1Header initial selected column header
+   * @param condition1 see {@link #getOperators()}
+   * @param filter1 a filter string
+   * @param conjunction 0 for and, 1 for or and 2 for andNot
+   * @param col2Header
+   * @param condition2
+   * @param filter2
+   */
+  public void setInitialSelection(String col1Header, String condition1, String filter1, int conjunction, String col2Header, String condition2, String filter2) {
+    header1.setSelectedItem(col1Header);
+    operator1.setSelectedItem(condition1);
+    text1.setText(filter1);    
+    
+    and.setSelected(conjunction<=0);
+    or.setSelected(conjunction==1);
+    andNot.setSelected(conjunction>1);
+    
+    header2.setSelectedItem(col2Header);
+    operator2.setSelectedItem(condition2);
+    text2.setText(filter2);
+    queueCounter();
+  }
+  
+  
+  /**
+   * Checks the user selection and shows warning messages if something is wrong.
+   * @return true if everything is fine. False else.
+   */
+  public boolean checkSelectionAndRaiseWarnings() {
+    String c1 = operator1.getSelectedItem().toString();
+    String c2 = operator2.getSelectedItem().toString();
+    String filter1 = text1.getText();
+    String filter2 = text2.getText();
+    
+    String message=null;
+    if (c1.length()<1) {
+      message = "Please select an operator (=, >, etc.) for the first condition";
+    } else if (filter1.trim().length()<1) {
+      message = "Please enter a filter string for the first condition.";
+    } else if (filter2.trim().length()>0 && c2.length()<1 ) {
+      message = "Please select an operator (=, >, etc.) for the second condition";
+    } else if (c2.length()>1 &&  filter2.trim().length()<1) {
+      message = "Please enter a filter string for the second condition.";
+    }
+    if (message!=null) {
+      GUITools.showErrorMessage(this, message);
+      return false;
+    }
+    
+    return true;
+  }
+
   public static void main(String[] args) {
     Object[][] row = new Object[][]{
         {-1,"Hallo"},

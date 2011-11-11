@@ -1060,7 +1060,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
       String baseDir = null;
       boolean sameBaseDir = true;
       for (File file : files) {
-        if (file.exists() && file.canRead() && !fileList.contains(file)) {
+        if (file!=null && file.exists() && file.canRead() && !fileList.contains(file)) {
           if (baseDir == null) {
             baseDir = file.getParent();
           } else if (!baseDir.equals(file.getParent())) {
