@@ -54,31 +54,51 @@ public class SubType {
 	 * relation element (ECrel, PPrel or GErel) and the name and value
 	 * attributes of the subtype element is shown below.
 	 * 
-	 * name value ECrel PPrel GErel Explanation 
+	 * name value
+	 * ECrel PPrel GErel (e.g., -** => PPrel and GErel)
+	 * Explanation 
 	 * 
-	 * - compound
+	 * - compound Entry element id attribute value for compound
+	 *   **-
 	 *   value for compound. shared with two successive reactions (ECrel)
 	 *   or intermediate of two interacting proteins (PPrel)
-	 * - hidden compound 
-	 *   value for hidden compound. shared with two successive reactions but not
-	 *   displayed in the pathway map
+	 * - hidden compound  Entry element id attribute value for hidden compound
+	 *   *--
+	 *   shared with two successive reactions but not displayed in the pathway map
 	 * - activation -->
+	 *   -*-
 	 *   positive and negative effects which may be associated with molecular
 	 *   information below
 	 * - inhibition --|
+	 *   -*-
 	 * - expression -->
+	 *   --*
 	 * - interactions via DNA binding repression --|
+	 *   --*
 	 * - indirect effect ..>
-	 *   indirect effect without molecular details state change ...
-	 * - state transition binding/association ---
-	 * - association and dissociation dissociation -+-
+	 *   -**
+	 *   indirect effect without molecular details
+	 * - state change ...
+	 *   -*-
+	 *   state transition
+	 * - binding/association ---
+	 *   -*-
+	 *   association and dissociation
+	 * - dissociation -+-
+	 *   -*-
 	 * - missing interaction -/-
+	 *   -**
 	 *   missing interaction due to mutation, etc.
 	 * - phosphorylation +p
+	 *   -*-
 	 * - molecular events dephosphorylation -p
+	 *   -*-
 	 * - glycosylation +g
+	 *   -*-
 	 * - ubiquitination +u
+	 *   -*-
 	 * - methylation +m
+	 *   -*-
 	 */
 
 	/**
