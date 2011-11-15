@@ -16,13 +16,13 @@
  */
 package de.zbit;
 
+import java.awt.HeadlessException;
 import java.awt.Window;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +31,7 @@ import javax.swing.SwingUtilities;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.UpdateMessage;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.logging.LogUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
@@ -51,16 +52,16 @@ import de.zbit.util.prefs.SBProperties;
  * @since 1.1
  * @date 20:49:11
  */
-public abstract class Launcher implements Serializable {
+public abstract class Launcher {
 	
 	/**
 	 * A {@link Logger} for this class.
 	 */
 	private static Logger logger = Logger.getLogger(Launcher.class.getName());
 	/**
-	 * Generated serial version identifier.
+	 * A resource bundle containing label texts for this object.
 	 */
-	private static final long serialVersionUID = -8887992352902937300L;
+  private static final ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 	
 	/**
 	 * Initializes this program including logging, log levels and packages,
@@ -73,8 +74,8 @@ public abstract class Launcher implements Serializable {
 	 */
 	public Launcher(String args[]) {
 		LogUtil.initializeLogging(getLogLevel(), getLogPackages());
-	  
-	  logger.info("Scanning command line arguments...");
+		
+	  logger.info(resources.getString("SCANNING_CMD_ARGS"));
 		final SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
 		
@@ -90,22 +91,19 @@ public abstract class Launcher implements Serializable {
 				 * @see java.lang.Runnable#run()
 				 */
 				public void run() {
-					guiMode(props);
+					try {
+						guiMode(props);
+					} catch (HeadlessException exc) {
+						if (props.getBooleanProperty(GUIOptions.GUI)) {
+							logger.fine(resources.getString("COULD_NOT_INITIALIZE_GUI"));
+						}
+						launchCommandLineMode(props);
+					}
+					System.exit(0);
 				}
 			});
 		} else {
-			printCopyrightMessage();
-			if (props.getBoolean(GUIOptions.CHECK_FOR_UPDATES)) {
-				try {
-					checkForUpdate();					
-				} catch (MalformedURLException exc) {
-					logger.log(Level.FINE, exc.getMessage(), exc);
-				}
-			}
-			logger.info(String.format("Launching command line mode of %s.",
-				getApplicationName()));
-			commandLineMode(props);
-			GUITools.hideSplashScreen();
+			launchCommandLineMode(props);
 		}
 	}
 	
@@ -124,7 +122,7 @@ public abstract class Launcher implements Serializable {
 			update.execute();
 		}
 	}
-	
+
 	/**
 	 * This method is called in case that no graphical user interface is to be
 	 * used. The given properties contain all the key-value pairs that have been
@@ -160,10 +158,25 @@ public abstract class Launcher implements Serializable {
 		  return Level.FINE;
 		}
 	
-  /**
+	/**
  * @return An array of package names whose log messages should appear.
  */
 public abstract String[] getLogPackages();
+	
+  /**
+	 * Gives the location where the license of this program is documented. This
+	 * could be, for instance, <a
+	 * href="http://www.gnu.org/copyleft/gpl.html">http:
+	 * //www.gnu.org/copyleft/gpl.html</a> in case of the GPL. This link to a
+	 * license file is required for the command-line mode, because in this case a
+	 * copyright notice is displayed upon startup. If your program doesn't support
+	 * a command-line mode, you may return null here, but since this is a public
+	 * method, this is not recommended.
+	 * 
+	 * @return A link to the license file of this program.
+   * @throws MalformedURLException 
+	 */
+	public abstract URL getURLlicenseFile() throws MalformedURLException;
 	
 	/**
 	 * 
@@ -181,6 +194,21 @@ public abstract String[] getLogPackages();
 	public abstract String getVersionNumber();
 	
 	/**
+	 * Gives the year when your program was released under the version
+	 * {@link #getVersionNumber()}.
+	 * 
+	 * @return the year of your program's release.
+	 */
+	public abstract short getYearOfProgramRelease();
+	
+	/**
+	 * Information about the year when this project was first initialized.
+	 * 
+	 * @return The year in which the first code for this program was written.
+	 */
+	public abstract short getYearWhenProjectWasStarted();
+	
+	/**
 	 * This method initializes and starts the graphical user interface if
 	 * possible. You can override this method in order to change its behavior.
 	 * 
@@ -195,12 +223,12 @@ public abstract String[] getLogPackages();
 		} else {
 			if (props.getBooleanProperty(GUIOptions.GUI)) {
 				logger.fine(String.format(
-				  "No graphical user interface supported for %s version %s.",
+				  resources.getString("NO_GUI_SUPPORTED"),
 				  getApplicationName(),
 				  getVersionNumber()));
 			} else {
 				logger.fine(String.format(
-				  "Incomplete list of command-line arguments. Try to restart %s version %s with the --help option",
+				  "INCOMPLETE_CMD_ARG_LIST",
 				  getApplicationName(),
 				  getVersionNumber()));
 			}
@@ -216,19 +244,43 @@ public abstract String[] getLogPackages();
 	 *         such mode is supported.
 	 */
 	public abstract Window initGUI();
-	
+
+	/**
+	 * Helper method that initializes the command line mode.
+	 * 
+	 * @param props
+	 */
+	protected void launchCommandLineMode(SBProperties props) {
+		printCopyrightMessage();
+		if (props.getBoolean(GUIOptions.CHECK_FOR_UPDATES)) {
+			try {
+				checkForUpdate();					
+			} catch (MalformedURLException exc) {
+				logger.log(Level.FINE, exc.getMessage(), exc);
+			}
+		}
+		logger.info(String.format(resources.getString("LAUNCHING_CMD_MODE"),
+			getApplicationName()));
+		commandLineMode(props);
+		GUITools.hideSplashScreen();
+	}
+
 	/**
 	 * Displays a copyright notice using the logger.
 	 */
 	public void printCopyrightMessage() {
-		logger.info(String.format(
-			"%s Copyright \u00A9 %d the University of Tuebingen,",
-			getApplicationName(), Calendar.getInstance().get(Calendar.YEAR)));
-		logger.info("Center for Bioinformatics Tuebingen (ZBIT).");
-	  logger.info("This program comes with ABSOLUTELY NO WARRANTY.");
-	  logger.info("This is free software, and you are welcome");
-	  logger.info("to redistribute it under certain conditions;");
-	  logger.info("see http://www.gnu.org/copyleft/gpl.html for details.");
+		logger.info(String.format(resources.getString("COPYRIGHT_MESSAGE"),
+			getApplicationName(), getYearWhenProjectWasStarted(),
+			getYearOfProgramRelease()));
+		URL licenseFile = null;
+		try {
+			licenseFile = getURLlicenseFile();
+		} catch (MalformedURLException exc) {
+		}
+		if (licenseFile != null) {
+			logger.info(String.format(resources.getString("LINK_TO_LICENSE_FILE"),
+				licenseFile.toString()));
+		}
 	}
 	
 }
