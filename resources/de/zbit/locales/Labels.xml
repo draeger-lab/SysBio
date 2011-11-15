@@ -106,6 +106,22 @@
   <entry key="PROGRAM_USAGE">Program usage</entry>
   <entry key="STARTS_PROGRAM">Starts the program %s.</entry> <!-- Program name -->
   
+  <!-- Launcher -->
+  
+  <entry key="SCANNING_CMD_ARGS">Scanning command line arguments...</entry>
+  <entry key="COULD_NOT_INITIALIZE_GUI">"Could not initialize graphical user interface."</entry>
+  <entry key="LAUNCHING_CMD_MODE">Launching command line mode of %s.</entry>
+  <entry key="NO_GUI_SUPPORTED">"No graphical user interface supported for %s version %s."</entry>
+  <entry key="INCOMPLETE_CMD_ARG_LIST">Incomplete list of command-line arguments. Try to restart %s version %s with the --help option</entry>
+    <entry key="COPYRIGHT_MESSAGE">
+%s Copyright © %d-%d the University of Tuebingen,
+Center for Bioinformatics Tuebingen (ZBIT).
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome
+to redistribute it under certain conditions.
+  </entry>
+  <entry key="LINK_TO_LICENSE_FILE">See %s for details.</entry>
+  
   <!-- MultiplePreferencesPanel -->
   
   <entry key="USER_PREFERENCES">User preferences</entry>
