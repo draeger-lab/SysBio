@@ -229,7 +229,6 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
   /* (non-Javadoc)
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
-  @Override
   public void actionPerformed(ActionEvent e) {
     if (popUpMenu==null) return;
     if (isSelected()) {
@@ -260,7 +259,6 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
   /* (non-Javadoc)
    * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent)
    */
-  @Override
   public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
     // Ignore. probably made visible by other components
   }
@@ -268,7 +266,6 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
   /* (non-Javadoc)
    * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent)
    */
-  @Override
   public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
     if (isSelected()) {
       // Don't immediately setSelected to false, because the
@@ -302,7 +299,6 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
   /* (non-Javadoc)
    * @see javax.swing.event.PopupMenuListener#popupMenuCanceled(javax.swing.event.PopupMenuEvent)
    */
-  @Override
   public void popupMenuCanceled(PopupMenuEvent e) {
     // don't care
   }

@@ -289,14 +289,12 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   /* (non-Javadoc)
    * @see java.awt.ItemSelectable#getSelectedObjects()
    */
-  @Override
   public Object[] getSelectedObjects() {
     return ArrayUtils.toArray(getSelectedItem());
   }
   /* (non-Javadoc)
    * @see java.awt.ItemSelectable#removeItemListener(java.awt.event.ItemListener)
    */
-  @Override
   public void removeItemListener(ItemListener l) {
     JComponent comp = getColumnChooser();
     if (comp instanceof JComboBox) {

@@ -179,11 +179,17 @@ public class JTableTools {
         });
         searchField.addFocusListener(new FocusListener() {
           
-          @Override
+          /*
+           * (non-Javadoc)
+           * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+           */
           public void focusGained(final FocusEvent e) {
           }
           
-          @Override
+          /*
+           * (non-Javadoc)
+           * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+           */
           public void focusLost(final FocusEvent e) {
             isDialogVisible=false;
             d.dispose();
@@ -191,7 +197,10 @@ public class JTableTools {
         });
         Action exit = new AbstractAction() {
           private static final long serialVersionUID = -5554144842629942687L;
-          @Override
+          /*
+           * (non-Javadoc)
+           * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+           */
           public void actionPerformed(final ActionEvent e) {
             isDialogVisible=false;
             d.dispose();

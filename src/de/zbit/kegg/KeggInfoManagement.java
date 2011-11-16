@@ -215,7 +215,10 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       final int final_i = i;
       final String apiInfos = APIinfos[final_i];
       Runnable parser = new Runnable() {
-        @Override
+        /*
+         * (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         public void run() {
           if (apiInfos==null || apiInfos.length()<1) {
             realRet[final_i+realRetOffset] = null;

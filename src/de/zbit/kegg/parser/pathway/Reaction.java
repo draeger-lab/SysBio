@@ -206,11 +206,17 @@ public class Reaction {
       public Iterator<ReactionComponent> iterator() {
         return new Iterator<ReactionComponent>() {
           int index=-1;
-          @Override
+          /*
+           * (non-Javadoc)
+           * @see java.util.Iterator#hasNext()
+           */
           public boolean hasNext() {
             return (index+1)<size();
           }
-          @Override
+          /*
+           * (non-Javadoc)
+           * @see java.util.Iterator#next()
+           */
           public ReactionComponent next() {
             index++;
             int numSubstrates = substrate.size();
@@ -224,7 +230,10 @@ public class Reaction {
               }
             }
           }
-          @Override
+          /*
+           * (non-Javadoc)
+           * @see java.util.Iterator#remove()
+           */
           public void remove() {
             System.err.println("REMOVE NOT SUPPORTED!");
           }
