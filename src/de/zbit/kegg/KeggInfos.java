@@ -273,9 +273,14 @@ public class KeggInfos implements Serializable {
   public static final String miriam_urn_eco = "urn:miriam:obo.eco:";
   
   /**
+   * MIRIAM urn for SBO-terms
+   */
+  public static final String miriam_urn_sbo = "urn:miriam:obo.sbo:"; 
+  
+  /**
    * RegEx Pattern for extracting EC enzyme codes
    */
-  private final static Pattern ECcodes = Pattern.compile("(\\d+\\.-\\.-\\.-|\\d+\\.\\d+\\.-\\.-|\\d+\\.\\d+\\.\\d+\\.-|\\d+\\.\\d+\\.\\d+\\.(n)?\\d+)"); 
+  private final static Pattern ECcodes = Pattern.compile("(\\d+\\.-\\.-\\.-|\\d+\\.\\d+\\.-\\.-|\\d+\\.\\d+\\.\\d+\\.-|\\d+\\.\\d+\\.\\d+\\.(n)?\\d+)");
   
 
 	// GO, kgGenes, hgnc, chebi - require extra prefixes!
