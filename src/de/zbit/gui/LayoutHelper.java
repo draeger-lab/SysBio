@@ -87,6 +87,12 @@ public class LayoutHelper {
 	}
 	
 	/**
+	 * True if and only if we are currently at the left most position of
+	 * any row.
+	 */
+	private boolean atRowBeginning;
+	
+	/**
 	 * 
 	 */
 	private Container cont;
@@ -100,12 +106,6 @@ public class LayoutHelper {
 	 * 
 	 */
 	private int row;
-	
-	/**
-	 * True if and only if we are currently at the left most position of
-	 * any row.
-	 */
-	private boolean atRowBeginning;
 	
 	/**
 	 * Creates a new GridBaglayout and associates this with the given container.
@@ -150,20 +150,8 @@ public class LayoutHelper {
 	 * @param c
 	 */
 	public void add(Component c) {
-	  addWithWidth(c,1);
+	  addWithWidth(c, 1);
 	}
-	
-	/**
-   * Adds this component in the next row, with
-   * the given width
-   * @param c
-   * @param width
-   */
-  public void addWithWidth(Component c, int width) {
-    ensurePointerIsAtBeginningOfARow();
-    add(c, 0, row, width, 1, 1d, 1d);
-    atRowBeginning=false;
-  }
 	
 	/**
 	 * Add one or many components in one line.
@@ -175,7 +163,7 @@ public class LayoutHelper {
 		add(false, c, comps);
 	}
 	
-	/**
+  /**
 	 * 
 	 * @param c
 	 * @param width
@@ -197,6 +185,16 @@ public class LayoutHelper {
 	    add(new JPanel(), 0, ++row, width, 1, 0, 0);
 	  }
 	}
+
+  /**
+	 * 
+	 * @param c
+	 * @param row
+	 * @param column
+	 */
+  public void add(Component c, int row, int column) {
+    add(c, row, column, 1, 1, 1d, 1d);
+  }
 	
 	/**
 	 * Add a component without specifying the row.
@@ -298,16 +296,6 @@ public class LayoutHelper {
 	}
 	
 	/**
-	 * Add a {@link JLabel} with text <code>label</code> and width
-	 * <code>width</code> to the current {@link Container}.
-	 * @param label
-	 * @param width
-	 */
-	 public void add(String label, int width) {
-	    add(new JLabel(label), width);
-	  }
-	
-	/**
 	 * 
 	 * @param label
 	 * @param c
@@ -378,31 +366,47 @@ public class LayoutHelper {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Add a {@link JLabel} with text <code>label</code> and width
+	 * <code>width</code> to the current {@link Container}.
+	 * @param label
+	 * @param width
 	 */
-	public Container getContainer() {
-		return this.cont;
-	}
+	 public void add(String label, int width) {
+	    add(new JLabel(label), width);
+	  }
 	
 	/**
 	 * 
-	 * @return
+	 * @param c
+	 * @param column
 	 */
-	public int getRow() {
-		return row;
+	public void addInColumn(Component c, int column) {
+	  addWithWidth(c, 1, column);
 	}
 	
 	/**
-	 * Manually increment the current row.
-	 * 
-	 * @param increment
-	 */
-	public void incrementRowBy(int increment) {
-		row += increment;
-	}
-
-  /**
+   * Adds this component in the next row, with
+   * the given width
+   * @param c
+   * @param width
+   */
+  public void addWithWidth(Component c, int width) {
+    addWithWidth(c, 0, width);
+  }
+	
+	/**
+   * 
+   * @param c
+   * @param column
+   * @param width
+   */
+	public void addWithWidth(Component c, int column, int width) {
+	  ensurePointerIsAtBeginningOfARow();
+    add(c, column, row, width, 1, 1d, 1d);
+    atRowBeginning=false;
+  }
+	
+	/**
    * Ensures that the next components are being written in a new row.
    */
   public void ensurePointerIsAtBeginningOfARow() {
@@ -411,5 +415,30 @@ public class LayoutHelper {
       atRowBeginning=true;
     }
   }
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Container getContainer() {
+		return this.cont;
+	}
+
+  /**
+	 * 
+	 * @return
+	 */
+	public int getRow() {
+		return row;
+	}
+
+	/**
+	 * Manually increment the current row.
+	 * 
+	 * @param increment
+	 */
+	public void incrementRowBy(int increment) {
+		row += increment;
+	}
 	
 }

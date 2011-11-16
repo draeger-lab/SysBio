@@ -57,7 +57,7 @@
   <!-- GUIOptions -->
   
   <entry key="CHECK_FOR_UPDATES">Entscheiden Sie, ob dieses beim Starten im Internet nach Aktualisierungen gesucht werden soll.</entry>
-  <entry key="GUI">Wird diese Option angegeben, so wird eine graphische Nutzeroberflache angezeigt.</entry>
+  <entry key="GUI">Wird diese Option angegeben, so wird eine graphische Nutzeroberfläche angezeigt.</entry>
   <entry key="OPEN_DIR">Standardverzeichnis, in dem nach Dateien gesucht werden soll.</entry>
   <entry key="SAVE_DIR">Standardverzeichnis, in dem Dateien abgespeichert werden sollen.</entry>
   <entry key="DEFAULT_DIRECTORIES">Standardverzeichnisse</entry>

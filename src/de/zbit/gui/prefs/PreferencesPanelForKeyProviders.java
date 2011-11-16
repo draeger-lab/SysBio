@@ -48,23 +48,46 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
    */
   private String title;
 
-
+  /**
+   * 
+   * @param provider
+   * @throws IOException
+   */
   public PreferencesPanelForKeyProviders(Class<? extends KeyProvider>... provider) throws IOException {
     this(Arrays.asList(provider));
   }
   
+  /**
+   * 
+   * @param provider
+   * @throws IOException
+   */
   public PreferencesPanelForKeyProviders(List<Class<? extends KeyProvider>> provider) throws IOException {
     this(null, provider);
   }
   
+  /**
+   * 
+   * @param title
+   * @param provider
+   * @throws IOException
+   */
   public PreferencesPanelForKeyProviders(String title, Class<? extends KeyProvider>... provider) throws IOException {
     this(title, Arrays.asList(provider));
   }
   
+  /**
+   * 
+   * @param title
+   * @param provider
+   * @throws IOException
+   */
   public PreferencesPanelForKeyProviders(String title, List<Class<? extends KeyProvider>> provider) throws IOException {
     super(false); // calls init, before provider is set => many null-pointer-exceptions.
     this.providers = provider;
-    if (title==null) title = KeyProvider.Tools.createTitle(providers.get(0));
+    if (title == null) {
+      title = KeyProvider.Tools.createTitle(providers.get(0));
+    }
     this.title = title;
     initializePrefPanel();
   }
@@ -73,7 +96,6 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
    * (non-Javadoc)
    * @see de.zbit.gui.prefs.PreferencesPanel#accepts(java.lang.Object)
    */
-  @Override
   public boolean accepts(Object key) {
     //return preferences.keySetFull().contains(key);
     // Preferences keyset contains all options from the package.
@@ -94,7 +116,6 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
    * (non-Javadoc)
    * @see de.zbit.gui.prefs.PreferencesPanel#getTitle()
    */
-  @Override
   public String getTitle() {
     return title;
   }
@@ -104,10 +125,9 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
    * @see de.zbit.gui.prefs.PreferencesPanel#init()
    */
   @SuppressWarnings("unchecked")
-  @Override
   public void init() {
-    if (providers != null && providers.size()>0) {
-      autoBuildPanel( (Class<? extends KeyProvider>[]) providers.toArray(new Class[0]) );
+    if ((providers != null) && (providers.size() > 0)) {
+      autoBuildPanel((Class<? extends KeyProvider>[]) providers.toArray(new Class[0]));
     }
   }
   
@@ -136,12 +156,14 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
    * (non-Javadoc)
    * @see de.zbit.gui.prefs.PreferencesPanel#loadPreferences()
    */
-  @Override
   protected SBPreferences loadPreferences() throws IOException {
     SBPreferences prefs = null;
     for (Class<? extends KeyProvider> provider: providers) {
-      if (prefs==null) prefs = SBPreferences.getPreferencesFor(provider);
-      else prefs.putAll(SBPreferences.getPreferencesFor(provider));
+      if (prefs == null) {
+        prefs = SBPreferences.getPreferencesFor(provider);
+      } else {
+        prefs.putAll(SBPreferences.getPreferencesFor(provider));
+      }
     }
     return prefs;
   }
