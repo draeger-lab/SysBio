@@ -90,7 +90,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    */
   @Override
   protected KeggInfos fetchInformation(String id) throws TimeoutException, UnsuccessfulRetrieveException {
-    if (offlineMode) throw new TimeoutException();
+    if (offlineMode) throw new TimeoutException(); // do not cache as "Unsuccessful" and retry next time.
     hasChanged=true;
     
     if (adap==null) adap = getKeggAdaptor(); // create new one
@@ -242,7 +242,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    * @throws UnsuccessfulRetrieveException
    */
   private String[] fetchMultipleInformationsUpTo100AtATime(String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
-    if (offlineMode) throw new TimeoutException();
+    if (offlineMode) throw new TimeoutException(); // do not cache as "Unsuccessful" and retry next time.
     if (ids == null) return null;
     if (ids.length<1) return new String[0];
     hasChanged=true;

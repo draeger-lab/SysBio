@@ -48,7 +48,6 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -235,7 +234,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @param options
    * @param deleteFromHere
    *        Processed options will be deleted from this {@link Map}.
-   * @return
+   * @return options, for which no {@link JComponent} could be created automatically
    */
   @SuppressWarnings("rawtypes")
   List<Option<?>> addOptions(LayoutHelper lh, Iterable<? extends Option> options, Map<Option<?>, OptionGroup<?>> deleteFromHere) {
@@ -354,14 +353,22 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     int index = 0;
     Component c;
     for (OptionGroup<?> optGrp : groupList) {
-      c = createGroup(optGrp, unprocessedOptions);
-      if (twoColumn) {
-        int column = index % 2;
-        int row = index / 2;
-        lh.add(c, row, column);
-        index++;
+      if (optGrp.isVisible()) {
+        // Group is visible => Generate components.
+        c = createGroup(optGrp, unprocessedOptions);
+        if (twoColumn) {
+          int column = index % 2;
+          int row = index / 2;
+          lh.add(c, row, column);
+          index++;
+        } else {
+          lh.add(c);
+        }
       } else {
-        lh.add(c);
+        // Remove from internal "to-do" list.
+        for (Option o: optGrp.getOptions()) {
+          option2group.remove(o);
+        }
       }
     }
   }

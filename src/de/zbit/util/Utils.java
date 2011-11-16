@@ -1053,12 +1053,13 @@ public class Utils {
    * @return
    */
   public static String replicateCharacter(String ch, int times) {
-    String retval = "";
+    StringBuilder retval = new StringBuilder();
     for (int i=0; i<times;i++){
-      retval += ch;
+      retval.append(ch);
     }
-    return retval;
+    return retval.toString();
   }
+
   
   /**
    * Returns the reverse of a string.
