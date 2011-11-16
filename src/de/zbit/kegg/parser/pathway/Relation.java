@@ -17,7 +17,10 @@
 package de.zbit.kegg.parser.pathway;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -102,8 +105,9 @@ public class Relation {
    * 
    * @return
    */
-  public List<String> getSubtypesNames() {
-    List<String> subTypeNames= new ArrayList<String>();
+  public Collection<String> getSubtypesNames() {
+    Set<String> subTypeNames= new HashSet<String>();
+    if (subtypes==null) return subTypeNames;
     for (SubType s : subtypes) {
       if(!subTypeNames.contains(s.getName()))
         subTypeNames.add(s.getName());
