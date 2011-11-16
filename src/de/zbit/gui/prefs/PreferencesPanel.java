@@ -48,6 +48,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -143,7 +144,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * this class.
    */
   @SuppressWarnings("rawtypes")
-  List<OptionGroup> optionGroups;
+  SortedMap<String, List<OptionGroup>> optionGroups;
   
   /**
    * These are the persistently saved user-preferences of which some ore all
@@ -305,14 +306,19 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   @SuppressWarnings("rawtypes")
   protected List<Option<?>> autoBuildPanel(Class<? extends KeyProvider>... keyProviders) {
     List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
-    LayoutHelper lh = new LayoutHelper(this);
-    
+        
     // search for OptionGroups first
     searchForOptionGroups(keyProviders);
+    LayoutHelper lh = new LayoutHelper(this), helper;
+    boolean multipleKeyProviders = keyProviders.length > 1;
     
-    // First we create GUI elements for all groups
-    for (OptionGroup<?> optGrp : optionGroups) {
-      lh.add(createGroup(optGrp, unprocessedOptions));
+    for (Class<? extends KeyProvider> keyProvider : keyProviders) {
+      helper = multipleKeyProviders ? new LayoutHelper(new JPanel()) : lh;
+      insertOptionGroups(optionGroups.get(keyProvider.getName()),
+        unprocessedOptions, helper);
+      if (multipleKeyProviders) {
+        lh.add(helper.getContainer());
+      }
     }
     
     // Now we consider what is left
@@ -330,6 +336,36 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     return unprocessedOptions;
   }
   
+  /**
+   * Helper method to arrange {@link OptionGroup}s for just one
+   * {@link KeyProvider} on a {@link LayoutHelper}.
+   * 
+   * @param groupList
+   * @param unprocessedOptions
+   * @param lh
+   */
+  @SuppressWarnings("rawtypes")
+  private void insertOptionGroups(List<OptionGroup> groupList,
+    List<Option<?>> unprocessedOptions, LayoutHelper lh) {
+    boolean twoColumn = (groupList.size() % 2 == 0)
+        && (ungroupedOptions.size() == 0);
+    
+    // First we create GUI elements for all groups
+    int index = 0;
+    Component c;
+    for (OptionGroup<?> optGrp : groupList) {
+      c = createGroup(optGrp, unprocessedOptions);
+      if (twoColumn) {
+        int column = index % 2;
+        int row = index / 2;
+        lh.add(c, row, column);
+        index++;
+      } else {
+        lh.add(c);
+      }
+    }
+  }
+
   /**
    * 
    * @param optGrp
@@ -799,7 +835,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    */
   public boolean isDefaultConfiguration() {
     for (Entry<Object, Object> e : properties.entrySet()) {
-      if (!e.getValue().equals(properties.getDefaults().get(e.getKey()))) { return false; }
+      if (!e.getValue().equals(properties.getDefaults().get(e.getKey()))) {
+        return false; 
+      }
     }
     return true;
   }
@@ -814,7 +852,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   public boolean isUserConfiguration() {
     for (Entry<Object, Object> e : properties.entrySet()) {
       if (!e.getValue().toString()
-          .equals(preferences.get(e.getKey().toString()))) { return false; }
+          .equals(preferences.get(e.getKey().toString()))) { 
+        return false; 
+      }
     }
     return true;
   }
@@ -933,15 +973,18 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   private void searchForOptionGroups(Class<? extends KeyProvider>... keyProviders) {
     option2group = new TreeMap<Option<?>, OptionGroup<?>>();
     ungroupedOptions = new TreeSet<Option>();
-    optionGroups = new LinkedList<OptionGroup>();
+    optionGroups = new TreeMap<String, List<OptionGroup>>();
     for (Class<? extends KeyProvider> keyProvider: keyProviders) {
       ungroupedOptions.addAll(KeyProvider.Tools.optionList(keyProvider));
-      optionGroups.addAll( KeyProvider.Tools.optionGroupList(keyProvider) );
+      optionGroups.put(keyProvider.getName(), KeyProvider.Tools
+          .optionGroupList(keyProvider));
     }
-    for (OptionGroup<?> group : optionGroups) {
-      for (Option<?> option : group.getOptions()) {
-        option2group.put(option, group);
-        ungroupedOptions.remove(option);
+    for (Class<? extends KeyProvider> keyProvider : keyProviders) {
+      for (OptionGroup<?> group : optionGroups.get(keyProvider.getName())) {
+        for (Option<?> option : group.getOptions()) {
+          option2group.put(option, group);
+          ungroupedOptions.remove(option);
+        }
       }
     }
   }
@@ -1144,8 +1187,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       if (ret != null) return ret;
     }
     if (currentRecurse.getParent() != null
-        && (!currentRecurse.getParent().equals(currentRecurse))) { return getOptionForJComponent(
-      toCompare, currentRecurse.getParent()); }
+        && (!currentRecurse.getParent().equals(currentRecurse))) { 
+      return getOptionForJComponent(toCompare, currentRecurse.getParent()); 
+    }
     return null;
   }
   

@@ -21,7 +21,7 @@ import javax.swing.JComponent;
 import de.zbit.util.prefs.Option;
 
 /**
- * This interface should provide common acces methods for
+ * This interface should provide common access methods for
  * {@link JComponent}s that are build to represent {@link Option}s.
  * 
  * This acts as a link between the JComponent and the actual option.

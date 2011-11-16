@@ -121,6 +121,14 @@ public class SBPreferences implements Map<Object, Object> {
 		public Object setValue(Object value) {
 			return this.value = value;
 		}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+      return String.format("%s=%s", key, value);
+    }
 		
 	}
 	
@@ -1108,7 +1116,9 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public final String getDefaultString(Object key) {
 		String def = defaults.getProperty(key.toString());
-		if (def == null) { return def; }
+		if (def == null) {
+		  return def;
+		}
 		String v = def.toString();
 		if (System.getProperties().containsKey(v)) { 
 			return System.getProperty(v); 
@@ -1176,8 +1186,8 @@ public class SBPreferences implements Map<Object, Object> {
 	public String getString(Object key) {
 		String k = key.toString();
 		String v = prefs.get(k, getDefaultString(k));
-		if (System.getProperties().containsKey(v)) { 
-			return System.getProperty(v); 
+		if (System.getProperties().containsKey(k)) { 
+			return System.getProperty(k); 
 		}
 		return v;
 	}

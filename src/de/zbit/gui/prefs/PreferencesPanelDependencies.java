@@ -110,31 +110,60 @@ public class PreferencesPanelDependencies {
       ((Container)dependant).setEnabled(enabled);
     }
     
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see javax.swing.event.DocumentListener#insertUpdate(javax.swing.event.DocumentEvent)
+     */
     public void insertUpdate(DocumentEvent e) {checkAndProcessConditions();}
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see javax.swing.event.DocumentListener#removeUpdate(javax.swing.event.DocumentEvent)
+     */
     public void removeUpdate(DocumentEvent e) {checkAndProcessConditions();}
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
+     */
     public void changedUpdate(DocumentEvent e) {checkAndProcessConditions();}
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+     */
     public void stateChanged(ChangeEvent e) {checkAndProcessConditions();}
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+     */
     public void itemStateChanged(ItemEvent e) {checkAndProcessConditions();}
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
     public void actionPerformed(ActionEvent e) {checkAndProcessConditions();}
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+     */
     public void keyTyped(KeyEvent e) {
       // Do not update buttons here. The KeyEvent is not yet processed
       // i.e. the textfield has not yet changed it's value!
     }
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+     */
     public void keyPressed(KeyEvent e) {} // INTENTIONALLY LEFT BLANK
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+     */
     public void keyReleased(KeyEvent e) {checkAndProcessConditions();}
     /* (non-Javadoc)
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
      */
-    @Override
+    /*
+     * 
+     */
     public void propertyChange(PropertyChangeEvent evt) {
       if (evt.getPropertyName().equals("enabled")) {
         checkAndProcessConditions();

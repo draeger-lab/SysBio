@@ -52,6 +52,12 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
     this(null, provider);
   }
   
+  /**
+   * 
+   * @param title
+   * @param provider
+   * @throws IOException
+   */
   public PreferencesPanelForKeyProvider(String title, Class<? extends KeyProvider> provider) throws IOException {
     super(false); // calls init, before provider is set => many null-pointer-exceptions.
     if (title==null) title = KeyProvider.Tools.createTitle(provider);
@@ -64,7 +70,6 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 * (non-Javadoc)
 	 * @see de.zbit.gui.prefs.PreferencesPanel#accepts(java.lang.Object)
 	 */
-	@Override
 	public boolean accepts(Object key) {
 		//return preferences.keySetFull().contains(key);
 	  // Preferences keyset contains all options from the package.
@@ -83,7 +88,6 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 * (non-Javadoc)
 	 * @see de.zbit.gui.prefs.PreferencesPanel#getTitle()
 	 */
-	@Override
 	public String getTitle() {
 		return title;
 	}
@@ -92,7 +96,6 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 * (non-Javadoc)
 	 * @see de.zbit.gui.prefs.PreferencesPanel#init()
 	 */
-	@Override
 	public void init() {
 		if (provider != null) {
 			autoBuildPanel();
@@ -103,7 +106,6 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	 * (non-Javadoc)
 	 * @see de.zbit.gui.prefs.PreferencesPanel#loadPreferences()
 	 */
-	@Override
 	protected SBPreferences loadPreferences() throws IOException {
 		return provider == null ? null : SBPreferences.getPreferencesFor(provider);
 	}

@@ -57,7 +57,7 @@
   <!-- GUIOptions -->
   
   <entry key="CHECK_FOR_UPDATES">判断在程序启动时是否要检查更新。</entry>
-  <entry key="GUI">可以以混合= true 或者= false或者只是--gui的形式使用。设定程序是否应显示其图形用户界面。</entry>
+  <entry key="GUI">如果选择此选项，程序将显示其图形用户界面。</entry>
   <entry key="OPEN_DIR">打开用户文件的标准文件夹。</entry>
   <entry key="SAVE_DIR">用户可以保存一些文件的标准文件夹。</entry>
   <entry key="DEFAULT_DIRECTORIES">默认文件夹</entry>
