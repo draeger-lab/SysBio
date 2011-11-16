@@ -835,7 +835,6 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
   /* (non-Javadoc)
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  @Override
   public int compareTo(Range<Type> other) {
     // Is only approximative...
     if (this == other) return 0;

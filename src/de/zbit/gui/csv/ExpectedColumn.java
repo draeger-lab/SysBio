@@ -287,7 +287,6 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
   /* (non-Javadoc)
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  @Override
   public int compareTo(ExpectedColumn o) {
     return originalName.toString().compareTo(o.getOriginalName().toString());
   }

@@ -88,7 +88,6 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
   /* (non-Javadoc)
    * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
    */
-  @Override
   public Component getTableCellRendererComponent(JTable table, Object value,
     boolean isSelected, boolean hasFocus, int row, int column) {
     
@@ -150,7 +149,6 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
   /* (non-Javadoc)
    * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
    */
-  @Override
   public Component getListCellRendererComponent(JList list, Object value,
     int index, boolean isSelected, boolean cellHasFocus) {
     

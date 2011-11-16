@@ -86,18 +86,30 @@ public class ColorChooserWithPreview extends JLabel {
    */
   private void addCommonColorChangeListeners() {
     addMouseListener(new MouseListener() {
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+       */
       public void mouseReleased(MouseEvent e) {}
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+       */
       public void mousePressed(MouseEvent e) {}
-      
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+       */
       public void mouseExited(MouseEvent e) {}
-      
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+       */
       public void mouseEntered(MouseEvent e) {}
-      
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+       */
       public void mouseClicked(MouseEvent e) {
         showJColorChooser();
         //e.consume();
@@ -105,8 +117,10 @@ public class ColorChooserWithPreview extends JLabel {
     });
     
     addKeyListener(new KeyListener() {
-      
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+       */
       public void keyTyped(KeyEvent e) {
         // Enter/ Confirm keys
         if (e.getKeyChar()=='\n' || e.getKeyCode()==13 || e.getKeyCode()==10 || e.getKeyCode()==16777296) { // letztes = Keypad Enter
@@ -117,10 +131,16 @@ public class ColorChooserWithPreview extends JLabel {
         }
       }
       
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+       */
       public void keyReleased(KeyEvent e) {}
       
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+       */
       public void keyPressed(KeyEvent e) {}
     });
   }

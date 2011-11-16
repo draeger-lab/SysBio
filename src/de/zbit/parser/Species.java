@@ -805,7 +805,6 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   /* (non-Javadoc)
    * @see de.zbit.gui.ActionCommand#getName()
    */
-  @Override
   public String getName() {
     // For a better readability in options and such
     return getScientificName();
@@ -814,7 +813,6 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   /* (non-Javadoc)
    * @see de.zbit.gui.ActionCommand#getToolTip()
    */
-  @Override
   public String getToolTip() {
     // no tooltip.
     return null;

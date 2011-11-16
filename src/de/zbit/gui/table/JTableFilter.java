@@ -121,21 +121,33 @@ public class JTableFilter extends JPanel {
     
     // Add listeners to refresh the preview
     ItemListener il = new ItemListener() {
-      @Override
+    /*
+     * 	(non-Javadoc)
+     * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+     */
       public void itemStateChanged(ItemEvent e) {
         queueCounter();
       }
     };
     DocumentListener dl = new DocumentListener() {
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see javax.swing.event.DocumentListener#removeUpdate(javax.swing.event.DocumentEvent)
+       */
       public void removeUpdate(DocumentEvent e) {
         queueCounter(); 
       }
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see javax.swing.event.DocumentListener#insertUpdate(javax.swing.event.DocumentEvent)
+       */
       public void insertUpdate(DocumentEvent e) {
         queueCounter();
       }
-      @Override
+      /*
+       * (non-Javadoc)
+       * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
+       */
       public void changedUpdate(DocumentEvent e) {
         queueCounter();
       }

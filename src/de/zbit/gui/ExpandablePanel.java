@@ -463,7 +463,6 @@ public class ExpandablePanel extends JPanel implements MouseListener {
   /* (non-Javadoc)
    * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
    */
-  @Override
   public void mouseClicked(MouseEvent e) {
     toggle();
   }
@@ -471,25 +470,21 @@ public class ExpandablePanel extends JPanel implements MouseListener {
   /* (non-Javadoc)
    * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
    */
-  @Override
   public void mousePressed(MouseEvent e) {}
 
   /* (non-Javadoc)
    * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
    */
-  @Override
   public void mouseReleased(MouseEvent e) {}
 
   /* (non-Javadoc)
    * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
    */
-  @Override
   public void mouseEntered(MouseEvent e) {}
 
   /* (non-Javadoc)
    * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
    */
-  @Override
   public void mouseExited(MouseEvent e) {}
 }  
 
