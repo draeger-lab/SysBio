@@ -577,6 +577,21 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param requiredType
 	 * @param description
 	 * @param defaultValue
+	 * @param visibility allows to hide this option from auto-generated
+	 * GUIs, HELPs, command-lines, etc.
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+	  String description, Type defaultValue, boolean visibility) {
+	  this(optionName, requiredType, description, null, defaultValue);
+	  setVisible(visibility);
+	}
+	
+	/**
+	 * 
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param defaultValue
 	 * @param displayName
 	 */
 	public Option(String optionName, Class<Type> requiredType,

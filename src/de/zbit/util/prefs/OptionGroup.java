@@ -46,6 +46,12 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
   private List<Option<? extends T>> options;
   
   /**
+   * Allows to hide this option group (and subsequently all contained
+   * options) in GUIs, help, command-line, etc.
+   */
+  private boolean visible = true;
+  
+  /**
    * If this is set to true, this {@link OptionGroup} should
    * be visualized collapsable in GUIs.
    */
@@ -74,7 +80,7 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
   }
   
   /**
-   * Creates a (eventually collapsable) {@link OptionGroup}.
+   * Creates a (eventually collapsible) {@link OptionGroup}.
    * @param name
    * @param toolTip
    * @param collapsable
@@ -90,6 +96,19 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
     this.options = new LinkedList<Option<? extends T>>();
     setOptions(option);
   }
+  
+  /**
+   * Creates a (eventually invisible) {@link OptionGroup}.
+   * @param name
+   * @param toolTip
+   * @param visibility see {@link #setVisible(boolean)}
+   * @param option
+   */
+  public OptionGroup(String name, String toolTip, boolean visibility, Option<? extends T>... option) {
+    this(name, toolTip, false, false, option);
+    setVisible(visibility);
+  }
+  
   
   /**
    * @param option
@@ -227,6 +246,24 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
     this.toolTip = toolTip;
   }
   
+  
+  
+  /**
+   * @return visibility state of this option
+   */
+  public boolean isVisible() {
+    return visible;
+  }
+
+  /**
+   * Allows to hide this option group (and subsequently all contained
+   * options) in GUIs, help, command-line, etc.
+   * @param visible visibility to set
+   */
+  public void setVisible(boolean visible) {
+    this.visible = visible;
+  }
+
   /*
    * (non-Javadoc)
    * 

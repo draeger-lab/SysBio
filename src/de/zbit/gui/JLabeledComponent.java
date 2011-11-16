@@ -32,6 +32,7 @@ import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,6 +56,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeListener;
@@ -1108,6 +1110,16 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     // Set width
     if (spinner.getEditor() instanceof JSpinner.DefaultEditor) {
       ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setColumns(TEXTFIELD_COLUMNS);
+    }
+    
+    // Show smaller numbers if data type us double
+    if (Double.class.isAssignableFrom(initialValue.getClass())) {
+      spinner.setEditor(new JSpinner.NumberEditor(spinner, "#."+Utils.replicateCharacter("#", TEXTFIELD_COLUMNS-2)));
+      JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
+      DecimalFormat format = editor.getFormat();
+      format.setMaximumFractionDigits(TEXTFIELD_COLUMNS-2);
+      editor.getTextField().setHorizontalAlignment(SwingConstants.RIGHT);
+      
     }
     
     return spinner;
