@@ -148,7 +148,9 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
         }
       }
       
-      if (changes) prefs.flush();
+      if (changes) {
+        prefs.flush();
+      }
     }
   }
   

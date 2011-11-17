@@ -75,7 +75,7 @@ public abstract class Launcher {
 	public Launcher(String args[]) {
 		LogUtil.initializeLogging(getLogLevel(), getLogPackages());
 		
-	  logger.fine(resources.getString("SCANNING_CMD_ARGS"));
+	  logger.finer(resources.getString("SCANNING_CMD_ARGS"));
 		final SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
 		

@@ -27,15 +27,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -145,6 +146,12 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   @SuppressWarnings("rawtypes")
   SortedMap<String, List<OptionGroup>> optionGroups;
   
+  /**
+   * Memorizes how many {@link OptionGroup}s contain {@link FileSelector}s in
+   * each {@link KeyProvider} of interest.
+   */
+  Map<String, Integer> keyProvider2fileGroups;
+    
   /**
    * These are the persistently saved user-preferences of which some ore all
    * elements are possibly to be changed in this panel. But only if the user
@@ -314,6 +321,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     for (Class<? extends KeyProvider> keyProvider : keyProviders) {
       helper = multipleKeyProviders ? new LayoutHelper(new JPanel()) : lh;
       insertOptionGroups(optionGroups.get(keyProvider.getName()),
+        keyProvider2fileGroups.get(keyProvider.getName()).intValue(),
         unprocessedOptions, helper);
       if (multipleKeyProviders) {
         lh.add(helper.getContainer());
@@ -340,33 +348,49 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * {@link KeyProvider} on a {@link LayoutHelper}.
    * 
    * @param groupList
+   * @param fileSelectors
    * @param unprocessedOptions
    * @param lh
    */
   @SuppressWarnings("rawtypes")
   private void insertOptionGroups(List<OptionGroup> groupList,
-    List<Option<?>> unprocessedOptions, LayoutHelper lh) {
-    boolean twoColumn = (groupList.size() % 2 == 0)
+    int fileSelectors, List<Option<?>> unprocessedOptions, LayoutHelper lh) {
+    boolean twoColumn = ((groupList.size() - fileSelectors) % 2 == 0)
         && (ungroupedOptions.size() == 0);
+    boolean oneColumn = false;
     
     // First we create GUI elements for all groups
-    int index = 0;
+    int column = 0;
+    int row = 0;
     Component c;
     for (OptionGroup<?> optGrp : groupList) {
       if (optGrp.isVisible()) {
         // Group is visible => Generate components.
         c = createGroup(optGrp, unprocessedOptions);
         if (twoColumn) {
-          int column = index % 2;
-          int row = index / 2;
-          lh.add(c, row, column);
-          index++;
+          for (Option<?> opt : optGrp) {
+            if (opt.getRequiredType().equals(File.class)) {
+              oneColumn = true;
+              break;
+            }
+          }
+          if (oneColumn) {
+            column = 0;
+            lh.add(c, column, row++, 2, 1, 1d, 1d);
+            oneColumn = false;
+          } else {
+            lh.add(c, column++, row, 1, 1, 1d, 1d);
+            if (column == 2) {
+              column = 0;
+              row++;
+            }
+          }
         } else {
           lh.add(c);
         }
       } else {
         // Remove from internal "to-do" list.
-        for (Option o: optGrp.getOptions()) {
+        for (Option<?> o: optGrp) {
           option2group.remove(o);
         }
       }
@@ -976,21 +1000,41 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     searchForOptionGroups(preferences.getKeyProvider());
   }
   
+  /**
+   * 
+   * @param keyProviders
+   */
   @SuppressWarnings("rawtypes")
-  private void searchForOptionGroups(Class<? extends KeyProvider>... keyProviders) {
+  private void searchForOptionGroups(
+    Class<? extends KeyProvider>... keyProviders) {
     option2group = new TreeMap<Option<?>, OptionGroup<?>>();
     ungroupedOptions = new TreeSet<Option>();
     optionGroups = new TreeMap<String, List<OptionGroup>>();
-    for (Class<? extends KeyProvider> keyProvider: keyProviders) {
+    keyProvider2fileGroups = new HashMap<String, Integer>();
+    for (Class<? extends KeyProvider> keyProvider : keyProviders) {
       ungroupedOptions.addAll(KeyProvider.Tools.optionList(keyProvider));
       optionGroups.put(keyProvider.getName(), KeyProvider.Tools
           .optionGroupList(keyProvider));
     }
+    int fileCount;
+    Integer fileGroupCount;
     for (Class<? extends KeyProvider> keyProvider : keyProviders) {
+      fileGroupCount = Integer.valueOf(0);
+      keyProvider2fileGroups.put(keyProvider.getName(), fileGroupCount);
       for (OptionGroup<?> group : optionGroups.get(keyProvider.getName())) {
-        for (Option<?> option : group.getOptions()) {
+        fileCount = 0;
+        for (Option<?> option : group) {
           option2group.put(option, group);
           ungroupedOptions.remove(option);
+          if (option.getRequiredType().equals(File.class)) {
+            fileCount++;
+          }
+        }
+        if (fileCount > 0) {
+          fileGroupCount = Integer.valueOf(keyProvider2fileGroups.get(
+            keyProvider.getName()).intValue() + 1);
+          keyProvider2fileGroups.put(keyProvider.getName(),
+            fileGroupCount);
         }
       }
     }
@@ -1156,7 +1200,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     // Try to search in internal mapping
     if (option2component != null) {
       for (Option<?> key : option2component.keySet()) {
-        if (option2component.get(key).equals(c)) return key;
+        if (option2component.get(key).equals(c)) {
+          return key;
+        }
       }
     }
     return null;

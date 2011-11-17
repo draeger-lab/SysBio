@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.JPanel;
@@ -54,10 +55,10 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * 
 	 * <p>Access this array by using {@link #getClasses()}!</p>
 	 */
-	private static Class<PreferencesPanel>[] classes=null;
+	private static Class<PreferencesPanel>[] classes = null;
 	
 	/**
-	 * Determines, if the {@link #classes} array has been inizialized.
+	 * Determines, if the {@link #classes} array has been initialized.
 	 * (Remark: the array may be initialized but still be null!).
 	 */
 	private static boolean isClassesInitialized = false;
@@ -66,13 +67,17 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = 3189416350182046246L;
+	
+	/**
+	 * 
+	 */
+	private static final transient Logger logger = Logger.getLogger(MultiplePreferencesPanel.class.getName());
 
 	/**
 	 * @return the classes
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
   public static Class<PreferencesPanel>[] getClasses() {
-	  boolean showDebugMessages=false;
 	  /* Moved the classes initialization to this method. Else, it causes projects using
 	   * SysBio to have a ~5sec delay, even when they do not use this Class!!
 	   */
@@ -97,10 +102,10 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	     */
 	    
 	    String pckName = MultiplePreferencesPanel.class.getPackage().getName();
-	    String panelClass = pckName+".PreferencePanels";
+	    String panelClass = pckName + ".PreferencePanels";
 	    
 	    // If the panels have been predefined, load them instead of using reflections.
-	    Object o=null;
+	    Object o = null;
       try {
         // Try to get a defined 'panelClass'-class instance.
         Class<?> cl = Class.forName(panelClass);
@@ -108,30 +113,34 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
         o = con.newInstance();
       } catch (Exception e1) {
         // Mainly ClassNotFoundException
-        if (showDebugMessages) System.out.println(panelClass + " not found. Using reflections to get preferences panels.");
+        logger.finer(String.format(
+          "%s not found. Using reflections to get preferences panels.",
+          panelClass));
       }
       // If a predefined 'panelClass'-instance exits, load the classes array from it.
-	    if (o!=null) {
+	    if (o != null) {
 	      try {
-	        classes = (Class<PreferencesPanel>[]) Reflect.invokeIfContains(o, "getPreferencesClasses");
-	        if (classes!=null) {
-	          if (showDebugMessages) System.out.println("Found preferences panels in " + panelClass);
-	        }
+          classes = (Class<PreferencesPanel>[]) Reflect.invokeIfContains(o,
+            "getPreferencesClasses");
+          if (classes != null) {
+            logger.finer(String.format("Found preferences panels in %s",
+              panelClass));
+          }
 	      } catch (Exception e) {
 	        e.printStackTrace();
 	      }
 	    }
 	    
-	    
-	    // TODO: Ich finde es nicht gut hier 'user.dir' drinzuhaben, da es z.B. bei webstart
-	    // "C:\Programme\Mozilla Firefox" ist und auch sonst nur in Ausnahmefällen
-	    // benötigt wird!
 	    if (classes == null) {
+        /*
+         * Remark: user.dir might cause problems when using web start programs;
+         * it might become something like C:\Programs\Mozilla Firefox.
+         */
 	      classes = Reflect.getAllClassesInPackage(pckName, true, true, PreferencesPanel.class,
 	        System.getProperty("user.dir") + File.separatorChar, true);
-	      
-	      if (showDebugMessages) System.out.println("Used reflection to find" +
-	      		"preferences panels: " + Arrays.deepToString(classes));
+        logger.finer(String.format(
+          "Used reflection to find preferences panels: %s", Arrays
+              .deepToString(classes)));
 	    }
 	    isClassesInitialized = true;
 	  }
@@ -185,7 +194,6 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * 
 	 * @see de.zbit.gui.cfg.PreferencesPanel#accepts(java.lang.Object)
 	 */
-	@Override
 	public boolean accepts(Object key) {
 		return false;
 	}
@@ -277,7 +285,6 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * 
 	 * @see de.zbit.gui.cfg.PreferencesPanel#getTitle()
 	 */
-	@Override
 	public String getTitle() {
 		return ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS)
 				.getString("USER_PREFERENCES");
@@ -346,7 +353,6 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * 
 	 * @see de.zbit.gui.cfg.PreferencesPanel#loadPreferences()
 	 */
-	@Override
 	protected SBPreferences loadPreferences() throws IOException {
 		// This class only gathers other preferences panels.
 		// It therefore does not have any own preferences.
@@ -387,4 +393,5 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	public void setSelectedIndex(int tab) {
 		this.tab.setSelectedIndex(tab);
 	}
+	
 }

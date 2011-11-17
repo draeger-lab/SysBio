@@ -78,11 +78,12 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	@SuppressWarnings("unchecked")
   public static <Type> Range<Type> buildRange(List<Type> acceptedObjects) {
-	   if (acceptedObjects==null || acceptedObjects.size()<1) {
-	      throw new IllegalArgumentException("Can not create empty range.");
-	    }
-	  return new Range<Type>((Class<Type>)acceptedObjects.get(0).getClass(), acceptedObjects);
-	}
+    if ((acceptedObjects == null) || (acceptedObjects.size() < 1)) {
+      throw new IllegalArgumentException("Can not create empty range.");
+    }
+    return new Range<Type>((Class<Type>) acceptedObjects.get(0).getClass(),
+      acceptedObjects);
+  }
 	
 	/**
 	 * Just a convenient wrapper method for {@link Range#Range(Class, List)}.
@@ -91,13 +92,9 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @param acceptedObjects
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
   public static <Type> Range<Type> buildRange(Type... acceptedObjects) {
-	  if (acceptedObjects==null || acceptedObjects.length<1) {
-	    throw new IllegalArgumentException("Can not create empty range.");
-	  }
-	  return new Range<Type>((Class<Type>)acceptedObjects[0].getClass(), Arrays.asList(acceptedObjects));
-	}
+    return buildRange(Arrays.asList(acceptedObjects));
+  }
 	
 	
 		
@@ -112,8 +109,9 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <Type> Type parseOrCast(Class<Type> requiredType, Object ret) {
-		if (ret == null) { return null; }
-		
+		if (ret == null) { 
+		  return null; 
+		}		
 		if (requiredType.isAssignableFrom(ret.getClass())) {
 			return requiredType.cast(ret); 
 		}
@@ -348,57 +346,112 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	public final void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
-
-	/**
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 */
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   */
 	public Option(String optionName, Class<Type> requiredType, String description) {
 		this(optionName, requiredType, description, null, (Type) null);
 	}
-	
-	/**
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param Range
-	 *        - see {@link Range#Range(Class, String)} or
-	 *        {@link #buildRange(Class, String)}.
-	 */
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param Range
+   *        - see {@link Range#Range(Class, String)} or
+   *        {@link #buildRange(Class, String)}.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range) {
 		this(optionName, requiredType, description, range, (short) 2);
 	}
-	
-	/**
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param Range
-	 *        - see {@link Range#Range(Class, String)} or
-	 *        {@link #buildRange(Class, String)}.
-	 * @param numLeadingMinus
-	 *        the number of leading '-' symbols of the command-line argument
-	 *        corresponding to this option.
-	 */
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param Range
+   *        - see {@link Range#Range(Class, String)} or
+   *        {@link #buildRange(Class, String)}.
+   * @param numLeadingMinus
+   *        the number of leading '-' symbols of the command-line argument
+   *        corresponding to this option.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus) {
 		this(optionName, requiredType, description, range, numLeadingMinus, null,
 			(Type) null);
 	}
 	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param Range
-	 *        - see {@link Range#Range(Class, String)} or
-	 *        {@link #buildRange(Class, String)}.
-	 * @param numLeadingMinus
-	 * @param shortCmdName
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param Range
+   *        - see {@link Range#Range(Class, String)} or
+   *        {@link #buildRange(Class, String)}.
+   * @param numLeadingMinus
+   * @param shortCmdName
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
 		String shortCmdName) {
@@ -406,18 +459,33 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			(Type) null);
 	}
 
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param Range
-	 *        - see {@link Range#Range(Class, String)} or
-	 *        {@link #buildRange(Class, String)}.
-	 * @param numLeadingMinus
-	 * @param shortCmdName
-	 * @param defaultValue
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param Range
+   *        see {@link Range#Range(Class, String)} or
+   *        {@link #buildRange(Class, String)}.
+   * @param numLeadingMinus
+   * @param shortCmdName
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
 		String shortCmdName, Type defaultValue) {
@@ -425,18 +493,33 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			shortCmdName, defaultValue, null);
 	}
 	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param Range
-	 *        - see {@link Range#Range(Class, String)} or
-	 *        {@link #buildRange(Class, String)}.
-	 * @param numLeadingMinus
-	 * @param shortCmdName
-	 * @param defaultValue
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param Range
+   *        see {@link Range#Range(Class, String)} or
+   *        {@link #buildRange(Class, String)}.
+   * @param numLeadingMinus
+   * @param shortCmdName
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   */
 	@SuppressWarnings("unchecked")
   public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
@@ -465,19 +548,34 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		this.displayName = displayName;
 	}
 	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param Range
-	 *        - see {@link Range#Range(Class, String)} or
-	 *        {@link #buildRange(Class, String)}.
-	 * @param numLeadingMinus
-	 *        the number of leading '-' symbols of the command-line argument
-	 *        corresponding to this option.
-	 * @param defaultValue
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param Range
+   *        - see {@link Range#Range(Class, String)} or
+   *        {@link #buildRange(Class, String)}.
+   * @param numLeadingMinus
+   *        the number of leading '-' symbols of the command-line argument
+   *        corresponding to this option.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
 		Type defaultValue) {
@@ -485,16 +583,34 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			defaultValue);
 	}
 	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param range
-	 * @param numLeadingMinus
-	 * @param defaultValue
-	 * @param displayName
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param range
+   * @param numLeadingMinus
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param displayName
+   *        A better human-readable name to be shown in graphical user
+   *        interfaces in order to give a brief description of this
+   *        {@link Option}.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
 		Type defaultValue, String displayName) {
@@ -502,56 +618,120 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			defaultValue, displayName);
 	}
 	
-	/**
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param Range see {@link Range#Range(Class, String)} or
-	 *        {@link #buildRange(Class, String)}.
-	 * @param defaultValue
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param Range
+   *        see {@link Range#Range(Class, String)} or
+   *        {@link #buildRange(Class, String)}.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, Type defaultValue) {
 		this(optionName, requiredType, description, range, (short) 2, defaultValue);
 	}
-	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param range
-	 * @param defaultValue
-	 * @param displayName
-	 */
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param range
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param displayName
+   *        A better human-readable name to be shown in graphical user
+   *        interfaces in order to give a brief description of this
+   *        {@link Option}.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, Type defaultValue, String displayName) {
 		this(optionName, requiredType, description, range, (short) 2, defaultValue,
 			displayName);
 	}
 	
-	/**
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param numLeadingMinus
-	 * @param shortCmdName
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param numLeadingMinus
+   * @param shortCmdName
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, short numLeadingMinus, String shortCmdName) {
 		this(optionName, requiredType, description, null, numLeadingMinus,
 			shortCmdName);
 	}
 	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param numLeadingMinus
-	 * @param shortCmdName
-	 * @param defaultValue
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param numLeadingMinus
+   * @param shortCmdName
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, short numLeadingMinus, String shortCmdName,
 		Type defaultValue) {
@@ -559,77 +739,166 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 			shortCmdName, defaultValue);
 	}
 	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param defaultValue
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Type defaultValue) {
 		this(optionName, requiredType, description, null, defaultValue);
 	}
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param visibility
+   *        allows to hide this option from auto-generated GUIs, HELPs,
+   *        command-lines, etc.
+   */
+  public Option(String optionName, Class<Type> requiredType,
+    String description, Type defaultValue, boolean visibility) {
+    this(optionName, requiredType, description, null, defaultValue);
+    setVisible(visibility);
+  }
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param displayName
+   *        A better human-readable name to be shown in graphical user
+   *        interfaces in order to give a brief description of this
+   *        {@link Option}.
+   */
+  public Option(String optionName, Class<Type> requiredType,
+    String description, Type defaultValue, String displayName) {
+    this(optionName, requiredType, description, null, defaultValue, displayName);
+  }
 	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param defaultValue
-	 * @param visibility allows to hide this option from auto-generated
-	 * GUIs, HELPs, command-lines, etc.
-	 */
-	public Option(String optionName, Class<Type> requiredType,
-	  String description, Type defaultValue, boolean visibility) {
-	  this(optionName, requiredType, description, null, defaultValue);
-	  setVisible(visibility);
-	}
-	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param defaultValue
-	 * @param displayName
-	 */
-	public Option(String optionName, Class<Type> requiredType,
-		String description, Type defaultValue, String displayName) {
-		this(optionName, requiredType, description, null, defaultValue, displayName);
-	}
-	
-	/**
-	 * 
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param defaultValue
-	 * @param displayName
-	 * @param group allows to create a group of buttons. This does only
-	 * make sense with {@link Boolean} options. All options on this
-	 * group will automatically be converted into a {@link JRadioButton},
-	 * when translated into a JComponent!
-	 */
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param displayName
+   *        A better human-readable name to be shown in graphical user
+   *        interfaces in order to give a brief description of this
+   *        {@link Option}.
+   * @param group
+   *        allows to create a group of buttons. This does only make sense with
+   *        {@link Boolean} options. All options on this group will
+   *        automatically be converted into a {@link JRadioButton}, when
+   *        translated into a JComponent!
+   */
 	public Option(String optionName, Class<Type> requiredType,
 	  String description, Type defaultValue, String displayName, ButtonGroup group) {
 	  this(optionName, requiredType, description, null, defaultValue, displayName);
 	  setButtonGroup(group);
 	}
-	
-	/**
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param defaultValue
-	 * @param displayName
-	 * @param group allows to create a group of buttons. This does only
-	 * make sense with {@link Boolean} options. All options on this
-	 * group will automatically be converted into a {@link JRadioButton},
-	 * when translated into a JComponent!
-	 * @param visibility allows to hide this option from auto-generated
-	 * GUIs, HELPs, command-lines, etc.
-	 */
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param displayName
+   *        A better human-readable name to be shown in graphical user
+   *        interfaces in order to give a brief description of this
+   *        {@link Option}.
+   * @param group
+   *        allows to create a group of buttons. This does only make sense with
+   *        {@link Boolean} options. All options on this group will
+   *        automatically be converted into a {@link JRadioButton}, when
+   *        translated into a JComponent!
+   * @param visibility
+   *        allows to hide this option from auto-generated GUIs, HELPs,
+   *        command-lines, etc.
+   */
 	public Option(String optionName, Class<Type> requiredType,
 	  String description, Type defaultValue, String displayName,
 	  ButtonGroup group, boolean visibility) {
@@ -637,17 +906,33 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	  setButtonGroup(group);
 	  setVisible(visibility);
 	}
-	
+  
   /**
-   * This constructor adds a dependency to the created option.
-   * The given <code>dependency</code> must fulfill the given
-   * <code>condition</code> that this option is considered enabled.
+   * Creates a new {@link Option}, that accepts an input of the given Type. This
+   * constructor adds a dependency to the created option. The given
+   * <code>dependency</code> must fulfill the given <code>condition</code> that
+   * this option is considered enabled.
+   * 
    * @param <E>
    * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
    * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
    * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
    * @param range
    * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
    * @param dependency
    * @param condition
    */
@@ -656,51 +941,215 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
     this(optionName, requiredType, description, range, defaultValue);
     addDependency(dependency, condition);
   }
-	
-	/**
-	 * This constructor adds a dependency to the created option.
-	 * The given <code>dependency</code> must fulfill the given
-	 * <code>condition</code> that this option is considered enabled.
-	 * @param <E>
-	 * @param optionName
-	 * @param requiredType
-	 * @param description
-	 * @param defaultValue
-	 * @param dependency
-	 * @param condition
-	 */
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type. This
+   * constructor adds a dependency to the created option. The given
+   * <code>dependency</code> must fulfill the given <code>condition</code> that
+   * this option is considered enabled.
+   * 
+   * @param <E>
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param dependency
+   * @param condition
+   */
   public <E> Option(String optionName, Class<Type> requiredType,
-    String description, Type defaultValue, Option<E> dependency, Range<E> condition) {
-    this(optionName, requiredType, description, defaultValue);
-    addDependency(dependency, condition);
+    String description, Type defaultValue, Option<E> dependency,
+    Range<E> condition) {
+    this(optionName, requiredType, description, defaultValue, (String) null,
+      dependency, condition);
   }
 
   /**
-   * This constructor adds all given dependencies to the created option.
-   * This is especially usefull for setting the dependencies
-   * of this option to the same dependencies as other options.
+   * Creates a new {@link Option}, that accepts an input of the given Type. This
+   * constructor adds a dependency to the created option. The given
+   * <code>dependency</code> must fulfill the given <code>condition</code> that
+   * this option is considered enabled.
+   * 
+   * @param <E>
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param displayName
+   *        A better human-readable name to be shown in graphical user
+   *        interfaces in order to give a brief description of this
+   *        {@link Option}.
+   * @param dependency
+   * @param condition
+   */
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Type defaultValue, String displayName,
+    Option<E> dependency, Range<E> condition) {
+    this(optionName, requiredType, description, defaultValue, displayName);
+    addDependency(dependency, condition);
+  }
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param range
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param displayName
+   *        A better human-readable name to be shown in graphical user
+   *        interfaces in order to give a brief description of this
+   *        {@link Option}.
+   * @param dependency
+   * @param condition
+   */
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Range<Type> range, Type defaultValue,
+    String displayName, Option<E> dependency, Range<E> condition) {
+    this(optionName, requiredType, description, range, (short) 2, defaultValue,
+      displayName);
+    addDependency(dependency, condition);
+  }
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type. This
+   * constructor adds all given dependencies to the created option. This is
+   * especially usefull for setting the dependencies of this option to the same
+   * dependencies as other options.
+   * 
    * @see #getDependencies()
    * @param <E>
    * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
    * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
    * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
    * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
    * @param dependencies
    */
   public <E> Option(String optionName, Class<Type> requiredType,
     String description, Type defaultValue, Map<Option<?>, Range<?>> dependencies) {
-    this(optionName, requiredType, description, defaultValue);
+    this(optionName, requiredType, description, defaultValue, null, dependencies);
+  }
+  
+  /**
+   * Creates a new {@link Option}, that accepts an input of the given Type. This
+   * constructor adds all given dependencies to the created option. This is
+   * especially usefull for setting the dependencies of this option to the same
+   * dependencies as other options.
+   * 
+   * @param <E>
+   * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param description
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param defaultValue
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param displayName
+   *        A better human-readable name to be shown in graphical user
+   *        interfaces in order to give a brief description of this
+   *        {@link Option}.
+   * @param dependencies
+   */
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Type defaultValue, String displayName,
+    Map<Option<?>, Range<?>> dependencies) {
+    this(optionName, requiredType, description, defaultValue, displayName);
     this.dependencies = dependencies;
   }
 
   /**
+   * Creates a new {@link Option}, that accepts an input of the given Type.
+   * 
    * @param optionName
+   *        This {@link String} must be the identical to the name of the
+   *        variable that stores this {@link Option}.
    * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
    * @param description
-   * @param Range see {@link Range#Range(Class, String)} or
+   *        A human-readable description of this {@link Option}. Note that the
+   *        identical description may serve as the explanation of the
+   *        corresponding command-line option or as a tool tip within a
+   *        graphical user interface. Hence, this text must be expressive enough
+   *        to specify the purpose of this {@link Option}, i.e., how it helps
+   *        the user to influence the program without explaining details of how
+   *        to enter this {@link Option}.
+   * @param Range
+   *        see {@link Range#Range(Class, String)} or
    *        {@link #buildRange(Class, String)}.
    * @param defaultValue
-   * @param visibility allows to hide this option from auto-generated
+   *        The value for this {@link Option} to be used in case that there is
+   *        no user-defined value at the moment.
+   * @param visibility
+   *        allows to hide this option from auto-generated
    */
   public Option(String optionName, Class<Type> requiredType,
     String description, Range<Type> range, Type defaultValue,
@@ -710,10 +1159,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
   }
 
   /**
-   * @param group allows to create a group of buttons. This does only
-   * make sense with {@link Boolean} options. All options on this
-   * group will automatically be converted into a {@link JRadioButton},
-   * when translated into a JComponent.
+   * @param group
+   *        allows to create a group of buttons. This does only make sense with
+   *        {@link Boolean} options. All options on this group will
+   *        automatically be converted into a {@link JRadioButton}, when
+   *        translated into a JComponent.
    */
   public void setButtonGroup(ButtonGroup group) {
     this.buttonGroup = group;
@@ -754,14 +1204,15 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		}
 	}
 	
-	/**
+  /**
    * Creates and returns a new argument holder for the required type of this
    * {@link Option} with the given object as default value.
-	 * 
-	 * @param object the default value of this {@link Option}
-	 * @return an argument holder of the required data type with given default
-	 *         value
-	 */
+   * 
+   * @param object
+   *        the default value of this {@link Option}
+   * @return an argument holder of the required data type with given default
+   *         value
+   */
 	public ArgHolder<?> createArgumentHolder(Object object) {
 		String value = object.toString();
 		if (requiredType.equals(Float.class)) {
@@ -796,10 +1247,10 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		return o.toString().equals(toString());
 	}
 	
-	/**
-	 * @see StringUtil#formatOptionName(String)
-	 * @return
-	 */
+  /**
+   * @see StringUtil#formatOptionName(String)
+   * @return
+   */
 	public String formatOptionName() {
 		return StringUtil.formatOptionName(getOptionName());
 	}
@@ -816,25 +1267,26 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		return defaultValue;
 	}
 	
-	/**
-	 * Change the default value for this option. Actually, you should do this only
-	 * once right at the start of your main class. This possibility has just been
-	 * added to use the same options with different default values in different
-	 * projects.
-	 * @param def
-	 */
+  /**
+   * Change the default value for this option. Actually, you should do this only
+   * once right at the start of your main class. This possibility has just been
+   * added to use the same options with different default values in different
+   * projects.
+   * 
+   * @param def
+   */
 	public void setDefaultValue(Type def) {
 	  this.defaultValue=def;
 	}
 	
-	/**
-	 * Returns a description for this {@link Option}. If the {@link Range} of this
-	 * {@link Option} is a {@link File} with a {@link GeneralFileFilter}
-	 * constraint, the description of the file filter is appended.
-	 * 
-	 * @see #description
-	 * @return the description
-	 */
+  /**
+   * Returns a description for this {@link Option}. If the {@link Range} of this
+   * {@link Option} is a {@link File} with a {@link GeneralFileFilter}
+   * constraint, the description of the file filter is appended.
+   * 
+   * @see #description
+   * @return the description
+   */
 	public String getDescription() {
 		if (isSetRangeSpecification() && getRange().isSetConstraints()
 				&& (getRange().getConstraints() instanceof GeneralFileFilter)) {
@@ -965,25 +1417,25 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * @return the configured dependencies for this option.
 	 */
 	public Map<Option<?>, Range<?>> getDependencies() {
-    if (dependencies==null) {
+    if (dependencies == null) {
       dependencies = new HashMap<Option<?>, Range<?>>();
     }
     return dependencies;
 	}
 	
 	
-	/**
-	 * A {@link String} to be parsed by an {@link ArgParser} to specify the
-	 * command line option corresponding to this {@link Option}. If a short
-	 * version of this option is set, this will have to be used without any
-	 * separators between the short option name and the command line value. For
-	 * instance, if the short option's name is '-v', the {@link ArgParser} will
-	 * require key value pairs such as '-vMyValue'. For the long option name,
-	 * multiple versions are generated to separate the option's name from the
-	 * value.
-	 * 
-	 * @return
-	 */
+  /**
+   * A {@link String} to be parsed by an {@link ArgParser} to specify the
+   * command line option corresponding to this {@link Option}. If a short
+   * version of this option is set, this will have to be used without any
+   * separators between the short option name and the command line value. For
+   * instance, if the short option's name is '-v', the {@link ArgParser} will
+   * require key value pairs such as '-vMyValue'. For the long option name,
+   * multiple versions are generated to separate the option's name from the
+   * value.
+   * 
+   * @return
+   */
 	public String getSpecification() {
 		StringBuilder sb = new StringBuilder();
 		if (isSetShortCmdName()) {
@@ -1055,13 +1507,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		return getDescription();
 	}
 	
-	/**
-	 * Returns the value for this Option, which must be contained in the given
-	 * SBPreferences.
-	 * 
-	 * @param parentPreferences
-	 * @return
-	 */
+  /**
+   * Returns the value for this {@link Option}, which must be contained in the
+   * given {@link SBPreferences}.
+   * 
+   * @param parentPreferences
+   * @return
+   */
 	public Type getValue(SBPreferences parentPreferences) {
 		// Returns a string.
 		Object ret = parentPreferences.get(this.toString());
@@ -1069,13 +1521,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		return parseOrCast(requiredType, ret);
 	}
 	
-	/**
-	 * Returns the value for this Option, which must be contained in the given
-	 * SBProperties.
-	 * 
-	 * @param parentPreferences
-	 * @return
-	 */
+  /**
+   * Returns the value for this {@link Option}, which must be contained in the
+   * given {@link SBProperties}.
+   * 
+   * @param parentPreferences
+   * @return
+   */
 	public Type getValue(SBProperties parentProperties) {
 		// Returns a string.
 		Object ret = parentProperties.getProperty(this.toString());
@@ -1129,10 +1581,10 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	}
 	
 	/**
-	 * See {@link #parseOrCast(Class, Object)}.
 	 * 
 	 * @param ret
 	 * @return
+	 * @see #parseOrCast(Class, Object)
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes"})
   public Type parseOrCast(Object ret) {
@@ -1143,16 +1595,21 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		return parseOrCast(requiredType, ret);
 	}
 	
-	/**
-	 * Does nearly the same as {@link Range#castAndCheckIsInRange(Object)},
-	 * but has some enhancements, e.g., when using Class as type.
-	 * @param value
-	 * @return
-	 */
+  /**
+   * Does nearly the same as {@link Range#castAndCheckIsInRange(Object)}, but
+   * has some enhancements, e.g., when using Class as type.
+   * 
+   * @param value
+   * @return
+   */
   public boolean castAndCheckIsInRange(Object value) {
     Type value2 = parseOrCast(value);
-    if (value2==null) { return false;}
-    if (!isSetRangeSpecification()) return true;
+    if (value2 == null) {
+      return false;
+    }
+    if (!isSetRangeSpecification()) {
+      return true;
+    }
     return range.isInRange(value2);
   }
   
