@@ -234,6 +234,17 @@ public class LayoutHelper {
 	 * @param x
 	 * @param y
 	 * @param width
+	 */
+	public void add(Component c, int x, int y, int width) {
+	  add(c, x, y, width, 1);
+	}
+	
+	/**
+	 * 
+	 * @param c
+	 * @param x
+	 * @param y
+	 * @param width
 	 * @param height
 	 * @param weightx
 	 * @param weighty

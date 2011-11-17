@@ -17,6 +17,7 @@
 package de.zbit.util.prefs;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,12 +35,24 @@ import de.zbit.gui.ActionCommand;
  * @version $Rev$
  * @since 1.0
  */
-public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>> {
+public class OptionGroup<T> implements ActionCommand,
+    Comparable<OptionGroup<T>>, Iterable<Option<? extends T>> {
+  
+  /**
+   * If this is set to true, this {@link OptionGroup} should
+   * be visualized collapsable in GUIs.
+   */
+  private boolean collapsable = false;
+  /**
+   * Defines the initial state, if this group is {@link #collapsable}.
+   */
+  private boolean isCollapsed = false;
   
   /**
    * 
    */
   private String name, toolTip;
+  
   /**
    * 
    */
@@ -52,31 +65,10 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
   private boolean visible = true;
   
   /**
-   * If this is set to true, this {@link OptionGroup} should
-   * be visualized collapsable in GUIs.
-   */
-  private boolean collapsable = false;
-  
-  /**
-   * Defines the initial state, if this group is {@link #collapsable}.
-   */
-  private boolean isCollapsed = false;
-  
-  /**
    * 
    */
   public OptionGroup() {
     this(null, null);
-  }
-  
-  /**
-   * 
-   * @param name
-   * @param toolTip
-   * @param option
-   */
-  public OptionGroup(String name, String toolTip, Option<? extends T>... option) {
-    this(name, toolTip, false, false, option);
   }
   
   /**
@@ -109,6 +101,16 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
     setVisible(visibility);
   }
   
+  /**
+   * 
+   * @param name
+   * @param toolTip
+   * @param option
+   */
+  public OptionGroup(String name, String toolTip, Option<? extends T>... option) {
+    this(name, toolTip, false, false, option);
+  }
+  
   
   /**
    * @param option
@@ -126,6 +128,16 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
    */
   public boolean addAll(Collection<Option<? extends T>> options) {
     return this.options.addAll(options);
+  }
+  
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(OptionGroup<T> optionGroup) {
+    return Integer.valueOf(getOptions().hashCode()).compareTo(
+      Integer.valueOf(optionGroup.getOptions().hashCode()));
   }
   
   /*
@@ -154,6 +166,20 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
   }
   
   /**
+   * @return the collapsable
+   */
+  public boolean isCollapsable() {
+    return collapsable;
+  }
+  
+  /**
+   * @return the isCollapsed
+   */
+  public boolean isInitiallyCollapsed() {
+    return isCollapsed;
+  }
+  
+  /**
    * 
    * @return
    */
@@ -170,6 +196,23 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
   }
   
   /**
+   * @return visibility state of this option
+   */
+  public boolean isVisible() {
+    return visible;
+  }
+  
+  
+  
+  /*
+   * (non-Javadoc)
+   * @see java.lang.Iterable#iterator()
+   */
+  public Iterator<Option<? extends T>> iterator() {
+    return getOptions().iterator();
+  }
+
+  /**
    * 
    * @param option
    * @return
@@ -178,7 +221,21 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
   public boolean remove(Option<T> option) {
     return options.remove(option);
   }
-  
+
+  /**
+   * @param collapsable the collapsable to set
+   */
+  public void setCollapsable(boolean collapsable) {
+    this.collapsable = collapsable;
+  }
+
+  /**
+   * @param isCollapsed the isCollapsed to set
+   */
+  public void setInitiallyCollapsed(boolean isCollapsed) {
+    this.isCollapsed = isCollapsed;
+  }
+
   /**
    * @param name
    *        the name to set
@@ -187,6 +244,8 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
     this.name = name;
   }
   
+  
+  
   /**
    * @param options
    *        the options to set
@@ -194,7 +253,7 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
   public void setOptions(List<Option<? extends T>> options) {
     this.options = options;
   }
-  
+
   /**
    * 
    * @param option
@@ -207,36 +266,6 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
       }
     }
   }
-  
-  
-  
-  /**
-   * @return the collapsable
-   */
-  public boolean isCollapsable() {
-    return collapsable;
-  }
-
-  /**
-   * @param collapsable the collapsable to set
-   */
-  public void setCollapsable(boolean collapsable) {
-    this.collapsable = collapsable;
-  }
-
-  /**
-   * @return the isCollapsed
-   */
-  public boolean isInitiallyCollapsed() {
-    return isCollapsed;
-  }
-
-  /**
-   * @param isCollapsed the isCollapsed to set
-   */
-  public void setInitiallyCollapsed(boolean isCollapsed) {
-    this.isCollapsed = isCollapsed;
-  }
 
   /**
    * @param toolTip
@@ -246,15 +275,6 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
     this.toolTip = toolTip;
   }
   
-  
-  
-  /**
-   * @return visibility state of this option
-   */
-  public boolean isVisible() {
-    return visible;
-  }
-
   /**
    * Allows to hide this option group (and subsequently all contained
    * options) in GUIs, help, command-line, etc.
@@ -278,16 +298,6 @@ public class OptionGroup<T> implements ActionCommand, Comparable<OptionGroup<T>>
     }
     sb.append(options.toString());
     return sb.toString();
-  }
-  
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
-   */
-  public int compareTo(OptionGroup<T> optionGroup) {
-    return Integer.valueOf(getOptions().hashCode()).compareTo(
-      Integer.valueOf(optionGroup.getOptions().hashCode()));
   }
   
 }
