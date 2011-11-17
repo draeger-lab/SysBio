@@ -360,10 +360,10 @@ public class SBFileFilter extends GeneralFileFilter {
   }
   
   public static final SBFileFilter[] createSBMLFileFilterList() {
-    FileType types[] = { FileType.SBML_FILES_L1V1, FileType.SBML_FILES_L1V2,
-        FileType.SBML_FILES_L2V1, FileType.SBML_FILES_L2V2,
-        FileType.SBML_FILES_L2V3, FileType.SBML_FILES_L2V4,
-        FileType.SBML_FILES_L3V1, FileType.SBML_FILES };
+    FileType types[] = { FileType.SBML_FILES, FileType.SBML_FILES_L1V1,
+        FileType.SBML_FILES_L1V2, FileType.SBML_FILES_L2V1,
+        FileType.SBML_FILES_L2V2, FileType.SBML_FILES_L2V3,
+        FileType.SBML_FILES_L2V4, FileType.SBML_FILES_L3V1 };
     SBFileFilter filters[] = new SBFileFilter[types.length];
     int i=0;
     for (FileType type : types) {
