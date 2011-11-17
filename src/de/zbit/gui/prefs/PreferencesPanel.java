@@ -181,7 +181,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   }
   
   /**
-   * If you decide not to initialize the panel imideately, you HAVE TO call
+   * If you decide not to initialize the panel immediately, you HAVE TO call
    * {@link #initializePrefPanel()} in the calling constructor.
    * 
    * @param init_Panel
@@ -376,10 +376,10 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           }
           if (oneColumn) {
             column = 0;
-            lh.add(c, column, row++, 2, 1, 1d, 1d);
+            lh.add(c, column, row++, 2, 1);
             oneColumn = false;
           } else {
-            lh.add(c, column++, row, 1, 1, 1d, 1d);
+            lh.add(c, column++, row, 1, 1);
             if (column == 2) {
               column = 0;
               row++;
