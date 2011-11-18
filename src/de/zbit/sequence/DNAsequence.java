@@ -210,6 +210,24 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
       if (sequence[i]!=o.sequence[i]) return sequence[i]?1:-1;
     return 0;
   }
+  
+  /**
+   * Additional compareTo method for convenience.
+   * @param o
+   * @return
+   */
+  public int compareTo(String o) {
+    int r = size - o.length();
+    if (r!=0) return r;
+    
+    int doubleSize = size*2;
+    for (int i=0; i<doubleSize; i+=2) {
+       char c = (getDNAcharacter(sequence[i], sequence[i+1]));
+       if (c!=Character.toUpperCase(o.charAt(i/2))) return sequence[i]?1:-1;
+    }
+    
+    return 0;
+  }
 
   /* (non-Javadoc)
    * @see java.lang.Appendable#append(java.lang.CharSequence)
@@ -273,6 +291,33 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
       builder.append(getDNAcharacter(sequence[i], sequence[i+1]));
     }
     return builder.toString();
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (DNAsequence.class.isAssignableFrom(obj.getClass())) {
+      return compareTo(((DNAsequence)obj))==0;
+    } else if (String.class.isAssignableFrom(obj.getClass())) {
+      return compareTo(((String)obj))==0; 
+    } else {
+      return false;
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    int result = 1;
+    int doubleSize = size*2;
+    for (int i=0; i<doubleSize; i++) {
+      result = 31 * result + (sequence[i] ? 1231 : 1237);
+    }
+    return result;
   }
   
 }
