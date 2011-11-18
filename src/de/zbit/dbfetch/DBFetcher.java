@@ -21,10 +21,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import org.apache.axis.AxisFault;
-
-import uk.ac.ebi.webservices.axis1.WSDbfetchClient;
-import uk.ac.ebi.webservices.axis1.stubs.wsdbfetch.DbfNoEntryFoundException;
+import uk.ac.ebi.webservices.jaxws.WSDbfetchClient;
+import uk.ac.ebi.webservices.jaxws.stubs.wsdbfetch.DbfNoEntryFoundException_Exception;
 import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
@@ -143,22 +141,26 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
     while (retried < retryLimit && (entriesStr == null || entriesStr.length() == 0)) {
       try {
         if (dbfetch==null) restoreUnserializableObject();
-        entriesStr = dbfetch.fetchData(getDbName() + ":" + id.toUpperCase(),
-            getFormat(), getStyleString());
-        break;
-      } catch (AxisFault e) {
-        if (e instanceof DbfNoEntryFoundException || e.toString()!=null && e.toString().equalsIgnoreCase("No result found"))
+          entriesStr = dbfetch.fetchData(getDbName() + ":" + id.toUpperCase(),
+              getFormat(), getStyleString());
+          
+        } catch (DbfNoEntryFoundException_Exception e) {
           throw new UnsuccessfulRetrieveException( e );
-        else {
+          // In older WSDBfetch libraries, DbfNoEntryFoundException was an instance of AxisFault.
+//        } catch (AxisFault e) {
+//          if (e instanceof DbfNoEntryFoundException || e.toString()!=null && e.toString().equalsIgnoreCase("No result found"))
+//            throw new UnsuccessfulRetrieveException( e );
+//          else {
+//            retried++;
+//            if (retried==retryLimit) e.printStackTrace();
+//            log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
+//          }
+        } catch (Exception e) {
           retried++;
           if (retried==retryLimit) e.printStackTrace();
           log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
         }
-      } catch (Exception e) {
-        retried++;
-        if (retried==retryLimit) e.printStackTrace();
-        log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
-      }
+
     }
 
     if (retried >= retryLimit && (entriesStr == null || entriesStr.length() == 0))
@@ -187,21 +189,27 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
         // I've no idea why, but sometimes the initial restoring call didn't work.
         if (dbfetch==null) restoreUnserializableObject();
         entriesStr = dbfetch.fetchBatch(getDbName(), queryString, getFormat(),getStyleString());
-      } catch (AxisFault e) {
-        if (e instanceof DbfNoEntryFoundException || e.toString()!=null && e.toString().equalsIgnoreCase("No result found")) {
-          // Propagate to caller.
-          for (int index = startID; index <= endID; index++)
-            ret[index] = null;
-          return;
-        } else {
-          retried++;
-          if (retried==retryLimit) {
-            e.printStackTrace();
-            log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
-          } else {
-            log.log(Level.FINE, "Attempt " + retried + " to fetch data failed");
-          }
-        }
+      } catch (DbfNoEntryFoundException_Exception e) {
+      // Propagate to caller.
+      for (int index = startID; index <= endID; index++)
+        ret[index] = null;
+      return;
+        // In older WSDBfetch libraries, DbfNoEntryFoundException was an instance of AxisFault.
+//      } catch (AxisFault e) {
+//        if (e instanceof DbfNoEntryFoundException || e.toString()!=null && e.toString().equalsIgnoreCase("No result found")) {
+//          // Propagate to caller.
+//          for (int index = startID; index <= endID; index++)
+//            ret[index] = null;
+//          return;
+//        } else {
+//          retried++;
+//          if (retried==retryLimit) {
+//            e.printStackTrace();
+//            log.log(Level.FINE, "Attempt " + retried + " to fetch data failed", e);
+//          } else {
+//            log.log(Level.FINE, "Attempt " + retried + " to fetch data failed");
+//          }
+//        }
       } catch (Exception e) {
         // One of DbfParamsException, DbfConnException, DbfException, 
         // InputException, RemoteException, ServiceException
