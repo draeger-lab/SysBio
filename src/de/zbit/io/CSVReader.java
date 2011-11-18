@@ -838,10 +838,10 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   
   /**
    * Initializes the class, based on the given file. More specific:
-   * - Inferes the separator char (if not set)
-   * - Sets the line number, where the data starts (firstConsistentLine)
-   * - Sets the number of columns (numCols)
-   * - Reads the headers
+   * <ul><li>Infers the separator char (if not set)</li>
+   * <li>Sets the line number, where the data starts (firstConsistentLine)</li>
+   * <li>Sets the number of columns (numCols)</li>
+   * <li>Reads the headers</li></ul>
    * @param filename
    * @throws IOException if file appears not to be a valid CSV file.
    */
