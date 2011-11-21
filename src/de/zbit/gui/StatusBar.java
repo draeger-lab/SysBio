@@ -60,6 +60,14 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 */
 	final private JLabel statusLabel;
 
+	/**
+	 * The parent panel in west border that contains {@link #statusLabel} in left slot.
+	 */
+	private JPanel leftPanel;
+	
+	/**
+	 * An additional progressbar that can be visualized in the status bar.
+	 */
 	private ProgressBarSwing progressBar = null;
 
 	/**
@@ -102,7 +110,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 
 		// Create the status label
 		if (initialMessage==null) initialMessage = defaultText;
-		JPanel leftPanel = new JPanel(new BorderLayout());
+		leftPanel = new JPanel(new BorderLayout());
 		((BorderLayout)leftPanel.getLayout()).setHgap(10);
 		statusLabel = new JLabel(initialMessage,icon, SwingConstants.LEFT);
 		
@@ -230,8 +238,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 			panel.add(bar);
 
 			progressBar = new ProgressBarSwing(bar);
-			Container parent = statusLabel.getParent();
-			parent.add(panel, BorderLayout.CENTER);
+			leftPanel.add(panel, BorderLayout.CENTER);
 			bar.setStringPainted(false);
 		} else {
 			bar = progressBar.getProgressBar();
