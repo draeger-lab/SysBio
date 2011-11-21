@@ -145,9 +145,12 @@ to redistribute it under certain conditions.
   
   <!-- SBFileFilter -->
   
+  <entry key="ASSOC_FILES">ASSOC files</entry>
   <entry key="BED_FILES">Binary PLINK genotype files</entry>
+  <entry key="BIM_FILES">BIM files</entry>
   <entry key="CSV_FILES">Comma separated files</entry>
   <entry key="DIRECTORIES_ONLY">Directories only</entry>
+  <entry key="FAM_FILES">FAM files</entry>
   <entry key="GIF_FILES">Graphics Interchange Format files</entry>
   <entry key="GML_FILES">Graph Modeling Language files</entry>
   <entry key="GRAPHML_FILES">GraphML files</entry>
@@ -155,6 +158,7 @@ to redistribute it under certain conditions.
   <entry key="IMAGE_FILES">Image files</entry>
   <entry key="JPEG_FILES">Joint Photographic Experts Group files</entry>
   <entry key="KGML_FILES">KGML files</entry>
+  <entry key="MAP_FILES">MAP files</entry>
   <entry key="PDF_FILES">Portable Document Format files</entry>
   <entry key="PED_FILES">Plain text PLINK genotype files</entry>
   <entry key="PNG_FILES">Portable Network Graphics files</entry>
