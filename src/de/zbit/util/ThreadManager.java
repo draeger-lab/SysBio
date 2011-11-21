@@ -156,6 +156,35 @@ public class ThreadManager {
   }
   
   /**
+   * Let the current thread wait until another thread is terminated.
+   * @param t
+   */
+  public static void awaitTermination(Thread t) {
+    long sleepTime = 0;
+    // Ensure thread is started
+    if (t.getState().equals(Thread.State.NEW)) {
+      t.start();
+    }
+    
+    while (!t.getState().equals(Thread.State.TERMINATED)) {
+      // Increase sleep timer in a way, that processor performance is
+      // not used to simply checking the active count over and over.
+      try {Thread.sleep(sleepTime);} catch (InterruptedException e) {
+        // If this thread is interrupted, cancel further executions
+        t.interrupt();
+        break;
+      }
+      
+      if (Thread.currentThread().isInterrupted()) {
+        t.interrupt();
+        break;        
+      }
+      
+      if (sleepTime<1000) sleepTime += 10; // Sleep a second at max.
+    }
+  }
+  
+  /**
    * This will
    * a) terminate all idle threads
    * b) still execute all submitted runnables, but not
