@@ -301,7 +301,7 @@ public class SBFileFilter extends GeneralFileFilter {
         return false;
       } finally {
         try {
-          if (br!=null) br.close();
+          if (br != null) br.close();
         } catch (IOException e) {
           return false;
         }
@@ -740,15 +740,18 @@ public class SBFileFilter extends GeneralFileFilter {
 	 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
 	 */
   public boolean accept(File f) {
-    if (f==null) return false;
+    if (f == null) {
+      return false;
+    }
     if (filter != null) {
       return filter.accept(f);
     }
     Set<String> extensions = type.getFileExtensions();
-    return (f.isDirectory() || ((extensions==null ||
-        extensions.isEmpty() || extensions.contains(getExtension(f))) && checkFileHead(f, type)));
+    return f.isDirectory()
+        || ((extensions == null || extensions.isEmpty() || extensions
+            .contains(getExtension(f))) && (checkFileHead(f, type)));
   }
-  
+
   /**
 	 * 
 	 * @return
