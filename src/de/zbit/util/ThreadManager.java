@@ -50,6 +50,12 @@ public class ThreadManager {
    * queue management and executing the runnables.
    */
   private ThreadPoolExecutor pool;
+
+  /**
+   * Total number of queued threads. This is crucial to get
+   * {@link #awaitTermination()} to work!
+   */
+  private int queuedThreads=0;
   
   /**
    * Number of actual or / and virtual processors in the current machine.
@@ -109,8 +115,11 @@ public class ThreadManager {
   
   /**
    * WARNING: this object is the core of this class.
-   * Modifications might have a hughe impact or even
+   * Modifications might have a huge impact or even
    * break this class!
+   * <p>Especially the local variable {@link #queuedThreads}
+   * might not change if you use the {@link ThreadPoolExecutor}
+   * directly!
    * @return the ThreadPoolExecutor that is used for the
    * internal queue management and execution of runnables.
    */
@@ -130,10 +139,10 @@ public class ThreadManager {
   public void awaitTermination() {
     long sleepTime = 0;
     // Avoid having zero active threads just because they
-    // aren't started.
+    // aren't started. (Unfortunately this does not avoid this...)
     pool.prestartAllCoreThreads();
     
-    while ( (pool.getActiveCount()>0) && !pool.isTerminated()) {
+    while (!isAllDone()) {
       // Increase sleep timer in a way, that processor performance is
       // not used to simply checking the active count over and over.
       try {Thread.sleep(sleepTime);} catch (InterruptedException e) {
@@ -209,16 +218,34 @@ public class ThreadManager {
    * @return true if and only if there is no active thread.
    */
   public boolean isAllDone() {
-    return pool.getActiveCount()<=0;
+    //return pool.getActiveCount()<=0;
+    /* Cases:
+     * 1. Queue is empty! => queuedThreads=0 and pool.getCompletedTaskCount=0
+     * 
+     * 2. Queue is not empty, but the current thread is so much priorized by
+     * the system that we have 0 active threads (does really occur!)
+     * => pool.getCompletedTaskCount<1 && queuedThreads>0;
+     * Furthermore is getActiveCount==0 and isTerminated() in this case!!!
+     * 
+     * 3. Regular active state => pool.getActiveCount>0
+     * 
+     * 4. Regular terminated state => pool.isTerminated
+     * 
+     */
+    return queuedThreads==pool.getCompletedTaskCount();
+    
+//    return !((queuedThreads != pool.getCompletedTaskCount()) &&
+//    (pool.getActiveCount()>0) && !pool.isTerminated());
   }
   
   /**
    * Add a task to the pool and execute it immediately if
    * there is a free slot.
-   * @param r - runnable to submit.
+   * @param r {@link Runnable} to submit.
    */
-  public void addToPool(Runnable r) {
+  public synchronized void addToPool(Runnable r) {
     pool.execute(r);
+    queuedThreads++;
     // java.lang.OutOfMemoryError: unable to create new native thread
     // might happen here!
   }
