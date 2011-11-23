@@ -162,6 +162,7 @@ to redistribute it under certain conditions.
   <entry key="PDF_FILES">Portable Document Format files</entry>
   <entry key="PED_FILES">Plain text PLINK genotype files</entry>
   <entry key="PNG_FILES">Portable Network Graphics files</entry>
+  <entry key="SBGN_FILES">SBGN files</entry>
   <entry key="SBML_FILES">SBML files</entry>
   <entry key="SBML_FILES_L1V1">SBML Level 1 Version 1 files</entry>
   <entry key="SBML_FILES_L1V2">SBML Level 1 Version 2 files</entry>

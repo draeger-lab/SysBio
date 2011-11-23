@@ -141,6 +141,7 @@
   <entry key="PDF_FILES">Portable Dokumentformat-Dateien</entry>
   <entry key="PED_FILES">Klartext PLINK Genotype Dateien</entry>
   <entry key="PNG_FILES">Portable Netzwerkgraphik-Dateien</entry>
+  <entry key="SBGN_FILES">SBGN-Dateien</entry>
   <entry key="SBML_FILES">SBML-Dateien</entry>
   <entry key="SBML_FILES_L1V1">SBML-Dateien in Level 1 Version 1</entry>
   <entry key="SBML_FILES_L1V2">SBML-Dateien in Level 1 Version 2</entry>

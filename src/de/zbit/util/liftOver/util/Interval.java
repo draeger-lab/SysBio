@@ -79,7 +79,10 @@ public class Interval implements Comparable<Interval>, Cloneable {
     }
   }
   
-  /** Gets the name of the sequence on which the interval resides. */
+  /** 
+   * Gets the name of the sequence on which the interval resides.
+   * This usually includes a chr-prefix, e.g. "chr3".
+   */
   public String getSequence() { return sequence; }
   
   /** Gets the 1-based start position of the interval on the sequence. */
