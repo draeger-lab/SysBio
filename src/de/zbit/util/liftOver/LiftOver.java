@@ -166,6 +166,7 @@ public class LiftOver {
 
   /**
    * @param searchFileAndGetInputStream
+   * <p>E.g. OpenFile.searchFileAndGetInputStream("de/zbit/resources/liftover/hg19ToHg18.over.chain")
    * @throws IOException 
    */
   public LiftOver(InputStream in) throws IOException {

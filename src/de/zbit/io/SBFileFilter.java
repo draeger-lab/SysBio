@@ -121,6 +121,10 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		PNG_FILES,
 		/**
+		 * To be selected if SBGN files (XML files) can be chosen.
+		 */
+		SBGN_FILES,
+		/**
 		 * To be selected if SBML files (XML files) can be chosen.
 		 */
 		SBML_FILES,
@@ -200,6 +204,7 @@ public class SBFileFilter extends GeneralFileFilter {
         case KGML_FILES:
           extensions.add("xml");
           return extensions;
+        case SBGN_FILES:
         case SBML_FILES:
         case SBML_FILES_L1V1:
         case SBML_FILES_L1V2:
@@ -469,6 +474,13 @@ public class SBFileFilter extends GeneralFileFilter {
 		return new SBFileFilter(FileType.SBML_FILES);
 	}
 	
+	 /**
+   * @return A filter for SBGN files
+   */
+  public static final SBFileFilter createSBGNFileFilter() {
+    return new SBFileFilter(FileType.SBGN_FILES);
+  }
+	
 	/**
 	 * @return A filter for SBML files in level 1 version 1
 	 */
@@ -661,6 +673,16 @@ public class SBFileFilter extends GeneralFileFilter {
 		return hasFileType(file, FileType.PNG_FILES);
 	}
 	
+  /**
+   * Returns true if the given file is a SBGN file.
+   * 
+   * @param file
+   * @return
+   */
+  public static boolean isSBGNFile(File file) {
+    return hasFileType(file, FileType.SBGN_FILES);
+  }
+  
 	/**
 	 * Returns true if the given file is an SBML file.
 	 * 
@@ -784,9 +806,17 @@ public class SBFileFilter extends GeneralFileFilter {
 	public boolean acceptsSBMLFiles() {
 		return type == FileType.SBML_FILES;
 	}
-  
-  /**
-   * 
+	
+	/**
+	 * 
+	 * @return true if this file filter accepts SBGN files.
+	 */
+	public boolean acceptsSBGNFiles() {
+	  return type == FileType.SBGN_FILES;
+	}
+	
+	/**
+	 * 
    * @return
    */
   public boolean acceptsSVGFiles() {
