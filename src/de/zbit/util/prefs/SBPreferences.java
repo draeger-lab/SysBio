@@ -1017,8 +1017,13 @@ public class SBPreferences implements Map<Object, Object> {
 	        logger.log(Level.FINE, String.format("Restored default value \"%s\" for %s in %s", (defaultV==null?"NULL":defaultV) , option, keyProvider), e);
 	        put(option, defaultV);
 	      } else {
-	        logger.log(Level.FINE, String.format("Could NOT restore default value \"%s\" for %s in %s", (defaultV==null?"NULL":defaultV) , option, keyProvider), e);
+	        //logger.log(Level.FINE, String.format("Could NOT restore default value \"%s\" for %s in %s", (defaultV==null?"NULL":defaultV) , option, keyProvider), e);
 	        // What to do? Removing is NOT the right way, because a value might still be set later on!
+
+	        // Note: this also fires if the default value is really set to null! To this might be intended!
+	        logger.log(Level.FINE, String.format("Default value set to NULL for option %s in %s.", option, keyProvider));
+//	        put(option, null);
+	        
 	      }
 	    }
 	  }
