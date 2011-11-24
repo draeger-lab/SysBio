@@ -166,6 +166,13 @@ public class KeggInfos implements Serializable {
 	 * E.g. "5.4.2.1         5.4.2.4"
 	 */
 	private String enzymes=null;
+	/**
+	 * Genes occuring in a pathway. Example:
+	 * <br>774  CACNA1B; calcium channel, voltage-dependent, N type, alpha 1B subunit [KO:K04849]
+	 * <br>775  CACNA1C; calcium channel, voltage-dependent, L type, alpha 1C subunit [KO:K04850]
+	 * <br>[...]
+	 */
+  private String[] gene_entry;
 	
 	
 	
@@ -466,6 +473,17 @@ public class KeggInfos implements Serializable {
 	public String getEnzymes() {
 	  return enzymes;
 	}
+	
+  /**
+   * Genes occuring in a pathway. Example:
+   * <br>774  CACNA1B; calcium channel, voltage-dependent, N type, alpha 1B subunit [KO:K04849]
+   * <br>775  CACNA1C; calcium channel, voltage-dependent, L type, alpha 1C subunit [KO:K04850]
+   * <br>[...]
+   * @return the gene_entry
+   */
+  public String[] getGeneEntry() {
+    return gene_entry;
+  }
 
 	/**
 	 * 
@@ -800,6 +818,19 @@ public class KeggInfos implements Serializable {
 		  } catch (Throwable t) {
 		    t.printStackTrace();
 		  }
+		}
+		
+    // For pathways, parse genes occurring in this pathway
+		try {
+		  String temp = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "\nGENE ", null);
+		  if (temp!=null && temp.length()>0) {
+		    gene_entry = temp.split("\n");
+		    for (int i=0; i<gene_entry.length; i++) {
+		      gene_entry[i] = gene_entry[i].trim();
+		    }
+		  }
+		} catch (Throwable t) {
+		  t.printStackTrace();
 		}
 
 		// Mainly Glycan specific (eg. "glycan:G00181")
@@ -1138,6 +1169,5 @@ public class KeggInfos implements Serializable {
 
     
   }
-
 
 }
