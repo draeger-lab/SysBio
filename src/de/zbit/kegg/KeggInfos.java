@@ -345,7 +345,10 @@ public class KeggInfos implements Serializable {
 	 */
   public static KeggInfos get(String ko_id, KeggInfoManagement manager) {
     KeggInfos ret = manager.getInformation(ko_id);
-    if (ret==null) return new KeggInfos(ko_id,(String)null);
+    if (ret==null) {
+      log.fine(String.format("Could not query KEGG API for id \"%s\".", ko_id==null?"NULL":ko_id));
+      return new KeggInfos(ko_id,(String)null);
+    }
     else return ret;
   }
 

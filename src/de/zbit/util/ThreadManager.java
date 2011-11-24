@@ -17,6 +17,7 @@
 package de.zbit.util;
 
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -58,10 +59,19 @@ public class ThreadManager {
   private int queuedThreads=0;
   
   /**
+   * This is the queue, used by {@link #pool}. Do never manually
+   * edit this queue! Use it read-only and prevent modifications
+   * on it.
+   */
+  private BlockingQueue <Runnable> queue;
+  
+  /**
    * Number of actual or / and virtual processors in the current machine.
    * ( = Runtime.getRuntime().availableProcessors() ).
    */
   public final static int NUMBER_OF_PROCESSORS=Runtime.getRuntime().availableProcessors();
+  
+  
   
   /**
    * Initializes a new ThreadManager with ideal settings(
@@ -78,8 +88,9 @@ public class ThreadManager {
    */
   public ThreadManager(int numberOfSlots) {
     super();
+    queue = new LinkedBlockingQueue <Runnable>();
     pool = new ThreadPoolExecutor(numberOfSlots, numberOfSlots, 0L,
-        TimeUnit.MILLISECONDS, new LinkedBlockingQueue <Runnable>());
+        TimeUnit.MILLISECONDS, queue);
   }
   
   /**
@@ -113,19 +124,19 @@ public class ThreadManager {
     return (int) pool.getTaskCount();
   }
   
-  /**
-   * WARNING: this object is the core of this class.
-   * Modifications might have a huge impact or even
-   * break this class!
-   * <p>Especially the local variable {@link #queuedThreads}
-   * might not change if you use the {@link ThreadPoolExecutor}
-   * directly!
-   * @return the ThreadPoolExecutor that is used for the
-   * internal queue management and execution of runnables.
-   */
-  public ThreadPoolExecutor getThreadPoolExecutor() {
-    return pool;
-  }
+//  /**
+//   * WARNING: this object is the core of this class.
+//   * Modifications might have a huge impact or even
+//   * break this class!
+//   * <p>Especially the local variable {@link #queuedThreads}
+//   * might not change if you use the {@link ThreadPoolExecutor}
+//   * directly!
+//   * @return the ThreadPoolExecutor that is used for the
+//   * internal queue management and execution of runnables.
+//   */
+//  public ThreadPoolExecutor getThreadPoolExecutor() {
+//    return pool;
+//  }
   
   /**
    * Blocks until all tasks have completed execution, or
@@ -158,6 +169,16 @@ public class ThreadManager {
       
       if (sleepTime<1000) sleepTime += 10; // Sleep a second at max.
       //else System.out.println(pool.getTaskCount());
+    }
+    
+    
+    // Just make sure we are really done! Call parent await Termination method.
+    if (!Thread.currentThread().isInterrupted()) {
+      try {
+        pool.awaitTermination(100, TimeUnit.MILLISECONDS);
+      } catch (InterruptedException e) {
+        pool.shutdownNow();
+      }
     }
     
     // Terminate all idle threads.
@@ -232,7 +253,7 @@ public class ThreadManager {
      * 4. Regular terminated state => pool.isTerminated
      * 
      */
-    return queuedThreads==pool.getCompletedTaskCount();
+    return queuedThreads==pool.getCompletedTaskCount() && queue.size()<1 && pool.getActiveCount()<1;
     
 //    return !((queuedThreads != pool.getCompletedTaskCount()) &&
 //    (pool.getActiveCount()>0) && !pool.isTerminated());
