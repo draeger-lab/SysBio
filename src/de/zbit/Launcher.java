@@ -93,8 +93,20 @@ public abstract class Launcher implements Runnable, Serializable {
    * initializes the logging functionality.
    */
   public Launcher() {
+    this(true);
+  }
+  
+  /**
+   * Creates a new {@link Launcher} with an empty list of command-line options
+   * but that will terminate the JVM after its execution. This constructor also
+   * initializes the logging functionality.
+   * @param showCopyrightMessage
+   */
+  private Launcher(boolean showCopyrightMessage) {
     super();
-    printCopyrightMessage();
+    if (showCopyrightMessage) {
+      printCopyrightMessage();
+    }
     this.terminateJVMwhenDone = true;
     this.props = new SBProperties();
     LogUtil.initializeLogging(getLogLevel(), getLogPackages());
@@ -106,7 +118,7 @@ public abstract class Launcher implements Runnable, Serializable {
    * @param launcher
    */
 	public Launcher(Launcher launcher) {
-    this();
+    this(false);
     this.props = launcher.getCommandLineArgs().clone();
     this.terminateJVMwhenDone = launcher.isTerminateJVMwhenDone();
   }
@@ -353,7 +365,7 @@ public abstract String[] getLogPackages();
   }
 
   /**
-	 * Displays a copyright notice using the logger.
+	 * Displays a copyright notice using the System.out.
 	 */
   public void printCopyrightMessage() {
     StringBuilder message = new StringBuilder();
