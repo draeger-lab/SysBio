@@ -60,6 +60,7 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
+import de.zbit.AppConf;
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
@@ -214,7 +215,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	/**
 	 * A {@link Logger} for this class.
 	 */
-	private static final Logger logger = Logger.getLogger(BaseFrame.class.getName());
+	private static final transient Logger logger = Logger.getLogger(BaseFrame.class.getName());
 	/**
 	 * Switch to avoid checking for updates multiple times.
 	 */
@@ -229,6 +230,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
    * A status bar...
    */
 	protected StatusBar statusBar;
+	/**
+	 * The configuration of this program.
+	 */
+  private AppConf appConf;
 	
 	/**
 	 * Creates a new {@link BaseFrame}.
@@ -275,7 +280,17 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		init();
 	}
 	
-	 /**
+	/**
+	 * 
+	 * @param appConf
+	 */
+  public BaseFrame(AppConf appConf) {
+    this();
+    this.appConf = appConf;
+  }
+
+
+  /**
    * @return the current {@link StatusBar}.
    */
   public StatusBar getStatusBar() {
@@ -704,7 +719,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * 
 	 * @return
 	 */
-	public abstract Class<? extends KeyProvider>[] getCommandLineOptions();
+	public Class<? extends KeyProvider>[] getCommandLineOptions() {
+	  if (this.appConf != null) {
+	    return appConf.getCmdOptions();
+	  }
+	  return null;
+	}
 	
 	/**
 	 * The version number of this program. This must be a {@link String}
@@ -713,7 +733,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * 
 	 * @return
 	 */
-	public abstract String getDottedVersionNumber();
+	public String getDottedVersionNumber() {
+	  if (this.appConf != null) {
+	    return appConf.getVersionNumber();
+	  }
+	  return "0.0.0";
+	}
 	
 	/**
 	 * Returns the {@link KeyProvider} that provides an {@link Option} to
@@ -758,7 +783,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 *         for any item. By returning 0 or less you can switch the file
 	 *         history function completely off.
 	 */
-	public abstract short getMaximalFileHistorySize();
+	public short getMaximalFileHistorySize() {
+	  return (short) 10;
+	}
 	
 	/**
 	 * Returns the default directory to open {@link File}s.
@@ -853,7 +880,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * 
 	 * @return The {@link URL} to some directory where to look for the online update.
 	 */
-	public abstract URL getURLOnlineUpdate();
+	public URL getURLOnlineUpdate() {
+	  if (this.appConf != null) {
+	    return appConf.getOnlineUpdate();
+	  }
+	  return null;
+	}
 	
 	/**
 	 * Initializes this graphical user interface.
