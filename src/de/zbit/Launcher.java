@@ -55,7 +55,7 @@ import de.zbit.util.prefs.SBProperties;
  * @since 1.1
  * @date 20:49:11
  */
-public abstract class Launcher implements Cloneable, Runnable, Serializable {
+public abstract class Launcher implements Runnable, Serializable {
 	
 	/**
 	 * A {@link Logger} for this class.
@@ -94,11 +94,17 @@ public abstract class Launcher implements Cloneable, Runnable, Serializable {
    */
   public Launcher() {
     super();
+    printCopyrightMessage();
     this.terminateJVMwhenDone = true;
     this.props = new SBProperties();
     LogUtil.initializeLogging(getLogLevel(), getLogPackages());
   }
 	
+  /**
+   * Copy constructor.
+   * 
+   * @param launcher
+   */
 	public Launcher(Launcher launcher) {
     this();
     this.props = launcher.getCommandLineArgs().clone();
@@ -116,7 +122,6 @@ public abstract class Launcher implements Cloneable, Runnable, Serializable {
 	 */
 	public Launcher(String args[]) {
 	  this();
-	  printCopyrightMessage();
 	  parseCmdArgs(args);
 		run();
 	}
@@ -136,12 +141,6 @@ public abstract class Launcher implements Cloneable, Runnable, Serializable {
 			update.execute();
 		}
 	}
-  
-  /* (non-Javadoc)
-   * @see java.lang.Object#clone()
-   */
-  @Override
-  public abstract Launcher clone() throws CloneNotSupportedException;
   
   /**
 	 * This method is called in case that no graphical user interface is to be
@@ -367,7 +366,7 @@ public abstract String[] getLogPackages();
       message.append(String.format(resources.getString("LINK_TO_LICENSE_FILE"),
         licenseFile.toString()));
     }
-    logger.info(message.toString());
+    System.out.println(message.toString());
   }
 
   /*
