@@ -18,6 +18,7 @@ package de.zbit;
 
 import java.awt.HeadlessException;
 import java.awt.Window;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -46,24 +47,65 @@ import de.zbit.util.prefs.SBProperties;
  * <li><code>app.name</code>: the name of the program</li>
  * <li><code>app.version</code>: the version number of the program</li>
  * </ul>
+ * Further details of the program configuration can be obtained from this
+ * {@link Launcher} by calling {@link #getAppConf()}.
  * 
  * @author Andreas Dr&auml;ger
  * @version $Rev$
  * @since 1.1
  * @date 20:49:11
  */
-public abstract class Launcher {
+public abstract class Launcher implements Cloneable, Runnable, Serializable {
 	
 	/**
 	 * A {@link Logger} for this class.
 	 */
-	private static Logger logger = Logger.getLogger(Launcher.class.getName());
-	/**
+  private static final transient Logger logger = Logger
+      .getLogger(Launcher.class.getName());
+
+  /**
 	 * A resource bundle containing label texts for this object.
 	 */
-  private static final ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+  private static final transient ResourceBundle resources = ResourceManager
+      .getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 	
 	/**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = -612780998835450100L;
+		
+	/**
+	 * Stores given command-line options as key-value pairs.
+	 */
+	private SBProperties props;
+  
+  /**
+   * Switch to decide if {@link System#exit(int)} should be called when the
+   * execution of this {@link Launcher} is finished. This option should be set
+   * to <code>true</code> when using a graphical user interface, which will be
+   * launched in a separate {@link Thread}.
+   */
+	private boolean terminateJVMwhenDone;
+  
+  /**
+   * Creates a new {@link Launcher} with an empty list of command-line options
+   * but that will terminate the JVM after its execution. This constructor also
+   * initializes the logging functionality.
+   */
+  public Launcher() {
+    super();
+    this.terminateJVMwhenDone = true;
+    this.props = new SBProperties();
+    LogUtil.initializeLogging(getLogLevel(), getLogPackages());
+  }
+	
+	public Launcher(Launcher launcher) {
+    this();
+    this.props = launcher.getCommandLineArgs().clone();
+    this.terminateJVMwhenDone = launcher.isTerminateJVMwhenDone();
+  }
+	
+  /**
 	 * Initializes this program including logging, log levels and packages,
 	 * parsing of command-line arguments, initializing of a graphical user
 	 * interface or a command-line mode (as defined by the command-line arguments
@@ -73,41 +115,13 @@ public abstract class Launcher {
 	 *        the command-line arguments.
 	 */
 	public Launcher(String args[]) {
-		LogUtil.initializeLogging(getLogLevel(), getLogPackages());
-		
-	  logger.finer(resources.getString("SCANNING_CMD_ARGS"));
-		final SBProperties props = SBPreferences.analyzeCommandLineArguments(
-				getCommandLineOptions(), args);
-		
-		System.setProperty("app.name", getApplicationName());
-		System.setProperty("app.version", getVersionNumber());
-		
-	  // Should we start the GUI?
-		if ((args.length < 1) || props.getBooleanProperty(GUIOptions.GUI)) {
-			SwingUtilities.invokeLater(new Runnable() {
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see java.lang.Runnable#run()
-				 */
-				public void run() {
-					try {
-						guiMode(props);
-					} catch (HeadlessException exc) {
-						if (props.getBooleanProperty(GUIOptions.GUI)) {
-							logger.fine(resources.getString("COULD_NOT_INITIALIZE_GUI"));
-						}
-						launchCommandLineMode(props);
-					}
-					System.exit(0);
-				}
-			});
-		} else {
-			launchCommandLineMode(props);
-		}
+	  this();
+	  printCopyrightMessage();
+	  parseCmdArgs(args);
+		run();
 	}
-	
-	/**
+
+  /**
 	 * This method can be called when starting the command-line mode of this
 	 * program. It checks for updates and may display a user notification (on the
 	 * console) in case that an update is available.
@@ -117,34 +131,67 @@ public abstract class Launcher {
 	public void checkForUpdate() throws MalformedURLException {
 		URL url = getURLOnlineUpdate();
 		if (url != null) {
-			UpdateMessage update = new UpdateMessage(false, getApplicationName(),
+			UpdateMessage update = new UpdateMessage(false, getAppName(),
 				url, getVersionNumber(), true);
 			update.execute();
 		}
 	}
-
-	/**
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public abstract Launcher clone() throws CloneNotSupportedException;
+  
+  /**
 	 * This method is called in case that no graphical user interface is to be
 	 * used. The given properties contain all the key-value pairs that have been
 	 * defined on the command line when starting this program.
 	 * 
-	 * @param props
+	 * @param appConf
 	 */
-	public abstract void commandLineMode(SBProperties props);
-	
-	/**
+	public abstract void commandLineMode(AppConf appConf);
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj.getClass().equals(getClass())) {
+      Launcher l = (Launcher) obj;
+      return l.getAppConf().equals(getAppConf())
+          && (l.isTerminateJVMwhenDone() == isTerminateJVMwhenDone());
+    }
+    return false;
+  }
+
+  /**
 	 * This method tells a caller the name of this program.
 	 * 
 	 * @return The name of this program.
 	 */
-	public abstract String getApplicationName();
-	
+	public abstract String getAppName();
+
+  /**
+   * 
+   * @return
+   */
+  public SBProperties getCommandLineArgs() {
+    return props;
+  }
+
 	/**
 	 * 
 	 * @return a {@link List} of {@link KeyProvider} {@link Class} objects that
 	 *         define collections of possible command-line options.
 	 */
-	public abstract List<Class<? extends KeyProvider>> getCommandLineOptions();
+	public abstract List<Class<? extends KeyProvider>> getCmdLineOptions();
+	
+	/**
+   * 
+   * @return
+   */
+  public abstract List<Class<? extends KeyProvider>> getInteractiveOptions();
 	
 	/**
 	   * This method returns the default log level that is the minimal {@link Level}
@@ -163,6 +210,16 @@ public abstract class Launcher {
  */
 public abstract String[] getLogPackages();
 	
+	/**
+   * 
+   * @return
+   */
+  public AppConf getAppConf() {
+    return new AppConf(getAppName(), getVersionNumber(),
+      getYearOfProgramRelease(), getCmdLineOptions(), getCommandLineArgs(),
+      getInteractiveOptions(), getURLlicenseFile(), getURLOnlineUpdate());
+  }
+	
   /**
 	 * Gives the location where the license of this program is documented. This
 	 * could be, for instance, <a
@@ -174,17 +231,15 @@ public abstract String[] getLogPackages();
 	 * method, this is not recommended.
 	 * 
 	 * @return A link to the license file of this program.
-   * @throws MalformedURLException 
 	 */
-	public abstract URL getURLlicenseFile() throws MalformedURLException;
+	public abstract URL getURLlicenseFile();
 	
 	/**
 	 * 
 	 * @return The {@link URL} where the information about online updates can be
 	 *         found. May be null.
-	 * @throws MalformedURLException
 	 */
-	public abstract URL getURLOnlineUpdate() throws MalformedURLException;
+	public abstract URL getURLOnlineUpdate();
 	
 	/**
 	 * 
@@ -212,29 +267,41 @@ public abstract String[] getLogPackages();
 	 * This method initializes and starts the graphical user interface if
 	 * possible. You can override this method in order to change its behavior.
 	 * 
-	 * @param props
+	 * @param appConf
 	 */
-	public void guiMode(SBProperties props) {
+	public void guiMode(AppConf appConf) {
 		Window ui = initGUI();
 		if (ui != null) {
 			ui.setVisible(true);
 			GUITools.hideSplashScreen();
 			ui.toFront();
 		} else {
-			if (props.getBooleanProperty(GUIOptions.GUI)) {
+			if (appConf.getCmdArgs().getBooleanProperty(GUIOptions.GUI)) {
 				logger.fine(String.format(
 				  resources.getString("NO_GUI_SUPPORTED"),
-				  getApplicationName(),
+				  getAppName(),
 				  getVersionNumber()));
 			} else {
 				logger.fine(String.format(
 				  "INCOMPLETE_CMD_ARG_LIST",
-				  getApplicationName(),
+				  getAppName(),
 				  getVersionNumber()));
 			}
 		}
 	}
 	
+	/* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 859;
+    int hashCode = getClass().getName().hashCode();
+    hashCode += prime * getAppConf().hashCode();
+    hashCode += prime * Boolean.valueOf(terminateJVMwhenDone).hashCode();
+    return hashCode;
+  }
+
 	/**
 	 * This method does nothing more than creating a new instance of a graphical
 	 * user interface for the application and returns it. In case that this
@@ -246,13 +313,19 @@ public abstract String[] getLogPackages();
 	public abstract Window initGUI();
 
 	/**
+   * @return the terminateJVMwhenDone
+   */
+  public boolean isTerminateJVMwhenDone() {
+    return terminateJVMwhenDone;
+  }
+
+  /**
 	 * Helper method that initializes the command line mode.
 	 * 
-	 * @param props
+	 * @param appConf
 	 */
-	protected void launchCommandLineMode(SBProperties props) {
-		printCopyrightMessage();
-		if (props.getBoolean(GUIOptions.CHECK_FOR_UPDATES)) {
+	protected void launchCommandLineMode(AppConf appConf) {
+		if (appConf.getCmdArgs().getBoolean(GUIOptions.CHECK_FOR_UPDATES)) {
 			try {
 				checkForUpdate();					
 			} catch (MalformedURLException exc) {
@@ -260,27 +333,92 @@ public abstract String[] getLogPackages();
 			}
 		}
 		logger.info(String.format(resources.getString("LAUNCHING_CMD_MODE"),
-			getApplicationName()));
-		commandLineMode(props);
+			getAppName()));
+		commandLineMode(appConf);
 		GUITools.hideSplashScreen();
+		if (terminateJVMwhenDone) {
+      System.exit(0);
+    }
 	}
 
-	/**
+  /**
+   * 
+   * @param args
+   * @return
+   */
+  public SBProperties parseCmdArgs(String[] args) {
+    logger.finer(resources.getString("SCANNING_CMD_ARGS"));
+    props = SBPreferences.analyzeCommandLineArguments(getCmdLineOptions(),
+      args);
+    return props;
+  }
+
+  /**
 	 * Displays a copyright notice using the logger.
 	 */
-	public void printCopyrightMessage() {
-		logger.info(String.format(resources.getString("COPYRIGHT_MESSAGE"),
-			getApplicationName(), getYearWhenProjectWasStarted(),
-			getYearOfProgramRelease()));
-		URL licenseFile = null;
-		try {
-			licenseFile = getURLlicenseFile();
-		} catch (MalformedURLException exc) {
-		}
-		if (licenseFile != null) {
-			logger.info(String.format(resources.getString("LINK_TO_LICENSE_FILE"),
-				licenseFile.toString()));
-		}
-	}
+  public void printCopyrightMessage() {
+    StringBuilder message = new StringBuilder();
+    message.append(String.format(resources.getString("COPYRIGHT_MESSAGE"),
+      getAppName(), getYearWhenProjectWasStarted(),
+      getYearOfProgramRelease()));
+    URL licenseFile = null;
+    licenseFile = getURLlicenseFile();
+    if (licenseFile != null) {
+      message.append(String.format(resources.getString("LINK_TO_LICENSE_FILE"),
+        licenseFile.toString()));
+    }
+    logger.info(message.toString());
+  }
+
+  /*
+	 * (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
+  public void run() {    
+    System.setProperty("app.name", getAppName());
+    System.setProperty("app.version", getVersionNumber());
+        
+    // Should we start the GUI?
+    if ((props.size() < 1) || props.getBooleanProperty(GUIOptions.GUI)) {
+      SwingUtilities.invokeLater(new Runnable() {
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Runnable#run()
+         */
+        public void run() {
+          AppConf appCnf = getAppConf();
+          try {
+            guiMode(appCnf);
+          } catch (HeadlessException exc) {
+            if (props.getBooleanProperty(GUIOptions.GUI)) {
+              logger.fine(resources.getString("COULD_NOT_INITIALIZE_GUI"));
+            }
+            launchCommandLineMode(appCnf);
+          }
+          if (terminateJVMwhenDone) {
+            System.exit(0);
+          }
+        }
+      });
+    } else {
+      launchCommandLineMode(getAppConf());
+    }
+  }
+
+  /**
+   * @param terminateJVMwhenDone the terminateJVMwhenDone to set
+   */
+  public void setTerminateJVMwhenDone(boolean terminateJVMwhenDone) {
+    this.terminateJVMwhenDone = terminateJVMwhenDone;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return getAppName();
+  }
 	
 }

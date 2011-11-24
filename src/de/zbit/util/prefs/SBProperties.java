@@ -55,6 +55,16 @@ public class SBProperties extends Properties {
 	public SBProperties(SBProperties defaults) {
 		super(defaults);
 	}
+
+  /* (non-Javadoc)
+   * @see java.util.Hashtable#clone()
+   */
+  @Override
+  public synchronized SBProperties clone() {
+    SBProperties props = new SBProperties(getDefaults());
+    props.putAll(this);
+    return props;
+  }
 	
 	/*
 	 * (non-Javadoc)

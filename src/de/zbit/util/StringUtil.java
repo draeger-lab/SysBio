@@ -39,27 +39,29 @@ public class StringUtil {
 	/**
 	 * 
 	 */
-  private static final String newLine = System.getProperty("line.separator");
-	
-	/**
-	 * 
-	 */
 	private static final char fileSeparator = System.getProperty("file.separator").charAt(0);
 	
 	/**
 	 * 
-	 * @return
 	 */
-	public static String newLine() {
-		return newLine;
-	}
+  private static final String newLine = System.getProperty("line.separator");
 	
 	/**
-	 * 
-	 * @return
+	 * Adds a prefix or/and suffix to each element.
+	 * @param list
+	 * @param prefix - may be null.
+	 * @param suffix - may be null.
+	 * @return List<String> - the list.
 	 */
-	public static char fileSeparator() {
-		return fileSeparator;
+	public static List<String> addPrefixAndSuffix(Iterable<?> list, String prefix, String suffix) {
+	  List<String> ret = new LinkedList<String>();
+	  // Simply define an empty string is faster than checking in the loop each time if it's null.
+	  if (prefix == null) prefix = "";
+	  if (suffix == null) suffix = "";
+	  for (Object string : list) {
+	    ret.add(prefix + string.toString() + suffix);
+	  }
+	  return ret;
 	}
 	
 	/**
@@ -115,32 +117,35 @@ public class StringUtil {
 	}
 	
 	/**
-	 * This method introduces left and right quotation marks where we normally
-	 * have straight quotation marks.
-	 * 
-	 * @param text
-	 * @param leftQuotationMark
-	 * @param rightQuotationMark
-	 * @return
-	 */
-	public static String correctQuotationMarks(String text,
-		String leftQuotationMark, String rightQuotationMark) {
-		boolean opening = true;
-		for (int i = 0; i < text.length(); i++) {
-			if (text.charAt(i) == '"') {
-				if (opening) {
-					text = text.substring(0, Math.max(0, i - 1)) + leftQuotationMark
-							+ text.substring(i + 1);
-					opening = false;
-				} else {
-					text = text.substring(0, Math.max(0, i - 1)) + rightQuotationMark
-							+ text.substring(i + 1);
-					opening = true;
-				}
-			}
-		}
-		return text;
-	}
+   * Checks if <code>parentString</code> contains any of the strings
+   * in <code>strings</code>.
+   * @param strings to search for
+   * @param parentString to search in
+   * @return index of (first) string of <code>strings</code>
+   * that is contained in <code>parentString</code>, or -1. 
+   */
+  public static int containsAny(String[] strings, String parentString) {
+      if (strings==null) return -1;
+      for (int i=0; i<strings.length; i++) {
+        if (parentString==null) {
+          // Also detect indexOf null
+          if (strings[i]==null) return i;
+          else continue;
+        }
+        if (strings[i]==null) continue;
+        if (parentString.contains(strings[i])) return i;
+      }
+      return -1;
+  }
+	
+	/**
+   * @param   source      the string to search.
+   * @param   str         the substring for which to search.
+   * @return
+   */
+  public static boolean containsIgnoreCase(String source, String str) {
+    return indexOfIgnoreCase(source, str)>=0;
+  }
 	
 //	/**
 //	 * Returns the name of a given month.
@@ -179,6 +184,103 @@ public class StringUtil {
 //		}
 //	}
 	
+	
+	/**
+	 * This method introduces left and right quotation marks where we normally
+	 * have straight quotation marks.
+	 * 
+	 * @param text
+	 * @param leftQuotationMark
+	 * @param rightQuotationMark
+	 * @return
+	 */
+	public static String correctQuotationMarks(String text,
+		String leftQuotationMark, String rightQuotationMark) {
+		boolean opening = true;
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) == '"') {
+				if (opening) {
+					text = text.substring(0, Math.max(0, i - 1)) + leftQuotationMark
+							+ text.substring(i + 1);
+					opening = false;
+				} else {
+					text = text.substring(0, Math.max(0, i - 1)) + rightQuotationMark
+							+ text.substring(i + 1);
+					opening = true;
+				}
+			}
+		}
+		return text;
+	}
+	
+	/**
+   * @param string
+   * @param toCount
+   * @return number of occurrences of <code>toCount</code> in <code>string</code>.
+   */
+  public static int countChar(String string, char toCount) {
+    int counter = 0;
+    if (string!=null) {
+      char[] arr = string.toCharArray();
+      for (char c2: arr) {
+        if (c2==toCount) counter++;
+      }
+    }
+    return counter;
+  }
+	
+	/**
+   * @param string
+   * @param toCount
+   * @return number of occurrences of <code>toCount</code> in <code>string</code>.
+   */
+  public static int countString(String string, String toCount) {
+    int counter = 0;
+    int pos = 0;
+    if (string!=null) {
+      while (pos>=0) {
+        pos = string.indexOf(toCount, pos);
+        if (pos>=0) {
+          counter++;
+          pos++;
+        }
+      }
+    }
+    return counter;
+  }
+	
+	/**
+   * Will change a regular variable name such as 'cmdOptions' to 'CMD_OPTIONS'.
+   * 
+   * @param name
+   * @return
+   */
+  public static String createKeyFromField(String name) {
+    StringBuilder sb = new StringBuilder();
+    char ch;
+    for (int i=0; i<name.length(); i++) {
+      ch = name.charAt(i);
+      if (Character.isLowerCase(ch)) {
+        sb.append(Character.toUpperCase(ch));
+      } else if (Character.isUpperCase(ch)) {
+        if (i < name.length()) {
+          sb.append('_');
+        }
+        sb.append(ch);
+      } else {
+        sb.append(ch);
+      }
+    }
+    return sb.toString();
+  }
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static char fileSeparator() {
+		return fileSeparator;
+	}
 	
 	/**
 	 * Return the given string filled up to the given length with the given
@@ -492,7 +594,7 @@ public class StringUtil {
 		if (b.length == 0 || !atLeastOneNonNull) return 0;
 		return minLength;
 	}
-	
+
 	/**
 	 * Returns the number as a word. Zero is converted to "no". Only positive
 	 * numbers from 1 to twelve can be converted. All other numbers are just
@@ -535,26 +637,8 @@ public class StringUtil {
 				return Integer.toString(number);
 		}
 	}
-	
-	/**
-	 * Adds a prefix or/and suffix to each element.
-	 * @param list
-	 * @param prefix - may be null.
-	 * @param suffix - may be null.
-	 * @return List<String> - the list.
-	 */
-	public static List<String> addPrefixAndSuffix(Iterable<?> list, String prefix, String suffix) {
-	  List<String> ret = new LinkedList<String>();
-	  // Simply define an empty string is faster than checking in the loop each time if it's null.
-	  if (prefix == null) prefix = "";
-	  if (suffix == null) suffix = "";
-	  for (Object string : list) {
-	    ret.add(prefix + string.toString() + suffix);
-	  }
-	  return ret;
-	}
-	
-	/**
+  
+  /**
 	 * <p>
 	 * Returns the concatenated strings of the array separated with the given
 	 * delimiter. See {@link #implode(String[], String)} for more details.
@@ -606,6 +690,73 @@ public class StringUtil {
 	}
 	
 	/**
+   * See same method in {@link String}. Helper method used by other methods.
+   * @return
+   */
+  private static int indexOfIgnoreCase(char[] source, int sourceOffset, int sourceCount,
+    char[] target, int targetOffset, int targetCount,
+    int fromIndex) {
+    if (fromIndex >= sourceCount) {
+      return (targetCount == 0 ? sourceCount : -1);
+    }
+    if (fromIndex < 0) {
+      fromIndex = 0;
+    }
+    if (targetCount == 0) {
+      return fromIndex;
+    }
+    
+    char lCaseFirst  = Character.toLowerCase(target[targetOffset]);
+    int max = sourceOffset + (sourceCount - targetCount);
+    
+    for (int i = sourceOffset + fromIndex; i <= max; i++) {
+      /* Look for first character. */
+      if (Character.toLowerCase(source[i]) != lCaseFirst) {
+        while (++i <= max && Character.toLowerCase(source[i]) != lCaseFirst);
+      }
+      
+      /* Found first character, now look at the rest of v2 */
+      if (i <= max) {
+        int j = i + 1;
+        int end = j + targetCount - 1;
+        for (int k = targetOffset + 1; j < end && Character.toLowerCase(source[j]) == Character.toLowerCase(target[k]); j++, k++);
+        
+        if (j == end) {
+          /* Found whole string. */
+          return i - sourceOffset;
+        }
+      }
+    }
+    return -1;
+  }
+	
+  /**
+   *
+   * @param   source      the string to search.
+   * @param   str   any string.
+   * @return  if the string argument occurs as a substring within this
+   *          object, then the index of the first character of the first
+   *          such substring is returned; if it does not occur as a
+   *          substring, <code>-1</code> is returned.
+   */
+  public static int indexOfIgnoreCase(String source, String str) {
+    return indexOfIgnoreCase(source, str, 0);
+  }
+	
+	/**
+   *
+   * @param   source      the string to search.
+   * @param   str         the substring for which to search.
+   * @param   fromIndex   the index from which to start the search.
+   * @return  the index within this string of the first occurrence of the
+   *          specified substring, starting at the specified index.
+   */
+  public static int indexOfIgnoreCase(String source, String str, int fromIndex) {
+    return indexOfIgnoreCase(source.toCharArray(), 0, source.length(),
+      str.toCharArray(), 0, str.length(), fromIndex);
+  }
+
+  /**
 	 * @see #insertLineBreaksAndCount(String, int, String, boolean)
 	 * @param message
 	 * @param lineBreak
@@ -617,7 +768,7 @@ public class StringUtil {
 		return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, false).getA();
 	}
 
-	/**
+  /**
 	 * @see #insertLineBreaksAndCount(String, int, String, boolean)
 	 * @param message
 	 * @param lineBreak breaks AFTER this number of characters is exceeded.
@@ -628,7 +779,7 @@ public class StringUtil {
     String message, int lineBreak, String lineBreakSymbol) {
     return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, false);
   }
-  
+
   /**
    * @param message
    * @param lineBreak
@@ -677,126 +828,6 @@ public class StringUtil {
     }
     return new ValuePair<String, Integer>(sb.toString(), Integer.valueOf(count));
   }
-	
-	/**
-	 * @param c
-	 * @return True if the given character is a vocal and false if it is a
-	 *         consonant.
-	 */
-	public static boolean isVocal(char c) {
-		c = Character.toLowerCase(c);
-		return (c == 'a') || (c == 'e') || (c == 'i') || (c == 'o') || (c == 'u');
-	}
-	
-	/**
-	 * Returns a HTML formated String without inserting linebreaks.
-	 * 
-	 * @param string
-	 * @return
-	 */
-	public static String toHTML(String string) {
-		return toHTML(string, Integer.MAX_VALUE);
-	}
-	
-  /**
-   * Returns a HTML formated String, in which each line is at most lineBreak
-   * symbols long.
-   * 
-   * @param string
-   * @param lineBreak
-   * @return
-   */
-	public static String toHTML(String string, int lineBreak) {
-	  return toHTML(string, lineBreak, true);
-	}
-	
-	/**
-   * Returns a HTML formated String, in which each line is at most lineBreak
-   * symbols long.
-   * 
-   * @param string
-   * @param lineBreak
-	 * @param preserveExistingLinebreaks
-	 * @return
-	 */
-	public static String toHTML(String string, int lineBreak, boolean preserveExistingLinebreaks) {
-	  String lineBreakSymbol = "<br/>";
-		if (string == null) {
-			return "<html><body>null</body></html>";
-		}
-		
-		// Preserve existing linebreaks.
-		if (preserveExistingLinebreaks) {
-		  string = string.replace("\r", "").replace("\n", lineBreakSymbol);
-		}
-		
-		StringBuilder sb = new StringBuilder();
-			if (!string.startsWith("<html><body>")) {
-			sb.insert(0, "<html><body>");
-		}
-		sb.append(insertLineBreaks(string, lineBreak, lineBreakSymbol));
-		if (!string.endsWith("</body></html>")) {
-			sb.append("</body></html>");
-		}
-		
-		
-		return sb.toString();
-	}
-
-  /**
-   * Removes all non-digit chars from input string.
-   * @param input - input string
-   * @return  input string with only digits.
-   */
-  public static String removeAllNonDigits(String input) {
-    StringBuffer ret = new StringBuffer();
-    for (char c:  input.toCharArray()) {
-      if (Character.isDigit(c)) ret.append(c);
-    }
-    return ret.toString();
-  }
-
-  /**
-   * Matches a regular expression agains a String array and
-   * returns the number of matches.
-   * @param regExpression
-   * @param content
-   * @return number of matches.
-   */
-  public static int matches(String regExpression, String[] content) {
-    Pattern pat = Pattern.compile(regExpression);
-    
-    int matches=0;
-    for (String s: content) {
-      if (pat.matcher(s).matches()) {
-        matches++;
-      }
-    }
-    
-    return matches;
-  }
-
-  /**
-   * Removes XML annotations such as &lt;HTML&gt; from any string.
-   * @param string
-   * @return string without any xml annotations.
-   */
-  public static String removeXML(String string) {
-    return string.replaceAll("\\<.*?\\>", "");
-  }
-
-  /**
-   * Removes all character from the string that are not valid in file names.
-   * @param outFile
-   * @return
-   */
-  public static String removeAllNonFileSystemCharacters(String outFile) {
-    StringBuffer ret = new StringBuffer();
-    for (char c: outFile.toCharArray()) {
-      if (isValidFileSystemCharacter(c)) ret.append(c);
-    }
-    return ret.toString();
-  }
 
   /**
    * For simplicity this method returns false if the char is in any operating system
@@ -822,138 +853,14 @@ public class StringUtil {
   }
 
   /**
-   * @param string
-   * @param toCount
-   * @return number of occurrences of <code>toCount</code> in <code>string</code>.
-   */
-  public static int countChar(String string, char toCount) {
-    int counter = 0;
-    if (string!=null) {
-      char[] arr = string.toCharArray();
-      for (char c2: arr) {
-        if (c2==toCount) counter++;
-      }
-    }
-    return counter;
-  }
-
-  /**
-   * @param string
-   * @param toCount
-   * @return number of occurrences of <code>toCount</code> in <code>string</code>.
-   */
-  public static int countString(String string, String toCount) {
-    int counter = 0;
-    int pos = 0;
-    if (string!=null) {
-      while (pos>=0) {
-        pos = string.indexOf(toCount, pos);
-        if (pos>=0) {
-          counter++;
-          pos++;
-        }
-      }
-    }
-    return counter;
-  }
-  
-  /**
-   * @param   source      the string to search.
-   * @param   str         the substring for which to search.
-   * @return
-   */
-  public static boolean containsIgnoreCase(String source, String str) {
-    return indexOfIgnoreCase(source, str)>=0;
-  }
-  
-  /**
-   *
-   * @param   source      the string to search.
-   * @param   str   any string.
-   * @return  if the string argument occurs as a substring within this
-   *          object, then the index of the first character of the first
-   *          such substring is returned; if it does not occur as a
-   *          substring, <code>-1</code> is returned.
-   */
-  public static int indexOfIgnoreCase(String source, String str) {
-    return indexOfIgnoreCase(source, str, 0);
-  }
-  
-  /**
-   *
-   * @param   source      the string to search.
-   * @param   str         the substring for which to search.
-   * @param   fromIndex   the index from which to start the search.
-   * @return  the index within this string of the first occurrence of the
-   *          specified substring, starting at the specified index.
-   */
-  public static int indexOfIgnoreCase(String source, String str, int fromIndex) {
-    return indexOfIgnoreCase(source.toCharArray(), 0, source.length(),
-      str.toCharArray(), 0, str.length(), fromIndex);
-  }
-  
-  /**
-   * See same method in {@link String}. Helper method used by other methods.
-   * @return
-   */
-  private static int indexOfIgnoreCase(char[] source, int sourceOffset, int sourceCount,
-    char[] target, int targetOffset, int targetCount,
-    int fromIndex) {
-    if (fromIndex >= sourceCount) {
-      return (targetCount == 0 ? sourceCount : -1);
-    }
-    if (fromIndex < 0) {
-      fromIndex = 0;
-    }
-    if (targetCount == 0) {
-      return fromIndex;
-    }
-    
-    char lCaseFirst  = Character.toLowerCase(target[targetOffset]);
-    int max = sourceOffset + (sourceCount - targetCount);
-    
-    for (int i = sourceOffset + fromIndex; i <= max; i++) {
-      /* Look for first character. */
-      if (Character.toLowerCase(source[i]) != lCaseFirst) {
-        while (++i <= max && Character.toLowerCase(source[i]) != lCaseFirst);
-      }
-      
-      /* Found first character, now look at the rest of v2 */
-      if (i <= max) {
-        int j = i + 1;
-        int end = j + targetCount - 1;
-        for (int k = targetOffset + 1; j < end && Character.toLowerCase(source[j]) == Character.toLowerCase(target[k]); j++, k++);
-        
-        if (j == end) {
-          /* Found whole string. */
-          return i - sourceOffset;
-        }
-      }
-    }
-    return -1;
-  }
-
-  /**
-   * Checks if <code>parentString</code> contains any of the strings
-   * in <code>strings</code>.
-   * @param strings to search for
-   * @param parentString to search in
-   * @return index of (first) string of <code>strings</code>
-   * that is contained in <code>parentString</code>, or -1. 
-   */
-  public static int containsAny(String[] strings, String parentString) {
-      if (strings==null) return -1;
-      for (int i=0; i<strings.length; i++) {
-        if (parentString==null) {
-          // Also detect indexOf null
-          if (strings[i]==null) return i;
-          else continue;
-        }
-        if (strings[i]==null) continue;
-        if (parentString.contains(strings[i])) return i;
-      }
-      return -1;
-  }
+	 * @param c
+	 * @return True if the given character is a vocal and false if it is a
+	 *         consonant.
+	 */
+	public static boolean isVocal(char c) {
+		c = Character.toLowerCase(c);
+		return (c == 'a') || (c == 'e') || (c == 'i') || (c == 'o') || (c == 'u');
+	}
 
   /**
    * Append or increment a numbered suffix to <code>newString</code> if
@@ -1017,5 +924,122 @@ public class StringUtil {
       return ret.toString();
     }
   }
+
+  /**
+   * Matches a regular expression agains a String array and
+   * returns the number of matches.
+   * @param regExpression
+   * @param content
+   * @return number of matches.
+   */
+  public static int matches(String regExpression, String[] content) {
+    Pattern pat = Pattern.compile(regExpression);
+    
+    int matches=0;
+    for (String s: content) {
+      if (pat.matcher(s).matches()) {
+        matches++;
+      }
+    }
+    
+    return matches;
+  }
+  
+  /**
+	 * 
+	 * @return
+	 */
+	public static String newLine() {
+		return newLine;
+	}
+  
+  /**
+   * Removes all non-digit chars from input string.
+   * @param input - input string
+   * @return  input string with only digits.
+   */
+  public static String removeAllNonDigits(String input) {
+    StringBuffer ret = new StringBuffer();
+    for (char c:  input.toCharArray()) {
+      if (Character.isDigit(c)) ret.append(c);
+    }
+    return ret.toString();
+  }
+  
+  /**
+   * Removes all character from the string that are not valid in file names.
+   * @param outFile
+   * @return
+   */
+  public static String removeAllNonFileSystemCharacters(String outFile) {
+    StringBuffer ret = new StringBuffer();
+    for (char c: outFile.toCharArray()) {
+      if (isValidFileSystemCharacter(c)) ret.append(c);
+    }
+    return ret.toString();
+  }
+  
+  /**
+   * Removes XML annotations such as &lt;HTML&gt; from any string.
+   * @param string
+   * @return string without any xml annotations.
+   */
+  public static String removeXML(String string) {
+    return string.replaceAll("\\<.*?\\>", "");
+  }
+
+  /**
+	 * Returns a HTML formated String without inserting linebreaks.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public static String toHTML(String string) {
+		return toHTML(string, Integer.MAX_VALUE);
+	}
+
+  /**
+   * Returns a HTML formated String, in which each line is at most lineBreak
+   * symbols long.
+   * 
+   * @param string
+   * @param lineBreak
+   * @return
+   */
+	public static String toHTML(String string, int lineBreak) {
+	  return toHTML(string, lineBreak, true);
+	}
+  
+  /**
+   * Returns a HTML formated String, in which each line is at most lineBreak
+   * symbols long.
+   * 
+   * @param string
+   * @param lineBreak
+	 * @param preserveExistingLinebreaks
+	 * @return
+	 */
+	public static String toHTML(String string, int lineBreak, boolean preserveExistingLinebreaks) {
+	  String lineBreakSymbol = "<br/>";
+		if (string == null) {
+			return "<html><body>null</body></html>";
+		}
+		
+		// Preserve existing linebreaks.
+		if (preserveExistingLinebreaks) {
+		  string = string.replace("\r", "").replace("\n", lineBreakSymbol);
+		}
+		
+		StringBuilder sb = new StringBuilder();
+			if (!string.startsWith("<html><body>")) {
+			sb.insert(0, "<html><body>");
+		}
+		sb.append(insertLineBreaks(string, lineBreak, lineBreakSymbol));
+		if (!string.endsWith("</body></html>")) {
+			sb.append("</body></html>");
+		}
+		
+		return sb.toString();
+	}
   
 }
