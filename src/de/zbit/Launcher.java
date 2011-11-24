@@ -69,10 +69,20 @@ public abstract class Launcher implements Runnable, Serializable {
   private static final transient ResourceBundle resources = ResourceManager
       .getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 	
-	/**
+  /**
    * Generated serial version identifier.
    */
   private static final long serialVersionUID = -612780998835450100L;
+
+  /**
+   * Grants access to the {@link ResourceBundle} used by this {@link Launcher}
+   * in order to support a full local-specific prorgramming.
+   * 
+   * @return the resources
+   */
+  public static ResourceBundle getResources() {
+    return resources;
+  }
 		
 	/**
 	 * Stores given command-line options as key-value pairs.
@@ -177,19 +187,21 @@ public abstract class Launcher implements Runnable, Serializable {
   }
 
   /**
+   * 
+   * @return
+   */
+  public AppConf getAppConf() {
+    return new AppConf(getAppName(), getVersionNumber(),
+      getYearOfProgramRelease(), getCmdLineOptions(), getCommandLineArgs(),
+      getInteractiveOptions(), getURLlicenseFile(), getURLOnlineUpdate());
+  }
+
+  /**
 	 * This method tells a caller the name of this program.
 	 * 
 	 * @return The name of this program.
 	 */
 	public abstract String getAppName();
-
-  /**
-   * 
-   * @return
-   */
-  public SBProperties getCommandLineArgs() {
-    return props;
-  }
 
 	/**
 	 * 
@@ -197,6 +209,14 @@ public abstract class Launcher implements Runnable, Serializable {
 	 *         define collections of possible command-line options.
 	 */
 	public abstract List<Class<? extends KeyProvider>> getCmdLineOptions();
+	
+	/**
+   * 
+   * @return
+   */
+  public SBProperties getCommandLineArgs() {
+    return props;
+  }
 	
 	/**
    * 
@@ -220,16 +240,6 @@ public abstract class Launcher implements Runnable, Serializable {
  * @return An array of package names whose log messages should appear.
  */
 public abstract String[] getLogPackages();
-	
-	/**
-   * 
-   * @return
-   */
-  public AppConf getAppConf() {
-    return new AppConf(getAppName(), getVersionNumber(),
-      getYearOfProgramRelease(), getCmdLineOptions(), getCommandLineArgs(),
-      getInteractiveOptions(), getURLlicenseFile(), getURLOnlineUpdate());
-  }
 	
   /**
 	 * Gives the location where the license of this program is documented. This
@@ -281,8 +291,9 @@ public abstract String[] getLogPackages();
 	 * @param appConf
 	 */
 	public void guiMode(AppConf appConf) {
-		Window ui = initGUI();
+		Window ui = initGUI(appConf);
 		if (ui != null) {
+		  setTerminateJVMwhenDone(false);
 			ui.setVisible(true);
 			GUITools.hideSplashScreen();
 			ui.toFront();
@@ -312,16 +323,19 @@ public abstract String[] getLogPackages();
     hashCode += prime * Boolean.valueOf(terminateJVMwhenDone).hashCode();
     return hashCode;
   }
-
-	/**
-	 * This method does nothing more than creating a new instance of a graphical
-	 * user interface for the application and returns it. In case that this
-	 * application does not support any GUI, this method may return null.
-	 * 
-	 * @return the graphical user interface for this application or null if no
-	 *         such mode is supported.
-	 */
-	public abstract Window initGUI();
+  
+  /**
+   * This method does nothing more than creating a new instance of a graphical
+   * user interface for the application and returns it. In case that this
+   * application does not support any GUI, this method may return null.
+   * 
+   * @param appConf
+   *        the configuration of the current application.
+   * 
+   * @return the graphical user interface for this application or null if no
+   *         such mode is supported.
+   */
+	public abstract Window initGUI(AppConf appConf);
 
 	/**
    * @return the terminateJVMwhenDone
