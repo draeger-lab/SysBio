@@ -241,8 +241,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * @throws HeadlessException
 	 */
 	public BaseFrame() throws HeadlessException {
-		super();
-		init();
+	  this((AppConf) null);
 	}
 	
 	
@@ -285,8 +284,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * @param appConf
 	 */
   public BaseFrame(AppConf appConf) {
-    this();
+    super();
     this.appConf = appConf;
+    init();
   }
 
 
