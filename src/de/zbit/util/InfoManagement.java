@@ -391,6 +391,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         } else {
           for (int i=0; i<ids.length; i++) {
             if (ret[i]==null && ids[i]!=null && !ids[i].equals("")) {
+              //log.fine(String.format("No info for id '%s'.", ids[i]));
               synchronized (unsuccessfulQueries) {
                 unsuccessfulQueries.add(ids[i]);
               }

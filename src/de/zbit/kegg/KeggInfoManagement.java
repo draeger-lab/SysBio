@@ -148,19 +148,33 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
   @Override
   protected KeggInfos[] fetchMultipleInformations(String[] ids,
     AbstractProgressBar progress) throws TimeoutException, UnsuccessfulRetrieveException {
+    final int atATime = 100;
+    
+    int fetchInArun = Math.min(atATime, ids.length);
+    int fetchRuns = (int) Math.ceil(((double)ids.length)/((double)atATime));
+    
     String[] APIinfos;
     final KeggInfos[] realRet = new KeggInfos[ids.length];
     if (progress!=null) {
-      progress.setNumberOfTotalCalls((long) (ids.length*Math.ceil(((double)ids.length)/100.0)));
+      progress.setNumberOfTotalCalls((fetchInArun*fetchRuns) + ids.length);
+      log.fine(String.format("Queriung %s KEGG ids in %s runs.", ids.length, fetchRuns ));
     }
+    
     // If we parse to many string in parallel, we get
-    // out of memory errors! => Limit to 50.
-    ThreadManager APIstringParser = new ThreadManager(50);
-    if (ids.length<=100) {
+    // out of memory errors! => Limit to maximal 50!
+    ThreadManager APIstringParser = new ThreadManager();
+    if (ids.length<=atATime) {
       APIinfos = fetchMultipleInformationsUpTo100AtATime(ids);
-      APIinfos = removeUnnecessaryInfos(APIinfos);
+      
+      // Jump progress bar to 50%
+      if (progress!=null) {
+        synchronized (progress) {
+          progress.setCallNr(progress.getCallNumber()+fetchInArun);
+        }
+      }
       
       // Multi-threaded string parsing
+      APIinfos = removeUnnecessaryInfos(APIinfos);
       parseAPI(ids, APIinfos, realRet, APIstringParser,0, progress);
       // ---
     } else {
@@ -169,13 +183,13 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       // Instead of requesting all objects at once, splitts Queries to 100 max and concatenates the results... that's it.
       int j=0;
       while (j<ids.length) {
-        String[] subArr = new String[Math.min(100, ids.length-j)];
+        String[] subArr = new String[Math.min(atATime, ids.length-j)];
         System.arraycopy(ids, j, subArr, 0, subArr.length);
 
         String[] ret = fetchMultipleInformationsUpTo100AtATime(subArr);
         if (progress!=null) {
           synchronized (progress) {
-            progress.setCallNr(progress.getCallNumber()+ids.length);
+            progress.setCallNr(progress.getCallNumber()+fetchInArun);
           }
         }
         ret = removeUnnecessaryInfos(ret);
