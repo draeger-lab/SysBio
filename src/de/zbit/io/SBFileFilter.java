@@ -770,8 +770,9 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     Set<String> extensions = type.getFileExtensions();
     return f.isDirectory()
-        || ((extensions == null || extensions.isEmpty() || extensions
-            .contains(getExtension(f))) && (checkFileHead(f, type)));
+        || (((extensions == null) || extensions.isEmpty() || extensions
+            .contains(getExtension(f))) && (!f.exists() || (checkFileHead(f,
+          type))));
   }
 
   /**
