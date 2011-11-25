@@ -236,10 +236,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public static SBProperties analyzeCommandLineArguments(
 		Class<? extends KeyProvider> defKeys, String[] args) {
-		List<Class<? extends KeyProvider>> l = new ArrayList<Class<? extends KeyProvider>>(
-			1);
-		l.add(defKeys);
-		
+		List<Class<? extends KeyProvider>> l = new ArrayList<Class<? extends KeyProvider>>(1);
+		l.add(defKeys);		
 		return analyzeCommandLineArguments(l, args);
 	}
 	

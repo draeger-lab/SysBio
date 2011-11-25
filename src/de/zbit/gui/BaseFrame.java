@@ -233,7 +233,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	/**
 	 * The configuration of this program.
 	 */
-  private AppConf appConf;
+  protected AppConf appConf;
 	
 	/**
 	 * Creates a new {@link BaseFrame}.
@@ -709,7 +709,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * 
 	 * @return
 	 */
-	public abstract String getApplicationName();
+	public String getApplicationName() {
+	  if (this.appConf != null) {
+	    return appConf.getApplicationName();
+	  }
+	  return getClass().getSimpleName();
+	}
 	
 	/**
 	 * This is required to automatically include a list of possible command-line
