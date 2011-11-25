@@ -383,6 +383,12 @@ public abstract String[] getLogPackages();
 	 */
   public void printCopyrightMessage() {
     StringBuilder message = new StringBuilder();
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < 60; i++) {
+      sb.append('-');
+    }
+    message.append(sb);
+    message.append('\n');
     message.append(String.format(resources.getString("COPYRIGHT_MESSAGE"),
       getAppName(), getYearWhenProjectWasStarted(),
       getYearOfProgramRelease()));
@@ -392,6 +398,8 @@ public abstract String[] getLogPackages();
       message.append(String.format(resources.getString("LINK_TO_LICENSE_FILE"),
         licenseFile.toString()));
     }
+    message.append('\n');
+    message.append(sb);
     System.out.println(message.toString());
   }
 
