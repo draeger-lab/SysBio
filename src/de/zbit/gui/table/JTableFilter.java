@@ -502,9 +502,9 @@ public class JTableFilter extends JPanel {
     String filter2 = text2.getText();
     
     String message=null;
-    if (c1.length()<1) {
+    if (c1.length()<1 && filter1.trim().length()>0 ) {
       message = "Please select an operator (=, >, etc.) for the first condition";
-    } else if (filter1.trim().length()<1) {
+    } else if (c1.length()>0 && filter1.trim().length()<1) {
       message = "Please enter a filter string for the first condition.";
     } else if (filter2.trim().length()>0 && c2.length()<1 ) {
       message = "Please select an operator (=, >, etc.) for the second condition";

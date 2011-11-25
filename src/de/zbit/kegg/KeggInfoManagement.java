@@ -157,7 +157,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     final KeggInfos[] realRet = new KeggInfos[ids.length];
     if (progress!=null) {
       progress.setNumberOfTotalCalls((fetchInArun*fetchRuns) + ids.length);
-      log.fine(String.format("Queriung %s KEGG ids in %s runs.", ids.length, fetchRuns ));
+      log.finer(String.format("Querying %s KEGG ids in %s runs.", ids.length, fetchRuns ));
     }
     
     // If we parse to many string in parallel, we get

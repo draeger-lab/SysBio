@@ -733,9 +733,13 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @throws IOException
    */
   private void writeObject(ObjectOutputStream out) throws IOException {
-    cleanupUnserializableObject();
-    
-    out.defaultWriteObject();
+    synchronized (rememberedInfos) {
+      synchronized (unsuccessfulQueries) {
+        cleanupUnserializableObject();
+        
+        out.defaultWriteObject();
+      }
+    }
     cacheChangedSinceLastLoading=false;
   }
   
