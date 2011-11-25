@@ -280,7 +280,7 @@ public class FileTools {
     if (localFile==null || localFile.length()<1) return false;
     
     File f  = new File(localFile);
-    if (f.exists() && (f.length()>0)) {
+    if (f.exists() && (f.length()>0) && f.canRead()) {
       return true;
     } else if (sourcePackage.getClassLoader().getResource(localFile)!=null) { // Load from jar - root
       return true;
@@ -290,7 +290,7 @@ public class FileTools {
       String curDir = System.getProperty("user.dir");
       if (!curDir.endsWith(File.separator)) curDir+=File.separator;
       f = new File (curDir+localFile);
-      if (f.exists() && (f.length()>0)){
+      if (f.exists() && (f.length()>0) && f.canRead()){
         return true;
       }
     }

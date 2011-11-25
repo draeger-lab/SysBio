@@ -16,6 +16,12 @@
  */
 package de.zbit.dbfetch;
 
+import java.util.concurrent.TimeoutException;
+
+import de.zbit.exception.UnsuccessfulRetrieveException;
+import de.zbit.kegg.KeggAdaptor;
+import de.zbit.parser.UniProtParser;
+
 /**
  * 
  * @author unknown

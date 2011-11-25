@@ -224,7 +224,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    * <code>ids</code> or <code>APIinfos</code> and  <code>realRet</code>.
    */
   private void parseAPI(final String[] ids, String[] APIinfos,
-    final KeggInfos[] realRet, ThreadManager APIstringParser, final int realRetOffset, final AbstractProgressBar progress) {
+      final KeggInfos[] realRet, ThreadManager APIstringParser, final int realRetOffset, final AbstractProgressBar progress) {
     for (int i=0; i<APIinfos.length; i++) {
       final int final_i = i;
       final String apiInfos = APIinfos[final_i];

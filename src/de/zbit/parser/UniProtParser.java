@@ -16,12 +16,12 @@
  */
 package de.zbit.parser;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
 import de.zbit.dbfetch.UniProtFetcher;
+import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.SortedArrayList;
 
 /**
@@ -34,7 +34,7 @@ import de.zbit.util.SortedArrayList;
  */
 public class UniProtParser {
   
-  public static final Logger log = Logger.getLogger(UniProtParser.class.getName());
+  protected static final Logger log = Logger.getLogger(UniProtParser.class.getName());
   UniProtFetcher UniProtFetcher = null;
 
   public UniProtParser(UniProtFetcher w) {
@@ -44,13 +44,8 @@ public class UniProtParser {
   
   public UniProtParser() {
     super();
-    try {
-      if (new File("uniprot.dat").exists())
-        UniProtFetcher = (UniProtFetcher) UniProtFetcher.loadFromFilesystem("uniprot.dat");
-    } catch (Throwable e) {
-    }
     if (UniProtFetcher == null) {
-      log.fine("Initialize new and empty cache UniprotFetcher cache.");
+      log.fine("Initialize new and empty UniprotFetcher cache.");
       UniProtFetcher = new UniProtFetcher(80000);
     }
   }
@@ -309,10 +304,10 @@ public class UniProtParser {
    * 
    * @return gene id, defined by NCBI, RefSeq; default = -1;
    */
-  public int[] getGeneIDs(String[] identifier) {
+  public int[] getGeneIDs(String[] identifier, AbstractProgressBar progress) {
     log.fine("getGene identifier.length(): " + identifier.length);
     
-    String[] proteinBlock = UniProtFetcher.getInformations(identifier);
+    String[] proteinBlock = UniProtFetcher.getInformations(identifier, progress);
     log.fine("proteins.length; " + proteinBlock.length);
     int[] geneIDs = new int[identifier.length];
     Arrays.fill(geneIDs, -1);
@@ -333,4 +328,7 @@ public class UniProtParser {
     
     return geneIDs;
   }
+ 
+
+  
 }
