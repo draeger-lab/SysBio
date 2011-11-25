@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import uk.ac.ebi.webservices.jaxws.WSDbfetchClient;
 import uk.ac.ebi.webservices.jaxws.stubs.wsdbfetch.DbfNoEntryFoundException_Exception;
 import de.zbit.exception.UnsuccessfulRetrieveException;
+import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.InfoManagement;
 import de.zbit.util.ProgressBar;
 import de.zbit.util.Utils;
@@ -167,11 +168,24 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
       throw new TimeoutException();
     if (entriesStr.trim().length() == 0)
       throw new UnsuccessfulRetrieveException();
+    
+    entriesStr = removeUnrequiredInformation(entriesStr);
 
     return entriesStr;
   }
   
   
+  /**
+   * Overwriting methods may want to remove something before
+   * caching this item. Just overwrite this method to remove
+   * unrequired information from the entry string.
+   * @param entriesStr
+   * @return
+   */
+  protected String removeUnrequiredInformation(String entriesStr) {
+    return entriesStr;
+  }
+
   /**
    * @param ids
    * @param ret
@@ -224,6 +238,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
     }
     if (retried >= retryLimit && (entriesStr == null || entriesStr.length() == 0)) {
       // Try it protein by protein
+      log.log(Level.FINE, "Falling back on single protein retrievement.");
       String[] splitt = queryString.split(",");
       for (int j = 0; j < splitt.length; j++) {
         try {
@@ -310,55 +325,58 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
     return Pattern.quote("\n//\n");
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.zbit.util.InfoManagement#fetchMultipleInformations(IDtype[])
-   */
   @Override
   protected String[] fetchMultipleInformations(String[] ids)
-            throws TimeoutException, UnsuccessfulRetrieveException {
+      throws TimeoutException, UnsuccessfulRetrieveException {
+    return fetchMultipleInformations(ids,null);
+  }
+  
+  @Override
+  protected String[] fetchMultipleInformations(String[] ids,
+      AbstractProgressBar progress) throws TimeoutException,
+      UnsuccessfulRetrieveException {
     String[] ret = new String[ids.length];
-    String queryString = "";
-    int protInQS = 0;
+    StringBuilder queryString = new StringBuilder();
+    int idsInCurrentQueue = 0;
     int startID = 0;
-    ProgressBar prog = null;
+    AbstractProgressBar prog = progress;
     
 
     if (showProgress) {
       log.info("Trying mass retrieve...");
-      prog = new ProgressBar(ids.length);
+      if (prog==null) prog = new ProgressBar(ids.length);
+    }
+    if (prog!=null) {
+      prog.setNumberOfTotalCalls(ids.length);
     }
 
+    final int lastI = ids.length-1;
     for (int i = 0; i < ids.length; i++) {
-      queryString += ids[i] + ",";
-      protInQS++;
-      if (queryString.length() > 500 || protInQS == 99) {
-        queryString = queryString.substring(0, queryString.length() - 1); // Remove last comma.
-        fetchMultipleChecked(ids, ret, queryString, startID, i);
+      if (queryString.length()>0) queryString.append(',');
+      queryString.append(ids[i]);
+      idsInCurrentQueue++;
+      if (queryString.length() > 500 || idsInCurrentQueue == 99 || i == lastI) {
+        fetchMultipleChecked(ids, ret, queryString.toString(), startID, i);
 
-        queryString = "";
-        protInQS = 0;
+        queryString = new StringBuilder();
+        idsInCurrentQueue = 0;
         startID = i + 1;
       }
-      if (showProgress)
+      if (prog!=null) {
         prog.DisplayBar();
+      }
     }
-
-    if (queryString.length() > 0) {
-      queryString = queryString.substring(0, queryString.length() - 1); // Remove last comma.
-      fetchMultipleChecked(ids, ret, queryString, startID, ids.length - 1);
-    }
-
+    
     if (fetchNonMappableIDs) {
-      if (showProgress) {
-        int c = 0;
+      int c = 0;
+      if (prog!=null) {
         for (int i = 0; i < ids.length; i++)
           if (ret[i] == null || ret[i].length() == 0)
             c++;
-        log.info("Fixing single not mappable or not found IDs (" + c + ")...");
-        prog = new ProgressBar(c);
+        prog.reset();
+        prog.setNumberOfTotalCalls(c);
       }
+      log.fine("Fixing single not mappable or not found IDs (" + c + ")...");
 
       // IDs that couldn't be mapped will be requested separately
       for (int i = 0; i < ids.length; i++) {
@@ -368,15 +386,24 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
           } catch (Exception e) {
             ret[i] = null;
           }
-          if (showProgress)
+          if (prog!=null) {
             prog.DisplayBar();
+          }
         }
       }
     }
     
+    // Eventually remove something before caching.
+    for (int i=0; i<ret.length; i++) {
+      if (ret[i]!=null) {
+        ret[i] = removeUnrequiredInformation(ret[i]);
+      }
+    }
+    
 
-    if (showProgress)
+    if (showProgress) {
       log.info("Done.");
+    }
 
     return ret;
   }
