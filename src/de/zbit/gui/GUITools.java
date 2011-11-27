@@ -1527,9 +1527,11 @@ public class GUITools {
    * @param choices different choices
    * @return chosen index or JOptionPane static ints
    */
-  public static int showQuestionMessage(Component parent, String message, String title, Object... choices) {
-    return JOptionPane.showOptionDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
-      title, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+  public static int showQuestionMessage(Component parent, String message,
+    String title, Object... choices) {
+    return JOptionPane.showOptionDialog(parent, StringUtil.toHTML(message,
+      TOOLTIP_LINE_LENGTH), title, JOptionPane.DEFAULT_OPTION,
+      JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
   }
   
   /**

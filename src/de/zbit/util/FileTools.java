@@ -35,7 +35,8 @@ import java.util.regex.Pattern;
 import de.zbit.io.OpenFile;
 
 /**
- * This class acts just like the linux or unix which command.
+ * This class acts just like the Linux or Unix which command.
+ * 
  * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
@@ -43,49 +44,102 @@ import de.zbit.io.OpenFile;
 public class FileTools {
   
   /**
-   * Just for testing.
+   * Checks whether a input resource (a file in the file system
+   * or a resource in the/a jar file) exists and data is available
+   * (in case of files, checks if the file size is greater than 0).
+   * <p>Note:<br/>
+   * This method should be used in combination with {@link OpenFile},
+   * because both searches for the input resources at the same locations.
+   * </p>
+   * @param localFile
+   * @return true, if the resource is available.
    */
-  public static void main(String[] args) {
-    
-    try {
-//      FileTools.splitFile("H:/ValidationData/proDGe_DROME_raw.txt", "H:/ValidationData", "proDGe_DROME_raw", ".txt", 8000000);     
-//      FileTools.splitFile("H:/ValidationData/proDGe_RAT_raw.txt", "H:/ValidationData", "proDGe_RAT_raw", ".txt", 8000000);
-      FileTools.splitFile("/home/buechel/ValidationData/proDGe_MOUSE_raw.txt", "/home/buechel/ValidationData", "proDGe_MOUSE_raw_", ".txt", 8000000);
-      FileTools.splitFile("/home/buechel/ValidationData/proDGe_HUMAN_raw.txt", "/home/buechel/ValidationData", "proDGe_HUMAN_raw", ".txt", 8000000);
-      
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    
-    System.out.println(which("pdflatex"));
+  public static boolean checkInputResource(String localFile) {
+    return checkInputResource(localFile, FileTools.class);
   }
   
   /**
-   * Acts just like the linux or unix which command.
-   * 
-   * Searches for an executable of the filename on the system path variable
-   * and in the current directory.
-   * 
-   * @param filename
-   * @return the executable file if found, or null if not.
+   * Checks whether a input resource (a file in the file system
+   * or a resource in the/a jar file) exists and data is available
+   * (in case of files, checks if the file size is greater than 0).
+   * <p>Note:<br/>
+   * This method should be used in combination with {@link OpenFile},
+   * because both searches for the input resources at the same locations.
+   * </p>
+   * @param localFile
+   * @param sourcePackage - if the file is inside a jar, searches for the file,
+   * relative to the given sourcePackage.
+   * @return true if and only if the file or URL denoted by <code>localFile</code>
+   * is available and contains data.
    */
-  public static File which(String filename) {
+  public static boolean checkInputResource(String localFile, Class<?> sourcePackage) {
+    if (localFile==null || localFile.length()<1) return false;
     
-    // Get paths from envivronment variable
-    String path = System.getenv("PATH");
-    String[] paths = path==null?new String[0]:
-       path.split(Pattern.quote(File.pathSeparator));
+    File f  = new File(localFile);
+    if (f.exists() && (f.length()>0) && f.canRead() && f.isFile()) {
+      return true;
+    } else if (sourcePackage.getClassLoader().getResource(localFile)!=null) { // Load from jar - root
+      return true;
+    } else if (sourcePackage.getResource(localFile)!=null) { // Load from jar - relative
+      return true;
+    } else { // Load from Filesystem, relative to program path
+      String curDir = System.getProperty("user.dir");
+      if (!curDir.endsWith(File.separator)) curDir+=File.separator;
+      f = new File (curDir+localFile);
+      if (f.exists() && (f.length()>0) && f.canRead() && f.isFile()){
+        return true;
+      }
+    }
     
-    // Append the current working directory
-    String[] morePaths = new String[paths.length+1];
-    morePaths[0] = System.getProperty("user.dir");
-    System.arraycopy(paths, 0, morePaths, 1, paths.length);
-    
-    // Search for the file
-    return searchExecutableFile(morePaths, filename);
+    return false;
+  }
+  
+  /**
+   * @param name any filename
+   * @return file extension of <code>name</code>
+   */
+  public static String getExtension(String name) {
+    if ((name != null) && (name.length() > 0)) {
+      int pos = name.lastIndexOf('.');
+      if (pos >= 0) {
+        return name.substring(pos + 1);
+      }
+    }
+    return "";
   }
 
 
+  /**
+   * Trims everything but the file name from a url or path.
+   * e.g. "ftp://asf.com/asf/frg.zip" would return "frg.zip".
+   * or "c:\asg\fgj" would return "fgj".
+   * 
+   * @param downloadurl
+   * @return
+   */
+  public static String getFilename(String downloadurl) {
+    char sep = File.separatorChar;
+    int pos = downloadurl.lastIndexOf(sep);
+    if (sep!='/') {
+      // In windows, BOTH \\ and / can be used as separators.
+      pos = Math.max(downloadurl.lastIndexOf(sep), downloadurl.lastIndexOf('/'));
+    }
+    if (pos<0) return downloadurl;
+    else return downloadurl.substring(pos+1);
+  }
+  
+  /**
+   * If the input has a file extension, it is removed. else, the input is
+   * returned.
+   * 
+   * @param fileName
+   * @return
+   */
+  public static String removeFileExtension(String fileName) {
+    int pos = fileName.lastIndexOf('.');
+    return (pos > 0) ? fileName.substring(0, pos) : fileName;
+  }
+  
   /**
    * Searches the given paths for an executable file, with the given name.
    * 
@@ -132,39 +186,6 @@ public class FileTools {
     
     return null;
   }
-
-  /**
-   * This method divides a file into several smaller files
-   * 
-   * @param input: file, that should be splitted
-   * @param outputFolder: where to save the file
-   * @param filename: name of the file, followed by a nummer created during splitting
-   * @param fileExtension: ending of the new files 
-   * @param lineSplit: no after how many lines a new file should be created
-   * @throws IOException 
-   */
-  public static void splitFile(String input, String outputFolder, String filename, String fileExtension,  int lineSplit) throws IOException{
-    int fileNo = 1;
-    int lineCounter = 0;
-    String line = "";
-    BufferedReader br = new BufferedReader(new FileReader(input));
-    BufferedWriter bw = new BufferedWriter(new FileWriter(outputFolder + File.separator + filename + 
-                                  String.valueOf(fileNo) + fileExtension));
-    while((line=br.readLine())!=null){
-      bw.append(line + "\n");
-      lineCounter++;
-      if(lineCounter == lineSplit){
-        bw.close();
-        fileNo++;
-        lineCounter = 0;
-        bw = new BufferedWriter(new FileWriter(outputFolder + File.separator + filename + 
-            String.valueOf(fileNo) + fileExtension));
-      }
-    }
-        
-    bw.close();
-    br.close();
-  }
   
   /**
    * Shuffles the lines in the file with the given filename. This method first
@@ -186,7 +207,7 @@ public class FileTools {
       throw new IOException("Failed to rename the shuffled file '" + tmpFile.getAbsolutePath() + "' to its original name '" + f.getAbsolutePath() + "'");
     }
   }
-  
+
   /**
    * Shuffles the lines in the file with the given filename. This method first
    * reads the whole infile into memory, shuffles it, and then writes it again.
@@ -227,77 +248,91 @@ public class FileTools {
     bw.close();
   }
   
+
   /**
-   * Trims everything but the file name from a url or path.
-   * e.g. "ftp://asf.com/asf/frg.zip" would return "frg.zip".
-   * or "c:\asg\fgj" would return "fgj".
+   * This method divides a file into several smaller files
    * 
-   * @param downloadurl
-   * @return
+   * @param input: file, that should be splitted
+   * @param outputFolder: where to save the file
+   * @param filename: name of the file, followed by a nummer created during splitting
+   * @param fileExtension: ending of the new files 
+   * @param lineSplit: no after how many lines a new file should be created
+   * @throws IOException 
    */
-  public static String getFilename(String downloadurl) {
-    char sep = File.separatorChar;
-    int pos = downloadurl.lastIndexOf(sep);
-    if (sep!='/') {
-      // In windows, BOTH \\ and / can be used as separators.
-      pos = Math.max(downloadurl.lastIndexOf(sep), downloadurl.lastIndexOf('/'));
-    }
-    if (pos<0) return downloadurl;
-    else return downloadurl.substring(pos+1);
-  }
-
-  /**
-   * Checks wether a input resource (a file in the file system
-   * or a resource in the/a jar file) exists and data is available
-   * (in case of files, checks if the file size is greater than 0).
-   * <p>Note:<br/>
-   * This method should be used in combination with {@link OpenFile},
-   * because both searches for the input resources at the same locations.
-   * </p>
-   * @param localFile
-   * @return true, if the resource is available.
-   */
-  public static boolean checkInputResource(String localFile) {
-    return checkInputResource(localFile, FileTools.class);
-  }
-  
-
-  /**
-   * Checks whether a input resource (a file in the file system
-   * or a resource in the/a jar file) exists and data is available
-   * (in case of files, checks if the file size is greater than 0).
-   * <p>Note:<br/>
-   * This method should be used in combination with {@link OpenFile},
-   * because both searches for the input resources at the same locations.
-   * </p>
-   * @param localFile
-   * @param sourcePackage - if the file is inside a jar, searches for the file,
-   * relative to the given sourcePackage.
-   * @return true if and only if the file or URL denoted by <code>localFile</code>
-   * is available and contains data.
-   */
-  public static boolean checkInputResource(String localFile, Class<?> sourcePackage) {
-    if (localFile==null || localFile.length()<1) return false;
-    
-    File f  = new File(localFile);
-    if (f.exists() && (f.length()>0) && f.canRead() && f.isFile()) {
-      return true;
-    } else if (sourcePackage.getClassLoader().getResource(localFile)!=null) { // Load from jar - root
-      return true;
-    } else if (sourcePackage.getResource(localFile)!=null) { // Load from jar - relative
-      return true;
-    } else { // Load from Filesystem, relative to program path
-      String curDir = System.getProperty("user.dir");
-      if (!curDir.endsWith(File.separator)) curDir+=File.separator;
-      f = new File (curDir+localFile);
-      if (f.exists() && (f.length()>0) && f.canRead() && f.isFile()){
-        return true;
+  public static void splitFile(String input, String outputFolder, String filename, String fileExtension,  int lineSplit) throws IOException{
+    int fileNo = 1;
+    int lineCounter = 0;
+    String line = "";
+    BufferedReader br = new BufferedReader(new FileReader(input));
+    BufferedWriter bw = new BufferedWriter(new FileWriter(outputFolder + File.separator + filename + 
+                                  String.valueOf(fileNo) + fileExtension));
+    while((line=br.readLine())!=null){
+      bw.append(line + "\n");
+      lineCounter++;
+      if(lineCounter == lineSplit){
+        bw.close();
+        fileNo++;
+        lineCounter = 0;
+        bw = new BufferedWriter(new FileWriter(outputFolder + File.separator + filename + 
+            String.valueOf(fileNo) + fileExtension));
       }
     }
-    
-    return false;
+        
+    bw.close();
+    br.close();
   }
 
+  /**
+   * Removes the file extension from any filename.
+   * @param name
+   * @return name without the last dot and everything behind it.
+   */
+  public static String trimExtension(String name) {
+    if (name!=null && name.length() > 0) {
+      int pos = name.lastIndexOf('.');
+      if (pos>=0) {
+        return name.substring(0,pos);
+      }
+    }
+    return name;
+  }
+  /**
+   * Acts just like the linux or unix which command.
+   * 
+   * Searches for an executable of the filename on the system path variable
+   * and in the current directory.
+   * 
+   * @param filename
+   * @return the executable file if found, or null if not.
+   */
+  public static File which(String filename) {
+    
+    // Get paths from envivronment variable
+    String path = System.getenv("PATH");
+    String[] paths = path==null?new String[0]:
+       path.split(Pattern.quote(File.pathSeparator));
+    
+    // Append the current working directory
+    String[] morePaths = new String[paths.length+1];
+    morePaths[0] = System.getProperty("user.dir");
+    System.arraycopy(paths, 0, morePaths, 1, paths.length);
+    
+    // Search for the file
+    return searchExecutableFile(morePaths, filename);
+  }
+
+  private static void write(Object toWrite, Appendable out) throws IOException {
+    if (toWrite.getClass().isArray()) {
+      for (int i=0; i<Array.getLength(toWrite); i++) {
+        if (i>0) out.append('\t');
+        Object o2 = Array.get(toWrite, i);
+        out.append(o2.toString());
+      }
+    } else {
+      out.append(toWrite.toString());
+    }
+  }
+  
   /**
    * Writes an Array or a single String to a file.
    * @param toWrite - may be a one or 2D array, or a simple string.
@@ -316,46 +351,6 @@ public class FileTools {
       write(toWrite, out);
     }
     if (out instanceof Closeable)((Closeable)out).close();
-  }
-  private static void write(Object toWrite, Appendable out) throws IOException {
-    if (toWrite.getClass().isArray()) {
-      for (int i=0; i<Array.getLength(toWrite); i++) {
-        if (i>0) out.append('\t');
-        Object o2 = Array.get(toWrite, i);
-        out.append(o2.toString());
-      }
-    } else {
-      out.append(toWrite.toString());
-    }
-  }
-
-  /**
-   * @param name any filename
-   * @return file extension of <code>name</code>
-   */
-  public static String getExtension(String name) {
-    if ((name != null) && (name.length() > 0)) {
-      int pos = name.lastIndexOf('.');
-      if (pos >= 0) {
-        return name.substring(pos + 1);
-      }
-    }
-    return "";
-  }
-  
-  /**
-   * Removes the file extension from any filename.
-   * @param name
-   * @return name without the last dot and everything behind it.
-   */
-  public static String trimExtension(String name) {
-    if (name!=null && name.length() > 0) {
-      int pos = name.lastIndexOf('.');
-      if (pos>=0) {
-        return name.substring(0,pos);
-      }
-    }
-    return name;
   }
   
 }
