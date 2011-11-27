@@ -698,11 +698,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   @SuppressWarnings("rawtypes")
   private static Object createNewArray(Object type, int size) {
-    Class elementType=null;
-    if (type instanceof Class)
+    Class elementType = null;
+    if (type instanceof Class) {
       elementType = (Class) type;
-    else if (type.getClass().isArray())
+    } else if (type.getClass().isArray()) {
       elementType = type.getClass().getComponentType();
+    }
     
     // If oldArray was in fact no array, then elementType==null here.
     if (elementType==null) elementType = type.getClass();
@@ -754,20 +755,20 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     try {
       in.defaultReadObject();
-    } catch (Exception e) {
-      throw new IOException("Could not read cache from disk.",e);
+    } catch (Exception exc) {
+      throw new IOException("Could not read cache from disk.", exc);
     }
     
     restoreUnserializableObject();
     cacheChangedSinceLastLoading=false;
     
     // Eventually change old file for compatibility with latest release
-    if (version!=latestVersion) {
-      if (version<1) {
+    if (version != latestVersion) {
+      if (version < 1) {
         clearCache();
       }
       
-      version=latestVersion;
+      version = latestVersion;
     }
   }
   
