@@ -240,8 +240,8 @@ public abstract class Launcher implements Runnable, Serializable {
  * @return An array of package names whose log messages should appear.
  */
 public abstract String[] getLogPackages();
-	
-  /**
+
+	/**
 	 * Gives the location where the license of this program is documented. This
 	 * could be, for instance, <a
 	 * href="http://www.gnu.org/copyleft/gpl.html">http:
