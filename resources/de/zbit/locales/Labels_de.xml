@@ -112,9 +112,10 @@
     <entry key="COPYRIGHT_MESSAGE">%s
 Urheberrecht © %d-%d Universität Tübingen,
 Zentrum für Bioinformatik Tübingen (ZBIT).
-Dieses Programm bietet KEINERLEI GARANTIE.
-Dies ist freie Software, die Sie gern unter 
-bestimmten Bedingungen weiter verbreiten dürfen.
+Dieses Programm wird unter AUSSCHLUSS JEGLICHER
+GEWÄHRLEISTUNG UND HAFTUNG kostenlos zur Verfügung
+gestellt. Dies ist freie Software, die Sie gern unter
+bestimmten Bedingungen weiterverbreiten dürfen.
 </entry>
   <entry key="LINK_TO_LICENSE_FILE">Siehe %s für Details.</entry>
   
