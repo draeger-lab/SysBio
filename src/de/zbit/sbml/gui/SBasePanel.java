@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -87,7 +89,8 @@ import de.zbit.util.StringUtil;
  */
 @SuppressWarnings("deprecation")
 public class SBasePanel extends JPanel {
-
+  public static final transient Logger log = Logger.getLogger(SBasePanel.class.getName());
+  
 	/**
 	 * Generated serial version id.
 	 */
@@ -616,8 +619,13 @@ public class SBasePanel extends JPanel {
 		JTextField sboTermField = new JTextField();
 		sboTermField.setEditable(editable);
 		if (sbase.isSetSBOTerm()) {
-			sboTermField.setText(SBOTermFormatter.getShortDefinition(SBO.getTerm(sbase.getSBOTerm())));
-			sboTermField.setColumns(sboTermField.getText().length());
+		  try {
+		    sboTermField.setText(SBOTermFormatter.getShortDefinition(SBO.getTerm(sbase.getSBOTerm())));
+		  } catch (Exception e) {
+		    // NoSuchElementException if ontology file is outdated
+		    log.log(Level.WARNING, "Could not get SBO identifier.", e);
+		  }
+		  sboTermField.setColumns(sboTermField.getText().length());
 		}
 		lh.add(sboTermField, 3, row, 1, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);

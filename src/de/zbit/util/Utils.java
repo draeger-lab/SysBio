@@ -319,6 +319,7 @@ public class Utils {
    * @param listIsAlreadySorted in doubt, set to false.
    * @return
    */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public static double quantile(List values, int quantile, boolean listIsAlreadySorted) {
     if (values.size()<1) return Double.NaN;
     if (!listIsAlreadySorted) Collections.sort(values);
@@ -1891,6 +1892,23 @@ public class Utils {
     // All called methods consinder the whole, unsorted collection!
     return(String.format("Min:%s, Mean:%s, Median:%s, Max:%s",
       Utils.min(values), Utils.average(values), Utils.median(values), Utils.max(values) )); 
+  }
+  
+  /**
+   * Creates a string that summarizes the given collection by
+   * returning min, max, median and mean.
+   * Example: "Min:0, Mean:4, Median:5, Max:10"
+   * @param <T>
+   * @param values
+   * @param roundToDigits round given values to this number of digits
+   * @return "Min:%s, Mean:%s, Median:%s, Max:%s"
+   */
+  public static <T extends Number> String summary(Collection<T> values, int roundToDigits) {
+    // Could be realized much more efficient by sorting and getting values manually.
+    // All called methods consinder the whole, unsorted collection!
+    return(String.format("Min:%s, Mean:%s, Median:%s, Max:%s",
+      round(Utils.min(values), roundToDigits), round(Utils.average(values), roundToDigits),
+      round(Utils.median(values), roundToDigits), round(Utils.max(values),roundToDigits) )); 
   }
 
   /**
