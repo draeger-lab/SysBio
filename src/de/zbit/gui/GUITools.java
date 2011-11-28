@@ -1971,6 +1971,22 @@ public class GUITools {
     }
     return removed;
   }
+
+
+  /**
+   * Scrolls to the top of the given <code>scrollPanel</code>.
+   * @param scrollPanel
+   */
+  public static void scrollToTop(final JScrollPane scrollPanel) {
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      public void run() { 
+        synchronized (scrollPanel) {
+          scrollPanel.getVerticalScrollBar().setValue(0);
+          scrollPanel.getHorizontalScrollBar().setValue(0);
+        }
+      }
+    });
+  }
   
   
 }

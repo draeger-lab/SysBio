@@ -89,4 +89,11 @@ public interface GUIOptions extends KeyProvider {
 		bundle.getString("DEFAULT_DIRECTORIES_TOOLTIP"),
 		OPEN_DIR, SAVE_DIR);
 	
+	/*
+	 * TODO: It would be useful to save the window width and height here (and maybe state,
+	 * i.e. normal or maximized (NOT MINIMIZED)). Also NOT save x/y to not set the window
+	 * out of visible area if resolution changes. BUT state and w/h would be useful!
+	 */
+	
+	
 }

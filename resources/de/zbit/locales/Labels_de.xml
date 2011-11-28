@@ -110,7 +110,7 @@
   <entry key="NO_GUI_SUPPORTED">"Das Programm %s in Version %s unterstützt keine graphische Nutzerschnittstelle."</entry>
   <entry key="INCOMPLETE_CMD_ARG_LIST">Unvollständige Liste von Kommandozeilenargumenten. Versuchen Sie, %s Version %s mit der Option --help erneut zu starten.</entry>
     <entry key="COPYRIGHT_MESSAGE">%s
-Urheberrecht © %d-%d Universität Tübingen,
+Copyright © %d-%d Universität Tübingen,
 Zentrum für Bioinformatik Tübingen (ZBIT).
 Dieses Programm wird unter AUSSCHLUSS JEGLICHER
 GEWÄHRLEISTUNG UND HAFTUNG kostenlos zur Verfügung

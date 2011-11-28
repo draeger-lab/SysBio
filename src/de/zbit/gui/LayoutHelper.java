@@ -154,6 +154,19 @@ public class LayoutHelper {
 	}
 	
 	/**
+   * Adds this component in the next row.
+   * @param c
+   * @param spacer
+   */
+  public void add(Component c, boolean spaceLine) {
+    int width = 1;
+    addWithWidth(c, width);
+    if (spaceLine) {
+      add(new JPanel(), 0, ++row, width, 1, 0, 0);
+    }
+  }
+	
+	/**
 	 * Add one or many components in one line.
 	 * 
 	 * @param c
@@ -451,5 +464,13 @@ public class LayoutHelper {
 	public void incrementRowBy(int increment) {
 		row += increment;
 	}
+
+  /**
+   * 
+   */
+  public void addSpacer() {
+    ensurePointerIsAtBeginningOfARow();
+    add(new JPanel(), 0, ++row, 1, 1, 0, 0);
+  }
 	
 }

@@ -903,7 +903,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		// Set this as property for static classes.
 		String appName = getApplicationName();
 		if (appName != null) {
-			System.setProperty("app.name", getApplicationName());
+			System.setProperty("app.name", appName);
+		}
+		String version = getDottedVersionNumber();
+		if (version!=null) {
+		  System.setProperty("app.version", version);
 		}
 		
     // Use the systems proxy settings to establish connections
