@@ -129,7 +129,7 @@ public interface KeyProvider {
 		 * @param headerRank
 		 * @return
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		private static StringBuilder createDocumantationContent(
 			Class<? extends KeyProvider> keyProvider, int headerRank) {
 			StringBuilder sb = new StringBuilder();
@@ -139,12 +139,22 @@ public interface KeyProvider {
 			List<Option> optionList = optionList(keyProvider);
 			if (groupList.size() > 0) {
 				for (OptionGroup<?> group : groupList) {
-					sb.append(createHeadline(headerRank, group.getName()));
-					sb.append("      <p>");
-					sb.append(StringUtil.insertLineBreaks(group.getToolTip(), 70,
-						"\n      "));
-					sb.append("</p>\n");
-					writeOptionsToHTMLTable(sb, group.getOptions(), optionList);
+					if (group.getOptions().size() > 0) {
+						int disabledCount = 0;
+						for (Option<?> option : group.getOptions()) {
+							if (!option.isVisible()) {
+								disabledCount++;
+							}
+						}
+						if (disabledCount < group.getOptions().size()) {
+							sb.append(createHeadline(headerRank, group.getName()));
+							sb.append("      <p>");
+							sb.append(StringUtil.insertLineBreaks(group.getToolTip(), 70,
+								"\n      "));
+							sb.append("</p>\n");
+							writeOptionsToHTMLTable(sb, group.getOptions(), optionList);
+						}
+					}
 				}
 			}
 			if (optionList.size() > 0) {
@@ -555,7 +565,7 @@ public interface KeyProvider {
 		 * @param keyProvider
 		 * @return
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		public static Iterator<OptionGroup> optionGroupIterator(
 			final Class<? extends KeyProvider> keyProvider) {
 			return iterator(keyProvider, OptionGroup.class);
@@ -614,6 +624,7 @@ public interface KeyProvider {
 		 * @param options
 		 * @param removeFromHere
 		 */
+		@SuppressWarnings("rawtypes")
 		private static void writeOptionsToHTMLTable(StringBuilder sb,
 			List<?> options, List<Option> removeFromHere) {
 			sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
@@ -623,7 +634,9 @@ public interface KeyProvider {
 				}
 				Option<?> option = (Option<?>) o;
 	      // Hide options that should not be visible.
-	      if (!option.isVisible()) continue;
+	      if (!option.isVisible()) {
+	      	continue;
+	      }
 				sb.append("        <tr>\n          ");
 				sb.append("<td colspan=\"2\" class=\"typewriter-blue\">");
 				String shortName = option.getShortCmdName();
