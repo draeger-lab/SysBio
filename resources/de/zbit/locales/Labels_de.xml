@@ -19,6 +19,15 @@
   <entry key="COULD_NOT_IDENTIFY_COLUMNS">%d Datenspalten der gegebenen Eingabedatei konnten nicht automatisch den erwarteten Spalten zugewiesen werden. Bitte führen Sie diese Zuweisung nun manuell durch.</entry>
   <entry key="COLUMN_ASSIGNMENT">Spaltenzuweisung</entry>
   
+  <!-- CSVOptions -->
+  
+  <entry key="CSVOptions">CSV-Optionen</entry>
+  <entry key="CSV_FILE">Eine Datei mit komma-separarierten Einträgen, die geöffnet werden soll.</entry>
+  <entry key="CSV_FILES_OPEN_DIR">Hiermit wird das Standard-Verzeichnis angegeben, in dem sich zu öffnende CSV-Dateien befinden (Dateien mit komma-separierten Einträgen).</entry>
+  <entry key="CSV_FILES_QUOTE_CHAR">Das Zeichen, mit dem zusammenhängende Zeichenketten innerhalb einer Datei mit komma-separierten Werten angebeben werden können, um eine Falsche Deutung von Leerzeichen als Trennzeichen zu verhindern.</entry>
+  <entry key="CSV_FILES_SAVE_DIR">Das Standard-Verzeichnis, in dem CSV-Dateien (Dateien mit komma-separierten Werten) abgespeichert werden.</entry>
+  <entry key="CSV_FILES_SEPARATOR_CHAR">Das Zeichen, mit dem die Werte in einer CSV-Datei getrennt werden sollen. Dies müssen keine Kommas im eigentlichen Sinne sein. Prinzipiell kann jedes UTF8-Zeichen als Separator genutzt werden.</entry>
+    
   <!-- CSVReaderColumnChooser -->
   
   <entry key="REQUIRED_COLUMNS">Erforderliche Spalten </entry>
@@ -56,6 +65,7 @@
   
   <!-- GUIOptions -->
   
+  <entry key="GUIOptions">Optionen für die graphische Oberfläche</entry>
   <entry key="CHECK_FOR_UPDATES">Entscheiden Sie, ob dieses beim Starten im Internet nach Aktualisierungen gesucht werden soll.</entry>
   <entry key="GUI">Wird diese Option angegeben, so wird eine graphische Nutzeroberfläche angezeigt.</entry>
   <entry key="OPEN_DIR">Standardverzeichnis, in dem nach Dateien gesucht werden soll.</entry>

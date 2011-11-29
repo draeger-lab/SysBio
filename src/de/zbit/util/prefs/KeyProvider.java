@@ -134,7 +134,7 @@ public interface KeyProvider {
 			Class<? extends KeyProvider> keyProvider, int headerRank) {
 			StringBuilder sb = new StringBuilder();
 			ResourceBundle bundle = ResourceManager
-					.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);						
+					.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);					
 			List<OptionGroup> groupList = optionGroupList(keyProvider);
 			List<Option> optionList = optionList(keyProvider);
 			if (groupList.size() > 0) {
@@ -375,6 +375,11 @@ public interface KeyProvider {
 		 */
 		public static String createTitle(Class<?> clazz) {
 			String title = clazz.getSimpleName();
+      ResourceBundle bundle = ResourceManager
+          .getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+      if (bundle.containsKey(title)) {
+        return bundle.getString(title);
+      }
 			StringBuilder headLine = new StringBuilder();
 			headLine.append(title.charAt(0));
 			for (int i = 1; i < title.length(); i++) {

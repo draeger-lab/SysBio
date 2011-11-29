@@ -85,8 +85,16 @@ import de.zbit.util.ResourceManager;
  * @since 1.0
  */
 public class CSVReaderOptionPanel extends JPanel {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = -3459654748893049315L;
-  public static final transient Logger log = Logger.getLogger(CSVReaderOptionPanel.class.getName());
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  public static final transient Logger logger = Logger.getLogger(CSVReaderOptionPanel.class.getName());
 
   // Save original and modified CSV Reader (for the cancel button)
   private final CSVReader original;
@@ -885,7 +893,7 @@ public class CSVReaderOptionPanel extends JPanel {
     try {
       currentPreview = buildPreview(numDataLinesForPreview);
     } catch (Exception e) {
-      log.log(Level.WARNING, "Exception while refreshing the preview table.", e);
+      logger.log(Level.WARNING, "Exception while refreshing the preview table.", e);
     }
     
     setBorder(currentPreview, getFilePreviewCaption());
@@ -949,7 +957,7 @@ public class CSVReaderOptionPanel extends JPanel {
     try {
       initGUI();
     } catch (IOException e) {
-      log.log(Level.WARNING, "Exception while rebuilding the preview table.", e);
+      logger.log(Level.WARNING, "Exception while rebuilding the preview table.", e);
     }
     
     validate();
