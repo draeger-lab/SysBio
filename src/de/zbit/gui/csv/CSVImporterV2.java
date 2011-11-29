@@ -76,7 +76,11 @@ import de.zbit.util.ResourceManager;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListener{
+public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListener {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = -1351897174228755331L;
 
   /**
@@ -95,7 +99,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
    * match the given RegEx pattern (if
    * {@link ExpectedColumn#regExPatternForInitialSuggestion} is not null)).
    */
-  boolean hideAutoIdentifiedColumns=false;
+  boolean hideAutoIdentifiedColumns = false;
 
   /**
    * A field that is added to each combo box to allow ignoring columns.
@@ -105,12 +109,12 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
   /**
    * This array holds the selections from {@link #exCols} for the column indices.
    */
-  private Integer[] exColSelections=null;
+  private Integer[] exColSelections = null;
   
   /**
-   * This array holds the selected type for the collumn in the indice.
+   * This array holds the selected type for the column in the indices.
    */
-  private Integer[] exColTypeSelections=null;
+  private Integer[] exColTypeSelections = null;
   
   /**
    * The {@link TableCellRenderer} and {@link ListCellRenderer} that is used
@@ -121,18 +125,34 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
   /**
    * A button that allows to rename expected column headers
    */
-  private String renameButtonCaption="Edit names";
+  private String renameButtonCaption = "Edit names";
   
+  /**
+   * 
+   * @param reader
+   * @throws IOException
+   */
   private CSVImporterV2(CSVReader reader) throws IOException {
     super(reader, false);
     this.inFile = reader.getFilename();
   }
   
+  /**
+   * 
+   * @param filepath
+   * @throws IOException
+   */
   private CSVImporterV2(String filepath) throws IOException {
     this(new CSVReader(filepath));
     this.inFile = filepath;
   }
   
+  /**
+   * 
+   * @param filepath
+   * @param expectedHeaders
+   * @throws IOException
+   */
   public CSVImporterV2(String filepath, String... expectedHeaders) throws IOException {
     this(filepath);
     exCols = new ArrayList<ExpectedColumn>(expectedHeaders.length);
@@ -142,24 +162,53 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     init(exCols);
   }
   
+  /**
+   * 
+   * @param filepath
+   * @param expectedColumns
+   * @throws IOException
+   */
   public CSVImporterV2(String filepath, ExpectedColumn... expectedColumns) throws IOException {
     this(filepath, Arrays.asList(expectedColumns));
   }
   
+  /**
+   * 
+   * @param reader
+   * @param expectedColumns
+   * @throws IOException
+   */
   public CSVImporterV2(CSVReader reader, ExpectedColumn... expectedColumns) throws IOException {
     this(reader, Arrays.asList(expectedColumns));
   }
   
+  /**
+   * 
+   * @param filepath
+   * @param expectedColumns
+   * @throws IOException
+   */
   public CSVImporterV2(String filepath, Collection<ExpectedColumn> expectedColumns) throws IOException {
     this(filepath);
     init(expectedColumns);
   }
   
+  /**
+   * 
+   * @param reader
+   * @param expectedColumns
+   * @throws IOException
+   */
   public CSVImporterV2(CSVReader reader, Collection<ExpectedColumn> expectedColumns) throws IOException {
     this(reader);
     init(expectedColumns);
   }
   
+  /**
+   * 
+   * @param expectedColumns
+   * @throws IOException
+   */
   private void init(Collection<ExpectedColumn> expectedColumns) throws IOException {
     if (expectedColumns instanceof List<?>) {
       exCols = (List<ExpectedColumn>) expectedColumns;
@@ -169,7 +218,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     
     // Prepare initial suggestions for columns
     int nc = getCSVReader().getNumberOfColumns();
-    if (nc>0) {
+    if (nc > 0) {
       exColSelections = new Integer[nc];
       Arrays.fill(exColSelections, 0);
       exColTypeSelections = new Integer[nc];
@@ -187,7 +236,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
       
       
        // Read eventual initial suggestions from exCols
-      int i=0;
+      int i = 0;
       for (ExpectedColumn expectedColumn : expectedColumns) {
         // Old manual selections
         if (expectedColumn.hasAssignedColumns()) {
@@ -204,14 +253,16 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
         } else {
           // Auto-inference based on file content patterns
           int sug = expectedColumn.getInitialSuggestion(getCSVReader());
-          if (sug>=0) exColSelections[sug]=i+1; // +1 because "Ignore Column"
+          if (sug >= 0) {
+            exColSelections[sug] = i + 1; // +1 because "Ignore Column"
+          }
         }
         i++;
       }
     }
     
     // display the GUI
-    setPreferredSize(new java.awt.Dimension(650, 400));
+    setPreferredSize(new Dimension(650, 400));
     initGUI();
   }
   
@@ -232,7 +283,9 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     JPanel p = new JPanel(new BorderLayout());
     p.add(base, BorderLayout.CENTER);
     if (isAColumnRequired()) {
-      p.add(new JLabel("* = "+ ResourceManager.getBundle("de.zbit.locales.Labels").getString("REQUIRED_COLUMNS")), BorderLayout.SOUTH);
+      p.add(new JLabel("* = "
+          + ResourceManager.getBundle("de.zbit.locales.Labels").getString(
+            "REQUIRED_COLUMNS")), BorderLayout.SOUTH);
     }
     if (isRenamingAllowed()) {
       JButton but = new JButton(getRenameButtonCaption());
@@ -250,6 +303,10 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     return renameButtonCaption;
   }
   
+  /**
+   * 
+   * @param caption
+   */
   public void setRenameButtonCaption(String caption) {
     renameButtonCaption = caption;
     refreshPreviewPanel();
@@ -299,7 +356,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     Object[][] dataNew = prependColumnSelectors(data);
     final JTableRowBased table = new JTableRowBased(new JComponentTableModel(dataNew, header));
     rend.setDefaultForegroundColorForJLabels(Color.GRAY);
-    int maxHeadRow = (isATypeSelectorRequired()?2:1);
+    int maxHeadRow = (isATypeSelectorRequired() ? 2 : 1);
     
     // Set an appropriate editor for the expected column and type selectors
     for (int row=0; row<maxHeadRow; row++) {
@@ -597,16 +654,37 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     
     // Set close operations
     jd.addWindowListener(new WindowAdapter() {
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(WindowEvent e) {
         jd.setVisible(false);
       }
     });
     c.addComponentListener(new ComponentListener() {
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.ComponentListener#componentHidden(java.awt.event.ComponentEvent)
+       */
       public void componentHidden(ComponentEvent e) {
         jd.setVisible(false);
       }
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.ComponentListener#componentMoved(java.awt.event.ComponentEvent)
+       */
       public void componentMoved(ComponentEvent e) {}
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
+       */
       public void componentResized(ComponentEvent e) {}
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.ComponentListener#componentShown(java.awt.event.ComponentEvent)
+       */
       public void componentShown(ComponentEvent e) {}
     });
     

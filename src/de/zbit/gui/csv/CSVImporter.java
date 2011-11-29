@@ -46,37 +46,23 @@ import de.zbit.util.StringUtil;
  * {@link #getColumnIndex(String)} directly delivers the new column index of the
  * expected table head entry or minus one if no such element exists.
  * 
- * <p><b>Deprecated since July 2011. Please use {@link CSVImporterV2} instead.</b></p>
+ * Demo usuage:
+ * <pre>
+ * String expectedHead[] = new String[] { &quot;A&quot;, &quot;B&quot;, &quot;C&quot; };
+ * CSVImporter converter = new CSVImporter(&quot;files/sample.csv.txt&quot;, expectedHead);
+ * System.out.println(Arrays.toString(converter.getColumnAssignment()));
+ * System.out.println(Arrays.toString(converter.getNewHead()));
+ * </pre>
  * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
  * @date 2010-09-03
  * @version $Rev$
  * @since 1.0
+ * @deprecated since July 2011. Please use {@link CSVImporterV2} instead.
  */
 @Deprecated
 public class CSVImporter {
-
-	/**
-	 * For testing only
-	 * 
-	 * @param args
-	 *            a list of {@link String}s for the expected head and the path
-	 *            to a file to be parsed.
-	 * @throws IOException
-	 */
-	public static void main(String[] args) throws IOException {
-		if (args.length < 1) {
-		  args = new String[]{"A","B","C", "files/sample.csv.txt"};
-		  System.out.println("Using a demo file.");
-		}
-		
-		String expectedHead[] = new String[args.length - 1];
-		System.arraycopy(args, 0, expectedHead, 0, args.length - 1);
-		CSVImporter converter = new CSVImporter(args[args.length - 1],expectedHead);
-		System.out.println(Arrays.toString(converter.getColumnAssignment()));
-		System.out.println(Arrays.toString(converter.getNewHead()));
-	}
 
 	/**
 	 * Switch of whether or not to hide those column names that can be
@@ -409,4 +395,5 @@ public class CSVImporter {
 	public boolean isCanceled() {
 		return cancelOption;
 	}
+
 }

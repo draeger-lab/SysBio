@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,14 +72,23 @@ import de.zbit.util.StringUtil;
  * @version $Rev$
  * @since 1.0
  */
-public class CSVReader implements Serializable, Cloneable, Closeable {
+public class CSVReader implements Cloneable, Closeable, Serializable {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = 7784651184371604357L;
+  
+  /**
+   * A {@link java.util.logging.Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(CSVReader.class.getName());
 
   /**
    * All lines, starting with one of these characters will be skipped.
    * By default, "#" and ";" will be added (you may remove them manually).
    */
-  private ArrayList<Character> CommentIndicators = new ArrayList<Character>();
+  private List<Character> CommentIndicators = new ArrayList<Character>();
   
   /**
    * Contains columns indices. All column indices in this array will
@@ -86,7 +96,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * E.g. if this contains just [1] and reading the line "A B C"
    * it will result is a returned split of "[A], [null], [C]".
    */
-  private ArrayList<Integer> setToNull = new ArrayList<Integer>();
+  private List<Integer> setToNull = new ArrayList<Integer>();
   
   /**
    * Indicates, that this file contains headers
@@ -103,13 +113,13 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * it can extract files from zips and the url might lay within the same jar or is
    * an external file. Everything is handled automatically.
    */
-  private boolean useOpenFileMethod=true;
+  private boolean useOpenFileMethod = true;
   
   /**
    * If true, empty lines will be skipped. If false, a String[0]
    * will be created from empty lines. Default: true.
    */
-  private boolean skipEmptyLines=true;
+  private boolean skipEmptyLines = true;
   
   /**
    * If this value is set to anything else than null, it is used in
@@ -117,7 +127,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * This allows to use file names, relative to packages, which will
    * work in a file system and for resources inside a jar file.
    */
-  private Class<?> useParentPackageForOpeningFiles=null;
+  private Class<?> useParentPackageForOpeningFiles = null;
   
   /**
    * Removes " symbol at cell start and end.
@@ -133,12 +143,12 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * 
    * Usually, no getter or setter required. Value is infered automatically.
    */
-  private boolean treatMultipleConsecutiveSeparatorsAsOne=false;
+  private boolean treatMultipleConsecutiveSeparatorsAsOne = false;
   
   /**
    * Auto detects {@link #treatMultipleConsecutiveSeparatorsAsOne}
    */
-  private boolean autoDetectTreatMultipleConsecutiveSeparatorsAsOne=true;
+  private boolean autoDetectTreatMultipleConsecutiveSeparatorsAsOne = true;
   
   
   /**
@@ -151,7 +161,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * 
    * Default: false
    */
-  private boolean trimLinesAfterReading=false;
+  private boolean trimLinesAfterReading = false;
   
   /**
    * This should always be true.
@@ -163,19 +173,19 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * If greater than 0 skips this number of lines directly after
    * opening the file for all operations.
    */
-  private int skipLines=0;
+  private int skipLines = 0;
   
   /**
    * A flag if the initialize method has already been calles successfuly.
    */
-  private boolean isInitialized=false;
+  private boolean isInitialized = false;
   
   /**
    * The column separator char.
    * If not set ('\u0000' = Null Character), it will be infered automatically.
    * '\u0001' equals the Regex whitespace (\\s).
    */
-  private char separatorChar='\u0000';
+  private char separatorChar = '\u0000';
   
   /**
    * ... if separatorChar is infered automatically, one of these chars in the given order
@@ -185,7 +195,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * without notice to the author of this class.
    * '\u0001' equals the Regex whitespace (\\s).
    */
-  private char[] trennzeichen = new char[]{'\t', ',', ';', '|', '/', ' ', '\u0001'};
+  private char[] separatorChars = new char[]{'\t', ',', ';', '|', '/', ' ', '\u0001'};
   
   /**
    * A common pattern for "any whitespace" that is used in many methods.
@@ -202,32 +212,44 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   /**
    * Number of columns.
    */
-  private int numCols=-1;
+  private int numCols = -1;
   
   /**
    * The number of data lines (all lines in the file, that do not belong to the preamble,
    * that are no comment lines and no header line).
    */
-  private int numDataLines=-1;
+  private int numDataLines = -1;
   
   /**
    * If a file is currently open, this enables to read it line by line and not the whole file.
    */
-  private transient BufferedReader currentOpenFile=null;
+  private transient BufferedReader currentOpenFile = null;
   
   /**
    * Display the progress, while reading the file.
    */
-  private boolean displayProgress=false;
-  private transient FileReadProgress progress=null;
-  private transient AbstractProgressBar progressBar=null;
+  private boolean displayProgress = false;
+  /**
+   * 
+   */
+  private transient FileReadProgress progress = null;
+  /**
+   * 
+   */
+  private transient AbstractProgressBar progressBar = null;
   
   /**
    * The file to read.
    */
   private String filename;
   
+  /**
+   * 
+   */
   private String[] headers;
+  /**
+   * 
+   */
   private String[][] data;
   
   /**
@@ -249,26 +271,36 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     this(filename);
     setContainsHeaders(containsHeaders);
   }
+  
+  /**
+   * 
+   * @param filename
+   */
   public CSVReader(String filename) {
-    isInitialized=false;
+    isInitialized = false;
     CommentIndicators.add(';');
     CommentIndicators.add('#');
     
     this.filename = filename;
-    autoDetectContainsHeaders=true;
-    useParentPackageForOpeningFiles=Reflect.getParentClass();
+    autoDetectContainsHeaders = true;
+    useParentPackageForOpeningFiles = Reflect.getParentClass();
   }
   
   /**
    * Adds a new Symbol, which indicates that this line should be treated as a comment (=>ignored)
    */
-  public void addCommentInidicator (char c) {
+  public void addCommentInidicator(char c) {
     if (!(CommentIndicators.contains((c)))) {
       CommentIndicators.add((c));
       isInitialized=false;
     }
   }
-  public void removeCommentIndicator (char c) {
+  
+  /**
+   * 
+   * @param c
+   */
+  public void removeCommentIndicator(char c) {
     while (CommentIndicators.contains(c)) {
       // Must cast to object. Else, the char is treated as int
       // and leads to index out of bounds.
@@ -282,19 +314,25 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * @param b yes (true) or false (no). Default: yes
    */
   public void setContainsHeaders(boolean b) {
-    if (b!=containsHeaders) isInitialized=false;
+    if (b!=containsHeaders) {
+      isInitialized = false;
+    }
     containsHeaders = b;
     autoDetectContainsHeaders=false;
   }
   
+  /**
+   * 
+   * @return
+   */
   public boolean getContainsHeaders() {
     if (!isInitialized && autoDetectContainsHeaders) {
       try {
         initialize();
       } catch (IOException e) {
-        e.printStackTrace();
+        logger.fine(e.getLocalizedMessage());
       }
-    }  
+    }
     
     return this.containsHeaders;
   }
@@ -335,7 +373,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       try {
         initialize();
       } catch (IOException e) {
-        e.printStackTrace();
+        logger.fine(e.getLocalizedMessage());
       }
     }
     
@@ -357,6 +395,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       isInitialized=false;
     this.trimLinesAfterReading = trimLinesAfterReading;
   }
+  
   /**
    * If greater than 0 skips this number of lines directly after
    * opening the file for all operations.
@@ -434,12 +473,13 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       try {
         initialize();
       } catch (IOException e) {
-        e.printStackTrace();
+        logger.fine(e.getLocalizedMessage());
       }
     }
     
     return treatMultipleConsecutiveSeparatorsAsOne;
   }
+  
   /**
    * See {@link #getTreatMultipleConsecutiveSeparatorsAsOne()}
    * 
@@ -477,6 +517,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   public boolean isSkipEmptyLines() {
     return skipEmptyLines;
   }
+  
   /**
    * @see #skipEmptyLines
    * @param skipEmptyLines the skipEmptyLines to set
@@ -484,13 +525,15 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   public void setSkipEmptyLines(boolean skipEmptyLines) {
     this.skipEmptyLines = skipEmptyLines;
   }
+  
   /**
-   * Set wether you want to remove the char " or ' when it occurs at the start and end of a cell.
+   * Set whether you want to remove the char " or ' when it occurs at the start and end of a cell.
    * @param b - if false will return e.g. ["hallo a"]; if true e.g.  [hallo a]. Default: true.
    */
   public void setRemoveStringIndiciatorsAtCellStartEnd(boolean b) {
     removeStringIndiciatorsAtCellStartEnd = b;
   }
+  
   /**
    * Set the separator char, by which columns are separated. If not set, the algorithm will try to infer this automatically.
    * Set it to '\u0000' to infere it automatically.
@@ -514,7 +557,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       try {
         initialize();
       } catch (IOException e) {
-        e.printStackTrace();
+        logger.fine(e.getLocalizedMessage());
       }
     }
     
@@ -593,8 +636,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
         if (data[i]!=null)
           data[i][column] = null;
     }
-  }
-  
+  }  
   
   /**
    * Allows to override the progressBar.
@@ -629,10 +671,12 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * @return
    */
   public String[][] getData(){
-    if (data==null) try {
-      readUsingArrayList();
-    } catch (IOException e) {
-      e.printStackTrace();
+    if (data == null) { 
+      try {
+        readUsingArrayList();
+      } catch (IOException e) {
+        logger.fine(e.getLocalizedMessage());
+      }
     }
     return this.data;
   }
@@ -652,11 +696,13 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * @return
    */
   public String[] getHeader(){
-    if (containsHeaders && headers==null ||
+    if (containsHeaders && (headers == null) ||
         !isInitialized) {
       try {
         initialize();
-      } catch (IOException e) {e.printStackTrace();}
+      } catch (IOException e) {
+        logger.fine(e.getLocalizedMessage());
+      }
     }
     return this.headers;
   }
@@ -676,10 +722,12 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * Returns the number of columns.
    */
   public int getNumberOfColumns() {
-    if (this.numCols<0)  {
+    if (this.numCols < 0)  {
       try {
         if (!isInitialized) initialize();
-      } catch (IOException e) {e.printStackTrace();}
+      } catch (IOException e) {
+        logger.fine(e.getLocalizedMessage());
+      }
     }
     return this.numCols;
   }
@@ -700,24 +748,27 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       try {
         initialize();
       } catch (IOException e) {
-        e.printStackTrace();
+        logger.fine(e.getLocalizedMessage());
       }
     }
     
-    if (headers==null) return -1;
-    for (int i=0; i<headers.length;i++) {
+    if (headers == null) {
+      return -1;
+    }
+    for (int i = 0; i<headers.length; i++) {
       String c = new String(headers[i]).toLowerCase();
       
       // Check if all words that should be contained are actually contained.
       boolean allContained=true;
-      for (int si=0; si<s.length; si++) {
+      for (int si = 0; si < s.length; si++) {
         if (!c.toLowerCase().contains(s[si].toLowerCase())) {
           allContained=false;
           break;
         }
       }
-      if (allContained) return i;
-      
+      if (allContained) {
+        return i;
+      }
     }
     return -1;
   }
@@ -738,7 +789,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       try {
         initialize();
       } catch (IOException e) {
-        e.printStackTrace();
+        logger.fine(e.getLocalizedMessage());
       }
     }
     
@@ -760,28 +811,43 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   
   /**
    * If column headers have been read, this function will return the column
-   * number, that equals string @param s case INsensitive.
+   * number, that equals string parameters case INsensitive.
    * 
-   * If no headers have been read or if the string does not equal any
-   * column, returns -1
+   * If no headers have been read or if the string does not equal any column,
+   * returns -1
    * 
-   * If multiple @param s are specified, an OR search will be performed.
-   *  
+   * @param names
+   *        If multiple parameters are specified, an OR search will be
+   *        performed.
+   * 
    * @return integer, column number
    */
-  public int getColumn(String... s) {
+  public int getColumn(String... names) {
+    return getColumn(false, names);
+  }
+  
+  /**
+   * 
+   * @param caseSensitive
+   * @param names
+   * @return
+   */
+  public int getColumn(boolean caseSensitive, String... names) {
     if (!isInitialized) {
       try {
         initialize();
       } catch (IOException e) {
-        e.printStackTrace();
+        logger.fine(e.getLocalizedMessage());
       }
     }
-    
-    if (headers==null) return -1;
-    for (int i=0; i<headers.length;i++) {
-      for (String target: s) {
-        if (headers[i].equalsIgnoreCase(target)) return i;
+    if (headers != null) {
+      for (int i = 0; i < headers.length; i++) {
+        for (String target : names) {
+          if ((caseSensitive && headers[i].equals(target))
+              || (!caseSensitive && headers[i].equalsIgnoreCase(target))) {
+            return i;
+          }
+        }
       }
     }
     return -1;
@@ -789,32 +855,35 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
   
   /**
    * If column headers have been read, this function will return the column
-   * number, that equals string @param s case sensitive.
+   * number, that equals string the given parameter case sensitive.
    * 
    * If no headers have been read or if the string does not equal any
    * column, returns -1
-   *  
+   * 
+   * @param columnName
    * @return integer, column number
    */
-  public int getColumnSensitive(String s) {
-    if (!isInitialized) {
-      try {
-        initialize();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    
-    if (headers==null) return -1;
-    for (int i=0; i<headers.length;i++) {
-      if (headers[i].equals(s)) return i;
-    }
-    return -1;
+  public int getColumnSensitive(String columnName) {
+    return getColumn(true, columnName);
   }
   
+  /**
+   * 
+   * @param filename
+   * @return
+   * @throws IOException
+   */
   private BufferedReader getAndResetInputReader(String filename) throws IOException {
     return getAndResetInputReader(filename, null);
   }
+  
+  /**
+   * 
+   * @param filename
+   * @param preamble
+   * @return
+   * @throws IOException
+   */
   private BufferedReader getAndResetInputReader(String filename, StringBuffer preamble) throws IOException {
     BufferedReader in;
     if (useOpenFileMethod) {
@@ -855,7 +924,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     // Make a list of separator chars to analyze
     char[] separatorChars;
     if (separatorChar=='\u0000') {// Need to be infered
-      separatorChars = this.trennzeichen.clone();
+      separatorChars = this.separatorChars.clone();
     } else {
       separatorChars = new char[]{separatorChar};
     }
@@ -1035,7 +1104,7 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
         try {
           line = getNextLine();
         } catch (IOException e) {
-          e.printStackTrace();
+          logger.fine(e.getLocalizedMessage());
           break;
         }
         if (line==null) break; // EOF
@@ -1333,7 +1402,9 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
       }
       
       return containsHeaders(headerLine, dataLine);
-    } catch (Exception ex) {ex.printStackTrace();}
+    } catch (Exception e) {
+      logger.fine(e.getLocalizedMessage());
+    }
     return false;
   }
   
@@ -1604,13 +1675,14 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
    * @return
    */
   public int getNumberOfDataLines() {
-    if (numDataLines<0 || !isInitialized) {
+    if ((numDataLines < 0) || !isInitialized) {
       // Only the case, if open has been called or neither open nor read.
       try {
         countNumberOfLines();
-      } catch (IOException e) {e.printStackTrace();}
-    }
-    
+      } catch (IOException e) {
+        logger.fine(e.getLocalizedMessage());
+      }
+    }    
     return numDataLines;
   }
   
@@ -1914,11 +1986,21 @@ public class CSVReader implements Serializable, Cloneable, Closeable {
     if (!atLeastOneDigit) return false; // Only "-" or "..." is no number.
     return true;
   }
+  
+  /**
+   * 
+   * @param s
+   * @return
+   */
   public static boolean isIntegerNumber(String s) {
-    if (s==null || s.length()<1) return false;
-    try{
+    if ((s == null) || (s.length()<1)) {
+      return false;
+    }
+    try {
       Integer.parseInt(s);
-    } catch (Exception e) {return false;}
+    } catch (Exception e) {
+      return false;
+    }
     return true;
   }
   

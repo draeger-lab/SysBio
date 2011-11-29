@@ -32,7 +32,11 @@ import de.zbit.io.CSVReader;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> {
+public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = 110385651572193188L;
 
   /**
@@ -42,7 +46,7 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
   Object name;
   
   /**
-   * Original, non-changeable name of the expected column (E.g. "Observation 1")
+   * Original, non-changeable name of the expected column (e.g., "Observation 1")
    */
   private final Object originalName;
   
@@ -50,36 +54,36 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
    * If multiple types can be interpreted, a list of acceptable types.
    * E.g. "pValue", "Fold change",...
    */
-  Object[] type=null;
+  Object[] type = null;
   
   /**
    * Is this Column required or optional?
    */
-  boolean required=true;
+  boolean required = true;
   
   /**
    * May multiple columns (e.g. with different types) be assigned to this column?
    * (e.g. an observation with pValue and fold change).
    */
-  boolean multiSelectionAllowed=false;
+  boolean multiSelectionAllowed = false;
   
   /**
    * Only if {@link #multiSelectionAllowed}, further restricts multiple selections to
    * selections with a different {@link #type}.
    */
-  boolean multiSelectionOnlyWithDifferentType=true;
+  boolean multiSelectionOnlyWithDifferentType = true;
   
   /**
    * Is renaming of the {@link #name} allowed?
    */
-  boolean renameAllowed=false;
+  boolean renameAllowed = false;
   
   /**
    * Besides matching the column headers with {@link #name}, this can be
    * set to make an initial suggestion for a column.
    * (E.g., ".*_at" identifies a column with AffyMetrix probe identifiers).
    */
-  String regExPatternForInitialSuggestion=null;
+  String regExPatternForInitialSuggestion = null;
   
   /**
    * A list of assigned columns. This list is only valid if the ok
@@ -100,7 +104,7 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
    */
   public ExpectedColumn(Object name) {
     super();
-    this.name=name;
+    this.name = name;
     this.originalName = name;
   }
   /**
@@ -145,12 +149,14 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
     this(name, type, required, multiSelectionAllowed, multiSelectionOnlyWithDifferentType, renameAllowed);
     this.regExPatternForInitialSuggestion = regExPatternForInitialSuggestion;
   }
+  
   /**
    * @return true if and only if {@link #type} contains more than one element. 
    */
   public boolean isSetTypeSelection() {
-    return type!=null&&type.length>0;
+    return (type != null) && (type.length > 0);
   }
+  
   /**
    * @return a {@link ComboBoxModel} for {@link #type}.
    */
@@ -166,7 +172,7 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
    */
   public int getInitialSuggestion(CSVReader r) {
     int sug = r.getColumn(name.toString());
-    if (sug<0 && isSetRegExPatternForInitialSuggestion()) {
+    if ((sug < 0) && isSetRegExPatternForInitialSuggestion()) {
       try {
         sug = r.getColumnByMatchingContent(regExPatternForInitialSuggestion,0,500);
       } catch (IOException e) {}
@@ -195,7 +201,7 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
    */
   @Override
   public String toString() {
-    return name.toString() + (required?"*":"");
+    return name.toString() + (required? "*" : "");
   }
   /**
    * A list of assigned columns. This list is only valid if the ok
@@ -232,6 +238,11 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
     return getAssignedType(0);
   }
   
+  /**
+   * 
+   * @param assignedColumnIndex
+   * @return
+   */
   public Object getAssignedType(int assignedColumnIndex) {
     if (type!=null && assignedTypeForEachColumn!=null &&
         assignedTypeForEachColumn.size()>0) {
@@ -255,6 +266,7 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
     }
     return -1;
   }
+  
   /**
    * For optional columns, this returns wether this {@link ExpectedColumn}
    * has assigned columns or not.
@@ -278,12 +290,14 @@ public class ExpectedColumn implements Serializable, Comparable<ExpectedColumn> 
   public boolean isRenamed() {
     return !isOriginalName();
   }
+  
   /**
    * @return the originally assigned name.
    */
   public Object getOriginalName() {
     return originalName;
   }
+  
   /* (non-Javadoc)
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
