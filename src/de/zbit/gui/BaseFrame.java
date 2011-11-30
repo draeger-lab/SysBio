@@ -20,6 +20,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
 import java.awt.MenuItem;
@@ -561,7 +562,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 					InputEvent.CTRL_DOWN_MASK), 'W', false);
 		}
 		JMenuItem exit = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "exit"), BaseAction.FILE_EXIT, UIManager
+			ActionListener.class, this, "exitPre"), BaseAction.FILE_EXIT, UIManager
 				.getIcon("ICON_EXIT_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F4,
 			InputEvent.ALT_DOWN_MASK));
 		JMenuItem items[] = additionalFileMenuItems();
@@ -697,6 +698,48 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 *         program.
 	 */
 	protected abstract Component createMainComponent();
+	
+	/**
+	 * This method is called when the window closes as well as
+	 * when the user presses the Exit button in the {@link JMenu}.
+	 * This is used to prepare the exit, before the actual exit
+	 * method {@link #exit()} is callsed (i.e. store window
+	 * size and state).
+	 */
+	public void exitPre() {
+	  // Save with/height and window state
+    SBPreferences windowProperties = SBPreferences.getPreferencesFor(GUIOptions.class);
+    if (getExtendedState()==Frame.NORMAL) {
+      // Do not store width and height of a maximized window.
+      // Rather also store the state and restore this"
+      windowProperties.put(GUIOptions.WINDOW_WIDTH, getWidth());
+      windowProperties.put(GUIOptions.WINDOW_HEIGHT, getHeight());
+    }
+    windowProperties.put(GUIOptions.WINDOW_STATE, getExtendedState());
+    try {
+      windowProperties.flush();
+    } catch (BackingStoreException exc) {
+      // Really not to mention this unimportant error
+    }
+    
+    // Call real exit method
+    exit();
+	}
+	
+	 /**
+   * Restores the window width, height and state from preferences.
+   */
+  private void restoreWindowSizeAndState() {
+    SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+    int width = GUIOptions.WINDOW_WIDTH.getValue(prefs);
+    int height = GUIOptions.WINDOW_HEIGHT.getValue(prefs);
+    int state = GUIOptions.WINDOW_STATE.getValue(prefs);
+    setSize(new java.awt.Dimension(width, height));
+    if (state!=Frame.ICONIFIED) {
+      // Never set a frame to be initially iconified ;-)
+      setExtendedState(state);
+    }
+  }
 	
 	/**
 	 * Method that is called on exit, i.e., when this {@link BaseFrame}
@@ -934,7 +977,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		// Do nothing is important! The actual closing is handled in "windowClosing()"
 		// which is not called on other close operations!
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		addWindowListener(EventHandler.create(WindowListener.class, this, "exit",
+		addWindowListener(EventHandler.create(WindowListener.class, this, "exitPre",
 			null, "windowClosing"));
 		boolean loadsDefaultFileMenuEntries = loadsDefaultFileMenuEntries();
 		setJMenuBar(createJMenuBar(loadsDefaultFileMenuEntries));
@@ -961,13 +1004,16 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		// Init status bar
 		statusBar = initializeStatusBar();
 		
-		pack();
+		
+  	// Restore last window size and state
 		setMinimumSize(new Dimension(640, 480));
+		pack();
+		restoreWindowSizeAndState();
 		setLocationRelativeTo(null);
 	}
 
 
-	/**
+  /**
 	 * Initialize the status bar. This method can be overwritten
 	 * and if null is returned, the status bar is disabled.
 	 */
