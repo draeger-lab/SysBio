@@ -234,7 +234,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     String[] localFiles = ArrayUtils.merge(getLocalFiles(), getLocalFile(), tempLocalFile);
     for (String localFile: localFiles) {
       if (!FileTools.checkInputResource(localFile, this.getClass())) {
-        log.config("Skipping " + getMappingName() + " mapping file " + localFile==null?"null":localFile);
+        log.config("Skipping " + getMappingName() + " mapping file " + (localFile==null?"null":localFile));
         continue;
       }
       log.config("Reading " + getMappingName() + " mapping file " + localFile);
@@ -262,7 +262,6 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
       // Read Source <=> Target mapping.
       String[] line;
       r.open();
-      // XXX: When using a progressBar here with a compressed File, the bar Fails!
       while ((line = r.getNextLine())!=null) {
         if (line.length<=maxColumn) {
           log.severe("Incomplete entry in mapping file '" + localFile + "'. Please try to delete this file and execute this application again.");

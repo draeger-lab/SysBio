@@ -28,6 +28,7 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.StringUtil;
 
 /**
@@ -179,6 +180,11 @@ public class CSVWriter {
 	 * The default or current symbol to be used as an indicator for comments
 	 */
 	private char commentSymbol;
+	
+	/**
+	 * Allows to display progress information.
+	 */
+	private AbstractProgressBar progress = null;
 
 	/**
 	 * Creates a new writer for tab-separated files with a comma as column
@@ -188,8 +194,17 @@ public class CSVWriter {
 		separator = '\t';
 		commentSymbol = '#';
 	}
-
+	
 	/**
+	 * 
+	 * @param progress
+	 */
+	public CSVWriter(AbstractProgressBar progress) {
+	  this();
+	  setProgressBar(progress);
+	}
+
+  /**
 	 * 
 	 * @param separator
 	 */
@@ -206,6 +221,17 @@ public class CSVWriter {
 	public CSVWriter(char separator, char commentSymbol) {
 		this(separator);
 		setCommentSymbol(commentSymbol);
+	}
+	
+	/**
+	 * 
+	 * @param separator
+	 * @param commentSymbol
+	 * @param progress
+	 */
+	public CSVWriter(char separator, char commentSymbol, AbstractProgressBar progress) {
+	  this(separator, commentSymbol);
+	  setProgressBar(progress);
 	}
 
 	/**
@@ -239,6 +265,16 @@ public class CSVWriter {
 	public char getCommentSymbol() {
 		return commentSymbol;
 	}
+	
+  
+  /**
+   * If this is called, the progress while saving to disk
+   * will be shown, using this {@link AbstractProgressBar}.
+   * @param progress
+   */
+  public void setProgressBar(AbstractProgressBar progress) {
+    this.progress = progress;
+  }
 
 	/**
 	 * Converts a String to a File object and checks if this
@@ -492,7 +528,7 @@ public class CSVWriter {
 			while (i < data.getColumnCount()) {
 				value = data.getColumnName(i++);
 				// Do not write new line terms here. This breaks the CSV file!
-				writer.append(value != null ? value.toString().replace('\n', ' ') : "");
+				writer.append(formatCellValue(value));
 				if (i < data.getColumnCount()) {
 					writer.append(separator);
 				}
@@ -501,19 +537,32 @@ public class CSVWriter {
 		}
 
 		// write table body
+		if (progress!=null) progress.setNumberOfTotalCalls(data.getRowCount());
 		for (i = 0; i < data.getRowCount(); i++) {
+		  if (progress!=null) progress.DisplayBar();
 			for (j = 0; j < data.getColumnCount(); j++) {
-				value = data.getValueAt(i, j);
+        if (j > 0) {
+          writer.append(separator);
+        }
   			// Do not write new line terms here. This breaks the CSV file!
-				writer.append(value != null ? value.toString().replace('\n', ' ') : "");
-				if (j < data.getColumnCount() - 1) {
-					writer.append(separator);
-				}
+				writer.append(formatCellValue(data.getValueAt(i, j)));
 			}
 			writer.write(lineSep);
 		}
+		if (progress!=null) progress.finished();
 		writer.close();
 	}
+
+  /**
+   * @param value
+   * @return
+   */
+  protected String formatCellValue(Object value) {
+    // NULL is equal to an empty string, in this case
+    if (value == null) return "";
+    // Avoid writing new lines or column separators (breaks file format).
+    else return value.toString().replace('\n', ' ').replace(separator, ' ');
+  }
 
 	/**
 	 * 
