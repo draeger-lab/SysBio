@@ -137,7 +137,6 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
   /* (non-Javadoc)
    * @see java.lang.CharSequence#length()
    */
-  @Override
   public int length() {
     return size;
   }
@@ -145,7 +144,6 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
   /* (non-Javadoc)
    * @see java.lang.CharSequence#charAt(int)
    */
-  @Override
   public char charAt(int index) {
     index*=2;
     return getDNAcharacter(sequence[index], sequence[index+1]);
@@ -194,7 +192,6 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
   /* (non-Javadoc)
    * @see java.lang.CharSequence#subSequence(int, int)
    */
-  @Override
   public CharSequence subSequence(int start, int end) {
     return new DNAsequence(Arrays.copyOfRange(sequence, start*2, end*2));
   }
@@ -202,7 +199,6 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
   /* (non-Javadoc)
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  @Override
   public int compareTo(DNAsequence o) {
     int r = size - o.size;
     if (r!=0) return r;
@@ -232,7 +228,6 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
   /* (non-Javadoc)
    * @see java.lang.Appendable#append(java.lang.CharSequence)
    */
-  @Override
   public Appendable append(CharSequence csq) throws IOException {
     return append(csq, 0, csq.length());
   }
@@ -240,7 +235,6 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
   /* (non-Javadoc)
    * @see java.lang.Appendable#append(java.lang.CharSequence, int, int)
    */
-  @Override
   public Appendable append(CharSequence csq, int start, int end)throws IOException {
     int length = end-start;
     
@@ -266,7 +260,6 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
   /* (non-Javadoc)
    * @see java.lang.Appendable#append(char)
    */
-  @Override
   public Appendable append(char c) throws IOException {
     int newSize = size + 1;
     if (newSize*2 > sequence.length)
