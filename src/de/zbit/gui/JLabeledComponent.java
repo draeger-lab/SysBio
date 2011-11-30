@@ -202,11 +202,21 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * @param fieldIsRequired
    * @param organisms
    */
-  @SuppressWarnings({ "rawtypes" })
   public JLabeledComponent(String title, boolean fieldIsRequired,
     Collection<?> columnHeaders) {
     this(title, fieldIsRequired, columnHeaders.toArray());
   }
+  
+  /**
+   * @param title
+   * @param fieldIsRequired
+   * @param b
+   */
+  public JLabeledComponent(String title, boolean fieldIsRequired, boolean acceptOnlyIntegers) {
+    this(title,fieldIsRequired);
+    setAcceptOnlyIntegers(acceptOnlyIntegers);
+  }
+  
   /**
    * @param title
    * @param fieldIsRequired
@@ -1013,7 +1023,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * and customized by the user!
    */
   public void setEditHeaderAllowed(boolean b) {
-    this.editHeaderAlllowed=true;
+    this.editHeaderAlllowed=b;
     if (colChooser instanceof JComboBox) {
       ((JComboBox)colChooser).setEditable(b);
     } else {

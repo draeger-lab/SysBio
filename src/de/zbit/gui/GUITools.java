@@ -52,6 +52,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -1986,6 +1987,20 @@ public class GUITools {
         }
       }
     });
+  }
+
+
+  /**
+   * Add some buttons to a {@link ButtonGroup}.
+   * @param buttons
+   * @return
+   */
+  public static ButtonGroup createButtonGroup(AbstractButton... buttons) {
+    ButtonGroup group = new ButtonGroup();
+    for (AbstractButton abstractButton : buttons) {
+      group.add(abstractButton);
+    }
+    return group;
   }
   
   

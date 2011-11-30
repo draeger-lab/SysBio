@@ -147,9 +147,19 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
     boolean multiSelectionAllowed, boolean multiSelectionOnlyWithDifferentType,
     boolean renameAllowed, String regExPatternForInitialSuggestion) {
     this(name, type, required, multiSelectionAllowed, multiSelectionOnlyWithDifferentType, renameAllowed);
-    this.regExPatternForInitialSuggestion = regExPatternForInitialSuggestion;
+    setRegExPatternForInitialSuggestion(regExPatternForInitialSuggestion);
   }
   
+  /**
+   * 
+   * @param name
+   * @param required Is this Column required or optional?
+   * @param regExPatternForInitialSuggestion
+   */
+  public ExpectedColumn(Object name, boolean required, String regExPatternForInitialSuggestion) {
+    this (name, required);
+    setRegExPatternForInitialSuggestion(regExPatternForInitialSuggestion);
+  }
   /**
    * @return true if and only if {@link #type} contains more than one element. 
    */

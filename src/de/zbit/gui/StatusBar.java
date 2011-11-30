@@ -186,6 +186,15 @@ public class StatusBar extends JPanel implements ProgressListener {
 
 		return statusBar;
 	}
+	
+	/**
+	 * A simple wrapper for {@link #showProgress()};
+	 * @return
+	 * @see #showProgress();
+	 */
+	public AbstractProgressBar getProgressBar() {
+	  return showProgress();
+	}
 
 	/**
 	 * Use the statusbar to display the progress of an operation.
@@ -240,6 +249,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 			progressBar = new ProgressBarSwing(bar);
 			leftPanel.add(panel, BorderLayout.CENTER);
 			bar.setStringPainted(false);
+			
 		} else {
 			bar = progressBar.getProgressBar();
 		}
