@@ -16,6 +16,7 @@
  */
 package de.zbit.gui;
 
+import java.awt.Frame;
 import java.io.File;
 import java.util.ResourceBundle;
 
@@ -89,11 +90,21 @@ public interface GUIOptions extends KeyProvider {
 		bundle.getString("DEFAULT_DIRECTORIES_TOOLTIP"),
 		OPEN_DIR, SAVE_DIR);
 	
-	/*
-	 * TODO: It would be useful to save the window width and height here (and maybe state,
-	 * i.e. normal or maximized (NOT MINIMIZED)). Also NOT save x/y to not set the window
-	 * out of visible area if resolution changes. BUT state and w/h would be useful!
+	/**
+	 * The last window width
 	 */
+	 public static final Option<Integer> WINDOW_WIDTH = new Option<Integer>("WINDOW_WIDTH",
+	     Integer.class,"Width of the window.",640, false);
+	 /**
+	  * The last window height
+	  */
+   public static final Option<Integer> WINDOW_HEIGHT = new Option<Integer>("WINDOW_HEIGHT",
+       Integer.class,"Height of the window.",480, false);
+   /**
+    * The last window state (iconified, maximized, etc).
+    */
+   public static final Option<Integer> WINDOW_STATE = new Option<Integer>("WINDOW_STATE",
+       Integer.class,"State of the window (maximized, minimized, etc).",Frame.NORMAL, false);
 	
 	
 }
