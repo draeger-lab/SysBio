@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import de.zbit.parser.Species;
 import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.ArrayUtils;
 
 /**
  * This class contains utilities for {@link AbstractMapper}s.
@@ -45,6 +46,25 @@ public class MappingUtils {
    */
   public static enum IdentifierType {
     Unknown, NCBI_GeneID, RefSeq, Ensembl, KeggGenes, GeneSymbol;
+  }
+  
+  /**
+   * Regular expressions for each {@link IdentifierType} in
+   * the same ordering as {@link IdentifierType#values()}.
+   */
+  public static String[] identifierTypeRegEx = new String[]{
+    null, "^\\d+$", "^(NC|AC|NG|NT|NW|NZ|NM|NR|XM|XR|NP|AP|XP|ZP)_\\d+$", "^ENS[A-Z]*[FPTG]\\d{11}$", "^\\w+:[\\w\\d\\.-]*$", null
+  };
+  
+  /**
+   * Return a regular expression to identify a certain identifier.
+   * @param identifier
+   * @return 
+   */
+  public static String getRegularExpressionForIdentifier(IdentifierType identifier) {
+    int pos = ArrayUtils.indexOf(IdentifierType.values(), identifier);
+    if (pos<0 || pos>identifierTypeRegEx.length) return null;
+    else return identifierTypeRegEx[pos];
   }
   
   

@@ -25,6 +25,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 
 import de.zbit.io.CSVReader;
+import de.zbit.io.PatternForColumnGuessing;
 
 /**
  * This class represents a column, that is expected as input
@@ -82,8 +83,10 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
    * Besides matching the column headers with {@link #name}, this can be
    * set to make an initial suggestion for a column.
    * (E.g., ".*_at" identifies a column with AffyMetrix probe identifiers).
+   * <p>If you allow assigning {@link #type}s to columns, this may have
+   * the same length as {@link #type}, to also suggest an initial type.
    */
-  String regExPatternForInitialSuggestion = null;
+  String[] regExPatternForInitialSuggestion = null;
   
   /**
    * A list of assigned columns. This list is only valid if the ok
@@ -145,7 +148,7 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
    */
   public ExpectedColumn(Object name, Object[] type, boolean required,
     boolean multiSelectionAllowed, boolean multiSelectionOnlyWithDifferentType,
-    boolean renameAllowed, String regExPatternForInitialSuggestion) {
+    boolean renameAllowed, String... regExPatternForInitialSuggestion) {
     this(name, type, required, multiSelectionAllowed, multiSelectionOnlyWithDifferentType, renameAllowed);
     setRegExPatternForInitialSuggestion(regExPatternForInitialSuggestion);
   }
@@ -179,30 +182,69 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
    * <p>May return -1 if no column can be suggested.
    * @param r
    * @return
+   * @see #getInitialSuggestions(CSVReader)
    */
   public int getInitialSuggestion(CSVReader r) {
     int sug = r.getColumn(name.toString());
-    if ((sug < 0) && isSetRegExPatternForInitialSuggestion()) {
+    if (isSetRegExPatternForInitialSuggestion()) {
       try {
-        sug = r.getColumnByMatchingContent(regExPatternForInitialSuggestion,0,500);
+        // match agains all patterns and return column with max matches
+        PatternForColumnGuessing[] pat = r.getColumnByMatchingContent(regExPatternForInitialSuggestion,0,250);
+        sug = PatternForColumnGuessing.getColumnWithMaxMatches(pat);
       } catch (IOException e) {}
     }
     return sug;
   }
   
   /**
+   * Suggest <b>one</b> initial column <b>for each {@link #type}</b>.
+   * <p>Only if {@link #hasRegexPatternForEachType()}!<br/>
+   * If you don't use {@link #type} or speciefied just one {@link #regExPatternForInitialSuggestion}
+   * please use {@link #getInitialSuggestion(CSVReader)}.
+   * @param r
+   * @return int array matching indices to {@link #type}, containing initial
+   * suggested column number. Or <code>NULL</code> if something went wrong.
+   * @see #getInitialSuggestion(CSVReader)
+   * @see #hasRegexPatternForEachType()
+   */
+  public int[] getInitialSuggestions(CSVReader r) {
+    if (isSetRegExPatternForInitialSuggestion()) {
+      int[] ret = new int[regExPatternForInitialSuggestion.length];
+      try {
+        // match agains all patterns and return column with max matches
+        PatternForColumnGuessing[] pat = r.getColumnByMatchingContent(regExPatternForInitialSuggestion,0,250);
+        if (type!=null && type.length==regExPatternForInitialSuggestion.length) {
+          for (int i=0;i<pat.length; i++) {
+            ret[i] = pat[i].getColumnWithMaximumNumberOfMatches();
+          }
+        }
+      } catch (IOException e) {}
+      return ret;
+    }
+    return null;
+  }
+  
+  /**
    * @return
    */
   public boolean isSetRegExPatternForInitialSuggestion() {
-    return regExPatternForInitialSuggestion!=null&&regExPatternForInitialSuggestion.length()>0;
+    if (regExPatternForInitialSuggestion==null||regExPatternForInitialSuggestion.length<1) {
+      return false;
+    }
+    for (String s: regExPatternForInitialSuggestion) {
+      if (s!=null && s.length()>0) return true;
+    }
+    return false;
   }
   
   /**
    * Set a regular expression pattern for a columns content
    * to be assigned as initial suggestion.
-   * @param regEx
+   * @param regEx if you specify multiples, the indicies are linked
+   * to the {@link #type}. If you have no different types, they are
+   * all synonyms.
    */
-  public void setRegExPatternForInitialSuggestion (String regEx) {
+  public void setRegExPatternForInitialSuggestion (String... regEx) {
     regExPatternForInitialSuggestion = regEx;
   }
   
@@ -313,6 +355,14 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
    */
   public int compareTo(ExpectedColumn o) {
     return originalName.toString().compareTo(o.getOriginalName().toString());
+  }
+  /**
+   * @return <code>TRUE</code> if this {@link ExpectedColumn} has multiple {@link #type}s
+   * and exactly the same numbers of {@link #regExPatternForInitialSuggestion}.
+   */
+  public boolean hasRegexPatternForEachType() {
+    return isSetRegExPatternForInitialSuggestion() &&
+    isSetTypeSelection() && type.length==regExPatternForInitialSuggestion.length;
   }
   
 }

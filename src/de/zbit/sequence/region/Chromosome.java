@@ -52,6 +52,13 @@ public interface Chromosome {
   public final static Pattern chromosome_regex = Pattern.compile("(chromosome|CHROMOSOME|chr|CHR)?:?([XYM]|[1-9][0-9]?)");
   
   /**
+   * Nearly the same regex String as used in {@link #chromosome_regex} but it
+   * forces a prefix (chr, chromosome, etc) before a number. Does not detect chromosomes
+   * without prefixes (i.e. just numbers). And it allows characters behind the chromosome.
+   */
+  public final static String chromosome_regex_with_forced_prefix = "(chromosome|CHROMOSOME|chr|CHR):?([XYM]|[1-9][0-9]?).*?";
+  
+  /**
    * Set the corresponding Chromosome.
    * @param chromosome
    */

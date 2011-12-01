@@ -238,7 +238,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
        // Read eventual initial suggestions from exCols
       int i = 0;
       for (ExpectedColumn expectedColumn : expectedColumns) {
-        // Old manual selections
+        // Previous manual selections
         if (expectedColumn.hasAssignedColumns()) {
           for (int j=0; j<expectedColumn.getAssignedColumns().size(); j++) {
             int idx = expectedColumn.getAssignedColumns().get(j);
@@ -252,9 +252,24 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
           
         } else {
           // Auto-inference based on file content patterns
-          int sug = expectedColumn.getInitialSuggestion(getCSVReader());
-          if (sug >= 0) {
-            exColSelections[sug] = i + 1; // +1 because "Ignore Column"
+          boolean hasAtLeastOneColumnAssigned=false;
+          if (expectedColumn.hasRegexPatternForEachType()) {
+            int[] sug = expectedColumn.getInitialSuggestions(getCSVReader());
+            if (sug!=null) {
+              for (int j=0; j<sug.length; j++) {
+                if (sug[j]>=0) {
+                  exColSelections[sug[j]] = i+1;
+                  exColTypeSelections[sug[j]]=j; // sug is matched to type-array
+                  hasAtLeastOneColumnAssigned = true;
+                }
+              }
+            }
+          } if (!hasAtLeastOneColumnAssigned) {
+            int sug = expectedColumn.getInitialSuggestion(getCSVReader());
+            if (sug >= 0) {
+              exColSelections[sug] = i + 1; // +1 because "Ignore Column"
+              exColTypeSelections[sug]=0;
+            }
           }
         }
         i++;
@@ -730,7 +745,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     
     exp[0] = new ExpectedColumn("Signal");
     exp[0].type=new String[]{"Pval","Fold change"};
-    exp[0].regExPatternForInitialSuggestion="\\d+";
+    exp[0].setRegExPatternForInitialSuggestion("\\d+");
     exp[0].renameAllowed=true;
     exp[0].multiSelectionAllowed=true;
     exp[0].multiSelectionOnlyWithDifferentType=true;
@@ -739,7 +754,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     exp[1].type=new String[]{"a1","a2","a3"};
     
     exp[2] = new ExpectedColumn("Chromosome");
-    exp[2].regExPatternForInitialSuggestion="chr.*";
+    exp[2].setRegExPatternForInitialSuggestion("chr.*");
     
     // Graphically import the file and let the user assign the columns
     try {
