@@ -23,8 +23,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1061,7 +1065,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * @throws IOException 
    */
   public int getColumnByMatchingContent(String regex, int patternOptions) throws IOException {
-    return getColumnByMatchingContent(regex, patternOptions, 25000);
+    return getColumnByMatchingContent(regex, patternOptions, 2500);
   }
   
   /**
@@ -1071,14 +1075,39 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * Pattern.CASE_INSENSITIVE. 0 for no options.
    * @param maxLinesToCheck - Maximum number of lines to check. Terminates
    * this search if more lines than this value have been read and no
-   * matching column has been found. 0 to disable. Default: 25,000
+   * matching column has been found. 0 to disable. Default: 2,500
    * @return column number
    * @throws IOException
    */
   public int getColumnByMatchingContent(String regex, int patternOptions, int maxLinesToCheck) throws IOException {
-    Pattern pat = Pattern.compile(regex, patternOptions);
-    int threshold = 25; // Number of lines to match.
+    return getColumnByMatchingContent(new String[]{regex}, patternOptions, maxLinesToCheck)[0].getColumnWithMaximumNumberOfMatches();
+  }
+  /**
+   * See #getColumnByMatchingContent(String, int, int)
+   * <p>This is the same, just with matching multiple regular expressions at once.
+   * @see #getColumnByMatchingContent(String, int, int)
+   * @param regex
+   * @param patternOptions
+   * @param maxLinesToCheck
+   * @return array of same length as <code>regex</code>, containing
+   * the number of matches for each regex and each column.
+   * @throws IOException
+   */
+  public PatternForColumnGuessing[] getColumnByMatchingContent(String[] regex, int patternOptions, int maxLinesToCheck) throws IOException {
+    int threshold = 25; // Number of lines to match to pattern for confirmation
     
+    // Compile all regex
+    PatternForColumnGuessing[] pat = new PatternForColumnGuessing[regex.length];
+    Set<PatternForColumnGuessing> unmatchedPatterns = new HashSet<PatternForColumnGuessing>();
+    for (int i=0; i<regex.length; i++) {
+      Pattern compiled = (regex[i]!=null && regex[i].length()>0) ? Pattern.compile(regex[i], patternOptions) : null;
+      pat[i] = new PatternForColumnGuessing(compiled, getNumberOfColumns());
+      if (compiled!=null) {
+        unmatchedPatterns.add(pat[i]);
+      }
+    }
+    
+    // Disable the progress bar
     boolean tempDisplayProgres = displayProgress;
     displayProgress=false;
     if (this.data==null) {
@@ -1086,25 +1115,21 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     }
     
     // Match pattern agains content
-    int[] matches = new int[numCols];
-    int matchesMax = 0;
-    int matchesMaxId = -1;
-    int lineNr=0; int linesRead=0;
-    while (matchesMax<threshold) {
-      linesRead++;
-      if (maxLinesToCheck>0 && linesRead>maxLinesToCheck) break;
+    int lineNr=-1;
+    while (!unmatchedPatterns.isEmpty()) {
+      lineNr++;
+      if (maxLinesToCheck>0 && lineNr>=maxLinesToCheck) break;
       
       // Get the next data line
       String[] line;
       if (this.data!=null) {
-        if (lineNr==data.length) break; // EOF
+        if (lineNr>=data.length) break; // EOF
         line = data[lineNr];
-        lineNr++;
       } else {
         try {
           line = getNextLine();
         } catch (IOException e) {
-          logger.fine(e.getLocalizedMessage());
+          logger.log(Level.FINE,"Could not read data for regEx column matching.", e);
           break;
         }
         if (line==null) break; // EOF
@@ -1112,16 +1137,13 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
       if (line==null) continue;
       // ---
       
-      // Match against pattern
-      for (int j=0; j<line.length; j++) {
-        if (line[j]==null) continue;
-        
-        if (pat.matcher(line[j]).matches()) {
-          matches[j]++;
-          if (matches[j]>matchesMax) {
-            matchesMax = matches[j];
-            matchesMaxId=j;
-          }
+      // Match against patterns and remove finished ones
+      Iterator<PatternForColumnGuessing> it = unmatchedPatterns.iterator();
+      while (it.hasNext()) {
+        PatternForColumnGuessing p = it.next();
+        p.countMatches(line);
+        if (p.getMaximumNumberOfMatchesInAnyColumn()>=threshold) {
+          it.remove();
         }
       }
     }
@@ -1133,7 +1155,13 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     }
     displayProgress = tempDisplayProgres;
     
-    return matchesMaxId;
+    // Build array with return values
+//    int[] ret = new int[pat.length];
+//    for (int i=0; i<pat.length; i++) {
+//      ret[i] = pat[i].getColumnWithMaximumNumberOfMatches();
+//    }
+    
+    return pat;
   }
   
 
