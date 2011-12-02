@@ -67,17 +67,17 @@ public interface GUIOptions extends KeyProvider {
 	 * Standard directory where user files can be found.
 	 */
 	public static final Option<File> OPEN_DIR = new Option<File>("OPEN_DIR",
-		File.class, bundle.getString("OPEN_DIR"),
-		new Range<File>(File.class, SBFileFilter.createDirectoryFilter()), new File(System
-				.getProperty("user.dir")));
+		File.class, bundle.getString("OPEN_DIR"), new Range<File>(File.class,
+			SBFileFilter.createDirectoryFilter()), new File(
+			System.getProperty("user.dir")), false);
 	
 	/**
 	 * Standard directory where the user may save some files.
 	 */
 	public static final Option<File> SAVE_DIR = new Option<File>("SAVE_DIR",
-		File.class, bundle.getString("SAVE_DIR"),
-		new Range<File>(File.class, SBFileFilter.createDirectoryFilter()), new File(System
-				.getProperty("user.dir")));
+		File.class, bundle.getString("SAVE_DIR"), new Range<File>(File.class,
+			SBFileFilter.createDirectoryFilter()), new File(
+			System.getProperty("user.dir")), false);
 	
 	/**
 	 * Define the default directories to open and save files. These directories
@@ -90,21 +90,26 @@ public interface GUIOptions extends KeyProvider {
 		bundle.getString("DEFAULT_DIRECTORIES_TOOLTIP"),
 		OPEN_DIR, SAVE_DIR);
 	
+	// TODO: This will lead to the strange effect that ALL windows will have the identical size! 
+
 	/**
-	 * The last window width
+	 * Defines the width of the window.
 	 */
-	 public static final Option<Integer> WINDOW_WIDTH = new Option<Integer>("WINDOW_WIDTH",
-	     Integer.class,"Width of the window.",640, false);
-	 /**
-	  * The last window height
-	  */
-   public static final Option<Integer> WINDOW_HEIGHT = new Option<Integer>("WINDOW_HEIGHT",
-       Integer.class,"Height of the window.",480, false);
+	public static final Option<Integer> WINDOW_WIDTH = new Option<Integer>(
+		"WINDOW_WIDTH", Integer.class, bundle.getString("WINDOW_WIDTH"),
+		Integer.valueOf(640), false);
+	
+	/**
+	 * Defines the height of the window.
+	 */
+	public static final Option<Integer> WINDOW_HEIGHT = new Option<Integer>(
+		"WINDOW_HEIGHT", Integer.class, bundle.getString("WINDOW_HEIGHT"),
+		Integer.valueOf(480), false);
+
    /**
     * The last window state (iconified, maximized, etc).
     */
    public static final Option<Integer> WINDOW_STATE = new Option<Integer>("WINDOW_STATE",
        Integer.class,"State of the window (maximized, minimized, etc).",Frame.NORMAL, false);
-	
 	
 }

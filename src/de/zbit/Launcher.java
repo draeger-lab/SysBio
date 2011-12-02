@@ -16,8 +16,8 @@
  */
 package de.zbit;
 
-import java.awt.HeadlessException;
 import java.awt.Window;
+import java.beans.EventHandler;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,8 +26,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
+import java.util.prefs.BackingStoreException;
 
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
@@ -49,6 +48,13 @@ import de.zbit.util.prefs.SBProperties;
  * </ul>
  * Further details of the program configuration can be obtained from this
  * {@link Launcher} by calling {@link #getAppConf()}.
+ * <p>
+ * Please note that this class does not import any classes that are related to
+ * GUI elements (in some standard Java packages, such as SWING or AWT). When
+ * making a reference to such a class, the complete class name including its
+ * package declaration is used in order to prevent that on systems that do not
+ * have these classes, the Launcher might not be useable.
+ * </p>
  * 
  * @author Andreas Dr&auml;ger
  * @version $Rev$
@@ -63,18 +69,18 @@ public abstract class Launcher implements Runnable, Serializable {
   private static final transient Logger logger = Logger
       .getLogger(Launcher.class.getName());
 
-  /**
+	/**
 	 * A resource bundle containing label texts for this object.
 	 */
   private static final transient ResourceBundle resources = ResourceManager
       .getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
-	
-  /**
+
+	/**
    * Generated serial version identifier.
    */
   private static final long serialVersionUID = -612780998835450100L;
 
-  /**
+	/**
    * Grants access to the {@link ResourceBundle} used by this {@link Launcher}
    * in order to support a full local-specific prorgramming.
    * 
@@ -83,21 +89,21 @@ public abstract class Launcher implements Runnable, Serializable {
   public static ResourceBundle getResources() {
     return resources;
   }
-		
+
 	/**
 	 * Stores given command-line options as key-value pairs.
 	 */
 	private SBProperties props;
-  
-  /**
+
+	/**
    * Switch to decide if {@link System#exit(int)} should be called when the
    * execution of this {@link Launcher} is finished. This option should be set
    * to <code>true</code> when using a graphical user interface, which will be
    * launched in a separate {@link Thread}.
    */
 	private boolean terminateJVMwhenDone;
-  
-  /**
+
+	/**
    * Creates a new {@link Launcher} with an empty list of command-line options
    * but that will terminate the JVM after its execution. This constructor also
    * initializes the logging functionality.
@@ -105,8 +111,8 @@ public abstract class Launcher implements Runnable, Serializable {
   public Launcher() {
     this(true);
   }
-  
-  /**
+
+	/**
    * Creates a new {@link Launcher} with an empty list of command-line options
    * but that will terminate the JVM after its execution. This constructor also
    * initializes the logging functionality.
@@ -121,7 +127,7 @@ public abstract class Launcher implements Runnable, Serializable {
     this.props = new SBProperties();
     LogUtil.initializeLogging(getLogLevel(), getLogPackages());
   }
-	
+
   /**
    * Copy constructor.
    * 
@@ -163,8 +169,8 @@ public abstract class Launcher implements Runnable, Serializable {
 			update.execute();
 		}
 	}
-  
-  /**
+		
+	/**
 	 * This method is called in case that no graphical user interface is to be
 	 * used. The given properties contain all the key-value pairs that have been
 	 * defined on the command line when starting this program.
@@ -172,7 +178,7 @@ public abstract class Launcher implements Runnable, Serializable {
 	 * @param appConf
 	 */
 	public abstract void commandLineMode(AppConf appConf);
-
+  
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
@@ -185,7 +191,28 @@ public abstract class Launcher implements Runnable, Serializable {
     }
     return false;
   }
-
+  
+  /**
+	 * Closes this application and memorizes the size of the given {@link Window},
+	 * this means that a call of this method will terminate the running Java
+	 * Virtual Machine (JVM).
+	 * 
+	 * @param window
+	 *        the {@link Window} whose size (width and height is to be memorized
+	 *        before switching of the JVM.
+	 */
+	public void exit(java.awt.Window window) {
+		SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+		prefs.put(GUIOptions.WINDOW_WIDTH, window.getWidth());
+		prefs.put(GUIOptions.WINDOW_HEIGHT, window.getHeight());
+		try {
+			prefs.flush();
+		} catch (BackingStoreException exc) {
+			logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+		}
+		System.exit(0);
+	}
+  
   /**
    * 
    * @return
@@ -195,36 +222,36 @@ public abstract class Launcher implements Runnable, Serializable {
       getYearOfProgramRelease(), getCmdLineOptions(), getCommandLineArgs(),
       getInteractiveOptions(), getURLlicenseFile(), getURLOnlineUpdate());
   }
-
+	
   /**
 	 * This method tells a caller the name of this program.
 	 * 
 	 * @return The name of this program.
 	 */
 	public abstract String getAppName();
-
-	/**
+	
+  /**
 	 * 
 	 * @return a {@link List} of {@link KeyProvider} {@link Class} objects that
 	 *         define collections of possible command-line options.
 	 */
 	public abstract List<Class<? extends KeyProvider>> getCmdLineOptions();
-	
-	/**
+
+  /**
    * 
    * @return
    */
   public SBProperties getCommandLineArgs() {
     return props;
   }
-	
-	/**
+  
+  /**
    * 
    * @return
    */
   public abstract List<Class<? extends KeyProvider>> getInteractiveOptions();
-	
-	/**
+
+  /**
 	   * This method returns the default log level that is the minimal {@link Level}
 	   * for log messages to be displayed to the user.
 	   * 
@@ -235,13 +262,13 @@ public abstract class Launcher implements Runnable, Serializable {
 		public Level getLogLevel() {
 		  return Level.FINE;
 		}
-	
-	/**
+
+  /**
  * @return An array of package names whose log messages should appear.
  */
 public abstract String[] getLogPackages();
 
-	/**
+  /**
 	 * Gives the location where the license of this program is documented. This
 	 * could be, for instance, <a
 	 * href="http://www.gnu.org/copyleft/gpl.html">http:
@@ -254,7 +281,7 @@ public abstract String[] getLogPackages();
 	 * @return A link to the license file of this program.
 	 */
 	public abstract URL getURLlicenseFile();
-	
+
 	/**
 	 * 
 	 * @return The {@link URL} where the information about online updates can be
@@ -291,10 +318,23 @@ public abstract String[] getLogPackages();
 	 * @param appConf
 	 */
 	public void guiMode(AppConf appConf) {
-		Window ui = initGUI(appConf);
+		java.awt.Window ui = initGUI(appConf);
 		if (ui != null) {
-		  setTerminateJVMwhenDone(false);
-			ui.setVisible(true);
+			if (terminateJVMwhenDone) {
+				ui.addWindowListener(EventHandler.create(
+					java.awt.event.WindowListener.class, this, "exit", "window",
+					"windowClosed"));
+				setTerminateJVMwhenDone(false);
+			}
+			SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
+			int width = prefs.getInt(GUIOptions.WINDOW_WIDTH);
+			int height = prefs.getInt(GUIOptions.WINDOW_HEIGHT);
+			// TODO: Make sure that the stored size of the window is not too large.
+//			width = Math.min(width, );
+//			height = Math.min(height, );
+			ui.setSize(new java.awt.Dimension(width, height));
+			ui.setLocationRelativeTo(null);
+		  ui.setVisible(true);
 			GUITools.hideSplashScreen();
 			ui.toFront();
 		} else {
@@ -311,7 +351,7 @@ public abstract String[] getLogPackages();
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
@@ -323,8 +363,8 @@ public abstract String[] getLogPackages();
     hashCode += prime * Boolean.valueOf(terminateJVMwhenDone).hashCode();
     return hashCode;
   }
-  
-  /**
+	
+	/**
    * This method does nothing more than creating a new instance of a graphical
    * user interface for the application and returns it. In case that this
    * application does not support any GUI, this method may return null.
@@ -335,16 +375,16 @@ public abstract String[] getLogPackages();
    * @return the graphical user interface for this application or null if no
    *         such mode is supported.
    */
-	public abstract Window initGUI(AppConf appConf);
-
+	public abstract java.awt.Window initGUI(AppConf appConf);
+	
 	/**
    * @return the terminateJVMwhenDone
    */
   public boolean isTerminateJVMwhenDone() {
     return terminateJVMwhenDone;
   }
-
-  /**
+	
+	/**
 	 * Helper method that initializes the command line mode.
 	 * 
 	 * @param appConf
@@ -365,8 +405,8 @@ public abstract String[] getLogPackages();
       System.exit(0);
     }
 	}
-
-  /**
+	
+	/**
    * 
    * @param args
    * @return
@@ -377,8 +417,8 @@ public abstract String[] getLogPackages();
       args);
     return props;
   }
-
-  /**
+	
+	/**
 	 * Displays a copyright notice using the System.out.
 	 */
   public void printCopyrightMessage() {
@@ -402,8 +442,8 @@ public abstract String[] getLogPackages();
     message.append(sb);
     System.out.println(message.toString());
   }
-
-  /*
+	
+	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
@@ -413,7 +453,7 @@ public abstract String[] getLogPackages();
         
     // Should we start the GUI?
     if ((props.size() < 1) || props.getBooleanProperty(GUIOptions.GUI)) {
-      SwingUtilities.invokeLater(new Runnable() {
+    	javax.swing.SwingUtilities.invokeLater(new Runnable() {
         /*
          * (non-Javadoc)
          * 
@@ -423,7 +463,7 @@ public abstract String[] getLogPackages();
           AppConf appCnf = getAppConf();
           try {
             guiMode(appCnf);
-          } catch (HeadlessException exc) {
+          } catch (java.awt.HeadlessException exc) {
             if (props.getBooleanProperty(GUIOptions.GUI)) {
               logger.fine(resources.getString("COULD_NOT_INITIALIZE_GUI"));
             }
@@ -438,15 +478,15 @@ public abstract String[] getLogPackages();
       launchCommandLineMode(getAppConf());
     }
   }
-
+  
   /**
    * @param terminateJVMwhenDone the terminateJVMwhenDone to set
    */
   public void setTerminateJVMwhenDone(boolean terminateJVMwhenDone) {
     this.terminateJVMwhenDone = terminateJVMwhenDone;
   }
-
-  /* (non-Javadoc)
+	
+	/* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
   @Override

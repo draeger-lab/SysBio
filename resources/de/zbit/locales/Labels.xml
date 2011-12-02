@@ -22,11 +22,20 @@
   <!-- CSVOptions -->
   
   <entry key="CSVOptions">CSV options</entry>
-  <entry key="CSV_FILE">A comma-separated file to be opened.</entry>
-  <entry key="CSV_FILES_OPEN_DIR">Key to specify the default directory for Comma Separated Value (CSV) files.</entry>
-  <entry key="CSV_FILES_QUOTE_CHAR">The character that is used to quote strings inside of comma separated value files in order to prevent a miss-interpretation of white spaces with separator characters.</entry>
-  <entry key="CSV_FILES_SAVE_DIR">The default directory where comma separated value files are stored.</entry>
-  <entry key="CSV_FILES_SEPARATOR_CHAR">The separator character that is written between the entries of a comma separated value file. Not that actually any UTF8 character can be used as a separator, not only commas.</entry>
+  <entry key="CSV_FILE">Select a CSV file</entry>
+  <entry key="CSV_FILE_TOOLTIP">A comma-separated file to be opened.</entry>
+  <entry key="CSV_FILES_OPEN_DIR">Open directory for CSV files</entry>
+  <entry key="CSV_FILES_OPEN_DIR_TOOLTIP">Key to specify the default directory for Comma Separated Value (CSV) files.</entry>
+  <entry key="CSV_FILES_QUOTE_CHAR">Quote character in CSV files</entry>
+  <entry key="CSV_FILES_QUOTE_CHAR_TOOLTIP">The character that is used to quote strings inside of comma separated value files in order to prevent a miss-interpretation of white spaces with separator characters.</entry>
+  <entry key="CSV_FILES_SAVE_DIR">Save directory for CSV files</entry>
+  <entry key="CSV_FILES_SAVE_DIR_TOOLTIP">The default directory where comma separated value files are stored.</entry>
+  <entry key="CSV_FILES_SEPARATOR_CHAR">CSV file separator char</entry>
+  <entry key="CSV_FILES_SEPARATOR_CHAR_TOOLTIP">The separator character that is written between the entries of a comma separated value file. Not that actually any UTF8 character can be used as a separator, not only commas.</entry>
+  <entry key="CSV_FILE_SELECTION">CSV file selection</entry>
+  <entry key="CSV_FILE_SELECTION_TOOLTIP">Select the comma-separated file to be opened.</entry>
+  <entry key="CSV_FILE_CHARACTERS">CSV file characters</entry>
+  <entry key="CSV_FILE_CHARACTERS_TOOLTIP">Define the special chracters in CSV files that separate values or that quote strings of characters.</entry>
   
   <!-- CSVReaderColumnChooser -->
   
@@ -72,6 +81,8 @@
   <entry key="SAVE_DIR">Standard directory where the user may save some files.</entry>
   <entry key="DEFAULT_DIRECTORIES">Default directories</entry>
   <entry key="DEFAULT_DIRECTORIES_TOOLTIP">Define the default directories to open and save files. These directories will be used as the first search target when selecting files in this graphical user interface.</entry>
+  <entry key="WINDOW_WIDTH">Defines the width of a window.</entry>
+  <entry key="WINDOW_HEIGHT">Defines the height of a window.</entry>
   
   <!-- GUITools -->
   

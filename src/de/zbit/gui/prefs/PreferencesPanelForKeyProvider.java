@@ -60,7 +60,9 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
    */
   public PreferencesPanelForKeyProvider(String title, Class<? extends KeyProvider> provider) throws IOException {
     super(false); // calls init, before provider is set => many null-pointer-exceptions.
-    if (title==null) title = KeyProvider.Tools.createTitle(provider);
+    if (title == null) {
+    	title = KeyProvider.Tools.createTitle(provider);
+    }
     this.title = title;
     this.provider = provider;
     initializePrefPanel();

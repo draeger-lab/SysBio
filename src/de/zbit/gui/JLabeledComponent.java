@@ -1,6 +1,6 @@
 /*
- * $Id:  JLabeledComponent.java 16:17:34 keller $
- * $URL: JLabeledComponent.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -14,7 +14,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-
 package de.zbit.gui;
 
 import java.awt.BorderLayout;
@@ -198,9 +197,10 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   }
   
   /**
+   * 
    * @param title
    * @param fieldIsRequired
-   * @param organisms
+   * @param columnHeaders
    */
   public JLabeledComponent(String title, boolean fieldIsRequired,
     Collection<?> columnHeaders) {
