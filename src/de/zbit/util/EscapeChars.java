@@ -513,6 +513,11 @@ public final class EscapeChars {
     "</SCRIPT>", Pattern.CASE_INSENSITIVE
   );
   
+  /**
+   * 
+   * @param aIdx
+   * @param aBuilder
+   */
   private static void addCharEntity(Integer aIdx, StringBuilder aBuilder){
     String padding = "";
     if( aIdx <= 9 ){

@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import de.zbit.gui.ActionCommand;
 
@@ -68,8 +69,37 @@ public class OptionGroup<T> implements ActionCommand,
    * 
    */
   public OptionGroup() {
-    this(null, null);
+    this(null, (String) null);
   }
+  
+  /**
+   * 
+   * @param optionGroupId
+   * @param bundle
+   *        This {@link ResourceBundle} looks for the optionGroupId as key for a
+	 *        human-readable display name. It also looks for the key
+	 *        <code>optionGroupId + "_TOOLTIP"</code> in order to obtain a more
+	 *        detailed description of this option. If no such description can be
+	 *        found, it tries to split the human-readable name connected with the
+	 *        optionGroupId using the character ';' (semicolon). If the
+	 *        human-readable name contains this symbol it assumes that the part
+	 *        before the semicolon is intended to be a short name and everything
+	 *        written after it is assumed to be a tooltip.
+   * @param option
+   */
+	public OptionGroup(String optionGroupId, ResourceBundle bundle,
+		Option<? extends T>... option) {
+		this(bundle.getString(optionGroupId), bundle.getString(optionGroupId),
+			option);
+		String key = optionGroupId + "_TOOLTIP";
+		if (bundle.containsKey(key)) {
+			setToolTip(bundle.getString(key));
+		} else if (getName().contains(";")) {
+			String names[] = getName().split(";");
+			setName(names[0]);
+			setToolTip(names[1]);
+		}
+	}
   
   /**
    * Creates a (eventually collapsible) {@link OptionGroup}.
@@ -111,8 +141,7 @@ public class OptionGroup<T> implements ActionCommand,
     this(name, toolTip, false, false, option);
   }
   
-  
-  /**
+	/**
    * @param option
    * @return
    * @see List#add(Object)

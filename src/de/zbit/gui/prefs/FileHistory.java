@@ -52,9 +52,9 @@ public interface FileHistory extends KeyProvider {
 	
 	@SuppressWarnings("unchecked")
 	public static Option<List<File>> LAST_OPENED = new Option<List<File>>(
-		"LAST_OPENED", (Class<List<File>>) emptyList.getClass(),
-		ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS).getString("LAST_OPENED"),
-		emptyList);
+		"LAST_OPENED", (Class<List<File>>) emptyList.getClass(), ResourceManager
+				.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS).getString(
+					"LAST_OPENED"), emptyList, false);
 	
 	/**
 	 * A collection of tools to facilitate working with the values associated

@@ -158,16 +158,24 @@ public interface KeyProvider {
 				}
 			}
 			if (optionList.size() > 0) {
-				if (groupList.size() > 0) {
-					sb.append("    <h");
-					sb.append(headerRank);
-					sb.append("> ");
-					sb.append(bundle.getString("ADDITIONAL_OPTIONS"));
-					sb.append(" </h");
-					sb.append(headerRank);
-					sb.append(">\n");
+				int countVisible = optionList.size();
+				for (Option<?> option : optionList) {
+					if (option.isVisible()) {
+						countVisible++;
+					}
 				}
-				writeOptionsToHTMLTable(sb, optionList, null);
+				if (countVisible > 0) {
+					if (groupList.size() > 0) {
+						sb.append("    <h");
+						sb.append(headerRank);
+						sb.append("> ");
+						sb.append(bundle.getString("ADDITIONAL_OPTIONS"));
+						sb.append(" </h");
+						sb.append(headerRank);
+						sb.append(">\n");
+					}
+					writeOptionsToHTMLTable(sb, optionList, null);
+				}
 			}
 			return sb;
 		}
@@ -638,96 +646,98 @@ public interface KeyProvider {
 					continue;
 				}
 				Option<?> option = (Option<?>) o;
-	      // Hide options that should not be visible.
-	      if (!option.isVisible()) {
-	      	continue;
-	      }
-				sb.append("        <tr>\n          ");
-				sb.append("<td colspan=\"2\" class=\"typewriter-blue\">");
-				String shortName = option.getShortCmdName();
-				String requiredType = String.format("&#60;%s&#62;", option
-						.getRequiredType().getSimpleName());
-				/*
-				 * Special treatment of boolean arguments whose presents only is already sufficient to switch some feature on.
-				 */
-				boolean switchOnOnlyOption = option.getRequiredType().equals(Boolean.class)
-						&& !(Boolean.parseBoolean(option.getDefaultValue().toString()) || option
-								.isSetRangeSpecification());
-				if (shortName != null) {
-					sb.append(shortName);
+				// Hide options that should not be visible, i.e., show only visible options.
+				if (option.isVisible()) {
+					sb.append("        <tr>\n          ");
+					sb.append("<td colspan=\"2\" class=\"typewriter-blue\">");
+					String shortName = option.getShortCmdName();
+					String requiredType = String.format("&#60;%s&#62;", option
+							.getRequiredType().getSimpleName());
+					/*
+					 * Special treatment of boolean arguments whose presents only is
+					 * already sufficient to switch some feature on.
+					 */
+					boolean switchOnOnlyOption = option.getRequiredType().equals(
+						Boolean.class)
+							&& !(Boolean.parseBoolean(option.getDefaultValue().toString()) || option
+									.isSetRangeSpecification());
+					if (shortName != null) {
+						sb.append(shortName);
+						if (!switchOnOnlyOption) {
+							sb.append(requiredType);
+						}
+						sb.append(", ");
+					}
+					sb.append(option.toCommandLineOptionKey());
 					if (!switchOnOnlyOption) {
+						sb.append("[ |=]");
 						sb.append(requiredType);
 					}
-					sb.append(", ");
-				}
-				sb.append(option.toCommandLineOptionKey());
-				if (!switchOnOnlyOption) {
-					sb.append("[ |=]");
-					sb.append(requiredType);
-				}
-				sb.append("</td>\n        ");
-				sb.append("</tr>\n        <tr><td width=\"6%\"> </td>\n");
-				sb.append("        <td>\n          ");
-				sb.append(StringUtil.insertLineBreaks(option.getToolTip(),
-					GUITools.TOOLTIP_LINE_LENGTH, "\n          "));
-				Range<?> range = option.getRange();
-				ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
-				if (range != null) {
-					List<?> list = range.getAllAcceptableValues();
-					String value;
-					int lineLength = 0;
-					if ((list != null) && (list.size() > 0)) {
-						sb.append("<br/>\n          ");
-						sb.append(bundle.getString("ALL_POSSIBLE_VALUES_FOR_TYPE"));
-						sb.append(" <span class=typewriter>");
-						sb.append(requiredType);
-						sb.append("</span> ");
-						sb.append(bundle.getString("ARE"));
-						sb.append(":\n          ");
-						for (int i = 0; i < list.size(); i++) {
-							if ((i > 0) && (list.size() > 2)) {
-								sb.append(',');
-								if (lineLength > GUITools.TOOLTIP_LINE_LENGTH) {
-									sb.append("\n          ");
-									lineLength = 0;
-								} else {
+					sb.append("</td>\n        ");
+					sb.append("</tr>\n        <tr><td width=\"6%\"> </td>\n");
+					sb.append("        <td>\n          ");
+					sb.append(StringUtil.insertLineBreaks(option.getToolTip(),
+						GUITools.TOOLTIP_LINE_LENGTH, "\n          "));
+					Range<?> range = option.getRange();
+					ResourceBundle bundle = ResourceManager
+							.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+					if (range != null) {
+						List<?> list = range.getAllAcceptableValues();
+						String value;
+						int lineLength = 0;
+						if ((list != null) && (list.size() > 0)) {
+							sb.append("<br/>\n          ");
+							sb.append(bundle.getString("ALL_POSSIBLE_VALUES_FOR_TYPE"));
+							sb.append(" <span class=typewriter>");
+							sb.append(requiredType);
+							sb.append("</span> ");
+							sb.append(bundle.getString("ARE"));
+							sb.append(":\n          ");
+							for (int i = 0; i < list.size(); i++) {
+								if ((i > 0) && (list.size() > 2)) {
+									sb.append(',');
+									if (lineLength > GUITools.TOOLTIP_LINE_LENGTH) {
+										sb.append("\n          ");
+										lineLength = 0;
+									} else {
+										sb.append(' ');
+									}
+								}
+								if (i == list.size() - 1) {
+									sb.append(' ');
+									sb.append(bundle.getString("AND"));
 									sb.append(' ');
 								}
+								value = list.get(i).toString();
+								sb.append("<span class=typewriter>");
+								sb.append(value);
+								sb.append("</span>");
+								lineLength += value.length() + 30;
 							}
-							if (i == list.size() - 1) {
-								sb.append(' ');
-								sb.append(bundle.getString("AND"));
-								sb.append(' ');
-							}
-							value = list.get(i).toString();
-							sb.append("<span class=typewriter>");
-							sb.append(value);
-							sb.append("</span>");
-							lineLength += value.length() + 30;
+							sb.append('.');
+						} else if ((range.getRangeSpecString() != null)
+								&& !range.isSetConstraints()) {
+							sb.append("<br/>\n          ");
+							sb.append(String.format(
+								bundle.getString("ARGS_MUST_FIT_INTO_RANGE"),
+								range.getRangeSpecString()));
 						}
-						sb.append('.');
-					} else if ((range.getRangeSpecString() != null)
-							&& !range.isSetConstraints()) {
+					}
+					Object defaultValue = option.getDefaultValue();
+					if (defaultValue != null) {
 						sb.append("<br/>\n          ");
-						sb.append(String.format(bundle
-								.getString("ARGS_MUST_FIT_INTO_RANGE"), range
-								.getRangeSpecString()));
+						sb.append(bundle.getString("DEFAULT_VALUE"));
+						sb.append(": <span class=typewriter> ");
+						if (defaultValue instanceof Class<?>) {
+							sb.append(((Class<?>) defaultValue).getSimpleName());
+						} else {
+							sb.append(defaultValue);
+						}
+						sb.append(" </span>");
 					}
+					sb.append("\n        </td>\n");
+					sb.append("      </tr>\n");
 				}
-				Object defaultValue = option.getDefaultValue();
-				if (defaultValue != null) {
-					sb.append("<br/>\n          ");
-					sb.append(bundle.getString("DEFAULT_VALUE"));
-					sb.append(": <span class=typewriter> ");
-					if (defaultValue instanceof Class<?>) {
-						sb.append(((Class<?>) defaultValue).getSimpleName());
-					} else {
-						sb.append(defaultValue);
-					}
-					sb.append(" </span>");
-				}
-				sb.append("\n        </td>\n");
-				sb.append("      </tr>\n");
 				if (removeFromHere != null) {
 					removeFromHere.remove(option);
 				}

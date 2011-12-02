@@ -31,12 +31,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -102,6 +102,10 @@ import de.zbit.util.prefs.SBProperties;
  */
 public abstract class PreferencesPanel extends JPanel implements KeyListener,
     ItemListener, ChangeListener {
+	
+	/**
+	 * A {@link Logger} for this class.
+	 */
   public static final transient Logger log = Logger
       .getLogger(PreferencesPanel.class.getName());
   
@@ -258,7 +262,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         // "reset defaults" button useless...
         //jc = option2component.get(option);
         
-        if (jc==null) {
+        if (jc == null) {
           jc = getJComponentForOption(option, properties, this);
         }
       }
@@ -641,9 +645,10 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       // Infere type
       Type ty = Type.OPEN;
       String check = option.getOptionName().toLowerCase();
-      if (check.contains("save") || check.contains("store") || check.contains("output")) {
-        ty = Type.SAVE;
-      }
+			if (check.contains("save") || check.contains("store")
+					|| check.contains("output")) {
+				ty = Type.SAVE;
+			}
       
       // Get default value
       if (defaultValue == null) {
@@ -684,15 +689,16 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       
     } else if (Number.class.isAssignableFrom(clazz)) {
       // Try to make a spinner
-      if (values==null || values.length>15) {
+      if ((values == null) || (values.length > 15)) {
         // we do not need a spinner if only 15 different values are possible.
         try {
           // Get Numeric option and Numeric default value
           Option<Number> o2 = (Option<Number>) option;
           Object defaultV = o2.parseOrCast(defaultValue);
-          if (defaultV != null
-              && !Number.class.isAssignableFrom(defaultV.getClass()))
+          if ((defaultV != null)
+              && !Number.class.isAssignableFrom(defaultV.getClass())) {
             defaultV = null;
+          }
           // init component with a spinner.
           component = new JLabeledComponent(optionTitle, true,
             JLabeledComponent.buildJSpinner(o2, (Number) defaultV));
@@ -703,7 +709,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       }
       
       // Fallback with regular JTextField or JComboBox
-      if (component==null) {
+      if (component == null) {
         component = new JLabeledComponent(optionTitle, true, values);
         if (!Utils.isInteger(option.getRequiredType())) {
           ((JLabeledComponent) component).setAcceptOnlyIntegers(false);
@@ -719,8 +725,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         initial = Option.parseOrCast(Color.class, defaultValue);
       }
       if (initial == null) {
-        log.warning("Invalid default value for color "
-            + defaultValue.getClass() + ": " + defaultValue);
+				log.warning(String.format("Invalid default value for color %s: %s",
+					defaultValue.getClass(), defaultValue));
         initial = Color.WHITE;
       }
       ColorChooserWithPreview colChooser = new ColorChooserWithPreview(initial);
@@ -731,7 +737,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       ((JLabeledComponent) component).setAcceptOnlyIntegers(false);
       
     } else {
-      log.severe("Please implement JComponent for " + clazz + ".");
+			log.severe(String.format("Please implement JComponent for %s.", clazz));
     }
     
     // Check if the option could be converted to a JComponent
@@ -788,9 +794,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       } else {
         // Issue a warning. Programmers should watch that each returned
         // JComponent implements the JComponentForOption interface!!!
-        log.warning(component.getClass().getName() + " IS NO " + JComponentForOption.class.getName() + "!");
-      }
-      
+				log.warning(String.format("%s IS NO %s!", component.getClass()
+						.getName(), JComponentForOption.class.getName()));
+      }      
     }
     
     return component;

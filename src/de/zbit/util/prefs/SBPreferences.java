@@ -487,7 +487,8 @@ public class SBPreferences implements Map<Object, Object> {
 							argHolder = option.createArgumentHolder();
 						}
 					}
-					parser.addOption(option.getSpecification(), argHolder);
+					parser.addOption(option.getSpecification(), argHolder,
+						option.isVisible());
 					options.put(option, argHolder);
 				}
 			} catch (Exception exc) {
