@@ -18,8 +18,11 @@ package de.zbit.sequence.region;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.RandomAccess;
 
 import de.zbit.util.Utils;
 
@@ -107,6 +110,14 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
   @Override
   public String getChromosome() {
     return ChromosomeTools.getChromosomeStringRepresentation(chr);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sequence.region.Region#getMiddle()
+   */
+  @Override
+  public int getMiddle() {
+    return start+((end-start)/2);
   }
 
   /* (non-Javadoc)
@@ -231,6 +242,8 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
   
   /**
    * Get all regions from <code>all</code>, overlapping with <code>intersectWith</code>. 
+   * This is for unsorted lists, please use {@link #getAllIntersections(List, Region, boolean)}
+   * for sorted lists!
    * @param all
    * @param intersectWith
    * @return Intersecting regions.
@@ -248,4 +261,143 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
     }
     return ret;
   }
+  
+
+  /**
+   * Searches for intersecting {@link Region}s in a sorted list and returns the intersecting region.
+   * Additionaly, it is possible to get the closest region, if no intersecting region could
+   * be found.
+   * <p>The list must be sorted into ascending order according primary by {@link #getChromosome()}
+   * and secondary by {@link #getStart()} prior to making this call.
+   * If it is not sorted, the results are undefined.</p>
+   * @param <T> Actual implementing class
+   * @param <K> May be T, may also be any {@link BasicRegion}
+   * @param allRegionsSorted sorted list of all regions
+   * @param searchFor {@link Region} to search for
+   * @param getClosestIfIntersectionIsEmpty get the single, closest region if no intersecting
+   * region could be found.
+   * @return 
+   * @return List of all intersecting {@link Region}s, or single closest.
+   */
+  public static <T extends Region & Comparable<? super Region>>  List<T> getAllIntersections(
+    List<T> allRegionsSorted, Region searchFor, boolean getClosestIfIntersectionIsEmpty) {
+    List<T> ret = new ArrayList<T>();
+    if (allRegionsSorted==null || allRegionsSorted.size()<1) return ret;
+    
+    // Track closest region to searchFor middle position
+    int middle = searchFor.getStart()+(searchFor.getEnd()-searchFor.getStart())/2;
+    T closest = null;
+    int minDistance = Integer.MAX_VALUE;
+    
+    // Get intersecting cgi
+    int pos = Collections.binarySearch(allRegionsSorted, searchFor);
+    if (pos<0) { // pos is (-(insertion point) - 1). 
+      pos = -(pos+1);
+    }
+    
+    /*
+     * Since region is sorted primary by chromosome and secondary by start,
+     * we now have to check each end point of all positions on same chromosome
+     * with a lower or equal starting point. consider the following
+     * 1 -------   <- does intersect
+     * 2  -        <- does not intersect
+     * 3   --      <- searchFor
+     * => Get boundaries for all regions on same chromosome with lower starting
+     * positions
+     */
+    int size = allRegionsSorted.size();
+    int lPos = pos, uPos = pos;
+    while ((--lPos>0) && allRegionsSorted.get(lPos).getChromosome()==searchFor.getChromosome());
+    while ((++uPos<size) && (allRegionsSorted.get(uPos).getChromosome()==searchFor.getChromosome()
+        && allRegionsSorted.get(uPos).getStart()<=searchFor.getStart()));
+    
+    // Now, there is now other way than checking each Region from
+    // lPos+1 to uPos-1 if their end is >= searchFors start position+1
+    T nextRegionStartingBehindSearchFor=null;
+    if (allRegionsSorted instanceof RandomAccess) {
+      for (int i=(lPos+1); i<uPos; i++) {
+        // Add all elements that end after searchFor starts
+        T current = allRegionsSorted.get(i);
+        if (current.getEnd()>searchFor.getStart()) {
+          ret.add(current);
+        }
+        if (getClosestIfIntersectionIsEmpty && ret.isEmpty()) {
+          // This code assumes, that we have no intersections
+          // => current.getEnd() is always <= searchFor.getStart() 
+          int distance = middle-current.getEnd();
+          if (distance<minDistance) {
+            minDistance = distance;
+            closest = current;
+          }
+        }
+      }
+      if (uPos<size) nextRegionStartingBehindSearchFor = allRegionsSorted.get(uPos);
+    } else {
+      // Iterate to lPos+1
+      Iterator<T> it = allRegionsSorted.iterator();
+      int i=0;
+      for (; i<(lPos+1);i++) {it.next();}
+      // Check all to uPos 
+      for (;i<uPos; i++) {
+        // Add all elements that end after searchFor starts
+        T current = it.next();
+        if (current.getEnd()>searchFor.getStart()) {
+          ret.add(current);
+        }
+        if (getClosestIfIntersectionIsEmpty && ret.isEmpty()) {
+          // This code assumes, that we have no intersections
+          // => current.getEnd() is always <= searchFor.getStart() 
+          int distance = middle-current.getEnd();
+          if (distance<minDistance) {
+            minDistance = distance;
+            closest = current;
+          }
+        }
+      }
+      if (it.hasNext()) nextRegionStartingBehindSearchFor = it.next();
+    }
+    
+
+    // Eventually return closest
+    if (getClosestIfIntersectionIsEmpty && ret.isEmpty()){
+      // If we have to return the closest, we also need to check the
+      // next item that starts behind searchFor
+      if (nextRegionStartingBehindSearchFor!=null) {
+        // This code assumes, that we have no intersections
+        // => current.getStart() is always >= searchFor.getEnd() 
+        int distance = nextRegionStartingBehindSearchFor.getStart()-middle;
+        if (distance<minDistance) {
+          minDistance = distance;
+          closest = nextRegionStartingBehindSearchFor;
+        }
+      }
+      if (closest!=null) ret.add(closest);
+      return ret;
+    }
+    
+    return ret;
+  }
+
+  /**
+   * @return a {@link Comparator} that compares {@link Region}s,
+   * primary by {@link #getChromosome()}, seconday by {@link #getStart()}
+   * and tertiary by {@link #getEnd()}.
+   */
+  public static Comparator<? super Region> getComparator() {
+    return new Comparator<Region>() {
+      @Override
+      public int compare(Region o1, Region o2) {
+        int r = Utils.compareIntegers((int)o1.getChromosomeAsByteRepresentation(), (int)o2.getChromosomeAsByteRepresentation());
+        if (r==0) {
+          r = Utils.compareIntegers(o1.getStart(), o2.getStart());
+          if (r==0) {
+            r = Utils.compareIntegers(o1.getEnd(), o2.getEnd());
+          }
+        }
+        
+        return r;
+      }
+    };
+  }
+  
 }
