@@ -61,6 +61,13 @@ public interface Region extends Chromosome {
   public void setEnd(int end);
   
   /**
+   * Performs the simple calculation:
+   * <pre>return start+((end-start)/2);</pre>
+   * @return middle position
+   */
+  public int getMiddle();
+  
+  /**
    * Used to determine if two regions overlap each other.
    * You may use the following code:
    * <pre>
