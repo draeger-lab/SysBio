@@ -81,11 +81,25 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  */
 public class JLabeledComponent extends JPanel implements JComponentForOption, ItemSelectable {
+	
+  /**
+   * A {@link Logger} for this class.
+   */
   public static final transient Logger log = Logger.getLogger(JLabeledComponent.class.getName());
+  
+  /**
+   * Generated serial version identifier.
+   */
   protected static final long serialVersionUID = -9026612128266336630L;
   
   // Label options
+  /**
+   * 
+   */
   protected String titel;
+  /**
+   * 
+   */
   protected JLabel label;
   
   // Column selector options
@@ -93,50 +107,66 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * Use a JTextField instead of JComboBoxes
    */
   protected boolean useJTextField=false;
+  /**
+   * 
+   */
   protected boolean required;
-  protected Object[] headers=null;
-  protected ComboBoxModel model=null;
-  protected JComponent colChooser;
-  
+  /**
+   * 
+   */
+  protected Object[] headers = null;
+  /**
+   * 
+   */
+  protected ComboBoxModel model = null;
+  /**
+   * 
+   */
+  protected JComponent colChooser;  
   /**
    * Number of columns to define the width of generated textfields.
    */
   private final static int TEXTFIELD_COLUMNS = 20;
-  
   /**
    * Only necessary for using this class in Combination with
    * {@link SBPreferences} and {@link Option}s.
    */
-  protected Option<?> option=null;
-  
+  protected Option<?> option = null;
   /**
    * This should always be true. Just if you want to use this
    * class not for "Choosing columns" but other stuff, you may
    * want to change this behavior.
    */
   protected boolean acceptOnlyIntegers=true;
-  
-  
   /**
    * Every integer added here corresponds to one column number. If an
    * integer is added, the column will be hidden in all ColumnChoosers.
    */
   protected List<Integer> hideColumns = new ArrayList<Integer>();
-  
   /**
    * If unsorted, the columns appear as they appear in the file. Else,
    * they are sorted alphabetically.
    */
   protected boolean sortHeaders=false;
-  
   /**
    * If true, the user may edit the given header strings.
    */
   private boolean editHeaderAlllowed=false;
-  
+  /**
+   * 
+   */
   protected static ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+  /**
+   * 
+   */
   protected static String noOptionChoosen=bundle.getString("NOT_AVAILABLE");
+  /**
+   * 
+   */
   protected static String exampleError=bundle.getString("INVALID_COLUMN");
+  /**
+   * 
+   */
   protected static String noSelection="n/a";
   
   /**
@@ -147,6 +177,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   public static void setStringComboBoxNoOptionChoosen(String s) {
     noOptionChoosen = s;
   }
+  
   /**
    * Set the static string to use for the preview in optional combo
    * boxes if no column has been selected.
@@ -155,6 +186,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   public static void setStringExampleNoOptionChoosen(String s) {
     noSelection = s;
   }
+  
   /**
    * Set the static string to use if the user selects a column
    * which is missing in the given preview.
@@ -183,7 +215,6 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     
     label.setLabelFor(colChooser);
   }
-  
   
   /**
    * Creates a new column chooser which let's the user choose
@@ -230,7 +261,6 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     label.setLabelFor(c);
   }
   
-  
   /**
    * 
    */
@@ -250,7 +280,6 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     super.setLayout(manager);
     layoutElements();
   }
-  
   
   /**
    * @return acceptOnlyIntegers
@@ -302,6 +331,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   public Object[] getSelectedObjects() {
     return ArrayUtils.toArray(getSelectedItem());
   }
+  
   /* (non-Javadoc)
    * @see java.awt.ItemSelectable#removeItemListener(java.awt.event.ItemListener)
    */
@@ -326,8 +356,6 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     Reflect.invokeIfContains(colChooser, "addChangeListener", ChangeListener.class, listener);
   }
   
-
-
   /**
    * Removes a <code>ChangeListener</code> from this {@link #colChooser}.
    *
@@ -474,7 +502,6 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * @param sort - True: headers appear sorted. False: headers appear
    * in the same ordering as they appear in the file.
    */
-  
   public void setSortHeaders(boolean sort) {
     if (sort!=this.sortHeaders) {
       // Keep the selection
@@ -530,19 +557,23 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    */
   public void setHeaders(Object[] header, int numberOfColumns) {
     // Set the header
-    Object[] newHeader=header;
-    int maxSize = newHeader!=null?newHeader.length:numberOfColumns;
+    Object[] newHeader = header;
+    int maxSize = newHeader != null ? newHeader.length:numberOfColumns;
     maxSize = Math.max(numberOfColumns, maxSize);
     newHeader = new Object[maxSize];
-    if (header!=null) System.arraycopy(header, 0, newHeader, 0, header.length);
+    if (header != null) {
+      System.arraycopy(header, 0, newHeader, 0, header.length);	
+    }
     String column = bundle.getString("COLUMN");
     for (int i = 0; i < newHeader.length; i++) {
       // Completely empty array
-      if (header == null)
+      if (header == null) {
         newHeader[i] = column + (i + 1);
+      }
       // Just fill missing gaps
-      else if (newHeader[i] == null || newHeader[i].toString().trim().length() < 1)
-        newHeader[i] = "(" + column + (i + 1) + ")";
+      else if ((newHeader[i] == null) || (newHeader[i].toString().trim().length() < 1)) {
+        newHeader[i] = '(' + column + (i + 1) + ')';
+      }
     }
     
     // Remember required headers and build model
@@ -569,24 +600,34 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     validateRepaint();
   }
   
+  /**
+   * 
+   * @param newHeader
+   * @return
+   */
   protected ComboBoxModel buildComboBoxModel(Object[] newHeader) {
-    if (newHeader==null || newHeader.length<1) return null;
+    if ((newHeader == null) || (newHeader.length < 1)) {
+      return null;
+    }
     
     // Create a list, hiding all unwanted elements
     Vector<Object> modelHeaders = new Vector<Object>();
     Map<String, Object> headersToDisplay = new HashMap<String, Object>();
     for (int i=0; i<newHeader.length; i++) {
-      if (hideColumns.contains(i)) continue;
+      if (hideColumns.contains(i)) {
+        continue;
+      }
       headersToDisplay.put(newHeader[i].toString(), newHeader[i]);
       modelHeaders.add(newHeader[i]);
     }
     
     // Sort eventually
     if (sortHeaders) {
-      ArrayList<String> keys = new ArrayList<String> (headersToDisplay.keySet());
+      ArrayList<String> keys = new ArrayList<String>(headersToDisplay.keySet());
       Collections.sort(keys);
-      for (int i=0; i<keys.size(); i++)
+      for (int i=0; i<keys.size(); i++) {
         modelHeaders.set(i, headersToDisplay.get(keys.get(i)));
+      }
     }
     
     // If not required, add noOptionChoosen
@@ -597,8 +638,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     // Build the model
     return new DefaultComboBoxModel(modelHeaders);
   }
-  
-  
+    
   /**
    * @param required - If not required, this class will add
    * a NoOptionChoosen String at the start of the box.
@@ -621,8 +661,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     refreshLabel();
     validateRepaint();
   }
-  
-  
+    
   /**
    * Set the default value of the column chooser.
    * Does account for required or optional settings
@@ -711,34 +750,39 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    */
   public void addActionListener(ActionListener l) {
     if (colChooser instanceof JComboBox) {
-      ((JComboBox)colChooser).addActionListener(l);
+      ((JComboBox) colChooser).addActionListener(l);
     } else if (colChooser instanceof JTextField) {
-      ((JTextField)colChooser).addActionListener(l);
+      ((JTextField) colChooser).addActionListener(l);
     } else {
       Reflect.invokeIfContains(colChooser, "addActionListener", ActionListener.class, l);
     }
   }
   
+  /**
+   * 
+   */
   protected void refreshSelector() {
     refreshSelector(false);
   }
   
   /**
    * @param onlySetNewModel if true and the colChooser is an already initialized
-   * JComboBox, this method will not create a new box, but simply change the model
+   * {@link JComboBox}, this method will not create a new box, but simply change the model
    * of the exiting one.
    */
   protected void refreshSelector(boolean onlySetNewModel) {
     // Remember last selection
-    int id = colChooser!=null?getSelectedValue():-1;
+    int id = colChooser != null ? getSelectedValue() : -1;
     
     // Build column chooser or only change existing model
-    if (onlySetNewModel && model!=null && colChooser!=null && colChooser instanceof JComboBox) {
-      ((JComboBox)colChooser).setModel(model);
+    if (onlySetNewModel && (model != null) && (colChooser != null) && (colChooser instanceof JComboBox)) {
+      ((JComboBox) colChooser).setModel(model);
     } else {
       // Note: replacing an existing colChooser will also remove all existing listeners!
-      if (colChooser!=null) remove(colChooser);
-      colChooser = getColumnChooser(useJTextField?null:model, -1, required, null, acceptOnlyIntegers);
+      if (colChooser != null) {
+        remove(colChooser);
+      }
+      colChooser = getColumnChooser(useJTextField ? null : model, -1, required, null, acceptOnlyIntegers);
       
       // Add to layout
       if (getLayout() instanceof GridBagLayout) {
@@ -752,12 +796,14 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     
     // Set Properties
     if (colChooser instanceof JComboBox) {
-      ((JComboBox)colChooser).setEditable(this.editHeaderAlllowed);
+      ((JComboBox) colChooser).setEditable(this.editHeaderAlllowed);
     }
     colChooser.setToolTipText(getToolTipText());
     
     // Try to restore old selection
-    if (id>=0) setSelectedValue(id);
+    if (id >= 0) {
+      setSelectedValue(id);
+    }
   }
   
   /**
@@ -767,24 +813,31 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * @return integer between -1 and headers.length.
    */
   public int getSelectedValue() {
-    if (colChooser==null) return -1;
+    if (colChooser == null) {
+      return -1;
+    }
     if (colChooser instanceof JComboBox) {
       if (!sortHeaders) {
-        if (required) return ((JComboBox)colChooser).getSelectedIndex();
-        else return ((JComboBox)colChooser).getSelectedIndex()-1;
+        if (required) {
+          return ((JComboBox) colChooser).getSelectedIndex();
+        } else {
+          return ((JComboBox) colChooser).getSelectedIndex() - 1;
+        }
       } else {
         return indexOf(headers, getSelectedItem().toString());
       }
     } else if (colChooser instanceof JTextComponent) {
       String s = ((JTextComponent)colChooser).getText().trim();
       
-      if (CSVReader.isNumber(s, true)) return Integer.parseInt(s);
-      else return -1;
+      if (CSVReader.isNumber(s, true)) {
+        return Integer.parseInt(s);
+      } else {
+    	return -1;
+      }
     } else {
       return -1; // Unknown
     }
-  }
-  
+  }  
   
   /**
    * Returns the selected item (Usually a header string).
@@ -799,7 +852,9 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     } else if (colChooser instanceof ColorChooserWithPreview) {
       return colChooser.getBackground();
     } else {
-      log.severe("Please implement getSelectedItem() for " + colChooser.getClass() + " in JLabeledComponent.");
+      log.severe(String.format(
+        "Please implement getSelectedItem() for %s in JLabeledComponent.", 
+        colChooser.getClass().toString()));
       return null;
     }
   }
@@ -812,12 +867,15 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    */
   public void setSelectedValue(int i) {
     if (colChooser instanceof JComboBox) {
-      if (i>=0 && i<((JComboBox)colChooser).getModel().getSize())
-        ((JComboBox)colChooser).setSelectedIndex(i);
+      if ((i >= 0) && (i < ((JComboBox) colChooser).getModel().getSize())) {
+        ((JComboBox) colChooser).setSelectedIndex(i);
+      }
     } else if (colChooser instanceof JTextComponent) {
-      ((JTextComponent)colChooser).setText(Integer.toString(i));
+      ((JTextComponent) colChooser).setText(Integer.toString(i));
     } else {
-      log.warning("Cannot set selected integer value on " + colChooser.getClass());
+      log.warning(String.format(
+        "Cannot set selected integer value on %s", 
+        colChooser.getClass().toString()));
     }
   }
   
@@ -827,27 +885,29 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    */
   public void setSelectedItem(Object string) {
     if (colChooser instanceof JComboBox) {
-      ((JComboBox)colChooser).setSelectedItem(string);
+      ((JComboBox) colChooser).setSelectedItem(string);
     } else if (colChooser instanceof JTextComponent) {
       int pos = indexOf(headers, string.toString());
-      if (pos<0) {
+      if (pos < 0) {
         if (CSVReader.isNumber(string.toString(), false)) {
-          ((JTextComponent)colChooser).setText(string.toString());
+          ((JTextComponent) colChooser).setText(string.toString());
         }
       } else {
-        ((JTextComponent)colChooser).setText(Integer.toString(pos));
+        ((JTextComponent) colChooser).setText(Integer.toString(pos));
       }
     } else if (colChooser instanceof ColorChooserWithPreview) {
       if (string instanceof java.awt.Color) {
         ((ColorChooserWithPreview) colChooser).setColor((Color)string);
       }
     } else {
-      log.warning("Please implement setSelectedItem for" + colChooser.getClass());
+      log.warning(String.format(
+        "Please implement setSelectedItem for %s.", colChooser.getClass().toString()));
     }
   }
   
-  
-  
+  /**
+   * 
+   */
   protected void refreshLabel() {
     // Create it
     if (this.label==null) {
@@ -864,30 +924,54 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     }
   }
   
+  /**
+   * 
+   */
   protected void validateRepaint() {
     validate();
     repaint();
   }
   
+  /**
+   * 
+   * @param model
+   * @return
+   */
   protected static JComponent getColumnChooser(ComboBoxModel model) {
     return getColumnChooser(model, -1, false, null, true);
   }
+  
+  /**
+   * 
+   * @param model
+   * @param defaultValue
+   * @param required
+   * @param l
+   * @param acceptOnlyIntegers
+   * @return
+   */
   protected static JComponent getColumnChooser(ComboBoxModel model, int defaultValue, boolean required, ActionListener l, boolean acceptOnlyIntegers) {
     JComponent ret;
     
-    if (model!=null && model.getSize()>0) {
+    if ((model != null) && (model.getSize() > 0)) {
       JComboBox cb = new JComboBox(model);
       // XXX: Feature possibility: remove the selected element in all other ComboBoxes.
-      if (l!=null) cb.addActionListener(l);
+      if (l != null) {
+        cb.addActionListener(l);
+      }
       
-      int def = defaultValue+(required?0:1);
-      if (def<0 || def>=model.getSize()) def=0;
+      int def = defaultValue + (required ? 0 : 1);
+      if ((def < 0) || (def >= model.getSize())) {
+        def = 0;
+      }
       cb.setSelectedIndex(def);
       // Configure an improved renderer that allows more customization.
       cb.setRenderer(new ActionCommandRenderer());
       ret = cb;
     } else {
-      if (defaultValue<0) defaultValue=0;
+      if (defaultValue < 0) {
+        defaultValue=0;
+      }
       JTextField tf;
       if (acceptOnlyIntegers) {
         tf =CSVReaderOptionPanel.buildIntegerBox(Integer.toString(defaultValue), l);
@@ -910,13 +994,18 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    */
   protected static int indexOf(Object[] array, Object toSearch) {
     for (int i=0; i<array.length; i++) {
-      if (array[i].equals(toSearch)) return i;
+      if (array[i].equals(toSearch)) {
+        return i;
+      }
     }
-    return-1;
+    return -1;
   }
   
-  
+  /**
+   * 
+   */
   public static final Insets insets = new Insets(1,3,1,3);
+  
   /**
    * Helper Method for GridBagConstrains.
    */
@@ -927,19 +1016,30 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     container.add(component, gbc);
   }
   
+  /**
+   * 
+   * @param lh
+   * @param jc
+   */
   public static void addSelectorsToLayout(LayoutHelper lh, JLabeledComponent jc) {
     addSelectorsToLayout(lh, jc, false);
   }
+  
+  /**
+   * 
+   * @param lh
+   * @param jc
+   * @param addSpace
+   */
   public static void addSelectorsToLayout(LayoutHelper lh, JLabeledComponent jc, boolean addSpace) {
-    int x=0;
+    int x = 0;
     lh.ensurePointerIsAtBeginningOfARow();
     
     lh.add(jc.label, (x++), lh.getRow(), 1, 1, 0d, 0d);
     lh.add(new JPanel(), (x++), lh.getRow(), 1, 1, 0d, 0d);
-    if(jc instanceof JColumnChooser) {
-      lh.add(jc.colChooser, (x++), ((JColumnChooser)jc).getUsePreview()?lh.getRow():1, 1, 0d, 0d);
-    }
-    else {
+    if (jc instanceof JColumnChooser) {
+      lh.add(jc.colChooser, (x++), ((JColumnChooser) jc).getUsePreview()?lh.getRow():1, 1, 0d, 0d);
+    } else {
       lh.add(jc.colChooser, (x++), 1, 1, 0d, 0d);
     }
     if (jc instanceof JColumnChooser && ((JColumnChooser)jc).getUsePreview()) {
@@ -964,12 +1064,14 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   public boolean isSetOption() {
     return option!=null;
   }
+  
   /* (non-Javadoc)
    * @see de.zbit.gui.prefs.JComponentForOption#setOption(de.zbit.util.prefs.Option)
    */
   public void setOption(Option<?> option) {
     this.option=option;
   }
+  
   /* (non-Javadoc)
    * @see de.zbit.gui.prefs.JComponentForOption#getCurrentValue()
    */
@@ -1025,7 +1127,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   public void setEditHeaderAllowed(boolean b) {
     this.editHeaderAlllowed=b;
     if (colChooser instanceof JComboBox) {
-      ((JComboBox)colChooser).setEditable(b);
+      ((JComboBox) colChooser).setEditable(b);
     } else {
       Reflect.invokeIfContains(colChooser, "setEditable", Boolean.class, b);
     }
@@ -1133,16 +1235,15 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     return spinner;
   }
   
-  
   /**
    * @return the {@link JTextComponent} associated with the current {@link #getColumnChooser()}.
    */
   public JTextComponent getJTextComponent() {
     if (colChooser==null) return null;
     if (colChooser instanceof JComboBox) {
-      return (JTextComponent) ((JComboBox)colChooser).getEditor().getEditorComponent();
+      return (JTextComponent) ((JComboBox) colChooser).getEditor().getEditorComponent();
     } else if (colChooser instanceof JTextComponent) {
-      return ((JTextComponent)colChooser);
+      return ((JTextComponent) colChooser);
     } else {
       return null; // Unknown
     }
