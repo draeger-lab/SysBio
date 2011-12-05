@@ -390,10 +390,14 @@ public interface KeyProvider {
       }
 			StringBuilder headLine = new StringBuilder();
 			headLine.append(title.charAt(0));
+			char prev, curr;
 			for (int i = 1; i < title.length(); i++) {
-				if ((Character.isLowerCase(title.charAt(i - 1)) && Character
-						.isUpperCase(title.charAt(i)))
-						|| (title.substring(i).startsWith("Option"))) {
+			  prev = title.charAt(i - 1);
+			  curr = title.charAt(i);
+        if (((Character.isLowerCase(prev) && Character.isUpperCase(curr))
+            || (Character.isLetter(prev) && Character.isDigit(curr)) || (Character
+            .isDigit(prev) && Character.isLetter(curr)))
+            || (title.substring(i).startsWith("Option"))) {
 					headLine.append(' ');
 				}
 				if (title.charAt(i) == '_') {
@@ -693,6 +697,7 @@ public interface KeyProvider {
 							sb.append("</span> ");
 							sb.append(bundle.getString("ARE"));
 							sb.append(":\n          ");
+							Object element;
 							for (int i = 0; i < list.size(); i++) {
 								if ((i > 0) && (list.size() > 2)) {
 									sb.append(',');
@@ -708,7 +713,12 @@ public interface KeyProvider {
 									sb.append(bundle.getString("AND"));
 									sb.append(' ');
 								}
-								value = list.get(i).toString();
+								element = list.get(i);
+                if (element instanceof Class<?>) {
+                  value = ((Class<?>) element).getName();
+                } else {
+                  value = element.toString();
+                }
 								sb.append("<span class=typewriter>");
 								sb.append(value);
 								sb.append("</span>");

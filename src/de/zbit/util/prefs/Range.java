@@ -322,14 +322,14 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	/**
 	 * Additional constraints to restrict an input.
 	 */
-	private Object constraints=null;
+	private Object constraints = null;
 	
 	/**
 	 * If this Range has been initialized with
 	 * {@link #Range(Class, Collection)}, this is the original
 	 * list of acceptable values.
 	 */
-  private List<Type> listOfAccpetedObjects=null;
+  private List<Type> listOfAccpetedObjects = null;
 	
 	/**
 	 * @return the constraints
@@ -365,7 +365,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
   public Range(Class<Type> requiredType, Iterable<Type> acceptedObjects) {
     this(requiredType, Range.toRangeString(acceptedObjects));
     // This requires a list => Convert to list
-    if (!(acceptedObjects instanceof List)) {
+    if (!(acceptedObjects instanceof List<?>)) {
       List<Type> acceptedObjects2 = new ArrayList<Type>();
       for (Type t: acceptedObjects)
         acceptedObjects2.add(t);
@@ -520,7 +520,9 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 			for (Type type : newItems) {
 				if (!ret.contains(type)) ret.add(type);
 			}
-			if (ret.size()>maximumToReturn) return null;
+			if (ret.size() > maximumToReturn) {
+			  return null;
+			}
 		}
 		return ret;
 	}
@@ -582,10 +584,9 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
    * @throws ParseException 
    */
   private void parseRangeSpec(String range) throws ParseException {
-  	
-  	int positionTracker=0;
+  	int positionTracker = 0;
 		try {
-			range = range.substring(range.indexOf('{')+1, range.lastIndexOf('}'));
+			range = range.substring(range.indexOf('{') + 1, range.lastIndexOf('}'));
 			// Be carefull with " and '
 			//String[] items = range.split(Pattern.quote(","));
 			List<Character> stringSep = new LinkedList<Character>();
@@ -593,16 +594,18 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 			String[] items = CSVReader.getSplits(range, ',', true, true, stringSep);
 			
 			SubRange r = null;
-			for (int i=0; i<items.length; i++) {
-				positionTracker+=items[i].length()+1; // +1 for the ','
+			for (int i = 0; i < items.length; i++) {
+				positionTracker += items[i].length() + 1; // +1 for the ','
 				String item = items[i].trim();
-				String item2=item;
+				String item2 = item;
 				r = new SubRange();
 				
 				// Check if we have a range
 				char c = item.charAt(0);
-				if (c=='(' || c=='[') {
-					if (c=='(') r.excludingLBound=true;
+				if ((c == '(') || (c == '[')) {
+					if (c == '(') {
+					  r.excludingLBound = true;
+					}
 					i++;
 					item = item.substring(1);
 					item2 = items[i].trim();
@@ -615,16 +618,16 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 				
 				// Trim the string indicators
 				for (Character sep : stringSep) {
-					if (item.length()>2 && item.charAt(0)==(sep) && item.charAt(item.length()-1)==(sep) ) {
-						item = item.substring(1, item.length()-1);
+					if ((item.length() > 2) && (item.charAt(0) == sep) && (item.charAt(item.length()-1) == sep)) {
+						item = item.substring(1, item.length() - 1);
 					}
-					if (item2.length()>2 && item2.charAt(0)==(sep) && item2.charAt(item2.length()-1)==(sep) ) {
-						item2 = item2.substring(1, item2.length()-1);
+					if ((item2.length() > 2) && (item2.charAt(0) ==sep) && (item2.charAt(item2.length() - 1) == sep)) {
+						item2 = item2.substring(1, item2.length() - 1);
 					}
 				}
 				
-				r.lBound=Option.parseOrCast(typee, item);
-				r.uBound=Option.parseOrCast(typee, item2);
+				r.lBound = Option.parseOrCast(typee, item);
+				r.uBound = Option.parseOrCast(typee, item2);
 				
 				addRange(r);
 			}
@@ -651,20 +654,19 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
    */
   @SuppressWarnings({ "unchecked" })
   public static <Type> String toRangeString(Iterable<Type> acceptedObjects) {
-    Iterable<Type> accObjects=acceptedObjects;
+    Iterable<Type> accObjects = acceptedObjects;
     
     //If the range consists of classes, use the simple class names
-    if((acceptedObjects!=null) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
+    if ((acceptedObjects != null) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
       List<Type> classStrings = new LinkedList<Type>();
-      for(Type object:acceptedObjects) {
-        classStrings.add((Type)((Class<?>)object).getSimpleName());
+      for (Type object : acceptedObjects) {
+        classStrings.add((Type) ((Class<?>) object).getSimpleName());
       }
-      accObjects=classStrings;
+      accObjects = classStrings;
     }
     
-    String s ="{" + StringUtil.implode(
-      StringUtil.addPrefixAndSuffix(accObjects, "\"", "\"")
-      , ",") + "}";
+    String s = '{' + StringUtil.implode(StringUtil.addPrefixAndSuffix(
+      accObjects, "\"", "\""), ",") + '}';
     
     logger.finer(String.format("Created a new range-string from a collection: %s", s));
     return s;
@@ -821,9 +823,11 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     
     if (ranges!=null) {
       for (SubRange r : ranges) {
-        if (max==null) max = r.getMaximum();
-        else if (max instanceof Comparable && r.uBound instanceof Comparable) {
-          max = ((Comparable)max).compareTo((Comparable)r.uBound)>0?max:r.uBound;
+        if (max == null) {
+          max = r.getMaximum();
+        }
+        else if ((max instanceof Comparable) && (r.uBound instanceof Comparable)) {
+          max = ((Comparable)max).compareTo((Comparable)r.uBound) > 0 ? max : r.uBound;
         }
         // Too much effort to process this...
         //if (r.excludinguBound) {}
@@ -837,33 +841,45 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
    */
   public int compareTo(Range<Type> other) {
     // Is only approximative...
-    if (this == other) return 0;
-    if (other == null) return -1;
+    if (this == other) {
+      return 0;
+    }
+    if (other == null) {
+      return -1;
+    }
     int ret = 0;
     
-    if (!typee.equals(other.typee)) return -2;
+    if (!typee.equals(other.typee)) {
+      return -2;
+    }
     
     if (constraints == null) {
-      if (other.constraints != null) return -3;
+      if (other.constraints != null) {
+        return -3;
+      }
     } else if (other.constraints == null) {
-      if (constraints != null) return -4;
+      if (constraints != null) {
+        return -4;
+      }
     } else if (constraints.equals(other.constraints)) {
       return 0;
     }
     
-    if (rangeString != null && other.rangeString!=null) {
+    if ((rangeString != null) && (other.rangeString != null)) {
       ret = rangeString.compareTo(other.rangeString);
-      if (ret!=0) return ret;
+      if (ret != 0) {
+        return ret;
+      }
     }
     
-    if (listOfAccpetedObjects != null && other.listOfAccpetedObjects!=null) {
+    if ((listOfAccpetedObjects != null) && (other.listOfAccpetedObjects != null)) {
       ret = listOfAccpetedObjects.size()-other.listOfAccpetedObjects.size();
-      if (ret!=0) return ret;
+      if (ret != 0) {
+        return ret;
+      }
     }
     
     return ret;
   }
-  
-  
-  
+
 }

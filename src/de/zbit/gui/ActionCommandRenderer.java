@@ -1,6 +1,6 @@
 /*
- * $Id:  ActionCommandComboBoxModel.java 16:18:36 wrzodek $
- * $URL: ActionCommandComboBoxModel.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -19,6 +19,7 @@ package de.zbit.gui;
 import java.awt.Component;
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -35,6 +36,7 @@ import javax.swing.table.TableCellRenderer;
 
 import de.zbit.util.Reflect;
 import de.zbit.util.StringUtil;
+import de.zbit.util.prefs.KeyProvider;
 
 /**
  * A {@link ComboBoxModel} that displays the names and ToolTips
@@ -48,8 +50,19 @@ import de.zbit.util.StringUtil;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class ActionCommandRenderer extends JLabel implements ListCellRenderer, TableCellRenderer, Serializable {
+public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
+    TableCellRenderer, Serializable {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = 6825133145583461124L;
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger
+      .getLogger(ActionCommandRenderer.class.getName());
   
   /**
    * If this is <code>TRUE</code>, each <code>value</code> of type
@@ -72,6 +85,9 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
    */
   private boolean showAsHTML = false;
   
+  /**
+   * 
+   */
   public ActionCommandRenderer() {
     this(false);
   }
@@ -112,8 +128,8 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     }
     
     // Generate component
-    if (c==null) {
-      if (defaultTableRenderer==null) {
+    if (c == null) {
+      if (defaultTableRenderer == null) {
         defaultTableRenderer = new DefaultTableCellRenderer();
       }
       c = defaultTableRenderer.getTableCellRendererComponent(table, label, isSelected, hasFocus, row, column);
@@ -136,11 +152,15 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     Method iconMethod = null;
     try {
       iconMethod = Reflect.getMethod(c, "setIcon", Icon.class);
-    } catch (Exception e) {}
+    } catch (Exception exc) {
+      logger.finest(exc.getLocalizedMessage());
+    }
     if (iconMethod!=null) {
       try {
         iconMethod.invoke(c, icon);
-      } catch (Exception e) {}
+      } catch (Exception exc) {
+        logger.finest(exc.getLocalizedMessage());
+      }
     } 
     
     return c;
@@ -160,51 +180,53 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     if (value instanceof Component) {
       c = (Component) value;
     } else if (value instanceof ActionCommand) {
-      label = ((ActionCommand)value).getName();
-      toolTip = ((ActionCommand)value).getToolTip();
+      label = ((ActionCommand) value).getName();
+      toolTip = ((ActionCommand) value).getToolTip();
       if (value instanceof ActionCommandWithIcon) {
-        icon = (((ActionCommandWithIcon)value).getIcon());
+        icon = (((ActionCommandWithIcon) value).getIcon());
       }
     } else if (value instanceof Class<?>) {
-      label = ((Class<?>)value).getSimpleName();
+      label = KeyProvider.Tools.createTitle((Class<?>) value);
       if (setToolTipToFullClassNameForClasses) {
-        toolTip = ((Class<?>)value).getName();
+        toolTip = ((Class<?>) value).getName();
       }
     }
     
     
     // Generate component
-    if (c==null) {
+    if (c == null) {
       /*
        * Get the systems default renderer.
        */
-      if (defaultListRenderer==null) {
+      if (defaultListRenderer == null) {
         // new DefaultListCellRenderer(); Is not necessarily the default!
         // even UIManager.get("List.cellRenderer"); returns a different value!
         try {
           defaultListRenderer = new JComboBox().getRenderer();
-          if (defaultListRenderer==null) {
+          if (defaultListRenderer == null) {
             defaultListRenderer = (ListCellRenderer) UIManager.get("List.cellRenderer");
           }
-        } catch (Throwable t){t.printStackTrace();}
-        if (defaultListRenderer==null) {
-          defaultListRenderer = new DefaultListCellRenderer();;
+        } catch (Throwable exc){
+          logger.warning(exc.getLocalizedMessage());
+        }
+        if (defaultListRenderer == null) {
+          defaultListRenderer = new DefaultListCellRenderer();
         }
       }
       //-------------------
       
       c = defaultListRenderer.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);
     }
-    
+        
     // Set ToolTip
-    if (toolTip!=null && toolTip.length()>0 && (c instanceof JComponent)) {
+    if ((toolTip != null) && (toolTip.length() > 0) && (c instanceof JComponent)) {
       if (showAsHTML) {
-        ((JComponent)c).setToolTipText(StringUtil.toHTML(toolTip, GUITools.TOOLTIP_LINE_LENGTH));
+        ((JComponent) c).setToolTipText(StringUtil.toHTML(toolTip, GUITools.TOOLTIP_LINE_LENGTH));
       } else {
-        ((JComponent)c).setToolTipText(toolTip);
+        ((JComponent) c).setToolTipText(toolTip);
       }
     } else {
-      ((JComponent)c).setToolTipText(null);
+      ((JComponent) c).setToolTipText(null);
     }
     
     // Set Icon
@@ -213,17 +235,18 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer, T
     Method iconMethod = null;
     try {
       iconMethod = Reflect.getMethod(c, "setIcon", Icon.class);
-    } catch (Exception e) {}
-    if (iconMethod!=null) {
+    } catch (Exception exc) {
+      logger.finest(exc.getLocalizedMessage());
+    }
+    if (iconMethod != null) {
       try {
         iconMethod.invoke(c, icon);
-      } catch (Exception e) {}
+      } catch (Exception exc) {
+        logger.finest(exc.getLocalizedMessage());
+      }
     } 
     
     return c;
-  }
-  
-  
-  
-  
+  }  
+
 }
