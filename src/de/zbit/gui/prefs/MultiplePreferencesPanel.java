@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -35,6 +36,8 @@ import javax.swing.event.ChangeListener;
 import de.zbit.gui.GUITools;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
@@ -56,6 +59,14 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * <p>Access this array by using {@link #getClasses()}!</p>
 	 */
 	private static Class<PreferencesPanel>[] classes = null;
+	
+	/**
+	 * With this {@link List} it is possible to let this
+	 * {@link MultiplePreferencesPanel} show only
+	 * {@link PreferencesPanelForKeyProvider}s defined by the given {@link Option}
+	 * s.
+	 */
+	private static Class<? extends KeyProvider>[] options;
 	
 	/**
 	 * Determines, if the {@link #classes} array has been initialized.
@@ -157,6 +168,9 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 *         this {@link MultiplePreferencesPanel} when initializing.
 	 */
 	public static int getPossibleTabCount() {
+		if (options != null) {
+			return options.length;
+		}
 		int tabCount = 0;
 		for (int i = 0; i < getClasses().length; i++) {
 			if (!getClasses()[i].equals(MultiplePreferencesPanel.class)) {
@@ -169,6 +183,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 						}
 					}
 				} catch (Exception exc) {
+					logger.finer(exc.getLocalizedMessage());
 				}
 			}
 		}
@@ -205,7 +220,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	public void setPreferredSize(Dimension preferredSize) {
 	  super.setPreferredSize(preferredSize);
     // Make tab at least as big as this panel.
-	  if (tab!=null) {
+	  if (tab != null) {
 	    Dimension p1 = tab.getPreferredSize();
 	    Dimension p2 = preferredSize;
 	    p1.width = Math.max(p1.width, p2.width);
@@ -228,12 +243,9 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see
-	 * de.zbit.gui.cfg.PreferencesPanel#addItemListener(java.awt.event.ItemListener
-	 * )
+	 * de.zbit.gui.cfg.PreferencesPanel#addItemListener(java.awt.event.ItemListener)
 	 */
 	@Override
 	public void addItemListener(ItemListener listener) {
@@ -242,9 +254,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.Component#addKeyListener(java.awt.event.KeyListener)
 	 */
 	@Override
@@ -280,9 +290,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		return tab.getSelectedIndex();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#getTitle()
 	 */
 	public String getTitle() {
@@ -290,27 +298,37 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 				.getString("USER_PREFERENCES");
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#init()
 	 */
 	public void init() {
 		tab = new JTabbedPane();
 		PreferencesPanel settingsPanel;
-		for (int i = 0; i < getClasses().length; i++) {
-			if (!getClasses()[i].equals(getClass())) {
+		if (options != null) {
+			for (Class<? extends KeyProvider> provider : options) {
 				try {
-					Class<PreferencesPanel> c = getClasses()[i];
-					Constructor<PreferencesPanel> con = c.getConstructor();
-					if (c!=null) {
-					  settingsPanel = con.newInstance();
-						tab.addTab(settingsPanel.getTitle(), new JScrollPane(settingsPanel));
-					}
-				} catch (NoSuchMethodException exc) {
-					// Do nothing.
-				} catch (Exception exc) {
+					settingsPanel = new PreferencesPanelForKeyProvider(provider);
+					tab.addTab(settingsPanel.getTitle(), new JScrollPane(settingsPanel));
+				} catch (IOException exc) {
+					GUITools.showErrorMessage(this, exc);
+				}
+			}
+		} else {
+			for (int i = 0; i < getClasses().length; i++) {
+				if (!getClasses()[i].equals(getClass())) {
+					try {
+						Class<PreferencesPanel> c = getClasses()[i];
+						Constructor<PreferencesPanel> con = c.getConstructor();
+						if (c != null) {
+							settingsPanel = con.newInstance();
+							tab.addTab(settingsPanel.getTitle(), new JScrollPane(
+								settingsPanel));
+						}
+					} catch (NoSuchMethodException exc) {
+						logger.finest(exc.getLocalizedMessage());
+					} catch (Exception exc) {
 						GUITools.showErrorMessage(this, exc);
+					}
 				}
 			}
 		}
@@ -318,9 +336,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		addItemListener(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#isDefaultConfiguration()
 	 */
 	@Override
@@ -333,9 +349,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#isUserConfiguration()
 	 */
 	@Override
@@ -348,9 +362,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#loadPreferences()
 	 */
 	protected SBPreferences loadPreferences() throws IOException {
@@ -359,9 +371,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#persist()
 	 */
 	@Override
@@ -371,9 +381,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#restoreDefaults()
 	 */
 	@Override
@@ -392,6 +400,13 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	public void setSelectedIndex(int tab) {
 		this.tab.setSelectedIndex(tab);
+	}
+
+	/**
+	 * @param interactive
+	 */
+	public static void setOptions(Class<? extends KeyProvider>[] interactive) {
+		options = interactive;
 	}
 	
 }
