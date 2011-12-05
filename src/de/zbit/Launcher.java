@@ -51,7 +51,7 @@ import de.zbit.util.prefs.SBProperties;
  * GUI elements (in some standard Java packages, such as SWING or AWT). When
  * making a reference to such a class, the complete class name including its
  * package declaration is used in order to prevent that on systems that do not
- * have these classes, the Launcher might not be useable.
+ * have these classes, the Launcher might not be usuable.
  * </p>
  * 
  * @author Andreas Dr&auml;ger

@@ -31,7 +31,7 @@ import de.zbit.util.prefs.SBPreferences;
 public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	
 	/**
-	 * Generated serial version identifer.
+	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = -3293205475880841303L;
 	

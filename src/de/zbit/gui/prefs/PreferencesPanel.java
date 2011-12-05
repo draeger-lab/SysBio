@@ -323,13 +323,14 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     searchForOptionGroups(keyProviders);
     LayoutHelper lh = new LayoutHelper(this), helper;
     boolean multipleKeyProviders = keyProviders.length > 1;
+    int elemCount;
     
     for (Class<? extends KeyProvider> keyProvider : keyProviders) {
       helper = multipleKeyProviders ? new LayoutHelper(new JPanel()) : lh;
-      insertOptionGroups(optionGroups.get(keyProvider.getName()),
+      elemCount = insertOptionGroups(optionGroups.get(keyProvider.getName()),
         keyProvider2fileGroups.get(keyProvider.getName()).intValue(),
         unprocessedOptions, helper);
-      if (multipleKeyProviders) {
+      if (multipleKeyProviders && (elemCount > 0)) {
         lh.add(helper.getContainer());
       }
     }
@@ -340,7 +341,16 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
        * Thus, we should keep the one column layout and create a new group for
        * ungrouped options.
        */
-      lh.add(createGroup((Collection<Option>) ungroupedOptions, unprocessedOptions));
+      elemCount = 0;
+      for (Option<?> option : ungroupedOptions) {
+        if (option.isVisible()) {
+          elemCount++;
+        }
+      }
+      if (elemCount > 0) {
+        lh.add(createGroup((Collection<Option>) ungroupedOptions,
+          unprocessedOptions));
+      }
     }
     
     // And finally we create the dependencies
@@ -357,9 +367,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @param fileSelectors
    * @param unprocessedOptions
    * @param lh
+   * @return the number of elements that are visibly added to the given
+   *         {@link LayoutHelper}.
    */
   @SuppressWarnings("rawtypes")
-  private void insertOptionGroups(List<OptionGroup> groupList,
+  private int insertOptionGroups(List<OptionGroup> groupList,
     int fileSelectors, List<Option<?>> unprocessedOptions, LayoutHelper lh) {
     boolean twoColumn = ((groupList.size() - fileSelectors) % 2 == 0)
         && (ungroupedOptions.size() == 0);
@@ -368,6 +380,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     // First we create GUI elements for all groups
     int column = 0;
     int row = 0;
+    int elemCount = 0;
     Component c;
     for (OptionGroup<?> optGrp : groupList) {
       if (optGrp.isVisible()) {
@@ -383,9 +396,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           if (oneColumn) {
             column = 0;
             lh.add(c, column, row++, 2, 1);
+            elemCount++;
             oneColumn = false;
           } else {
             lh.add(c, column++, row, 1, 1);
+            elemCount++;
             if (column == 2) {
               column = 0;
               row++;
@@ -393,6 +408,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           }
         } else {
           lh.add(c);
+          elemCount++;
         }
       } else {
         // Remove from internal "to-do" list.
@@ -401,6 +417,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         }
       }
     }
+    return elemCount;
   }
 
   /**
