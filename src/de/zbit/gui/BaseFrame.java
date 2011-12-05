@@ -86,8 +86,9 @@ import de.zbit.util.prefs.SBProperties;
  * @version $Rev$
  * @since 1.0
  */
-public abstract class BaseFrame extends JFrame implements FileHistory {
-	
+public abstract class BaseFrame extends JFrame implements FileHistory,
+    GUIOptions {
+
 	/**
 	 * This {@link Enum} contains very basic actions of a graphical user interface.
 	 * 
@@ -584,15 +585,21 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 			UIManager.getIcon("ICON_PREFS_16"), KeyStroke.getKeyStroke('E',
 				InputEvent.ALT_GRAPH_DOWN_MASK), 'P', true);
 		items = additionalEditMenuItems();
-		// Speed up the GUI by loading the preferences classes at the beginning
-		// and add this menu only if there is at least one preference panel defined.
+		/* Speed up the GUI by loading the preferences classes at the beginning
+		 * and add this menu only if there is at least one preference panel defined.
+		 * In case of options defined directly as a collection of KeyProviders, avoid
+		 * using reflection (time consuming).
+		 */
+		int numPrefs = -1;
 		if (appConf != null) {
 			Class<? extends KeyProvider> interactive[] = appConf.getInteractiveOptions();
 			if (interactive != null) {
-				MultiplePreferencesPanel.setOptions(interactive);
+				numPrefs = interactive.length;
 			}
 		}
-		int numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
+    if (numPrefs < 0) {
+      numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
+    }
 		if ((numPrefs > 0) || ((items != null) && (items.length > 0))) {
 			title = BaseAction.EDIT.getName();
 			JMenu editMenu = GUITools.createJMenu(
@@ -704,44 +711,48 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 *         program.
 	 */
 	protected abstract Component createMainComponent();
-	
-	/**
-	 * This method is called when the window closes as well as
-	 * when the user presses the Exit button in the {@link JMenu}.
-	 * This is used to prepare the exit, before the actual exit
-	 * method {@link #exit()} is callsed (i.e. store window
-	 * size and state).
-	 */
+  
+  /**
+   * This method is called when the window closes as well as when the user
+   * presses the Exit button in the {@link JMenu}. This is used to prepare the
+   * exit, before the actual exit method {@link #exit()} is called (i.e., store
+   * window size and state).
+   */
 	public void exitPre() {
 	  // Save with/height and window state
-    SBPreferences windowProperties = SBPreferences.getPreferencesFor(GUIOptions.class);
+    SBPreferences windowProperties = SBPreferences.getPreferencesFor(getClass());
     if (getExtendedState() == Frame.NORMAL) {
       // Do not store width and height of a maximized window.
       // Rather also store the state and restore this"
-      windowProperties.put(GUIOptions.WINDOW_WIDTH, getWidth());
-      windowProperties.put(GUIOptions.WINDOW_HEIGHT, getHeight());
+      windowProperties.put(WINDOW_WIDTH, getWidth());
+      windowProperties.put(WINDOW_HEIGHT, getHeight());
     }
-    windowProperties.put(GUIOptions.WINDOW_STATE, getExtendedState());
+    windowProperties.put(WINDOW_STATE, getExtendedState());
     try {
       windowProperties.flush();
     } catch (BackingStoreException exc) {
-      // Really not to mention this unimportant error
-    }
-    
+      // Really not to mention this unimportant error, unless for debugging.
+      logger.finest(exc.getLocalizedMessage());
+    }    
     // Call real exit method
     exit();
 	}
 	
-	 /**
+	/**
    * Restores the window width, height and state from preferences.
    */
   private void restoreWindowSizeAndState() {
-    SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-    int width = GUIOptions.WINDOW_WIDTH.getValue(prefs);
-    int height = GUIOptions.WINDOW_HEIGHT.getValue(prefs);
-    int state = GUIOptions.WINDOW_STATE.getValue(prefs);
-    setSize(new java.awt.Dimension(width, height));
-    if (state!=Frame.ICONIFIED) {
+    SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+    // Avoid that the window may be bigger as the screen. This may cause problems on
+    // some computers, e.g., MacOS.
+    Dimension screenDimension = getToolkit().getScreenSize();
+    int width = Math.min(WINDOW_WIDTH.getValue(prefs), (int) screenDimension
+        .getWidth());
+    int height = Math.min(WINDOW_HEIGHT.getValue(prefs), (int) screenDimension
+        .getHeight());
+    int state = WINDOW_STATE.getValue(prefs);
+    setSize(new Dimension(width, height));
+    if (state != Frame.ICONIFIED) {
       // Never set a frame to be initially iconified ;-)
       setExtendedState(state);
     }
@@ -846,10 +857,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * 
 	 * @return
 	 */
-	public File getOpenDir() {
-		SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-		return new File(prefs.get(GUIOptions.OPEN_DIR));
-	}
+  public File getOpenDir() {
+    SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+    return new File(prefs.get(OPEN_DIR));
+  }
 	
 	/**
 	 * This method creates a title from the values of
@@ -882,8 +893,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * @return
 	 */
 	public File getSaveDir() {
-		SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-		return new File(prefs.get(GUIOptions.SAVE_DIR));
+		SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+		return new File(prefs.get(SAVE_DIR));
 	}
 	
 	/**
@@ -949,16 +960,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 			setTitle(getProgramNameAndVersion());
 		}
 		
-		// Set this as property for static classes.
-		String appName = getApplicationName();
-		if (appName != null) {
-			System.setProperty("app.name", appName);
-		}
-		String version = getDottedVersionNumber();
-		if (version!=null) {
-		  System.setProperty("app.version", version);
-		}
-		
     // Use the systems proxy settings to establish connections
     System.setProperty("java.net.useSystemProxies", "true");
     
@@ -973,6 +974,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 				try {
 					BaseAction.nameProperties.putAll(ResourceManager.getBundle(location));
 				} catch (Exception exc) {
+				  logger.finest(exc.getLocalizedMessage());
 				}
 			}
 		} catch (Exception exc) {
@@ -1163,15 +1165,15 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
       }
       // Memorize the default open directory.
       if (sameBaseDir && (baseDir != null)) {
-        SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-        prefs.put(GUIOptions.OPEN_DIR, baseDir);
+        SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+        prefs.put(OPEN_DIR, baseDir);
         try {
           prefs.flush();
         } catch (BackingStoreException exc) {
-          //GUITools.showErrorMessage(this, exc);
           // do NOT show this error, because the user really dosn't know
           // how to handle a "The value for SAVE_DIR is out of range [...]"
-          // message. Better log it here!
+          // message.
+          logger.finest(exc.getLocalizedMessage());
         }
       }
       // Allow users to close the file(s) again
@@ -1226,9 +1228,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	 * 
 	 * @return 
 	 */
-	public boolean preferences() {
-		return PreferencesDialog.showPreferencesDialog();
-	}
+  public boolean preferences() {
+    if ((appConf != null) && (appConf.getInteractiveOptions() != null)) {
+      return PreferencesDialog.showPreferencesDialog(appConf
+          .getInteractiveOptions());
+    }
+    return PreferencesDialog.showPreferencesDialog();
+  }
 
 	/**
 	 * Saves some results or the current work in some {@link File}.
@@ -1271,8 +1277,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	@Override
 	public void setVisible(boolean b) {
 		if (!UPDATE_CHECKED) {
-			SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-			if (prefs.getBoolean(GUIOptions.CHECK_FOR_UPDATES)) {
+			SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+			if (prefs.getBoolean(CHECK_FOR_UPDATES)) {
 				onlineUpdate(true);
 				UPDATE_CHECKED = true;
 			}

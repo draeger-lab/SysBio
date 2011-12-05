@@ -16,7 +16,6 @@
  */
 package de.zbit;
 
-import java.awt.Window;
 import java.beans.EventHandler;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -26,7 +25,6 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
 
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
@@ -193,23 +191,10 @@ public abstract class Launcher implements Runnable, Serializable {
   }
   
   /**
-	 * Closes this application and memorizes the size of the given {@link Window},
-	 * this means that a call of this method will terminate the running Java
-	 * Virtual Machine (JVM).
-	 * 
-	 * @param window
-	 *        the {@link Window} whose size (width and height is to be memorized
-	 *        before switching of the JVM.
-	 */
-	public void exit(java.awt.Window window) {
-		SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-		prefs.put(GUIOptions.WINDOW_WIDTH, window.getWidth());
-		prefs.put(GUIOptions.WINDOW_HEIGHT, window.getHeight());
-		try {
-			prefs.flush();
-		} catch (BackingStoreException exc) {
-			logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
-		}
+   * Closes this application, this means that a call of this method will
+   * terminate the running Java Virtual Machine (JVM).
+   */
+	public void exit() {
 		System.exit(0);
 	}
   
@@ -224,11 +209,15 @@ public abstract class Launcher implements Runnable, Serializable {
   }
 	
   /**
-	 * This method tells a caller the name of this program.
+	 * This method tells a caller the name of this program. By default this
+	 * will be equivalent to calling {@link Class#getSimpleName()} for the
+	 * current object.
 	 * 
 	 * @return The name of this program.
 	 */
-	public abstract String getAppName();
+	public String getAppName() {
+	  return getClass().getSimpleName();
+	}
 	
   /**
 	 * 
@@ -321,18 +310,11 @@ public abstract String[] getLogPackages();
 		java.awt.Window ui = initGUI(appConf);
 		if (ui != null) {
 			if (terminateJVMwhenDone) {
-				ui.addWindowListener(EventHandler.create(
-					java.awt.event.WindowListener.class, this, "exit", "window",
-					"windowClosed"));
+        ui.addWindowListener(EventHandler.create(
+          java.awt.event.WindowListener.class, this, "exit", null,
+          "windowClosed"));
 				setTerminateJVMwhenDone(false);
 			}
-			SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-			int width = prefs.getInt(GUIOptions.WINDOW_WIDTH);
-			int height = prefs.getInt(GUIOptions.WINDOW_HEIGHT);
-			// TODO: Make sure that the stored size of the window is not too large.
-//			width = Math.min(width, );
-//			height = Math.min(height, );
-			ui.setSize(new java.awt.Dimension(width, height));
 			ui.setLocationRelativeTo(null);
 		  ui.setVisible(true);
 			GUITools.hideSplashScreen();

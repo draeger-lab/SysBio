@@ -66,7 +66,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * {@link PreferencesPanelForKeyProvider}s defined by the given {@link Option}
 	 * s.
 	 */
-	private static Class<? extends KeyProvider>[] options;
+	private Class<? extends KeyProvider>[] options;
 	
 	/**
 	 * Determines, if the {@link #classes} array has been initialized.
@@ -168,9 +168,6 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 *         this {@link MultiplePreferencesPanel} when initializing.
 	 */
 	public static int getPossibleTabCount() {
-		if (options != null) {
-			return options.length;
-		}
 		int tabCount = 0;
 		for (int i = 0; i < getClasses().length; i++) {
 			if (!getClasses()[i].equals(MultiplePreferencesPanel.class)) {
@@ -204,7 +201,19 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		super();
 	}
 
-	/*
+  /**
+   * 
+   * @param kp
+   * @throws IOException
+   */
+  public MultiplePreferencesPanel(Class<? extends KeyProvider>... kp)
+    throws IOException {
+    super(false);
+    this.options = kp;
+    initializePrefPanel();
+  }
+
+  /*
 	 * (non-Javadoc)
 	 * 
 	 * @see de.zbit.gui.cfg.PreferencesPanel#accepts(java.lang.Object)
@@ -400,13 +409,6 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	public void setSelectedIndex(int tab) {
 		this.tab.setSelectedIndex(tab);
-	}
-
-	/**
-	 * @param interactive
-	 */
-	public static void setOptions(Class<? extends KeyProvider>[] interactive) {
-		options = interactive;
 	}
 	
 }
