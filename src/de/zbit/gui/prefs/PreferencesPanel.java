@@ -252,7 +252,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
     for (Option<?> option : options) {
       // Hide options that should not be visible.
-      if (!option.isVisible()) continue;
+      if (!option.isVisible()) {
+        continue;
+      }
       
       // Create swing option based on field type
       JComponent jc = null;
@@ -708,7 +710,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         }
       }
       
-      // Fallback with regular JTextField or JComboBox
+      // Fall back with regular JTextField or JComboBox
       if (component == null) {
         component = new JLabeledComponent(optionTitle, true, values);
         if (!Utils.isInteger(option.getRequiredType())) {

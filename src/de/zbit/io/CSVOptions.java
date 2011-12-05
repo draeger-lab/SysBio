@@ -55,7 +55,7 @@ public interface CSVOptions extends KeyProvider {
 	public static final Option<File> CSV_FILES_OPEN_DIR = new Option<File>(
 		"CSV_FILES_OPEN_DIR", File.class,
 		bundle.getString("CSV_FILES_OPEN_DIR_TOOLTIP"), new File(
-			System.getProperty("user.dir")), bundle.getString("CSV_FILES_OPEN_DIR"),
+			System.getProperty("user.home")), bundle.getString("CSV_FILES_OPEN_DIR"),
 		false);
 
 	/**
@@ -73,7 +73,7 @@ public interface CSVOptions extends KeyProvider {
 	public static final Option<File> CSV_FILES_SAVE_DIR = new Option<File>(
 		"CSV_FILES_SAVE_DIR", File.class,
 		bundle.getString("CSV_FILES_SAVE_DIR_TOOLTIP"), new File(
-			System.getProperty("user.dir")), bundle.getString("CSV_FILES_SAVE_DIR"),
+			System.getProperty("user.home")), bundle.getString("CSV_FILES_SAVE_DIR"),
 		false);
 
 	/**
