@@ -586,6 +586,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		items = additionalEditMenuItems();
 		// Speed up the GUI by loading the preferences classes at the beginning
 		// and add this menu only if there is at least one preference panel defined.
+		if (appConf != null) {
+			Class<? extends KeyProvider> interactive[] = appConf.getInteractiveOptions();
+			if (interactive != null) {
+				MultiplePreferencesPanel.setOptions(interactive);
+			}
+		}
 		int numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
 		if ((numPrefs > 0) || ((items != null) && (items.length > 0))) {
 			title = BaseAction.EDIT.getName();
@@ -709,7 +715,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 	public void exitPre() {
 	  // Save with/height and window state
     SBPreferences windowProperties = SBPreferences.getPreferencesFor(GUIOptions.class);
-    if (getExtendedState()==Frame.NORMAL) {
+    if (getExtendedState() == Frame.NORMAL) {
       // Do not store width and height of a maximized window.
       // Rather also store the state and restore this"
       windowProperties.put(GUIOptions.WINDOW_WIDTH, getWidth());
@@ -1003,8 +1009,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory {
 		
 		// Init status bar
 		statusBar = initializeStatusBar();
-		
-		
+				
   	// Restore last window size and state
 		setMinimumSize(new Dimension(640, 480));
 		pack();
