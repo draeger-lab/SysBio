@@ -26,7 +26,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.prefs.BackingStoreException;
@@ -104,7 +103,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @param provider
 	 * @return true, if and only if the user approved this dialog.
 	 */
-	public static final boolean showPreferencesDialog(Class<? extends KeyProvider> provider) {
+	public static final boolean showPreferencesDialog(Class<? extends KeyProvider>... provider) {
 		PreferencesDialog dialog = new PreferencesDialog();
 		boolean exitStatus;
 		if (provider != null) {
@@ -172,11 +171,8 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		setTitle(title);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent ae) {
 		if ((ae.getActionCommand() == null) || ae.getActionCommand().equals(CANCEL)) {
@@ -203,9 +199,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
 	public void itemStateChanged(ItemEvent e) {
@@ -214,17 +208,13 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		ok.setEnabled(true);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
 	public void keyPressed(KeyEvent e) {
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	public void keyReleased(KeyEvent e) {
@@ -233,9 +223,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
     ok.setEnabled(true);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	public void keyTyped(KeyEvent e) {
@@ -375,13 +363,22 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		return exitStatus;
 	}
 	
-	public boolean showPrefsDialog(Class<? extends KeyProvider> kp) {
+	/**
+	 * 
+	 * @param kp
+	 * @return
+	 */
+	public boolean showPrefsDialog(Class<? extends KeyProvider>... kp) {
 		PreferencesPanel panel;
 		try {
-			panel = new PreferencesPanelForKeyProvider(kp);
-		} catch (IOException e) {
-			// May happen only if defaults are loaded from XML
-			e.printStackTrace();
+      if (kp.length > 1) {
+        panel = new MultiplePreferencesPanel(kp);
+      } else {
+        panel = new PreferencesPanelForKeyProvider(kp[0]);
+      }
+		} catch (Throwable exc) {
+			// May happen only if defaults are loaded from XML or kp is null.
+			GUITools.showErrorMessage(this, exc);
 			return false;
 		}
 		setPreferencesPanel(panel);
@@ -389,16 +386,13 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		return exitStatus;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent
-	 * )
+	/* (non-Javadoc)
+	 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
 	 */
 	public void stateChanged(ChangeEvent e) {
 		apply.setEnabled(!allPrefsPanel.isUserConfiguration());
 		defaults.setEnabled(!allPrefsPanel.isDefaultConfiguration());
 		ok.setEnabled(true);
 	}
+
 }

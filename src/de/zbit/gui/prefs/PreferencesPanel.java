@@ -188,17 +188,17 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * If you decide not to initialize the panel immediately, you HAVE TO call
    * {@link #initializePrefPanel()} in the calling constructor.
    * 
-   * @param init_Panel
+   * @param initPanel
    * @throws IOException
    */
-  protected PreferencesPanel(boolean init_Panel) throws IOException {
+  protected PreferencesPanel(boolean initPanel) throws IOException {
     super();
     /*
      * We have to move this into a separate method, because it calls abstract
-     * functions and they may require an initilization first, by extending
-     * methds (e.g. see PreferencesPanelForKeyProvider).
+     * functions and they may require an initialization first, by extending
+     * methods (e.g., see PreferencesPanelForKeyProvider).
      */
-    if (init_Panel) {
+    if (initPanel) {
       initializePrefPanel();
     }
   }
@@ -681,6 +681,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     } else if (Character.class.isAssignableFrom(clazz)) {
       component = new JLabeledComponent(optionTitle, true, values);
       ((JLabeledComponent) component).setAcceptOnlyIntegers(false);
+      // TODO: Replace certain Strings by others, e.g.
+      // '\t' with "[Tab]", as already done CSVReaderOptionPanel.java
       CSVReaderOptionPanel.createCharacterBox(
         ((JLabeledComponent) component).getJTextComponent());      
       
