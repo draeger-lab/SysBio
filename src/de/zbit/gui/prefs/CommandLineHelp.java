@@ -16,6 +16,8 @@
  */
 package de.zbit.gui.prefs;
 
+import java.awt.Color;
+
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -105,6 +107,7 @@ public class CommandLineHelp {
 				.createDocumentation(clazz));
 		editor.setEditable(false);
 		editor.setEnabled(true);
+		editor.setBackground(Color.WHITE);
 		return editor;
 	}
 	

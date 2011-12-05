@@ -106,7 +106,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   /**
    * Use a JTextField instead of JComboBoxes
    */
-  protected boolean useJTextField=false;
+  protected boolean useJTextField = false;
   /**
    * 
    */
@@ -137,7 +137,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * class not for "Choosing columns" but other stuff, you may
    * want to change this behavior.
    */
-  protected boolean acceptOnlyIntegers=true;
+  protected boolean acceptOnlyIntegers = true;
   /**
    * Every integer added here corresponds to one column number. If an
    * integer is added, the column will be hidden in all ColumnChoosers.
@@ -147,11 +147,11 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * If unsorted, the columns appear as they appear in the file. Else,
    * they are sorted alphabetically.
    */
-  protected boolean sortHeaders=false;
+  protected boolean sortHeaders = false;
   /**
    * If true, the user may edit the given header strings.
    */
-  private boolean editHeaderAlllowed=false;
+  private boolean editHeaderAlllowed = false;
   /**
    * 
    */
@@ -613,7 +613,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     // Create a list, hiding all unwanted elements
     Vector<Object> modelHeaders = new Vector<Object>();
     Map<String, Object> headersToDisplay = new HashMap<String, Object>();
-    for (int i=0; i<newHeader.length; i++) {
+    for (int i = 0; i < newHeader.length; i++) {
       if (hideColumns.contains(i)) {
         continue;
       }
@@ -625,7 +625,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     if (sortHeaders) {
       ArrayList<String> keys = new ArrayList<String>(headersToDisplay.keySet());
       Collections.sort(keys);
-      for (int i=0; i<keys.size(); i++) {
+      for (int i = 0; i < keys.size(); i++) {
         modelHeaders.set(i, headersToDisplay.get(keys.get(i)));
       }
     }

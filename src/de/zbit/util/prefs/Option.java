@@ -277,7 +277,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 	 * for each entry in the map, the value of the option fulfills
 	 * the condition, this Option is enabled (e.g., in GUIs). 
 	 */
-	private Map<Option<?>, Range<?>> dependencies=null;
+	private Map<Option<?>, Range<?>> dependencies = null;
 
 	/**
    * This group allows to create a group of buttons. This does only
@@ -285,7 +285,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
    * group will automatically be converted into a {@link JRadioButton},
    * when translated into a JComponent.
 	 */
-  private ButtonGroup buttonGroup=null;
+  private ButtonGroup buttonGroup = null;
   
   /**
    * Allows to set a visibility for this option. If this is false,
@@ -541,7 +541,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>> {
 		this.description = description;
 		this.range = range;
 		this.shortCmdName = shortCmdName;
-		this.defaultValue = defaultValue;
+		if (requiredType.isAssignableFrom(Class.class)) {
+		  this.defaultValue = (Type) ((Class) defaultValue).getSimpleName();
+		} else {
+		  this.defaultValue = defaultValue;
+		}
 		if (numLeadingMinus < 0) { 
 			throw new IllegalArgumentException(String
 				.format(ResourceManager.getBundle("de.zbit.loales.Warnings").getString(

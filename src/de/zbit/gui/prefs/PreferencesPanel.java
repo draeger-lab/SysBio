@@ -779,9 +779,17 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         if (defaultValue != null) {
           // Set default value
           if (defaultValue.toString().startsWith("class ")) {
+            int count = -1;
             for (Object value : option.getRange().getAllAcceptableValues()) {
+              count++;
               if (defaultValue.toString().contains(value.toString())) {
-                ((JLabeledComponent) component).setDefaultValue(value.toString());
+                /*
+                 * Note: a renderer might have changed the display-value for the
+                 * component. In this case, if you directly call
+                 * setDefaultValue(String) you might override the value given by
+                 * the renderer (althought this would be correct as well).
+                 */
+                ((JLabeledComponent) component).setDefaultValue(count);
                 break;
               }
             }
