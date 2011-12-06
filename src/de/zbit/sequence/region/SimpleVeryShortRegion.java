@@ -96,7 +96,7 @@ public class SimpleVeryShortRegion extends AbstractRegion implements Region, Ser
   @Override
   public void setEnd(int end) throws Exception {
     if (!isSetStart()) throw new Exception("Can not set end position prior to start position.");
-    int diff = (getStart()-end);
+    int diff = (end-getStart());
     if (diff<0 || diff>Byte.MAX_VALUE) {
       throw new Exception("Invalid or too long region.");
     }
