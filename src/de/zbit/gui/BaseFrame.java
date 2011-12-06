@@ -762,7 +762,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * Method that is called on exit, i.e., when this {@link BaseFrame}
 	 * {@link Window} is closing.
 	 */
-	public abstract void exit();
+	public void exit() {
+	  dispose();
+	}
 	
 	/**
 	 * The name of this program.
