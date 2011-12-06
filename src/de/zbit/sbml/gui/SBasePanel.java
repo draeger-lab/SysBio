@@ -76,10 +76,8 @@ import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
-import org.sbml.jsbml.util.StringTools;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
-//import org.sbml.tolatex.LaTeXOptions;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
@@ -141,7 +139,15 @@ public class SBasePanel extends JPanel {
    * 
    * @param sbase
    * @param namesIfAvailable
-   * @throws IOException 
+   */
+  public SBasePanel(SBase sbase, boolean namesIfAvailable) {
+  	this(sbase, namesIfAvailable, null);
+  }
+  
+  /**
+   * 
+   * @param sbase
+   * @param namesIfAvailable
    */
   public SBasePanel(SBase sbase, boolean namesIfAvailable, Renderer renderer){
     super();
