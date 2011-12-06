@@ -121,7 +121,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	private JScrollPane createRightComponent(SBase sbase) throws SBMLException,
 		IOException {
 		JPanel p = new JPanel();
-		p.add(new SBasePanel(sbase, namesIfAvailalbe));
+		p.add(new SBasePanel(sbase, namesIfAvailalbe, null));
 		JScrollPane scroll = new JScrollPane(p);
 		return scroll;
 	}

@@ -125,7 +125,7 @@ public class ASTNodePanel extends JPanel {
 	    tf.setEditable(enabled);
 	    lh.add("Name", tf, true);
 	    if (node.getVariable() != null) {
-		lh.add(new SBasePanel(node.getVariable(), namesIfAvailable), 0, lh.getRow() + 1,
+		lh.add(new SBasePanel(node.getVariable(), namesIfAvailable, null), 0, lh.getRow() + 1,
 		    3, 1);
 		lh.add(new JPanel(), 0, lh.getRow() + 1, 3, 1);
 	    }
