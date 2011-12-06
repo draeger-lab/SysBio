@@ -1,6 +1,6 @@
 /*
- * $Id:  PreferencesPanelDependencies.java 12:34:45 wrzodek $
- * $URL: PreferencesPanelDependencies.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
@@ -56,6 +57,7 @@ import de.zbit.util.prefs.Range;
  * (i.e., with {@link Option#addDependency(Option, Object)}).
  * </i></p>
  * @author Clemens Wrzodek
+ * @author Andreas Dr&auml;ger
  * @version $Rev$
  */
 public class PreferencesPanelDependencies {
@@ -87,27 +89,76 @@ public class PreferencesPanelDependencies {
    * @author Clemens Wrzodek
    * @version $Rev$
    */
-  public class DependencyListener implements EventListener, ActionListener, ItemListener, 
-  ChangeListener, DocumentListener, KeyListener, PropertyChangeListener{
+  public class DependencyListener implements EventListener, ActionListener,
+      ItemListener, ChangeListener, DocumentListener, KeyListener,
+      PropertyChangeListener {
+    
+    /**
+     * 
+     */
     private Iterable<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck;
+    /**
+     * 
+     */
     private Component dependant;
-    public DependencyListener(Iterable<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck, Component dependant) {
+    /**
+     * Decides if all conditions must be satisfied to connect conditions or if
+     * just one is enough.
+     */
+    private boolean andLogic;
+    
+    /**
+     * 
+     * @param toCheck
+     * @param dependant
+     */
+    public DependencyListener(
+      Iterable<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck,
+      Component dependant, boolean andLogic) {
       this.toCheck = toCheck;
       this.dependant = dependant;
+      this.andLogic = andLogic;
     }
+    
+    /**
+     * 
+     * @param toCheck
+     * @param dependant
+     */
+    public DependencyListener(
+      List<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck,
+      Component dependant) {
+      this(toCheck, dependant, false);
+    }
+
+    /**
+     * 
+     */
     public void checkAndProcessConditions() {
       // Check all conditions and enable or disable
-      boolean enabled=true;
+      boolean enabled = true;
+      boolean inRange;
+      int inRangeCount = 0;
+      Range<?> range;
       for (ValuePairUncomparable<JComponentForOption, Range<?>> valuePairUncomparable : toCheck) {
         //if (!valuePairUncomparable.getA().getCurrentValue().equals(valuePairUncomparable.getB())) {
         JComponentForOption jc = valuePairUncomparable.getA();
-        if (!jc.getOption().castAndCheckRange(jc.getCurrentValue(), valuePairUncomparable.getB())
-            || !((Component)jc).isEnabled()) { // Novel logic: disabled items propate this to dependents.
-          enabled = false;
-          break;
+        range = valuePairUncomparable.getB();
+        inRange = jc.getOption().castAndCheckRange(jc.getCurrentValue(), range);
+        if (andLogic) {
+          if (!inRange || !((Component) jc).isEnabled()) {
+            // Novel logic: disabled items propagate this to dependents.
+            enabled = false;
+            break;
+          }
+        } else if (inRange && ((Component) jc).isEnabled()) {
+          inRangeCount++;
         }
       }
-      ((Container)dependant).setEnabled(enabled);
+      if (!andLogic && (inRangeCount == 0)) {
+        enabled = false;
+      }
+      ((Container) dependant).setEnabled(enabled);
     }
     
     /*
@@ -211,42 +262,52 @@ public class PreferencesPanelDependencies {
    */
   public static Set<JComponentForOption> getAllJComponentsForOptions(Container c) {
     Set<JComponentForOption> list = new HashSet<JComponentForOption>();
-    if (c == null) return list;
+    if (c == null) {
+      return list;
+    }
     
     // Iterate over all components and collect all JComponentForOption
-    for (Component co: c.getComponents()) {
+    for (Component co : c.getComponents()) {
       if (co instanceof JComponentForOption) {
-        list.add((JComponentForOption)co);
+        list.add((JComponentForOption) co);
       }
       
       if (co instanceof Container) {
-        list.addAll(getAllJComponentsForOptions((Container)co));
+        list.addAll(getAllJComponentsForOptions((Container) co));
       }
     }
     return list;
   }
   
   /**
-   * Processes the dependencies of the <code>dependant</code> and adds
-   * listeners to all dependent JComponents from the given list that
-   * automatically enable or disable the <code>dependant</code>, based
-   * on the current value of the dependent JComponents.
-   * @param jcomponents components that control <code>dependant</code>
-   * @param dependant option and component that depends on <code>jcomponents</code>.
+   * Processes the dependencies of the <code>dependant</code> and adds listeners
+   * to all dependent JComponents from the given list that automatically enable
+   * or disable the <code>dependant</code>, based on the current value of the
+   * dependent JComponents.
+   * 
+   * @param jcomponents
+   *        components that control <code>dependant</code>
+   * @param dependant
+   *        option and component that depends on <code>jcomponents</code>.
    */
   private void createDependencyActionListeners(Iterable<? extends JComponentForOption> jcomponents, final JComponentForOption dependant) {
-    if (!dependant.getOption().hasDependencies()) return;
+    
+    if (!dependant.getOption().hasDependencies()) {
+      return;
+    }
     
     // Summarize all dependent JComponents and their conditions
     final List<ValuePairUncomparable<JComponentForOption, Range<?>>> toCheck = 
       new ArrayList<ValuePairUncomparable<JComponentForOption, Range<?>>>();
     
-    Map<Option<?>, Range<?>> dependsOn = dependant.getOption().getDependencies();
+    Map<Option<?>, SortedSet<Range<?>>> dependsOn = dependant.getOption().getDependencies();
     for (JComponentForOption jc : jcomponents) {
       Option<?> cur = jc.getOption();
       if (dependsOn.containsKey(cur)) {
-        Range<?> condition = dependsOn.get(cur);
-        toCheck.add(new ValuePairUncomparable<JComponentForOption, Range<?>>(jc, condition));
+        for (Range<?> condition : dependsOn.get(cur)) {
+          toCheck.add(new ValuePairUncomparable<JComponentForOption, Range<?>>(
+            jc, condition));
+        }
       }
     }
     
@@ -260,26 +321,23 @@ public class PreferencesPanelDependencies {
       // Add all listener interfaces 
       // For JComboBoxes
       if (dependent instanceof ItemSelectable) {
-        ((ItemSelectable)dependent).addItemListener(listener);
+        ((ItemSelectable) dependent).addItemListener(listener);
       }
       // For any textfields and similar
       if (dependent instanceof JTextComponent) {
-        ((JTextComponent)dependent).getDocument().addDocumentListener(listener);
+        ((JTextComponent) dependent).getDocument().addDocumentListener(listener);
       }
       // Others (e.g, for buttons)
       Reflect.invokeIfContains(dependent, "addChangeListener", ChangeListener.class, listener);
       Reflect.invokeIfContains(dependent, "addActionListener", ActionListener.class, listener);
-      ((Component)dependent).addKeyListener(listener);
+      ((Component) dependent).addKeyListener(listener);
       
       // Propagate enabled changes also to dependent components
-      ((Component)dependent).addPropertyChangeListener("enabled", listener);
+      ((Component) dependent).addPropertyChangeListener("enabled", listener);
     }
     
     // Perform an initial check
     listener.checkAndProcessConditions();
-    
-  }
-  
-  
-  
+  } 
+
 }

@@ -1,6 +1,6 @@
 /*
- * $Id:  ValuePairUncomparable.java 16:25:50 wrzodek $
- * $URL: ValuePairUncomparable.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

@@ -92,6 +92,15 @@ public class XMLResourceBundleControl extends Control {
 			return properties.getProperty(key);
 		}
 		
+
+	  /* (non-Javadoc)
+	   * @see java.lang.Object#toString()
+	   */
+	  @Override
+	  public String toString() {
+	    return properties.toString();
+	  } 
+		
 	}
 	
 	/**
