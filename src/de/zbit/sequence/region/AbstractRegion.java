@@ -356,7 +356,7 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
     if (end<0 || end==DEFAULT_START || end==start) {
       return new ChromosomalPoint(chr, start);
     } else {
-      int diff = start-end;
+      int diff = end-start;
       try {
         if (diff<=Byte.MAX_VALUE) {
           return new SimpleVeryShortRegion(chr, start, end);
