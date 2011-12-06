@@ -31,7 +31,7 @@ public class SimpleVeryShortRegion extends AbstractRegion implements Region, Ser
   /**
    * End position
    */
-  private byte end;
+  private byte length;
   
   
   /**
@@ -87,7 +87,7 @@ public class SimpleVeryShortRegion extends AbstractRegion implements Region, Ser
    */
   @Override
   public int getEnd() {
-    return end;
+    return getStart() + length;
   }
 
   /* (non-Javadoc)
@@ -100,7 +100,7 @@ public class SimpleVeryShortRegion extends AbstractRegion implements Region, Ser
     if (diff<0 || diff>Byte.MAX_VALUE) {
       throw new Exception("Invalid or too long region.");
     }
-    this.end = (byte)diff;
+    this.length = (byte)diff;
   }
   
 }

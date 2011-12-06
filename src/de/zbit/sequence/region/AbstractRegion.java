@@ -149,7 +149,7 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
   public String toString() {
     if (isSetEnd() && isSetStart()) {
       // both
-      return String.format("%s:%s-%s", getChromosome(), getStart(),getEnd());
+      return String.format("%s:%s-%s", getChromosome(), getStart(), getEnd());
     } else {
       // Is a point
       return super.toString();

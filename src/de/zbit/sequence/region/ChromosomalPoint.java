@@ -137,7 +137,7 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
    */
   @Override
   public int getEnd() {
-    return start;
+    return DEFAULT_START;
   }
 
   /* (non-Javadoc)

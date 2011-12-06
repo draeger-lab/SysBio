@@ -31,7 +31,7 @@ public class SimpleShortRegion extends AbstractRegion implements Region, Seriali
   /**
    * End position
    */
-  private short end;
+  private short length;
   
   
   /**
@@ -87,7 +87,7 @@ public class SimpleShortRegion extends AbstractRegion implements Region, Seriali
    */
   @Override
   public int getEnd() {
-    return end;
+    return getStart() + length;
   }
 
   /* (non-Javadoc)
@@ -100,7 +100,7 @@ public class SimpleShortRegion extends AbstractRegion implements Region, Seriali
     if (diff<0 || diff>Short.MAX_VALUE) {
       throw new Exception("Invalid or too long region.");
     }
-    this.end = (short)diff;
+    this.length = (short)diff;
   }
   
 }
