@@ -27,35 +27,42 @@ import java.util.RandomAccess;
 import de.zbit.util.Utils;
 
 /**
- * A basic implementation of the {@link Region} interface.
- * 
+ * A basic, abstract implementation of the {@link Region} interface. This allows other
+ * classes to set a variable type for saving the end position. 
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class BasicRegion implements Region, Serializable, Cloneable, Comparable<Region> {
-  private static final long serialVersionUID = 833008166151851420L;
+public abstract class AbstractRegion extends ChromosomalPoint implements Region, Serializable, Cloneable, Comparable<Region> {
+  private static final long serialVersionUID = 5027672293870790223L;
   
   /**
-   * Chromosome as byte encoding (see 
-   * {@link ChromosomeTools#getChromosomeByteRepresentation(String)})
+   * A comparator to compare two {@link Region}s.
    */
-  byte chr;
-  /**
-   * Start position 
-   */
-  int start;
-  /**
-   * End position
-   */
-  int end;
+  private static Comparator<Region> regionComparator = new Comparator<Region>() {
+    @Override
+    public int compare(Region o1, Region o2) {
+      int r = Utils.compareIntegers((int)o1.getChromosomeAsByteRepresentation(), (int)o2.getChromosomeAsByteRepresentation());
+      if (r==0) {
+        r = Utils.compareIntegers(o1.getStart(), o2.getStart());
+        if (r==0) {
+          r = Utils.compareIntegers(o1.getEnd(), o2.getEnd());
+        }
+      }
+      
+      return r;
+    }
+  };
+  
   
   /**
    * 
    * @param chromosome
    * @param start
    * @param end
+   * @throws Exception see {@link #setEnd(int)}
+   * @see {@link AbstractRegion#createRegion(String, int, int)}
    */
-  public BasicRegion(String chromosome, int start, int end) {
+  public AbstractRegion(String chromosome, int start, int end) throws Exception {
     this (ChromosomeTools.getChromosomeByteRepresentation(chromosome), start, end);
   }
   
@@ -63,102 +70,58 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
    * @param chr as given by {@link ChromosomeTools#getChromosomeByteRepresentation(String)}
    * @param start
    * @param end
+   * @throws Exception see {@link #setEnd(int)}
+   * @see {@link AbstractRegion#createRegion(byte, int, int)}
    */
-  public BasicRegion(byte chr, int start, int end) {
-    setStart(Math.min(start, end));
+  public AbstractRegion(byte chr, int start, int end) throws Exception {
+    super(chr, Math.min(start, end));
     setEnd(Math.max(start, end));
-    setChromosome(chr);
   }
   
   /**
    * Copy constructor
    * @param r
+   * @throws Exception see {@link #setEnd(int)}
+   * @see {@link AbstractRegion#createRegion(Region)}
    */
-  public BasicRegion(Region r) {
-    setStart(r.getStart());
+  public AbstractRegion(Region r) throws Exception {
+    super(r);
     setEnd(r.getEnd());
-    setChromosome(r.getChromosomeAsByteRepresentation());
   }
   
   /* (non-Javadoc)
    * @see java.lang.Object#clone()
    */
   @Override
-  protected BasicRegion clone() {
-    return new BasicRegion(this);
-  }
-
-  /* (non-Javadoc)
-   * @see de.zbit.data.Chromosome#setChromosome(java.lang.String)
-   */
-  @Override
-  public void setChromosome(String chromosome) {
-    setChromosome(ChromosomeTools.getChromosomeByteRepresentation(chromosome));
-  }
-
-  /* (non-Javadoc)
-   * @see de.zbit.data.Chromosome#setChromosome(byte)
-   */
-  @Override
-  public void setChromosome(byte chromosome) {
-    this.chr = chromosome;
-  }
-
-  /* (non-Javadoc)
-   * @see de.zbit.data.Chromosome#getChromosome()
-   */
-  @Override
-  public String getChromosome() {
-    return ChromosomeTools.getChromosomeStringRepresentation(chr);
-  }
+  protected abstract AbstractRegion clone();
   
   /* (non-Javadoc)
    * @see de.zbit.sequence.region.Region#getMiddle()
    */
   @Override
   public int getMiddle() {
-    return start+((end-start)/2);
+    return getStart()+(getLength()/2);
   }
-
-  /* (non-Javadoc)
-   * @see de.zbit.data.Chromosome#getChromosomeAsByteRepresentation()
+  
+  /**
+   * @return length of this region.
    */
-  @Override
-  public byte getChromosomeAsByteRepresentation() {
-    return chr;
+  public int getLength() {
+    if (!isSetEnd()) return 0;
+    else return getEnd()-getStart();
   }
-
-  /* (non-Javadoc)
-   * @see de.zbit.data.Region#getStart()
-   */
-  @Override
-  public int getStart() {
-    return start;
-  }
-
-  /* (non-Javadoc)
-   * @see de.zbit.data.Region#setStart(int)
-   */
-  @Override
-  public void setStart(int probeStart) {
-    start = probeStart;
-  }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.data.Region#getEnd()
    */
   @Override
-  public int getEnd() {
-    return end;
-  }
+  public abstract int getEnd();
 
   /* (non-Javadoc)
    * @see de.zbit.data.Region#setEnd(int)
    */
   @Override
-  public void setEnd(int end) {
-    this.end = end;
-  }
+  public abstract void setEnd(int end) throws Exception;
 
   /* (non-Javadoc)
    * @see de.zbit.data.Region#intersects(de.zbit.data.Region)
@@ -176,15 +139,7 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
    */
   @Override
   public int compareTo(Region o) {
-    int r = Utils.compareIntegers((int)getChromosomeAsByteRepresentation(), (int)o.getChromosomeAsByteRepresentation());
-    if (r==0) {
-      r = Utils.compareIntegers(getStart(), o.getStart());
-      if (r==0) {
-        r = Utils.compareIntegers(getEnd(), o.getEnd());
-      }
-    }
-    
-    return r;
+    return regionComparator.compare(this, o);
   }
   
   /* (non-Javadoc)
@@ -195,12 +150,9 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
     if (isSetEnd() && isSetStart()) {
       // both
       return String.format("%s:%s-%s", getChromosome(), getStart(),getEnd());
-    } else if (isSetStart()) {
-      // start only
-      return String.format("%s:%s", getChromosome(), getStart());
     } else {
-      // chromosome only
-      return getChromosome();
+      // Is a point
+      return super.toString();
     }
   }
   
@@ -217,18 +169,12 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
       return false;
     }
   }
-
+  
   /**
-   * @return
-   */
-  public boolean isSetStart() {
-    return end>-1 && end!=DEFAULT_START;
-  }
-
-  /**
-   * @return
+   * @return <code>TRUE</code> if end is set.
    */
   public boolean isSetEnd() {
+    int end = getEnd();
     return end>-1 && end!=DEFAULT_START;
   }
   
@@ -237,7 +183,7 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
    */
   @Override
   public int hashCode() {
-    return super.hashCode() + chr + start + end;
+    return super.hashCode() + getEnd()*7;
   }
   
   /**
@@ -271,7 +217,7 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
    * and secondary by {@link #getStart()} prior to making this call.
    * If it is not sorted, the results are undefined.</p>
    * @param <T> Actual implementing class
-   * @param <K> May be T, may also be any {@link BasicRegion}
+   * @param <K> May be T, may also be any {@link AbstractRegion}
    * @param allRegionsSorted sorted list of all regions
    * @param searchFor {@link Region} to search for
    * @param getClosestIfIntersectionIsEmpty get the single, closest region if no intersecting
@@ -384,20 +330,60 @@ public class BasicRegion implements Region, Serializable, Cloneable, Comparable<
    * and tertiary by {@link #getEnd()}.
    */
   public static Comparator<? super Region> getComparator() {
-    return new Comparator<Region>() {
-      @Override
-      public int compare(Region o1, Region o2) {
-        int r = Utils.compareIntegers((int)o1.getChromosomeAsByteRepresentation(), (int)o2.getChromosomeAsByteRepresentation());
-        if (r==0) {
-          r = Utils.compareIntegers(o1.getStart(), o2.getStart());
-          if (r==0) {
-            r = Utils.compareIntegers(o1.getEnd(), o2.getEnd());
-          }
-        }
-        
-        return r;
-      }
-    };
+    return regionComparator;
   }
   
+  /**
+   * A factory to get any {@link Region} implementation with minimal memory needs.
+   * @param chromosome
+   * @param start
+   * @param end
+   * @return
+   */
+  public static Region createRegion(String chromosome, int start, int end) {
+    return createRegion(ChromosomeTools.getChromosomeByteRepresentation(chromosome), start, end);
+  }
+
+  /**
+   * A factory to get any {@link Region} implementation with minimal memory needs.
+   * @param chr as given by {@link ChromosomeTools#getChromosomeByteRepresentation(String)}
+   * @param start
+   * @param end
+   * @return
+   */
+  public static Region createRegion(byte chr, int start, int end) {
+    // Is any end position set?
+    if (end<0 || end==DEFAULT_START || end==start) {
+      return new ChromosomalPoint(chr, start);
+    } else {
+      int diff = start-end;
+      try {
+        if (diff<=Byte.MAX_VALUE) {
+          return new SimpleVeryShortRegion(chr, start, end);
+        } else if (diff<=Short.MAX_VALUE) {
+          return new SimpleShortRegion(chr, start, end);
+        } else {
+          return new SimpleRegion(chr, start, end);
+        }
+      } catch (Exception e) {
+        // Impossible, beacause exception is always when
+        // end<0 or too long and since we check this here,
+        // this exception is impossible.
+        return null;
+      }
+    }
+  }
+
+
+  /**
+   * Create a new simple region, based on the given {@link Region}.
+   * This will create a region with minimal memory needs.
+   * @param other
+   * @return
+   */
+  public static Region createRegion(Region other) {
+    return createRegion(other.getChromosomeAsByteRepresentation(), other.getStart(), other.getEnd());
+  }
+  
+
 }

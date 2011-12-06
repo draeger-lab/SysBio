@@ -57,8 +57,12 @@ public interface Region extends Chromosome {
   
   /**
    * Set the (probe) starting position.
+   * @throws Exception in some implementations, region length is
+   * limited to a certain number of base pairs and end may not be
+   * set prior to start. In these cases, an exception is thrown.
+   * You might want to use {@link AbstractRegion#createRegion(String, int, int)} to avoid this issue.
    */
-  public void setEnd(int end);
+  public void setEnd(int end) throws Exception;
   
   /**
    * Performs the simple calculation:
