@@ -217,7 +217,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     // Sort the list by lastUsage and delete lowest time-stamps.
     List<IDtype> keysToDelete = new ArrayList<IDtype>(elements+1);
     SortedArrayList<Long> minDate = new SortedArrayList<Long>(elements+1);
-    long minMaxDate = Long.MIN_VALUE;
+    long maxMinDate = Long.MAX_VALUE;
     
     int removedElements =0;
     synchronized (rememberedInfos) {
@@ -226,10 +226,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         Entry<IDtype, ObjectAndTimestamp<INFOtype>> entry = it.next();
         long usageDate = entry.getValue().getLastUsage();
         
-        if(usageDate<=minMaxDate || keysToDelete.size() < elements) {
+        if(usageDate<maxMinDate || keysToDelete.size() < elements) {
           minDate.add(usageDate);
           keysToDelete.add(minDate.getIndexOfLastAddedItem(), entry.getKey());
-          minMaxDate = minDate.get(0);
+          maxMinDate = minDate.get(minDate.size()-1);
           // XXX: It would be good to have a break condition (i.e. good enough)
           // here, to speedup the whole process.
           //if (minMaxDate<1) break;
