@@ -393,9 +393,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
    */
   public <E> Option(String optionName, Class<Type> requriedType,
     ResourceBundle bundle, Range<Type> range, Type defaultValue,
-    Map<Option<?>, SortedSet<Range<?>>> dependencies) {
+    ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
     this(optionName, requriedType, bundle.getString(optionName), range,
       defaultValue);
+    this.dependencies = new HashMap<Option<?>, SortedSet<Range<?>>>();
+    for (ValuePairUncomparable<Option<E>, Range<E>> pair : dependencies) {
+      addDependency(pair.getA(), pair.getB());
+    }
     String key = optionName + "_TOOLTIP";
     if (bundle.containsKey(key)) {
       setDisplayName(bundle.getString(optionName));
@@ -405,7 +409,6 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
       this.displayName = names[0];
       this.description = names[1];
     }
-    this.dependencies = dependencies;
   }
 	
 	/**
@@ -1309,24 +1312,6 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
   public <E> Option(String optionName, Class<Type> requiredType,
     ResourceBundle bundle, Type defaultValue,
     ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
-    this(optionName, requiredType, bundle, defaultValue);
-    this.dependencies = new HashMap<Option<?>, SortedSet<Range<?>>>();
-    for (ValuePairUncomparable<Option<E>, Range<E>> pair : dependencies) {
-      addDependency(pair.getA(), pair.getB());
-    }
-  }
-  
-  /**
-   * 
-   * @param optionName
-   * @param requiredType
-   * @param bundle
-   * @param defaultValue
-   * @param dependencies
-   */
-  public Option(String optionName, Class<Type> requiredType,
-    ResourceBundle bundle, Type defaultValue,
-    Map<Option<?>, SortedSet<Range<?>>> dependencies) {
     this(optionName, requiredType, bundle, null, defaultValue, dependencies);
   }
 
