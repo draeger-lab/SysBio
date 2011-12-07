@@ -34,6 +34,7 @@ import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
+import de.zbit.util.ValuePair;
 
 /**
  * A collection of ranges with a few convenient methods to work with them.
@@ -49,6 +50,54 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	 * The {@link Logger} of this {@link Class}.
 	 */
 	public static final Logger logger = Logger.getLogger(Range.class.getName());
+	
+	/**
+	 * 
+	 * @author Andreas Dr&auml;ger
+	 * @version $Rev$
+	 */
+	public static enum Relation {
+	  /**
+	   * Less than
+	   */
+	  LT,
+	  /**
+	   * Less or equal than
+	   */
+	  LE,
+	  /**
+	   * Equal to
+	   */
+	  EQ,
+	  /**
+	   * Greater than or equal to
+	   */
+	  GE,
+	  /**
+	   * Greater than
+	   */
+	  GT;
+	  
+	  /**
+	   * 
+	   */
+	  public String getRelationSymbol() {
+	    switch (this) {
+        case LT:
+          return "<";
+        case LE:
+          return "<=";
+        case EQ:
+          return "==";
+        case GE:
+          return ">=";
+        case GT:
+          return ">";
+        default:
+          return null;
+      }
+	  }
+	}
 	
 	/**
 	 * If {@link #getAllAcceptableValues()} is called, if there are more than
@@ -120,7 +169,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 		 * 
 		 * @param value
 		 */
-		public SubRange (Type value) {
+		public SubRange(Type value) {
 			this (value, value);
 		}
 		
@@ -151,7 +200,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 			
 			// Ensure, that lBound is always smaller than uBound
 			if (lBound instanceof Comparable) {
-				if (((Comparable)lBound).compareTo(((Comparable)uBound)) >0) {
+				if (((Comparable) lBound).compareTo(((Comparable)uBound)) > 0) {
 					// SWAP
 					Type temp = lBound;
 					lBound=uBound;
@@ -330,6 +379,11 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	 * list of acceptable values.
 	 */
   private List<Type> listOfAccpetedObjects = null;
+
+  /**
+   * 
+   */
+  private Relation relation;
 	
 	/**
 	 * @return the constraints
@@ -367,22 +421,36 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     // This requires a list => Convert to list
     if (!(acceptedObjects instanceof List<?>)) {
       List<Type> acceptedObjects2 = new ArrayList<Type>();
-      for (Type t: acceptedObjects)
+      for (Type t: acceptedObjects) {
         acceptedObjects2.add(t);
+      }
       acceptedObjects = acceptedObjects2;
     }
-    this.setListOfAccpetedObjects((List<Type>)acceptedObjects);
+    this.setListOfAccpetedObjects((List<Type>) acceptedObjects);
   }
   
   /**
-   * This is a convenient constructors that builds a range string from
+   * This is a convenient constructor that builds a range string from
    * a list of all acceptable object automatically.
    * 
    * @param requiredType
    * @param acceptedObjects
    */
   public Range(Class<Type> requiredType, Type... acceptedObjects) {
-    this (requiredType, Arrays.asList(acceptedObjects));
+    this(requiredType, Arrays.asList(acceptedObjects));
+  }
+  
+  /**
+   * 
+   * @param <T>
+   * @param requiredType
+   * @param relation
+   * @param option
+   */
+  public <T extends Comparable<Type>> Range(Class<Type> requiredType,
+    Relation relation, Option<T> option) {
+    this(requiredType);
+    this.constraints = new ValuePair<Relation, Option<T>>(relation, option);
   }
   
   /**
@@ -528,13 +596,24 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	}
 	
 	/**
-	 * Checks, if the given value is in range of all ranges. See also
-	 * {@link #castAndCheckIsInRange(Object)}.
 	 * 
 	 * @param value
 	 * @return
 	 */
 	public boolean isInRange(Type value) {
+	  return isInRange(value, null);
+	}
+	
+	/**
+	 * Checks, if the given value is in range of all ranges. See also
+	 * {@link #castAndCheckIsInRange(Object)}.
+	 * 
+	 * @param value
+	 * @param props
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+  public boolean isInRange(Type value, SBProperties props) {
 		if (isSetConstraints()) {
 			if (constraints instanceof GeneralFileFilter) {
 				// in this case, Type must be a String or a File.
@@ -545,17 +624,43 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 					file = (File) value;
 				}
 				return ((GeneralFileFilter) constraints).accept(file);
-			}
-		} else {
-		  // Special treatment for concrete lists (e.g., for classes).
-		  if (listOfAccpetedObjects!=null) {
-		    return listOfAccpetedObjects.contains(value);
-		  }
-			for (SubRange r : ranges) {
-				if (r.isInRange(value)) { return true; }
+			} else if (constraints instanceof ValuePair<?, ?>) {
+			  Relation relation = (Relation) ((ValuePair<?, ?>) constraints).getA();
+        Option<? extends Comparable<Type>> option = (Option<? extends Comparable<Type>>) ((ValuePair<?, ?>) constraints)
+            .getB();
+        if ((props != null) && (props.containsKey(option))) {
+          Comparable<Type> v = ((Comparable<Type>) option.getValue(props));
+          String message = "The value %s for option %s ";
+          switch (relation) {
+            case LT:
+              message += (v.compareTo(value) < 0) ? "is" : "is not";
+            case LE:
+              message += (v.compareTo(value) <= 0) ? "is" : "is not";
+            case EQ:
+              message += (v.compareTo(value) == 0) ? "is" : "is not";
+            case GE:
+              message += (v.compareTo(value) >= 0) ? "is" : "is not";
+            case GT:
+              message += (v.compareTo(value) > 0) ? "is" : "is not";
+            default:
+              break;
+          }
+          message += ' ' + relation.getRelationSymbol() + ' ';
+          message += value;
+          logger.fine(String.format(message, v, option));
+        }
 			}
 		}
-		return false;
+    // Special treatment for concrete lists (e.g., for classes).
+    if (listOfAccpetedObjects != null) {
+      return listOfAccpetedObjects.contains(value);
+    }
+    for (SubRange r : ranges) {
+      if (r.isInRange(value)) {
+        return true;
+      }
+    }
+    return false;
 	}
 	
 	/**
@@ -568,10 +673,12 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	 */
 	@SuppressWarnings("unused")
   @Deprecated
-	private boolean castAndCheckIsInRange(Object value) {
+	private boolean castAndCheckIsInRange(Object value, SBProperties props) {
 		Type value2 = Option.parseOrCast(typee, value);
-		if (value2==null) { return false;}
-		return isInRange(value2);
+		if (value2 == null) { 
+		  return false;
+		}
+		return isInRange(value2, props);
 	}
 	
 
@@ -776,9 +883,9 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-	public String toString() {
-	  return getRangeSpecString();
-	}
+  public String toString() {
+    return getRangeSpecString();
+  }
 
   /**
    * @return the minimum acceptable value. Only if {@link #typee} is
@@ -790,15 +897,17 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
   public Type getMinimum() {
     // listOfAccpetedObjects should be sorted, if it implements comparable.
     Type min = null;
-    if (listOfAccpetedObjects!=null && listOfAccpetedObjects.size()>0) {
+    if ((listOfAccpetedObjects != null) && (listOfAccpetedObjects.size() > 0)) {
       min = listOfAccpetedObjects.get(0);
     }
     
-    if (ranges!=null) {
+    if (ranges != null) {
       for (SubRange r : ranges) {
-        if (min==null) min = r.getMinimum();
-        else if (min instanceof Comparable && r.lBound instanceof Comparable) {
-          min = ((Comparable)min).compareTo((Comparable)r.lBound)<0?min:r.lBound;
+        if (min == null) {
+          min = r.getMinimum();
+        }
+        else if ((min instanceof Comparable<?>) && (r.lBound instanceof Comparable<?>)) {
+          min = ((Comparable) min).compareTo((Comparable) r.lBound) < 0 ? min : r.lBound;
         }
         // Too much effort to process this...
         //if (r.excludingLBound) {}
@@ -817,16 +926,16 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
   public Type getMaximum() {
     // listOfAccpetedObjects should be sorted, if it implements comparable.
     Type max = null;
-    if (listOfAccpetedObjects!=null && listOfAccpetedObjects.size()>0) {
+    if ((listOfAccpetedObjects != null) && (listOfAccpetedObjects.size() > 0)) {
       max = listOfAccpetedObjects.get(listOfAccpetedObjects.size()-1);
     }
     
-    if (ranges!=null) {
+    if (ranges != null) {
       for (SubRange r : ranges) {
         if (max == null) {
           max = r.getMaximum();
         }
-        else if ((max instanceof Comparable) && (r.uBound instanceof Comparable)) {
+        else if ((max instanceof Comparable<?>) && (r.uBound instanceof Comparable<?>)) {
           max = ((Comparable)max).compareTo((Comparable)r.uBound) > 0 ? max : r.uBound;
         }
         // Too much effort to process this...

@@ -43,8 +43,8 @@ public class SBProperties extends Properties {
 	private static final long serialVersionUID = 4883076517282212786L;
 	
 	/**
-     * 
-     */
+	 * 
+	 */
 	public SBProperties() {
 		super();
 	}

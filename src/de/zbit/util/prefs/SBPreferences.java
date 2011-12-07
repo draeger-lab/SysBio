@@ -198,7 +198,7 @@ public class SBPreferences implements Map<Object, Object> {
 			if (option.isSetRangeSpecification()) {
 			  // FIXME: each entry contains a mapping from Option to an argument
 			  //        holder, but this code expects the actual object.
-				if (!option.castAndCheckIsInRange(entry.getValue())) {
+				if (!option.castAndCheckIsInRange(entry.getValue(), props)) {
 					ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
 					parser.printErrorAndExit(String.format(resources.getString("OPTION_OUT_OF_RANGE"),
 						option));
@@ -861,7 +861,7 @@ public class SBPreferences implements Map<Object, Object> {
 				resources.getString("VALUE_FOR_OPTION_NOT_AVAILABLE"), option)); 
 			}
 			if (option.isSetRangeSpecification()
-					&& !option.castAndCheckIsInRange(get(option))) { 
+					&& !option.castAndCheckIsInRange(get(option), toProperties())) { 
 				throw new BackingStoreException(
 				String.format(
 							resources.getString("RANGE_CONSTRAINT_VIOLATION_MESSAGE"),

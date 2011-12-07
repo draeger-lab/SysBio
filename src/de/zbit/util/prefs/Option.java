@@ -341,9 +341,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
    * @param defaultValue
    * @param range
    */
+  @SuppressWarnings("unchecked")
   public Option(String optionName, Class<Type> requiredType,
     ResourceBundle bundle, Range<Type> range, Type defaultValue) {
-    this(optionName, requiredType, bundle, range, defaultValue, null);
+    this(optionName, requiredType, bundle, range, defaultValue,
+      (ValuePairUncomparable) null);
   }
 
   /**
@@ -396,10 +398,6 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
     this(optionName, requriedType, bundle.getString(optionName), range,
       defaultValue);
-    this.dependencies = new HashMap<Option<?>, SortedSet<Range<?>>>();
-    for (ValuePairUncomparable<Option<E>, Range<E>> pair : dependencies) {
-      addDependency(pair.getA(), pair.getB());
-    }
     String key = optionName + "_TOOLTIP";
     if (bundle.containsKey(key)) {
       setDisplayName(bundle.getString(optionName));
@@ -408,6 +406,18 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
       String names[] = this.description.split(";");
       this.displayName = names[0];
       this.description = names[1];
+    }
+    if ((dependencies != null) && (dependencies.length > 0)) {
+      this.dependencies = new HashMap<Option<?>, SortedSet<Range<?>>>();
+      for (ValuePairUncomparable<Option<E>, Range<E>> pair : dependencies) {
+        // this might happen if this method was called with null as last argument.
+        if ((pair != null) && pair.isSetA() && pair.isSetB()) {
+          addDependency(pair.getA(), pair.getB());
+        }
+      }
+      if (this.dependencies.size() == 0) {
+        this.dependencies = null;
+      }
     }
   }
 	
@@ -1358,9 +1368,10 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
    * has some enhancements, e.g., when using Class as type.
    * 
    * @param value
+   * @param props the current properties of all options.
    * @return
    */
-  public boolean castAndCheckIsInRange(Object value) {
+  public boolean castAndCheckIsInRange(Object value, SBProperties props) {
     Type value2 = parseOrCast(value);
     if (value2 == null) {
       return false;
@@ -1368,7 +1379,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     if (!isSetRangeSpecification()) {
       return true;
     }
-    return range.isInRange(value2);
+    return range.isInRange(value2, props);
   }
   
   /**
@@ -1377,21 +1388,22 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
    * 
    * @param value
    * @param r
-   * @return true if <code>value</code> is in {@link Range} <code>r</code>.
+   * @param props the current properties of all options.
+   * @return <code>true</code> if <code>value</code> is in {@link Range} <code>r</code>.
    */
   @SuppressWarnings("unchecked")
-  public boolean castAndCheckRange(Object value, Range<?> r) {
+  public boolean castAndCheckRange(Object value, Range<?> r, SBProperties props) {
     Type value2 = parseOrCast(value);
     if (value2 == null) {
       return false;
     }
-    if ((r == null) ||  (r.getRangeSpecString() == null)) {
+    if ((r == null) || (r.getRangeSpecString() == null)) {
       return true;
     }
     // I made the method a bit more generic, expecting a Range<?>
     // instead a Range<Type>. This improves the usability of the method.
     try {
-      return ((Range<Type>) r).isInRange(value2);
+      return ((Range<Type>) r).isInRange(value2, props);
     } catch (Throwable exc) {
       logger.finest(exc.getLocalizedMessage());
       return false;
