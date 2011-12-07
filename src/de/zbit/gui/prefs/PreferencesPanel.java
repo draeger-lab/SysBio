@@ -31,12 +31,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -1120,7 +1120,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @param properties
    * @param source
    */
-  public static void setProperty(Map<Object, Object> properties, Object source) {
+  public static void setProperty(SBProperties properties, Object source) {
     setProperty(properties, source, false);
   }
   
@@ -1205,8 +1205,14 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           if (c instanceof JComponent) {
             o = getOptionForJComponent((JComponent) c);
           }
-          if (o != null && o.isSetRangeSpecification()) {
-            isInRange = o.castAndCheckIsInRange(value);
+          if ((o != null) && o.isSetRangeSpecification()) {
+            if (properties instanceof SBProperties) {
+              isInRange = o.castAndCheckIsInRange(value,
+                (SBProperties) properties);
+            } else if (properties instanceof SBPreferences) {
+              isInRange = o.castAndCheckIsInRange(value,
+                ((SBPreferences) properties).toProperties());
+            }
           } else if (o == null) {
 //            System.out.println("Could not get option for JComponent.");
           }

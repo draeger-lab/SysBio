@@ -851,6 +851,8 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       return s;
     } else if (colChooser instanceof ColorChooserWithPreview) {
       return colChooser.getBackground();
+    } else if (colChooser instanceof JSpinner) {
+      return ((JSpinner) colChooser).getValue();
     } else {
       logger.severe(String.format(
         "Please implement getSelectedItem() for %s in JLabeledComponent.", 

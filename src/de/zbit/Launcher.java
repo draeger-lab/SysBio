@@ -225,8 +225,11 @@ public abstract class Launcher implements Runnable, Serializable {
 	 *         define collections of possible command-line options.
 	 */
 	public abstract List<Class<? extends KeyProvider>> getCmdLineOptions();
-
+  
   /**
+   * These options influence the behavior of the program before it is actually
+   * started, i.e., options that are parsed from the command line before really
+   * launching the program.
    * 
    * @return
    */
@@ -235,6 +238,10 @@ public abstract class Launcher implements Runnable, Serializable {
   }
   
   /**
+   * These are options that can be used to manipulate the behavior of a program
+   * while the program is already running. For instance, these options may be
+   * called in a graphical user interface or in the command line mode where the
+   * user may interactively select some options.
    * 
    * @return
    */

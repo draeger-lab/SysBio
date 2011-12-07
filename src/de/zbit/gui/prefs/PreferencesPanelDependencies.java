@@ -144,7 +144,8 @@ public class PreferencesPanelDependencies {
         //if (!valuePairUncomparable.getA().getCurrentValue().equals(valuePairUncomparable.getB())) {
         JComponentForOption jc = valuePairUncomparable.getA();
         range = valuePairUncomparable.getB();
-        inRange = jc.getOption().castAndCheckRange(jc.getCurrentValue(), range);
+        inRange = jc.getOption().castAndCheckRange(jc.getCurrentValue(), range,
+          parent.getProperties());
         if (andLogic) {
           if (!inRange || !((Component) jc).isEnabled()) {
             // Novel logic: disabled items propagate this to dependents.
