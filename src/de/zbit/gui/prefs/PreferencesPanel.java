@@ -265,7 +265,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         //jc = option2component.get(option);
         
         if (jc == null) {
-          jc = getJComponentForOption(option, properties, this);
+          jc = createJComponentForOption(option, properties, this);
         }
       }
       
@@ -502,13 +502,13 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * Initializes a Option type specific JComponent without any listeners and
    * default values.
    * 
-   * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener,
+   * @see #createJComponentForOption(Option, Object, ItemListener, ChangeListener,
    *      KeyListener)
    * @param option
    * @return
    */
   public JComponent getJComponentForOption(Option<?> option) {
-    return getJComponentForOption(option, properties, this);
+    return createJComponentForOption(option, properties, this);
   }
   
   /**
@@ -517,18 +517,18 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * {@link SBPreferences}. This is in contrast to {@link SBProperties}, i.e., a
    * current in-memory user-configuration.
    * 
-   * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener,
+   * @see #createJComponentForOption(Option, Object, ItemListener, ChangeListener,
    *      KeyListener)
    * @param option
    * @param prefs
    * @param l
    * @return
    */
-  public static JComponent getJComponentForOption(Option<?> option,
+  public static JComponent createJComponentForOption(Option<?> option,
     SBPreferences prefs, EventListener l) {
     Object def = prefs != null ? option.getValue(prefs) : option
         .getDefaultValue();
-    return getJComponentForOption(option, def, l);
+    return createJComponentForOption(option, def, l);
   }
   
   /**
@@ -546,9 +546,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @param probs
    * @param l
    * @return
-   * @see #getJComponentForOption(Option, SBPreferences, EventListener)
+   * @see #createJComponentForOption(Option, SBPreferences, EventListener)
    */
-  public static JComponent getJComponentForOption(Option<?> option, SBProperties probs, EventListener l) {
+  public static JComponent createJComponentForOption(Option<?> option, SBProperties probs, EventListener l) {
     // Get default value
     Object def = (probs != null)? probs.get(option) : option.getDefaultValue();
     if (def != null) {
@@ -559,7 +559,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         // doesn't matter, try to continue with string representation.
       }
     }
-    return getJComponentForOption(option, def, l);
+    return createJComponentForOption(option, def, l);
   }
   
   /**
@@ -567,7 +567,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * 
    * May be called as getJComponentForOption(Option, null, null).
    * 
-   * @see #getJComponentForOption(Option, Object, ItemListener, ChangeListener,
+   * @see #createJComponentForOption(Option, Object, ItemListener, ChangeListener,
    *      KeyListener)
    * @param option
    * @param def
@@ -577,9 +577,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    *        ChangeListener, KeyListener or null.
    * @return
    */
-  public static JComponent getJComponentForOption(Option<?> option, Object def,
+  public static JComponent createJComponentForOption(Option<?> option, Object def,
     EventListener l) {
-    return getJComponentForOption(option, def,
+    return createJComponentForOption(option, def,
       (l instanceof ItemListener ? (ItemListener) l : null),
       (l instanceof ChangeListener ? (ChangeListener) l : null),
       (l instanceof KeyListener ? (KeyListener) l : null));
@@ -615,7 +615,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    *         is unknown.
    */
   @SuppressWarnings("unchecked")
-  public static JComponent getJComponentForOption(Option<?> option,
+  public static JComponent createJComponentForOption(Option<?> option,
     Object defaultValue, ItemListener itemListener,
     ChangeListener changeListener, KeyListener keyListener) {
     // Create swing option based on field type

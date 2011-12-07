@@ -62,9 +62,7 @@ public class CommandLineHelp {
 	public static JComponent createHelpComponent(
 		Class<? extends KeyProvider>... clazz) {
 		if (clazz.length == 1) {
-			return new JScrollPane(initJEditor(clazz[0]),
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			return new JScrollPane(initJEditor(clazz[0]));
 		} else if (clazz.length > 1) {
 			//			JTabbedPane tabs = new JTabbedPane();
 			//			for (Class<? extends KeyProvider> keyProvider : clazz) {
@@ -75,9 +73,7 @@ public class CommandLineHelp {
 			//				}
 			//			}
 			//			return tabs;
-			return new JScrollPane(initJEditor(clazz),
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			return new JScrollPane(initJEditor(clazz));
 		}
 		return null;
 	}

@@ -85,7 +85,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   /**
    * A {@link Logger} for this class.
    */
-  public static final transient Logger log = Logger.getLogger(JLabeledComponent.class.getName());
+  public static final transient Logger logger = Logger.getLogger(JLabeledComponent.class.getName());
   
   /**
    * Generated serial version identifier.
@@ -255,7 +255,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    */
   public JLabeledComponent(String title, boolean fieldIsRequired,
     JComponent c) {
-    this (title, fieldIsRequired, new Object[]{c});
+    this (title, fieldIsRequired, new Object[] {c});
     GUITools.replaceComponent(colChooser, c);
     colChooser = c;
     label.setLabelFor(c);
@@ -852,7 +852,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     } else if (colChooser instanceof ColorChooserWithPreview) {
       return colChooser.getBackground();
     } else {
-      log.severe(String.format(
+      logger.severe(String.format(
         "Please implement getSelectedItem() for %s in JLabeledComponent.", 
         colChooser.getClass().toString()));
       return null;
@@ -873,7 +873,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     } else if (colChooser instanceof JTextComponent) {
       ((JTextComponent) colChooser).setText(Integer.toString(i));
     } else {
-      log.warning(String.format(
+      logger.warning(String.format(
         "Cannot set selected integer value on %s", 
         colChooser.getClass().toString()));
     }
@@ -900,7 +900,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
         ((ColorChooserWithPreview) colChooser).setColor((Color)string);
       }
     } else {
-      log.warning(String.format(
+      logger.warning(String.format(
         "Please implement setSelectedItem for %s.", colChooser.getClass().toString()));
     }
   }
@@ -1187,19 +1187,19 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   public static <T extends Number> JSpinner buildJSpinner(Option<T> option, T initialValue) {
     
     // Try to get min and max (optional parameters, might be null)
-    T minimum = option.isSetRangeSpecification()?option.getRange().getMinimum():null;
-    T maximum = option.isSetRangeSpecification()?option.getRange().getMaximum():null;
+    T minimum = option.isSetRangeSpecification() ? option.getRange().getMinimum() : null;
+    T maximum = option.isSetRangeSpecification() ? option.getRange().getMaximum() : null;
     
     // Get an initial value (required parameter)
-    if (initialValue==null) initialValue = option.getDefaultValue();
-    if (initialValue==null) initialValue=(minimum!=null)?minimum:maximum;
-    if (initialValue==null) initialValue=option.parseOrCast("0");
+    if (initialValue == null) initialValue = option.getDefaultValue();
+    if (initialValue == null) initialValue = (minimum != null) ? minimum : maximum;
+    if (initialValue == null) initialValue = option.parseOrCast("0");
     
     // Get the step size (required parameter)
-    T stepSize=null;
-    if (minimum!=null && maximum!=null) {
+    T stepSize = null;
+    if ((minimum != null) && (maximum != null)) {
       // Initially define 100 steps between minimum and maximum.
-      double d = (maximum.doubleValue() - minimum.doubleValue())/100;
+      double d = (maximum.doubleValue() - minimum.doubleValue()) / 100;
       try {
         // 0.95 is INTEGER paresed to "0" => round before doing that
         //stepSize = option.parseOrCast(d);
@@ -1207,29 +1207,30 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
           d = Math.ceil(d);
         }
         stepSize = option.parseOrCast(d);
-      } catch (Throwable e) {}
+      } catch (Throwable exc) {
+    	logger.finest(exc.getLocalizedMessage());
+      }
     }
-    if (stepSize==null || stepSize.doubleValue()==0.0) {
-      stepSize=option.parseOrCast("1");
+    if ((stepSize == null) || (stepSize.doubleValue() == 0d)) {
+      stepSize = option.parseOrCast("1");
     }
     
     // Create a number model with these values
-    SpinnerModel myModel = new SpinnerNumberModel((Number)initialValue, (Comparable)minimum, (Comparable)maximum, (Number)stepSize);
+    SpinnerModel myModel = new SpinnerNumberModel((Number) initialValue, (Comparable) minimum, (Comparable) maximum, (Number) stepSize);
     JSpinner spinner = new JSpinner(myModel);
     
     // Set width
     if (spinner.getEditor() instanceof JSpinner.DefaultEditor) {
-      ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setColumns(TEXTFIELD_COLUMNS);
+      ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField().setColumns(TEXTFIELD_COLUMNS);
     }
     
     // Show smaller numbers if data type us double
     if (Double.class.isAssignableFrom(initialValue.getClass())) {
-      spinner.setEditor(new JSpinner.NumberEditor(spinner, "#."+Utils.replicateCharacter("#", TEXTFIELD_COLUMNS-2)));
-      JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
+      spinner.setEditor(new JSpinner.NumberEditor(spinner, "#." + Utils.replicateCharacter("#", TEXTFIELD_COLUMNS - 2)));
+      JSpinner.NumberEditor editor = (JSpinner.NumberEditor) spinner.getEditor();
       DecimalFormat format = editor.getFormat();
-      format.setMaximumFractionDigits(TEXTFIELD_COLUMNS-2);
-      editor.getTextField().setHorizontalAlignment(SwingConstants.RIGHT);
-      
+      format.setMaximumFractionDigits(TEXTFIELD_COLUMNS - 2);
+      editor.getTextField().setHorizontalAlignment(SwingConstants.RIGHT);      
     }
     
     return spinner;

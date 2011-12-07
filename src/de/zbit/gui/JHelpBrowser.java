@@ -269,7 +269,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 				}
 			}
 		} else {
-			dispose();
+		  dispose();
 		}
 	}
 	
@@ -337,14 +337,13 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		setLocationByPlatform(true);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event
-	 * .HyperlinkEvent)
+	/* (non-Javadoc)
+	 * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event.HyperlinkEvent)
 	 */
 	public void hyperlinkUpdate(HyperlinkEvent event) {
 		if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED
-				&& !backButton.isEnabled()) backButton.setEnabled(true);
+				&& !backButton.isEnabled()) {
+		  backButton.setEnabled(true);
+		}
 	}
 }
