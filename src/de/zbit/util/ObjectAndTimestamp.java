@@ -32,10 +32,12 @@ public class ObjectAndTimestamp<INFOtype> implements Comparable, Serializable {
    * The information itself.
    */
   private INFOtype information;
+  
   /**
    * Datestamp, when this information has been accessed the last time.
+   * The smaller the older. See {@link System#currentTimeMillis()}.
    */
-  private long lastUsage = System.currentTimeMillis();
+  private long lastUsage;
   
   
   /**
@@ -45,7 +47,7 @@ public class ObjectAndTimestamp<INFOtype> implements Comparable, Serializable {
    */
   public ObjectAndTimestamp(INFOtype information) {
     super();
-    this.information = information;
+    setInformation(information);
   }
   
   /**
