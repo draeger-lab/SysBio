@@ -26,7 +26,7 @@ import java.awt.Color;
  * @since 1.1
  * @date 2011-03-27
  */
-public interface ColorPalette {
+public class ColorPalette {
 		
 	/**
 	 * 
@@ -129,5 +129,71 @@ public interface ColorPalette {
 	 */
 	public static final Color ANTHRACITE = new Color(50, 56, 59); 
 		// new Color(CMYK, new float[] {30, 0, 0, 85}, 0f);
+	
+	/**
+	 * Has 27 colors and returns one color for any index (using modulo).
+	 * 
+   * @param index
+   * @return
+   */
+  public static Color indexToColor(int index) {
+    switch (index % 27) {
+    case 0:
+      return ANTHRACITE;
+    case 1:
+      return SECOND_292;
+    case 2:
+      return SECOND_131;
+    case 3:
+      return SECOND_180;
+    case 4:
+      return SECOND_3015;
+    case 5:
+      return SECOND_364;
+    case 6:
+      return SECOND_557;
+    case 7:
+      return SECOND_653;
+    case 8:
+      return SECOND_6880;
+    case 9:
+      return SECOND_7490;
+    case 10:
+      return SECOND_7505;
+    case 11:
+      return SECOND_7508;
+    case 12:
+      return SECOND_7530;
+    case 13:
+      return GOLD;
+    case 14:
+      return CAMINE_RED;
+    case 15:
+      return CAMINE_RED_50_PERCENT;
+    case 16:
+      return GOLD_50_PERCENT;
+    case 17:
+      return Color.BLACK;
+    case 18:
+      return Color.RED;
+    case 19:
+      return Color.BLUE;
+    case 20:
+      return Color.PINK;
+    case 21:
+      return Color.GREEN;
+    case 22:
+      return Color.GRAY;
+    case 23:
+      return Color.MAGENTA;
+    case 24:
+      return Color.CYAN;
+    case 25:
+      return Color.ORANGE;
+    case 26:
+      return Color.DARK_GRAY;
+    }
+    return Color.BLACK;
+  }
 	
 }
