@@ -67,6 +67,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
@@ -98,14 +99,14 @@ import de.zbit.util.ValuePair;
 public class GUITools {
   
   /**
-   * The location for texts of labels. 
-   */
-  public static final String RESOURCE_LOCATION_FOR_LABELS = "de.zbit.locales.Labels";
-  
-  /**
    * 
    */
   private static final Logger logger = Logger.getLogger(GUITools.class.getName());
+  
+  /**
+   * The location for texts of labels. 
+   */
+  public static final String RESOURCE_LOCATION_FOR_LABELS = "de.zbit.locales.Labels";
   
   /**
    * The number of symbols per line in tool tip texts.
@@ -165,6 +166,60 @@ public class GUITools {
   }
   
   /**
+   * Build a panel with cancel and ok buttons.
+   * When any button is pressed, it will trigger setVisible(false).
+   * <p>You can check if ok has been pressed with
+   * <pre> ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).isSelected()</pre>
+   * @param parentDialog the dialog to close (hide) with ok and cancel.
+   * @return
+   */
+  public static JPanel buildOkCancelButtons(final Component parentDialog) {
+    JPanel southPanel = new JPanel(new BorderLayout());
+
+    // Ok Button
+    FlowLayout fr = new FlowLayout();
+    fr.setAlignment(FlowLayout.RIGHT);
+    JPanel se = new JPanel(fr);
+    String text = GUITools.getOkButtonText();
+    final JButton ok = new JButton(text);
+    //if (this.defaultFont!=null) ok.setFont(defaultFont);
+    se.add(ok);
+    southPanel.add(se, BorderLayout.EAST);
+
+    // Cancel Button
+    FlowLayout fl = new FlowLayout();
+    fl.setAlignment(FlowLayout.LEFT);
+    JPanel sw = new JPanel(fl);
+    text = GUITools.getCancelButtonText();
+    final JButton cancel = new JButton(text);
+    //if (this.defaultFont!=null) cancel.setFont(defaultFont);
+    sw.add(cancel);
+    southPanel.add(sw, BorderLayout.WEST);
+    
+    // Set common size
+    ok.setPreferredSize(cancel.getPreferredSize()); // new Dimension(75,25)
+    
+    // Add listeners
+    ok.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        ok.setSelected(true);
+        cancel.setSelected(false);
+        if (parentDialog!=null) parentDialog.setVisible(false);
+      }      
+    });
+    cancel.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        ok.setSelected(false);
+        cancel.setSelected(true);
+        if (parentDialog!=null) parentDialog.setVisible(false);
+      }      
+    });
+    
+    return southPanel;
+  }
+  
+  
+  /**
    * Sets the dimension of all given {@link JComponent} instances to the maximal
    * size, i.e., all components will be set to equal size, which is the maximal
    * preferred size of one of the components.
@@ -187,7 +242,6 @@ public class GUITools {
       component.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
     }
   }
-  
   
   /**
    * Checks whether the first container contains the second one.
@@ -253,6 +307,67 @@ public class GUITools {
   }
   
   /**
+   * Add some buttons to a {@link ButtonGroup}.
+   * @param buttons
+   * @return
+   */
+  public static ButtonGroup createButtonGroup(AbstractButton... buttons) {
+    ButtonGroup group = new ButtonGroup();
+    for (AbstractButton abstractButton : buttons) {
+      group.add(abstractButton);
+    }
+    return group;
+  }
+  
+  /**
+   * Creates a new {@link JButton} with action listeners that invoke
+   * a specific method.
+   * @param listener the ActionListener to be added
+   * @param command the action command for this button, i.e., the item
+   *        in the menu. This will be converted to a {@link String} using 
+   *        the {@link String.#toString()} method.
+   * @param icon the icon of the JButton (can be null)
+   * @return A new {@link JButton} with the given features.
+   */
+  public static JButton createJButton(ActionListener listener,
+    ActionCommand command, Icon icon) {
+    return createJButton(listener, command, icon, null);
+  }
+  
+  /**
+   * Creates a {@link JButton}.
+   * @param listener
+   * @param command
+   * @param icon
+   * @param mnemonic
+   * @return
+   */
+  public static JButton createJButton(ActionListener listener,
+    ActionCommand command, Icon icon, Character mnemonic) {
+    JButton button = new JButton();
+    if (listener != null) {
+      button.addActionListener(listener);
+    }
+    if (mnemonic != null) {
+      button.setMnemonic(mnemonic.charValue());
+    }
+    if (command != null) {
+      button.setText(command.getName());
+      String toolTip = command.getToolTip();
+      if (toolTip != null) {
+        button.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
+      }
+      button.setActionCommand(command.toString());
+    }
+    if (icon != null) {
+      button.setIcon(icon);
+    } else if (command instanceof ActionCommandWithIcon) {
+      button.setIcon(((ActionCommandWithIcon)command).getIcon());
+    }
+    return button;
+  }
+  
+  /**
    * Creates and returns a JCheckBox with all the given properties.
    * 
    * @param label
@@ -272,6 +387,51 @@ public class GUITools {
     }
     chkbx.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
     return chkbx;
+  }
+  
+  /**
+   * Creates a new {@link JDropDownButton} using the entries from the given
+   * {@link ResourceBundle}. It is assumed that the bundle contains at least the
+   * key specified by the given <code>name</code>. It then tries to obtain an
+   * associated tooltip by first looking for the key
+   * <code>name + "_TOOLTIP"</code>. If such a key is present, it uses this
+   * tooltip. Otherwise it will try to split the text of the
+   * {@link JDropDownButton} using the separator character <code>';'</code>.
+   * Remember, the text is defined by the entry in the {@link ResourceBundle}
+   * for the <code>name</code> key. If it is not possible obtain a tooltip by
+   * splitting or concatanation of the name with the suffix
+   * <code>"_TOOLTIP"</code>, no tooltip will be set.
+   * 
+   * @param name
+   *        the name (not the {@link JDropDownButton#getText()}) of the
+   *        {@link JDropDownButton} to be created, also used as look-up key in
+   *        the given {@link ResourceBundle} and as the name of the action
+   *        command for the new button.
+   * @param bundle
+   *        where to look keys up.
+   * @param menu
+   *        the options to be offered by the button.
+   * @return a new {@link JDropDownButton} with many properties defined.
+   */
+  public static JDropDownButton createJDropDownButton(String name,
+    ResourceBundle bundle, JPopupMenu menu) {
+    JDropDownButton button = new JDropDownButton(bundle.getString(name), menu);
+    String tooltip = null;
+    String key = name + "_TOOLTIP";
+    if (bundle.containsKey(key)) {
+      tooltip = bundle.getString(key);
+    } else if (button.getText().contains(";")) {
+      String description[] = button.getText().split(";");
+      button.setText(description[0]);
+      tooltip = description[1];
+    }
+    if (tooltip != null) {
+      button.setToolTipText(StringUtil.toHTML(tooltip,
+        GUITools.TOOLTIP_LINE_LENGTH));
+    }
+    button.setName(name);
+    button.setActionCommand(name);
+    return button;
   }
   
   /**
@@ -316,55 +476,6 @@ public class GUITools {
       }
     }
     return chooser;
-  }
-  
-  /**
-   * Shows a {@link JFileChooser} to the user, appends the selected file extension to the
-   * selected file and checks weather the selected file is writable. If the file already
-   * exists, the user will be asked if he wants to overwrite the file. If the file is not
-   * writable, an error message id displayed to the user.
-   * @param parent parent component for makeing a modal dialog. May be null.
-   * @param saveDir initial directory for the {@link JFileChooser}. May be null.
-   * @param filter {@link FileFilter} the user may choose from. May be null.
-   * @return a file selected by the user if and only if this file is writable and the user
-   * confirmed every warning. Else, null is returned. 
-   */
-  public static File showSaveFileChooser(Component parent, String saveDir, FileFilter... filter) {
-    JFileChooser fc = GUITools.createJFileChooser(saveDir, (filter==null || filter.length<1),
-      false, JFileChooser.FILES_ONLY, filter);
-    if (fc.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION) return null;
-    
-    // Get selected file and try to prepend extension
-    File f = fc.getSelectedFile();
-    
-    // Eventually append file extension
-    if (!f.getName().contains(".")) {
-      String extension = fc.getFileFilter().getDescription();
-      int pos = extension.lastIndexOf("*.");
-      if (pos>=0) {
-        extension = Utils.getWord(extension, pos+2, false);
-        // *.* => (extension.length()==0)
-        if (extension!=null && extension.length()>0) {
-          f = new File(f.getPath() + "." + extension);
-        }
-      }
-    }
-    
-    // Check if file exists and is writable
-    boolean fileExists = f.exists();
-    if (!fileExists) try {
-      f.createNewFile();
-    } catch (IOException e) {
-      GUITools.showErrorMessage(parent, e);
-      return null;
-    }
-    if (!f.canWrite() || f.isDirectory()) {
-      GUITools.showNowWritingAccessWarning(parent, f);
-    } else if (!fileExists || (fileExists && GUITools.overwriteExistingFile(parent, f))) {
-      // This is the usual case
-      return f;
-    }
-    return null;
   }
   
   /**
@@ -436,7 +547,7 @@ public class GUITools {
     ActionCommand command) {
     return createJMenuItem(listener, command, (Icon) null);
   }
-  
+
   /**
    * @param listener
    * @param command
@@ -483,6 +594,7 @@ public class GUITools {
     return createJMenuItem(listener, command, icon, keyStroke, null);
   }
   
+  
   /**
    * Creates an entry for the menu bar.
    * 
@@ -497,7 +609,24 @@ public class GUITools {
     ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic) {
     return createJMenuItem(listener, command, icon, ks, mnemonic, JMenuItem.class);
   }
-
+  
+  /**
+   * @param listener
+   * @param command
+   * @param icon
+   * @param ks
+   * @param mnemonic
+   * @param enabled
+   * @return
+   */
+  public static JMenuItem createJMenuItem(ActionListener listener,
+    ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic,
+    boolean enabled) {
+    JMenuItem item = createJMenuItem(listener, command, icon, ks, mnemonic);
+    item.setEnabled(enabled);
+    return item;
+  }
+  
   /**
    * Creates an entry for the menu bar.
    * 
@@ -551,23 +680,6 @@ public class GUITools {
   /**
    * @param listener
    * @param command
-   * @param icon
-   * @param ks
-   * @param mnemonic
-   * @param enabled
-   * @return
-   */
-  public static JMenuItem createJMenuItem(ActionListener listener,
-    ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic,
-    boolean enabled) {
-    JMenuItem item = createJMenuItem(listener, command, icon, ks, mnemonic);
-    item.setEnabled(enabled);
-    return item;
-  }
-  
-  /**
-   * @param listener
-   * @param command
    * @param keyStroke
    * @return
    */
@@ -576,54 +688,6 @@ public class GUITools {
     return createJMenuItem(listener, command, null, keyStroke);
   }
   
-  
-  /**
-   * Creates a new {@link JButton} with action listeners that invoke
-   * a specific method.
-   * @param listener the ActionListener to be added
-   * @param command the action command for this button, i.e., the item
-   *        in the menu. This will be converted to a {@link String} using 
-   *        the {@link String.#toString()} method.
-   * @param icon the icon of the JButton (can be null)
-   * @return A new {@link JButton} with the given features.
-   */
-  public static JButton createJButton(ActionListener listener,
-    ActionCommand command, Icon icon) {
-    return createJButton(listener, command, icon, null);
-  }
-  
-  /**
-   * Creates a {@link JButton}.
-   * @param listener
-   * @param command
-   * @param icon
-   * @param mnemonic
-   * @return
-   */
-  public static JButton createJButton(ActionListener listener,
-    ActionCommand command, Icon icon, Character mnemonic) {
-    JButton button = new JButton();
-    if (listener != null) {
-      button.addActionListener(listener);
-    }
-    if (mnemonic != null) {
-      button.setMnemonic(mnemonic.charValue());
-    }
-    if (command != null) {
-      button.setText(command.getName());
-      String toolTip = command.getToolTip();
-      if (toolTip != null) {
-        button.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
-      }
-      button.setActionCommand(command.toString());
-    }
-    if (icon != null) {
-      button.setIcon(icon);
-    } else if (command instanceof ActionCommandWithIcon) {
-      button.setIcon(((ActionCommandWithIcon)command).getIcon());
-    }
-    return button;
-  }
   
   /**
    * Create a panel for a component and adds a title to it. 
@@ -666,6 +730,25 @@ public class GUITools {
     return false;
   }
   
+  /**
+   * Searches for the parent {@link java.awt.Window} of the given component c.
+   * Checks if this Window contains a #{@link javax.swing.AbstractButton} which
+   * is called "Ok" and enables this button.
+   * @param c
+   * @return true if and only if an ok-button has been enabled. Else, false.
+   */
+  public static synchronized boolean enableOkButton(Container c) {
+    // Search for ok button and enable.
+    if (c!=null) {
+      // c is now a Window.
+      Component okButton = getOKButton(c, true);
+      if (okButton!=null) {
+        okButton.setEnabled(true);
+        return true;
+      }
+    }
+    return false;
+  }
   
   /**
    * Checks if this "c" contains a #{@link javax.swing.AbstractButton} which
@@ -677,6 +760,25 @@ public class GUITools {
    */
   public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c) {
     return enableOkButtonIfAllComponentsReady(c, false);
+  }
+  
+  /**
+   * Simply checks if all elements on "c" are enabled and if yes, the given "okButton" will
+   * be enabled. Else, the current state stays untouched.
+   * 
+   * In opposite to {@link #enableOkButtonIfAllComponentsReady(Component)}, this function 
+   * uses the given okButton.
+   * @param c
+   * @param okButton
+   * @return
+   */
+  public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c, AbstractButton okButton) {
+    if (isEnabled(c)) {
+      okButton.setEnabled(true);
+      return true;
+    } else {
+      return false;
+    }
   }
   
   /**
@@ -703,59 +805,6 @@ public class GUITools {
           okButton.setEnabled(previousState);
           return false;
         }
-      }
-    }
-    return false;
-  }
-  
-  /**
-   * Simply checks if all elements on "c" are enabled and if yes, the given "okButton" will
-   * be enabled. Else, the current state stays untouched.
-   * 
-   * In opposite to {@link #enableOkButtonIfAllComponentsReady(Component)}, this function 
-   * uses the given okButton.
-   * @param c
-   * @param okButton
-   * @return
-   */
-  public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c, AbstractButton okButton) {
-    if (isEnabled(c)) {
-      okButton.setEnabled(true);
-      return true;
-    } else {
-      return false;
-    }
-  }
-  
-  public static AbstractButton getOKButton(Container c, boolean inspectWholeWindow) {
-    // Search for parent window
-    Container oldC = c;
-    if (inspectWholeWindow) c = getParentWindow(c);
-    if (c==null) c = oldC;
-    
-    // Search for ok button and enable.
-    if (c!=null) {
-      return (AbstractButton) searchFor(c, AbstractButton.class, "getText", getOkButtonText());
-    } else {
-      return null;
-    }
-  }
-  
-  /**
-   * Searches for the parent {@link java.awt.Window} of the given component c.
-   * Checks if this Window contains a #{@link javax.swing.AbstractButton} which
-   * is called "Ok" and enables this button.
-   * @param c
-   * @return true if and only if an ok-button has been enabled. Else, false.
-   */
-  public static synchronized boolean enableOkButton(Container c) {
-    // Search for ok button and enable.
-    if (c!=null) {
-      // c is now a Window.
-      Component okButton = getOKButton(c, true);
-      if (okButton!=null) {
-        okButton.setEnabled(true);
-        return true;
       }
     }
     return false;
@@ -817,6 +866,57 @@ public class GUITools {
   }
   
   /**
+   * Determines the maximal preferred size of the two given elements and creates
+   * a new instance of {@link Dimension} with exactly this size and returns it.
+   * 
+   * @param a
+   * @param b
+   * @return a new instance of {@link Dimension} of maximal width and height of
+   *         the two given {@link Container}s.
+   */
+  public static Dimension getMaxPreferredSize(Container a, Container b) {
+    Dimension prefA = a.getPreferredSize();
+    Dimension prefB = b.getPreferredSize();
+    return new Dimension((int) Math.max(prefA.getWidth(), prefB.getWidth()),
+      (int) Math.max(prefA.getHeight(), prefB.getHeight()));
+  }
+  
+  
+  /**
+   * Return a best suited string to describe this {@link Throwable}.
+   * Prefers in this order: <ol><li>LocalizedMessage
+   * <li>LocalizedMessage of the Cause
+   * <li>message<li>toString()<li>NULL</ol>
+   * @param exc
+   * @return
+   */
+  private static String getMessage(Throwable exc) {
+    if (exc==null) return "NULL";
+    String msg = exc.getLocalizedMessage();
+    if ((msg == null) && (exc.getCause() != null)) {
+      msg = exc.getCause().getLocalizedMessage();
+    }
+    if (msg == null) msg = exc.getMessage();
+    if (msg == null) msg = exc.toString(); // Axis Faults have all messages null
+    if (msg == null) msg = "NULL";
+    return msg;
+  }
+  
+  public static AbstractButton getOKButton(Container c, boolean inspectWholeWindow) {
+    // Search for parent window
+    Container oldC = c;
+    if (inspectWholeWindow) c = getParentWindow(c);
+    if (c==null) c = oldC;
+    
+    // Search for ok button and enable.
+    if (c!=null) {
+      return (AbstractButton) searchFor(c, AbstractButton.class, "getText", getOkButtonText());
+    } else {
+      return null;
+    }
+  }
+  
+  /**
    * Tries to get the lokalized ok Button Message, as it occurs
    * in the UIManager (e.g. JOptionPane).
    * @return
@@ -852,7 +952,6 @@ public class GUITools {
     }
     return null;
   }
-  
   
   /**
    * The JVM command line allows to show splash screens. If the user made
@@ -957,6 +1056,49 @@ public class GUITools {
   }
   
   /**
+   * Create an open file dialog that let's the user
+   * select any file.
+   * @param parent
+   * @param dialogTitle allows to change the title of the
+   * file dialog.
+   * @param acceptURLs if true, will also accept any http
+   * or ftp url as input and return this url.
+   * @return
+   */
+  public static String openFileDialog(final Component parent,
+    String dialogTitle, boolean acceptURLs) {
+    JFileChooser chooser = createJFileChooser(null, true,
+      false, JFileChooser.FILES_ONLY, (FileFilter)null);
+    if (dialogTitle!=null) chooser.setDialogTitle(dialogTitle);
+    if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+      File f = chooser.getSelectedFile();
+      String fString = f.getPath();
+      if (acceptURLs) {
+        // Stupid dialog converts the url to something like
+        // C:\Users\Documents\http:\www.broadinstitute.org\c3.gmt
+        int pos = fString.indexOf("http:");
+        int pos2 = fString.indexOf("ftp:");
+        pos = Math.max(pos, pos2);
+        if (pos>=0) {
+          String url = fString.substring(pos, fString.length());
+          if (StringUtil.fileSeparator()=='\\') {
+            url = url.replace('\\', '/');
+          }
+          url = url.replaceFirst(Pattern.quote("http:/"), "http://");
+          url = url.replaceFirst(Pattern.quote("ftp:/"), "ftp://");
+          return url;
+        }
+      }
+      if (!f.canRead()) {
+        showNowReadingAccessWarning(parent, f);
+      } else {
+        return f.getPath();
+      }
+    }
+    return null;
+  }
+  
+  /**
    * @param parent
    * @param dir
    * @param allFilesAcceptable
@@ -1014,49 +1156,6 @@ public class GUITools {
   }
   
   /**
-   * Create an open file dialog that let's the user
-   * select any file.
-   * @param parent
-   * @param dialogTitle allows to change the title of the
-   * file dialog.
-   * @param acceptURLs if true, will also accept any http
-   * or ftp url as input and return this url.
-   * @return
-   */
-  public static String openFileDialog(final Component parent,
-    String dialogTitle, boolean acceptURLs) {
-    JFileChooser chooser = createJFileChooser(null, true,
-      false, JFileChooser.FILES_ONLY, (FileFilter)null);
-    if (dialogTitle!=null) chooser.setDialogTitle(dialogTitle);
-    if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-      File f = chooser.getSelectedFile();
-      String fString = f.getPath();
-      if (acceptURLs) {
-        // Stupid dialog converts the url to something like
-        // C:\Users\Documents\http:\www.broadinstitute.org\c3.gmt
-        int pos = fString.indexOf("http:");
-        int pos2 = fString.indexOf("ftp:");
-        pos = Math.max(pos, pos2);
-        if (pos>=0) {
-          String url = fString.substring(pos, fString.length());
-          if (StringUtil.fileSeparator()=='\\') {
-            url = url.replace('\\', '/');
-          }
-          url = url.replaceFirst(Pattern.quote("http:/"), "http://");
-          url = url.replaceFirst(Pattern.quote("ftp:/"), "ftp://");
-          return url;
-        }
-      }
-      if (!f.canRead()) {
-        showNowReadingAccessWarning(parent, f);
-      } else {
-        return f.getPath();
-      }
-    }
-    return null;
-  }
-  
-  /**
    * @param parent
    * @param out
    * @return
@@ -1100,6 +1199,30 @@ public class GUITools {
       }
       c = c.getParent();
     }
+  }
+  
+  /**
+   * Remove all elements from this container and all childs, that
+   * have a name that is equal to the given one.
+   * @param container
+   * @param nameToRemove
+   * @return true if at least one element has been removed.
+   */
+  public static boolean removeAllComponentsWithName(Container container, String nameToRemove) {
+    boolean removed = false;
+    
+    for (Component c: container.getComponents()) {
+      String name = c.getName();
+      
+      if (name!=null && name.equals(nameToRemove)) {
+        container.remove(c);
+        removed=true;
+      } else if (c instanceof Container) {
+        // Recurse
+        removed|=removeAllComponentsWithName((Container) c,nameToRemove);
+      }
+    }
+    return removed;
   }
   
   /**
@@ -1213,6 +1336,21 @@ public class GUITools {
     FileFilter... filter) {
     return saveFileDialog(parent, dir, allFilesAcceptable,
       multiSelectionAllowed, true, mode, filter);
+  }
+  
+  /**
+   * Scrolls to the top of the given <code>scrollPanel</code>.
+   * @param scrollPanel
+   */
+  public static void scrollToTop(final JScrollPane scrollPanel) {
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      public void run() { 
+        synchronized (scrollPanel) {
+          scrollPanel.getVerticalScrollBar().setValue(0);
+          scrollPanel.getHorizontalScrollBar().setValue(0);
+        }
+      }
+    });
   }
   
   /**
@@ -1368,7 +1506,8 @@ public class GUITools {
       }
     }
   }
-  
+
+
   /**
    * 
    * @param state
@@ -1399,6 +1538,18 @@ public class GUITools {
     setEnabled(state, null, toolbar, commands);
   }
   
+  
+  /**
+   * Disabled or enables the given components.
+   * @param enabled
+   * @param components
+   */
+  public static void setEnabledForAll(boolean enabled, Component...components) {
+    for (Component component: components) {
+      component.setEnabled(enabled);
+    }
+  }
+  
   /**
    * Recursively set opaque to a value for p and all JComoponents on p.
    * @param p
@@ -1414,428 +1565,6 @@ public class GUITools {
       }
     }
     
-  }
-  
-  /**
-   * 
-   * @param parent
-   * @param message
-   */
-  public static void showErrorMessage(Component parent, String message) {
-    showErrorMessage(parent, null, message);
-  }
-  
-  /**
-   * Displays the error message on a {@link JOptionPane}.
-   * 
-   * @param exc
-   */
-  public static void showErrorMessage(Component parent, Throwable exc) {
-    String msg = getMessage(exc);
-    
-    if (logger!=null) logger.log(Level.WARNING, msg, exc);
-    ValuePair<String, Integer> messagePair = StringUtil
-    .insertLineBreaksAndCount(msg, TOOLTIP_LINE_LENGTH, "\n");
-    Object message;
-    if (messagePair.getB().intValue() > 30) {
-      JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
-      pane.setEditable(false);
-      pane.setPreferredSize(new Dimension(480, 240));
-      message = new JScrollPane(pane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    } else {
-      message = messagePair.getA();
-    }
-    Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause()
-        .getClass() : exc.getClass();
-        JOptionPane.showMessageDialog(parent, message, clazz!=null?clazz.getSimpleName():"",
-            JOptionPane.ERROR_MESSAGE);
-  }
-
-
-  /**
-   * Return a best suited string to describe this {@link Throwable}.
-   * Prefers in this order: <ol><li>LocalizedMessage
-   * <li>LocalizedMessage of the Cause
-   * <li>message<li>toString()<li>NULL</ol>
-   * @param exc
-   * @return
-   */
-  private static String getMessage(Throwable exc) {
-    if (exc==null) return "NULL";
-    String msg = exc.getLocalizedMessage();
-    if ((msg == null) && (exc.getCause() != null)) {
-      msg = exc.getCause().getLocalizedMessage();
-    }
-    if (msg == null) msg = exc.getMessage();
-    if (msg == null) msg = exc.toString(); // Axis Faults have all messages null
-    if (msg == null) msg = "NULL";
-    return msg;
-  }
-  
-  /**
-   * Shows an error dialog with the given message in case the exception does not
-   * provide any detailed message.
-   * 
-   * @param parent
-   * @param exc
-   * @param defaultMessage
-   */
-  public static void showErrorMessage(Component parent, Throwable exc, String defaultMessage) {
-    if ((exc == null) || (exc.getLocalizedMessage() == null)
-        || (exc.getLocalizedMessage().length() == 0)) {
-      
-      logger.log(Level.WARNING, defaultMessage, exc);
-      String name = (exc!=null?exc.getClass().getSimpleName():"Error");
-      JOptionPane.showMessageDialog(parent, defaultMessage, name, JOptionPane.ERROR_MESSAGE);
-    } else {
-      showErrorMessage(parent, exc);
-    }
-  }
-  
-  /**
-   * Shows a simple message with a given title and an ok button.
-   * 
-   * @param message
-   * @param title
-   * @return
-   */
-  public static void showMessage(String message, String title) {
-    JOptionPane.showMessageDialog(null, StringUtil.toHTML(message,
-      TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
-  }
-  
-  
-  /**
-   * Displays a message on a message dialog window, i.e., an HTML document.
-   * 
-   * @param path
-   *        the URL of an HTML document.
-   * @param title
-   *        the title of the dialog to be displayed
-   * @param owner
-   *        the parent of the dialog or null.
-   */
-  public static void showMessage(URL path, String title, Component owner) {
-    showMessage(path, title, owner, null);
-  }
-  
-  /**
-   * Show a Question Dialog
-   * @param parent may be null
-   * @param message question to display
-   * @param title dialog title
-   * @param choices different choices
-   * @return chosen index or JOptionPane static ints
-   */
-  public static int showQuestionMessage(Component parent, String message,
-    String title, Object... choices) {
-    return JOptionPane.showOptionDialog(parent, StringUtil.toHTML(message,
-      TOOLTIP_LINE_LENGTH), title, JOptionPane.DEFAULT_OPTION,
-      JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
-  }
-  
-  /**
-   * Show a Question Dialog
-   * @param parent may be null
-   * @param message question to display
-   * @param title dialog title
-   * @param optionType e.g. {@link JOptionPane#YES_NO_OPTION}
-   * @return an integer indicating the option selected by the user (e.g. {@link JOptionPane#YES_OPTION})
-   */
-  public static int showQuestionMessage(Component parent, String message, String title, int optionType) {
-    return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
-      title, optionType, JOptionPane.QUESTION_MESSAGE);
-  }
-  
-  /**
-   * @param path
-   * @param title
-   * @param owner
-   * @param icon
-   */
-  public static void showMessage(URL path, String title, Component owner,
-    Icon icon) {
-    JBrowserPane browser = new JBrowserPane(path);
-    browser.removeHyperlinkListener(browser);
-    browser.addHyperlinkListener(new SystemBrowser());
-    browser.setBorder(BorderFactory.createEtchedBorder());
-    
-    try {
-      File f = new File(OpenFile.doDownload(path.toString()));
-      BufferedReader br;
-      br = new BufferedReader(new FileReader(f));
-      String line;
-      int rowCount = 0, maxLine = 0;
-      while (br.ready()) {
-        line = br.readLine();
-        if (line.length() > maxLine) {
-          maxLine = line.length();
-        }
-        rowCount++;
-      }
-      
-      if ((rowCount > 100) || (maxLine > 250)) {
-        JScrollPane scroll = new JScrollPane(browser,
-          JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        // TODO: Calculate required size using the font size.
-        scroll.setMaximumSize(new Dimension(470, 470));
-        Dimension prefered = new Dimension(450, 450);
-        browser.setPreferredSize(prefered);
-        JOptionPane.showMessageDialog(owner, scroll, title,
-          JOptionPane.INFORMATION_MESSAGE, icon);
-      } else {
-        JOptionPane.showMessageDialog(owner, browser, title,
-          JOptionPane.INFORMATION_MESSAGE, icon);
-      }
-    } catch (IOException exc) {
-      showErrorMessage(owner, exc);
-    }
-  }
-  
-  
-  /**
-   * Show the component in an information message context, but does
-   * not wait until the user clicks ok, but simply invokes this
-   * message dialog in a new thread.
-   * 
-   * Simply executes {@link javax.swing.JOptionPane#showMessageDialog(Component, Object, String, int)}
-   * in a new thread.
-   * 
-   * @param component - the component to show
-   * @param caption - the caption of the dialog
-   */
-  public static void showMessageDialogInNewThred(final Component component, final String caption) {
-    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-      @Override
-      protected Void doInBackground() throws Exception {
-        JOptionPane.showMessageDialog(null, component,
-          caption, JOptionPane.INFORMATION_MESSAGE);
-        return null;
-      }
-    };
-    worker.execute();
-    
-    // Wait until the dialog is painted, before continuing
-    while (worker.getState()==SwingWorker.StateValue.PENDING) {
-      try {
-        Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
-      } catch (InterruptedException e) {}
-    }
-  }
-  
-  /**
-   * Shows an ok/ cancel dialog in a new thread. You can specify runnables that
-   * are executed, depending if the user confirms the dialog or not.
-   * 
-   * <p>This method has the advantage to allow modifications of the dialog, because
-   * evaulation takes place in a new thread!
-   * 
-   * @param component
-   * @param caption
-   * @param okAction optional, action to be performed after dialog confirmation.
-   * @param cancelAction optional, action to be performed after dialog cancellation.
-   */
-  public static void showOkCancelDialogInNewThred(final Component component, final String caption, final Runnable okAction, final Runnable cancelAction) {
-    SwingWorker<Integer, Void> worker = new SwingWorker<Integer, Void>() {
-      @Override
-      protected Integer doInBackground() throws Exception {
-        return JOptionPane.showConfirmDialog(null, component,
-          caption, JOptionPane.OK_CANCEL_OPTION);
-      }
-      
-      /* (non-Javadoc)
-       * @see javax.swing.SwingWorker#done()
-       */
-      @Override
-      protected void done() {
-        super.done();
-        try {
-          Integer retVal = get();
-          if (retVal==JOptionPane.OK_OPTION && okAction!=null) {
-            okAction.run();
-          } else if (retVal==JOptionPane.CANCEL_OPTION && cancelAction!=null) {
-            cancelAction.run();
-          }
-        } catch (Exception e) {
-          GUITools.showErrorMessage(null, e);
-        }
-      }
-    };
-    worker.execute();
-    
-    // Wait until the dialog is painted, before continuing
-    while (worker.getState()==SwingWorker.StateValue.PENDING) {
-      try {
-        Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
-      } catch (InterruptedException e) {}
-    }
-  }
-  
-  
-  /**
-   * 
-   * @param parent
-   * @param file
-   */
-  public static void showNowReadingAccessWarning(Component parent, File file) {
-    ResourceBundle resource = ResourceManager
-    .getBundle(RESOURCE_LOCATION_FOR_LABELS);
-    JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
-      resource.getString("NO_READ_ACCESS_MESSAGE"), resource.getString(file
-        .isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
-        TOOLTIP_LINE_LENGTH), resource.getString("NO_READ_ACCESS_TITLE"),
-        JOptionPane.WARNING_MESSAGE);
-  }
-  
-  /**
-   * 
-   * @param parent
-   * @param file
-   */
-  public static void showNowWritingAccessWarning(Component parent, File file) {
-    ResourceBundle resource = ResourceManager
-    .getBundle(RESOURCE_LOCATION_FOR_LABELS);
-    JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
-      resource.getString("NO_WRITE_ACCESS_MESSAGE"), resource.getString(file
-        .isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
-        TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
-        JOptionPane.WARNING_MESSAGE);
-  }
-  
-  /**
-   * Shows the output of a process inside a textarea.
-   * Autoscrolls as the process genereates output and
-   * automatically disables the ok-button as long as
-   * the process is running and enables it, as soon
-   * as the process terminates.
-   * 
-   * Hint: Consider setting {@link ProcessBuilder#redirectErrorStream()}
-   * to true.
-   * 
-   * @param p - the process to monitor.
-   * @param caption - the caption of the window
-   * @param closeWindowAutomaticallyWhenDone - if set to
-   * true, the window will be closed, as soon as the
-   * process finished.
-   * @return JTextArea
-   */
-  public static JTextArea showProcessOutputInTextArea(final Process p, final String caption,
-    final boolean closeWindowAutomaticallyWhenDone) {
-    final JTextArea area = new JTextArea();
-    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-      @Override
-      protected Void doInBackground() throws Exception {
-        
-        // Show a JTextArea in an information message in background
-        area.setEditable(false);
-        JScrollPane pane = new JScrollPane(
-          area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        pane.setPreferredSize(new Dimension(480, 240));
-        
-        GUITools.showMessageDialogInNewThred(pane, caption);
-        
-        // Disable the ok-Button of the area
-        GUITools.disableOkButton(area);
-        
-        // Update the window, as the process is executing
-        String line;
-        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        while ((line = in.readLine()) != null) {
-          area.append(line+"\n");
-          // Scroll down
-          area.setCaretPosition(area.getDocument().getLength()); 
-        }
-        
-        // As soon as the process is done, enable the ok button again
-        Window w = getParentWindow(area);
-        if (closeWindowAutomaticallyWhenDone) {
-          if (w!=null) w.dispose();
-        } else {
-          enableOkButtonIfAllComponentsReady(w);
-        }
-        
-        return null;
-      }
-    };
-    worker.execute();
-    
-    // Wait until the dialog is painted, before continuing
-    while (worker.getState()==SwingWorker.StateValue.PENDING) {
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e) {}
-    }
-    
-    return area;
-  }
-  
-
-  /**
-   * Build a panel with cancel and ok buttons.
-   * When any button is pressed, it will trigger setVisible(false).
-   * <p>You can check if ok has been pressed with
-   * <pre> ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).isSelected()</pre>
-   * @param parentDialog the dialog to close (hide) with ok and cancel.
-   * @return
-   */
-  public static JPanel buildOkCancelButtons(final Component parentDialog) {
-    JPanel southPanel = new JPanel(new BorderLayout());
-
-    // Ok Button
-    FlowLayout fr = new FlowLayout();
-    fr.setAlignment(FlowLayout.RIGHT);
-    JPanel se = new JPanel(fr);
-    String text = GUITools.getOkButtonText();
-    final JButton ok = new JButton(text);
-    //if (this.defaultFont!=null) ok.setFont(defaultFont);
-    se.add(ok);
-    southPanel.add(se, BorderLayout.EAST);
-
-    // Cancel Button
-    FlowLayout fl = new FlowLayout();
-    fl.setAlignment(FlowLayout.LEFT);
-    JPanel sw = new JPanel(fl);
-    text = GUITools.getCancelButtonText();
-    final JButton cancel = new JButton(text);
-    //if (this.defaultFont!=null) cancel.setFont(defaultFont);
-    sw.add(cancel);
-    southPanel.add(sw, BorderLayout.WEST);
-    
-    // Set common size
-    ok.setPreferredSize(cancel.getPreferredSize()); // new Dimension(75,25)
-    
-    // Add listeners
-    ok.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent arg0) {
-        ok.setSelected(true);
-        cancel.setSelected(false);
-        if (parentDialog!=null) parentDialog.setVisible(false);
-      }      
-    });
-    cancel.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent arg0) {
-        ok.setSelected(false);
-        cancel.setSelected(true);
-        if (parentDialog!=null) parentDialog.setVisible(false);
-      }      
-    });
-    
-    return southPanel;
-  }
-  
-  
-  
-  /**
-   * Disabled or enables the given components.
-   * @param enabled
-   * @param components
-   */
-  public static void setEnabledForAll(boolean enabled, Component...components) {
-    for (Component component: components) {
-      component.setEnabled(enabled);
-    }
   }
   
   /**
@@ -1947,61 +1676,393 @@ public class GUITools {
     
     return retVal;
   }
-
-
+  
   /**
-   * Remove all elements from this container and all childs, that
-   * have a name that is equal to the given one.
-   * @param container
-   * @param nameToRemove
-   * @return true if at least one element has been removed.
+   * 
+   * @param parent
+   * @param message
    */
-  public static boolean removeAllComponentsWithName(Container container, String nameToRemove) {
-    boolean removed = false;
-    
-    for (Component c: container.getComponents()) {
-      String name = c.getName();
-      
-      if (name!=null && name.equals(nameToRemove)) {
-        container.remove(c);
-        removed=true;
-      } else if (c instanceof Container) {
-        // Recurse
-        removed|=removeAllComponentsWithName((Container) c,nameToRemove);
-      }
-    }
-    return removed;
-  }
-
-
-  /**
-   * Scrolls to the top of the given <code>scrollPanel</code>.
-   * @param scrollPanel
-   */
-  public static void scrollToTop(final JScrollPane scrollPanel) {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-      public void run() { 
-        synchronized (scrollPanel) {
-          scrollPanel.getVerticalScrollBar().setValue(0);
-          scrollPanel.getHorizontalScrollBar().setValue(0);
-        }
-      }
-    });
-  }
-
-
-  /**
-   * Add some buttons to a {@link ButtonGroup}.
-   * @param buttons
-   * @return
-   */
-  public static ButtonGroup createButtonGroup(AbstractButton... buttons) {
-    ButtonGroup group = new ButtonGroup();
-    for (AbstractButton abstractButton : buttons) {
-      group.add(abstractButton);
-    }
-    return group;
+  public static void showErrorMessage(Component parent, String message) {
+    showErrorMessage(parent, null, message);
   }
   
+  
+  /**
+   * Displays the error message on a {@link JOptionPane}.
+   * 
+   * @param exc
+   */
+  public static void showErrorMessage(Component parent, Throwable exc) {
+    String msg = getMessage(exc);
+    
+    if (logger!=null) logger.log(Level.WARNING, msg, exc);
+    ValuePair<String, Integer> messagePair = StringUtil
+    .insertLineBreaksAndCount(msg, TOOLTIP_LINE_LENGTH, "\n");
+    Object message;
+    if (messagePair.getB().intValue() > 30) {
+      JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
+      pane.setEditable(false);
+      pane.setPreferredSize(new Dimension(480, 240));
+      message = new JScrollPane(pane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    } else {
+      message = messagePair.getA();
+    }
+    Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause()
+        .getClass() : exc.getClass();
+        JOptionPane.showMessageDialog(parent, message, clazz!=null?clazz.getSimpleName():"",
+            JOptionPane.ERROR_MESSAGE);
+  }
+  
+  /**
+   * Shows an error dialog with the given message in case the exception does not
+   * provide any detailed message.
+   * 
+   * @param parent
+   * @param exc
+   * @param defaultMessage
+   */
+  public static void showErrorMessage(Component parent, Throwable exc, String defaultMessage) {
+    if ((exc == null) || (exc.getLocalizedMessage() == null)
+        || (exc.getLocalizedMessage().length() == 0)) {
+      
+      logger.log(Level.WARNING, defaultMessage, exc);
+      String name = (exc!=null?exc.getClass().getSimpleName():"Error");
+      JOptionPane.showMessageDialog(parent, defaultMessage, name, JOptionPane.ERROR_MESSAGE);
+    } else {
+      showErrorMessage(parent, exc);
+    }
+  }
+  
+  
+  /**
+   * Shows a simple message with a given title and an ok button.
+   * 
+   * @param message
+   * @param title
+   * @return
+   */
+  public static void showMessage(String message, String title) {
+    JOptionPane.showMessageDialog(null, StringUtil.toHTML(message,
+      TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
+  }
+  
+  /**
+   * Displays a message on a message dialog window, i.e., an HTML document.
+   * 
+   * @param path
+   *        the URL of an HTML document.
+   * @param title
+   *        the title of the dialog to be displayed
+   * @param owner
+   *        the parent of the dialog or null.
+   */
+  public static void showMessage(URL path, String title, Component owner) {
+    showMessage(path, title, owner, null);
+  }
+  
+  /**
+   * @param path
+   * @param title
+   * @param owner
+   * @param icon
+   */
+  public static void showMessage(URL path, String title, Component owner,
+    Icon icon) {
+    JBrowserPane browser = new JBrowserPane(path);
+    browser.removeHyperlinkListener(browser);
+    browser.addHyperlinkListener(new SystemBrowser());
+    browser.setBorder(BorderFactory.createEtchedBorder());
+    
+    try {
+      File f = new File(OpenFile.doDownload(path.toString()));
+      BufferedReader br;
+      br = new BufferedReader(new FileReader(f));
+      String line;
+      int rowCount = 0, maxLine = 0;
+      while (br.ready()) {
+        line = br.readLine();
+        if (line.length() > maxLine) {
+          maxLine = line.length();
+        }
+        rowCount++;
+      }
+      
+      if ((rowCount > 100) || (maxLine > 250)) {
+        JScrollPane scroll = new JScrollPane(browser,
+          JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        // TODO: Calculate required size using the font size.
+        scroll.setMaximumSize(new Dimension(470, 470));
+        Dimension prefered = new Dimension(450, 450);
+        browser.setPreferredSize(prefered);
+        JOptionPane.showMessageDialog(owner, scroll, title,
+          JOptionPane.INFORMATION_MESSAGE, icon);
+      } else {
+        JOptionPane.showMessageDialog(owner, browser, title,
+          JOptionPane.INFORMATION_MESSAGE, icon);
+      }
+    } catch (IOException exc) {
+      showErrorMessage(owner, exc);
+    }
+  }
+  
+
+  /**
+   * Show the component in an information message context, but does
+   * not wait until the user clicks ok, but simply invokes this
+   * message dialog in a new thread.
+   * 
+   * Simply executes {@link javax.swing.JOptionPane#showMessageDialog(Component, Object, String, int)}
+   * in a new thread.
+   * 
+   * @param component - the component to show
+   * @param caption - the caption of the dialog
+   */
+  public static void showMessageDialogInNewThred(final Component component, final String caption) {
+    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+      @Override
+      protected Void doInBackground() throws Exception {
+        JOptionPane.showMessageDialog(null, component,
+          caption, JOptionPane.INFORMATION_MESSAGE);
+        return null;
+      }
+    };
+    worker.execute();
+    
+    // Wait until the dialog is painted, before continuing
+    while (worker.getState()==SwingWorker.StateValue.PENDING) {
+      try {
+        Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
+      } catch (InterruptedException e) {}
+    }
+  }
+  
+  
+  
+  /**
+   * 
+   * @param parent
+   * @param file
+   */
+  public static void showNowReadingAccessWarning(Component parent, File file) {
+    ResourceBundle resource = ResourceManager
+    .getBundle(RESOURCE_LOCATION_FOR_LABELS);
+    JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
+      resource.getString("NO_READ_ACCESS_MESSAGE"), resource.getString(file
+        .isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
+        TOOLTIP_LINE_LENGTH), resource.getString("NO_READ_ACCESS_TITLE"),
+        JOptionPane.WARNING_MESSAGE);
+  }
+  
+  /**
+   * 
+   * @param parent
+   * @param file
+   */
+  public static void showNowWritingAccessWarning(Component parent, File file) {
+    ResourceBundle resource = ResourceManager
+    .getBundle(RESOURCE_LOCATION_FOR_LABELS);
+    JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
+      resource.getString("NO_WRITE_ACCESS_MESSAGE"), resource.getString(file
+        .isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
+        TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
+        JOptionPane.WARNING_MESSAGE);
+  }
+
+
+  /**
+   * Shows an ok/ cancel dialog in a new thread. You can specify runnables that
+   * are executed, depending if the user confirms the dialog or not.
+   * 
+   * <p>This method has the advantage to allow modifications of the dialog, because
+   * evaulation takes place in a new thread!
+   * 
+   * @param component
+   * @param caption
+   * @param okAction optional, action to be performed after dialog confirmation.
+   * @param cancelAction optional, action to be performed after dialog cancellation.
+   */
+  public static void showOkCancelDialogInNewThred(final Component component, final String caption, final Runnable okAction, final Runnable cancelAction) {
+    SwingWorker<Integer, Void> worker = new SwingWorker<Integer, Void>() {
+      @Override
+      protected Integer doInBackground() throws Exception {
+        return JOptionPane.showConfirmDialog(null, component,
+          caption, JOptionPane.OK_CANCEL_OPTION);
+      }
+      
+      /* (non-Javadoc)
+       * @see javax.swing.SwingWorker#done()
+       */
+      @Override
+      protected void done() {
+        super.done();
+        try {
+          Integer retVal = get();
+          if (retVal==JOptionPane.OK_OPTION && okAction!=null) {
+            okAction.run();
+          } else if (retVal==JOptionPane.CANCEL_OPTION && cancelAction!=null) {
+            cancelAction.run();
+          }
+        } catch (Exception e) {
+          GUITools.showErrorMessage(null, e);
+        }
+      }
+    };
+    worker.execute();
+    
+    // Wait until the dialog is painted, before continuing
+    while (worker.getState()==SwingWorker.StateValue.PENDING) {
+      try {
+        Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
+      } catch (InterruptedException e) {}
+    }
+  }
+
+
+  /**
+   * Shows the output of a process inside a textarea.
+   * Autoscrolls as the process genereates output and
+   * automatically disables the ok-button as long as
+   * the process is running and enables it, as soon
+   * as the process terminates.
+   * 
+   * Hint: Consider setting {@link ProcessBuilder#redirectErrorStream()}
+   * to true.
+   * 
+   * @param p - the process to monitor.
+   * @param caption - the caption of the window
+   * @param closeWindowAutomaticallyWhenDone - if set to
+   * true, the window will be closed, as soon as the
+   * process finished.
+   * @return JTextArea
+   */
+  public static JTextArea showProcessOutputInTextArea(final Process p, final String caption,
+    final boolean closeWindowAutomaticallyWhenDone) {
+    final JTextArea area = new JTextArea();
+    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+      @Override
+      protected Void doInBackground() throws Exception {
+        
+        // Show a JTextArea in an information message in background
+        area.setEditable(false);
+        JScrollPane pane = new JScrollPane(
+          area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pane.setPreferredSize(new Dimension(480, 240));
+        
+        GUITools.showMessageDialogInNewThred(pane, caption);
+        
+        // Disable the ok-Button of the area
+        GUITools.disableOkButton(area);
+        
+        // Update the window, as the process is executing
+        String line;
+        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        while ((line = in.readLine()) != null) {
+          area.append(line+"\n");
+          // Scroll down
+          area.setCaretPosition(area.getDocument().getLength()); 
+        }
+        
+        // As soon as the process is done, enable the ok button again
+        Window w = getParentWindow(area);
+        if (closeWindowAutomaticallyWhenDone) {
+          if (w!=null) w.dispose();
+        } else {
+          enableOkButtonIfAllComponentsReady(w);
+        }
+        
+        return null;
+      }
+    };
+    worker.execute();
+    
+    // Wait until the dialog is painted, before continuing
+    while (worker.getState()==SwingWorker.StateValue.PENDING) {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {}
+    }
+    
+    return area;
+  }
+
+
+  /**
+   * Show a Question Dialog
+   * @param parent may be null
+   * @param message question to display
+   * @param title dialog title
+   * @param optionType e.g. {@link JOptionPane#YES_NO_OPTION}
+   * @return an integer indicating the option selected by the user (e.g. {@link JOptionPane#YES_OPTION})
+   */
+  public static int showQuestionMessage(Component parent, String message, String title, int optionType) {
+    return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
+      title, optionType, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * Show a Question Dialog
+   * @param parent may be null
+   * @param message question to display
+   * @param title dialog title
+   * @param choices different choices
+   * @return chosen index or JOptionPane static ints
+   */
+  public static int showQuestionMessage(Component parent, String message,
+    String title, Object... choices) {
+    return JOptionPane.showOptionDialog(parent, StringUtil.toHTML(message,
+      TOOLTIP_LINE_LENGTH), title, JOptionPane.DEFAULT_OPTION,
+      JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+  }
+  
+  /**
+   * Shows a {@link JFileChooser} to the user, appends the selected file extension to the
+   * selected file and checks weather the selected file is writable. If the file already
+   * exists, the user will be asked if he wants to overwrite the file. If the file is not
+   * writable, an error message id displayed to the user.
+   * @param parent parent component for makeing a modal dialog. May be null.
+   * @param saveDir initial directory for the {@link JFileChooser}. May be null.
+   * @param filter {@link FileFilter} the user may choose from. May be null.
+   * @return a file selected by the user if and only if this file is writable and the user
+   * confirmed every warning. Else, null is returned. 
+   */
+  public static File showSaveFileChooser(Component parent, String saveDir, FileFilter... filter) {
+    JFileChooser fc = GUITools.createJFileChooser(saveDir, (filter==null || filter.length<1),
+      false, JFileChooser.FILES_ONLY, filter);
+    if (fc.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION) return null;
+    
+    // Get selected file and try to prepend extension
+    File f = fc.getSelectedFile();
+    
+    // Eventually append file extension
+    if (!f.getName().contains(".")) {
+      String extension = fc.getFileFilter().getDescription();
+      int pos = extension.lastIndexOf("*.");
+      if (pos>=0) {
+        extension = Utils.getWord(extension, pos+2, false);
+        // *.* => (extension.length()==0)
+        if (extension!=null && extension.length()>0) {
+          f = new File(f.getPath() + "." + extension);
+        }
+      }
+    }
+    
+    // Check if file exists and is writable
+    boolean fileExists = f.exists();
+    if (!fileExists) try {
+      f.createNewFile();
+    } catch (IOException e) {
+      GUITools.showErrorMessage(parent, e);
+      return null;
+    }
+    if (!f.canWrite() || f.isDirectory()) {
+      GUITools.showNowWritingAccessWarning(parent, f);
+    } else if (!fileExists || (fileExists && GUITools.overwriteExistingFile(parent, f))) {
+      // This is the usual case
+      return f;
+    }
+    return null;
+  }
   
 }
