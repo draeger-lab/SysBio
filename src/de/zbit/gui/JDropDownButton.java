@@ -1,6 +1,6 @@
 /*
- * $Id:  JDropDownButton.java 16:27:25 wrzodek $
- * $URL: JDropDownButton.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -119,14 +119,14 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
    * @param menu {@link JPopupMenu} to show when the button is pressed.
    */
   public JDropDownButton (String text, Icon icon, boolean selected, JPopupMenu menu) {
-    super(text,icon,selected);
+    super(text, icon, selected);
     setPopUpMenu(menu);
     
     addActionListener(this);
     if (selected) {
       showPopUpMenu();
     }
-    super.setSize(getSize().width+50, getSize().height);
+    super.setSize(getSize().width + 50, getSize().height);
   }
 
 

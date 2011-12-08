@@ -80,7 +80,7 @@ public abstract class Launcher implements Runnable, Serializable {
 
 	/**
    * Grants access to the {@link ResourceBundle} used by this {@link Launcher}
-   * in order to support a full local-specific prorgramming.
+   * in order to support a full local-specific prorgraming.
    * 
    * @return the resources
    */
@@ -191,13 +191,64 @@ public abstract class Launcher implements Runnable, Serializable {
   }
   
   /**
-   * Closes this application, this means that a call of this method will
-   * terminate the running Java Virtual Machine (JVM).
+   * Calls #exit(java.awt.Window, boolean) with <code>null</code> as first
+   * argument. The second is taken from {@link #isTerminateJVMwhenDone()}.
    */
 	public void exit() {
-		System.exit(0);
+    exit(null, isTerminateJVMwhenDone());
+  }
+	
+  /**
+   * Calls {@link #exit(java.awt.Window, boolean)} with the given window as
+   * first argument, the second argument is set to <code>true</code>.
+   * 
+   * @param window
+   */
+	public void exit(java.awt.Window window) {
+	  exit(window, true);
 	}
   
+  /**
+   * Saves all interactive actions and closes this application (if
+   * {@link #terminateJVMwhenDone} is set to <code>true</code>), this means that
+   * a call of this method will terminate the running Java Virtual Machine
+   * (JVM).
+   * 
+   * @param window
+   *        the parent window that has just been closed.
+   * @param terminateJVMwhenDone
+   *        whether or not to terminate the JVM (and making all interactive
+   *        options persistent).
+   */
+  public void exit(java.awt.Window window, boolean terminateJVMwhenDone) {
+    if (terminateJVMwhenDone) {
+      StringBuilder exception = new StringBuilder();
+      for (Class<? extends KeyProvider> clazz : getInteractiveOptions()) {
+        SBPreferences prefs = SBPreferences.getPreferencesFor(clazz);
+        try {
+          prefs.flush();
+        } catch (Exception exc) {
+          exception.append(exc.getLocalizedMessage());
+          exception.append('\n');
+        }
+      }
+      if (exception.length() > 0) {
+        boolean showExc = false;
+        if (showsGUI()) {
+          try {
+            GUITools.showErrorMessage(window, exception.toString());
+          } catch (java.awt.HeadlessException exc) {
+            showExc = true;
+          }
+        }
+        if (showExc) {
+          logger.fine('\n' + exception.toString());
+        }
+      }
+      System.exit(0);
+    }
+  }
+	
   /**
    * 
    * @return
@@ -218,7 +269,7 @@ public abstract class Launcher implements Runnable, Serializable {
 	public String getAppName() {
 	  return getClass().getSimpleName();
 	}
-	
+  
   /**
 	 * 
 	 * @return a {@link List} of {@link KeyProvider} {@link Class} objects that
@@ -236,12 +287,14 @@ public abstract class Launcher implements Runnable, Serializable {
   public SBProperties getCommandLineArgs() {
     return props;
   }
-  
+
   /**
    * These are options that can be used to manipulate the behavior of a program
    * while the program is already running. For instance, these options may be
    * called in a graphical user interface or in the command line mode where the
-   * user may interactively select some options.
+   * user may interactively select some options. The {@link #exit()} method of
+   * this {@link Launcher} will also try to make all key-value pairs related to
+   * these interactive options persistent right before closing the JVM.
    * 
    * @return
    */
@@ -264,7 +317,7 @@ public abstract class Launcher implements Runnable, Serializable {
  */
 public abstract String[] getLogPackages();
 
-  /**
+	/**
 	 * Gives the location where the license of this program is documented. This
 	 * could be, for instance, <a
 	 * href="http://www.gnu.org/copyleft/gpl.html">http:
@@ -277,7 +330,7 @@ public abstract String[] getLogPackages();
 	 * @return A link to the license file of this program.
 	 */
 	public abstract URL getURLlicenseFile();
-
+	
 	/**
 	 * 
 	 * @return The {@link URL} where the information about online updates can be
@@ -306,7 +359,7 @@ public abstract String[] getLogPackages();
 	 * @return The year in which the first code for this program was written.
 	 */
 	public abstract short getYearWhenProjectWasStarted();
-	
+
 	/**
 	 * This method initializes and starts the graphical user interface if
 	 * possible. You can override this method in order to change its behavior.
@@ -318,7 +371,7 @@ public abstract String[] getLogPackages();
 		if (ui != null) {
 			if (terminateJVMwhenDone) {
         ui.addWindowListener(EventHandler.create(
-          java.awt.event.WindowListener.class, this, "exit", null,
+          java.awt.event.WindowListener.class, this, "exit", "window",
           "windowClosed"));
 				setTerminateJVMwhenDone(false);
 			}
@@ -340,7 +393,7 @@ public abstract String[] getLogPackages();
 			}
 		}
 	}
-
+	
 	/* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
@@ -390,12 +443,10 @@ public abstract String[] getLogPackages();
 			getAppName()));
 		commandLineMode(appConf);
 		GUITools.hideSplashScreen();
-		if (terminateJVMwhenDone) {
-      System.exit(0);
-    }
+		exit();
 	}
-	
-	/**
+
+  /**
    * 
    * @param args
    * @return
@@ -441,7 +492,7 @@ public abstract String[] getLogPackages();
     System.setProperty("app.version", getVersionNumber());
         
     // Should we start the GUI?
-    if ((props.size() < 1) || props.getBooleanProperty(GUIOptions.GUI)) {
+    if (showsGUI()) {
     	javax.swing.SwingUtilities.invokeLater(new Runnable() {
         /*
          * (non-Javadoc)
@@ -458,9 +509,7 @@ public abstract String[] getLogPackages();
             }
             launchCommandLineMode(appCnf);
           }
-          if (terminateJVMwhenDone) {
-            System.exit(0);
-          }
+          exit();
         }
       });
     } else {
@@ -473,6 +522,16 @@ public abstract String[] getLogPackages();
    */
   public void setTerminateJVMwhenDone(boolean terminateJVMwhenDone) {
     this.terminateJVMwhenDone = terminateJVMwhenDone;
+  }
+
+  /**
+   * Decides whether or not to show a graphical user interface.
+   * 
+   * @return <code>true</code> if a graphical user interface should be shown,
+   *         <code>false</code> otherwise.
+   */
+  public boolean showsGUI() {
+    return (props.size() < 1) || props.getBooleanProperty(GUIOptions.GUI);
   }
 	
 	/* (non-Javadoc)
