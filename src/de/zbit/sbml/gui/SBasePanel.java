@@ -342,7 +342,7 @@ public class SBasePanel extends JPanel {
 			JPanel preview = new JPanel(new BorderLayout());
 			//added
 			if (isRendererAvailable()) {
-				preview.add(this.renderer.getEquation(laTeXpreview.toString()),
+				preview.add(this.renderer.renderEquation(laTeXpreview.toString()),
 					BorderLayout.CENTER);
 			}
 			preview.setBackground(Color.WHITE);
@@ -856,7 +856,7 @@ public class SBasePanel extends JPanel {
 				} catch (SBMLException e) {
 					l = "invalid";
 				}
-				Component eqn = this.renderer.setBorder(l,BorderFactory.createLoweredBevelBorder());
+				Component eqn = this.renderer.renderEquation(l,BorderFactory.createLoweredBevelBorder());
 				p.add(eqn);
 			}
 

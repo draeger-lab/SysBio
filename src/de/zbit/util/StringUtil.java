@@ -1296,45 +1296,4 @@ public class StringUtil {
 		return sb.toString();
 	}
   
-  /**
-	 * Creates a new String, in which all special German umlat characters within
-	 * the given String are replaced with corresponding HTML codes and returns the
-	 * result.
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public static String toUnicode(String s) {
-		StringBuffer html = new StringBuffer();
-		for (int i = 0; i < s.length(); i++) {
-			switch (s.charAt(i)) {
-			case 'ä':
-				html.append("\u00e4");
-				break;
-			case 'ö':
-				html.append("\u00f6");
-				break;
-			case 'ü':
-				html.append("\u00fc");
-				break;
-			case 'ß':
-				html.append("\u00df");
-				break;
-			case 'Ä':
-				html.append("\u00c4");
-				break;
-			case 'Ö':
-				html.append("\u00d6");
-				break;
-			case 'Ü':
-				html.append("\u00dc");
-				break;
-			default:
-				html.append(s.charAt(i));
-				break;
-			}
-		}
-		return html.toString();
-	}
-  
 }
