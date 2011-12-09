@@ -28,12 +28,35 @@ import de.zbit.util.prefs.Option;
  * A interface for the latex renderer.
  * 
  * @author Sebastian Nagel
- * @since 1.4
+ * @since 1.1
  * @version $Rev: 643 $
  */
 public interface Renderer {
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public Class<? extends KeyProvider> getLaTeXOptions();
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public Option<Boolean> printNamesIfAvailable();
-	public Component getEquation(String equation);
-	public Component setBorder(String equation, Border border);
+	
+	/**
+	 * 
+	 * @param equation
+	 * @return
+	 */
+	public Component renderEquation(String equation);
+	
+	/**
+	 * 
+	 * @param equation
+	 * @param border
+	 * @return
+	 */
+	public Component renderEquation(String equation, Border border);
 }
