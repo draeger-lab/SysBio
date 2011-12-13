@@ -1992,5 +1992,19 @@ public class Utils {
     return l;
   }
 
+  /**
+   * converts a collection to an ArrayList
+   * 
+   * @param coll
+   * @return
+   */
+  public static <T extends Object> List<T> getListOfCollection(Collection<T> coll) {
+    List<T> list = new ArrayList<T>();
+    for (T o : coll) {
+      list.add(o);
+    }
+    return list;
+  }
+
   
 }
