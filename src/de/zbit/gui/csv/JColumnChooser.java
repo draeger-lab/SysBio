@@ -26,10 +26,12 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import de.zbit.gui.JLabeledComponent;
+import de.zbit.gui.LayoutHelper;
 
 
 /**
@@ -135,6 +137,31 @@ public class JColumnChooser extends JLabeledComponent {
   }
   
 	
+  /**
+   * 
+   * @param lh
+   * @param jc
+   * @param addSpace
+   */
+  public static void addSelectorsToLayout(LayoutHelper lh, JLabeledComponent jc, boolean addSpace) {
+    int x = 0;
+    lh.ensurePointerIsAtBeginningOfARow();
+    
+    lh.add(jc.getLabel(), (x++), lh.getRow(), 1, 1, 0d, 0d);
+    lh.add(new JPanel(), (x++), lh.getRow(), 1, 1, 0d, 0d);
+    if (jc instanceof JColumnChooser) {
+      lh.add(jc.getColumnChooser(), (x++), ((JColumnChooser) jc).getUsePreview()?lh.getRow() : 1, 1, 0d, 0d);
+    } else {
+      lh.add(jc.getColumnChooser(), (x++), 1, 1, 0d, 0d);
+    }
+    if (jc instanceof JColumnChooser && ((JColumnChooser) jc).getUsePreview()) {
+      lh.add(new JPanel(), (x++), lh.getRow(), 1, 1, 0d, 0d);
+      lh.add(((JColumnChooser) jc).getPreview(), (x++), 1, 1, 0d, 0d);
+    }
+    if (addSpace) {
+      lh.add(new JPanel(), 0, (x++), 1, 0d, 0d);
+    }
+  }
 
   
   /**
