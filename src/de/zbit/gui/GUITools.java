@@ -1825,9 +1825,11 @@ public class GUITools {
    * @param component - the component to show
    * @param caption - the caption of the dialog
    */
-  public static void showMessageDialogInNewThred(final Component component, final String caption) {
+  public static void showMessageDialogInNewThread(final Component component, final String caption) {
     SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-      @Override
+      /* (non-Javadoc)
+       * @see javax.swing.SwingWorker#doInBackground()
+       */
       protected Void doInBackground() throws Exception {
         JOptionPane.showMessageDialog(null, component,
           caption, JOptionPane.INFORMATION_MESSAGE);
@@ -1837,10 +1839,12 @@ public class GUITools {
     worker.execute();
     
     // Wait until the dialog is painted, before continuing
-    while (worker.getState()==SwingWorker.StateValue.PENDING) {
+    while (worker.getState() == SwingWorker.StateValue.PENDING) {
       try {
         Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
-      } catch (InterruptedException e) {}
+      } catch (InterruptedException exc) {
+        logger.finest(exc.getLocalizedMessage());
+      }
     }
   }
   
@@ -1889,9 +1893,11 @@ public class GUITools {
    * @param okAction optional, action to be performed after dialog confirmation.
    * @param cancelAction optional, action to be performed after dialog cancellation.
    */
-  public static void showOkCancelDialogInNewThred(final Component component, final String caption, final Runnable okAction, final Runnable cancelAction) {
+  public static void showOkCancelDialogInNewThread(final Component component, final String caption, final Runnable okAction, final Runnable cancelAction) {
     SwingWorker<Integer, Void> worker = new SwingWorker<Integer, Void>() {
-      @Override
+      /* (non-Javadoc)
+       * @see javax.swing.SwingWorker#doInBackground()
+       */
       protected Integer doInBackground() throws Exception {
         return JOptionPane.showConfirmDialog(null, component,
           caption, JOptionPane.OK_CANCEL_OPTION);
@@ -1905,23 +1911,25 @@ public class GUITools {
         super.done();
         try {
           Integer retVal = get();
-          if (retVal==JOptionPane.OK_OPTION && okAction!=null) {
+          if ((retVal == JOptionPane.OK_OPTION) && (okAction != null)) {
             okAction.run();
-          } else if (retVal==JOptionPane.CANCEL_OPTION && cancelAction!=null) {
+          } else if ((retVal == JOptionPane.CANCEL_OPTION) && (cancelAction != null)) {
             cancelAction.run();
           }
-        } catch (Exception e) {
-          GUITools.showErrorMessage(null, e);
+        } catch (Exception exc) {
+          GUITools.showErrorMessage(null, exc);
         }
       }
     };
     worker.execute();
     
     // Wait until the dialog is painted, before continuing
-    while (worker.getState()==SwingWorker.StateValue.PENDING) {
+    while (worker.getState() == SwingWorker.StateValue.PENDING) {
       try {
         Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
-      } catch (InterruptedException e) {}
+      } catch (InterruptedException exc) {
+        logger.finest(exc.getLocalizedMessage());
+      }
     }
   }
 
@@ -1956,7 +1964,7 @@ public class GUITools {
           area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.setPreferredSize(new Dimension(480, 240));
         
-        GUITools.showMessageDialogInNewThred(pane, caption);
+        GUITools.showMessageDialogInNewThread(pane, caption);
         
         // Disable the ok-Button of the area
         GUITools.disableOkButton(area);

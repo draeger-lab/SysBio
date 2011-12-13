@@ -152,15 +152,21 @@ public class FileTools {
    */
   public static File searchExecutableFile(String[] paths, String filename) {
     boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
-    if (isWindows) filename = filename.toLowerCase();
+    if (isWindows) {
+      filename = filename.toLowerCase();
+    }
       
     for (String path: paths) {
       String[] files = new File(path).list();
-      if (files==null) continue; // In webstart sometimes null
+      if (files == null) {
+        continue; // In webstart sometimes null
+      }
       
-      for (String file:files) {
+      for (String file : files) {
         File fullFile = new File(Utils.ensureSlash(path) + file);
-        if (fullFile.isDirectory()) continue;
+        if (fullFile.isDirectory()) {
+          continue;
+        }
         
         /*
          * On Windows: compare names and look if it has an executable extension
@@ -168,7 +174,8 @@ public class FileTools {
         if (isWindows) {
           file = file.toLowerCase();
           if (file.endsWith(".com") ||  file.endsWith(".exe") || file.endsWith(".bat")) {
-            if (file.startsWith(filename) && file.length() == filename.length()+4) {
+            if (file.startsWith(filename)
+                && (file.length() == filename.length() + 4)) {
               return fullFile;
             }
           }
@@ -176,14 +183,12 @@ public class FileTools {
           /*
            * On Linux / Mac / other, don't add an extension, simply look if it is executable.
            */
-          if (file.equals(filename) && fullFile.canExecute()) return fullFile;
+          if (file.equals(filename) && fullFile.canExecute()) {
+            return fullFile;
+          }
         }
-        
-        
       }
-      
     }
-    
     return null;
   }
   
@@ -309,7 +314,7 @@ public class FileTools {
     
     // Get paths from envivronment variable
     String path = System.getenv("PATH");
-    String[] paths = path==null?new String[0]:
+    String[] paths = path == null ? new String[0]:
        path.split(Pattern.quote(File.pathSeparator));
     
     // Append the current working directory
