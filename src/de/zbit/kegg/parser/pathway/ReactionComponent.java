@@ -46,6 +46,11 @@ public class ReactionComponent implements Cloneable {
   Integer id=null;
   
   /**
+   * Stoichiometry (count) of this reaction component in this reaction 
+   */
+  Integer stoichiometry=null;
+  
+  /**
    * 
    * @param name
    */
@@ -141,8 +146,21 @@ public class ReactionComponent implements Cloneable {
   public boolean hasName() {
     return (this.name != null && this.name.length()>0);
   }
-
   
+  /**
+   * @return the stoichiometry (defaults to <code>NULL</code>, if not set manually by calling {@link #setStoichiometry(Integer)})
+   */
+  public Integer getStoichiometry() {
+    return stoichiometry;
+  }
+
+  /**
+   * @param stoichiometry the stoichiometry to set
+   */
+  public void setStoichiometry(Integer stoichiometry) {
+    this.stoichiometry = stoichiometry;
+  }
+
   /* (non-Javadoc)
    * @see java.lang.Object#clone()
    */

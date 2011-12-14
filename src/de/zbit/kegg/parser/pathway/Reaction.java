@@ -258,6 +258,29 @@ public class Reaction {
   }
   
   /**
+   * Returns the reactant, but only if it is a substrate or product!
+   * @param reactantKeggID the name of the reactant, e.g. "cpd:C05922".
+   * @param isSubstrate <code>TRUE</code> to only return the
+   * reactant if it occurs as substrate. <code>FALSE</code> to only return the
+   * reactant if it occurs as product.  
+   * @return
+   * @see #getReactant(String) the same method without boolean attribute
+   * to return a reactant, regardless if it occurs as substrate or product.
+   */
+  public ReactionComponent getReactant(String reactantKeggID, boolean isSubstrate) {
+    if (isSubstrate) {
+      for (ReactionComponent rc: getSubstrates()) {
+        if (rc.getName().equalsIgnoreCase(reactantKeggID)) return rc;
+      }
+    } else { // isProduct
+      for (ReactionComponent rc: getProducts()) {
+        if (rc.getName().equalsIgnoreCase(reactantKeggID)) return rc;
+      }
+    }
+    return null;
+  }
+  
+  /**
    * WARNING: this erases all substrates and products of this
    * reaction.
    */
@@ -302,6 +325,7 @@ public class Reaction {
 
   /**
    * @return an equation like "C00183 + C00026 <=> C00141 + C00025"
+   * <br/>or "16 C00002 + 16 C00001 + 8 C00138 <=> 8 C05359 + 16 C00009 + 16 C00008 + 8 C00139"
    */
   public String getEquation() {
     StringBuilder b = new StringBuilder();

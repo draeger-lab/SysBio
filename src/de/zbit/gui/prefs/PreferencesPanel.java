@@ -885,7 +885,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           properties.put(k, preferences.get(k));
           properties.getDefaults().put(k, preferences.getDefault(k));
         } else {
-          log.fine(String.format("Rejecting key: %s", key));
+          log.finer(String.format("Rejecting key: %s", key));
         }
       }
     }
