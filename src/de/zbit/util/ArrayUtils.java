@@ -89,6 +89,31 @@ public class ArrayUtils {
   }
   
   /**
+   * Checks if any element from <code>arr</code>toString()
+   * is containe in <code>s</code>.
+   * @param <T>
+   * @param arr
+   * @param s
+   * @param ignoreCase
+   * @return
+   */
+  public static <T> int isContainedIn(T[] arr, String s, boolean ignoreCase) {
+    if (arr==null) return s==null?-2:-1;
+    if (s==null) return -1;
+    if (ignoreCase) s = s.toLowerCase();
+    
+    String s2;
+    int index=0;
+    for (T a: arr) {
+      s2 = a.toString();
+      if (ignoreCase) s2 = s2.toLowerCase();
+      if (s.contains(s2)) return index;
+      index++;
+    }
+    return -1;
+  }
+  
+  /**
    * @param multiSourceColumn
    * @param i
    * @return

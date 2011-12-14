@@ -23,7 +23,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.zbit.kegg.parser.pathway.Entry;
@@ -140,7 +142,7 @@ public class KeggTools {
               }
               
               // Look if we need to add new components
-              ReactionComponent rc=r.getReactant(reactant);
+              ReactionComponent rc = r.getReactant(reactant, isSubstrate);
               if (rc==null) {
                 rc = nameAndIdOfReactants.get(reactant);
                 if (rc==null) rc = new ReactionComponent(reactant);
@@ -528,5 +530,73 @@ public class KeggTools {
     }
   }
 
+  /**
+   * Parse the stoichiometric coefficients from the reaction
+   * equations and set them on the {@link ReactionComponent}s.
+   * <p>Example:
+   * <pre>16 C00002 + 16 C00001 + 8 C00138 <=> 8 C05359 + 16 C00009 + 16 C00008 + 8 C00139</pre>
+   * 
+   * @param p
+   * @param manager
+   */
+  public static void parseStoichiometryFromEquations(Pathway p,
+    KeggInfoManagement manager) {
+    // CRUCIAL: reactions are divided by " + ", not "+". Consider, e.g. rn:R04241:
+    // "C00002 + C03541(n) + C00025 <=> C00008 + C00009 + C03541(n+1)"!    
+    final String reactantSeparator = " + ";
+    
+    for (Reaction r : p.getReactions()) {
+      String[] reactionIDs = r.getName().trim().split(" ");
+      
+      for (String ko_id : reactionIDs) {        
+        // Get the complete reaction from Kegg
+        KeggInfos infos = KeggInfos.get(ko_id, manager);
+        if (infos.queryWasSuccessfull()) {
+          
+          // Add missing reactants
+          if (infos.getEquation()!=null) {
+            String eq = infos.getEquation();
+            int dividerPos = eq.indexOf("<=>");
+            eq = eq.replace("<=>", reactantSeparator);
+            
+            int curPos = eq.indexOf(reactantSeparator);
+            int lastPos = 0;
+            while (lastPos>=0) {
+              String partial = eq.substring(lastPos, curPos>=0?curPos:eq.length()).trim();
+              boolean isSubstrate = (lastPos<dividerPos);
+              String reactant = removeReactantPrefixAndSuffix(partial);
+              
+              // Compile a pattern to match the stoichiometry (in group 3).
+              Pattern stoi = Pattern.compile(".*?(\\W)*(\\s)*(\\d+)\\s" + reactant + ".*");
+              Matcher m = stoi.matcher(partial);
+              if (m.find()) {
+                
+                try {
+                  if (!reactant.contains(":")) {
+                    reactant = KeggInfos.appendPrefix(reactant);
+                  }
+                  
+                  // Look if we need to add new components
+                  ReactionComponent reactantInstance=r.getReactant(reactant, isSubstrate);
+                  if (reactantInstance!=null) {
+                    reactantInstance.setStoichiometry(Integer.parseInt(m.group(3)));
+                  } else {
+                    log.log(Level.WARNING, "Could not get reaction component for " + reactant);
+                  }
+                } catch (NumberFormatException e) {
+                  log.log(Level.WARNING, "Could not parse stoichometry from " + partial, e);
+                }
+              }
+              
+              lastPos = curPos<0?curPos:curPos+reactantSeparator.length();
+              curPos = eq.indexOf(" + ", curPos+reactantSeparator.length());
+            }
+          }
+        }
+        
+      }
+      
+    }
+  }
   
 }

@@ -80,33 +80,7 @@ public class KeggAdaptor {
     KeggAdaptor adap = new KeggAdaptor();
     
 
-    String query = "mghv-miR-M1-1";
-    adap.find("genes "+query);
-    
-    // Query should be a standard gene symbol
-    ArrayList<String> kgIds = adap.getKEGGIdentifierForAGeneSymbol(query, "hsa");
-    System.out.println("========= GeneSymbol 2 KGId DONE =========");
-    if(true) return;
-
-    adap.get_linkdb_by_entry("path:hsa05012", "pathway", 0, 300);
-    if(true) return;
-    
-    adap.find("genes ENSG00000152413");
-    
-    // Other way round
-    adap.getIdentifier("mcc:709774");
-    System.out.println("========= KGId 2 GeneSymbol DONE =========");
-    
-    if (kgIds!=null && kgIds.size()>0)
-      adap.getBestNeighborsByGene(kgIds.get(0));
-    else
-      System.out.println("No Kegg IDs found for "+query+".");
-    System.out.println("========= Orthologous neighbors for KGId DONE =========");
-    if (true) return;
-    
-    adap.getPathways("hsa");
-    
-    String ret = adap.get("rn:R02750");
+    String ret = adap.get("rn:R02189");
     System.out.println("---\n"+KeggAdaptor.extractInfo(ret, "PATHWAY")+"\n---");
     
     String ttt = adap.get("path:hsa04010");
