@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.zbit.kegg.gui.KGMLSelectAndDownload;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
@@ -122,6 +123,7 @@ public class KeggTools {
           if (infos.getEquation()!=null) {
             String eq = infos.getEquation();
             int dividerPos = eq.indexOf("<=>");
+            boolean isEquationReversed = isEquationReversed(r, eq);
             eq = eq.replace("<=>", reactantSeparator);
             
             int curPos = eq.indexOf(reactantSeparator);
@@ -129,6 +131,7 @@ public class KeggTools {
             while (lastPos>=0) {
               String reactant = eq.substring(lastPos, curPos>=0?curPos:eq.length()).trim();
               boolean isSubstrate = (lastPos<dividerPos);
+              if (isEquationReversed) isSubstrate = !isSubstrate;
               reactant = removeReactantPrefixAndSuffix(reactant);
               
               // Check entry type and prepend kegg prefix
@@ -209,6 +212,37 @@ public class KeggTools {
       p.addReaction(it.next());
     }
     
+  }
+
+  /**
+   * Check if the substrates, defined in the reaction are really on the left side,
+   * or if they are swapped.
+   * @param reaction
+   * @param equation
+   * @return <code>TRUE</code> if substrates are on the RIGHT side of the equation.
+   */
+  public static boolean isEquationReversed(Reaction reaction, String equation) {
+    int dividerPos = equation.indexOf("<=>");
+    
+    int[] subsSides = new int[2];
+    int[] prodSides = new int[2];
+    for (ReactionComponent rc : reaction.getSubstrates()) {
+      String name = KeggInfos.suffix(rc.getName());
+      int pos = -1;
+      while ((pos = equation.indexOf(name, ++pos))>=0) {
+        subsSides[pos<dividerPos?0:1]++;
+      }
+    }
+    
+    for (ReactionComponent rc : reaction.getProducts()) {
+      String name = KeggInfos.suffix(rc.getName());
+      int pos = -1;
+      while ((pos = equation.indexOf(name, ++pos))>=0) {
+        prodSides[pos<dividerPos?0:1]++;
+      }
+    }
+    
+    return (subsSides[0]+prodSides[1])<(subsSides[1]+prodSides[0]);
   }
 
   /**
@@ -557,6 +591,7 @@ public class KeggTools {
           if (infos.getEquation()!=null) {
             String eq = infos.getEquation();
             int dividerPos = eq.indexOf("<=>");
+            boolean isEquationReversed = isEquationReversed(r, eq);
             eq = eq.replace("<=>", reactantSeparator);
             
             int curPos = eq.indexOf(reactantSeparator);
@@ -564,6 +599,7 @@ public class KeggTools {
             while (lastPos>=0) {
               String partial = eq.substring(lastPos, curPos>=0?curPos:eq.length()).trim();
               boolean isSubstrate = (lastPos<dividerPos);
+              if (isEquationReversed) isSubstrate = !isSubstrate;
               String reactant = removeReactantPrefixAndSuffix(partial);
               
               // Compile a pattern to match the stoichiometry (in group 3).

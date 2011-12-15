@@ -138,7 +138,7 @@ public final class AtomBalanceCheck {
       }
       
       // Defects
-      if (defects.size()>1) {
+      if (defects.size()!=0) {
         addHTMLtableRow(sb, "Defects", atoms, defects);
       }
       
