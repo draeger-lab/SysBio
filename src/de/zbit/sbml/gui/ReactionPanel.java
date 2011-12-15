@@ -134,6 +134,9 @@ public class ReactionPanel extends JPanel {
 		Graphics g) {
 		int x2 = (int) (x + length), y2, width = fontSize / 3, height = fontSize / 4;
 		
+		// Ensure a minimum arrow length
+		length = Math.max(length, width*2);
+		
 		if (reaction.isReversible()) {
 			y2 = y - width;
 			int y3 = y2 + height;
