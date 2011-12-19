@@ -22,7 +22,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
