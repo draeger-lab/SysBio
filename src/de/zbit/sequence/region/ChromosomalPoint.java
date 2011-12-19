@@ -79,7 +79,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.data.Chromosome#setChromosome(java.lang.String)
    */
-  @Override
   public void setChromosome(String chromosome) {
     setChromosome(ChromosomeTools.getChromosomeByteRepresentation(chromosome));
   }
@@ -87,7 +86,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.data.Chromosome#setChromosome(byte)
    */
-  @Override
   public void setChromosome(byte chromosome) {
     this.chr = chromosome;
   }
@@ -95,7 +93,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.data.Chromosome#getChromosome()
    */
-  @Override
   public String getChromosome() {
     return ChromosomeTools.getChromosomeStringRepresentation(chr);
   }
@@ -103,7 +100,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.sequence.region.Region#getMiddle()
    */
-  @Override
   public int getMiddle() {
     return start;
   }
@@ -111,7 +107,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.data.Chromosome#getChromosomeAsByteRepresentation()
    */
-  @Override
   public byte getChromosomeAsByteRepresentation() {
     return chr;
   }
@@ -119,7 +114,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.data.Region#getStart()
    */
-  @Override
   public int getStart() {
     return start;
   }
@@ -127,7 +121,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.data.Region#setStart(int)
    */
-  @Override
   public void setStart(int probeStart) {
     start = probeStart;
   }
@@ -135,7 +128,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.data.Region#getEnd()
    */
-  @Override
   public int getEnd() {
     return DEFAULT_START;
   }
@@ -143,7 +135,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.data.Region#setEnd(int)
    */
-  @Override
   public void setEnd(int end) throws Exception {
     throw new Exception("Can not set an end position for a point.");
   }
@@ -151,7 +142,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see de.zbit.data.Region#intersects(de.zbit.data.Region)
    */
-  @Override
   public boolean intersects(Region other) {
     int start = getStart(); int end = getEnd();
     int start2 = other.getStart(); int end2 = other.getEnd();
@@ -162,7 +152,6 @@ public class ChromosomalPoint implements Region, Serializable, Cloneable, Compar
   /* (non-Javadoc)
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  @Override
   public int compareTo(Region o) {
     return SimpleRegion.getComparator().compare(this, o);
   }
