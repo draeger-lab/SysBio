@@ -17,12 +17,9 @@
 
 package de.zbit.sbml.gui;
 
-import java.awt.Component;
-
-import javax.swing.border.Border;
+import javax.swing.JComponent;
 
 import de.zbit.util.prefs.KeyProvider;
-import de.zbit.util.prefs.Option;
 
 /**
  * A interface for the latex renderer.
@@ -37,26 +34,12 @@ public interface Renderer {
 	 * 
 	 * @return
 	 */
-	public Class<? extends KeyProvider> getLaTeXOptions();
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Option<Boolean> printNamesIfAvailable();
+	public boolean printNamesIfAvailable();
 	
 	/**
 	 * 
 	 * @param equation
 	 * @return
 	 */
-	public Component renderEquation(String equation);
-	
-	/**
-	 * 
-	 * @param equation
-	 * @param border
-	 * @return
-	 */
-	public Component renderEquation(String equation, Border border);
+	public JComponent renderEquation(String equation);
 }

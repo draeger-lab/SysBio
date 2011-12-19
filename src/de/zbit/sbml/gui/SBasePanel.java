@@ -18,7 +18,6 @@ package de.zbit.sbml.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -31,6 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -137,6 +137,14 @@ public class SBasePanel extends JPanel {
   /**
    * 
    * @param sbase
+   */
+  public SBasePanel(SBase sbase) {
+  	this(sbase, true);
+  }
+  
+  /**
+   * 
+   * @param sbase
    * @param namesIfAvailable
    */
   public SBasePanel(SBase sbase, boolean namesIfAvailable) {
@@ -155,10 +163,10 @@ public class SBasePanel extends JPanel {
     GridBagLayout gbl = new GridBagLayout();
     setLayout(gbl);
     //added
-    if (isRendererAvailable()) {
-	    prefs = SBPreferences.getPreferencesFor(this.renderer.getLaTeXOptions());
-		latex = new LaTeXCompiler(prefs.getBoolean(this.renderer.printNamesIfAvailable()));
-    }
+		if (isRendererAvailable()) {
+			latex = new LaTeXCompiler(prefs.getBoolean(this.renderer
+					.printNamesIfAvailable()));
+		}
     lh = new LayoutHelper(this, gbl);
     editable = false;
     row = -1;
@@ -855,7 +863,8 @@ public class SBasePanel extends JPanel {
 				} catch (SBMLException e) {
 					l = "invalid";
 				}
-				Component eqn = this.renderer.renderEquation(l,BorderFactory.createLoweredBevelBorder());
+				JComponent eqn = this.renderer.renderEquation(l);
+				eqn.setBorder(BorderFactory.createLoweredBevelBorder());
 				p.add(eqn);
 			}
 
