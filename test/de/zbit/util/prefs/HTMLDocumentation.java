@@ -16,7 +16,10 @@
  */
 package de.zbit.util.prefs;
 
-import de.zbit.gui.GUIOptions;
+import java.util.List;
+
+import de.zbit.Launcher;
+
 
 /**
  * @author Andreas Dr&auml;ger
@@ -27,9 +30,38 @@ public class HTMLDocumentation {
 	
 	/**
 	 * @param args
+	 * @throws ClassNotFoundException 
 	 */
-	public static void main(String[] args) {
-		System.out.println(KeyProvider.Tools.createDocumentation(GUIOptions.class));
-	}
+  @SuppressWarnings("unchecked")
+  public static void main(String[] args) throws ClassNotFoundException {
+    Class<?> providers[] = new Class<?>[args.length];
+    for (int i = 0; i < args.length; i++) {
+      providers[i] = Class.forName(args[i]);
+    }
+    writeDocumentation((Class<? extends KeyProvider>[]) providers);
+  }
+  
+  /**
+   * 
+   * @param launcher
+   */
+  @SuppressWarnings("unchecked")
+  public static void writeDocumentation(Launcher launcher) {
+    List<Class<? extends KeyProvider>> opts = launcher.getCmdLineOptions();
+    Class<?> providers[] = new Class<?>[opts.size()];
+    for (int i = 0; i < opts.size(); i++) {
+      providers[i] = opts.get(i);
+    }
+    writeDocumentation((Class<? extends KeyProvider>[]) providers);
+  }
+  
+  /**
+   * 
+   * @param providers
+   */
+  public static void writeDocumentation(
+    Class<? extends KeyProvider>... providers) {
+    System.out.println(KeyProvider.Tools.createDocumentation(providers));
+  }
 	
 }

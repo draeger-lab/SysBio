@@ -21,10 +21,13 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.sbml.jsbml.ListOf;
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.Reaction;
+import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
@@ -56,6 +59,19 @@ public class ReactionPanel extends JPanel {
 	 * prefs.getBoolean(LaTeXOptions.PRINT_NAMES_IF_AVAILABLE)
 	 */
 	private boolean namesIfAvailalbe;
+	
+	
+	public static void main(String args[]) {
+	  SBMLDocument doc = new SBMLDocument(2, 4);
+	  Model model = doc.createModel("test");
+	  Species s1 = model.createSpecies("s1", model.createCompartment("c1"));
+	  Species s2 = model.createSpecies("s2", s1.getCompartmentInstance());
+	  Reaction r1 = model.createReaction("r1");
+	  r1.createReactant(s1);
+	  r1.createProduct(s2);
+	  r1.setReversible(false);
+	  JOptionPane.showMessageDialog(null, new ReactionPanel(r1, true));
+	}
 	
 	/**
 	 * 
@@ -132,10 +148,13 @@ public class ReactionPanel extends JPanel {
 	 */
 	private void drawReactionArrow(int x, int y, double length, int fontSize,
 		Graphics g) {
-		int x2 = (int) (x + length), y2, width = fontSize / 3, height = fontSize / 4;
-		
-		// Ensure a minimum arrow length
-		length = Math.max(length, width*2);
+	  
+	  int width = fontSize / 3;
+	  
+	  // Ensure a minimum arrow length
+    length = Math.max(length, width * 3);
+    
+		int x2 = (int) (x + length), y2, height = fontSize / 4;
 		
 		if (reaction.isReversible()) {
 			y2 = y - width;
@@ -163,9 +182,7 @@ public class ReactionPanel extends JPanel {
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see javax.swing.JComponent#getPreferredSize()
 	 */
 	@Override
@@ -173,9 +190,7 @@ public class ReactionPanel extends JPanel {
 		return new Dimension(preferredWith, preferredHeight);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
 	 */
 	@Override
