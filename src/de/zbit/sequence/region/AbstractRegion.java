@@ -39,7 +39,6 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
    * A comparator to compare two {@link Region}s.
    */
   private static Comparator<Region> regionComparator = new Comparator<Region>() {
-    @Override
     public int compare(Region o1, Region o2) {
       int r = Utils.compareIntegers((int)o1.getChromosomeAsByteRepresentation(), (int)o2.getChromosomeAsByteRepresentation());
       if (r==0) {
