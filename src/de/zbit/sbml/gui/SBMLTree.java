@@ -23,6 +23,7 @@ import java.awt.event.MouseListener;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -30,6 +31,7 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
@@ -92,6 +94,15 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 			}
 		} 
 		return node;
+	}
+	
+	public void addPopupMenuItem(JMenuItem item, Class<? extends SBase>... types) {
+		Class<? extends SBase> type = types[0];
+		DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(null);
+		if ((types == null) || (types.length == 0)
+				|| type.isAssignableFrom(treeNode.getUserObject().getClass())) {
+			
+		}
 	}
 	
 	/**
@@ -236,4 +247,6 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	 */
 	public void mouseReleased(MouseEvent e) {
 	}
+	
+	
 }
