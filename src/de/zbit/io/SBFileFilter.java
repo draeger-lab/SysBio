@@ -235,10 +235,9 @@ public class SBFileFilter extends GeneralFileFilter {
      * @return a pattern for one of the top-most lines to be matched in order to
      *         accept a file of the given type.
      */
-    public String getLinePattern() {
-      String linePattern = null;
+    public Pattern getLinePattern() {
       if (this == KGML_FILES) {
-        return "<!DOCTYPE[\\p{ASCII}]*KGML[\\p{ASCII}]*>";
+        return Pattern.compile(".*?<!DOCTYPE[\\p{ASCII}]*KGML[\\p{ASCII}]*>.*?", Pattern.MULTILINE & Pattern.DOTALL);
       }
       if (this.toString().startsWith(SBML_FILES.toString())) {
         String anyChar = "[\\s\\w\\p{ASCII}]*";
@@ -251,10 +250,12 @@ public class SBFileFilter extends GeneralFileFilter {
           level = this.toString().substring(12, 13);
           version = this.toString().substring(14);
         }
-        return String.format(sbmlDef, anything, whiteSpace, anyChar, level,
-          whiteSpace, anyChar, version, version, whiteSpace, anyChar, level, anyChar, anything);
+				return Pattern.compile(String.format(sbmlDef, anything, whiteSpace,
+					anyChar, level, whiteSpace, anyChar, version, version, whiteSpace,
+					anyChar, level, anyChar, anything), Pattern.MULTILINE
+						& Pattern.DOTALL);
       }
-      return linePattern;
+      return null;
     } 
 	}
   
@@ -294,11 +295,10 @@ public class SBFileFilter extends GeneralFileFilter {
    *         pattern of the given {@link FileType}
    */
   private static boolean checkFileHead(File file, FileType type) {
-    String linePattern = type.getLinePattern();
-    boolean retVal = linePattern == null;
+  	Pattern pattern = type.getLinePattern();
+    boolean retVal = pattern == null;
     if (!retVal) {
       BufferedReader br = OpenFile.openFile(file.getAbsolutePath());
-      Pattern pattern = Pattern.compile(linePattern);
       Matcher matcher;
       try {
         int bytesRead;
@@ -307,7 +307,7 @@ public class SBFileFilter extends GeneralFileFilter {
         for (int i = 0; br.ready() && (i < MAX_CHARACTERS_TO_PARSE) && !retVal; i++) {
           bytesRead = br.read(chunk);
 					if (bytesRead > 0) {
-						line.append(new String(chunk, 0, bytesRead).replace('\n', ' '));
+						line.append(new String(chunk, 0, bytesRead));
 						matcher = pattern.matcher(line.toString());
 						retVal = matcher.matches();
 					}
