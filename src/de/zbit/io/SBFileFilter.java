@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.filechooser.FileFilter;
@@ -242,15 +243,16 @@ public class SBFileFilter extends GeneralFileFilter {
       if (this.toString().startsWith(SBML_FILES.toString())) {
         String anyChar = "[\\s\\w\\p{ASCII}]*";
         String whiteSpace = "[\\s]+";
+        String anything = "[\\s\\S]*";
         String number = "[1-9]+[0-9]*";
         String level = number, version = number;
-        String sbmlDef = "<sbml%s%s((level=\"%s\"%s%sversion=\"%s\")|(version=\"%s\"%s%slevel=\"%s\"))%s>";
+        String sbmlDef = "%s<sbml%s%s((level=\"%s\"%s%sversion=\"%s\")|(version=\"%s\"%s%slevel=\"%s\"))%s>%s";
         if (this != SBML_FILES) {
           level = this.toString().substring(12, 13);
           version = this.toString().substring(14);
         }
-        return String.format(sbmlDef, whiteSpace, anyChar, level,
-          whiteSpace, anyChar, version, version, whiteSpace, anyChar, level, anyChar);
+        return String.format(sbmlDef, anything, whiteSpace, anyChar, level,
+          whiteSpace, anyChar, version, version, whiteSpace, anyChar, level, anyChar, anything);
       }
       return linePattern;
     } 
@@ -259,12 +261,12 @@ public class SBFileFilter extends GeneralFileFilter {
 	public static final Logger log = Logger.getLogger(SBFileFilter.class.getName());
 	
   /**
-   * The maximal number of lines to check for characteristic identifier in
-   * files. If the first {@link #MAX_LINES_TO_PARSE} do not contain a defined
+   * The maximal number of characters to check for characteristic identifier in
+   * files. If the first {@link #MAX_CHARACTERS_TO_PARSE} do not contain a defined
    * pattern for the given file type, the file cannot be recognized as a valid
    * file of this type.
    */
-  private static final int MAX_LINES_TO_PARSE = 20;
+  private static final int MAX_CHARACTERS_TO_PARSE = 512;
 
   /**
 	 * 
@@ -281,9 +283,9 @@ public class SBFileFilter extends GeneralFileFilter {
 
 	/**
    * This method opens the given file and parses the first
-   * {@link #MAX_LINES_TO_PARSE} lines. If a line pattern for the given expected
+   * {@link #MAX_CHARACTERS_TO_PARSE} characters. If a line pattern for the given expected
    * {@link FileType} is available (see {@link FileType#getLinePattern()}), it
-   * then tries to match the current line to the pattern. In case it finds the
+   * then tries to match the String read so far to the pattern. In case it finds the
    * expected pattern, this method will return <code>true</code>.
    * 
    * @param file
@@ -296,11 +298,19 @@ public class SBFileFilter extends GeneralFileFilter {
     boolean retVal = linePattern == null;
     if (!retVal) {
       BufferedReader br = OpenFile.openFile(file.getAbsolutePath());
+      Pattern pattern = Pattern.compile(linePattern);
+      Matcher matcher;
       try {
-        String line;
-        for (int i = 0; br.ready() && (i < MAX_LINES_TO_PARSE) && !retVal; i++) {
-          line = br.readLine();
-          retVal = Pattern.matches(linePattern, line);
+        int bytesRead;
+        char chunk[] = new char[128];
+        StringBuilder line = new StringBuilder();
+        for (int i = 0; br.ready() && (i < MAX_CHARACTERS_TO_PARSE) && !retVal; i++) {
+          bytesRead = br.read(chunk);
+					if (bytesRead > 0) {
+						line.append(new String(chunk, 0, bytesRead).replace('\n', ' '));
+						matcher = pattern.matcher(line.toString());
+						retVal = matcher.matches();
+					}
         }
       } catch (Throwable e) {
         return false;
