@@ -256,7 +256,7 @@ public class Reflect {
 	 * @param className
 	 * @return
 	 */
-	public static ArrayList<String> getClassesFromClassPath(String className) {
+	public static List<String> getClassesFromClassPath(String className) {
 		ArrayList<String> classes = new ArrayList<String>();
 		int dotIndex = className.lastIndexOf('.');
 		if (dotIndex <= 0) {
@@ -504,7 +504,7 @@ public class Reflect {
 	 * Read the classes available for user selection from the properties or the
 	 * classpath respectively
 	 */
-	public static ArrayList<String> getClassesFromProperties(String className) {
+	public static List<String> getClassesFromProperties(String className) {
 		if (TRACE) {
 			logger.info(String.format(
 				"getClassesFromProperties - requesting className: %s", className));

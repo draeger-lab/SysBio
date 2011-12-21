@@ -167,9 +167,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		 */
 		private static final String separator = ";";
 		
-		/*
-		 * (non-Javadoc)
-		 * 
+		/* (non-Javadoc)
 		 * @see de.zbit.gui.ActionCommand#getName()
 		 */
 		public String getName() {
@@ -188,9 +186,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				key.lastIndexOf('_') + 1));
 		}
 		
-		/*
-		 * (non-Javadoc)
-		 * 
+		/* (non-Javadoc)
 		 * @see de.zbit.gui.ActionCommand#getToolTip()
 		 */
 		public String getToolTip() {
@@ -446,15 +442,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     // Make this panel responsive to drag'n drop events.
     FileDropHandler dragNdrop = new FileDropHandler(
       new ActionListener() {
-      	/*
-      	 * (non-Javadoc)
+      	/* (non-Javadoc)
       	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
       	 */
         @SuppressWarnings("unchecked")
         public void actionPerformed(ActionEvent event) {
-          if (event.getID()==FileDropHandler.FILE_DROPPED) {
+          if (event.getID() == FileDropHandler.FILE_DROPPED) {
             openFileAndLogHistory((File) event.getSource());
-          } else if (event.getID()==FileDropHandler.FILES_DROPPED) {
+          } else if (event.getID() == FileDropHandler.FILES_DROPPED) {
             openFileAndLogHistory((File[])((List<File>) event.getSource()).toArray());
           }
         }
@@ -544,6 +539,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		JMenuBar menuBar = new JMenuBar();
 		String title;
 		
+		int ctr_down = InputEvent.CTRL_DOWN_MASK;
+		boolean macOS = GUITools.isMacOSX();
+		
+		if (macOS) {
+			// some version of Mac OS
+			ctr_down = InputEvent.META_DOWN_MASK;
+		}
+		
 		/*
 		 * File menu
 		 */
@@ -552,28 +555,36 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			openFile = GUITools.createJMenuItem(EventHandler.create(
 				ActionListener.class, this, "openFileAndLogHistory"),
 				BaseAction.FILE_OPEN, UIManager.getIcon("ICON_OPEN_16"), KeyStroke
-						.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK), 'O', true);
-			saveFile = GUITools.createJMenuItem(EventHandler.create(
-				ActionListener.class, this, "saveFile"), BaseAction.FILE_SAVE,
-				UIManager.getIcon("ICON_SAVE_16"), KeyStroke.getKeyStroke('S',
-					InputEvent.CTRL_DOWN_MASK), 'S', false);
-			closeFile = GUITools.createJMenuItem(EventHandler.create(
-				ActionListener.class, this, "closeFile"), BaseAction.FILE_CLOSE,
-				UIManager.getIcon("ICON_TRASH_16"), KeyStroke.getKeyStroke('W',
-					InputEvent.CTRL_DOWN_MASK), 'W', false);
+						.getKeyStroke('O', ctr_down), 'O', true);
+			saveFile = GUITools.createJMenuItem(
+				EventHandler.create(ActionListener.class, this, "saveFile"),
+				BaseAction.FILE_SAVE, UIManager.getIcon("ICON_SAVE_16"),
+				KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
+			closeFile = GUITools.createJMenuItem(
+				EventHandler.create(ActionListener.class, this, "closeFile"),
+				BaseAction.FILE_CLOSE, UIManager.getIcon("ICON_TRASH_16"),
+				KeyStroke.getKeyStroke('W', ctr_down), 'W', false);
 		}
-		JMenuItem exit = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "exitPre"), BaseAction.FILE_EXIT, UIManager
-				.getIcon("ICON_EXIT_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F4,
-			InputEvent.ALT_DOWN_MASK));
+		JMenu fileMenu;
 		JMenuItem items[] = additionalFileMenuItems();
-		boolean addSeparator = (openFile != null) || (saveFile != null)
-				|| ((items != null) && (items.length > 0)) || (closeFile != null);
 		JMenu fileHistory = createFileHistory();
 		title = BaseAction.FILE.getName();
-		JMenu fileMenu = GUITools.createJMenu(title == null ? "File" : title,
-				BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
-				closeFile, addSeparator ? new JSeparator() : null, exit);
+		if (macOS) {
+			new MacOSXController(this);
+			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
+					closeFile);
+		} else {
+			JMenuItem exit = GUITools.createJMenuItem(EventHandler.create(
+				ActionListener.class, this, "exitPre"), BaseAction.FILE_EXIT, UIManager
+					.getIcon("ICON_EXIT_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F4,
+						InputEvent.ALT_DOWN_MASK));
+			boolean addSeparator = (openFile != null) || (saveFile != null)
+					|| ((items != null) && (items.length > 0)) || (closeFile != null);
+			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
+					closeFile, addSeparator ? new JSeparator() : null, exit);
+		}
 		fileMenu.setActionCommand(BaseAction.FILE.toString());
 		menuBar.add(fileMenu);
 
@@ -961,11 +972,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		if ((getTitle() == null) || (getTitle().length() == 0)) {
 			setTitle(getProgramNameAndVersion());
 		}
-		
-    // Use the systems proxy settings to establish connections
-    System.setProperty("java.net.useSystemProxies", "true");
-    
-		GUITools.initLaF(getTitle());
 		setDefaultLookAndFeelDecorated(true);
 		
 		try {
@@ -1271,9 +1277,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.Window#setVisible(boolean)
 	 */
 	@Override
