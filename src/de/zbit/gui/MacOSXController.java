@@ -34,6 +34,10 @@ import com.apple.eawt.QuitResponse;
  */
 public class MacOSXController implements AboutHandler, PreferencesHandler, QuitHandler {
 	
+	/**
+	 * The actual graphical element whose properties are to be linked to Mac OS X
+	 * specific actions.
+	 */
 	private BaseFrame frame;
 	
 	/**
@@ -51,21 +55,21 @@ public class MacOSXController implements AboutHandler, PreferencesHandler, QuitH
 	/* (non-Javadoc)
 	 * @see com.apple.eawt.AboutHandler#handleAbout(com.apple.eawt.AppEvent.AboutEvent)
 	 */
-	public void handleAbout(AboutEvent arg0) {
+	public void handleAbout(AboutEvent aEvt) {
 		frame.showAboutMessage();
 	}
 
 	/* (non-Javadoc)
 	 * @see com.apple.eawt.PreferencesHandler#handlePreferences(com.apple.eawt.AppEvent.PreferencesEvent)
 	 */
-	public void handlePreferences(PreferencesEvent arg0) {
+	public void handlePreferences(PreferencesEvent pEvt) {
 		frame.preferences();
 	}
 
 	/* (non-Javadoc)
 	 * @see com.apple.eawt.QuitHandler#handleQuitRequestWith(com.apple.eawt.AppEvent.QuitEvent, com.apple.eawt.QuitResponse)
 	 */
-	public void handleQuitRequestWith(QuitEvent arg0, QuitResponse arg1) {
+	public void handleQuitRequestWith(QuitEvent qEvt, QuitResponse qr) {
 		frame.exitPre();
 	}
 	
