@@ -612,20 +612,20 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		if (((numPrefs > 0) && !macOS) || ((items != null) && (items.length > 0))) {
 			title = BaseAction.EDIT.getName();
 			JMenu editMenu;
-			if (macOS) {
+			if (macOS || (numPrefs == 0)) {
 				// Mac OS has its own preferences menu which is linked differently.
-				editMenu = GUITools.createJMenu(
-					title == null ? "Edit" : title, BaseAction.EDIT.getToolTip(), (Object[]) items);
+				editMenu = GUITools.createJMenu(title == null ? "Edit" : title,
+					BaseAction.EDIT.getToolTip(), (Object[]) items);
 			} else {
 				// On all other systems we want to have a menu item for preferences.
-				JMenuItem preferences = GUITools.createJMenuItem(EventHandler.create(
-					ActionListener.class, this, "preferences"), BaseAction.EDIT_PREFERENCES,
-					UIManager.getIcon("ICON_PREFS_16"), KeyStroke.getKeyStroke('E',
-						InputEvent.ALT_GRAPH_DOWN_MASK), 'P', true);
-				editMenu = GUITools.createJMenu(
-					title == null ? "Edit" : title, BaseAction.EDIT.getToolTip(), items,
-							(items != null) && (items.length > 0) && (numPrefs > 0) ? new JSeparator()
-									: null, numPrefs > 0 ? preferences : null);
+				JMenuItem preferences = GUITools.createJMenuItem(
+					EventHandler.create(ActionListener.class, this, "preferences"),
+					BaseAction.EDIT_PREFERENCES, UIManager.getIcon("ICON_PREFS_16"),
+					KeyStroke.getKeyStroke('E', InputEvent.ALT_GRAPH_DOWN_MASK), 'P',
+					true);
+				editMenu = GUITools.createJMenu(title == null ? "Edit" : title,
+					BaseAction.EDIT.getToolTip(), items, (items != null)
+							&& (items.length > 0) ? new JSeparator() : null, preferences);
 			}
 			editMenu.setActionCommand(BaseAction.EDIT.toString());
 			menuBar.add(editMenu);
@@ -651,11 +651,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 					"showOnlineHelp"), BaseAction.HELP_ONLINE, UIManager
 						.getIcon("ICON_HELP_16"),
 					KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), 'H', true);
-		JMenuItem about = (getURLAboutMessage() == null) ? null : GUITools
-				.createJMenuItem(EventHandler.create(ActionListener.class, this,
-					"showAboutMessage"), BaseAction.HELP_ABOUT, UIManager
-						.getIcon("ICON_INFO_16"),
-					KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 'I', true);
 		JMenuItem license = (getURLLicense() == null) ? null : GUITools
 				.createJMenuItem(EventHandler.create(ActionListener.class, this,
 					"showLicense"), BaseAction.HELP_LICENSE, UIManager
@@ -668,14 +663,29 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			UIManager.getIcon("ICON_GLOBE_16"), KeyStroke.getKeyStroke(
 				KeyEvent.VK_F4, 0), 'U', true);
 		title = BaseAction.HELP.getName();
-		JMenu helpMenu = GUITools.createJMenu((title == null) ? "Help" : title,
-			BaseAction.HELP.getToolTip(), help, about, license, update,
-			additionalHelpMenuItems());
+		if (title == null) {
+			title = "Help";
+		}
+		JMenu helpMenu;
+		if (macOS || (getURLAboutMessage() == null)) {
+			// In Mac OS X the about message is shown in a different position.
+			helpMenu = GUITools.createJMenu(title, BaseAction.HELP.getToolTip(),
+				help, license, update, additionalHelpMenuItems());
+		} else {
+			JMenuItem about = GUITools.createJMenuItem(
+				EventHandler.create(ActionListener.class, this, "showAboutMessage"),
+				BaseAction.HELP_ABOUT, UIManager.getIcon("ICON_INFO_16"),
+				KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 'I', true);
+			helpMenu = GUITools.createJMenu(title, BaseAction.HELP.getToolTip(),
+				help, about, license, update, additionalHelpMenuItems());
+		}
 		if (helpMenu.getItemCount() > 0) {
 			helpMenu.setActionCommand(BaseAction.HELP.toString());
 			try {
 				menuBar.setHelpMenu(helpMenu);
 			} catch (Error exc) {
+				// The special method setHelpMenu might not yet been implemented. 
+				// So, let us just ignore this problem.
 				menuBar.add(helpMenu);
 			}
 		}
