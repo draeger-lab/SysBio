@@ -570,11 +570,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		JMenu fileHistory = createFileHistory();
 		title = BaseAction.FILE.getName();
 		if (macOS) {
+			// Mac OS has its own "quit" menu item, so we don't want to create a separate one.
 			new MacOSXController(this);
 			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
 					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
 					closeFile);
 		} else {
+			// On all other platforms we want to have a dedicated "exit" item.
 			JMenuItem exit = GUITools.createJMenuItem(EventHandler.create(
 				ActionListener.class, this, "exitPre"), BaseAction.FILE_EXIT, UIManager
 					.getIcon("ICON_EXIT_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F4,
@@ -591,10 +593,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		/*
 		 * Edit menu
 		 */
-		JMenuItem preferences = GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "preferences"), BaseAction.EDIT_PREFERENCES,
-			UIManager.getIcon("ICON_PREFS_16"), KeyStroke.getKeyStroke('E',
-				InputEvent.ALT_GRAPH_DOWN_MASK), 'P', true);
 		items = additionalEditMenuItems();
 		/* Speed up the GUI by loading the preferences classes at the beginning
 		 * and add this menu only if there is at least one preference panel defined.
@@ -611,12 +609,24 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     if (numPrefs < 0) {
       numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
     }
-		if ((numPrefs > 0) || ((items != null) && (items.length > 0))) {
+		if (((numPrefs > 0) && !macOS) || ((items != null) && (items.length > 0))) {
 			title = BaseAction.EDIT.getName();
-			JMenu editMenu = GUITools.createJMenu(
-				title == null ? "Edit" : title, BaseAction.EDIT.getToolTip(), items,
-						(items != null) && (items.length > 0) && (numPrefs > 0) ? new JSeparator()
-								: null, numPrefs > 0 ? preferences : null);
+			JMenu editMenu;
+			if (macOS) {
+				// Mac OS has its own preferences menu which is linked differently.
+				editMenu = GUITools.createJMenu(
+					title == null ? "Edit" : title, BaseAction.EDIT.getToolTip(), (Object[]) items);
+			} else {
+				// On all other systems we want to have a menu item for preferences.
+				JMenuItem preferences = GUITools.createJMenuItem(EventHandler.create(
+					ActionListener.class, this, "preferences"), BaseAction.EDIT_PREFERENCES,
+					UIManager.getIcon("ICON_PREFS_16"), KeyStroke.getKeyStroke('E',
+						InputEvent.ALT_GRAPH_DOWN_MASK), 'P', true);
+				editMenu = GUITools.createJMenu(
+					title == null ? "Edit" : title, BaseAction.EDIT.getToolTip(), items,
+							(items != null) && (items.length > 0) && (numPrefs > 0) ? new JSeparator()
+									: null, numPrefs > 0 ? preferences : null);
+			}
 			editMenu.setActionCommand(BaseAction.EDIT.toString());
 			menuBar.add(editMenu);
 		}
