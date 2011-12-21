@@ -982,11 +982,15 @@ public class Reflect {
   public static Enumeration<String> getStaticFinalVariablesAsEnumeration(final Class<?> clazz) {
     return new Enumeration<String>() {
       int i=0;
-      @Override
+      /* (non-Javadoc)
+       * @see java.util.Enumeration#hasMoreElements()
+       */
       public boolean hasMoreElements() {
         return clazz.getFields().length>i;
       }
-      @Override
+      /* (non-Javadoc)
+       * @see java.util.Enumeration#nextElement()
+       */
       public String nextElement() {
         try {
           return clazz.getFields()[i++].get(new String()).toString();
