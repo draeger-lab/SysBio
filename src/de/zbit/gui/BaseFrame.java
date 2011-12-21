@@ -34,6 +34,8 @@ import java.beans.EventHandler;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -131,7 +133,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		 * {@link BaseAction} to saves the currently opened file or the result of a
 		 * computation in one of the available formats.
 		 */
-		FILE_SAVE,
+		FILE_SAVE_AS,
 		/**
 		 * The {@link ActionCommand} for the help menu. 
 		 */
@@ -207,31 +209,65 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	}
 	
 	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = -6533854985804740883L;
-	/**
 	 * A {@link Logger} for this class.
 	 */
 	private static final transient Logger logger = Logger.getLogger(BaseFrame.class.getName());
+	/**
+	 * Generated serial version identifier.
+	 */
+	private static final long serialVersionUID = -6533854985804740883L;
 	/**
 	 * Switch to avoid checking for updates multiple times.
 	 */
 	private static boolean UPDATE_CHECKED = false;
 	
 	/**
+	 * This creates a new {@link JBrowserPane} which can be embedded in a
+	 * {@link JScrollPane} depending on the value of the boolean parameter.
+	 * 
+	 * @param url
+	 *        The {@link URL} of the HTML file to be displayed in the
+	 *        {@link JBrowserPane}.
+	 * @param preferedWidth
+	 *        the width dimension of the {@link JBrowserPane}.
+	 * @param preferedHeight
+	 *        the height dimension of the {@link JBrowserPane}.
+	 * @param scorll
+	 *        whether or not to embed the created {@link JBrowserPane} in a
+	 *        {@link JScrollPane}.
+	 * @return Either an instance of {@link JBrowserPane} that displays the HTML
+	 *         file located at the given {@link URL}, or a {@link JScrollPane}
+	 *         containing such a {@link JBrowserPane}.
+	 */
+	public final static JComponent createJBrowser(URL url, int preferedWidth,
+		int preferedHeight, boolean scroll) {
+		JBrowserPane browser = new JBrowserPane(url);
+		browser.removeHyperlinkListener(browser);
+		browser.addHyperlinkListener(new SystemBrowser());
+		browser.setPreferredSize(new Dimension(preferedWidth, preferedHeight));
+		if (scroll) { 
+		  return new JScrollPane(browser,
+			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); 
+		}
+		browser.setBorder(BorderFactory.createLoweredBevelBorder());
+		return browser;
+	}
+	
+  /**
+	 * The configuration of this program.
+	 */
+  protected AppConf appConf;
+	/**
+   * A status bar...
+   */
+	protected StatusBar statusBar;
+	
+	/**
 	 * A tool bar
 	 */
 	protected JToolBar toolBar;
 	
-  /**
-   * A status bar...
-   */
-	protected StatusBar statusBar;
-	/**
-	 * The configuration of this program.
-	 */
-  protected AppConf appConf;
 	
 	/**
 	 * Creates a new {@link BaseFrame}.
@@ -242,6 +278,15 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	  this((AppConf) null);
 	}
 	
+	/**
+	 * 
+	 * @param appConf
+	 */
+  public BaseFrame(AppConf appConf) {
+    super();
+    this.appConf = appConf;
+    init();
+  }
 	
 	/**
 	 * Creates a new {@link BaseFrame} with the given
@@ -264,8 +309,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		super(title);
 		init();
 	}
-	
-	/**
+
+
+  /**
 	 * Creates a new {@link BaseFrame} with the given title and the given
 	 * {@link GraphicsConfiguration}.
 	 * 
@@ -276,24 +322,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		super(title, gc);
 		init();
 	}
-	
-	/**
-	 * 
-	 * @param appConf
-	 */
-  public BaseFrame(AppConf appConf) {
-    super();
-    this.appConf = appConf;
-    init();
-  }
-
-
-  /**
-   * @return the current {@link StatusBar}.
-   */
-  public StatusBar getStatusBar() {
-    return statusBar;
-  }
   
 	/**
 	 * This method enables the {@link JMenuItem} that displays the online help and
@@ -364,12 +392,43 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	}
 	
   /**
-   * @return the {@link #toolBar} if it has been initialized in {@link #createJToolBar()}.
-   * Else, <code>null</code> is returned.
-   */
-  public JToolBar getJToolBar() {
-    return toolBar;
-  }
+	 * 
+	 * @param fileList
+	 * @param fileHistory
+	 */
+	protected void addToFileHistory(List<File> fileList, JMenu... fileHistory) {
+    if (getMaximalFileHistorySize() > 0) {
+      // Create the list of files to update the file history in the menu.
+      // In addition to the files that have just been opened (above), we
+      // also have to consider older files.
+      
+      // Ensure that the current FileHistory is in the list.
+      JMenu c_fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
+        BaseAction.FILE_OPEN_RECENT);
+      if (!ArrayUtils.contains(fileHistory, c_fileHistory)) {
+        fileHistory = ArrayUtils.removeNull(fileHistory);
+        if (fileHistory==null) {
+          fileHistory = new JMenu[]{c_fileHistory};
+        } else {
+          JMenu[] histories = new JMenu[fileHistory.length+1];
+          histories[0] = c_fileHistory;
+          System.arraycopy(fileHistory, 0, histories, 1, fileHistory.length);
+          fileHistory = histories;
+        }
+      }
+      
+      // Add previous files to history
+      File file;
+      for (int i = 0; i < c_fileHistory.getItemCount(); i++) {
+        file = new File(c_fileHistory.getItem(i).getToolTipText());
+        if (file.exists() && file.canRead() && !fileList.contains(file)) {
+          fileList.add(file);
+        }
+      }
+      // update
+      updateFileHistory(fileList, fileHistory);
+    }
+	}
 	
 	/**
 	 * Closes a {@link File} that is currently open.
@@ -459,38 +518,180 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
   }
 	
 	/**
-	 * This creates a new {@link JBrowserPane} which can be embedded in a
-	 * {@link JScrollPane} depending on the value of the boolean parameter.
+	 * Creates a {@link JMenu} for user edit operations.
 	 * 
-	 * @param url
-	 *        The {@link URL} of the HTML file to be displayed in the
-	 *        {@link JBrowserPane}.
-	 * @param preferedWidth
-	 *        the width dimension of the {@link JBrowserPane}.
-	 * @param preferedHeight
-	 *        the height dimension of the {@link JBrowserPane}.
-	 * @param scorll
-	 *        whether or not to embed the created {@link JBrowserPane} in a
-	 *        {@link JScrollPane}.
-	 * @return Either an instance of {@link JBrowserPane} that displays the HTML
-	 *         file located at the given {@link URL}, or a {@link JScrollPane}
-	 *         containing such a {@link JBrowserPane}.
+	 * @return a {@link JMenu} might be <code>null</code> or empty (zero
+	 *         {@link JMenuItem}s).
 	 */
-	public final static JComponent createJBrowser(URL url, int preferedWidth,
-		int preferedHeight, boolean scroll) {
-		JBrowserPane browser = new JBrowserPane(url);
-		browser.removeHyperlinkListener(browser);
-		browser.addHyperlinkListener(new SystemBrowser());
-		browser.setPreferredSize(new Dimension(preferedWidth, preferedHeight));
-		if (scroll) { 
-		  return new JScrollPane(browser,
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); 
+	protected JMenu createEditMenu() {
+		int numPrefs = -1;
+		if (appConf != null) {
+			Class<? extends KeyProvider> interactive[] = appConf.getInteractiveOptions();
+			if (interactive != null) {
+				numPrefs = interactive.length;
+			}
 		}
-		browser.setBorder(BorderFactory.createLoweredBevelBorder());
-		return browser;
+    if (numPrefs < 0) {
+  		/* 
+  		 * Speed up the GUI by loading the preferences classes at the beginning
+  		 * and add this menu only if there is at least one preference panel defined.
+  		 * In case of options defined directly as a collection of KeyProviders, avoid
+  		 * using reflection (time consuming).
+  		 */
+      numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
+    }
+    
+    boolean macOS = GUITools.isMacOSX();
+		JMenuItem items[] = additionalEditMenuItems();
+		
+    if (((numPrefs > 0) && !macOS) || ((items != null) && (items.length > 0))) {
+			JMenu editMenu;
+	    String title = BaseAction.EDIT.getName();
+			if (macOS || (numPrefs == 0)) {
+				// Mac OS has its own preferences menu which is linked differently.
+				editMenu = GUITools.createJMenu(title == null ? "Edit" : title,
+					BaseAction.EDIT.getToolTip(), (Object[]) items);
+			} else {
+				// On all other systems we want to have a menu item for preferences.
+				JMenuItem preferences = GUITools.createJMenuItem(
+					EventHandler.create(ActionListener.class, this, "preferences"),
+					BaseAction.EDIT_PREFERENCES, UIManager.getIcon("ICON_PREFS_16"),
+					KeyStroke.getKeyStroke('E', InputEvent.ALT_GRAPH_DOWN_MASK), 'P',
+					true);
+				editMenu = GUITools.createJMenu(title == null ? "Edit" : title,
+					BaseAction.EDIT.getToolTip(), items, (items != null)
+							&& (items.length > 0) ? new JSeparator() : null, preferences);
+			}
+			editMenu.setActionCommand(BaseAction.EDIT.toString());
+			return editMenu;
+		}
+    return null;
 	}
 	
+	/**
+	 * Create a {@link JMenu} with recently opened files.
+	 * @return
+	 */
+	protected JMenu createFileHistory() {
+    JMenu fileHistory = null;
+    if (getMaximalFileHistorySize() > 0) {
+			fileHistory = new JMenu(BaseAction.FILE_OPEN_RECENT.getName());
+			fileHistory.setActionCommand(BaseAction.FILE_OPEN_RECENT.toString());
+			fileHistory.setEnabled(false);
+			String tooltip = BaseAction.FILE_OPEN_RECENT.getToolTip();
+			if (tooltip != null) {
+				if (GUITools.isMacOSX()) {
+					fileHistory.setToolTipText(tooltip);
+				} else {
+					fileHistory.setToolTipText(StringUtil.toHTML(tooltip,
+						GUITools.TOOLTIP_LINE_LENGTH, false));
+				}
+			}
+			SBPreferences history = SBPreferences
+					.getPreferencesFor(getFileHistoryKeyProvider());
+			String fileList = (history != null) ? history
+					.get(FileHistory.LAST_OPENED) : null;
+			updateFileHistory(FileHistory.Tools.parseList(fileList), fileHistory);
+		}
+    return fileHistory;
+  }
+
+	/**
+	 * Creates a {@link JMenu} for dealing with files.
+	 * 
+	 * @param loadDefaultFileMenuEntries
+	 * @return a {@link JMenu} might be <code>null</code> or empty (zero
+	 *         {@link JMenuItem}s).
+	 */
+	protected JMenu createFileMenu(boolean loadDefaultFileMenuEntries) {
+		boolean macOS = GUITools.isMacOSX();
+		int ctr_down = macOS ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
+		JMenuItem openFile = null, saveFile = null, closeFile = null;
+		if (loadDefaultFileMenuEntries) {
+			openFile = GUITools.createJMenuItem(EventHandler.create(
+				ActionListener.class, this, "openFileAndLogHistory"),
+				BaseAction.FILE_OPEN, UIManager.getIcon("ICON_OPEN_16"), KeyStroke
+						.getKeyStroke('O', ctr_down), 'O', true);
+			
+			saveFile = GUITools.createJMenuItem(
+				EventHandler.create(ActionListener.class, this, "saveFile"),
+				BaseAction.FILE_SAVE_AS, UIManager.getIcon("ICON_SAVE_16"),
+				KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
+			
+			closeFile = GUITools.createJMenuItem(
+				EventHandler.create(ActionListener.class, this, "closeFile"),
+				BaseAction.FILE_CLOSE, UIManager.getIcon("ICON_TRASH_16"),
+				KeyStroke.getKeyStroke(KeyEvent.VK_F4, ctr_down), (char)KeyEvent.VK_F4, false);
+		}
+		JMenu fileMenu;
+		JMenuItem items[] = additionalFileMenuItems();
+		JMenu fileHistory = createFileHistory();
+		String title = BaseAction.FILE.getName();
+		if (macOS) {
+			// Mac OS has its own "quit" menu item, so we don't want to create a separate one.
+			new MacOSXController(this);
+			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
+					closeFile);
+		} else {
+			// On all other platforms we want to have a dedicated "exit" item.
+			JMenuItem exit = GUITools.createJMenuItem(EventHandler.create(
+				ActionListener.class, this, "exitPre"), BaseAction.FILE_EXIT, UIManager
+					.getIcon("ICON_EXIT_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F4,
+						InputEvent.ALT_DOWN_MASK));
+			boolean addSeparator = (openFile != null) || (saveFile != null)
+					|| ((items != null) && (items.length > 0)) || (closeFile != null);
+			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
+					closeFile, addSeparator ? new JSeparator() : null, exit);
+		}
+		fileMenu.setActionCommand(BaseAction.FILE.toString());
+		return fileMenu;
+	}
+
+	/**
+	 * Creates a {@link JMenu} for user help.
+	 * 
+	 * @return a {@link JMenu} might be <code>null</code> or empty (zero
+	 *         {@link JMenuItem}s).
+	 */
+	protected JMenu createHelpMenu() {
+		JMenuItem help = (getURLOnlineHelp() == null) ? null : GUITools
+				.createJMenuItem(EventHandler.create(ActionListener.class, this,
+					"showOnlineHelp"), BaseAction.HELP_ONLINE, UIManager
+						.getIcon("ICON_HELP_16"),
+					KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), 'H', true);
+		JMenuItem license = (getURLLicense() == null) ? null : GUITools
+				.createJMenuItem(EventHandler.create(ActionListener.class, this,
+					"showLicense"), BaseAction.HELP_LICENSE, UIManager
+						.getIcon("ICON_LICENSE_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F3,
+					0), 'L', true);
+		JMenuItem update = ((getURLOnlineUpdate() == null)
+				|| (getDottedVersionNumber() == null) || (getDottedVersionNumber()
+				.length() == 0)) ? null : GUITools.createJMenuItem(EventHandler.create(
+			ActionListener.class, this, "onlineUpdate"), BaseAction.HELP_UPDATE,
+			UIManager.getIcon("ICON_GLOBE_16"), KeyStroke.getKeyStroke(
+				KeyEvent.VK_F4, 0), 'U', true);
+		String title = BaseAction.HELP.getName();
+		if (title == null) {
+			title = "Help";
+		}
+		JMenu helpMenu;
+		if (GUITools.isMacOSX() || (getURLAboutMessage() == null)) {
+			// In Mac OS X the about message is shown in a different position.
+			helpMenu = GUITools.createJMenu(title, BaseAction.HELP.getToolTip(),
+				help, license, update, additionalHelpMenuItems());
+		} else {
+			JMenuItem about = GUITools.createJMenuItem(
+				EventHandler.create(ActionListener.class, this, "showAboutMessage"),
+				BaseAction.HELP_ABOUT, UIManager.getIcon("ICON_INFO_16"),
+				KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 'I', true);
+			helpMenu = GUITools.createJMenu(title, BaseAction.HELP.getToolTip(),
+				help, about, license, update, additionalHelpMenuItems());
+		}
+		return helpMenu;
+	}
+
 	/**
 	 * <p>
 	 * Creates the default {@link JMenuBar} for this {@link BaseFrame}. You can
@@ -536,152 +737,28 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @see GUITools#getJMenuItem(JMenuBar, Object)
 	 */
 	protected JMenuBar createJMenuBar(boolean loadDefaultFileMenuEntries) {
-		JMenuBar menuBar = new JMenuBar();
-		String title;
-		
-		int ctr_down = InputEvent.CTRL_DOWN_MASK;
-		boolean macOS = GUITools.isMacOSX();
-		
-		if (macOS) {
-			// some version of Mac OS
-			ctr_down = InputEvent.META_DOWN_MASK;
-		}
-		
-		/*
-		 * File menu
-		 */
-		JMenuItem openFile = null, saveFile = null, closeFile = null;
-		if (loadDefaultFileMenuEntries) {
-			openFile = GUITools.createJMenuItem(EventHandler.create(
-				ActionListener.class, this, "openFileAndLogHistory"),
-				BaseAction.FILE_OPEN, UIManager.getIcon("ICON_OPEN_16"), KeyStroke
-						.getKeyStroke('O', ctr_down), 'O', true);
-			
-			saveFile = GUITools.createJMenuItem(
-				EventHandler.create(ActionListener.class, this, "saveFile"),
-				BaseAction.FILE_SAVE, UIManager.getIcon("ICON_SAVE_16"),
-				KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
-			
-			closeFile = GUITools.createJMenuItem(
-				EventHandler.create(ActionListener.class, this, "closeFile"),
-				BaseAction.FILE_CLOSE, UIManager.getIcon("ICON_TRASH_16"),
-				KeyStroke.getKeyStroke(KeyEvent.VK_F4, ctr_down), (char)KeyEvent.VK_F4, false);
-		}
-		JMenu fileMenu;
-		JMenuItem items[] = additionalFileMenuItems();
-		JMenu fileHistory = createFileHistory();
-		title = BaseAction.FILE.getName();
-		if (macOS) {
-			// Mac OS has its own "quit" menu item, so we don't want to create a separate one.
-			new MacOSXController(this);
-			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
-					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
-					closeFile);
-		} else {
-			// On all other platforms we want to have a dedicated "exit" item.
-			JMenuItem exit = GUITools.createJMenuItem(EventHandler.create(
-				ActionListener.class, this, "exitPre"), BaseAction.FILE_EXIT, UIManager
-					.getIcon("ICON_EXIT_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F4,
-						InputEvent.ALT_DOWN_MASK));
-			boolean addSeparator = (openFile != null) || (saveFile != null)
-					|| ((items != null) && (items.length > 0)) || (closeFile != null);
-			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
-					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
-					closeFile, addSeparator ? new JSeparator() : null, exit);
-		}
-		fileMenu.setActionCommand(BaseAction.FILE.toString());
-		menuBar.add(fileMenu);
-
-		/*
-		 * Edit menu
-		 */
-		items = additionalEditMenuItems();
-		/* Speed up the GUI by loading the preferences classes at the beginning
-		 * and add this menu only if there is at least one preference panel defined.
-		 * In case of options defined directly as a collection of KeyProviders, avoid
-		 * using reflection (time consuming).
-		 */
-		int numPrefs = -1;
-		if (appConf != null) {
-			Class<? extends KeyProvider> interactive[] = appConf.getInteractiveOptions();
-			if (interactive != null) {
-				numPrefs = interactive.length;
-			}
-		}
-    if (numPrefs < 0) {
-      numPrefs = MultiplePreferencesPanel.getPossibleTabCount();
-    }
-		if (((numPrefs > 0) && !macOS) || ((items != null) && (items.length > 0))) {
-			title = BaseAction.EDIT.getName();
-			JMenu editMenu;
-			if (macOS || (numPrefs == 0)) {
-				// Mac OS has its own preferences menu which is linked differently.
-				editMenu = GUITools.createJMenu(title == null ? "Edit" : title,
-					BaseAction.EDIT.getToolTip(), (Object[]) items);
-			} else {
-				// On all other systems we want to have a menu item for preferences.
-				JMenuItem preferences = GUITools.createJMenuItem(
-					EventHandler.create(ActionListener.class, this, "preferences"),
-					BaseAction.EDIT_PREFERENCES, UIManager.getIcon("ICON_PREFS_16"),
-					KeyStroke.getKeyStroke('E', InputEvent.ALT_GRAPH_DOWN_MASK), 'P',
-					true);
-				editMenu = GUITools.createJMenu(title == null ? "Edit" : title,
-					BaseAction.EDIT.getToolTip(), items, (items != null)
-							&& (items.length > 0) ? new JSeparator() : null, preferences);
-			}
-			editMenu.setActionCommand(BaseAction.EDIT.toString());
-			menuBar.add(editMenu);
-		}
-		
-		/*
-		 * Additional menus
-		 */
+		// Additional menus
 		JMenu[] additionalMenus = additionalMenus();
+		ArrayList<JMenu> listOfMenus = new ArrayList<JMenu>(
+			additionalMenus == null ? 0 : additionalMenus.length + 2);
+		
+		listOfMenus.add(createFileMenu(loadDefaultFileMenuEntries));
+		listOfMenus.add(createEditMenu());
 		if (additionalMenus != null) {
-			for (JMenu menu : additionalMenus) {
-				if (menu != null) {
-					menuBar.add(menu);
-				}
+			listOfMenus.addAll(Arrays.asList(additionalMenus));
+		}
+		
+		JMenuBar menuBar = new JMenuBar();
+		for (JMenu menu : listOfMenus) {
+			// avoid adding empty menus
+			if ((menu != null) && (menu.getItemCount() > 0)) {
+				menuBar.add(menu);
 			}
 		}
 		
-		/*
-		 * Help menu
-		 */
-		JMenuItem help = (getURLOnlineHelp() == null) ? null : GUITools
-				.createJMenuItem(EventHandler.create(ActionListener.class, this,
-					"showOnlineHelp"), BaseAction.HELP_ONLINE, UIManager
-						.getIcon("ICON_HELP_16"),
-					KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), 'H', true);
-		JMenuItem license = (getURLLicense() == null) ? null : GUITools
-				.createJMenuItem(EventHandler.create(ActionListener.class, this,
-					"showLicense"), BaseAction.HELP_LICENSE, UIManager
-						.getIcon("ICON_LICENSE_16"), KeyStroke.getKeyStroke(KeyEvent.VK_F3,
-					0), 'L', true);
-		JMenuItem update = ((getURLOnlineUpdate() == null)
-				|| (getDottedVersionNumber() == null) || (getDottedVersionNumber()
-				.length() == 0)) ? null : GUITools.createJMenuItem(EventHandler.create(
-			ActionListener.class, this, "onlineUpdate"), BaseAction.HELP_UPDATE,
-			UIManager.getIcon("ICON_GLOBE_16"), KeyStroke.getKeyStroke(
-				KeyEvent.VK_F4, 0), 'U', true);
-		title = BaseAction.HELP.getName();
-		if (title == null) {
-			title = "Help";
-		}
-		JMenu helpMenu;
-		if (macOS || (getURLAboutMessage() == null)) {
-			// In Mac OS X the about message is shown in a different position.
-			helpMenu = GUITools.createJMenu(title, BaseAction.HELP.getToolTip(),
-				help, license, update, additionalHelpMenuItems());
-		} else {
-			JMenuItem about = GUITools.createJMenuItem(
-				EventHandler.create(ActionListener.class, this, "showAboutMessage"),
-				BaseAction.HELP_ABOUT, UIManager.getIcon("ICON_INFO_16"),
-				KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 'I', true);
-			helpMenu = GUITools.createJMenu(title, BaseAction.HELP.getToolTip(),
-				help, about, license, update, additionalHelpMenuItems());
-		}
-		if (helpMenu.getItemCount() > 0) {
+		// Help menu might be a special case.
+		JMenu helpMenu = createHelpMenu();
+		if ((helpMenu != null) && (helpMenu.getItemCount() > 0)) {
 			helpMenu.setActionCommand(BaseAction.HELP.toString());
 			try {
 				menuBar.setHelpMenu(helpMenu);
@@ -694,30 +771,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		
 		return menuBar;
 	}
-
-	/**
-	 * Create a {@link JMenu} with recently opened files.
-	 * @return
-	 */
-	protected JMenu createFileHistory() {
-    JMenu fileHistory = null;
-    if (getMaximalFileHistorySize() > 0) {
-			fileHistory = new JMenu(BaseAction.FILE_OPEN_RECENT.getName());
-			fileHistory.setActionCommand(BaseAction.FILE_OPEN_RECENT.toString());
-			fileHistory.setEnabled(false);
-			String tooltip = BaseAction.FILE_OPEN_RECENT.getToolTip();
-			if (tooltip != null) {
-				fileHistory.setToolTipText(StringUtil.toHTML(tooltip,
-					GUITools.TOOLTIP_LINE_LENGTH, false));
-			}
-			SBPreferences history = SBPreferences
-					.getPreferencesFor(getFileHistoryKeyProvider());
-			String fileList = (history != null) ? history
-					.get(FileHistory.LAST_OPENED) : null;
-			updateFileHistory(FileHistory.Tools.parseList(fileList), fileHistory);
-		}
-    return fileHistory;
-  }
 
 	/**
 	 * By default this method simply returns null. You can override it to create
@@ -744,6 +797,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *         program.
 	 */
 	protected abstract Component createMainComponent();
+
+	/**
+	 * Method that is called on exit, i.e., when this {@link BaseFrame}
+	 * {@link Window} is closing.
+	 */
+	public void exit() {
+	  dispose();
+	}
   
   /**
    * This method is called when the window closes as well as when the user
@@ -769,34 +830,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     }    
     // Call real exit method
     exit();
-	}
-	
-	/**
-   * Restores the window width, height and state from preferences.
-   */
-  private void restoreWindowSizeAndState() {
-    SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
-    // Avoid that the window may be bigger as the screen. This may cause problems on
-    // some computers, e.g., MacOS.
-    Dimension screenDimension = getToolkit().getScreenSize();
-    int width = Math.min(WINDOW_WIDTH.getValue(prefs), (int) screenDimension
-        .getWidth());
-    int height = Math.min(WINDOW_HEIGHT.getValue(prefs), (int) screenDimension
-        .getHeight());
-    int state = WINDOW_STATE.getValue(prefs);
-    setSize(new Dimension(width, height));
-    if (state != Frame.ICONIFIED) {
-      // Never set a frame to be initially iconified ;-)
-      setExtendedState(state);
-    }
-  }
-	
-	/**
-	 * Method that is called on exit, i.e., when this {@link BaseFrame}
-	 * {@link Window} is closing.
-	 */
-	public void exit() {
-	  dispose();
 	}
 	
 	/**
@@ -851,6 +884,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	public Class<? extends FileHistory> getFileHistoryKeyProvider() {
 		return getClass();
 	}
+	
+	/**
+   * @return the {@link #toolBar} if it has been initialized in {@link #createJToolBar()}.
+   * Else, <code>null</code> is returned.
+   */
+  public JToolBar getJToolBar() {
+    return toolBar;
+  }
 	
 	/**
 	 * Override this message to change the texts of some or all {@link JMenuItem}s
@@ -931,6 +972,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
 		return new File(prefs.get(SAVE_DIR));
 	}
+	
+	/**
+   * @return the current {@link StatusBar}.
+   */
+  public StatusBar getStatusBar() {
+    return statusBar;
+  }
 	
 	/**
 	 * The {@link URL} where the about message for this program is located, i.e.,
@@ -1214,46 +1262,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	}
 	
 	/**
-	 * 
-	 * @param fileList
-	 * @param fileHistory
-	 */
-	protected void addToFileHistory(List<File> fileList, JMenu... fileHistory) {
-    if (getMaximalFileHistorySize() > 0) {
-      // Create the list of files to update the file history in the menu.
-      // In addition to the files that have just been opened (above), we
-      // also have to consider older files.
-      
-      // Ensure that the current FileHistory is in the list.
-      JMenu c_fileHistory = (JMenu) GUITools.getJMenuItem(getJMenuBar(),
-        BaseAction.FILE_OPEN_RECENT);
-      if (!ArrayUtils.contains(fileHistory, c_fileHistory)) {
-        fileHistory = ArrayUtils.removeNull(fileHistory);
-        if (fileHistory==null) {
-          fileHistory = new JMenu[]{c_fileHistory};
-        } else {
-          JMenu[] histories = new JMenu[fileHistory.length+1];
-          histories[0] = c_fileHistory;
-          System.arraycopy(fileHistory, 0, histories, 1, fileHistory.length);
-          fileHistory = histories;
-        }
-      }
-      
-      // Add previous files to history
-      File file;
-      for (int i = 0; i < c_fileHistory.getItemCount(); i++) {
-        file = new File(c_fileHistory.getItem(i).getToolTipText());
-        if (file.exists() && file.canRead() && !fileList.contains(file)) {
-          fileList.add(file);
-        }
-      }
-      // update
-      updateFileHistory(fileList, fileHistory);
-    }
-	}
-	
-	
-	/**
 	 * Displays the configuration for the {@link PreferencesDialog}.
 	 * 
 	 * @return 
@@ -1264,6 +1272,27 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
           .getInteractiveOptions());
     }
     return PreferencesDialog.showPreferencesDialog();
+  }
+	
+	
+	/**
+   * Restores the window width, height and state from preferences.
+   */
+  private void restoreWindowSizeAndState() {
+    SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+    // Avoid that the window may be bigger as the screen. This may cause problems on
+    // some computers, e.g., MacOS.
+    Dimension screenDimension = getToolkit().getScreenSize();
+    int width = Math.min(WINDOW_WIDTH.getValue(prefs), (int) screenDimension
+        .getWidth());
+    int height = Math.min(WINDOW_HEIGHT.getValue(prefs), (int) screenDimension
+        .getHeight());
+    int state = WINDOW_STATE.getValue(prefs);
+    setSize(new Dimension(width, height));
+    if (state != Frame.ICONIFIED) {
+      // Never set a frame to be initially iconified ;-)
+      setExtendedState(state);
+    }
   }
 
 	/**

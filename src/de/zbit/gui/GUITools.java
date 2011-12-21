@@ -645,43 +645,49 @@ public class GUITools {
    * of {@link JMenuItem}.
    * @return
    */
-  public static JMenuItem createJMenuItem(ActionListener listener,
-      ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic,
-      Class<?extends JMenuItem> type) {
-    if (type==null) type = JMenuItem.class;
-    JMenuItem item;
-    try {
-      item = type.newInstance();
-    } catch (Exception e) {
-      logger.log(Level.WARNING, "Cannot instantiate class.", e);
-      item = new JMenuItem();
-    }
-
-    if (ks != null) {
-      item.setAccelerator(ks);
-    }
-    if (listener != null) {
-      item.addActionListener(listener);
-    }
-    if (mnemonic != null) {
-      item.setMnemonic(mnemonic.charValue());
-    }
-    if (command != null) {
-      item.setText(command.getName());
-      String toolTip = command.getToolTip();
-      if (toolTip != null) {
-        item.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
-      }
-      item.setActionCommand(command.toString());
-    }
-    if (icon != null) {
-      item.setIcon(icon);
-    } else if (command instanceof ActionCommandWithIcon) {
-      item.setIcon(((ActionCommandWithIcon)command).getIcon());
-    }
-    
-    return item;
-  }
+	public static JMenuItem createJMenuItem(ActionListener listener,
+		ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic,
+		Class<? extends JMenuItem> type) {
+		if (type == null) {
+			type = JMenuItem.class;
+		}
+		JMenuItem item;
+		try {
+			item = type.newInstance();
+		} catch (Exception e) {
+			logger.log(Level.WARNING, "Cannot instantiate class.", e);
+			item = new JMenuItem();
+		}
+		
+		if (ks != null) {
+			item.setAccelerator(ks);
+		}
+		if (listener != null) {
+			item.addActionListener(listener);
+		}
+		if (mnemonic != null) {
+			item.setMnemonic(mnemonic.charValue());
+		}
+		if (command != null) {
+			item.setText(command.getName());
+			String toolTip = command.getToolTip();
+			if (toolTip != null) {
+				if (isMacOSX()) {
+					item.setToolTipText(toolTip);
+				} else {
+					item.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
+				}
+			}
+			item.setActionCommand(command.toString());
+		}
+		if (icon != null) {
+			item.setIcon(icon);
+		} else if (command instanceof ActionCommandWithIcon) {
+			item.setIcon(((ActionCommandWithIcon) command).getIcon());
+		}
+		
+		return item;
+	}
   
   /**
    * @param listener
