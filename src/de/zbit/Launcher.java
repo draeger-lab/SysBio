@@ -367,6 +367,7 @@ public abstract String[] getLogPackages();
 	 * @param appConf
 	 */
 	public void guiMode(AppConf appConf) {
+		GUITools.initLaF(getAppName());
 		java.awt.Window ui = initGUI(appConf);
 		if (ui != null) {
 			if (terminateJVMwhenDone) {
@@ -487,9 +488,11 @@ public abstract String[] getLogPackages();
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
-  public void run() {    
+  public void run() {
     System.setProperty("app.name", getAppName());
     System.setProperty("app.version", getVersionNumber());
+    // Use the systems proxy settings to establish connections
+    System.setProperty("java.net.useSystemProxies", "true");
         
     // Should we start the GUI?
     if (showsGUI()) {

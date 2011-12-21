@@ -990,19 +990,21 @@ public class GUITools {
    *        - Name of your application.
    */
   public static void initLaF(String title) {
-	// 15 s for tooltips to be displayed
-	ToolTipManager.sharedInstance().setDismissDelay(15000);
+		// 15 s for tooltips to be displayed
+		ToolTipManager.sharedInstance().setDismissDelay(15000);
 	
     // Locale.setDefault(Locale.ENGLISH);
     // For MacOS X
-    boolean isMacOSX = false;
-    if (System.getProperty("mrj.version") != null) {
-      isMacOSX = true;
+    boolean isMacOSX = isMacOSX();
+    if (isMacOSX) {
+      // also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
+    	System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+    	System.setProperty("apple.laf.useScreenMenuBar", "true");
       System.setProperty("com.apple.macos.smallTabs", "true");
+      System.setProperty("com.apple.macos.useScreenMenuBar", "true");
+      System.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
+      System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
       System.setProperty("com.apple.mrj.application.live-resize", "true");
-      System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-        title);
-      System.setProperty("apple.laf.useScreenMenuBar", "true");
     }
     try {			
       UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
@@ -1013,35 +1015,46 @@ public class GUITools {
       } else if (isMacOSX) {
         UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
       } else if (osName.contains("Windows")) {
-        UIManager
-        .setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
+        UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
       } else {
-        // UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       }
       
     } catch (Exception e) {
-      // If Nimbus is not available, you can set the GUI to another look
-      // and feel.
-      // Native look and feel for Windows, MacOS X. GTK look and
-      // feel for Linux, FreeBSD
-      try {
-        for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-          if ("Nimbus".equals(info.getName())) {
-            UIManager.setLookAndFeel(info.getClassName());
-            break;
-          }
-        }
-        
-      } catch (Exception exc) {
-        JOptionPane.showMessageDialog(null, StringUtil.toHTML(exc.getLocalizedMessage(),
-          TOOLTIP_LINE_LENGTH), exc.getClass().getName(), JOptionPane.WARNING_MESSAGE);
-        logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
-      }
-    }
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (Exception e1) {
+	      // If Nimbus is not available, you can set the GUI to another look
+	      // and feel.
+	      // Native look and feel for Windows, MacOS X. GTK look and
+	      // feel for Linux, FreeBSD
+				try {
+					for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+						if ("Nimbus".equals(info.getName())) {
+							UIManager.setLookAndFeel(info.getClassName());
+							break;
+						}
+					}
+				} catch (Exception exc) {
+					JOptionPane.showMessageDialog(null,
+						StringUtil.toHTML(exc.getLocalizedMessage(), TOOLTIP_LINE_LENGTH),
+						exc.getClass().getName(), JOptionPane.WARNING_MESSAGE);
+					logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
+				}
+			}
+		}
   }
   
   /**
+   * 
+   * @return
+   */
+  public static boolean isMacOSX() {
+		return System.getProperty("mrj.version") != null;
+	}
+
+
+	/**
    * Checks, if all elements on c are enabled.
    * @param c
    * @return true if and only if c and all components on c are enabled.
