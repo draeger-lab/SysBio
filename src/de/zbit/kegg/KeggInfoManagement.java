@@ -41,11 +41,11 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    * True if this class contents have changed since
    * the last reading/writing of this instance.
    */
-  private boolean hasChanged=false;
+  private transient boolean hasChanged=false;
   /**
    * The adapter to communicate with the KEGG API
    */
-  private KeggAdaptor adap=null;
+  private transient KeggAdaptor adap=null;
   
   
   /**
@@ -421,5 +421,19 @@ CLASS       Metabolism; [...]
       ret.append(' ');
     }
     return ret.toString().trim();
+  }
+  
+  /**
+   * Save the given instance of {@link #KeggInfoManagement()}.
+   * @param filepath
+   * @param m current instance
+   * @return true if and only if the file has been successfully saved.
+   */
+  public static boolean saveToFilesystem(String filepath, KeggInfoManagement m) {
+    boolean ret = InfoManagement.saveToFilesystem(filepath, m);
+    if (ret) {
+      m.hasChanged = false;
+    }
+    return ret;
   }
 }

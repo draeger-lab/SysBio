@@ -1263,6 +1263,15 @@ public class StringUtil {
 	public static String toHTML(String string, int lineBreak) {
 	  return toHTML(string, lineBreak, true);
 	}
+	
+	/**
+	 * Escape all HTML Characters in <code>string</code>.
+	 * @param string
+	 * @return string with escaped characters.
+	 */
+	public static String escapeHTMLchars(String string) {
+	  return EscapeChars.forHTML(string);
+	}
 
   /**
    * Returns a HTML formated String, in which each line is at most lineBreak

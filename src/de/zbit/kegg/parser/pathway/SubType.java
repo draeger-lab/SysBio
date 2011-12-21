@@ -16,6 +16,10 @@
  */
 package de.zbit.kegg.parser.pathway;
 
+import java.util.Enumeration;
+
+import de.zbit.util.Reflect;
+
 /**
  * Corresponding to the Kegg SubType class (see {@link http
  * ://www.genome.jp/kegg/xml/docs/})
@@ -45,63 +49,17 @@ public class SubType {
   public static final String UBIQUITINATION = "ubiquitination";
   public static final String METHYLATION = "methylation";
   
-	/*
-	 * name and value attributes
-	 * 
-	 * The name attribute specifies the subcategory and/or the additional
-	 * information in each of the three types of the generalized protein
-	 * interactions. The correspondence between the type attribute of the
-	 * relation element (ECrel, PPrel or GErel) and the name and value
-	 * attributes of the subtype element is shown below.
-	 * 
-	 * name value
-	 * ECrel PPrel GErel (e.g., -** => PPrel and GErel)
-	 * Explanation 
-	 * 
-	 * - compound Entry element id attribute value for compound
-	 *   **-
-	 *   value for compound. shared with two successive reactions (ECrel)
-	 *   or intermediate of two interacting proteins (PPrel)
-	 * - hidden compound  Entry element id attribute value for hidden compound
-	 *   *--
-	 *   shared with two successive reactions but not displayed in the pathway map
-	 * - activation -->
-	 *   -*-
-	 *   positive and negative effects which may be associated with molecular
-	 *   information below
-	 * - inhibition --|
-	 *   -*-
-	 * - expression -->
-	 *   --*
-	 * - interactions via DNA binding repression --|
-	 *   --*
-	 * - indirect effect ..>
-	 *   -**
-	 *   indirect effect without molecular details
-	 * - state change ...
-	 *   -*-
-	 *   state transition
-	 * - binding/association ---
-	 *   -*-
-	 *   association and dissociation
-	 * - dissociation -+-
-	 *   -*-
-	 * - missing interaction -/-
-	 *   -**
-	 *   missing interaction due to mutation, etc.
-	 * - phosphorylation +p
-	 *   -*-
-	 * - molecular events dephosphorylation -p
-	 *   -*-
-	 * - glycosylation +g
-	 *   -*-
-	 * - ubiquitination +u
-	 *   -*-
-	 * - methylation +m
-	 *   -*-
-	 */
+  /**
+   * Returns an enumeration, that contains all values of all
+   * declared static final variables in this class.
+   * @return
+   */
+  public static Enumeration<String> asEnum() {
+    return Reflect.getStaticFinalVariablesAsEnumeration(SubType.class);
+  }
 
 	/**
+	 * One of the following:
 	 * <ul>
 	 *   <li>compound</li>
 	 *   <li>hidden compound</li>
@@ -122,6 +80,7 @@ public class SubType {
 	 * </ul>
 	 */
 	String name;
+	
 	/**
 	 * Interaction/relation property value.
 	 * See <a href="http://www.genome.jp/kegg/xml/docs/#label:34">official
@@ -246,8 +205,7 @@ public class SubType {
 	 * @param value
 	 */
 	public void setValue(String value) {
-		this.value = value.replace("&gt;", ">").trim(); // + HTML Code
-														// korrekturen
+		this.value = value.replace("&gt;", ">").trim(); // + HTML Code Korrekturen
 	}
 	
 	@Override

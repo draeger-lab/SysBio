@@ -34,7 +34,7 @@ import de.zbit.util.InfoManagement;
  */
 public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObject<Object>>{
   private static final long serialVersionUID = -4559358395869823899L;
-  private KeggAdaptor adap=null;
+  private transient KeggAdaptor adap=null;
   
   /**
    * If this flag is set to true, this class does NOT retrieve any Information, but uses stored information.

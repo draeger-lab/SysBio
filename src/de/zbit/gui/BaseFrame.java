@@ -556,14 +556,16 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				ActionListener.class, this, "openFileAndLogHistory"),
 				BaseAction.FILE_OPEN, UIManager.getIcon("ICON_OPEN_16"), KeyStroke
 						.getKeyStroke('O', ctr_down), 'O', true);
+			
 			saveFile = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "saveFile"),
 				BaseAction.FILE_SAVE, UIManager.getIcon("ICON_SAVE_16"),
 				KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
+			
 			closeFile = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "closeFile"),
 				BaseAction.FILE_CLOSE, UIManager.getIcon("ICON_TRASH_16"),
-				KeyStroke.getKeyStroke('W', ctr_down), 'W', false);
+				KeyStroke.getKeyStroke(KeyEvent.VK_F4, ctr_down), (char)KeyEvent.VK_F4, false);
 		}
 		JMenu fileMenu;
 		JMenuItem items[] = additionalFileMenuItems();

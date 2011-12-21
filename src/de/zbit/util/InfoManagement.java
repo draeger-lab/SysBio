@@ -77,7 +77,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * If true, the cache has changed since last reading/writing
    * and should be saved to disk upon exit.
    */
-  private boolean cacheChangedSinceLastLoading=false;
+  private transient boolean cacheChangedSinceLastLoading=false;
   
   /**
    * Version number of this java class.
@@ -658,11 +658,16 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   /**
    * Save the given instance of the cache (InfoManagement) as serialized object.
    * @param filepath
-   * @param m - object to store.
+   * @param m object to store.
    * @return true if and only if the file has been successfully saved.
    */
   public static boolean saveToFilesystem(String filepath, InfoManagement<?, ?> m) {
-    return Utils.saveGZippedObject(filepath, m);
+    boolean ret = Utils.saveGZippedObject(filepath, m);
+    if (ret) {
+      // reset cache changed flag
+      m.cacheChangedSinceLastLoading = false;
+    }
+    return ret;
   }
   
   /**
