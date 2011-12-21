@@ -223,13 +223,15 @@ public abstract class Launcher implements Runnable, Serializable {
   public void exit(java.awt.Window window, boolean terminateJVMwhenDone) {
     if (terminateJVMwhenDone) {
       StringBuilder exception = new StringBuilder();
-      for (Class<? extends KeyProvider> clazz : getInteractiveOptions()) {
-        SBPreferences prefs = SBPreferences.getPreferencesFor(clazz);
-        try {
-          prefs.flush();
-        } catch (Exception exc) {
-          exception.append(exc.getLocalizedMessage());
-          exception.append('\n');
+      if (getInteractiveOptions()!=null) {
+        for (Class<? extends KeyProvider> clazz : getInteractiveOptions()) {
+          SBPreferences prefs = SBPreferences.getPreferencesFor(clazz);
+          try {
+            prefs.flush();
+          } catch (Exception exc) {
+            exception.append(exc.getLocalizedMessage());
+            exception.append('\n');
+          }
         }
       }
       if (exception.length() > 0) {
@@ -301,16 +303,16 @@ public abstract class Launcher implements Runnable, Serializable {
   public abstract List<Class<? extends KeyProvider>> getInteractiveOptions();
 
   /**
-	   * This method returns the default log level that is the minimal {@link Level}
-	   * for log messages to be displayed to the user.
-	   * 
-	   * @return By default, this method returns {@link Level#FINE}. If something
-	   *         different is desired, this method should be overridden in an
-	   *         implementing class.
-	   */
-		public Level getLogLevel() {
-		  return Level.FINE;
-		}
+   * This method returns the default log level that is the minimal {@link Level}
+   * for log messages to be displayed to the user.
+   * 
+   * @return By default, this method returns {@link Level#FINE}. If something
+   *         different is desired, this method should be overridden in an
+   *         implementing class.
+   */
+  public Level getLogLevel() {
+    return Level.FINE;
+  }
 
   /**
  * @return An array of package names whose log messages should appear.

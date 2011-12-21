@@ -25,12 +25,16 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.logging.Logger;
+
+import sun.reflect.FieldAccessor;
+import sun.reflect.ReflectionFactory;
 
 /**
  * This class loads other classes that implement certain interfaces or extend
@@ -905,21 +909,93 @@ public class Reflect {
    */
   public static Class<?> getMainClass() {
     Class<?> lastMain = null;
+    
+    // Get last command-line from properties
+    String command = System.getProperty("sun.java.command");
+    if (command!=null && command.length()>0) {
+      // Trim arguments
+      int pos = command.indexOf(' ');
+      if (pos>0) command = command.substring(0, pos);
+      try {
+        lastMain = Class.forName(command);
+      } catch (ClassNotFoundException e1) {
+        lastMain = null;
+      }
+    }
+    
     // Get the main class from the stackTrace
-    final Throwable t = new Throwable();
-    for (StackTraceElement e : t.getStackTrace()) {
-      // Search the main class
-      if (e.getMethodName().equalsIgnoreCase("main")) {
-        // Get it's name
-        try {
-          lastMain = Class.forName(e.getClassName());
-          //break;
-        } catch (ClassNotFoundException e1) {
-          // Not possible, because class is in StackTrace
+    if (lastMain==null) {
+      final Throwable t = new Throwable();
+      for (StackTraceElement e : t.getStackTrace()) {
+        // Search the main class
+        if (e.getMethodName().equalsIgnoreCase("main")) {
+          // Get it's name
+          try {
+            lastMain = Class.forName(e.getClassName());
+            //break;
+          } catch (ClassNotFoundException e1) {
+            // Not possible, because class is in StackTrace
+          }
         }
       }
     }
+    
     return lastMain;
+  }
+  
+  /**
+   * Set the value of a (eventually private) final field.
+   * Found at http://www.javaspecialists.eu/archive/Issue161.html
+   * @param field
+   * @param value
+   * @throws NoSuchFieldException
+   * @throws IllegalAccessException
+   */
+  public static void setStaticFinalField(Field field, Object value)
+      throws NoSuchFieldException, IllegalAccessException {
+    ReflectionFactory reflection =
+      ReflectionFactory.getReflectionFactory();
+    final String MODIFIERS_FIELD = "modifiers";
+    
+    // we mark the field to be public
+    field.setAccessible(true);
+    // next we change the modifier in the Field instance to
+    // not be final anymore, thus tricking reflection into
+    // letting us modify the static final field
+    Field modifiersField =
+        Field.class.getDeclaredField(MODIFIERS_FIELD);
+    modifiersField.setAccessible(true);
+    int modifiers = modifiersField.getInt(field);
+    // blank out the final bit in the modifiers int
+    modifiers &= ~Modifier.FINAL;
+    modifiersField.setInt(field, modifiers);
+    FieldAccessor fa = reflection.newFieldAccessor(
+        field, false
+    );
+    fa.set(null, value);
+  }
+
+  /**
+   * @param clazz
+   * @return
+   */
+  public static Enumeration<String> getStaticFinalVariablesAsEnumeration(final Class<?> clazz) {
+    return new Enumeration<String>() {
+      int i=0;
+      @Override
+      public boolean hasMoreElements() {
+        return clazz.getFields().length>i;
+      }
+      @Override
+      public String nextElement() {
+        try {
+          return clazz.getFields()[i++].get(new String()).toString();
+        } catch (Exception e) {
+          e.printStackTrace();
+          return null;
+        }
+      }
+    };
   }
 
 }

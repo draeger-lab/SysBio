@@ -282,7 +282,7 @@ public class KeggInfos implements Serializable {
   /**
    * MIRIAM urn for SBO-terms
    */
-  public static final String miriam_urn_sbo = "urn:miriam:obo.sbo:"; 
+  public static final String miriam_urn_sbo = "urn:miriam:biomodels.sbo:"; 
   
   /**
    * RegEx Pattern for extracting EC enzyme codes

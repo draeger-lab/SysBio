@@ -109,8 +109,7 @@ public class Relation {
     Set<String> subTypeNames= new HashSet<String>();
     if (subtypes==null) return subTypeNames;
     for (SubType s : subtypes) {
-      if(!subTypeNames.contains(s.getName()))
-        subTypeNames.add(s.getName());
+      subTypeNames.add(s.getName());
     }
     return subTypeNames;
   }
