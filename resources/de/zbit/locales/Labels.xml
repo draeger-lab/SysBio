@@ -129,9 +129,9 @@
   
   <!-- Launcher -->
   
-  <entry key="SCANNING_CMD_ARGS">Scanning command line arguments...</entry>
+  <entry key="SCANNING_CMD_ARGS">Scanning command-line arguments...</entry>
   <entry key="COULD_NOT_INITIALIZE_GUI">"Could not initialize graphical user interface."</entry>
-  <entry key="LAUNCHING_CMD_MODE">Launching command line mode of %s.</entry>
+  <entry key="LAUNCHING_CMD_MODE">Launching command-line mode of %s.</entry>
   <entry key="NO_GUI_SUPPORTED">"No graphical user interface supported for %s version %s."</entry>
   <entry key="INCOMPLETE_CMD_ARG_LIST">Incomplete list of command-line arguments. Try to restart %s version %s with the --help option</entry>
     <entry key="COPYRIGHT_MESSAGE">%s
