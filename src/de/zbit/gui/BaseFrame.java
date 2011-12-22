@@ -64,6 +64,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import de.zbit.AppConf;
+import de.zbit.gui.mac.MacOSXController;
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
