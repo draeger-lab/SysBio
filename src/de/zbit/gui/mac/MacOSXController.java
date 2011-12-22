@@ -13,16 +13,14 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.gui;
+package de.zbit.gui.mac;
 
-import com.apple.eawt.AboutHandler;
-import com.apple.eawt.AppEvent.AboutEvent;
-import com.apple.eawt.AppEvent.PreferencesEvent;
-import com.apple.eawt.AppEvent.QuitEvent;
-import com.apple.eawt.Application;
-import com.apple.eawt.PreferencesHandler;
-import com.apple.eawt.QuitHandler;
-import com.apple.eawt.QuitResponse;
+import com.apple.mrj.MRJAboutHandler;
+import com.apple.mrj.MRJApplicationUtils;
+import com.apple.mrj.MRJPrefsHandler;
+import com.apple.mrj.MRJQuitHandler;
+
+import de.zbit.gui.BaseFrame;
 
 /**
  * Adaptation of a {@link BaseFrame} to Mac OS X.
@@ -32,7 +30,8 @@ import com.apple.eawt.QuitResponse;
  * @since 1.1
  * @version $Rev$
  */
-public class MacOSXController implements AboutHandler, PreferencesHandler, QuitHandler {
+@SuppressWarnings("deprecation")
+public class MacOSXController implements MRJAboutHandler, MRJQuitHandler, MRJPrefsHandler {
 	
 	/**
 	 * The actual graphical element whose properties are to be linked to Mac OS X
@@ -46,30 +45,29 @@ public class MacOSXController implements AboutHandler, PreferencesHandler, QuitH
 	 */
 	public MacOSXController(BaseFrame frame) {
 		this.frame = frame;
-		Application app = Application.getApplication();
-		app.setAboutHandler(this);
-		app.setPreferencesHandler(this);
-		app.setQuitHandler(this);
+		MRJApplicationUtils.registerAboutHandler(this);
+		MRJApplicationUtils.registerPrefsHandler(this);
+		MRJApplicationUtils.registerQuitHandler(this);
 	}
 
 	/* (non-Javadoc)
-	 * @see com.apple.eawt.AboutHandler#handleAbout(com.apple.eawt.AppEvent.AboutEvent)
+	 * @see com.apple.mrj.MRJAboutHandler#handleAbout()
 	 */
-	public void handleAbout(AboutEvent aEvt) {
+	public void handleAbout() {
 		frame.showAboutMessage();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.apple.eawt.PreferencesHandler#handlePreferences(com.apple.eawt.AppEvent.PreferencesEvent)
+	 * @see com.apple.mrj.MRJPrefsHandler#handlePrefs()
 	 */
-	public void handlePreferences(PreferencesEvent pEvt) {
+	public void handlePrefs() throws IllegalStateException {
 		frame.preferences();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.apple.eawt.QuitHandler#handleQuitRequestWith(com.apple.eawt.AppEvent.QuitEvent, com.apple.eawt.QuitResponse)
+	 * @see com.apple.mrj.MRJQuitHandler#handleQuit()
 	 */
-	public void handleQuitRequestWith(QuitEvent qEvt, QuitResponse qr) {
+	public void handleQuit() throws IllegalStateException {
 		frame.exitPre();
 	}
 	
