@@ -596,7 +596,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			saveFile = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "saveFile"),
 				BaseAction.FILE_SAVE_AS, UIManager.getIcon("ICON_SAVE_16"),
-				KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
+				KeyStroke.getKeyStroke('S', ctr_down | InputEvent.SHIFT_DOWN_MASK),
+				'S', false);
 			
 			closeFile = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "closeFile"),

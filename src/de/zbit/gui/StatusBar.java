@@ -171,6 +171,9 @@ public class StatusBar extends JPanel implements ProgressListener {
 
 		// Change status bar icon with frame
 		frame.addPropertyChangeListener("iconImage", new PropertyChangeListener() {
+			/* (non-Javadoc)
+			 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+			 */
 			public void propertyChange(PropertyChangeEvent evt) {
 				Icon icon = null;
 				icon = frame.getIconImage()!=null?new ImageIcon(frame.getIconImage()):null;
