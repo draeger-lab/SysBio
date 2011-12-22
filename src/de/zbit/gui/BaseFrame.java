@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -64,7 +65,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import de.zbit.AppConf;
-import de.zbit.gui.mac.MacOSXController;
+import de.zbit.gui.mac.MacOSXController2;
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
@@ -288,39 +289,17 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     this.appConf = appConf;
     init();
   }
-	
+
 	/**
 	 * Creates a new {@link BaseFrame} with the given
 	 * {@link GraphicsConfiguration}.
 	 * 
+	 * @param title
 	 * @param gc
 	 */
-	public BaseFrame(GraphicsConfiguration gc) {
+	public BaseFrame(AppConf appConf, GraphicsConfiguration gc) {
 		super(gc);
-		init();
-	}
-	
-	/**
-	 * Creates a new {@link BaseFrame} with the given title.
-	 * 
-	 * @param title
-	 * @throws HeadlessException
-	 */
-	public BaseFrame(String title) throws HeadlessException {
-		super(title);
-		init();
-	}
-
-
-  /**
-	 * Creates a new {@link BaseFrame} with the given title and the given
-	 * {@link GraphicsConfiguration}.
-	 * 
-	 * @param title
-	 * @param gc
-	 */
-	public BaseFrame(String title, GraphicsConfiguration gc) {
-		super(title, gc);
+		this.appConf = appConf;
 		init();
 	}
   
@@ -622,7 +601,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			closeFile = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "closeFile"),
 				BaseAction.FILE_CLOSE, UIManager.getIcon("ICON_TRASH_16"),
-				KeyStroke.getKeyStroke(KeyEvent.VK_F4, ctr_down), (char)KeyEvent.VK_F4, false);
+				KeyStroke.getKeyStroke('W', ctr_down), 'W', false);
 		}
 		JMenu fileMenu;
 		JMenuItem items[] = additionalFileMenuItems();
@@ -630,7 +609,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		String title = BaseAction.FILE.getName();
 		if (macOS) {
 			// Mac OS has its own "quit" menu item, so we don't want to create a separate one.
-			new MacOSXController(this);
+			new MacOSXController2(this);
 			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
 					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
 					closeFile);
@@ -834,6 +813,23 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	}
 	
 	/**
+	 * This convenient method allows callers to change the entry names of
+	 * {@link JMenuItem}s in the {@link JMenuBar} of this {@link BaseFrame}. The
+	 * returned {@link Map} contains a mapping from each {@link BaseAction} to the
+	 * name that is to be associated with it. By default this method returns
+	 * <code>null</code>, but you may override this method in order to customize
+	 * the menu bar more easily. In this way, it is even possible to override
+	 * single entries of the {@link JMenu} instead of being forced to override the
+	 * entire list.
+	 * 
+	 * @return a mapping from {@link BaseAction} to its display name,
+	 *         <code>null</code> by default.
+	 */
+  protected Map<BaseAction, String> getAlternativeBaseActionNames() {
+		return null;
+	}
+	
+	/**
 	 * The name of this program.
 	 * 
 	 * @return
@@ -989,7 +985,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @return
 	 */
 	public abstract URL getURLAboutMessage();
-	
+
 	/**
 	 * The {@link URL} of the license file under which this application is
 	 * distributed.
@@ -997,7 +993,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @return
 	 */
 	public abstract URL getURLLicense();
-
+	
 	/**
 	 * The {@link URL} of the online help file.
 	 * 
@@ -1035,7 +1031,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	  }
 	  return null;
 	}
-	
+
 	/**
 	 * Initializes this graphical user interface.
 	 */
@@ -1046,14 +1042,25 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		setDefaultLookAndFeelDecorated(true);
 		
 		try {
+			String defaultLocation = "de.zbit.locales.BaseAction";
 			BaseAction.nameProperties.setDefaults(ResourceManager
-					.getBundle("de.zbit.locales.BaseAction"));
+					.getBundle(defaultLocation));
 			String location = getLocationOfBaseActionProperties();
-			if (location != null) {
+			if ((location != null) && (!location.equals(defaultLocation))) {
 				try {
 					BaseAction.nameProperties.putAll(ResourceManager.getBundle(location));
 				} catch (Exception exc) {
-				  logger.finest(exc.getLocalizedMessage());
+					logger.finest(exc.getLocalizedMessage());
+				}
+			}
+			Map<BaseAction, String> alternativeNames = getAlternativeBaseActionNames();
+			if (alternativeNames != null) {
+				for (Map.Entry<BaseAction, String> entry : alternativeNames.entrySet()) {
+					try {
+						BaseAction.nameProperties.put(entry.getKey(), entry.getValue());
+					} catch (Exception exc) {
+						logger.finest(exc.getLocalizedMessage());
+					}
 				}
 			}
 		} catch (Exception exc) {
@@ -1098,8 +1105,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		setLocationRelativeTo(null);
 	}
 
-
-  /**
+	/**
 	 * Initialize the status bar. This method can be overwritten
 	 * and if null is returned, the status bar is disabled.
 	 */

@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
@@ -80,6 +81,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 
+import de.zbit.Launcher;
 import de.zbit.io.OpenFile;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
@@ -991,41 +993,22 @@ public class GUITools {
   
   /**
    * Initializes the look and feel.
-   * 
-   * @param title
-   *        - Name of your application.
    */
-  public static void initLaF(String title) {
-		// 15 s for tooltips to be displayed
-		ToolTipManager.sharedInstance().setDismissDelay(15000);
-	
+  public static void initLaF() {
     // Locale.setDefault(Locale.ENGLISH);
-    // For MacOS X
-    boolean isMacOSX = isMacOSX();
-    if (isMacOSX) {
-      // also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
-    	System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
-    	System.setProperty("apple.laf.useScreenMenuBar", "true");
-      System.setProperty("com.apple.macos.smallTabs", "true");
-      System.setProperty("com.apple.macos.useScreenMenuBar", "true");
-      System.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
-      System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
-      System.setProperty("com.apple.mrj.application.live-resize", "true");
-    }
-    try {			
+    try {	
       UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
       String osName = System.getProperty("os.name");
       if (osName.equals("Linux") || osName.equals("FreeBSD")) {
         UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
         // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-      } else if (isMacOSX) {
+      } else if (isMacOSX()) {
         UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
       } else if (osName.contains("Windows")) {
         UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
       } else {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       }
-      
     } catch (Exception e) {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -1049,18 +1032,46 @@ public class GUITools {
 				}
 			}
 		}
+		// 15 s for tooltips to be displayed
+		ToolTipManager.sharedInstance().setDismissDelay(15000);
   }
   
   /**
-   * 
-   * @return
-   */
-  public static boolean isMacOSX() {
-		return System.getProperty("mrj.version") != null;
-	}
-
-
-	/**
+	 * Initializes the look and feel. This method is only useful when the calling
+	 * class contains the main method of your program and is also derived from this
+	 * class ({@link GUITools}). The preferred way to set up your application would
+	 * be to let it extend {@link Launcher}.
+	 * 
+	 * @param title
+	 *        the title to be displayed in the xDock in case of MacOS. Note that
+	 *        this title can only be displayed if this method belongs to the class
+	 *        that has the main method (or is in a super class of it), i.e., in
+	 *        order to make use of this method in a proper way, you have to extend
+	 *        this {@link GUITools} and to put the main method into your derived
+	 *        class. From this main method you then have to call this method.
+	 *        Otherwise, this title will not have any effect. An easier way to set
+	 *        the xDock properties for your application would be to use the
+	 *        {@link Launcher} class that already correctly sets all properties
+	 *        for you.
+	 */
+  public static void initLaF(String title) {
+		if (isMacOSX()) {
+			Properties p = System.getProperties();
+			// also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
+			p.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+			p.setProperty("apple.laf.useScreenMenuBar", "true");
+			p.setProperty("com.apple.macos.smallTabs", "true");
+			p.setProperty("com.apple.macos.useScreenMenuBar", "true");
+			if ((title != null) && (title.length() > 0)) {
+				p.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
+			}
+			p.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
+			p.setProperty("com.apple.mrj.application.live-resize", "true");
+		}
+		initLaF();
+  }
+  
+  /**
    * Checks, if all elements on c are enabled.
    * @param c
    * @return true if and only if c and all components on c are enabled.
@@ -1079,6 +1090,15 @@ public class GUITools {
     }
     return enabled;
   }
+
+
+	/**
+   * 
+   * @return
+   */
+  public static boolean isMacOSX() {
+		return System.getProperty("mrj.version") != null;
+	}
   
   /**
    * Create an open file dialog that let's the user
