@@ -25,12 +25,14 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageObserver;
 import java.awt.image.Kernel;
 import java.awt.image.RescaleOp;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -434,5 +436,24 @@ public class ImageTools {
   public static BufferedImage getImage(URL imagePath) throws IOException {
     return ImageIO.read(imagePath);
   }
+
+  /**
+   * 
+   * @param listOfImages
+   * @param obs allows <code>null</code>
+   * @return
+   */
+	public static Image getImageOfHighestResolution(List<Image> listOfImages, ImageObserver obs) {
+		Image image = null;
+		int resolution = Integer.MIN_VALUE;
+		for (Image i : listOfImages) {
+			int res = i.getWidth(obs) * i.getHeight(obs);
+			if (res>resolution) {
+				image = i;
+				resolution = res;
+			}
+		}
+		return image;
+	}
 
 }

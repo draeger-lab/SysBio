@@ -119,11 +119,20 @@ public abstract class Launcher implements Runnable, Serializable {
   private Launcher(boolean showCopyrightMessage) {
     super();
     if (showCopyrightMessage) {
-      printCopyrightMessage();
+			printCopyrightMessage();
+	    /* 
+	     * In this case we can assume that this is the first instance of 
+	     * Launcher that has been initialized. So let's also set a minimum
+	     * of Mac OS X specific properties if we operate on a Mac. 
+	     */
+			if (System.getProperty("mrj.version") != null) {
+				System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+					getAppName());
+			}
     }
     this.terminateJVMwhenDone = true;
     this.props = new SBProperties();
-    LogUtil.initializeLogging(getLogLevel(), getLogPackages());
+	  LogUtil.initializeLogging(getLogLevel(), getLogPackages());
   }
 
   /**
@@ -371,7 +380,6 @@ public abstract class Launcher implements Runnable, Serializable {
 	 * @param appConf
 	 */
 	public void guiMode(AppConf appConf) {
-		GUITools.initLaF(getAppName());
 		java.awt.Window ui = initGUI(appConf);
 		if (ui != null) {
 			if (terminateJVMwhenDone) {
@@ -488,8 +496,7 @@ public abstract class Launcher implements Runnable, Serializable {
     System.out.println(message.toString());
   }
 	
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
   public void run() {
@@ -500,10 +507,22 @@ public abstract class Launcher implements Runnable, Serializable {
         
     // Should we start the GUI?
     if (showsGUI()) {
+			if (System.getProperty("mrj.version") != null) {
+				// also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
+				System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+				System.setProperty("apple.laf.useScreenMenuBar", "true");
+				System.setProperty("com.apple.macos.smallTabs", "true");
+				System.setProperty("com.apple.macos.useScreenMenuBar", "true");
+				/* 
+				 * Note: the xDock name property must be set before parsing 
+				 * command-line arguments! See above!
+				 */
+				System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
+				System.setProperty("com.apple.mrj.application.live-resize", "true");
+			}
+			GUITools.initLaF();
     	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-        /*
-         * (non-Javadoc)
-         * 
+        /* (non-Javadoc)
          * @see java.lang.Runnable#run()
          */
         public void run() {
