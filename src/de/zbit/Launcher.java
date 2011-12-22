@@ -244,7 +244,7 @@ public abstract class Launcher implements Runnable, Serializable {
           }
         }
         if (showExc) {
-          logger.fine('\n' + exception.toString());
+          logger.warning('\n' + exception.toString());
         }
       }
       System.exit(0);
@@ -311,15 +311,17 @@ public abstract class Launcher implements Runnable, Serializable {
    *         implementing class.
    */
   public Level getLogLevel() {
-    return Level.FINE;
+    return Level.INFO;
   }
 
   /**
- * @return An array of package names whose log messages should appear.
- */
-public abstract String[] getLogPackages();
-
-	/**
+   * @return An array of package names whose log messages should appear.
+   */
+  public String[] getLogPackages() {
+    return new String[] {"de.zbit"};
+  }
+  
+  /**
 	 * Gives the location where the license of this program is documented. This
 	 * could be, for instance, <a
 	 * href="http://www.gnu.org/copyleft/gpl.html">http:
@@ -384,12 +386,12 @@ public abstract String[] getLogPackages();
 			ui.toFront();
 		} else {
 			if (appConf.getCmdArgs().getBooleanProperty(GUIOptions.GUI)) {
-				logger.fine(String.format(
+				logger.warning(String.format(
 				  resources.getString("NO_GUI_SUPPORTED"),
 				  getAppName(),
 				  getVersionNumber()));
 			} else {
-				logger.fine(String.format(
+				logger.warning(String.format(
 				  "INCOMPLETE_CMD_ARG_LIST",
 				  getAppName(),
 				  getVersionNumber()));
@@ -455,7 +457,7 @@ public abstract String[] getLogPackages();
    * @return
    */
   public SBProperties parseCmdArgs(String[] args) {
-    logger.finer(resources.getString("SCANNING_CMD_ARGS"));
+    logger.fine(resources.getString("SCANNING_CMD_ARGS"));
     props = SBPreferences.analyzeCommandLineArguments(getCmdLineOptions(),
       args);
     return props;
@@ -510,7 +512,7 @@ public abstract String[] getLogPackages();
             guiMode(appCnf);
           } catch (java.awt.HeadlessException exc) {
             if (props.getBooleanProperty(GUIOptions.GUI)) {
-              logger.fine(resources.getString("COULD_NOT_INITIALIZE_GUI"));
+              logger.severe(resources.getString("COULD_NOT_INITIALIZE_GUI"));
             }
             launchCommandLineMode(appCnf);
           }
