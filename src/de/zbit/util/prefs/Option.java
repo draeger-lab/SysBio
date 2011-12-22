@@ -1640,12 +1640,13 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 			sb.append(',');
 		}
 		String cmd = toCommandLineOptionKey();
-		if (requiredType.equals(Boolean.class)
-				&& !(Boolean.parseBoolean(defaultValue.toString()) || isSetRangeSpecification())) {
-			// Special treatment of boolean arguments whose presents only is already sufficient
-			// to switch some feature on.
-			sb.append(cmd);
-		} else {
+//		if (requiredType.equals(Boolean.class)
+//				&& !(Boolean.parseBoolean(defaultValue.toString()) || isSetRangeSpecification())) {
+//			// Special treatment of boolean arguments whose presents only is already sufficient
+//			// to switch some feature on.
+//			sb.append(cmd);
+//		} else {
+		// Removed. Explanation see below
 			String separators[] = { "=", " ", "" };
 			for (int i = 0; i < separators.length; i++) {
 				sb.append(cmd);
@@ -1654,7 +1655,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 					sb.append(',');
 				}
 			}
-		}
+//		}
 		sb.append('%');
 		if (requiredType.equals(Float.class)) {
 			sb.append('f');
@@ -1673,11 +1674,17 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		   *    option plus "true" or "false" (%b) 
 		   * 2) otherwise it only uses the presence or absence of the option (%v)
 		   */
-		  if (Boolean.parseBoolean(defaultValue.toString()) || isSetRangeSpecification()) {
-		    sb.append('b');
-		  } else {
-		    sb.append('v');
-		  }
+		  /* Changed by Wrzodek: since we make thse options persistent, we might
+		   * fave a default value of false, but a persitent value of true in memory.
+		   * If we make the option with %v, it is impossible to change this option
+		   * to be false. Thus, always make an option that expects an argument.
+		   */
+//		  if (Boolean.parseBoolean(defaultValue.toString()) || isSetRangeSpecification()) {
+//		    sb.append('b');
+//		  } else {
+//		    sb.append('v');
+//		  }
+		  sb.append('b');
 		} else if (requiredType.equals(Character.class)) {
 			sb.append('c');
 		} else if (requiredType.equals(String.class)) {

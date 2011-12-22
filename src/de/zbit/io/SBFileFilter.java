@@ -237,22 +237,21 @@ public class SBFileFilter extends GeneralFileFilter {
      */
     public Pattern getLinePattern() {
       if (this == KGML_FILES) {
-        return Pattern.compile(".*?<!DOCTYPE[\\p{ASCII}]*KGML[\\p{ASCII}]*>.*?", Pattern.MULTILINE & Pattern.DOTALL);
+        return Pattern.compile("<!DOCTYPE[\\p{ASCII}]*KGML[\\p{ASCII}]*>", Pattern.MULTILINE & Pattern.DOTALL);
       }
       if (this.toString().startsWith(SBML_FILES.toString())) {
         String anyChar = "[\\s\\w\\p{ASCII}]*";
         String whiteSpace = "[\\s]+";
-        String anything = "[\\s\\S]*";
         String number = "[1-9]+[0-9]*";
         String level = number, version = number;
-        String sbmlDef = "%s<sbml%s%s((level=\"%s\"%s%sversion=\"%s\")|(version=\"%s\"%s%slevel=\"%s\"))%s>%s";
+        String sbmlDef = "<sbml%s%s((level=\"%s\"%s%sversion=\"%s\")|(version=\"%s\"%s%slevel=\"%s\"))%s>";
         if (this != SBML_FILES) {
           level = this.toString().substring(12, 13);
           version = this.toString().substring(14);
         }
-				return Pattern.compile(String.format(sbmlDef, anything, whiteSpace,
+				return Pattern.compile(String.format(sbmlDef, whiteSpace,
 					anyChar, level, whiteSpace, anyChar, version, version, whiteSpace,
-					anyChar, level, anyChar, anything), Pattern.MULTILINE
+					anyChar, level, anyChar), Pattern.MULTILINE
 						& Pattern.DOTALL);
       }
       return null;
@@ -309,7 +308,7 @@ public class SBFileFilter extends GeneralFileFilter {
 					if (bytesRead > 0) {
 						line.append(new String(chunk, 0, bytesRead));
 						matcher = pattern.matcher(line.toString());
-						retVal = matcher.matches();
+						retVal = matcher.find();
 					}
         }
       } catch (Throwable e) {
