@@ -339,7 +339,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *         above of the exit entry. This method may return null.
 	 */
 	protected JMenuItem[] additionalFileMenuItems() {
-		// empty method
+		// Intentionally left blank
 		return null;
 	}
 	

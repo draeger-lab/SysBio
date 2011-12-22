@@ -1304,5 +1304,26 @@ public class StringUtil {
 		
 		return sb.toString();
 	}
+
+  /**
+   * Perform an indexOf with mutliple strings.
+   * @param string
+   * @param lookFor multiple strings to search for. Returns 
+   * @return the first occurance of any of <code>lookFor</code> strings.
+   */
+  public static int indexOf(String string, String... lookFor) {
+    int firstMatch = -1;
+    if (lookFor!=null) {
+      for (String s: lookFor) {
+        int pos = string.indexOf(s);
+        if (pos==0) return pos; // can not get lower
+        else if (pos>0 && (pos<firstMatch || firstMatch<0)) {
+          firstMatch = pos;
+        }
+      }
+    }
+    
+    return firstMatch;
+  }
   
 }

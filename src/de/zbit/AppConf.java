@@ -34,6 +34,7 @@ import de.zbit.util.prefs.SBProperties;
 /**
  * @author Andreas Dr&auml;ger
  * @author Stephanie Tscherneck
+ * @author Clemens Wrzodek
  * @version $Rev$
  */
 public class AppConf implements Cloneable, Serializable {
@@ -85,6 +86,11 @@ public class AppConf implements Cloneable, Serializable {
   
   /**
    * 
+   */
+  private short yearOfProjectStart;
+  
+  /**
+   * 
    * @param pc
    */
   public AppConf(AppConf pc) {
@@ -115,6 +121,7 @@ public class AppConf implements Cloneable, Serializable {
       this.versionNumber = new String(pc.getVersionNumber());
     }
     this.yearOfRelease = pc.getYearOfRelease();
+    this.yearOfProjectStart = pc.getYearOfProjectStart();
   }
   
   /**
@@ -122,6 +129,7 @@ public class AppConf implements Cloneable, Serializable {
    * @param applicationName
    * @param versionNumber
    * @param yearOfRelease
+   * @param yearOfProjectStart
    * @param cmdOptions
    * @param cmdArgs
    * @param interactiveOptions
@@ -129,10 +137,10 @@ public class AppConf implements Cloneable, Serializable {
    * @param onlineUpdate
    */
   public AppConf(String applicationName, String versionNumber,
-    short yearOfRelease, Class<? extends KeyProvider> cmdOptions[],
+    short yearOfRelease, short yearOfProjectStart, Class<? extends KeyProvider> cmdOptions[],
     SBProperties cmdArgs, Class<? extends KeyProvider> interactiveOptions[],
     URL licenseFile, URL onlineUpdate) {
-    this(applicationName, versionNumber, yearOfRelease, cmdOptions, cmdArgs,
+    this(applicationName, versionNumber, yearOfRelease, yearOfProjectStart, cmdOptions, cmdArgs,
       licenseFile);
     this.interactiveOptions = interactiveOptions;
     this.onlineUpdate = onlineUpdate;
@@ -148,12 +156,13 @@ public class AppConf implements Cloneable, Serializable {
    * @param licenseFile
    */
   public AppConf(String applicationName, String versionNumber,
-    short yearOfRelease, Class<? extends KeyProvider> cmdOptions[],
+    short yearOfRelease, short yearOfProjectStart, Class<? extends KeyProvider> cmdOptions[],
     SBProperties cmdArgs, URL licenseFile) {
     super();
     this.applicationName = applicationName;
     this.versionNumber = versionNumber;
     this.yearOfRelease = yearOfRelease;
+    this.yearOfProjectStart = yearOfProjectStart;
     this.cmdOptions = cmdOptions;
     this.cmdArgs = cmdArgs;
     this.licenceFile = licenseFile;
@@ -164,6 +173,7 @@ public class AppConf implements Cloneable, Serializable {
    * @param applicationName
    * @param versionNumber
    * @param yearOfProgramRelease
+   * @param yearOfProjectStart
    * @param commandLineOptions
    * @param commandLineArgs
    * @param interactiveOptions
@@ -172,12 +182,12 @@ public class AppConf implements Cloneable, Serializable {
    */
   @SuppressWarnings("unchecked")
   public AppConf(String applicationName, String versionNumber,
-    short yearOfProgramRelease,
+    short yearOfProgramRelease, short yearOfProjectStart,
     List<Class<? extends KeyProvider>> commandLineOptions,
     SBProperties commandLineArgs,
     List<Class<? extends KeyProvider>> interactiveOptions, URL urLlicenseFile,
     URL urlOnlineUpdate) {
-    this(applicationName, versionNumber, yearOfProgramRelease,
+    this(applicationName, versionNumber, yearOfProgramRelease, yearOfProjectStart,
       (Class<? extends KeyProvider>[]) (commandLineOptions != null ? commandLineOptions
           .toArray(new Class<?>[0]) : null),
       commandLineArgs,
@@ -257,6 +267,14 @@ public class AppConf implements Cloneable, Serializable {
   public short getYearOfRelease() {
     return yearOfRelease;
   }
+  
+  /**
+   * @return the year when the project started
+   */
+  public short getYearOfProjectStart() {
+    return yearOfProjectStart;
+  }
+  
 
   /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
@@ -267,13 +285,13 @@ public class AppConf implements Cloneable, Serializable {
     int hashCode = getClass().getName().hashCode();
     hashCode += cmdArgs != null ? prime * cmdArgs.hashCode() : 0;
     hashCode += cmdOptions != null ? prime * cmdOptions.hashCode() : 0;
-    hashCode += interactiveOptions != null ? prime
-        * interactiveOptions.hashCode() : 0;
+    hashCode += interactiveOptions != null ? prime * interactiveOptions.hashCode() : 0;
     hashCode += licenceFile != null ? prime * licenceFile.hashCode() : 0;
     hashCode += onlineUpdate != null ? prime * onlineUpdate.hashCode() : 0;
     hashCode += applicationName != null ? prime * applicationName.hashCode() : 0;
     hashCode += versionNumber != null ? prime * versionNumber.hashCode() : 0;
     hashCode += prime * Short.valueOf(yearOfRelease).hashCode();
+    hashCode += prime * Short.valueOf(yearOfProjectStart).hashCode();
     return super.hashCode();
   }
 

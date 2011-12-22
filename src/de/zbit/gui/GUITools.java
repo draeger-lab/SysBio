@@ -24,9 +24,12 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Frame;
+import java.awt.Graphics2D;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.SplashScreen;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -37,6 +40,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -81,6 +85,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 
+import de.zbit.AppConf;
 import de.zbit.Launcher;
 import de.zbit.io.OpenFile;
 import de.zbit.util.Reflect;
@@ -979,6 +984,51 @@ public class GUITools {
         return;
       }
       splash.close();
+    } catch (Throwable t) {}
+  }
+  
+  /**
+   * 
+   */
+  public static void configureSplashScreen(AppConf conf, boolean showVersionNumber, boolean showCopyright) {
+    try {
+      int distanceToBorder = 7;
+      SplashScreen splash = SplashScreen.getSplashScreen();
+      Graphics2D g = splash==null?null:splash.createGraphics();
+      if (g==null || (!showVersionNumber && !showCopyright)) return;
+      
+      // Decrease font size and set color
+      g.setFont( g.getFont().deriveFont((g.getFont().getSize()*0.8f)) );
+      g.setColor(ColorPalette.CAMINE_RED);
+      
+      Rectangle b = splash.getBounds();
+      FontMetrics m = g.getFontMetrics();
+      
+      // Show version number in lower right corner
+      if (showVersionNumber) {
+        Rectangle2D stringBounds = m.getStringBounds(conf.getVersionNumber(), g);
+        g.drawString(conf.getVersionNumber(), 
+          (int) (b.getWidth()-stringBounds.getWidth()-distanceToBorder),
+          (int) (b.getHeight()-distanceToBorder));
+      }
+      
+      
+      // Show copyright in lower left corner
+      if (showCopyright) {
+        ResourceBundle resources = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+        
+        String cMessage = String.format(resources.getString("COPYRIGHT_MESSAGE"),
+          "", conf.getYearOfProjectStart(), conf.getYearOfRelease()).trim();
+        int pos = StringUtil.indexOf(cMessage, ",", "\n");
+        if (pos>0) {
+          cMessage = cMessage.substring(0, pos);
+        }
+        
+        g.drawString(cMessage, (int) (distanceToBorder),
+          (int) (b.getHeight()-distanceToBorder));    
+      }
+      
+    splash.update();
     } catch (Throwable t) {}
   }
   
