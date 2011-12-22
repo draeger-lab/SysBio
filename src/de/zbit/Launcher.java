@@ -32,6 +32,7 @@ import de.zbit.gui.UpdateMessage;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.logging.LogUtil;
 import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
@@ -121,63 +122,25 @@ public abstract class Launcher implements Runnable, Serializable {
     super();
     
     configureSystemProperties();
-    GUITools.configureSplashScreen(getAppConf(), addVersionNumberToSplashScreen(), addCopyrightToSplashScreen());
     
-    if (showCopyrightMessage) {
+    /* 
+     * Do not call getAppConf() here because this will cause 
+     * several other operations to be executed...
+     */
+		GUITools.configureSplashScreen(getVersionNumber(),
+			getYearWhenProjectWasStarted(), getYearOfProgramRelease(),
+			addVersionNumberToSplashScreen(), addCopyrightToSplashScreen());
+    
+	  if (showCopyrightMessage) {
 			printCopyrightMessage();
     }
+    
     this.terminateJVMwhenDone = true;
     this.props = new SBProperties();
-	  LogUtil.initializeLogging(getLogLevel(), getLogPackages());
+    LogUtil.initializeLogging(getLogLevel(), getLogPackages());
   }
 
-  /**
-   * @return
-   */
-  protected boolean addCopyrightToSplashScreen() {
-    return true;
-  }
-
-  /**
-   * @return
-   */
-  protected boolean addVersionNumberToSplashScreen() {
-    return true;
-  }
-
-  /**
-   * 
-   */
-  protected void configureSystemProperties() {
-    /* 
-     * In this case we can assume that this is the first instance of 
-     * Launcher that has been initialized. So let's also set a minimum
-     * of Mac OS X specific properties if we operate on a Mac. 
-     */
-    if (System.getProperty("mrj.version") != null) {
-      // also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
-      System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
-      System.setProperty("apple.laf.useScreenMenuBar", "true");
-      System.setProperty("com.apple.macos.smallTabs", "true");
-      System.setProperty("com.apple.macos.useScreenMenuBar", "true");
-      /* 
-       * Note: the xDock name property must be set before parsing 
-       * command-line arguments! See above!
-       */
-      System.setProperty("com.apple.mrj.application.apple.menu.about.name", getAppName());
-      
-      System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
-      System.setProperty("com.apple.mrj.application.live-resize", "true");
-    }
-    // Use the systems proxy settings to establish connections
-    // This must also be done prior to any other calls.
-    System.setProperty("java.net.useSystemProxies", "true");
-    
-    System.setProperty("app.name", getAppName());
-    System.setProperty("app.version", getVersionNumber());
-  }
-
-  /**
+	/**
    * Copy constructor.
    * 
    * @param launcher
@@ -187,7 +150,7 @@ public abstract class Launcher implements Runnable, Serializable {
     this.props = launcher.getCommandLineArgs().clone();
     this.terminateJVMwhenDone = launcher.isTerminateJVMwhenDone();
   }
-	
+
   /**
 	 * Initializes this program including logging, log levels and packages,
 	 * parsing of command-line arguments, initializing of a graphical user
@@ -204,6 +167,29 @@ public abstract class Launcher implements Runnable, Serializable {
 	}
 
   /**
+	 * Decides whether or not the copyright notice of the copyright holder of this
+	 * program should be displayed on a layer on top of the splash screen of the
+	 * program (if there is any).
+	 * 
+	 * @return <code>true</code> if the copyright message should be displayed,
+	 *         <code>false</code> otherwise.
+	 */
+  protected boolean addCopyrightToSplashScreen() {
+    return true;
+  }
+
+  /**
+	 * Decides whether or not the version number of this program should be shown
+	 * on a layer on top of the program's splash screen (if there is any).
+	 * 
+	 * @return <code>true</code> if the version number should be displayed,
+	 *         <code>false</code> otherwise.
+	 */
+  protected boolean addVersionNumberToSplashScreen() {
+    return true;
+  }
+	
+  /**
 	 * This method can be called when starting the command-line mode of this
 	 * program. It checks for updates and may display a user notification (on the
 	 * console) in case that an update is available.
@@ -218,8 +204,8 @@ public abstract class Launcher implements Runnable, Serializable {
 			update.execute();
 		}
 	}
-		
-	/**
+
+  /**
 	 * This method is called in case that no graphical user interface is to be
 	 * used. The given properties contain all the key-value pairs that have been
 	 * defined on the command line when starting this program.
@@ -227,6 +213,43 @@ public abstract class Launcher implements Runnable, Serializable {
 	 * @param appConf
 	 */
 	public abstract void commandLineMode(AppConf appConf);
+		
+	/**
+	 * Configures necessary properties of the {@link System} in order to support
+	 * certain platform dependencies correctly. This method should be called very
+	 * early when the program is launched (as early as possible).
+	 */
+  protected void configureSystemProperties() {
+    /* 
+     * In this case we can assume that this is the first instance of 
+     * Launcher that has been initialized. So let's also set a minimum
+     * of Mac OS X specific properties if we operate on a Mac. 
+     */
+  	Properties p = System.getProperties();
+  	
+		if ((p.getProperty("mrj.version") != null)
+				|| (p.getProperty("os.name").toLowerCase().indexOf("mac") != -1)) {
+      // might make using -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line unnecessary.
+      p.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+      p.setProperty("apple.laf.useScreenMenuBar", "true");
+      p.setProperty("com.apple.macos.smallTabs", "true");
+      p.setProperty("com.apple.macos.useScreenMenuBar", "true");
+      /* 
+       * Note: the xDock name property must be set before parsing 
+       * command-line arguments! See above!
+       */
+      p.setProperty("com.apple.mrj.application.apple.menu.about.name", getAppName());
+      
+      p.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
+      p.setProperty("com.apple.mrj.application.live-resize", "true");
+    }
+    // Use the systems proxy settings to establish connections
+    // This must also be done prior to any other calls.
+    p.setProperty("java.net.useSystemProxies", "true");
+    
+    p.setProperty("app.name", getAppName());
+    p.setProperty("app.version", getVersionNumber());
+  }
   
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
@@ -303,14 +326,18 @@ public abstract class Launcher implements Runnable, Serializable {
   }
 	
   /**
-   * 
-   * @return
-   */
-  public AppConf getAppConf() {
-    return new AppConf(getAppName(), getVersionNumber(),
-      getYearOfProgramRelease(), getYearWhenProjectWasStarted(), getCmdLineOptions(), getCommandLineArgs(),
-      getInteractiveOptions(), getURLlicenseFile(), getURLOnlineUpdate());
-  }
+	 * Creates and returns an exhaustive data structure that provides several
+	 * characteristic features of this program.
+	 * 
+	 * @return A specialized data structure that encapsulates information about a
+	 *         program.
+	 */
+	public AppConf getAppConf() {
+		return new AppConf(getAppName(), getVersionNumber(),
+			getYearOfProgramRelease(), getYearWhenProjectWasStarted(),
+			getCmdLineOptions(), getCommandLineArgs(), getInteractiveOptions(),
+			getURLlicenseFile(), getURLOnlineUpdate());
+	}
 	
   /**
 	 * This method tells a caller the name of this program. By default this
@@ -324,6 +351,9 @@ public abstract class Launcher implements Runnable, Serializable {
 	}
   
   /**
+	 * This method provides information about the {@link Option} containing
+	 * {@link KeyProvider} {@link Class} objects that are allowable command line
+	 * options for this program.
 	 * 
 	 * @return a {@link List} of {@link KeyProvider} {@link Class} objects that
 	 *         define collections of possible command-line options.
@@ -396,7 +426,7 @@ public abstract class Launcher implements Runnable, Serializable {
 	/**
 	 * 
 	 * @return The (dotted) version number of this program, e.g., "0.9.3" (without
-	 *         quotes). Must not be null.
+	 *         quotes). Must not be <code>null</code>.
 	 */
 	public abstract String getVersionNumber();
 	
