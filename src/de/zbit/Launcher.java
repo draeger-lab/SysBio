@@ -55,6 +55,7 @@ import de.zbit.util.prefs.SBProperties;
  * </p>
  * 
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.1
  * @date 20:49:11
@@ -118,21 +119,62 @@ public abstract class Launcher implements Runnable, Serializable {
    */
   private Launcher(boolean showCopyrightMessage) {
     super();
+    
+    configureSystemProperties();
+    GUITools.configureSplashScreen(getAppConf(), addVersionNumberToSplashScreen(), addCopyrightToSplashScreen());
+    
     if (showCopyrightMessage) {
 			printCopyrightMessage();
-	    /* 
-	     * In this case we can assume that this is the first instance of 
-	     * Launcher that has been initialized. So let's also set a minimum
-	     * of Mac OS X specific properties if we operate on a Mac. 
-	     */
-			if (System.getProperty("mrj.version") != null) {
-				System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-					getAppName());
-			}
     }
     this.terminateJVMwhenDone = true;
     this.props = new SBProperties();
 	  LogUtil.initializeLogging(getLogLevel(), getLogPackages());
+  }
+
+  /**
+   * @return
+   */
+  protected boolean addCopyrightToSplashScreen() {
+    return true;
+  }
+
+  /**
+   * @return
+   */
+  protected boolean addVersionNumberToSplashScreen() {
+    return true;
+  }
+
+  /**
+   * 
+   */
+  protected void configureSystemProperties() {
+    /* 
+     * In this case we can assume that this is the first instance of 
+     * Launcher that has been initialized. So let's also set a minimum
+     * of Mac OS X specific properties if we operate on a Mac. 
+     */
+    if (System.getProperty("mrj.version") != null) {
+      // also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
+      System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+      System.setProperty("apple.laf.useScreenMenuBar", "true");
+      System.setProperty("com.apple.macos.smallTabs", "true");
+      System.setProperty("com.apple.macos.useScreenMenuBar", "true");
+      /* 
+       * Note: the xDock name property must be set before parsing 
+       * command-line arguments! See above!
+       */
+      System.setProperty("com.apple.mrj.application.apple.menu.about.name", getAppName());
+      
+      System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
+      System.setProperty("com.apple.mrj.application.live-resize", "true");
+    }
+    // Use the systems proxy settings to establish connections
+    // This must also be done prior to any other calls.
+    System.setProperty("java.net.useSystemProxies", "true");
+    
+    System.setProperty("app.name", getAppName());
+    System.setProperty("app.version", getVersionNumber());
   }
 
   /**
@@ -266,7 +308,7 @@ public abstract class Launcher implements Runnable, Serializable {
    */
   public AppConf getAppConf() {
     return new AppConf(getAppName(), getVersionNumber(),
-      getYearOfProgramRelease(), getCmdLineOptions(), getCommandLineArgs(),
+      getYearOfProgramRelease(), getYearWhenProjectWasStarted(), getCmdLineOptions(), getCommandLineArgs(),
       getInteractiveOptions(), getURLlicenseFile(), getURLOnlineUpdate());
   }
 	
@@ -500,26 +542,8 @@ public abstract class Launcher implements Runnable, Serializable {
 	 * @see java.lang.Runnable#run()
 	 */
   public void run() {
-    System.setProperty("app.name", getAppName());
-    System.setProperty("app.version", getVersionNumber());
-    // Use the systems proxy settings to establish connections
-    System.setProperty("java.net.useSystemProxies", "true");
-        
     // Should we start the GUI?
     if (showsGUI()) {
-			if (System.getProperty("mrj.version") != null) {
-				// also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
-				System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
-				System.setProperty("apple.laf.useScreenMenuBar", "true");
-				System.setProperty("com.apple.macos.smallTabs", "true");
-				System.setProperty("com.apple.macos.useScreenMenuBar", "true");
-				/* 
-				 * Note: the xDock name property must be set before parsing 
-				 * command-line arguments! See above!
-				 */
-				System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
-				System.setProperty("com.apple.mrj.application.live-resize", "true");
-			}
 			GUITools.initLaF();
     	javax.swing.SwingUtilities.invokeLater(new Runnable() {
         /* (non-Javadoc)
@@ -542,7 +566,7 @@ public abstract class Launcher implements Runnable, Serializable {
       launchCommandLineMode(getAppConf());
     }
   }
-  
+
   /**
    * @param terminateJVMwhenDone the terminateJVMwhenDone to set
    */
