@@ -924,6 +924,27 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		this(optionName, requiredType, description, null, numLeadingMinus,
 			shortCmdName, defaultValue);
 	}
+	
+	/**
+	 * 
+	 * @param <E>
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param numLeadingMinus
+	 * @param shortCmdName
+	 * @param defaultValue
+	 * @param dependency
+	 * @param condition
+	 * @see #Option(String, Class, String, short, String, Object)
+	 */
+	 public <E> Option(String optionName, Class<Type> requiredType,
+	    String description, short numLeadingMinus, String shortCmdName,
+	    Type defaultValue, Option<E> dependency, Range<E> condition) {
+	    this(optionName, requiredType, description, numLeadingMinus, shortCmdName,
+	      defaultValue);
+	    addDependency(dependency, condition);
+	  }
   
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
