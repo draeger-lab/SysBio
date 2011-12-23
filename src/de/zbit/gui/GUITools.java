@@ -267,48 +267,46 @@ public class GUITools {
 	public static void configureSplashScreen(String versionNumber,
 		int yearOfProjectStart, int yearOfRelease, boolean showVersionNumber,
 		boolean showCopyright) {
-    try {
-      int distanceToBorder = 7;
-      SplashScreen splash = SplashScreen.getSplashScreen();
-      Graphics2D g = splash == null ? null : splash.createGraphics();
-      if ((g == null) || (!showVersionNumber && !showCopyright)) {
-      	return;
-      }
-      
-      // Decrease font size and set color
-      g.setFont(g.getFont().deriveFont((g.getFont().getSize() * 0.8f)));
-      g.setColor(ColorPalette.CAMINE_RED);
-      
-      Rectangle b = splash.getBounds();
-      FontMetrics m = g.getFontMetrics();
-      
-      // Show version number in lower right corner
-      if (showVersionNumber) {
-        Rectangle2D stringBounds = m.getStringBounds(versionNumber, g);
-        g.drawString(versionNumber, 
-          (int) (b.getWidth() - stringBounds.getWidth() - distanceToBorder),
-          (int) (b.getHeight() - distanceToBorder));
-      }
-      
-      // Show copyright in lower left corner
-      if (showCopyright) {
-        ResourceBundle resources = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
-        
-        String cMessage = String.format(resources.getString("COPYRIGHT_MESSAGE"),
-          "", yearOfProjectStart, yearOfRelease).trim();
-        int pos = StringUtil.indexOf(cMessage, ",", "\n");
-        if (pos > 0) {
-          cMessage = cMessage.substring(0, pos);
-        }
-        
-				g.drawString(cMessage, distanceToBorder,
-					(int) (b.getHeight() - distanceToBorder));
-      }
-      
-      splash.update();
-    } catch (Throwable t) {
-    }
-  }
+		int distanceToBorder = 7;
+		SplashScreen splash = SplashScreen.getSplashScreen();
+		Graphics2D g = splash == null ? null : splash.createGraphics();
+		if ((g == null) || (!showVersionNumber && !showCopyright)) { 
+			return;
+		}
+		
+		// Decrease font size and set color
+		g.setFont(g.getFont().deriveFont((g.getFont().getSize() * 0.8f)));
+		g.setColor(ColorPalette.CAMINE_RED);
+		
+		Rectangle b = splash.getBounds();
+		FontMetrics m = g.getFontMetrics();
+		
+		// Show version number in lower right corner
+		if (showVersionNumber) {
+			Rectangle2D stringBounds = m.getStringBounds(versionNumber, g);
+			g.drawString(versionNumber,
+				(int) (b.getWidth() - stringBounds.getWidth() - distanceToBorder),
+				(int) (b.getHeight() - distanceToBorder));
+		}
+		
+		// Show copyright in lower left corner
+		if (showCopyright) {
+			ResourceBundle resources = ResourceManager
+					.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+			
+			String cMessage = String.format(resources.getString("COPYRIGHT_MESSAGE"),
+				"", yearOfProjectStart, yearOfRelease).trim();
+			int pos = StringUtil.indexOf(cMessage, ",", "\n");
+			if (pos > 0) {
+				cMessage = cMessage.substring(0, pos);
+			}
+			
+			g.drawString(cMessage, distanceToBorder,
+				(int) (b.getHeight() - distanceToBorder));
+		}
+		
+		splash.update();
+	}
   
   /**
    * Checks whether the first container contains the second one.
@@ -1054,7 +1052,8 @@ public class GUITools {
    * Initializes the look and feel.
    */
   public static void initLaF() {
-    // Locale.setDefault(Locale.ENGLISH);
+		// 15 s for tooltips to be displayed
+		ToolTipManager.sharedInstance().setDismissDelay(15000);
     try {	
       UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
       String osName = System.getProperty("os.name");
@@ -1068,10 +1067,10 @@ public class GUITools {
       } else {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e1) {
+			} catch (Throwable e1) {
 	      // If Nimbus is not available, you can set the GUI to another look
 	      // and feel.
 	      // Native look and feel for Windows, MacOS X. GTK look and
@@ -1083,16 +1082,11 @@ public class GUITools {
 							break;
 						}
 					}
-				} catch (Exception exc) {
-					JOptionPane.showMessageDialog(null,
-						StringUtil.toHTML(exc.getLocalizedMessage(), TOOLTIP_LINE_LENGTH),
-						exc.getClass().getName(), JOptionPane.WARNING_MESSAGE);
-					logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
+				} catch (Throwable exc) {
+					showErrorMessage(null, exc.getLocalizedMessage());
 				}
 			}
 		}
-		// 15 s for tooltips to be displayed
-		ToolTipManager.sharedInstance().setDismissDelay(15000);
   }
   
   /**
