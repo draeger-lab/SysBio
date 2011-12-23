@@ -19,8 +19,6 @@ package de.zbit.sbml.gui;
 
 import javax.swing.JComponent;
 
-import de.zbit.util.prefs.KeyProvider;
-
 /**
  * A interface for the latex renderer.
  * 
@@ -42,4 +40,5 @@ public interface Renderer {
 	 * @return
 	 */
 	public JComponent renderEquation(String equation);
+
 }

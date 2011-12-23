@@ -32,6 +32,9 @@ import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBProperties;
 
 /**
+ * This object encapsulates information about the configuration of a program,
+ * i.e., an application.
+ * 
  * @author Andreas Dr&auml;ger
  * @author Stephanie Tscherneck
  * @author Clemens Wrzodek
@@ -292,7 +295,7 @@ public class AppConf implements Cloneable, Serializable {
     hashCode += versionNumber != null ? prime * versionNumber.hashCode() : 0;
     hashCode += prime * Short.valueOf(yearOfRelease).hashCode();
     hashCode += prime * Short.valueOf(yearOfProjectStart).hashCode();
-    return super.hashCode();
+    return hashCode;
   }
 
   /**

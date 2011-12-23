@@ -207,11 +207,6 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1923146558856297087L;
-	
 	private String applicationName;
 	
 	private String dottedVersionNumber;

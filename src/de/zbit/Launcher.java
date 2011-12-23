@@ -41,18 +41,33 @@ import de.zbit.util.prefs.SBProperties;
  * using an implementation of this class, the {@link System} will contain the
  * following new {@link Properties} in order to make these accessible within
  * other objects, too:
- * <ul>
- * <li><code>app.name</code>: the name of the program</li>
- * <li><code>app.version</code>: the version number of the program</li>
- * </ul>
- * Further details of the program configuration can be obtained from this
- * {@link Launcher} by calling {@link #getAppConf()}.
+ * <table>
+ * <tr>
+ * <th>Key</th>
+ * <th>Content</th>
+ * </tr>
+ * <tr>
+ * <td><code>app.name</code></td>
+ * <td>the name of the program</td>
+ * </tr>
+ * <tr>
+ * <td><code>app.version</code></td>
+ * <td>the version number of the program</td>
+ * </tr>
+ * </table>
+ * If the user operates on Mac OS X, all necessary {@link System}
+ * {@link Properties} specific to this environment will also be set. This might
+ * make using <code>-Xdock:name="Some title" -Xdock:icon=path/to/icon</code> on
+ * command line unnecessary.
  * <p>
+ * Further details of the program configuration can be
+ * obtained from this {@link Launcher} by calling {@link #getAppConf()}.
+ * </p><p>
  * Please note that this class does not import any classes that are related to
  * GUI elements (in some standard Java packages, such as SWING or AWT). When
  * making a reference to such a class, the complete class name including its
  * package declaration is used in order to prevent that on systems that do not
- * have these classes, the Launcher might not be usuable.
+ * have these classes, the Launcher might not be usable.
  * </p>
  * 
  * @author Andreas Dr&auml;ger
@@ -72,8 +87,8 @@ public abstract class Launcher implements Runnable, Serializable {
 	/**
 	 * A resource bundle containing label texts for this object.
 	 */
-  private static final transient ResourceBundle resources = ResourceManager
-      .getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+	private static final transient ResourceBundle resources = ResourceManager
+			.getBundle("de.zbit.locales.Labels");
 
 	/**
    * Generated serial version identifier.
@@ -123,13 +138,21 @@ public abstract class Launcher implements Runnable, Serializable {
     
     configureSystemProperties();
     
-    /* 
-     * Do not call getAppConf() here because this will cause 
-     * several other operations to be executed...
-     */
-		GUITools.configureSplashScreen(getVersionNumber(),
-			getYearWhenProjectWasStarted(), getYearOfProgramRelease(),
-			addVersionNumberToSplashScreen(), addCopyrightToSplashScreen());
+		try {
+			/*
+			 * Do not call getAppConf() here because this will cause several other
+			 * operations to be executed...
+			 */
+			GUITools.configureSplashScreen(getVersionNumber(),
+				getYearWhenProjectWasStarted(), getYearOfProgramRelease(),
+				addVersionNumberToSplashScreen(), addCopyrightToSplashScreen());
+		} catch (Throwable t) {
+			/* 
+			 * Ignore any problems here, because it might happen that under some
+			 * environments splash screens cannot be displayed, which is not a
+			 * serious problem. 
+			 */
+		}
     
 	  if (showCopyrightMessage) {
 			printCopyrightMessage();
@@ -141,10 +164,11 @@ public abstract class Launcher implements Runnable, Serializable {
   }
 
 	/**
-   * Copy constructor.
-   * 
-   * @param launcher
-   */
+	 * Copy constructor. This constructor will neither show a splash screen nor
+	 * print the license agreement on the standard out.
+	 * 
+	 * @param launcher the original {@link Launcher} to be cloned.
+	 */
 	public Launcher(Launcher launcher) {
     this(false);
     this.props = launcher.getCommandLineArgs().clone();
@@ -226,10 +250,10 @@ public abstract class Launcher implements Runnable, Serializable {
      * of Mac OS X specific properties if we operate on a Mac. 
      */
   	Properties p = System.getProperties();
+  	String title = getAppName();
   	
 		if ((p.getProperty("mrj.version") != null)
 				|| (p.getProperty("os.name").toLowerCase().indexOf("mac") != -1)) {
-      // might make using -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line unnecessary.
       p.setProperty("apple.awt.graphics.EnableQ2DX", "true");
       p.setProperty("apple.laf.useScreenMenuBar", "true");
       p.setProperty("com.apple.macos.smallTabs", "true");
@@ -238,7 +262,7 @@ public abstract class Launcher implements Runnable, Serializable {
        * Note: the xDock name property must be set before parsing 
        * command-line arguments! See above!
        */
-      p.setProperty("com.apple.mrj.application.apple.menu.about.name", getAppName());
+      p.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
       
       p.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
       p.setProperty("com.apple.mrj.application.live-resize", "true");
@@ -247,7 +271,7 @@ public abstract class Launcher implements Runnable, Serializable {
     // This must also be done prior to any other calls.
     p.setProperty("java.net.useSystemProxies", "true");
     
-    p.setProperty("app.name", getAppName());
+    p.setProperty("app.name", title);
     p.setProperty("app.version", getVersionNumber());
   }
   
@@ -462,6 +486,7 @@ public abstract class Launcher implements Runnable, Serializable {
 			}
 			ui.setLocationRelativeTo(null);
 		  ui.setVisible(true);
+			// Since we are in the GUI mode, there is no need to try/catch the following command:
 			GUITools.hideSplashScreen();
 			ui.toFront();
 		} else {
@@ -527,7 +552,11 @@ public abstract class Launcher implements Runnable, Serializable {
 		logger.info(String.format(resources.getString("LAUNCHING_CMD_MODE"),
 			getAppName()));
 		commandLineMode(appConf);
-		GUITools.hideSplashScreen();
+		try {
+			GUITools.hideSplashScreen();
+		} catch (Throwable t) {
+			// Ignore problems when dealing with splash screens in command line mode.
+		}
 		exit();
 	}
 
@@ -574,7 +603,6 @@ public abstract class Launcher implements Runnable, Serializable {
   public void run() {
     // Should we start the GUI?
     if (showsGUI()) {
-			GUITools.initLaF();
     	javax.swing.SwingUtilities.invokeLater(new Runnable() {
         /* (non-Javadoc)
          * @see java.lang.Runnable#run()
@@ -582,6 +610,8 @@ public abstract class Launcher implements Runnable, Serializable {
         public void run() {
           AppConf appCnf = getAppConf();
           try {
+          	// Now we're preparing the GUI mode.
+      			GUITools.initLaF();
             guiMode(appCnf);
           } catch (java.awt.HeadlessException exc) {
             if (props.getBooleanProperty(GUIOptions.GUI)) {
