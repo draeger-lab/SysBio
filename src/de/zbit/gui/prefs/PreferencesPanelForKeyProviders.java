@@ -143,8 +143,9 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
       boolean changes = false;
       for (Map.Entry<? extends Object, ? extends Object> entry : properties.entrySet()) {
         if (prefs.containsKey(entry.getKey())) {
+        	// TODO: this is a very simple check. What if we have a new key-value pair? Null values??
           prefs.put(entry.getKey(), entry.getValue());
-          changes=true;
+          changes = true;
         }
       }
       

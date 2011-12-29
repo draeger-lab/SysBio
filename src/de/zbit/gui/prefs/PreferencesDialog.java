@@ -18,7 +18,6 @@ package de.zbit.gui.prefs;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,9 +25,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.PreferenceChangeListener;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -59,6 +61,9 @@ import de.zbit.util.prefs.KeyProvider;
 public class PreferencesDialog extends JDialog implements ActionListener,
 		ItemListener, ChangeListener, KeyListener {
 	
+	/**
+	 * 
+	 */
 	private static final ResourceBundle resource = ResourceManager
 			.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 
@@ -85,7 +90,16 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @return
 	 */
 	public static final boolean showPreferencesDialog() {
-		return showPreferencesDialog((PreferencesPanel) null);
+		return showPreferencesDialog((List<PreferenceChangeListener>) null);
+	}
+	
+	/**
+	 * 
+	 * @param listener
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(List<PreferenceChangeListener> listeners) {
+		return showPreferencesDialog((PreferencesPanel) null, listeners);
 	}
 	
 	/**
@@ -94,22 +108,45 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @return
 	 */
 	public static final boolean showPreferencesDialog(PreferencesPanel panel) {
+		return showPreferencesDialog(panel, null);
+	}
+	
+	/**
+	 * 
+	 * @param panel
+	 * @param listener
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(PreferencesPanel panel, List<PreferenceChangeListener>  listeners) {
 		PreferencesDialog dialog = new PreferencesDialog();
-		return (panel != null) ? dialog.showPrefsDialog(panel) : dialog.showPrefsDialog();
+		return (panel != null) ? dialog.showPrefsDialog(panel, listeners) : dialog.showPrefsDialog(listeners);
 	}
 	
 	/**
 	 * 
 	 * @param provider
-	 * @return true, if and only if the user approved this dialog.
+	 * @return <code>true</code>, if and only if the user approved this dialog.
 	 */
 	public static final boolean showPreferencesDialog(Class<? extends KeyProvider>... provider) {
+		return showPreferencesDialog(null, provider);
+	}
+	
+	/**
+	 * 
+	 * @param listener
+	 *        A {@link PropertyChangeListener} that is notified about any changes
+	 *        in the user-preferences.
+	 * @param provider
+	 * @return <code>true</code>, if and only if the user approved this dialog.
+	 */
+	public static final boolean showPreferencesDialog(
+		List<PreferenceChangeListener> listeners, Class<? extends KeyProvider>... provider) {
 		PreferencesDialog dialog = new PreferencesDialog();
 		boolean exitStatus;
-		if (provider != null) {
-			exitStatus = dialog.showPrefsDialog(provider);
+		if ((provider != null) && (provider.length > 0)) {
+			exitStatus = dialog.showPrefsDialog(listeners, provider);
 		} else {
-			exitStatus = dialog.showPrefsDialog();
+			exitStatus = dialog.showPrefsDialog(listeners);
 		}
 		return exitStatus;
 	}
@@ -250,7 +287,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		getContentPane().add(allPrefsPanel, BorderLayout.CENTER);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		JPanel p = new JPanel();
-		defaults = createButton(DEFAULTS, !panel.isDefaultConfiguration());
+		defaults = createButton(DEFAULTS, !allPrefsPanel.isDefaultConfiguration());
 		JButton cancel = createButton(CANCEL, true);
 		apply = createButton(APPLY, false);
 		ok = createButton(OK, true);
@@ -268,11 +305,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
     
     // Preferences panels look stupid if they are smaller
     // than the "Ok","Cancel", etc. button panel!
-    Dimension p2 = foot.getPreferredSize();
-    Dimension p1 = panel.getPreferredSize();
-    p1.width = Math.max(p1.width, p2.width);
-    p1.height = Math.max(p1.height, p2.height);
-    panel.setPreferredSize(p1);
+    allPrefsPanel.setPreferredSize(GUITools.getMaxPreferredSize(foot, allPrefsPanel));
     
 		pack();
 	}
@@ -295,9 +328,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		return button;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.Component#setVisible(boolean)
 	 */
 	@Override
@@ -311,7 +342,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 			// FIXME: This is a really dirty solution. You should first check,
 			// if this panel is not already registered as listener on allPrefsPanel.
 			// Secondly, if allPrefsPanel changes (see setPreferencesPanel()), this
-			// panel should not listen anymore to the old panel and shoud now listen
+			// panel should not listen anymore to the old panel and should now listen
 			// to the new panel!
 			allPrefsPanel.addItemListener(this);
 			allPrefsPanel.addChangeListener(this);
@@ -333,12 +364,22 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 *         the user.
 	 */
 	public boolean showPrefsDialog() {
+		return showPrefsDialog((List<PreferenceChangeListener>) null);
+	}
+	
+	/**
+	 * 
+	 * @param listener
+	 * @return
+	 */
+	public boolean showPrefsDialog(List<PreferenceChangeListener> listeners) {
 		MultiplePreferencesPanel pane;
 		try {
 			pane = new MultiplePreferencesPanel();
-			if (pane.getPreferencesPanelCount() == 1) { return showPrefsDialog(pane
-					.getPreferencesPanel(0)); }
-			return showPrefsDialog(pane);
+			if (pane.getPreferencesPanelCount() == 1) { 
+				return showPrefsDialog(pane.getPreferencesPanel(0), listeners); 
+			}
+			return showPrefsDialog(pane, listeners);
 		} catch (Exception exc) {
 			GUITools.showErrorMessage(this, exc);
 			return false;
@@ -358,6 +399,21 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 *         the user.
 	 */
 	public boolean showPrefsDialog(PreferencesPanel panel) {
+		return showPrefsDialog(panel, null);
+	}
+	
+	/**
+	 * 
+	 * @param panel
+	 * @param listener
+	 * @return
+	 */
+	public boolean showPrefsDialog(PreferencesPanel panel, List<PreferenceChangeListener>  listeners) {
+		if ((listeners != null) && (listeners.size() > 0) && (panel != null)) {
+			for (PreferenceChangeListener listener : listeners) {
+				panel.addPreferenceChangeListener(listener);
+			}
+		}
 		setPreferencesPanel(panel);
 		setVisible(true);
 		return exitStatus;
@@ -369,6 +425,16 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @return
 	 */
 	public boolean showPrefsDialog(Class<? extends KeyProvider>... kp) {
+		return showPrefsDialog(null, kp);
+	}
+	
+	/**
+	 * 
+	 * @param listener
+	 * @param kp
+	 * @return
+	 */
+	public boolean showPrefsDialog(List<PreferenceChangeListener> listeners, Class<? extends KeyProvider>... kp) {
 		PreferencesPanel panel;
 		try {
       if (kp.length > 1) {
@@ -381,9 +447,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 			GUITools.showErrorMessage(this, exc);
 			return false;
 		}
-		setPreferencesPanel(panel);
-		setVisible(true);
-		return exitStatus;
+		return showPrefsDialog(panel, listeners);
 	}
 	
 	/* (non-Javadoc)

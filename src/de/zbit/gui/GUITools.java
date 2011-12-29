@@ -59,7 +59,6 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
@@ -92,6 +91,8 @@ import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
 import de.zbit.util.ValuePair;
+import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * This class contains various GUI tools.
@@ -118,64 +119,6 @@ public class GUITools {
    * The number of symbols per line in tool tip texts.
    */
   public static int TOOLTIP_LINE_LENGTH = 60;
-  
-  static {
-    // ImageTools.initImages(GUITools.class.getResource("img"));
-    
-    String iconPaths[] = {
-        "ICON_ARROW_LEFT_16.png",
-        "ICON_ARROW_LEFT_32.png",
-        "ICON_ARROW_RIGHT_16.png",
-        "ICON_ARROW_RIGHT_32.png",
-        "ICON_DOCUMENT_16.png",
-        "ICON_DOCUMENT_32.png",
-        "ICON_DOCUMENT_48.png",
-        "ICON_DOCUMENT_64.png",
-        "ICON_EXIT_16.png",
-        "ICON_EXIT_32.png",
-        "ICON_GEAR_16.png",
-        "ICON_GEAR_64.png",
-        "ICON_GLOBE_16.png",
-        "ICON_GLOBE_64.png",
-        "ICON_HELP_16.png",
-        "ICON_HELP_48.png",
-        "ICON_HELP_64.png",
-        "ICON_INFO_16.png",
-        "ICON_INFO_64.png",
-        "ICON_LICENSE_16.png",
-        "ICON_LICENSE_64.png",
-        "ICON_LICENSE_48.png",
-        "ICON_MINUS_16.png",
-        "ICON_OPEN_16.png",
-        "ICON_PENCIL_16.png",
-        "ICON_PENCIL_32.png",
-        "ICON_PENCIL_48.png",
-        "ICON_PENCIL_64.png",
-        "ICON_PLUS_16.png",
-        "ICON_PREFS_16.png",
-        "ICON_REFRESH_16.png",
-        "ICON_REFRESH_32.png",
-        "ICON_REFRESH_48.png",
-        "ICON_REFRESH_64.png",        
-        "ICON_SAVE_16.png",
-        "ICON_TICK_16.png",
-        "ICON_TRASH_16.png",
-        "ICON_SEARCH_16.png",
-        "ICON_WARNING_16.png",
-        "ICON_WARNING_32.png",
-        "ICON_WARNING_48.png",
-        "ICON_WARNING_64.png",
-        "UT_BM_Rot_RGB_tr_36x64.png",
-        "UT_WBMS_Rot_RGB_tr_64x62.png",
-        "UT_WBMW_mathnat_4C_380x45.png"
-    };
-    for (String path : iconPaths) {
-      URL u = GUITools.class.getResource("img/" + path);
-      if (u!=null) {
-        UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(u));
-      }
-    }
-  }
   
   /**
    * Build a panel with cancel and ok buttons.
@@ -383,21 +326,42 @@ public class GUITools {
     }
     return group;
   }
-  
-  /**
-   * Creates a new {@link JButton} with action listeners that invoke
-   * a specific method.
-   * @param listener the ActionListener to be added
-   * @param command the action command for this button, i.e., the item
-   *        in the menu. This will be converted to a {@link String} using 
-   *        the {@link String.#toString()} method.
-   * @param icon the icon of the JButton (can be null)
-   * @return A new {@link JButton} with the given features.
-   */
-  public static JButton createJButton(ActionListener listener,
-    ActionCommand command, Icon icon) {
-    return createJButton(listener, command, icon, null);
-  }
+	
+	/**
+	 * Creates a new {@link JButton} with action listeners that invoke a specific
+	 * method.
+	 * 
+	 * @param listener
+	 *        the ActionListener to be added
+	 * @param command
+	 *        the action command for this button, i.e., the item in the menu. This
+	 *        will be converted to a {@link String} using the {@link
+	 *        String.#toString()} method.
+	 * @return A new {@link JButton} with the given features.
+	 */
+	public static JButton createJButton(ActionListener listener,
+		ActionCommand command) {
+		return createJButton(listener, command, null);
+	}
+	
+	/**
+	 * Creates a new {@link JButton} with action listeners that invoke a specific
+	 * method.
+	 * 
+	 * @param listener
+	 *        the ActionListener to be added
+	 * @param command
+	 *        the action command for this button, i.e., the item in the menu. This
+	 *        will be converted to a {@link String} using the {@link
+	 *        String.#toString()} method.
+	 * @param icon
+	 *        the icon of the JButton (can be null)
+	 * @return A new {@link JButton} with the given features.
+	 */
+	public static JButton createJButton(ActionListener listener,
+		ActionCommand command, Icon icon) {
+		return createJButton(listener, command, icon, null);
+	}
   
   /**
    * Creates a {@link JButton}.
@@ -453,6 +417,37 @@ public class GUITools {
     chkbx.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
     return chkbx;
   }
+  
+	/**
+	 * More convenient method to create a {@link JCheckBox} for a {@link Boolean}
+	 * {@link Option}.
+	 * 
+	 * @param option
+	 * @param selected
+	 * @param listener
+	 * @return
+	 * @see #createJCheckBox(String, boolean, Object, String, ItemListener...)
+	 */
+	public static JCheckBox createJCheckBox(Option<Boolean> option,
+		boolean selected, ItemListener... listener) {
+		return createJCheckBox(option.getName(), selected, option,
+			option.getToolTip(), listener);
+	}
+	
+	/**
+	 * More convenient method to create a {@link JCheckBox} for a {@link Boolean}
+	 * {@link Option}.
+	 * 
+	 * @param option
+	 * @param prefs
+	 * @param listener
+	 * @return
+	 * @see #createJCheckBox(Option, boolean, ItemListener...)
+	 */
+	public static JCheckBox createJCheckBox(Option<Boolean> option,
+		SBPreferences prefs, ItemListener... listener) {
+		return createJCheckBox(option, prefs.getBoolean(option), listener);
+	}
   
   /**
    * Creates a new {@link JDropDownButton} using the entries from the given
@@ -1052,6 +1047,8 @@ public class GUITools {
    * Initializes the look and feel.
    */
   public static void initLaF() {
+    ImageTools.initImages();
+  	
 		// 15 s for tooltips to be displayed
 		ToolTipManager.sharedInstance().setDismissDelay(15000);
     try {	

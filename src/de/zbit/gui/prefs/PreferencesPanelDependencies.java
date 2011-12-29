@@ -205,16 +205,12 @@ public class PreferencesPanelDependencies {
      * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void keyPressed(KeyEvent e) {} // INTENTIONALLY LEFT BLANK
-    /*
-     * (non-Javadoc)
+    /* (non-Javadoc)
      * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
      */
     public void keyReleased(KeyEvent e) {checkAndProcessConditions();}
     /* (non-Javadoc)
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     */
-    /*
-     * 
      */
     public void propertyChange(PropertyChangeEvent evt) {
       if (evt.getPropertyName().equals("enabled")) {

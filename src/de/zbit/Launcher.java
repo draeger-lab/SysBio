@@ -97,7 +97,7 @@ public abstract class Launcher implements Runnable, Serializable {
 
 	/**
    * Grants access to the {@link ResourceBundle} used by this {@link Launcher}
-   * in order to support a full local-specific prorgraming.
+   * in order to support a full local-specific programming.
    * 
    * @return the resources
    */
@@ -321,7 +321,7 @@ public abstract class Launcher implements Runnable, Serializable {
   public void exit(java.awt.Window window, boolean terminateJVMwhenDone) {
     if (terminateJVMwhenDone) {
       StringBuilder exception = new StringBuilder();
-      if (getInteractiveOptions()!=null) {
+      if (getInteractiveOptions() != null) {
         for (Class<? extends KeyProvider> clazz : getInteractiveOptions()) {
           SBPreferences prefs = SBPreferences.getPreferencesFor(clazz);
           try {

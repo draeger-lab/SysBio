@@ -223,33 +223,40 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 		@SuppressWarnings({ "rawtypes", "unchecked" })
     public boolean isInRange(Type value) {
 			if (value instanceof Comparable) {
-			  try {
-				// Check lower bound
-				int r = ((Comparable)value).compareTo(((Comparable)lBound));
-				if (r<0 || (r==0 && excludingLBound) ) return false;
-				
-				// Check upper bound
-				r = ((Comparable)value).compareTo(((Comparable)uBound));
-				if (r>0 || (r==0 && excludingUBound) ) return false;
-			  } catch (Exception e) {
-			    // E.g. when a float is expected and value is "Hallo", a
-			    // Float cannot be cast to String Exception is raised when
-			    // casting to comparable
-			    return false;
-			  }
-			  return true;
+				try {
+					// Check lower bound
+					int r = ((Comparable) value).compareTo(((Comparable) lBound));
+					if ((r < 0) || ((r == 0) && excludingLBound)) { 
+						return false;
+					}
+					
+					// Check upper bound
+					r = ((Comparable) value).compareTo(((Comparable) uBound));
+					if ((r > 0) || ((r == 0) && excludingUBound)) {
+						return false;
+					}
+				} catch (Exception e) {
+					// E.g., when a float is expected and value is "Hallo", a
+					// Float cannot be cast to String Exception is raised when
+					// casting to comparable
+					return false;
+				}
+				return true;
 			} else if (lBound.equals(uBound)) {
 			  // Check absolute value
 				if (!excludingLBound && !excludingUBound) {
 				  // Special treatment for classes
 				  if (value instanceof Class) {
-				    if (((Class)value).getSimpleName().equals(lBound)) {
+				    if (((Class) value).getSimpleName().equals(lBound)) {
 				      return true;
 				    }
 				  }
 				  //---
-				  if (value.equals(lBound)) return true;
-				  else return false;
+				  if (value.equals(lBound)) {
+				  	return true;
+				  } else {
+				  	return false;
+				  }
 				} else {
 					return false;
 				}
@@ -277,14 +284,14 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 		  }
 		  
 		  // Check if ranges have a finite length
-		  double start=0;double end=0;
+		  double start=0, end=0;
 		  if (Utils.isInteger(lBound.getClass())) {
-		  	start = ((Number)lBound).doubleValue();
-		  	end = ((Number)uBound).doubleValue();
+		  	start = ((Number) lBound).doubleValue();
+		  	end = ((Number) uBound).doubleValue();
 		  	
 		  } else if (lBound instanceof Character) {
-		  	start = (int)(Character)lBound;
-		  	end = (int)(Character)uBound;
+		  	start = (int) (Character) lBound;
+		  	end = (int) (Character) uBound;
 		  	
 		  } else {
 		  	// E.g. Strings
@@ -328,7 +335,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
       } catch (Throwable e) {
         re=null;
       }
-			if (re==null) {
+			if (re == null) {
 				// Character
 				if (Type.equals(Character.class)) {
 					((List<Character>)list).add(( (char)val) );
@@ -340,8 +347,10 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 				}
 			} else {
 				try {
-				  list.add( (Type)(re) );
-				} catch(Throwable t) {return false;}
+				  list.add((Type) (re));
+				} catch(Throwable t) {
+					return false;
+				}
 				return true;
 			}
 			return false;
@@ -670,6 +679,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	 * @see Option#castAndCheckIsInRange(Object)
 	 * @param value
 	 * @return
+	 * @deprecated use {@link #isInRange(Object, SBProperties)}
 	 */
 	@SuppressWarnings("unused")
   @Deprecated
