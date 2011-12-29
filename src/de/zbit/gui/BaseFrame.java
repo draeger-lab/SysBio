@@ -44,6 +44,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.PreferenceChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -131,6 +132,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		 * {@link BaseAction} to access the history of previously opened files.
 		 */
 		FILE_OPEN_RECENT,
+		/**
+		 * Saves the current changes in the file that has been opened before by the
+		 * user. Note that this action means that the user cannot select any different
+		 * file format or file location. The program might just warn the user if the
+		 * existing file should be really overwritten.
+		 */
+		FILE_SAVE,
 		/**
 		 * {@link BaseAction} to saves the currently opened file or the result of a
 		 * computation in one of the available formats.
@@ -261,6 +269,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 */
   protected AppConf appConf;
 	/**
+	 * Allows implementing classes to register listeners for changes in
+	 * preferences. These listeners are notified in case that the user changes
+	 * some preferences within the preferences dialog.
+	 */
+	protected List<PreferenceChangeListener> listOfPrefChangeListeners;
+	
+	/**
    * A status bar...
    */
 	protected StatusBar statusBar;
@@ -269,7 +284,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * A tool bar
 	 */
 	protected JToolBar toolBar;
-	
 	
 	/**
 	 * Creates a new {@link BaseFrame}.
@@ -287,9 +301,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
   public BaseFrame(AppConf appConf) {
     super();
     this.appConf = appConf;
+    this.listOfPrefChangeListeners = new LinkedList<PreferenceChangeListener>();
     init();
   }
-
+	
+	
 	/**
 	 * Creates a new {@link BaseFrame} with the given
 	 * {@link GraphicsConfiguration}.
@@ -300,9 +316,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	public BaseFrame(AppConf appConf, GraphicsConfiguration gc) {
 		super(gc);
 		this.appConf = appConf;
+		this.listOfPrefChangeListeners = new LinkedList<PreferenceChangeListener>();
 		init();
 	}
-  
+	
 	/**
 	 * This method enables the {@link JMenuItem} that displays the online help and
 	 * also enables the {@link JButton} in the {@link JToolBar} linked to this
@@ -312,7 +329,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.HELP_ONLINE,
 			BaseAction.HELP_LICENSE);
 	}
-	
+
 	/**
 	 * Override this method to add additional {@link JMenuItem}s to the Edit menu
 	 * (if this exists, otherwise the given {@link JMenuItem} will define the Edit
@@ -328,7 +345,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		// empty method
 		return null;
 	}
-	
+  
 	/**
 	 * Override this method to add additional {@link JMenuItem}s to the File menu.
 	 * These will be placed after the command {@link BaseAction#FILE_CLOSE} (if
@@ -371,7 +388,17 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		return null;
 	}
 	
-  /**
+	/**
+	 * Adds a listener to this {@link BaseFrame} that is notified in case that the
+	 * user alters some preferences within the preferences dialog.
+	 * 
+	 * @param pcl
+	 */
+	public void addPreferenceChangeListener(PreferenceChangeListener pcl) {
+		listOfPrefChangeListeners.add(pcl);
+	}
+	
+	/**
 	 * 
 	 * @param fileList
 	 * @param fileHistory
@@ -410,7 +437,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     }
 	}
 	
-	/**
+  /**
 	 * Closes a {@link File} that is currently open.
 	 * 
 	 * @return Whether or not calling this method lead to any change on this
@@ -441,6 +468,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		Object action = null;
 		ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 		JToolBar toolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
+		toolBar.setOpaque(true);
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
 			menu = getJMenuBar().getMenu(i);
 			for (int j = 0; j < menu.getItemCount(); j++) {
@@ -575,7 +603,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		}
     return fileHistory;
   }
-
+	
 	/**
 	 * Creates a {@link JMenu} for dealing with files.
 	 * 
@@ -786,8 +814,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	public void exit() {
 	  dispose();
 	}
-  
-  /**
+
+	/**
    * This method is called when the window closes as well as when the user
    * presses the Exit button in the {@link JMenu}. This is used to prepare the
    * exit, before the actual exit method {@link #exit()} is called (i.e., store
@@ -812,8 +840,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     // Call real exit method
     exit();
 	}
-	
-	/**
+  
+  /**
 	 * This convenient method allows callers to change the entry names of
 	 * {@link JMenuItem}s in the {@link JMenuBar} of this {@link BaseFrame}. The
 	 * returned {@link Map} contains a mapping from each {@link BaseAction} to the
@@ -986,7 +1014,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @return
 	 */
 	public abstract URL getURLAboutMessage();
-
+	
 	/**
 	 * The {@link URL} of the license file under which this application is
 	 * distributed.
@@ -994,7 +1022,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @return
 	 */
 	public abstract URL getURLLicense();
-	
+
 	/**
 	 * The {@link URL} of the online help file.
 	 * 
@@ -1032,7 +1060,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	  }
 	  return null;
 	}
-
+	
 	/**
 	 * Initializes this graphical user interface.
 	 */
@@ -1114,8 +1142,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     // Create and put statusBar in south
 		return StatusBar.addStatusBar(this);
   }
-  
-  /**
+
+	/**
    * This method decides whether or not the file menu should already be equipped
    * with the default entries for "open", "save", and "close". By default, this
    * method returns <code>true</code>, i.e., the default File menu already
@@ -1136,8 +1164,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
   public void onlineUpdate() {
     onlineUpdate(false);
   }
-	
-	/**
+  
+  /**
 	 * This actually performs the online update, i.e., this method looks if an
 	 * update is available and shows a message if this is the case. If the option
 	 * hideErrorMessages is set to <code>false</code>, a message will also be
@@ -1274,13 +1302,23 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * 
 	 * @return 
 	 */
-  public boolean preferences() {
-    if ((appConf != null) && (appConf.getInteractiveOptions() != null)) {
-      return PreferencesDialog.showPreferencesDialog(appConf
-          .getInteractiveOptions());
-    }
-    return PreferencesDialog.showPreferencesDialog();
-  }
+	public boolean preferences() {
+		if ((appConf != null) && (appConf.getInteractiveOptions() != null)) { 
+      return PreferencesDialog.showPreferencesDialog(
+      	listOfPrefChangeListeners,
+				appConf.getInteractiveOptions());
+		}
+		return PreferencesDialog.showPreferencesDialog(listOfPrefChangeListeners);
+	}
+	
+	/**
+	 * Removes the given listener from this {@link BaseFrame}.
+	 * 
+	 * @param pcl
+	 */
+	public void removePreferenceChangeListener(PreferenceChangeListener pcl) {
+		listOfPrefChangeListeners.remove(pcl);
+	}
 	
 	
 	/**

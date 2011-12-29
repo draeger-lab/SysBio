@@ -36,6 +36,8 @@ import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.NodeChangeListener;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
 import de.zbit.io.GeneralFileFilter;
@@ -56,21 +58,6 @@ import de.zbit.util.argparser.ArgParser;
  * @since 1.0
  */
 public class SBPreferences implements Map<Object, Object> {
-	
-	/**
-	 * The location of the localized warnings messages.
-	 */
-	public static final String WARNINGS_LOCATION = "de.zbit.locales.Warnings";
-	
-	/**
-	 * The logger of this {@link Class}.
-	 */
-	public static final Logger logger = Logger.getLogger(SBPreferences.class.getName());
-	
-	/**
-	 * The main class, used to start the application.
-	 */
-	private static Class<?> mainClass = null;
 	
 	/**
 	 * @author Andreas Dr&auml;ger
@@ -96,26 +83,21 @@ public class SBPreferences implements Map<Object, Object> {
 			this.value = value;
 		}
 		
-		/*
-		 * (non-Javadoc)
-		 * 
+		/* (non-Javadoc)
 		 * @see java.util.Map.Entry#getKey()
 		 */
 		public Object getKey() {
 			return key;
 		}
 		
-		/*
-		 * (non-Javadoc)
+		/* (non-Javadoc)
 		 * @see java.util.Map.Entry#getValue()
 		 */
 		public Object getValue() {
 			return value;
 		}
 		
-		/*
-		 * (non-Javadoc)
-		 * 
+		/* (non-Javadoc)
 		 * @see java.util.Map.Entry#setValue(java.lang.Object)
 		 */
 		public Object setValue(Object value) {
@@ -136,11 +118,26 @@ public class SBPreferences implements Map<Object, Object> {
 	 * Pointers to avoid senselessly parsing configuration files again and again.
 	 */
 	private static final Map<String, SBProperties> allDefaults = new HashMap<String, SBProperties>();
-
+	
 	/**
 	 * Indicates whether to clean invalid user prefs for when loading defaults.
 	 */
 	private static boolean clean;
+	
+	/**
+	 * The logger of this {@link Class}.
+	 */
+	public static final Logger logger = Logger.getLogger(SBPreferences.class.getName());
+	
+	/**
+	 * The main class, used to start the application.
+	 */
+	private static Class<?> mainClass = null;
+
+	/**
+	 * The location of the localized warnings messages.
+	 */
+	public static final String WARNINGS_LOCATION = "de.zbit.locales.Warnings";
 	
 	/**
 	 * @param keyProvider
@@ -284,9 +281,8 @@ public class SBPreferences implements Map<Object, Object> {
 				
 			} catch (Exception e) {
 				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
-				Exception exc = new Exception(String.format(
+				logger.log(Level.WARNING, String.format(
 					resources.getString("COULD_NOT_LOAD_PROPERTIES_MESSAGE"), entry.getName()), e);
-				exc.printStackTrace();
 			}
 		}
 		
@@ -357,10 +353,9 @@ public class SBPreferences implements Map<Object, Object> {
 				prefs[i].flush();
 			} catch (BackingStoreException e) {
 				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
-				Exception exc = new Exception(String.format(
-					resources.getString("BACKING_STORE_EXCEPTION_MESSAGE"),
-					prefs[i].getKeyProvider().getName()), e);
-				exc.printStackTrace();
+				logger.log(Level.WARNING, String.format(resources
+						.getString("BACKING_STORE_EXCEPTION_MESSAGE"), prefs[i]
+						.getKeyProvider().getName()), e);
 			}
 		}
 		
@@ -427,10 +422,9 @@ public class SBPreferences implements Map<Object, Object> {
 				
 			} catch (Exception e) {
 				ResourceBundle resources = ResourceManager.getBundle(WARNINGS_LOCATION);
-				Exception exc = new Exception(String.format(
-					resources.getString("COULD_NOT_LOAD_PROPERTIES_FROM_FILE"), entry
-							.getValue().getName(), entry.getKey()), e);
-				exc.printStackTrace();
+				logger.log(Level.WARNING, String.format(resources
+						.getString("COULD_NOT_LOAD_PROPERTIES_FROM_FILE"), entry.getValue()
+						.getName(), entry.getKey()), e);
 			} finally {
 				i++;
 			}
@@ -499,6 +493,7 @@ public class SBPreferences implements Map<Object, Object> {
 				// Just ignore...
 			  // TODO: Then catch and ignore only this specific error, but still
 			  // print other errors
+				logger.fine(exc.getLocalizedMessage());
 			}
 		}
 		return options;
@@ -590,6 +585,7 @@ public class SBPreferences implements Map<Object, Object> {
 			return loadDefaults(keyProvider, null);
 		} catch (IOException e) {
 			// Can never happen
+			logger.fine(e.getLocalizedMessage());
 		}
 		return null;
 	}
@@ -645,6 +641,8 @@ public class SBPreferences implements Map<Object, Object> {
 					// ignore non-static fields
 					if (exc instanceof IllegalArgumentException) { 
 						throw (IllegalArgumentException) exc; 
+					} else {
+						logger.fine(exc.getLocalizedMessage());
 					}
 				}
 			}
@@ -794,6 +792,24 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
+	 * 
+	 * @param ncl
+	 * @see Preferences#addNodeChangeListener(NodeChangeListener)
+	 */
+	public void addNodeChangeListener(NodeChangeListener ncl) {
+		prefs.addNodeChangeListener(ncl);
+	}
+	
+	/**
+	 * 
+	 * @param pcl
+	 * @see Preferences#addPreferenceChangeListener(PreferenceChangeListener)
+	 */
+	public void addPreferenceChangeListener(PreferenceChangeListener pcl) {
+		prefs.addPreferenceChangeListener(pcl);
+	}
+	
+	/**
 	 * @param args
 	 */
 	public void analyzeCommandLineArguments(String args[]) {
@@ -801,6 +817,7 @@ public class SBPreferences implements Map<Object, Object> {
 			analyzeCommandLineArguments(generateUsageString(), args, false);
 		} catch (BackingStoreException e) {
 			// This can never happen because we don't try to persist anything!
+			logger.fine(e.getLocalizedMessage());
 		}
 	}
 	
@@ -813,6 +830,7 @@ public class SBPreferences implements Map<Object, Object> {
 			analyzeCommandLineArguments(usage, args, false);
 		} catch (BackingStoreException e) {
 			// This can never happen because we don't try to persist anything!
+			logger.fine(e.getLocalizedMessage());
 		}
 	}
 	
@@ -900,7 +918,7 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 		return true;
 	}
-
+	
 	/**
 	 * Removes all those key-value pairs from the user's configuration, for which
 	 * no default values are defined.
@@ -937,9 +955,7 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Map#clear()
 	 */
 	public void clear() {
@@ -952,31 +968,40 @@ public class SBPreferences implements Map<Object, Object> {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
+
+	/* (non-Javadoc)
 	 * @see java.util.Map#containsKey(java.lang.Object)
 	 */
 	public boolean containsKey(Object key) { 
 		return keySet().contains(key);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Map#containsValue(java.lang.Object)
 	 */
 	public boolean containsValue(Object value) {
 		for (String key : keys()) {
-			if (get(key).equals(value)) { return true; }
+			if (get(key).equals(value)) { 
+				return true; 
+			}
 		}
 		return false;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Same as {@link #keys()}, but using the {@link #defaults}.
+	 * @return
+	 */
+  public String[] defaultKeys() {
+    String keys[] = new String[defaults.size()];
+    int i = 0;
+    for (Object key : defaults.keySet()) {
+    	keys[i++] = key.toString();
+    }
+    return keys;
+  }
+	
+	/* (non-Javadoc)
 	 * @see java.util.Map#entrySet()
 	 */
 	public Set<java.util.Map.Entry<Object, Object>> entrySet() {
@@ -996,41 +1021,7 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 	}
 	
-	/**
-	 * This method restores the default value for all keys, for
-	 * which {@link #checkPref(Option)} throws a
-	 * {@link BackingStoreException}.
-	 */
-	@SuppressWarnings("rawtypes")
-	public void setInvalidKeysToDefaultValues() {
-	  Iterator<Option> iterator = optionIterator();
-	  Option<?> option;
-	  while (iterator.hasNext()) {
-	    option = iterator.next();
-	    try {
-	      // if false, key is simply not contained in the provider
-	      checkPref(option);
-	    } catch (Exception e) { // Also IllegalArgumentExceptions possible
-	      Object defaultV = option.getDefaultValue();
-	      if (defaultV!=null) {
-	        logger.log(Level.FINE, String.format("Restored default value \"%s\" for %s in %s", (defaultV==null?"NULL":defaultV) , option, keyProvider), e);
-	        put(option, defaultV);
-	      } else {
-	        //logger.log(Level.FINE, String.format("Could NOT restore default value \"%s\" for %s in %s", (defaultV==null?"NULL":defaultV) , option, keyProvider), e);
-	        // What to do? Removing is NOT the right way, because a value might still be set later on!
-
-	        // Note: this also fires if the default value is really set to null! To this might be intended!
-	        logger.log(Level.FINE, String.format("Default value set to NULL for option %s in %s.", option, keyProvider));
-//	        put(option, null);
-	        
-	      }
-	    }
-	  }
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Map#get(java.lang.Object)
 	 */
 	public String get(Object key) {
@@ -1138,7 +1129,7 @@ public class SBPreferences implements Map<Object, Object> {
 		String k = key.toString();
 		return prefs.getDouble(k, getDefaultDouble(k));
 	}
-
+	
 	/**
 	 * @param key
 	 * @return
@@ -1156,7 +1147,7 @@ public class SBPreferences implements Map<Object, Object> {
 		String k = key.toString();
 		return prefs.getInt(k, getDefaultInt(k));
 	}
-	
+
 	/**
 	 * @return the keyProvider
 	 */
@@ -1196,9 +1187,7 @@ public class SBPreferences implements Map<Object, Object> {
 		return v;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Map#isEmpty()
 	 */
 	public boolean isEmpty() {
@@ -1219,29 +1208,15 @@ public class SBPreferences implements Map<Object, Object> {
 			return defaultKeys();
 		}
 	}
-
-	/**
-	 * Same as {@link #keys()}, but using the {@link #defaults}.
-	 * @return
-	 */
-  public String[] defaultKeys() {
-    String keys[] = new String[defaults.size()];
-    int i = 0;
-    for (Object key : defaults.keySet()) {
-    	keys[i++] = key.toString();
-    }
-    return keys;
-  }
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Map#keySet()
 	 */
 	public Set<Object> keySet() {
 		Set<Object> set = new HashSet<Object>();
 		set.addAll(Arrays.asList(keys()));
-		set.addAll(Arrays.asList(defaultKeys()));
+	  // If the complete list of keys incl. default keys is required, use keySetFull! 
+		// set.addAll(Arrays.asList(defaultKeys()));
 		return set;
 	}
 	
@@ -1258,7 +1233,7 @@ public class SBPreferences implements Map<Object, Object> {
 		set.addAll(defaults.keySet());
 		return set;
 	}
-	
+
 	/**
 	 * Creates a complete array of all keys defined by this data structure, i.e.,
 	 * it creates a set of keys for those key-value pairs for which the user has
@@ -1352,9 +1327,7 @@ public class SBPreferences implements Map<Object, Object> {
 		return oldValue;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
 	 */
 	public Object put(Object key, Object value) {
@@ -1378,25 +1351,39 @@ public class SBPreferences implements Map<Object, Object> {
 		return oldValue;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Map#putAll(java.util.Map)
 	 */
 	public void putAll(Map<? extends Object, ? extends Object> m) {
+		/* 
+		 * In order to notify change listeners only when necessary
+		 * there must be a fine-grained check if it is really necessary
+		 * to put some preference.
+		 */
+		String orig;
+		Set<Object> keySet = keySet();
 		for (Map.Entry<? extends Object, ? extends Object> entry : m.entrySet()) {
-			put(entry.getKey(), entry.getValue());
+			if (!keySet.contains(entry.getKey())) {
+				put(entry.getKey(), entry.getValue());
+			} else {
+				orig = get(entry.getKey());
+				if (entry.getValue() != null) {
+					if (!orig.equals(entry.getValue().toString())) {
+						put(entry.getKey(), entry.getValue());
+					}
+				} else if (orig != null) {
+					remove(entry.getKey());
+				}
+			}
 		}
     // FIXME: We are loosing options here, for which there are no
-		// custom set value and just defaults (I.e. values, that are
+		// custom set value and just defaults (i.e., values, that are
 		// only stored in "defaults" and not in "prefs" are not copied here).
 	}
 	
-	 /*
-   * (non-Javadoc)
-   * 
-   * @see java.util.Map#putAll(java.util.Map)
-   */
+	/* (non-Javadoc)
+	 * @see java.util.Map#putAll(java.util.Map)
+	 */
   public void putAll(SBPreferences prefs) {
     for (Map.Entry<? extends Object, ? extends Object> entry : prefs.entrySet()) {
       put(entry.getKey(), entry.getValue());
@@ -1405,7 +1392,6 @@ public class SBPreferences implements Map<Object, Object> {
       defaults.put(entry.getKey(), entry.getValue());
     }
   }
-	
 	
 	/**
 	 * Removes the key-value pair from the preferences but doesn't affect the
@@ -1420,6 +1406,25 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
+	 * 
+	 * @param ncl
+	 * @see Preferences#removeNodeChangeListener(NodeChangeListener)
+	 */
+	public void removeNodeChangeListener(NodeChangeListener ncl) {
+		prefs.removeNodeChangeListener(ncl);
+	}
+	
+	/**
+	 * 
+	 * @param pcl
+	 * @see Preferences#removePreferenceChangeListener(PreferenceChangeListener)
+	 */
+	public void removePreferenceChangeListener(PreferenceChangeListener pcl) {
+		prefs.removePreferenceChangeListener(pcl);
+	}
+	
+	
+	/**
 	 * @param props
 	 * @throws BackingStoreException
 	 */
@@ -1432,9 +1437,39 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * This method restores the default value for all keys, for
+	 * which {@link #checkPref(Option)} throws a
+	 * {@link BackingStoreException}.
+	 */
+	@SuppressWarnings("rawtypes")
+	public void setInvalidKeysToDefaultValues() {
+	  Iterator<Option> iterator = optionIterator();
+	  Option<?> option;
+	  while (iterator.hasNext()) {
+	    option = iterator.next();
+	    try {
+	      // if false, key is simply not contained in the provider
+	      checkPref(option);
+	    } catch (Exception e) { // Also IllegalArgumentExceptions possible
+	      Object defaultV = option.getDefaultValue();
+	      if (defaultV!=null) {
+	        logger.log(Level.FINE, String.format("Restored default value \"%s\" for %s in %s", (defaultV == null ? "NULL" : defaultV) , option, keyProvider), e);
+	        put(option, defaultV);
+	      } else {
+	        //logger.log(Level.FINE, String.format("Could NOT restore default value \"%s\" for %s in %s", (defaultV==null?"NULL":defaultV) , option, keyProvider), e);
+	        // What to do? Removing is NOT the right way, because a value might still be set later on!
+
+	        // Note: this also fires if the default value is really set to null! To this might be intended!
+	        logger.log(Level.FINE, String.format("Default value set to NULL for option %s in %s.", option, keyProvider));
+//	        put(option, null);
+	        
+	      }
+	    }
+	  }
+	}
+	
+	/* (non-Javadoc)
 	 * @see java.util.Map#size()
 	 */
 	public int size() {
@@ -1510,9 +1545,7 @@ public class SBPreferences implements Map<Object, Object> {
 		return properties;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -1520,9 +1553,7 @@ public class SBPreferences implements Map<Object, Object> {
 		return prefs.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Map#values()
 	 */
 	public Collection<Object> values() {

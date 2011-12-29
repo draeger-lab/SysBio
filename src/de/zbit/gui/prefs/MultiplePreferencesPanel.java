@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.PreferenceChangeListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -61,29 +62,21 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	private static Class<PreferencesPanel>[] classes = null;
 	
 	/**
-	 * With this {@link List} it is possible to let this
-	 * {@link MultiplePreferencesPanel} show only
-	 * {@link PreferencesPanelForKeyProvider}s defined by the given {@link Option}
-	 * s.
-	 */
-	private Class<? extends KeyProvider>[] options;
-	
-	/**
 	 * Determines, if the {@link #classes} array has been initialized.
 	 * (Remark: the array may be initialized but still be null!).
 	 */
 	private static boolean isClassesInitialized = false;
-
-	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = 3189416350182046246L;
 	
 	/**
 	 * 
 	 */
 	private static final transient Logger logger = Logger.getLogger(MultiplePreferencesPanel.class.getName());
 
+	/**
+	 * Generated serial version identifier.
+	 */
+	private static final long serialVersionUID = 3189416350182046246L;
+	
 	/**
 	 * @return the classes
 	 */
@@ -157,7 +150,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	  }
 	  
 		return classes;
-	};
+	}
 
 	/**
 	 * Counts how many tabs can be created inside of this
@@ -185,7 +178,15 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 			}
 		}
 		return tabCount;
-	}
+	};
+
+	/**
+	 * With this {@link List} it is possible to let this
+	 * {@link MultiplePreferencesPanel} show only
+	 * {@link PreferencesPanelForKeyProvider}s defined by the given {@link Option}
+	 * s.
+	 */
+	private Class<? extends KeyProvider>[] options;
 
 	/**
 	 * Needed to structure this {@link PreferencesPanel}.
@@ -213,9 +214,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
     initializePrefPanel();
   }
 
-  /*
-	 * (non-Javadoc)
-	 * 
+  /* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#accepts(java.lang.Object)
 	 */
 	public boolean accepts(Object key) {
@@ -223,26 +222,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	}
 	
 	/* (non-Javadoc)
-	 * @see javax.swing.JComponent#setPreferredSize(java.awt.Dimension)
-	 */
-	@Override
-	public void setPreferredSize(Dimension preferredSize) {
-	  super.setPreferredSize(preferredSize);
-    // Make tab at least as big as this panel.
-	  if (tab != null) {
-	    Dimension p1 = tab.getPreferredSize();
-	    Dimension p2 = preferredSize;
-	    p1.width = Math.max(p1.width, p2.width);
-	    p1.height = Math.max(p1.height, p2.height);
-	    tab.setPreferredSize(p1);
-	  }
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.zbit.gui.cfg.PreferencesPanel#addChangeListener(javax.swing.event.
+	 * @see de.zbit.gui.cfg.PreferencesPanel#addChangeListener(javax.swing.event.
 	 * ChangeListener)
 	 */
 	@Override
@@ -253,8 +233,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	}
 
 	/* (non-Javadoc)
-	 * @see
-	 * de.zbit.gui.cfg.PreferencesPanel#addItemListener(java.awt.event.ItemListener)
+	 * @see de.zbit.gui.cfg.PreferencesPanel#addItemListener(java.awt.event.ItemListener)
 	 */
 	@Override
 	public void addItemListener(ItemListener listener) {
@@ -270,6 +249,16 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	public void addKeyListener(KeyListener listener) {
 		for (int i = 0; i < tab.getTabCount(); i++) {
 			getPreferencesPanel(i).addKeyListener(listener);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.prefs.PreferencesPanel#addPreferenceChangeListener(java.util.prefs.PreferenceChangeListener)
+	 */
+	@Override
+	public void addPreferenceChangeListener(PreferenceChangeListener listener) {
+		for (int i = 0; i < tab.getTabCount(); i++) {
+		  getPreferencesPanel(i).addPreferenceChangeListener(listener);
 		}
 	}
 
@@ -306,7 +295,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		return ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS)
 				.getString("USER_PREFERENCES");
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#init()
 	 */
@@ -379,14 +368,48 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		// It therefore does not have any own preferences.
 		return null;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see de.zbit.gui.cfg.PreferencesPanel#persist()
 	 */
 	@Override
 	public void persist() throws BackingStoreException {
-		for (int i = 0; i < tab.getComponentCount(); i++) {
+		for (int i = 0; i < tab.getTabCount(); i++) {
 			getPreferencesPanel(i).persist();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.prefs.PreferencesPanel#removeChangeListener(javax.swing.event.ChangeListener)
+	 */
+	@Override
+	public boolean removeChangeListener(ChangeListener listener) {
+		boolean removed = false;
+		for (int i = 0; i < tab.getTabCount(); i++) {
+		  removed |= getPreferencesPanel(i).removeChangeListener(listener);
+		}
+		return removed;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.prefs.PreferencesPanel#removeItemListener(java.awt.event.ItemListener)
+	 */
+	@Override
+	public boolean removeItemListener(ItemListener listener) {
+		boolean removed = false;
+		for (int i = 0; i < tab.getTabCount(); i++) {
+		  removed |= getPreferencesPanel(i).removeItemListener(listener);
+		}
+		return removed;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.prefs.PreferencesPanel#removePreferenceChangeLisener(java.util.prefs.PreferenceChangeListener)
+	 */
+	@Override
+	public void removePreferenceChangeLisener(PreferenceChangeListener listener) {
+		for (int i = 0; i < tab.getTabCount(); i++) {
+		  getPreferencesPanel(i).removePreferenceChangeLisener(listener);
 		}
 	}
 
@@ -395,10 +418,26 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	@Override
 	public void restoreDefaults() {
-		for (int i = 0; i < tab.getComponentCount(); i++) {
+		for (int i = 0; i < tab.getTabCount(); i++) {
 			getPreferencesPanel(i).restoreDefaults();
 		}
 		validate();
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.JComponent#setPreferredSize(java.awt.Dimension)
+	 */
+	@Override
+	public void setPreferredSize(Dimension preferredSize) {
+	  super.setPreferredSize(preferredSize);
+    // Make tab at least as big as this panel.
+	  if (tab != null) {
+	    Dimension p1 = tab.getPreferredSize();
+	    Dimension p2 = preferredSize;
+	    p1.width = Math.max(p1.width, p2.width);
+	    p1.height = Math.max(p1.height, p2.height);
+	    tab.setPreferredSize(p1);
+	  }
 	}
 
 	/**

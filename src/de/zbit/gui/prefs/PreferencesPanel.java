@@ -31,14 +31,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractButton;
@@ -113,454 +114,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * Generated serial version identifier
    */
   private static final long serialVersionUID = 1852850798328875230L;
-  
-  /**
-   * A list of {@link ChangeListener}s to be notified in case that values change
-   * on this {@link PreferencesPanel}.
-   */
-  private List<ChangeListener> changeListeners;
-  
-  /**
-   * A list of {@link ItemListener}s to be notified when switching items on this
-   * {@link PreferencesPanel}.
-   */
-  private List<ItemListener> itemListeners;
-  /**
-   * Stores a sorted mapping between {@link Option}s and corresponding
-   * {@link OptionGroup}s.
-   */
-  SortedMap<Option<?>, OptionGroup<?>> option2group;
-  
-  /**
-   * Stores a sorted mapping between {@link Option}s and corresponding
-   * {@link JComponent}s.
-   */
-  SortedMap<Option<?>, JComponent> option2component = new TreeMap<Option<?>, JComponent>();
-  
-  /**
-   * Stores those options that do not belong to any {@link OptionGroup}.
-   */
-  @SuppressWarnings("rawtypes")
-  SortedSet<Option> ungroupedOptions;
-  
-  /**
-   * Stores a (sorted) {@link List} of all {@link OptionGroup}s belonging to
-   * this class.
-   */
-  @SuppressWarnings("rawtypes")
-  SortedMap<String, List<OptionGroup>> optionGroups;
-  
-  /**
-   * Memorizes how many {@link OptionGroup}s contain {@link FileSelector}s in
-   * each {@link KeyProvider} of interest.
-   */
-  Map<String, Integer> keyProvider2fileGroups;
-    
-  /**
-   * These are the persistently saved user-preferences of which some ore all
-   * elements are possibly to be changed in this panel. But only if the user
-   * wants. Hence, we have to first manipulate the field {@link #properties} and
-   * can maybe persist these changes.
-   */
-  protected SBPreferences preferences;
-  
-  /**
-   * The settings to be changed by the user including default settings as a
-   * backup.
-   */
-  protected SBProperties properties;
-  
-  /**
-   * Creates a new {@link PreferencesPanel}.
-   * 
-   * @param properties
-   *        The current user properties. These will be filtered to contain only
-   *        accepted elements. Access to other elements is possible by
-   *        overriding {@link #initConstantFields(Properties)}.
-   * @throws IOException
-   * @see #accepts(Object)
-   */
-  public PreferencesPanel() throws IOException {
-    this(true);
-  }
-  
-  /**
-   * If you decide not to initialize the panel immediately, you HAVE TO call
-   * {@link #initializePrefPanel()} in the calling constructor.
-   * 
-   * @param initPanel
-   * @throws IOException
-   */
-  protected PreferencesPanel(boolean initPanel) throws IOException {
-    super();
-    /*
-     * We have to move this into a separate method, because it calls abstract
-     * functions and they may require an initialization first, by extending
-     * methods (e.g., see PreferencesPanelForKeyProvider).
-     */
-    if (initPanel) {
-      initializePrefPanel();
-    }
-  }
-  
-  /**
-   * This method decides whether or not this {@link PreferencesPanel} accepts
-   * the given key parameter as a valid key for which an option can be shown on
-   * this panel. This method is necessary to filter those settings that are not
-   * supported to avoid later write conflicts.
-   * 
-   * @param key
-   *        A key parameter for which it is to be decided whether it constitutes
-   *        a valid option here.
-   * @return True if the given key corresponds to a valid option, false
-   *         otherwise.
-   */
-  public abstract boolean accepts(Object key);
-  
-  /**
-   * Adds the given {@link ChangeListener} to this element's list of this kind
-   * of listeners.
-   * 
-   * @param listener
-   *        the element to be added.
-   */
-  public void addChangeListener(ChangeListener listener) {
-    changeListeners.add(listener);
-  }
-  
-  /**
-   * Adds the given {@link ItemListener} to this element's list of this kind of
-   * listeners.
-   * 
-   * @param listener
-   *        the element to be added.
-   */
-  public void addItemListener(ItemListener listener) {
-    itemListeners.add(listener);
-  }
-  
-  /**
-   * 
-   * @param lh
-   * @param options
-   * @param deleteFromHere
-   *        Processed options will be deleted from this {@link Map}.
-   * @return options, for which no {@link JComponent} could be created automatically
-   */
-  @SuppressWarnings("rawtypes")
-  List<Option<?>> addOptions(LayoutHelper lh, Iterable<? extends Option> options, Map<Option<?>, OptionGroup<?>> deleteFromHere) {
-    List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
-    for (Option<?> option : options) {
-      // Hide options that should not be visible.
-      if (!option.isVisible()) {
-        continue;
-      }
-      
-      // Create swing option based on field type
-      JComponent jc = null;
-      if (properties.containsKey(option)) {
-        // Check if we already have an element for this option
-        // Unfortunately is no good choice: this renderse the
-        // "reset defaults" button useless...
-        //jc = option2component.get(option);
-        
-        if (jc == null) {
-          jc = createJComponentForOption(option, properties, this);
-        }
-      }
-      
-      // Add to layout component
-      if (jc != null) {
-        if (jc instanceof FileSelector) {
-          FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
-        } else if (jc instanceof JLabeledComponent) {
-          JLabeledComponent.addSelectorsToLayout(lh, (JLabeledComponent) jc);
-        } else {
-          // Most options have 3 columns (2 real + a spacer).
-          lh.addWithWidth(jc, 3);
-        }
-        if (deleteFromHere != null) {
-          deleteFromHere.remove(option);
-        }
-        if (option2component != null) {
-          option2component.put(option, jc);
-        }
-        
-      } else {
-        // Remember unprocessed options
-        unprocessedOptions.add(option);
-      }
-      
-    }
-    return unprocessedOptions;
-  }
-  
-  /**
-   * Automatically builds an option panel, based on the static Option fields of
-   * the {@link #preferences#getKeyProvider()}.
-   * 
-   * @return all options that could not automatically be converted into a
-   *         JComponent.
-   */
-  @SuppressWarnings("unchecked")
-  public List<Option<?>> autoBuildPanel() {
-    return autoBuildPanel(preferences.getKeyProvider());
-  }
-  
-  /**
-   * Automatically builds an option panel, based on the given fields in the
-   * {@link KeyProvider}s.
-   * 
-   * @param keyProviders
-   * @return all options that could not automatically be converted into a
-   *         JComponent.
-   */
-  @SuppressWarnings("rawtypes")
-  protected List<Option<?>> autoBuildPanel(Class<? extends KeyProvider>... keyProviders) {
-    List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
-        
-    // search for OptionGroups first
-    searchForOptionGroups(keyProviders);
-    LayoutHelper lh = new LayoutHelper(this), helper;
-    boolean multipleKeyProviders = keyProviders.length > 1;
-    int elemCount;
-    
-    for (Class<? extends KeyProvider> keyProvider : keyProviders) {
-      helper = multipleKeyProviders ? new LayoutHelper(new JPanel()) : lh;
-      elemCount = insertOptionGroups(optionGroups.get(keyProvider.getName()),
-        keyProvider2fileGroups.get(keyProvider.getName()).intValue(),
-        unprocessedOptions, helper);
-      if (multipleKeyProviders && (elemCount > 0)) {
-        lh.add(helper.getContainer());
-      }
-    }
-    
-    // Now we consider what is left
-    if (ungroupedOptions.size() > 0) {
-      /* We only have one column in the layout so far (only grouped panels).
-       * Thus, we should keep the one column layout and create a new group for
-       * ungrouped options.
-       */
-      elemCount = 0;
-      for (Option<?> option : ungroupedOptions) {
-        if (option.isVisible()) {
-          elemCount++;
-        }
-      }
-      if (elemCount > 0) {
-        lh.add(createGroup((Collection<Option>) ungroupedOptions,
-          unprocessedOptions));
-      }
-    }
-    
-    // And finally we create the dependencies
-    PreferencesPanelDependencies.configureDependencies(this);
-    
-    return unprocessedOptions;
-  }
-  
-  /**
-   * Helper method to arrange {@link OptionGroup}s for just one
-   * {@link KeyProvider} on a {@link LayoutHelper}.
-   * 
-   * @param groupList
-   * @param fileSelectors
-   * @param unprocessedOptions
-   * @param lh
-   * @return the number of elements that are visibly added to the given
-   *         {@link LayoutHelper}.
-   */
-  @SuppressWarnings("rawtypes")
-  private int insertOptionGroups(List<OptionGroup> groupList,
-    int fileSelectors, List<Option<?>> unprocessedOptions, LayoutHelper lh) {
-    boolean twoColumn = ((groupList.size() - fileSelectors) % 2 == 0)
-        && (ungroupedOptions.size() == 0);
-    boolean oneColumn = false;
-    
-    // First we create GUI elements for all groups
-    int column = 0;
-    int row = 0;
-    int elemCount = 0;
-    Component c;
-    for (OptionGroup<?> optGrp : groupList) {
-      if (optGrp.isVisible()) {
-        // Group is visible => Generate components.
-        c = createGroup(optGrp, unprocessedOptions);
-        if (twoColumn) {
-          for (Option<?> opt : optGrp) {
-            if (opt.getRequiredType().equals(File.class)) {
-              oneColumn = true;
-              break;
-            }
-          }
-          if (oneColumn) {
-            column = 0;
-            lh.add(c, column, row++, 2, 1);
-            elemCount++;
-            oneColumn = false;
-          } else {
-            lh.add(c, column++, row, 1, 1);
-            elemCount++;
-            if (column == 2) {
-              column = 0;
-              row++;
-            }
-          }
-        } else {
-          lh.add(c);
-          elemCount++;
-        }
-      } else {
-        // Remove from internal "to-do" list.
-        for (Option<?> o: optGrp) {
-          option2group.remove(o);
-        }
-      }
-    }
-    return elemCount;
-  }
-
-  /**
-   * 
-   * @param optGrp
-   * @param unprocessedOptions
-   *        where to put those options that could not be added to the groups
-   *        panel.
-   * @return
-   */
-  Component createGroup(OptionGroup<?> optGrp,
-    List<Option<?>> unprocessedOptions) {
-    
-    // Create a new panel for the group
-    JPanel groupPanel = new JPanel();
-    LayoutHelper groupsLayout = new LayoutHelper(groupPanel);
-    // Add all child-options to this panel 
-    unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(), option2group));
-    
-    // Set Border, Name and ToolTip
-    String title = (optGrp.isSetName()) ? StringUtil.concat(" ", optGrp.getName().trim(), " ").toString() : null;
-    String toolTip = (optGrp.isSetToolTip()) ? StringUtil.toHTML(optGrp.getToolTip(), GUITools.TOOLTIP_LINE_LENGTH) : null;
-    groupPanel.setToolTipText(toolTip);
-    if (optGrp.isCollapsable()) {
-      // Create a collapsible panel
-      ExpandablePanel parentPanel = new ExpandablePanel(title, groupPanel, optGrp.isInitiallyCollapsed(), true);
-      parentPanel.setToolTipText(toolTip);
-      return parentPanel;
-      
-    } else {
-      // Set border and return simple panel
-      if (title != null) {
-        groupPanel.setBorder(BorderFactory.createTitledBorder(title));
-      } else {
-        groupPanel.setBorder(BorderFactory.createEtchedBorder());
-      }
-      return groupPanel;
-    }
-  }
-  
-  /**
-   * @param optGrp
-   * @param unprocessedOptions
-   *        where to put those options that could not be added to the groups
-   *        panel.
-   * @return
-   */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  Component createGroup(Collection<Option> optGrp,
-    List<Option<?>> unprocessedOptions) {
-    OptionGroup group = new OptionGroup();
-    group.addAll(optGrp);
-    return createGroup(group, unprocessedOptions);
-  }
-  
-  /**
-   * The default {@link Properties} are the standard values to be used if the
-   * user wants to re-initialize this object. With this method you can access
-   * these elements. Note that the default properties are never filtered and may
-   * therefore contain many additional elements in comparison to the current
-   * properties of this {@link PreferencesPanel}
-   * 
-   * @return The {@link Properties} object containing the default key-value
-   *         pairs of user settings.
-   * @see #getProperties()
-   */
-  public Properties getDefaultProperties() {
-    return properties != null ? properties.getDefaults() : new Properties();
-  }
-  
-  /**
-   * 
-   * @param <T>
-   * @param option
-   * @return
-   */
-  public <T> T getProperty(Option<T> option) {
-    return option.parseOrCast(properties.getProperty(option));
-  }
-  
-  /**
-   * Initializes a Option type specific JComponent without any listeners and
-   * default values.
-   * 
-   * @see #createJComponentForOption(Option, Object, ItemListener, ChangeListener,
-   *      KeyListener)
-   * @param option
-   * @return
-   */
-  public JComponent getJComponentForOption(Option<?> option) {
-    return createJComponentForOption(option, properties, this);
-  }
-  
-  /**
-   * With this method it is possible to create a {@link JComponent} based on the
-   * persistently saved user preferences, i.e., here an instance of
-   * {@link SBPreferences}. This is in contrast to {@link SBProperties}, i.e., a
-   * current in-memory user-configuration.
-   * 
-   * @see #createJComponentForOption(Option, Object, ItemListener, ChangeListener,
-   *      KeyListener)
-   * @param option
-   * @param prefs
-   * @param l
-   * @return
-   */
-  public static JComponent createJComponentForOption(Option<?> option,
-    SBPreferences prefs, EventListener l) {
-    Object def = prefs != null ? option.getValue(prefs) : option
-        .getDefaultValue();
-    return createJComponentForOption(option, def, l);
-  }
-  
-  /**
-   * With this method it is possible to create a {@link JComponent} based on the
-   * current in-memory preferences, i.e., here an instance of
-   * {@link SBProperties}. This is in contrast to {@link SBPreferences}, i.e., a
-   * persistently saved user-configuration.
-   * 
-   * <p>
-   * NOTE: the returned Element is ALWAYS a {@link JComponent} that implements
-   * the {@link JComponentForOption} interface.
-   * </p>
-   * 
-   * @param option
-   * @param probs
-   * @param l
-   * @return
-   * @see #createJComponentForOption(Option, SBPreferences, EventListener)
-   */
-  public static JComponent createJComponentForOption(Option<?> option, SBProperties probs, EventListener l) {
-    // Get default value
-    Object def = (probs != null)? probs.get(option) : option.getDefaultValue();
-    if (def != null) {
-      try {
-        // Try to get the real default value
-        def = option.parseOrCast(def);
-      } catch (Throwable t) {
-        // doesn't matter, try to continue with string representation.
-      }
-    }
-    return createJComponentForOption(option, def, l);
-  }
   
   /**
    * This Method will generate a {@link JComponent}, based on the given option.
@@ -830,298 +383,101 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     
     return component;
   }
-  
   /**
-   * A derived class may override this method because it might be necessary to
-   * gather information from some GUI elements in the properties field variable.
-   * By default, this method returns a pointer to the properties field assuming
-   * that during the manipulation of all fields by the user the entries within
-   * this {@link Properties} object have been updated already.
+   * With this method it is possible to create a {@link JComponent} based on the
+   * persistently saved user preferences, i.e., here an instance of
+   * {@link SBPreferences}. This is in contrast to {@link SBProperties}, i.e., a
+   * current in-memory user-configuration.
    * 
-   * @return A pointer to the currently set properties of this class.
-   */
-  public SBProperties getProperties() {
-    return properties;
-  }
-  
-  /**
-   * Returns a meaningful human-readable title for this {@link PreferencesPanel}
-   * .
-   * 
-   * @return A representative title for this element.
-   */
-  public abstract String getTitle();
-  
-  /**
-   * Initializes the layout and GUI of this {@link PreferencesPanel}. This
-   * method should use the values stored in the field variable
-   * {@link #properties}. Please note, although the {@link #accepts(Object)}
-   * method is used to filter possible values from the given {@link Properties},
-   * there is no guarantee that a desired key-value pair is set. You can also
-   * access the {@link #defaultProperties} field here. Please make sure, all GUI
-   * elements used on this {@link PreferencesPanel} provide some method to
-   * update the {@link #properties} field as this is the interesting value to be
-   * returned by the {@link #getProperties()} method.
-   */
-  public abstract void init();
-  
-  /**
-   * The main initialization method, that must be called by every constructor.
-   * 
-   * @throws IOException
-   */
-  protected void initializePrefPanel() throws IOException {
-    changeListeners = new LinkedList<ChangeListener>();
-    itemListeners = new LinkedList<ItemListener>();
-    properties = new SBProperties(new SBProperties());
-    preferences = loadPreferences();
-    if (preferences != null) {
-      String k;
-      for (Object key : preferences.keySetFull()) {
-        if (accepts(key)) {
-          // Accept only key from KeyProvider!
-          // Don't put all keys in properties (also not in preferences) here!
-          k = key.toString();
-          properties.put(k, preferences.get(k));
-          properties.getDefaults().put(k, preferences.getDefault(k));
-        } else {
-          log.finer(String.format("Rejecting key: %s", key));
-        }
-      }
-    }
-    init();
-  }
-  
-  /**
-   * Method to test whether the current properties equal the default
-   * configuration.
-   * 
-   * @return true if the values of all current properties equal the values of
-   *         the defaults.
-   */
-  public boolean isDefaultConfiguration() {
-    for (Entry<Object, Object> e : properties.entrySet()) {
-      if (!e.getValue().equals(properties.getDefaults().get(e.getKey()))) {
-        return false; 
-      }
-    }
-    return true;
-  }
-  
-  /**
-   * Method to test whether the current properties equal the user's current
-   * configuration.
-   * 
-   * @return true if the values of all current properties equal the current
-   *         persistent user configuration.
-   */
-  public boolean isUserConfiguration() {
-    for (Entry<Object, Object> e : properties.entrySet()) {
-      if (!e.getValue().toString()
-          .equals(preferences.get(e.getKey().toString()))) { 
-        return false; 
-      }
-    }
-    return true;
-  }
-  
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
-   */
-  public void itemStateChanged(ItemEvent e) {
-    setProperty(properties, e.getSource());
-    for (ItemListener i : itemListeners) {
-      i.itemStateChanged(e);
-    }
-  }
-  
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-   */
-  public void keyPressed(KeyEvent e) {
-    setProperty(properties, e.getSource());
-    for (KeyListener i : getKeyListeners()) {
-      i.keyPressed(e);
-    }
-  }
-  
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-   */
-  public void keyReleased(KeyEvent e) {
-    setProperty(properties, e.getSource());
-    for (KeyListener kl : getKeyListeners()) {
-      kl.keyReleased(e);
-    }
-  }
-  
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-   */
-  public void keyTyped(KeyEvent e) {
-    setProperty(properties, e.getSource());
-    for (KeyListener kl : getKeyListeners()) {
-      kl.keyTyped(e);
-    }
-  }
-  
-  /**
-   * This method loads an {@link SBPreferences} object whose key-value pairs are
-   * to be manipulated by the user. In this way, this method tells this class
-   * where these preferences are located.
-   * 
+   * @see #createJComponentForOption(Option, Object, ItemListener, ChangeListener,
+   *      KeyListener)
+   * @param option
+   * @param prefs
+   * @param l
    * @return
-   * @throws IOException
    */
-  protected abstract SBPreferences loadPreferences() throws IOException;
+  public static JComponent createJComponentForOption(Option<?> option,
+    SBPreferences prefs, EventListener l) {
+    Object def = prefs != null ? option.getValue(prefs) : option
+        .getDefaultValue();
+    return createJComponentForOption(option, def, l);
+  }
   
   /**
-   * Persistently stores the currently set options, i.e., key-value pairs in the
-   * user's configuration. Depending on the operating system, the way how this
-   * information is actually stored can vary.
+   * With this method it is possible to create a {@link JComponent} based on the
+   * current in-memory preferences, i.e., here an instance of
+   * {@link SBProperties}. This is in contrast to {@link SBPreferences}, i.e., a
+   * persistently saved user-configuration.
    * 
-   * @throws BackingStoreException
-   */
-  public void persist() throws BackingStoreException {
-    preferences.putAll(properties);
-    preferences.flush();
-  }
-  
-  /**
-   * Removes the given {@link ChangeListener} from the list of this kind of
-   * listeners in this object.
+   * <p>
+   * NOTE: the returned Element is ALWAYS a {@link JComponent} that implements
+   * the {@link JComponentForOption} interface.
+   * </p>
    * 
-   * @param listener
-   *        the element to be removed.
-   * @return true if the list contained the specified element.
+   * @param option
+   * @param probs
+   * @param l
+   * @return
+   * @see #createJComponentForOption(Option, SBPreferences, EventListener)
    */
-  public boolean removeChangeListener(ChangeListener listener) {
-    return changeListeners.remove(listener);
-  }
-  
-  /**
-   * Removes the given {@link ItemListener} from the list of this kind of
-   * listeners in this object.
-   * 
-   * @param listener
-   *        the element to be removed.
-   * @return true if the list contained the specified element.
-   */
-  public boolean removeItemListener(ItemListener listener) {
-    return itemListeners.remove(listener);
-  }
-  
-  /**
-   * Switches all properties back to the given default values and re-initializes
-   * the graphical user interface.
-   */
-  public void restoreDefaults() {
-    setProperties(preferences != null ? preferences.getDefaults() : new SBProperties());
-  }
-  
-  /**
-	 * 
-	 */
-  @SuppressWarnings("unchecked")
-  void searchForOptionGroups() {
-    searchForOptionGroups(preferences.getKeyProvider());
-  }
-  
-  /**
-   * 
-   * @param keyProviders
-   */
-  @SuppressWarnings("rawtypes")
-  private void searchForOptionGroups(
-    Class<? extends KeyProvider>... keyProviders) {
-    option2group = new TreeMap<Option<?>, OptionGroup<?>>();
-    ungroupedOptions = new TreeSet<Option>();
-    optionGroups = new TreeMap<String, List<OptionGroup>>();
-    keyProvider2fileGroups = new HashMap<String, Integer>();
-    for (Class<? extends KeyProvider> keyProvider : keyProviders) {
-      ungroupedOptions.addAll(KeyProvider.Tools.optionList(keyProvider));
-      optionGroups.put(keyProvider.getName(), KeyProvider.Tools
-          .optionGroupList(keyProvider));
-    }
-    int fileCount;
-    Integer fileGroupCount;
-    for (Class<? extends KeyProvider> keyProvider : keyProviders) {
-      fileGroupCount = Integer.valueOf(0);
-      keyProvider2fileGroups.put(keyProvider.getName(), fileGroupCount);
-      for (OptionGroup<?> group : optionGroups.get(keyProvider.getName())) {
-        fileCount = 0;
-        for (Option<?> option : group) {
-          option2group.put(option, group);
-          ungroupedOptions.remove(option);
-          if (option.getRequiredType().equals(File.class)) {
-            fileCount++;
-          }
-        }
-        if (fileCount > 0) {
-          fileGroupCount = Integer.valueOf(keyProvider2fileGroups.get(
-            keyProvider.getName()).intValue() + 1);
-          keyProvider2fileGroups.put(keyProvider.getName(),
-            fileGroupCount);
-        }
+  public static JComponent createJComponentForOption(Option<?> option, SBProperties probs, EventListener l) {
+    // Get default value
+    Object def = (probs != null)? probs.get(option) : option.getDefaultValue();
+    if (def != null) {
+      try {
+        // Try to get the real default value
+        def = option.parseOrCast(def);
+      } catch (Throwable t) {
+        // doesn't matter, try to continue with string representation.
       }
     }
+    return createJComponentForOption(option, def, l);
   }
   
   /**
-   * @return the {@link #preferences}.
+   * @param c any {@link Component}
+   * @return the option, associated with this component or any parent of this
+   *         component.
    */
-  public SBPreferences getPreferences() {
-    return preferences;
+  public static Option<?> getOptionForJComponent(JComponent c) {
+    return getOptionForJComponent(c, c);
   }
   
   /**
-   * @return the {@link KeyProvider} of the {@link #preferences}.
-   */
-  public Class<? extends KeyProvider> getKeyProvider() {
-    return preferences != null ? preferences.getKeyProvider() : null;
-  }
-  
-  /**
-   * Filters the given properties and only keeps those key-value pairs that are
-   * accepted by this class. Then it initializes the layout of this GUI element
-   * and also allows to select non-modifiable but important key-value pairs from
-   * the given {@link Properties} by overriding the method
-   * {@link #initConstantFields(Properties)}.
    * 
-   * @param map
-   *        All available current properties of the user.
-   * @see #accepts(Object)
+   * @param toCompare
+   * @param currentRecurse
+   * @return
    */
-  public void setProperties(Map<Object, Object> map) {
-    for (Object key : map.keySet()) {
-      if (accepts(key)) {
-        this.properties.setProperty(key.toString(), map.get(key).toString());
-      }
-    }
+  private static Option<?> getOptionForJComponent(JComponent toCompare,
+    Component currentRecurse) {
     
-    // Reset panel
-    removeAll();
-    init();
-  }
-  
-  /**
-   * Calls {@link #setProperty(Map, Object, boolean)} WITHOUT performing range
-   * checks (to keep compatibility).
-   * 
-   * @see #setProperty(Map, Object, boolean)
-   * @param properties
-   * @param source
-   */
-  public static void setProperty(SBProperties properties, Object source) {
-    setProperty(properties, source, false);
+    /*
+     * This does NOT work for JLabeledComponents and FileSelectors. FIXED: =>
+     * Avoided by adding the getOptionForAutoGeneratedJComponent() method.
+     * 
+     * Unfortunately, the {@link JLabeledComponent}s and {@link FileSelector}s
+     * are added in {@link PreferencesPanel#addOptions(de.zbit.gui.LayoutHelper,
+     * Iterable, Map)} with their components only (not as whole objects). Thus,
+     * this method can not identify these components.
+     */
+		if ((currentRecurse instanceof JComponentForOption)
+				|| JComponentForOption.class
+						.isAssignableFrom(currentRecurse.getClass())) {
+      return ((JComponentForOption) currentRecurse).getOption();
+    } else if ((currentRecurse instanceof PreferencesPanel)
+        || PreferencesPanel.class.isAssignableFrom(currentRecurse.getClass())) {
+      Option<?> ret = ((PreferencesPanel) currentRecurse)
+          .getOptionForAutoGeneratedJComponent(toCompare);
+      if (ret != null) {
+      	return ret;
+      }
+    }
+    if ((currentRecurse.getParent() != null)
+        && (!currentRecurse.getParent().equals(currentRecurse))) { 
+      return getOptionForJComponent(toCompare, currentRecurse.getParent()); 
+    }
+    return null;
   }
   
   /**
@@ -1195,7 +551,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         } else if (c instanceof JTextComponent) {
           value = ((JTextComponent) c).getText();
         } else if (c instanceof JComponentForOption) {
-          value = ((JComponentForOption)c).getCurrentValue().toString();
+          value = ((JComponentForOption) c).getCurrentValue().toString();
         }
         
         // Check before saving
@@ -1214,7 +570,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
                 ((SBPreferences) properties).toProperties());
             }
           } else if (o == null) {
-//            System.out.println("Could not get option for JComponent.");
+            log.finest("Could not get option for JComponent.");
           }
         }
         
@@ -1230,6 +586,369 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 //        System.out.println(" - " + "failed: properties contains no key with that name.");
       }
     }
+  }
+    
+  /**
+   * Calls {@link #setProperty(Map, Object, boolean)} WITHOUT performing range
+   * checks (to keep compatibility).
+   * 
+   * @see #setProperty(Map, Object, boolean)
+   * @param properties
+   * @param source
+   */
+  public static void setProperty(SBProperties properties, Object source) {
+    setProperty(properties, source, false);
+  }
+  
+  /**
+   * A {@link List} of {@link ChangeListener}s to be notified in case that values change
+   * on this {@link PreferencesPanel}.
+   */
+  private List<ChangeListener> changeListeners;
+  
+  /**
+   * A {@link List} of {@link ItemListener}s to be notified when switching items on this
+   * {@link PreferencesPanel}.
+   */
+  private List<ItemListener> itemListeners;
+  
+  /**
+   * Memorizes how many {@link OptionGroup}s contain {@link FileSelector}s in
+   * each {@link KeyProvider} of interest.
+   */
+  Map<String, Integer> keyProvider2fileGroups;
+  
+  /**
+   * Stores a sorted mapping between {@link Option}s and corresponding
+   * {@link JComponent}s.
+   */
+  SortedMap<Option<?>, JComponent> option2component = new TreeMap<Option<?>, JComponent>();
+  
+  /**
+   * Stores a sorted mapping between {@link Option}s and corresponding
+   * {@link OptionGroup}s.
+   */
+  SortedMap<Option<?>, OptionGroup<?>> option2group;
+  
+  /**
+   * Stores a (sorted) {@link List} of all {@link OptionGroup}s belonging to
+   * this class.
+   */
+  @SuppressWarnings("rawtypes")
+  SortedMap<String, List<OptionGroup>> optionGroups;
+  
+  /**
+   * These are the persistently saved user-preferences of which some ore all
+   * elements are possibly to be changed in this panel. But only if the user
+   * wants. Hence, we have to first manipulate the field {@link #properties} and
+   * can maybe persist these changes.
+   */
+  protected SBPreferences preferences;
+  
+  /**
+   * The settings to be changed by the user including default settings as a
+   * backup.
+   */
+  protected SBProperties properties;
+  
+  /**
+   * Stores those options that do not belong to any {@link OptionGroup}.
+   */
+  @SuppressWarnings("rawtypes")
+  SortedSet<Option> ungroupedOptions;
+  
+  /**
+   * Creates a new {@link PreferencesPanel}.
+   * 
+   * @param properties
+   *        The current user properties. These will be filtered to contain only
+   *        accepted elements. Access to other elements is possible by
+   *        overriding {@link #initConstantFields(Properties)}.
+   * @throws IOException
+   * @see #accepts(Object)
+   */
+  public PreferencesPanel() throws IOException {
+    this(true);
+  }
+
+  /**
+   * If you decide not to initialize the panel immediately, you HAVE TO call
+   * {@link #initializePrefPanel()} in the calling constructor.
+   * 
+   * @param initPanel
+   * @throws IOException
+   */
+  protected PreferencesPanel(boolean initPanel) throws IOException {
+    super();
+    /*
+     * We have to move this into a separate method, because it calls abstract
+     * functions and they may require an initialization first, by extending
+     * methods (e.g., see PreferencesPanelForKeyProvider).
+     */
+    if (initPanel) {
+      initializePrefPanel();
+    }
+  }
+  
+  /**
+   * This method decides whether or not this {@link PreferencesPanel} accepts
+   * the given key parameter as a valid key for which an option can be shown on
+   * this panel. This method is necessary to filter those settings that are not
+   * supported to avoid later write conflicts.
+   * 
+   * @param key
+   *        A key parameter for which it is to be decided whether it constitutes
+   *        a valid option here.
+   * @return True if the given key corresponds to a valid option, false
+   *         otherwise.
+   */
+  public abstract boolean accepts(Object key);
+  
+  /**
+   * Adds the given {@link ChangeListener} to this element's list of this kind
+   * of listeners.
+   * 
+   * @param listener
+   *        the element to be added.
+   */
+  public void addChangeListener(ChangeListener listener) {
+    changeListeners.add(listener);
+  }
+  
+  /**
+   * Adds the given {@link ItemListener} to this element's list of this kind of
+   * listeners.
+   * 
+   * @param listener
+   *        the element to be added.
+   */
+  public void addItemListener(ItemListener listener) {
+    itemListeners.add(listener);
+  }
+  
+  /**
+   * 
+   * @param lh
+   * @param options
+   * @param deleteFromHere
+   *        Processed options will be deleted from this {@link Map}.
+   * @return options, for which no {@link JComponent} could be created automatically
+   */
+  @SuppressWarnings("rawtypes")
+  List<Option<?>> addOptions(LayoutHelper lh, Iterable<? extends Option> options, Map<Option<?>, OptionGroup<?>> deleteFromHere) {
+    List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
+    for (Option<?> option : options) {
+      // Hide options that should not be visible.
+      if (!option.isVisible()) {
+        continue;
+      }
+      
+      // Create swing option based on field type
+      JComponent jc = null;
+      if (properties.containsKey(option)) {
+        // Check if we already have an element for this option
+        // Unfortunately is no good choice: this renderse the
+        // "reset defaults" button useless...
+        //jc = option2component.get(option);
+        
+        if (jc == null) {
+          jc = createJComponentForOption(option, properties, this);
+        }
+      }
+      
+      // Add to layout component
+      if (jc != null) {
+        if (jc instanceof FileSelector) {
+          FileSelector.addSelectorsToLayout(lh, (FileSelector) jc);
+        } else if (jc instanceof JLabeledComponent) {
+          JLabeledComponent.addSelectorsToLayout(lh, (JLabeledComponent) jc);
+        } else {
+          // Most options have 3 columns (2 real + a spacer).
+          lh.addWithWidth(jc, 3);
+        }
+        if (deleteFromHere != null) {
+          deleteFromHere.remove(option);
+        }
+        if (option2component != null) {
+          option2component.put(option, jc);
+        }
+        
+      } else {
+        // Remember unprocessed options
+        unprocessedOptions.add(option);
+      }
+      
+    }
+    return unprocessedOptions;
+  }
+  
+  /**
+   * Allows dedicated listeners to react to changes in the user's preferences.
+   * 
+   * @param listener
+   */
+  public void addPreferenceChangeListener(PreferenceChangeListener listener) {
+  	preferences.addPreferenceChangeListener(listener);
+  }
+  
+  /**
+   * Automatically builds an option panel, based on the static Option fields of
+   * the {@link #preferences#getKeyProvider()}.
+   * 
+   * @return all options that could not automatically be converted into a
+   *         JComponent.
+   */
+  @SuppressWarnings("unchecked")
+  public List<Option<?>> autoBuildPanel() {
+    return autoBuildPanel(preferences.getKeyProvider());
+  }
+  
+  /**
+   * Automatically builds an option panel, based on the given fields in the
+   * {@link KeyProvider}s.
+   * 
+   * @param keyProviders
+   * @return all options that could not automatically be converted into a
+   *         JComponent.
+   */
+  @SuppressWarnings("rawtypes")
+  protected List<Option<?>> autoBuildPanel(Class<? extends KeyProvider>... keyProviders) {
+    List<Option<?>> unprocessedOptions = new LinkedList<Option<?>>();
+        
+    // search for OptionGroups first
+    searchForOptionGroups(keyProviders);
+    LayoutHelper lh = new LayoutHelper(this), helper;
+    boolean multipleKeyProviders = keyProviders.length > 1;
+    int elemCount;
+    
+    for (Class<? extends KeyProvider> keyProvider : keyProviders) {
+      helper = multipleKeyProviders ? new LayoutHelper(new JPanel()) : lh;
+      elemCount = insertOptionGroups(optionGroups.get(keyProvider.getName()),
+        keyProvider2fileGroups.get(keyProvider.getName()).intValue(),
+        unprocessedOptions, helper);
+      if (multipleKeyProviders && (elemCount > 0)) {
+        lh.add(helper.getContainer());
+      }
+    }
+    
+    // Now we consider what is left
+    if (ungroupedOptions.size() > 0) {
+      /* We only have one column in the layout so far (only grouped panels).
+       * Thus, we should keep the one column layout and create a new group for
+       * ungrouped options.
+       */
+      elemCount = 0;
+      for (Option<?> option : ungroupedOptions) {
+        if (option.isVisible()) {
+          elemCount++;
+        }
+      }
+      if (elemCount > 0) {
+        lh.add(createGroup((Collection<Option>) ungroupedOptions,
+          unprocessedOptions));
+      }
+    }
+    
+    // And finally we create the dependencies
+    PreferencesPanelDependencies.configureDependencies(this);
+    
+    return unprocessedOptions;
+  }
+  
+  /**
+   * @param optGrp
+   * @param unprocessedOptions
+   *        where to put those options that could not be added to the groups
+   *        panel.
+   * @return
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  Component createGroup(Collection<Option> optGrp,
+    List<Option<?>> unprocessedOptions) {
+    OptionGroup group = new OptionGroup();
+    group.addAll(optGrp);
+    return createGroup(group, unprocessedOptions);
+  }
+  
+  /**
+   * 
+   * @param optGrp
+   * @param unprocessedOptions
+   *        where to put those options that could not be added to the groups
+   *        panel.
+   * @return
+   */
+  Component createGroup(OptionGroup<?> optGrp,
+    List<Option<?>> unprocessedOptions) {
+    
+    // Create a new panel for the group
+    JPanel groupPanel = new JPanel();
+    LayoutHelper groupsLayout = new LayoutHelper(groupPanel);
+    // Add all child-options to this panel 
+    unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(), option2group));
+    
+    // Set Border, Name and ToolTip
+    String title = (optGrp.isSetName()) ? StringUtil.concat(" ", optGrp.getName().trim(), " ").toString() : null;
+    String toolTip = (optGrp.isSetToolTip()) ? StringUtil.toHTML(optGrp.getToolTip(), GUITools.TOOLTIP_LINE_LENGTH) : null;
+    groupPanel.setToolTipText(toolTip);
+    if (optGrp.isCollapsable()) {
+      // Create a collapsible panel
+      ExpandablePanel parentPanel = new ExpandablePanel(title, groupPanel, optGrp.isInitiallyCollapsed(), true);
+      parentPanel.setToolTipText(toolTip);
+      return parentPanel;
+      
+    } else {
+      // Set border and return simple panel
+      if (title != null) {
+        groupPanel.setBorder(BorderFactory.createTitledBorder(title));
+      } else {
+        groupPanel.setBorder(BorderFactory.createEtchedBorder());
+      }
+      return groupPanel;
+    }
+  }
+  
+  /**
+   * @param option
+   * @return {@link JComponent} representing this option
+   */
+  public JComponent getComponentForOption(Option<?> option) {
+    return option2component.get(option);
+  }
+  
+  /**
+   * The default {@link Properties} are the standard values to be used if the
+   * user wants to re-initialize this object. With this method you can access
+   * these elements. Note that the default properties are never filtered and may
+   * therefore contain many additional elements in comparison to the current
+   * properties of this {@link PreferencesPanel}
+   * 
+   * @return The {@link Properties} object containing the default key-value
+   *         pairs of user settings.
+   * @see #getProperties()
+   */
+  public Properties getDefaultProperties() {
+    return properties != null ? properties.getDefaults() : new Properties();
+  }
+  
+  /**
+   * Initializes a Option type specific JComponent without any listeners and
+   * default values.
+   * 
+   * @see #createJComponentForOption(Option, Object, ItemListener, ChangeListener,
+   *      KeyListener)
+   * @param option
+   * @return
+   */
+  public JComponent getJComponentForOption(Option<?> option) {
+    return createJComponentForOption(option, properties, this);
+  }
+  
+  /**
+   * @return the {@link KeyProvider} of the {@link #preferences}.
+   */
+  public Class<? extends KeyProvider> getKeyProvider() {
+    return preferences != null ? preferences.getKeyProvider() : null;
   }
   
   /**
@@ -1250,43 +969,353 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   }
   
   /**
-   * @param c any {@link Component}
-   * @return the option, associated with this component or any parent of this
-   *         component.
+   * @return the {@link #preferences}.
    */
-  public static Option<?> getOptionForJComponent(JComponent c) {
-    return getOptionForJComponent(c, c);
+  public SBPreferences getPreferences() {
+    return preferences;
   }
   
-  private static Option<?> getOptionForJComponent(JComponent toCompare,
-    Component currentRecurse) {
+  /**
+   * A derived class may override this method because it might be necessary to
+   * gather information from some GUI elements in the properties field variable.
+   * By default, this method returns a pointer to the properties field assuming
+   * that during the manipulation of all fields by the user the entries within
+   * this {@link Properties} object have been updated already.
+   * 
+   * @return A pointer to the currently set properties of this class.
+   */
+  public SBProperties getProperties() {
+    return properties;
+  }
+  
+  /**
+   * 
+   * @param <T>
+   * @param option
+   * @return
+   */
+  public <T> T getProperty(Option<T> option) {
+    return option.parseOrCast(properties.getProperty(option));
+  }
+  
+  /**
+   * Returns a meaningful human-readable title for this {@link PreferencesPanel}
+   * .
+   * 
+   * @return A representative title for this element.
+   */
+  public abstract String getTitle();
+  
+  /**
+   * Initializes the layout and GUI of this {@link PreferencesPanel}. This
+   * method should use the values stored in the field variable
+   * {@link #properties}. Please note, although the {@link #accepts(Object)}
+   * method is used to filter possible values from the given {@link Properties},
+   * there is no guarantee that a desired key-value pair is set. You can also
+   * access the {@link #defaultProperties} field here. Please make sure, all GUI
+   * elements used on this {@link PreferencesPanel} provide some method to
+   * update the {@link #properties} field as this is the interesting value to be
+   * returned by the {@link #getProperties()} method.
+   */
+  public abstract void init();
+  
+  /**
+   * The main initialization method, that must be called by every constructor.
+   * 
+   * @throws IOException
+   */
+  protected void initializePrefPanel() throws IOException {
+    changeListeners = new LinkedList<ChangeListener>();
+    itemListeners = new LinkedList<ItemListener>();
+    properties = new SBProperties(new SBProperties());
+    preferences = loadPreferences();
+    if (preferences != null) {
+      String k;
+      for (Object key : preferences.keySetFull()) {
+        if (accepts(key)) {
+          // Accept only key from KeyProvider!
+          // Don't put all keys in properties (also not in preferences) here!
+          k = key.toString();
+          properties.put(k, preferences.get(k));
+          properties.getDefaults().put(k, preferences.getDefault(k));
+        } else {
+          log.finer(String.format("Rejecting key: %s", key));
+        }
+      }
+    }
+    init();
+  }
+  
+  /**
+   * Helper method to arrange {@link OptionGroup}s for just one
+   * {@link KeyProvider} on a {@link LayoutHelper}.
+   * 
+   * @param groupList
+   * @param fileSelectors
+   * @param unprocessedOptions
+   * @param lh
+   * @return the number of elements that are visibly added to the given
+   *         {@link LayoutHelper}.
+   */
+  @SuppressWarnings("rawtypes")
+  private int insertOptionGroups(List<OptionGroup> groupList,
+    int fileSelectors, List<Option<?>> unprocessedOptions, LayoutHelper lh) {
+    boolean twoColumn = ((groupList.size() - fileSelectors) % 2 == 0)
+        && (ungroupedOptions.size() == 0);
+    boolean oneColumn = false;
     
-    /*
-     * This does NOT work for JLabeledComponents and FileSelectors. FIXED: =>
-     * Avoided by adding the getOptionForAutoGeneratedJComponent() method.
-     * 
-     * Unfortunately, the {@link JLabeledComponent}s and {@link FileSelector}s
-     * are added in {@link PreferencesPanel#addOptions(de.zbit.gui.LayoutHelper,
-     * Iterable, Map)} with their components only (not as whole objects). Thus,
-     * this method can not identify these components.
-     */
-    if (currentRecurse instanceof JComponentForOption
-        || JComponentForOption.class
-            .isAssignableFrom(currentRecurse.getClass())) {
-      return ((JComponentForOption) currentRecurse).getOption();
-    } else if (currentRecurse instanceof PreferencesPanel
-        || PreferencesPanel.class.isAssignableFrom(currentRecurse.getClass())) {
-      Option<?> ret = ((PreferencesPanel) currentRecurse)
-          .getOptionForAutoGeneratedJComponent(toCompare);
-      if (ret != null) return ret;
+    // First we create GUI elements for all groups
+    int column = 0;
+    int row = 0;
+    int elemCount = 0;
+    Component c;
+    for (OptionGroup<?> optGrp : groupList) {
+      if (optGrp.isVisible()) {
+        // Group is visible => Generate components.
+        c = createGroup(optGrp, unprocessedOptions);
+        if (twoColumn) {
+          for (Option<?> opt : optGrp) {
+            if (opt.getRequiredType().equals(File.class)) {
+              oneColumn = true;
+              break;
+            }
+          }
+          if (oneColumn) {
+            column = 0;
+            lh.add(c, column, row++, 2, 1);
+            elemCount++;
+            oneColumn = false;
+          } else {
+            lh.add(c, column++, row, 1, 1);
+            elemCount++;
+            if (column == 2) {
+              column = 0;
+              row++;
+            }
+          }
+        } else {
+          lh.add(c);
+          elemCount++;
+        }
+      } else {
+        // Remove from internal "to-do" list.
+        for (Option<?> o: optGrp) {
+          option2group.remove(o);
+        }
+      }
     }
-    if (currentRecurse.getParent() != null
-        && (!currentRecurse.getParent().equals(currentRecurse))) { 
-      return getOptionForJComponent(toCompare, currentRecurse.getParent()); 
-    }
-    return null;
+    return elemCount;
   }
   
+  /**
+   * Method to test whether the current properties equal the default
+   * configuration.
+   * 
+   * @return true if the values of all current properties equal the values of
+   *         the defaults.
+   */
+  public boolean isDefaultConfiguration() {
+    for (Entry<Object, Object> e : properties.entrySet()) {
+      if (!e.getValue().equals(properties.getDefaults().get(e.getKey()))) {
+        return false; 
+      }
+    }
+    return true;
+  }
+  
+  /**
+   * Method to test whether the current properties equal the user's current
+   * configuration.
+   * 
+   * @return true if the values of all current properties equal the current
+   *         persistent user configuration.
+   */
+  public boolean isUserConfiguration() {
+    for (Entry<Object, Object> e : properties.entrySet()) {
+      if (!e.getValue().toString()
+          .equals(preferences.get(e.getKey().toString()))) { 
+        return false; 
+      }
+    }
+    return true;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+   */
+  public void itemStateChanged(ItemEvent e) {
+    setProperty(properties, e.getSource());
+    for (ItemListener i : itemListeners) {
+      i.itemStateChanged(e);
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+   */
+  public void keyPressed(KeyEvent e) {
+    setProperty(properties, e.getSource());
+    for (KeyListener i : getKeyListeners()) {
+      i.keyPressed(e);
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+   */
+  public void keyReleased(KeyEvent e) {
+    setProperty(properties, e.getSource());
+    for (KeyListener kl : getKeyListeners()) {
+      kl.keyReleased(e);
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+   */
+  public void keyTyped(KeyEvent e) {
+    setProperty(properties, e.getSource());
+    for (KeyListener kl : getKeyListeners()) {
+      kl.keyTyped(e);
+    }
+  }
+  
+  /**
+   * This method loads an {@link SBPreferences} object whose key-value pairs are
+   * to be manipulated by the user. In this way, this method tells this class
+   * where these preferences are located.
+   * 
+   * @return
+   * @throws IOException
+   */
+  protected abstract SBPreferences loadPreferences() throws IOException;
+  
+  /**
+   * Persistently stores the currently set options, i.e., key-value pairs in the
+   * user's configuration. Depending on the operating system, the way how this
+   * information is actually stored can vary.
+   * 
+   * @throws BackingStoreException
+   */
+  public void persist() throws BackingStoreException {
+    preferences.putAll(properties);
+    preferences.flush();
+  }
+  
+  /**
+   * Removes the given {@link ChangeListener} from the list of this kind of
+   * listeners in this object.
+   * 
+   * @param listener
+   *        the element to be removed.
+   * @return <code>true</code> if the list contained the specified element.
+   */
+  public boolean removeChangeListener(ChangeListener listener) {
+    return changeListeners.remove(listener);
+  }
+  
+	/**
+	 * Removes the given {@link ItemListener} from the list of this kind of
+	 * listeners in this object.
+	 * 
+	 * @param listener
+	 *        the element to be removed.
+	 * @return <code>true</code> if the list contained the specified element.
+	 */
+  public boolean removeItemListener(ItemListener listener) {
+    return itemListeners.remove(listener);
+  }
+  
+	/**
+	 * Removes the given {@link PreferenceChangeListener} from this
+	 * {@link PreferencesPanel}.
+	 * 
+	 * @param listener
+	 *        the element to be removed.
+	 */
+  public void removePreferenceChangeLisener(PreferenceChangeListener listener) {
+  	preferences.remove(listener);
+  }
+  
+  /**
+   * Switches all properties back to the given default values and re-initializes
+   * the graphical user interface.
+   */
+  public void restoreDefaults() {
+    setProperties(preferences != null ? preferences.getDefaults() : new SBProperties());
+  }
+  
+  /**
+	 * 
+	 */
+  @SuppressWarnings("unchecked")
+  void searchForOptionGroups() {
+    searchForOptionGroups(preferences.getKeyProvider());
+  }
+  
+  /**
+   * 
+   * @param keyProviders
+   */
+  @SuppressWarnings("rawtypes")
+  private void searchForOptionGroups(
+    Class<? extends KeyProvider>... keyProviders) {
+    option2group = new TreeMap<Option<?>, OptionGroup<?>>();
+    ungroupedOptions = new TreeSet<Option>();
+    optionGroups = new TreeMap<String, List<OptionGroup>>();
+    keyProvider2fileGroups = new HashMap<String, Integer>();
+    for (Class<? extends KeyProvider> keyProvider : keyProviders) {
+      ungroupedOptions.addAll(KeyProvider.Tools.optionList(keyProvider));
+      optionGroups.put(keyProvider.getName(), KeyProvider.Tools
+          .optionGroupList(keyProvider));
+    }
+    int fileCount;
+    Integer fileGroupCount;
+    for (Class<? extends KeyProvider> keyProvider : keyProviders) {
+      fileGroupCount = Integer.valueOf(0);
+      keyProvider2fileGroups.put(keyProvider.getName(), fileGroupCount);
+      for (OptionGroup<?> group : optionGroups.get(keyProvider.getName())) {
+        fileCount = 0;
+        for (Option<?> option : group) {
+          option2group.put(option, group);
+          ungroupedOptions.remove(option);
+          if (option.getRequiredType().equals(File.class)) {
+            fileCount++;
+          }
+        }
+        if (fileCount > 0) {
+          fileGroupCount = Integer.valueOf(keyProvider2fileGroups.get(
+            keyProvider.getName()).intValue() + 1);
+          keyProvider2fileGroups.put(keyProvider.getName(),
+            fileGroupCount);
+        }
+      }
+    }
+  }
+  
+  /**
+   * Filters the given properties and only keeps those key-value pairs that are
+   * accepted by this class. Then it initializes the layout of this GUI element
+   * and also allows to select non-modifiable but important key-value pairs from
+   * the given {@link Properties} by overriding the method
+   * {@link #initConstantFields(Properties)}.
+   * 
+   * @param map
+   *        All available current properties of the user.
+   * @see #accepts(Object)
+   */
+  public void setProperties(Map<Object, Object> map) {
+    for (Object key : map.keySet()) {
+      if (accepts(key)) {
+        this.properties.setProperty(key.toString(), map.get(key).toString());
+      }
+    }
+    
+    // Reset panel
+    removeAll();
+    init();
+  }
+
   /**
    * Sets the property for the given {@link Option}.
    * 
@@ -1297,13 +1326,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   public <T> void setProperty(Option<T> option, T value) {
     properties.setProperty(option.toString(), value.toString());
   }
-  
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent
-   * )
+
+  /* (non-Javadoc)
+   * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
    */
   public void stateChanged(ChangeEvent e) {
     setProperty(properties, e.getSource());
@@ -1311,14 +1336,5 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       cl.stateChanged(e);
     }
   }
-
-  /**
-   * @param option
-   * @return {@link JComponent} representing this option
-   */
-  public JComponent getComponentForOption(Option<?> option) {
-    return option2component.get(option);
-  }
-  
   
 }
