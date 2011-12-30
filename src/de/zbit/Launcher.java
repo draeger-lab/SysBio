@@ -136,6 +136,7 @@ public abstract class Launcher implements Runnable, Serializable {
   private Launcher(boolean showCopyrightMessage) {
     super();
     
+    // This must be done as early as possible!
     configureSystemProperties();
     
 		try {
@@ -567,8 +568,8 @@ public abstract class Launcher implements Runnable, Serializable {
    */
   public SBProperties parseCmdArgs(String[] args) {
     logger.fine(resources.getString("SCANNING_CMD_ARGS"));
-    props = SBPreferences.analyzeCommandLineArguments(getCmdLineOptions(),
-      args);
+    // This does not make command-line arguments persistent.
+    props = SBPreferences.analyzeCmdArgs(getCmdLineOptions(), args);
     return props;
   }
 	

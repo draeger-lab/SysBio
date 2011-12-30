@@ -66,9 +66,7 @@ public class SBProperties extends Properties {
     return props;
   }
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Hashtable#contains(java.lang.Object)
 	 */
 	@Override
@@ -76,9 +74,7 @@ public class SBProperties extends Properties {
 		return super.containsValue(value.toString());
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Hashtable#containsKey(java.lang.Object)
 	 */
 	@Override
@@ -86,9 +82,7 @@ public class SBProperties extends Properties {
 		return super.containsKey(key.toString());
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Hashtable#containsValue(java.lang.Object)
 	 */
 	@Override
@@ -96,9 +90,7 @@ public class SBProperties extends Properties {
 		return super.containsValue(value.toString());
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.util.Hashtable#get(java.lang.Object)
 	 */
 	@Override

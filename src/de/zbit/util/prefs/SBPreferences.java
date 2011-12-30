@@ -140,6 +140,36 @@ public class SBPreferences implements Map<Object, Object> {
 	public static final String WARNINGS_LOCATION = "de.zbit.locales.Warnings";
 	
 	/**
+	 * No persistence, defaults only from options itself, no preferences.
+	 * 
+	 * @param keyProviders
+	 * @param args
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static final SBProperties analyzeCmdArgs(List<Class<? extends KeyProvider>> keyProviders, String[] args) {
+		SBProperties defaults = new SBProperties();
+		for (Class<? extends KeyProvider> provider : keyProviders) {
+			Iterator<Option> iterator = KeyProvider.Tools.optionIterator(provider);
+			while (iterator.hasNext()) {
+				Option option = iterator.next();
+				if (option.isSetDefault()) {
+					defaults.put(option, option.getDefaultValue());
+				}
+			}
+		}
+		SBProperties props = new SBProperties(defaults);
+		ArgParser parser = new ArgParser(generateUsageString());
+		Map<Option<?>, ArgHolder<?>> options = new HashMap<Option<?>, ArgHolder<?>>();
+		for (Class<? extends KeyProvider> provider : keyProviders) {
+		  configureArgParser(parser, options, provider, props, defaults);
+		}
+		parser.matchAllArgs(args);
+		putAll(props, options);
+		return props;
+	}
+	
+	/**
 	 * @param keyProvider
 	 * @param relPath
 	 * @param persist
@@ -378,11 +408,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @return
 	 */
 	public static final SBProperties analyzeCommandLineArguments(
-		SortedMap<String, Class<? extends KeyProvider>> defFileAndKeys,
-		String args[]) {
-		
-		return analyzeCommandLineArguments(defFileAndKeys, generateUsageString(),
-			args);
+		SortedMap<String, Class<? extends KeyProvider>> defFileAndKeys, String args[]) {
+		return analyzeCommandLineArguments(defFileAndKeys, generateUsageString(), args);
 	}
 	
 	/**
@@ -1385,9 +1412,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @see java.util.Map#putAll(java.util.Map)
 	 */
   public void putAll(SBPreferences prefs) {
-    for (Map.Entry<? extends Object, ? extends Object> entry : prefs.entrySet()) {
-      put(entry.getKey(), entry.getValue());
-    }
+    putAll((Map<?, ?>) prefs);
     for (Map.Entry<? extends Object, ? extends Object> entry : prefs.defaults.entrySet()) {
       defaults.put(entry.getKey(), entry.getValue());
     }
@@ -1463,7 +1488,6 @@ public class SBPreferences implements Map<Object, Object> {
 	        // Note: this also fires if the default value is really set to null! To this might be intended!
 	        logger.log(Level.FINE, String.format("Default value set to NULL for option %s in %s.", option, keyProvider));
 //	        put(option, null);
-	        
 	      }
 	    }
 	  }
@@ -1487,7 +1511,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @throws IOException
 	 */
 	public void store(OutputStream out, String comment) throws IOException {
-		toProperties().storeToXML(out, comment);
+		storeToXML(out, comment);
 	}
 	
 	/**

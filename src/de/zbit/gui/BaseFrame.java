@@ -93,7 +93,7 @@ import de.zbit.util.prefs.SBProperties;
  */
 public abstract class BaseFrame extends JFrame implements FileHistory,
     GUIOptions {
-
+	
 	/**
 	 * This {@link Enum} contains very basic actions of a graphical user interface.
 	 * 
@@ -301,7 +301,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
   public BaseFrame(AppConf appConf) {
     super();
     this.appConf = appConf;
-    this.listOfPrefChangeListeners = new LinkedList<PreferenceChangeListener>();
     init();
   }
 	
@@ -316,7 +315,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	public BaseFrame(AppConf appConf, GraphicsConfiguration gc) {
 		super(gc);
 		this.appConf = appConf;
-		this.listOfPrefChangeListeners = new LinkedList<PreferenceChangeListener>();
 		init();
 	}
 	
@@ -1065,6 +1063,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * Initializes this graphical user interface.
 	 */
 	protected void init() {
+    this.listOfPrefChangeListeners = new LinkedList<PreferenceChangeListener>();
+		if ((appConf != null) && (appConf.getInteractiveOptions() != null)) {
+			try {
+				appConf.persistInteractiveOptions();
+			} catch (BackingStoreException exc) {
+				GUITools.showErrorMessage(this, exc);
+			}
+		}
 		if ((getTitle() == null) || (getTitle().length() == 0)) {
 			setTitle(getProgramNameAndVersion());
 		}
@@ -1304,11 +1310,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 */
 	public boolean preferences() {
 		if ((appConf != null) && (appConf.getInteractiveOptions() != null)) { 
-      return PreferencesDialog.showPreferencesDialog(
-      	listOfPrefChangeListeners,
-				appConf.getInteractiveOptions());
+			return PreferencesDialog.showPreferencesDialog(
+				this, listOfPrefChangeListeners, appConf.getInteractiveOptions()); 
 		}
-		return PreferencesDialog.showPreferencesDialog(listOfPrefChangeListeners);
+		return PreferencesDialog.showPreferencesDialog(this, listOfPrefChangeListeners);
 	}
 	
 	/**
