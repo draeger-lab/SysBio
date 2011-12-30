@@ -77,14 +77,14 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     Serializable {
 
   /**
-   * Generated serial version identifier.
-   */
-  private static final long serialVersionUID = 1799289265354101320L;
-
-  /**
    * A {@link Logger} for this class.
    */
   private static final transient Logger logger = Logger.getLogger(Option.class.getName());
+
+  /**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = 1799289265354101320L;
   
 	/**
 	 * Just a convenient wrapper method for {@link Range#Range(Class, List)}.
@@ -341,35 +341,11 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
    * @param defaultValue
    * @param range
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public Option(String optionName, Class<Type> requiredType,
     ResourceBundle bundle, Range<Type> range, Type defaultValue) {
     this(optionName, requiredType, bundle, range, defaultValue,
       (ValuePairUncomparable) null);
-  }
-
-  /**
-   * 
-   * @param optionName
-   * @param requiredType
-   *        Since it is not possible in Java to access the generic type
-   *        attribute at run time, each {@link Option} also requires its type
-   *        attribute in form of a {@link Class} object.
-   * @param bundle
-   *        This {@link ResourceBundle} looks for the optionName as key for a
-   *        human-readable display name. It also looks for the key
-   *        <code>optionName + "_TOOLTIP"</code> in order to obtain a more
-   *        detailed description of this option. If no such description can be
-   *        found, it tries to split the human-readable name connected with the
-   *        optionName using the character ';' (semicolon). If the
-   *        human-readable name contains this symbol it assumes that the part
-   *        before the semicolon is intended to be a short name and everything
-   *        written after it is assumed to be a tooltip.
-   * @param defaultValue
-   */
-  public Option(String optionName, Class<Type> requiredType,
-    ResourceBundle bundle, Type defaultValue) {
-    this(optionName, requiredType, bundle, null, defaultValue);
   }
 
   /**
@@ -420,7 +396,46 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
       }
     }
   }
+
+  /**
+   * 
+   * @param optionName
+   * @param requiredType
+   *        Since it is not possible in Java to access the generic type
+   *        attribute at run time, each {@link Option} also requires its type
+   *        attribute in form of a {@link Class} object.
+   * @param bundle
+   *        This {@link ResourceBundle} looks for the optionName as key for a
+   *        human-readable display name. It also looks for the key
+   *        <code>optionName + "_TOOLTIP"</code> in order to obtain a more
+   *        detailed description of this option. If no such description can be
+   *        found, it tries to split the human-readable name connected with the
+   *        optionName using the character ';' (semicolon). If the
+   *        human-readable name contains this symbol it assumes that the part
+   *        before the semicolon is intended to be a short name and everything
+   *        written after it is assumed to be a tooltip.
+   * @param defaultValue
+   */
+  public Option(String optionName, Class<Type> requiredType,
+    ResourceBundle bundle, Type defaultValue) {
+    this(optionName, requiredType, bundle, null, defaultValue);
+  }
 	
+	/**
+   * 
+   * @param <E>
+   * @param optionName
+   * @param requiredType
+   * @param bundle
+   * @param defaultValue
+   * @param dependencies
+   */
+  public <E> Option(String optionName, Class<Type> requiredType,
+    ResourceBundle bundle, Type defaultValue,
+    ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
+    this(optionName, requiredType, bundle, null, defaultValue, dependencies);
+  }
+
 	/**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -443,8 +458,8 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	public Option(String optionName, Class<Type> requiredType, String description) {
 		this(optionName, requiredType, description, null, (Type) null);
 	}
-
-	/**
+  
+  /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
    * @param optionName
@@ -532,7 +547,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		this(optionName, requiredType, description, range, numLeadingMinus, null,
 			(Type) null);
 	}
-  
+	
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -566,7 +581,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		this(optionName, requiredType, description, range, numLeadingMinus,
 			shortCmdName, defaultValue, null);
 	}
-	
+
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -600,7 +615,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		String shortCmdName, Type defaultValue, String displayName) {
 		super();
 		
-	  // Ensure that the option name contains no whitespaces.
+	  // Ensure that the option name contains no white spaces.
 	  this.optionName = optionName.replaceAll("\\s", "_");
 	  
 	  // If declaring for Enums, always set a Range that accepts only
@@ -615,19 +630,19 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		this.range = range;
 		this.shortCmdName = shortCmdName;
 		if (requiredType.isAssignableFrom(Class.class)) {
-		  this.defaultValue = (Type) ((Class) defaultValue).getSimpleName();
+		  this.defaultValue = (Type) ((Class<Type>) defaultValue).getName();
 		} else {
 		  this.defaultValue = defaultValue;
 		}
 		if (numLeadingMinus < 0) { 
-			throw new IllegalArgumentException(String
-				.format(ResourceManager.getBundle("de.zbit.loales.Warnings").getString(
-					"VALUE_MUST_BE_POSITIVE"), "numLeadingMinus")); 
+			throw new IllegalArgumentException(String.format(
+					ResourceManager.getBundle("de.zbit.loales.Warnings").getString(
+					"VALUE_MUST_BE_POSITIVE"), "numLeadingMinus"));
 		}
 		this.numLeadingMinus = numLeadingMinus;
 		this.displayName = displayName;
 	}
-
+	
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -663,7 +678,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 			defaultValue);
 	}
 	
-  /**
+	/**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
    * @param optionName
@@ -728,7 +743,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		this(optionName, requiredType, description, range, (short) 2, defaultValue);
 	}
 	
-	/**
+  /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
    * @param optionName
@@ -760,6 +775,23 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     boolean visibility) {
     this(optionName, requiredType, description, range, (short) 2, defaultValue);
     setVisible(visibility);
+  }
+	
+	/**
+   * 
+   * @param <E>
+   * @param optionName
+   * @param requiredType
+   * @param description
+   * @param range
+   * @param defaultValue
+   * @param dependencies
+   */
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Range<Type> range, Type defaultValue,
+    Map<Option<?>, SortedSet<Range<?>>> dependencies) {
+    this(optionName, requiredType, description, range, defaultValue, null,
+      dependencies);
   }
 	
   /**
@@ -797,7 +829,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     addDependency(dependency, condition);
   }
 	
-	/**
+  /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
    * @param optionName
@@ -831,6 +863,25 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	}
 	
   /**
+   * 
+   * @param <E>
+   * @param optionName
+   * @param requiredType
+   * @param description
+   * @param range
+   * @param defaultValue
+   * @param displayName
+   * @param dependencies
+   */
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Range<Type> range, Type defaultValue,
+    String displayName, Map<Option<?>, SortedSet<Range<?>>> dependencies) {
+    this(optionName, requiredType, description, range, defaultValue,
+      displayName);
+    this.dependencies = dependencies;
+  }
+	
+	/**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
    * @param optionName
@@ -866,7 +917,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
       displayName);
     addDependency(dependency, condition);
   }
-	
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -925,7 +976,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 			shortCmdName, defaultValue);
 	}
 	
-	/**
+  /**
 	 * 
 	 * @param <E>
 	 * @param optionName
@@ -1002,8 +1053,8 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		String description, Type defaultValue, boolean visibility) {
 		this(optionName, requiredType, description, defaultValue, null, visibility);
 	}
-	
-  /**
+  
+	/**
    * Creates a new {@link Option}, that accepts an input of the given Type. This
    * constructor adds all given dependencies to the created option. This is
    * especially usefull for setting the dependencies of this option to the same
@@ -1037,25 +1088,8 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     this(optionName, requiredType, description, defaultValue, null,
       dependencies);
   }
-  
-  /**
-   * 
-   * @param <E>
-   * @param optionName
-   * @param requiredType
-   * @param description
-   * @param range
-   * @param defaultValue
-   * @param dependencies
-   */
-  public <E> Option(String optionName, Class<Type> requiredType,
-    String description, Range<Type> range, Type defaultValue,
-    Map<Option<?>, SortedSet<Range<?>>> dependencies) {
-    this(optionName, requiredType, description, range, defaultValue, null,
-      dependencies);
-  }
 	
-  /**
+	/**
    * Creates a new {@link Option}, that accepts an input of the given Type. This
    * constructor adds a dependency to the created option. The given
    * <code>dependency</code> must fulfill the given <code>condition</code> that
@@ -1090,7 +1124,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
       dependency, condition);
   }
   
-	/**
+  /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
    * @param optionName
@@ -1121,7 +1155,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     this(optionName, requiredType, description, null, defaultValue, displayName);
   }
 	
-	/**
+  /**
 	 * Creates a new {@link Option}, that accepts an input of the given Type.
 	 * 
 	 * @param optionName
@@ -1192,7 +1226,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	  this(optionName, requiredType, description, null, defaultValue, displayName);
 	  setButtonGroup(group);
 	}
-	
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -1274,25 +1308,6 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
   }
   
   /**
-   * 
-   * @param <E>
-   * @param optionName
-   * @param requiredType
-   * @param description
-   * @param range
-   * @param defaultValue
-   * @param displayName
-   * @param dependencies
-   */
-  public <E> Option(String optionName, Class<Type> requiredType,
-    String description, Range<Type> range, Type defaultValue,
-    String displayName, Map<Option<?>, SortedSet<Range<?>>> dependencies) {
-    this(optionName, requiredType, description, range, defaultValue,
-      displayName);
-    this.dependencies = dependencies;
-  }
-  
-  /**
    * Creates a new {@link Option}, that accepts an input of the given Type. This
    * constructor adds a dependency to the created option. The given
    * <code>dependency</code> must fulfill the given <code>condition</code> that
@@ -1329,21 +1344,6 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     Option<E> dependency, Range<E> condition) {
     this(optionName, requiredType, description, defaultValue, displayName);
     addDependency(dependency, condition);
-  }
-  
-  /**
-   * 
-   * @param <E>
-   * @param optionName
-   * @param requiredType
-   * @param bundle
-   * @param defaultValue
-   * @param dependencies
-   */
-  public <E> Option(String optionName, Class<Type> requiredType,
-    ResourceBundle bundle, Type defaultValue,
-    ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
-    this(optionName, requiredType, bundle, null, defaultValue, dependencies);
   }
 
   /**
@@ -1431,9 +1431,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     }
   }
   
-  /*
-	 * (non-Javadoc)
-	 * 
+  /* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(Option<Type> option) {
@@ -1499,9 +1497,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		}
 	}
 
-  /*
-	 * (non-Javadoc)
-	 * 
+  /* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -1588,9 +1584,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		return displayName;
 	}
 	
-  /*
-	 * (non-Javadoc)
-	 * 
+  /* (non-Javadoc)
 	 * @see de.zbit.gui.ActionCommand#getName()
 	 */
 	public String getName() {
@@ -1723,9 +1717,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		return sb.toString();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.ActionCommand#getToolTip()
 	 */
 	public String getToolTip() {
@@ -1768,9 +1760,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	  return (dependencies!=null && dependencies.size()>0);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -1780,13 +1770,21 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	
 	
   /**
+	 * 
+	 * @return
+	 */
+	public boolean isSetDefault() {
+		return defaultValue != null;
+	}
+	
+	/**
 	 * @return
 	 */
 	public final boolean isSetDescription() {
 		return description != null;
 	}
 	
-	/**
+  /**
 	 * Checks if a display name for this option has been set.
 	 * 
 	 * @return <code>true</code> if the display name has been set,
@@ -1803,7 +1801,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		return (range != null) && (range.getRangeSpecString() != null);
 	}
 	
-  /**
+	/**
 	 * @return
 	 */
 	public final boolean isSetRequiredType() {
@@ -1869,7 +1867,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     this.buttonGroup = group;
   }
 	
-	/**
+  /**
    * Change the default value for this option. Actually, you should do this only
    * once right at the start of your main class. This possibility has just been
    * added to use the same options with different default values in different
@@ -1880,7 +1878,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	public void setDefaultValue(Type def) {
 	  this.defaultValue=def;
 	}
-	
+  
   /**
 	 * Sets the display name of this {@link Option}.
 	 * 
@@ -1890,8 +1888,8 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	public final void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
-  
-  /**
+	
+	/**
    * @param visible allows to change the desired visibility for
    * this option.
    * @see #visible
@@ -1915,10 +1913,8 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		sb.append(optionName.toLowerCase().replace('_', '-'));
 		return sb.toString();
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
+
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

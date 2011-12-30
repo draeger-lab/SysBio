@@ -22,13 +22,17 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
 /**
@@ -85,12 +89,12 @@ public class AppConf implements Cloneable, Serializable {
   /**
    * 
    */
-  private short yearOfRelease;
+  private short yearOfProjectStart;
   
   /**
    * 
    */
-  private short yearOfProjectStart;
+  private short yearOfRelease;
   
   /**
    * 
@@ -265,17 +269,17 @@ public class AppConf implements Cloneable, Serializable {
   }
 
   /**
-   * @return the yearOfRelease
-   */
-  public short getYearOfRelease() {
-    return yearOfRelease;
-  }
-  
-  /**
    * @return the year when the project started
    */
   public short getYearOfProjectStart() {
     return yearOfProjectStart;
+  }
+  
+  /**
+   * @return the yearOfRelease
+   */
+  public short getYearOfRelease() {
+    return yearOfRelease;
   }
   
 
@@ -299,6 +303,34 @@ public class AppConf implements Cloneable, Serializable {
   }
 
   /**
+	 * If command line arguments are stored in this object, this method makes all
+	 * those {@link Option}-value pairs belonging to the
+	 * {@link #interactiveOptions} persistent in corresponding
+	 * {@link SBPreferences}.
+	 * 
+	 * @throws BackingStoreException
+	 */
+	@SuppressWarnings("rawtypes")
+	public void persistInteractiveOptions() throws BackingStoreException {
+		// make command-line options belonging to interactive options persistent
+		SBProperties props = getCmdArgs();
+		if (props.size() > 0) {
+			for (Class<? extends KeyProvider> provider : getInteractiveOptions()) {
+				SBPreferences prefs = SBPreferences.getPreferencesFor(provider);
+				Iterator<Option> options = KeyProvider.Tools.optionIterator(provider);
+				Option<?> option;
+				while (options.hasNext()) {
+					option = options.next();
+					if (props.containsKey(option)) {
+						prefs.put(option, props.get(option));
+					}
+				}
+				prefs.flush();
+			}
+		}
+	}
+
+  /**
    * Creates and returns a {@link Map} representation of all fields in this
    * {@link AppConf}.
    * 
@@ -320,7 +352,7 @@ public class AppConf implements Cloneable, Serializable {
     return map;
   }
 
-  /* (non-Javadoc)
+	/* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
   @Override

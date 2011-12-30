@@ -429,7 +429,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     this(requiredType, Range.toRangeString(acceptedObjects));
     // This requires a list => Convert to list
     if (!(acceptedObjects instanceof List<?>)) {
-      List<Type> acceptedObjects2 = new ArrayList<Type>();
+      List<Type> acceptedObjects2 = new LinkedList<Type>();
       for (Type t: acceptedObjects) {
         acceptedObjects2.add(t);
       }
@@ -777,7 +777,11 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     if ((acceptedObjects != null) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
       List<Type> classStrings = new LinkedList<Type>();
       for (Type object : acceptedObjects) {
-        classStrings.add((Type) ((Class<?>) object).getSimpleName());
+      	/* Simple name for classes doesn't work. It is not precise and 
+      	 * causes errors at other positions...
+      	 * Therefore, getName is the only possible option here.
+      	 */
+        classStrings.add((Type) ((Class<Type>) object).getName());
       }
       accObjects = classStrings;
     }

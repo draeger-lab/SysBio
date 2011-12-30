@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import de.zbit.gui.GUITools;
 import de.zbit.util.ResourceManager;
@@ -122,6 +123,11 @@ public interface KeyProvider {
 	 * @since 1.0
 	 */
 	public static class Tools {
+		
+		/**
+		 * A {@link Logger} for this class.
+		 */
+		private static final transient Logger logger = Logger.getLogger(Tools.class.getName());
 		
 		/**
 		 * 
@@ -427,13 +433,16 @@ public interface KeyProvider {
 			Class<? extends KeyProvider> keyProvider, Class<T> clazz, int n) {
 			Field fields[] = keyProvider.getFields();
 			Object fieldValue;
-			for (; n < fields.length; n++) {
+			while (n < fields.length) {
 				try {
 					fieldValue = fields[n].get(keyProvider);
-					if (fieldValue.getClass().isAssignableFrom(clazz)) { return new Entry<T>(
-						n, (T) fieldValue); }
+					if (fieldValue.getClass().isAssignableFrom(clazz)) { 
+						return new Entry<T>(n, (T) fieldValue); 
+					}
 				} catch (Exception exc) {
+					logger.fine(exc.getLocalizedMessage());
 				}
+				n++;
 			}
 			return null;
 		}
@@ -485,11 +494,13 @@ public interface KeyProvider {
 		    try {
 		      fieldValue = f.get(keyProvider);
 		      if (fieldValue.getClass().isAssignableFrom(Option.class)) {
-		        if (((Option<?>)fieldValue).getOptionName().equals(optionName)) {
+		        if (((Option<?>) fieldValue).getOptionName().equals(optionName)) {
 		          return (Option<?>) fieldValue;
 		        }
 		      }
-		    } catch (Exception e) {}
+		    } catch (Exception e) {
+		    	logger.fine(e.getLocalizedMessage());
+		    }
 		  }
 		  return null;
 		}
@@ -521,9 +532,7 @@ public interface KeyProvider {
 				
 				private int i = -1;
 				
-				/*
-				 * (non-Javadoc)
-				 * 
+				/* (non-Javadoc)
 				 * @see java.util.Iterator#hasNext()
 				 */
 				public boolean hasNext() {
@@ -534,9 +543,7 @@ public interface KeyProvider {
 					}
 				}
 				
-				/*
-				 * (non-Javadoc)
-				 * 
+				/* (non-Javadoc)
 				 * @see java.util.Iterator#next()
 				 */
 				public T next() {
@@ -549,9 +556,7 @@ public interface KeyProvider {
 					return entry.getElement();
 				}
 				
-				/*
-				 * (non-Javadoc)
-				 * 
+				/* (non-Javadoc)
 				 * @see java.util.Iterator#remove()
 				 */
 				public void remove() {

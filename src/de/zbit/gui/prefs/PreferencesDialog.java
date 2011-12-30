@@ -19,6 +19,7 @@ package de.zbit.gui.prefs;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -62,16 +63,11 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		ItemListener, ChangeListener, KeyListener {
 	
 	/**
-	 * 
-	 */
-	private static final ResourceBundle resource = ResourceManager
-			.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
-
-	/**
 	 * Texts for the {@link JButton}s.
 	 */
 	private static final String APPLY = "APPLY", CANCEL = "CANCEL",
 			DEFAULTS = "DEFAULTS", OK = "OK";
+
 	/**
 	 * Return types for the dialog.
 	 */
@@ -79,47 +75,35 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	/**
 	 * 
 	 */
-	private static final String DEFAULT_TITLE = resource.getString("PREFERENCES");
+	private static final ResourceBundle resource = ResourceManager
+			.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 	/**
 	 * Generated serial version id.
 	 */
 	private static final long serialVersionUID = -8842237776948135071L;
 	
 	/**
+	 * Helper method that initializes the correct constructor given an instance of {@link Window}.
+	 * @param parent
+	 * @return
+	 */
+	private static PreferencesDialog createPreferenesDialog(Window parent) {
+		if (parent != null) {
+			if (parent instanceof Dialog) {
+			  return new PreferencesDialog((Dialog) parent);
+			} else if (parent instanceof Frame) {
+				return new PreferencesDialog((Frame) parent);
+			}
+		} 
+		return new PreferencesDialog();
+	}
+	
+	/**
 	 * 
 	 * @return
 	 */
 	public static final boolean showPreferencesDialog() {
-		return showPreferencesDialog((List<PreferenceChangeListener>) null);
-	}
-	
-	/**
-	 * 
-	 * @param listener
-	 * @return
-	 */
-	public static final boolean showPreferencesDialog(List<PreferenceChangeListener> listeners) {
-		return showPreferencesDialog((PreferencesPanel) null, listeners);
-	}
-	
-	/**
-	 * 
-	 * @param panel
-	 * @return
-	 */
-	public static final boolean showPreferencesDialog(PreferencesPanel panel) {
-		return showPreferencesDialog(panel, null);
-	}
-	
-	/**
-	 * 
-	 * @param panel
-	 * @param listener
-	 * @return
-	 */
-	public static final boolean showPreferencesDialog(PreferencesPanel panel, List<PreferenceChangeListener>  listeners) {
-		PreferencesDialog dialog = new PreferencesDialog();
-		return (panel != null) ? dialog.showPrefsDialog(panel, listeners) : dialog.showPrefsDialog(listeners);
+		return showPreferencesDialog((Window) null);
 	}
 	
 	/**
@@ -128,7 +112,16 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @return <code>true</code>, if and only if the user approved this dialog.
 	 */
 	public static final boolean showPreferencesDialog(Class<? extends KeyProvider>... provider) {
-		return showPreferencesDialog(null, provider);
+		return showPreferencesDialog((Window) null, provider);
+	}
+	
+	/**
+	 * 
+	 * @param listener
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(List<PreferenceChangeListener> listeners) {
+		return showPreferencesDialog((Window) null, listeners);
 	}
 	
 	/**
@@ -141,7 +134,67 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 */
 	public static final boolean showPreferencesDialog(
 		List<PreferenceChangeListener> listeners, Class<? extends KeyProvider>... provider) {
-		PreferencesDialog dialog = new PreferencesDialog();
+		return showPreferencesDialog(null, listeners, provider);
+	}
+	
+	/**
+	 * 
+	 * @param panel
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(PreferencesPanel panel) {
+		return showPreferencesDialog(null, panel);
+	}
+	
+	/**
+	 * 
+	 * @param panel
+	 * @param listener
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(PreferencesPanel panel, List<PreferenceChangeListener>  listeners) {
+		return showPreferencesDialog(null, panel, listeners);
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(Window parent) {
+		return showPreferencesDialog(parent, (List<PreferenceChangeListener>) null);
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param provider
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(Window parent, Class<? extends KeyProvider>... provider) {
+		return showPreferencesDialog(parent, null, provider);
+	}
+
+	/**
+	 * 
+	 * @param parent
+	 * @param listeners
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(Window parent, List<PreferenceChangeListener> listeners) {
+		return showPreferencesDialog(parent, (PreferencesPanel) null, listeners);
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param listeners
+	 * @param provider
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(Window parent,
+		List<PreferenceChangeListener> listeners, Class<? extends KeyProvider>... provider) {
+		PreferencesDialog dialog = createPreferenesDialog(parent);
 		boolean exitStatus;
 		if ((provider != null) && (provider.length > 0)) {
 			exitStatus = dialog.showPrefsDialog(listeners, provider);
@@ -149,6 +202,28 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 			exitStatus = dialog.showPrefsDialog(listeners);
 		}
 		return exitStatus;
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param panel
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(Window parent, PreferencesPanel panel) {
+		return showPreferencesDialog(parent, panel, null);
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param panel
+	 * @param listeners
+	 * @return
+	 */
+	public static final boolean showPreferencesDialog(Window parent, PreferencesPanel panel, List<PreferenceChangeListener>  listeners) {
+		PreferencesDialog dialog = createPreferenesDialog(parent);
+		return (panel != null) ? dialog.showPrefsDialog(panel, listeners) : dialog.showPrefsDialog(listeners);
 	}
 	
 	/**
@@ -171,7 +246,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * 
 	 */
 	public PreferencesDialog() {
-		this(DEFAULT_TITLE);
+		this((Dialog) null);
 	}
 	
 	/**
@@ -182,7 +257,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 *        The parent element of this {@link PreferencesDialog}.
 	 */
 	public PreferencesDialog(Dialog owner) {
-		super(owner, DEFAULT_TITLE);
+		super(owner, resource.getString("PREFERENCES"));
 	}
 	
 	/**
@@ -193,7 +268,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 *        The parent element of this {@link PreferencesDialog}.
 	 */
 	public PreferencesDialog(Frame owner) {
-		super(owner, DEFAULT_TITLE);
+		super(owner, resource.getString("PREFERENCES"));
 	}
 	
 	/**
@@ -236,6 +311,24 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		}
 	}
 	
+	/**
+	 * 
+	 * @param command
+	 * @param enabled
+	 * @return
+	 */
+	private JButton createButton(String command, boolean enabled) {
+		String separator = ";";
+		String labels[] = resource.getString(command).split(separator);
+		JButton button = new JButton(labels[0]);
+		button.setMnemonic(labels[0].charAt(0));
+		button.addActionListener(this);
+		button.setActionCommand(command);
+		button.setToolTipText(StringUtil.toHTML(labels[1], GUITools.TOOLTIP_LINE_LENGTH));
+		button.setEnabled(enabled);
+		return button;
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
@@ -267,7 +360,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	  // Do not update buttons here. The KeyEvent is not yet processed
 	  // i.e. the textfield has not yet changed it's value!
 	}
-	
+
 	/**
 	 * Initializes the GUI of this dialog.
 	 * 
@@ -308,24 +401,6 @@ public class PreferencesDialog extends JDialog implements ActionListener,
     allPrefsPanel.setPreferredSize(GUITools.getMaxPreferredSize(foot, allPrefsPanel));
     
 		pack();
-	}
-
-	/**
-	 * 
-	 * @param command
-	 * @param enabled
-	 * @return
-	 */
-	private JButton createButton(String command, boolean enabled) {
-		String separator = ";";
-		String labels[] = resource.getString(command).split(separator);
-		JButton button = new JButton(labels[0]);
-		button.setMnemonic(labels[0].charAt(0));
-		button.addActionListener(this);
-		button.setActionCommand(command);
-		button.setToolTipText(StringUtil.toHTML(labels[1], GUITools.TOOLTIP_LINE_LENGTH));
-		button.setEnabled(enabled);
-		return button;
 	}
 
 	/* (non-Javadoc)
@@ -369,6 +444,15 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	
 	/**
 	 * 
+	 * @param kp
+	 * @return
+	 */
+	public boolean showPrefsDialog(Class<? extends KeyProvider>... kp) {
+		return showPrefsDialog(null, kp);
+	}
+	
+	/**
+	 * 
 	 * @param listener
 	 * @return
 	 */
@@ -384,6 +468,28 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 			GUITools.showErrorMessage(this, exc);
 			return false;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param listener
+	 * @param kp
+	 * @return
+	 */
+	public boolean showPrefsDialog(List<PreferenceChangeListener> listeners, Class<? extends KeyProvider>... kp) {
+		PreferencesPanel panel;
+		try {
+      if (kp.length > 1) {
+        panel = new MultiplePreferencesPanel(kp);
+      } else {
+        panel = new PreferencesPanelForKeyProvider(kp[0]);
+      }
+		} catch (Throwable exc) {
+			// May happen only if defaults are loaded from XML or kp is null.
+			GUITools.showErrorMessage(this, exc);
+			return false;
+		}
+		return showPrefsDialog(panel, listeners);
 	}
 	
 	/**
@@ -417,37 +523,6 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		setPreferencesPanel(panel);
 		setVisible(true);
 		return exitStatus;
-	}
-	
-	/**
-	 * 
-	 * @param kp
-	 * @return
-	 */
-	public boolean showPrefsDialog(Class<? extends KeyProvider>... kp) {
-		return showPrefsDialog(null, kp);
-	}
-	
-	/**
-	 * 
-	 * @param listener
-	 * @param kp
-	 * @return
-	 */
-	public boolean showPrefsDialog(List<PreferenceChangeListener> listeners, Class<? extends KeyProvider>... kp) {
-		PreferencesPanel panel;
-		try {
-      if (kp.length > 1) {
-        panel = new MultiplePreferencesPanel(kp);
-      } else {
-        panel = new PreferencesPanelForKeyProvider(kp[0]);
-      }
-		} catch (Throwable exc) {
-			// May happen only if defaults are loaded from XML or kp is null.
-			GUITools.showErrorMessage(this, exc);
-			return false;
-		}
-		return showPrefsDialog(panel, listeners);
 	}
 	
 	/* (non-Javadoc)
