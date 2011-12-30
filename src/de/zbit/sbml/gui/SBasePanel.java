@@ -83,7 +83,6 @@ import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.SystemBrowser;
 import de.zbit.sbml.io.SBOTermFormatter;
 import de.zbit.util.StringUtil;
-import de.zbit.util.prefs.SBPreferences;
 
 /**
  * A specialized {@link JPanel} that displays all available properties of a
@@ -113,8 +112,6 @@ public class SBasePanel extends JPanel {
 	private boolean editable;
 
 	private int row;
-	
-	private SBPreferences prefs;
 	
 	private Renderer renderer;
 	
@@ -162,11 +159,7 @@ public class SBasePanel extends JPanel {
     this.renderer = renderer;
     GridBagLayout gbl = new GridBagLayout();
     setLayout(gbl);
-    //added
-		if (isRendererAvailable()) {
-			latex = new LaTeXCompiler(prefs.getBoolean(this.renderer
-					.printNamesIfAvailable()));
-		}
+		latex = new LaTeXCompiler(namesIfAvailable);
     lh = new LayoutHelper(this, gbl);
     editable = false;
     row = -1;
