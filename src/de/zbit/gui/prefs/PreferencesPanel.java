@@ -340,7 +340,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
                  * Note: a renderer might have changed the display-value for the
                  * component. In this case, if you directly call
                  * setDefaultValue(String) you might override the value given by
-                 * the renderer (althought this would be correct as well).
+                 * the renderer (although this would be correct as well).
                  */
                 ((JLabeledComponent) component).setDefaultValue(count);
                 break;

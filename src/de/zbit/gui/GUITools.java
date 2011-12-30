@@ -62,6 +62,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -74,14 +75,18 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
+import javax.swing.SpinnerModel;
 import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.Launcher;
@@ -397,28 +402,6 @@ public class GUITools {
   }
   
   /**
-   * Creates and returns a JCheckBox with all the given properties.
-   * 
-   * @param label
-   * @param selected
-   * @param name
-   *        The name for the component to be identifiable by the ItemListener
-   * @param toolTip
-   * @param listener
-   * @return
-   */
-  public static JCheckBox createJCheckBox(String label, boolean selected,
-    Object command, String toolTip, ItemListener... listener) {
-    JCheckBox chkbx = new JCheckBox(label, selected);
-    chkbx.setActionCommand(command.toString());
-    for (ItemListener l : listener) {
-      chkbx.addItemListener(l);
-    }
-    chkbx.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
-    return chkbx;
-  }
-  
-	/**
 	 * More convenient method to create a {@link JCheckBox} for a {@link Boolean}
 	 * {@link Option}.
 	 * 
@@ -433,7 +416,7 @@ public class GUITools {
 		return createJCheckBox(option.getName(), selected, option,
 			option.getToolTip(), listener);
 	}
-	
+  
 	/**
 	 * More convenient method to create a {@link JCheckBox} for a {@link Boolean}
 	 * {@link Option}.
@@ -448,8 +431,96 @@ public class GUITools {
 		SBPreferences prefs, ItemListener... listener) {
 		return createJCheckBox(option, prefs.getBoolean(option), listener);
 	}
+	
+	/**
+   * Creates and returns a JCheckBox with all the given properties.
+   * 
+   * @param label
+   * @param selected
+   * @param name
+   *        The name for the component to be identifiable by the ItemListener
+   * @param toolTip
+   * @param listener
+   * @return
+   */
+	public static JCheckBox createJCheckBox(String label, boolean selected,
+		Object command, String toolTip, ItemListener... listener) {
+		JCheckBox chkbx = new JCheckBox(label, selected);
+		chkbx.setActionCommand(command.toString());
+		if (listener.length > 0) {
+			for (ItemListener l : listener) {
+				chkbx.addItemListener(l);
+			}
+		}
+		chkbx.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
+		return chkbx;
+	}
   
-  /**
+	/**
+	 * Creates a {@link JComboBox} with the given properties.
+	 * 
+	 * @param items
+	 * @param renderer
+	 *        <code>null</code> allowed.
+	 * @param enabled
+	 * @param name
+	 *        <code>null</code> allowed.
+	 * @param tooltip
+	 *        <code>null</code> allowed.
+	 * @param listeners
+	 *        <code>null</code> allowed.
+	 * @return
+	 */
+	public static JComboBox createJComboBox(Object[] items,
+		ListCellRenderer renderer, boolean enabled, String name, String tooltip,
+		ItemListener... listeners) {
+		return createJComboBox(items, renderer, enabled, name, tooltip, 0,
+			listeners);
+	}
+	
+	/**
+	 * Creates a {@link JComboBox} with the given properties.
+	 * 
+	 * @param items
+	 * @param renderer
+	 *        <code>null</code> allowed.
+	 * @param enabled
+	 * @param name
+	 *        <code>null</code> allowed.
+	 * @param tooltip
+	 *        <code>null</code> allowed.
+	 * @param selectedIndex
+	 * @param listeners
+	 *        <code>null</code> allowed.
+	 * @return
+	 */
+	public static JComboBox createJComboBox(Object[] items,
+		ListCellRenderer renderer, boolean enabled, String name, String tooltip,
+		int selectedIndex, ItemListener... listeners) {
+		JComboBox box = new JComboBox(items);
+		if (renderer != null) {
+			box.setRenderer(renderer);
+		}
+		box.setEnabled(enabled);
+		if ((name != null) && (name.length() > 0)) {
+			box.setName(name);
+		}
+		if ((tooltip != null) && (tooltip.length() > 0)) {
+			box.setToolTipText(StringUtil.toHTML(tooltip, TOOLTIP_LINE_LENGTH));
+		}
+		if (listeners != null) {
+			for (ItemListener listener : listeners) {
+				box.addItemListener(listener);
+			}
+		}
+		if ((-1 < selectedIndex) && (items != null)
+				&& (selectedIndex < items.length)) {
+			box.setSelectedIndex(selectedIndex);
+		}
+		return box;
+	}
+	
+	/**
    * Creates a new {@link JDropDownButton} using the entries from the given
    * {@link ResourceBundle}. It is assumed that the bundle contains at least the
    * key specified by the given <code>name</code>. It then tries to obtain an
@@ -595,7 +666,7 @@ public class GUITools {
     }
     return menu;
   }
-
+  
   /**
    * Creates an entry for the menu bar.
    * 
@@ -607,7 +678,7 @@ public class GUITools {
     ActionCommand command) {
     return createJMenuItem(listener, command, (Icon) null);
   }
-  
+
   /**
    * @param listener
    * @param command
@@ -634,7 +705,6 @@ public class GUITools {
       .valueOf(mnemonic));
   }
   
-  
   /**
    * Creates a new item for a {@link JMenu}.
    * 
@@ -654,6 +724,7 @@ public class GUITools {
     ActionCommand command, Icon icon, KeyStroke keyStroke) {
     return createJMenuItem(listener, command, icon, keyStroke, null);
   }
+  
   
   /**
    * Creates an entry for the menu bar.
@@ -743,7 +814,6 @@ public class GUITools {
 		return item;
 	}
   
-  
   /**
    * @param listener
    * @param command
@@ -754,6 +824,54 @@ public class GUITools {
     ActionCommand command, KeyStroke keyStroke) {
     return createJMenuItem(listener, command, null, keyStroke);
   }
+  
+  
+  /**
+	 * Creates a {@link JSpinner} with the given properties.
+	 * 
+	 * @param model
+	 * @param name
+	 *        <code>null</code> allowed.
+	 * @param tooltip
+	 *        <code>null</code> allowed.
+	 * @param enabled
+	 * @param cl
+	 *        <code>null</code> allowed.
+	 * @return
+	 */
+	public static JSpinner createJSpinner(SpinnerModel model, String name,
+		String tooltip, boolean enabled, ChangeListener... cl) {
+		JSpinner spinner = new JSpinner(model);
+		if ((name != null) && (name.length() > 0)) {
+			spinner.setName(name);
+		}
+		if ((tooltip != null) && (tooltip.length() > 0)) {
+			spinner.setToolTipText(StringUtil.toHTML(tooltip, TOOLTIP_LINE_LENGTH));
+		}
+		spinner.setEnabled(enabled);
+		if (cl != null) {
+			for (ChangeListener c : cl) {
+				spinner.addChangeListener(c);
+			}
+		}
+		return spinner;
+	}
+  
+  /**
+	 * Creates an enabled {@link JSpinner} with the given properties.
+	 * 
+	 * @param model
+	 * @param name
+	 * @param tooltip
+	 * @param listener
+	 * @return
+	 * @see #createJSpinner(SpinnerModel, String, String, boolean,
+	 *      ChangeListener...)
+	 */
+	public static JSpinner createJSpinner(SpinnerModel model, String name,
+		String tooltip, ChangeListener... listener) {
+		return createJSpinner(model, name, tooltip, true, listener);
+	}
   
   /**
    * Create a panel for a component and adds a title to it. 
@@ -910,6 +1028,7 @@ public class GUITools {
       .getIconWidth(), icon.getIconHeight());
   }
   
+  
   /**
    * @param jMenuBar
    * @param fileOpenRecent
@@ -930,7 +1049,6 @@ public class GUITools {
     }
     return null;
   }
-  
   
   /**
    * Determines the maximal preferred size of the two given elements and creates
@@ -1120,8 +1238,9 @@ public class GUITools {
 		}
 		initLaF();
   }
-  
-  /**
+
+
+	/**
    * Checks, if all elements on c are enabled.
    * @param c
    * @return true if and only if c and all components on c are enabled.
@@ -1140,9 +1259,8 @@ public class GUITools {
     }
     return enabled;
   }
-
-
-	/**
+  
+  /**
    * 
    * @return
    */
@@ -1544,7 +1662,8 @@ public class GUITools {
       }
     }
   }
-  
+
+
   /**
    * Enables or disables actions that can be performed by SBMLsqueezer, i.e.,
    * all menu items and buttons that are associated with the given actions are
@@ -1602,8 +1721,7 @@ public class GUITools {
       }
     }
   }
-
-
+  
   /**
    * 
    * @param state
@@ -1624,6 +1742,7 @@ public class GUITools {
     setEnabled(state, menuBar, null, commands);
   }
   
+  
   /**
    * @param state
    * @param toolbar
@@ -1633,7 +1752,6 @@ public class GUITools {
     Object... commands) {
     setEnabled(state, null, toolbar, commands);
   }
-  
   
   /**
    * Disabled or enables the given components.
@@ -1773,6 +1891,7 @@ public class GUITools {
     return retVal;
   }
   
+  
   /**
    * 
    * @param parent
@@ -1781,7 +1900,6 @@ public class GUITools {
   public static void showErrorMessage(Component parent, String message) {
     showErrorMessage(parent, null, message);
   }
-  
   
   /**
    * Displays the error message on a {@link JOptionPane}.
@@ -1810,6 +1928,7 @@ public class GUITools {
             JOptionPane.ERROR_MESSAGE);
   }
   
+  
   /**
    * Shows an error dialog with the given message in case the exception does not
    * provide any detailed message.
@@ -1829,7 +1948,6 @@ public class GUITools {
       showErrorMessage(parent, exc);
     }
   }
-  
   
   /**
    * Shows a simple message with a given title and an ok button.
@@ -1857,6 +1975,7 @@ public class GUITools {
     showMessage(path, title, owner, null);
   }
   
+
   /**
    * @param path
    * @param title
@@ -1903,7 +2022,8 @@ public class GUITools {
     }
   }
   
-
+  
+  
   /**
    * Show the component in an information message context, but does
    * not wait until the user clicks ok, but simply invokes this
@@ -1938,8 +2058,6 @@ public class GUITools {
     }
   }
   
-  
-  
   /**
    * 
    * @param parent
@@ -1954,7 +2072,8 @@ public class GUITools {
         TOOLTIP_LINE_LENGTH), resource.getString("NO_READ_ACCESS_TITLE"),
         JOptionPane.WARNING_MESSAGE);
   }
-  
+
+
   /**
    * 
    * @param parent
@@ -2090,8 +2209,7 @@ public class GUITools {
     
     return area;
   }
-
-
+  
   /**
    * Show a Question Dialog
    * @param parent may be null
@@ -2119,8 +2237,8 @@ public class GUITools {
       TOOLTIP_LINE_LENGTH), title, JOptionPane.DEFAULT_OPTION,
       JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
   }
-  
-  /**
+
+	/**
    * Shows a {@link JFileChooser} to the user, appends the selected file extension to the
    * selected file and checks weather the selected file is writable. If the file already
    * exists, the user will be asked if he wants to overwrite the file. If the file is not
