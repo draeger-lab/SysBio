@@ -121,9 +121,9 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
         icon = (((ActionCommandWithIcon)value).getIcon());
       }
     } else if (value instanceof Class<?>) {
-      label = ((Class<?>)value).getSimpleName();
+      label = ((Class<?>) value).getSimpleName();
       if (setToolTipToFullClassNameForClasses) {
-        toolTip = ((Class<?>)value).getName();
+        toolTip = ((Class<?>) value).getName();
       }
     }
     
@@ -138,12 +138,12 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
     // Set ToolTip
     if (toolTip!=null && toolTip.length()>0 && (c instanceof JComponent)) {
       if (showAsHTML) {
-        ((JComponent)c).setToolTipText(StringUtil.toHTML(toolTip, GUITools.TOOLTIP_LINE_LENGTH));
+        ((JComponent) c).setToolTipText(StringUtil.toHTML(toolTip, GUITools.TOOLTIP_LINE_LENGTH));
       } else {
-        ((JComponent)c).setToolTipText(toolTip);
+        ((JComponent) c).setToolTipText(toolTip);
       }
     } else {
-      ((JComponent)c).setToolTipText(null);
+      ((JComponent) c).setToolTipText(null);
     }
     
     // Set Icon
