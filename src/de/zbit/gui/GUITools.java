@@ -467,28 +467,6 @@ public class GUITools {
 	 *        <code>null</code> allowed.
 	 * @param tooltip
 	 *        <code>null</code> allowed.
-	 * @param listeners
-	 *        <code>null</code> allowed.
-	 * @return
-	 */
-	public static JComboBox createJComboBox(Object[] items,
-		ListCellRenderer renderer, boolean enabled, String name, String tooltip,
-		ItemListener... listeners) {
-		return createJComboBox(items, renderer, enabled, name, tooltip, 0,
-			listeners);
-	}
-	
-	/**
-	 * Creates a {@link JComboBox} with the given properties.
-	 * 
-	 * @param items
-	 * @param renderer
-	 *        <code>null</code> allowed.
-	 * @param enabled
-	 * @param name
-	 *        <code>null</code> allowed.
-	 * @param tooltip
-	 *        <code>null</code> allowed.
 	 * @param selectedIndex
 	 * @param listeners
 	 *        <code>null</code> allowed.
@@ -518,6 +496,28 @@ public class GUITools {
 			box.setSelectedIndex(selectedIndex);
 		}
 		return box;
+	}
+	
+	/**
+	 * Creates a {@link JComboBox} with the given properties.
+	 * 
+	 * @param items
+	 * @param renderer
+	 *        <code>null</code> allowed.
+	 * @param enabled
+	 * @param name
+	 *        <code>null</code> allowed.
+	 * @param tooltip
+	 *        <code>null</code> allowed.
+	 * @param listeners
+	 *        <code>null</code> allowed.
+	 * @return
+	 */
+	public static JComboBox createJComboBox(Object[] items,
+		ListCellRenderer renderer, boolean enabled, String name, String tooltip,
+		ItemListener... listeners) {
+		return createJComboBox(items, renderer, enabled, name, tooltip, 0,
+			listeners);
 	}
 	
 	/**
@@ -978,9 +978,9 @@ public class GUITools {
   public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c, boolean searchInWholeWindow) {
     
     // Search for ok button and check if all other are enabled.
-    if (c!=null) {
+    if (c != null) {
       Component okButton = getOKButton(c, searchInWholeWindow);
-      if (okButton!=null) {
+      if (okButton != null) {
         boolean previousState = okButton.isEnabled();
         okButton.setEnabled(true);
         if (isEnabled(c)) {
@@ -993,6 +993,30 @@ public class GUITools {
     }
     return false;
   }
+	
+	/**
+	 * 
+	 * @param menu
+	 * @param action
+	 * @return
+	 * @see #find(Container, ActionCommand)
+	 */
+	public static JMenuItem find(JMenu menu, Object action) {
+		JMenuItem item;
+		for (int i = 0; i < menu.getItemCount(); i++) {
+			item = menu.getItem(i);
+			if ((item.getActionCommand() != null)
+					&& item.getActionCommand().equals(action.toString())) {
+				return item;
+			} else if (item instanceof JMenu) {
+				JMenuItem subItem = find((JMenu) item, action);
+				if (subItem != null) {
+					return subItem;
+				}
+			}
+		}
+		return null;
+	}
   
   /**
    * Tries to get the lokalized cancel Button Message, as it occurs
@@ -1016,6 +1040,7 @@ public class GUITools {
     return "Cancel";
   }
   
+  
   /**
    * Computes and returns the dimension, i.e., the size of a given icon.
    * 
@@ -1028,7 +1053,6 @@ public class GUITools {
       .getIconWidth(), icon.getIconHeight());
   }
   
-  
   /**
    * @param jMenuBar
    * @param fileOpenRecent
@@ -1040,11 +1064,23 @@ public class GUITools {
     for (int i = 0; i < menuBar.getMenuCount(); i++) {
       menu = menuBar.getMenu(i);
       if ((menu.getActionCommand() != null)
-          && (menu.getActionCommand().equals(command.toString()))) { return menu; }
+          && (menu.getActionCommand().equals(command.toString()))) { 
+      	return menu; 
+      }
       for (int j = 0; j < menu.getItemCount(); j++) {
         item = menu.getItem(j);
-        if ((item != null) && (item.getActionCommand() != null)
-            && (item.getActionCommand().equals(command.toString()))) { return item; }
+				if (item != null) {
+					if ((item.getActionCommand() != null)
+							&& (item.getActionCommand().equals(command.toString()))) { 
+						return item; 
+					}
+					if (item instanceof JMenu) {
+						item = find((JMenu) item, command);
+						if (item != null) {
+							return item;
+						}
+					}
+				}
       }
     }
     return null;
@@ -1203,8 +1239,9 @@ public class GUITools {
 			}
 		}
   }
-  
-  /**
+
+
+	/**
 	 * Initializes the look and feel. This method is only useful when the calling
 	 * class contains the main method of your program and is also derived from this
 	 * class ({@link GUITools}). The preferred way to set up your application would
@@ -1238,9 +1275,8 @@ public class GUITools {
 		}
 		initLaF();
   }
-
-
-	/**
+  
+  /**
    * Checks, if all elements on c are enabled.
    * @param c
    * @return true if and only if c and all components on c are enabled.
@@ -1325,14 +1361,14 @@ public class GUITools {
   public static File[] openFileDialog(final Component parent, String dir,
     boolean allFilesAcceptable, boolean multiSelectionAllowed, int mode,
     FileFilter... filter) {
-    File[] ret=null;
+    File[] ret = null;
     JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
       multiSelectionAllowed, mode, filter);
     if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
       if (multiSelectionAllowed) {
         ret = chooser.getSelectedFiles();
       } else {
-        ret = new File[]{chooser.getSelectedFile()};
+        ret = new File[] {chooser.getSelectedFile()};
       }
       for (File f: ret) {
         if (!f.canRead()) {
@@ -1354,17 +1390,10 @@ public class GUITools {
    *         the {@link File} cannot be read, else the selected {@link File}.
    */
   public static File openFileDialog(final Component parent, String dir,
-    boolean allFilesAcceptable, int mode,
-    FileFilter... filter) {
-    JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
-      false, mode, filter);
-    if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-      File f = chooser.getSelectedFile();
-      if (!f.canRead()) {
-        showNowReadingAccessWarning(parent, f);
-      } else {
-        return f;
-      }
+    boolean allFilesAcceptable, int mode, FileFilter... filter) {
+    File files[] = openFileDialog(parent, dir, false, allFilesAcceptable, mode, filter);
+    if ((files != null) && (files.length == 1)) {
+    	return files[0];
     }
     return null;
   }
@@ -2286,5 +2315,27 @@ public class GUITools {
     }
     return null;
   }
+
+	/**
+	 * Swaps the {@link KeyStroke} associated with the {@link JMenuItem}s that
+	 * have the given actions, but only if both items can be found and are hence
+	 * not null.
+	 * 
+	 * @param jMenuBar
+	 * @param action1
+	 * @param action2
+	 */
+	public static void swapAccelerator(JMenuBar jMenuBar, Object action1,
+		Object action2) {
+		JMenuItem item1 = GUITools.getJMenuItem(jMenuBar, action1);
+		JMenuItem item2 = GUITools.getJMenuItem(jMenuBar, action2);
+		
+		if ((item1 != null) && (item2 != null)) {
+			KeyStroke ks1 = item1.getAccelerator();
+			KeyStroke ks2 = item2.getAccelerator();
+			item1.setAccelerator(ks2);
+			item2.setAccelerator(ks1);
+		}
+	}
   
 }
