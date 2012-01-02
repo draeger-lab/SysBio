@@ -131,11 +131,11 @@ public abstract class BaseFrameWithInternalFrames extends BaseFrame {
 		return success;
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#openFileAndLogHistory(java.io.File[])
 	 */
-	File[] openFileAndLogHistory(File... files) {
+	@Override
+	protected File[] openFileAndLogHistory(File... files) {
 		files = super.openFileAndLogHistory(files);
 		JInternalFrame frames[] = desktop.getAllFrames(); 
 		if (frames.length > 0) {
@@ -156,11 +156,8 @@ public abstract class BaseFrameWithInternalFrames extends BaseFrame {
 				i++;
 				final String name = item.getText();
 				item.addActionListener(new ActionListener() {
-					/*
-					 * (non-Javadoc)
-					 * 
-					 * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.
-					 * ActionEvent)
+					/* (non-Javadoc)
+					 * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 					 */
 					public void actionPerformed(ActionEvent e) {
 						selectInternalFrame(name);

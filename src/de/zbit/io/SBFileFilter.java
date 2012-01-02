@@ -19,7 +19,9 @@ package de.zbit.io;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -33,6 +35,7 @@ import javax.swing.filechooser.FileFilter;
 import de.zbit.util.FileTools;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
+import de.zbit.util.ValuePairUncomparable;
 
 /**
  * A file filter implementation for TeX and text files. It also accepts
@@ -373,19 +376,6 @@ public class SBFileFilter extends GeneralFileFilter {
     return new SBFileFilter(FileType.FAM_FILES);
   }
   
-  public static final SBFileFilter[] createSBMLFileFilterList() {
-    FileType types[] = { FileType.SBML_FILES, FileType.SBML_FILES_L1V1,
-        FileType.SBML_FILES_L1V2, FileType.SBML_FILES_L2V1,
-        FileType.SBML_FILES_L2V2, FileType.SBML_FILES_L2V3,
-        FileType.SBML_FILES_L2V4, FileType.SBML_FILES_L3V1 };
-    SBFileFilter filters[] = new SBFileFilter[types.length];
-    int i=0;
-    for (FileType type : types) {
-      filters[i++] = new SBFileFilter(type);
-    }
-	  return filters;
-	}
-  
   /**
 	 * 
 	 * @return
@@ -409,8 +399,8 @@ public class SBFileFilter extends GeneralFileFilter {
 	public static final SBFileFilter createGraphMLFileFilter() {
 		return new SBFileFilter(FileType.GRAPHML_FILES);
 	}
-	
-	/**
+  
+  /**
 	 * @return 
 	 */
 	public static final FileFilter createHTMLFileFilter() {
@@ -477,13 +467,6 @@ public class SBFileFilter extends GeneralFileFilter {
 	}
 	
 	/**
-	 * @return A filter for SBML files
-	 */
-	public static final SBFileFilter createSBMLFileFilter() {
-		return new SBFileFilter(FileType.SBML_FILES);
-	}
-	
-	 /**
    * @return A filter for SBGN files
    */
   public static final SBFileFilter createSBGNFileFilter() {
@@ -491,6 +474,13 @@ public class SBFileFilter extends GeneralFileFilter {
   }
 	
 	/**
+	 * @return A filter for SBML files
+	 */
+	public static final SBFileFilter createSBMLFileFilter() {
+		return new SBFileFilter(FileType.SBML_FILES);
+	}
+	
+	 /**
 	 * @return A filter for SBML files in level 1 version 1
 	 */
 	public static final SBFileFilter createSBMLFileFilterL1V1() {
@@ -510,14 +500,14 @@ public class SBFileFilter extends GeneralFileFilter {
   public static final SBFileFilter createSBMLFileFilterL2V1() {
     return new SBFileFilter(FileType.SBML_FILES_L2V1);
   }
-	 
-  /**
+	
+	/**
    * @return A filter for SBML files in level 2 version 2
    */
   public static final SBFileFilter createSBMLFileFilterL2V2() {
     return new SBFileFilter(FileType.SBML_FILES_L2V2);
   }
-  
+	 
   /**
    * @return A filter for SBML files in level 2 version 3
    */
@@ -538,6 +528,23 @@ public class SBFileFilter extends GeneralFileFilter {
   public static final SBFileFilter createSBMLFileFilterL3V1() {
     return new SBFileFilter(FileType.SBML_FILES_L3V1);
   }
+  
+  /**
+   * 
+   * @return
+   */
+  public static final SBFileFilter[] createSBMLFileFilterList() {
+    FileType types[] = { FileType.SBML_FILES, FileType.SBML_FILES_L1V1,
+        FileType.SBML_FILES_L1V2, FileType.SBML_FILES_L2V1,
+        FileType.SBML_FILES_L2V2, FileType.SBML_FILES_L2V3,
+        FileType.SBML_FILES_L2V4, FileType.SBML_FILES_L3V1 };
+    SBFileFilter filters[] = new SBFileFilter[types.length];
+    int i = 0;
+    for (FileType type : types) {
+      filters[i++] = new SBFileFilter(type);
+    }
+	  return filters;
+	}
   
   /**
 	 * @return A filter for SVG files (Scalable Vector Graphics)
@@ -809,20 +816,20 @@ public class SBFileFilter extends GeneralFileFilter {
 	}
 	
   /**
+	 * 
+	 * @return true if this file filter accepts SBGN files.
+	 */
+	public boolean acceptsSBGNFiles() {
+	  return type == FileType.SBGN_FILES;
+	}
+	
+	/**
 	 * Returns true if this file filter accepts SBML files.
 	 * 
 	 * @return
 	 */
 	public boolean acceptsSBMLFiles() {
 		return type == FileType.SBML_FILES;
-	}
-	
-	/**
-	 * 
-	 * @return true if this file filter accepts SBGN files.
-	 */
-	public boolean acceptsSBGNFiles() {
-	  return type == FileType.SBGN_FILES;
 	}
 	
 	/**
@@ -869,6 +876,44 @@ public class SBFileFilter extends GeneralFileFilter {
     return new SBFileFilter(type);
   }
 	
+	/**
+	 * Filters the given files for those acceptable by this
+	 * {@link java.io.FileFilter}.
+	 * 
+	 * @param files
+	 * @return a {@link List} containing only acceptable {@link File} objects.
+	 *         This {@link List} may be empty.
+	 */
+	public List<File> filter(File... files) {
+		return separate(files).getA();
+	}
+	
+	/**
+	 * Sorts the given {@link File} objects into two {@link List}s:
+	 * <ol>
+	 *   <li>A {@link List} of accepted {@link File}s</li>
+	 *   <li>The remaining {@link List} of elements that are not accepted by this {@link java.io.FileFilter}</li>
+	 * </ol>
+	 * @param files
+	 * @return Can be two empty {@link List}s
+	 */
+	public ValuePairUncomparable<List<File>, List<File>> separate(File... files) {
+		if ((files == null) || (files.length == 0)) { 
+			return new ValuePairUncomparable<List<File>, List<File>>(
+			  new ArrayList<File>(0), new ArrayList<File>(0)); 
+		}
+		ValuePairUncomparable<List<File>, List<File>> separation = new ValuePairUncomparable<List<File>, List<File>>(
+			new ArrayList<File>(files.length), new ArrayList<File>(files.length));
+		for (File f : files) {
+			if (accept(f)) {
+				separation.getA().add(f);
+			} else {
+				separation.getB().add(f);
+			}
+		}
+		return separation;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -877,8 +922,8 @@ public class SBFileFilter extends GeneralFileFilter {
 	public String getDescription() {
 	  return getDescription(false);
 	}
-	
-	/**
+  
+  /**
    * 
    * @param inTheMiddleOfASentence
    *        if <code>true</code>, will return a {@link String} that can be used
@@ -918,8 +963,8 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return sb.toString();
   }
-  
-  /**
+	
+	/**
    * @see {@link #getExtensions()}
    * @return the first file extension of all acceptable extensions.
    */
@@ -930,14 +975,14 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return null;
   }
-	
-	/**
+
+  /**
    * @return all acceptable file extensions.
    */
   public Set<String> getExtensions() {
     return type.getFileExtensions();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.io.GeneralFileFilter#hashCode()
    */
@@ -953,8 +998,8 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return hashCode;
   }
-  
-  /**
+
+	/**
    * 
    * @return
    */

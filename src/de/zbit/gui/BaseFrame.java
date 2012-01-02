@@ -412,10 +412,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
         BaseAction.FILE_OPEN_RECENT);
       if (!ArrayUtils.contains(fileHistory, c_fileHistory)) {
         fileHistory = ArrayUtils.removeNull(fileHistory);
-        if (fileHistory==null) {
-          fileHistory = new JMenu[]{c_fileHistory};
+        if (fileHistory == null) {
+          fileHistory = new JMenu[] {c_fileHistory};
         } else {
-          JMenu[] histories = new JMenu[fileHistory.length+1];
+          JMenu[] histories = new JMenu[fileHistory.length + 1];
           histories[0] = c_fileHistory;
           System.arraycopy(fileHistory, 0, histories, 1, fileHistory.length);
           fileHistory = histories;
@@ -1262,10 +1262,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @param files
 	 *        any number of files that should be passed to the method
 	 *        {@link #openFile(File...)}.
-	 * @return the files that originate from the method {@link #openFile(File...)}
-	 *         .
+	 * @return the files that originate from the method {@link #openFile(File...)}.
 	 */
-	File[] openFileAndLogHistory(File... files) {
+	protected File[] openFileAndLogHistory(File... files) {
 		files = openFile(files);
 		// Remember the baseDir and put files into history.
     if ((files != null) && (files.length > 0)) {
@@ -1274,7 +1273,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
       String baseDir = null;
       boolean sameBaseDir = true;
       for (File file : files) {
-        if (file!=null && file.exists() && file.canRead() && !fileList.contains(file)) {
+        if ((file != null) && file.exists() && file.canRead() && !fileList.contains(file)) {
           if (baseDir == null) {
             baseDir = file.getParent();
           } else if (!baseDir.equals(file.getParent())) {
@@ -1470,7 +1469,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			if (file.exists() && file.canRead()) {
 			  for (JMenu jMenu : fileHistory) {
 			    // One JMenuItem can only have one parent, thus, create it multiple times
-			    // ie for every fileHistory once.
+			    // i.e., for every fileHistory once.
 			    fileItem = new JMenuItem(file.getName());
 			    fileItem.setToolTipText(file.getAbsolutePath());
 			    if (maximum <= 10) {
@@ -1478,11 +1477,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			        (i + 1 < 10) ? i + 1 : 0).charAt(0), InputEvent.ALT_DOWN_MASK));
 			    }
 			    fileItem.addActionListener(new ActionListener() {
-			      /*
-			       * (non-Javadoc)
-			       * 
-			       * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.
-			       * ActionEvent)
+			      /* (non-Javadoc)
+			       * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			       */
 			      public void actionPerformed(ActionEvent e) {
 			        openFileAndLogHistory(file);
@@ -1498,8 +1494,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
       jMenu.setEnabled(jMenu.getItemCount() > 0);
     }
 		// This removes files that cannot be read from the history.
-		SBPreferences history = SBPreferences
-				.getPreferencesFor(getFileHistoryKeyProvider());
+		SBPreferences history = SBPreferences.getPreferencesFor(getFileHistoryKeyProvider());
 		history.put(FileHistory.LAST_OPENED, FileHistory.Tools.toString(keepFiles));
 		try {
 			history.flush();
