@@ -478,16 +478,16 @@ public class SBasePanel extends JPanel {
 	 * @param nsb
 	 */
 	private void addProperties(NamedSBase nsb) {
-		if (nsb.isSetId() || editable) {
-			lh.add(new JLabel("Identifier: "), 1, ++row, 1, 1, 1, 1);
-			JTextField tf = new JTextField(nsb.getId());
+		if (nsb.isSetName() || editable) {
+			lh.add(new JLabel("Name: "), 1, ++row, 1, 1, 1, 1);
+			JTextField tf = new JTextField(nsb.getName());
 			tf.setEditable(editable);
 			lh.add(tf, 3, row, 1, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
-		if (nsb.isSetName() || editable) {
+		else if (nsb.isSetId() || editable) {
 			lh.add(new JLabel("Name: "), 1, ++row, 1, 1, 1, 1);
-			JTextField tf = new JTextField(nsb.getName());
+			JTextField tf = new JTextField(nsb.getId());
 			tf.setEditable(editable);
 			lh.add(tf, 3, row, 1, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);

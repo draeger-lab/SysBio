@@ -23,19 +23,42 @@ import java.awt.event.MouseListener;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.Compartment;
+import org.sbml.jsbml.CompartmentType;
+import org.sbml.jsbml.Constraint;
+import org.sbml.jsbml.Delay;
+import org.sbml.jsbml.Event;
+import org.sbml.jsbml.EventAssignment;
+import org.sbml.jsbml.FunctionDefinition;
+import org.sbml.jsbml.InitialAssignment;
+import org.sbml.jsbml.KineticLaw;
+import org.sbml.jsbml.LocalParameter;
+import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
+import org.sbml.jsbml.ModifierSpeciesReference;
+import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.Reaction;
+import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
+import org.sbml.jsbml.Species;
+import org.sbml.jsbml.SpeciesReference;
+import org.sbml.jsbml.SpeciesType;
+import org.sbml.jsbml.Trigger;
+import org.sbml.jsbml.Unit;
+import org.sbml.jsbml.UnitDefinition;
 
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a
@@ -73,6 +96,16 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	 */
 	public SBMLTree(SBase sbase) {
 		super(createNodes(sbase));
+		init();
+	}
+	
+	/**
+	 * Generate a tree that displays an ASTNode tree.
+	 * 
+	 * @param math
+	 */
+	public SBMLTree(ASTNode math) {
+		super(math);
 		init();
 	}
 	
@@ -162,6 +195,10 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 		addMouseListener(this);
 	}
 	
+	public void setPopupMenu(JPopupMenu popup){
+		this.popup = popup;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -196,21 +233,21 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 							e.getY() + ((int) getLocationOnScreen().getY()));// e.getLocationOnScreen());
 						popup.setVisible(true);
 					}
+					if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
+						MathContainer mc = (MathContainer) ((DefaultMutableTreeNode) clickedOn)
+								.getUserObject();
+						JDialog dialog = new JDialog();
+						JScrollPane scroll = new JScrollPane(new SBMLTree(mc.getMath()),
+							JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+							JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+						dialog.getContentPane().add(scroll);
+						dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+						dialog.pack();
+						dialog.setModal(true);
+						dialog.setLocationRelativeTo(null);
+						dialog.setVisible(true);
+					}
 				}
-//				if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
-//					MathContainer mc = (MathContainer) ((DefaultMutableTreeNode) clickedOn)
-//							.getUserObject();
-//					JDialog dialog = new JDialog();
-//					JScrollPane scroll = new JScrollPane(new SBMLTree(mc.getMath()),
-//						JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-//						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-//					dialog.getContentPane().add(scroll);
-//					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//					dialog.pack();
-//					dialog.setModal(true);
-//					dialog.setLocationRelativeTo(null);
-//					dialog.setVisible(true);
-//				}
 			}
 		}
 	}
