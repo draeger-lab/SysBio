@@ -17,6 +17,7 @@
 package de.zbit;
 
 import java.beans.EventHandler;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -358,7 +359,12 @@ public abstract class Launcher implements Runnable, Serializable {
   public void exit(java.awt.Window window, boolean terminateJVMwhenDone) {
     if (terminateJVMwhenDone) {
     	if (isMacOS()) {
-    		NativeLibraryLoader.deleteTempLibFile(System.getProperty("user.dir"));
+    		try {
+    			// Delete temporary file again...
+					NativeLibraryLoader.deleteTempLibFile(System.getProperty("user.dir"));
+				} catch (IOException exc) {
+					logger.warning(exc.getLocalizedMessage());
+				}
     	}
       StringBuilder exception = new StringBuilder();
       if (getInteractiveOptions() != null) {

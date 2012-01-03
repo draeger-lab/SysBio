@@ -29,11 +29,58 @@ import de.zbit.util.Utils;
 public class NativeLibraryLoader {
 	
 	/**
+	 * The only instance of this class!
+	 */
+	private static NativeLibraryLoader loader = new NativeLibraryLoader();
+	
+	/**
+	 * 
+	 * @param tmpDir
+	 * @throws IOException 
+	 */
+	public static final void deleteTempLibFile(String tmpDir) throws IOException {
+		File libFile = loader.createLibFile(tmpDir);
+		if (libFile.exists()) {
+			libFile.delete();
+			loader.libFile = null;
+		}
+	}
+	
+	/**
+	 * @throws IOException 
+	 * 
+	 */
+	public static final void loadMacOSLibrary(String tmpDir) throws IOException {
+		File libFile = loader.createLibFile(tmpDir);
+		if (libFile.canWrite()) {
+			Utils.copyStream(NativeLibraryLoader.class.getResourceAsStream(libFile.getName()), libFile);
+			System.load(libFile.getAbsolutePath());
+			System.loadLibrary(libFile.getName());
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private File libFile;
+
+	/**
+	 * 
+	 */
+	private NativeLibraryLoader() {
+		super();
+	}
+
+	/**
 	 * 
 	 * @param tmpDir
 	 * @return
+	 * @throws IOException 
 	 */
-	private static File createLibFile(String tmpDir) {
+	private final File createLibFile(String tmpDir) throws IOException {
+		if (libFile != null) {
+			return libFile;
+		}
 		String osArch = System.getProperty("os.arch").toString();
 		String suffix = "jnilib";
 		String libFileName = "libquaqua";
@@ -41,38 +88,11 @@ public class NativeLibraryLoader {
 			libFileName += "64";
 		}
 		libFileName += '.' + suffix;
-		return new File(Utils.ensureSlash(tmpDir) + libFileName);
-	}
-	
-	/**
-	 * 
-	 * @param tmpDir
-	 */
-	public static void deleteTempLibFile(String tmpDir) {
-		File libFile = createLibFile(tmpDir);
-		if (libFile.exists()) {
-			libFile.delete();
+		libFile = new File(Utils.ensureSlash(tmpDir) + libFileName);
+		if (!libFile.exists()) {
+			libFile.createNewFile();
 		}
-	}
-
-	/**
-	 * @throws IOException 
-	 * 
-	 */
-	public static final void loadMacOSLibrary(String tmpDir) throws IOException {
-		File libFile = createLibFile(tmpDir);
-		if (libFile.canWrite()) {
-			Utils.copyStream(NativeLibraryLoader.class.getResourceAsStream(libFile.getName()), libFile);
-			System.load(libFile.getAbsolutePath());
-			System.loadLibrary(libFile.getName());
-		}
-	}
-
-	/**
-	 * 
-	 */
-	private NativeLibraryLoader() {
-		super();
+		return libFile;
 	}
 	
 }
