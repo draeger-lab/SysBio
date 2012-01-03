@@ -662,7 +662,11 @@ public class GUITools {
   public static JMenu createJMenu(String text, String tooltip, Object... menuItems) {
     JMenu menu = createJMenu(text, menuItems);
     if ((tooltip != null) && (tooltip.length() > 0) && (!tooltip.equals(text))) {
-      menu.setToolTipText(StringUtil.toHTML(tooltip, TOOLTIP_LINE_LENGTH));
+    	if (isMacOSX()) {
+    		menu.setToolTipText(tooltip);
+    	} else {
+        menu.setToolTipText(StringUtil.toHTML(tooltip, TOOLTIP_LINE_LENGTH));
+    	}
     }
     return menu;
   }

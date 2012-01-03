@@ -34,7 +34,6 @@ import javax.swing.table.TableCellRenderer;
  * @version $Rev$
  */
 public class JComponentTableRenderer implements TableCellRenderer, ListCellRenderer {
-  private static final long serialVersionUID = -4823385664888615784L;
   
   DefaultListCellRenderer listRenderer = null;
   DefaultTableCellRenderer tableRenderer = null;
