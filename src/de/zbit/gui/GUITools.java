@@ -89,6 +89,9 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
+import org.sbml.jsbml.UnitDefinition;
+import org.sbml.jsbml.util.compilers.HTMLFormula;
+
 import de.zbit.Launcher;
 import de.zbit.io.OpenFile;
 import de.zbit.util.Reflect;
@@ -2342,4 +2345,19 @@ public class GUITools {
 		}
 	}
   
+
+
+	/**
+	 * Creates a JEditorPane that displays the given UnitDefinition as a HTML.
+	 * 
+	 * @param ud
+	 * @return
+	 */
+	public static JEditorPane unitPreview(UnitDefinition ud) {
+		JEditorPane preview = new JEditorPane("text/html", StringUtil
+				.toHTML(ud != null ? HTMLFormula.toHTML(ud) : ""));
+		preview.setEditable(false);
+		preview.setBorder(BorderFactory.createLoweredBevelBorder());
+		return preview;
+	}
 }

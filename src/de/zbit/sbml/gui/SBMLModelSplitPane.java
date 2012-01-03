@@ -18,6 +18,7 @@ package de.zbit.sbml.gui;
 
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.beans.PropertyChangeEvent;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -28,17 +29,21 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 
+
 import de.zbit.gui.GUITools;
 import de.zbit.sbml.gui.SBMLTree.SBMLNode;
+import de.zbit.sbml.gui.SBasePanel;
 
 /**
  * A specialized {@link JSplitPane} that displays a {@link JTree} containing all
@@ -61,7 +66,14 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 */
 	private final Set<ActionListener> actionListeners;
-	
+
+	/**
+	 * @return the actionListeners
+	 */
+	public Set<ActionListener> getActionListeners() {
+		return actionListeners;
+	}
+
 	/**
 	 * 
 	 */
@@ -72,6 +84,20 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 */
 	private SBMLTree tree;
 	
+	/**
+	 * @return the tree
+	 */
+	public SBMLTree getTree() {
+		return tree;
+	}
+
+	/**
+	 * @param tree the tree to set
+	 */
+	public void setTree(SBMLTree tree) {
+		this.tree = tree;
+	}
+
 	/**
 	 * 
 	 */
