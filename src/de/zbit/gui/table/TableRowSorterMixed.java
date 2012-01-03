@@ -77,6 +77,9 @@ public class TableRowSorterMixed<M extends TableModel> extends TableRowSorter<M>
   }
   
   private static class CheckedComparableComparator implements Comparator {
+  	/* (non-Javadoc)
+  	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+  	 */
     @SuppressWarnings("unchecked")
     public int compare(Object o1, Object o2) {
       try {

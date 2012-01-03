@@ -113,6 +113,10 @@ public class JTableUtils implements Serializable {
       });
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing.JTable, java.lang.Object, boolean, int, int)
+     */
+    @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
         boolean isSelected, int row, int column) {
       if (isSelected) {
@@ -141,6 +145,10 @@ public class JTableUtils implements Serializable {
       return button;
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.DefaultCellEditor#getCellEditorValue()
+     */
+    @Override
     public Object getCellEditorValue() {
       if (isPushed) {
         for (ActionListener i : button.getActionListeners()) {
@@ -151,11 +159,19 @@ public class JTableUtils implements Serializable {
       return new String(label);
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.DefaultCellEditor#stopCellEditing()
+     */
+    @Override
     public boolean stopCellEditing() {
       isPushed = false;
       return super.stopCellEditing();
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.AbstractCellEditor#fireEditingStopped()
+     */
+    @Override
     protected void fireEditingStopped() {
       super.fireEditingStopped();
     }
@@ -175,6 +191,9 @@ public class JTableUtils implements Serializable {
       setColEditable(editableColumn, true);
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+     */
     @Override
     public Class<?> getColumnClass(int column) {
       Class<?> returnValue;

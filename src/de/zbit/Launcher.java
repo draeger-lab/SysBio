@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.UpdateMessage;
+import de.zbit.gui.mac.NativeLibraryLoader;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.logging.LogUtil;
 import de.zbit.util.prefs.KeyProvider;
@@ -106,6 +107,15 @@ public abstract class Launcher implements Runnable, Serializable {
   }
 
 	/**
+   * Checks whether the operating system is MacOS.
+   * @return
+   */
+	private static final boolean isMacOS() {
+		return (System.getProperty("mrj.version") != null)
+				|| (System.getProperty("os.name").toLowerCase().indexOf("mac") != -1);
+	}
+
+	/**
 	 * Stores given command-line options as key-value pairs.
 	 */
 	private SBProperties props;
@@ -164,7 +174,7 @@ public abstract class Launcher implements Runnable, Serializable {
     LogUtil.initializeLogging(getLogLevel(), getLogPackages());
   }
 
-	/**
+  /**
 	 * Copy constructor. This constructor will neither show a splash screen nor
 	 * print the license agreement on the standard out.
 	 * 
@@ -202,7 +212,7 @@ public abstract class Launcher implements Runnable, Serializable {
   protected boolean addCopyrightToSplashScreen() {
     return true;
   }
-
+	
   /**
 	 * Decides whether or not the version number of this program should be shown
 	 * on a layer on top of the program's splash screen (if there is any).
@@ -213,7 +223,7 @@ public abstract class Launcher implements Runnable, Serializable {
   protected boolean addVersionNumberToSplashScreen() {
     return true;
   }
-	
+
   /**
 	 * This method can be called when starting the command-line mode of this
 	 * program. It checks for updates and may display a user notification (on the
@@ -229,8 +239,8 @@ public abstract class Launcher implements Runnable, Serializable {
 			update.execute();
 		}
 	}
-
-  /**
+		
+	/**
 	 * This method is called in case that no graphical user interface is to be
 	 * used. The given properties contain all the key-value pairs that have been
 	 * defined on the command line when starting this program.
@@ -238,8 +248,8 @@ public abstract class Launcher implements Runnable, Serializable {
 	 * @param appConf
 	 */
 	public abstract void commandLineMode(AppConf appConf);
-		
-	/**
+  
+  /**
 	 * Configures necessary properties of the {@link System} in order to support
 	 * certain platform dependencies correctly. This method should be called very
 	 * early when the program is launched (as early as possible).
@@ -253,20 +263,46 @@ public abstract class Launcher implements Runnable, Serializable {
   	Properties p = System.getProperties();
   	String title = getAppName();
   	
-		if ((p.getProperty("mrj.version") != null)
-				|| (p.getProperty("os.name").toLowerCase().indexOf("mac") != -1)) {
-      p.setProperty("apple.awt.graphics.EnableQ2DX", "true");
-      p.setProperty("apple.laf.useScreenMenuBar", "true");
-      p.setProperty("com.apple.macos.smallTabs", "true");
-      p.setProperty("com.apple.macos.useScreenMenuBar", "true");
+		if (isMacOS()) {
       /* 
        * Note: the xDock name property must be set before parsing 
        * command-line arguments! See above!
        */
       p.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
+			
+      p.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+      p.setProperty("apple.laf.useScreenMenuBar", "true");
+      p.setProperty("com.apple.macos.smallTabs", "true");
+      p.setProperty("com.apple.macos.useScreenMenuBar", "true");
       
       p.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
       p.setProperty("com.apple.mrj.application.live-resize", "true");
+      
+      String classPath = p.getProperty("java.class.path");
+      String javaSystemDir = "/System/Library/Java";
+      if (!classPath.contains(javaSystemDir)) {
+      	if (classPath.length() > 0) {
+      		classPath += ':';
+      	}
+      	classPath += javaSystemDir;
+      	p.setProperty("java.class.path", classPath);
+      }
+      
+			try {
+				String tmpDirName = p.getProperty("user.dir");
+				String libPath = p.get("java.library.path").toString();
+				if (!libPath.contains(tmpDirName)) {
+					if (libPath.length() > 0) {
+						libPath += ':';
+					}
+					libPath += tmpDirName;
+					p.setProperty("java.library.path", libPath);
+				}
+	      NativeLibraryLoader.loadMacOSLibrary(tmpDirName);
+			} catch (Throwable e) {
+				// Ignore this problem.
+			}
+      
     }
     // Use the systems proxy settings to establish connections
     // This must also be done prior to any other calls.
@@ -275,8 +311,8 @@ public abstract class Launcher implements Runnable, Serializable {
     p.setProperty("app.name", title);
     p.setProperty("app.version", getVersionNumber());
   }
-  
-  /* (non-Javadoc)
+
+	/* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -321,6 +357,9 @@ public abstract class Launcher implements Runnable, Serializable {
    */
   public void exit(java.awt.Window window, boolean terminateJVMwhenDone) {
     if (terminateJVMwhenDone) {
+    	if (isMacOS()) {
+    		NativeLibraryLoader.deleteTempLibFile(System.getProperty("user.dir"));
+    	}
       StringBuilder exception = new StringBuilder();
       if (getInteractiveOptions() != null) {
         for (Class<? extends KeyProvider> clazz : getInteractiveOptions()) {

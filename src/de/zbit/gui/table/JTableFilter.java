@@ -202,6 +202,10 @@ public class JTableFilter extends JPanel {
     
     // Queue the refresh.
     counter = new Thread() {
+    	/* (non-Javadoc)
+    	 * @see java.lang.Thread#run()
+    	 */
+    	@Override
       public void run() {
         int hits = getSelectedRowCount();
         if (Thread.currentThread().isInterrupted()) return;
