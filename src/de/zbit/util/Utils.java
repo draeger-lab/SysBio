@@ -558,15 +558,18 @@ public class Utils {
   }
   
   /**
-   * Cut number at dot. E.g. 1.68 => 1
+   * Cut number at dot. E.g., 1.68 => 1
    * In contrary, decimal format "#" would return 2!
    * @param d
    * @return
    */
   public static String cut(double d) {
+  	// FIXME: What happens if we have, e.g., 1.68E-7? This method will give a totally wrong result!
     String s = Double.toString(d);
-    int ep = s.indexOf(".");
-    if (ep<1) ep = s.length();
+    int ep = s.indexOf('.');
+    if (ep < 1) {
+    	ep = s.length();
+    }
     return s.substring(0, ep);
   }
   
@@ -742,22 +745,22 @@ public class Utils {
    * @return
    */
   public static String getTimeString(long miliseconds) {
-    double seconds = (miliseconds/1000.0);
-    double minutes = (seconds/60.0);
-    double hours = (minutes/60.0);
-    double days = hours/24;
+    double seconds = miliseconds / 1000d;
+    double minutes = seconds / 60d;
+    double hours = minutes / 60d;
+    double days = hours / 24;
     
     String ret;
-    if (days>=1) {
-      ret = cut(days) + "d " + cut(hours%24.0)  + "h " + cut(minutes%60) + "m";
-    } else if (hours>=1) {
-      ret = cut(hours%24.0)  + "h " + cut(minutes%60) + "m " + cut(seconds%60) + "s";
-    } else if (minutes>=1) {
-      ret = cut(minutes%60) + "m " + cut(seconds%60) + "s " + cut(miliseconds%1000.0) + "ms";
-    } else if (seconds>=1) {
-      ret = cut(seconds%60) + "s " + cut(miliseconds%1000.0) + "ms";
+    if (days >= 1) {
+      ret = cut(days) + "d " + cut(hours % 24d)  + "h " + cut(minutes % 60) + "m";
+    } else if (hours >= 1) {
+      ret = cut(hours % 24d)  + "h " + cut(minutes % 60) + "m " + cut(seconds % 60) + "s";
+    } else if (minutes >= 1) {
+      ret = cut(minutes % 60) + "m " + cut(seconds % 60) + "s " + cut(miliseconds % 1000d) + " ms";
+    } else if (seconds >= 1) {
+      ret = cut(seconds % 60) + " s " + cut(miliseconds%1000.0) + " ms";
     } else {
-      ret = cut(miliseconds%1000.0) + "ms";
+      ret = cut(miliseconds % 1000d) + " ms";
     }
     return ret;
   }
@@ -770,24 +773,24 @@ public class Utils {
    * @see #getTimeString(long)
    */
   public static String getPrettyTimeString(long miliseconds) {
-    double seconds = (miliseconds/1000.0);
-    double minutes = (seconds/60.0);
-    double hours = (minutes/60.0);
-    double days = hours/24;
+    double seconds = miliseconds / 1000d;
+    double minutes = seconds / 60d;
+    double hours = minutes / 60d;
+    double days = hours / 24d;
     
     String ret;
-    if (days>=1) {
-      ret = cut(days) + "d " + cut(hours%24.0)  + "h";
-    } else if (hours>=1) {
-      ret = cut(hours%24.0)  + "h " + cut(minutes%60) + "m";
-    } else if (minutes>=2) {
-      ret = cut(minutes%60) + "m";
-    } else if (minutes>=1) {
-      ret = cut(minutes%60) + "m " + cut(seconds%60) + "s";
-    } else if (seconds>=1) {
-      ret = cut(seconds%60) + "s";
+    if (days >= 1) {
+      ret = cut(days) + " d " + cut(hours % 24d)  + " h";
+    } else if (hours >= 1) {
+      ret = cut(hours % 24d)  + " h " + cut(minutes % 60) + " m";
+    } else if (minutes >= 2) {
+      ret = cut(minutes % 60d) + " m";
+    } else if (minutes >= 1) {
+      ret = cut(minutes % 60) + " m " + cut(seconds % 60) + " s";
+    } else if (seconds >= 1) {
+      ret = cut(seconds % 60) + " s";
     } else {
-      ret = cut(miliseconds%1000.0) + "ms";
+      ret = cut(miliseconds % 1000d) + " ms";
     }
     return ret;
   }
