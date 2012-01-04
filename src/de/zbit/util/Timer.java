@@ -55,7 +55,7 @@ public class Timer {
   public double getAndReset(boolean milis) {
   	double ret = getAndReset();
   	if (!milis) {
-    	ret *= 1E-3d;
+    	ret /= 1000d;
     }
   	return ret;
   }

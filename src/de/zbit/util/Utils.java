@@ -564,8 +564,7 @@ public class Utils {
    * @return
    */
   public static String cut(double d) {
-  	// FIXME: What happens if we have, e.g., 1.68E-7? This method will give a totally wrong result!
-    String s = Double.toString(d);
+    String s = Double.toString(Math.floor(d));
     int ep = s.indexOf('.');
     if (ep < 1) {
     	ep = s.length();

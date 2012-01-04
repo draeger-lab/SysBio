@@ -427,7 +427,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
    * @param acceptedObjects
    */
   public Range(Class<Type> requiredType, Iterable<Type> acceptedObjects) {
-    this(requiredType, Range.toRangeString(acceptedObjects));
+    this(requiredType, Range.toNiceRangeString(acceptedObjects));
     // This requires a list => Convert to list
     if (!(acceptedObjects instanceof List<?>)) {
       List<Type> acceptedObjects2 = new LinkedList<Type>();
@@ -795,6 +795,39 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
       	 * Therefore, getName is the only possible option here.
       	 */
         classStrings.add((Type) ((Class<Type>) object).getName());
+      }
+      accObjects = classStrings;
+    }
+    
+    String s = '{' + StringUtil.implode(StringUtil.addPrefixAndSuffix(
+      accObjects, "\"", "\""), ",") + '}';
+    
+    logger.finer(String.format("Created a new range-string from a collection: %s", s));
+    return s;
+  }
+  
+  /**
+   * Returns a List of type String, that is parsable as Range by the
+   * Range class.
+   * Tries to gain a nice formatting, e.g., {@link Class}es are
+   * represented by their simple name.
+   * @param <Type>
+   * @param acceptedObjects - a simple list of all acceptable objects.
+   * @return String
+   */
+  @SuppressWarnings({ "unchecked" })
+  public static <Type> String toNiceRangeString(Iterable<Type> acceptedObjects) {
+    Iterable<Type> accObjects = acceptedObjects;
+    
+    //If the range consists of classes, use the simple class names
+    if ((acceptedObjects != null) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
+      List<Type> classStrings = new LinkedList<Type>();
+      for (Type object : acceptedObjects) {
+        /* Simple name for classes doesn't work. It is not precise and 
+         * causes errors at other positions...
+         * Nope... works just fine for me!
+         */
+        classStrings.add((Type) ((Class<Type>) object).getSimpleName());
       }
       accObjects = classStrings;
     }
