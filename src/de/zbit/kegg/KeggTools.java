@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.zbit.kegg.gui.KGMLSelectAndDownload;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
@@ -617,7 +616,7 @@ public class KeggTools {
                   if (reactantInstance!=null) {
                     reactantInstance.setStoichiometry(Integer.parseInt(m.group(3)));
                   } else {
-                    log.log(Level.WARNING, "Could not get reaction component for " + reactant);
+                    log.log(Level.WARNING, "Could not get reaction component for " + reactant + " in " + r);
                   }
                 } catch (NumberFormatException e) {
                   log.log(Level.WARNING, "Could not parse stoichometry from " + partial, e);
