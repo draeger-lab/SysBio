@@ -23,7 +23,7 @@ import javax.swing.table.AbstractTableModel;
 
 /**
  * A {@link AbstractTableModel} that renders {@link JComponent}s inside a
- * table, instead of calling the {@link #toString()} method. 
+ * table, instead of calling the toString() method of the respective object. 
  * @author Clemens Wrzodek
  * @version $Rev$
  */
