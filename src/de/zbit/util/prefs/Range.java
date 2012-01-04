@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -419,7 +420,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	
 	/**
 	 * This is a convenient constructors that builds a range string from
-	 * a list of all acceptable object automatically.
+	 * a list of all acceptable objects automatically.
 	 * 
 	 * @see {@link #Range(Class, String)} for more information.
    * @param requiredType
@@ -436,6 +437,18 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
       acceptedObjects = acceptedObjects2;
     }
     this.setListOfAccpetedObjects((List<Type>) acceptedObjects);
+  }
+  
+  /**
+   * This is a convenient constructors that builds a range string from
+   * am {@link Enumeration} of all acceptable objects automatically.
+   * 
+   * @see {@link #Range(Class, String)} for more information.
+   * @param requiredType
+   * @param acceptedObjects
+   */
+  public Range(Class<Type> requiredType, Enumeration<Type> acceptedObjects) {
+    this(requiredType, Collections.list(acceptedObjects));
   }
   
   /**

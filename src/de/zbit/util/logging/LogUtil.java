@@ -68,22 +68,48 @@ public class LogUtil {
     //}
     packages_to_log = packages;
     
+    changeLogLevel(logLevel, true);
+
+  }
+  
+  /**
+   * Change the log level of all packes for those logging has
+   * been initialized with {@link #initializeLogging(Level, String...)}.
+   * @param logLevel
+   */
+  public static void changeLogLevel(Level logLevel) {
+    changeLogLevel(logLevel, false);
+  }
+  
+  /**
+   * Change the log level of all packes for those logging has
+   * been initialized with {@link #initializeLogging(Level, String...)}.
+   * 
+   * @param logLevel
+   * @param initOneLineFormatter also change the formatter of all
+   * Handlers to the {@link OneLineFormatter}.
+   */
+  private static void changeLogLevel(Level logLevel, boolean initOneLineFormatter) {
     for (Handler h : Logger.getLogger("").getHandlers()) {
       h.setLevel(logLevel);
-      h.setFormatter(new OneLineFormatter());
+      if (initOneLineFormatter) {
+        h.setFormatter(new OneLineFormatter());
+      }
     }
     Logger.getLogger(basePackage).setLevel(logLevel);
-
+    
     // additional packages to log
-		if (packages != null) {
-			for (String s : packages) {
-				for (Handler h : Logger.getLogger(s).getHandlers()) {
-					h.setLevel(logLevel);
-					h.setFormatter(new OneLineFormatter());
-				}
-				Logger.getLogger(s).setLevel(logLevel);
-			}
-		}
+    if (packages_to_log != null) {
+      for (String s : packages_to_log) {
+        for (Handler h : Logger.getLogger(s).getHandlers()) {
+          h.setLevel(logLevel);
+          if (initOneLineFormatter) {
+            h.setFormatter(new OneLineFormatter());
+          }
+        }
+        Logger.getLogger(s).setLevel(logLevel);
+      }
+    }
   }
   
   /**

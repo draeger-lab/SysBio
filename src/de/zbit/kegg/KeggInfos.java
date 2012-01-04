@@ -1013,6 +1013,9 @@ public class KeggInfos implements Serializable {
       ret = miriam_urn_kgDrug + suffix;
     } else if (prefix.startsWith("rn:")) {
       ret = miriam_urn_kgReaction + suffix;
+    } else if (prefix.startsWith("rp:") || prefix.startsWith("rc:")) {
+      // Unfortunately, miriam does not support reaction pairs or classes
+      ret = null;
     } else if (prefix.startsWith("path:")) { // Link to another pathway
       ret = miriam_urn_kgPathway + suffix;
     } else if (prefix.startsWith("ko:")) {
@@ -1085,7 +1088,14 @@ public class KeggInfos implements Serializable {
           // "ko:E3.1.4.11" is also possible
           return "ko:" + s;
         } else if (firstChar=='R') {
-          return "rn:" + s;
+          char secondChar = Character.toUpperCase(s.charAt(1));
+          if (secondChar=='P') {
+            return "rp:" + s;
+          } else if (secondChar=='C') {
+            return "rc:" + s;
+          } else {
+            return "rn:" + s;
+          }
         }
         
         
@@ -1099,11 +1109,11 @@ public class KeggInfos implements Serializable {
       } else {
         // genes, impossible without knowing the organism ("^\w+:[\w\d\.-]*$")
         // e.g. "hsa:1738"; also impossible is KEGG brite ("br:*" ids)
-        log.warning(String.format("Warning: can not prepend unknown organism on possibly gene-id %s", s));
+        log.warning(String.format("Warning: can not prepend unknown organism on possibly gene-id '%s'.", s));
         return s;
       }
     } else {
-      log.warning(String.format("Warning: can not prepend prefix to unknown id %s", s));
+      log.warning(String.format("Warning: can not prepend prefix to unknown id '%s'.", s));
     }
     
     return s;

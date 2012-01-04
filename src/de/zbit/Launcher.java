@@ -457,9 +457,11 @@ public abstract class Launcher implements Runnable, Serializable {
    * This method returns the default log level that is the minimal {@link Level}
    * for log messages to be displayed to the user.
    * 
-   * @return By default, this method returns {@link Level#FINE}. If something
+   * @return By default, this method returns {@link Level#INFO}. If something
    *         different is desired, this method should be overridden in an
    *         implementing class.
+   * @see {@link GUIOptions#LOG_LEVEL} allows to overwrite this value from
+   *         the command-line.
    */
   public Level getLogLevel() {
     return Level.INFO;
@@ -647,6 +649,15 @@ public abstract class Launcher implements Runnable, Serializable {
 	 * @see java.lang.Runnable#run()
 	 */
   public void run() {
+    // Get appConf command-line options
+    final AppConf appConf = getAppConf();
+    
+    // Eventually change the log-level
+    String logLevel = appConf.getCmdArgs().get(GUIOptions.LOG_LEVEL);
+    if (logLevel!=null) {
+      LogUtil.changeLogLevel(Level.parse(logLevel.toUpperCase()));
+    }
+    
     // Should we start the GUI?
     if (showsGUI()) {
     	javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -654,22 +665,21 @@ public abstract class Launcher implements Runnable, Serializable {
          * @see java.lang.Runnable#run()
          */
         public void run() {
-          AppConf appCnf = getAppConf();
           try {
           	// Now we're preparing the GUI mode.
       			GUITools.initLaF();
-            guiMode(appCnf);
+            guiMode(appConf);
           } catch (java.awt.HeadlessException exc) {
             if (props.getBooleanProperty(GUIOptions.GUI)) {
               logger.severe(resources.getString("COULD_NOT_INITIALIZE_GUI"));
             }
-            launchCommandLineMode(appCnf);
+            launchCommandLineMode(appConf);
           }
           exit();
         }
       });
     } else {
-      launchCommandLineMode(getAppConf());
+      launchCommandLineMode(appConf);
     }
   }
 

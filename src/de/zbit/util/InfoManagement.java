@@ -147,10 +147,20 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * Clears the whole cache (rememberedInfos and unsuccessfulQueries).
    */
   public void clearCache() {
-    cacheChangedSinceLastLoading = (unsuccessfulQueries.size()>0 || rememberedInfos.size()>0);
+    cacheChangedSinceLastLoading |= (unsuccessfulQueries.size()>0 || rememberedInfos.size()>0);
     synchronized (rememberedInfos) {
       rememberedInfos.clear();
     }
+    synchronized (unsuccessfulQueries) {
+      unsuccessfulQueries.clear();
+    }
+  }
+  
+  /**
+   * Clears the unsuccessfulQueries (Queries with no, or no valid, response).
+   */
+  public void clearFailCache() {
+    cacheChangedSinceLastLoading |= (unsuccessfulQueries.size()>0);
     synchronized (unsuccessfulQueries) {
       unsuccessfulQueries.clear();
     }

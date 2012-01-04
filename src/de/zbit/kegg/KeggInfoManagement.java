@@ -17,6 +17,7 @@
 package de.zbit.kegg;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -271,10 +272,15 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     String[] splitt = q.split("///");
     
     String[] ret = new String[ids.length];
-    for (int i=0; i<ret.length; i++) ret[i] = null; // Initialize all non-successful ids.
+    Arrays.fill(ret, null); // Initialize all non-successful ids.
+    
     int numMissing = 0;
+    boolean errors = false;
     for (int i=0; i<splitt.length; i++) {
-      if (splitt[i]==null || splitt[i].trim().length()==0) {splitt[i]=null; continue;}
+      // Trim and check trivial cases
+      if (splitt[i]==null) continue;
+      splitt[i] = splitt[i].trim();
+      if  (splitt[i].length()<=0) {splitt[i]=null; continue;}
       
       // Extract Entry id of current dataset
       String aktEntryID = KeggAdaptor.extractInfo(splitt[i], "ENTRY", "  ");
@@ -288,15 +294,17 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
         if (aktEntryID==null || aktEntryID.length()==0) {
           Matcher m = Pattern.compile("\\s?ENTRY\\s+(\\w+)").matcher(splitt[i]);
           if (m.find()) {
-            aktEntryID = (m.group(2));
+            aktEntryID = (m.group(1));
           }
         }
       }
-      if (aktEntryID==null || aktEntryID.length()==0) {
+      if (aktEntryID==null || aktEntryID.length()<=0) {
         // Should NEVER happen, because KEGG does always send ENTRY-entries.
         System.err.println(String.format("No Entry id found in:\n%s\n[...]\n------------",
           splitt[i].substring(0, Math.min(150, splitt[i].length()))));
         continue;
+      } else {
+        aktEntryID = aktEntryID.trim();
       }
       
       
@@ -321,7 +329,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
         }
         aktQueryID = (ids[idIndex].contains(":")? ids[idIndex].substring(ids[idIndex].indexOf(':')+1):ids[idIndex]).trim().toUpperCase();
         if (aktQueryID.equalsIgnoreCase(aktEntryID) 
-            || ("EC " + aktQueryID).equalsIgnoreCase(aktEntryID) // Enzyme werden ohne "EC " gequeried, kommen aber MIT zur�ck... 
+            || ("EC " + aktQueryID).equalsIgnoreCase(aktEntryID) // Enzyme werden ohne "EC " gequeried, kommen aber MIT zurueck... 
             || (takeNotSoSureHits && Utils.isWord(splitt[i].toUpperCase(), aktQueryID))) { // Siehe obiges Beispiel.
           ret[idIndex] = splitt[i]; // Aufpassen. Hier nur i, da index von splitt und id2 hier gleich!
           found = true;
@@ -331,9 +339,24 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       }
       
       if (!found) {
-        System.err.println("No id found for result:\n" + splitt[i].substring(0, Math.min(150, splitt[i].length())) + "...\n-----------------\nThis should not happen!");
+        System.err.println("No id found for result '"+aktEntryID+"':\n" + splitt[i].substring(0, Math.min(150, splitt[i].length())) + "...\n-----------------\nThis should not happen!");
+        errors = true;
       }
       
+    }
+    
+    // Output missing ids (helps debugging...)
+    if (errors) {
+      StringBuilder sb = new StringBuilder();
+      for (int i=0; i<ret.length; i++) {
+        if (ret[i] ==null){
+          if (sb.length()>0) sb.append(", ");
+          sb.append('"');
+          sb.append(ids[i]==null?null:ids[i]);
+          sb.append('"');
+        }
+      }
+      System.err.println("The following ids could not get fetched from KEGG: " + sb.toString());
     }
     
     return ret; // Successfull and "with data" ;-) 
