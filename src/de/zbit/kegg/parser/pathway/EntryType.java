@@ -41,6 +41,11 @@ public enum EntryType {
 	 */
 	enzyme,
 	/**
+	 * Since KGML 7.1
+	 * Some kind of a reaction node... KGML says: "the node is a reaction".
+	 */
+	reaction,
+	/**
 	 * the node is a gene product (mostly a protein)
 	 * Should be trated as 'protein'.
 	 */

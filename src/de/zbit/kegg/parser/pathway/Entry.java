@@ -395,6 +395,8 @@ public class Entry {
       return EntryType.group;
     } else if (kgId.startsWith("path:")) { // Link to another pathway
       return EntryType.map;
+    } else if (kgId.startsWith("rp:") || kgId.startsWith("rc:") || kgId.startsWith("rn:")) {
+      return EntryType.reaction;
     } else if (kgId.startsWith("ko:") || kgId.startsWith("br:")) {
       // Actually it's KEGG Brite, but somehow also an ortholog...
       return EntryType.ortholog;

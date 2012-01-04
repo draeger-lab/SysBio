@@ -19,8 +19,10 @@ package de.zbit.gui;
 import java.awt.Frame;
 import java.io.File;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 import de.zbit.io.SBFileFilter;
+import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
@@ -91,6 +93,7 @@ public interface GUIOptions extends KeyProvider {
 		OPEN_DIR, SAVE_DIR);
 	
 	// TODO: This will lead to the strange effect that ALL windows will have the identical size! 
+	// The same holds truth for OPEN_DIR, SAVE_DIR, DEFAULT_DIRECTORIES, etc.
 
 	/**
 	 * Defines the width of the window.
@@ -112,4 +115,15 @@ public interface GUIOptions extends KeyProvider {
    public static final Option<Integer> WINDOW_STATE = new Option<Integer>("WINDOW_STATE",
        Integer.class,"State of the window (maximized, minimized, etc).",Frame.NORMAL, false);
 	
+   /**
+    * This allows to change the Log-{@link Level}.
+    * It it intented to not allow levels ALL or OFF
+    * (giving bounds of -/+ Intenger maxvalues is not
+    * resonable for the range).
+    */
+   public static final Option<String> LOG_LEVEL = new Option<String>(
+       "LOG_LEVEL", String.class, "Change the log-level of this application.",
+       new Range<String>(String.class, Reflect.getStaticFinalVariablesAsEnumeration(Level.class)),
+       Level.INFO.getName());
+   
 }
