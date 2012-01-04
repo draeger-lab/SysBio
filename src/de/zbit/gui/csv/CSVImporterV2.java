@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.swing.ComboBoxModel;
@@ -424,7 +425,9 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
    * @return
    */
   private Object[][] prependColumnSelectors(String[][] data) {
-    if (data.length<1) return new Object[][]{{"Invalid settings."}};
+    if (data.length < 1) {
+    	return new Object[][]{{"Invalid settings."}};
+    }
     
     // Create Column Selectors
     JComponent[][] colSel=buildColumnSelectors(data[0].length);
@@ -497,6 +500,9 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
       // Add an action listener to the columnSelector that controls the type selector
       // and stores the selected item.
       box.addActionListener(new ActionListener() {
+      	/* (non-Javadoc)
+      	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+      	 */
         public void actionPerformed(ActionEvent e) {
           exColSelections[i_copy] = ((JComboBox)e.getSource()).getSelectedIndex();
           if (typeBox==null) return;
@@ -621,7 +627,8 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
    * @throws IOException
    */
   public static boolean showDialog(Component parent, final CSVImporterV2 c) throws IOException {
-    return showDialog(parent, String.format("Data import for '%s'", FileTools.getFilename(c.getCSVReader().getFilename())), c);
+  	ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+    return showDialog(parent, String.format(bundle.getString("CSV_IMPORT_TITLE"), FileTools.getFilename(c.getCSVReader().getFilename())), c);
   }
   
   /**
@@ -636,10 +643,10 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
 
     // Initialize the dialog
     final JDialog jd;
-    if (parent!=null && parent instanceof Frame) {
-      jd = new JDialog((Frame)parent, title, true);
-    } else if (parent!=null && parent instanceof Dialog) {
-      jd = new JDialog((Dialog)parent, title, true);
+    if ((parent != null) && (parent instanceof Frame)) {
+      jd = new JDialog((Frame) parent, title, true);
+    } else if ((parent != null) && (parent instanceof Dialog)) {
+      jd = new JDialog((Dialog) parent, title, true);
     } else {
       jd = new JDialog();
       jd.setTitle(title);
@@ -651,7 +658,10 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     jd.add(c);
     // Close dialog with ESC button.
     jd.getRootPane().registerKeyboardAction(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
+      /* (non-Javadoc)
+       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+       */
+    	public void actionPerformed(ActionEvent e) {
         c.removeSelectionsFromObjects();
         c.buttonPressed = JOptionPane.CANCEL_OPTION;
         jd.dispose();
@@ -659,6 +669,9 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     // Close dialog with ENTER button.
     jd.getRootPane().registerKeyboardAction(new ActionListener() {
+    	/* (non-Javadoc)
+    	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+    	 */
       public void actionPerformed(ActionEvent e) {
         if (c.isSelectionValid()) {
           c.buttonPressed = JOptionPane.OK_OPTION;
@@ -669,8 +682,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     
     // Set close operations
     jd.addWindowListener(new WindowAdapter() {
-      /*
-       * (non-Javadoc)
+      /* (non-Javadoc)
        * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
        */
       @Override
@@ -679,25 +691,21 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
       }
     });
     c.addComponentListener(new ComponentListener() {
-      /*
-       * (non-Javadoc)
+      /* (non-Javadoc)
        * @see java.awt.event.ComponentListener#componentHidden(java.awt.event.ComponentEvent)
        */
       public void componentHidden(ComponentEvent e) {
         jd.setVisible(false);
       }
-      /*
-       * (non-Javadoc)
+      /* (non-Javadoc)
        * @see java.awt.event.ComponentListener#componentMoved(java.awt.event.ComponentEvent)
        */
       public void componentMoved(ComponentEvent e) {}
-      /*
-       * (non-Javadoc)
+      /* (non-Javadoc)
        * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
        */
       public void componentResized(ComponentEvent e) {}
-      /*
-       * (non-Javadoc)
+      /* (non-Javadoc)
        * @see java.awt.event.ComponentListener#componentShown(java.awt.event.ComponentEvent)
        */
       public void componentShown(ComponentEvent e) {}
@@ -715,7 +723,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     // Dispose and return if dialog has been confirmed.
     jd.dispose();
     
-    return (c.getButtonPressed()==JOptionPane.OK_OPTION);
+    return (c.getButtonPressed() == JOptionPane.OK_OPTION);
   }
   
   /**
@@ -792,11 +800,14 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
       
       // get CSV file headers for initial suggestions
       String[] headers = getCSVReader().getHeader();
-      if (headers==null) headers = new String[0];
-      else {
+      if (headers == null) {
+      	headers = new String[0];
+      } else {
         // Trim to maximum 40 chars
         for (int i=0; i<headers.length; i++) {
-          if (headers[i].length()>40)headers[i] = headers[i].substring(0, 40);
+          if (headers[i].length() > 40) {
+          	headers[i] = headers[i].substring(0, 40);
+          }
         }
       }
       
@@ -804,7 +815,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
       List<String> fields = new ArrayList<String>();
       List<ExpectedColumn> field_ecs = new ArrayList<ExpectedColumn>();
       List<String[]> suggestions = new ArrayList<String[]>();
-      int i=0;
+      int i = 0;
       for (ExpectedColumn ec: exCols) {
         if (ec.renameAllowed) {
           //fields.add((++i)+".");
@@ -813,8 +824,8 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
           
           // Propose name of selected column for already assigned columns
           String currentName = ec.name.toString();
-          if (ec.isOriginalName() && ec.getAssignedColumn()>=0 && r.getContainsHeaders()
-              && ec.getAssignedColumn()<r.getHeader().length) {
+          if (ec.isOriginalName() && (ec.getAssignedColumn() >= 0) && r.getContainsHeaders()
+              && (ec.getAssignedColumn() < r.getHeader().length)) {
             currentName = r.getHeader()[ec.getAssignedColumn()];
           }
           // Suggest: currentName/colHeader, originalName, <all other col headers>
@@ -831,8 +842,8 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
       // Show dialog and let the user enter new labels
       String[] newLabels = JLabeledComponent.showDialog(this, getRenameButtonCaption(),
         fields.toArray(new String[0]), suggestions.toArray(new String[0][]), false);
-      if (newLabels!=null) {
-        for(i=0; i<newLabels.length; i++) {
+      if (newLabels != null) {
+        for(i = 0; i < newLabels.length; i++) {
           field_ecs.get(i).name = newLabels[i];
         }
         refreshPreviewPanel();
