@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -67,6 +68,8 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -91,6 +94,8 @@ import javax.swing.filechooser.FileFilter;
 
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
+
+import com.hp.hpl.jena.sparql.pfunction.library.listIndex;
 
 import de.zbit.Launcher;
 import de.zbit.io.OpenFile;
@@ -460,6 +465,27 @@ public class GUITools {
 	}
   
 	/**
+   * 
+   * @param command
+   * @param selected
+   * @param enabled
+   * @param listeners
+   * @return
+   */
+	public static JCheckBoxMenuItem createJCheckBoxMenuItem(
+		ActionCommand command, boolean selected, boolean enabled,
+		ItemListener... listeners) {
+		JCheckBoxMenuItem item = new JCheckBoxMenuItem(command.getName(), selected);
+		item.setEnabled(enabled);
+		item.setToolTipText(command.getToolTip());
+		item.setActionCommand(command.toString());
+		for (ItemListener listener : listeners) {
+			item.addItemListener(listener);
+		}
+		return item;
+	}
+	
+	/**
 	 * Creates a {@link JComboBox} with the given properties.
 	 * 
 	 * @param items
@@ -522,8 +548,8 @@ public class GUITools {
 		return createJComboBox(items, renderer, enabled, name, tooltip, 0,
 			listeners);
 	}
-	
-	/**
+  
+  /**
    * Creates a new {@link JDropDownButton} using the entries from the given
    * {@link ResourceBundle}. It is assumed that the bundle contains at least the
    * key specified by the given <code>name</code>. It then tries to obtain an
@@ -673,7 +699,7 @@ public class GUITools {
     }
     return menu;
   }
-  
+
   /**
    * Creates an entry for the menu bar.
    * 
@@ -685,7 +711,7 @@ public class GUITools {
     ActionCommand command) {
     return createJMenuItem(listener, command, (Icon) null);
   }
-
+  
   /**
    * @param listener
    * @param command
@@ -712,6 +738,7 @@ public class GUITools {
       .valueOf(mnemonic));
   }
   
+  
   /**
    * Creates a new item for a {@link JMenu}.
    * 
@@ -731,7 +758,6 @@ public class GUITools {
     ActionCommand command, Icon icon, KeyStroke keyStroke) {
     return createJMenuItem(listener, command, icon, keyStroke, null);
   }
-  
   
   /**
    * Creates an entry for the menu bar.
@@ -821,6 +847,7 @@ public class GUITools {
 		return item;
 	}
   
+  
   /**
    * @param listener
    * @param command
@@ -831,7 +858,6 @@ public class GUITools {
     ActionCommand command, KeyStroke keyStroke) {
     return createJMenuItem(listener, command, null, keyStroke);
   }
-  
   
   /**
 	 * Creates a {@link JSpinner} with the given properties.
@@ -971,8 +997,8 @@ public class GUITools {
       return false;
     }
   }
-  
-  /**
+	
+	/**
    * Checks if this "c" contains a #{@link javax.swing.AbstractButton} which
    * is called "OK" and enables this button if and only if it a) exists and is
    * disabled and b) all other elements on this container and all
@@ -1000,8 +1026,8 @@ public class GUITools {
     }
     return false;
   }
-	
-	/**
+  
+  /**
 	 * 
 	 * @param menu
 	 * @param action
@@ -1025,6 +1051,7 @@ public class GUITools {
 		return null;
 	}
   
+  
   /**
    * Tries to get the lokalized cancel Button Message, as it occurs
    * in the UIManager (e.g. JOptionPane).
@@ -1046,7 +1073,6 @@ public class GUITools {
     
     return "Cancel";
   }
-  
   
   /**
    * Computes and returns the dimension, i.e., the size of a given icon.
@@ -1203,8 +1229,9 @@ public class GUITools {
   public static Font incrementFontSize(Font g, int incrementBy) {
     return g.deriveFont((float) (g.getSize() + incrementBy));
   }
-  
-  /**
+
+
+	/**
    * Initializes the look and feel.
    */
   public static void initLaF() {
@@ -1246,9 +1273,8 @@ public class GUITools {
 			}
 		}
   }
-
-
-	/**
+  
+  /**
 	 * Initializes the look and feel. This method is only useful when the calling
 	 * class contains the main method of your program and is also derived from this
 	 * class ({@link GUITools}). The preferred way to set up your application would
@@ -1670,7 +1696,8 @@ public class GUITools {
       children[i].setEnabled(enabled);
     }
   }
-  
+
+
   /**
    * Tries to recursively find instances of {@link AbstractButton} within the
    * given container and sets their enabled status to the given value.
@@ -1698,8 +1725,7 @@ public class GUITools {
       }
     }
   }
-
-
+  
   /**
    * Enables or disables actions that can be performed by SBMLsqueezer, i.e.,
    * all menu items and buttons that are associated with the given actions are
@@ -1768,6 +1794,7 @@ public class GUITools {
     setEnabled(state, menuBar, new Object[] {command});
   }
   
+  
   /**
    * @param state
    * @param menuBar
@@ -1777,7 +1804,6 @@ public class GUITools {
     Object... commands) {
     setEnabled(state, menuBar, null, commands);
   }
-  
   
   /**
    * @param state
@@ -1816,6 +1842,7 @@ public class GUITools {
     }
     
   }
+  
   
   /**
    * Show a {@link JPanel} as {@link Dialog}.
@@ -1927,7 +1954,6 @@ public class GUITools {
     return retVal;
   }
   
-  
   /**
    * 
    * @param parent
@@ -1936,6 +1962,7 @@ public class GUITools {
   public static void showErrorMessage(Component parent, String message) {
     showErrorMessage(parent, null, message);
   }
+  
   
   /**
    * Displays the error message on a {@link JOptionPane}.
@@ -1963,7 +1990,6 @@ public class GUITools {
         JOptionPane.showMessageDialog(parent, message, clazz!=null?clazz.getSimpleName():"",
             JOptionPane.ERROR_MESSAGE);
   }
-  
   
   /**
    * Shows an error dialog with the given message in case the exception does not
@@ -1997,6 +2023,7 @@ public class GUITools {
       TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
   }
   
+
   /**
    * Displays a message on a message dialog window, i.e., an HTML document.
    * 
@@ -2011,7 +2038,8 @@ public class GUITools {
     showMessage(path, title, owner, null);
   }
   
-
+  
+  
   /**
    * @param path
    * @param title
@@ -2058,8 +2086,6 @@ public class GUITools {
     }
   }
   
-  
-  
   /**
    * Show the component in an information message context, but does
    * not wait until the user clicks ok, but simply invokes this
@@ -2071,7 +2097,7 @@ public class GUITools {
    * @param component - the component to show
    * @param caption - the caption of the dialog
    */
-  public static void showMessageDialogInNewThread(final Component component, final String caption) {
+  public static SwingWorker<Void, Void> showMessageDialogInNewThread(final Component component, final String caption) {
     SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
       /* (non-Javadoc)
        * @see javax.swing.SwingWorker#doInBackground()
@@ -2092,8 +2118,11 @@ public class GUITools {
         logger.finest(exc.getLocalizedMessage());
       }
     }
+    
+    return worker;
   }
-  
+
+
   /**
    * 
    * @param parent
@@ -2177,8 +2206,7 @@ public class GUITools {
       }
     }
   }
-
-
+  
   /**
    * Shows the output of a process inside a textarea.
    * Autoscrolls as the process genereates output and
@@ -2200,7 +2228,9 @@ public class GUITools {
     final boolean closeWindowAutomaticallyWhenDone) {
     final JTextArea area = new JTextArea();
     SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-      @Override
+      /* (non-Javadoc)
+       * @see javax.swing.SwingWorker#doInBackground()
+       */
       protected Void doInBackground() throws Exception {
         
         // Show a JTextArea in an information message in background
@@ -2226,7 +2256,9 @@ public class GUITools {
         // As soon as the process is done, enable the ok button again
         Window w = getParentWindow(area);
         if (closeWindowAutomaticallyWhenDone) {
-          if (w!=null) w.dispose();
+          if (w != null) {
+          	w.dispose();
+          }
         } else {
           enableOkButtonIfAllComponentsReady(w);
         }
@@ -2237,7 +2269,7 @@ public class GUITools {
     worker.execute();
     
     // Wait until the dialog is painted, before continuing
-    while (worker.getState()==SwingWorker.StateValue.PENDING) {
+    while (worker.getState() == SwingWorker.StateValue.PENDING) {
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {}
@@ -2258,8 +2290,8 @@ public class GUITools {
     return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
       title, optionType, JOptionPane.QUESTION_MESSAGE);
   }
-  
-  /**
+
+	/**
    * Show a Question Dialog
    * @param parent may be null
    * @param message question to display
@@ -2322,8 +2354,31 @@ public class GUITools {
     }
     return null;
   }
+  
+
 
 	/**
+	 * Shows a dialog that displays the given {@link listIndex} of {@link Object}s
+	 * together with a label and a title.
+	 * 
+	 * @param parent
+	 * @param label
+	 *        A description what the purpose of the given {@link List} of
+	 *        {@link File}s is.
+	 * @param title
+	 * @param things
+	 */
+	public static void showListMessage(Component parent, String label,
+		String title, List<?> things) {
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(new JLabel(StringUtil.toHTML(label, TOOLTIP_LINE_LENGTH)),
+			BorderLayout.NORTH);
+		panel.add(new JScrollPane(new JList(things.toArray())));
+		JOptionPane.showMessageDialog(parent, panel, title,
+			JOptionPane.WARNING_MESSAGE);
+	}
+
+  /**
 	 * Swaps the {@link KeyStroke} associated with the {@link JMenuItem}s that
 	 * have the given actions, but only if both items can be found and are hence
 	 * not null.
@@ -2344,10 +2399,8 @@ public class GUITools {
 			item2.setAccelerator(ks1);
 		}
 	}
-  
 
-
-	/**
+  /**
 	 * Creates a JEditorPane that displays the given UnitDefinition as a HTML.
 	 * 
 	 * @param ud
@@ -2360,4 +2413,5 @@ public class GUITools {
 		preview.setBorder(BorderFactory.createLoweredBevelBorder());
 		return preview;
 	}
+
 }

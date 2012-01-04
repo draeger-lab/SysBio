@@ -18,6 +18,10 @@
   
   <entry key="COULD_NOT_IDENTIFY_COLUMNS">%d Datenspalten der gegebenen Eingabedatei konnten nicht automatisch den erwarteten Spalten zugewiesen werden. Bitte führen Sie diese Zuweisung nun manuell durch.</entry>
   <entry key="COLUMN_ASSIGNMENT">Spaltenzuweisung</entry>
+    
+  <!-- CSVImporterV2 -->
+  
+  <entry key="CSV_IMPORT_TITLE">Datenimport für '%s'</entry>
   
   <!-- CSVOptions -->
   

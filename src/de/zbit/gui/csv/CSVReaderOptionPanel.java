@@ -144,9 +144,11 @@ public class CSVReaderOptionPanel extends JPanel {
     try {
       org = (CSVReader) r.clone();
     } catch (CloneNotSupportedException e) {e.printStackTrace();}
-    original=org;
+    original = org;
     
-    if (initGUI) initGUI();
+    if (initGUI) {
+    	initGUI();
+    }
   }
   public CSVReaderOptionPanel(String inFile) throws IOException {
     this(new CSVReader(inFile));
@@ -347,7 +349,10 @@ public class CSVReaderOptionPanel extends JPanel {
     JPanel se = new JPanel(fr);
     String text = GUITools.getOkButtonText();
     JButton ok = new JButton(text);
-    if (this.defaultFont!=null) ok.setFont(defaultFont);
+    if (this.defaultFont != null) {
+    	ok.setFont(defaultFont);
+    }
+    ok.setSelected(true);
     se.add(ok);
     southPanel.add(se, BorderLayout.EAST);
 

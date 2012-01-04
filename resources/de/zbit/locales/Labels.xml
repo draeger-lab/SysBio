@@ -19,6 +19,10 @@
   <entry key="COULD_NOT_IDENTIFY_COLUMNS">%d data columns from the given input file could not be automatically assigned to expected columns. Please manually assign these columns here.</entry>
   <entry key="COLUMN_ASSIGNMENT">Column assignment</entry>
   
+  <!-- CSVImporterV2 -->
+  
+  <entry key="CSV_IMPORT_TITLE">Data import for '%s'</entry>
+  
   <!-- CSVOptions -->
   
   <entry key="CSVOptions">CSV options</entry>
