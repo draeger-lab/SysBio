@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.gui.GUITools;
@@ -436,11 +437,11 @@ public interface KeyProvider {
 			while (n < fields.length) {
 				try {
 					fieldValue = fields[n].get(keyProvider);
-					if (fieldValue.getClass().isAssignableFrom(clazz)) { 
+					if (fieldValue!=null && fieldValue.getClass().isAssignableFrom(clazz)) { 
 						return new Entry<T>(n, (T) fieldValue); 
 					}
-				} catch (Exception exc) {
-					logger.fine(exc.getLocalizedMessage());
+				} catch (Exception e) {
+				  logger.log(Level.FINE, e.getLocalizedMessage(), e);
 				}
 				n++;
 			}
@@ -463,6 +464,7 @@ public interface KeyProvider {
 					if (fieldValue.getClass().isAssignableFrom(clazz)) { return (T) fieldValue; }
 				}
 			} catch (Exception e) {
+			  logger.log(Level.FINE, e.getLocalizedMessage(), e);
 			}
 			return null;
 		}
@@ -493,13 +495,13 @@ public interface KeyProvider {
 		    Object fieldValue;
 		    try {
 		      fieldValue = f.get(keyProvider);
-		      if (fieldValue.getClass().isAssignableFrom(Option.class)) {
+		      if (fieldValue!=null && fieldValue.getClass().isAssignableFrom(Option.class)) {
 		        if (((Option<?>) fieldValue).getOptionName().equals(optionName)) {
 		          return (Option<?>) fieldValue;
 		        }
 		      }
 		    } catch (Exception e) {
-		    	logger.fine(e.getLocalizedMessage());
+		    	logger.log(Level.FINE, e.getLocalizedMessage(), e);
 		    }
 		  }
 		  return null;
