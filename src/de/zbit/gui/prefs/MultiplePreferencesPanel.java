@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.PreferenceChangeListener;
@@ -80,7 +81,6 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	/**
 	 * @return the classes
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
   public static Class<PreferencesPanel>[] getClasses() {
 	  /* Moved the classes initialization to this method. Else, it causes projects using
 	   * SysBio to have a ~5sec delay, even when they do not use this Class!!
@@ -105,37 +105,12 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
        * </pre>
 	     */
 	    
-	    String pckName = MultiplePreferencesPanel.class.getPackage().getName();
-	    String panelClass = pckName + ".PreferencePanels";
+	    // Try to get some predefined classes
+	    classes = getPredefinedPanels();
 	    
-	    // If the panels have been predefined, load them instead of using reflections.
-	    Object o = null;
-      try {
-        // Try to get a defined 'panelClass'-class instance.
-        Class<?> cl = Class.forName(panelClass);
-        Constructor con = cl.getConstructor();
-        o = con.newInstance();
-      } catch (Exception e1) {
-        // Mainly ClassNotFoundException
-        logger.finer(String.format(
-          "%s not found. Using reflections to get preferences panels.",
-          panelClass));
-      }
-      // If a predefined 'panelClass'-instance exits, load the classes array from it.
-	    if (o != null) {
-	      try {
-          classes = (Class<PreferencesPanel>[]) Reflect.invokeIfContains(o,
-            "getPreferencesClasses");
-          if (classes != null) {
-            logger.finer(String.format("Found preferences panels in %s",
-              panelClass));
-          }
-	      } catch (Exception e) {
-	        e.printStackTrace();
-	      }
-	    }
-	    
+	    // Fallback on reflection
 	    if (classes == null) {
+	      String pckName = MultiplePreferencesPanel.class.getPackage().getName();
         /*
          * Remark: user.dir might cause problems when using web start programs;
          * it might become something like C:\Programs\Mozilla Firefox.
@@ -151,6 +126,49 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	  
 		return classes;
 	}
+
+  /**
+   * Loads a class in the same package as this class, called "PreferencePanels".
+   * Looks if it exists and contains some predefined {@link PreferencesPanel}s
+   * in a method called <pre>public static Class<?>[] getPreferencesClasses() {}</pre>
+   * returns them if this is the case, else, null.
+   * 
+   * @return
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected static Class<PreferencesPanel>[] getPredefinedPanels() {
+    String pckName = MultiplePreferencesPanel.class.getPackage().getName();
+    String panelClass = pckName + ".PreferencePanels";
+    Class<PreferencesPanel>[] classes = null;
+    
+    // If the panels have been predefined, load them instead of using reflections.
+    Object o = null;
+    try {
+      // Try to get a defined 'panelClass'-class instance.
+      Class<?> cl = Class.forName(panelClass);
+      Constructor con = cl.getConstructor();
+      o = con.newInstance();
+    } catch (Exception e1) {
+      // Mainly ClassNotFoundException
+      logger.log(Level.FINER, String.format("%s not found.", panelClass), e1);
+    }
+    
+    // If a predefined 'panelClass'-instance exits, load the classes array from it.
+    if (o != null) {
+      try {
+        classes = (Class<PreferencesPanel>[]) Reflect.invokeIfContains(o,
+          "getPreferencesClasses");
+        if (classes != null) {
+          logger.finer(String.format("Found preferences panels in %s", panelClass));
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    } else {
+    }
+    
+    return classes;
+  }
 
 	/**
 	 * Counts how many tabs can be created inside of this
@@ -302,7 +320,13 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	public void init() {
 		tab = new JTabbedPane();
 		PreferencesPanel settingsPanel;
-		if (options != null) {
+		
+		/* Initializes all preferences-tabs according to the following priority:
+     * 1. explicitly predefined in a class called de.zbit.gui.prefs.PreferencePanels
+     * 2. given as "options"
+     * 3. with reflection
+		 */
+		if (options != null && getPredefinedPanels()==null) {
 			for (Class<? extends KeyProvider> provider : options) {
 				try {
 					settingsPanel = new PreferencesPanelForKeyProvider(provider);
