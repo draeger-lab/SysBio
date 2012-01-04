@@ -1914,10 +1914,9 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		return sb.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * Returns the {@link #optionName}.
 	 */
-	@Override
 	public String toString() {
 		return optionName;
 	}

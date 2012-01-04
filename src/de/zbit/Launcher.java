@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -363,7 +364,7 @@ public abstract class Launcher implements Runnable, Serializable {
     			// Delete temporary file again...
 					NativeLibraryLoader.deleteTempLibFile(System.getProperty("user.dir"));
 				} catch (IOException exc) {
-					logger.warning(exc.getLocalizedMessage());
+					logger.log(Level.WARNING,exc.getLocalizedMessage(), exc);
 				}
     	}
       StringBuilder exception = new StringBuilder();
@@ -452,6 +453,16 @@ public abstract class Launcher implements Runnable, Serializable {
    * @return
    */
   public abstract List<Class<? extends KeyProvider>> getInteractiveOptions();
+  
+  /**
+   * This is a list of options, given on the command-line (i.e. should also
+   * be contained in {@link #getCmdLineOptions()}), that are made persistent.
+   * @return
+   */
+  public List<Class<? extends KeyProvider>> getPersistentOptions() {
+    // Per definition, interactive options should be made persistent!
+    return getInteractiveOptions();
+  }
 
   /**
    * This method returns the default log level that is the minimal {@link Level}
@@ -613,10 +624,34 @@ public abstract class Launcher implements Runnable, Serializable {
    * @param args
    * @return
    */
+  @SuppressWarnings("rawtypes")
   public SBProperties parseCmdArgs(String[] args) {
     logger.fine(resources.getString("SCANNING_CMD_ARGS"));
     // This does not make command-line arguments persistent.
     props = SBPreferences.analyzeCmdArgs(getCmdLineOptions(), args);
+    
+    // Do not make all, but some defined subset of them persistent
+    List<Class<? extends KeyProvider>> persist = getPersistentOptions();
+    if (persist!=null) {
+      for (Class<? extends KeyProvider> kp : persist) {
+        SBPreferences toflush = new SBPreferences(kp);
+        Iterator<Option> it = KeyProvider.Tools.optionIterator(kp);
+        while (it!=null && it.hasNext()) {
+          Option<?> o = it.next();
+          if (props.containsKey(o.toString())) {
+            toflush.put(o, o.getValue(props));
+          }
+        }
+        if (toflush.size()>0) {
+          try {
+            toflush.flush();
+          } catch (Exception e) {
+            logger.log(Level.WARNING, e.getLocalizedMessage(), e);
+          }
+        }
+      }
+    }
+    
     return props;
   }
 	

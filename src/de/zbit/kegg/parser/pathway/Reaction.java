@@ -320,7 +320,8 @@ public class Reaction {
    */
   @Override
   public String toString() {
-    return (String.format("[Raction name:'%s' type:'%s' formula:'%s']", name, type, getEquation()));
+    return (String.format("[Reaction name:'%s' type:'%s' formula:'%s']", name, type, getEquation()));
+    //return String.format("[Reaction name:'%s' type:'%s' formula:'%s' substrates:'%s' products:'%s']", name, type, getEquation(), getSubstrates(), getProducts() );
   }
 
   /**
