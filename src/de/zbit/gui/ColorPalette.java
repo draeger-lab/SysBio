@@ -31,6 +31,12 @@ public class ColorPalette {
 	/**
 	 * 
 	 */
+	public static final Color ANTHRACITE = new Color(50, 56, 59); 
+		// new Color(CMYK, new float[] {30, 0, 0, 85}, 0f);
+	
+	/**
+	 * 
+	 */
 	public static final Color CAMINE_RED = new Color(139, 36, 64); 
 		// new Color(CMYK, new float[] {35, 100, 70, 10}, 0f);
 	
@@ -53,40 +59,10 @@ public class ColorPalette {
 		//new Color(CMYK, new float[] {12, 16, 24, 1}, 0f);
 	
 	/**
-	 * Dark blue
+	 * Brown-yellow 
 	 */
-	public static final Color SECOND_653 = new Color(64, 78, 118); 
-		//new Color(CMYK, new float[] {70, 50, 0, 35}, 0f);
-	
-	/**
-	 * Blue
-	 */
-	public static final Color SECOND_3015 = new Color(0, 93, 151); 
-		// new Color(CMYK, new float[] {100, 50, 10, 0}, 0f);
-	
-	/**
-	 * Light blue
-	 */
-	public static final Color SECOND_292 = new Color(63, 145, 182); 
-		// new Color(CMYK, new float[] {60, 0, 0, 20}, 0f);
-	
-	/**
-	 * Blue-green
-	 */
-	public static final Color SECOND_557 = new Color(95, 169, 146); 
-		//new Color(CMYK, new float[] {50, 0, 40, 10}, 0f);
-	
-	/**
-	 * Green
-	 */
-	public static final Color SECOND_7490 = new Color(93, 150, 81); 
-		// new Color(CMYK, new float[] {50, 0, 80, 20}, 0f);
-	
-	/**
-	 * Dark green
-	 */
-	public static final Color SECOND_364 = new Color(40, 96, 38); 
-		// new Color(CMYK, new float[] {70, 00, 100, 50}, 0f);
+	public static final Color SECOND_131 = new Color(191, 138, 28); 
+		// new Color(CMYK, new float[] {10, 40, 100, 10}, 0f);
 	
 	/**
 	 * Warm red
@@ -95,22 +71,46 @@ public class ColorPalette {
 		//new Color(CMYK, new float[] {20, 80, 80, 0}, 0f);
 	
 	/**
+	 * Light blue
+	 */
+	public static final Color SECOND_292 = new Color(63, 145, 182); 
+		// new Color(CMYK, new float[] {60, 0, 0, 20}, 0f);
+	
+	/**
+	 * Blue
+	 */
+	public static final Color SECOND_3015 = new Color(0, 93, 151); 
+		// new Color(CMYK, new float[] {100, 50, 10, 0}, 0f);
+	
+	/**
+	 * Dark green
+	 */
+	public static final Color SECOND_364 = new Color(40, 96, 38); 
+		// new Color(CMYK, new float[] {70, 00, 100, 50}, 0f);
+	
+	/**
+	 * Blue-green
+	 */
+	public static final Color SECOND_557 = new Color(95, 169, 146); 
+		//new Color(CMYK, new float[] {50, 0, 40, 10}, 0f);
+	
+	/**
+	 * Dark blue
+	 */
+	public static final Color SECOND_653 = new Color(64, 78, 118); 
+		//new Color(CMYK, new float[] {70, 50, 0, 35}, 0f);
+	
+	/**
 	 * Purple
 	 */
 	public static final Color SECOND_6880 = new Color(153, 97, 136); 
 		// new Color(CMYK, new float[] {20, 60, 0, 20}, 0f);
 	
 	/**
-	 * Gray-purple
+	 * Green
 	 */
-	public static final Color SECOND_7530 = new Color(154, 134, 129);
-		// new Color(CMYK, new float[] {20, 30, 30, 20}, 0f);
-	
-	/**
-	 * Sand
-	 */
-	public static final Color SECOND_7508 = new Color(186, 159, 104); 
-		// new Color(CMYK, new float[] {20, 30, 65, 0}, 0f);
+	public static final Color SECOND_7490 = new Color(93, 150, 81); 
+		// new Color(CMYK, new float[] {50, 0, 80, 20}, 0f);
 	
 	/**
 	 * Brown
@@ -119,16 +119,16 @@ public class ColorPalette {
 		// new Color(CMYK, new float[] {30, 50, 70, 30}, 0f);
 	
 	/**
-	 * Brown-yellow 
+	 * Sand
 	 */
-	public static final Color SECOND_131 = new Color(191, 138, 28); 
-		// new Color(CMYK, new float[] {10, 40, 100, 10}, 0f);
+	public static final Color SECOND_7508 = new Color(186, 159, 104); 
+		// new Color(CMYK, new float[] {20, 30, 65, 0}, 0f);
 	
 	/**
-	 * 
+	 * Gray-purple
 	 */
-	public static final Color ANTHRACITE = new Color(50, 56, 59); 
-		// new Color(CMYK, new float[] {30, 0, 0, 85}, 0f);
+	public static final Color SECOND_7530 = new Color(154, 134, 129);
+		// new Color(CMYK, new float[] {20, 30, 30, 20}, 0f);
 	
 	/**
 	 * Has 27 colors and returns one color for any index (using modulo).
@@ -195,5 +195,19 @@ public class ColorPalette {
     }
     return Color.BLACK;
   }
+
+  /**
+   * Creates a palette with the given number of colors.
+   * 
+   * @param count
+   * @return
+   */
+	public static Color[] palette(int count) {
+		Color palette[] = new Color[count];
+		for (int i = 0; i < count; i++) {
+			palette[i] = indexToColor(i);
+		}
+		return palette;
+	}
 	
 }
