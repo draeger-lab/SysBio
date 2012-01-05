@@ -24,7 +24,7 @@ import de.zbit.kegg.parser.KeggParser;
 
 /**
  * Corresponding to the Kegg ReactionComponent class (see {@link http://www.genome.jp/kegg/xml/docs/})
- * Includes the Kegg "alt" class.
+ * Includes the Kegg "alt", "substrate" and "product" classes.
  * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
@@ -169,10 +169,10 @@ public class ReactionComponent implements Cloneable {
     ReactionComponent other = new ReactionComponent(name);
     if (id==null) other.setId(null);
     else other.setId(new Integer(id.intValue()));
-    if (alt!=this) {
+    if (alt!=null && alt!=this) {
       other.setAlt(alt.clone());
     }
-    return alt;
+    return other;
   }
   
   /* (non-Javadoc)
