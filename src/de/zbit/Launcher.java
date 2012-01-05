@@ -345,31 +345,32 @@ public abstract class Launcher implements Runnable, Serializable {
 	  exit(window, true);
 	}
   
-  /**
-   * Saves all interactive actions and closes this application (if
-   * {@link #terminateJVMwhenDone} is set to <code>true</code>), this means that
-   * a call of this method will terminate the running Java Virtual Machine
-   * (JVM).
-   * 
-   * @param window
-   *        the parent window that has just been closed.
-   * @param terminateJVMwhenDone
-   *        whether or not to terminate the JVM (and making all interactive
-   *        options persistent).
-   */
-  public void exit(java.awt.Window window, boolean terminateJVMwhenDone) {
-    if (terminateJVMwhenDone) {
-    	if (isMacOS()) {
-    		try {
-    			// Delete temporary file again...
+	/**
+	 * Saves all interactive actions and closes this application (if
+	 * {@link #terminateJVMwhenDone} is set to <code>true</code>), this means that
+	 * a call of this method will terminate the running Java Virtual Machine
+	 * (JVM).
+	 * 
+	 * @param window
+	 *        the parent window that has just been closed.
+	 * @param terminateJVMwhenDone
+	 *        whether or not to terminate the JVM (and making selected options
+	 *        persistent).
+	 * @see #getPersistentOptions()
+	 */
+	public void exit(java.awt.Window window, boolean terminateJVMwhenDone) {
+		if (terminateJVMwhenDone) {
+			if (isMacOS()) {
+				try {
+					// Delete temporary file again...
 					NativeLibraryLoader.deleteTempLibFile(System.getProperty("user.dir"));
 				} catch (IOException exc) {
-					logger.log(Level.WARNING,exc.getLocalizedMessage(), exc);
+					logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
 				}
-    	}
-      StringBuilder exception = new StringBuilder();
+			}
+			StringBuilder exception = new StringBuilder();
       if (getInteractiveOptions() != null) {
-        for (Class<? extends KeyProvider> clazz : getInteractiveOptions()) {
+        for (Class<? extends KeyProvider> clazz : getPersistentOptions()) {
           SBPreferences prefs = SBPreferences.getPreferencesFor(clazz);
           try {
             prefs.flush();
@@ -389,12 +390,12 @@ public abstract class Launcher implements Runnable, Serializable {
           }
         }
         if (showExc) {
-          logger.warning('\n' + exception.toString());
+          logger.log(Level.WARNING, '\n' + exception.toString());
         }
       }
-      System.exit(0);
-    }
-  }
+			System.exit(0);
+		}
+	}
 	
   /**
 	 * Creates and returns an exhaustive data structure that provides several
@@ -689,7 +690,7 @@ public abstract class Launcher implements Runnable, Serializable {
     
     // Eventually change the log-level
     String logLevel = appConf.getCmdArgs().get(GUIOptions.LOG_LEVEL);
-    if (logLevel!=null) {
+    if (logLevel != null) {
       LogUtil.changeLogLevel(Level.parse(logLevel.toUpperCase()));
     }
     

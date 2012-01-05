@@ -1064,13 +1064,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 */
 	protected void init() {
     this.listOfPrefChangeListeners = new LinkedList<PreferenceChangeListener>();
-		if ((appConf != null) && (appConf.getInteractiveOptions() != null)) {
-			try {
-				appConf.persistInteractiveOptions();
-			} catch (BackingStoreException exc) {
-				GUITools.showErrorMessage(this, exc);
-			}
-		}
+
 		if ((getTitle() == null) || (getTitle().length() == 0)) {
 			setTitle(getProgramNameAndVersion());
 		}
