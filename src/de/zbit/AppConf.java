@@ -302,7 +302,7 @@ public class AppConf implements Cloneable, Serializable {
     return hashCode;
   }
 
-  /**
+	/**
 	 * If command line arguments are stored in this object, this method makes all
 	 * those {@link Option}-value pairs belonging to the
 	 * {@link #interactiveOptions} persistent in corresponding
@@ -311,11 +311,13 @@ public class AppConf implements Cloneable, Serializable {
 	 * @throws BackingStoreException
 	 */
 	@SuppressWarnings("rawtypes")
-	public void persistInteractiveOptions() throws BackingStoreException {
-		// make command-line options belonging to interactive options persistent
+	public void persistCmdArgs(Class<? extends KeyProvider>... keyProvider) throws BackingStoreException {
+		if (keyProvider == null) {
+			return;
+		}
 		SBProperties props = getCmdArgs();
 		if (props.size() > 0) {
-			for (Class<? extends KeyProvider> provider : getInteractiveOptions()) {
+			for (Class<? extends KeyProvider> provider : keyProvider) {
 				SBPreferences prefs = SBPreferences.getPreferencesFor(provider);
 				Iterator<Option> options = KeyProvider.Tools.optionIterator(provider);
 				Option<?> option;
