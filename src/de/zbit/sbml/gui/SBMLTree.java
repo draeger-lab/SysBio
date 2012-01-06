@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JDialog;
@@ -30,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
@@ -53,6 +55,8 @@ import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
+import org.sbml.jsbml.util.filters.Filter;
+import org.sbml.jsbml.util.filters.RegexpNameFilter;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.SpeciesType;
@@ -100,6 +104,15 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	}
 	
 	/**
+	 * @param sbase
+	 * @param regexp
+	 */
+	public SBMLTree(SBase sbase, String regexp) {
+		super(searchTree(sbase,regexp));
+		init();
+	}
+	
+	/**
 	 * Generate a tree that displays an ASTNode tree.
 	 * 
 	 * @param math
@@ -125,6 +138,25 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 				}
 			}
 		} 
+		return node;
+	}
+	
+	/**
+	 * @param sbase
+	 * @return
+	 */
+	public static MutableTreeNode searchTree(TreeNode sbase, String regexp){
+		Filter filter = new RegexpNameFilter(regexp, false);
+	    List<TreeNode> list = ((SBase) sbase).filter(filter);
+	    
+	    SBMLNode node = new SBMLNode((SBase) sbase);
+	    if (list.size() > 0) {
+		    for (int i=0; i<list.size(); i++){
+		    	node.add(new SBMLNode((SBase) list.get(i)));
+		    }
+			return node;
+	    }
+	   	
 		return node;
 	}
 	

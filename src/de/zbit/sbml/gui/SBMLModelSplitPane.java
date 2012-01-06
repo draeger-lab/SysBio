@@ -16,7 +16,12 @@
  */
 package de.zbit.sbml.gui;
 
+import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.beans.PropertyChangeEvent;
 import java.util.HashSet;
@@ -26,10 +31,12 @@ import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -39,9 +46,11 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
+import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
 
 import de.zbit.gui.GUITools;
+import de.zbit.gui.LayoutHelper;
 import de.zbit.sbml.gui.SBMLTree.SBMLNode;
 import de.zbit.sbml.gui.SBasePanel;
 
@@ -82,7 +91,17 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 */
-	private SBMLTree tree;
+	protected SBMLTree tree;
+	
+	/**
+	 * 
+	 */
+	protected SBMLDocument sbmlDoc;
+	
+	/**
+	 * 
+	 */
+	protected JTextField searchField;
 	
 	/**
 	 * @return the tree
@@ -123,6 +142,59 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	public void addActionListener(ActionListener al) {
 		tree.addActionListener(al);
 		actionListeners.add(al);
+	}
+	
+	/**
+	 * @param nodeInfo
+	 * @return
+	 * @throws SBMLException
+	 * @throws IOException
+	 */
+	protected JPanel createLeftComponent() throws SBMLException,
+		IOException {
+		GridBagLayout gbl = new GridBagLayout();
+		
+		JPanel leftPane = new JPanel();
+		leftPane.setLayout(gbl);
+		
+	  	LayoutHelper lh = new LayoutHelper(leftPane, gbl);
+		
+	  	JScrollPane treePane = new JScrollPane(tree,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	  	
+		lh.add(treePane, 1, 1, 1, 1, 1, 1);
+	  	
+		searchField = new JTextField();
+		searchField.setEditable(true);
+		searchField.setSize(searchField.getSize().width, 15);
+		searchField.addKeyListener(
+				new KeyListener(){
+					@Override
+					public void keyPressed(KeyEvent arg0) {
+					}
+					@Override
+					public void keyReleased(KeyEvent arg0) {
+						DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+						SBMLTree newTree;
+						
+						if (searchField.getText().equals("")){
+							newTree = new SBMLTree(sbmlDoc);
+						}
+						else {
+							newTree = new SBMLTree(sbmlDoc, ".*"+searchField.getText()+".*");
+						}
+
+						model.setRoot((TreeNode) newTree.getModel().getRoot());
+						tree.setRootVisible(false);
+					}
+					@Override
+					public void keyTyped(KeyEvent arg0) {
+					}});
+		
+		lh.add(searchField, 1, 2, 1, 1, 1, 1);
+		
+		return leftPane;
 	}
 	
 	/**
@@ -169,11 +241,25 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	public void init(SBMLDocument doc, boolean keepDivider) throws SBMLException,
 		IOException {
 		int proportionalLocation = getDividerLocation();
+		
+		sbmlDoc = doc.getSBMLDocument();
+		tree = new SBMLTree(sbmlDoc);
+		initTree();
+		
+		setLeftComponent(createLeftComponent());
+		setRightComponent(createRightComponent(doc));
+		if (keepDivider) {
+			setDividerLocation(proportionalLocation);
+		}
+		validate();
+	}
+	
+	protected void initTree() {
 		TreePath path = null;
 		if (tree != null) {
 			path = tree.getSelectionPath();
 		}
-		tree = new SBMLTree(doc.getSBMLDocument());
+		
 		tree.setShowsRootHandles(true);
 		tree.setScrollsOnExpand(true);
 		for (ActionListener al : actionListeners) {
@@ -186,14 +272,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		}
 		tree.addTreeSelectionListener(this);
 		tree.setSelectionRow(0);
-		setLeftComponent(new JScrollPane(tree,
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-		setRightComponent(createRightComponent(doc));
-		if (keepDivider) {
-			setDividerLocation(proportionalLocation);
-		}
-		validate();
 	}
 	
 	/*
