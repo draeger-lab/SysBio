@@ -56,13 +56,14 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 import org.sbml.jsbml.util.filters.Filter;
-import org.sbml.jsbml.util.filters.RegexpNameFilter;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.SpeciesType;
 import org.sbml.jsbml.Trigger;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
+
+import de.zbit.sbml.jsbml.util.filters.RegexpNameFilter;
 
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a
