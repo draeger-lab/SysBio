@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.Compartment;
@@ -49,6 +51,7 @@ import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
+import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
@@ -108,8 +111,8 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	 * @param sbase
 	 * @param regexp
 	 */
-	public SBMLTree(SBase sbase, String regexp) {
-		super(searchTree(sbase,regexp));
+	public SBMLTree(SBase sbase, Filter filter) {
+		super(searchTree(sbase, filter));
 		init();
 	}
 	
@@ -144,21 +147,58 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	
 	/**
 	 * @param sbase
+	 * @param filter
 	 * @return
 	 */
-	public static MutableTreeNode searchTree(TreeNode sbase, String regexp){
-		Filter filter = new RegexpNameFilter(regexp, false);
-	    List<TreeNode> list = ((SBase) sbase).filter(filter);
-	    
-	    SBMLNode node = new SBMLNode((SBase) sbase);
-	    if (list.size() > 0) {
-		    for (int i=0; i<list.size(); i++){
-		    	node.add(new SBMLNode((SBase) list.get(i)));
-		    }
-			return node;
-	    }
-	   	
+	private static MutableTreeNode searchTree(TreeNode sbase, Filter filter) {
+		SBMLNode node = null;
+		if ((sbase instanceof SBase)) {
+			List<TreeNode> list = ((SBase) sbase).filter(filter);
+			if (list.size() > 0) {
+				node = new SBMLNode((SBase) sbase);
+				MutableTreeNode child = null;
+				for (int i = 0; i < sbase.getChildCount(); i++) {
+					child = searchTree(sbase.getChildAt(i), filter);
+					if (child != null) {
+						node.add(child);
+					}
+				}
+				if (node.getChildCount() == 0) {
+					for (int j=0; j<list.size(); j++){
+						child = createNodes((SBase) list.get(j));
+						//child = new SBMLNode((SBase) list.get(j));
+						node.add(child);
+					}
+				}
+			}
+		}
 		return node;
+	}
+	
+	public void expandAll(boolean expand){
+		if (this.getModel().getRoot() != null){
+			this.expandAll(null, expand);
+		}
+	}
+	
+	private void expandAll(TreePath parent, boolean expand) {
+		if (parent == null){
+			parent = new TreePath(((TreeNode) this.getModel().getRoot()));
+		}
+	    TreeNode node = (TreeNode) parent.getLastPathComponent();
+	    if (node.getChildCount() >= 0) {
+	        for (Enumeration e=node.children(); e.hasMoreElements(); ) {
+	            TreeNode n = (TreeNode)e.nextElement();
+	            TreePath path = parent.pathByAddingChild(n);
+	            expandAll(path, expand);
+	        }
+	    }
+
+	    if (expand) {
+	        this.expandPath(parent);
+	    } else {
+	        this.collapsePath(parent);
+	    }
 	}
 	
 	public void addPopupMenuItem(JMenuItem item, Class<? extends SBase>... types) {

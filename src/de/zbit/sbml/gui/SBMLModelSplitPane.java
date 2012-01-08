@@ -16,6 +16,7 @@
  */
 package de.zbit.sbml.gui;
 
+import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -25,6 +26,7 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.beans.PropertyChangeEvent;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -53,6 +55,7 @@ import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.sbml.gui.SBMLTree.SBMLNode;
 import de.zbit.sbml.gui.SBasePanel;
+import de.zbit.sbml.jsbml.util.filters.RegexpNameFilter;
 
 /**
  * A specialized {@link JSplitPane} that displays a {@link JTree} containing all
@@ -167,7 +170,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	  	
 		searchField = new JTextField();
 		searchField.setEditable(true);
-		searchField.setSize(searchField.getSize().width, 15);
+		searchField.setMaximumSize(new Dimension(searchField.getSize().width, 10));
 		searchField.addKeyListener(
 				new KeyListener(){
 					@Override
@@ -180,12 +183,16 @@ public class SBMLModelSplitPane extends JSplitPane implements
 						
 						if (searchField.getText().equals("")){
 							newTree = new SBMLTree(sbmlDoc);
+							model.setRoot((TreeNode) newTree.getModel().getRoot());
+							initTree();
 						}
 						else {
-							newTree = new SBMLTree(sbmlDoc, ".*"+searchField.getText()+".*");
+							RegexpNameFilter filter = new RegexpNameFilter( ".*"+searchField.getText()+".*", false);
+							newTree = new SBMLTree(sbmlDoc,filter);
+							model.setRoot((TreeNode) newTree.getModel().getRoot());
+							tree.expandAll(true);
 						}
 
-						model.setRoot((TreeNode) newTree.getModel().getRoot());
 						tree.setRootVisible(false);
 					}
 					@Override
@@ -218,9 +225,13 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 */
 	private JScrollPane createRightComponent(SBase sbase) throws SBMLException,
 		IOException {
+		SBasePanel sbPanel = new SBasePanel(sbase, namesIfAvailalbe);
+//		sbPanel.doLayout();
+//		sbPanel.setPreferredSize(new Dimension(sbPanel.getPreferredSize().width, 100));
 		JPanel p = new JPanel();
-		p.add(new SBasePanel(sbase, namesIfAvailalbe, null));
+		p.add(sbPanel);
 		JScrollPane scroll = new JScrollPane(p);
+//		JScrollPane scroll = new JScrollPane(sbPanel);
 		return scroll;
 	}
 	
