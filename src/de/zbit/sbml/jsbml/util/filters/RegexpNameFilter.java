@@ -37,14 +37,25 @@ public class RegexpNameFilter implements Filter {
 	private String regexp;
 	
 	/**
-	 * 
+	 * @return the regexp
 	 */
-	private boolean caseSensitive;
+	public String getRegexp() {
+		return regexp;
+	}
 
 	/**
 	 * 
-	 * @param id
-	 * @param name
+	 */
+	private boolean caseSensitive;
+	
+	/**
+	 * 
+	 */
+	private boolean invert;
+
+	/**
+	 * 
+	 * @param regexp
 	 */
 	public RegexpNameFilter(String regexp) {
 		this(regexp, true);
@@ -52,12 +63,23 @@ public class RegexpNameFilter implements Filter {
 	
 	/**
 	 * 
-	 * @param id
-	 * @param name
+	 * @param regexp
+	 * @param caseSensitive
 	 */
 	public RegexpNameFilter(String regexp, boolean caseSensitive) {
+		this(regexp, caseSensitive, false);
+	}
+	
+	/**
+	 * 
+	 * @param regexp
+	 * @param caseSensitive
+	 * @param invert
+	 */
+	public RegexpNameFilter(String regexp, boolean caseSensitive, boolean invert) {
 		this.regexp = regexp;
 		this.caseSensitive = caseSensitive;
+		this.invert = invert;
 	}
 	
 	/* (non-Javadoc)
@@ -65,6 +87,7 @@ public class RegexpNameFilter implements Filter {
 	 */
 	@Override
 	public boolean accepts(Object o) {
+		boolean result = false;
 		if (o instanceof NamedSBase) {
 			NamedSBase nsb = (NamedSBase) o;
 			if ((nsb.isSetName() || nsb.isSetId()) && (regexp != null)) {
@@ -75,10 +98,13 @@ public class RegexpNameFilter implements Filter {
 					name = name.toLowerCase();
 					id = id.toLowerCase();
 				}
-				return (name.matches(regexp) || id.matches(regexp));
+				result = (name.matches(regexp) || id.matches(regexp));
 			}
 		}
-		return false;
+		if (invert) {
+			return !result;
+		}
+		return result;
 	}
 
 }
