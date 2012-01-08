@@ -19,14 +19,10 @@ package de.zbit.sbml.gui;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.beans.PropertyChangeEvent;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -37,18 +33,15 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
-import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
-import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
 
 import de.zbit.gui.GUITools;
@@ -184,12 +177,13 @@ public class SBMLModelSplitPane extends JSplitPane implements
 						if (searchField.getText().equals("")){
 							newTree = new SBMLTree(sbmlDoc);
 							model.setRoot((TreeNode) newTree.getModel().getRoot());
-							initTree();
+							tree.setCellRenderer(newTree.getCellRenderer());
 						}
 						else {
 							RegexpNameFilter filter = new RegexpNameFilter( ".*"+searchField.getText()+".*", false);
 							newTree = new SBMLTree(sbmlDoc,filter);
 							model.setRoot((TreeNode) newTree.getModel().getRoot());
+							tree.setCellRenderer(newTree.getCellRenderer());
 							tree.expandAll(true);
 						}
 

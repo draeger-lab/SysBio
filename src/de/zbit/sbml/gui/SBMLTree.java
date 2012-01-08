@@ -109,10 +109,11 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	
 	/**
 	 * @param sbase
-	 * @param regexp
+	 * @param filter
 	 */
 	public SBMLTree(SBase sbase, Filter filter) {
-		super(searchTree(sbase, filter));
+		super(searchTree(sbase, filter, true));
+		this.setCellRenderer(new SBMLTreeCellRenderer());
 		init();
 	}
 	
@@ -148,9 +149,10 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	/**
 	 * @param sbase
 	 * @param filter
+	 * @param showChildren
 	 * @return
 	 */
-	private static MutableTreeNode searchTree(TreeNode sbase, Filter filter) {
+	private static MutableTreeNode searchTree(TreeNode sbase, Filter filter, boolean showChildren) {
 		SBMLNode node = null;
 		if ((sbase instanceof SBase)) {
 			List<TreeNode> list = ((SBase) sbase).filter(filter);
@@ -158,16 +160,22 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 				node = new SBMLNode((SBase) sbase);
 				MutableTreeNode child = null;
 				for (int i = 0; i < sbase.getChildCount(); i++) {
-					child = searchTree(sbase.getChildAt(i), filter);
+					child = searchTree(sbase.getChildAt(i), filter, showChildren);
 					if (child != null) {
 						node.add(child);
 					}
 				}
 				if (node.getChildCount() == 0) {
 					for (int j=0; j<list.size(); j++){
-						child = createNodes((SBase) list.get(j));
-						//child = new SBMLNode((SBase) list.get(j));
-						node.add(child);
+						if (showChildren) {
+							child = createNodes((SBase) list.get(j));
+						} else {
+							child = new SBMLNode((SBase) list.get(j));
+						}
+						if (child != null) {
+							((SBMLNode) child).boldFont = true;
+							node.add(child);
+						}
 					}
 				}
 			}
@@ -221,7 +229,8 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 		 */
 		private static final long serialVersionUID = 9057010975355065921L;
 		
-		
+		public boolean boldFont = false;
+
 		public SBMLNode(SBase sbase) {
 			super(sbase);
 		}
