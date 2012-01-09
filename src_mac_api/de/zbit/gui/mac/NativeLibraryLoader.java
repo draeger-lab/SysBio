@@ -54,6 +54,7 @@ public class NativeLibraryLoader {
 		File libFile = loader.createLibFile(tmpDir);
 		if (libFile.canWrite()) {
 			Utils.copyStream(NativeLibraryLoader.class.getResourceAsStream(libFile.getName()), libFile);
+			libFile.deleteOnExit();
 			System.load(libFile.getAbsolutePath());
 			System.loadLibrary(libFile.getName());
 		}
