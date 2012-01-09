@@ -17,7 +17,6 @@
 package de.zbit.sbml.gui;
 
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -26,11 +25,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
@@ -43,11 +44,9 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 
-
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.sbml.gui.SBMLTree.SBMLNode;
-import de.zbit.sbml.gui.SBasePanel;
 import de.zbit.sbml.jsbml.util.filters.RegexpNameFilter;
 
 /**
@@ -148,28 +147,28 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 */
 	protected JPanel createLeftComponent() throws SBMLException,
 		IOException {
-		GridBagLayout gbl = new GridBagLayout();
-		
 		JPanel leftPane = new JPanel();
-		leftPane.setLayout(gbl);
-		
-	  	LayoutHelper lh = new LayoutHelper(leftPane, gbl);
+    LayoutHelper lh = new LayoutHelper(leftPane);
 		
 	  	JScrollPane treePane = new JScrollPane(tree,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	  	
-		lh.add(treePane, 1, 1, 1, 1, 1, 1);
+		lh.add(treePane, 0, 0, 2, 1, 1d, 1d);
 	  	
 		searchField = new JTextField();
 		searchField.setEditable(true);
 		searchField.setMaximumSize(new Dimension(searchField.getSize().width, 10));
 		searchField.addKeyListener(
 				new KeyListener(){
-					@Override
+					/* (non-Javadoc)
+					 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+					 */
 					public void keyPressed(KeyEvent arg0) {
 					}
-					@Override
+					/* (non-Javadoc)
+					 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+					 */
 					public void keyReleased(KeyEvent arg0) {
 						DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 						SBMLTree newTree;
@@ -180,8 +179,9 @@ public class SBMLModelSplitPane extends JSplitPane implements
 							tree.setCellRenderer(newTree.getCellRenderer());
 						}
 						else {
-							RegexpNameFilter filter = new RegexpNameFilter( ".*"+searchField.getText()+".*", false);
-							newTree = new SBMLTree(sbmlDoc,filter);
+							String search = searchField.getText();
+							RegexpNameFilter filter = new RegexpNameFilter( ".*" + search + ".*", false);
+							newTree = new SBMLTree(sbmlDoc, filter);
 							model.setRoot((TreeNode) newTree.getModel().getRoot());
 							tree.setCellRenderer(newTree.getCellRenderer());
 							tree.expandAll(true);
@@ -189,11 +189,16 @@ public class SBMLModelSplitPane extends JSplitPane implements
 
 						tree.setRootVisible(false);
 					}
-					@Override
+					/* (non-Javadoc)
+					 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+					 */
 					public void keyTyped(KeyEvent arg0) {
-					}});
-		
-		lh.add(searchField, 1, 2, 1, 1, 1, 1);
+					}
+				});
+		JLabel label = new JLabel(UIManager.getIcon("ICON_SEARCH_16"));
+		label.setOpaque(true);
+		lh.add(label, 0, 2, 1, 1, 0d, 0d);
+		lh.add(searchField, 1, 2, 1, 1, 0d, 0d);
 		
 		return leftPane;
 	}

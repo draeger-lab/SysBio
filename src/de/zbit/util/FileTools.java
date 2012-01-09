@@ -293,10 +293,10 @@ public class FileTools {
    * @return name without the last dot and everything behind it.
    */
   public static String trimExtension(String name) {
-    if (name!=null && name.length() > 0) {
+    if ((name != null) && (name.length() > 0)) {
       int pos = name.lastIndexOf('.');
-      if (pos>=0) {
-        return name.substring(0,pos);
+      if (pos >= 0) {
+        return name.substring(0, pos);
       }
     }
     return name;

@@ -85,7 +85,6 @@ public class RegexpNameFilter implements Filter {
 	/* (non-Javadoc)
 	 * @see org.sbml.jsbml.util.filters.Filter#accepts(java.lang.Object)
 	 */
-	@Override
 	public boolean accepts(Object o) {
 		boolean result = false;
 		if (o instanceof NamedSBase) {
