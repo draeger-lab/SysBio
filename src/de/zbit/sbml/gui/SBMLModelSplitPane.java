@@ -34,6 +34,7 @@ import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -176,9 +177,11 @@ public class SBMLModelSplitPane extends JSplitPane implements
 						if (searchField.getText().equals("")){
 							newTree = new SBMLTree(sbmlDoc);
 							model.setRoot((TreeNode) newTree.getModel().getRoot());
-							tree.setCellRenderer(newTree.getCellRenderer());
+							tree.setCellRenderer(new DefaultTreeCellRenderer());
+							tree.restoreExpanstionState();
 						}
 						else {
+							tree.saveExpansionState();
 							String search = searchField.getText();
 							RegexpNameFilter filter = new RegexpNameFilter( ".*" + search + ".*", false);
 							newTree = new SBMLTree(sbmlDoc, filter);
