@@ -20,53 +20,31 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
-import org.sbml.jsbml.Compartment;
-import org.sbml.jsbml.CompartmentType;
-import org.sbml.jsbml.Constraint;
-import org.sbml.jsbml.Delay;
-import org.sbml.jsbml.Event;
-import org.sbml.jsbml.EventAssignment;
-import org.sbml.jsbml.FunctionDefinition;
-import org.sbml.jsbml.InitialAssignment;
-import org.sbml.jsbml.KineticLaw;
-import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
-import org.sbml.jsbml.ModifierSpeciesReference;
-import org.sbml.jsbml.NamedSBase;
-import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.Reaction;
-import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 import org.sbml.jsbml.util.filters.Filter;
-import org.sbml.jsbml.Species;
-import org.sbml.jsbml.SpeciesReference;
-import org.sbml.jsbml.SpeciesType;
-import org.sbml.jsbml.Trigger;
-import org.sbml.jsbml.Unit;
-import org.sbml.jsbml.UnitDefinition;
-
-import de.zbit.sbml.jsbml.util.filters.RegexpNameFilter;
 
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a
@@ -98,6 +76,11 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	 * 
 	 */
 	private Set<ActionListener> setOfActionListeners;
+	
+	/**
+	 * 
+	 */
+	private String savedState;
 	
 	/**
 	 * @param sbase
@@ -217,6 +200,50 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 			
 		}
 	}
+	
+	// is path1 descendant of path2
+    public static boolean isDescendant(TreePath path1, TreePath path2){
+        int count1 = path1.getPathCount();
+        int count2 = path2.getPathCount();
+        if(count1<=count2)
+            return false;
+        while(count1!=count2){
+            path1 = path1.getParentPath();
+            count1--;
+        }
+        return path1.equals(path2);
+    }
+ 
+    public void saveExpansionState(){
+    	if (savedState == null) {
+	    	int row = 0;
+	        TreePath rowPath = this.getPathForRow(row);
+	        StringBuffer buf = new StringBuffer();
+	        int rowCount = this.getRowCount();
+	        for(int i=row; i<rowCount; i++){
+	            TreePath path = this.getPathForRow(i);
+	            if(i==row || isDescendant(path, rowPath)){
+	                if(this.isExpanded(path))
+	                    buf.append(","+String.valueOf(i-row));
+	            } else {
+	            	break;
+	            }
+	        }
+	        savedState = buf.toString();
+    	}
+    }
+    
+    public void restoreExpanstionState(){
+    	if (savedState != null) {
+	    	int row = 0;
+	        StringTokenizer stok = new StringTokenizer(savedState, ",");
+	        while(stok.hasMoreTokens()){
+	            int token = row + Integer.parseInt(stok.nextToken());
+	            this.expandRow(token);
+	        }
+	        savedState = null;
+    	}
+    }
 	
 	/**
 	 * 
