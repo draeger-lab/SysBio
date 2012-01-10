@@ -1,6 +1,6 @@
 /*
- * $Id:  JTableTools.java 15:20:16 wrzodek $
- * $URL: JTableTools.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.util;
+package de.zbit.gui.table;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -51,11 +51,18 @@ public class JTableTools {
     //  table.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE);
     final JTextField searchField = new JTextField();
     
-    // Define the actual search operations
+    /** 
+     * Define the actual search operations 
+     */
     class Search {
       private void search() {
         search(0);
       }
+      
+      /**
+       * 
+       * @param rowStart
+       */
       private void search(int rowStart) {
         /* TODO: A much better solution would be to shift this code
          * to a new thread and show a loading indicator in the search
@@ -63,14 +70,18 @@ public class JTableTools {
          */
         table.clearSelection();
         String text = searchField.getText();
-        if (text.length() <1) { return; }
+        if (text.length() <1) { 
+        	return; 
+        }
         text = text.toLowerCase();
         for (int row = rowStart; row < table.getRowCount(); row++) {
           for (int col = 0; col < table.getColumnCount(); col++) {
             Object val = table.getValueAt(row, col);
             
-            if (val==null) continue;
-            if (val.getClass().isArray() || val instanceof Iterable) {
+            if (val == null) {
+            	continue;
+            }
+            if (val.getClass().isArray() || (val instanceof Iterable)) {
               val = list2String(val);
             }
             String value = val.toString();
@@ -87,6 +98,9 @@ public class JTableTools {
     table.addKeyListener(new KeyAdapter() {
       boolean isDialogVisible = false;
       
+      /* (non-Javadoc)
+       * @see java.awt.event.KeyAdapter#keyPressed(java.awt.event.KeyEvent)
+       */
       @Override
       public void keyPressed(final KeyEvent evt) {
         if (evt.getKeyCode() == 114) { //F3 => Search next
@@ -98,7 +112,7 @@ public class JTableTools {
             showSearchDialog();
           }
           return;
-        } else if (evt.getKeyCode() == 70 && evt.getModifiers()==2) {
+        } else if ((evt.getKeyCode() == 70) && (evt.getModifiers() == 2)) {
           // STRG + F
           if (!isDialogVisible) {
             showSearchDialog();
@@ -108,15 +122,19 @@ public class JTableTools {
         }
         
         char ch = evt.getKeyChar(); 
-        if (!Character.isLetterOrDigit(ch)) { return; }
+        if (!Character.isLetterOrDigit(ch)) { 
+        	return; 
+        }
         int selectedRow = table.getSelectedRow();
         int selectedColumn = table.getSelectedColumn();
         Object clientProperty = table.getClientProperty("JTable.autoStartsEdit");
-        if ((clientProperty == null || (Boolean) clientProperty)
-            && selectedRow >= 0
-            && selectedColumn >= 0
+        if (((clientProperty == null) || ((Boolean) clientProperty).booleanValue())
+            && (selectedRow >= 0)
+            && (selectedColumn >= 0)
             && table.isCellEditable(table.getSelectedRow(),
-              table.getSelectedColumn())) { return; }
+              table.getSelectedColumn())) { 
+        	return; 
+        }
         searchField.setText(String.valueOf(ch));
         
         // Create a dialog looking like a search field at the tables header
@@ -150,12 +168,21 @@ public class JTableTools {
         d.setVisible(true);
         isDialogVisible = true;
         searchField.getDocument().addDocumentListener(new DocumentListener() {
+        	/* (non-Javadoc)
+        	 * @see javax.swing.event.DocumentListener#insertUpdate(javax.swing.event.DocumentEvent)
+        	 */
           public void insertUpdate(final DocumentEvent e) {
             s.search();
           }
+          /* (non-Javadoc)
+           * @see javax.swing.event.DocumentListener#removeUpdate(javax.swing.event.DocumentEvent)
+           */
           public void removeUpdate(final DocumentEvent e) {
             s.search();
           }
+          /* (non-Javadoc)
+           * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
+           */
           public void changedUpdate(final DocumentEvent e) {
             s.search();
           }
@@ -179,15 +206,13 @@ public class JTableTools {
         });
         searchField.addFocusListener(new FocusListener() {
           
-          /*
-           * (non-Javadoc)
+          /* (non-Javadoc)
            * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
            */
           public void focusGained(final FocusEvent e) {
           }
           
-          /*
-           * (non-Javadoc)
+          /* (non-Javadoc)
            * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
            */
           public void focusLost(final FocusEvent e) {
@@ -197,8 +222,7 @@ public class JTableTools {
         });
         Action exit = new AbstractAction() {
           private static final long serialVersionUID = -5554144842629942687L;
-          /*
-           * (non-Javadoc)
+          /* (non-Javadoc)
            * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
            */
           public void actionPerformed(final ActionEvent e) {
@@ -215,6 +239,11 @@ public class JTableTools {
     });
   }
 
+  /**
+   * 
+   * @param val
+   * @return
+   */
   public static String list2String(Object val) {
     StringBuffer ret = new StringBuffer();
     
