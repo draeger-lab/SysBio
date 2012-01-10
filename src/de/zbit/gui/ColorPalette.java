@@ -27,6 +27,22 @@ import java.awt.Color;
  * @date 2011-03-27
  */
 public class ColorPalette {
+	
+	/**
+	 * An additional color that is not part of the Corporate Design of the
+	 * University of Tuebingen.
+	 */
+	public static final Color lightBlue = new Color(205, 225, 255, 50);
+	/**
+	 * An additional color that is not part of the Corporate Design of the
+	 * University of Tuebingen.
+	 */
+	public static final Color lightRed = new Color(255, 85, 85);
+	/**
+	 * An additional color that is not part of the Corporate Design of the
+	 * University of Tuebingen.
+	 */
+	public static final Color slateGray3 = new Color(159, 182, 205);
 		
 	/**
 	 * 
