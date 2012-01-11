@@ -622,12 +622,11 @@ public class GUITools {
     JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
       multiSelectionAllowed, mode);
     if (filter != null) {
-      int i = filter.length - 1;
-      while (0 <= i) {
-        chooser.addChoosableFileFilter(filter[i--]);
-      }
-      if (i >= 0) {
-        chooser.setFileFilter(filter[i]);
+			for (int i = filter.length; i > 0; i--) {
+				chooser.addChoosableFileFilter(filter[i - 1]);
+			}
+      if (filter.length > 0) {
+        chooser.setFileFilter(filter[0]);
       }
     }
     return chooser;
@@ -1605,6 +1604,7 @@ public class GUITools {
     JFileChooser fc = createJFileChooser(dir, allFilesAcceptable,
       multiSelectionAllowed, mode, filter);
     if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
+    	// FIXME: This only checks one file. If multiselection is allowed, multiple files may be returned!
       File f = fc.getSelectedFile();
       if (f.exists()) {
         if (checkFile && !f.canWrite()) {
