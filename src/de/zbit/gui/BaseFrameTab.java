@@ -1,6 +1,6 @@
 /*
- * $Id:  BaseFrameTab.java 12:28:07 wrzodek $
- * $URL: BaseFrameTab.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -29,17 +29,19 @@ import javax.swing.JToolBar;
 public interface BaseFrameTab {
   
   /**
-   * Save the contents of this tab to a file.
-   * @return the saved file.
+   * Save the contents of this tab to a {@link File}.
+   * @return the saved {@link File}.
    */
   public File saveToFile();
   
-  /**
-   * Enable or disable the buttons of the given <code>menuBar</code>.
-   * The <code>toolbar</code> might be null if your application does
-   * not use a {@link JToolBar}.
-   * @param menuBar
-   */
+	/**
+	 * Enable or disable the buttons of the given {@link JMenuBar} The
+	 * {@link JToolBar} might be <code>null</code> if your application does not
+	 * use a {@link JToolBar}.
+	 * 
+	 * @param menuBar
+	 * @param toolbar
+	 */
   public void updateButtons(JMenuBar menuBar, JToolBar toolbar);
   
 }

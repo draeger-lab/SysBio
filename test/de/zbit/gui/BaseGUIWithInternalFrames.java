@@ -147,9 +147,9 @@ public class BaseGUIWithInternalFrames extends BaseFrameWithInternalFrames {
 	 * @see de.zbit.gui.BaseFrame#saveFile()
 	 */
 	@Override
-	public void saveFile() {
+	public File saveFile() {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 	
 	/**

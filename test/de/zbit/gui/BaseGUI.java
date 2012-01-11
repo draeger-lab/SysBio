@@ -152,8 +152,9 @@ public class BaseGUI extends BaseFrame {
 	 * 
 	 * @see de.zbit.gui.BaseFrame#saveFile()
 	 */
-	public void saveFile() {
+	public File saveFile() {
 		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	/*

@@ -28,8 +28,6 @@ import javax.swing.ListCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import de.zbit.gui.ColorPalette;
-
 /**
  * A {@link TableCellRenderer} that draws {@link JComponent}s.
  * @author Clemens Wrzodek
