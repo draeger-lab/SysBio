@@ -658,11 +658,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				ActionListener.class, this, "openFileAndLogHistory"),
 				BaseAction.FILE_OPEN, KeyStroke.getKeyStroke('O', ctr_down), 'O', true);
 			
-			saveFile = GUITools.createJMenuItem(
-				EventHandler.create(ActionListener.class, this, "saveFileAndLogSaveDir"),
-				BaseAction.FILE_SAVE_AS,
-				KeyStroke.getKeyStroke('S', ctr_down | InputEvent.SHIFT_DOWN_MASK),
-				'S', false);
+			saveFile = GUITools.createJMenuItem(EventHandler.create(
+				ActionListener.class, this, "saveFileAndLogSaveDir"),
+				BaseAction.FILE_SAVE_AS, KeyStroke.getKeyStroke('S', ctr_down
+						| InputEvent.SHIFT_DOWN_MASK), 'S', false);
 			
 			closeFile = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "closeFile"),
@@ -1398,7 +1397,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * disabled. When done, these are enabled again. Override this method if you
 	 * want a different behavior.
 	 */
-	protected void saveFileAndLogSaveDir() {
+	public void saveFileAndLogSaveDir() {
 		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
 			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
 		File file = saveFile();
