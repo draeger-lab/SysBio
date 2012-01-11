@@ -58,6 +58,7 @@ import javax.swing.UIManager;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import de.zbit.gui.ColorPalette;
 import de.zbit.gui.ExpandablePanel;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
@@ -372,6 +373,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     Object[][] dataNew = prependColumnSelectors(data);
     final JTableRowBased table = new JTableRowBased(new JComponentTableModel(dataNew, header));
     rend.setDefaultForegroundColorForJLabels(Color.GRAY);
+    rend.setBackgroundColors(Color.WHITE, ColorPalette.lightBlue);
     int maxHeadRow = (isATypeSelectorRequired() ? 2 : 1);
     
     // Set an appropriate editor for the expected column and type selectors

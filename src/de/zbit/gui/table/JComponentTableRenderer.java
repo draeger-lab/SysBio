@@ -84,9 +84,12 @@ public class JComponentTableRenderer implements TableCellRenderer, ListCellRende
 	 */
 	private Color bg[];
 	
+	/**
+	 * Creates a new renderer with default colors for each row, i.e., no special colors set.
+	 */
 	public JComponentTableRenderer() {
 		super();
-		this.bg = new Color[] {Color.WHITE, ColorPalette.lightBlue};
+		this.bg = null;
 	}
 	
 	/**
