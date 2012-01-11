@@ -659,7 +659,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				BaseAction.FILE_OPEN, KeyStroke.getKeyStroke('O', ctr_down), 'O', true);
 			
 			saveFile = GUITools.createJMenuItem(
-				EventHandler.create(ActionListener.class, this, "saveFile"),
+				EventHandler.create(ActionListener.class, this, "saveFileAndLogSaveDir"),
 				BaseAction.FILE_SAVE_AS,
 				KeyStroke.getKeyStroke('S', ctr_down | InputEvent.SHIFT_DOWN_MASK),
 				'S', false);
@@ -1321,7 +1321,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
           prefs.flush();
         } catch (BackingStoreException exc) {
           // do NOT show this error, because the user really dosn't know
-          // how to handle a "The value for SAVE_DIR is out of range [...]"
+          // how to handle a "The value for OPEN_DIR is out of range [...]"
           // message.
           logger.finest(exc.getLocalizedMessage());
         }
@@ -1377,12 +1377,51 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
   }
 
 	/**
-	 * Saves some results or the current work in some {@link File}.
-	 * If you use a {@link JTabbedPane}, it is recommended to let your tabs
-	 * implement the {@link BaseFrameTab} interface and simply call
+	 * Saves some results or the current work in some {@link File}. If you use a
+	 * {@link JTabbedPane}, it is recommended to let your tabs implement the
+	 * {@link BaseFrameTab} interface and simply call
 	 * {@link BaseFrameTab#saveToFile()}.
+	 * 
+	 * @return the {@link File} into which the content has been saved. If the
+	 *         returned value is not <code>null</code>, the directory in which the
+	 *         {@link File} is located is stored as the
+	 *         {@link GUIOptions#SAVE_DIR} property of the current class (but only
+	 *         if it exists and can be read).
 	 */
-	public abstract void saveFile();
+	public abstract File saveFile();
+	
+	/**
+	 * Calls {@link #saveFile()} and memorizes the directory in which a file was
+	 * stored as a {@link GUIOptions#SAVE_DIR} for the current {@link Class}
+	 * (which implements {@link GUIOptions}. While saving some file, the actions
+	 * {@link BaseAction#FILE_SAVE} and {@link BaseAction#FILE_SAVE_AS} are
+	 * disabled. When done, these are enabled again. Override this method if you
+	 * want a different behavior.
+	 */
+	protected void saveFileAndLogSaveDir() {
+		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
+			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
+		File file = saveFile();
+		if (file != null) {
+			if (!file.isDirectory()) {
+				file = file.getParentFile();
+			}
+			if (file.exists() && file.canRead() && file.canWrite()) {
+				SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+				prefs.put(GUIOptions.SAVE_DIR, file.getAbsolutePath());
+				try {
+          prefs.flush();
+        } catch (BackingStoreException exc) {
+          // do NOT show this error, because the user really dosn't know
+          // how to handle a "The value for SAVE_DIR is out of range [...]"
+          // message.
+          logger.finest(exc.getLocalizedMessage());
+        };
+			}
+		}
+		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
+			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
+	}
 	
 	/**
 	 * Enables the {@link JButton} in the {@link JToolBar} (if there is any) and

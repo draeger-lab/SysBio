@@ -16,8 +16,8 @@
  */
 package de.zbit.sbml.gui;
 
-import java.io.IOException;
 import java.awt.Component;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -36,10 +36,8 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
-import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.util.StringUtil;
-import de.zbit.sbml.gui.SBasePanel;
 
 /**
  * Creates a {@link JPanel} for an {@link ASTNode}.
@@ -210,7 +208,7 @@ public class ASTNodePanel extends JPanel {
 			} catch (SBMLException e) {
 				ud = new UnitDefinition();
 			}
-			JEditorPane unitPane = GUITools.unitPreview(ud != null ? ud
+			JEditorPane unitPane = GUIToolsForSBML.unitPreview(ud != null ? ud
 					: new UnitDefinition());
 			unitPane.setBorder(BorderFactory.createLoweredBevelBorder());
 			l.add(new JPanel(), 0, 1, 3, 1);

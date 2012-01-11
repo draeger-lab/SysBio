@@ -92,11 +92,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
-import org.sbml.jsbml.UnitDefinition;
-import org.sbml.jsbml.util.compilers.HTMLFormula;
-
-import com.hp.hpl.jena.sparql.pfunction.library.listIndex;
-
 import de.zbit.Launcher;
 import de.zbit.io.OpenFile;
 import de.zbit.util.Reflect;
@@ -1755,9 +1750,11 @@ public class GUITools {
   }
   
   /**
-   * Enables or disables actions that can be performed by SBMLsqueezer, i.e.,
+   * Enables or disables actions that can be performed by a program, i.e.,
    * all menu items and buttons that are associated with the given actions are
    * enabled or disabled.
+   * 
+   * Originates from SBMLsqueezer.
    * 
    * @param state
    *        if true buttons, items etc. are enabled, otherwise disabled.
@@ -2426,20 +2423,6 @@ public class GUITools {
 			item1.setAccelerator(ks2);
 			item2.setAccelerator(ks1);
 		}
-	}
-
-  /**
-	 * Creates a JEditorPane that displays the given UnitDefinition as a HTML.
-	 * 
-	 * @param ud
-	 * @return
-	 */
-	public static JEditorPane unitPreview(UnitDefinition ud) {
-		JEditorPane preview = new JEditorPane("text/html", StringUtil
-				.toHTML(ud != null ? HTMLFormula.toHTML(ud) : ""));
-		preview.setEditable(false);
-		preview.setBorder(BorderFactory.createLoweredBevelBorder());
-		return preview;
 	}
 
 }
