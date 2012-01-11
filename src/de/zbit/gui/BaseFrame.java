@@ -496,6 +496,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
 		JToolBar toolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
 		toolBar.setOpaque(true);
+		if (GUITools.isMacOSX()) {
+			toolBar.add(GUITools.createButton(BaseAction.EDIT_PREFERENCES.getIcon(),
+				EventHandler.create(ActionListener.class, this, "preferences"), action,
+				BaseAction.EDIT_PREFERENCES.getToolTip()));
+			toolBar.add(new JSeparator(JSeparator.VERTICAL));
+		}
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
 			menu = getJMenuBar().getMenu(i);
 			for (int j = 0; j < menu.getItemCount(); j++) {
@@ -521,6 +527,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			if (i < getJMenuBar().getMenuCount() - 1) {
 				toolBar.add(new JSeparator(JSeparator.VERTICAL));
 			}
+		}
+		if (GUITools.isMacOSX()) {
+			toolBar.add(GUITools.createButton(BaseAction.HELP_ABOUT.getIcon(),
+				EventHandler.create(ActionListener.class, this, "showAboutMessage"),
+				action, BaseAction.HELP_ABOUT.getToolTip()));
 		}
 		return toolBar;
 	}
@@ -590,7 +601,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				// On all other systems we want to have a menu item for preferences.
 				JMenuItem preferences = GUITools.createJMenuItem(
 					EventHandler.create(ActionListener.class, this, "preferences"),
-					BaseAction.EDIT_PREFERENCES, BaseAction.EDIT_PREFERENCES.getIcon(),
+					BaseAction.EDIT_PREFERENCES,
 					KeyStroke.getKeyStroke('E', InputEvent.ALT_GRAPH_DOWN_MASK), 'P',
 					true);
 				editMenu = GUITools.createJMenu(title == null ? "Edit" : title,
@@ -645,19 +656,18 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		if (loadDefaultFileMenuEntries) {
 			openFile = GUITools.createJMenuItem(EventHandler.create(
 				ActionListener.class, this, "openFileAndLogHistory"),
-				BaseAction.FILE_OPEN, BaseAction.FILE_OPEN.getIcon(), KeyStroke
-						.getKeyStroke('O', ctr_down), 'O', true);
+				BaseAction.FILE_OPEN, KeyStroke.getKeyStroke('O', ctr_down), 'O', true);
 			
 			saveFile = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "saveFile"),
-				BaseAction.FILE_SAVE_AS, BaseAction.FILE_SAVE_AS.getIcon(),
+				BaseAction.FILE_SAVE_AS,
 				KeyStroke.getKeyStroke('S', ctr_down | InputEvent.SHIFT_DOWN_MASK),
 				'S', false);
 			
 			closeFile = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "closeFile"),
-				BaseAction.FILE_CLOSE, BaseAction.FILE_CLOSE.getIcon(),
-				KeyStroke.getKeyStroke('W', ctr_down), 'W', false);
+				BaseAction.FILE_CLOSE, KeyStroke.getKeyStroke('W', ctr_down), 'W',
+				false);
 		}
 		JMenu fileMenu;
 		JMenuItem items[] = additionalFileMenuItems();
@@ -673,7 +683,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			// On all other platforms we want to have a dedicated "exit" item.
 			JMenuItem exit = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "exitPre"),
-				BaseAction.FILE_EXIT, BaseAction.FILE_EXIT.getIcon(),
+				BaseAction.FILE_EXIT,
 				KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK));
 			boolean addSeparator = (openFile != null) || (saveFile != null)
 					|| ((items != null) && (items.length > 0)) || (closeFile != null);
@@ -695,19 +705,17 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		JMenuItem help = (getURLOnlineHelp() == null) ? null : GUITools
 				.createJMenuItem(
 					EventHandler.create(ActionListener.class, this, "showOnlineHelp"),
-					BaseAction.HELP_ONLINE, BaseAction.HELP_ONLINE.getIcon(),
-					KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), 'H', true);
+					BaseAction.HELP_ONLINE, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0),
+					'H', true);
 		JMenuItem license = (getURLLicense() == null) ? null : GUITools
 				.createJMenuItem(
 					EventHandler.create(ActionListener.class, this, "showLicense"),
-					BaseAction.HELP_LICENSE, BaseAction.HELP_LICENSE.getIcon(),
-					KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0), 'L', true);
+					BaseAction.HELP_LICENSE, 'L', true);
 		JMenuItem update = ((getURLOnlineUpdate() == null)
 				|| (getDottedVersionNumber() == null) || (getDottedVersionNumber()
 				.length() == 0)) ? null : GUITools.createJMenuItem(
 			EventHandler.create(ActionListener.class, this, "onlineUpdate"),
-			BaseAction.HELP_UPDATE, BaseAction.HELP_UPDATE.getIcon(),
-			KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0), 'U', true);
+			BaseAction.HELP_UPDATE, 'U', true);
 		String title = BaseAction.HELP.getName();
 		if (title == null) {
 			title = "Help";
@@ -720,8 +728,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		} else {
 			JMenuItem about = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "showAboutMessage"),
-				BaseAction.HELP_ABOUT, BaseAction.HELP_ABOUT.getIcon(),
-				KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 'I', true);
+				BaseAction.HELP_ABOUT, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 'I',
+				true);
 			helpMenu = GUITools.createJMenu(title, BaseAction.HELP.getToolTip(),
 				help, about, license, update, additionalHelpMenuItems());
 		}

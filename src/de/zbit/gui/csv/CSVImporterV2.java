@@ -375,17 +375,17 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     int maxHeadRow = (isATypeSelectorRequired() ? 2 : 1);
     
     // Set an appropriate editor for the expected column and type selectors
-    for (int row=0; row<maxHeadRow; row++) {
-      for (int col=0; col<dataNew[row].length; col++) {
+    for (int row = 0; row < maxHeadRow; row++) {
+      for (int col = 0; col < dataNew[row].length; col++) {
         Object cur = dataNew[row][col];
         
         TableCellEditor cellEditor;
         if (cur instanceof JCheckBox) {
-          cellEditor = new DefaultCellEditor((JCheckBox)cur);
-        }else if (cur instanceof JComboBox) {
-          cellEditor = new DefaultCellEditor((JComboBox)cur);
-        }else if (cur instanceof JTextField) {
-          cellEditor = new DefaultCellEditor((JTextField)cur);
+          cellEditor = new DefaultCellEditor((JCheckBox) cur);
+        } else if (cur instanceof JComboBox) {
+          cellEditor = new DefaultCellEditor((JComboBox) cur);
+        } else if (cur instanceof JTextField) {
+          cellEditor = new DefaultCellEditor((JTextField) cur);
         } else {
           cellEditor = table.getCellEditor(0,col);
         }
@@ -395,26 +395,27 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     }
     
     // Draw JComponents inside the JTable
-    for (int i=0; i<table.getColumnCount(); i++) {
+    for (int i=0; i< table.getColumnCount(); i++) {
       table.getColumnModel().getColumn(i).setCellRenderer(rend);
     }
     
     // Set additional attributes
-    if (defaultPreviewFont!=null) table.setFont(defaultPreviewFont);
+    if (defaultPreviewFont != null) table.setFont(defaultPreviewFont);
     table.setPreferredScrollableViewportSize(new Dimension(500, 100));
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    for (int i=0; i<maxHeadRow+1;i++)
-      table.setRowHeight(i, (int) (table.getRowHeight(i)*1.3));
+    for (int i = 0; i< maxHeadRow + 1; i++)
+      table.setRowHeight(i, (int) (table.getRowHeight(i) * 1.3f));
     
     // Disallow dragging columns
     table.getTableHeader().setReorderingAllowed(false);
     
     // Resize columns to a reasonable width
-    if (table.getColumnModel().getColumnCount()>0)  {
+    if (table.getColumnModel().getColumnCount() > 0)  {
       int width = table.getColumnModel().getColumn(0).getWidth();
       width = Math.max(width, 120);
-      for (int i=0; i<table.getColumnModel().getColumnCount(); i++)
-        table.getColumnModel().getColumn(i).setPreferredWidth(width); 
+      for (int i=0; i<table.getColumnModel().getColumnCount(); i++) {
+        table.getColumnModel().getColumn(i).setPreferredWidth(width);
+      }
     }
     
     return table;

@@ -43,10 +43,17 @@ public class ColoredBooleanRenderer extends JCheckBox implements
 	 */
 	private static final long serialVersionUID = 2699486332938892133L;
 	
+	/**
+	 * An array that allows to store the background {@link Color}s of rows. The
+	 * first row will have the first background {@link Color}, the second row the
+	 * second {@link Color} etc. At the end of the array's length, it will repeat
+	 * again.
+	 */
 	private Color bg[];
 	
 	/**
-	 * 
+	 * Creates a new renderer with the two default background {@link Color}
+	 * {@link ColorPalette#lightBlue} and {@link Color#WHITE}.
 	 */
 	public ColoredBooleanRenderer() {
 		this(ColorPalette.lightBlue, Color.WHITE);

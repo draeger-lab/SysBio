@@ -60,6 +60,10 @@
   <entry key="TREAT_CONSECUTIVE_SEPARATORS_AS_ONE_TOOLTIP">Geben Sie an, ob mehrere aufeinanderfolgende Trennzeichen als ein einziges behandelt werden sollen.</entry>
   <entry key="SKIP_THIS_NUMBER_OF_LEADING_LINES">Überspringe soviele Zeilen am Dateianfang.</entry>
   <entry key="SKIP_LINES">Überspringe Zeilen</entry>
+    
+  <!-- ColorEditor -->
+  
+  <entry key="PICK_A_COLOR">Wählen Sie eine Farbe</entry>
   
   <!-- FileHistory -->
   

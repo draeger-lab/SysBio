@@ -860,6 +860,34 @@ public class GUITools {
   }
   
   /**
+   * 
+   * @param listener
+   * @param command
+   * @param mnemonic
+   * @param enabled
+   * @return
+   */
+	public static JMenuItem createJMenuItem(ActionListener listener,
+		ActionCommandWithIcon command, char mnemonic, boolean enabled) {
+		return createJMenuItem(listener, command, null, mnemonic, enabled);
+	}
+	
+	/**
+	 * 
+	 * @param listener
+	 * @param command
+	 * @param ks
+	 * @param mnemonic
+	 * @param enabled
+	 * @return
+	 */
+	public static JMenuItem createJMenuItem(ActionListener listener,
+		ActionCommandWithIcon command, KeyStroke ks, char mnemonic, boolean enabled) {
+		return createJMenuItem(listener, command, command.getIcon(), ks, mnemonic,
+			enabled);
+	}
+  
+  /**
 	 * Creates a {@link JSpinner} with the given properties.
 	 * 
 	 * @param model
@@ -978,8 +1006,8 @@ public class GUITools {
   public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c) {
     return enableOkButtonIfAllComponentsReady(c, false);
   }
-  
-  /**
+	
+	/**
    * Simply checks if all elements on "c" are enabled and if yes, the given "okButton" will
    * be enabled. Else, the current state stays untouched.
    * 
@@ -997,8 +1025,8 @@ public class GUITools {
       return false;
     }
   }
-	
-	/**
+  
+  /**
    * Checks if this "c" contains a #{@link javax.swing.AbstractButton} which
    * is called "OK" and enables this button if and only if it a) exists and is
    * disabled and b) all other elements on this container and all
@@ -1027,6 +1055,7 @@ public class GUITools {
     return false;
   }
   
+  
   /**
 	 * 
 	 * @param menu
@@ -1050,7 +1079,6 @@ public class GUITools {
 		}
 		return null;
 	}
-  
   
   /**
    * Tries to get the lokalized cancel Button Message, as it occurs
@@ -1220,8 +1248,9 @@ public class GUITools {
       splash.close();
     } catch (Throwable t) {}
   }
-  
-  /**
+
+
+	/**
    * @param g
    * @param incrementBy
    * @return
@@ -1229,9 +1258,8 @@ public class GUITools {
   public static Font incrementFontSize(Font g, int incrementBy) {
     return g.deriveFont((float) (g.getSize() + incrementBy));
   }
-
-
-	/**
+  
+  /**
    * Initializes the look and feel.
    */
   public static void initLaF() {
@@ -1682,7 +1710,8 @@ public class GUITools {
       children[i].setBackground(color);
     }
   }
-  
+
+
   /**
    * @param c
    * @param enabled
@@ -1696,8 +1725,7 @@ public class GUITools {
       children[i].setEnabled(enabled);
     }
   }
-
-
+  
   /**
    * Tries to recursively find instances of {@link AbstractButton} within the
    * given container and sets their enabled status to the given value.
@@ -1784,6 +1812,7 @@ public class GUITools {
     }
   }
   
+  
   /**
    * 
    * @param state
@@ -1793,7 +1822,6 @@ public class GUITools {
   public static void setEnabled(boolean state, JMenuBar menuBar, Object command) {
     setEnabled(state, menuBar, new Object[] {command});
   }
-  
   
   /**
    * @param state
@@ -1826,6 +1854,7 @@ public class GUITools {
     }
   }
   
+  
   /**
    * Recursively set opaque to a value for p and all JComoponents on p.
    * @param p
@@ -1842,7 +1871,6 @@ public class GUITools {
     }
     
   }
-  
   
   /**
    * Show a {@link JPanel} as {@link Dialog}.
@@ -1954,6 +1982,7 @@ public class GUITools {
     return retVal;
   }
   
+  
   /**
    * 
    * @param parent
@@ -1962,7 +1991,6 @@ public class GUITools {
   public static void showErrorMessage(Component parent, String message) {
     showErrorMessage(parent, null, message);
   }
-  
   
   /**
    * Displays the error message on a {@link JOptionPane}.
@@ -2011,6 +2039,30 @@ public class GUITools {
     }
   }
   
+
+  /**
+	 * Shows a dialog that displays the given {@link listIndex} of {@link Object}s
+	 * together with a label and a title.
+	 * 
+	 * @param parent
+	 * @param label
+	 *        A description what the purpose of the given {@link List} of
+	 *        {@link File}s is.
+	 * @param title
+	 * @param things
+	 */
+	public static void showListMessage(Component parent, String label,
+		String title, List<?> things) {
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(new JLabel(StringUtil.toHTML(label, TOOLTIP_LINE_LENGTH)),
+			BorderLayout.NORTH);
+		panel.add(new JScrollPane(new JList(things.toArray())));
+		JOptionPane.showMessageDialog(parent, panel, title,
+			JOptionPane.WARNING_MESSAGE);
+	}
+  
+  
+  
   /**
    * Shows a simple message with a given title and an ok button.
    * 
@@ -2023,7 +2075,6 @@ public class GUITools {
       TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
   }
   
-
   /**
    * Displays a message on a message dialog window, i.e., an HTML document.
    * 
@@ -2037,9 +2088,8 @@ public class GUITools {
   public static void showMessage(URL path, String title, Component owner) {
     showMessage(path, title, owner, null);
   }
-  
-  
-  
+
+
   /**
    * @param path
    * @param title
@@ -2085,7 +2135,8 @@ public class GUITools {
       showErrorMessage(owner, exc);
     }
   }
-  
+
+
   /**
    * Show the component in an information message context, but does
    * not wait until the user clicks ok, but simply invokes this
@@ -2137,8 +2188,7 @@ public class GUITools {
         TOOLTIP_LINE_LENGTH), resource.getString("NO_READ_ACCESS_TITLE"),
         JOptionPane.WARNING_MESSAGE);
   }
-
-
+  
   /**
    * 
    * @param parent
@@ -2153,8 +2203,7 @@ public class GUITools {
         TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
         JOptionPane.WARNING_MESSAGE);
   }
-
-
+  
   /**
    * Shows an ok/ cancel dialog in a new thread. You can specify runnables that
    * are executed, depending if the user confirms the dialog or not.
@@ -2206,8 +2255,8 @@ public class GUITools {
       }
     }
   }
-  
-  /**
+
+	/**
    * Shows the output of a process inside a textarea.
    * Autoscrolls as the process genereates output and
    * automatically disables the ok-button as long as
@@ -2277,8 +2326,8 @@ public class GUITools {
     
     return area;
   }
-  
-  /**
+
+	/**
    * Show a Question Dialog
    * @param parent may be null
    * @param message question to display
@@ -2290,6 +2339,8 @@ public class GUITools {
     return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
       title, optionType, JOptionPane.QUESTION_MESSAGE);
   }
+  
+
 
 	/**
    * Show a Question Dialog
@@ -2306,7 +2357,7 @@ public class GUITools {
       JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
   }
 
-	/**
+  /**
    * Shows a {@link JFileChooser} to the user, appends the selected file extension to the
    * selected file and checks weather the selected file is writable. If the file already
    * exists, the user will be asked if he wants to overwrite the file. If the file is not
@@ -2354,29 +2405,6 @@ public class GUITools {
     }
     return null;
   }
-  
-
-
-	/**
-	 * Shows a dialog that displays the given {@link listIndex} of {@link Object}s
-	 * together with a label and a title.
-	 * 
-	 * @param parent
-	 * @param label
-	 *        A description what the purpose of the given {@link List} of
-	 *        {@link File}s is.
-	 * @param title
-	 * @param things
-	 */
-	public static void showListMessage(Component parent, String label,
-		String title, List<?> things) {
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(new JLabel(StringUtil.toHTML(label, TOOLTIP_LINE_LENGTH)),
-			BorderLayout.NORTH);
-		panel.add(new JScrollPane(new JList(things.toArray())));
-		JOptionPane.showMessageDialog(parent, panel, title,
-			JOptionPane.WARNING_MESSAGE);
-	}
 
   /**
 	 * Swaps the {@link KeyStroke} associated with the {@link JMenuItem}s that
