@@ -108,11 +108,18 @@ public class JTableRowBased extends JTable {
     cellEditors.put(new ValuePair<Integer, Integer>(row, col), editor);
   }
   
+  /* (non-Javadoc)
+   * @see javax.swing.JTable#getCellEditor(int, int)
+   */
   public TableCellEditor getCellEditor(int row, int col) {
     TableCellEditor tmpEditor = cellEditors.get(new ValuePair<Integer, Integer>(row, col));
     
-    if (tmpEditor==null && rm != null) tmpEditor = rm.getEditor(row);
-    if (tmpEditor != null) return tmpEditor;
+    if ((tmpEditor == null) && (rm != null)) {
+    	tmpEditor = rm.getEditor(row);
+    }
+    if (tmpEditor != null) {
+    	return tmpEditor;
+    }
     return super.getCellEditor(row, col);
   }
   

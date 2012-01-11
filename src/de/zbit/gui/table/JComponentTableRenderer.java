@@ -28,6 +28,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import de.zbit.gui.ColorPalette;
+
 /**
  * A {@link TableCellRenderer} that draws {@link JComponent}s.
  * @author Clemens Wrzodek
@@ -48,18 +50,22 @@ public class JComponentTableRenderer implements TableCellRenderer, ListCellRende
   }
 
   private void configureRenderer(JLabel renderer, Object value) {
-    if (value==null) {
+    if (value == null) {
       renderer.setText(" ");
     } else if (value instanceof Color) {
       renderer.setText(value.toString());
-      renderer.setBackground((Color)value);
+      renderer.setBackground((Color) value);
     } else {
       renderer.setText(value.toString());
-      if (defaultFGcolor!=null)
+      if (defaultFGcolor != null) {
         renderer.setForeground(defaultFGcolor);
+      }
     }
   }
 
+  /* (non-Javadoc)
+   * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
+   */
   public Component getListCellRendererComponent(JList list, Object value, int index,
       boolean isSelected, boolean cellHasFocus) {
     if (value instanceof Component) return (Component) value;
@@ -69,14 +75,50 @@ public class JComponentTableRenderer implements TableCellRenderer, ListCellRende
     configureRenderer(listRenderer, value);
     return listRenderer;
   }
+  
+	/**
+	 * An array that allows to store the background {@link Color}s of rows. The
+	 * first row will have the first background {@link Color}, the second row the
+	 * second {@link Color} etc. At the end of the array's length, it will repeat
+	 * again.
+	 */
+	private Color bg[];
+	
+	public JComponentTableRenderer() {
+		super();
+		this.bg = new Color[] {Color.WHITE, ColorPalette.lightBlue};
+	}
+	
+	/**
+	 * @return the background colors.
+	 */
+	public Color[] getBackgroundColors() {
+		return bg;
+	}
+	
+	/**
+	 * @param bg the background colors to set
+	 */
+	public void setBackgroundColors(Color... bg) {
+		this.bg = bg;
+	}
 
+  /* (non-Javadoc)
+   * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+   */
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
       boolean hasFocus, int row, int column) {
-    if (value instanceof Component) return (Component) value;
-    else if (tableRenderer==null) tableRenderer = new DefaultTableCellRenderer();
+    if (value instanceof Component) {
+    	return (Component) value;
+    } else if (tableRenderer == null) {
+    	tableRenderer = new DefaultTableCellRenderer();
+    }
     tableRenderer = (DefaultTableCellRenderer) tableRenderer.getTableCellRendererComponent(table,
         value, isSelected, hasFocus, row, column);
     configureRenderer(tableRenderer, value);
+		if ((bg != null) && (bg.length > 0)) {
+			tableRenderer.setBackground(bg[row % bg.length]);
+		}
     return tableRenderer;
   }
   

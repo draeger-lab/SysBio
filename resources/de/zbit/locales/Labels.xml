@@ -61,6 +61,10 @@
   <entry key="SKIP_THIS_NUMBER_OF_LEADING_LINES">Skip that much lines at the beginning of the file.</entry>
   <entry key="SKIP_LINES">Skip lines</entry>
   
+  <!-- ColorEditor -->
+  
+  <entry key="PICK_A_COLOR">Pick a color</entry>
+  
   <!-- FileHistory -->
   
   <entry key="LAST_OPENED">This memorizes the last files that have been opened by the program.</entry>
