@@ -76,7 +76,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * 
 	 */
 	private static final ResourceBundle resource = ResourceManager
-			.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+			.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 	/**
 	 * Generated serial version id.
 	 */
@@ -324,7 +324,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		button.setMnemonic(labels[0].charAt(0));
 		button.addActionListener(this);
 		button.setActionCommand(command);
-		button.setToolTipText(StringUtil.toHTML(labels[1], GUITools.TOOLTIP_LINE_LENGTH));
+		button.setToolTipText(StringUtil.toHTMLToolTip(labels[1]));
 		button.setEnabled(enabled);
 		return button;
 	}
@@ -384,6 +384,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		JButton cancel = createButton(CANCEL, true);
 		apply = createButton(APPLY, false);
 		ok = createButton(OK, true);
+		ok.setSelected(true);
 		
 		GUITools.calculateAndSetMaxWidth(defaults, cancel, apply, ok);
 		

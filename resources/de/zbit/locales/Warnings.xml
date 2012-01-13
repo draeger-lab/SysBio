@@ -21,6 +21,11 @@
   
   <entry key="CANNOT_FOLLOW_LINK">Can't follow link to </entry>
   
+  <!-- MultipleTableView -->
+  
+  <entry key="NO_TAB_WITH_INDEX">No tab with index %d</entry> <!-- requires an index -->
+  <entry key="NO_TAB_WITH_TITLE">No tab wiht title "%s"</entry> <!-- requires a string -->
+  
   <!-- Option -->
   
   <entry key="VALUE_MUST_BE_POSITIVE">%s must be a positive number.</entry>

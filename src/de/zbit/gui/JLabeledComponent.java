@@ -67,6 +67,7 @@ import de.zbit.io.CSVReader;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
@@ -83,7 +84,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   /**
    * 
    */
-  protected static ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+  protected static ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
   
   /**
    * 

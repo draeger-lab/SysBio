@@ -69,6 +69,7 @@ import de.zbit.io.CSVReader;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.FileTools;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.StringUtil;
 
 /**
  * A graphical CSV Importer with very flexible column choosers.
@@ -630,7 +631,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
    * @throws IOException
    */
   public static boolean showDialog(Component parent, final CSVImporterV2 c) throws IOException {
-  	ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+  	ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
     return showDialog(parent, String.format(bundle.getString("CSV_IMPORT_TITLE"), FileTools.getFilename(c.getCSVReader().getFilename())), c);
   }
   

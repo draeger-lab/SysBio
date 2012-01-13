@@ -493,7 +493,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		JMenu menu;
 		JMenuItem item;
 		Object action = null;
-		ResourceBundle resources = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+		ResourceBundle resources = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 		JToolBar toolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
 		toolBar.setOpaque(true);
 		if (GUITools.isMacOSX()) {
@@ -630,7 +630,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 					fileHistory.setToolTipText(tooltip);
 				} else {
 					fileHistory.setToolTipText(StringUtil.toHTML(tooltip,
-						GUITools.TOOLTIP_LINE_LENGTH, false));
+						StringUtil.TOOLTIP_LINE_LENGTH, false));
 				}
 			}
 			SBPreferences history = SBPreferences
@@ -1468,7 +1468,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 */
 	public final void showAboutMessage() {
 		ResourceBundle resources = ResourceManager
-				.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+				.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 		JPanel panel = new JPanel(new BorderLayout());
 		JLabel label = new JLabel();
 		label.setIcon(UIManager.getIcon("UT_WBMW_mathnat_4C_380x45"));
@@ -1489,7 +1489,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 */
 	public final void showLicense() {
 		ResourceBundle resources = ResourceManager
-				.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+				.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 		JOptionPane.showMessageDialog(this, createJBrowser(getURLLicense(), 640,
 			480, true), String.format(resources.getString("LICENSE_OF_THE_PROGRAM"),
 			getProgramNameAndVersion()), JOptionPane.INFORMATION_MESSAGE, UIManager
@@ -1502,7 +1502,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	public final void showOnlineHelp() {
 		GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_ONLINE);
 		ResourceBundle resources = ResourceManager
-				.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+				.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 		JHelpBrowser.showOnlineHelp(this, EventHandler.create(WindowListener.class,
 			this, "activateOnlineHelpCommand", null, "windowClosed"), String.format(
 			resources.getString("ONLINE_HELP_FOR_THE_PROGRAM"),

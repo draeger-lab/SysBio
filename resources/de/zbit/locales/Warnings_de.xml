@@ -19,8 +19,13 @@
   
   <!-- JBrowserPane -->
   
-  <entry key="CANNOT_FOLLOW_LINK">Es ist nicht möglich, folgendem Verweis nachzugehen: </entry>
+  <entry key="CANNOT_FOLLOW_LINK">Es ist nicht möglich, folgendem Verweis nachzugehen: </entry>  
     
+  <!-- MultipleTableView -->
+  
+  <entry key="NO_TAB_WITH_INDEX">Kein Reiter mit Index %d</entry> <!-- requires an index -->
+  <entry key="NO_TAB_WITH_TITLE">Kein Reiter mit Titel "%s"</entry> <!-- requires a string -->
+  
   <!-- Option -->
   
   <entry key="VALUE_MUST_BE_POSITIVE">%s muss eine positive Zahl sein.</entry>

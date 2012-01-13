@@ -27,8 +27,8 @@ import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
-import de.zbit.gui.GUITools;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.StringUtil;
 
 /**
  * A {@link TableCellEditor} that allows users to select a {@link Color} within
@@ -85,7 +85,7 @@ public class ColorEditor extends AbstractCellEditor implements TableCellEditor,
 		// Set up the dialog that the button brings up.
 		colorChooser = new JColorChooser();
 		dialog = JColorChooser.createDialog(button,
-			ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS)
+			ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS)
 					.getString("PICK_A_COLOR"), true, colorChooser, this, null);
 	}
 

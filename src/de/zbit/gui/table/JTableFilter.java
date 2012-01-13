@@ -38,7 +38,7 @@ public class JTableFilter extends JPanel {
   private static final long serialVersionUID = 6976706059419605006L;
 
   /** Bundle to get localized Strings. **/
-  protected static ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+  protected static ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
   
   /**
    * String and identifier for arbitrary regular expressions.

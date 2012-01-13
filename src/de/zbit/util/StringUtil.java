@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  */
 public class StringUtil {
 	
-	/**
+  /**
 	 * The file separator of the operating system.
 	 */
 	private static final char fileSeparator = System.getProperty("file.separator").charAt(0);
@@ -46,25 +46,22 @@ public class StringUtil {
 	 * New line separator of this operating system
 	 */
   private static final String newLine = System.getProperty("line.separator");
+	
+	/**
+   * The location for texts of labels. 
+   */
+  public static final String RESOURCE_LOCATION_FOR_LABELS = "de.zbit.locales.Labels";
+
+  /**
+   * The location for warning message texts.
+   */
+	public static final String RESOURCE_LOCATION_FOR_WARNINGS = "de.zbit.locales.Warnings";
   
 
 	/**
-	 * This just computes the minimum of three integer values.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return Gives the minimum of three integers
-	 */
-	private static int min(int x, int y, int z) {
-		if ((x < y) && (x < z)) {
-			return x;
-		}
-		if (y < z) {
-			return y;
-		}
-		return z;
-	}
+   * The number of symbols per line in tool tip texts.
+   */
+  public static int TOOLTIP_LINE_LENGTH = 60;
   
 	/**
 	 * Adds a prefix or/and suffix to each element.
@@ -294,6 +291,15 @@ public class StringUtil {
 //		}
 //	}
 	
+	
+	/**
+	 * Escape all HTML Characters in <code>string</code>.
+	 * @param string
+	 * @return string with escaped characters.
+	 */
+	public static String escapeHTMLchars(String string) {
+	  return EscapeChars.forHTML(string);
+	}
 	
 	/**
 	 * 
@@ -862,7 +868,7 @@ public class StringUtil {
 		}
 		return costMatrix[costMatrix.length - 1][costMatrix[costMatrix.length - 1].length - 1];
 	}
-	
+
 	/**
 	 * <p>
 	 * Returns the concatenated strings of the array separated with the given
@@ -887,8 +893,8 @@ public class StringUtil {
     }
     return out.toString();
 	}
-
-	/**
+  
+  /**
 	 * <p>
 	 * Returns the concatenated strings of the array separated with the given
 	 * delimiter. Useful for constructing queries from arrays.
@@ -913,8 +919,29 @@ public class StringUtil {
 		}
 		return out.toString();
 	}
-  
-  /**
+	
+	/**
+   * Perform an indexOf with mutliple strings.
+   * @param string
+   * @param lookFor multiple strings to search for. Returns 
+   * @return the first occurance of any of <code>lookFor</code> strings.
+   */
+  public static int indexOf(String string, String... lookFor) {
+    int firstMatch = -1;
+    if (lookFor!=null) {
+      for (String s: lookFor) {
+        int pos = string.indexOf(s);
+        if (pos==0) return pos; // can not get lower
+        else if (pos>0 && (pos<firstMatch || firstMatch<0)) {
+          firstMatch = pos;
+        }
+      }
+    }
+    
+    return firstMatch;
+  }
+	
+	/**
    * See same method in {@link String}. Helper method used by other methods.
    * @return
    */
@@ -955,7 +982,7 @@ public class StringUtil {
     return -1;
   }
 	
-	/**
+  /**
    *
    * @param   source      the string to search.
    * @param   str   any string.
@@ -980,7 +1007,7 @@ public class StringUtil {
     return indexOfIgnoreCase(source.toCharArray(), 0, source.length(),
       str.toCharArray(), 0, str.length(), fromIndex);
   }
-	
+
   /**
 	 * @see #insertLineBreaksAndCount(String, int, String, boolean)
 	 * @param message
@@ -992,8 +1019,8 @@ public class StringUtil {
 		String lineBreakSymbol) {
 		return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, false).getA();
 	}
-	
-	/**
+
+  /**
 	 * @see #insertLineBreaksAndCount(String, int, String, boolean)
 	 * @param message
 	 * @param lineBreak breaks AFTER this number of characters is exceeded.
@@ -1169,7 +1196,7 @@ public class StringUtil {
     
     return matches;
   }
-
+  
   /**
 	 * Merges the two given arrays of Strings according to a lexicographic
 	 * order.
@@ -1198,7 +1225,25 @@ public class StringUtil {
 		}
 		return l.toArray(new String[] {});
 	}
-
+  
+  /**
+	 * This just computes the minimum of three integer values.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return Gives the minimum of three integers
+	 */
+	private static int min(int x, int y, int z) {
+		if ((x < y) && (x < z)) {
+			return x;
+		}
+		if (y < z) {
+			return y;
+		}
+		return z;
+	}
+  
   /**
 	 * 
 	 * @return
@@ -1219,7 +1264,7 @@ public class StringUtil {
     }
     return ret.toString();
   }
-  
+
   /**
    * Removes all character from the string that are not valid in file names.
    * @param outFile
@@ -1241,7 +1286,7 @@ public class StringUtil {
   public static String removeXML(String string) {
     return string.replaceAll("\\<.*?\\>", "");
   }
-  
+	
   /**
 	 * Returns a HTML formated String without inserting linebreaks.
 	 * 
@@ -1251,8 +1296,8 @@ public class StringUtil {
 	public static String toHTML(String string) {
 		return toHTML(string, Integer.MAX_VALUE);
 	}
-
-  /**
+	
+	/**
    * Returns a HTML formated String, in which each line is at most lineBreak
    * symbols long.
    * 
@@ -1262,15 +1307,6 @@ public class StringUtil {
    */
 	public static String toHTML(String string, int lineBreak) {
 	  return toHTML(string, lineBreak, true);
-	}
-	
-	/**
-	 * Escape all HTML Characters in <code>string</code>.
-	 * @param string
-	 * @return string with escaped characters.
-	 */
-	public static String escapeHTMLchars(String string) {
-	  return EscapeChars.forHTML(string);
 	}
 
   /**
@@ -1306,24 +1342,14 @@ public class StringUtil {
 	}
 
   /**
-   * Perform an indexOf with mutliple strings.
-   * @param string
-   * @param lookFor multiple strings to search for. Returns 
-   * @return the first occurance of any of <code>lookFor</code> strings.
+   * Creates an appropriate tool tip text.
+   * 
+   * @param format A {@link String} that might contain format commands
+   * @param args optional replacements according to the format {@link String}
+   * @return An HTML string with line breaks after {@link #TOOLTIP_LINE_LENGTH}
    */
-  public static int indexOf(String string, String... lookFor) {
-    int firstMatch = -1;
-    if (lookFor!=null) {
-      for (String s: lookFor) {
-        int pos = string.indexOf(s);
-        if (pos==0) return pos; // can not get lower
-        else if (pos>0 && (pos<firstMatch || firstMatch<0)) {
-          firstMatch = pos;
-        }
-      }
-    }
-    
-    return firstMatch;
-  }
+	public static String toHTMLToolTip(String format, Object... args) {
+		return toHTML(String.format(format, args), TOOLTIP_LINE_LENGTH);
+	}
   
 }
