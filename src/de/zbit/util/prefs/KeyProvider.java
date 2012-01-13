@@ -30,7 +30,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zbit.gui.GUITools;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
@@ -141,7 +140,7 @@ public interface KeyProvider {
 			Class<? extends KeyProvider> keyProvider, int headerRank) {
 			StringBuilder sb = new StringBuilder();
 			ResourceBundle bundle = ResourceManager
-					.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);					
+					.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);					
 			List<OptionGroup> groupList = optionGroupList(keyProvider);
 			List<Option> optionList = optionList(keyProvider);
 			if (groupList.size() > 0) {
@@ -297,7 +296,7 @@ public interface KeyProvider {
 		public static String createDocumentation(String applicationName,
 			Class<? extends KeyProvider>... keyProviders) {
 			StringBuilder sb = new StringBuilder();
-			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+			ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 			String cmdArgs = bundle.getString("COMMAND_LINE_ARGUMENTS");
 			if (applicationName != null && applicationName.length()>0) {
 				sb.append(createDocumentationHeader(StringUtil.concat(applicationName,
@@ -391,7 +390,7 @@ public interface KeyProvider {
 		public static String createTitle(Class<?> clazz) {
 			String title = clazz.getSimpleName();
       ResourceBundle bundle = ResourceManager
-          .getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+          .getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
       if (bundle.containsKey(title)) {
         return bundle.getString(title);
       }
@@ -688,10 +687,10 @@ public interface KeyProvider {
 					sb.append("</tr>\n        <tr><td width=\"6%\"> </td>\n");
 					sb.append("        <td>\n          ");
 					sb.append(StringUtil.insertLineBreaks(option.getToolTip(),
-						GUITools.TOOLTIP_LINE_LENGTH, "\n          "));
+						StringUtil.TOOLTIP_LINE_LENGTH, "\n          "));
 					Range<?> range = option.getRange();
 					ResourceBundle bundle = ResourceManager
-							.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+							.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 					if (range != null) {
 						List<?> list = range.getAllAcceptableValues();
 						String value;
@@ -708,7 +707,7 @@ public interface KeyProvider {
 							for (int i = 0; i < list.size(); i++) {
 								if ((i > 0) && (list.size() > 2)) {
 									sb.append(',');
-									if (lineLength > GUITools.TOOLTIP_LINE_LENGTH) {
+									if (lineLength > StringUtil.TOOLTIP_LINE_LENGTH) {
 										sb.append("\n          ");
 										lineLength = 0;
 									} else {

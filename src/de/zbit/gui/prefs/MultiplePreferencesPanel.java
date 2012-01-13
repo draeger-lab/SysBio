@@ -38,6 +38,7 @@ import javax.swing.event.ChangeListener;
 import de.zbit.gui.GUITools;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
@@ -310,7 +311,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * @see de.zbit.gui.cfg.PreferencesPanel#getTitle()
 	 */
 	public String getTitle() {
-		return ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS)
+		return ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS)
 				.getString("USER_PREFERENCES");
 	}
 

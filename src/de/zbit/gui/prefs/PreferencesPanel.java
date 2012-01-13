@@ -60,7 +60,6 @@ import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.ColorChooserWithPreview;
 import de.zbit.gui.ExpandablePanel;
-import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.csv.CSVReaderOptionPanel;
@@ -889,7 +888,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     
     // Set Border, Name and ToolTip
     String title = (optGrp.isSetName()) ? StringUtil.concat(" ", optGrp.getName().trim(), " ").toString() : null;
-    String toolTip = (optGrp.isSetToolTip()) ? StringUtil.toHTML(optGrp.getToolTip(), GUITools.TOOLTIP_LINE_LENGTH) : null;
+    String toolTip = (optGrp.isSetToolTip()) ? StringUtil.toHTMLToolTip(optGrp.getToolTip()) : null;
     groupPanel.setToolTipText(toolTip);
     if (optGrp.isCollapsable()) {
       // Create a collapsible panel

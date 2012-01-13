@@ -40,8 +40,8 @@ import javax.swing.JSeparator;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-import de.zbit.gui.GUITools;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.StringUtil;
 
 /**
  * This class implements a basic wizard dialog, where the programmer can insert
@@ -476,7 +476,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
 
   private void initComponents() {
 
-    ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+    ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 
     BACK_TEXT = bundle.getString("WIZARD_BACK");
     NEXT_TEXT = bundle.getString("WIZARD_NEXT");

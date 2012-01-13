@@ -77,11 +77,14 @@ public class ColoredBooleanRenderer extends JCheckBox implements
 		boolean isSelected, boolean hasFocus, int row, int column) {
 		if (isSelected) {
       setForeground(table.getSelectionForeground());
+      setBackground(table.getSelectionBackground());
 		} else {
 			setForeground(table.getForeground());
-		}
-		if ((bg != null) && (bg.length > 0)) {
-			setBackground(bg[row % bg.length]);
+			if ((bg != null) && (bg.length > 0)) {
+				setBackground(bg[row % bg.length]);
+			} else {
+				setBackground(table.getBackground());
+			}
 		}
 		setSelected(((value != null) && ((Boolean) value).booleanValue()));
 		setOpaque(true);

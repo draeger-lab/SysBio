@@ -119,16 +119,6 @@ public class GUITools {
   private static final Logger logger = Logger.getLogger(GUITools.class.getName());
   
   /**
-   * The location for texts of labels. 
-   */
-  public static final String RESOURCE_LOCATION_FOR_LABELS = "de.zbit.locales.Labels";
-  
-  /**
-   * The number of symbols per line in tool tip texts.
-   */
-  public static int TOOLTIP_LINE_LENGTH = 60;
-  
-  /**
    * Build a panel with cancel and ok buttons.
    * When any button is pressed, it will trigger setVisible(false).
    * <p>You can check if ok has been pressed with
@@ -243,7 +233,7 @@ public class GUITools {
 		// Show copyright in lower left corner
 		if (showCopyright) {
 			ResourceBundle resources = ResourceManager
-					.getBundle(RESOURCE_LOCATION_FOR_LABELS);
+					.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 			
 			String cMessage = String.format(resources.getString("COPYRIGHT_MESSAGE"),
 				"", yearOfProjectStart, yearOfRelease).trim();
@@ -279,7 +269,7 @@ public class GUITools {
   
   /**
    * Creates a JButton with the given properties. The tool tip becomes an HTML
-   * formatted string with a line break after {@link #TOOLTIP_LINE_LENGTH} symbols.
+   * formatted string with a line break after {@link #StringUtil.TOOLTIP_LINE_LENGTH} symbols.
    * 
    * @param icon
    * @param listener
@@ -300,7 +290,7 @@ public class GUITools {
       button.setActionCommand(command.toString());
     }
     if (toolTip != null) {
-      button.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH ));
+      button.setToolTipText(StringUtil.toHTML(toolTip, StringUtil.TOOLTIP_LINE_LENGTH));
     }
     return button;
   }
@@ -392,7 +382,7 @@ public class GUITools {
       button.setText(command.getName());
       String toolTip = command.getToolTip();
       if (toolTip != null) {
-        button.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
+        button.setToolTipText(StringUtil.toHTML(toolTip, StringUtil.TOOLTIP_LINE_LENGTH));
       }
       button.setActionCommand(command.toString());
     }
@@ -455,7 +445,7 @@ public class GUITools {
 				chkbx.addItemListener(l);
 			}
 		}
-		chkbx.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
+		chkbx.setToolTipText(StringUtil.toHTML(toolTip, StringUtil.TOOLTIP_LINE_LENGTH));
 		return chkbx;
 	}
   
@@ -508,7 +498,7 @@ public class GUITools {
 			box.setName(name);
 		}
 		if ((tooltip != null) && (tooltip.length() > 0)) {
-			box.setToolTipText(StringUtil.toHTML(tooltip, TOOLTIP_LINE_LENGTH));
+			box.setToolTipText(StringUtil.toHTML(tooltip, StringUtil.TOOLTIP_LINE_LENGTH));
 		}
 		if (listeners != null) {
 			for (ItemListener listener : listeners) {
@@ -581,8 +571,8 @@ public class GUITools {
       tooltip = description[1];
     }
     if (tooltip != null) {
-      button.setToolTipText(StringUtil.toHTML(tooltip,
-        GUITools.TOOLTIP_LINE_LENGTH));
+			button.setToolTipText(StringUtil.toHTML(tooltip,
+				StringUtil.TOOLTIP_LINE_LENGTH));
     }
     button.setName(name);
     button.setActionCommand(name);
@@ -688,7 +678,7 @@ public class GUITools {
     	if (isMacOSX()) {
     		menu.setToolTipText(tooltip);
     	} else {
-        menu.setToolTipText(StringUtil.toHTML(tooltip, TOOLTIP_LINE_LENGTH));
+        menu.setToolTipText(StringUtil.toHTML(tooltip, StringUtil.TOOLTIP_LINE_LENGTH));
     	}
     }
     return menu;
@@ -827,7 +817,7 @@ public class GUITools {
 				if (isMacOSX()) {
 					item.setToolTipText(toolTip);
 				} else {
-					item.setToolTipText(StringUtil.toHTML(toolTip, TOOLTIP_LINE_LENGTH));
+					item.setToolTipText(StringUtil.toHTML(toolTip, StringUtil.TOOLTIP_LINE_LENGTH));
 				}
 			}
 			item.setActionCommand(command.toString());
@@ -901,7 +891,7 @@ public class GUITools {
 			spinner.setName(name);
 		}
 		if ((tooltip != null) && (tooltip.length() > 0)) {
-			spinner.setToolTipText(StringUtil.toHTML(tooltip, TOOLTIP_LINE_LENGTH));
+			spinner.setToolTipText(StringUtil.toHTML(tooltip, StringUtil.TOOLTIP_LINE_LENGTH));
 		}
 		spinner.setEnabled(enabled);
 		if (cl != null) {
@@ -1086,11 +1076,14 @@ public class GUITools {
     if (cancel!=null) return cancel.toString();
     
     // Second, try to get it from the internal resources
-    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
-    cancel = resource==null?null: resource.getString("CANCEL");
-    if (cancel!=null) {
-      if (cancel.toString().contains(";")) return cancel.toString().split(";")[0];
-      else return cancel.toString();
+    ResourceBundle resource = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+    cancel = resource == null ? null: resource.getString("CANCEL");
+    if (cancel != null) {
+      if (cancel.toString().contains(";")) {
+      	return cancel.toString().split(";")[0];
+      } else {
+      	return cancel.toString();
+      }
     }
     
     return "Cancel";
@@ -1203,11 +1196,14 @@ public class GUITools {
     if (ok!=null) return ok.toString();
     
     // Second, try to get it from the internal resources
-    ResourceBundle resource = ResourceManager.getBundle(RESOURCE_LOCATION_FOR_LABELS);
-    ok = resource==null?null: resource.getString("OK");
-    if (ok!=null) {
-      if (ok.toString().contains(";")) return ok.toString().split(";")[0];
-      else return ok.toString();
+    ResourceBundle resource = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+    ok = resource == null ? null : resource.getString("OK");
+    if (ok != null) {
+      if (ok.toString().contains(";")) {
+      	return ok.toString().split(";")[0];
+      } else {
+      	return ok.toString();
+      }
     }
     
     return "OK";
@@ -1472,12 +1468,12 @@ public class GUITools {
    */
   public static int overwriteExistingFileDialog(Component parent, File out) {
     ResourceBundle resource = ResourceManager
-    .getBundle(RESOURCE_LOCATION_FOR_LABELS);
+    .getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
     return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(String
       .format(resource.getString("OVERRIDE_EXISTING_FILE_QUESTION"),
         StringUtil.changeFirstLetterCase(resource
           .getString(out.isFile() ? "THE_FILE" : "THE_DIRECTORY"), true,
-          false), out.getName()), TOOLTIP_LINE_LENGTH), resource
+          false), out.getName()), StringUtil.TOOLTIP_LINE_LENGTH), resource
           .getString("OVERRIDE_EXISTING_FILE_TITLE"), JOptionPane.YES_NO_OPTION,
           JOptionPane.QUESTION_MESSAGE);
   }
@@ -1999,7 +1995,7 @@ public class GUITools {
     
     if (logger!=null) logger.log(Level.WARNING, msg, exc);
     ValuePair<String, Integer> messagePair = StringUtil
-    .insertLineBreaksAndCount(msg, TOOLTIP_LINE_LENGTH, "\n");
+    .insertLineBreaksAndCount(msg, StringUtil.TOOLTIP_LINE_LENGTH, "\n");
     Object message;
     if (messagePair.getB().intValue() > 30) {
       JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
@@ -2051,7 +2047,7 @@ public class GUITools {
 	public static void showListMessage(Component parent, String label,
 		String title, List<?> things) {
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(new JLabel(StringUtil.toHTML(label, TOOLTIP_LINE_LENGTH)),
+		panel.add(new JLabel(StringUtil.toHTML(label, StringUtil.TOOLTIP_LINE_LENGTH)),
 			BorderLayout.NORTH);
 		panel.add(new JScrollPane(new JList(things.toArray())));
 		JOptionPane.showMessageDialog(parent, panel, title,
@@ -2069,7 +2065,7 @@ public class GUITools {
    */
   public static void showMessage(String message, String title) {
     JOptionPane.showMessageDialog(null, StringUtil.toHTML(message,
-      TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
+      StringUtil.TOOLTIP_LINE_LENGTH), title, JOptionPane.INFORMATION_MESSAGE);
   }
   
   /**
@@ -2177,12 +2173,12 @@ public class GUITools {
    * @param file
    */
   public static void showNowReadingAccessWarning(Component parent, File file) {
-    ResourceBundle resource = ResourceManager
-    .getBundle(RESOURCE_LOCATION_FOR_LABELS);
+		ResourceBundle resource = ResourceManager
+				.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
     JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
       resource.getString("NO_READ_ACCESS_MESSAGE"), resource.getString(file
         .isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
-        TOOLTIP_LINE_LENGTH), resource.getString("NO_READ_ACCESS_TITLE"),
+        StringUtil.TOOLTIP_LINE_LENGTH), resource.getString("NO_READ_ACCESS_TITLE"),
         JOptionPane.WARNING_MESSAGE);
   }
   
@@ -2192,12 +2188,12 @@ public class GUITools {
    * @param file
    */
   public static void showNowWritingAccessWarning(Component parent, File file) {
-    ResourceBundle resource = ResourceManager
-    .getBundle(RESOURCE_LOCATION_FOR_LABELS);
+		ResourceBundle resource = ResourceManager
+				.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
     JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
       resource.getString("NO_WRITE_ACCESS_MESSAGE"), resource.getString(file
         .isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
-        TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
+        StringUtil.TOOLTIP_LINE_LENGTH), resource.getString("NO_WRITE_ACCESS_TITLE"),
         JOptionPane.WARNING_MESSAGE);
   }
   
@@ -2333,7 +2329,7 @@ public class GUITools {
    * @return an integer indicating the option selected by the user (e.g. {@link JOptionPane#YES_OPTION})
    */
   public static int showQuestionMessage(Component parent, String message, String title, int optionType) {
-    return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(message, TOOLTIP_LINE_LENGTH), 
+    return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(message, StringUtil.TOOLTIP_LINE_LENGTH), 
       title, optionType, JOptionPane.QUESTION_MESSAGE);
   }
   
@@ -2350,7 +2346,7 @@ public class GUITools {
   public static int showQuestionMessage(Component parent, String message,
     String title, Object... choices) {
     return JOptionPane.showOptionDialog(parent, StringUtil.toHTML(message,
-      TOOLTIP_LINE_LENGTH), title, JOptionPane.DEFAULT_OPTION,
+      StringUtil.TOOLTIP_LINE_LENGTH), title, JOptionPane.DEFAULT_OPTION,
       JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
   }
 

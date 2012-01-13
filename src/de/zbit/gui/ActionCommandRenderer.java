@@ -138,7 +138,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
     // Set ToolTip
     if (toolTip!=null && toolTip.length()>0 && (c instanceof JComponent)) {
       if (showAsHTML) {
-        ((JComponent) c).setToolTipText(StringUtil.toHTML(toolTip, GUITools.TOOLTIP_LINE_LENGTH));
+        ((JComponent) c).setToolTipText(StringUtil.toHTMLToolTip(toolTip));
       } else {
         ((JComponent) c).setToolTipText(toolTip);
       }
@@ -221,7 +221,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
     // Set ToolTip
     if ((toolTip != null) && (toolTip.length() > 0) && (c instanceof JComponent)) {
       if (showAsHTML) {
-        ((JComponent) c).setToolTipText(StringUtil.toHTML(toolTip, GUITools.TOOLTIP_LINE_LENGTH));
+        ((JComponent) c).setToolTipText(StringUtil.toHTMLToolTip(toolTip));
       } else {
         ((JComponent) c).setToolTipText(toolTip);
       }

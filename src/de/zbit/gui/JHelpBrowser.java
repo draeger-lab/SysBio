@@ -52,6 +52,7 @@ import javax.swing.event.HyperlinkListener;
 import de.zbit.gui.prefs.CommandLineHelp;
 import de.zbit.io.SBFileFilter;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
 
@@ -87,7 +88,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		String title, URL fileLocation, Class<? extends KeyProvider>... clazz) {
 		JHelpBrowser helpBrowser = new JHelpBrowser(owner, title, fileLocation);
 		if ((clazz != null) && (clazz.length > 0)) {
-			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+			ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 			JComponent component = CommandLineHelp.createHelpComponent(clazz);
 			helpBrowser.getLayout().removeLayoutComponent(helpBrowser.mainPart);
 			if (component instanceof JTabbedPane) {
@@ -295,7 +296,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
 		this.mainPart = scroll;
 		content.add(scroll, BorderLayout.CENTER);
 		
-		ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+		ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 		
 		JToolBar toolbar = new JToolBar();
 		// image = image.getScaledInstance(22, 22, Image.SCALE_SMOOTH);

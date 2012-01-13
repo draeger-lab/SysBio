@@ -46,6 +46,7 @@ import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
 import de.zbit.util.ResourceManager;
+import de.zbit.util.StringUtil;
 
 /**
  * This class implements a {@link JWindow} object which is shown on the bottom
@@ -121,7 +122,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 			JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			buttonPanel.setBackground(getBackground());
 			
-			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+			ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 			okButton = new JButton(GUITools.getOkButtonText());
 			okButton.addActionListener(this);
 			showHideButton = new JButton(bundle.getString("SHOW_RELEASE_NOTES"));
@@ -178,7 +179,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 		 */
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() instanceof JButton) {
-				ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+				ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 				String buttonText = ((JButton) e.getSource()).getName();
 				if (buttonText==null) buttonText=""; // Simply avoid NullPointerExceptions (=> OK Button)
 				if (buttonText.equals("showReleaseNotes")) {
@@ -361,7 +362,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 			umw.setVisible(true);
 		} else {
 			System.out.printf(ResourceManager.getBundle(
-				GUITools.RESOURCE_LOCATION_FOR_LABELS).getString(
+				StringUtil.RESOURCE_LOCATION_FOR_LABELS).getString(
 				"COMMAND_LINE_UPDATE_MESSAGE"), applicationName, urlPrefix,
 				latestVersion, applicationName, dottedVersionNumber);
 		}
@@ -400,7 +401,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 		} else {
 			if (!hideErrorMessages) {
 				ResourceBundle resources = ResourceManager
-						.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+						.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 				String message = String.format(resources
 						.getString("NO_UPDATE_AVAILABLE_FOR_CURRENT_VERSION_MESSAGE"),
 					dottedVersionNumber, applicationName);

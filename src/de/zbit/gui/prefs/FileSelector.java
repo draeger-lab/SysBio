@@ -158,7 +158,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 		 */
 		public String getLabelText() {
 			ResourceBundle bundle = ResourceManager
-					.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+					.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 			return String.format("%s %s: ", bundle
 					.getString(acceptOnlyFiles() ? "FILE" : "DIRECTORY"), bundle
 							.getString(command.getType() == Type.OPEN ? "OPEN" : "SAVE"));
@@ -179,7 +179,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 		 * @see de.zbit.gui.ActionCommand#getToolTip()
 		 */
 		public String getToolTip() {
-			ResourceBundle bundle = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+			ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 			if (acceptOnlyFiles()) { 
 				return String.format(bundle
 					.getString("SELECT_TARGET_FILE"), bundle
@@ -787,7 +787,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 		textField.setInputVerifier(new FileInputVerifier(
 			acceptOnlyFiles() ? FileInputVerifier.FileType.FILE
 					: FileInputVerifier.FileType.DIRECTORY));
-		ResourceBundle resource = ResourceManager.getBundle(GUITools.RESOURCE_LOCATION_FOR_LABELS);
+		ResourceBundle resource = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 		button = GUITools.createButton(resource.getString("BROWSE"), UIManager
 				.getIcon(type == Type.OPEN ? "ICON_OPEN_16" : "ICON_SAVE_16"), this, type,
 			command.getToolTip());
