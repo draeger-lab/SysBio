@@ -1,6 +1,6 @@
 /*
- * $Id: RegexpNameFilter.java 708 2012-01-06 14:56:40Z snagel $
- * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/jsbml/util/filter/RegexpNameFilter.java $
+ * $Id: RegexpSpeciesReferenceFilter.java 708 2012-01-06 14:56:40Z snagel $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/jsbml/util/filter/RegexpSpeciesReferenceFilter.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -17,22 +17,24 @@
 
 package de.zbit.sbml.jsbml.util.filters;
 
-import org.sbml.jsbml.NamedSBase;
+import org.sbml.jsbml.SimpleSpeciesReference;
+import org.sbml.jsbml.Species;
 import org.sbml.jsbml.util.filters.Filter;
 
 /**
- * This filter only accepts instances of {@link NamedSBase} with the name as
- * given in the constructor of this object.
+ * This is a {@link Filter} that allows to search with a regular expression for a
+ * {@link SimpleSpeciesReference} that refers to a {@link Species} with the
+ * given identifier attribute.
  * 
  * @author Sebastian Nagel
- * @date 2012-01-04
+ * @date 2012-01-14
  * @since 0.8
  * @version $Rev: 708 $
  */
-public class RegexpNameFilter implements Filter {
+public class RegexpSpeciesReferenceFilter implements Filter {
 
 	/**
-	 * The desired regexp for NamedSBases to be acceptable.
+	 * The desired regexp for SimpleSpeciesReference to be acceptable.
 	 */
 	private String regexp;
 	
@@ -57,7 +59,7 @@ public class RegexpNameFilter implements Filter {
 	 * 
 	 * @param regexp
 	 */
-	public RegexpNameFilter(String regexp) {
+	public RegexpSpeciesReferenceFilter(String regexp) {
 		this(regexp, true);
 	}
 	
@@ -66,7 +68,7 @@ public class RegexpNameFilter implements Filter {
 	 * @param regexp
 	 * @param caseSensitive
 	 */
-	public RegexpNameFilter(String regexp, boolean caseSensitive) {
+	public RegexpSpeciesReferenceFilter(String regexp, boolean caseSensitive) {
 		this(regexp, caseSensitive, false);
 	}
 	
@@ -76,7 +78,7 @@ public class RegexpNameFilter implements Filter {
 	 * @param caseSensitive
 	 * @param invert
 	 */
-	public RegexpNameFilter(String regexp, boolean caseSensitive, boolean invert) {
+	public RegexpSpeciesReferenceFilter(String regexp, boolean caseSensitive, boolean invert) {
 		this.regexp = regexp;
 		this.caseSensitive = caseSensitive;
 		this.invert = invert;
@@ -87,17 +89,21 @@ public class RegexpNameFilter implements Filter {
 	 */
 	public boolean accepts(Object o) {
 		boolean result = false;
-		if (o instanceof NamedSBase) {
-			NamedSBase nsb = (NamedSBase) o;
-			if ((nsb.isSetName() || nsb.isSetId()) && (regexp != null)) {
-				String name = nsb.getName();
-				String id = nsb.getId();
+		if (o instanceof SimpleSpeciesReference) {
+			SimpleSpeciesReference specRef = (SimpleSpeciesReference) o;
+			if (specRef.isSetSpecies() && (regexp != null)) {
+				String refName = specRef.getName();
+				String refId = specRef.getSpecies();
+				String specName = specRef.getSpeciesInstance().getName();
+				String specId = specRef.getSpeciesInstance().getId();
 				if (!caseSensitive){
 					regexp = regexp.toLowerCase();
-					name = name.toLowerCase();
-					id = id.toLowerCase();
+					refName = refName.toLowerCase();
+					refId = refId.toLowerCase();
+					specName = specName.toLowerCase();
+					specId = specId.toLowerCase();
 				}
-				result = (name.matches(regexp) || id.matches(regexp));
+				result = (refName.matches(regexp) || refId.matches(regexp) || specName.matches(regexp) || specId.matches(regexp));
 			}
 		}
 		if (invert) {
