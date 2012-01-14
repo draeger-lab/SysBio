@@ -1,6 +1,6 @@
 /*
- * $Id: RegexpNameFilter.java 708 2012-01-06 14:56:40Z snagel $
- * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/jsbml/util/filter/RegexpNameFilter.java $
+ * $Id: RegexpAssignmentVariableFilter.java 708 2012-01-06 14:56:40Z snagel $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/jsbml/util/filter/RegexpAssignmentVariableFilter.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -14,25 +14,20 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-
 package de.zbit.sbml.jsbml.util.filters;
 
-import org.sbml.jsbml.NamedSBase;
+import org.sbml.jsbml.Assignment;
 import org.sbml.jsbml.util.filters.Filter;
 
 /**
- * This filter only accepts instances of {@link NamedSBase} with the name as
- * given in the constructor of this object.
- * 
  * @author Sebastian Nagel
- * @date 2012-01-04
- * @since 0.8
- * @version $Rev: 708 $
+ * @version $Rev$
+ * @since 1.4
  */
-public class RegexpNameFilter implements Filter {
+public class RegexpAssignmentVariableFilter implements Filter {
 
 	/**
-	 * The desired regexp for NamedSBases to be acceptable.
+	 * 
 	 */
 	private String regexp;
 	
@@ -57,7 +52,7 @@ public class RegexpNameFilter implements Filter {
 	 * 
 	 * @param regexp
 	 */
-	public RegexpNameFilter(String regexp) {
+	public RegexpAssignmentVariableFilter(String regexp) {
 		this(regexp, true);
 	}
 	
@@ -66,7 +61,7 @@ public class RegexpNameFilter implements Filter {
 	 * @param regexp
 	 * @param caseSensitive
 	 */
-	public RegexpNameFilter(String regexp, boolean caseSensitive) {
+	public RegexpAssignmentVariableFilter(String regexp, boolean caseSensitive) {
 		this(regexp, caseSensitive, false);
 	}
 	
@@ -76,28 +71,30 @@ public class RegexpNameFilter implements Filter {
 	 * @param caseSensitive
 	 * @param invert
 	 */
-	public RegexpNameFilter(String regexp, boolean caseSensitive, boolean invert) {
+	public RegexpAssignmentVariableFilter(String regexp, boolean caseSensitive, boolean invert) {
 		this.regexp = regexp;
-		this.caseSensitive = caseSensitive;
-		this.invert = invert;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.util.filters.Filter#accepts(java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.sbml.jsbml.util.Filter#fulfilsProperty(java.lang.Object)
 	 */
 	public boolean accepts(Object o) {
 		boolean result = false;
-		if (o instanceof NamedSBase) {
-			NamedSBase nsb = (NamedSBase) o;
-			if ((nsb.isSetName() || nsb.isSetId()) && (regexp != null)) {
-				String name = nsb.getName();
-				String id = nsb.getId();
+		if (o instanceof Assignment) {
+			Assignment er = (Assignment) o;
+			if (er.isSetVariable() && (regexp != null)) {
+				String assId = er.getVariable();
+				String varId = er.getVariableInstance().getId();
+				String varName = er.getVariableInstance().getName();
 				if (!caseSensitive){
 					regexp = regexp.toLowerCase();
-					name = name.toLowerCase();
-					id = id.toLowerCase();
+					assId = assId.toLowerCase();
+					varId = varId.toLowerCase();
+					varName = varName.toLowerCase();
 				}
-				result = (name.matches(regexp) || id.matches(regexp));
+				result = (assId.matches(regexp) || varId.matches(regexp) || varName.matches(regexp));
 			}
 		}
 		if (invert) {

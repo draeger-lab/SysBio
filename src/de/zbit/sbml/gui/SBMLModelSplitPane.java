@@ -44,11 +44,14 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
+import org.sbml.jsbml.util.filters.OrFilter;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.sbml.gui.SBMLTree.SBMLNode;
+import de.zbit.sbml.jsbml.util.filters.RegexpAssignmentVariableFilter;
 import de.zbit.sbml.jsbml.util.filters.RegexpNameFilter;
+import de.zbit.sbml.jsbml.util.filters.RegexpSpeciesReferenceFilter;
 
 /**
  * A specialized {@link JSplitPane} that displays a {@link JTree} containing all
@@ -182,8 +185,11 @@ public class SBMLModelSplitPane extends JSplitPane implements
 						}
 						else {
 							tree.saveExpansionState();
-							String search = searchField.getText();
-							RegexpNameFilter filter = new RegexpNameFilter( ".*" + search + ".*", false);
+							String search = ".*" + searchField.getText() + ".*";
+							RegexpNameFilter nameFilter = new RegexpNameFilter(search, false);
+							RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);
+							RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
+							OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
 							newTree = new SBMLTree(sbmlDoc, filter);
 							model.setRoot((TreeNode) newTree.getModel().getRoot());
 							tree.setCellRenderer(newTree.getCellRenderer());
@@ -228,12 +234,10 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	private JScrollPane createRightComponent(SBase sbase) throws SBMLException,
 		IOException {
 		SBasePanel sbPanel = new SBasePanel(sbase, namesIfAvailalbe);
-//		sbPanel.doLayout();
-//		sbPanel.setPreferredSize(new Dimension(sbPanel.getPreferredSize().width, 100));
-		JPanel p = new JPanel();
-		p.add(sbPanel);
-		JScrollPane scroll = new JScrollPane(p);
-//		JScrollPane scroll = new JScrollPane(sbPanel);
+//		JPanel p = new JPanel();
+//		p.add(sbPanel);
+//		JScrollPane scroll = new JScrollPane(p);
+		JScrollPane scroll = new JScrollPane(sbPanel);
 		return scroll;
 	}
 	

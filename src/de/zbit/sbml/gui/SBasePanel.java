@@ -218,6 +218,8 @@ public class SBasePanel extends JPanel {
 	if (sbase instanceof Variable) {
 		addProperties((Variable) sbase);
 	}
+
+	lh.add(new JPanel(), 1, ++row, 5, 1, 1, 1);
   }
 
   /**
@@ -225,25 +227,25 @@ public class SBasePanel extends JPanel {
 	 */
 	private void addProperties(Compartment c) {
 		if (c.isSetCompartmentType() || editable) {
-			lh.add(new JLabel("Compartment type: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Compartment type: "), 1, ++row, 1, 1, 0d, 0d);
 			JTextField tf = new JTextField(c.getCompartmentTypeInstance()
 					.toString());
 			tf.setEditable(editable);
-			lh.add(tf, 3, ++row, 1, 1, 1, 1);
+			lh.add(tf, 3, ++row, 1, 1, 1, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 		if (c.isSetOutside() || editable) {
-			lh.add(new JLabel("Outside: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Outside: "), 1, ++row, 1, 1, 0d, 0d);
 			JTextField tf = new JTextField(c.getOutsideInstance().toString());
 			tf.setEditable(editable);
-			lh.add(tf, 3, row, 1, 1, 1, 1);
+			lh.add(tf, 3, row, 1, 1, 1, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
-		lh.add(new JLabel("Spatial dimensions: "), 1, ++row, 1, 1, 1, 1);
+		lh.add(new JLabel("Spatial dimensions: "), 1, ++row, 1, 1, 0d, 0d);
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(c
 				.getSpatialDimensions(), 0, 3, 1));
 		spinner.setEnabled(editable);
-		lh.add(spinner, 3, row, 1, 1, 1, 1);
+		lh.add(spinner, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		addProperties((Symbol) c);
 	}
@@ -268,7 +270,7 @@ public class SBasePanel extends JPanel {
 		JCheckBox check = new JCheckBox("Uses values from trigger time", e
 				.getUseValuesFromTriggerTime());
 		check.setEnabled(editable);
-		lh.add(check, 1, ++row, 3, 1, 1, 1);
+		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		if (e.isSetTrigger()) {
 			lh.add(new SBasePanel(e.getTrigger(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1, 1);
@@ -380,7 +382,7 @@ public class SBasePanel extends JPanel {
 	private void addProperties(Model m) {
 		if (m.isSetHistory()) {
 			History hist = m.getHistory();
-			lh.add(new JLabel("Model creators: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Model creators: "), 1, ++row, 1, 1, 0d, 0d);
 			String columnNames[] = new String[] { "Given name", "Family name",
 					"E-mail", "Organization" };
 			String rowData[][] = new String[hist.getNumCreators()][4];
@@ -406,10 +408,10 @@ public class SBasePanel extends JPanel {
 			lh.add(scroll, 1, ++row, 3, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 			if (hist.isSetCreatedDate()) {
-				lh.add(new JLabel("Model creation: "), 1, ++row, 1, 1, 1, 1);
+				lh.add(new JLabel("Model creation: "), 1, ++row, 1, 1, 0d, 0d);
 				JTextField tf = new JTextField(hist.getCreatedDate().toString());
 				tf.setEditable(editable);
-				lh.add(tf, 3, row, 1, 1, 1, 1);
+				lh.add(tf, 3, row, 1, 1, 1, 0d);
 				lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 			}
 			Vector<Date> modification = new Vector<Date>();
@@ -419,7 +421,7 @@ public class SBasePanel extends JPanel {
 				if (!modification.contains(hist.getModifiedDate(i)))
 					modification.add(hist.getModifiedDate(i));
 			if (modification.size() > 0) {
-				lh.add(new JLabel("Modification: "), 1, ++row, 1, 1, 1, 1);
+				lh.add(new JLabel("Modification: "), 1, ++row, 1, 1, 0d, 0d);
 				JList l = new JList(modification);
 				l.setEnabled(editable);
 				JScrollPane scroll2 = new JScrollPane(l,
@@ -479,10 +481,10 @@ public class SBasePanel extends JPanel {
 	 */
 	private void addProperties(NamedSBase nsb) {
 		if (nsb.isSetName() || nsb.isSetId() || editable) {
-			lh.add(new JLabel("Name: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Name: "), 1, ++row, 1, 1, 0d, 0d);
 			JTextField tf = new JTextField((nsb.isSetName()) ? nsb.getName() : nsb.getId());
 			tf.setEditable(editable);
-			lh.add(tf, 3, row, 1, 1, 1, 1);
+			lh.add(tf, 3, row, 1, 1, 1, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 	}
@@ -499,10 +501,9 @@ public class SBasePanel extends JPanel {
 	 * @param q
 	 */
 	private void addProperties(QuantityWithUnit q) {
-		lh
-				.add(new JLabel(q instanceof Species ? "Substance unit: "
-						: "Unit: "), 1, ++row, 1, 1, 1, 1);
-		lh.add(unitPreview(q.getUnitsInstance()), 3, row, 1, 1, 1, 1);
+		lh.add(new JLabel(q instanceof Species ? "Substance unit: "
+						: "Unit: "), 1, ++row, 1, 1, 0d, 0d);
+		lh.add(unitPreview(q.getUnitsInstance()), 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 	}
 
@@ -513,11 +514,11 @@ public class SBasePanel extends JPanel {
 	private void addProperties(Reaction reaction) throws XMLStreamException {
 		JCheckBox check = new JCheckBox("Reversible", reaction.getReversible());
 		check.setEnabled(editable);
-		lh.add(check, 1, ++row, 3, 1, 1, 1);
+		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		check = new JCheckBox("Fast", reaction.getFast());
 		check.setEnabled(editable);
-		lh.add(check, 1, ++row, 3, 1, 1, 1);
+		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 
 		// Create Table of reactants, modifiers and products
@@ -577,7 +578,7 @@ public class SBasePanel extends JPanel {
 		lh.add(new JPanel(), 2, row, 1, 1, 0, 0);
 		if (sbase.isSetHistory()) {
 			History hist = sbase.getHistory();
-			lh.add(new JLabel("Model creators: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Model creators: "), 1, ++row, 1, 1, 0d, 0d);
 			String columnNames[] = new String[] { "Given name", "Family name",
 					"E-mail", "Organization" };
 			String rowData[][] = new String[hist.getNumCreators()][4];
@@ -603,10 +604,10 @@ public class SBasePanel extends JPanel {
 			lh.add(scroll, 1, ++row, 3, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 			if (hist.isSetCreatedDate()) {
-				lh.add(new JLabel("Model creation: "), 1, ++row, 1, 1, 1, 1);
+				lh.add(new JLabel("Model creation: "), 1, ++row, 1, 1, 0d, 0d);
 				JTextField tf = new JTextField(hist.getCreatedDate().toString());
 				tf.setEditable(editable);
-				lh.add(tf, 3, row, 1, 1, 1, 1);
+				lh.add(tf, 3, row, 1, 1, 1, 0d);
 				lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 			}
 			Vector<Date> modification = new Vector<Date>();
@@ -616,7 +617,7 @@ public class SBasePanel extends JPanel {
 				if (!modification.contains(hist.getModifiedDate(i)))
 					modification.add(hist.getModifiedDate(i));
 			if (modification.size() > 0) {
-				lh.add(new JLabel("Modification: "), 1, ++row, 1, 1, 1, 1);
+				lh.add(new JLabel("Modification: "), 1, ++row, 1, 1, 0d, 0d);
 				JList l = new JList(modification);
 				l.setEnabled(editable);
 				JScrollPane scroll2 = new JScrollPane(l,
@@ -630,14 +631,14 @@ public class SBasePanel extends JPanel {
 			}
 		}
 		if (sbase.isSetMetaId() || editable) {
-			lh.add(new JLabel("Meta identifier: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Meta identifier: "), 1, ++row, 1, 1, 0d, 0d);
 			JTextField tf = new JTextField(sbase.getMetaId());
 			tf.setEditable(editable);
-			lh.add(tf, 3, row, 1, 1, 1, 1);
+			lh.add(tf, 3, row, 1, 1, 1, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 		if (sbase.isSetNotes() || editable) {
-			lh.add(new JLabel("Notes: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Notes: "), 1, ++row, 1, 1, 0d, 0d);
 			String text = sbase.getNotesString();
 			if (text.startsWith("<notes") && text.endsWith("notes>")) {
 				text = text.substring(sbase.getNotesString().indexOf('>') + 1,
@@ -661,7 +662,7 @@ public class SBasePanel extends JPanel {
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 		if (sbase.getNumCVTerms() > 0) {
-			lh.add(new JLabel("MIRIAM annotation: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("MIRIAM annotation: "), 1, ++row, 1, 1, 0d, 0d);
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><body>");
 			if (sbase.getNumCVTerms() > 1) {
@@ -721,7 +722,7 @@ public class SBasePanel extends JPanel {
 			lh.add(scroll, 3, row, 1, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
-		lh.add(new JLabel("SBO term: "), 1, ++row, 1, 1, 1, 1);
+		lh.add(new JLabel("SBO term: "), 1, ++row, 1, 1, 0d, 0d);
 		JTextField sboTermField = new JTextField();
 		sboTermField.setEditable(editable);
 		if (sbase.isSetSBOTerm()) {
@@ -733,7 +734,7 @@ public class SBasePanel extends JPanel {
 		  }
 		  sboTermField.setColumns(sboTermField.getText().length());
 		}
-		lh.add(sboTermField, 3, row, 1, 1, 1, 1);
+		lh.add(sboTermField, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 	}
 	
@@ -745,13 +746,13 @@ public class SBasePanel extends JPanel {
 		JEditorPane pane = unitPreview(sbase
 				.getDerivedUnitDefinition());
 		pane.setBorder(BorderFactory.createLoweredBevelBorder());
-		lh.add(new JLabel("Derived unit: "), 1, ++row, 1, 1, 1, 1);
+		lh.add(new JLabel("Derived unit: "), 1, ++row, 1, 1, 0d, 0d);
 		lh.add(pane, 3, row, 1, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 1, 1, 1, 1);
 		JCheckBox chck = new JCheckBox("Contains undeclared units", sbase
 				.containsUndeclaredUnits());
 		chck.setEnabled(false);
-		lh.add(chck, 1, ++row, 3, 1, 0, 0);
+		lh.add(chck, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 0, ++row, 1, 1, 0, 0);
 	}
 
@@ -772,8 +773,8 @@ public class SBasePanel extends JPanel {
 			JComboBox combo = new JComboBox(idsOrNames);
 			combo.setSelectedIndex(index);
 			combo.setEnabled(editable);
-			lh.add(new JLabel("Species"), 1, ++row, 1, 1, 1, 1);
-			lh.add(combo, 3, row, 1, 1, 1, 1);
+			lh.add(new JLabel("Species"), 1, ++row, 1, 1, 0d, 0d);
+			lh.add(combo, 3, row, 1, 1, 1, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 		if (ssr instanceof SpeciesReference) {
@@ -792,42 +793,42 @@ public class SBasePanel extends JPanel {
 	 */
 	private void addProperties(Species species) {
 		if (species.isSetSpeciesType()) {
-			lh.add(new JLabel("Species type: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Species type: "), 1, ++row, 1, 1, 0d, 0d);
 			JTextField tf = new JTextField(species.getSpeciesTypeInstance()
 					.toString());
 			tf.setEditable(editable);
-			lh.add(tf, 1, ++row, 1, 1, 1, 1);
+			lh.add(tf, 1, ++row, 1, 1, 1, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
-		lh.add(new JLabel("Compartment: "), 1, ++row, 1, 1, 1, 1);
+		lh.add(new JLabel("Compartment: "), 1, ++row, 1, 1, 0d, 0d);
 		JTextField tf = new JTextField(species.getCompartmentInstance()
 				.toString());
 		tf.setEditable(editable);
-		lh.add(tf, 3, row, 1, 1, 1, 1);
+		lh.add(tf, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		if (species.isSetSpeciesType() || editable) {
-			lh.add(new JLabel("Species type: "), 1, row, 1, 1, 1, 1);
+			lh.add(new JLabel("Species type: "), 1, row, 1, 1, 0d, 0d);
 			tf = new JTextField(species.getSpeciesTypeInstance().toString());
 			tf.setEditable(editable);
-			lh.add(tf, 1, row, 1, 1, 1, 1);
+			lh.add(tf, 1, row, 1, 1, 1, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 		JSpinner spinCharge = new JSpinner(new SpinnerNumberModel(species
 				.getCharge(), -10, 10, 1));
-		lh.add(new JLabel("Charge: "), 1, ++row, 1, 1, 1, 1);
+		lh.add(new JLabel("Charge: "), 1, ++row, 1, 1, 0d, 0d);
 		spinCharge.setEnabled(editable);
-		lh.add(spinCharge, 3, row, 1, 1, 1, 1);
+		lh.add(spinCharge, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		addProperties((Symbol) species);
 		JCheckBox check = new JCheckBox("Boundary condition", species
 				.getBoundaryCondition());
 		check.setEnabled(editable);
-		lh.add(check, 1, ++row, 3, 1, 1, 1);
+		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		check = new JCheckBox("Has only substance units", species
 				.getHasOnlySubstanceUnits());
 		check.setEnabled(editable);
-		lh.add(check, 1, ++row, 3, 1, 1, 1);
+		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 	}
 
@@ -857,12 +858,12 @@ public class SBasePanel extends JPanel {
 			lh.add(p, 3, ++row, 1, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		} else {
-			lh.add(new JLabel("Stoichiometry"), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Stoichiometry"), 1, ++row, 1, 1, 0d, 0d);
 			JSpinner spinner = new JSpinner(new SpinnerNumberModel(specRef
 					.getStoichiometry(), specRef.getStoichiometry() - 1000,
 					specRef.getStoichiometry() + 1000, .1d));
 			spinner.setEnabled(editable);
-			lh.add(spinner, 3, row, 1, 1, 1, 1);
+			lh.add(spinner, 3, row, 1, 1, 1, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
 	}
@@ -888,7 +889,7 @@ public class SBasePanel extends JPanel {
 			JComboBox type = new JComboBox(types);
 			type.setSelectedIndex(amount ? 0 : 1);
 			type.setEnabled(editable);
-			lh.add(type, 1, ++row, 1, 1, 1, 1);
+			lh.add(type, 1, ++row, 1, 1, 0d, 0d);
 		} else {
 			String label = null;
 			if (s instanceof Compartment) {
@@ -903,21 +904,22 @@ public class SBasePanel extends JPanel {
 				}
 				label = "Value: ";
 			}
-			lh.add(new JLabel(label), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel(label), 1, ++row, 1, 1, 0d, 0d);
 		}
 		JSpinner spinValue = new JSpinner(new SpinnerNumberModel(val, Math.min(
 				val, min), Math.max(val, max), .1d));
 		spinValue.setEnabled(editable);
-		lh.add(spinValue, 3, row, 1, 1, 0, 1);
+		lh.add(spinValue, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
-		lh
-				.add(new JLabel(s instanceof Species ? "Substance unit: "
-						: "Unit: "), 1, ++row, 1, 1, 1, 1);
-		lh.add(unitPreview(s.getUnitsInstance()), 3, row, 1, 1, 1, 1);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
-		JCheckBox check = new JCheckBox("Constant", s.isConstant());
-		check.setEnabled(editable);
-		lh.add(check, 1, ++row, 3, 1, 1, 1);
+		// TODO duplicated?
+//		lh
+//				.add(new JLabel(s instanceof Species ? "Substance unit: "
+//						: "Unit: "), 1, ++row, 1, 1, 0d, 0d);
+//		lh.add(unitPreview(s.getUnitsInstance()), 3, row, 1, 1, 1, 0d);
+//		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
+//		JCheckBox check = new JCheckBox("Constant", s.isConstant());
+//		check.setEnabled(editable);
+//		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 	}
 
@@ -925,7 +927,7 @@ public class SBasePanel extends JPanel {
 	 * @param unit
 	 */
 	private void addProperties(Unit unit) {
-		lh.add(new JLabel("Kind: "), 1, ++row, 1, 1, 1, 1);
+		lh.add(new JLabel("Kind: "), 1, ++row, 1, 1, 0d, 0d);
 		JComboBox unitSelection = new JComboBox();
 		for (Unit.Kind unitKind : Unit.Kind.values()) {
 			unitSelection.addItem(unitKind);
@@ -934,34 +936,34 @@ public class SBasePanel extends JPanel {
 		}
 		unitSelection.setEditable(false);
 		unitSelection.setEnabled(editable);
-		lh.add(unitSelection, 3, row, 1, 1, 1, 1);
+		lh.add(unitSelection, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
-		lh.add(new JLabel("Mutiplier: "), 1, ++row, 1, 1, 1, 1);
+		lh.add(new JLabel("Mutiplier: "), 1, ++row, 1, 1, 0d, 0d);
 		JSpinner sMultiplier = new JSpinner(new SpinnerNumberModel(unit
 				.getMultiplier(), -1000, 1000, 1));
 		sMultiplier.setEnabled(editable);
-		lh.add(sMultiplier, 3, row, 1, 1, 1, 1);
+		lh.add(sMultiplier, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		if (unit.getLevel() == 1
 				|| (unit.getLevel() == 2 && unit.getVersion() == 1)) {
-			lh.add(new JLabel("Offset: "), 1, ++row, 1, 1, 1, 1);
+			lh.add(new JLabel("Offset: "), 1, ++row, 1, 1, 0d, 0d);
 			JSpinner sOffset = new JSpinner(new SpinnerNumberModel(unit
 					.getOffset(), -1000, 1000, 1));
 			sOffset.setEnabled(editable);
-			lh.add(sOffset, 3, row, 1, 1, 1, 1);
+			lh.add(sOffset, 3, row, 1, 1, 1, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
-		lh.add(new JLabel("Scale: "), 1, ++row, 1, 1, 1, 1);
+		lh.add(new JLabel("Scale: "), 1, ++row, 1, 1, 0d, 0d);
 		JSpinner sScale = new JSpinner(new SpinnerNumberModel(unit.getScale(),
 				-1000, 1000, 1));
 		sScale.setEnabled(editable);
-		lh.add(sScale, 3, row, 1, 1, 1, 1);
+		lh.add(sScale, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		JSpinner sExponent = new JSpinner(new SpinnerNumberModel(unit
 				.getExponent(), -24, 24, 1));
 		sExponent.setEnabled(editable);
-		lh.add(new JLabel("Exponent: "), 1, ++row, 1, 1, 1, 1);
-		lh.add(sExponent, 3, row, 1, 1, 1, 1);
+		lh.add(new JLabel("Exponent: "), 1, ++row, 1, 1, 0d, 0d);
+		lh.add(sExponent, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 	}
 
@@ -969,8 +971,8 @@ public class SBasePanel extends JPanel {
 	 * @param ud
 	 */
 	private void addProperties(UnitDefinition ud) {
-		lh.add(new JLabel("Definition: "), 1, ++row, 1, 1, 1, 1);
-		lh.add(unitPreview(ud), 3, row, 1, 1, 1, 1);
+		lh.add(new JLabel("Definition: "), 1, ++row, 1, 1, 0d, 0d);
+		lh.add(unitPreview(ud), 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		for (Unit u : ud.getListOfUnits()) {
 			lh.add(new SBasePanel(u, namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1, 1);
@@ -998,7 +1000,7 @@ public class SBasePanel extends JPanel {
 	private void addProperties(Variable v) {
 		JCheckBox check = new JCheckBox("Constant", v.isConstant());
 		check.setEnabled(editable);
-		lh.add(check, 1, ++row, 3, 1, 1, 1);
+		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 	}
 
