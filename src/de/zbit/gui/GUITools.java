@@ -406,8 +406,8 @@ public class GUITools {
 	 */
 	public static JCheckBox createJCheckBox(Option<Boolean> option,
 		boolean selected, ItemListener... listener) {
-		return createJCheckBox(option.getName(), selected, option,
-			option.getToolTip(), listener);
+		return createJCheckBox(option.getName(), option.toString(), selected,
+			option, option.getToolTip(), listener);
 	}
   
 	/**
@@ -426,17 +426,19 @@ public class GUITools {
 	}
 	
 	/**
-   * Creates and returns a JCheckBox with all the given properties.
-   * 
-   * @param label
-   * @param selected
-   * @param name
-   *        The name for the component to be identifiable by the ItemListener
-   * @param toolTip
-   * @param listener
-   * @return
-   */
-	public static JCheckBox createJCheckBox(String label, boolean selected,
+	 * Creates and returns a JCheckBox with all the given properties.
+	 * 
+	 * @param label
+	 * @param name
+	 *        The name for the component to be identifiable by the
+	 *        {@link ItemListener}. <code>null</code> allowed.
+	 * @param selected
+	 * @param command
+	 * @param toolTip
+	 * @param listener
+	 * @return
+	 */
+	public static JCheckBox createJCheckBox(String label, String name, boolean selected,
 		Object command, String toolTip, ItemListener... listener) {
 		JCheckBox chkbx = new JCheckBox(label, selected);
 		chkbx.setActionCommand(command.toString());
@@ -444,6 +446,9 @@ public class GUITools {
 			for (ItemListener l : listener) {
 				chkbx.addItemListener(l);
 			}
+		}
+		if (name != null) {
+			chkbx.setName(name);
 		}
 		chkbx.setToolTipText(StringUtil.toHTML(toolTip, StringUtil.TOOLTIP_LINE_LENGTH));
 		return chkbx;
@@ -500,14 +505,14 @@ public class GUITools {
 		if ((tooltip != null) && (tooltip.length() > 0)) {
 			box.setToolTipText(StringUtil.toHTML(tooltip, StringUtil.TOOLTIP_LINE_LENGTH));
 		}
+		if ((-1 < selectedIndex) && (items != null)
+				&& (selectedIndex < items.length)) {
+			box.setSelectedIndex(selectedIndex);
+		}
 		if (listeners != null) {
 			for (ItemListener listener : listeners) {
 				box.addItemListener(listener);
 			}
-		}
-		if ((-1 < selectedIndex) && (items != null)
-				&& (selectedIndex < items.length)) {
-			box.setSelectedIndex(selectedIndex);
 		}
 		return box;
 	}

@@ -49,9 +49,9 @@ import org.sbml.jsbml.util.filters.OrFilter;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.sbml.gui.SBMLTree.SBMLNode;
-import de.zbit.sbml.jsbml.util.filters.RegexpAssignmentVariableFilter;
-import de.zbit.sbml.jsbml.util.filters.RegexpNameFilter;
-import de.zbit.sbml.jsbml.util.filters.RegexpSpeciesReferenceFilter;
+import de.zbit.sbml.util.RegexpAssignmentVariableFilter;
+import de.zbit.sbml.util.RegexpNameFilter;
+import de.zbit.sbml.util.RegexpSpeciesReferenceFilter;
 
 /**
  * A specialized {@link JSplitPane} that displays a {@link JTree} containing all

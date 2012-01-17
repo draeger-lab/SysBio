@@ -359,31 +359,11 @@ public abstract class Launcher implements Runnable, Serializable {
 	 */
 	public void exit(java.awt.Window window, boolean terminateJVMwhenDone) {
 		if (terminateJVMwhenDone) {
-			StringBuilder exception = new StringBuilder();
-      if (getInteractiveOptions() != null) {
-        for (Class<? extends KeyProvider> clazz : getPersistentOptions()) {
-          SBPreferences prefs = SBPreferences.getPreferencesFor(clazz);
-          try {
-            prefs.flush();
-          } catch (Exception exc) {
-            exception.append(exc.getLocalizedMessage());
-            exception.append('\n');
-          }
-        }
-      }
-      if (exception.length() > 0) {
-        boolean showExc = false;
-        if (showsGUI()) {
-          try {
-            GUITools.showErrorMessage(window, exception.toString());
-          } catch (java.awt.HeadlessException exc) {
-            showExc = true;
-          }
-        }
-        if (showExc) {
-          logger.log(Level.WARNING, '\n' + exception.toString());
-        }
-      }
+			/*
+			 * Do not manipulate any preferences here. This must be done in the
+			 * individual program. Otherwise it might happen that changes are
+			 * overwritten.
+			 */
 			System.exit(0);
 		}
 	}

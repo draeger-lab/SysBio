@@ -281,7 +281,6 @@ public class AppConf implements Cloneable, Serializable {
   public short getYearOfRelease() {
     return yearOfRelease;
   }
-  
 
   /* (non-Javadoc)
    * @see java.lang.Object#hashCode()

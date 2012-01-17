@@ -29,6 +29,9 @@ import java.util.Comparator;
 public class ValueTriplet <S extends Comparable<? super S>, T extends Comparable<? super T>, E extends Comparable<? super E>>
   implements Comparable<ValueTriplet<S, T, E>>, Serializable {
   
+	/**
+	 * Generated serial version identifier.
+	 */
   private static final long serialVersionUID = -5702457060946906428L;
   
   /**
@@ -66,9 +69,7 @@ public class ValueTriplet <S extends Comparable<? super S>, T extends Comparable
     this.b = ValueTriplet.getB();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see java.lang.Object#clone()
    */
   @Override
@@ -76,9 +77,7 @@ public class ValueTriplet <S extends Comparable<? super S>, T extends Comparable
     return new ValueTriplet<S, T, E>(this);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(ValueTriplet<S, T, E> v) {
@@ -113,9 +112,7 @@ public class ValueTriplet <S extends Comparable<? super S>, T extends Comparable
     return comp;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @SuppressWarnings("unchecked")
@@ -160,9 +157,7 @@ public class ValueTriplet <S extends Comparable<? super S>, T extends Comparable
     return c;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -257,9 +252,7 @@ public class ValueTriplet <S extends Comparable<? super S>, T extends Comparable
     return sortOnlyCyC;
   }
   
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
   @Override
