@@ -23,6 +23,8 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -31,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -91,6 +94,11 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 */
 	protected SBMLTree tree;
+	
+	/**
+	 * 
+	 */
+	SwingWorker<SBMLTree, Void> worker;
 	
 	/**
 	 * 
@@ -174,29 +182,13 @@ public class SBMLModelSplitPane extends JSplitPane implements
 					 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 					 */
 					public void keyReleased(KeyEvent arg0) {
-						DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-						SBMLTree newTree;
+						if (worker!=null && !worker.isDone()){
+							worker.cancel(true);
+						}
 						
-						if (searchField.getText().equals("")){
-							newTree = new SBMLTree(sbmlDoc);
-							model.setRoot((TreeNode) newTree.getModel().getRoot());
-							tree.setCellRenderer(new DefaultTreeCellRenderer());
-							tree.restoreExpanstionState();
-						}
-						else {
-							tree.saveExpansionState();
-							String search = ".*" + searchField.getText() + ".*";
-							RegexpNameFilter nameFilter = new RegexpNameFilter(search, false);
-							RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);
-							RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
-							OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
-							newTree = new SBMLTree(sbmlDoc, filter);
-							model.setRoot((TreeNode) newTree.getModel().getRoot());
-							tree.setCellRenderer(newTree.getCellRenderer());
-							tree.expandAll(true);
-						}
-
-						tree.setRootVisible(false);
+						resetTreeWorker();
+							
+						worker.execute();
 					}
 					/* (non-Javadoc)
 					 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
@@ -234,9 +226,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	private JScrollPane createRightComponent(SBase sbase) throws SBMLException,
 		IOException {
 		SBasePanel sbPanel = new SBasePanel(sbase, namesIfAvailalbe);
-//		JPanel p = new JPanel();
-//		p.add(sbPanel);
-//		JScrollPane scroll = new JScrollPane(p);
 		JScrollPane scroll = new JScrollPane(sbPanel);
 		return scroll;
 	}
@@ -289,6 +278,55 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		}
 		tree.addTreeSelectionListener(this);
 		tree.setSelectionRow(0);
+	}
+	
+	/**
+	 * set a new SwingWorker for tree search
+	 */
+	private void resetTreeWorker() {
+		worker = new SwingWorker<SBMLTree, Void>(){
+			protected SBMLTree doInBackground(){
+
+				SBMLTree newTree;
+				
+				if (searchField.getText().equals("")){
+					newTree = new SBMLTree(sbmlDoc);
+				}
+				else {
+					tree.saveExpansionState();
+					String search = ".*" + searchField.getText() + ".*";
+					RegexpNameFilter nameFilter = new RegexpNameFilter(search, false);
+					RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);
+					RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
+					OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
+					newTree = new SBMLTree(sbmlDoc, filter);
+				}
+				
+				return newTree;
+			}
+			
+			protected void done(){
+				try {
+					if (!this.isCancelled()){
+						SBMLTree newTree = get();
+						((DefaultTreeModel) tree.getModel()).setRoot((TreeNode) newTree.getModel().getRoot());
+
+						tree.setCellRenderer(newTree.getCellRenderer());
+						tree.setRootVisible(false);
+						
+						if (newTree.getCellRenderer() instanceof SBMLTreeCellRenderer) {
+							tree.expandAll(true);
+						} else {
+							tree.restoreExpanstionState();
+						}
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
+		};
 	}
 	
 	/*
