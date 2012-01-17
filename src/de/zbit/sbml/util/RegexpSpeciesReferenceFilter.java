@@ -15,7 +15,7 @@
  * ---------------------------------------------------------------------
  */
 
-package de.zbit.sbml.jsbml.util.filters;
+package de.zbit.sbml.util;
 
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;

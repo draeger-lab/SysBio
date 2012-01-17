@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.sbml.jsbml.util.filters;
+package de.zbit.sbml.util;
 
 import org.sbml.jsbml.Assignment;
 import org.sbml.jsbml.util.filters.Filter;

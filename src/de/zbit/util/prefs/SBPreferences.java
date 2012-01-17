@@ -819,6 +819,18 @@ public class SBPreferences implements Map<Object, Object> {
 	}
 	
 	/**
+	 * Adds all given {@link PreferenceChangeListener}s to this object.
+	 * 
+	 * @param preferenceChangeListeners
+	 */
+	public void addAllPreferenceChangeListeners(
+		Iterable<PreferenceChangeListener> preferenceChangeListeners) {
+		for (PreferenceChangeListener listener : preferenceChangeListeners) {
+			addPreferenceChangeListener(listener);
+		}
+	}
+	
+	/**
 	 * 
 	 * @param ncl
 	 * @see Preferences#addNodeChangeListener(NodeChangeListener)
@@ -981,7 +993,7 @@ public class SBPreferences implements Map<Object, Object> {
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.util.Map#clear()
 	 */
@@ -995,7 +1007,7 @@ public class SBPreferences implements Map<Object, Object> {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see java.util.Map#containsKey(java.lang.Object)
 	 */
@@ -1165,7 +1177,7 @@ public class SBPreferences implements Map<Object, Object> {
 		String k = key.toString();
 		return prefs.getFloat(k, getDefaultFloat(k));
 	}
-	
+
 	/**
 	 * @param key
 	 * @return
@@ -1174,7 +1186,7 @@ public class SBPreferences implements Map<Object, Object> {
 		String k = key.toString();
 		return prefs.getInt(k, getDefaultInt(k));
 	}
-
+	
 	/**
 	 * @return the keyProvider
 	 */
@@ -1246,7 +1258,7 @@ public class SBPreferences implements Map<Object, Object> {
 		// set.addAll(Arrays.asList(defaultKeys()));
 		return set;
 	}
-	
+
 	/**
 	 * Creates a complete set of all keys defined by this data structure, i.e., it
 	 * creates a set of keys for those key-value pairs for which the user has
@@ -1260,7 +1272,7 @@ public class SBPreferences implements Map<Object, Object> {
 		set.addAll(defaults.keySet());
 		return set;
 	}
-
+	
 	/**
 	 * Creates a complete array of all keys defined by this data structure, i.e.,
 	 * it creates a set of keys for those key-value pairs for which the user has
@@ -1290,7 +1302,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public boolean put(Object key, boolean value) {
 		String k = key.toString();
-		if (!defaults.contains(key)) {
+		if (!defaults.containsKey(key)) {
 			defaults.put(k, Boolean.valueOf(value));
 		}
 		boolean oldValue = getBoolean(key);
@@ -1439,6 +1451,7 @@ public class SBPreferences implements Map<Object, Object> {
 		prefs.removeNodeChangeListener(ncl);
 	}
 	
+	
 	/**
 	 * 
 	 * @param pcl
@@ -1447,7 +1460,6 @@ public class SBPreferences implements Map<Object, Object> {
 	public void removePreferenceChangeListener(PreferenceChangeListener pcl) {
 		prefs.removePreferenceChangeListener(pcl);
 	}
-	
 	
 	/**
 	 * @param props
@@ -1568,7 +1580,7 @@ public class SBPreferences implements Map<Object, Object> {
 		}
 		return properties;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

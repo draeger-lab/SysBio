@@ -20,15 +20,14 @@ package de.zbit.gui.table;
 import java.awt.Color;
 import java.awt.Component;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.Locale;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import de.zbit.gui.ColorPalette;
+import de.zbit.util.StringUtil;
 
 /**
  * A table renderer for decimal numbers.
@@ -39,20 +38,6 @@ import de.zbit.gui.ColorPalette;
  * @since 1.0
  */
 public class DecimalCellRenderer extends DefaultTableCellRenderer {
-	
-	/**
-	 * 
-	 */
-	public static final String DECIMAL_FORMAT = "###0.######";
-	
-	/**
-	 * 
-	 */
-	public static final String REAL_FORMAT = "########.###############";
-	/**
-	 * 
-	 */
-	public static final String SCIENTIFIC_FORMAT = "###0.######E0";
 	
   /**
 	 * Generated serial version identifier
@@ -87,7 +72,7 @@ public class DecimalCellRenderer extends DefaultTableCellRenderer {
 	 * {@link ColorPalette#lightBlue} and {@link Color#WHITE}.
 	 */
 	public DecimalCellRenderer() {
-		this.formatter = new DecimalFormat(DECIMAL_FORMAT);
+		this.formatter = new DecimalFormat(StringUtil.DECIMAL_FORMAT);
 		this.align = SwingConstants.RIGHT;
 		this.allSame = false;
 		this.bg = new Color[] {ColorPalette.lightBlue, Color.WHITE};
@@ -190,7 +175,6 @@ public class DecimalCellRenderer extends DefaultTableCellRenderer {
 		this.bg = bg;
 	}
 	
-
 	/* (non-Javadoc)
 	 * @see javax.swing.table.DefaultTableCellRenderer#setValue(java.lang.Object)
 	 */
@@ -198,25 +182,9 @@ public class DecimalCellRenderer extends DefaultTableCellRenderer {
 	protected void setValue(final Object value) {
 		if ((value != null) && (value instanceof Number)) {
 			double v = ((Number) value).doubleValue();
-			if (Double.isNaN(v)) {
-				setText("NaN");
-			} else if (Double.isInfinite(v)) {
-				setText((v < 0) ? "-\u221E" : "\u221E");
-			} else if (((int) v) - v == 0) {
-				setText(String.format("%d", Integer.valueOf((int) v)));
-			} else {
-				Locale locale = Locale.getDefault();
-				DecimalFormat df;
-				if ((Math.abs(v) < 1E-5f) || (1E5f < Math.abs(v))) {
-					df = new DecimalFormat(SCIENTIFIC_FORMAT, new DecimalFormatSymbols(locale));
-				} else {
-					df = new DecimalFormat(DECIMAL_FORMAT, new DecimalFormatSymbols(locale));
-				}
-				df.setMaximumIntegerDigits(formatter.getMaximumIntegerDigits());
-				df.setMaximumFractionDigits(formatter.getMaximumFractionDigits());
-				df.setMinimumFractionDigits(formatter.getMinimumFractionDigits());
-				setText(df.format(value));
-			}
+			setText(StringUtil.toString(v, formatter.getMaximumIntegerDigits(),
+				formatter.getMinimumFractionDigits(),
+				formatter.getMinimumFractionDigits()));
 		} else {
 			super.setValue(value);
 		}

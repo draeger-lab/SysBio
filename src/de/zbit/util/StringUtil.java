@@ -16,11 +16,14 @@
  */
 package de.zbit.util;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -36,6 +39,21 @@ import java.util.regex.Pattern;
  * @since 1.0
  */
 public class StringUtil {
+	
+	/**
+	 * 
+	 */
+	public static final String DECIMAL_FORMAT = "###0.######";
+	
+	/**
+	 * 
+	 */
+	public static final String REAL_FORMAT = "########.###############";
+	/**
+	 * 
+	 */
+	public static final String SCIENTIFIC_FORMAT = "###0.######E0";
+	
 	
   /**
 	 * The file separator of the operating system.
@@ -1350,6 +1368,38 @@ public class StringUtil {
    */
 	public static String toHTMLToolTip(String format, Object... args) {
 		return toHTML(String.format(format, args), TOOLTIP_LINE_LENGTH);
+	}
+
+	/**
+	 * Formats a number for display purposes.
+	 * @param v
+	 * @param maxIntDigits
+	 * @param minFracDigits
+	 * @param maxFracDigits
+	 * @return
+	 */
+	public static String toString(double v, int maxIntDigits, int minFracDigits,
+		int maxFracDigits) {
+		if (Double.isNaN(v)) {
+			return "NaN";
+		} else if (Double.isInfinite(v)) {
+			return (v < 0) ? "-\u221E" : "\u221E";
+		} else if (((int) v) - v == 0) { 
+			return String.format("%d", Integer.valueOf((int) v)); 
+		}
+		Locale locale = Locale.getDefault();
+		DecimalFormat df;
+		if ((Math.abs(v) < 1E-5f) || (1E5f < Math.abs(v))) {
+			df = new DecimalFormat(StringUtil.SCIENTIFIC_FORMAT,
+				new DecimalFormatSymbols(locale));
+		} else {
+			df = new DecimalFormat(StringUtil.DECIMAL_FORMAT,
+				new DecimalFormatSymbols(locale));
+		}
+		df.setMaximumIntegerDigits(maxIntDigits);
+		df.setMinimumFractionDigits(minFracDigits);
+		df.setMaximumFractionDigits(maxFracDigits);
+		return df.format(v);
 	}
   
 }

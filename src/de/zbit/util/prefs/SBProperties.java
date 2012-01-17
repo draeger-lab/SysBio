@@ -71,7 +71,7 @@ public class SBProperties extends Properties {
 	 */
 	@Override
 	public synchronized boolean contains(Object value) {
-		return super.containsValue(value.toString());
+		return super.contains(value.toString());
 	}
 	
 	/* (non-Javadoc)
