@@ -749,8 +749,7 @@ public class SBasePanel extends JPanel {
 		lh.add(new JLabel("Derived unit: "), 1, ++row, 1, 1, 0d, 0d);
 		lh.add(pane, 3, row, 1, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 1, 1, 1, 1);
-		JCheckBox chck = new JCheckBox("Contains undeclared units", sbase
-				.containsUndeclaredUnits());
+		JCheckBox chck = new JCheckBox("Contains undeclared units", sbase.containsUndeclaredUnits());
 		chck.setEnabled(false);
 		lh.add(chck, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 0, ++row, 1, 1, 0, 0);
