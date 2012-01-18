@@ -146,6 +146,10 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 		if ((sbase instanceof SBase)) {
 			List<TreeNode> list = ((SBase) sbase).filter(filter);
 			if (list.size() > 0) {
+				if (sbase instanceof SimpleSpeciesReference){
+					SimpleSpeciesReference specRef = (SimpleSpeciesReference) sbase;
+					specRef.setName(specRef.getSpeciesInstance().getName());
+				}
 				node = new SBMLNode((SBase) sbase);
 				MutableTreeNode child = null;
 				for (int i = 0; i < sbase.getChildCount(); i++) {
