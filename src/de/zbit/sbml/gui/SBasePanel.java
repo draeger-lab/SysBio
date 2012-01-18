@@ -219,7 +219,7 @@ public class SBasePanel extends JPanel {
 		addProperties((Variable) sbase);
 	}
 
-	lh.add(new JPanel(), 1, ++row, 5, 1, 1, 1);
+	lh.add(new JPanel(), 1, ++row, 5, 1, 1, 0.001);
   }
 
   /**
@@ -298,8 +298,7 @@ public class SBasePanel extends JPanel {
 		JList l = new JList(list.toArray(new SBase[] {}));
 		l.setBorder(BorderFactory.createLoweredBevelBorder());
 		lh.add(new JScrollPane(l, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), 1, ++row, 3, 1, 1,
-				0);
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), 1, ++row, 3, 1, 1, 1);
 	}
 
 	/**
@@ -657,7 +656,7 @@ public class SBasePanel extends JPanel {
 			JScrollPane scroll = new JScrollPane(notesArea,
 					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			scroll.setPreferredSize(new Dimension(preferedWidth, 200));
+			//scroll.setPreferredSize(new Dimension(preferedWidth, 200));
 			lh.add(scroll, 3, row, 1, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		}
