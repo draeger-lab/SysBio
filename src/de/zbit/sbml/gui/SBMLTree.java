@@ -43,6 +43,7 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 import org.sbml.jsbml.util.filters.Filter;
 
@@ -52,6 +53,7 @@ import org.sbml.jsbml.util.filters.Filter;
  * 
  * @author Simon Sch&auml;fer
  * @author Andreas Dr&auml;ger
+ * @author Sebastian Nagel
  * @since 1.0
  * @version $Rev$
  */
@@ -117,6 +119,10 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	private static MutableTreeNode createNodes(TreeNode sbase) {
 		SBMLNode node = null;
 		if ((sbase instanceof SBase)) {
+			if (sbase instanceof SimpleSpeciesReference){
+				SimpleSpeciesReference specRef = (SimpleSpeciesReference) sbase;
+				specRef.setName(specRef.getSpeciesInstance().getName());
+			}
 			node = new SBMLNode((SBase) sbase);
 			MutableTreeNode child;
 			for (int i = 0; i < sbase.getChildCount(); i++) {

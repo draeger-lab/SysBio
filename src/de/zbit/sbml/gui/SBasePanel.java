@@ -629,13 +629,13 @@ public class SBasePanel extends JPanel {
 				lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 			}
 		}
-		if (sbase.isSetMetaId() || editable) {
-			lh.add(new JLabel("Meta identifier: "), 1, ++row, 1, 1, 0d, 0d);
-			JTextField tf = new JTextField(sbase.getMetaId());
-			tf.setEditable(editable);
-			lh.add(tf, 3, row, 1, 1, 1, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
-		}
+//		if (sbase.isSetMetaId() || editable) {
+//			lh.add(new JLabel("Meta identifier: "), 1, ++row, 1, 1, 0d, 0d);
+//			JTextField tf = new JTextField(sbase.getMetaId());
+//			tf.setEditable(editable);
+//			lh.add(tf, 3, row, 1, 1, 1, 0d);
+//			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
+//		}
 		if (sbase.isSetNotes() || editable) {
 			lh.add(new JLabel("Notes: "), 1, ++row, 1, 1, 0d, 0d);
 			String text = sbase.getNotesString();
