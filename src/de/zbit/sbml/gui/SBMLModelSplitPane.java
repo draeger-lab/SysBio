@@ -63,6 +63,7 @@ import de.zbit.sbml.util.RegexpSpeciesReferenceFilter;
  * right hand side.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Sebastian Nagel
  * @since 1.0 (originates from SBMLsqueezer 1.3)
  * @version $Rev$
  */

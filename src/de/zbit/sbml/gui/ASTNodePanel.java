@@ -44,6 +44,7 @@ import de.zbit.util.StringUtil;
  * This class is required for visualizing SBML documents.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Sebastian Nagel
  * @date 2010-05-11
  * @since 1.0
  * @version $Rev$
