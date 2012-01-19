@@ -1998,7 +1998,9 @@ public class GUITools {
   public static void showErrorMessage(Component parent, Throwable exc) {
     String msg = getMessage(exc);
     
-    if (logger!=null) logger.log(Level.WARNING, msg, exc);
+    if (logger != null) {
+    	logger.log(Level.WARNING, msg, exc);
+    }
     ValuePair<String, Integer> messagePair = StringUtil
     .insertLineBreaksAndCount(msg, StringUtil.TOOLTIP_LINE_LENGTH, "\n");
     Object message;
@@ -2006,15 +2008,14 @@ public class GUITools {
       JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
       pane.setEditable(false);
       pane.setPreferredSize(new Dimension(480, 240));
-      message = new JScrollPane(pane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+      message = new JScrollPane(pane);
     } else {
       message = messagePair.getA();
     }
-    Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause()
-        .getClass() : exc.getClass();
-        JOptionPane.showMessageDialog(parent, message, clazz!=null?clazz.getSimpleName():"",
-            JOptionPane.ERROR_MESSAGE);
+		Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause()
+				.getClass() : exc.getClass();
+		JOptionPane.showMessageDialog(parent, message,
+			clazz != null ? clazz.getSimpleName() : "Error", JOptionPane.ERROR_MESSAGE);
   }
   
   /**
