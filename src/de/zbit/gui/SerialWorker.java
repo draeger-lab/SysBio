@@ -19,6 +19,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
 
@@ -39,9 +40,19 @@ import javax.swing.SwingWorker;
  */
 public class SerialWorker implements PropertyChangeListener {
 	
+	/**
+	 * A {@link Logger} for this class.
+	 */
+	private static final transient Logger logger = Logger.getLogger(SerialWorker.class.getName());
+	/**
+	 * Listeners that respond to changes triggered by the individual workers.
+	 */
 	private List<PropertyChangeListener> listOfPropertyChangeListeners;
+	/**
+	 * The {@link SwingWorker}s that can be executed.
+	 */
 	private LinkedList<SwingWorker<?, ?>> workers;
-
+	
 	/**
 	 * Creates a new {@link SerialWorker} that doesn't have any tasks.
 	 */
@@ -59,7 +70,7 @@ public class SerialWorker implements PropertyChangeListener {
 		this();
 		if (worker != null) {
 			for (SwingWorker<?, ?> w : worker) {
-				workers.add(w);
+				add(w);
 			}
 		}
 	}
@@ -69,7 +80,11 @@ public class SerialWorker implements PropertyChangeListener {
 	 * @param worker
 	 */
 	public void add(SwingWorker<?, ?> worker) {
-		workers.add(worker);
+		if (worker != null) {
+			workers.add(worker);
+		} else {
+			logger.fine("ignoring null value for worker");
+		}
 	}
 
 	/**
