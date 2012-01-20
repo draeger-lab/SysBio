@@ -20,10 +20,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
+import java.beans.EventHandler;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -57,7 +58,7 @@ import org.sbml.jsbml.util.filters.Filter;
  * @since 1.0
  * @version $Rev$
  */
-public class SBMLTree extends JTree implements MouseListener, ActionListener {
+public class SBMLTree extends JTree implements ActionListener {
 	
 	/**
 	 * Generated serial version id
@@ -292,8 +293,8 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 		if (popup != null) {
 			popup.setVisible(false);
 		}
+		e.setSource(currSBase);
 		for (ActionListener al : setOfActionListeners) {
-			e.setSource(currSBase);
 			al.actionPerformed(e);
 		}
 	}
@@ -311,20 +312,22 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	private void init() {
 		setOfActionListeners = new HashSet<ActionListener>();
 		// popup = new JPopupMenu();
-		addMouseListener(this);
+		addMouseListener(EventHandler.create(MouseListener.class, this, "mouseClicked", ""));
 	}
 	
 	public void setPopupMenu(JPopupMenu popup){
 		this.popup = popup;
 	}
 	
-	/*
-	 * (non-Javadoc)
+	private Map<Class<? extends SBase>, List<JMenuItem>> popUpMap;
+	
+	/**
 	 * 
-	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+	 * @param e
 	 */
 	public void mouseClicked(MouseEvent e) {
-		if ((popup != null) && popup.isVisible()) {
+		if ((e.getClickCount() == 1) && (e.getButton() == MouseEvent.BUTTON1)
+				&& (popup != null) && popup.isVisible()) {
 			currSBase = null;
 			popup.setVisible(false);
 		}
@@ -369,38 +372,6 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 				}
 			}
 		}
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-	 */
-	public void mouseEntered(MouseEvent e) {
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-	 */
-	public void mouseExited(MouseEvent e) {
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
-	public void mousePressed(MouseEvent e) {
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-	 */
-	public void mouseReleased(MouseEvent e) {
 	}
 	
 	

@@ -231,6 +231,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		IOException {
 		SBasePanel sbPanel = new SBasePanel(sbase, namesIfAvailalbe);
 		JScrollPane scroll = new JScrollPane(sbPanel);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		return scroll;
 	}
 	
