@@ -23,7 +23,6 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
@@ -37,7 +36,6 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -216,7 +214,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * @throws SBMLException
 	 * @throws IOException
 	 */
-	private JScrollPane createRightComponent(ASTNode node) throws SBMLException,
+	protected JScrollPane createRightComponent(ASTNode node) throws SBMLException,
 		IOException {
 		return new JScrollPane(new ASTNodePanel(node, namesIfAvailalbe));
 	}
@@ -227,7 +225,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * @throws SBMLException
 	 * @throws IOException
 	 */
-	private JScrollPane createRightComponent(SBase sbase) throws SBMLException,
+	protected JScrollPane createRightComponent(SBase sbase) throws SBMLException,
 		IOException {
 		SBasePanel sbPanel = new SBasePanel(sbase, namesIfAvailalbe);
 		JScrollPane scroll = new JScrollPane(sbPanel);

@@ -21,7 +21,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.EventHandler;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +42,6 @@ import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.MathContainer;
-import org.sbml.jsbml.Model;
-import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
@@ -84,6 +84,11 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * 
 	 */
 	private String savedState;
+	
+	/**
+	 * 
+	 */
+	private Map<JMenuItem, List<Class<? extends SBase>>> popUpMap;
 	
 	/**
 	 * @param sbase
@@ -204,12 +209,8 @@ public class SBMLTree extends JTree implements ActionListener {
 	}
 	
 	public void addPopupMenuItem(JMenuItem item, Class<? extends SBase>... types) {
-		Class<? extends SBase> type = types[0];
-		DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(null);
-		if ((types == null) || (types.length == 0)
-				|| type.isAssignableFrom(treeNode.getUserObject().getClass())) {
-			
-		}
+		popUpMap.put(item, Arrays.asList(types));
+		popup.add(item);
 	}
 	
 	// is path1 descendant of path2
@@ -311,15 +312,10 @@ public class SBMLTree extends JTree implements ActionListener {
 	 */
 	private void init() {
 		setOfActionListeners = new HashSet<ActionListener>();
-		// popup = new JPopupMenu();
+		popup = new JPopupMenu();
+		popUpMap = new HashMap<JMenuItem, List<Class<? extends SBase>>>();
 		addMouseListener(EventHandler.create(MouseListener.class, this, "mouseClicked", ""));
 	}
-	
-	public void setPopupMenu(JPopupMenu popup){
-		this.popup = popup;
-	}
-	
-	private Map<Class<? extends SBase>, List<JMenuItem>> popUpMap;
 	
 	/**
 	 * 
@@ -343,32 +339,42 @@ public class SBMLTree extends JTree implements ActionListener {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) getSelectionPath()
 						.getLastPathComponent();
 				Object userObject = node.getUserObject();
-				if ((userObject instanceof Reaction) || (userObject instanceof Model)
-						|| (userObject instanceof SBMLDocument)) {
-					if (userObject instanceof SBMLDocument) {
-						currSBase = ((SBMLDocument) userObject).getModel();
-					} else {
-						currSBase = (SBase) userObject;
+				if (userObject instanceof SBMLDocument) {
+					currSBase = ((SBMLDocument) userObject).getModel();
+				} else {
+					currSBase = (SBase) userObject;
+				}
+				if (popup != null) {
+					if (popUpMap != null && popUpMap.size() > 0) {
+						for (int i=0; i<popup.getComponentCount(); i++){
+							List<Class<? extends SBase>> classes = popUpMap.get(popup.getComponent(i));
+							boolean enabled = false;
+							for (int j=0; j<classes.size(); j++){
+								if (classes.get(j).isInstance(userObject)){
+									enabled = true;
+									break;
+								}
+							}
+							popup.getComponent(i).setEnabled(enabled);
+						}
 					}
-					if (popup != null) {
-						popup.setLocation(e.getX() + ((int) getLocationOnScreen().getX()),
+					popup.setLocation(e.getX() + ((int) getLocationOnScreen().getX()),
 							e.getY() + ((int) getLocationOnScreen().getY()));// e.getLocationOnScreen());
-						popup.setVisible(true);
-					}
-					if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
-						MathContainer mc = (MathContainer) ((DefaultMutableTreeNode) clickedOn)
-								.getUserObject();
-						JDialog dialog = new JDialog();
-						JScrollPane scroll = new JScrollPane(new SBMLTree(mc.getMath()),
-							JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-							JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-						dialog.getContentPane().add(scroll);
-						dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-						dialog.pack();
-						dialog.setModal(true);
-						dialog.setLocationRelativeTo(null);
-						dialog.setVisible(true);
-					}
+					popup.setVisible(true);
+				}
+				if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
+					MathContainer mc = (MathContainer) ((DefaultMutableTreeNode) clickedOn)
+							.getUserObject();
+					JDialog dialog = new JDialog();
+					JScrollPane scroll = new JScrollPane(new SBMLTree(mc.getMath()),
+						JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+					dialog.getContentPane().add(scroll);
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.pack();
+					dialog.setModal(true);
+					dialog.setLocationRelativeTo(null);
+					dialog.setVisible(true);
 				}
 			}
 		}
