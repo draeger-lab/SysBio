@@ -182,6 +182,12 @@ public class SBMLModelSplitPane extends JSplitPane implements
 					 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 					 */
 					public void keyReleased(KeyEvent arg0) {
+
+					}
+					/* (non-Javadoc)
+					 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+					 */
+					public void keyTyped(KeyEvent arg0) {
 						if (worker!=null){
 							if (!worker.isDone())
 								worker.cancel(true);
@@ -191,11 +197,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 								worker.execute();
 							}
 						}
-					}
-					/* (non-Javadoc)
-					 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-					 */
-					public void keyTyped(KeyEvent arg0) {
 					}
 				});
 		JLabel label = new JLabel(UIManager.getIcon("ICON_SEARCH_16"));
