@@ -45,6 +45,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
+import org.sbml.jsbml.util.filters.AndFilter;
 import org.sbml.jsbml.util.filters.OrFilter;
 
 import de.zbit.gui.GUITools;
@@ -97,7 +98,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 */
-	SBMLTreeSwingWorker<SBMLTree, Void> worker;
+	SBMLTreeSwingWorker<Void, Void> worker;
 	
 	/**
 	 * 
@@ -193,7 +194,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 								worker.cancel(true);
 							
 							if (!worker.getSearchString().equals(searchField.getText())){
-								worker = new SBMLTreeSwingWorker<SBMLTree, Void>(searchField.getText());
+								worker = new SBMLTreeSwingWorker<Void, Void>(searchField.getText());
 								worker.execute();
 							}
 						}
@@ -264,7 +265,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	}
 	
 	protected void initTree() {
-		worker = new SBMLTreeSwingWorker<SBMLTree, Void>(searchField.getText());
+		worker = new SBMLTreeSwingWorker<Void, Void>(searchField.getText());
 		
 		TreePath path = null;
 		if (tree != null) {
@@ -313,47 +314,33 @@ public class SBMLModelSplitPane extends JSplitPane implements
 				Thread.sleep(500);
 			} catch (Exception e) {
 			}
-
-			SBMLTree newTree = null;
 			
 			if (!this.isCancelled()) {
+				tree.setAllVisible();
 				
 				if (searchString.equals("")){
-					newTree = new SBMLTree(sbmlDoc);
+					SBMLTree.filterEnabled = false;
 				}
 				else {
-					tree.saveExpansionState();
 					String search = ".*" + searchString + ".*";
 					RegexpNameFilter nameFilter = new RegexpNameFilter(search, false);
 					RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);
 					RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
 					OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
-					newTree = new SBMLTree(sbmlDoc, filter);
+					tree.search(filter);
 				}
 			}
 			
-			return ((T) newTree);
+			return null;
 		}
 		
 		protected void done(){
-			try {
-				if (!this.isCancelled()){
-					SBMLTree newTree = (SBMLTree) get();
-					((DefaultTreeModel) tree.getModel()).setRoot((TreeNode) newTree.getModel().getRoot());
-
-					tree.setCellRenderer(newTree.getCellRenderer());
-					tree.setRootVisible(false);
-					
-					if (newTree.getCellRenderer() instanceof SBMLTreeCellRenderer) {
-						tree.expandAll(true);
-					} else {
-						tree.restoreExpanstionState();
-					}
+			if (!this.isCancelled()){
+				if (SBMLTree.filterEnabled) {
+					tree.expandAll(true);
+				} else {
+					tree.restoreExpansionState();
 				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
 			}
 		}
 		

@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.EventHandler;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -36,15 +37,18 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.MathContainer;
+import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
+import org.sbml.jsbml.util.TreeNodeAdapter;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 import org.sbml.jsbml.util.filters.Filter;
 
@@ -83,7 +87,12 @@ public class SBMLTree extends JTree implements ActionListener {
 	/**
 	 * 
 	 */
-	private String savedState;
+	private TreeNode[] savedState;
+	
+	/**
+	 * 
+	 */
+	public static boolean filterEnabled = true;
 	
 	/**
 	 * 
@@ -95,16 +104,6 @@ public class SBMLTree extends JTree implements ActionListener {
 	 */
 	public SBMLTree(SBase sbase) {
 		super(createNodes(sbase));
-		init();
-	}
-	
-	/**
-	 * @param sbase
-	 * @param filter
-	 */
-	public SBMLTree(SBase sbase, Filter filter) {
-		super(searchTree(sbase, filter, true));
-		this.setCellRenderer(new SBMLTreeCellRenderer());
 		init();
 	}
 	
@@ -141,45 +140,31 @@ public class SBMLTree extends JTree implements ActionListener {
 		return node;
 	}
 	
-	/**
-	 * @param sbase
-	 * @param filter
-	 * @param showChildren
-	 * @return
-	 */
-	private static MutableTreeNode searchTree(TreeNode sbase, Filter filter, boolean showChildren) {
-		SBMLNode node = null;
-		if ((sbase instanceof SBase)) {
-			List<TreeNode> list = ((SBase) sbase).filter(filter);
-			if (list.size() > 0) {
-				if (sbase instanceof SimpleSpeciesReference){
-					SimpleSpeciesReference specRef = (SimpleSpeciesReference) sbase;
-					specRef.setName(specRef.getSpeciesInstance().getName());
-				}
-				node = new SBMLNode((SBase) sbase);
-				MutableTreeNode child = null;
-				for (int i = 0; i < sbase.getChildCount(); i++) {
-					child = searchTree(sbase.getChildAt(i), filter, showChildren);
-					if (child != null) {
-						node.add(child);
-					}
-				}
-				if (node.getChildCount() == 0) {
-					for (int j=0; j<list.size(); j++){
-						if (showChildren) {
-							child = createNodes((SBase) list.get(j));
-						} else {
-							child = new SBMLNode((SBase) list.get(j));
-						}
-						if (child != null) {
-							((SBMLNode) child).boldFont = true;
-							node.add(child);
-						}
-					}
-				}
+	public void search(Filter filter){
+		filterEnabled = false;
+		SBMLNode root = (SBMLNode)this.getModel().getRoot();
+		List<TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
+		search(root, filter, list);
+		filterEnabled = true;
+	}
+	
+	private void search(SBMLNode node,Filter filter,List<TreeNode> list){
+		SBase sbase = ((SBase)node.getUserObject());
+		if (sbase.filter(filter).size() > 0){
+			node.setVisible(true);
+			node.boldFont = false;
+			for (int i = 0; i < node.getChildCount(); ++i) {
+				SBMLNode child = (SBMLNode) node.getChildAt(i);
+				search(child, filter, list);
 			}
 		}
-		return node;
+		else if (list.contains(sbase)){
+			node.boldFont = true;
+			node.setVisible(true);
+		} else {
+			node.boldFont = false;
+			node.setVisible(false);
+		}
 	}
 	
 	public void expandAll(boolean expand){
@@ -213,6 +198,28 @@ public class SBMLTree extends JTree implements ActionListener {
 		popup.add(item);
 	}
 	
+	public void setAllVisible(){
+		filterEnabled=false;
+		setAllVisible((SBMLNode) this.getModel().getRoot());
+		reload();
+		filterEnabled=true;
+	}
+	
+	private void setAllVisible(SBMLNode node) {
+		node.setVisible(true);
+		node.boldFont = false;
+		for (int i = 0; i<node.getChildCount(); i++){
+			TreeNode child = node.getChildAt(i);
+			if (child instanceof SBMLNode){
+				setAllVisible((SBMLNode) child);
+			}
+		}
+	}
+	
+	public void reload() {
+		((DefaultTreeModel)this.getModel()).reload();
+	}
+	
 	// is path1 descendant of path2
     public static boolean isDescendant(TreePath path1, TreePath path2){
         int count1 = path1.getPathCount();
@@ -227,33 +234,17 @@ public class SBMLTree extends JTree implements ActionListener {
     }
  
     public void saveExpansionState(){
-    	if (savedState == null) {
-	    	int row = 0;
-	        TreePath rowPath = this.getPathForRow(row);
-	        StringBuffer buf = new StringBuffer();
-	        int rowCount = this.getRowCount();
-	        for(int i=row; i<rowCount; i++){
-	            TreePath path = this.getPathForRow(i);
-	            if(i==row || isDescendant(path, rowPath)){
-	                if(this.isExpanded(path))
-	                    buf.append(","+String.valueOf(i-row));
-	            } else {
-	            	break;
-	            }
-	        }
-	        savedState = buf.toString();
-    	}
+    	savedState = ((DefaultTreeModel)this.getModel()).getPathToRoot((TreeNode) this.getSelectionPath().getLastPathComponent());
     }
     
-    public void restoreExpanstionState(){
+    public void restoreExpansionState(){
     	if (savedState != null) {
-	    	int row = 0;
-	        StringTokenizer stok = new StringTokenizer(savedState, ",");
-	        while(stok.hasMoreTokens()){
-	            int token = row + Integer.parseInt(stok.nextToken());
-	            this.expandRow(token);
-	        }
-	        savedState = null;
+    		for (int i=0; i<savedState.length; i++){
+    			TreePath path = new TreePath(((DefaultTreeModel)this.getModel()).getPathToRoot(savedState[i]));
+    			this.expandPath(path);
+    			this.setSelectionPath(path);
+    			this.scrollPathToVisible(path);
+    		}
     	}
     }
 	
@@ -269,9 +260,15 @@ public class SBMLTree extends JTree implements ActionListener {
 		private static final long serialVersionUID = 9057010975355065921L;
 		
 		public boolean boldFont = false;
+		public boolean isVisible;
 
 		public SBMLNode(SBase sbase) {
-			super(sbase);
+			this(sbase,true);
+		}
+		
+		public SBMLNode(SBase sbase, boolean isVisible) {
+		    super(sbase);
+		    this.isVisible = isVisible;
 		}
 		
 		/*
@@ -282,6 +279,64 @@ public class SBMLTree extends JTree implements ActionListener {
 		public TreeNodeWithChangeSupport getUserObject() {
 		  return (TreeNodeWithChangeSupport) super.getUserObject();
 		}
+		
+		  
+
+
+		  public TreeNode getChildAt(int index) {
+		    if (!filterEnabled) {
+		      return super.getChildAt(index);
+		    }
+		    if (children == null) {
+		      throw new ArrayIndexOutOfBoundsException("node has no children");
+		    }
+
+		    int realIndex = -1;
+		    int visibleIndex = -1;
+		    Enumeration e = children.elements();
+		    while (e.hasMoreElements()) {
+		      SBMLNode node = (SBMLNode) e.nextElement();
+		      if (node.isVisible()) {
+		        visibleIndex++;
+		      }
+		      realIndex++;
+		      if (visibleIndex == index) {
+		        return (TreeNode) children.elementAt(realIndex);
+		      }
+		    }
+
+		    throw new ArrayIndexOutOfBoundsException("index unmatched");
+		    //return (TreeNode)children.elementAt(index);
+		  }
+
+		  public int getChildCount() {
+		    if (!filterEnabled) {
+		      return super.getChildCount();
+		    }
+		    if (children == null) {
+		      return 0;
+		    }
+
+		    int count = 0;
+		    Enumeration e = children.elements();
+		    while (e.hasMoreElements()) {
+		    	SBMLNode node = (SBMLNode) e.nextElement();
+		      if (node.isVisible()) {
+		        count++;
+		      }
+		    }
+
+		    return count;
+		  }
+
+		  public void setVisible(boolean visible) {
+		    this.isVisible = visible;
+		  }
+
+		  public boolean isVisible() {
+		    return isVisible;
+		  }
+
 	}
 	
 	/*
@@ -314,6 +369,7 @@ public class SBMLTree extends JTree implements ActionListener {
 		setOfActionListeners = new HashSet<ActionListener>();
 		popup = new JPopupMenu();
 		popUpMap = new HashMap<JMenuItem, List<Class<? extends SBase>>>();
+		this.setCellRenderer(new SBMLTreeCellRenderer());
 		addMouseListener(EventHandler.create(MouseListener.class, this, "mouseClicked", ""));
 	}
 	
@@ -322,13 +378,17 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * @param e
 	 */
 	public void mouseClicked(MouseEvent e) {
-		if ((e.getClickCount() == 1) && (e.getButton() == MouseEvent.BUTTON1)
-				&& (popup != null) && popup.isVisible()) {
-			currSBase = null;
-			popup.setVisible(false);
-		}
 		Object clickedOn = getClosestPathForLocation(e.getX(), e.getY())
 				.getLastPathComponent();
+		
+		if ((e.getClickCount() == 1) && (e.getButton() == MouseEvent.BUTTON1)){
+			if ((popup != null) && popup.isVisible()) {
+				currSBase = null;
+				popup.setVisible(false);
+			} else if (clickedOn instanceof DefaultMutableTreeNode){
+				this.saveExpansionState();
+			}
+		}
 		if (clickedOn instanceof ASTNode) {
 			ASTNode ast = (ASTNode) clickedOn;
 			System.out.println(ast.getType());
