@@ -214,7 +214,7 @@ public class ReactionPanel extends JPanel {
 				x += length;
 			} else {
 				// simply draw a regular reaction arrow
-				curr = reaction.isReversible() ? " \u21CC " : " \u21FE ";
+				curr = reaction.isReversible() ? " \u21CC " : " \u2192 ";
 				g.drawString(curr, x, y);
 				x += metrics.getStringBounds(curr, g).getWidth();
 			}
