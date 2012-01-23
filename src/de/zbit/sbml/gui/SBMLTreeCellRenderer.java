@@ -1,5 +1,5 @@
 /*
- * $Id:  SBMLTreeCellRenderer.java 17:49:52 Nagel$
+ * $Id:  SBMLTreeCellRenderer.java 17:49:52 snagel$
  * $URL: SBMLTreeCellRenderer.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
@@ -18,11 +18,10 @@ package de.zbit.sbml.gui;
 
 import java.awt.Component;
 import java.awt.Font;
-import java.util.List;
 
+import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeNode;
 
 import de.zbit.sbml.gui.SBMLTree.SBMLNode;
 
@@ -55,8 +54,7 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 	 * @param hasFocus the focus 
 	 */ 
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-		super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus); 
-	 
+		super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 		if (value instanceof SBMLNode) {
 			if (((SBMLNode) value).boldFont){
 				setFont(getFont().deriveFont(Font.BOLD));
@@ -64,7 +62,8 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 				setFont(getFont().deriveFont(Font.PLAIN));
 			}
 		}
+		
 	    return this; 
-	} 
+	}
 
 }
