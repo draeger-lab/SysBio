@@ -1372,7 +1372,7 @@ public class SBPreferences implements Map<Object, Object> {
 	public Object put(Object key, Object value) {
    	// if value is null, a NullPointerException is thrown later.
 		Object o = get(key);
-		put(key, value!=null?value.toString():(String)null);
+		put(key, value != null ? value.toString() : (String) null);
 		return o;
 	}
 	
@@ -1386,7 +1386,10 @@ public class SBPreferences implements Map<Object, Object> {
 			defaults.setProperty(k, value);
 		}
 		String oldValue = getString(key);
-		prefs.put(k, value);
+		if (!oldValue.equals(value)) {
+		  // This check is necessary because otherwise listeners might be notified without necessity.
+		  prefs.put(k, value);
+		}
 		return oldValue;
 	}
 	
