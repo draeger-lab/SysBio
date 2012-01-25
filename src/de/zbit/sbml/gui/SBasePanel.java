@@ -18,7 +18,9 @@ package de.zbit.sbml.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.Date;
@@ -28,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -299,6 +302,19 @@ public class SBasePanel extends JPanel {
 	 */
 	private void addProperties(ListOf<? extends SBase> list) {
 		JList l = new JList(list.toArray(new SBase[] {}));
+		l.setCellRenderer(new DefaultListCellRenderer(){
+			/*
+			 * (non-Javadoc)
+			 * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
+			 */
+			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
+				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				if (value instanceof SimpleSpeciesReference){
+					this.setText(((SimpleSpeciesReference) value).getSpeciesInstance().getName());
+				}
+				return this;
+			}
+		});
 		l.setBorder(BorderFactory.createLoweredBevelBorder());
 		lh.add(new JScrollPane(l), 1, ++row, 3, 1, 1d, 1d);
 	}

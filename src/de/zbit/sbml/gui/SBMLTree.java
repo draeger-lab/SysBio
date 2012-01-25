@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.EventHandler;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -29,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
@@ -44,12 +42,9 @@ import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.MathContainer;
-import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
-import org.sbml.jsbml.util.TreeNodeAdapter;
-import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 import org.sbml.jsbml.util.filters.Filter;
 
 /**
@@ -92,11 +87,6 @@ public class SBMLTree extends JTree implements ActionListener {
 	/**
 	 * 
 	 */
-	public static boolean filterEnabled = true;
-	
-	/**
-	 * 
-	 */
 	private Map<JMenuItem, List<Class<? extends SBase>>> popUpMap;
 	
 	/**
@@ -124,10 +114,6 @@ public class SBMLTree extends JTree implements ActionListener {
 	private static MutableTreeNode createNodes(TreeNode sbase) {
 		SBMLNode node = null;
 		if ((sbase instanceof SBase)) {
-			if (sbase instanceof SimpleSpeciesReference){
-				SimpleSpeciesReference specRef = (SimpleSpeciesReference) sbase;
-				specRef.setName(specRef.getSpeciesInstance().getName());
-			}
 			node = new SBMLNode((SBase) sbase);
 			MutableTreeNode child;
 			for (int i = 0; i < sbase.getChildCount(); i++) {
@@ -140,46 +126,65 @@ public class SBMLTree extends JTree implements ActionListener {
 		return node;
 	}
 	
+	/**
+	 * 
+	 * @param filter
+	 */
 	public void search(Filter filter){
-		filterEnabled = false;
+		SBMLNode.showInvisible = true;
 		SBMLNode root = (SBMLNode)this.getModel().getRoot();
 		List<TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
 		search(root, filter, list);
-		filterEnabled = true;
+		SBMLNode.showInvisible = false;
 	}
 	
+	/**
+	 * 
+	 * @param node
+	 * @param filter
+	 * @param list
+	 */
 	private void search(SBMLNode node,Filter filter,List<TreeNode> list){
 		SBase sbase = ((SBase)node.getUserObject());
 		if (sbase.filter(filter).size() > 0){
 			node.setVisible(true);
-			node.boldFont = false;
+			node.setBoldFont(false);
 			for (int i = 0; i < node.getChildCount(); ++i) {
 				SBMLNode child = (SBMLNode) node.getChildAt(i);
 				search(child, filter, list);
 			}
 		}
 		else if (list.contains(sbase)){
-			node.boldFont = true;
+			node.setBoldFont(true);
 			node.setVisible(true);
 		} else {
-			node.boldFont = false;
+			node.setBoldFont(false);
 			node.setVisible(false);
 		}
 	}
 	
+	/**
+	 * 
+	 * @param expand
+	 */
 	public void expandAll(boolean expand){
 		if (this.getModel().getRoot() != null){
 			this.expandAll(null, expand);
 		}
 	}
 	
+	/**
+	 * 
+	 * @param parent
+	 * @param expand
+	 */
 	private void expandAll(TreePath parent, boolean expand) {
 		if (parent == null){
 			parent = new TreePath(((TreeNode) this.getModel().getRoot()));
 		}
 	    TreeNode node = (TreeNode) parent.getLastPathComponent();
 	    if (node.getChildCount() >= 0) {
-	        for (Enumeration e=node.children(); e.hasMoreElements(); ) {
+	        for (Enumeration<?> e=node.children(); e.hasMoreElements(); ) {
 	            TreeNode n = (TreeNode)e.nextElement();
 	            TreePath path = parent.pathByAddingChild(n);
 	            expandAll(path, expand);
@@ -193,21 +198,34 @@ public class SBMLTree extends JTree implements ActionListener {
 	    }
 	}
 	
+	/**
+	 * 
+	 * @param item
+	 * @param types
+	 */
+	@SuppressWarnings("unchecked")
 	public void addPopupMenuItem(JMenuItem item, Class<? extends SBase>... types) {
 		popUpMap.put(item, Arrays.asList(types));
 		popup.add(item);
 	}
 	
+	/**
+	 * 
+	 */
 	public void setAllVisible(){
-		filterEnabled=false;
+		SBMLNode.showInvisible=true;
 		setAllVisible((SBMLNode) this.getModel().getRoot());
 		reload();
-		filterEnabled=true;
+		SBMLNode.showInvisible=false;
 	}
 	
+	/**
+	 * 
+	 * @param node
+	 */
 	private void setAllVisible(SBMLNode node) {
 		node.setVisible(true);
-		node.boldFont = false;
+		node.setBoldFont(false);
 		for (int i = 0; i<node.getChildCount(); i++){
 			TreeNode child = node.getChildAt(i);
 			if (child instanceof SBMLNode){
@@ -216,11 +234,20 @@ public class SBMLTree extends JTree implements ActionListener {
 		}
 	}
 	
+	/**
+	 * reload the tree model
+	 */
 	public void reload() {
 		((DefaultTreeModel)this.getModel()).reload();
 	}
 	
-	// is path1 descendant of path2
+	/**
+	 * is path1 descendant of path2
+	 * 
+	 * @param path1
+	 * @param path2
+	 * @return
+	 */
     public static boolean isDescendant(TreePath path1, TreePath path2){
         int count1 = path1.getPathCount();
         int count2 = path2.getPathCount();
@@ -233,112 +260,37 @@ public class SBMLTree extends JTree implements ActionListener {
         return path1.equals(path2);
     }
  
-    public void saveExpansionState(){
-    	savedState = ((DefaultTreeModel)this.getModel()).getPathToRoot((TreeNode) this.getSelectionPath().getLastPathComponent());
+    /**
+     * save current selection Path
+     */
+    public void saveSelectionPath(){
+    	if (this.getSelectionPath() != null) {
+    		savedState = ((DefaultTreeModel)this.getModel()).getPathToRoot((TreeNode) this.getSelectionPath().getLastPathComponent());
+    	}
     }
     
-    public void restoreExpansionState(){
-    	if (savedState != null) {
-    		for (int i=0; i<savedState.length; i++){
-    			TreePath path = new TreePath(((DefaultTreeModel)this.getModel()).getPathToRoot(savedState[i]));
-    			this.expandPath(path);
-    			this.setSelectionPath(path);
-    			this.scrollPathToVisible(path);
+    /**
+     * restore selection path
+     */
+    public void restoreSelectionPath(){
+    	expandPath(savedState);
+    }
+    
+    /**
+     * expand a path
+     * @param path
+     */
+    public void expandPath(TreeNode[] path){
+    	if (path != null) {
+    		for (int i=0; i<path.length; i++){
+    			TreePath treePath = new TreePath(((DefaultTreeModel)this.getModel()).getPathToRoot(path[i]));
+    			this.expandPath(treePath);
+    			this.setSelectionPath(treePath);
+    			this.scrollPathToVisible(treePath);
     		}
     	}
     }
-	
-	/**
-	 * 
-	 * @author Andreas Dr&auml;ger
-	 */
-	public static class SBMLNode extends DefaultMutableTreeNode {
-
-		/**
-		 * Generated serial version identifier.
-		 */
-		private static final long serialVersionUID = 9057010975355065921L;
-		
-		public boolean boldFont = false;
-		public boolean isVisible;
-
-		public SBMLNode(SBase sbase) {
-			this(sbase,true);
-		}
-		
-		public SBMLNode(SBase sbase, boolean isVisible) {
-		    super(sbase);
-		    this.isVisible = isVisible;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see javax.swing.tree.DefaultMutableTreeNode#getUserObject()
-		 */
-		@Override
-		public TreeNodeWithChangeSupport getUserObject() {
-		  return (TreeNodeWithChangeSupport) super.getUserObject();
-		}
-		
-		  
-
-
-		  public TreeNode getChildAt(int index) {
-		    if (!filterEnabled) {
-		      return super.getChildAt(index);
-		    }
-		    if (children == null) {
-		      throw new ArrayIndexOutOfBoundsException("node has no children");
-		    }
-
-		    int realIndex = -1;
-		    int visibleIndex = -1;
-		    Enumeration e = children.elements();
-		    while (e.hasMoreElements()) {
-		      SBMLNode node = (SBMLNode) e.nextElement();
-		      if (node.isVisible()) {
-		        visibleIndex++;
-		      }
-		      realIndex++;
-		      if (visibleIndex == index) {
-		        return (TreeNode) children.elementAt(realIndex);
-		      }
-		    }
-
-		    throw new ArrayIndexOutOfBoundsException("index unmatched");
-		    //return (TreeNode)children.elementAt(index);
-		  }
-
-		  public int getChildCount() {
-		    if (!filterEnabled) {
-		      return super.getChildCount();
-		    }
-		    if (children == null) {
-		      return 0;
-		    }
-
-		    int count = 0;
-		    Enumeration e = children.elements();
-		    while (e.hasMoreElements()) {
-		    	SBMLNode node = (SBMLNode) e.nextElement();
-		      if (node.isVisible()) {
-		        count++;
-		      }
-		    }
-
-		    return count;
-		  }
-
-		  public void setVisible(boolean visible) {
-		    this.isVisible = visible;
-		  }
-
-		  public boolean isVisible() {
-		    return isVisible;
-		  }
-
-	}
-	
+    
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -386,7 +338,7 @@ public class SBMLTree extends JTree implements ActionListener {
 				currSBase = null;
 				popup.setVisible(false);
 			} else if (clickedOn instanceof DefaultMutableTreeNode){
-				this.saveExpansionState();
+				this.saveSelectionPath();
 			}
 		}
 		if (clickedOn instanceof ASTNode) {

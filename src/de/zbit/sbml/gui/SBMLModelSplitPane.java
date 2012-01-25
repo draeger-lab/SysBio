@@ -23,7 +23,6 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -36,7 +35,6 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -45,12 +43,10 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
-import org.sbml.jsbml.util.filters.AndFilter;
 import org.sbml.jsbml.util.filters.OrFilter;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
-import de.zbit.sbml.gui.SBMLTree.SBMLNode;
 import de.zbit.sbml.util.RegexpAssignmentVariableFilter;
 import de.zbit.sbml.util.RegexpNameFilter;
 import de.zbit.sbml.util.RegexpSpeciesReferenceFilter;
@@ -127,7 +123,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 */
-  private boolean namesIfAvailalbe;
+	private boolean namesIfAvailalbe;
 	
 	/**
 	 * @param model
@@ -161,7 +157,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	protected JPanel createLeftComponent() throws SBMLException,
 		IOException {
 		JPanel leftPane = new JPanel();
-    LayoutHelper lh = new LayoutHelper(leftPane);
+		LayoutHelper lh = new LayoutHelper(leftPane);
 		
 	  	JScrollPane treePane = new JScrollPane(tree,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -278,7 +274,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			tree.addActionListener(al);
 		}
 		if (path != null) {
-			// tree.setSelectionPath(path);
 			tree.setExpandsSelectedPaths(true);
 			tree.expandPath(path);
 		}
@@ -295,6 +290,9 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * @param <V>
 	 */
 	class SBMLTreeSwingWorker<T,V> extends SwingWorker<T,V>{
+		/**
+		 * 
+		 */
 		private String searchString;
 		
 		/**
@@ -305,10 +303,18 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			this.searchString = searchString;
 		}
 
+		/**
+		 * 
+		 * @return
+		 */
 		public String getSearchString(){
 			return searchString;
 		}
 		
+		/*
+		 * (non-Javadoc)
+		 * @see javax.swing.SwingWorker#doInBackground()
+		 */
 		protected T doInBackground(){
 			try {
 				Thread.sleep(500);
@@ -319,7 +325,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 				tree.setAllVisible();
 				
 				if (searchString.equals("")){
-					SBMLTree.filterEnabled = false;
+					SBMLNode.showInvisible = true;
 				}
 				else {
 					String search = ".*" + searchString + ".*";
@@ -334,12 +340,16 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			return null;
 		}
 		
+		/*
+		 * (non-Javadoc)
+		 * @see javax.swing.SwingWorker#done()
+		 */
 		protected void done(){
 			if (!this.isCancelled()){
-				if (SBMLTree.filterEnabled) {
-					tree.expandAll(true);
+				if (SBMLNode.showInvisible) {
+					tree.restoreSelectionPath();
 				} else {
-					tree.restoreExpansionState();
+					tree.expandAll(true);
 				}
 			}
 		}
@@ -354,33 +364,33 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 */
 	public void valueChanged(TreeSelectionEvent e) {
 		TreeNode node = (TreeNode) tree.getLastSelectedPathComponent();
-    if (node == null) {
-      // Nothing is selected.
-      return;
-    }
-    if (node instanceof SBMLNode) {
-      TreeNodeWithChangeSupport sbmlNode = ((SBMLNode) node).getUserObject();
-      if (sbmlNode instanceof SBase) {
-        int proportionalLocation = getDividerLocation();
-        try {
-          setRightComponent(createRightComponent((SBase) sbmlNode));
-        } catch (Exception e1) {
-          GUITools.showErrorMessage(this, e1);
-        }
-        setDividerLocation(proportionalLocation);
-      } else if (sbmlNode instanceof ASTNode) {
-        int proportionalLocation = getDividerLocation();
-        try {
-          setRightComponent(createRightComponent((ASTNode) sbmlNode));
-        } catch (Exception exc) {
-          GUITools.showErrorMessage(this, exc);
-        }
-        setDividerLocation(proportionalLocation);
-      } else {
-        logger.fine(String.format("node class %s is unknown.", node.getClass()
-            .getName()));
-        // displayURL(helpURL);
-      }
-    }
+	    if (node == null) {
+	      // Nothing is selected.
+	      return;
+	    }
+	    if (node instanceof SBMLNode) {
+	      TreeNodeWithChangeSupport sbmlNode = ((SBMLNode) node).getUserObject();
+	      if (sbmlNode instanceof SBase) {
+	        int proportionalLocation = getDividerLocation();
+	        try {
+	          setRightComponent(createRightComponent((SBase) sbmlNode));
+	        } catch (Exception e1) {
+	          GUITools.showErrorMessage(this, e1);
+	        }
+	        setDividerLocation(proportionalLocation);
+	      } else if (sbmlNode instanceof ASTNode) {
+	        int proportionalLocation = getDividerLocation();
+	        try {
+	          setRightComponent(createRightComponent((ASTNode) sbmlNode));
+	        } catch (Exception exc) {
+	          GUITools.showErrorMessage(this, exc);
+	        }
+	        setDividerLocation(proportionalLocation);
+	      } else {
+	        logger.fine(String.format("node class %s is unknown.", node.getClass()
+	            .getName()));
+	        // displayURL(helpURL);
+	      }
+	    }
 	}
 }
