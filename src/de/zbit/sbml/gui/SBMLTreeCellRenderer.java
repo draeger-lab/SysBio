@@ -19,11 +19,10 @@ package de.zbit.sbml.gui;
 import java.awt.Component;
 import java.awt.Font;
 
-import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import de.zbit.sbml.gui.SBMLTree.SBMLNode;
+import org.sbml.jsbml.SimpleSpeciesReference;
 
 /**
  * @author Sebastian Nagel
@@ -56,10 +55,15 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 		if (value instanceof SBMLNode) {
-			if (((SBMLNode) value).boldFont){
+			SBMLNode node = (SBMLNode) value;
+			if (node.isBoldFont()){
 				setFont(getFont().deriveFont(Font.BOLD));
 			} else {
 				setFont(getFont().deriveFont(Font.PLAIN));
+			}
+
+			if (node.getUserObject() instanceof SimpleSpeciesReference){
+				this.setText(((SimpleSpeciesReference) node.getUserObject()).getSpeciesInstance().getName());
 			}
 		}
 		
