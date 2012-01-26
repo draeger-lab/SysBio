@@ -25,8 +25,10 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import javax.swing.JDialog;
@@ -207,27 +209,36 @@ public class SBMLTree extends JTree implements ActionListener {
 			progressBar.DisplayBar();
 		}
 		TreeNode node = (TreeNode) parent.getLastPathComponent();
-		boolean found = true;
-		if ((nodesOfInterest != null) && (node instanceof SBMLNode)) {
+		boolean found = nodesOfInterest == null;
+		if ((!found) && (node instanceof SBMLNode)) {
 			SBMLNode sbmlNode = (SBMLNode) node;
 			SBase sbase = ((SBase) sbmlNode.getUserObject());
 			found = nodesOfInterest.remove(sbase);
 			sbmlNode.setBoldFont(found);
 		}
-		if (node.getChildCount() >= 0) {
-			Enumeration<TreeNode> e = node.children();
-			while (e.hasMoreElements()) {
-				TreeNode child = e.nextElement();
-				TreePath path = parent.pathByAddingChild(child);
-				expandAll(nodesOfInterest, expand, path, progressBar);
-				if (child instanceof SBMLNode) {
-					found |= ((SBMLNode) child).isVisible();
+		Enumeration<TreeNode> e = node.children();
+		Queue<TreeNode> nodeQueue = new LinkedList<TreeNode>();
+		while (e.hasMoreElements()) {
+			TreeNode child = e.nextElement();
+			expandAll(nodesOfInterest, expand, parent.pathByAddingChild(child), progressBar);
+			if (child instanceof SBMLNode) {
+				SBMLNode n = (SBMLNode) child;
+				if (n.isVisible()) {
+					found = true;
+					nodeQueue.add(child);
 				}
 			}
 		}
 		if (node instanceof SBMLNode) { 
 			SBMLNode sbmlNode = (SBMLNode) node;
 			sbmlNode.setVisible(found);
+		}
+		while (!nodeQueue.isEmpty()) {
+			if (expand) {
+				expandPath(parent.pathByAddingChild(nodeQueue.poll()));
+			} else {
+				collapsePath(parent.pathByAddingChild(nodeQueue.poll()));
+			}
 		}
 		return parent;
 	}
