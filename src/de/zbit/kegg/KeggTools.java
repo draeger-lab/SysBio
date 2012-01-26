@@ -84,13 +84,13 @@ public class KeggTools {
       String[] reactionIDs = r.getName().trim().split(" ");
       
       // Parse IDs of reactants if we plan to split the reaction
-      Map<String, ReactionComponent> nameAndIdOfReactants = new HashMap<String, ReactionComponent>();
+      Map<String, ReactionComponent> reactantName2reactant = new HashMap<String, ReactionComponent>();
       Reaction toClone = r;
       boolean hasMultipleReactions = reactionIDs.length>1;
       if (crateOneReactionForEachID && hasMultipleReactions) {
         for (ReactionComponent rc: r.getReactants()) {
           if (rc.hasId()) {
-            nameAndIdOfReactants.put(rc.getName(), rc);
+            reactantName2reactant.put(rc.getName(), rc);
           }
         }
       }
@@ -146,7 +146,7 @@ public class KeggTools {
               // Look if we need to add new components
               ReactionComponent rc = r.getReactant(reactant, isSubstrate);
               if (rc==null) {
-                rc = nameAndIdOfReactants.get(reactant);
+                rc = reactantName2reactant.get(reactant);
                 if (rc==null) rc = new ReactionComponent(reactant);
                 if (isSubstrate) r.addSubstrate(rc);
                 else r.addProduct(rc);

@@ -463,7 +463,7 @@ public interface KeyProvider {
 					if (fieldValue.getClass().isAssignableFrom(clazz)) { return (T) fieldValue; }
 				}
 			} catch (Exception e) {
-			  logger.log(Level.FINE, e.getLocalizedMessage(), e);
+			  logger.log(Level.FINER, e.getLocalizedMessage(), e);
 			}
 			return null;
 		}

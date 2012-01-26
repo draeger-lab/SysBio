@@ -207,7 +207,7 @@ public class ThreadManager {
       
       if (Thread.currentThread().isInterrupted()) {
         t.interrupt();
-        break;        
+        break;
       }
       
       if (sleepTime<1000) sleepTime += 10; // Sleep a second at max.

@@ -116,6 +116,13 @@ public class Ensembl2GeneIDMapper extends AbstractMapper<String, Integer> {
     return null;
   }
   
+  /**
+   * @return organism common name (e.g., "mouse"), for which this mapper is initialized
+   */
+  public String getOrganism() {
+    return this.organism;
+  }
+  
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#getLocalFiles()
    */

@@ -100,7 +100,7 @@ public class DirectoryParser implements Iterator<String> {
 	 * @param path
 	 * @return
 	 */
-	private String appendSlash(String path) {
+	private static String appendSlash(String path) {
 		if (!path.endsWith("\\") && !path.endsWith("/"))
 			if (path.contains("/"))
 				path += "/";
@@ -162,8 +162,7 @@ public class DirectoryParser implements Iterator<String> {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * @return the {@link #path}, always with ending slash.
 	 */
 	public String getPath() {
 		return getPath(this.path);
@@ -174,7 +173,7 @@ public class DirectoryParser implements Iterator<String> {
 	 * @param path
 	 * @return
 	 */
-	private String getPath(String path) {
+	private static String getPath(String path) {
 		path = appendSlash(path);
 		return path;
 	}
