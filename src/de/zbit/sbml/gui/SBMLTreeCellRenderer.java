@@ -21,6 +21,7 @@ import java.awt.Font;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.SimpleSpeciesReference;
 
@@ -61,7 +62,6 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 			} else {
 				setFont(getFont().deriveFont(Font.PLAIN));
 			}
-
 			if (node.getUserObject() instanceof SimpleSpeciesReference){
 				this.setText(((SimpleSpeciesReference) node.getUserObject()).getSpeciesInstance().getName());
 			}

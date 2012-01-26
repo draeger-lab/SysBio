@@ -20,9 +20,12 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +38,8 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
@@ -192,23 +197,9 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		searchField = new JTextField();
 		searchField.setEditable(true);
 		searchField.setMaximumSize(new Dimension(searchField.getSize().width, 10));
-		searchField.addKeyListener(
-				new KeyListener(){
-					/* (non-Javadoc)
-					 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-					 */
-					public void keyPressed(KeyEvent arg0) {
-					}
-					/* (non-Javadoc)
-					 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-					 */
-					public void keyReleased(KeyEvent arg0) {
-
-					}
-					/* (non-Javadoc)
-					 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-					 */
-					public void keyTyped(KeyEvent arg0) {
+		searchField.getDocument().addDocumentListener(
+				new DocumentListener() {
+					public void changedUpdate(DocumentEvent arg0) {
 						if (worker!=null){
 							if (!worker.isDone())
 								worker.cancel(true);
@@ -218,6 +209,14 @@ public class SBMLModelSplitPane extends JSplitPane implements
 								worker.execute();
 							}
 						}
+					}
+
+					public void insertUpdate(DocumentEvent arg0) {
+						changedUpdate(arg0);
+					}
+
+					public void removeUpdate(DocumentEvent arg0) {
+						changedUpdate(arg0);
 					}
 				});
 		JLabel label = new JLabel(UIManager.getIcon("ICON_SEARCH_16"));
@@ -344,9 +343,10 @@ public class SBMLModelSplitPane extends JSplitPane implements
 				Thread.sleep(500);
 			} catch (Exception e) {
 			}
+
+			ProgressBarSwing progressBar = null;
 			
 			if (!this.isCancelled()) {
-				ProgressBarSwing progressBar = null;
 				logger.log(Level.INFO, "Searching...");
 				if (statusbar != null){
 					progressBar = (ProgressBarSwing) statusbar.showProgress();
@@ -357,6 +357,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 				
 				if (searchString.equals("")){
 					SBMLNode.showInvisible = true;
+					tree.restoreSelectionPath();
 				}
 				else {
 					String search = ".*" + searchString + ".*";
@@ -365,10 +366,20 @@ public class SBMLModelSplitPane extends JSplitPane implements
 					RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
 					OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
 					tree.search(filter,progressBar);
+
+					logger.log(Level.INFO, "Expanding...");
+					try {
+						tree.expandAll(true,progressBar);
+					} catch (Exception e) {}
+					if (statusbar != null) {
+						statusbar.hideProgress();
+					}
+
+					logger.log(Level.INFO, "Ready.");
 				}
 			}
 			
-			return null;
+			return (T) progressBar;
 		}
 		
 		/*
@@ -376,17 +387,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		 * @see javax.swing.SwingWorker#done()
 		 */
 		protected void done(){
-			if (!this.isCancelled()){
-				logger.log(Level.INFO, "Ready.");
-				if (statusbar != null) {
-					statusbar.hideProgress();
-				}
-				if (SBMLNode.showInvisible) {
-					tree.restoreSelectionPath();
-				} else {
-					tree.expandAll(true);
-				}
-			}
 		}
 		
 	}

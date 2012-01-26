@@ -144,9 +144,10 @@ public class SBMLTree extends JTree implements ActionListener {
 		SBMLNode root = (SBMLNode)this.getModel().getRoot();
 		List<TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
 		if (progressBar != null){
-			progressBar.setNumberOfTotalCalls(this.nodeCount());
+			progressBar.setNumberOfTotalCalls(2*this.nodeCount());
 		}
 		search(root, filter, list, progressBar);
+		reload();
 		SBMLNode.showInvisible = false;
 	}
 	
@@ -160,23 +161,22 @@ public class SBMLTree extends JTree implements ActionListener {
 	 */
 	private void search(SBMLNode node,Filter filter,List<TreeNode> list, final ProgressBarSwing progressBar){
 		SBase sbase = ((SBase)node.getUserObject());
-		if (progressBar != null) {
-			progressBar.DisplayBar();
-		}
 		if (sbase.filter(filter).size() > 0){
 			node.setVisible(true);
 			node.setBoldFont(false);
-			for (int i = 0; i < node.getChildCount(); ++i) {
-				SBMLNode child = (SBMLNode) node.getChildAt(i);
-				search(child, filter, list, progressBar);
-			}
-		}
-		else if (list.contains(sbase)){
+		} else if (list.contains(sbase)){
 			node.setBoldFont(true);
 			node.setVisible(true);
 		} else {
 			node.setBoldFont(false);
 			node.setVisible(false);
+		}
+		for (int i = 0; i < node.getChildCount(); ++i) {
+			SBMLNode child = (SBMLNode) node.getChildAt(i);
+			search(child, filter, list, progressBar);
+		}
+		if (progressBar != null) {
+			progressBar.DisplayBar();
 		}
 	}
 	
@@ -184,13 +184,18 @@ public class SBMLTree extends JTree implements ActionListener {
 		return SBMLNode.nodeCount;
 	}
 	
+	public void expandAll(boolean expand){
+		expandAll(expand, null);
+	}
+	
 	/**
 	 * 
 	 * @param expand
+	 * @param progressBarSwing 
 	 */
-	public void expandAll(boolean expand){
+	public void expandAll(boolean expand, ProgressBarSwing progressBar){
 		if (this.getModel().getRoot() != null){
-			this.expandAll(null, expand);
+			this.expandAll(null, expand, progressBar);
 		}
 	}
 	
@@ -199,7 +204,10 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * @param parent
 	 * @param expand
 	 */
-	private void expandAll(TreePath parent, boolean expand) {
+	private void expandAll(TreePath parent, boolean expand, ProgressBarSwing progressBar) {
+		if (progressBar != null){
+			progressBar.DisplayBar();
+		}
 		if (parent == null){
 			parent = new TreePath(((TreeNode) this.getModel().getRoot()));
 		}
@@ -208,7 +216,7 @@ public class SBMLTree extends JTree implements ActionListener {
 	        for (Enumeration<?> e=node.children(); e.hasMoreElements(); ) {
 	            TreeNode n = (TreeNode)e.nextElement();
 	            TreePath path = parent.pathByAddingChild(n);
-	            expandAll(path, expand);
+	            expandAll(path, expand, progressBar);
 	        }
 	    }
 
@@ -295,6 +303,16 @@ public class SBMLTree extends JTree implements ActionListener {
      */
     public void restoreSelectionPath(){
     	expandPath(savedState);
+    }
+    
+    /**
+     * expand a path from root to node
+     * @param node
+     */
+    public void expandNode(TreeNode node){
+    	if (node != null) {
+    		expandPath(((DefaultTreeModel)this.getModel()).getPathToRoot(node));
+    	}
     }
     
     /**

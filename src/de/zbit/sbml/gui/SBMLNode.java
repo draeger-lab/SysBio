@@ -49,6 +49,7 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	
 	private boolean boldFont = false;
 	private boolean isVisible;
+	private boolean expanded = false;
 
 	/**
 	 * 
@@ -139,5 +140,17 @@ public class SBMLNode extends DefaultMutableTreeNode {
 
 	public boolean isVisible() {
 		return isVisible;
+	}
+	
+	public boolean isExpanded() {
+		return expanded;
+	}
+	
+	public void expand() {
+		this.expanded = true;
+	}
+	
+	public void collapse() {
+		this.expanded = false;
 	}
 }
