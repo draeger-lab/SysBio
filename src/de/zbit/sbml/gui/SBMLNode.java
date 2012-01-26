@@ -1,6 +1,6 @@
 /*
- * $Id: SBMLNode.java 739 2012-01-25 21:07:44Z snagel $
- * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/gui/SBMLNode.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -43,9 +43,9 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	/**
 	 * true: show invisible nodes
 	 */
-	public static boolean showInvisible = false;
+	private static boolean showInvisible = false;
 	
-	public static int nodeCount = 0;
+	private static int nodeCount = 0;
 	
 	private boolean boldFont = false;
 	private boolean isVisible;
@@ -84,7 +84,7 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	 * @see javax.swing.tree.DefaultMutableTreeNode#getChildAt(int)
 	 */
 	public TreeNode getChildAt(int index) {
-		if (showInvisible) {
+		if (isShowInvisible()) {
 			return super.getChildAt(index);
 		}
 		if (this.children == null) {
@@ -109,7 +109,7 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	}
 
 	public int getChildCount() {
-		if (showInvisible) {
+		if (isShowInvisible()) {
 			return super.getChildCount();
 		}
 		if (this.children == null) {
@@ -152,5 +152,18 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	
 	public void collapse() {
 		this.expanded = false;
+	}
+
+	public static boolean isShowInvisible() {
+		return showInvisible;
+	}
+
+	public static void setShowInvisible(boolean showInvisible) {
+		SBMLNode.showInvisible = showInvisible;
+	}
+
+	public static int getNodeCount() {
+		// TODO: This will return the number of nodes FOR ALL SBMLNode instances!!!
+		return nodeCount;
 	}
 }

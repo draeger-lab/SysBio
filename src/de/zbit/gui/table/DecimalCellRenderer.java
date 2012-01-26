@@ -74,7 +74,7 @@ public class DecimalCellRenderer extends DefaultTableCellRenderer {
 	public DecimalCellRenderer() {
 		this.formatter = new DecimalFormat(StringUtil.DECIMAL_FORMAT);
 		this.align = SwingConstants.RIGHT;
-		this.allSame = false;
+		this.allSame = true;
 		this.bg = new Color[] {ColorPalette.lightBlue, Color.WHITE};
 	}
 	
@@ -182,9 +182,7 @@ public class DecimalCellRenderer extends DefaultTableCellRenderer {
 	protected void setValue(final Object value) {
 		if ((value != null) && (value instanceof Number)) {
 			double v = ((Number) value).doubleValue();
-			setText(StringUtil.toString(v, formatter.getMaximumIntegerDigits(),
-				formatter.getMinimumFractionDigits(),
-				formatter.getMinimumFractionDigits()));
+			setText(StringUtil.toString(v));
 		} else {
 			super.setValue(value);
 		}

@@ -44,15 +44,22 @@ import de.zbit.util.ProgressListener;
 import de.zbit.util.logging.LogUtil;
 
 /**
- * A pseudo StatusBar implementation for Swing. This can be used
+ * A pseudo-{@link StatusBar} implementation for Swing. This can be used
  * to display a status information (e.g., attached to a logger with
  * {@link #displayLogMessagesInStatusBar()}) and a
- * {@link AbstractProgressBar} at the bottom of a window.
+ * {@link AbstractProgressBar} at the bottom of a {@link java.awt.Window}.
  * @author Clemens Wrzodek
  * @version $Rev$
  */
 public class StatusBar extends JPanel implements ProgressListener {
+	
+	/**
+	 * Generated serial version identifier.
+	 */
 	private static final long serialVersionUID = -5115329140165258105L;
+	/**
+	 * A {@link Logger} for this class.
+	 */
 	public static final transient Logger log = Logger.getLogger(StatusBar.class.getName());
 
 	/**
@@ -163,8 +170,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 		}
 
 		// Get current icon
-		Icon icon = null;
-		icon = frame.getIconImage()!=null?new ImageIcon(frame.getIconImage()):null;
+		Icon icon = frame.getIconImage() != null ? new ImageIcon(frame.getIconImage()) : null;
 
 		// Create the status bar
 		final StatusBar statusBar = new StatusBar(icon, null);
@@ -212,7 +218,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 * Hide the {@link #progressBar} if it is visible.
 	 */
 	public synchronized void hideProgress() {
-		if (progressBar!=null) {
+		if (progressBar != null) {
 			progressBar.getProgressBar().setVisible(false);
 		}
 		return;

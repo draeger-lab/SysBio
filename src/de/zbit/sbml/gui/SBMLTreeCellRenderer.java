@@ -1,6 +1,6 @@
 /*
  * $Id:  SBMLTreeCellRenderer.java 17:49:52 snagel$
- * $URL: SBMLTreeCellRenderer.java $
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -21,7 +21,6 @@ import java.awt.Font;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.SimpleSpeciesReference;
 
@@ -44,20 +43,15 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 		super();
 	}
 	
-	/** 
-	 * @param tree tree 
-	 * @param value cell value 
-	 * @param selected closed tree icon 
-	 * @param expanded opened tree icon 
-	 * @param leaf end point icon 
-	 * @param row number of row 
-	 * @param hasFocus the focus 
-	 */ 
+	/* (non-Javadoc)
+	 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+	 */
+	@Override
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 		if (value instanceof SBMLNode) {
 			SBMLNode node = (SBMLNode) value;
-			if (node.isBoldFont()){
+			if (node.isBoldFont()) {
 				setFont(getFont().deriveFont(Font.BOLD));
 			} else {
 				setFont(getFont().deriveFont(Font.PLAIN));
@@ -66,8 +60,7 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 				this.setText(((SimpleSpeciesReference) node.getUserObject()).getSpeciesInstance().getName());
 			}
 		}
-		
-	    return this; 
+		return this; 
 	}
 
 }
