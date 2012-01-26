@@ -65,6 +65,7 @@ import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.table.JComponentTableModel;
 import de.zbit.gui.table.JComponentTableRenderer;
 import de.zbit.gui.table.JTableRowBased;
+import de.zbit.gui.table.JTableTools;
 import de.zbit.io.CSVReader;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.FileTools;
@@ -406,20 +407,14 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     if (defaultPreviewFont != null) table.setFont(defaultPreviewFont);
     table.setPreferredScrollableViewportSize(new Dimension(500, 100));
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    for (int i = 0; i< maxHeadRow + 1; i++)
+    for (int i = 0; i< maxHeadRow + 1; i++) {
       table.setRowHeight(i, (int) (table.getRowHeight(i) * 1.3f));
+    }
     
     // Disallow dragging columns
     table.getTableHeader().setReorderingAllowed(false);
-    
-    // Resize columns to a reasonable width
-    if (table.getColumnModel().getColumnCount() > 0)  {
-      int width = table.getColumnModel().getColumn(0).getWidth();
-      width = Math.max(width, 120);
-      for (int i=0; i<table.getColumnModel().getColumnCount(); i++) {
-        table.getColumnModel().getColumn(i).setPreferredWidth(width);
-      }
-    }
+    // Resize columns to a reasonable with.
+    JTableTools.resizeColumns(table, 120);
     
     return table;
   }

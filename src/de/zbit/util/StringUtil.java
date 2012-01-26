@@ -1378,8 +1378,7 @@ public class StringUtil {
 	 * @param maxFracDigits
 	 * @return
 	 */
-	public static String toString(double v, int maxIntDigits, int minFracDigits,
-		int maxFracDigits) {
+	public static String toString(double v) {
 		if (Double.isNaN(v)) {
 			return "NaN";
 		} else if (Double.isInfinite(v)) {
@@ -1396,9 +1395,6 @@ public class StringUtil {
 			df = new DecimalFormat(StringUtil.DECIMAL_FORMAT,
 				new DecimalFormatSymbols(locale));
 		}
-		df.setMaximumIntegerDigits(maxIntDigits);
-		df.setMinimumFractionDigits(minFracDigits);
-		df.setMaximumFractionDigits(maxFracDigits);
 		return df.format(v);
 	}
   

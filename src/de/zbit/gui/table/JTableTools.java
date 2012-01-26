@@ -43,6 +43,49 @@ import javax.swing.event.DocumentListener;
 public class JTableTools {
 
   /**
+   * 
+   * @param val
+   * @return
+   */
+  public static String list2String(Object val) {
+    StringBuffer ret = new StringBuffer();
+    
+    if (val.getClass().isArray()) {
+      int size = Array.getLength(val);
+      for (int i=0; i<size; i++) {
+        ret.append(Array.get(val, i));
+        ret.append(" ");
+      }
+    } else if (val instanceof Iterable) {
+      Iterator<?> it = ((Iterable<?>) val).iterator();
+      while (it.hasNext()) {
+        ret.append(it.next().toString());
+        ret.append(" ");
+      }
+    } else {
+      ret.append(val.toString());
+    }
+
+    return ret.toString();
+  }
+
+  /**
+   * Resize columns to a reasonable width.
+   * 
+   * @param table
+   * @param maxWidth
+   */
+	public static void resizeColumns(JTable table, int maxWidth) {
+		if (table.getColumnModel().getColumnCount() > 0) {
+			int width = table.getColumnModel().getColumn(0).getWidth();
+			width = Math.max(width, maxWidth);
+			for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+				table.getColumnModel().getColumn(i).setPreferredWidth(width);
+			}
+		}
+	}
+
+  /**
    * Adds search capabilities to a table.
    * Simply start typing when the focus is on a non-editable cell.
    * @param table
@@ -169,6 +212,12 @@ public class JTableTools {
         isDialogVisible = true;
         searchField.getDocument().addDocumentListener(new DocumentListener() {
         	/* (non-Javadoc)
+           * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
+           */
+          public void changedUpdate(final DocumentEvent e) {
+            s.search();
+          }
+          /* (non-Javadoc)
         	 * @see javax.swing.event.DocumentListener#insertUpdate(javax.swing.event.DocumentEvent)
         	 */
           public void insertUpdate(final DocumentEvent e) {
@@ -178,12 +227,6 @@ public class JTableTools {
            * @see javax.swing.event.DocumentListener#removeUpdate(javax.swing.event.DocumentEvent)
            */
           public void removeUpdate(final DocumentEvent e) {
-            s.search();
-          }
-          /* (non-Javadoc)
-           * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
-           */
-          public void changedUpdate(final DocumentEvent e) {
             s.search();
           }
         });
@@ -237,33 +280,6 @@ public class JTableTools {
         searchField.getActionMap().put("exit", exit);
       }
     });
-  }
-
-  /**
-   * 
-   * @param val
-   * @return
-   */
-  public static String list2String(Object val) {
-    StringBuffer ret = new StringBuffer();
-    
-    if (val.getClass().isArray()) {
-      int size = Array.getLength(val);
-      for (int i=0; i<size; i++) {
-        ret.append(Array.get(val, i));
-        ret.append(" ");
-      }
-    } else if (val instanceof Iterable) {
-      Iterator<?> it = ((Iterable<?>) val).iterator();
-      while (it.hasNext()) {
-        ret.append(it.next().toString());
-        ret.append(" ");
-      }
-    } else {
-      ret.append(val.toString());
-    }
-
-    return ret.toString();
   }
   
 }

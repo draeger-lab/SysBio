@@ -16,20 +16,20 @@
  */
 package de.zbit.sbml.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.beans.EventHandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -37,12 +37,12 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -56,7 +56,6 @@ import org.sbml.jsbml.util.filters.OrFilter;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.ProgressBarSwing;
-import de.zbit.gui.StatusBar;
 import de.zbit.sbml.util.RegexpAssignmentVariableFilter;
 import de.zbit.sbml.util.RegexpNameFilter;
 import de.zbit.sbml.util.RegexpSpeciesReferenceFilter;
@@ -74,7 +73,7 @@ import de.zbit.util.AbstractProgressBar;
  * @version $Rev$
  */
 public class SBMLModelSplitPane extends JSplitPane implements
-		TreeSelectionListener {
+		TreeSelectionListener, PropertyChangeListener {
 	
 	/**
 	 * Generated serial version id.
@@ -105,11 +104,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 */
-	SBMLTreeSwingWorker<Void, Void> worker;
-	
-	/**
-	 * 
-	 */
 	protected SBMLDocument sbmlDoc;
 	
 	/**
@@ -135,38 +129,30 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 */
 	private boolean namesIfAvailalbe;
-	
-	/**
-	 * 
-	 */
-	StatusBar statusbar;
+	private AbstractProgressBar progressBar;
 	
 	/**
 	 * 
 	 * @param document
 	 * @param namesIfAvailable
-	 * @throws IOException 
-	 * @throws SBMLException 
-	 */
-	public SBMLModelSplitPane(SBMLDocument document, boolean namesIfAvailable) throws SBMLException, IOException{
-		this(null, document, namesIfAvailable);
-	}
-	
-	/**
-	 * @param sbmLsqueezerUI 
-	 * @param model
 	 * @throws SBMLException
 	 * @throws IOException
 	 */
-	public SBMLModelSplitPane(JFrame owner, SBMLDocument document, boolean namesIfAvailable) throws SBMLException,
-		IOException {
+	public SBMLModelSplitPane(SBMLDocument document, boolean namesIfAvailable) throws SBMLException, IOException {
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		this.namesIfAvailalbe = namesIfAvailable;
-		this.statusbar = (owner == null) ? null : StatusBar.addStatusBar(owner);
 		actionListeners = new HashSet<ActionListener>();
 		//document.addChangeListener(this);
 		init(document, false);
 		initTree();
+	}
+	
+	/**
+	 * 
+	 * @param progressBar
+	 */
+	public void setProgressBar(AbstractProgressBar progressBar){
+		this.progressBar = progressBar;
 	}
 	
 	/**
@@ -197,34 +183,50 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		searchField = new JTextField();
 		searchField.setEditable(true);
 		searchField.setMaximumSize(new Dimension(searchField.getSize().width, 10));
-		searchField.getDocument().addDocumentListener(
-				new DocumentListener() {
-					public void changedUpdate(DocumentEvent arg0) {
-						if (worker!=null){
-							if (!worker.isDone())
-								worker.cancel(true);
-							
-							if (!worker.getSearchString().equals(searchField.getText())){
-								worker = new SBMLTreeSwingWorker<Void, Void>(searchField.getText());
-								worker.execute();
-							}
-						}
-					}
-
-					public void insertUpdate(DocumentEvent arg0) {
-						changedUpdate(arg0);
-					}
-
-					public void removeUpdate(DocumentEvent arg0) {
-						changedUpdate(arg0);
-					}
-				});
+		searchField.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "changedUpdate", ""));
 		JLabel label = new JLabel(UIManager.getIcon("ICON_SEARCH_16"));
 		label.setOpaque(true);
 		lh.add(label, 0, 2, 1, 1, 0d, 0d);
 		lh.add(searchField, 1, 2, 1, 1, 0d, 0d);
 		
 		return leftPane;
+	}
+	
+	
+	private Timer swingTimer;
+	
+	/* (non-Javadoc)
+	 * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
+	 */
+	public void changedUpdate(DocumentEvent evt) {
+		int delay = 900;
+		if (swingTimer == null) {
+			swingTimer = new Timer(delay, EventHandler.create(ActionListener.class, this, "searchTree"));
+			swingTimer.setRepeats(false);
+			swingTimer.setInitialDelay(delay);
+			swingTimer.start();
+		} else {
+			swingTimer.restart();
+		}
+		if (searchField.getText().length() == 0) {
+			swingTimer.stop();
+			swingTimer = null;
+			tree.setAllVisible();
+			searchField.setEnabled(true);
+		}
+	}
+	
+	/**
+	 * Invoke search
+	 */
+	public void searchTree() {
+		swingTimer = null;
+		searchField.setEnabled(false);
+		logger.info("searching");
+		SBMLTreeSwingWorker worker = new SBMLTreeSwingWorker(this,
+			searchField.getText(), tree);
+		worker.addPropertyChangeListener(this);
+		worker.execute();
 	}
 	
 	/**
@@ -284,8 +286,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	}
 	
 	protected void initTree() {
-		worker = new SBMLTreeSwingWorker<Void, Void>(searchField.getText());
-		
 		TreePath path = null;
 		if (tree != null) {
 			path = tree.getSelectionPath();
@@ -308,29 +308,39 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 * @author Sebastian Nagel
 	 * @version $Rev$
-	 * @since 1.4
-	 * @param <T>
-	 * @param <V>
+	 * @since 1.1
 	 */
-	class SBMLTreeSwingWorker<T,V> extends SwingWorker<T,V>{
+	class SBMLTreeSwingWorker extends SwingWorker<List<TreeNode>, Void> {
 		/**
 		 * 
 		 */
 		private String searchString;
+		/**
+		 * 
+		 */
+		private SBMLTree tree;
+		/**
+		 * 
+		 */
+		private Component parent;
 		
 		/**
-		 * @param text
+		 * 
+		 * @param searchString
+		 * @param node
 		 */
-		public SBMLTreeSwingWorker(String searchString) {
+		public SBMLTreeSwingWorker(Component parent, String searchString, SBMLTree tree) {
 			super();
+			this.parent = parent;
 			this.searchString = searchString;
+			this.tree = tree;
 		}
 
 		/**
 		 * 
 		 * @return
 		 */
-		public String getSearchString(){
+		public String getSearchString() {
 			return searchString;
 		}
 		
@@ -338,26 +348,11 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		 * (non-Javadoc)
 		 * @see javax.swing.SwingWorker#doInBackground()
 		 */
-		protected T doInBackground(){
-			try {
-				Thread.sleep(500);
-			} catch (Exception e) {
-			}
-
-			ProgressBarSwing progressBar = null;
-			
-			if (!this.isCancelled()) {
-				logger.log(Level.INFO, "Searching...");
-				if (statusbar != null){
-					progressBar = (ProgressBarSwing) statusbar.showProgress();
-					progressBar.reset();
-				}
-				
+		protected List<TreeNode> doInBackground() {
 				tree.setAllVisible();
 				
-				if (searchString.equals("")){
-					SBMLNode.showInvisible = true;
-					tree.restoreSelectionPath();
+				if (searchString.equals("")) {
+					return null;
 				}
 				else {
 					String search = ".*" + searchString + ".*";
@@ -365,37 +360,45 @@ public class SBMLModelSplitPane extends JSplitPane implements
 					RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);
 					RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
 					OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
-					tree.search(filter,progressBar);
-
-					logger.log(Level.INFO, "Expanding...");
-					try {
-						tree.expandAll(true,progressBar);
-					} catch (Exception e) {}
-					if (statusbar != null) {
-						statusbar.hideProgress();
+					if ((tree.getModel() != null) && (tree.getModel().getRoot() != null)) {
+						return ((SBMLNode) tree.getModel().getRoot()).getUserObject().filter(filter);
 					}
-
-					logger.log(Level.INFO, "Ready.");
+					return null;
 				}
 			}
-			
-			return (T) progressBar;
-		}
 		
-		/*
-		 * (non-Javadoc)
+		/* (non-Javadoc)
 		 * @see javax.swing.SwingWorker#done()
 		 */
-		protected void done(){
+		@Override
+		protected void done() {
+			List<TreeNode> list = null;
+			try {
+				list = get();
+			} catch (InterruptedException exc) {
+				GUITools.showErrorMessage(parent, exc);
+			} catch (ExecutionException exc) {
+				GUITools.showErrorMessage(parent, exc);
+			}
+			if (list == null) {
+				SBMLNode.setShowInvisible(true);
+				tree.restoreSelectionPath();
+			} else {
+				logger.log(Level.INFO, "Expanding...");
+				try {
+					tree.expandAll(list, true, progressBar);
+				} catch (Exception e) {}
+				if ((progressBar != null) && (progressBar instanceof ProgressBarSwing)) {
+					((ProgressBarSwing) progressBar).getProgressBar().setVisible(false);
+				}
+			}
+			firePropertyChange("done", null, list);
 		}
 		
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event
-	 * .TreeSelectionEvent)
+	/* (non-Javadoc)
+	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
 	 */
 	public void valueChanged(TreeSelectionEvent e) {
 		TreeNode node = (TreeNode) tree.getLastSelectedPathComponent();
@@ -427,5 +430,14 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	        // displayURL(helpURL);
 	      }
 	    }
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	public void propertyChange(PropertyChangeEvent evt) {
+		if (evt.getPropertyName().equals("done")) {
+			searchField.setEnabled(true);
+		}
 	}
 }
