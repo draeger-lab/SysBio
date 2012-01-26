@@ -361,7 +361,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 					RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);
 					RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
 					OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
-					tree.search(filter);
+					tree.search(filter, progressBar);
 					if ((tree.getModel() != null) && (tree.getModel().getRoot() != null)) {
 						return ((SBMLNode) tree.getModel().getRoot()).getUserObject().filter(filter);
 					}
