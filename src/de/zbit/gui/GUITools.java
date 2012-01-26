@@ -2134,18 +2134,25 @@ public class GUITools {
       showErrorMessage(owner, exc);
     }
   }
-
-
+  
   /**
-   * Show the component in an information message context, but does
-   * not wait until the user clicks ok, but simply invokes this
-   * message dialog in a new thread.
+   * Show the component in an information message context, but does not wait
+   * until the user clicks ok, but simply invokes this message dialog in a new
+   * thread.
    * 
-   * Simply executes {@link javax.swing.JOptionPane#showMessageDialog(Component, Object, String, int)}
+   * Simply executes
+   * {@link javax.swing.JOptionPane#showMessageDialog(Component, Object, String, int)}
    * in a new thread.
    * 
-   * @param component - the component to show
-   * @param caption - the caption of the dialog
+   * <b>WARNING: This might not work on all plattforms. Do not show messages in
+   * different threads. There is a GUI thread in which messages should be
+   * displayed, use other threads for computation. Do not go the opposite
+   * way!</b>
+   * 
+   * @param component
+   *        - the component to show
+   * @param caption
+   *        - the caption of the dialog
    */
   public static SwingWorker<Void, Void> showMessageDialogInNewThread(final Component component, final String caption) {
     SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
@@ -2210,6 +2217,11 @@ public class GUITools {
    * <p>This method has the advantage to allow modifications of the dialog, because
    * evaulation takes place in a new thread!
    * 
+   * <b>WARNING: This might not work on all plattforms. Do not show messages in
+   * different threads. There is a GUI thread in which messages should be
+   * displayed, use other threads for computation. Do not go the opposite
+   * way!</b>
+   * 
    * @param component
    * @param caption
    * @param okAction optional, action to be performed after dialog confirmation.
@@ -2264,6 +2276,11 @@ public class GUITools {
    * 
    * Hint: Consider setting {@link ProcessBuilder#redirectErrorStream()}
    * to true.
+   * 
+   * <b>WARNING: This might not work on all plattforms. Do not show messages in
+   * different threads. There is a GUI thread in which messages should be
+   * displayed, use other threads for computation. Do not go the opposite
+   * way!</b>
    * 
    * @param p - the process to monitor.
    * @param caption - the caption of the window
