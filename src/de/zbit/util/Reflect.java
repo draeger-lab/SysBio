@@ -911,19 +911,26 @@ public class Reflect {
     Class<?> lastMain = null;
     
     // Get last command-line from properties
-    String command = System.getProperty("sun.java.command");
-    if (command!=null && command.length()>0) {
-      // Trim arguments
-      int pos = command.indexOf(' ');
-      if (pos>0) command = command.substring(0, pos);
-      try {
-        lastMain = Class.forName(command);
-      } catch (ClassNotFoundException e1) {
-        lastMain = null;
-      }
-    }
+    /*
+     * NOTE: This does NOT WORK IN ALL CASES! E.g. in webstart
+     * applications, "com.sun.javaws.Main" is returned.
+     */
+//    String command = System.getProperty("sun.java.command");
+//    if (command!=null && command.length()>0) {
+//      // Trim arguments
+//      int pos = command.indexOf(' ');
+//      if (pos>0) command = command.substring(0, pos);
+//      try {
+//        lastMain = Class.forName(command);
+//      } catch (ClassNotFoundException e1) {
+//        lastMain = null;
+//      }
+//    }
     
     // Get the main class from the stackTrace
+    /*
+     * This may not be the nicest solution, but WORKS IN ALL CASES! 
+     */
     if (lastMain==null) {
       final Throwable t = new Throwable();
       for (StackTraceElement e : t.getStackTrace()) {
