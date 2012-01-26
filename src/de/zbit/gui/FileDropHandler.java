@@ -23,9 +23,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.TransferHandler;
+
+import de.zbit.util.FileTools;
 
 /**
  * This class allows the user to drag and drop files to a target.
@@ -50,14 +57,22 @@ import javax.swing.TransferHandler;
  * @since 1.0
  */
 public class FileDropHandler extends TransferHandler {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = -2874307479020044075L;
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(FileDropHandler.class.getName());
   
   /**
    * Event ID for a single file, fired on the listener.
    * The source object will be a {@link File}.
    */
   public final static int FILE_DROPPED = 1;
-
+  
   /**
    * Event ID for a multiple files, fired on the listener.
    * The source object will be a {@link List} of {@link File}s.
@@ -78,16 +93,28 @@ public class FileDropHandler extends TransferHandler {
     listener = l;
   }
   
+  /* (non-Javadoc)
+   * @see javax.swing.TransferHandler#canImport(javax.swing.TransferHandler.TransferSupport)
+   */
+  @Override
   public boolean canImport(TransferSupport supp) {
+    boolean canImport = supp.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
     // Also clipboard paste's possible.
     //if (!supp.isDrop()) {
     //return false;
     //}
+    if (!canImport && supp.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+      canImport = true;
+    }
     
     /* return true if and only if the drop contains a list of files */
-    return supp.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+    return canImport;
   }
   
+  /* (non-Javadoc)
+   * @see javax.swing.TransferHandler#importData(javax.swing.TransferHandler.TransferSupport)
+   */
+  @Override
   @SuppressWarnings("unchecked")
   public boolean importData(TransferSupport supp) {
     if (!canImport(supp)) {
@@ -99,13 +126,30 @@ public class FileDropHandler extends TransferHandler {
     
     try {
       /* fetch the data from the Transferable */
-      Object data = t.getTransferData(DataFlavor.javaFileListFlavor);
       
-      /* data of type javaFileListFlavor is a list of files */
-      List<File> fileList = (List<File>)data;
+      Object data;
+      List<File> fileList;
+      
+      if (!t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+        data = t.getTransferData(DataFlavor.stringFlavor);
+        List<String> stringList = Arrays.asList(data.toString().split("\n"));
+        fileList = new LinkedList<File>();
+        for (int i = 0; i < stringList.size(); i++) {
+          try {
+            URL url = new URL(stringList.get(i));
+            fileList.add(new File(url.getFile()));
+          } catch (MalformedURLException exc) {
+            logger.fine(exc.getLocalizedMessage());
+          }
+        }
+      } else {
+        data = t.getTransferData(DataFlavor.javaFileListFlavor);
+        /* data of type javaFileListFlavor is a list of files */
+        fileList = (List<File>) data; 
+      }
       
       // Fire single action per drag and drop.
-      if (fileList.size()>1) {
+      if (fileList.size() > 1) {
         ActionEvent e = new ActionEvent(fileList, FILES_DROPPED, "FILES_DROPPED");
         listener.actionPerformed(e);
         
