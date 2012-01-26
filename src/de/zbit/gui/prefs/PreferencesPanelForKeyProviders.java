@@ -146,8 +146,6 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
         	// TODO: this is a very simple check. What if we have a new key-value pair? Null values??
           prefs.put(entry.getKey(), entry.getValue());
           changes = true;
-        } else {
-          System.out.println("Rejecting key " + entry);
         }
       }
       
