@@ -352,6 +352,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 				tree.setAllVisible();
 				
 				if (searchString.equals("")) {
+					SBMLNode.setShowInvisible(true);
 					return null;
 				}
 				else {
@@ -360,6 +361,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 					RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);
 					RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
 					OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
+					tree.search(filter);
 					if ((tree.getModel() != null) && (tree.getModel().getRoot() != null)) {
 						return ((SBMLNode) tree.getModel().getRoot()).getUserObject().filter(filter);
 					}
@@ -392,6 +394,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 					((ProgressBarSwing) progressBar).getProgressBar().setVisible(false);
 				}
 			}
+			logger.log(Level.INFO, "Ready.");
 			firePropertyChange("done", null, list);
 		}
 		
