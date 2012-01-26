@@ -28,6 +28,7 @@ import de.zbit.util.logging.LogUtil;
 /**
  * A mapper from microRNA systematic <b>precursor</b> names (e.g., "mmu-mir-30e") to
  * NCBI entrez gene identifiers (e.g., 723836).
+ * <p><B>MIRNA ID MUST BE LOWERCASED!</B></p>
  * @author Clemens Wrzodek
  * @version $Rev$
  */
@@ -84,6 +85,9 @@ public class MicroRNAsn2GeneIDMapper  extends AbstractMapper<String, Integer>{
     LogUtil.initializeLogging(Level.FINE);
     MicroRNAsn2GeneIDMapper mapper = new MicroRNAsn2GeneIDMapper();
     System.out.println(mapper.map("mmu-mir-30e"));
+    System.out.println(mapper.map("mmu-mir-127"));
+    System.out.println(mapper.map("mmu-mir-93"));
+    System.out.println(mapper.map("hsa-let-7f-1"));
   }
   
 
@@ -154,6 +158,7 @@ public class MicroRNAsn2GeneIDMapper  extends AbstractMapper<String, Integer>{
   @Override
   protected String preProcessSourceID(String string) {
     try {
+      //System.out.println(string + " -- " + preMapper.map(string));
       return preMapper.map(string);
     } catch (Exception e) {
       return null;

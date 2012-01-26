@@ -73,12 +73,14 @@ public class JTableTools {
    * Resize columns to a reasonable width.
    * 
    * @param table
-   * @param maxWidth
+   * @param minWidth each column, with a width lower than
+   * this value will get this value as minimum column width
+   * assigned.
    */
-	public static void resizeColumns(JTable table, int maxWidth) {
+	public static void resizeColumns(JTable table, int minWidth) {
 		if (table.getColumnModel().getColumnCount() > 0) {
 			int width = table.getColumnModel().getColumn(0).getWidth();
-			width = Math.max(width, maxWidth);
+			width = Math.max(width, minWidth);
 			for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
 				table.getColumnModel().getColumn(i).setPreferredWidth(width);
 			}
