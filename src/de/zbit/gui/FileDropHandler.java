@@ -32,8 +32,6 @@ import java.util.logging.Logger;
 
 import javax.swing.TransferHandler;
 
-import de.zbit.util.FileTools;
-
 /**
  * This class allows the user to drag and drop files to a target.
  * 
@@ -141,6 +139,9 @@ public class FileDropHandler extends TransferHandler {
           } catch (MalformedURLException exc) {
             logger.fine(exc.getLocalizedMessage());
           }
+        }
+        if ((fileList.size() == 0) && (stringList.size() > 0)) {
+          return false;
         }
       } else {
         data = t.getTransferData(DataFlavor.javaFileListFlavor);
