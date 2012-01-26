@@ -34,6 +34,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -46,6 +47,9 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.util.filters.Filter;
+
+import de.zbit.gui.ProgressBarSwing;
+import de.zbit.util.AbstractProgressBar;
 
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a
@@ -126,15 +130,23 @@ public class SBMLTree extends JTree implements ActionListener {
 		return node;
 	}
 	
+	public void search(Filter filter){
+		search(filter, null);
+	}
+	
 	/**
 	 * 
 	 * @param filter
+	 * @param progressBar 
 	 */
-	public void search(Filter filter){
+	public void search(Filter filter, ProgressBarSwing progressBar){
 		SBMLNode.showInvisible = true;
 		SBMLNode root = (SBMLNode)this.getModel().getRoot();
 		List<TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
-		search(root, filter, list);
+		if (progressBar != null){
+			progressBar.setNumberOfTotalCalls(this.nodeCount());
+		}
+		search(root, filter, list, progressBar);
 		SBMLNode.showInvisible = false;
 	}
 	
@@ -143,15 +155,20 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * @param node
 	 * @param filter
 	 * @param list
+	 * @param progressBar
+	 * @param callNr
 	 */
-	private void search(SBMLNode node,Filter filter,List<TreeNode> list){
+	private void search(SBMLNode node,Filter filter,List<TreeNode> list, final ProgressBarSwing progressBar){
 		SBase sbase = ((SBase)node.getUserObject());
+		if (progressBar != null) {
+			progressBar.DisplayBar();
+		}
 		if (sbase.filter(filter).size() > 0){
 			node.setVisible(true);
 			node.setBoldFont(false);
 			for (int i = 0; i < node.getChildCount(); ++i) {
 				SBMLNode child = (SBMLNode) node.getChildAt(i);
-				search(child, filter, list);
+				search(child, filter, list, progressBar);
 			}
 		}
 		else if (list.contains(sbase)){
@@ -161,6 +178,10 @@ public class SBMLTree extends JTree implements ActionListener {
 			node.setBoldFont(false);
 			node.setVisible(false);
 		}
+	}
+	
+	public int nodeCount() {
+		return SBMLNode.nodeCount;
 	}
 	
 	/**

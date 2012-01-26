@@ -45,6 +45,8 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	 */
 	public static boolean showInvisible = false;
 	
+	public static int nodeCount = 0;
+	
 	private boolean boldFont = false;
 	private boolean isVisible;
 
@@ -64,6 +66,7 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	public SBMLNode(SBase sbase, boolean isVisible) {
 	    super(sbase);
 	    this.isVisible = isVisible;
+	    nodeCount++;
 	}
 	
 	/*

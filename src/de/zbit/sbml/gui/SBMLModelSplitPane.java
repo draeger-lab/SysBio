@@ -23,8 +23,10 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -35,6 +37,7 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -47,9 +50,12 @@ import org.sbml.jsbml.util.filters.OrFilter;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
+import de.zbit.gui.ProgressBarSwing;
+import de.zbit.gui.StatusBar;
 import de.zbit.sbml.util.RegexpAssignmentVariableFilter;
 import de.zbit.sbml.util.RegexpNameFilter;
 import de.zbit.sbml.util.RegexpSpeciesReferenceFilter;
+import de.zbit.util.AbstractProgressBar;
 
 /**
  * A specialized {@link JSplitPane} that displays a {@link JTree} containing all
@@ -126,14 +132,32 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	private boolean namesIfAvailalbe;
 	
 	/**
+	 * 
+	 */
+	StatusBar statusbar;
+	
+	/**
+	 * 
+	 * @param document
+	 * @param namesIfAvailable
+	 * @throws IOException 
+	 * @throws SBMLException 
+	 */
+	public SBMLModelSplitPane(SBMLDocument document, boolean namesIfAvailable) throws SBMLException, IOException{
+		this(null, document, namesIfAvailable);
+	}
+	
+	/**
+	 * @param sbmLsqueezerUI 
 	 * @param model
 	 * @throws SBMLException
 	 * @throws IOException
 	 */
-	public SBMLModelSplitPane(SBMLDocument document, boolean namesIfAvailable) throws SBMLException,
+	public SBMLModelSplitPane(JFrame owner, SBMLDocument document, boolean namesIfAvailable) throws SBMLException,
 		IOException {
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		this.namesIfAvailalbe = namesIfAvailable;
+		this.statusbar = (owner == null) ? null : StatusBar.addStatusBar(owner);
 		actionListeners = new HashSet<ActionListener>();
 		//document.addChangeListener(this);
 		init(document, false);
@@ -322,6 +346,13 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			}
 			
 			if (!this.isCancelled()) {
+				ProgressBarSwing progressBar = null;
+				logger.log(Level.INFO, "Searching...");
+				if (statusbar != null){
+					progressBar = (ProgressBarSwing) statusbar.showProgress();
+					progressBar.reset();
+				}
+				
 				tree.setAllVisible();
 				
 				if (searchString.equals("")){
@@ -333,7 +364,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 					RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);
 					RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
 					OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
-					tree.search(filter);
+					tree.search(filter,progressBar);
 				}
 			}
 			
@@ -346,6 +377,10 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		 */
 		protected void done(){
 			if (!this.isCancelled()){
+				logger.log(Level.INFO, "Ready.");
+				if (statusbar != null) {
+					statusbar.hideProgress();
+				}
 				if (SBMLNode.showInvisible) {
 					tree.restoreSelectionPath();
 				} else {
