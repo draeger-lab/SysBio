@@ -48,6 +48,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.filters.Filter;
 
+import de.zbit.gui.ProgressBarSwing;
 import de.zbit.util.AbstractProgressBar;
 
 /**
@@ -143,7 +144,11 @@ public class SBMLTree extends JTree implements ActionListener {
 		SBMLNode root = (SBMLNode)this.getModel().getRoot();
 		List<TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
 		if (progressBar != null) {
+			progressBar.reset();
 			progressBar.setNumberOfTotalCalls(2 * SBMLNode.getNodeCount());
+			if (progressBar instanceof ProgressBarSwing){
+				((ProgressBarSwing) progressBar).getProgressBar().setVisible(true);
+			}
 		}
 		search(root, filter, list, progressBar);
 		reload();
