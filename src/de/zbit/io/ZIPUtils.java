@@ -68,7 +68,7 @@ public class ZIPUtils {
   /**
    * Allows for unpacking of archives into a specific path.
    */
-  public static String prefixOfOutFile="";
+  public static String prefixOfOutFile = "";
   
   /**
    * While extracting archives, skip files that already exist.
@@ -126,7 +126,9 @@ public class ZIPUtils {
    */
   public static BufferedReader BZ2unCompressStream(String INfilename) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    if (fi==null) return null;
+    if (fi == null) {
+    	return null;
+    }
     
     return new BufferedReader( new InputStreamReader( new CBZip2InputStream(new CheckedInputStream(fi,new CRC32()))));
   }
