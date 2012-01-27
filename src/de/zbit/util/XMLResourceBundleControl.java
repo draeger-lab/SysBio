@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.ResourceBundle.Control;
+import java.util.Set;
 
 /**
  * This class provides the necessary functionality to load a
@@ -67,15 +67,13 @@ public class XMLResourceBundleControl extends Control {
 		 * @throws IOException
 		 */
 		public XMLResourceBundle(InputStream stream) throws IOException,
-			InvalidPropertiesFormatException {
+		InvalidPropertiesFormatException {
 			Properties defaults = new Properties();
 			defaults.loadFromXML(stream);
 			properties = new Properties(defaults);
 		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
+		
+		/* (non-Javadoc)
 		 * @see java.util.ResourceBundle#getKeys()
 		 */
 		public Enumeration<String> getKeys() {
@@ -83,23 +81,21 @@ public class XMLResourceBundleControl extends Control {
 			return Collections.enumeration(key);
 		}
 		
-		/*
-		 * (non-Javadoc)
-		 * 
+		/* (non-Javadoc)
 		 * @see java.util.ResourceBundle#handleGetObject(java.lang.String)
 		 */
 		protected Object handleGetObject(String key) {
 			return properties.getProperty(key);
 		}
 		
-
-	  /* (non-Javadoc)
-	   * @see java.lang.Object#toString()
-	   */
-	  @Override
-	  public String toString() {
-	    return properties.toString();
-	  } 
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return properties.toString();
+		} 
 		
 	}
 	
@@ -107,10 +103,8 @@ public class XMLResourceBundleControl extends Control {
 	 * The extension for XML files.
 	 */
 	public static final String XML = "xml";
-		
-	/*
-	 * (non-Javadoc)
-	 * 
+	
+	/* (non-Javadoc)
 	 * @see java.util.ResourceBundle.Control#getFormats(java.lang.String)
 	 */
 	@Override
@@ -118,16 +112,13 @@ public class XMLResourceBundleControl extends Control {
 		return Arrays.asList(XML);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.ResourceBundle.Control#newBundle(java.lang.String,
-	 * java.util.Locale, java.lang.String, java.lang.ClassLoader, boolean)
+	/* (non-Javadoc)
+	 * @see java.util.ResourceBundle.Control#newBundle(java.lang.String, java.util.Locale, java.lang.String, java.lang.ClassLoader, boolean)
 	 */
 	@Override
 	public ResourceBundle newBundle(String baseName, Locale locale,
 		String format, ClassLoader loader, boolean reload)
-		throws IllegalAccessException, InstantiationException, IOException {
+				throws IllegalAccessException, InstantiationException, IOException {
 		if ((baseName == null) || (locale == null) || (format == null)
 				|| (loader == null)) { 
 			throw new NullPointerException(); 
