@@ -18,10 +18,12 @@ package de.zbit.gui.table;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.beans.EventHandler;
 import java.lang.reflect.Array;
 import java.util.Iterator;
 
@@ -33,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -87,6 +90,91 @@ public class JTableTools {
 		}
 	}
 
+  /** 
+   * Define the actual search operations 
+   */
+  public static class Search implements ActionListener {
+    private static final int delay = 900;
+    private Timer swingTimer=null;
+    
+    private JTextField searchField = null;
+    private JTable table = null;
+    
+    public Search(JTable table, JTextField searchField) {
+      this.searchField = searchField;
+      this.table = table;
+    }
+    
+    /**
+     * Start to search after 900ms. Timer is resetted if this
+     * method is called again, before the timer is up.
+     */
+    public void searchAfterDelay() {
+      if (swingTimer == null) {
+        swingTimer = new Timer(delay, EventHandler.create(ActionListener.class, this, "search"));
+        swingTimer.setRepeats(false);
+        swingTimer.setInitialDelay(delay);
+        swingTimer.start();
+      } else {
+        swingTimer.restart();
+      }
+      if (searchField.getText().length() == 0) {
+        swingTimer.stop();
+        swingTimer = null;
+        searchField.setEnabled(true);
+      }  
+    }
+    
+    public void search() {
+      search(0);
+    }
+    
+    /**
+     * 
+     * @param rowStart
+     */
+    public void search(int rowStart) {
+      /* TODO: A much better solution would be to shift this code
+       * to a new thread and show a loading indicator in the search
+       * field.
+       */
+      table.clearSelection();
+      String text = searchField.getText();
+      if (text.length() <1) { 
+        return; 
+      }
+      text = text.toLowerCase();
+      for (int row = rowStart; row < table.getRowCount(); row++) {
+        for (int col = 0; col < table.getColumnCount(); col++) {
+          Object val = table.getValueAt(row, col);
+          
+          if (val == null) {
+            continue;
+          }
+          if (val.getClass().isArray() || (val instanceof Iterable)) {
+            val = list2String(val);
+          }
+          String value = val.toString();
+          if (value.toLowerCase().contains(text)) {
+            table.changeSelection(row, col, false, false);
+            return;
+          }
+        }
+      }
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      System.out.println(e);
+      if (e.getActionCommand().equals("search")) {
+        search();
+      }
+    }
+  }
+  
   /**
    * Adds search capabilities to a table.
    * Simply start typing when the focus is on a non-editable cell.
@@ -96,48 +184,6 @@ public class JTableTools {
     //  table.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE);
     final JTextField searchField = new JTextField();
     
-    /** 
-     * Define the actual search operations 
-     */
-    class Search {
-      private void search() {
-        search(0);
-      }
-      
-      /**
-       * 
-       * @param rowStart
-       */
-      private void search(int rowStart) {
-        /* TODO: A much better solution would be to shift this code
-         * to a new thread and show a loading indicator in the search
-         * field.
-         */
-        table.clearSelection();
-        String text = searchField.getText();
-        if (text.length() <1) { 
-        	return; 
-        }
-        text = text.toLowerCase();
-        for (int row = rowStart; row < table.getRowCount(); row++) {
-          for (int col = 0; col < table.getColumnCount(); col++) {
-            Object val = table.getValueAt(row, col);
-            
-            if (val == null) {
-            	continue;
-            }
-            if (val.getClass().isArray() || (val instanceof Iterable)) {
-              val = list2String(val);
-            }
-            String value = val.toString();
-            if (value.toLowerCase().contains(text)) {
-              table.changeSelection(row, col, false, false);
-              return;
-            }
-          }
-        }
-      }
-    }
     
     // Add the listeners that active the search
     table.addKeyListener(new KeyAdapter() {
@@ -150,7 +196,7 @@ public class JTableTools {
       public void keyPressed(final KeyEvent evt) {
         if (evt.getKeyCode() == 114) { //F3 => Search next
           if (isDialogVisible) {
-            final Search s = new Search();
+            final Search s = new Search(table, searchField);
             s.search(table.getSelectedRow()+1);
             evt.consume();
           } else {
@@ -192,7 +238,7 @@ public class JTableTools {
        * @param searchField searchField
        */
       private void showSearchDialog() {
-        final Search s = new Search();
+        final Search s = new Search(table, searchField);
         //s.search();
         
         final JDialog d = new JDialog();
@@ -217,19 +263,19 @@ public class JTableTools {
            * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
            */
           public void changedUpdate(final DocumentEvent e) {
-            s.search();
+            s.searchAfterDelay();
           }
           /* (non-Javadoc)
         	 * @see javax.swing.event.DocumentListener#insertUpdate(javax.swing.event.DocumentEvent)
         	 */
           public void insertUpdate(final DocumentEvent e) {
-            s.search();
+            s.searchAfterDelay();
           }
           /* (non-Javadoc)
            * @see javax.swing.event.DocumentListener#removeUpdate(javax.swing.event.DocumentEvent)
            */
           public void removeUpdate(final DocumentEvent e) {
-            s.search();
+            s.searchAfterDelay();
           }
         });
         searchField.addKeyListener(new KeyAdapter() {
@@ -240,7 +286,7 @@ public class JTableTools {
           public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == 114 || e.getKeyCode() == 13) { //F3 / Enter => Search next
               if (isDialogVisible) {
-                final Search s = new Search();
+                final Search s = new Search(table, searchField);
                 s.search(table.getSelectedRow()+1);
               } else {
                 showSearchDialog();
