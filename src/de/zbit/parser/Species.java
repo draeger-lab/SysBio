@@ -311,7 +311,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
 
   /**
    * @param list
-   * @param name
+   * @param biopaxRDFid
    * @param type
    */
   public String getName(int type) {

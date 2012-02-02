@@ -258,7 +258,7 @@ public class KeggParser extends DefaultHandler {
       comment = document.getDoctype().getNextSibling().getNodeValue();
     }
     
-    return comment.trim();
+    return comment==null?null:comment.trim();
   }
   
   /**
@@ -304,7 +304,7 @@ public class KeggParser extends DefaultHandler {
     ArrayList<Pathway> ret = parseKeggML(doc.getChildNodes());
     double version = getKGMLVersion(doc);
     String comment = getKGMLComment(doc);
-    if (comment.trim().length()<1) comment = null;
+    if (comment!=null && comment.trim().length()<1) comment = null;
     if (ret!=null) {
       for (Pathway p : ret) {
         p.setVersion(version);
@@ -377,7 +377,7 @@ public class KeggParser extends DefaultHandler {
         p.addReaction(r);
       } else if (name.equalsIgnoreCase("relation")) {
         if (!silent) System.out.println("Parsing Relation " + getNodeValue(att,"name") + "...");
-        Relation r = new Relation(getNodeValueInt(att, "entry1"), getNodeValueInt(att, "entry2"), RelationType.valueOf(getNodeValue(att,"type")), node.getChildNodes());
+        Relation r = new Relation(p, getNodeValueInt(att, "entry1"), getNodeValueInt(att, "entry2"), RelationType.valueOf(getNodeValue(att,"type")), node.getChildNodes());
         p.addRelation(r);
       }
     }

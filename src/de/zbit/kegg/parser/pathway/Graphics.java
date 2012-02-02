@@ -16,8 +16,12 @@
  */
 package de.zbit.kegg.parser.pathway;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import de.zbit.util.StringUtil;
 
 
 /**
@@ -72,6 +76,10 @@ public class Graphics {
     super();
   }
   
+  public Graphics(String name){
+    this();
+    this.name = name;
+  }
   /**
    * 
    * @param isGeneProduct - (EntryType==EntryType.gene)
@@ -313,6 +321,64 @@ public class Graphics {
     if (fgcolor!=null && fgcolor.length()>0 && !fgcolor.trim().equalsIgnoreCase("none"))
       return true;
     return false;
+  }
+
+  public Map<String, String> getKGMLAttributes() {
+    Map<String, String> attributes = new HashMap<String, String>();
+
+    if(isSetName()){
+      attributes.put("name", name);
+    }        
+    if(isSetX()){
+      attributes.put("x", String.valueOf(x));
+    }
+    if(isSetY()){
+      attributes.put("y", String.valueOf(y));
+    }
+    if(isSetCoords()) {
+      attributes.put("coords", StringUtil.implode(coords, ","));
+    }
+    if(isSetType()){
+      attributes.put("tpye", name);
+    }
+    if(isSetWidth()){
+      attributes.put("width", String.valueOf(width));
+    }
+    if(isSetHeight()){
+      attributes.put("heigth", String.valueOf(height));
+    }
+    if(isSetFGcolor()){
+      attributes.put("fgcolor", fgcolor);
+    }
+    return attributes;
+  }
+
+  private boolean isSetFGcolor() {    
+    return fgcolor!=null;
+  }
+
+  private boolean isSetType() {
+    return type!=null;
+  }
+
+  private boolean isSetHeight() {
+    return height>=0;
+  }
+
+  private boolean isSetWidth() {
+    return width>=0;
+  }
+
+  private boolean isSetY() {
+    return y>=0;
+  }
+
+  private boolean isSetX() {    
+    return x>=0;
+  }
+
+  private boolean isSetName() {
+    return name!=null;
   }
   
 }

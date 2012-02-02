@@ -133,6 +133,18 @@ public class Pathway {
 		setOrg(org);
 		setNumber(number);
 	}
+	
+	 /**
+   * 
+   * @param name
+   * @param org
+   * @param number
+   * @param title
+   */
+  public Pathway(String name, String org, int number, String title) {
+    this(name, org, number);
+    setTitle(title);
+  }
 
 	/**
 	 * 
@@ -712,6 +724,54 @@ public class Pathway {
     
     return rcEntry;
   }
+  
+  private boolean isSetName(){
+    return (name==null|| name.isEmpty()) ? false : true;
+  }
+  
 
-	
+  private boolean isSetOrg() {
+    return (org==null || org.isEmpty()) ? false : true;
+  }
+  
+
+  private boolean isSetNumber() {
+    return number==0 ? false : true;
+  }
+
+  private boolean isSetTitle() {
+    return (title==null || title.isEmpty()) ? false : true;
+  }
+
+  private boolean isSetImage() {
+   return (image==null || image.isEmpty()) ? false : true;
+  }
+  
+  /**
+   * 
+   * @return all the necessary XML attributes of this class
+   */
+  public Map<String, String> getKGMLAttributes() {
+    Map<String, String> attributes = new HashMap<String, String>();
+    
+    if(isSetName()){
+      attributes.put("name", name);
+    }
+    if(isSetOrg()){
+      attributes.put("org", org);
+    }
+    if(isSetNumber()){
+      attributes.put("number", String.valueOf(number));
+    }
+    if(isSetTitle()){
+      attributes.put("title", title);
+    }
+    if(isSetImage()){
+      attributes.put("image", image);
+    }
+    
+    
+    return attributes;
+  }
+
 }

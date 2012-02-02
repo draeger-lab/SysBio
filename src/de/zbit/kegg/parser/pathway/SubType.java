@@ -17,6 +17,8 @@
 package de.zbit.kegg.parser.pathway;
 
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.zbit.util.Reflect;
 
@@ -212,5 +214,26 @@ public class SubType {
 	public String toString() {
 	  return getName() + "(" + getValue() + ")";
 	}
+
+  public Map<String, String> getKGMLAttributes() {
+    Map<String, String> attributes = new HashMap<String, String>();
+    
+    if(isSetName()){
+      attributes.put("name", name);
+    }
+    if(isSetValue()){
+      attributes.put("value", value);
+    }
+    
+    return attributes;
+  }
+
+  private boolean isSetValue() {   
+    return value!=null;
+  }
+
+  private boolean isSetName() {
+    return name!=null;
+  }
 
 }
