@@ -20,8 +20,10 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -36,6 +38,10 @@ import de.zbit.kegg.parser.KeggParser;
  * @since 1.0
  */
 public class Reaction {
+  /**
+   * 
+   */
+  Integer id;
   /**
    * KEGGID of this reaction (e.g. "rn:R00943")
    */
@@ -63,11 +69,17 @@ public class Reaction {
    * @param name
    * @param type
    */
-  private Reaction(Pathway parentPathway, String name, ReactionType type) {
+  public Reaction(Pathway parentPathway, String name, ReactionType type) {
     super();
     this.parentPathway = parentPathway;
     this.name = name;
     this.type = type;
+    this.parentPathway.addReaction(this);
+  }
+  
+  public Reaction(Integer id, Pathway parentPathway, String name, ReactionType type) {
+    this(parentPathway, name, type);
+    this.id = id;
   }
   
   /**
@@ -102,6 +114,12 @@ public class Reaction {
     this.product.add(product);
     parentPathway.registerReactionComponent(product, this);
   }
+  
+  public void addProducts(List<ReactionComponent> products) {
+   for (ReactionComponent component : products) {
+     addProduct(component);
+   } 
+  }
 
   /**
    * 
@@ -111,6 +129,13 @@ public class Reaction {
     this.substrate.add(substrate);
     parentPathway.registerReactionComponent(substrate, this);
   }
+ 
+  public void addSubstrates(List<ReactionComponent> products) {
+    for (ReactionComponent component : products) {
+      addSubstrate(component);
+    } 
+   }
+
   
   /**
    * 
@@ -345,5 +370,46 @@ public class Reaction {
     }
     return b.toString();
   }
+  
+  /**
+   * 
+   * @return all the necessary XML attributes of this class
+   */
+  public Map<String, String> getKGMLAttributes() {
+    Map<String, String> attributes = new HashMap<String, String>();
+    
+    if(isSetID()){
+      attributes.put("id", id.toString());
+    }
+    if(isSetName()){
+      attributes.put("name", name);
+    }    
+    if(isSetType()){
+      attributes.put("type", type.toString());
+    }
+       
+    
+    return attributes;
+  }
+
+  private boolean isSetType() {
+    return type!=null;
+  }
+
+  private boolean isSetName() {    
+    return name!=null;
+  }
+
+  private boolean isSetID() {   
+    return id!=null;
+  }
+
+  public boolean isSetProduct() {
+    return product.size()>0 ? true : false;
+  }
+
+  public boolean isSetSubstrate() {
+    return substrate.size()>0 ? true : false;
+  }  
 
 }

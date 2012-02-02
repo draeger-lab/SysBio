@@ -19,8 +19,11 @@ package de.zbit.kegg.parser.pathway;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -98,7 +101,9 @@ public class Entry {
     this.parentPathway = parentPathway;
     this.id = id;
     this.type = type;
-    setName(name);
+    this.name = name;
+    this.parentPathway.addEntry(this);
+    //setName(name);
     //if (type==EntryType.gene) graph = new Graphics(true); else graph = new Graphics(false);
   }
   
@@ -144,7 +149,7 @@ public class Entry {
    * @see #hasComponents()
    */
   public List<Integer> getComponents() {
-    return components==null?new ArrayList<Integer>():components;
+    return components==null?Collections.unmodifiableList(new ArrayList<Integer>()):components;
   }
   
   /**
@@ -281,6 +286,27 @@ public class Entry {
       }
     }
   }
+  
+  /**
+   * checks if the component is in the {@link Entry#components} list and
+   * adds the {@link Integer} if it is not in the list
+   * @param component
+   */
+  public void addComponent(Integer component){
+    if (!isSetComponent())
+      components = new ArrayList<Integer>();
+    if (!components.contains(component)){
+      components.add(component);
+    }
+  }
+  
+  public void addGraphics(Graphics gr){
+    if(!isSetGraphics()){
+      graph = new ArrayList<Graphics>();
+    } 
+    if(!graph.contains(gr))
+      graph.add(gr);
+  }
 
   /**
    * 
@@ -319,7 +345,7 @@ public class Entry {
         name = KeggInfos.appendPrefix(name); // prepends, e.g. "cpd:"
       }
     }
-    //parentPathway has maps containing this nane
+    //parentPathway has maps containing this name
     // => any changes must be reported!
     parentPathway.removeEntryFromNameMap(this);
     this.name = name;
@@ -407,6 +433,34 @@ public class Entry {
     }
   }
 
+  public boolean isSetID(){
+    return id>0;
+  }
+  
+  public boolean isSetName(){
+    return (name!=null && name.length()>0);
+  }
+  
+  public boolean isSetType(){
+    return type==null ? false : true;
+  }
+  
+  public boolean isSetLink(){
+    return (link!=null && link.length()>0);
+  }
+  
+  public boolean isSetReaction(){
+    return (reaction!=null && reaction.length()>0);
+  }
+  
+  public boolean isSetComponent(){
+    return components!=null && components.size()>0;
+  }
+  
+  public boolean isSetGraphics(){
+    return graph!=null && graph.size()>0;
+  }
+  
   /**
    * @return true if {@link #hasGraphics()} and
    * size of graphics list is greater than 1.
@@ -431,6 +485,32 @@ public class Entry {
         return graph.size()-1;
       }
     };
+  }
+
+  /**
+   * 
+   * @return all the necessary XML attributes of this class
+   */
+  public Map<String, String> getKGMLAttributes() {
+    Map<String, String> attributes = new HashMap<String, String>();
+    
+    if(isSetID()){
+      attributes.put("id", String.valueOf(id));
+    }
+    if(isSetName()){
+      attributes.put("name", name);
+    }    
+    if(isSetType()){
+      attributes.put("type", type.toString());
+    }
+    if(isSetLink()){
+      attributes.put("link", link);
+    }
+    if(isSetReaction()){
+      attributes.put("reaction", reaction);
+    }        
+    
+    return attributes;
   }
 
 }

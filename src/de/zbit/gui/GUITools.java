@@ -426,7 +426,7 @@ public class GUITools {
 	}
 	
 	/**
-	 * Creates and returns a JCheckBox with all the given properties.
+  	 * Creates and returns a JCheckBox with all the given properties.
 	 * 
 	 * @param label
 	 * @param name

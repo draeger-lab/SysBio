@@ -16,6 +16,9 @@
  */
 package de.zbit.kegg.parser.pathway;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -58,6 +61,16 @@ public class ReactionComponent implements Cloneable {
     super();
     this.name = name;
   }
+  
+  /**
+   * 
+   * @param name
+   */
+  public ReactionComponent(Integer id, String name) {
+    this(name);
+    this.id = id;    
+  }
+  
   
   /**
    * 
@@ -181,6 +194,31 @@ public class ReactionComponent implements Cloneable {
   @Override
   public String toString() {
     return (String.format("[RC name:'%s' id:'%s'%s]", name, id==null?"none":id, alt!=null?" alternative available":""));
+  }
+  
+  /**
+   * 
+   * @return all the necessary XML attributes of this class
+   */
+  public Map<String, String> getKGMLAttributes() {
+    Map<String, String> attributes = new HashMap<String, String>();
+    
+    if(isSetID()){
+      attributes.put("id", id.toString());
+    }
+    if(isSetName()){
+      attributes.put("name", name);
+    }           
+    
+    return attributes;
+  }
+
+  private boolean isSetName() {
+    return name!=null;
+  }
+
+  private boolean isSetID() {
+    return id!=null;
   }
   
 }

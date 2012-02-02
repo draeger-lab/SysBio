@@ -16,17 +16,20 @@
  */
 package de.zbit.kegg;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.sbml.jsbml.CVTerm;
+import org.sbml.jsbml.ext.qual.QualitativeSpecies;
 
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -122,7 +125,6 @@ public class KeggTools {
           if (infos.getEquation()!=null) {
             String eq = infos.getEquation();
             int dividerPos = eq.indexOf("<=>");
-            boolean isEquationReversed = isEquationReversed(r, eq);
             eq = eq.replace("<=>", reactantSeparator);
             
             int curPos = eq.indexOf(reactantSeparator);
@@ -130,7 +132,6 @@ public class KeggTools {
             while (lastPos>=0) {
               String reactant = eq.substring(lastPos, curPos>=0?curPos:eq.length()).trim();
               boolean isSubstrate = (lastPos<dividerPos);
-              if (isEquationReversed) isSubstrate = !isSubstrate;
               reactant = removeReactantPrefixAndSuffix(reactant);
               
               // Check entry type and prepend kegg prefix
@@ -144,7 +145,7 @@ public class KeggTools {
               }
               
               // Look if we need to add new components
-              ReactionComponent rc = r.getReactant(reactant, isSubstrate);
+              ReactionComponent rc=r.getReactant(reactant);
               if (rc==null) {
                 rc = reactantName2reactant.get(reactant);
                 if (rc==null) rc = new ReactionComponent(reactant);
@@ -210,38 +211,59 @@ public class KeggTools {
     while (it.hasNext()) {
       p.addReaction(it.next());
     }
-    
   }
 
   /**
-   * Check if the substrates, defined in the reaction are really on the left side,
-   * or if they are swapped.
-   * @param reaction
-   * @param equation
-   * @return <code>TRUE</code> if substrates are on the RIGHT side of the equation.
+   * Retrieves all Relations for all relations in the pathway.
+   * Looks, which of them is already contained in the pathway and adds all
+   * missing relations to the pathway.
+   * 
+   * @param p
+   * @param manager
+   * @param b
    */
-  public static boolean isEquationReversed(Reaction reaction, String equation) {
-    int dividerPos = equation.indexOf("<=>");
+  public static void autocompleteRelations(Pathway p,
+      KeggInfoManagement manager, boolean b) {
+    Collection<Relation> novelRelations = new LinkedList<Relation>();
+    Collection<Relation> keggRelations = p.getRelations();
+    // first fetching BioCarta relations
     
-    int[] subsSides = new int[2];
-    int[] prodSides = new int[2];
-    for (ReactionComponent rc : reaction.getSubstrates()) {
-      String name = KeggInfos.suffix(rc.getName());
-      int pos = -1;
-      while ((pos = equation.indexOf(name, ++pos))>=0) {
-        subsSides[pos<dividerPos?0:1]++;
+    // is the relation in KEGG?
+        // - Yes: do nothing
+        // - No: Create a new relation
+//           p.addRelation(new Relation(entry1, entry2, type))
+    
+    
+    
+    List<Integer> geneIdsQone = getGeneIDs(qOne);
+    List<Integer> geneIdsQtwo = getGeneIDs(qTwo);
+    
+    annotateRelationWithBioCartaInforation(geneIdsQone, geneIdsQtwo);
+    
+    
+    // Add novel relations
+    Iterator<Relation> it = novelRelations.iterator();
+    while (it.hasNext()) {
+      p.addRelation(it.next());
+    }
+  }
+
+  /**
+   * @param qOne
+   * @return
+   */
+  private List<Integer> getGeneIDs(QualitativeSpecies qOne) {
+    List<Integer> ret = new ArrayList<Integer>();
+    if (qOne==null) return ret;
+    
+    for (CVTerm cv: qOne.getCVTerms()) {
+      for (String urn:cv.getResources()) {
+        if (urn.startsWith(KeggInfos.miriam_urn_entrezGene)) {
+          ret.add(Integer.parseInt(urn.substring(KeggInfos.miriam_urn_entrezGene.length())));
+        }
       }
     }
-    
-    for (ReactionComponent rc : reaction.getProducts()) {
-      String name = KeggInfos.suffix(rc.getName());
-      int pos = -1;
-      while ((pos = equation.indexOf(name, ++pos))>=0) {
-        prodSides[pos<dividerPos?0:1]++;
-      }
-    }
-    
-    return (subsSides[0]+prodSides[1])<(subsSides[1]+prodSides[0]);
+    return ret;
   }
 
   /**
@@ -563,75 +585,4 @@ public class KeggTools {
     }
   }
 
-  /**
-   * Parse the stoichiometric coefficients from the reaction
-   * equations and set them on the {@link ReactionComponent}s.
-   * <p>Example:
-   * <pre>16 C00002 + 16 C00001 + 8 C00138 <=> 8 C05359 + 16 C00009 + 16 C00008 + 8 C00139</pre>
-   * 
-   * @param p
-   * @param manager
-   */
-  public static void parseStoichiometryFromEquations(Pathway p,
-    KeggInfoManagement manager) {
-    // CRUCIAL: reactions are divided by " + ", not "+". Consider, e.g. rn:R04241:
-    // "C00002 + C03541(n) + C00025 <=> C00008 + C00009 + C03541(n+1)"!    
-    final String reactantSeparator = " + ";
-    
-    for (Reaction r : p.getReactions()) {
-      String[] reactionIDs = r.getName().trim().split(" ");
-      
-      for (String ko_id : reactionIDs) {        
-        // Get the complete reaction from Kegg
-        KeggInfos infos = KeggInfos.get(ko_id, manager);
-        if (infos.queryWasSuccessfull()) {
-          
-          // Add missing reactants
-          if (infos.getEquation()!=null) {
-            String eq = infos.getEquation();
-            int dividerPos = eq.indexOf("<=>");
-            boolean isEquationReversed = isEquationReversed(r, eq);
-            eq = eq.replace("<=>", reactantSeparator);
-            
-            int curPos = eq.indexOf(reactantSeparator);
-            int lastPos = 0;
-            while (lastPos>=0) {
-              String partial = eq.substring(lastPos, curPos>=0?curPos:eq.length()).trim();
-              boolean isSubstrate = (lastPos<dividerPos);
-              if (isEquationReversed) isSubstrate = !isSubstrate;
-              String reactant = removeReactantPrefixAndSuffix(partial);
-              
-              // Compile a pattern to match the stoichiometry (in group 3).
-              Pattern stoi = Pattern.compile(".*?(\\W)*(\\s)*(\\d+)\\s" + reactant + ".*");
-              Matcher m = stoi.matcher(partial);
-              if (m.find()) {
-                
-                try {
-                  if (!reactant.contains(":")) {
-                    reactant = KeggInfos.appendPrefix(reactant);
-                  }
-                  
-                  // Look if we need to add new components
-                  ReactionComponent reactantInstance=r.getReactant(reactant, isSubstrate);
-                  if (reactantInstance!=null) {
-                    reactantInstance.setStoichiometry(Integer.parseInt(m.group(3)));
-                  } else {
-                    log.log(Level.WARNING, "Could not get reaction component for " + reactant + " in " + r);
-                  }
-                } catch (NumberFormatException e) {
-                  log.log(Level.WARNING, "Could not parse stoichometry from " + partial, e);
-                }
-              }
-              
-              lastPos = curPos<0?curPos:curPos+reactantSeparator.length();
-              curPos = eq.indexOf(" + ", curPos+reactantSeparator.length());
-            }
-          }
-        }
-        
-      }
-      
-    }
-  }
-  
 }

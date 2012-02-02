@@ -18,8 +18,10 @@ package de.zbit.kegg.parser.pathway;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.w3c.dom.NamedNodeMap;
@@ -54,15 +56,17 @@ public class Relation {
   
   /**
    * 
+   * @param keggPW 
    * @param entry1
    * @param entry2
    * @param type
    */
-  public Relation(int entry1, int entry2, RelationType type) {
+  public Relation(Pathway keggPW, int entry1, int entry2, RelationType type) {
     super();
     this.entry1 = entry1;
     this.entry2 = entry2;
     this.type = type;
+    keggPW.addRelation(this);
   }
   
   /**
@@ -72,8 +76,8 @@ public class Relation {
    * @param type
    * @param childNodes
    */
-  public Relation(int entry1, int entry2, RelationType type, NodeList childNodes) {
-    this(entry1, entry2, type);
+  public Relation(Pathway keggPW,int entry1, int entry2, RelationType type, NodeList childNodes) {
+    this(keggPW, entry1, entry2, type);
     parseSubNodes(childNodes);
   }
   
@@ -171,6 +175,38 @@ public class Relation {
    */
   public void setType(RelationType type) {
     this.type = type;
+  }
+  
+  public Map<String, String> getKGMLAttributes() {
+    Map<String, String> attributes = new HashMap<String, String>();
+    
+    if(isSetEntry1()){
+      attributes.put("entry1", String.valueOf(getEntry1()));
+    }
+    if(isSetEntry2()){
+      attributes.put("entry2", String.valueOf(getEntry2()));
+    }
+    if(isSetType()){
+      attributes.put("type", type.toString());
+    }
+    
+    return attributes;
+  }
+
+  public boolean isSetSubTypes(){
+    return subtypes.size()>0;
+  }
+  
+  private boolean isSetType() {    
+    return type!=null;
+  }
+
+  private boolean isSetEntry2() {
+    return entry2!=-1;
+  }
+
+  private boolean isSetEntry1() {
+    return entry1!=-1;
   }
 
 }
