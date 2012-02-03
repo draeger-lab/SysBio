@@ -26,7 +26,7 @@ import javax.swing.JComponent;
  * @since 1.1
  * @version $Rev: 643 $
  */
-public interface Renderer {
+public interface EquationRenderer {
 	
 	/**
 	 * 
