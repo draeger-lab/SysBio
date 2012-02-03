@@ -167,7 +167,6 @@ public class JTableTools {
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent e) {
-      System.out.println(e);
       if (e.getActionCommand().equals("search")) {
         search();
       }
