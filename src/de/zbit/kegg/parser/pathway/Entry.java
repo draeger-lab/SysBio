@@ -31,6 +31,7 @@ import org.w3c.dom.NodeList;
 
 import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
+import de.zbit.util.Utils;
 
 /**
  * Corresponding to the Kegg Entry class (see 
@@ -254,7 +255,7 @@ public class Entry {
    * @see #getReactionString()
    */
   public boolean hasReaction() {
-    return (getReactionString() != null && getReactionString().trim().length() != 0);
+    return isSetReaction();
   }
 
   /**
@@ -357,8 +358,23 @@ public class Entry {
    * @param reaction
    */
   public void setReaction(String reaction) {
-    parentPathway.reactionChange(this, name);
+    parentPathway.reactionChange(this, reaction);
     this.reaction = reaction;
+  }
+  
+  /**
+   * 
+   * @param reaction
+   */
+  public void appendReaction(String reaction) {
+    if (!isSetReaction()) {
+      setReaction(reaction);
+    } else {
+      if (!Utils.containsWord(this.reaction, reaction)) {
+        String newReaction = this.reaction + " " + reaction;
+        parentPathway.reactionChange(this, newReaction);
+      }
+    }
   }
 
   /**
@@ -450,7 +466,7 @@ public class Entry {
   }
   
   public boolean isSetReaction(){
-    return (reaction!=null && reaction.length()>0);
+    return (reaction!=null && reaction.trim().length()>0);
   }
   
   public boolean isSetComponent(){

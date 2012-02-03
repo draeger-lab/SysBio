@@ -235,10 +235,10 @@ public class KeggTools {
     
     
     
-    List<Integer> geneIdsQone = getGeneIDs(qOne);
-    List<Integer> geneIdsQtwo = getGeneIDs(qTwo);
-    
-    annotateRelationWithBioCartaInforation(geneIdsQone, geneIdsQtwo);
+//    List<Integer> geneIdsQone = getGeneIDs(qOne);
+//    List<Integer> geneIdsQtwo = getGeneIDs(qTwo);
+//    
+//    annotateRelationWithBioCartaInforation(geneIdsQone, geneIdsQtwo);
     
     
     // Add novel relations
