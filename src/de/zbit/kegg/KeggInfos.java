@@ -623,6 +623,15 @@ public class KeggInfos implements Serializable {
 	  
 	  return ecCodes;
 	}
+	
+	
+  /**
+   * @return
+   */
+  public boolean isSetECcodes() {
+    Collection<String> toCheck = getECcodes();
+    return !(toCheck==null || toCheck.size()<1 );
+  }
 
   /**
 	 * Extract enzyme codes (e.g. "EC:2.1.2.10") from any string.
