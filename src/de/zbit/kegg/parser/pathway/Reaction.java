@@ -149,6 +149,14 @@ public class Reaction {
    * 
    * @return
    */
+  public int getId() {
+    return id;
+  }
+  
+  /**
+   * 
+   * @return
+   */
   public List<ReactionComponent> getProducts() {
     return Collections.unmodifiableList(product);
   }
@@ -412,4 +420,50 @@ public class Reaction {
     return substrate.size()>0 ? true : false;
   }  
 
+  @Override
+  public int hashCode() {
+    int hash = 727;
+    if(isSetID())
+      hash *= id;
+    if(isSetName())
+      hash *= name.hashCode();
+    if(isSetType())
+      hash *= type.hashCode();
+    if(isSetSubstrate())
+      hash *= substrate.hashCode();
+    if(isSetProduct())
+      hash *= product.hashCode();
+    
+    
+    return hash;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = false;
+    if(obj.getClass().isAssignableFrom(Reaction.class)){    
+      Reaction o = (Reaction)obj;
+      equals &= o.isSetID()==this.isSetID();
+      if(equals && isSetID()) 
+        equals &= (o.getId() == this.getId());
+      
+      equals &= o.isSetName()==this.isSetName();
+      if(equals && isSetName()) 
+        equals &= (o.getName().equals(this.getName()));
+      
+      equals &= o.isSetType()==this.isSetType();
+      if(equals && isSetType()) 
+        equals &= (o.getType().equals(this.getType()));
+      
+      equals &= o.isSetProduct()==this.isSetProduct();
+      if(equals && isSetProduct()) 
+        equals &= (o.getProducts().equals(this.getProducts()));
+      
+      equals &= o.isSetSubstrate()==this.isSetSubstrate();
+      if(equals && isSetSubstrate()) 
+        equals &= (o.getSubstrates().equals(this.getSubstrates()));
+      
+    }
+    return equals;
+  }
 }

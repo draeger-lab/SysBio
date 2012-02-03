@@ -235,5 +235,33 @@ public class SubType {
   private boolean isSetName() {
     return name!=null;
   }
+  
+  @Override
+  public int hashCode() {
+    int hash = 683;
+    if(isSetName())
+      hash *= name.hashCode();
+    if(isSetValue())
+      hash *= value.hashCode();
+        
+    return hash;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = false;
+    if(obj.getClass().isAssignableFrom(SubType.class)){    
+      SubType o = (SubType)obj;
+      equals &= o.isSetName()==this.isSetName();
+      if(equals && isSetName()) 
+        equals &= (o.getName() == this.getName());
+      
+      equals &= o.isSetValue()==this.isSetValue();
+      if(equals && isSetValue()) 
+        equals &= (o.getValue()==this.getValue());      
+      
+    }
+    return equals;
+  }
 
 }

@@ -208,5 +208,46 @@ public class Relation {
   private boolean isSetEntry1() {
     return entry1!=-1;
   }
+  
+  @Override
+  public int hashCode() {
+    int hash = 461;
+    if(isSetEntry1())
+      hash *= entry1;
+    if(isSetEntry2())
+      hash *= entry2;
+    if(isSetType())
+      hash *= type.hashCode();
+    if(isSetSubTypes())
+      hash *= subtypes.hashCode();
+        
+    return hash;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = false;
+    if(obj.getClass().isAssignableFrom(Relation.class)){    
+      Relation o = (Relation)obj;
+      equals &= o.isSetEntry1()==this.isSetEntry1();
+      if(equals && isSetEntry1()) 
+        equals &= (o.getEntry1() == this.getEntry1());
+      
+      equals &= o.isSetEntry2()==this.isSetEntry2();
+      if(equals && isSetEntry2()) 
+        equals &= (o.getEntry2()==this.getEntry2());
+      
+      equals &= o.isSetType()==this.isSetType();
+      if(equals && isSetType())
+        equals &= (o.getType().equals(this.getType()));
+        
+      equals &= o.isSetSubTypes()==this.isSetSubTypes();
+      if(equals && isSetSubTypes()) 
+        equals &= (o.getSubtypes().equals(this.getSubtypes()));
+     
+      
+    }
+    return equals;
+  }
 
 }

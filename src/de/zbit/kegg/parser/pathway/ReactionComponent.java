@@ -221,4 +221,37 @@ public class ReactionComponent implements Cloneable {
     return id!=null;
   }
   
+  @Override
+  public int hashCode() {
+    int hash = 467;
+    if(isSetID())
+      hash *= id;
+    if(isSetName())
+      hash *= name.hashCode();
+    if(hasAlt())
+      hash *= alt.hashCode();
+    return hash;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = false;
+    if(obj.getClass().isAssignableFrom(ReactionComponent.class)){    
+      ReactionComponent o = (ReactionComponent)obj;
+      equals &= o.isSetID()==this.isSetID();
+      if(equals && isSetID()) 
+        equals &= (o.getId() == this.getId());
+      
+      equals &= o.isSetName()==this.isSetName();
+      if(equals && isSetName()) 
+        equals &= (o.getName().equals(this.getName()));
+      
+      equals &= o.hasAlt()==this.hasAlt();
+      if(equals && hasAlt()) 
+        equals &= (o.getAlt().equals(this.getAlt()));
+      
+    }
+    return equals;
+  }
+  
 }

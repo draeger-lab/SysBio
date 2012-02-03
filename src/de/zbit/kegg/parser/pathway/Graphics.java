@@ -381,4 +381,69 @@ public class Graphics {
     return name!=null;
   }
   
+  @Override
+  public int hashCode() {
+    int hash = 17;
+    if(isSetName())
+      hash *= name.hashCode();
+    if(isSetX())
+      hash *= x;
+    if(isSetY())
+      hash *= y;
+    if(isSetCoords())
+      hash *= coords.hashCode();
+    if(isSetType())
+      hash *= type.hashCode();
+    if(isSetWidth())
+      hash *= width;
+    if(isSetHeight())
+      hash *= height;
+    if(isSetFGcolor())
+      hash *= fgcolor.hashCode();
+    
+    return hash;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = false;
+    if(obj.getClass().isAssignableFrom(Graphics.class)){    
+      Graphics o = (Graphics)obj;
+      
+      equals &= o.isSetName()==this.isSetName();
+      if(equals && isSetName()) 
+        equals &= (o.getName().equals(this.getName()));
+      
+      equals &= o.isSetX()==this.isSetX();
+      if(equals && isSetX()) 
+        equals &= (o.getX() == this.getX());
+      
+      equals &= o.isSetY()==this.isSetY();
+      if(equals && isSetY()) 
+        equals &= (o.getY() == this.getY());
+      
+      equals &= o.isSetCoords() == this.isSetCoords();
+      if(equals && isSetCoords()){
+        equals &= (o.getCoords().equals(coords));
+      }
+      
+      equals &= o.isSetType()==this.isSetType();
+      if(equals && isSetType()) 
+        equals &= (o.getType().equals(this.getType()));
+      
+      equals &= o.isSetWidth()==this.isSetWidth();
+      if(equals && isSetWidth()) 
+        equals &= (o.getWidth()==this.getWidth());
+      
+      equals &= o.isSetHeight()==this.isSetHeight();
+      if(equals && isSetHeight()) 
+        equals &= (o.getHeight()==  this.getHeight());
+      
+      equals &= o.isSetFGcolor()==this.isSetFGcolor();
+      if(equals && isSetFGcolor()) 
+        equals &= (o.getFgcolor().equals(this.getFgcolor()));
+    }
+    return equals;
+  }
+  
 }
