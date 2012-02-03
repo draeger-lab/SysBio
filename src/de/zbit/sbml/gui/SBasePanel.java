@@ -44,7 +44,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.xml.stream.XMLStreamException;
 
-import org.sbml.jsbml.AssignmentRule;
+import org.sbml.jsbml.Assignment;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Constraint;
@@ -53,7 +53,6 @@ import org.sbml.jsbml.Event;
 import org.sbml.jsbml.EventAssignment;
 import org.sbml.jsbml.FunctionDefinition;
 import org.sbml.jsbml.History;
-import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
 import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.LocalParameter;
@@ -63,7 +62,6 @@ import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.QuantityWithUnit;
-import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBO;
@@ -97,47 +95,33 @@ import de.zbit.util.StringUtil;
  * @version $Rev$
  */
 @SuppressWarnings("deprecation")
-public class SBasePanel extends JPanel {
+public class SBasePanel extends JPanel implements EquationComponent {
 	
   /**
    * A {@link Logger} for this class.
    */
   public static final transient Logger logger = Logger.getLogger(SBasePanel.class.getName());
   
+	private static final int preferedWidth = 450;
+
 	/**
 	 * Generated serial version id.
 	 */
 	private static final long serialVersionUID = -4969096536922920641L;
 
-	private final LayoutHelper lh;
+	private boolean editable;
 
 	private LaTeXCompiler latex;
 
-	private static final int preferedWidth = 450;
+	private final LayoutHelper lh;
 
-	private boolean editable;
-
-	private int row;
-	
-	private Renderer renderer;
-	
 	private boolean namesIfAvailable;
+	
+	private EquationRenderer renderer;
+	
+	private int row;
 
 	/**
-   * @return the namesIfAvailable
-   */
-  public boolean isNamesIfAvailable() {
-    return namesIfAvailable;
-  }
-  
-  /**
-   * @return isRendererAvailable
-   */
-  public boolean isRendererAvailable() {
-    return this.renderer != null;
-  }
-
-  /**
    * 
    * @param sbase
    */
@@ -153,13 +137,13 @@ public class SBasePanel extends JPanel {
   public SBasePanel(SBase sbase, boolean namesIfAvailable) {
   	this(sbase, namesIfAvailable, null);
   }
-  
+
   /**
    * 
    * @param sbase
    * @param namesIfAvailable
    */
-  public SBasePanel(SBase sbase, boolean namesIfAvailable, Renderer renderer){
+  public SBasePanel(SBase sbase, boolean namesIfAvailable, EquationRenderer renderer){
     super();
     this.namesIfAvailable = namesIfAvailable;
     this.renderer = renderer;
@@ -227,7 +211,7 @@ public class SBasePanel extends JPanel {
 
 	lh.add(new JPanel(), 1, ++row, 5, 1, 1, 0.001d);
   }
-
+  
   /**
 	 * @param c
 	 */
@@ -255,8 +239,8 @@ public class SBasePanel extends JPanel {
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		addProperties((Symbol) c);
 	}
-
-	/**
+  
+  /**
 	 * @param c
 	 */
 	private void addProperties(Constraint c) {
@@ -269,7 +253,7 @@ public class SBasePanel extends JPanel {
 		}
 	}
 
-	/**
+  /**
 	 * @param e
 	 */
 	private void addProperties(Event e) {
@@ -323,69 +307,48 @@ public class SBasePanel extends JPanel {
 	 */
 	private void addProperties(MathContainer mc) {
 		if (mc.isSetMath()) {
-			StringBuffer laTeXpreview = new StringBuffer();
-			laTeXpreview.append(LaTeXCompiler.eqBegin);
-			if (mc instanceof KineticLaw) {
-				KineticLaw k = (KineticLaw) mc;
-				laTeXpreview.append("v_");
-				laTeXpreview
-						.append(latex.mbox(k.getParentSBMLObject().getId()));
-				laTeXpreview.append('=');
-			} else if (mc instanceof FunctionDefinition) {
-				FunctionDefinition f = (FunctionDefinition) mc;
-				laTeXpreview.append(latex.mbox(f.getId()));
-			} else if (mc instanceof EventAssignment) {
-				EventAssignment ea = (EventAssignment) mc;
-				laTeXpreview.append(latex.mbox(ea.getVariable()));
-				laTeXpreview.append('=');
-			} else if (mc instanceof AssignmentRule) {
-				AssignmentRule ar = (AssignmentRule) mc;
-				laTeXpreview.append(latex.mbox(ar.getVariable()));
-				laTeXpreview.append('=');
-			} else if (mc instanceof RateRule) {
-				RateRule rr = (RateRule) mc;
-				laTeXpreview.append(latex.timeDerivative(rr.getVariable()));
-				laTeXpreview.append('=');
-			}
-			try {
-				laTeXpreview.append(mc.getMath().compile(latex).toString()
+			if (isRendererAvailable()) {
+				StringBuffer laTeXpreview = new StringBuffer();
+				laTeXpreview.append(LaTeXCompiler.eqBegin);
+				if (mc instanceof KineticLaw) {
+					KineticLaw k = (KineticLaw) mc;
+					laTeXpreview.append("v_");
+					laTeXpreview
+					.append(latex.mbox(k.getParentSBMLObject().getId()));
+					laTeXpreview.append('=');
+				} else if (mc instanceof FunctionDefinition) {
+					FunctionDefinition f = (FunctionDefinition) mc;
+					laTeXpreview.append(latex.mbox(f.getId()));
+				} else if (mc instanceof Assignment) {
+					Assignment ea = (Assignment) mc;
+					laTeXpreview.append(latex.mbox(ea.getVariable()));
+					laTeXpreview.append('=');
+				}
+				try {
+					laTeXpreview.append(mc.getMath().compile(latex).toString()
 						.replace("mathrm", "mbox").replace("text", "mbox")
 						.replace("mathtt", "mbox"));
-			} catch (Throwable e) {
-				logger.log(Level.FINE, "Could not create LaTeX code from syntax tree.", e);
-				laTeXpreview.append("invalid");
-				//e.printStackTrace();
-			}
-			laTeXpreview.append(LaTeXCompiler.eqEnd);
-			JPanel preview = new JPanel(new BorderLayout());
-			//added
-			if (isRendererAvailable()) {
+				} catch (Throwable e) {
+					logger.log(Level.FINE, "Could not create LaTeX code from syntax tree.", e);
+					laTeXpreview.append("invalid");
+					//e.printStackTrace();
+				}
+				laTeXpreview.append(LaTeXCompiler.eqEnd);
+				JPanel preview = new JPanel(new BorderLayout());
 				preview.add(this.renderer.renderEquation(laTeXpreview.toString()),
 					BorderLayout.CENTER);
-			}
-			preview.setBackground(Color.WHITE);
-			preview.setBorder(BorderFactory.createLoweredBevelBorder());
-			Dimension d = new Dimension(preferedWidth, 120);
-			JScrollPane scroll = new JScrollPane(preview);
-			scroll.setPreferredSize(new Dimension((int) d.getWidth() + 10,
+				preview.setBackground(Color.WHITE);
+				preview.setBorder(BorderFactory.createLoweredBevelBorder());
+				Dimension d = new Dimension(preferedWidth, 120);
+				JScrollPane scroll = new JScrollPane(preview);
+				scroll.setPreferredSize(new Dimension((int) d.getWidth() + 10,
 					(int) d.getHeight() + 10));
-			lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-			if (mc instanceof EventAssignment) {
-				lh.add(new SBasePanel(((EventAssignment) mc)
-						.getVariableInstance(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
+				lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
+				lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 			}
-			else if (mc instanceof InitialAssignment) {
-				lh.add(new SBasePanel(((InitialAssignment) mc)
+			if (mc instanceof Assignment) {
+				lh.add(new SBasePanel(((Assignment) mc)
 						.getVariableInstance(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
-			}
-			else if (mc instanceof AssignmentRule) {
-				lh.add(new SBasePanel(((AssignmentRule) mc)
-						.getVariableInstance(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
-			}
-			else if (mc instanceof RateRule) {
-				lh.add(new SBasePanel(((RateRule) mc).getVariableInstance(), namesIfAvailable, this.renderer),
-						1, ++row, 3, 1, 1d, 1d);
 			}
 		}
 	}
@@ -503,7 +466,7 @@ public class SBasePanel extends JPanel {
 	private void addProperties(Parameter p) {
 		addProperties((Symbol) p);
 	}
-	
+
 	/**
 	 * 
 	 * @param q
@@ -570,7 +533,7 @@ public class SBasePanel extends JPanel {
 			lh.add(new SBasePanel(reaction.getKineticLaw(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 0d, 0d);
 		}
 	}
-
+	
 	/**
 	 * @param sbase
 	 */
@@ -731,7 +694,7 @@ public class SBasePanel extends JPanel {
 		lh.add(sboTermField, 3, row, 1, 1, 1d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 	}
-	
+
 	/**
 	 * 
 	 * @param sbase
@@ -780,7 +743,7 @@ public class SBasePanel extends JPanel {
         ++row, 3, 1, 1d, 1d);
     }
 	}
-
+	
 	/**
 	 * @param sbase
 	 */
@@ -972,6 +935,59 @@ public class SBasePanel extends JPanel {
 	}
 
 	/**
+	 * 
+	 * @param v
+	 */
+	private void addProperties(Variable v) {
+		JCheckBox check = new JCheckBox("Constant", v.isConstant());
+		check.setEnabled(editable);
+		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
+		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.gui.EquationComponent#getRenderer()
+	 */
+	public EquationRenderer getEquationRenderer() {
+		return renderer;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isEditable() {
+		return editable;
+	}
+	
+	/**
+   * @return the namesIfAvailable
+   */
+  public boolean isNamesIfAvailable() {
+    return namesIfAvailable;
+  }
+
+	/**
+   * @return isRendererAvailable
+   */
+  public boolean isRendererAvailable() {
+    return this.renderer != null;
+  }
+
+	/**
+	 * @param editable
+	 */
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.gui.EquationComponent#setRenderer(de.zbit.sbml.gui.EquationRenderer)
+	 */
+	public void setEquationRenderer(EquationRenderer renderer) {
+		this.renderer = renderer;
+	}
+
+	/**
 	 * Creates a JEditorPane that displays the given UnitDefinition as a HTML.
 	 * 
 	 * @param ud
@@ -983,30 +999,5 @@ public class SBasePanel extends JPanel {
 		preview.setEditable(false);
 		preview.setBorder(BorderFactory.createLoweredBevelBorder());
 		return preview;
-	}
-	
-	/**
-	 * 
-	 * @param v
-	 */
-	private void addProperties(Variable v) {
-		JCheckBox check = new JCheckBox("Constant", v.isConstant());
-		check.setEnabled(editable);
-		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-	}
-
-	/**
-	 * @return
-	 */
-	public boolean isEditable() {
-		return editable;
-	}
-
-	/**
-	 * @param editable
-	 */
-	public void setEditable(boolean editable) {
-		this.editable = editable;
 	}
 }

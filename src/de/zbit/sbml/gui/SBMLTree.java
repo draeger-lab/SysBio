@@ -24,12 +24,10 @@ import java.beans.EventHandler;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
@@ -69,49 +67,6 @@ public class SBMLTree extends JTree implements ActionListener {
 	private static final long serialVersionUID = -3081533906479036522L;
 	
 	/**
-	 * 
-	 */
-	private SBase currSBase;
-	
-	/**
-	 * 
-	 */
-	private JPopupMenu popup;
-	
-	/**
-	 * 
-	 */
-	private Set<ActionListener> setOfActionListeners;
-	
-	/**
-	 * 
-	 */
-	private TreeNode[] savedState;
-	
-	/**
-	 * 
-	 */
-	private Map<JMenuItem, List<Class<? extends SBase>>> popUpMap;
-	
-	/**
-	 * @param sbase
-	 */
-	public SBMLTree(SBase sbase) {
-		super(createNodes(sbase));
-		init();
-	}
-	
-	/**
-	 * Generate a tree that displays an ASTNode tree.
-	 * 
-	 * @param math
-	 */
-	public SBMLTree(ASTNode math) {
-		super(math);
-		init();
-	}
-	
-	/**
 	 * @param sbase
 	 * @return
 	 */
@@ -130,64 +85,110 @@ public class SBMLTree extends JTree implements ActionListener {
 		return node;
 	}
 	
-	public void search(Filter filter) {
-		search(filter, null);
-	}
+	/**
+	 * is path1 descendant of path2
+	 * 
+	 * @param path1
+	 * @param path2
+	 * @return
+	 */
+    public static boolean isDescendant(TreePath path1, TreePath path2) {
+        int count1 = path1.getPathCount();
+        int count2 = path2.getPathCount();
+        if(count1<=count2)
+            return false;
+        while(count1!=count2) {
+            path1 = path1.getParentPath();
+            count1--;
+        }
+        return path1.equals(path2);
+    }
 	
 	/**
 	 * 
-	 * @param filter
-	 * @param progressBar 
 	 */
-	public void search(Filter filter, AbstractProgressBar progressBar) {
-		SBMLNode.setShowInvisible(true);
-		SBMLNode root = (SBMLNode)this.getModel().getRoot();
-		List<TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
-		if (progressBar != null) {
-			progressBar.reset();
-			progressBar.setNumberOfTotalCalls(2 * SBMLNode.getNodeCount());
-			if (progressBar instanceof ProgressBarSwing){
-				((ProgressBarSwing) progressBar).getProgressBar().setVisible(true);
-			}
+	private SBase currSBase;
+	
+	/**
+	 * 
+	 */
+	private List<ActionListener> listOfActionListeners;
+	
+	/**
+	 * 
+	 */
+	private JPopupMenu popup;
+	
+	/**
+	 * 
+	 */
+	private Map<JMenuItem, List<Class<? extends SBase>>> popUpMap;
+	
+	/**
+	 * 
+	 */
+	private TreeNode[] savedState;
+	
+	/**
+	 * Generate a tree that displays an ASTNode tree.
+	 * 
+	 * @param math
+	 */
+	public SBMLTree(ASTNode math) {
+		super(math);
+		init();
+	}
+	
+	/**
+	 * @param sbase
+	 */
+	public SBMLTree(SBase sbase) {
+		super(createNodes(sbase));
+		init();
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	public void actionPerformed(ActionEvent e) {
+		if (popup != null) {
+			popup.setVisible(false);
 		}
-		search(root, filter, list, progressBar);
-		reload();
-		SBMLNode.setShowInvisible(false);
+		e.setSource(currSBase);
+		for (ActionListener listener : listOfActionListeners) {
+			listener.actionPerformed(e);
+		}
 	}
 	
 	/**
 	 * 
-	 * @param node
-	 * @param filter
-	 * @param list
-	 * @param progressBar
-	 * @param callNr
+	 * @param listener
 	 */
-	private void search(SBMLNode node,Filter filter,List<TreeNode> list, final AbstractProgressBar progressBar) {
-		SBase sbase = ((SBase)node.getUserObject());
-		if (sbase.filter(filter).size() > 0) {
-			node.setVisible(true);
-			node.setBoldFont(false);
-		} else if (list.contains(sbase)) {
-			node.setBoldFont(true);
-			node.setVisible(true);
+	public void addActionListener(ActionListener listener) {
+		listOfActionListeners.add(listener);
+	}
+	
+	/**
+	 * 
+	 * @param item
+	 * @param types
+	 */
+	public void addPopupMenuItem(JMenuItem item, Class<? extends SBase>... types) {
+		if (popUpMap.containsKey(item)) {
+			List<Class<? extends SBase>> list = popUpMap.get(item);
+			list.addAll(Arrays.asList(types));
+			popUpMap.put(item, list);
 		} else {
-			node.setBoldFont(false);
-			node.setVisible(false);
+			popUpMap.put(item, Arrays.asList(types));
 		}
-		for (int i = 0; i < node.getChildCount(); ++i) {
-			SBMLNode child = (SBMLNode) node.getChildAt(i);
-			search(child, filter, list, progressBar);
-		}
-		if (progressBar != null) {
-			progressBar.DisplayBar();
-		}
+		// TODO: Why this? We don't know if this item is appropriate in the current situation! 
+		popup.add(item);
 	}
 	
 	public void expandAll(boolean expand) {
 		expandAll(null, expand, null);
 	}
-	
+
 	/**
 	 * 
 	 * @param expand
@@ -203,7 +204,7 @@ public class SBMLTree extends JTree implements ActionListener {
 			}
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @param parent
@@ -249,145 +250,38 @@ public class SBMLTree extends JTree implements ActionListener {
 	}
 	
 	/**
-	 * 
-	 * @param item
-	 * @param types
-	 */
-	public void addPopupMenuItem(JMenuItem item, Class<? extends SBase>... types) {
-		if (popUpMap.containsKey(item)) {
-			List<Class<? extends SBase>> list = popUpMap.get(item);
-			list.addAll(Arrays.asList(types));
-			popUpMap.put(item, list);
-		} else {
-			popUpMap.put(item, Arrays.asList(types));
-		}
-		// TODO: Why this? We don't know if this item is appropriate in the current situation! 
-		popup.add(item);
-	}
-	
-	/**
-	 * 
-	 */
-	public void setAllVisible() {
-		SBMLNode.setShowInvisible(true);
-		setAllVisible((SBMLNode) this.getModel().getRoot());
-		reload();
-		SBMLNode.setShowInvisible(false);
-	}
-	
-	/**
-	 * 
+	 * expand a path from root to node
 	 * @param node
 	 */
-	private void setAllVisible(SBMLNode node) {
-		node.setVisible(true);
-		node.setBoldFont(false);
-		for (int i = 0; i<node.getChildCount(); i++) {
-			TreeNode child = node.getChildAt(i);
-			if (child instanceof SBMLNode) {
-				setAllVisible((SBMLNode) child);
+	public void expandNode(TreeNode node) {
+		if (node != null) {
+			expandPath(((DefaultTreeModel)this.getModel()).getPathToRoot(node));
+		}
+	}
+	
+	/**
+	 * expand a path
+	 * @param path
+	 */
+	public void expandPath(TreeNode[] path) {
+		if (path != null) {
+			for (int i=0; i<path.length; i++) {
+				TreePath treePath = new TreePath(((DefaultTreeModel)this.getModel()).getPathToRoot(path[i]));
+				this.expandPath(treePath);
+				this.setSelectionPath(treePath);
+				this.scrollPathToVisible(treePath);
 			}
 		}
-	}
-	
-	/**
-	 * reload the tree model
-	 */
-	public void reload() {
-		((DefaultTreeModel)this.getModel()).reload();
-	}
-	
-	/**
-	 * is path1 descendant of path2
-	 * 
-	 * @param path1
-	 * @param path2
-	 * @return
-	 */
-    public static boolean isDescendant(TreePath path1, TreePath path2) {
-        int count1 = path1.getPathCount();
-        int count2 = path2.getPathCount();
-        if(count1<=count2)
-            return false;
-        while(count1!=count2) {
-            path1 = path1.getParentPath();
-            count1--;
-        }
-        return path1.equals(path2);
-    }
- 
-    /**
-     * save current selection Path
-     */
-    public void saveSelectionPath() {
-    	if (this.getSelectionPath() != null) {
-    		savedState = ((DefaultTreeModel)this.getModel()).getPathToRoot((TreeNode) this.getSelectionPath().getLastPathComponent());
-    	}
-    }
-    
-    /**
-     * restore selection path
-     */
-    public void restoreSelectionPath() {
-    	expandPath(savedState);
-    }
-    
-    /**
-     * expand a path from root to node
-     * @param node
-     */
-    public void expandNode(TreeNode node) {
-    	if (node != null) {
-    		expandPath(((DefaultTreeModel)this.getModel()).getPathToRoot(node));
-    	}
-    }
-    
-    /**
-     * expand a path
-     * @param path
-     */
-    public void expandPath(TreeNode[] path) {
-    	if (path != null) {
-    		for (int i=0; i<path.length; i++) {
-    			TreePath treePath = new TreePath(((DefaultTreeModel)this.getModel()).getPathToRoot(path[i]));
-    			this.expandPath(treePath);
-    			this.setSelectionPath(treePath);
-    			this.scrollPathToVisible(treePath);
-    		}
-    	}
-    }
-    
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	public void actionPerformed(ActionEvent e) {
-		if (popup != null) {
-			popup.setVisible(false);
-		}
-		e.setSource(currSBase);
-		for (ActionListener al : setOfActionListeners) {
-			al.actionPerformed(e);
-		}
-	}
-	
-	/**
-	 * @param al
-	 */
-	public void addActionListener(ActionListener al) {
-		setOfActionListeners.add(al);
 	}
 	
 	/**
 	 * Initializes this object.
 	 */
 	private void init() {
-		setOfActionListeners = new HashSet<ActionListener>();
+		listOfActionListeners = new LinkedList<ActionListener>();
 		popup = new JPopupMenu();
 		popUpMap = new HashMap<JMenuItem, List<Class<? extends SBase>>>();
-		this.setCellRenderer(new SBMLTreeCellRenderer());
+		setCellRenderer(new SBMLTreeCellRenderer());
 		addMouseListener(EventHandler.create(MouseListener.class, this, "mouseClicked", ""));
 	}
 	
@@ -401,27 +295,21 @@ public class SBMLTree extends JTree implements ActionListener {
 		
 		if ((e.getClickCount() == 1) && (e.getButton() == MouseEvent.BUTTON1)) {
 			if ((popup != null) && popup.isVisible()) {
-				currSBase = null;
 				popup.setVisible(false);
 			} else if (clickedOn instanceof DefaultMutableTreeNode) {
 				this.saveSelectionPath();
 			}
 		}
-		if (clickedOn instanceof ASTNode) {
-			ASTNode ast = (ASTNode) clickedOn;
-			System.out.println(ast.getType());
-		} else if ((e.getClickCount() == 2)
-				|| (e.getButton() == MouseEvent.BUTTON3)
-				&& setOfActionListeners.size() > 0) {
+		if (e.getButton() == MouseEvent.BUTTON3) {
 			if (clickedOn instanceof DefaultMutableTreeNode) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) getSelectionPath()
 						.getLastPathComponent();
 				Object userObject = node.getUserObject();
 				if (userObject instanceof SBMLDocument) {
-					currSBase = ((SBMLDocument) userObject).getModel();
-				} else {
-					currSBase = (SBase) userObject;
-				}
+				currSBase = ((SBMLDocument) userObject).getModel();
+			} else {
+				currSBase = (SBase) userObject;
+			}
 				if (popup != null) {
 					if (popUpMap != null && popUpMap.size() > 0) {
 						for (int i=0; i<popup.getComponentCount(); i++) {
@@ -437,7 +325,7 @@ public class SBMLTree extends JTree implements ActionListener {
 						}
 					}
 					popup.setLocation(e.getX() + ((int) getLocationOnScreen().getX()),
-							e.getY() + ((int) getLocationOnScreen().getY()));// e.getLocationOnScreen());
+						e.getY() + ((int) getLocationOnScreen().getY()));// e.getLocationOnScreen());
 					popup.setVisible(true);
 				}
 				if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
@@ -457,6 +345,108 @@ public class SBMLTree extends JTree implements ActionListener {
 			}
 		}
 	}
-	
-	
+ 
+    /**
+		 * reload the tree model
+		 */
+		public void reload() {
+			((DefaultTreeModel)this.getModel()).reload();
+		}
+    
+    /**
+     * restore selection path
+     */
+    public void restoreSelectionPath() {
+    	expandPath(savedState);
+    }
+    
+    /**
+     * save current selection Path
+     */
+    public void saveSelectionPath() {
+    	if (this.getSelectionPath() != null) {
+    		savedState = ((DefaultTreeModel)this.getModel()).getPathToRoot((TreeNode) this.getSelectionPath().getLastPathComponent());
+    	}
+    }
+    
+    public void search(Filter filter) {
+			search(filter, null);
+		}
+    
+    /**
+		 * 
+		 * @param filter
+		 * @param progressBar 
+		 */
+		public void search(Filter filter, AbstractProgressBar progressBar) {
+			SBMLNode.setShowInvisible(true);
+			SBMLNode root = (SBMLNode)this.getModel().getRoot();
+			List<TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
+			if (progressBar != null) {
+				progressBar.reset();
+				progressBar.setNumberOfTotalCalls(2 * SBMLNode.getNodeCount());
+				if (progressBar instanceof ProgressBarSwing){
+					((ProgressBarSwing) progressBar).getProgressBar().setVisible(true);
+				}
+			}
+			search(root, filter, list, progressBar);
+			reload();
+			SBMLNode.setShowInvisible(false);
+		}
+    
+    /**
+		 * 
+		 * @param node
+		 * @param filter
+		 * @param list
+		 * @param progressBar
+		 * @param callNr
+		 */
+		private void search(SBMLNode node,Filter filter,List<TreeNode> list, final AbstractProgressBar progressBar) {
+			SBase sbase = ((SBase)node.getUserObject());
+			if (sbase.filter(filter).size() > 0) {
+				node.setVisible(true);
+				node.setBoldFont(false);
+			} else if (list.contains(sbase)) {
+				node.setBoldFont(true);
+				node.setVisible(true);
+			} else {
+				node.setBoldFont(false);
+				node.setVisible(false);
+			}
+			for (int i = 0; i < node.getChildCount(); ++i) {
+				SBMLNode child = (SBMLNode) node.getChildAt(i);
+				search(child, filter, list, progressBar);
+			}
+			if (progressBar != null) {
+				progressBar.DisplayBar();
+			}
+		}
+
+    /**
+		 * 
+		 */
+		public void setAllVisible() {
+			SBMLNode.setShowInvisible(true);
+			setAllVisible((SBMLNode) this.getModel().getRoot());
+			reload();
+			SBMLNode.setShowInvisible(false);
+		}
+
+		/**
+		 * 
+		 * @param node
+		 */
+		private void setAllVisible(SBMLNode node) {
+			node.setVisible(true);
+			node.setBoldFont(false);
+			for (int i = 0; i<node.getChildCount(); i++) {
+				TreeNode child = node.getChildAt(i);
+				if (child instanceof SBMLNode) {
+					setAllVisible((SBMLNode) child);
+				}
+			}
+		}
+    
+    
 }
