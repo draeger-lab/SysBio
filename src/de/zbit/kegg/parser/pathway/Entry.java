@@ -529,4 +529,61 @@ public class Entry {
     return attributes;
   }
 
+  @Override
+  public int hashCode() {
+    int hash = 13;
+    if(isSetID())
+      hash *= id;
+    if(isSetName())
+      hash *= name.hashCode();
+    if(isSetType())
+      hash *= type.hashCode();
+    if(isSetLink())
+      hash *= link.hashCode();
+    if(isSetReaction())
+      hash *= reaction.hashCode();
+    if(isSetComponent())
+      hash *= components.hashCode();
+    if(isSetGraphics())
+      hash *= graph.hashCode();
+    
+    return hash;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = false;
+    if(obj.getClass().isAssignableFrom(Entry.class)){    
+      Entry o = (Entry)obj;
+      equals &= o.isSetID()==this.isSetID();
+      if(equals && isSetID()) 
+        equals &= (o.getId() == this.getId());
+      
+      equals &= o.isSetName()==this.isSetName();
+      if(equals && isSetName()) 
+        equals &= (o.getName().equals(this.getName()));
+      
+      equals &= o.isSetType()==this.isSetType();
+      if(equals && isSetType()) 
+        equals &= (o.getType().equals(this.getType()));
+      
+      equals &= o.isSetLink()==this.isSetLink();
+      if(equals && isSetLink()) 
+        equals &= (o.getLink().equals(this.getLink()));
+      
+      equals &= o.isSetReaction()==this.isSetReaction();
+      if(equals && isSetReaction()) 
+        equals &= (o.getReactions().equals(this.getReactions()));
+      
+      equals &= o.isSetComponent()==this.isSetComponent();
+      if(equals && isSetComponent()) 
+        equals &= (o.getComponents().equals(this.getComponents()));
+      
+      equals &= o.isSetGraphics()==this.isSetGraphics();
+      if(equals && isSetGraphics()) 
+        equals &= (o.getGraphics().equals(this.getGraphics()));
+      
+    }
+    return equals;
+  }
 }

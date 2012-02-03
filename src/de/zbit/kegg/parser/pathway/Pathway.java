@@ -773,5 +773,82 @@ public class Pathway {
     
     return attributes;
   }
+  
+  private boolean isSetEntries(){
+    return entries!=null && entries.size()>0;
+  }
+  
+  private boolean isSetReactions(){
+    return reactions!=null && reactions.size()>0;
+  }
+  
+  private boolean isSetRelations(){
+    return relations!=null && relations.size()>0;
+  }
+  
+  @Override
+  public int hashCode() {
+    int hash = 199;
+    if(isSetName())
+      hash *= name.hashCode();
+    if(isSetOrg())
+      hash *= org.hashCode();
+    if(isSetNumber())
+      hash *= number;
+    if(isSetTitle())
+      hash *= title.hashCode();
+    if(isSetImage())
+      hash *= image.hashCode();
+    if(isSetEntries())
+      hash *= entries.hashCode();
+    if(isSetReactions())
+      hash *= reactions.hashCode();
+    if(isSetRelations())
+      hash *= relations.hashCode();
+  
+    
+    return hash;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = false;
+    if(obj.getClass().isAssignableFrom(Pathway.class)){    
+      Pathway o = (Pathway)obj;
+      equals &= o.isSetName()==this.isSetName();
+      if(equals && isSetName()) 
+        equals &= (o.getName().equals(this.getName()));
+      
+      equals &= o.isSetOrg()==this.isSetOrg();
+      if(equals && isSetOrg()) 
+        equals &= (o.getOrg().equals(this.getOrg()));
+      
+      equals &= o.isSetNumber()==this.isSetNumber();
+      if(equals && isSetNumber()) 
+        equals &= (o.getNumber()==this.getNumber());
+      
+      equals &= o.isSetTitle()==this.isSetTitle();
+      if(equals && isSetTitle()) 
+        equals &= (o.getTitle().equals(this.getTitle()));
+      
+      equals &= o.isSetImage()==this.isSetImage();
+      if(equals && isSetImage()) 
+        equals &= (o.getImage().equals(this.getImage()));
+      
+      equals &= o.isSetEntries()==this.isSetEntries();
+      if(equals && isSetEntries()) 
+        equals &= (o.getEntries().equals(this.getEntries()));
+      
+      equals &= o.isSetReactions()==this.isSetReactions();
+      if(equals && isSetReactions()) 
+        equals &= (o.getReactions().equals(this.getReactions()));
+      
+      equals &= o.isSetRelations()==this.isSetRelations();
+      if(equals && isSetRelations()) 
+        equals &= (o.getRelations().equals(this.getRelations()));
+      
+    }
+    return equals;
+  }
 
 }

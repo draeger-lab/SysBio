@@ -121,5 +121,28 @@ public class EntryExtended extends Entry {
     
     return attributes;
   }
+  
+  @Override
+  public int hashCode() {
+    int hash = super.hashCode();
+    if(isSetGeneType())
+      hash *= geneType.hashCode();
+    
+    return hash;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = super.equals(obj);
+    
+    if(equals && obj.getClass().isAssignableFrom(EntryExtended.class)){    
+      EntryExtended o = (EntryExtended)obj;
+      equals &= (o.isSetGeneType()==this.isSetGeneType());
+      if(equals && isSetGeneType()) 
+        equals &= (o.getGeneType().equals(this.getGeneType()));
+      
+    }
+    return equals;
+  }
 
 }
