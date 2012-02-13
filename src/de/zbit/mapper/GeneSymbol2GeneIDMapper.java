@@ -76,45 +76,6 @@ public class GeneSymbol2GeneIDMapper extends Ensembl2GeneIDMapper {
     System.out.println(mapper.map("Cyp3a4"));
     System.out.println(mapper.map("CYP3A4"));
     System.out.println(mapper.map("CYP3A3"));
-    System.out.println(mapper.map("CYP3A4-0001"));
-    
-    System.out.println(mapper.map("SLC6A3")); // DAT: // http://www.genenames.org/data/hgnc_data.php?hgnc_id=11049
-    System.out.println(mapper.map("ComplexI"));
-    System.out.println(mapper.map("PLD2"));
-    System.out.println(mapper.map("CaseinkinaseI"));
-    System.out.println(mapper.map("Casein kinaseII"));
-    System.out.println(mapper.map("GRK"));
-    System.out.println(mapper.map("20S proteasome"));
-    System.out.println(mapper.map("Parkin"));
-    System.out.println(mapper.map("_alpha_-Synuclein"));
-    System.out.println(mapper.map("UCH-L1"));
-    System.out.println(mapper.map("Synphilin"));
-    System.out.println(mapper.map("1433"));
-    System.out.println(mapper.map("Fynkinase"));
-    System.out.println(mapper.map("Srckinase"));
-    System.out.println(mapper.map("19Sproteasome"));
-    System.out.println(mapper.map("Elk1"));
-    System.out.println(mapper.map("Hsp70"));
-    System.out.println(mapper.map("betaSynuclein"));
-    System.out.println(mapper.map("gammaSynuclein"));
-    System.out.println(mapper.map("TorsinA"));
-    System.out.println(mapper.map("UbcH7"));
-    System.out.println(mapper.map("UbcH8"));
-    System.out.println(mapper.map("ERK"));
-    System.out.println(mapper.map("SAPK"));
-    System.out.println(mapper.map("p38MAPK"));
-    System.out.println(mapper.map("aelR"));
-    System.out.println(mapper.map("UBC6"));
-    System.out.println(mapper.map("Ubc7"));
-    System.out.println(mapper.map("CyclinE"));
-    System.out.println(mapper.map("hSel10"));
-    System.out.println(mapper.map("Cul1"));
-    System.out.println(mapper.map("CASK"));
-    System.out.println(mapper.map("TH"));
-    System.out.println(mapper.map("CDCrel1"));
-    System.out.println(mapper.map("Syntaxin"));
-    System.out.println(mapper.map("CHIP"));
-    
   }
   
   /* (non-Javadoc)
