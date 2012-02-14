@@ -35,9 +35,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
-import org.w3c.dom.views.DocumentView;
 
 import de.zbit.biocarta.BioCartaTools;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -139,7 +137,6 @@ public class KGMLWriter {
     
     // kegg entries
     ArrayList<Entry>  entries = keggPW.getEntries();
-    System.out.println("Entries.size(): " + entries.size());
     if(entries.size()>0){
       for (Entry entry : entries) {
         Element newChild = doc.createElement("entry");
@@ -169,7 +166,6 @@ public class KGMLWriter {
     
     // kegg reactions
     ArrayList<Reaction>  reactions = keggPW.getReactions();
-    System.out.println("Reactions.size(): " + reactions.size());
     if(reactions.size()>0){
       for (Reaction reaction : reactions) {
         Element newChild = doc.createElement("reaction");
@@ -210,7 +206,6 @@ public class KGMLWriter {
     
     // kegg relations
     ArrayList<Relation>  relations = keggPW.getRelations();
-    System.out.println("Relations.size(): " + relations.size());
     if(relations.size()>0){
       for (Relation relation : relations) {
         Element newChild = doc.createElement("relation");
