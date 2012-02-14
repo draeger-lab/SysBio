@@ -379,7 +379,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
       return generateSpeciesDataStructure(uniprotSpeciesFile);
     } catch (IOException e) {
       e.printStackTrace();
-      System.exit(1);// TODO: Will ich das so oder gibt's noch was geschickteres?
+      System.exit(1);// TODO: Is this good or exist something more convenient?
     }
     return new LinkedList<Species>();
   }
@@ -640,7 +640,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
       if (nameTypeToSearch==UNIPROT_EXTENSION || nameTypeToSearch==-1) {
         if (getUniprotExtension()!=null && getUniprotExtension().equalsIgnoreCase(species)) return true;
       }
-      // TODO: Implement checls for nameTypeToSearch for other name types.
+      // TODO: Implement checks for nameTypeToSearch for other name types.
       
       if (getScientificName()!=null && getScientificName().equalsIgnoreCase(species)) return true;
       if (getCommonName()!=null && getCommonName().equalsIgnoreCase(species)) return true;
