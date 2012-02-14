@@ -406,7 +406,7 @@ public class Graphics {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = false;
+    boolean equals = true;
     if(obj.getClass().isAssignableFrom(Graphics.class)){    
       Graphics o = (Graphics)obj;
       

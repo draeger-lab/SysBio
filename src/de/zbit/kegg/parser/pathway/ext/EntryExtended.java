@@ -70,7 +70,6 @@ public class EntryExtended extends Entry {
   public EntryExtended(Pathway parentPathway, int id, String name,
       EntryType type, String link, String reaction) {
     super(parentPathway, id, name, type, link, reaction);
-    // TODO Auto-generated constructor stub
   }
 
   /**
@@ -85,7 +84,6 @@ public class EntryExtended extends Entry {
   public EntryExtended(Pathway parentPathway, int id, String name,
       EntryType type, String link, String reaction, NodeList childNodes) {
     super(parentPathway, id, name, type, link, reaction, childNodes);
-    // TODO Auto-generated constructor stub
   }
 
   /**
@@ -95,7 +93,6 @@ public class EntryExtended extends Entry {
    */
   public EntryExtended(Pathway parentPathway, int id, String name) {
     super(parentPathway, id, name);
-    // TODO Auto-generated constructor stub
   }
 
   

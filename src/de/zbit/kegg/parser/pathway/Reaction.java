@@ -440,7 +440,7 @@ public class Reaction {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = false;
+    boolean equals = true;
     if(obj.getClass().isAssignableFrom(Reaction.class)){    
       Reaction o = (Reaction)obj;
       equals &= o.isSetID()==this.isSetID();

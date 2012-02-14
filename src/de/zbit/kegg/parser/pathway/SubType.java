@@ -249,7 +249,7 @@ public class SubType {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = false;
+    boolean equals = true;
     if(obj.getClass().isAssignableFrom(SubType.class)){    
       SubType o = (SubType)obj;
       equals &= o.isSetName()==this.isSetName();

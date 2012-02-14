@@ -812,7 +812,7 @@ public class Pathway {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = false;
+    boolean equals = true;
     if(obj.getClass().isAssignableFrom(Pathway.class)){    
       Pathway o = (Pathway)obj;
       equals &= o.isSetName()==this.isSetName();
