@@ -168,6 +168,8 @@ public class Pathway {
 	 * @param e
 	 */
 	public void addEntry(Entry e) {
+	  if (entries.contains(e)) return;
+	  
 	  idMap.put(e.getId(), e);
 	  putEntryInNameMap(e);
 	  addReactionModifier(e);
@@ -305,6 +307,7 @@ public class Pathway {
 	 * @param r
 	 */
 	public void addReaction(Reaction r) {
+	  if (reactions.contains(r)) return;
 		reactions.add(r);
 	}
 
@@ -313,6 +316,7 @@ public class Pathway {
 	 * @param r
 	 */
 	public void addRelation(Relation r) {
+	  if (relations.contains(r)) return;
 		relations.add(r);
 	}
 

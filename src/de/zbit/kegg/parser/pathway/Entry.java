@@ -103,6 +103,7 @@ public class Entry {
     this.id = id;
     this.type = type;
     this.name = name;
+    
     this.parentPathway.addEntry(this);
     //setName(name);
     //if (type==EntryType.gene) graph = new Graphics(true); else graph = new Graphics(false);
@@ -553,7 +554,8 @@ public class Entry {
   @Override
   public boolean equals(Object obj) {
     boolean equals = true;
-    if(obj.getClass().isAssignableFrom(Entry.class)){    
+    
+    if (Entry.class.isAssignableFrom(obj.getClass())){
       Entry o = (Entry)obj;
       equals &= o.isSetID()==this.isSetID();
       if(equals && isSetID()) 
@@ -573,7 +575,7 @@ public class Entry {
       
       equals &= o.isSetReaction()==this.isSetReaction();
       if(equals && isSetReaction()) 
-        equals &= (o.getReactions().equals(this.getReactions()));
+        equals &= (o.getReactionString().equals(this.getReactionString()));
       
       equals &= o.isSetComponent()==this.isSetComponent();
       if(equals && isSetComponent()) 
