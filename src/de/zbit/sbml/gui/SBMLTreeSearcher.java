@@ -116,7 +116,6 @@ public class SBMLTreeSearcher extends SwingWorker<List<TreeNode>, Void> {
 		}
 		if (list == null) {
 			SBMLNode.setShowInvisible(true);
-			tree.restoreSelectionPath();
 		} else {
 			logger.log(Level.INFO, "Expanding...");
 			try {

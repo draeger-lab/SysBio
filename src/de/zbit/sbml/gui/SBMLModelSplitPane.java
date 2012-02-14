@@ -134,6 +134,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			swingTimer.stop();
 			swingTimer = null;
 			tree.setAllVisible();
+			tree.restoreSelectionPath();
 			searchField.setEnabled(true);
 		}
 	}
