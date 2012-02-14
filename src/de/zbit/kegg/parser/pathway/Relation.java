@@ -226,7 +226,7 @@ public class Relation {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = false;
+    boolean equals = true;
     if(obj.getClass().isAssignableFrom(Relation.class)){    
       Relation o = (Relation)obj;
       equals &= o.isSetEntry1()==this.isSetEntry1();

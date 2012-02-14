@@ -235,7 +235,7 @@ public class ReactionComponent implements Cloneable {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = false;
+    boolean equals = true;
     if(obj.getClass().isAssignableFrom(ReactionComponent.class)){    
       ReactionComponent o = (ReactionComponent)obj;
       equals &= o.isSetID()==this.isSetID();

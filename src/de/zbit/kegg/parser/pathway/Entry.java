@@ -552,7 +552,7 @@ public class Entry {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = false;
+    boolean equals = true;
     if(obj.getClass().isAssignableFrom(Entry.class)){    
       Entry o = (Entry)obj;
       equals &= o.isSetID()==this.isSetID();
