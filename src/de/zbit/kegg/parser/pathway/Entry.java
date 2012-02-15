@@ -120,7 +120,7 @@ public class Entry {
   public Entry(Pathway parentPathway, int id, String name, EntryType type, String link, String reaction) {
     this(parentPathway, id, name, type);
     this.link = link;
-    this.reaction = reaction;
+    setReaction(reaction);
   }
   
   /**

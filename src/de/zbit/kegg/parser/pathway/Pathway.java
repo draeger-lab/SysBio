@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import de.zbit.kegg.KeggInfos;
+
 /**
  * Main Kegg document. Corresponding to the Kegg Pathway class
  * (see {@link http://www.genome.jp/kegg/xml/docs/})
@@ -678,7 +680,9 @@ public class Pathway {
     return getEntryForReactionComponent(rc, false);
   }
   /**
-   * 
+   * <p>Note: This function queries the KEGG API for synonyms of
+   * {@link ReactionComponent#getName()}. So better cache all of them
+   * before calling this method.</p> 
    * @param rc
    * @param supressWarning
    * @return
@@ -695,6 +699,20 @@ public class Pathway {
     if (rcEntry==null){ // no id or invalid id.
       Collection<Entry> c = getEntriesForName(rc.getName());
       int size = c==null?0:c.size();
+      
+      // Many glycand, compounds, ligands have synonyms! So query them...
+      if (size<1) {
+        KeggInfos reaInfo = new KeggInfos(rc.getName());
+        if (reaInfo.getSameAs()!=null) {
+          String[] synonyms = reaInfo.getSameAs().split("\\s");
+          int synIndex=-1; c=null;
+          while (c==null && ((++synIndex)<synonyms.length) ) {
+            c = getEntriesForName(KeggInfos.appendPrefix(synonyms[synIndex]));
+            if ( (size = c==null?0:c.size()) > 0 ) break;
+          }
+        }
+      }
+        
       if (size>1) {
         /* Actually we don't know which of those entries is really
          * involved in the reaction and I don't know if this ever

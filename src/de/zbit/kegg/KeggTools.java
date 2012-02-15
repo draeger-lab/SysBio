@@ -146,6 +146,19 @@ public class KeggTools {
               // Look if we need to add new components
               ReactionComponent rc = r.getReactant(reactant, isSubstrate);
               if (rc==null) {
+                // Many reactants have synonyms! Maybe we do have the reactant, but under a different name
+                KeggInfos reaInfo = new KeggInfos(reactant);
+                if (reaInfo.getSameAs()!=null) {
+                  String[] synonyms = reaInfo.getSameAs().split("\\s");
+                  int synIndex=-1;
+                  while (rc==null && ((++synIndex)<synonyms.length) ) {
+                    rc = r.getReactant(KeggInfos.appendPrefix(synonyms[synIndex]), isSubstrate);
+                  }
+                }
+              }
+              
+              // If we really miss a reaction component, create it!
+              if (rc==null) {
                 rc = reactantName2reactant.get(reactant);
                 if (rc==null) rc = new ReactionComponent(reactant);
                 if (isSubstrate) r.addSubstrate(rc);
