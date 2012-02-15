@@ -374,15 +374,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
     this(optionName, requriedType, bundle.getString(optionName), range,
       defaultValue);
-    String key = optionName + "_TOOLTIP";
-    if (bundle.containsKey(key)) {
-      setDisplayName(bundle.getString(optionName));
-      this.description = bundle.getString(key);
-    } else if (this.description.contains(";")) {
-      String names[] = this.description.split(";");
-      this.displayName = names[0];
-      this.description = names[1];
-    }
+    loadDisplayNameAndDescription(optionName, bundle);
     if ((dependencies != null) && (dependencies.length > 0)) {
       this.dependencies = new HashMap<Option<?>, SortedSet<Range<?>>>();
       for (ValuePairUncomparable<Option<E>, Range<E>> pair : dependencies) {
@@ -397,7 +389,25 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     }
   }
 
-  /**
+  	/**
+  	 * load the display name and description ("_TOOLTIP" or the string after ";")
+  	 * 
+  	 * @param optionName
+  	 * @param bundle
+  	 */
+	private void loadDisplayNameAndDescription(String optionName, ResourceBundle bundle) {
+		String key = optionName + "_TOOLTIP";
+	    if (bundle.containsKey(key)) {
+	      setDisplayName(bundle.getString(optionName));
+	      this.description = bundle.getString(key);
+	    } else if (this.description.contains(";")) {
+	      String names[] = this.description.split(";");
+	      this.displayName = names[0];
+	      this.description = names[1];
+	    }
+	}
+
+/**
    * 
    * @param optionName
    * @param requiredType
@@ -714,6 +724,43 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	}
 	
 	/**
+	   * Creates a new {@link Option}, that accepts an input of the given Type.
+	   * 
+	   * @param optionName
+	   *        This {@link String} must be the identical to the name of the
+	   *        variable that stores this {@link Option}.
+	   * @param requiredType
+	   *        Since it is not possible in Java to access the generic type
+	   *        attribute at run time, each {@link Option} also requires its type
+	   *        attribute in form of a {@link Class} object.
+	   * @param bundle This {@link ResourceBundle} looks for the optionName as key for a
+	   *        human-readable display name. It also looks for the key
+	   *        <code>optionName + "_TOOLTIP"</code> in order to obtain a more
+	   *        detailed description of this option. If no such description can be
+	   *        found, it tries to split the human-readable name connected with the
+	   *        optionName using the character ';' (semicolon). If the
+	   *        human-readable name contains this symbol it assumes that the part
+	   *        before the semicolon is intended to be a short name and everything
+	   *        written after it is assumed to be a tooltip.
+	   * @param range
+	   * @param numLeadingMinus
+	   * @param defaultValue
+	   *        The value for this {@link Option} to be used in case that there is
+	   *        no user-defined value at the moment.
+	   * @param displayName
+	   *        A better human-readable name to be shown in graphical user
+	   *        interfaces in order to give a brief description of this
+	   *        {@link Option}.
+	   */
+	public Option(String optionName, Class<Type> requiredType,
+		ResourceBundle bundle, Range<Type> range, short numLeadingMinus,
+		Type defaultValue, String displayName) {
+		this(optionName, requiredType, bundle.getString(optionName), range, numLeadingMinus, null,
+			defaultValue, displayName);
+		loadDisplayNameAndDescription(optionName, bundle);
+	}
+	
+	/**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
    * @param optionName
@@ -738,7 +785,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
    *        The value for this {@link Option} to be used in case that there is
    *        no user-defined value at the moment.
    */
-	public Option(String optionName, Class<Type> requiredType,
+	public Option(String optionName, Class<Type> requiredType, 
 		String description, Range<Type> range, Type defaultValue) {
 		this(optionName, requiredType, description, range, (short) 2, defaultValue);
 	}
