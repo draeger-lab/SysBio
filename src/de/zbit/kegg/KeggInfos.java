@@ -105,6 +105,11 @@ public class KeggInfos implements Serializable {
    * 
    */
 	private String formula = null;
+  /**
+   * Kegg has synonyms for identifiers (in the "REMARK" part).
+   * E.g. C00208 is "Same as:" D00044 G00275
+   */
+  private String sameAsIDs = null;
 	/**
    * 
    */
@@ -495,6 +500,18 @@ public class KeggInfos implements Serializable {
 	public String getFormula() {
 		return formula;
 	}
+	
+	/**
+   * Kegg has synonyms for identifiers (in the "REMARK" part).
+   * All of them should be treated as separat KEGG identifiers,
+   * pointing to the same object. They do never contain a
+   * prefix and may be separated by space.
+   * E.g. C00208 is "Same as:" D00044 G00275
+	 * @return synonym kegg ids. E.g. "D00044 G00275"
+	 */
+	public String getSameAs() {
+	  return sameAsIDs;
+	}
 
 	/**
 	 * Maybe multiple values separated by space!
@@ -880,6 +897,15 @@ public class KeggInfos implements Serializable {
 		// Mainly drg (eg. "dr:D00694")
 		// missing: NIKKAJI, LigandBox (CAS)
 		drugbank = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "DRUGBANK:", "\n");
+		
+		// Synonym identifiers
+		String remark = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "REMARK", null);
+		if (remark!=null && remark.length()>1) {
+		  final String synStart = "Same as:";
+		  if (remark.startsWith(synStart)) {
+		    sameAsIDs = remark.substring(synStart.length()).trim();
+		  }
+		}
 
 		// in reactions:
 		equation = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "EQUATION", "\n");
@@ -948,6 +974,8 @@ public class KeggInfos implements Serializable {
 			entrez_id = null;
 		if (formula != null && formula.trim().length() == 0)
 			formula = null;
+    if (sameAsIDs != null && sameAsIDs.trim().length() == 0)
+      sameAsIDs = null;
 		if (mass != null && mass.trim().length() == 0)
 			mass = null;
 		if (chebi != null && chebi.trim().length() == 0)
