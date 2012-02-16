@@ -62,8 +62,11 @@ public class Graphics {
   /**
    * the background color used by this graphics object
    * "=> for gene products"
+   * <p>Do NOT set white as default, because the option
+   * "Remove white gene nodes" than also removes nodes that
+   * have no color set, but the default color.
    */
-  private String bgcolor = "#FFFFFF"; // "#BFFFBF";
+  private String bgcolor = "#E8E8E8"; // "#BFFFBF";
   /**
    * Multiple x,y,x,y,... coordinates for a line"
    */
@@ -130,19 +133,12 @@ public class Graphics {
     this.bgcolor = bgcolor;
   }
   
-  /**
-   * Returns true if and only if the background color has been set.
-   * @return
-   */
-  public boolean isBGcolorSet() {
-    if (bgcolor!=null && bgcolor.length()>0 && !bgcolor.trim().equalsIgnoreCase("none"))
-      return true;
-    return false;
-  }
   
   /**
    * The bgcolor attribute specifies the background color of this object. The default
    * value is "#FFFFFF". The background color for the gene product is "#BFFFBF".
+   * <p>NOTE: because of conflicts with the "remove white gene notes" option,
+   * the default value in this class is now "#E8E8E8".
    * @return Background color
    */
   public String getBgcolor() {
@@ -321,10 +317,24 @@ public class Graphics {
 
   /**
    * Returns true if and only if the foreground color has been set.
+   * <p>Note: returns also true if it has never been set but is on
+   * the default value right now.
    * @return
    */
-  public boolean isFGcolorSet() {
+  public boolean isSetFGcolor() {
     if (fgcolor!=null && fgcolor.length()>0 && !fgcolor.trim().equalsIgnoreCase("none"))
+      return true;
+    return false;
+  }
+  
+  /**
+   * Returns true if and only if the background color has been set.
+   * <p>Note: returns also true if it has never been set but is on
+   * the default value right now.
+   * @return
+   */
+  public boolean isSetBGcolor() {    
+    if (bgcolor!=null && bgcolor.length()>0 && !bgcolor.trim().equalsIgnoreCase("none"))
       return true;
     return false;
   }
@@ -361,13 +371,6 @@ public class Graphics {
     }
     
     return attributes;
-  }
-
-  private boolean isSetFGcolor() {    
-    return fgcolor!=null;
-  }
-  private boolean isSetBGcolor() {    
-    return bgcolor!=null;
   }
 
   private boolean isSetType() {
@@ -413,6 +416,8 @@ public class Graphics {
       hash *= height;
     if(isSetFGcolor())
       hash *= fgcolor.hashCode();
+    if(isSetBGcolor())
+      hash *= bgcolor.hashCode();
     
     return hash;
   }
@@ -455,8 +460,42 @@ public class Graphics {
       equals &= o.isSetFGcolor()==this.isSetFGcolor();
       if(equals && isSetFGcolor()) 
         equals &= (o.getFgcolor().equals(this.getFgcolor()));
+      
+      equals &= o.isSetBGcolor()==this.isSetBGcolor();
+      if(equals && isSetBGcolor()) 
+        equals &= (o.getBgcolor().equals(this.getBgcolor()));
     }
     return equals;
+  }
+  
+  /**
+   * Creates a new graphics object, that is suitable for compounds
+   * or small molecules. 
+   * @param name
+   * @return {@link Graphics} object with the given <code>name</code>.
+   */
+  public static Graphics createGraphicsForCompound(String name) {
+    Graphics g = new Graphics(name);
+    g.setBgcolor("#FFFFFF");
+    g.setHeight(8);
+    g.setWidth(8);
+    g.setType(GraphicsType.circle);
+    return g;
+  }
+  
+  /**
+   * Creates a new graphics object, that is suitable for
+   * Pathway References. 
+   * @param name
+   * @return {@link Graphics} object with the given <code>name</code>.
+   */
+  public static Graphics createGraphicsForPathwayReference(String name) {
+    Graphics g = new Graphics(name);
+    g.setBgcolor("#C0C0C0");
+    g.setHeight(34);
+    g.setWidth(110);
+    g.setType(GraphicsType.roundrectangle);
+    return g;
   }
   
 }

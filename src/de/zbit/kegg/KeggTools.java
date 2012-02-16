@@ -494,7 +494,7 @@ public class KeggTools {
   public static void removeWhiteNodes(Pathway p) {
     for (int i=0; i<p.getEntries().size(); i++) {
       Entry entry = p.getEntries().get(i);
-      if (entry.hasGraphics() && entry.getGraphics().isBGcolorSet() &&          
+      if (entry.hasGraphics() && entry.getGraphics().isSetBGcolor() &&          
           entry.getGraphics().getBgcolor().toLowerCase().trim().endsWith("ffffff")
           && (entry.getType() == EntryType.gene || entry.getType() == EntryType.ortholog)) {
         p.removeEntry(i);
