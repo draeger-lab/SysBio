@@ -23,10 +23,9 @@ import javax.swing.SwingWorker;
 
 import org.sbml.jsbml.CallableSBase;
 import org.sbml.jsbml.Model;
-import org.sbml.jsbml.util.compilers.HTMLFormula;
+import org.sbml.jsbml.UnitDefinition;
 
 import de.zbit.sbml.util.ListOfCallableSBases;
-import de.zbit.util.StringUtil;
 
 /**
  * Derives all units within a given {@link Model} (in background). The result is
@@ -36,7 +35,7 @@ import de.zbit.util.StringUtil;
  * @since 1.1
  * @version $Rev$
  */
-public class UnitDerivationWorker extends SwingWorker<String[], Void> {
+public class UnitDerivationWorker extends SwingWorker<UnitDefinition[], Void> {
 	
 	/**
 	 * A {@link Logger} for this class.
@@ -58,15 +57,14 @@ public class UnitDerivationWorker extends SwingWorker<String[], Void> {
 	/* (non-Javadoc)
 	 * @see javax.swing.SwingWorker#doInBackground()
 	 */
-	protected String[] doInBackground() throws Exception {
+	protected UnitDefinition[] doInBackground() throws Exception {
 		List<CallableSBase> listOfCallableSBases = new ListOfCallableSBases(model);
-		String result[] = new String[listOfCallableSBases.size()];
+		UnitDefinition result[] = new UnitDefinition[listOfCallableSBases.size()];
 		for (int i = 0; i < result.length; i++) {
 			try {
-				result[i] = StringUtil.toHTML(HTMLFormula.toHTML(listOfCallableSBases
-						.get(i).getDerivedUnitDefinition()));
+				result[i] = listOfCallableSBases.get(i).getDerivedUnitDefinition();
 			} catch (Exception exc) {
-				result[i] = "N/A";
+				result[i] = null;
 				logger.warning(exc.getLocalizedMessage());
 			}
 		}

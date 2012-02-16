@@ -128,11 +128,11 @@ public class MultipleTableView<T extends TableModel> extends JPanel implements I
 	 * @return
 	 */
 	public JTable getJTable(int index) {
-		if ((0 < index) || (tables.getTabCount() < index)) { 
- throw new IndexOutOfBoundsException(
-			String.format(
-				ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_WARNINGS)
-						.getString("NO_TAB_WITH_INDEX"), index)); 
+		if ((index < 0) || (tables.getTabCount() <= index)) { 
+			throw new IndexOutOfBoundsException(
+				String.format(
+					ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_WARNINGS)
+					.getString("NO_TAB_WITH_INDEX"), index)); 
 		}
 		return (JTable) ((JScrollPane) tables.getComponentAt(index)).getViewport().getComponent(0);
 	}

@@ -150,7 +150,7 @@ public class LayoutHelper {
 	 * @param c
 	 */
 	public void add(Component c) {
-	  addWithWidth(c, 1);
+		add(c, 1d, 1d);
 	}
 	
 	/**
@@ -174,6 +174,16 @@ public class LayoutHelper {
 	 */
 	public void add(Component c, Component... comps) {
 		add(false, c, comps);
+	}
+	
+	/**
+	 * 
+	 * @param c
+	 * @param weightx
+	 * @param weighty
+	 */
+	public void add(Component c, double weightx, double weighty) {
+		addWithWidth(c, 1, weightx, weighty);
 	}
 	
   /**
@@ -210,6 +220,17 @@ public class LayoutHelper {
   }
 	
 	/**
+	 * 
+	 * @param c
+	 * @param x
+	 * @param y
+	 * @param width
+	 */
+	public void add(Component c, int x, int y, int width) {
+	  add(c, x, y, width, 1);
+	}
+	
+	/**
 	 * Add a component without specifying the row.
 	 * 
 	 * @param c
@@ -239,17 +260,6 @@ public class LayoutHelper {
 		LayoutHelper.addComponent(this.cont, this.gbl, c, x, y, width, height, 0, 0);
 		row = y;
 		atRowBeginning=false;
-	}
-	
-	/**
-	 * 
-	 * @param c
-	 * @param x
-	 * @param y
-	 * @param width
-	 */
-	public void add(Component c, int x, int y, int width) {
-	  add(c, x, y, width, 1);
 	}
 	
 	/**
@@ -409,13 +419,32 @@ public class LayoutHelper {
 	}
 	
 	/**
+   * 
+   */
+  public void addSpacer() {
+    ensurePointerIsAtBeginningOfARow();
+    add(new JPanel(), 0, ++row, 1, 1, 0, 0);
+  }
+  
+  /**
    * Adds this component in the next row, with
    * the given width
    * @param c
    * @param width
    */
   public void addWithWidth(Component c, int width) {
-    addWithWidth(c, 0, width);
+  	addWithWidth(c, width, 1d, 1d);
+  }
+	
+	/**
+   * 
+   * @param c
+   * @param width
+   * @param weightx
+   * @param weighty
+   */
+  public void addWithWidth(Component c, int width, double weightx, double weighty) {
+  	addWithWidth(c, 0, width, weightx, weighty);
   }
 	
 	/**
@@ -425,10 +454,22 @@ public class LayoutHelper {
    * @param width
    */
 	public void addWithWidth(Component c, int column, int width) {
-	  ensurePointerIsAtBeginningOfARow();
-    add(c, column, row, width, 1, 1d, 1d);
-    atRowBeginning=false;
+	  addWithWidth(c, column, width, 1d, 1d);
   }
+	
+	/**
+	 * 
+	 * @param c
+	 * @param column
+	 * @param width
+	 * @param weightx
+	 * @param weighty
+	 */
+	public void addWithWidth(Component c, int column, int width, double weightx, double weighty) {
+		ensurePointerIsAtBeginningOfARow();
+    add(c, column, row, width, 1, weightx, weighty);
+    atRowBeginning = false;
+	}
 	
 	/**
    * Ensures that the next components are being written in a new row.
@@ -436,11 +477,11 @@ public class LayoutHelper {
   public void ensurePointerIsAtBeginningOfARow() {
     if (!atRowBeginning) {
       row++;
-      atRowBeginning=true;
+      atRowBeginning = true;
     }
   }
-	
-	/**
+
+  /**
 	 * 
 	 * @return
 	 */
@@ -448,7 +489,7 @@ public class LayoutHelper {
 		return this.cont;
 	}
 
-  /**
+	/**
 	 * 
 	 * @return
 	 */
@@ -456,7 +497,7 @@ public class LayoutHelper {
 		return row;
 	}
 
-	/**
+  /**
 	 * Manually increment the current row.
 	 * 
 	 * @param increment
@@ -464,13 +505,5 @@ public class LayoutHelper {
 	public void incrementRowBy(int increment) {
 		row += increment;
 	}
-
-  /**
-   * 
-   */
-  public void addSpacer() {
-    ensurePointerIsAtBeginningOfARow();
-    add(new JPanel(), 0, ++row, 1, 1, 0, 0);
-  }
 	
 }

@@ -496,7 +496,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		ResourceBundle resources = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 		JToolBar toolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
 		toolBar.setOpaque(true);
-		if (GUITools.isMacOSX()) {
+		if (GUITools.isMacOSX()
+				&& ((appConf != null) && (appConf.getInteractiveOptions() != null) && 
+						(appConf.getInteractiveOptions().length > 0))
+				|| (MultiplePreferencesPanel.getPossibleTabCount() > 0)) {
 			toolBar.add(GUITools.createButton(BaseAction.EDIT_PREFERENCES.getIcon(),
 				EventHandler.create(ActionListener.class, this, "preferences"), action,
 				BaseAction.EDIT_PREFERENCES.getToolTip()));
@@ -701,13 +704,15 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *         {@link JMenuItem}s).
 	 */
 	protected JMenu createHelpMenu() {
-		JMenuItem help = (getURLOnlineHelp() == null) ? null : GUITools
-				.createJMenuItem(
+		KeyStroke ks = GUITools.isMacOSX() ? 
+				KeyStroke.getKeyStroke(Character.valueOf('?'), InputEvent.META_DOWN_MASK) :
+				KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0);
+		JMenuItem help = (getURLOnlineHelp() == null) ? null : 
+			GUITools.createJMenuItem(
 					EventHandler.create(ActionListener.class, this, "showOnlineHelp"),
-					BaseAction.HELP_ONLINE, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0),
-					'H', true);
-		JMenuItem license = (getURLLicense() == null) ? null : GUITools
-				.createJMenuItem(
+					BaseAction.HELP_ONLINE, ks, 'H', true);
+		JMenuItem license = (getURLLicense() == null) ? null : 
+			GUITools.createJMenuItem(
 					EventHandler.create(ActionListener.class, this, "showLicense"),
 					BaseAction.HELP_LICENSE, 'L', true);
 		JMenuItem update = ((getURLOnlineUpdate() == null)
