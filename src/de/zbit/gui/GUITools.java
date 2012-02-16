@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -173,17 +174,17 @@ public class GUITools {
   
   
   /**
-   * Sets the dimension of all given {@link JComponent} instances to the maximal
+   * Sets the dimension of all given {@link Component} instances to the maximal
    * size, i.e., all components will be set to equal size, which is the maximal
    * preferred size of one of the components.
    * 
    * @param components
    */
-  public static void calculateAndSetMaxWidth(JComponent... components) {
+  public static void calculateAndSetMaxWidth(Component... components) {
     double maxWidth = 0d, maxHeight = 0d;
     Dimension curr;
-    for (JComponent component : components) {
-      curr = component.getPreferredSize();
+    for (Component component : components) {
+      curr = component != null ? component.getPreferredSize() : new Dimension(0, 0);
       if (curr.getWidth() > maxWidth) {
         maxWidth = curr.getWidth();
       }
@@ -191,8 +192,10 @@ public class GUITools {
         maxHeight = curr.getHeight();
       }
     }
-    for (JComponent component : components) {
-      component.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
+    for (Component component : components) {
+    	if (component != null) {
+    		component.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
+    	}
     }
   }
   
@@ -260,11 +263,33 @@ public class GUITools {
     boolean contains = c.equals(insight);
     if ((c instanceof Container) && !contains)
       for (Component c1 : ((Container) c).getComponents()) {
-        if (c1.equals(insight))
+        if (c1.equals(insight)) {
           return true;
-        else contains |= contains(c1, insight);
+        } else {
+        	contains |= contains(c1, insight);
+        }
       }
     return contains;
+  }
+  
+  /**
+   * 
+   * @param c
+   * @param clazz
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+	public static <T extends Component> List<T> find(Container c, Class<T> clazz) {
+  	List<T> list = new LinkedList<T>();
+  	if (c.getClass().isAssignableFrom(clazz)) {
+  		list.add((T) c);
+  	}
+  	for (Component c1 : c.getComponents()) {
+  		if (c1 instanceof Container) {
+  			list.addAll(find((Container) c1, clazz));
+  		}
+  	}
+  	return list;
   }
   
   /**
