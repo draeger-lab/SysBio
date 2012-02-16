@@ -60,7 +60,7 @@ public class Graphics {
    */
   private String fgcolor="#000000";
   /**
-   * the backgraound color used by this graphics object
+   * the background color used by this graphics object
    * "=> for gene products"
    */
   private String bgcolor = "#FFFFFF"; // "#BFFFBF";
@@ -80,6 +80,12 @@ public class Graphics {
     this();
     this.name = name;
   }
+  
+//  public Graphics(String name, GraphicsType type){
+//    this();
+//    this.name = name;
+//    this.type = type;
+//  }
   /**
    * 
    * @param isGeneProduct - (EntryType==EntryType.gene)
@@ -339,7 +345,7 @@ public class Graphics {
       attributes.put("coords", StringUtil.implode(coords, ","));
     }
     if(isSetType()){
-      attributes.put("tpye", name);
+      attributes.put("type", type.toString());
     }
     if(isSetWidth()){
       attributes.put("width", String.valueOf(width));
@@ -350,11 +356,18 @@ public class Graphics {
     if(isSetFGcolor()){
       attributes.put("fgcolor", fgcolor);
     }
+    if(isSetBGcolor()){
+      attributes.put("bgcolor", bgcolor);
+    }
+    
     return attributes;
   }
 
   private boolean isSetFGcolor() {    
     return fgcolor!=null;
+  }
+  private boolean isSetBGcolor() {    
+    return bgcolor!=null;
   }
 
   private boolean isSetType() {
