@@ -383,6 +383,14 @@ public class Pathway {
 	  return reactionModifiers.get(reactionName);
 	}
 
+	 /**
+   * 
+   * @return
+   */
+  public boolean isSetImage() {
+    return image!=null && image.length()>0;
+  }
+  
 	/**
 	 * 
 	 * @return
@@ -391,6 +399,14 @@ public class Pathway {
 		return image;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isSetLink() {
+	  return link!=null && link.length()>0;
+	}
+	
 	/**
 	 * 
 	 * @return
@@ -764,10 +780,6 @@ public class Pathway {
   private boolean isSetTitle() {
     return (title==null || title.isEmpty()) ? false : true;
   }
-
-  private boolean isSetImage() {
-   return (image==null || image.isEmpty()) ? false : true;
-  }
   
   /**
    * 
@@ -790,6 +802,9 @@ public class Pathway {
     }
     if(isSetImage()){
       attributes.put("image", image);
+    }
+    if(isSetLink()){
+      attributes.put("link", link);
     }
     
     
@@ -821,6 +836,8 @@ public class Pathway {
       hash *= title.hashCode();
     if(isSetImage())
       hash *= image.hashCode();
+    if(isSetLink())
+      hash *= link.hashCode();
     if(isSetEntries())
       hash *= entries.hashCode();
     if(isSetReactions())
@@ -856,6 +873,10 @@ public class Pathway {
       equals &= o.isSetImage()==this.isSetImage();
       if(equals && isSetImage()) 
         equals &= (o.getImage().equals(this.getImage()));
+
+      equals &= o.isSetLink()==this.isSetLink();
+      if(equals && isSetLink()) 
+        equals &= (o.getLink().equals(this.getLink()));
       
       equals &= o.isSetEntries()==this.isSetEntries();
       if(equals && isSetEntries()) 
