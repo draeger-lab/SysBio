@@ -374,6 +374,7 @@ public class Entry {
       if (!Utils.containsWord(this.reaction, reaction)) {
         String newReaction = this.reaction + " " + reaction;
         parentPathway.reactionChange(this, newReaction);
+        this.reaction = newReaction;
       }
     }
   }
