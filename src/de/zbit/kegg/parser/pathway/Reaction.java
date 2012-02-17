@@ -66,6 +66,9 @@ public class Reaction {
   
   /**
    * 
+   * <p>Note: This does not (and should not) add this reaction to the
+   * parent pathway. You need to call addReaction() on the parent pathway
+   * after creating the reaction.</p>
    * @param name
    * @param type
    */
@@ -74,9 +77,18 @@ public class Reaction {
     this.parentPathway = parentPathway;
     this.name = name;
     this.type = type;
-    this.parentPathway.addReaction(this);
   }
   
+  /**
+   * 
+   * <p>Note: This does not (and should not) add this reaction to the
+   * parent pathway. You need to call addReaction() on the parent pathway
+   * after creating the reaction.</p>
+   * @param id
+   * @param parentPathway
+   * @param name
+   * @param type
+   */
   public Reaction(Integer id, Pathway parentPathway, String name, ReactionType type) {
     this(parentPathway, name, type);
     this.id = id;
@@ -84,6 +96,9 @@ public class Reaction {
   
   /**
    * 
+   * <p>Note: This does not (and should not) add this reaction to the
+   * parent pathway. You need to call addReaction() on the parent pathway
+   * after creating the reaction.</p>
    * @param name
    * @param type
    * @param childNodes
@@ -95,6 +110,9 @@ public class Reaction {
   
   /**
    * 
+   * <p>Note: This does not (and should not) add this reaction to the
+   * parent pathway. You need to call addReaction() on the parent pathway
+   * after creating the reaction.</p>
    * @param name
    * @param type
    * @param substrate

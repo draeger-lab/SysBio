@@ -56,28 +56,33 @@ public class Relation {
   
   /**
    * 
+   * <p>Note: This does not (and should not) add this relation to the
+   * parent pathway. You need to call addRelation() on the parent pathway
+   * after creating the relation.</p>
    * @param keggPW 
    * @param entry1
    * @param entry2
    * @param type
    */
-  public Relation(Pathway keggPW, int entry1, int entry2, RelationType type) {
+  public Relation(int entry1, int entry2, RelationType type) {
     super();
     this.entry1 = entry1;
     this.entry2 = entry2;
     this.type = type;
-    keggPW.addRelation(this);
   }
   
   /**
    * 
+   * <p>Note: This does not (and should not) add this relation to the
+   * parent pathway. You need to call addRelation() on the parent pathway
+   * after creating the relation.</p>
    * @param entry1
    * @param entry2
    * @param type
    * @param childNodes
    */
-  public Relation(Pathway keggPW,int entry1, int entry2, RelationType type, NodeList childNodes) {
-    this(keggPW, entry1, entry2, type);
+  public Relation(int entry1, int entry2, RelationType type, NodeList childNodes) {
+    this(entry1, entry2, type);
     parseSubNodes(childNodes);
   }
   

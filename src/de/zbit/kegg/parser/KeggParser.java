@@ -377,7 +377,7 @@ public class KeggParser extends DefaultHandler {
         p.addReaction(r);
       } else if (name.equalsIgnoreCase("relation")) {
         if (!silent) System.out.println("Parsing Relation " + getNodeValue(att,"name") + "...");
-        Relation r = new Relation(p, getNodeValueInt(att, "entry1"), getNodeValueInt(att, "entry2"), RelationType.valueOf(getNodeValue(att,"type")), node.getChildNodes());
+        Relation r = new Relation(getNodeValueInt(att, "entry1"), getNodeValueInt(att, "entry2"), RelationType.valueOf(getNodeValue(att,"type")), node.getChildNodes());
         p.addRelation(r);
       }
     }
