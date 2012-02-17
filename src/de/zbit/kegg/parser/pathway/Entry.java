@@ -93,6 +93,9 @@ public class Entry {
   
   /**
    * 
+   * <p>Note: This does not (and should not) add this entry to the
+   * parent pathway. You need to call addEntry() on the parent pathway
+   * after creating the entry.</p>
    * @param id
    * @param name
    * @param type
@@ -104,13 +107,17 @@ public class Entry {
     this.type = type;
     this.name = name;
     
-    this.parentPathway.addEntry(this);
+    //this.parentPathway.addEntry(this);
     //setName(name);
     //if (type==EntryType.gene) graph = new Graphics(true); else graph = new Graphics(false);
   }
   
   /**
    * 
+   * 
+   * <p>Note: This does not (and should not) add this entry to the
+   * parent pathway. You need to call addEntry() on the parent pathway
+   * after creating the entry.</p>
    * @param id
    * @param name
    * @param type
@@ -120,11 +127,14 @@ public class Entry {
   public Entry(Pathway parentPathway, int id, String name, EntryType type, String link, String reaction) {
     this(parentPathway, id, name, type);
     this.link = link;
-    setReaction(reaction);
+    this.reaction = reaction;
   }
   
   /**
    * 
+   * <p>Note: This does not (and should not) add this entry to the
+   * parent pathway. You need to call addEntry() on the parent pathway
+   * after creating the entry.</p>
    * @param id
    * @param name
    * @param type
@@ -138,6 +148,10 @@ public class Entry {
   }
   
   /**
+   * 
+   * <p>Note: This does not (and should not) add this entry to the
+   * parent pathway. You need to call addEntry() on the parent pathway
+   * after creating the entry.</p>
    * @param newEntrysId
    * @param substrate
    */
