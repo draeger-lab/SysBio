@@ -101,7 +101,7 @@ public class EntryExtended extends Entry {
   }
   
 
-  private boolean isSetGeneType() {
+  public boolean isSetGeneType() {
     return geneType==null ? false : true;
   }
   
