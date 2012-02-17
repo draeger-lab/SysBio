@@ -205,6 +205,10 @@ bestimmten Bedingungen weiterverbreiten dürfen.
   <!-- SBAcceptAllFileFilter -->
   
   <entry key="ACCEPT_ALL_FILES">Alle Dateien (*)</entry>
+    
+  <!-- StatusBar -->
+  
+  <entry key="READY">Bereit.</entry>
   
   <!-- UpdateMessage -->
   

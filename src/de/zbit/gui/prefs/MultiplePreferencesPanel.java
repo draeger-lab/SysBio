@@ -219,6 +219,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	public MultiplePreferencesPanel() throws IOException {
 		super();
+		setOpaque(true);
 	}
 
   /**
@@ -229,6 +230,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
   public MultiplePreferencesPanel(Class<? extends KeyProvider>... kp)
     throws IOException {
     super(false);
+    setOpaque(true);
     this.options = kp;
     initializePrefPanel();
   }
@@ -320,18 +322,17 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 */
 	public void init() {
 		tab = new JTabbedPane();
-		PreferencesPanel settingsPanel;
+		tab.setOpaque(true);
 		
 		/* Initializes all preferences-tabs according to the following priority:
      * 1. explicitly predefined in a class called de.zbit.gui.prefs.PreferencePanels
      * 2. given as "options"
      * 3. with reflection
 		 */
-		if (options != null && getPredefinedPanels()==null) {
+		if ((options != null) && (getPredefinedPanels() == null)) {
 			for (Class<? extends KeyProvider> provider : options) {
 				try {
-					settingsPanel = new PreferencesPanelForKeyProvider(provider);
-					tab.addTab(settingsPanel.getTitle(), new JScrollPane(settingsPanel));
+					addTab(new PreferencesPanelForKeyProvider(provider));
 				} catch (IOException exc) {
 					GUITools.showErrorMessage(this, exc);
 				}
@@ -343,9 +344,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 						Class<PreferencesPanel> c = getClasses()[i];
 						Constructor<PreferencesPanel> con = c.getConstructor();
 						if (c != null) {
-							settingsPanel = con.newInstance();
-							tab.addTab(settingsPanel.getTitle(), new JScrollPane(
-								settingsPanel));
+							addTab(con.newInstance());
 						}
 					} catch (NoSuchMethodException exc) {
 						logger.finest(exc.getLocalizedMessage());
@@ -355,8 +354,20 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 				}
 			}
 		}
-		this.add(tab);
+		add(tab);
 		addItemListener(this);
+	}
+	
+	/**
+	 * Helper method.
+	 * 
+	 * @param settingsPanel
+	 */
+	private void addTab(PreferencesPanel settingsPanel) {
+		settingsPanel.setOpaque(true);
+		JScrollPane scroll = new JScrollPane(settingsPanel);
+		scroll.setOpaque(true);
+		tab.addTab(settingsPanel.getTitle(), scroll);
 	}
 
 	/* (non-Javadoc)

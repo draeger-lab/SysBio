@@ -882,6 +882,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     
     // Create a new panel for the group
     JPanel groupPanel = new JPanel();
+    groupPanel.setOpaque(true);
     LayoutHelper groupsLayout = new LayoutHelper(groupPanel);
     // Add all child-options to this panel 
     unprocessedOptions.addAll(addOptions(groupsLayout, optGrp.getOptions(), option2group));

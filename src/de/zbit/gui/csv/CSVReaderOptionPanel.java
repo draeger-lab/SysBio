@@ -284,7 +284,9 @@ public class CSVReaderOptionPanel extends JPanel {
     // Reset reading position before returning the reader
     try {
       r.open();
-    } catch (IOException e) {e.printStackTrace();}
+    } catch (IOException e) {
+    	e.printStackTrace();
+    }
     return r;
   }
   
