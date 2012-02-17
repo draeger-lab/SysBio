@@ -197,7 +197,7 @@ public class Relation {
     return subtypes.size()>0;
   }
   
-  private boolean isSetType() {    
+  public boolean isSetType() {    
     return type!=null;
   }
 
