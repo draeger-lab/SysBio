@@ -156,6 +156,10 @@
   
   <entry key="ACCEPT_ALL_FILES">所有文件(*)</entry>
   
+  <!-- StatusBar -->
+  
+  <entry key="READY">准备完毕</entry>
+  
   <!-- UpdateMessage -->
   
   <entry key="SHOW_RELEASE_NOTES">显示发布记录</entry>

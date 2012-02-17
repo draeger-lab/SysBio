@@ -25,6 +25,7 @@ import java.awt.Graphics;
 import java.awt.SystemColor;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ResourceBundle;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -41,6 +42,7 @@ import javax.swing.SwingConstants;
 
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.ProgressListener;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.logging.LogUtil;
 
 /**
@@ -61,6 +63,11 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 * A {@link Logger} for this class.
 	 */
 	public static final transient Logger log = Logger.getLogger(StatusBar.class.getName());
+	
+	/**
+	 * Localization support.
+	 */
+	private static final transient ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
 
 	/**
 	 * A Label that is used to display status information
@@ -80,7 +87,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 	/**
 	 * This is the default status message text.
 	 */
-	public static String defaultText = " Ready.";
+	public static String defaultText = bundle.getString("READY");
 
 	/**
 	 * A log handler that is used to catch and display log messages.
@@ -116,7 +123,9 @@ public class StatusBar extends JPanel implements ProgressListener {
 		setPreferredSize(new Dimension(10, 23));
 
 		// Create the status label
-		if (initialMessage==null) initialMessage = defaultText;
+		if (initialMessage == null) {
+			initialMessage = defaultText;
+		}
 		leftPanel = new JPanel(new BorderLayout());
 		((BorderLayout)leftPanel.getLayout()).setHgap(10);
 		statusLabel = new JLabel(initialMessage,icon, SwingConstants.LEFT);
@@ -294,24 +303,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 		statusLabel.setIcon(image);
 	}
 
-	/**
-	 * JUST FOR TESTING AND DEMONSTRATION
-	 */
-	public static void main(String[] args) throws Exception {
-		JFrame frame = new JFrame();
-		frame.setBounds(200, 200, 600, 200);
-		frame.setTitle("Status bar test");
-
-		addStatusBar(frame);
-
-		log.warning("Test log message.");
-
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-	}
-
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
 	 */
 	@Override
@@ -350,7 +342,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 * @see de.zbit.util.ProgressListener#percentageChanged(int, double, java.lang.String)
 	 */
 	public void percentageChanged(int percent, double miliSecondsRemaining, String additionalText) {
-		if (progressBar==null || !progressBar.getProgressBar().isVisible()) {
+		if ((progressBar == null) || !progressBar.getProgressBar().isVisible()) {
 			initializeProgressBar();
 		}
 		synchronized (progressBar) {
@@ -358,7 +350,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 			progressBar.drawProgressBar(percent, miliSecondsRemaining, additionalText);
 
 			// Hide when done.
-			if (percent==100) {
+			if (percent == 100) {
 				progressBar.getProgressBar().setVisible(false);
 			}
 		}
@@ -370,7 +362,9 @@ public class StatusBar extends JPanel implements ProgressListener {
 	public void reset() {
 		unsetLogMessageLimit();
 		statusLabel.setText(defaultText);
-		if (progressBar!=null) progressBar.getProgressBar().setVisible(false);
+		if (progressBar != null) {
+			progressBar.getProgressBar().setVisible(false);
+		}
 	}
 
 	private class LimitLogHandler extends Handler{
@@ -381,15 +375,13 @@ public class StatusBar extends JPanel implements ProgressListener {
 			this.fontMetrics = fontMetrics;
 		}
 		
-		/*
-		 * (non-Javadoc)
+		/* (non-Javadoc)
 		 * @see java.util.logging.Handler#close()
 		 */
 		public void close() throws SecurityException {
 			statusLabel.setText(StatusBar.defaultText);
 		}
-		/*
-		 * (non-Javadoc)
+		/* (non-Javadoc)
 		 * @see java.util.logging.Handler#flush()
 		 */
 		public void flush() {
@@ -397,9 +389,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 			statusLabel.repaint();
 		}
 
-
-		/*
-		 * (non-Javadoc)
+		/* (non-Javadoc)
 		 * @see java.util.logging.Handler#publish(java.util.logging.LogRecord)
 		 */
 		public void publish(LogRecord record) {

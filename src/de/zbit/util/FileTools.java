@@ -120,12 +120,15 @@ public class FileTools {
   public static String getFilename(String downloadurl) {
     char sep = File.separatorChar;
     int pos = downloadurl.lastIndexOf(sep);
-    if (sep!='/') {
+    if (sep != '/') {
       // In windows, BOTH \\ and / can be used as separators.
       pos = Math.max(downloadurl.lastIndexOf(sep), downloadurl.lastIndexOf('/'));
     }
-    if (pos<0) return downloadurl;
-    else return downloadurl.substring(pos+1);
+    if (pos < 0) {
+    	return downloadurl;
+    } else {
+    	return downloadurl.substring(pos + 1);
+    }
   }
   
   /**

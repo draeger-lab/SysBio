@@ -713,8 +713,12 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     // Set size
     jd.setPreferredSize(c.getPreferredSize());
     jd.setSize(c.getPreferredSize());
-    //jd.pack();
-    jd.setLocationRelativeTo(parent);
+    if (parent.isVisible()) {
+    	jd.setLocationRelativeTo(parent);
+    } else {
+    	jd.pack();
+    	jd.setLocationRelativeTo(null);
+    }
     
     // Set visible and wait until invisible
     jd.setVisible(true);

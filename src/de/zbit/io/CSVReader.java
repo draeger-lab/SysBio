@@ -1268,10 +1268,12 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
   public void open() throws IOException {
     
     // Infere separator char, get header and data start, etc.
-    if (!isInitialized) initialize();
+    if (!isInitialized) {
+    	initialize();
+    }
     
     // Initialize a progress bar
-    if (displayProgress && progress==null) {
+    if (displayProgress && (progress == null)) {
       initializeFileReadProgress();
     } else if (displayProgress) {
       progress.reset();
@@ -1280,20 +1282,24 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     // Finally... get the data
     preamble = new StringBuffer();
     this.currentOpenFile = getAndResetInputReader(filename, preamble);
-    int j=-1+skipLines;
+    int j = -1 + skipLines;
     while (currentOpenFile.ready()) {
       j++;
-      if (j==firstConsistentLine && !containsHeaders || (j>firstConsistentLine) && containsHeaders ) {
+      if ((j == firstConsistentLine) && !containsHeaders || ( j > firstConsistentLine) && containsHeaders) {
         // We reached the first data line (don't read it!).
         break;
       }
       
       String line = currentOpenFile.readLine();
-      if (displayProgress && progress!=null) progress.progress(line);
-      if (trimLinesAfterReading) line = line.trim();
-      if (!(containsHeaders && j==firstConsistentLine)) {
+      if (displayProgress && (progress != null)) {
+      	progress.progress(line);
+      }
+      if (trimLinesAfterReading) {
+      	line = line.trim();
+      }
+      if (!(containsHeaders && (j == firstConsistentLine))) {
         // Else, this line is the header.
-        preamble.append(line+'\n');
+        preamble.append(line + '\n');
       }
     }
     

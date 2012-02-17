@@ -212,6 +212,10 @@ to redistribute it under certain conditions.
   
   <entry key="ACCEPT_ALL_FILES">All files (*)</entry>
   
+  <!-- StatusBar -->
+  
+  <entry key="READY">Ready.</entry>
+  
   <!-- UpdateMessage -->
   
   <entry key="SHOW_RELEASE_NOTES">Show release notes</entry>

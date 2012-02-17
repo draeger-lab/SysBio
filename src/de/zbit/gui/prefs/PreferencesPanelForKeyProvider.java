@@ -68,8 +68,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
     initializePrefPanel();
   }
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.prefs.PreferencesPanel#accepts(java.lang.Object)
 	 */
 	public boolean accepts(Object key) {
@@ -86,16 +85,14 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
     }
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.prefs.PreferencesPanel#getTitle()
 	 */
 	public String getTitle() {
 		return title;
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.prefs.PreferencesPanel#init()
 	 */
 	public void init() {
@@ -104,8 +101,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.prefs.PreferencesPanel#loadPreferences()
 	 */
 	protected SBPreferences loadPreferences() throws IOException {
