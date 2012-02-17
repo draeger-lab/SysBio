@@ -159,6 +159,11 @@ public class Entry {
     this(parentPathway, id,name,Entry.getEntryTypeForKeggId(name));
   }
 
+  public Entry(Pathway keggPW, int keggEntryID, String keggname, EntryType eType, Graphics graphics) {
+    this(keggPW, keggEntryID, keggname, eType);
+    addGraphics(graphics);
+  }
+
   /**
    * If it is a group node, this list contains the ids of all children.
    * @return
@@ -564,6 +569,33 @@ public class Entry {
       hash *= graph.hashCode();
     
     return hash;
+  }
+  
+
+  public boolean equalsWithoutIDNameReactionComparison(Object obj) {
+    boolean equals = true;
+    
+    if (Entry.class.isAssignableFrom(obj.getClass())){
+      Entry o = (Entry)obj;          
+      
+      equals &= o.isSetType()==this.isSetType();
+      if(equals && isSetType()) 
+        equals &= (o.getType().equals(this.getType()));
+      
+      equals &= o.isSetLink()==this.isSetLink();
+      if(equals && isSetLink()) 
+        equals &= (o.getLink().equals(this.getLink()));
+      
+      equals &= o.isSetComponent()==this.isSetComponent();
+      if(equals && isSetComponent()) 
+        equals &= (o.getComponents().equals(this.getComponents()));
+      
+      equals &= o.isSetGraphics()==this.isSetGraphics();
+      if(equals && isSetGraphics()) 
+        equals &= (o.getGraphics().equals(this.getGraphics()));
+      
+    }
+    return equals;
   }
   
   @Override
