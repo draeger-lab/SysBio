@@ -16,12 +16,14 @@
  */
 package de.zbit.kegg.parser.pathway.ext;
 
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.NodeList;
 
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
+import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
 
 /**
@@ -53,6 +55,12 @@ public class EntryExtended extends Entry {
       EntryType etype, GeneType type) {
     super(parentPathway, id, name, etype);
     setGeneType(type);
+  }
+  
+  public EntryExtended(Pathway parentPathway, int id, String name,
+      EntryType etype, GeneType type, Graphics graphics) {
+    this(parentPathway, id, name, etype, type);    
+    addGraphics(graphics);
   }
 
   private void setGeneType(GeneType type) {
@@ -96,6 +104,11 @@ public class EntryExtended extends Entry {
   }
 
   
+  public EntryExtended(de.zbit.kegg.parser.pathway.Pathway keggPW, int keggEntryID,
+      String keggname, EntryType eType, Graphics graphics) {
+    super(keggPW, keggEntryID, keggname, eType, graphics);
+  }
+
   public GeneType getGeneType(){
     return geneType;
   }
@@ -128,6 +141,19 @@ public class EntryExtended extends Entry {
     return hash;
   }
   
+  public boolean equalsWithoutIDNameReactionComparison(Object obj) {
+    boolean equals = super.equalsWithoutIDNameReactionComparison(obj);
+    
+    if(equals && obj.getClass().isAssignableFrom(EntryExtended.class)){    
+      EntryExtended o = (EntryExtended)obj;
+      equals &= (o.isSetGeneType()==this.isSetGeneType());
+      if(equals && isSetGeneType()) 
+        equals &= (o.getGeneType().equals(this.getGeneType()));
+      
+    }
+    return equals;
+  }
+  
   @Override
   public boolean equals(Object obj) {
     boolean equals = super.equals(obj);
@@ -141,5 +167,10 @@ public class EntryExtended extends Entry {
     }
     return equals;
   }
+
+  public void addComponents(List<Integer> components) {
+    components.addAll(components);
+  }
+
 
 }
