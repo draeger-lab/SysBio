@@ -18,6 +18,7 @@ package de.zbit.util;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -1360,7 +1361,7 @@ public class StringUtil {
 	}
 
   /**
-   * Creates an appropriate tool tip text.
+   * Creates an appropriate tool tip text using simple {@link String#format(String, Object...)}.
    * 
    * @param format A {@link String} that might contain format commands
    * @param args optional replacements according to the format {@link String}
@@ -1368,6 +1369,17 @@ public class StringUtil {
    */
 	public static String toHTMLToolTip(String format, Object... args) {
 		return toHTML(String.format(format, args), TOOLTIP_LINE_LENGTH);
+	}
+	
+	/**
+   * Creates an appropriate tool tip text using {@link MessageFormat}.
+   * 
+   * @param format A {@link String} that might contain format commands
+   * @param args optional replacements according to the format {@link String}
+   * @return An HTML string with line breaks after {@link #TOOLTIP_LINE_LENGTH}
+   */
+	public static String toHTMLMessageToolTip(String format, Object... args) {
+		return toHTML(MessageFormat.format(format, args), TOOLTIP_LINE_LENGTH);
 	}
 
 	/**
