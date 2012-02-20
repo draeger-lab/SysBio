@@ -31,6 +31,7 @@ import de.zbit.kegg.KeggInfos;
  * (see {@link http://www.genome.jp/kegg/xml/docs/})
  * 
  * @author Clemens Wrzodek
+ * @author Finja B&uuml;chel
  * @version $Rev$
  * @since 1.0
  */
@@ -851,8 +852,8 @@ public class Pathway {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = true;
-    if(obj.getClass().isAssignableFrom(Pathway.class)){    
+    boolean equals = Pathway.class.isAssignableFrom(obj.getClass());
+    if(equals){    
       Pathway o = (Pathway)obj;
       equals &= o.isSetName()==this.isSetName();
       if(equals && isSetName()) 

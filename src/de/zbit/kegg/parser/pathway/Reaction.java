@@ -34,6 +34,7 @@ import de.zbit.kegg.parser.KeggParser;
 /**
  * Corresponding to the Kegg Reaction class (see {@link http://www.genome.jp/kegg/xml/docs/})
  * @author Clemens Wrzodek
+ * @author Finja B&uuml;chel
  * @version $Rev$
  * @since 1.0
  */
@@ -458,8 +459,8 @@ public class Reaction {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = true;
-    if(obj.getClass().isAssignableFrom(Reaction.class)){    
+    boolean equals = Reaction.class.isAssignableFrom(obj.getClass());
+    if(equals){
       Reaction o = (Reaction)obj;
       equals &= o.isSetID()==this.isSetID();
       if(equals && isSetID()) 

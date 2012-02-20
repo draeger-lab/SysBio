@@ -28,6 +28,7 @@ import de.zbit.util.Reflect;
  * 
  * @author Clemens Wrzodek
  * @author Florian Mittag
+ * @author Finja B&uuml;chel
  * @version $Rev$
  * @since 1.0
  */
@@ -249,16 +250,16 @@ public class SubType {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = true;
-    if(obj.getClass().isAssignableFrom(SubType.class)){    
+    boolean equals = SubType.class.isAssignableFrom(obj.getClass());
+    if(equals){
       SubType o = (SubType)obj;
       equals &= o.isSetName()==this.isSetName();
       if(equals && isSetName()) 
-        equals &= (o.getName() == this.getName());
+        equals &= (o.getName().equals(this.getName()));
       
       equals &= o.isSetValue()==this.isSetValue();
       if(equals && isSetValue()) 
-        equals &= (o.getValue()==this.getValue());      
+        equals &= (o.getValue().equals(this.getValue()));      
       
     }
     return equals;

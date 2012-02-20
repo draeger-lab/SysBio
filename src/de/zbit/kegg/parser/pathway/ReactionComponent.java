@@ -29,6 +29,7 @@ import de.zbit.kegg.parser.KeggParser;
  * Corresponding to the Kegg ReactionComponent class (see {@link http://www.genome.jp/kegg/xml/docs/})
  * Includes the Kegg "alt", "substrate" and "product" classes.
  * @author Clemens Wrzodek
+ * @author Finja B&uuml;chel
  * @version $Rev$
  * @since 1.0
  */
@@ -235,8 +236,8 @@ public class ReactionComponent implements Cloneable {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = true;
-    if(obj.getClass().isAssignableFrom(ReactionComponent.class)){    
+    boolean equals = ReactionComponent.class.isAssignableFrom(obj.getClass());
+    if(equals){
       ReactionComponent o = (ReactionComponent)obj;
       equals &= o.isSetID()==this.isSetID();
       if(equals && isSetID()) 

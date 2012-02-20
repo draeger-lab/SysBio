@@ -37,6 +37,7 @@ import de.zbit.util.Utils;
  * Corresponding to the Kegg Entry class (see 
  * <a href="http://www.genome.jp/kegg/xml/docs/">KeggAPI</a>)
  * @author Clemens Wrzodek
+ * @author Finja B&uuml;chel
  * @version $Rev$
  * @since 1.0
  */
@@ -600,9 +601,9 @@ public class Entry {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = true;
+    boolean equals = Entry.class.isAssignableFrom(obj.getClass());
     
-    if (Entry.class.isAssignableFrom(obj.getClass())){
+    if (equals){
       Entry o = (Entry)obj;
       equals &= o.isSetID()==this.isSetID();
       if(equals && isSetID()) 
