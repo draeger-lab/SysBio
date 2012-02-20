@@ -389,8 +389,20 @@ public interface KeyProvider {
 		 */
 		public static String createTitle(Class<?> clazz) {
 			String title = clazz.getSimpleName();
-      ResourceBundle bundle = ResourceManager
-          .getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+      ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+      // Check if the given class contains an own ResourceBundle:
+      for (Field field : clazz.getFields()) {
+				try {
+					Object b = field.get(clazz);
+	      	if ((b != null) && (b instanceof ResourceBundle)) {
+	      		bundle = (ResourceBundle) b;
+	      		System.out.println(b);
+	      		break;
+	      	}
+				} catch (Throwable exc) {
+					// ignore
+				}
+      }
       if (bundle.containsKey(title)) {
         return bundle.getString(title);
       }
@@ -420,7 +432,7 @@ public interface KeyProvider {
 		 * 
 		 * @param <T>
 		 *        The type of the desired element
-		 * @param keyProvider
+		 * @param sourceClass
 		 *        The {@link KeyProvider} holding the keys
 		 * @param clazz
 		 *        The class of the desired element.
@@ -429,18 +441,17 @@ public interface KeyProvider {
 		 * @return null if no such element exists or the desired element.
 		 */
 		@SuppressWarnings("unchecked")
-		public static <T> Entry<T> getField(
-			Class<? extends KeyProvider> keyProvider, Class<T> clazz, int n) {
-			Field fields[] = keyProvider.getFields();
+		public static <T> Entry<T> getField(Class<?> sourceClass, Class<T> clazz, int n) {
+			Field fields[] = sourceClass.getFields();
 			Object fieldValue;
 			while (n < fields.length) {
 				try {
-					fieldValue = fields[n].get(keyProvider);
-					if (fieldValue!=null && fieldValue.getClass().isAssignableFrom(clazz)) { 
+					fieldValue = fields[n].get(sourceClass);
+					if ((fieldValue != null) && fieldValue.getClass().isAssignableFrom(clazz)) { 
 						return new Entry<T>(n, (T) fieldValue); 
 					}
-				} catch (Exception e) {
-				  logger.log(Level.FINE, e.getLocalizedMessage(), e);
+				} catch (Exception exc) {
+				  logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
 				}
 				n++;
 			}
@@ -454,16 +465,17 @@ public interface KeyProvider {
 		 * @return
 		 */
 		@SuppressWarnings("unchecked")
-		private static <T> T getField(Class<? extends KeyProvider> keyProvider,
-			String name, Class<T> clazz) {
+		private static <T> T getField(Class<?> keyProvider, String name, Class<T> clazz) {
 			try {
 				Field field = keyProvider.getField(name);
 				if (field != null) {
 					Object fieldValue = field.get(keyProvider);
-					if (fieldValue.getClass().isAssignableFrom(clazz)) { return (T) fieldValue; }
+					if (fieldValue.getClass().isAssignableFrom(clazz)) { 
+						return (T) fieldValue; 
+					}
 				}
-			} catch (Exception e) {
-			  logger.log(Level.FINER, e.getLocalizedMessage(), e);
+			} catch (Exception exc) {
+			  logger.log(Level.FINER, exc.getLocalizedMessage(), exc);
 			}
 			return null;
 		}

@@ -211,6 +211,10 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       editor.getTextField().setHorizontalAlignment(SwingConstants.RIGHT);      
     }
     
+    if (option.isSetDescription()) {
+    	spinner.setToolTipText(option.getDescription());
+    }
+    
     return spinner;
   }
   /**

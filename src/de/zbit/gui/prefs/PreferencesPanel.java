@@ -276,7 +276,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           component = new JLabeledComponent(optionTitle, true,
             JLabeledComponent.buildJSpinner(o2, (Number) defaultV));
         } catch (Throwable t) {
-          component=null;
+          component = null;
           // Might occur when dealing with strange Number instances.
         }
       }
