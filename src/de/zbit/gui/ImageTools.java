@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -41,7 +42,6 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
-import de.zbit.biocarta.BioPax2KGML;
 import de.zbit.io.SBFileFilter;
 import de.zbit.util.ResourceManager;
 
@@ -121,9 +121,7 @@ public class ImageTools {
  */
 public static BufferedImage brightenImage(BufferedImage image, float percent) {
 	if ((percent < 0) ) { //|| (percent > 1)
-  	// TODO: Logging
-    System.err.printf(bundle.getString("WRONG_PERCENTAGE_IN_IMAGE"), "brightenImage", percent);
-//    log.log(Level.SEVERE, (bundle.getString("WRONG_PERCENTAGE_IN_IMAGE") + "brightenImage" + ":" + percent));
+    log.log(Level.SEVERE, MessageFormat.format(bundle.getString("WRONG_PERCENTAGE_IN_IMAGE"), "brightenImage", percent));
     return image;
   }
 	// Brighten the image by given percentage
@@ -203,11 +201,9 @@ public static BufferedImage brightenImage(BufferedImage image, float percent) {
 	 * @param percent a value between 0 and 1 (0 to 100 percent).
 	 * @return darkened image
 	 */
-  public static BufferedImage darkenImage(BufferedImage image, float percent) {
+  public static BufferedImage darkenImage(BufferedImage image, float percent) {    
 		if ((percent < 0) || (percent > 1)) {
-			// TODO: Logging
-			System.err.printf(bundle.getString("WRONG_PERCENTAGE_IN_IMAGE"), "darkenImage", percent);
-//			log.log(Level.SEVERE, (bundle.getString("WRONG_PERCENTAGE_IN_IMAGE") + "darkenImage" + ":" + percent));
+			log.log(Level.SEVERE, MessageFormat.format(bundle.getString("WRONG_PERCENTAGE_IN_IMAGE"), "darkenImage", percent));
 			return image;
 		}
     
@@ -432,20 +428,14 @@ public static BufferedImage brightenImage(BufferedImage image, float percent) {
 									new ImageIcon(ImageIO.read(file)));
 						}
 					} catch (Exception exc) {
-						// TODO: Logging
-						System.err.printf(bundle.getString("COULD_NOT_LOAD_IMAGE"), file);
-//						log.log(Level.SEVERE, (bundle.getString("COULD_NOT_LOAD_IMAGE") + ":" + file));
+					  log.log(Level.SEVERE, MessageFormat.format(bundle.getString("COULD_NOT_LOAD_IMAGE"), file));						
 					}
 				}
 			}
 		} catch (IllegalArgumentException e) {
-			// TODO: Logging
-			System.err.println(String.format(bundle.getString("COULD_NOT_LOAD_ICONS_FROM_DIR"), directory));
-//			log.log(Level.SEVERE, (bundle.getString("COULD_NOT_LOAD_ICONS_FROM_DIR") + ":" + directory));
+			log.log(Level.SEVERE, MessageFormat.format(bundle.getString("COULD_NOT_LOAD_ICONS_FROM_DIR"), directory));
 		} catch (URISyntaxException e) {
-			// TODO: Logging
-			System.err.println(String.format(bundle.getString("COULD_NOT_LOAD_ICONS_FROM_DIR"), directory));
-//			log.log(Level.SEVERE, (bundle.getString("COULD_NOT_LOAD_ICONS_FROM_DIR") + ":" + directory));
+			log.log(Level.SEVERE, MessageFormat.format(bundle.getString("COULD_NOT_LOAD_ICONS_FROM_DIR"), directory));
 		}
 	}
 
