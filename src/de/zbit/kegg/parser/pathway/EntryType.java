@@ -26,6 +26,7 @@ package de.zbit.kegg.parser.pathway;
  * graphics object (round rectangle) in the KEGG Web service."
  * 
  * @author Clemens Wrzodek
+ * @author Finja B&uuml;chel
  * @version $Rev$
  * @since 1.0
  */

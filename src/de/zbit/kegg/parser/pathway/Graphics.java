@@ -27,6 +27,7 @@ import de.zbit.util.StringUtil;
 /**
  * Corresponding to the Kegg Graphics class (see {@link http://www.genome.jp/kegg/xml/docs/})
  * @author Clemens Wrzodek
+ * @author Finja B&uuml;chel
  * @version $Rev$
  * @since 1.0
  */
@@ -424,8 +425,8 @@ public class Graphics {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = true;
-    if(obj.getClass().isAssignableFrom(Graphics.class)){    
+    boolean equals = Graphics.class.isAssignableFrom(obj.getClass());
+    if(equals){    
       Graphics o = (Graphics)obj;
       
       equals &= o.isSetName()==this.isSetName();

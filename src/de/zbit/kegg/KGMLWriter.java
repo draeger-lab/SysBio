@@ -206,21 +206,22 @@ public class KGMLWriter {
     
     // kegg relations
     ArrayList<Relation>  relations = keggPW.getRelations();
-    if(relations.size()>0){
+    if(relations!=null && relations.size()>0){
       for (Relation relation : relations) {
         Element newChild = doc.createElement("relation");
         for (java.util.Map.Entry<String, String> att : relation.getKGMLAttributes().entrySet()) {
           newChild.setAttribute(att.getKey(), att.getValue());
-          if (relation.isSetSubTypes()){
-            for (SubType subtype : relation.getSubtypes()) {
-              Element newChild2 = doc.createElement("subtype");
-              for (java.util.Map.Entry<String, String> att1 : (subtype.getKGMLAttributes()).entrySet()) {
-                newChild2.setAttribute(att1.getKey(), att1.getValue());  
-              }              
-              newChild.appendChild(newChild2);              
-            }
+        }
+        if (relation.isSetSubTypes()){
+          for (SubType subtype : relation.getSubtypes()) {
+            Element newChild2 = doc.createElement("subtype");
+            for (java.util.Map.Entry<String, String> att1 : (subtype.getKGMLAttributes()).entrySet()) {
+              newChild2.setAttribute(att1.getKey(), att1.getValue());  
+            }              
+            newChild.appendChild(newChild2);              
           }
         }
+
         rootElement.appendChild(newChild);
       }
     }

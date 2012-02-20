@@ -18,6 +18,7 @@ package de.zbit.kegg.parser.pathway;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +34,7 @@ import de.zbit.kegg.parser.KeggParser;
 /**
  * Corresponding to the Kegg Relation class (see {@link http://www.genome.jp/kegg/xml/docs/})
  * @author Clemens Wrzodek
+ * @author Finja B&uuml;chel
  * @version $Rev$
  * @since 1.0
  */
@@ -86,6 +88,11 @@ public class Relation {
     parseSubNodes(childNodes);
   }
   
+  public Relation(int entry1, int entry2, RelationType type, SubType subType) {
+    this(entry1, entry2, type);
+    addSubtype(subType);
+  }
+
   /**
    * 
    * @return
@@ -107,7 +114,7 @@ public class Relation {
    * @return
    */
   public List<SubType> getSubtypes() {
-    return subtypes;
+    return Collections.unmodifiableList(subtypes);
   }
   
   /**
@@ -128,7 +135,9 @@ public class Relation {
    * @param s
    */
   public void addSubtype(SubType s) {
-	  subtypes.add(s);
+    if(s!=null && (!subtypes.contains(s))){
+      subtypes.add(s);
+    }
   }
   
   /**
@@ -199,7 +208,7 @@ public class Relation {
   }
 
   public boolean isSetSubTypes(){
-    return subtypes.size()>0;
+    return subtypes!=null && subtypes.size()>0;
   }
   
   public boolean isSetType() {    
@@ -231,8 +240,8 @@ public class Relation {
   
   @Override
   public boolean equals(Object obj) {
-    boolean equals = true;
-    if(obj.getClass().isAssignableFrom(Relation.class)){    
+    boolean equals = Relation.class.isAssignableFrom(obj.getClass());
+    if(equals){
       Relation o = (Relation)obj;
       equals &= o.isSetEntry1()==this.isSetEntry1();
       if(equals && isSetEntry1()) 
