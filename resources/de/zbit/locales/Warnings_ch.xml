@@ -13,9 +13,9 @@
   
   <!-- ImageTools -->
   
-  <entry key="COULD_NOT_LOAD_IMAGE">"无法载入图像 %s.\n"</entry>
-  <entry key="COULD_NOT_LOAD_ICONS_FROM_DIR">无法从文件夹 %s载入图标。</entry>
-  <entry key="WRONG_PERCENTAGE_IN_IMAGE"> %s: %f中的错误的百分率。</entry>
+  <entry key="COULD_NOT_LOAD_IMAGE">"无法载入图像 {0}.\n"</entry>
+  <entry key="COULD_NOT_LOAD_ICONS_FROM_DIR">无法从文件夹 {0}载入图标。</entry>
+  <entry key="WRONG_PERCENTAGE_IN_IMAGE"> {0}: {1,number,percent}中的错误的百分率。</entry>
   
   <!-- JBrowserPane -->
   

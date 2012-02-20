@@ -13,9 +13,9 @@
   
   <!-- ImageTools -->
   
-  <entry key="COULD_NOT_LOAD_IMAGE">"Konnte Bild %s nicht laden.\n"</entry>
-  <entry key="COULD_NOT_LOAD_ICONS_FROM_DIR">Konnte keine Piktogramme aus dem Verzeichnis %s laden.</entry>
-  <entry key="WRONG_PERCENTAGE_IN_IMAGE">Falsche Prozentangabe in %s: %f.</entry>
+  <entry key="COULD_NOT_LOAD_IMAGE">"Konnte Bild {0} nicht laden."</entry>
+  <entry key="COULD_NOT_LOAD_ICONS_FROM_DIR">Konnte keine Piktogramme aus dem Verzeichnis {0} laden.</entry>
+  <entry key="WRONG_PERCENTAGE_IN_IMAGE">Falsche Prozentangabe in {0}: {1,number,percent}.</entry>
   
   <!-- JBrowserPane -->
   
