@@ -503,7 +503,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			toolBar.add(GUITools.createButton(BaseAction.EDIT_PREFERENCES.getIcon(),
 				EventHandler.create(ActionListener.class, this, "preferences"), action,
 				BaseAction.EDIT_PREFERENCES.getToolTip()));
-			toolBar.add(new JSeparator(JSeparator.VERTICAL));
+			toolBar.add(new JToolBar.Separator());
 		}
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
 			menu = getJMenuBar().getMenu(i);
@@ -528,7 +528,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				}
 			}
 			if (i < getJMenuBar().getMenuCount() - 1) {
-				toolBar.add(new JSeparator(JSeparator.VERTICAL));
+				toolBar.add(new JToolBar.Separator());
 			}
 		}
 		if (GUITools.isMacOSX()) {
