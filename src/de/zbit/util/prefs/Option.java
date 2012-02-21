@@ -754,9 +754,9 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	   */
 	public Option(String optionName, Class<Type> requiredType,
 		ResourceBundle bundle, Range<Type> range, short numLeadingMinus,
-		Type defaultValue, String displayName) {
+		Type defaultValue) {
 		this(optionName, requiredType, bundle.getString(optionName), range, numLeadingMinus, null,
-			defaultValue, displayName);
+			defaultValue, bundle.getString(optionName));
 		loadDisplayNameAndDescription(optionName, bundle);
 	}
 	
