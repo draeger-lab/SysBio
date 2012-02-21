@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -47,7 +47,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -55,7 +54,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
@@ -1101,21 +1099,5 @@ public class CSVReaderOptionPanel extends JPanel {
     jd.dispose();
     return (r);
   }
-  
-  /**
-   * Just for testing purposes.
-   */
-	public static void main(String[] args) {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			JFrame parent = new JFrame();
-			parent.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			System.out.println(showDialog(parent,"files/sample.csv.txt",
-				getCSVOptionsString()).getNumberOfDataLines());
-			System.exit(0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
   
 }

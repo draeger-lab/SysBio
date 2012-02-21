@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -33,7 +33,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +46,6 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -56,7 +54,6 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
@@ -283,38 +280,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     }
     return -1;
   }
-  /**
-   * Just for testing purposes.
-   */
-  public static void main(String[] args) {
-    String[][] sug = new String[][]{{"A","B","C"}, {"A","D","E"}, {"A","F","G"}};
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      JFrame parent = new JFrame();
-      parent.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      String[] ret = showDialog(parent,"My title", new String[]{"1.", "2.", "3."}, sug, false);
-      if (ret == null) {
-      	System.out.println("Cancelled");
-      } else {
-      	System.out.println(Arrays.deepToString(ret));
-      }
-      System.exit(0);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    
-    /*JFrame frame = new JFrame();
-      frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-      try {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        JLabeledComponent c = new JLabeledComponent("test", false, new String[]{"header1", "header2"});
-        frame.getContentPane().add(c);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      frame.pack();
-      frame.setVisible(true);*/
-  }
+
   /**
    * Set the static string to use in optional combo boxes if no
    * column has been selected.

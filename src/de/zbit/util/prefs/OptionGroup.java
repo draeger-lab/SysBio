@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -68,7 +68,8 @@ public class OptionGroup<T> implements ActionCommand,
   /**
    * 
    */
-  public OptionGroup() {
+  @SuppressWarnings("unchecked")
+	public OptionGroup() {
     this(null, (String) null);
   }
   
@@ -159,9 +160,7 @@ public class OptionGroup<T> implements ActionCommand,
     return this.options.addAll(options);
   }
   
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(OptionGroup<T> optionGroup) {
@@ -169,9 +168,7 @@ public class OptionGroup<T> implements ActionCommand,
       Integer.valueOf(optionGroup.getOptions().hashCode()));
   }
   
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see de.zbit.gui.ActionCommand#getName()
    */
   public String getName() {
@@ -185,9 +182,7 @@ public class OptionGroup<T> implements ActionCommand,
     return options;
   }
   
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see de.zbit.gui.ActionCommand#getToolTip()
    */
   public String getToolTip() {
@@ -231,10 +226,7 @@ public class OptionGroup<T> implements ActionCommand,
     return visible;
   }
   
-  
-  
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see java.lang.Iterable#iterator()
    */
   public Iterator<Option<? extends T>> iterator() {
@@ -313,9 +305,7 @@ public class OptionGroup<T> implements ActionCommand,
     this.visible = visible;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
   @Override

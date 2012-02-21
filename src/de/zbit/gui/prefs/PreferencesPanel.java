@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------- This
  * file is part of the SysBio API library.
  * 
- * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
  * 
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -512,7 +512,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     if (source instanceof Component) {
       Component c = (Component) source;
       String name = c.getName();
-//      System.out.print("DEBUG - try to change property of "+ name);
+			log.fine("try to change property of " + name);
       /*
        * Properties is build in initializePrefPanel() -> loadPreferences ->
        * accept(key). If a key is missing in properties, it is very likely that
@@ -577,12 +577,12 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         // are displayed later! Write all options to properties first!
         if (!checkRange || isInRange) {
           properties.put(name, value);
-//          System.out.println(" - " + "changed to '" + value.toString() + "'.");
+          log.fine(name + " changed to '" + value.toString() + "'.");
         } else {
-//          System.out.println(" - " + "out of Range.");
+          log.fine("out of Range.");
         }
       } else {
-//        System.out.println(" - " + "failed: properties contains no key with that name.");
+        log.fine("failed: properties contains no key with that name.");
       }
     }
   }

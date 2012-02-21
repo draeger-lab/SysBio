@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -50,6 +50,15 @@ import java.util.Set;
 public class XMLResourceBundleControl extends Control {
 	
 	/**
+	 * An adapter class that wrapps a {@link Properties} class and provides its
+	 * functionality as a {@link ResourceBundle}.
+	 * 
+	 * Usually, this will simply return the elements for a given key as it would
+	 * be in an instance of {@link Properties}. The only difference is the support
+	 * for {@link String} arrays: If a returned element is surrounded with square
+	 * brackets (<code>'['</code> and <code>']'</code>), these brackets are
+	 * removed from the string and the separator char <code>';'</code> is used to
+	 * split the given {@link String} into an array of {@link String}s.
 	 * 
 	 * @author Andreas Dr&auml;ger
 	 * @date 2011-01-04
@@ -57,7 +66,7 @@ public class XMLResourceBundleControl extends Control {
 	private static class XMLResourceBundle extends ResourceBundle {
 		
 		/**
-		 * 
+		 * The wrapped element.
 		 */
 		private Properties properties;
 		
@@ -67,7 +76,7 @@ public class XMLResourceBundleControl extends Control {
 		 * @throws IOException
 		 */
 		public XMLResourceBundle(InputStream stream) throws IOException,
-		InvalidPropertiesFormatException {
+			InvalidPropertiesFormatException {
 			Properties defaults = new Properties();
 			defaults.loadFromXML(stream);
 			properties = new Properties(defaults);
@@ -85,7 +94,13 @@ public class XMLResourceBundleControl extends Control {
 		 * @see java.util.ResourceBundle#handleGetObject(java.lang.String)
 		 */
 		protected Object handleGetObject(String key) {
-			return properties.getProperty(key);
+			String element = properties.getProperty(key);
+			if ((element != null) && (element.length() > 0)
+					&& (element.charAt(0) == '[')
+					&& (element.charAt(element.length() - 1) == ']')) {
+				return element.substring(1, element.length() - 1).split(";");
+			}
+			return element;
 		}
 		
 		/* (non-Javadoc)
