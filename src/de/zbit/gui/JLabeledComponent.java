@@ -293,8 +293,11 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       JFrame parent = new JFrame();
       parent.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       String[] ret = showDialog(parent,"My title", new String[]{"1.", "2.", "3."}, sug, false);
-      if (ret==null) System.out.println("Cancelled");
-      else System.out.println(Arrays.deepToString(ret));
+      if (ret == null) {
+      	System.out.println("Cancelled");
+      } else {
+      	System.out.println(Arrays.deepToString(ret));
+      }
       System.exit(0);
     } catch (Exception e) {
       e.printStackTrace();

@@ -20,6 +20,7 @@ import java.beans.EventHandler;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessControlException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -261,56 +262,67 @@ public abstract class Launcher implements Runnable, Serializable {
      * Launcher that has been initialized. So let's also set a minimum
      * of Mac OS X specific properties if we operate on a Mac. 
      */
-  	Properties p = System.getProperties();
   	String title = getAppName();
   	
-		if (isMacOS()) {
-      /* 
-       * Note: the xDock name property must be set before parsing 
-       * command-line arguments! See above!
-       */
-      p.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
-			
-      p.setProperty("apple.awt.graphics.EnableQ2DX", "true");
-      p.setProperty("apple.laf.useScreenMenuBar", "true");
-      p.setProperty("com.apple.macos.smallTabs", "true");
-      p.setProperty("com.apple.macos.useScreenMenuBar", "true");
-      
-      p.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
-      p.setProperty("com.apple.mrj.application.live-resize", "true");
-      
-      String classPath = p.getProperty("java.class.path");
-      String javaSystemDir = "/System/Library/Java";
-      if (!classPath.contains(javaSystemDir)) {
-      	if (classPath.length() > 0) {
-      		classPath += ':';
-      	}
-      	classPath += javaSystemDir;
-      	p.setProperty("java.class.path", classPath);
-      }
-      
-			try {
-				String tmpDirName = p.getProperty("user.dir");
-				String libPath = p.get("java.library.path").toString();
-				if (!libPath.contains(tmpDirName)) {
-					if (libPath.length() > 0) {
-						libPath += ':';
-					}
-					libPath += tmpDirName;
-					p.setProperty("java.library.path", libPath);
-				}
-	      NativeLibraryLoader.loadMacOSLibrary(tmpDirName);
-			} catch (Throwable e) {
-				// Ignore this problem.
-			}
-      
-    }
-    // Use the systems proxy settings to establish connections
-    // This must also be done prior to any other calls.
-    p.setProperty("java.net.useSystemProxies", "true");
-    
-    p.setProperty("app.name", title);
-    p.setProperty("app.version", getVersionNumber());
+  	try {
+  		
+  		if (isMacOS()) {
+  			/* 
+  			 * Note: the xDock name property must be set before parsing 
+  			 * command-line arguments! See above!
+  			 */
+  			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
+  			
+  			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+  			System.setProperty("apple.laf.useScreenMenuBar", "true");
+  			System.setProperty("com.apple.macos.smallTabs", "true");
+  			System.setProperty("com.apple.macos.useScreenMenuBar", "true");
+  			
+  			System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
+  			System.setProperty("com.apple.mrj.application.live-resize", "true");
+  			
+  			String classPath = System.getProperty("java.class.path");
+  			String javaSystemDir = "/System/Library/Java";
+  			if (!classPath.contains(javaSystemDir)) {
+  				if (classPath.length() > 0) {
+  					classPath += ':';
+  				}
+  				classPath += javaSystemDir;
+  				System.setProperty("java.class.path", classPath);
+  			}
+  			
+  			try {
+  				String tmpDirName = System.getProperty("user.dir");
+  				String libPath = System.getProperty("java.library.path").toString();
+  				if (!libPath.contains(tmpDirName)) {
+  					if (libPath.length() > 0) {
+  						libPath += ':';
+  					}
+  					libPath += tmpDirName;
+  					System.setProperty("java.library.path", libPath);
+  				}
+  				NativeLibraryLoader.loadMacOSLibrary(tmpDirName);
+  			} catch (Throwable exc) {
+  				// Ignore this problem.
+  				logger.fine(exc.getLocalizedMessage());
+  			}
+  		}
+  		// Use the systems proxy settings to establish connections
+  		// This must also be done prior to any other calls.
+  		System.setProperty("java.net.useSystemProxies", "true");
+  		
+  		System.setProperty("app.name", title);
+  		System.setProperty("app.version", getVersionNumber());
+  		
+  	} catch (AccessControlException exc) {
+  		/* This happens when executing a program as a Java(TM) Web Start Application
+  		 * In this case, you should include the following code into your JNLP file:
+  		 * <security>
+       *   <all-permissions/>
+       * </security>
+  		 */
+  		logger.warning(exc.getLocalizedMessage());
+  	}
   }
 
 	/* (non-Javadoc)
