@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -389,25 +389,25 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
     }
   }
 
-  	/**
-  	 * load the display name and description ("_TOOLTIP" or the string after ";")
-  	 * 
-  	 * @param optionName
-  	 * @param bundle
-  	 */
-	private void loadDisplayNameAndDescription(String optionName, ResourceBundle bundle) {
-		String key = optionName + "_TOOLTIP";
-	    if (bundle.containsKey(key)) {
-	      setDisplayName(bundle.getString(optionName));
-	      this.description = bundle.getString(key);
-	    } else if (this.description.contains(";")) {
-	      String names[] = this.description.split(";");
-	      this.displayName = names[0];
-	      this.description = names[1];
-	    }
-	}
-
-/**
+  /**
+   * load the display name and description ("_TOOLTIP" or the string after ";")
+   * 
+   * @param optionName
+   * @param bundle
+   */
+  private void loadDisplayNameAndDescription(String optionName, ResourceBundle bundle) {
+  	String key = optionName + "_TOOLTIP";
+  	if (bundle.containsKey(key)) {
+  		setDisplayName(bundle.getString(optionName));
+  		this.description = bundle.getString(key);
+  	} else if (this.description.contains(";")) {
+  		String names[] = this.description.split(";");
+  		this.displayName = names[0];
+  		this.description = names[1];
+  	}
+  }
+  
+  /**
    * 
    * @param optionName
    * @param requiredType

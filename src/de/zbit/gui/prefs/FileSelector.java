@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,7 +29,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -408,26 +407,6 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 		Configuration saveConfig = new Configuration(Type.SAVE, saveBaseDir,
 			allSaveFilesAcceptable, saveFilter);
 		return addSelectorsToLayout(lh, openConfig, saveConfig);
-	}
-	
-	public static void main(String args[]) {
-		GUITools.initLaF("FileSelector test");
-		JPanel p = new JPanel();
-		FileSelector selectors[] = createOpenSavePanel(new LayoutHelper(p), System
-				.getProperty("user.dir"), false, new SBFileFilter[] { SBFileFilter
-				.createSBMLFileFilter() }, System.getProperty("user.dir"), false,
-			new SBFileFilter[] { SBFileFilter.createTeXFileFilter() });
-		if (JOptionPane.showConfirmDialog(null, p, "Test",
-			JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-			for (FileSelector fs : selectors) {
-				try {
-					System.out.println(fs.getSelectedFile());
-				} catch (IOException exc) {
-					GUITools.showErrorMessage(null, exc);
-				}
-			}
-		}
-		
 	}
 	
 	/**

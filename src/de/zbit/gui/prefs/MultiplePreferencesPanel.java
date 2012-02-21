@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -70,7 +70,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	private static boolean isClassesInitialized = false;
 	
 	/**
-	 * 
+	 * A {@link Logger} for this class.
 	 */
 	private static final transient Logger logger = Logger.getLogger(MultiplePreferencesPanel.class.getName());
 
@@ -243,8 +243,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#addChangeListener(javax.swing.event.
-	 * ChangeListener)
+	 * @see de.zbit.gui.cfg.PreferencesPanel#addChangeListener(javax.swing.event.ChangeListener)
 	 */
 	@Override
 	public void addChangeListener(ChangeListener listener) {
