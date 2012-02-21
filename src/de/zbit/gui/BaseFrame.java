@@ -497,9 +497,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		JToolBar toolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
 		toolBar.setOpaque(true);
 		if (GUITools.isMacOSX()
-				&& ((appConf != null) && (appConf.getInteractiveOptions() != null) && 
+				&& (((appConf != null) && (appConf.getInteractiveOptions() != null) && 
 						(appConf.getInteractiveOptions().length > 0))
-				|| (MultiplePreferencesPanel.getPossibleTabCount() > 0)) {
+				|| (MultiplePreferencesPanel.getPossibleTabCount() > 0))) {
 			toolBar.add(GUITools.createButton(BaseAction.EDIT_PREFERENCES.getIcon(),
 				EventHandler.create(ActionListener.class, this, "preferences"), action,
 				BaseAction.EDIT_PREFERENCES.getToolTip()));
