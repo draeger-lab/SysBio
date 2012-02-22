@@ -40,10 +40,13 @@ public class HTMLtools {
 	 * @return
 	 */
 	public static String toTooltip(String notesString) {
-		notesString = notesString.substring(notesString.indexOf("<html"),
-			notesString.indexOf("</notes")).trim();
-		notesString = notesString.replace(
-			" xmlns=\"http://www.w3.org/1999/xhtml\"", "");
+		int firstIndex = notesString.indexOf("<html");
+		int secondIndex = notesString.indexOf("</notes");
+		if ((firstIndex > 0) && (secondIndex > 0)) {
+			String ns = notesString.substring(firstIndex, secondIndex).trim();
+			ns = ns.replace(" xmlns=\"http://www.w3.org/1999/xhtml\"", "");
+			return ns;
+		}
 		return null;
 	}
 	
