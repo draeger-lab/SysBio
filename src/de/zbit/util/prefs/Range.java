@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -818,9 +819,10 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
   @SuppressWarnings({ "unchecked" })
   public static <Type> String toNiceRangeString(Iterable<Type> acceptedObjects) {
     Iterable<Type> accObjects = acceptedObjects;
+    Iterator<Type> iterator = acceptedObjects.iterator();
     
     //If the range consists of classes, use the simple class names
-    if ((acceptedObjects != null) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
+    if ((acceptedObjects != null) && iterator.hasNext() && (Class.class.isAssignableFrom(iterator.next().getClass()))) {
       List<Type> classStrings = new LinkedList<Type>();
       for (Type object : acceptedObjects) {
         /* Simple name for classes doesn't work. It is not precise and 
@@ -832,8 +834,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
       accObjects = classStrings;
     }
     
-    String s = '{' + StringUtil.implode(StringUtil.addPrefixAndSuffix(
-      accObjects, "\"", "\""), ",") + '}';
+    String s = '{' + StringUtil.implode(StringUtil.addPrefixAndSuffix(accObjects, "\"", "\""), ",") + '}';
     
     logger.finer(String.format("Created a new range-string from a collection: %s", s));
     return s;
