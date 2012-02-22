@@ -1,6 +1,6 @@
 /*
- * $Id: RegexpAssignmentVariableFilter.java 708 2012-01-06 14:56:40Z snagel $
- * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/jsbml/util/filter/RegexpAssignmentVariableFilter.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -22,7 +22,7 @@ import org.sbml.jsbml.util.filters.Filter;
 /**
  * @author Sebastian Nagel
  * @version $Rev$
- * @since 1.4
+ * @since 1.1
  */
 public class RegexpAssignmentVariableFilter implements Filter {
 
@@ -75,9 +75,7 @@ public class RegexpAssignmentVariableFilter implements Filter {
 		this.regexp = regexp;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.sbml.jsbml.util.Filter#fulfilsProperty(java.lang.Object)
 	 */
 	public boolean accepts(Object o) {

@@ -16,11 +16,15 @@
 package de.zbit.sbml.util;
 
 import java.util.AbstractList;
+import java.util.List;
 
 import org.sbml.jsbml.CallableSBase;
 import org.sbml.jsbml.Model;
 
 /**
+ * This class makes all instances of {@link CallableSBase} of a {@link Model}
+ * accessible in a {@link List}.
+ * 
  * @author Andreas Dr&auml;ger
  * @since 1.1
  * @version $Rev$

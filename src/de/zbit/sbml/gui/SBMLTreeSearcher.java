@@ -86,8 +86,7 @@ public class SBMLTreeSearcher extends SwingWorker<List<TreeNode>, Void> {
 		if (searchString.equals("")) {
 			SBMLNode.setShowInvisible(true);
 			return null;
-		}
-		else {
+		} else {
 			String search = ".*" + searchString + ".*";
 			RegexpNameFilter nameFilter = new RegexpNameFilter(search, false);
 			RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);

@@ -181,10 +181,13 @@ public class SBMLTree extends JTree implements ActionListener {
 		} else {
 			popUpMap.put(item, Arrays.asList(types));
 		}
-		// TODO: Why this? We don't know if this item is appropriate in the current situation! 
 		popup.add(item);
 	}
 	
+	/**
+	 * 
+	 * @param expand
+	 */
 	public void expandAll(boolean expand) {
 		expandAll(null, expand, null);
 	}
@@ -306,27 +309,30 @@ public class SBMLTree extends JTree implements ActionListener {
 						.getLastPathComponent();
 				Object userObject = node.getUserObject();
 				if (userObject instanceof SBMLDocument) {
-				currSBase = ((SBMLDocument) userObject).getModel();
-			} else {
-				currSBase = (SBase) userObject;
-			}
+					currSBase = ((SBMLDocument) userObject).getModel();
+				} else {
+					currSBase = (SBase) userObject;
+				}
 				if (popup != null) {
-					if (popUpMap != null && popUpMap.size() > 0) {
-						for (int i=0; i<popup.getComponentCount(); i++) {
+					int enabledCount = 0;
+					if (popUpMap.size() > 0) {
+						for (int i = 0; i < popup.getComponentCount(); i++) {
 							List<Class<? extends SBase>> classes = popUpMap.get(popup.getComponent(i));
 							boolean enabled = false;
-							for (int j=0; j<classes.size(); j++) {
+							for (int j = 0; (j < classes.size()) && !enabled; j++) {
 								if (classes.get(j).isInstance(userObject)) {
 									enabled = true;
-									break;
+									enabledCount++;
 								}
 							}
 							popup.getComponent(i).setEnabled(enabled);
 						}
 					}
-					popup.setLocation(e.getX() + ((int) getLocationOnScreen().getX()),
-						e.getY() + ((int) getLocationOnScreen().getY()));// e.getLocationOnScreen());
-					popup.setVisible(true);
+					if (0 < enabledCount) {
+						popup.setLocation(e.getX() + ((int) getLocationOnScreen().getX()),
+							e.getY() + ((int) getLocationOnScreen().getY()));// e.getLocationOnScreen());
+						popup.setVisible(true);
+					}
 				}
 				if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
 					MathContainer mc = (MathContainer) ((DefaultMutableTreeNode) clickedOn)
