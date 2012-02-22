@@ -268,8 +268,8 @@ public class SBMLTree extends JTree implements ActionListener {
 	 */
 	public void expandPath(TreeNode[] path) {
 		if (path != null) {
-			for (int i=0; i<path.length; i++) {
-				TreePath treePath = new TreePath(((DefaultTreeModel)this.getModel()).getPathToRoot(path[i]));
+			for (int i = 0; i < path.length; i++) {
+				TreePath treePath = new TreePath(((DefaultTreeModel) this.getModel()).getPathToRoot(path[i]));
 				this.expandPath(treePath);
 				this.setSelectionPath(treePath);
 				this.scrollPathToVisible(treePath);
