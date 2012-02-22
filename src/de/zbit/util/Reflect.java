@@ -83,11 +83,6 @@ public class Reflect {
 	/**
 	 * 
 	 */
-	private static boolean TRACE;
-	
-	/**
-	 * 
-	 */
 	private static boolean useFilteredClassPath;
 	
 	/**
@@ -103,9 +98,7 @@ public class Reflect {
 	 * @return
 	 */
 	private static <T> int addClass(HashSet<Class<T>> set, Class<T> cls) {
-		if (TRACE) {
-			logger.info("adding class " + cls.getName());
-		}
+		logger.fine("adding class " + cls.getName());
 		if (set.contains(cls)) {
 			// logger.warn(String.format("warning, Class %s not added twice!", cls
 			// .getName()));
@@ -182,7 +175,7 @@ public class Reflect {
 	 */
 	public static <T> Class<T>[] getAllClassesInPackage(String packageName,
 		boolean includeSubs, boolean bSort, Class<T> superClass, String jarPath) {
-		Class<T> classes[] = Reflect.getAllClassesInPackage(packageName, false,
+		Class<T> classes[] = getAllClassesInPackage(packageName, false,
 			true, superClass);
 		if ((classes == null) || (classes.length == 0)) {
 			HashSet<Class<T>> set = new HashSet<Class<T>>();
@@ -242,10 +235,7 @@ public class Reflect {
 	 */
 	public static <T> Class<T>[] getAssignableClassesInPackage(String pckg,
 		Class<T> reqSuperCls, boolean includeSubs, boolean bSort) {
-		if (TRACE){
-			logger.info("requesting classes assignable from "
-					+ reqSuperCls.getName());
-		}
+		logger.fine("requesting classes assignable from " + reqSuperCls.getName());
 		return getClassesInPackageFltr(new HashSet<Class<T>>(), pckg, includeSubs,
 			bSort, reqSuperCls);
 	}
@@ -287,10 +277,8 @@ public class Reflect {
 						// to be displayed
 						Field f = class1.getDeclaredField("hideFromGOE");
 						if (f.getBoolean(class1) == true) {
-							if (TRACE) {
-								logger.info("Class " + class1
-										+ " wants to be hidden from GOE, skipping...");
-							}
+							logger.fine("Class " + class1
+									+ " wants to be hidden from GOE, skipping...");
 							continue;
 						}
 					} catch (Exception e) {
@@ -394,31 +382,28 @@ public class Reflect {
 			String dir = null;
 			try {
 				ClassLoader cld = ClassLoader.getSystemClassLoader();
-				if (cld == null) { throw new ClassNotFoundException("Can't get class loader."); }
+				if (cld == null) { 
+					throw new ClassNotFoundException("Can't get class loader."); 
+				}
 				dir = path + "/" + pckgname.replace(".", "/");
 				
-				if (TRACE) {
-					logger.warning(String.format(".. opening %s", path));
-				}
+				logger.fine(String.format(".. opening %s", path));
 				
 				directory = new File(dir);
 				
 			} catch (NullPointerException x) {
-				if (TRACE) {
-					logger.warning(String.format("%s not found in %s.", directory.getPath(), path));
-					logger.warning(String.format("directory %s.", (directory.exists() ? "exists"
-							: "does nott exist")));
-				}
+				logger.warning(String.format("%s not found in %s.",
+					directory.getPath(), path));
+				logger.warning(String.format("directory %s.",
+					(directory.exists() ? "exists" : "does nott exist")));
 				return 0;
 			}
 			if (directory.exists()) {
 				// Get the list of the files contained in the package
 				return getClassesFromDirFltr(set, directory, pckgname, includeSubs, reqSuperCls);
 			} else {
-				if (TRACE) {
-					logger.warning(String.format("%s does not exist in %s, dir was %s.", directory
-							.getPath(), path, dir));
-				}
+				logger.warning(String.format("%s does not exist in %s, search directory was %s.", 
+					directory.getPath(), path, dir));
 				return 0;
 			}
 		} catch (ClassNotFoundException e) {
@@ -444,9 +429,7 @@ public class Reflect {
 		int cntAdded = 0;
 		
 		packageName = packageName.replace('.', '/');
-		if (TRACE) {
-			logger.info(String.format("Jar %s looking for %s", jarName, packageName));
-		}
+		logger.fine(String.format("Jar %s looking for %s", jarName, packageName));
 		try {
 			JarInputStream jarFile = new JarInputStream(new FileInputStream(jarName));
 			JarEntry jarEntry;
@@ -509,10 +492,8 @@ public class Reflect {
 	 * classpath respectively
 	 */
 	public static List<String> getClassesFromProperties(String className) {
-		if (TRACE) {
-			logger.info(String.format(
-				"getClassesFromProperties - requesting className: %s", className));
-		}
+		logger.fine(String.format(
+			"getClassesFromProperties - requesting className: %s", className));
 		return getClassesFromClassPath(className);
 	}
 
@@ -595,20 +576,13 @@ public class Reflect {
 		 * 
 		 */
 		
-		
-		if (TRACE) {
-			logger.info(String.format("classpath is %s", classPath));
-		}
+	  logger.fine(String.format("classpath is %s", classPath));
 		for (int i = 0; i < dynCP.length; i++) {
-			if (TRACE) {
-				logger.info("reading element " + dynCP[i]);
-			}
+			logger.fine("reading element " + dynCP[i]);
 			if (dynCP[i].endsWith(".jar")) {
 				getClassesFromJarFltr(set, dynCP[i], pckg, includeSubs, reqSuperCls);
 			} else {
-				if (TRACE) {
-					logger.info(String.format("reading from files: %s %s", dynCP[i], pckg));
-				}
+				logger.fine(String.format("reading from files: %s %s", dynCP[i], pckg));
 				getClassesFromFilesFltr(set, dynCP[i], pckg, includeSubs, reqSuperCls);
 			}
 		}
@@ -861,10 +835,9 @@ public class Reflect {
 	
 	/**
 	 * 
-	 * 
 	 */
 	public Reflect() {
-		TRACE = true;
+		super();
 	}
 
   /**

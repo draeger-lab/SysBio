@@ -1076,6 +1076,27 @@ public class SBPreferences implements Map<Object, Object> {
 		return prefs.getBoolean(k, getDefaultBoolean(k));
 	}
 	
+	/**
+	 * Convenient method that directly tries to obtain the class represented by
+	 * the given key.
+	 * 
+	 * @param key
+	 *        The search key.
+	 * @return <code>null</code> if no value exists associated with the given key,
+	 *         or an instance of {@link Class}.
+	 * @throws ClassNotFoundException
+	 *         if the value associated with the given key cannot successfully be
+	 *         used to load a {@link Class} object.
+	 */
+	public Class<?> getClass(Object key) throws ClassNotFoundException {
+		String value = getString(key);
+		if (value == null) {
+			return null;
+		}
+		return Class.forName(value);
+	}
+	
+	
 	/***
 	 * @param key
 	 * @return
@@ -1090,6 +1111,26 @@ public class SBPreferences implements Map<Object, Object> {
 	 */
 	public final boolean getDefaultBoolean(Object key) {
 		return Boolean.parseBoolean(defaults.get(key.toString()).toString());
+	}
+	
+	/**
+	 * Convenient method that directly tries to obtain the class represented by
+	 * the given key from the defaults.
+	 * 
+	 * @param key
+	 *        The search key.
+	 * @return <code>null</code> if no value exists associated with the given key,
+	 *         or an instance of {@link Class}.
+	 * @throws ClassNotFoundException
+	 *         if the value associated with the given key cannot successfully be
+	 *         used to load a {@link Class} object.
+	 */
+	public Class<?> getDefaultClass(Object key) throws ClassNotFoundException {
+		String value = getDefaultString(key);
+		if (value == null) {
+			return null;
+		}
+		return Class.forName(value);
 	}
 	
 	/**
@@ -1308,6 +1349,18 @@ public class SBPreferences implements Map<Object, Object> {
 		boolean oldValue = getBoolean(key);
 		prefs.putBoolean(k, value);
 		return oldValue;
+	}
+	
+	/**
+	 * Stores the value defined by {@link Class#getName()} in this
+	 * {@link Preferences} object.
+	 * 
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public Object put(Object key, Class<?> value) {
+		return put(key, value.getName());
 	}
 	
 	/**
