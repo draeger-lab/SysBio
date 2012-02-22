@@ -28,7 +28,7 @@ import org.sbml.jsbml.util.filters.Filter;
  * 
  * @author Sebastian Nagel
  * @date 2012-01-14
- * @since 0.8
+ * @since 1.1
  * @version $Rev: 708 $
  */
 public class RegexpSpeciesReferenceFilter implements Filter {

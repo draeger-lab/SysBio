@@ -45,18 +45,22 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	 */
 	private static boolean showInvisible = false;
 	
+	/**
+	 * 
+	 */
 	private static int nodeCount = 0;
 	
-	private boolean boldFont = false;
-	private boolean isVisible;
-	private boolean expanded = false;
+	/**
+	 * 
+	 */
+	private boolean boldFont, expanded, isVisible;
 
 	/**
 	 * 
 	 * @param sbase
 	 */
 	public SBMLNode(SBase sbase) {
-		this(sbase,true);
+		this(sbase, true);
 	}
 	
 	/**
@@ -66,12 +70,13 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	 */
 	public SBMLNode(SBase sbase, boolean isVisible) {
 	    super(sbase);
+	    this.boldFont = false;
+	    this.expanded = false;
 	    this.isVisible = isVisible;
 	    nodeCount++;
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see javax.swing.tree.DefaultMutableTreeNode#getUserObject()
 	 */
 	@Override
@@ -79,8 +84,7 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	  return (TreeNodeWithChangeSupport) super.getUserObject();
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see javax.swing.tree.DefaultMutableTreeNode#getChildAt(int)
 	 */
 	public TreeNode getChildAt(int index) {
@@ -108,6 +112,9 @@ public class SBMLNode extends DefaultMutableTreeNode {
 		throw new ArrayIndexOutOfBoundsException("index unmatched");
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.tree.DefaultMutableTreeNode#getChildCount()
+	 */
 	public int getChildCount() {
 		if (isShowInvisible()) {
 			return super.getChildCount();
@@ -126,42 +133,80 @@ public class SBMLNode extends DefaultMutableTreeNode {
 		return count;
 	}
 	
+	/**
+	 * 
+	 * @param boldFont
+	 */
 	public void setBoldFont(boolean boldFont) {
 		this.boldFont = boldFont;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isBoldFont() {
 		return boldFont;
 	}
 
+	/**
+	 * 
+	 * @param visible
+	 */
 	public void setVisible(boolean visible) {
 		this.isVisible = visible;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isVisible() {
 		return isVisible;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isExpanded() {
 		return expanded;
 	}
 	
+	/**
+	 * 
+	 */
 	public void expand() {
 		this.expanded = true;
 	}
 	
+	/**
+	 * 
+	 */
 	public void collapse() {
 		this.expanded = false;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public static boolean isShowInvisible() {
 		return showInvisible;
 	}
 
+	/**
+	 * 
+	 * @param showInvisible
+	 */
 	public static void setShowInvisible(boolean showInvisible) {
 		SBMLNode.showInvisible = showInvisible;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public static int getNodeCount() {
 		// TODO: This will return the number of nodes FOR ALL SBMLNode instances!!!
 		return nodeCount;
