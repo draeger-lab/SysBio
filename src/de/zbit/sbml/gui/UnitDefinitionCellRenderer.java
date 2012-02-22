@@ -76,7 +76,7 @@ public class UnitDefinitionCellRenderer extends JLabel implements
 		} catch (Exception exc) {
 			setText("N/A");
 			setToolTipText(null);
-			if (value != null) {
+			if (value != null && !value.equals("")) {
 				logger.warning(exc.getLocalizedMessage());
 			}
 		}
