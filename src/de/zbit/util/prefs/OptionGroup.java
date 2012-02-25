@@ -22,6 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.ButtonGroup;
+
 import de.zbit.gui.ActionCommand;
 
 /**
@@ -101,6 +103,35 @@ public class OptionGroup<T> implements ActionCommand,
 			setToolTip(names[1]);
 		}
 	}
+	
+	/**
+	   * 
+	   * @param optionGroupId
+	   * @param bundle
+	   *        This {@link ResourceBundle} looks for the optionGroupId as key for a
+	   *        human-readable display name. It also looks for the key
+	   *        <code>optionGroupId + "_TOOLTIP"</code> in order to obtain a more
+	   *        detailed description of this option. If no such description can be
+	   *        found, it tries to split the human-readable name connected with the
+	   *        optionGroupId using the character ';' (semicolon). If the
+	   *        human-readable name contains this symbol it assumes that the part
+	   *        before the semicolon is intended to be a short name and everything
+	   *        written after it is assumed to be a tooltip.
+	   * @param asRadioButtons
+	   * 		handle all options as radio buttons
+	   * @param option
+	   */
+		public OptionGroup(String optionGroupId, ResourceBundle bundle, boolean asRadioButtons,
+			Option<? extends T>... option) {
+			this(optionGroupId, bundle, option);
+			
+			if (asRadioButtons) {
+				ButtonGroup group = new ButtonGroup();
+				for (Option opt : option) {
+					opt.setButtonGroup(group);
+				}
+			}
+		}
   
   /**
    * Creates a (eventually collapsible) {@link OptionGroup}.
