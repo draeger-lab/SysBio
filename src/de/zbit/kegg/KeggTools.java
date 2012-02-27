@@ -28,6 +28,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.biopax.paxtools.model.Model;
+
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
@@ -229,60 +231,7 @@ public class KeggTools {
     
   }
   
-
-  /**
-   * Retrieves all Relations for all relations in the pathway.
-   * Looks, which of them is already contained in the pathway and adds all
-   * missing relations to the pathway.
-   * 
-   * @param p
-   * @param manager
-   * @param b
-   */
-  public static void autocompleteRelations(Pathway p,
-      KeggInfoManagement manager, boolean b) {
-    Collection<Relation> novelRelations = new LinkedList<Relation>();
-    Collection<Relation> keggRelations = p.getRelations();
-    // first fetching BioCarta relations
-    
-    // is the relation in KEGG?
-        // - Yes: do nothing
-        // - No: Create a new relation
-//           p.addRelation(new Relation(entry1, entry2, type))
-    
-    
-    
-//    List<Integer> geneIdsQone = getGeneIDs(qOne);
-//    List<Integer> geneIdsQtwo = getGeneIDs(qTwo);
-//    
-//    annotateRelationWithBioCartaInforation(geneIdsQone, geneIdsQtwo);
-    
-    
-    // Add novel relations
-    Iterator<Relation> it = novelRelations.iterator();
-    while (it.hasNext()) {
-      p.addRelation(it.next());
-    }
-  }
-
-  /**
-   * @param qOne
-   * @return
-   */
-  // TODO: Please do NEVER use jSBML imports here. Move this method to another class.
-//  private List<Integer> getGeneIDs(QualitativeSpecies qOne) {
-//    List<Integer> ret = new ArrayList<Integer>();
-//    if (qOne==null) return ret;
-//    
-//    for (CVTerm cv: qOne.getCVTerms()) {
-//      for (String urn:cv.getResources()) {
-//        if (urn.startsWith(KeggInfos.miriam_urn_entrezGene)) {
-//          ret.add(Integer.parseInt(urn.substring(KeggInfos.miriam_urn_entrezGene.length())));
-//        }
-//      }
-//    }
-//    return ret;
-//  }
+  static Model m;
 
   /**
    * Check if the substrates, defined in the reaction are really on the left side,
