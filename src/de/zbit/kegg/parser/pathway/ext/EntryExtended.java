@@ -141,8 +141,8 @@ public class EntryExtended extends Entry {
     return hash;
   }
   
-  public boolean equalsWithoutIDNameReactionComparison(Object obj) {
-    boolean equals = super.equalsWithoutIDNameReactionComparison(obj);
+  public boolean equalsWithoutIDReactionComparison(Object obj) {
+    boolean equals = super.equalsWithoutIDReactionComparison(obj);
     
     if(equals && obj.getClass().isAssignableFrom(EntryExtended.class)){    
       EntryExtended o = (EntryExtended)obj;
@@ -166,10 +166,6 @@ public class EntryExtended extends Entry {
       
     }
     return equals;
-  }
-
-  public void addComponents(List<Integer> components) {
-    components.addAll(components);
   }
 
 

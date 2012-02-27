@@ -772,24 +772,8 @@ public class Pathway {
          * involved in the reaction and I don't know if this ever
          * occurs => report a warning.
          */
-        // Look for exact match with an contained object
-        Set<Entry> exactMatches = new HashSet<Entry>();
-        for (Entry e: c) {
-          if (e.getName().equalsIgnoreCase(rc.getName())) {
-            exactMatches.add(e);
-          }
-        }
-        if (exactMatches.size()==1) {
-          log.fine("Ambiguous reaction component " + rc.getName() + ". Took unique exact id match.");
-          return exactMatches.iterator().next();
-        } else {
-          for (Entry e: exactMatches) {
-            if (e.getCustom()!=null) {
-              log.fine("Ambiguous reaction component " + rc.getName() + ". Took first exact match with custom object.");
-              return e;
-            }
-          }
-        }
+        rcEntry = getBestMatchingEntry(rc.getName(), c);
+        
         if (!supressWarning) {
           log.warning("Ambiguous reaction component: " + rc.getName());
         }
@@ -799,6 +783,45 @@ public class Pathway {
     }
     
     return rcEntry;
+  }
+
+  /**
+   * Sometimes, {@link #getEntriesForName(String)} returnes multiple results.
+   * This means, that multiple entries in the source pathway are available,
+   * in which the given <code>keggName</code> is contained.
+   * 
+   * This method checks, if there is a unique entry, describing only the
+   * <code>keggName</code> and returns this. Else, it returns any of the entries.
+   * The results are reported at log level fine.
+   * @param keggName
+   * @param c all entries matching to <code>keggName</code>.
+   * See {@link #getEntriesForName(String)} to generate this collection
+   * @return any or best matching entry.
+   */
+  public static Entry getBestMatchingEntry(String keggName, Collection<Entry> c) {
+    // Look for exact match with an contained object
+    Set<Entry> exactMatches = new HashSet<Entry>();
+    if (c!=null) {
+      for (Entry e: c) {
+        if (e.getName().equalsIgnoreCase(keggName)) {
+          exactMatches.add(e);
+        }
+      }
+    }
+    
+    if (exactMatches.size()==1) {
+      log.fine("Ambiguous reaction component " + keggName + ". Took unique exact id match.");
+      return exactMatches.iterator().next();
+    } else if (exactMatches.size()>1) {
+      for (Entry e: exactMatches) {
+        if (e.getCustom()!=null) {
+          log.fine("Ambiguous reaction component " + keggName + ". Took first exact match with custom object.");
+          return e;
+        }
+      }
+    }
+    
+    return null;
   }
   
   private boolean isSetName(){
