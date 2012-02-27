@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -134,10 +135,12 @@ public class Relation {
    * 
    * @param s
    */
-  public void addSubtype(SubType s) {
+  public boolean addSubtype(SubType s) {
     if(s!=null && (!subtypes.contains(s))){
       subtypes.add(s);
+      return true;
     }
+    return false;
   }
   
   /**
@@ -192,7 +195,7 @@ public class Relation {
   }
   
   public Map<String, String> getKGMLAttributes() {
-    Map<String, String> attributes = new HashMap<String, String>();
+    Map<String, String> attributes = new TreeMap<String, String>();
     
     if(isSetEntry1()){
       attributes.put("entry1", String.valueOf(getEntry1()));

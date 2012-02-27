@@ -20,10 +20,10 @@ package de.zbit.kegg.parser.pathway;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -173,6 +173,15 @@ public class Entry {
    */
   public List<Integer> getComponents() {
     return components==null?Collections.unmodifiableList(new ArrayList<Integer>()):components;
+  }
+  
+
+  /**
+   * adds a list of components to the entry
+   * @param components
+   */
+  public void addComponents(List<Integer> components) {
+    components.addAll(components);
   }
   
   /**
@@ -531,7 +540,7 @@ public class Entry {
    * @return all the necessary XML attributes of this class
    */
   public Map<String, String> getKGMLAttributes() {
-    Map<String, String> attributes = new HashMap<String, String>();
+    Map<String, String> attributes = new TreeMap<String, String>();
     
     if(isSetID()){
       attributes.put("id", String.valueOf(id));
@@ -542,12 +551,12 @@ public class Entry {
     if(isSetType()){
       attributes.put("type", type.toString());
     }
-    if(isSetLink()){
-      attributes.put("link", link);
-    }
     if(isSetReaction()){
       attributes.put("reaction", reaction);
-    }        
+    }  
+    if(isSetLink()){
+      attributes.put("link", link);
+    }      
     
     return attributes;
   }
@@ -573,12 +582,41 @@ public class Entry {
     return hash;
   }
   
-
   public boolean equalsWithoutIDNameReactionComparison(Object obj) {
     boolean equals = true;
     
     if (Entry.class.isAssignableFrom(obj.getClass())){
       Entry o = (Entry)obj;          
+      
+      equals &= o.isSetType()==this.isSetType();
+      if(equals && isSetType()) 
+        equals &= (o.getType().equals(this.getType()));
+      
+      equals &= o.isSetLink()==this.isSetLink();
+      if(equals && isSetLink()) 
+        equals &= (o.getLink().equals(this.getLink()));
+      
+      equals &= o.isSetComponent()==this.isSetComponent();
+      if(equals && isSetComponent()) 
+        equals &= (o.getComponents().equals(this.getComponents()));
+      
+      equals &= o.isSetGraphics()==this.isSetGraphics();
+      if(equals && isSetGraphics()) 
+        equals &= (o.getGraphics().equals(this.getGraphics()));
+      
+    }
+    return equals;
+  }
+
+  public boolean equalsWithoutIDReactionComparison(Object obj) {
+    boolean equals = true;
+    
+    if (Entry.class.isAssignableFrom(obj.getClass())){
+      Entry o = (Entry)obj;          
+      
+      equals &= o.isSetName()==this.isSetName();
+      if(equals && isSetName()) 
+        equals &= (o.getName().equals(this.getName()));
       
       equals &= o.isSetType()==this.isSetType();
       if(equals && isSetType()) 
