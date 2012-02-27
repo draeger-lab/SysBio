@@ -512,7 +512,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     if (source instanceof Component) {
       Component c = (Component) source;
       String name = c.getName();
-			log.fine("try to change property of " + name);
+			log.fine("tring to change property of " + name);
       /*
        * Properties is build in initializePrefPanel() -> loadPreferences ->
        * accept(key). If a key is missing in properties, it is very likely that

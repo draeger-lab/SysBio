@@ -851,6 +851,7 @@ public class GUITools {
 				}
 			}
 			item.setActionCommand(command.toString());
+			item.setName(command.toString());
 		}
 		if (icon != null) {
 			item.setIcon(icon);
