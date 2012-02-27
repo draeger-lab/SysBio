@@ -39,11 +39,13 @@ import org.w3c.dom.Element;
 
 import de.zbit.biopax.BioPax2KGML;
 import de.zbit.kegg.parser.pathway.Entry;
+import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.util.StringUtil;
 
 /**
  * This class writes an kgml file out of a pathway element
@@ -65,22 +67,86 @@ public class KGMLWriter {
 
 
   /**
-   * creates first an {@link Document} an then writes it with the defined {@link KGMLWriter#indent}
+   * if the fileName is not set it will be set automatically to the pathway
+   * name. The file will be saved in the current folder
+   * 
+   * then an {@link Document} an then writes it with the defined {@link KGMLWriter#indent}
    * 
    * @param keggPW
    * @param fileName
-   * @throws FileNotFoundException
-   * @throws XMLStreamException
+   * @throws XMLStreamException 
+   * @throws FileNotFoundException 
    */
-  public static void writeKGMLFile(de.zbit.kegg.parser.pathway.Pathway keggPW,
-      String fileName) throws FileNotFoundException, XMLStreamException {
-    Document doc = null;
-    try {
-      doc = createDocument(keggPW);
-    } catch (ParserConfigurationException e) {
-      log.log(Level.SEVERE, "Could not create a document from the KEGG pathway.", e);
+  public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW)  {
+    if (keggPW.getEntries().size() > 0) {
+      String fileName = createFileName(keggPW);
+
+      writeKGML(keggPW, fileName);
     }
-    writeKGMLFileFromDoc(doc, fileName);
+  }
+
+  /**
+   * 
+   * @param keggPW
+   * @return
+   */
+  public static String createFileName(de.zbit.kegg.parser.pathway.Pathway keggPW) {
+    String fileName = keggPW.getTitle() + ".xml";
+    fileName = fileName.replace(" ", "_");
+    fileName = StringUtil.removeAllNonFileSystemCharacters(fileName);
+
+    if (fileName == null) {
+      fileName = keggPW.getName();
+      if (fileName == null)
+        fileName = Integer.toString(keggPW.hashCode());
+      fileName = StringUtil.removeAllNonFileSystemCharacters(fileName);
+    }
+    if (!fileName.toLowerCase().endsWith(".xml")) {
+      fileName += ".xml";
+    }
+
+    // TODO: delete this line for publishing
+    fileName = "pws/" + fileName;
+    return fileName;
+  }
+  
+  /**
+   * if the fileName is not set it will be set automatically to the pathway
+   * name. The file will be saved in the current folder
+   * 
+   * @param keggPW
+   * @param fileName
+   */
+  public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW, String fileName) {
+    ArrayList<de.zbit.kegg.parser.pathway.Entry> entries = keggPW.getEntries();
+
+    if (entries.size() > 0) {
+      int counter = 0;
+      int counterMacro = 0;
+      int counterMaps = 0;
+
+      for (de.zbit.kegg.parser.pathway.Entry entry : entries) {
+        if (entry.getType().equals(EntryType.group))
+          counter++;
+        if (entry.getType().equals(EntryType.map))
+          counterMaps++;
+        if (entry.getType().equals(EntryType.compound))
+          counterMacro++;
+      }
+      log.info("Entries.size(): " + entries.size() + " - " + counter + " are groups, " + " "
+          + counterMacro + " are marcromolecules, " + " " + counterMaps + " are maps.");
+      log.info("Reactions.size(): " + keggPW.getReactions().size());
+      log.info("Relations.size(): " + keggPW.getRelations().size());
+
+      
+      Document doc = null;
+      try {
+        doc = createDocument(keggPW);
+      } catch (ParserConfigurationException e) {
+        log.log(Level.SEVERE, "Could not create a document from the KEGG pathway.", e);
+      }
+      writeKGMLFileFromDoc(doc, fileName);
+    }
   }
   
 
@@ -92,7 +158,7 @@ public class KGMLWriter {
    * @throws FileNotFoundException
    * @throws XMLStreamException
    */
-  public static void writeKGMLFileFromDoc(Document doc, String fileName) throws FileNotFoundException, XMLStreamException {
+  public static void writeKGMLFileFromDoc(Document doc, String fileName) {
     try {    
       // write the content into xml file
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -162,9 +228,31 @@ public class KGMLWriter {
         
         rootElement.appendChild(newChild);
       }
+    }    
+    
+    // kegg relations
+    ArrayList<Relation>  relations = keggPW.getRelations();
+    if(relations!=null && relations.size()>0){
+      for (Relation relation : relations) {
+        Element newChild = doc.createElement("relation");
+        for (java.util.Map.Entry<String, String> att : relation.getKGMLAttributes().entrySet()) {
+          newChild.setAttribute(att.getKey(), att.getValue());
+        }
+        if (relation.isSetSubTypes()){
+          for (SubType subtype : relation.getSubtypes()) {
+            Element newChild2 = doc.createElement("subtype");
+            for (java.util.Map.Entry<String, String> att1 : (subtype.getKGMLAttributes()).entrySet()) {
+              newChild2.setAttribute(att1.getKey(), att1.getValue());  
+            }              
+            newChild.appendChild(newChild2);              
+          }
+        }
+
+        rootElement.appendChild(newChild);
+      }
     }
     
-    // kegg reactions
+ // kegg reactions
     ArrayList<Reaction>  reactions = keggPW.getReactions();
     if(reactions.size()>0){
       for (Reaction reaction : reactions) {
@@ -200,28 +288,6 @@ public class KGMLWriter {
             newChild.appendChild(newChild2);              
           }
         }
-        rootElement.appendChild(newChild);
-      }
-    }
-    
-    // kegg relations
-    ArrayList<Relation>  relations = keggPW.getRelations();
-    if(relations!=null && relations.size()>0){
-      for (Relation relation : relations) {
-        Element newChild = doc.createElement("relation");
-        for (java.util.Map.Entry<String, String> att : relation.getKGMLAttributes().entrySet()) {
-          newChild.setAttribute(att.getKey(), att.getValue());
-        }
-        if (relation.isSetSubTypes()){
-          for (SubType subtype : relation.getSubtypes()) {
-            Element newChild2 = doc.createElement("subtype");
-            for (java.util.Map.Entry<String, String> att1 : (subtype.getKGMLAttributes()).entrySet()) {
-              newChild2.setAttribute(att1.getKey(), att1.getValue());  
-            }              
-            newChild.appendChild(newChild2);              
-          }
-        }
-
         rootElement.appendChild(newChild);
       }
     }
