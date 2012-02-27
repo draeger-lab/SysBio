@@ -44,6 +44,7 @@ import de.zbit.util.Utils;
 public class Entry {
   /**
    * id.type    the ID of this entry in the pathway map
+   * <p>0 means INVALID/NO ID</p>
    */
   private int id = 0;
   /**

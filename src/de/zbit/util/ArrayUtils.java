@@ -415,6 +415,7 @@ public class ArrayUtils {
    */
   @SuppressWarnings("unchecked")
   public static <T> T[] toSubArray(T[] arr, int rangeStart, int rangeEnde) {
+    // Couldn't we just use Arrays.copyOfRange ?
     int length = rangeEnde-rangeStart;
     T[] newArr = (T[]) createNewArray(arr[rangeStart], length);
     System.arraycopy(arr, rangeStart, newArr, 0, length);

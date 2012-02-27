@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
 
 /**
@@ -197,6 +198,22 @@ public class Pathway {
 	      if (ko_id.length()>0) {
 	        addToSet(nameMap, ko_id, e);
 	      }
+	    }
+	  }
+	}
+	
+	/**
+	 * Adds various synonyms, that should point to one entry.
+	 * <p><b>USE THIS WITH CAUTION!</b></p>
+	 * @param e
+	 * @param synonyms
+	 */
+	public void putEntrySynonymsInNameMap(Entry e, String synonyms) {
+	  // Put splitted name (as whole name may be "hsa:12345 hsa:23456")
+	  for (String ko_id:synonyms.split("\\s")) {
+	    ko_id = ko_id.trim();
+	    if (ko_id.length()>0) {
+	      addToSet(nameMap, ko_id, e);
 	    }
 	  }
 	}
@@ -696,30 +713,50 @@ public class Pathway {
   public Entry getEntryForReactionComponent(ReactionComponent rc) {
     return getEntryForReactionComponent(rc, false);
   }
+  
   /**
-   * <p>Note: This function queries the KEGG API for synonyms of
-   * {@link ReactionComponent#getName()}. So better cache all of them
-   * before calling this method.</p> 
+   * <p>Note: This method returns other results than
+   * {@link #getEntryForReactionComponent(ReactionComponent, boolean, KeggInfoManagement)}.
+   * The other method (NOT THIS ONE) should be preferred.
+   * </p> 
    * @param rc
    * @param supressWarning
    * @return
    * @see #getEntryForReactionComponent(ReactionComponent)
    */
   public Entry getEntryForReactionComponent(ReactionComponent rc, boolean supressWarning) {
+    return getEntryForReactionComponent(rc,supressWarning,null);
+  }
+  
+  /**
+   * <p>Note: This function queries the KEGG API for synonyms of
+   * {@link ReactionComponent#getName()}. So better cache all of them
+   * before calling this method.</p> 
+   * @param rc
+   * @param supressWarning
+   * @param manag for qerying synonyms of <code>rc</code>
+   * @return
+   * @see #getEntryForReactionComponent(ReactionComponent)
+   */
+  public Entry getEntryForReactionComponent(ReactionComponent rc, boolean supressWarning, KeggInfoManagement manag) {
     Entry rcEntry=null;
     
-    if (rc.hasId()) {
+    if (rc.isSetCorrespondingEntry()) {
+      rcEntry = rc.getCorrespondingEntry();
+    }
+    
+    if (rcEntry==null && rc.hasId()) {
       // Id is a unique identifier and thus preferred!
       rcEntry = getEntryForId(rc.getId());
     } 
     
-    if (rcEntry==null){ // no id or invalid id.
+    if (rcEntry==null && rc.hasName()){ // no id or invalid id.
       Collection<Entry> c = getEntriesForName(rc.getName());
       int size = c==null?0:c.size();
       
       // Many glycand, compounds, ligands have synonyms! So query them...
-      if (size<1) {
-        KeggInfos reaInfo = new KeggInfos(rc.getName());
+      if (size<1 && manag!=null) {
+        KeggInfos reaInfo = KeggInfos.get(rc.getName(), manag);
         if (reaInfo.getSameAs()!=null) {
           String[] synonyms = reaInfo.getSameAs().split("\\s");
           int synIndex=-1; c=null;

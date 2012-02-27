@@ -310,19 +310,22 @@ public class KeggInfos implements Serializable {
 	}
 
 	/**
+	 * <p><b>BETTER USE {@link #get(String, KeggInfoManagement)}</b></p>
 	 * Please use {@link #KeggInfos(String, KeggAdaptor)} if
 	 * possible.
 	 */
+	@Deprecated
 	public KeggInfos(String Kegg_ID) {
 		this(Kegg_ID, new KeggAdaptor());
 	}
 
 
 	/**
-	 * 
+	 * <p><b>BETTER USE {@link #get(String, KeggInfoManagement)}</b></p>
 	 * @param Kegg_ID
 	 * @param adap
 	 */
+	@Deprecated
 	public KeggInfos(String Kegg_ID, KeggAdaptor adap) {
 	  this(Kegg_ID, adap.get(Kegg_ID));
 	}

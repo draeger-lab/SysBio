@@ -50,9 +50,18 @@ public class ReactionComponent implements Cloneable {
   Integer id=null;
   
   /**
-   * Stoichiometry (count) of this reaction component in this reaction 
+   * Stoichiometry (count) of this reaction component in this reaction
+   * <p><i>This attribute is NOT part of the original KGML specification!</i> 
    */
   Integer stoichiometry=null;
+  
+  /**
+   * The entry {@link #name} or {@link #id} is referring to.
+   * <b>This attribute is OPTIONAL and an unset attribute means just,
+   * that it is not set, NOT that the entry does not exist!</b>
+   * <p><i>This attribute is NOT part of the original KGML specification!</i> 
+   */
+  Entry correspondingEntry=null;
   
   /**
    * 
@@ -69,7 +78,11 @@ public class ReactionComponent implements Cloneable {
    */
   public ReactionComponent(Integer id, String name) {
     this(name);
-    this.id = id;    
+    if (id.intValue()!=0) {
+      // Id defaults to 0 (unfornatunately) even if it was not set
+      // Thus, never store an int value of 0 here.
+      this.id = id;
+    }
   }
   
   
@@ -78,8 +91,8 @@ public class ReactionComponent implements Cloneable {
    * @param name
    * @param nl
    */
-  public ReactionComponent(String name, NodeList nl) {
-    this(name);
+  public ReactionComponent(Integer id, String name, NodeList nl) {
+    this(id, name);
     if (nl==null) return;
     
     // Parse child ("Alt's") from nodeList
@@ -89,8 +102,16 @@ public class ReactionComponent implements Cloneable {
       
       NamedNodeMap att = node.getAttributes();
       if (node.getNodeName().trim().equalsIgnoreCase("alt"))
-        alt = new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes());
+        alt = new ReactionComponent(KeggParser.getNodeValueInt(att, "id"), KeggParser.getNodeValue(att, "name"), node.getChildNodes());
     }
+  }
+
+  /**
+   * @param child
+   */
+  public ReactionComponent(Entry child) {
+    this (child.getId(), child.getName());
+    setCorrespondingEntry(child);
   }
 
   /**
@@ -166,6 +187,29 @@ public class ReactionComponent implements Cloneable {
    */
   public Integer getStoichiometry() {
     return stoichiometry;
+  }
+  
+  
+  /**
+   * Returns the corresponding entry, IF IT IS SET! This is
+   * a non-required attribute, thus, if it is not set, you
+   * must use another method (e.g.
+   * {@link Pathway#getEntryForReactionComponent(ReactionComponent)}). 
+   * @return the correspondingEntry
+   */
+  public Entry getCorrespondingEntry() {
+    return correspondingEntry;
+  }
+
+  /**
+   * @param correspondingEntry the correspondingEntry to set
+   */
+  public void setCorrespondingEntry(Entry correspondingEntry) {
+    this.correspondingEntry = correspondingEntry;
+  }
+  
+  public boolean isSetCorrespondingEntry() {
+    return correspondingEntry!=null;
   }
 
   /**

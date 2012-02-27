@@ -147,7 +147,7 @@ public class KeggTools {
               ReactionComponent rc = r.getReactant(reactant, isSubstrate);
               if (rc==null) {
                 // Many reactants have synonyms! Maybe we do have the reactant, but under a different name
-                KeggInfos reaInfo = new KeggInfos(reactant);
+                KeggInfos reaInfo = KeggInfos.get(reactant, manager);
                 if (reaInfo.getSameAs()!=null) {
                   String[] synonyms = reaInfo.getSameAs().split("\\s");
                   int synIndex=-1;
@@ -166,7 +166,7 @@ public class KeggTools {
               }
               
               // Look if we need to add a new entry and configure linkage (id of ReactionComponent)
-              Entry found = p.getEntryForReactionComponent(rc,true);
+              Entry found = p.getEntryForReactionComponent(rc,true, manager);
               if (found == null) {
                 // Create a new entry
                 newEntrysId++;
@@ -175,7 +175,10 @@ public class KeggTools {
                 
                 autocompleteLinkAndAddToPathway(p, entry);
               } else {
-                if (!rc.hasId()) rc.setId(found.getId());
+                if (!rc.hasId()) {
+                  rc.setId(found.getId());
+                  rc.setCorrespondingEntry(found);
+                }
               }
               
               lastPos = curPos<0?curPos:curPos+reactantSeparator.length();
@@ -356,7 +359,7 @@ public class KeggTools {
     preFetchIDs.add(p.getName());
     for (Entry entry : p.getEntries()) {
       for (String ko_id : entry.getName().split(" ")) {
-        if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents())
+        if (!ko_id.contains(":")) // all valid kegg ids contain a doublepoint.
           continue; // "undefined" = group node, which contains "Components"
         preFetchIDs.add(ko_id);
       }
@@ -404,7 +407,20 @@ public class KeggTools {
       manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]), progress);
     }
     
-    // TODO: Add relations?
+    // Add Synonyms to list. This step is MANDATORY AND VERY IMPORTANT
+    for (Entry entry: p.getEntries()) {
+      for (String ko_id : entry.getName().split(" ")) {
+        // We should have cached information about all entries!
+        KeggInfos reaInfo = KeggInfos.get(ko_id, manager);
+        
+        if (reaInfo!=null && reaInfo.getSameAs()!=null) {
+          p.putEntrySynonymsInNameMap(entry, reaInfo.getSameAs());
+        }
+      }
+    }
+    
+    // Add relations?
+    // No, because there's nothing to fetch here... (can't query relations)
     // -------------------------
   }
   
