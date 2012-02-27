@@ -130,7 +130,7 @@ public class Utils {
    * @return the average of all non-NaN and non-infinite values in the given
    *         array.
    */
-  public static double average(double[] d){
+  public static double average(double... d){
     double average = average1(d);
     if (Double.isNaN(average) || Double.isInfinite(average)) 
         return average2(d);

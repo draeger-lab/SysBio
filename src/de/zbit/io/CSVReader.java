@@ -982,7 +982,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
         }
         
         // If more consistent counts, or same but less columns, take this char.
-        if (consistentCounts[i]>max || consistentCounts[i]==max && numCols<=aktCounts) {
+        if (consistentCounts[i]>max || consistentCounts[i]==max && numCols>aktCounts) {
           separatorChar = separatorChars[i % separatorChars.length];
           this.treatMultipleConsecutiveSeparatorsAsOne=treatMultipleConsecutiveSeparatorsAsOne;
           numCols = counts[i]+1; // +1 because number of columns is number of separator chars in line+1

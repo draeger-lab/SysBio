@@ -373,7 +373,7 @@ public class KeggParser extends DefaultHandler {
         p.addEntry(e);
       } else if (name.equalsIgnoreCase("reaction")) {
         if (!silent) System.out.println("Parsing Reaction " + getNodeValue(att,"name") + "...");
-        Reaction r = new Reaction(p, getNodeValue(att, "name"), ReactionType.valueOf(getNodeValue(att,"type")), node.getChildNodes());
+        Reaction r = new Reaction(p, getNodeValueInt(att, "id"), getNodeValue(att, "name"), ReactionType.valueOf(getNodeValue(att,"type")), node.getChildNodes());
         p.addReaction(r);
       } else if (name.equalsIgnoreCase("relation")) {
         if (!silent) System.out.println("Parsing Relation " + getNodeValue(att,"name") + "...");
@@ -399,13 +399,13 @@ public class KeggParser extends DefaultHandler {
    * 
    * @param n
    * @param attribute
-   * @return
+   * @return 0 if any error occurs, or the int value, represented by <code>attribute</code>.
    */
   public static int getNodeValueInt(NamedNodeMap n, String attribute) {
     int number = 0;
     boolean error = false;
     Exception ex = null;
-    if (n.getNamedItem(attribute)!=null)
+    if (n.getNamedItem(attribute)!=null) {
       try {
         number = Integer.parseInt(getNodeValue(n, attribute));
         error = false; // Parsing was succesfull.
@@ -434,6 +434,7 @@ public class KeggParser extends DefaultHandler {
           }
         }
       }
+    }
     return number;
   }
   

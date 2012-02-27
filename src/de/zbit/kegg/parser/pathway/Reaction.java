@@ -90,7 +90,7 @@ public class Reaction {
    * @param name
    * @param type
    */
-  public Reaction(Integer id, Pathway parentPathway, String name, ReactionType type) {
+  public Reaction(Pathway parentPathway, Integer id, String name, ReactionType type) {
     this(parentPathway, name, type);
     this.id = id;
   }
@@ -104,8 +104,8 @@ public class Reaction {
    * @param type
    * @param childNodes
    */
-  public Reaction(Pathway parentPathway, String name, ReactionType type, NodeList childNodes) {
-    this(parentPathway, name, type);
+  public Reaction(Pathway parentPathway, Integer id, String name, ReactionType type, NodeList childNodes) {
+    this(parentPathway, id, name, type);
     parseSubNodes(childNodes);
   }
   
@@ -211,10 +211,10 @@ public class Reaction {
       NamedNodeMap att = node.getAttributes();
       ReactionComponent rc = null;
       if (name.equalsIgnoreCase("substrate")) {
-        rc = new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes());
+        rc = new ReactionComponent(KeggParser.getNodeValueInt(att, "id"), KeggParser.getNodeValue(att, "name"), node.getChildNodes());
         addSubstrate(rc);
       } else if(name.equals("product")) {
-        rc = new ReactionComponent(KeggParser.getNodeValue(att, "name"), node.getChildNodes());
+        rc = new ReactionComponent(KeggParser.getNodeValueInt(att, "id"), KeggParser.getNodeValue(att, "name"), node.getChildNodes());
         addProduct(rc);
       }
       
