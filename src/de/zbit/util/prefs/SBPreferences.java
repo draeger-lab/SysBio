@@ -1093,6 +1093,9 @@ public class SBPreferences implements Map<Object, Object> {
 		if (value == null) {
 			return null;
 		}
+		if (value.startsWith("class ")) {
+			return Class.forName(value.substring(6));
+		}
 		return Class.forName(value);
 	}
 	
@@ -1129,6 +1132,9 @@ public class SBPreferences implements Map<Object, Object> {
 		String value = getDefaultString(key);
 		if (value == null) {
 			return null;
+		}
+		if (value.startsWith("class ")) {
+			return Class.forName(value.substring(6));
 		}
 		return Class.forName(value);
 	}
