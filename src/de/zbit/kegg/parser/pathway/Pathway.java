@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import de.zbit.kegg.KeggInfoManagement;
@@ -847,7 +848,7 @@ public class Pathway {
    * @return all the necessary XML attributes of this class
    */
   public Map<String, String> getKGMLAttributes() {
-    Map<String, String> attributes = new HashMap<String, String>();
+    Map<String, String> attributes = new TreeMap<String, String>();
     
     if(isSetName()){
       attributes.put("name", name);

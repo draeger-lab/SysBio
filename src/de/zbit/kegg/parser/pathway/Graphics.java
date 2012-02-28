@@ -16,10 +16,10 @@
  */
 package de.zbit.kegg.parser.pathway;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import de.zbit.util.StringUtil;
 
@@ -341,7 +341,7 @@ public class Graphics {
   }
 
   public Map<String, String> getKGMLAttributes() {
-    Map<String, String> attributes = new HashMap<String, String>();
+    Map<String, String> attributes = new TreeMap<String, String>();
 
     if(isSetName()){
       attributes.put("name", name);

@@ -20,10 +20,10 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -403,7 +403,7 @@ public class Reaction {
    * @return all the necessary XML attributes of this class
    */
   public Map<String, String> getKGMLAttributes() {
-    Map<String, String> attributes = new HashMap<String, String>();
+    Map<String, String> attributes = new TreeMap<String, String>();
     
     if(isSetID()){
       attributes.put("id", id.toString());
