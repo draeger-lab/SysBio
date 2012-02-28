@@ -16,8 +16,8 @@
  */
 package de.zbit.kegg.parser.pathway;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -246,7 +246,7 @@ public class ReactionComponent implements Cloneable {
    * @return all the necessary XML attributes of this class
    */
   public Map<String, String> getKGMLAttributes() {
-    Map<String, String> attributes = new HashMap<String, String>();
+    Map<String, String> attributes = new TreeMap<String, String>();
     
     if(isSetID()){
       attributes.put("id", id.toString());
