@@ -7,19 +7,25 @@ public class CSVReaderTest {
 
   /**
    * @param args
-   * @throws IOException 
+   * @throws IOException
    */
   public static void main(String[] args) throws IOException {
-    CSVReader a = new CSVReader("C:/Dokumente und Einstellungen/buechel/Eigene Dateien/Downloads/Mapping250K_Nsp.na31.annot.csv");
-    a.setDisplayProgress(false); // Optional, set to true, if not sysouting
+    if (args != null && args.length == 1) {
+      CSVReader a = new CSVReader(args[0]);
+      a.setDisplayProgress(false); // Optional, set to true, if not sysouting
 
-    String[] line;
-    while ((line = a.getNextLine())!=null) {
-       System.out.println(Arrays.toString(line));
+      String[] line;
+      while ((line = a.getNextLine()) != null) {
+        System.out.println(Arrays.toString(line));
+      }
+
+      a.getHeader(); // The header (if available)
+      a.getPreamble(); // Everything, before actual table start
+
+    } else {
+      System.out.println("It is necessary to enter a csv file!");
     }
-    
-    a.getHeader(); // The header (if available)
-    a.getPreamble(); // Everything, before actual table start
+
   }
 
 }

@@ -106,7 +106,7 @@ ArrayList<String[]> acList = null, idList = null;
 ArrayList<String> acList2 = new ArrayList<String>();
 try {
   // Reading file
-  BufferedReader snpIn = new BufferedReader(new FileReader("C:/Dokumente und Einstellungen/buechel/Desktop/protein.txt"));
+  BufferedReader snpIn = new BufferedReader(new FileReader(System.getenv("UNIDOMINT_FOLDER" + "protein.txt")));
   String line;
   int counter = 0;
   while((line=snpIn.readLine())!=null){
@@ -115,7 +115,7 @@ try {
   snpIn.close();
 
   overAllArray = new String[counter][3];
-  snpIn = new BufferedReader(new FileReader("C:/Dokumente und Einstellungen/buechel/Desktop/protein.txt"));
+  snpIn = new BufferedReader(new FileReader("UNIDOMINT_FOLDER" + "/protein.txt"));
   ipiArray = new String[counter];
   int i=0;
   while((line=snpIn.readLine())!=null){
