@@ -363,7 +363,6 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public static List<Species> generateSpeciesDataStructure() throws IOException {
     BufferedReader in = new BufferedReader(new InputStreamReader(Resource.class.getResourceAsStream("speclist.txt")));
     List<Species> a = generateSpeciesDataStructure(in);
-    //addNCBItaxonomyIdentifier(a, "C:/Dokumente und Einstellungen/wrzodek/Eigene Dateien/Downloads/names.dmp");
     return a;
   }
   
