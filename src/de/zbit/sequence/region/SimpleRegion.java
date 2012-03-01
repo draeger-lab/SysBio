@@ -96,4 +96,22 @@ public class SimpleRegion extends AbstractRegion implements Region, Serializable
     this.end = end;
   }
   
+  
+  /**
+   * Will create a {@link SimpleRegion}.
+   * This class does NOT throw exceptions, so you must use the correct inputs
+   * @param chr
+   * @param start must be &lt; <code>end</code>
+   * @param end must be &gt; <code>start</code>
+   * @return
+   */
+  public static SimpleRegion createRegion(byte chr, int start, int end) {
+    try {
+      return new SimpleRegion(chr, start, end);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+  
 }

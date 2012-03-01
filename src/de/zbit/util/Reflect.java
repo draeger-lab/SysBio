@@ -395,14 +395,15 @@ public class Reflect {
 				logger.warning(String.format("%s not found in %s.",
 					directory.getPath(), path));
 				logger.warning(String.format("directory %s.",
-					(directory.exists() ? "exists" : "does nott exist")));
+					(directory.exists() ? "exists" : "does not exist")));
 				return 0;
 			}
 			if (directory.exists()) {
 				// Get the list of the files contained in the package
 				return getClassesFromDirFltr(set, directory, pckgname, includeSubs, reqSuperCls);
 			} else {
-				logger.warning(String.format("%s does not exist in %s, search directory was %s.", 
+			  // It is NOT mandatory that directory does exist => below info!
+				logger.fine(String.format("%s does not exist in %s, search directory was %s.", 
 					directory.getPath(), path, dir));
 				return 0;
 			}

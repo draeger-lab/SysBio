@@ -17,7 +17,11 @@
 package de.zbit.sequence.region;
 
 /**
- * Interface for genome regions
+ * Interface for genome regions.
+ * 
+ * Please see {@link AbstractRegion} for various very helpful tools
+ * and an abstract implementation.
+ * 
  * @author Clemens Wrzodek
  * @version $Rev$
  */

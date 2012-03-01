@@ -16,8 +16,13 @@
  */
 package de.zbit.sequence.region;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
+
+import de.zbit.util.ArrayUtils;
 
 /**
  * Tools to convert a chromosome from and to different condings.
@@ -38,10 +43,9 @@ public final class ChromosomeTools {
       return Chromosome.default_Chromosome_byte;
     }
     
-    Matcher m = Chromosome.chromosome_regex.matcher(chromosome.trim());
-    if (m.find()) {
-      chromosome = m.group(2);
-      
+    chromosome = parseChromosomeFromString(chromosome);
+    
+    if (chromosome!=null) {
       if (chromosome.equalsIgnoreCase("X")) return -1;
       else if (chromosome.equalsIgnoreCase("Y")) return -2;
       else if (chromosome.equalsIgnoreCase("M")) return -3;
@@ -53,11 +57,25 @@ public final class ChromosomeTools {
           return Chromosome.default_Chromosome_byte;
         }
       }
+      
     } else {
       log.warning(String.format("Unknown Chromosome \"%s\".", chromosome));
     }
     
     return Chromosome.default_Chromosome_byte;
+  }
+  
+  /**
+   * Parse a chromosome from any string (using the {@link Chromosome#chromosome_regex}).
+   * @param chromosome
+   * @return <code>NULL</code> if the regex did not match any expression.
+   */
+  public static String parseChromosomeFromString(String chromosome) {
+    Matcher m = Chromosome.chromosome_regex.matcher(chromosome.trim());
+    if (m.find()) {
+      return m.group(2);
+    }
+    return null;
   }
   
   /**
@@ -78,6 +96,21 @@ public final class ChromosomeTools {
         return "chr"+Byte.toString(chromosome);
       }
     }
+  }
+
+  /**
+   * Splits a list of regions by their chromosomal location
+   * @param <T>
+   * @param regions
+   * @return a map from chromosome to list of all regions
+   * on that chromosome
+   */
+  public static <T extends Chromosome> Map<Byte, List<T>> splitByChromosome(Iterable<T> regions) {
+    Map<Byte, List<T>> ret = new HashMap<Byte, List<T>>();
+    for (T region: regions) {
+      ArrayUtils.addToList(ret, new Byte(region.getChromosomeAsByteRepresentation()), region);
+    }
+    return ret;
   }
   
 }

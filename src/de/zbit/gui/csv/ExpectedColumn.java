@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -248,6 +249,14 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
     regExPatternForInitialSuggestion = regEx;
   }
   
+  /**
+   * Define, if this is an optional or required column.
+   * @param required
+   */
+  public void setRequired(boolean required) {
+    this.required = required;
+  }
+  
   /* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
@@ -363,6 +372,56 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
   public boolean hasRegexPatternForEachType() {
     return isSetRegExPatternForInitialSuggestion() &&
     isSetTypeSelection() && type.length==regExPatternForInitialSuggestion.length;
+  }
+  
+  /**
+   * Copy assigned values from another instance. Just copies values, that
+   * can be changed by the user. Not properties or configurations of this
+   * instance.
+   * <p>You MUST take care that <code>cache</code> refers to an {@link ExpectedColumn}
+   * of the same type as this instance with same configuration
+   * (especially the {@link #originalName}).
+   * @param cache another instance of this class with the same configuration.
+   */
+  public void copyAssignedValuesFrom(ExpectedColumn cache) {
+    this.name = cache.name;
+    this.assignedColumns = cache.assignedColumns;
+    this.assignedTypeForEachColumn = cache.assignedTypeForEachColumn;
+  }
+  /**
+   * Checks if all {@link #assignedColumns} match the template
+   * {@link #regExPatternForInitialSuggestion}.
+   * @param anyContentLine any line, representing content of the CSV file.
+   * The regEX will be checked agains this line.
+   * @return <code>FALSE</code> if any only if we have a regEx pattern,
+   * we have assigned columns, and the given regEX matches the
+   * assigned column (in <code>anyContentLine</code>).
+   */
+  public boolean regEXmatches(String[] anyContentLine) {
+    if (!isSetRegExPatternForInitialSuggestion() ||
+        !hasAssignedColumns()) {
+      // a) No regex = emtpy = always matches
+      // b) If we have no column assignments, we can't check this
+      return true;
+    }
+    
+    // We must perform this check for all columns
+    for (int i=0; i<assignedColumns.size(); i++) {
+      
+      // Get regEx pattern for this column
+      String regEx = regExPatternForInitialSuggestion[0];
+      if (hasRegexPatternForEachType()) {
+        regEx = regExPatternForInitialSuggestion[assignedTypeForEachColumn.get(i)];
+      }
+      
+      int column = assignedColumns.get(i);
+      if (column<anyContentLine.length &&
+          !Pattern.matches(regEx, anyContentLine[column])) {
+        return false;
+      }
+    }
+    
+    return true;
   }
   
 }
