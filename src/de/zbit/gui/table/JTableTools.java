@@ -17,6 +17,7 @@
 package de.zbit.gui.table;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -38,6 +39,9 @@ import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import de.zbit.gui.GUITools;
+import de.zbit.util.StringUtil;
 
 /**
  * @author Clemens Wrzodek
@@ -119,10 +123,19 @@ public class JTableTools {
         swingTimer.restart();
       }
       if (searchField.getText().length() == 0) {
+        disableTimer();
+      }  
+    }
+
+    /**
+     * 
+     */
+    public void disableTimer() {
+      if (swingTimer!=null) {
         swingTimer.stop();
         swingTimer = null;
-        searchField.setEnabled(true);
-      }  
+      }
+      searchField.setEnabled(true);
     }
     
     public void search() {
@@ -138,6 +151,7 @@ public class JTableTools {
        * to a new thread and show a loading indicator in the search
        * field.
        */
+      disableTimer();
       table.clearSelection();
       String text = searchField.getText();
       if (text.length() <1) { 
@@ -155,7 +169,8 @@ public class JTableTools {
             val = list2String(val);
           }
           String value = val.toString();
-          if (value.toLowerCase().contains(text)) {
+          
+          if (StringUtil.indexOfIgnoreCase(value, text)>=0) {
             table.changeSelection(row, col, false, false);
             return;
           }
@@ -182,10 +197,17 @@ public class JTableTools {
     //  table.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE);
     final JTextField searchField = new JTextField();
     
-    
     // Add the listeners that active the search
     table.addKeyListener(new KeyAdapter() {
       boolean isDialogVisible = false;
+      
+      /*
+       * Configure search field. Must be done exactly once!
+       */
+      {
+        configureSearchField(table, searchField);
+      }
+
       
       /* (non-Javadoc)
        * @see java.awt.event.KeyAdapter#keyPressed(java.awt.event.KeyEvent)
@@ -236,9 +258,6 @@ public class JTableTools {
        * @param searchField searchField
        */
       private void showSearchDialog() {
-        final Search s = new Search(table, searchField);
-        //s.search();
-        
         final JDialog d = new JDialog();
         d.setUndecorated(true);
         d.setSize(150, 20);
@@ -256,6 +275,17 @@ public class JTableTools {
         d.add(next);*/
         d.setVisible(true);
         isDialogVisible = true;
+      }
+
+      /**
+       * @param table
+       * @param searchField
+       * @param s
+       * @param d
+       */
+      public void configureSearchField(final JTable table, final JTextField searchField) {
+        final Search s = new Search(table, searchField);
+        
         searchField.getDocument().addDocumentListener(new DocumentListener() {
         	/* (non-Javadoc)
            * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
@@ -306,7 +336,8 @@ public class JTableTools {
            */
           public void focusLost(final FocusEvent e) {
             isDialogVisible=false;
-            d.dispose();
+            Dialog d = GUITools.getParentDialog(searchField);
+            if (d!=null) d.dispose();
           }
         });
         Action exit = new AbstractAction() {
@@ -316,7 +347,8 @@ public class JTableTools {
            */
           public void actionPerformed(final ActionEvent e) {
             isDialogVisible=false;
-            d.dispose();
+            Dialog d = GUITools.getParentDialog(searchField);
+            if (d!=null) d.dispose();
           }
         };
         // Close on exit or escape

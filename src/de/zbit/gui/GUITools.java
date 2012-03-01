@@ -1269,7 +1269,7 @@ public class GUITools {
   }
   
   /**
-   * Searches for the parent #{@link java.awt.Window} of the given component c.
+   * Searches for the parent {@link Window} of the given component c.
    * @param c
    * @return the window if found, or null if not found.
    */
@@ -1277,6 +1277,21 @@ public class GUITools {
     while (c!=null) {
       if (c instanceof Window) {
         return (Window) c;
+      }
+      c = c.getParent();
+    }
+    return null;
+  }
+  
+  /**
+   * Searches for the parent {@link Dialog} of the given component c.
+   * @param c
+   * @return the Dialog if found, or null if not found.
+   */
+  public static Dialog getParentDialog(Component c) {
+    while (c!=null) {
+      if (c instanceof Dialog) {
+        return (Dialog) c;
       }
       c = c.getParent();
     }

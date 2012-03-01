@@ -1003,7 +1003,7 @@ public class StringUtil {
 	
   /**
    *
-   * @param   source      the string to search.
+   * @param   source      the string to search in (full length).
    * @param   str   any string.
    * @return  if the string argument occurs as a substring within this
    *          object, then the index of the first character of the first
@@ -1016,7 +1016,7 @@ public class StringUtil {
 	
 	/**
    *
-   * @param   source      the string to search.
+   * @param   source      the string to search in (full length).
    * @param   str         the substring for which to search.
    * @param   fromIndex   the index from which to start the search.
    * @return  the index within this string of the first occurrence of the
