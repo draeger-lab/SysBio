@@ -187,8 +187,8 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
   
   /**
    * Get all regions from <code>all</code>, overlapping with <code>intersectWith</code>. 
-   * This is for unsorted lists, please use {@link #getAllIntersections(List, Region, boolean)}
-   * for sorted lists!
+   * <p><b>This is for unsorted lists, please use {@link #getAllIntersections(List, Region, boolean)}
+   * for sorted lists!</b></p>
    * @param all
    * @param intersectWith
    * @return Intersecting regions.
@@ -213,19 +213,50 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
    * Additionaly, it is possible to get the closest region, if no intersecting region could
    * be found.
    * <p>The list must be sorted into ascending order according primary by {@link #getChromosome()}
-   * and secondary by {@link #getStart()} prior to making this call.
+   * and secondary by {@link #getStart()} prior to making this call (see {@link AbstractRegion#getComparator()}.
    * If it is not sorted, the results are undefined.</p>
+   * 
+   * <p>NOTE: If you itend to call this method multiple times, it is much faster to calculate
+   * the maximum region length of all regions in <code>allRegionsSorted</code> iteratively
+   * and use {@link #getAllIntersections(List, Region, boolean, int)}</p>
+   *  
    * @param <T> Actual implementing class
    * @param <K> May be T, may also be any {@link AbstractRegion}
    * @param allRegionsSorted sorted list of all regions
    * @param searchFor {@link Region} to search for
    * @param getClosestIfIntersectionIsEmpty get the single, closest region if no intersecting
    * region could be found.
-   * @return 
+   * 
    * @return List of all intersecting {@link Region}s, or single closest.
    */
   public static <T extends Region & Comparable<? super Region>>  List<T> getAllIntersections(
     List<T> allRegionsSorted, Region searchFor, boolean getClosestIfIntersectionIsEmpty) {
+    return getAllIntersections(allRegionsSorted, searchFor, getClosestIfIntersectionIsEmpty, -1);
+  }
+  
+  /**
+   * Searches for intersecting {@link Region}s in a sorted list and returns the intersecting region.
+   * Additionaly, it is possible to get the closest region, if no intersecting region could
+   * be found.
+   * <p>The list must be sorted into ascending order according primary by {@link #getChromosome()}
+   * and secondary by {@link #getStart()} prior to making this call (see {@link AbstractRegion#getComparator()}.
+   * If it is not sorted, the results are undefined.</p>
+   * 
+   * <p>NOTE: If you know the <code>maximumRegionSize</code>, this is the fastest method!</p>
+   * @param <T> Actual implementing class
+   * @param <K> May be T, may also be any {@link AbstractRegion}
+   * @param allRegionsSorted sorted list of all regions
+   * @param searchFor {@link Region} to search for
+   * @param getClosestIfIntersectionIsEmpty get the single, closest region if no intersecting
+   * region could be found. 
+   * @param maximumRegionSize values &lt; 1 will be interpreted as unknwon!
+   * If you know the maximum length of your regions in <code>allRegionsSorted</code>,
+   * you should specify this here. This will speedup the whole process enormously.
+   * 
+   * @return List of all intersecting {@link Region}s, or single closest.
+   */
+  public static <T extends Region & Comparable<? super Region>>  List<T> getAllIntersections(
+    List<T> allRegionsSorted, Region searchFor, boolean getClosestIfIntersectionIsEmpty, int maximumRegionSize) {
     List<T> ret = new ArrayList<T>();
     if (allRegionsSorted==null || allRegionsSorted.size()<1) return ret;
     
@@ -235,7 +266,7 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
     int minDistance = Integer.MAX_VALUE;
     
     // Get intersecting cgi
-    int pos = Collections.binarySearch(allRegionsSorted, searchFor);
+    int pos = Collections.binarySearch(allRegionsSorted, searchFor, AbstractRegion.getComparator());
     if (pos<0) { // pos is (-(insertion point) - 1). 
       pos = -(pos+1);
     }
@@ -251,11 +282,16 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
      * positions
      */
     int size = allRegionsSorted.size();
-    int lPos = pos, uPos = pos;
-    while ((--lPos>0) && allRegionsSorted.get(lPos).getChromosome()==searchFor.getChromosome());
-    while ((++uPos<size) && (allRegionsSorted.get(uPos).getChromosome()==searchFor.getChromosome()
+    // Search first region in chromosome, i.e. all regions below this are for sure NOT overlapping
+    int lPos = maximumRegionSize>0 ? pos :
+      Math.abs(Collections.binarySearch(allRegionsSorted, SimpleRegion.createRegion(searchFor.getChromosomeAsByteRepresentation(), 1, 2), AbstractRegion.getComparator())+1);
+    // Search for "greater start", i.e. first not-overlapping region
+    int uPos = pos-1;
+    while ((--lPos>0) && allRegionsSorted.get(lPos).getChromosomeAsByteRepresentation()==searchFor.getChromosomeAsByteRepresentation() &&
+        (maximumRegionSize<=0 || (allRegionsSorted.get(lPos).getStart()+maximumRegionSize) >= searchFor.getStart()));
+    while ((++uPos<size) && (allRegionsSorted.get(uPos).getChromosomeAsByteRepresentation()==searchFor.getChromosomeAsByteRepresentation()
         && allRegionsSorted.get(uPos).getStart()<=searchFor.getStart()));
-    
+
     // Now, there is now other way than checking each Region from
     // lPos+1 to uPos-1 if their end is >= searchFors start position+1
     T nextRegionStartingBehindSearchFor=null;

@@ -2058,7 +2058,7 @@ public class GUITools {
       
       logger.log(Level.WARNING, defaultMessage, exc);
       String name = (exc!=null?exc.getClass().getSimpleName():"Error");
-      JOptionPane.showMessageDialog(parent, defaultMessage, name, JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(parent, StringUtil.toHTMLToolTip(defaultMessage), name, JOptionPane.ERROR_MESSAGE);
     } else {
       showErrorMessage(parent, exc);
     }

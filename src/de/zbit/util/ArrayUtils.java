@@ -16,10 +16,12 @@
  */
 package de.zbit.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -433,6 +435,47 @@ public class ArrayUtils {
    */
   public static <T> List<T> asList(T[] arr, int rangeStart, int rangeEnde) {
     return Arrays.asList(toSubArray(arr, rangeStart, rangeEnde));
+  }
+  
+  /**
+   * Add a key value pair to a {@link Map}, in which each Value is
+   * actually a {@link List} of real values (i.e. one key can refer
+   * to multiple values - Map&lt;K, List&lt;V&gt;&gt;)!
+   * @param <K>
+   * @param <V>
+   * @param map
+   * @param key
+   * @param listItem
+   */
+  public static <K, V> void addToList(Map<K,List<V>> map, K key, V listItem) {
+    List<V> list = map.get(key);
+    if (list==null) {
+      list = new ArrayList<V>();
+      map.put(key, list);
+    }
+    list.add(listItem);
+  }
+
+  /**
+   * <p>NOTE: THIS IS UNTESTED AND MIGHT NOT WORK.</p>
+   * @param <T>
+   * @param insertAtPosition
+   * @param arr
+   * @param element
+   * @return
+   */
+    public static <T> T[] insert(int insertAtPosition, T[] arr, T... element) {
+    // Ensure that both are not null.
+    if (arr==null) return element;
+    if (element==null || element.length==1 && element[0]==null) return arr;
+    
+    // Copy arrays
+    T[] ret = (T[]) createNewArray(element, arr.length+element.length);
+    System.arraycopy(arr, 0, ret, 0, insertAtPosition);
+    System.arraycopy(element, 0, ret, insertAtPosition, element.length);
+    System.arraycopy(arr, insertAtPosition, ret, insertAtPosition+element.length, arr.length-insertAtPosition);
+    
+    return ret;
   }
 
 }
