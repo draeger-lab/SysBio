@@ -28,8 +28,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.biopax.paxtools.model.Model;
-
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
@@ -230,8 +228,6 @@ public class KeggTools {
     }
     
   }
-  
-  static Model m;
 
   /**
    * Check if the substrates, defined in the reaction are really on the left side,
