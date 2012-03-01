@@ -350,7 +350,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 			progressBar.drawProgressBar(percent, miliSecondsRemaining, additionalText);
 
 			// Hide when done.
-			if (percent == 100) {
+			if (percent >= 100) {
 				progressBar.getProgressBar().setVisible(false);
 			}
 		}

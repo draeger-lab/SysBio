@@ -748,8 +748,36 @@ public class GUITools {
    */
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, Icon icon, char mnemonic) {
-    return createJMenuItem(listener, command, icon, null, Character
-      .valueOf(mnemonic));
+    return createJMenuItem(listener, command, icon, mnemonic, true);
+  }
+  
+  /**
+   * Creates an entry for the menu bar.
+   * 
+   * @param listener
+   * @param command
+   * @param icon
+   * @param mnemonic
+   * @param enabled
+   * @return
+   */
+  public static JMenuItem createJMenuItem(ActionListener listener,
+    ActionCommand command, Icon icon, char mnemonic, boolean enabled) {
+    return createJMenuItem(listener, command, icon, null, Character.valueOf(mnemonic), enabled);
+  }
+  
+  /**
+   * Creates an entry for the menu bar.
+   * 
+   * @param listener
+   * @param command
+   * @param icon
+   * @param enabled
+   * @return
+   */
+  public static JMenuItem createJMenuItem(ActionListener listener,
+    ActionCommand command, Icon icon, boolean enabled) {
+    return createJMenuItem(listener, command, icon, null, null, enabled);
   }
   
   
@@ -884,7 +912,7 @@ public class GUITools {
    */
 	public static JMenuItem createJMenuItem(ActionListener listener,
 		ActionCommandWithIcon command, char mnemonic, boolean enabled) {
-		return createJMenuItem(listener, command, null, mnemonic, enabled);
+		return createJMenuItem(listener, command, (Icon) null, mnemonic, enabled);
 	}
 	
 	/**
