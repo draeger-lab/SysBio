@@ -37,7 +37,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.zbit.biopax.BioPax2KGML;
+import de.zbit.biopax.BioPaxL32KGML;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
@@ -63,7 +63,7 @@ public class KGMLWriter {
    */
   static String indent = "4";
 
-  public static final Logger log = Logger.getLogger(BioPax2KGML.class.getName());
+  public static final Logger log = Logger.getLogger(BioPaxL32KGML.class.getName());
 
 
   /**

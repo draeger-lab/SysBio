@@ -16,10 +16,10 @@
  */
 package de.zbit.kegg.parser.pathway;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import de.zbit.util.StringUtil;
 
@@ -341,7 +341,8 @@ public class Graphics {
   }
 
   public Map<String, String> getKGMLAttributes() {
-    Map<String, String> attributes = new TreeMap<String, String>();
+    Map<String, String> attributes = new LinkedHashMap<String, String>();
+    // LinkedHashMap has a stable ordering (fifo).
 
     if(isSetName()){
       attributes.put("name", name);
@@ -362,7 +363,7 @@ public class Graphics {
       attributes.put("width", String.valueOf(width));
     }
     if(isSetHeight()){
-      attributes.put("heigth", String.valueOf(height));
+      attributes.put("height", String.valueOf(height));
     }
     if(isSetFGcolor()){
       attributes.put("fgcolor", fgcolor);
