@@ -83,6 +83,19 @@ public class WizardModel {
   public static final String CANCEL_BUTTON_ENABLED_PROPERTY = "cancelButtonEnabledProperty";
 
   /**
+   * Property identification String for the Help button's text
+   */
+  public static final String HELP_BUTTON_TEXT_PROPERTY = "helpButtonTextProperty";
+  /**
+   * Property identification String for the Help button's icon
+   */
+  public static final String HELP_BUTTON_ICON_PROPERTY = "helpButtonIconProperty";
+  /**
+   * Property identification String for the Help button's enabled state
+   */
+  public static final String HELP_BUTTON_ENABLED_PROPERTY = "helpButtonEnabledProperty";
+
+  /**
    * Property identification String for the warning panel's text
    */
   public static final String WARNING_MESSAGE_TEXT_PROPERTY = "warningMessageTextProperty";
@@ -226,6 +239,19 @@ public class WizardModel {
     }
   }
 
+  String getHelpButtonText() {
+    return buttonTextHashmap.get(HELP_BUTTON_TEXT_PROPERTY);
+  }
+
+  void setHelpButtonText(String newText) {
+
+    String oldText = getHelpButtonText();
+    if (!newText.equals(oldText)) {
+      buttonTextHashmap.put(HELP_BUTTON_TEXT_PROPERTY, newText);
+      firePropertyChange(HELP_BUTTON_TEXT_PROPERTY, oldText, newText);
+    }
+  }
+
   String getWarningText() {
     return warningText;
   }
@@ -273,6 +299,19 @@ public class WizardModel {
     if (!newIcon.equals(oldIcon)) {
       buttonIconHashmap.put(CANCEL_BUTTON_ICON_PROPERTY, newIcon);
       firePropertyChange(CANCEL_BUTTON_ICON_PROPERTY, oldIcon, newIcon);
+    }
+  }
+
+  Icon getHelpButtonIcon() {
+    return (Icon) buttonIconHashmap.get(HELP_BUTTON_ICON_PROPERTY);
+  }
+
+  void setHelpButtonIcon(Icon newIcon) {
+
+    Icon oldIcon = getHelpButtonIcon();
+    if (!newIcon.equals(oldIcon)) {
+      buttonIconHashmap.put(HELP_BUTTON_ICON_PROPERTY, newIcon);
+      firePropertyChange(HELP_BUTTON_ICON_PROPERTY, oldIcon, newIcon);
     }
   }
 
@@ -325,6 +364,19 @@ public class WizardModel {
     if (newValue != oldValue) {
       buttonEnabledHashmap.put(CANCEL_BUTTON_ENABLED_PROPERTY, newValue);
       firePropertyChange(CANCEL_BUTTON_ENABLED_PROPERTY, oldValue, newValue);
+    }
+  }
+  
+  Boolean getHelpButtonEnabled() {
+    return buttonEnabledHashmap.get(HELP_BUTTON_ENABLED_PROPERTY);
+  }
+
+  void setHelpButtonEnabled(Boolean newValue) {
+
+    Boolean oldValue = getHelpButtonEnabled();
+    if (newValue != oldValue) {
+      buttonEnabledHashmap.put(HELP_BUTTON_ENABLED_PROPERTY, newValue);
+      firePropertyChange(HELP_BUTTON_ENABLED_PROPERTY, oldValue, newValue);
     }
   }
   
