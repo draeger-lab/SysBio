@@ -225,5 +225,6 @@ bestimmten Bedingungen weiterverbreiten dürfen.
   <entry key="WIZARD_BACK">Zurück</entry>
   <entry key="WIZARD_CANCEL">Abbrechen</entry>
   <entry key="WIZARD_FINISH">Fertigstellen</entry>
+  <entry key="WIZARD_HELP">Hilfe</entry>
   
 </properties>

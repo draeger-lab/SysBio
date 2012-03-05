@@ -175,5 +175,6 @@
   <entry key="WIZARD_BACK">上一步</entry>
   <entry key="WIZARD_CANCEL">取消</entry>
   <entry key="WIZARD_FINISH">完成</entry>
+  <entry key="WIZARD_HELP">帮助</entry>
   
 </properties>

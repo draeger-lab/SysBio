@@ -88,6 +88,10 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
    * The String-based action command for the 'Cancel' button.
    */
   public static final String CANCEL_BUTTON_ACTION_COMMAND = "CancelButtonActionCommand";
+  /**
+   * The String-based action command for the 'Cancel' button.
+   */
+  public static final String HELP_BUTTON_ACTION_COMMAND = "HelpButtonActionCommand";
 
   // The i18n text used for the buttons. Loaded from a property resource file.    
 
@@ -95,6 +99,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
   static String NEXT_TEXT;
   static String FINISH_TEXT;
   static String CANCEL_TEXT;
+  static String HELP_TEXT;
 
   // The image icons used for the buttons. Filenames are loaded from a property resource file.    
 
@@ -102,6 +107,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
   static Icon NEXT_ICON;
   static Icon FINISH_ICON;
   static Icon CANCEL_ICON;
+  static Icon HELP_ICON;
   
   static Icon WARNING_ICON;
   static Icon ERROR_ICON;
@@ -115,6 +121,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
   private JButton backButton;
   private JButton nextButton;
   private JButton cancelButton;
+  private JButton helpButton;
   private JPanel warningPanel;
   private JLabel warningLabel;
 
@@ -322,6 +329,8 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
       backButton.setText(evt.getNewValue().toString());
     } else if (evt.getPropertyName().equals(WizardModel.CANCEL_BUTTON_TEXT_PROPERTY)) {
       cancelButton.setText(evt.getNewValue().toString());
+    } else if (evt.getPropertyName().equals(WizardModel.HELP_BUTTON_TEXT_PROPERTY)) {
+      helpButton.setText(evt.getNewValue().toString());
     } else if (evt.getPropertyName().equals(WizardModel.WARNING_MESSAGE_TEXT_PROPERTY)) {
       warningLabel.setText((String) evt.getNewValue());
     } else if (evt.getPropertyName().equals(WizardModel.NEXT_FINISH_BUTTON_ENABLED_PROPERTY)) {
@@ -330,12 +339,16 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
       backButton.setEnabled(((Boolean) evt.getNewValue()).booleanValue());
     } else if (evt.getPropertyName().equals(WizardModel.CANCEL_BUTTON_ENABLED_PROPERTY)) {
       cancelButton.setEnabled(((Boolean) evt.getNewValue()).booleanValue());
+    } else if (evt.getPropertyName().equals(WizardModel.HELP_BUTTON_ENABLED_PROPERTY)) {
+      helpButton.setEnabled(((Boolean) evt.getNewValue()).booleanValue());
     } else if (evt.getPropertyName().equals(WizardModel.NEXT_FINISH_BUTTON_ICON_PROPERTY)) {
       nextButton.setIcon((Icon) evt.getNewValue());
     } else if (evt.getPropertyName().equals(WizardModel.BACK_BUTTON_ICON_PROPERTY)) {
       backButton.setIcon((Icon) evt.getNewValue());
     } else if (evt.getPropertyName().equals(WizardModel.CANCEL_BUTTON_ICON_PROPERTY)) {
       cancelButton.setIcon((Icon) evt.getNewValue());
+    } else if (evt.getPropertyName().equals(WizardModel.HELP_BUTTON_ICON_PROPERTY)) {
+      helpButton.setIcon((Icon) evt.getNewValue());
     } else if (evt.getPropertyName().equals(WizardModel.WARNING_MESSAGE_ICON_PROPERTY)) {
       warningLabel.setIcon((Icon) evt.getNewValue());
     }
@@ -405,7 +418,25 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
   public void setCancelButtonEnabled(boolean newValue) {
     wizardModel.setCancelButtonEnabled(new Boolean(newValue));
   }
-  
+
+  /**
+   * Mirrors the WizardModel method of the same name.
+   * 
+   * @return A boolean indicating if the button is enabled.
+   */
+  public boolean getHelpButtonEnabled() {
+    return wizardModel.getHelpButtonEnabled().booleanValue();
+  }
+
+  /**
+   * Mirrors the WizardModel method of the same name.
+   * 
+   * @param boolean newValue The new enabled status of the button.
+   */
+  public void setHelpButtonEnabled(boolean newValue) {
+    wizardModel.setHelpButtonEnabled(new Boolean(newValue));
+  }
+
   public void setWarningText(String message) {
     wizardModel.setWarningText(message);
   }
@@ -482,11 +513,13 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     NEXT_TEXT = bundle.getString("WIZARD_NEXT");
     CANCEL_TEXT = bundle.getString("WIZARD_CANCEL");
     FINISH_TEXT = bundle.getString("WIZARD_FINISH");
+    HELP_TEXT = bundle.getString("WIZARD_HELP");
 
     BACK_ICON = UIManager.getIcon("ICON_ARROW_LEFT_16");
     NEXT_ICON = UIManager.getIcon("ICON_ARROW_RIGHT_16");
     CANCEL_ICON = UIManager.getIcon("ICON_EXIT_16");
     FINISH_ICON = UIManager.getIcon("ICON_TICK_16");
+    HELP_ICON = UIManager.getIcon("ICON_HELP_16");
     
     WARNING_ICON = UIManager.getIcon("ICON_WARNING_16");
     ERROR_ICON = UIManager.getIcon("ICON_EXIT_16");
@@ -515,14 +548,17 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     backButton = new JButton(new ImageIcon("com/nexes/wizard/backIcon.gif"));
     nextButton = new JButton();
     cancelButton = new JButton();
+    helpButton = new JButton();
 
     backButton.setActionCommand(BACK_BUTTON_ACTION_COMMAND);
     nextButton.setActionCommand(NEXT_BUTTON_ACTION_COMMAND);
     cancelButton.setActionCommand(CANCEL_BUTTON_ACTION_COMMAND);
+    helpButton.setActionCommand(HELP_BUTTON_ACTION_COMMAND);
 
     backButton.addActionListener(wizardController);
     nextButton.addActionListener(wizardController);
     cancelButton.addActionListener(wizardController);
+    helpButton.addActionListener(wizardController);
 
     warningPanel = new JPanel();
     warningPanel.setLayout(new BorderLayout());
@@ -539,6 +575,10 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     buttonPanel.add(new JSeparator(), BorderLayout.NORTH);
 
     buttonBox.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
+    // TODO: move somewhere else, maybe to the left
+    buttonBox.add(helpButton);
+    buttonBox.add(Box.createHorizontalStrut(40));
+    /////////////////////////////////////////////
     buttonBox.add(backButton);
     buttonBox.add(Box.createHorizontalStrut(10));
     buttonBox.add(nextButton);

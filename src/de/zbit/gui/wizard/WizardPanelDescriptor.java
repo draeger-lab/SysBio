@@ -152,7 +152,18 @@ public class WizardPanelDescriptor {
     public Object getBackPanelDescriptor() {
         return null;
     }
-    
+
+    /**
+     * Returns an object that represents what happens if the help button is
+     * clicked.
+     * 
+     * TODO: This is just a place holder and about to change.
+     * @return object
+     */    
+    public Object getHelpAction() {
+        return null;
+    }
+
     //  Override this method in the subclass if you wish it to be called
     //  just before the panel is displayed.
     
