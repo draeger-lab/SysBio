@@ -181,7 +181,10 @@ public class Entry {
    * @param components
    */
   public void addComponents(List<Integer> components) {
-    components.addAll(components);
+    if (!isSetComponent()){
+      this.components = new ArrayList<Integer>();
+    }
+    this.components.addAll(components);
   }
   
   /**
