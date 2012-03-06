@@ -73,7 +73,6 @@ public class KGMLWriter {
    * then an {@link Document} an then writes it with the defined {@link KGMLWriter#indent}
    * 
    * @param keggPW
-   * @param fileName
    * @throws XMLStreamException 
    * @throws FileNotFoundException 
    */
@@ -105,8 +104,6 @@ public class KGMLWriter {
       fileName += ".xml";
     }
 
-    // TODO: delete this line for publishing
-    fileName = "pws/" + fileName;
     return fileName;
   }
   
