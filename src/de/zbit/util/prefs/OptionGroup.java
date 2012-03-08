@@ -349,5 +349,30 @@ public class OptionGroup<T> implements ActionCommand,
     sb.append(options.toString());
     return sb.toString();
   }
+
+  /**
+   * Check if any {@link Option} on this group is visible.
+   * @return <code>TRUE</code> if all {@link #options} on this
+   * group are invisible.
+   */
+  public boolean isAllOptionsInvisible() {
+    return isAllOptionsInvisible(options);
+  }
+  
+  /**
+   * Check if any of the given {@link Option}s is visible.
+   * 
+   * @param <T>
+   * @param options
+   * @return <code>TRUE</code> if all {@link #options} are invisible.
+   */
+  public static <T extends Option<?>> boolean isAllOptionsInvisible(Iterable<T> options) {
+    for (Option<?> option : options) {
+      if (option.isVisible()) {
+        return false;
+      }
+    }
+    return true;
+  }
   
 }
