@@ -245,6 +245,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("done")) {
 			searchField.setEnabled(true);
+			searchField.requestFocus();
 		}
 	}
 	

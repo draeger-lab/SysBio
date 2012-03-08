@@ -22,6 +22,9 @@ import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -33,10 +36,13 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
@@ -559,6 +565,14 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     nextButton.addActionListener(wizardController);
     cancelButton.addActionListener(wizardController);
     helpButton.addActionListener(wizardController);
+    
+    getDialog().getRootPane().registerKeyboardAction(
+    		wizardController, 
+    		CANCEL_BUTTON_ACTION_COMMAND,
+    		KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
+    		JComponent.WHEN_IN_FOCUSED_WINDOW);
+    
+    nextButton.setSelected(true);
 
     warningPanel = new JPanel();
     warningPanel.setLayout(new BorderLayout());
