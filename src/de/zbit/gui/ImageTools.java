@@ -281,6 +281,12 @@ public static BufferedImage brightenImage(BufferedImage image, float percent) {
 	 */
 	public static BufferedImage image2BufferedImage(Image img,
 			boolean drawBorder) {
+	  int width = img.getWidth(null);
+	  int height = img.getHeight(null);
+	  if (width<=0 || height<=0) {
+	    log.log(Level.WARNING, String.format("Image width invalid size (width: %s, height: %s).", width, height));
+	    return new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+	  }
 		BufferedImage bmage = new BufferedImage(img.getWidth(null), 
 		  img.getHeight(null), BufferedImage.TYPE_INT_RGB);
 		Graphics g = bmage.getGraphics();

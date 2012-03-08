@@ -836,13 +836,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
        * Thus, we should keep the one column layout and create a new group for
        * ungrouped options.
        */
-      elemCount = 0;
-      for (Option<?> option : ungroupedOptions) {
-        if (option.isVisible()) {
-          elemCount++;
-        }
-      }
-      if (elemCount > 0) {
+      if (OptionGroup.isAnyOptionVisible(ungroupedOptions)) {
         lh.add(createGroup((Collection<Option>) ungroupedOptions,
           unprocessedOptions));
       }
