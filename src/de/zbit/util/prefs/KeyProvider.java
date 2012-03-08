@@ -146,13 +146,7 @@ public interface KeyProvider {
 			if (groupList.size() > 0) {
 				for (OptionGroup<?> group : groupList) {
 					if (group.getOptions().size() > 0) {
-						int disabledCount = 0;
-						for (Option<?> option : group.getOptions()) {
-							if (!option.isVisible()) {
-								disabledCount++;
-							}
-						}
-						if (disabledCount < group.getOptions().size()) {
+						if (!group.isAllOptionsInvisible()) {
 							sb.append(createHeadline(headerRank, group.getName()));
 							sb.append("      <p>");
 							sb.append(StringUtil.insertLineBreaks(group.getToolTip(), 70,
@@ -164,21 +158,9 @@ public interface KeyProvider {
 				}
 			}
 			if (optionList.size() > 0) {
-				int countVisible = optionList.size();
-				for (Option<?> option : optionList) {
-					if (option.isVisible()) {
-						countVisible++;
-					}
-				}
-				if (countVisible > 0) {
+				if (!OptionGroup.isAllOptionsInvisible(optionList)) {
 					if (groupList.size() > 0) {
-						sb.append("    <h");
-						sb.append(headerRank);
-						sb.append("> ");
-						sb.append(bundle.getString("ADDITIONAL_OPTIONS"));
-						sb.append(" </h");
-						sb.append(headerRank);
-						sb.append(">\n");
+						sb.append(createHeadline(headerRank, bundle.getString("ADDITIONAL_OPTIONS")));
 					}
 					writeOptionsToHTMLTable(sb, optionList, null);
 				}
@@ -219,6 +201,72 @@ public interface KeyProvider {
 			sb.append(createDocumantationFooter());
 			return sb.toString();
 		}
+		
+		
+		/**
+		 * Create a LaTeX documentation string.
+		 * 
+		 * XXX: This method is work-in-progress!
+		 * 
+		 * @param keyProvider
+		 * @param headerRank wether you want to start with chapter (=0) or section (=1).
+		 * @return
+		 */
+		public static String createLaTeXDocumentation(
+		  Class<? extends KeyProvider> keyProvider, int headerRank) {
+		  
+		  StringBuilder sb = new StringBuilder();
+		  sb.append(String.format("%s{%s}\n", getLaTeXSection(headerRank), createTitle(keyProvider)));
+      //sb.append(createProgramUsage(2, "")); // TODO: LaTeX program usage
+      
+      ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);          
+      List<OptionGroup> groupList = optionGroupList(keyProvider);
+      List<Option> optionList = optionList(keyProvider);
+      if (groupList.size() > 0) {
+        for (OptionGroup<?> group : groupList) {
+          if (group.getOptions().size() > 0) {
+            if (!group.isAllOptionsInvisible()) {
+              // a headline
+              sb.append(String.format("%s{%s}\n", getLaTeXSection(headerRank+1), group.getName()));
+              
+              // display all options in an description environment
+              sb.append("\\begin{description}\n");
+              //writeOptionsToHTMLTable(sb, group.getOptions(), optionList); // TODO: LaTeX method
+              sb.append("\\end{description}\n");
+            }
+          }
+        }
+      }
+      if (optionList.size() > 0) {
+        if (!OptionGroup.isAllOptionsInvisible(optionList)) {
+          if (groupList.size() > 0) {
+            sb.append(String.format("%s{%s}\n", getLaTeXSection(headerRank+1), bundle.getString("ADDITIONAL_OPTIONS")));
+          }
+          sb.append("\\begin{description}\n");
+          //writeOptionsToHTMLTable(sb, optionList, null);  // TODO: LaTeX method
+          sb.append("\\end{description}\n");
+        }
+      }
+      
+      return sb.toString();
+    }
+    
+    /**
+     * Returns a latex section definition, based on the <code>headerRank</code>.
+     * 
+     * @param headerRank 0 will return "chapter", 1 is "section", 2 is "subsection", etc.
+     * @return
+     */
+    private static String getLaTeXSection(int headerRank) {
+      if (headerRank<=0) return "\\chapter";
+      
+      StringBuilder sb = new StringBuilder("\\");
+      for (int i=1; i<headerRank; i++) {
+        sb.append("sub");
+      }
+      sb.append("section");
+      return sb.toString();
+    }
 		
 		/**
 		 * 
