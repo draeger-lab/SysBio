@@ -352,11 +352,11 @@ public class OptionGroup<T> implements ActionCommand,
 
   /**
    * Check if any {@link Option} on this group is visible.
-   * @return <code>TRUE</code> if all {@link #options} on this
+   * @return <code>FALSE</code> if all {@link #options} on this
    * group are invisible.
    */
-  public boolean isAllOptionsInvisible() {
-    return isAllOptionsInvisible(options);
+  public boolean isAnyOptionVisible() {
+    return isAnyOptionVisible(options);
   }
   
   /**
@@ -364,15 +364,15 @@ public class OptionGroup<T> implements ActionCommand,
    * 
    * @param <T>
    * @param options
-   * @return <code>TRUE</code> if all {@link #options} are invisible.
+   * @return <code>FALSE</code> if all {@link #options} are invisible.
    */
-  public static <T extends Option<?>> boolean isAllOptionsInvisible(Iterable<T> options) {
+  public static <T extends Option<?>> boolean isAnyOptionVisible(Iterable<T> options) {
     for (Option<?> option : options) {
       if (option.isVisible()) {
-        return false;
+        return true;
       }
     }
-    return true;
+    return false;
   }
   
 }

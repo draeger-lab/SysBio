@@ -146,7 +146,7 @@ public interface KeyProvider {
 			if (groupList.size() > 0) {
 				for (OptionGroup<?> group : groupList) {
 					if (group.getOptions().size() > 0) {
-						if (!group.isAllOptionsInvisible()) {
+						if (group.isAnyOptionVisible()) {
 							sb.append(createHeadline(headerRank, group.getName()));
 							sb.append("      <p>");
 							sb.append(StringUtil.insertLineBreaks(group.getToolTip(), 70,
@@ -158,7 +158,7 @@ public interface KeyProvider {
 				}
 			}
 			if (optionList.size() > 0) {
-				if (!OptionGroup.isAllOptionsInvisible(optionList)) {
+				if (OptionGroup.isAnyOptionVisible(optionList)) {
 					if (groupList.size() > 0) {
 						sb.append(createHeadline(headerRank, bundle.getString("ADDITIONAL_OPTIONS")));
 					}
@@ -225,7 +225,7 @@ public interface KeyProvider {
       if (groupList.size() > 0) {
         for (OptionGroup<?> group : groupList) {
           if (group.getOptions().size() > 0) {
-            if (!group.isAllOptionsInvisible()) {
+            if (group.isAnyOptionVisible()) {
               // a headline
               sb.append(String.format("%s{%s}\n", getLaTeXSection(headerRank+1), group.getName()));
               
@@ -238,7 +238,7 @@ public interface KeyProvider {
         }
       }
       if (optionList.size() > 0) {
-        if (!OptionGroup.isAllOptionsInvisible(optionList)) {
+        if (OptionGroup.isAnyOptionVisible(optionList)) {
           if (groupList.size() > 0) {
             sb.append(String.format("%s{%s}\n", getLaTeXSection(headerRank+1), bundle.getString("ADDITIONAL_OPTIONS")));
           }

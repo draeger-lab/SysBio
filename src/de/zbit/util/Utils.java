@@ -335,7 +335,7 @@ public class Utils {
     } else {
       // value is an integer
       double upperMedian = getDoubleValue(values.get((int) valFloor));
-      double lowerMedian = getDoubleValue(values.get((int) (valFloor-1)));
+      double lowerMedian = getDoubleValue(values.get(Math.max((int) (valFloor-1), 0)));
       
       return (lowerMedian+(upperMedian-lowerMedian)/2);
     }
