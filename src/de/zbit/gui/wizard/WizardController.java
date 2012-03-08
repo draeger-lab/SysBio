@@ -59,7 +59,6 @@ public class WizardController implements ActionListener {
    * @param evt The ActionEvent that occurred.
    */
   public void actionPerformed(java.awt.event.ActionEvent evt) {
-
     if (evt.getActionCommand().equals(Wizard.CANCEL_BUTTON_ACTION_COMMAND))
       cancelButtonPressed();
     else if (evt.getActionCommand().equals(Wizard.BACK_BUTTON_ACTION_COMMAND))
