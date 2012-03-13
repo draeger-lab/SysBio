@@ -37,8 +37,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.exception.UnsuccessfulRetrieveException;
+import de.zbit.io.SerializableTools;
 import de.zbit.util.SortedArrayList;
-import de.zbit.util.Utils;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
@@ -642,7 +642,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @throws IOException 
    */
   public static InfoManagement<?, ?> loadFromFilesystem(File file) throws IOException {
-    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObjectAutoDetectZIP(file);
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)SerializableTools.loadObjectAutoDetectZIP(file);
     return m;
   }
   /**
@@ -654,7 +654,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @throws IOException 
    */
   public static InfoManagement<?, ?> loadFromFilesystem(InputStream in) throws IOException {
-    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObjectAutoDetectZIP(in);
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)SerializableTools.loadObjectAutoDetectZIP(in);
     return m;
   }
   /**
@@ -664,7 +664,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @throws IOException 
    */
   public static InfoManagement<?, ?> loadFromFilesystem(String filepath) throws IOException {
-    InfoManagement<?, ?> m = (InfoManagement<?, ?>)Utils.loadObjectAutoDetectZIP(filepath);
+    InfoManagement<?, ?> m = (InfoManagement<?, ?>)SerializableTools.loadObjectAutoDetectZIP(filepath);
     return m;
   }
 
@@ -675,7 +675,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @return true if and only if the file has been successfully saved.
    */
   public static boolean saveToFilesystem(String filepath, InfoManagement<?, ?> m) {
-    boolean ret = Utils.saveGZippedObject(filepath, m);
+    boolean ret = SerializableTools.saveGZippedObject(filepath, m);
     if (ret) {
       // reset cache changed flag
       m.cacheChangedSinceLastLoading = false;

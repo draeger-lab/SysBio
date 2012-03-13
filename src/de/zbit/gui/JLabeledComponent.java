@@ -204,7 +204,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     
     // Show smaller numbers if data type us double
     if (Double.class.isAssignableFrom(initialValue.getClass())) {
-      spinner.setEditor(new JSpinner.NumberEditor(spinner, "#." + Utils.replicateCharacter("#", TEXTFIELD_COLUMNS - 2)));
+      spinner.setEditor(new JSpinner.NumberEditor(spinner, "#." + StringUtil.replicateCharacter("#", TEXTFIELD_COLUMNS - 2)));
       JSpinner.NumberEditor editor = (JSpinner.NumberEditor) spinner.getEditor();
       DecimalFormat format = editor.getFormat();
       format.setMaximumFractionDigits(TEXTFIELD_COLUMNS - 2);

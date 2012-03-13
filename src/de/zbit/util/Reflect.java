@@ -983,4 +983,26 @@ public class Reflect {
     };
   }
 
+  /**
+   * If the given class 'c' is inside a JAR file, this function returns the name
+   * of the jar file. Else, if it is a class file, outside of a JAR file, an empty
+   * string is returned.
+   * If an error occurs, null is returned.
+   * @param c - Class to check.
+   * @return String (Jarfile name) if Class is in jar, EmptyString if not, null if
+   * something went wrong.
+   */
+  public static String getNameOfJar(Class<?> c) {
+    try {
+      File moduleFile = new File(c.getProtectionDomain().getCodeSource().getLocation().toURI());
+      if (moduleFile.isFile())
+        return moduleFile.getName();
+      else
+        return "";
+    } catch (Throwable t) {
+      // Not important
+    }
+    return null;
+  }
+
 }

@@ -1454,5 +1454,123 @@ public class StringUtil {
 		}
 		return df.format(v);
 	}
+
+  /**
+   * Same as {@link isWord} !!!
+   */
+  public static boolean containsWord(String containingLine, String containedString) {
+    return isWord(containingLine, containedString);
+  }
+
+  /**
+   * Returns, wether the containedString does occur somewhere in containingLine as a word.
+   * E.g. containingLine = "12.ENOA_MOUSE ABC". "NOA_MOUSE" is no word, but "ENOA_MOUSE"
+   * is a word.
+   * The function could also be called "containsWord".
+   * @param containingLine
+   * @param containedString
+   * @return true if and only if containedString is contained in containingLine and is not
+   * sourrounded by a digit or letter.
+   */
+  public static boolean isWord(String containingLine, String containedString) {
+    return isWord(containingLine, containedString, false);
+  }
+
+  /**
+   * Returns, wether the containedString does occur somewhere in containingLine as a word.
+   * E.g. containingLine = "12.ENOA_MOUSE ABC". "NOA_MOUSE" is no word, but "ENOA_MOUSE"
+   * is a word.
+   * @param containingLine
+   * @param containedString
+   * @param ignoreDigits - if false, digits will be treated as part of a word (default case).
+   * If true, digits will be treated as NOT being part of a word (a word splitter, like a space).
+   * @return true if and only if containedString is contained in containingLine as word.
+   */
+  public static boolean isWord(String containingLine, String containedString, boolean ignoreDigits) {
+    // Check if it's a word
+    int pos = -1;
+    while (true) {
+      if (pos+1>=containingLine.length()) break;
+      pos = containingLine.indexOf(containedString, pos+1);
+      if (pos<0) break;
+      
+      boolean leftOK = true;
+      if (pos>0) {
+        char l = containingLine.charAt(pos-1);
+        if ((Character.isDigit(l) && !ignoreDigits) || Character.isLetter(l)) leftOK = false;
+      }
+      boolean rechtsOK = true;
+      if (pos+containedString.length()<containingLine.length()) {
+        char l = containingLine.charAt(pos+containedString.length());
+        if ((Character.isDigit(l) &&!ignoreDigits) || Character.isLetter(l)) rechtsOK = false;
+      }
+      
+      if (rechtsOK && leftOK) return true;
+    }
+    return false;
+  }
+
+  /**
+   * @param containingLine
+   * @param startPosition
+   * @param ignoreDigits
+   * @return the next word in <code>containingLine</code>, starting from <code>startPosition</code>
+   * only including letters and if <code>ignoreDigits</code> is false, also digits.
+   */
+  public static String getWord(String containingLine, int startPosition, boolean ignoreDigits) {
+    // get next word
+    int pos = startPosition;
+    if (pos<0) return null;
+    
+    StringBuffer ret = new StringBuffer();
+    while (pos<=containingLine.length()) {
+      char c = containingLine.charAt(pos);
+      if (Character.isLetter(c)) ret.append(c);
+      else if (!ignoreDigits && Character.isDigit(c)) ret.append(c);
+      else {
+        // End of word
+        break;
+      }
+      pos++;
+    }
+    return ret.toString();
+  }
+
+  /**
+   * 
+   * @param c
+   * @param times
+   * @return
+   */
+  public static StringBuffer replicateCharacter(char c, int times) {
+    StringBuffer s = new StringBuffer();
+    for (int i=0; i<times; i++)
+      s.append(c);
+    return s;
+  }
+
+  /**
+   * 
+   * @param ch
+   * @param times
+   * @return
+   */
+  public static String replicateCharacter(String ch, int times) {
+    StringBuilder retval = new StringBuilder();
+    for (int i=0; i<times;i++){
+      retval.append(ch);
+    }
+    return retval.toString();
+  }
+
+  /**
+   * Returns the reverse of a string.
+   * @param s
+   * @return
+   */
+  public static String reverse(String s) {
+    StringBuffer a = new StringBuffer(s);
+    return a.reverse().toString();
+  }
   
 }

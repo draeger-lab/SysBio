@@ -43,7 +43,6 @@ import java.util.prefs.Preferences;
 import de.zbit.io.filefilter.GeneralFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
-import de.zbit.util.Utils;
 import de.zbit.util.argparser.ArgHolder;
 import de.zbit.util.argparser.ArgParser;
 
@@ -563,7 +562,7 @@ public class SBPreferences implements Map<Object, Object> {
 	public static String generateUsageString(Class<?> mainClass) {
 		String synopsis = "java ";
 		
-		String jarName = Utils.getNameOfJar(mainClass);
+		String jarName = Reflect.getNameOfJar(mainClass);
 		if (jarName != null && jarName.length() > 0) {
 			synopsis += "-jar " + jarName;
 		} else {

@@ -26,8 +26,8 @@ import de.zbit.cache.InfoManagement;
 import de.zbit.exception.UnsuccessfulRetrieveException;
 import de.zbit.kegg.api.KeggAdaptor;
 import de.zbit.kegg.api.KeggInfos;
+import de.zbit.util.StringUtil;
 import de.zbit.util.ThreadManager;
-import de.zbit.util.Utils;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
@@ -332,7 +332,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
         aktQueryID = (ids[idIndex].contains(":")? ids[idIndex].substring(ids[idIndex].indexOf(':')+1):ids[idIndex]).trim().toUpperCase();
         if (aktQueryID.equalsIgnoreCase(aktEntryID) 
             || ("EC " + aktQueryID).equalsIgnoreCase(aktEntryID) // Enzyme werden ohne "EC " gequeried, kommen aber MIT zurueck... 
-            || (takeNotSoSureHits && Utils.isWord(splitt[i].toUpperCase(), aktQueryID))) { // Siehe obiges Beispiel.
+            || (takeNotSoSureHits && StringUtil.isWord(splitt[i].toUpperCase(), aktQueryID))) { // Siehe obiges Beispiel.
           ret[idIndex] = splitt[i]; // Aufpassen. Hier nur i, da index von splitt und id2 hier gleich!
           found = true;
           break;
