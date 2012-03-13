@@ -25,12 +25,12 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zbit.io.CSVReader;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.mapper.GeneID2KeggIDMapper;
 import de.zbit.mapper.KeggPathwayID2PathwayName;
-import de.zbit.parser.Species;
-import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.Species;
 import de.zbit.util.Timer;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * This is a meta-mapper, that actually has no own mapping but

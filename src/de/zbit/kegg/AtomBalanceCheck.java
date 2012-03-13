@@ -26,6 +26,8 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.zbit.kegg.api.KeggInfos;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;

@@ -37,7 +37,7 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
-import de.zbit.gui.LayoutHelper;
+import de.zbit.gui.layout.LayoutHelper;
 import de.zbit.util.StringUtil;
 
 /**

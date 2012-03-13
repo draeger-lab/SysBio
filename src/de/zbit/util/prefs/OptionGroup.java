@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.ButtonGroup;
 
-import de.zbit.gui.ActionCommand;
+import de.zbit.gui.actioncommand.ActionCommand;
 
 /**
  * Gathers multiple instances of {@link Option} in a group together with a

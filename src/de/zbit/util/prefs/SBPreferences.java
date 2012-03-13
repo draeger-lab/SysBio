@@ -40,7 +40,7 @@ import java.util.prefs.NodeChangeListener;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
-import de.zbit.io.GeneralFileFilter;
+import de.zbit.io.filefilter.GeneralFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.Utils;

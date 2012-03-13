@@ -20,6 +20,8 @@ import static org.junit.Assert.*;
 
 import org.junit.*;
 
+import de.zbit.util.progressbar.FileReadProgress;
+
 
 /**
  * NOTE: To run this from command line, go to the "bin" directory and execute:

@@ -57,16 +57,16 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import de.zbit.gui.ColorPalette;
-import de.zbit.gui.ExpandablePanel;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
+import de.zbit.gui.panels.ExpandablePanel;
 import de.zbit.gui.table.JComponentTableModel;
-import de.zbit.gui.table.JComponentTableRenderer;
 import de.zbit.gui.table.JTableRowBased;
-import de.zbit.gui.table.JTableTools;
-import de.zbit.io.CSVReader;
+import de.zbit.gui.table.JTableUtils;
+import de.zbit.gui.table.renderer.JComponentTableRenderer;
+import de.zbit.io.FileTools;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.util.ArrayUtils;
-import de.zbit.util.FileTools;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
@@ -412,7 +412,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     // Disallow dragging columns
     table.getTableHeader().setReorderingAllowed(false);
     // Resize columns to a reasonable with.
-    JTableTools.resizeColumns(table, 120);
+    JTableUtils.resizeColumns(table, 120);
     
     return table;
   }

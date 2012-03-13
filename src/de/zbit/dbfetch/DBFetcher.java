@@ -23,11 +23,11 @@ import java.util.regex.Pattern;
 
 import uk.ac.ebi.webservices.jaxws.WSDbfetchClient;
 import uk.ac.ebi.webservices.jaxws.stubs.wsdbfetch.DbfNoEntryFoundException_Exception;
+import de.zbit.cache.InfoManagement;
 import de.zbit.exception.UnsuccessfulRetrieveException;
-import de.zbit.util.AbstractProgressBar;
-import de.zbit.util.InfoManagement;
-import de.zbit.util.ProgressBar;
 import de.zbit.util.Utils;
+import de.zbit.util.progressbar.AbstractProgressBar;
+import de.zbit.util.progressbar.ProgressBar;
 
 /**
  * Abstract implementation of the WSDBfetch client, using a cache and

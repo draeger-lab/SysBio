@@ -3,6 +3,8 @@ package de.zbit.io;
 import java.io.IOException;
 import java.util.Arrays;
 
+import de.zbit.io.csv.CSVReader;
+
 public class CSVReaderTest {
 
   /**

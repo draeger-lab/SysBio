@@ -25,13 +25,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import de.zbit.io.CSVReader;
-import de.zbit.util.AbstractProgressBar;
+import de.zbit.io.FileDownload;
+import de.zbit.io.FileTools;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.util.ArrayUtils;
-import de.zbit.util.FileDownload;
-import de.zbit.util.FileTools;
 import de.zbit.util.Timer;
 import de.zbit.util.prefs.Option;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * An abstract mapper that can download a csv file or read an

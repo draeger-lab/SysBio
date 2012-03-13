@@ -23,13 +23,13 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zbit.io.CSVReader;
+import de.zbit.io.FileTools;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.mapper.GeneSymbol2GeneIDMapper;
-import de.zbit.parser.Species;
-import de.zbit.util.AbstractProgressBar;
-import de.zbit.util.FileTools;
-import de.zbit.util.ProgressBar;
+import de.zbit.util.Species;
 import de.zbit.util.logging.LogUtil;
+import de.zbit.util.progressbar.AbstractProgressBar;
+import de.zbit.util.progressbar.ProgressBar;
 
 /**
  * Enrichment Mapper for any Gene Set Enrichment from MSigDB

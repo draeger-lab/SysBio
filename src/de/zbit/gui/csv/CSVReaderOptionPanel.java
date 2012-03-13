@@ -58,9 +58,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
-import de.zbit.gui.ExpandablePanel;
 import de.zbit.gui.GUITools;
-import de.zbit.io.CSVReader;
+import de.zbit.gui.panels.ExpandablePanel;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.util.ResourceManager;
 
 /**

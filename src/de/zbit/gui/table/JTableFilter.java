@@ -24,7 +24,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.GUITools;
-import de.zbit.gui.LayoutHelper;
+import de.zbit.gui.layout.LayoutHelper;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.Option;

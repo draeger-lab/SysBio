@@ -24,14 +24,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import de.zbit.io.CSVReader;
+import de.zbit.io.FileTools;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.mapper.AbstractMapper;
 import de.zbit.mapper.GeneID2KeggIDMapper;
 import de.zbit.mapper.KeggPathwayID2PathwayName;
-import de.zbit.parser.Species;
-import de.zbit.util.AbstractProgressBar;
-import de.zbit.util.FileTools;
+import de.zbit.util.Species;
 import de.zbit.util.logging.LogUtil;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * Maps the given KEGG gene id (see {@link GeneID2KeggIDMapper}) to

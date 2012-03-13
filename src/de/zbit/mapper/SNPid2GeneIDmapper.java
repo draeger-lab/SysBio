@@ -24,10 +24,10 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
-import de.zbit.io.CSVReader;
-import de.zbit.util.AbstractProgressBar;
-import de.zbit.util.FileTools;
-import de.zbit.util.ProgressBar;
+import de.zbit.io.FileTools;
+import de.zbit.io.csv.CSVReader;
+import de.zbit.util.progressbar.AbstractProgressBar;
+import de.zbit.util.progressbar.ProgressBar;
 
 /**
  * A mapper to map from rs-dbSNP identifier (see http://www.ncbi.nlm.nih.gov/projects/SNP/)

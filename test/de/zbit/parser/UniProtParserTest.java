@@ -21,7 +21,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import de.zbit.util.InfoManagement;
+import de.zbit.cache.InfoManagement;
 import de.zbit.util.logging.LogUtil;
 
 /**

@@ -21,8 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import de.zbit.gui.GUITools;
-import de.zbit.gui.LayoutHelper;
-import de.zbit.io.SBFileFilter;
+import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.io.filefilter.SBFileFilter;
 
 /**
  * @author Andreas Dr&auml;ger

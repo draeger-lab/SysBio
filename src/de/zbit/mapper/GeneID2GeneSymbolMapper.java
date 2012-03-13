@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zbit.io.CSVReader;
-import de.zbit.util.AbstractProgressBar;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.util.logging.LogUtil;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * NCBI GeneID 2 GeneSymbol mapping.

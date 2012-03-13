@@ -33,6 +33,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
+import de.zbit.gui.table.renderer.DecimalCellRenderer;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
@@ -104,7 +105,7 @@ public class MultipleTableView<T extends TableModel> extends JPanel implements I
 			table.setDefaultRenderer(entry.getKey(), entry.getValue());
 		}
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		JTableTools.resizeColumns(table, 120);
+		JTableUtils.resizeColumns(table, 120);
 		firePropertyChange(PROPERTY_DATA_TAB, null, data);
 		tables.addTab(title, new JScrollPane(table));
 	}

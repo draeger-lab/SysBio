@@ -31,7 +31,7 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import de.zbit.gui.JLabeledComponent;
-import de.zbit.gui.LayoutHelper;
+import de.zbit.gui.layout.LayoutHelper;
 
 
 /**

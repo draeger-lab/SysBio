@@ -45,8 +45,8 @@ import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 
 import de.zbit.gui.GUITools;
-import de.zbit.gui.LayoutHelper;
-import de.zbit.util.AbstractProgressBar;
+import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * A specialized {@link JSplitPane} that displays a {@link JTree} containing all

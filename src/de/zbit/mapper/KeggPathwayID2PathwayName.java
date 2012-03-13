@@ -20,12 +20,12 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zbit.io.CSVReader;
-import de.zbit.kegg.KeggAdaptor;
-import de.zbit.kegg.KeggFunctionManagement;
-import de.zbit.util.AbstractProgressBar;
-import de.zbit.util.FileTools;
+import de.zbit.io.FileTools;
+import de.zbit.io.csv.CSVReader;
+import de.zbit.kegg.api.KeggAdaptor;
+import de.zbit.kegg.api.cache.KeggFunctionManagement;
 import de.zbit.util.logging.LogUtil;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * A mapping from KEGG pathway identifier to human readable name

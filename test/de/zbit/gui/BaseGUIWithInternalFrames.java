@@ -24,7 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JToolBar;
 
-import de.zbit.io.SBFileFilter;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.prefs.KeyProvider;
 
 /**

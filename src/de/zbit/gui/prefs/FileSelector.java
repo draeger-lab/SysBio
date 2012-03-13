@@ -34,10 +34,10 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
-import de.zbit.gui.ActionCommand;
 import de.zbit.gui.GUITools;
-import de.zbit.gui.LayoutHelper;
-import de.zbit.io.SBFileFilter;
+import de.zbit.gui.actioncommand.ActionCommand;
+import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.Option;

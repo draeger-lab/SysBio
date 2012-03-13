@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 import de.zbit.mapper.AbstractMapper;
 import de.zbit.mapper.KeggPathwayID2PathwayName;
 import de.zbit.mapper.Mapper;
-import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.prefs.Option;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 
 /**

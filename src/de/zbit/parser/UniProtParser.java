@@ -21,8 +21,8 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import de.zbit.dbfetch.UniProtFetcher;
-import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.SortedArrayList;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * @author Finja B&uml;chel

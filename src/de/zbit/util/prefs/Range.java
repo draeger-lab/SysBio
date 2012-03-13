@@ -30,13 +30,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zbit.io.CSVReader;
-import de.zbit.io.GeneralFileFilter;
+import de.zbit.io.csv.CSVReader;
+import de.zbit.io.filefilter.GeneralFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
-import de.zbit.util.ValuePair;
+import de.zbit.util.objectwrapper.ValuePair;
 
 /**
  * A collection of ranges with a few convenient methods to work with them.

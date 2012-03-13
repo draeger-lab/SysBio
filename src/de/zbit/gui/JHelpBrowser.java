@@ -50,7 +50,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import de.zbit.gui.prefs.CommandLineHelp;
-import de.zbit.io.SBFileFilter;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;

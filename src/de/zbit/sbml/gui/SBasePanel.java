@@ -79,8 +79,8 @@ import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
 import de.zbit.gui.GUITools;
-import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.SystemBrowser;
+import de.zbit.gui.layout.LayoutHelper;
 import de.zbit.sbml.io.SBOTermFormatter;
 import de.zbit.util.StringUtil;
 

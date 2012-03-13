@@ -34,6 +34,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 
+import de.zbit.gui.actioncommand.ActionCommand;
+
 /**
  * @author Andreas Dr&auml;ger
  * @since 18.03.2011
