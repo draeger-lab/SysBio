@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 import de.zbit.parser.Species;
 import de.zbit.util.AbstractProgressBar;
-import de.zbit.util.ArrayUtils;
+import de.zbit.util.DatabaseIdentifiers;
 
 /**
  * This class contains utilities for {@link AbstractMapper}s.
@@ -33,11 +33,11 @@ import de.zbit.util.ArrayUtils;
  * @version $Rev$
  */
 public class MappingUtils {
-  public static final transient Logger log = Logger.getLogger(MappingUtils.class.getName());
+  private static final transient Logger log = Logger.getLogger(MappingUtils.class.getName());
   
   
   /**
-   * A enumeration of different gene identifiers.
+   * An enumeration of different gene identifiers.
    * <b>All these identifiers should be mappable to GeneID.</b>
    * <p>Note: If you change this list, please also change the
    * {@link MappingUtils#initialize2GeneIDMapper(IdentifierType, AbstractProgressBar, String)}
@@ -45,16 +45,27 @@ public class MappingUtils {
    * @author Clemens Wrzodek
    */
   public static enum IdentifierType {
+    // We can not use the "DatabaseIdentifiers" class here, because
+    // we need a subset of identifiers that are mappabla to geneID
+    // and have an actual 2GeneID implementation here.
     Unknown, NCBI_GeneID, RefSeq, Ensembl, KeggGenes, GeneSymbol;
   }
   
   /**
-   * Regular expressions for each {@link IdentifierType} in
+   * Get a regular expression for each {@link IdentifierType}.
+   * @return regular expressions for each {@link IdentifierType} in
    * the same ordering as {@link IdentifierType#values()}.
    */
-  public static String[] identifierTypeRegEx = new String[]{
-    null, "^\\d+$", "^(NC|AC|NG|NT|NW|NZ|NM|NR|XM|XR|NP|AP|XP|ZP)_\\d+$", "^ENS[A-Z]*[FPTG]\\d{11}$", "^\\w+:[\\w\\d\\.-]*$", null
-  };
+  public static String[] getRegularExpressionsForAllIdentifierTypes() {
+    IdentifierType[] values = IdentifierType.values();
+    String[] ret = new String[values.length];
+    
+    for (int i=0; i<values.length; i++) {
+      ret[i] = getRegularExpressionForIdentifier(values[i]);
+    }
+    
+    return ret;
+  }
   
   /**
    * Return a regular expression to identify a certain identifier.
@@ -62,9 +73,26 @@ public class MappingUtils {
    * @return 
    */
   public static String getRegularExpressionForIdentifier(IdentifierType identifier) {
-    int pos = ArrayUtils.indexOf(IdentifierType.values(), identifier);
-    if (pos<0 || pos>identifierTypeRegEx.length) return null;
-    else return identifierTypeRegEx[pos];
+    // Use the new class "DatabaseIdentifiers" for this method.
+    switch (identifier) {
+      case NCBI_GeneID:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.NCBI_GeneID, false);
+      case RefSeq:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.RefSeq, false);
+      case Ensembl:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.Ensembl, false);
+      case KeggGenes:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.KeggGenes, false);
+      case GeneSymbol:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.GeneSymbol, false);
+      default:
+        return null;
+    }
   }
   
   
