@@ -27,11 +27,11 @@ import javax.swing.tree.TreeNode;
 import org.sbml.jsbml.util.filters.OrFilter;
 
 import de.zbit.gui.GUITools;
-import de.zbit.gui.ProgressBarSwing;
 import de.zbit.sbml.util.RegexpAssignmentVariableFilter;
 import de.zbit.sbml.util.RegexpNameFilter;
 import de.zbit.sbml.util.RegexpSpeciesReferenceFilter;
-import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.progressbar.AbstractProgressBar;
+import de.zbit.util.progressbar.gui.ProgressBarSwing;
 
 /**
  * Filters a given {@link SBMLTree} according to a given search {@link String}.

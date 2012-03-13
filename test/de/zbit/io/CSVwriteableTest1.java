@@ -21,6 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.zbit.exception.CorruptInputStreamException;
+import de.zbit.io.csv.CSVwriteable;
+import de.zbit.io.csv.CSVwriteableIO;
 
 /**
  * @author Clemens Wrzodek

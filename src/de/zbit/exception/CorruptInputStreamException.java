@@ -19,7 +19,7 @@ package de.zbit.exception;
 import java.io.IOException;
 
 /**
- * Used by, e.g., {@link de.zbit.io.CSVReader#read(de.zbit.io.CSVwriteable, String)}.
+ * Used by, e.g., {@link de.zbit.io.csv.CSVReader#read(de.zbit.io.CSVwriteable, String)}.
  * 
  * @author Clemens Wrzodek
  * @version $Rev$

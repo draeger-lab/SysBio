@@ -24,11 +24,11 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zbit.io.CSVReader;
-import de.zbit.util.AbstractProgressBar;
+import de.zbit.io.FileTools;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.util.ArrayUtils;
-import de.zbit.util.FileTools;
 import de.zbit.util.logging.LogUtil;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * Maps Ensembl identifiers to NCBI Gene IDs (Entrez).

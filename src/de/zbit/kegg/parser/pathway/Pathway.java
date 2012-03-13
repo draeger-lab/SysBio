@@ -25,8 +25,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import de.zbit.kegg.KeggInfoManagement;
-import de.zbit.kegg.KeggInfos;
+import de.zbit.kegg.api.KeggInfos;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 
 /**
  * Main Kegg document. Corresponding to the Kegg Pathway class

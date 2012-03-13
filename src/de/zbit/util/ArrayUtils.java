@@ -18,13 +18,18 @@ package de.zbit.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * Contains various utilities for arrays, but also some rare examples
+ * for {@link Collection}s or {@link List}s (when e.g. a list shoudl
+ * be converted to an array).
  * 
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */

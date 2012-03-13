@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import de.zbit.exception.CorruptInputStreamException;
+import de.zbit.io.csv.CSVwriteable;
+import de.zbit.io.csv.CSVwriteableIO;
 import de.zbit.util.SortedArrayList;
 
 /**

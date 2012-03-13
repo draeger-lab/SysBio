@@ -58,9 +58,12 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
+import de.zbit.gui.actioncommand.ActionCommandRenderer;
 import de.zbit.gui.csv.CSVReaderOptionPanel;
+import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.gui.layout.VerticalLayout;
 import de.zbit.gui.prefs.JComponentForOption;
-import de.zbit.io.CSVReader;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;

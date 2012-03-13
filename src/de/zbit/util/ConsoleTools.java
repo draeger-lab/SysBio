@@ -18,6 +18,8 @@ package de.zbit.util;
 
 import java.io.File;
 
+import de.zbit.io.FileTools;
+
 /**
  * Sevaral tools, regarding the console.
  * Before using any other tool, you should check wether the output

@@ -28,6 +28,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.zbit.kegg.api.KeggInfos;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
@@ -35,7 +37,7 @@ import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
-import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * Various Tools related to graph-processing and 

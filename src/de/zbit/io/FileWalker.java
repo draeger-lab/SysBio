@@ -22,8 +22,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 /**
  * A class that contains methods to walk through a file system and do operations such as copying etc.
+ * 
+ * <p>Note: for a real "FileWalker", consider using the {@link DirectoryParser}!</p>
  * 
  * @author Andreas Dr&auml;ger
  * @since 1.1

@@ -49,8 +49,8 @@ import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.filters.Filter;
 
-import de.zbit.gui.ProgressBarSwing;
-import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.progressbar.AbstractProgressBar;
+import de.zbit.util.progressbar.gui.ProgressBarSwing;
 
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a

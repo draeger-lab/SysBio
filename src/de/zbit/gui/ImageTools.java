@@ -42,7 +42,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
-import de.zbit.io.SBFileFilter;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.ResourceManager;
 
 /**

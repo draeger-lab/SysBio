@@ -35,8 +35,8 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
 import de.zbit.gui.GUITools;
-import de.zbit.gui.VerticalLayout;
-import de.zbit.io.CSVReader;
+import de.zbit.gui.layout.VerticalLayout;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 

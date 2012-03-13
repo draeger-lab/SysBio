@@ -32,11 +32,11 @@ import javax.swing.SwingWorker;
 
 import keggapi.Definition;
 import de.zbit.gui.GUITools;
-import de.zbit.gui.LayoutHelper;
-import de.zbit.kegg.KeggFunctionManagement;
-import de.zbit.kegg.KeggQuery;
-import de.zbit.parser.Species;
-import de.zbit.util.CustomObject;
+import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.kegg.api.cache.KeggFunctionManagement;
+import de.zbit.kegg.api.cache.KeggQuery;
+import de.zbit.util.Species;
+import de.zbit.util.objectwrapper.CustomObject;
 
 /**
  * This will show a panel to choose one of Kegg's supported organisms.

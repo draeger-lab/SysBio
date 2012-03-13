@@ -44,7 +44,7 @@ import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.util.Reflect;
-import de.zbit.util.ValuePairUncomparable;
+import de.zbit.util.objectwrapper.ValuePairUncomparable;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.Range;
 

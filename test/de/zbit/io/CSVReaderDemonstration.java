@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import de.zbit.gui.csv.CSVReaderOptionPanel;
+import de.zbit.io.csv.CSVReader;
 
 /**
  * @author Clemens Wrzodek

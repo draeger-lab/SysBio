@@ -40,10 +40,11 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 
-import de.zbit.util.AbstractProgressBar;
-import de.zbit.util.ProgressListener;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.logging.LogUtil;
+import de.zbit.util.progressbar.AbstractProgressBar;
+import de.zbit.util.progressbar.ProgressListener;
+import de.zbit.util.progressbar.gui.ProgressBarSwing;
 
 /**
  * A pseudo-{@link StatusBar} implementation for Swing. This can be used

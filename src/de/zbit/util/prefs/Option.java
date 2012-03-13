@@ -30,18 +30,18 @@ import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.JRadioButton;
 
-import de.zbit.gui.ActionCommand;
 import de.zbit.gui.JLabeledComponent;
-import de.zbit.io.GeneralFileFilter;
-import de.zbit.io.SBFileFilter;
+import de.zbit.gui.actioncommand.ActionCommand;
+import de.zbit.io.filefilter.GeneralFileFilter;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
-import de.zbit.util.ValuePairUncomparable;
 import de.zbit.util.argparser.ArgHolder;
 import de.zbit.util.argparser.ArgParser;
+import de.zbit.util.objectwrapper.ValuePairUncomparable;
 
 /**
  * An {@link Option} defines a key in a key-provider class and can also be used

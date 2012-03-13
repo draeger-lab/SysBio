@@ -19,6 +19,8 @@ package de.zbit.util;
 
 import java.io.IOException;
 
+import de.zbit.io.FileTools;
+
 /**
  * @author Finja B&uuml;chel
  * @version $Rev$

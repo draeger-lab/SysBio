@@ -19,9 +19,9 @@ package de.zbit.mapper;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import de.zbit.parser.Species;
-import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.DatabaseIdentifiers;
+import de.zbit.util.Species;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * This class contains utilities for {@link AbstractMapper}s.

@@ -25,7 +25,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import de.zbit.util.ValuePair;
+import de.zbit.util.objectwrapper.ValuePair;
 
 /**
  * The default {@link JTable} is column based. I.e., it contains methods like

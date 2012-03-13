@@ -21,7 +21,7 @@ import java.io.File;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
-import de.zbit.io.SBFileFilter;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.prefs.KeyProvider;

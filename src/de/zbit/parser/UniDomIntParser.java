@@ -20,9 +20,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
 
-import de.zbit.io.CSVReader;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.util.SortedArrayList;
-import de.zbit.util.ValuePair;
+import de.zbit.util.objectwrapper.ValuePair;
 
 /**
  * 

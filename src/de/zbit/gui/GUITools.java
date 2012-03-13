@@ -94,12 +94,14 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 import de.zbit.Launcher;
+import de.zbit.gui.actioncommand.ActionCommand;
+import de.zbit.gui.actioncommand.ActionCommandWithIcon;
 import de.zbit.io.OpenFile;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
-import de.zbit.util.ValuePair;
+import de.zbit.util.objectwrapper.ValuePair;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 

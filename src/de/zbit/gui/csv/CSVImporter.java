@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import de.zbit.io.CSVReader;
+import de.zbit.io.csv.CSVReader;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 

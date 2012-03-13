@@ -23,9 +23,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import de.zbit.gui.GUITools;
-import de.zbit.gui.LayoutHelper;
-import de.zbit.util.AbstractProgressBar;
-import de.zbit.util.FileDownload;
+import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.io.FileDownload;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * Class for downloading KEGG Pathways in XML format (KGML-files).

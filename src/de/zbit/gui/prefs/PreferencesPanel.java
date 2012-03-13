@@ -59,13 +59,13 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.ColorChooserWithPreview;
-import de.zbit.gui.ExpandablePanel;
 import de.zbit.gui.JLabeledComponent;
-import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.csv.CSVReaderOptionPanel;
+import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.gui.panels.ExpandablePanel;
 import de.zbit.gui.prefs.FileSelector.Type;
-import de.zbit.io.GeneralFileFilter;
-import de.zbit.io.SBFileFilter;
+import de.zbit.io.filefilter.GeneralFileFilter;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;

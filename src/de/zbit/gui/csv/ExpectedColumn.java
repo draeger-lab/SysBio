@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 
-import de.zbit.io.CSVReader;
 import de.zbit.io.PatternForColumnGuessing;
+import de.zbit.io.csv.CSVReader;
 
 /**
  * This class represents a column, that is expected as input

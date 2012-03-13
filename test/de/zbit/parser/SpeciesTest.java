@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import de.zbit.resources.Resource;
+import de.zbit.util.Species;
 
 public class SpeciesTest {
 

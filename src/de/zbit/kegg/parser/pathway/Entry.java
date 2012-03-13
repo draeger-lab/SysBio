@@ -29,7 +29,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import de.zbit.kegg.KeggInfos;
+import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.util.Utils;
 

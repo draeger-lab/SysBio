@@ -19,6 +19,8 @@ package de.zbit.io;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import de.zbit.io.csv.CSVReader;
+
 /**
  * A class that counts the regex-matches for each column in a string array
  * (possible the content of a row in any table), and may return

@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.zbit.util.ValuePair;
+import de.zbit.util.objectwrapper.ValuePair;
 
 /**
  * @author Finja B&uml;chel

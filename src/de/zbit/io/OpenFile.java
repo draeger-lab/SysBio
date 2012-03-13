@@ -26,7 +26,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
-import de.zbit.util.FileDownload;
+import de.zbit.io.fileformat.FormatDescription;
+import de.zbit.io.fileformat.FormatIdentification;
 import de.zbit.util.Reflect;
 import de.zbit.util.SortedArrayList;
 
