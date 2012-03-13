@@ -82,7 +82,7 @@ public class ProgressBarSwing extends AbstractProgressBar {
   /* (non-Javadoc)
    * @see de.zbit.util.AbstractProgressBar#drawProgressBar(int, double, java.lang.String)
    */
-  protected void drawProgressBar(int percent, double miliSecondsRemaining, String additionalText) {
+  public void drawProgressBar(int percent, double miliSecondsRemaining, String additionalText) {
     if (progressBar instanceof JProgressBar) {
       ((JProgressBar)progressBar).setValue(percent);
       
