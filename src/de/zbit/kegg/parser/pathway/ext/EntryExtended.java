@@ -33,6 +33,14 @@ import de.zbit.kegg.parser.pathway.Pathway;
 public class EntryExtended extends Entry {
   
   GeneType geneType = null;
+  
+  //TODO: getter and setter
+  //TODO: noch in equals, und hashCode aufnehmen?
+  String uniProtID;
+  int geneID;
+  String GO;
+  List<String> geneSymbolSynonyms;
+  //
 
   /**
    * @param parentPathway
@@ -107,6 +115,7 @@ public class EntryExtended extends Entry {
   public EntryExtended(de.zbit.kegg.parser.pathway.Pathway keggPW, int keggEntryID,
       String keggname, EntryType eType, Graphics graphics) {
     super(keggPW, keggEntryID, keggname, eType, graphics);
+    
   }
 
   public GeneType getGeneType(){
@@ -149,6 +158,20 @@ public class EntryExtended extends Entry {
       equals &= (o.isSetGeneType()==this.isSetGeneType());
       if(equals && isSetGeneType()) 
         equals &= (o.getGeneType().equals(this.getGeneType()));
+      
+    }
+    return equals;
+  }
+  
+  public boolean equalsWithoutIDNameReactionComparison(Object obj) {
+    boolean equals = super.equalsWithoutIDNameReactionComparison(obj);
+    
+    if (EntryExtended.class.isAssignableFrom(obj.getClass())){
+      EntryExtended o = (EntryExtended)obj;          
+      
+      equals &= o.isSetGeneType()==this.isSetGeneType();
+      if(equals && isSetGeneType()) 
+        equals &= (o.getGeneType().equals(this.getGeneType()));      
       
     }
     return equals;

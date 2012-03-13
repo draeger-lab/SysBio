@@ -45,6 +45,7 @@ import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.kegg.parser.pathway.ext.EntryExtended;
 import de.zbit.util.StringUtil;
 
 /**
@@ -73,14 +74,16 @@ public class KGMLWriter {
    * then an {@link Document} an then writes it with the defined {@link KGMLWriter#indent}
    * 
    * @param keggPW
+   * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended}, 
+   * otherwise the basic KGML is written with normal {@link Entry}
    * @throws XMLStreamException 
    * @throws FileNotFoundException 
    */
-  public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW)  {
+  public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW, boolean writeEntryExtended)  {
     if (keggPW.getEntries().size() > 0) {
       String fileName = createFileName(keggPW);
 
-      writeKGML(keggPW, fileName);
+      writeKGML(keggPW, fileName, writeEntryExtended);
     }
   }
 
@@ -111,10 +114,13 @@ public class KGMLWriter {
    * if the fileName is not set it will be set automatically to the pathway
    * name. The file will be saved in the current folder
    * 
-   * @param keggPW
+   * @param keggPW 
+   * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended}, 
+   * otherwise the basic KGML is written with normal {@link Entry}
    * @param fileName
    */
-  public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW, String fileName) {
+  public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW, String fileName, 
+      boolean writeEntryExtended) {
     ArrayList<de.zbit.kegg.parser.pathway.Entry> entries = keggPW.getEntries();
 
     if (entries.size() > 0) {
@@ -138,7 +144,7 @@ public class KGMLWriter {
       
       Document doc = null;
       try {
-        doc = createDocument(keggPW);
+        doc = createDocument(keggPW, writeEntryExtended);
       } catch (ParserConfigurationException e) {
         log.log(Level.SEVERE, "Could not create a document from the KEGG pathway.", e);
       }
@@ -182,10 +188,12 @@ public class KGMLWriter {
   /**
    * 
    * @param keggPW
+   * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended}, 
+   * otherwise the basic KGML is written with normal {@link Entry}
    * @return
    * @throws ParserConfigurationException
    */
-  private static Document createDocument(Pathway keggPW) throws ParserConfigurationException {
+  private static Document createDocument(Pathway keggPW, boolean writeEntryExtended) throws ParserConfigurationException {
     DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
     DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
     Document doc = docBuilder.newDocument();
@@ -203,7 +211,13 @@ public class KGMLWriter {
     if(entries.size()>0){
       for (Entry entry : entries) {
         Element newChild = doc.createElement("entry");
-        for (java.util.Map.Entry<String, String> att : (entry.getKGMLAttributes()).entrySet()) {
+        Map<String, String> entryMap = null;
+        if(writeEntryExtended){
+          entryMap = ((EntryExtended)entry).getKGMLAttributes();
+        } else {
+          entryMap = entry.getKGMLAttributes();
+        }
+        for (java.util.Map.Entry<String, String> att : entryMap.entrySet()) {
           newChild.setAttribute(att.getKey(), att.getValue());
         }
         
