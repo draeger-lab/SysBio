@@ -131,7 +131,7 @@ public class MathUtils {
    * @return the average of all non-NaN and non-infinite values in the given
    *         array.
    */
-  public static double mean2(double[] d){ // Keine to-large-numbers
+  private static double mean2(double[] d){ // Keine to-large-numbers
     if (d.length<1) return Double.NaN;
     double retVal= 0;
   
@@ -154,7 +154,7 @@ public class MathUtils {
    * @param d
    * @return
    */
-  public static double[] mean2(double[][] d){ // Keine to-large-numbers
+  private static double[] mean2(double[][] d){ // Keine to-large-numbers
     if (d.length<1) return new double[0];
     double[] retVal= null;
     ArrayList<Integer> spaltenCounter = new ArrayList<Integer>(); 
@@ -212,7 +212,7 @@ public class MathUtils {
   }
 
   @SuppressWarnings("rawtypes")
-  static double mean2(Collection doubles){ // Keine to-large-numbers
+  private static double mean2(Collection doubles){ // Keine to-large-numbers
     if (doubles==null || doubles.size()<1) return Double.NaN;
     double retVal= 0;
     
@@ -692,6 +692,7 @@ public class MathUtils {
   }
 
   /**
+   * Returns a weighted mean of two values.
    * @param old_m
    * @param old_cgs
    * @param m
