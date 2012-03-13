@@ -1030,27 +1030,50 @@ public class StringUtil {
   }
 
   /**
-	 * @see #insertLineBreaksAndCount(String, int, String, boolean)
+	 * @see #insertLineBreaksAndCount(String, int, String, String, boolean)
 	 * @param message
 	 * @param lineBreak
 	 * @param lineBreakSymbol
-	 * @param sb
 	 */
 	public static String insertLineBreaks(String message, int lineBreak,
 		String lineBreakSymbol) {
-		return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, false).getA();
+		return insertLineBreaks(message, lineBreak, lineBreakSymbol, null);
 	}
 
   /**
-	 * @see #insertLineBreaksAndCount(String, int, String, boolean)
+   * @param message
+   * @param lineBreak
+   * @param lineBreakSymbol
+   * @param padString
+   */
+  public static String insertLineBreaks(String message, int lineBreak,
+    String lineBreakSymbol, String padString) {
+    return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, null, false).getA();
+  }
+
+  /**
+   * @see #insertLineBreaksAndCount(String, int, String, String, boolean)
+   * @param message
+   * @param lineBreak breaks AFTER this number of characters is exceeded.
+   * @param lineBreakSymbol
+   * @return String with lineBreaks and number of inserted lineBreaks
+   */
+  public static ValuePair<String, Integer> insertLineBreaksAndCount(
+    String message, int lineBreak, String lineBreakSymbol) {
+      return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, null);
+    }
+
+  /**
+	 * @see #insertLineBreaksAndCount(String, int, String, String, boolean)
 	 * @param message
-	 * @param lineBreak breaks AFTER this number of characters is exceeded.
-	 * @param lineBreakSymbol
+   * @param lineBreak breaks AFTER this number of characters is exceeded.
+   * @param lineBreakSymbol
+   * @param padString TODO
 	 * @return String with lineBreaks and number of inserted lineBreaks
 	 */
   public static ValuePair<String, Integer> insertLineBreaksAndCount(
-    String message, int lineBreak, String lineBreakSymbol) {
-    return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, false);
+    String message, int lineBreak, String lineBreakSymbol, String padString) {
+    return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, padString, false);
   }
 
   /**
@@ -1066,6 +1089,23 @@ public class StringUtil {
   public static ValuePair<String, Integer> insertLineBreaksAndCount(
             String message, int lineBreak, String lineBreakSymbol, boolean
             breakBeforeLineBreak) {
+    return insertLineBreaksAndCount(message, lineBreak, lineBreakSymbol, null, breakBeforeLineBreak);
+  }
+
+  /**
+   * @param message
+   * @param lineBreak
+   * @param lineBreakSymbol
+   * @param padString TODO
+   * @param breakBeforeLineBreak if false, breaks after a line is longer than
+   * <code>lineBreak</code> characters. If true, ensures that no line is longer
+   * than <code>lineBreak</code> characters, i.e., breaks before that number
+   * of chars.
+   * @return String with lineBreaks and number of inserted lineBreaks
+   */
+  public static ValuePair<String, Integer> insertLineBreaksAndCount(
+            String message, int lineBreak, String lineBreakSymbol,
+            String padString, boolean breakBeforeLineBreak) {
     StringBuilder sb = new StringBuilder();
     StringTokenizer st = new StringTokenizer(message != null ? message : ""," ");
     if (st.hasMoreElements()) {
@@ -1081,6 +1121,9 @@ public class StringUtil {
           (length >= lineBreak) || 
           (breakBeforeLineBreak && (length + tmp.length()) >= lineBreak) )) {
         sb.append(lineBreakSymbol);
+        if( padString != null ) {
+          sb.append(padString);
+        }
         count++;
         length = 0;
       }

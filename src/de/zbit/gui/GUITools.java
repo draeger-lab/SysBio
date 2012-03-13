@@ -2073,7 +2073,7 @@ public class GUITools {
     	logger.log(Level.WARNING, msg, exc);
     }
     ValuePair<String, Integer> messagePair = StringUtil
-    .insertLineBreaksAndCount(msg, StringUtil.TOOLTIP_LINE_LENGTH, "\n");
+    .insertLineBreaksAndCount(msg, StringUtil.TOOLTIP_LINE_LENGTH, "\n", null);
     Object message;
     if (messagePair.getB().intValue() > 30) {
       JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
