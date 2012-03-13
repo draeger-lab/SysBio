@@ -12,7 +12,8 @@ Finja Büchel (1)
   finja.buechel@uni-tuebingen.de
 Johannes Eichner (1)
   johannes.eichner@uni-tuebingen.de
-Roland Kellder (1)
+Roland Keller (1)
+  roland.keller@uni-tuebingen.de
   
 ###################
 #  Contributors   #
