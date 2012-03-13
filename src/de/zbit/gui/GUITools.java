@@ -100,7 +100,6 @@ import de.zbit.io.OpenFile;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
-import de.zbit.util.Utils;
 import de.zbit.util.objectwrapper.ValuePair;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
@@ -2468,7 +2467,7 @@ public class GUITools {
       String extension = fc.getFileFilter().getDescription();
       int pos = extension.lastIndexOf("*.");
       if (pos>=0) {
-        extension = Utils.getWord(extension, pos+2, false);
+        extension = StringUtil.getWord(extension, pos+2, false);
         // *.* => (extension.length()==0)
         if (extension!=null && extension.length()>0) {
           f = new File(f.getPath() + "." + extension);

@@ -87,12 +87,45 @@ public class ArrayUtils {
   }
   
   /**
+   * If there exists one element in arr such that arr[i].equalsIgnoreCase(s),
+   * i (the index) is returned.
+   * @param <T>
+   * @param arr
+   * @param s
+   * @return
+   */
+  public static int indexOfIgnoreCase(String[] arr, String s) {
+    if (arr==null) return -1;
+    for (int i=0; i<arr.length; i++) {
+      if (s==null) {
+        // Also detect indexOf null
+        if (arr[i]==null) return i;
+        else continue;
+      }
+      if (arr[i]==null) continue;
+      if (arr[i].equalsIgnoreCase(s)) return i;
+    }
+    return -1;
+  }
+  
+  /**
    * @param arr
    * @param s
    * @return true if <code>s</code> is in <code>arr</code>.
    */
   public static <T> boolean contains(T[] arr, T s) {
     return indexOf(arr, s)>=0;
+  }
+  
+  /**
+   * Returns true if and only if there exists one item in arr
+   * such that arr[i].equals(s) OR arr[i].equalsIgnoreCase(s).
+   * @param arr
+   * @param s
+   * @return true if <code>s</code> is in <code>arr</code>.
+   */
+  public static boolean containsIgnoreCase(String[] arr, String s) {
+    return indexOfIgnoreCase(arr, s)>=0;
   }
   
   /**
@@ -469,6 +502,7 @@ public class ArrayUtils {
    * @param element
    * @return
    */
+    @SuppressWarnings("unchecked")
     public static <T> T[] insert(int insertAtPosition, T[] arr, T... element) {
     // Ensure that both are not null.
     if (arr==null) return element;

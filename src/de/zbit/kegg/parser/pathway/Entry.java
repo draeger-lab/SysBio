@@ -31,7 +31,7 @@ import org.w3c.dom.NodeList;
 
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
-import de.zbit.util.Utils;
+import de.zbit.util.StringUtil;
 
 /**
  * Corresponding to the Kegg Entry class (see 
@@ -404,7 +404,7 @@ public class Entry {
     if (!isSetReaction()) {
       setReaction(reaction);
     } else {
-      if (!Utils.containsWord(this.reaction, reaction)) {
+      if (!StringUtil.containsWord(this.reaction, reaction)) {
         String newReaction = this.reaction + " " + reaction;
         parentPathway.reactionChange(this, newReaction);
         this.reaction = newReaction;

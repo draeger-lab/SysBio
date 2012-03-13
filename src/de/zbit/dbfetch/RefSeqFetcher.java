@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-import de.zbit.util.Utils;
+import de.zbit.util.StringUtil;
 import de.zbit.util.logging.LogUtil;
 
 /**
@@ -109,7 +109,7 @@ public class RefSeqFetcher extends DBFetcher {
     
     // Search for exact id match
     id = id.toUpperCase().trim();
-    boolean matches = Utils.isWord(toCheck, id);
+    boolean matches = StringUtil.isWord(toCheck, id);
     
     // Trim version number from id and search again
     // (adapter may return a newer version of the same accession).
@@ -117,7 +117,7 @@ public class RefSeqFetcher extends DBFetcher {
       int index = id.indexOf('.');
       if( index > 0 ) {
         id = id.substring(0, index);
-        matches = Utils.isWord(toCheck, id);
+        matches = StringUtil.isWord(toCheck, id);
       }
     }
     

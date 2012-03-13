@@ -25,7 +25,7 @@ import uk.ac.ebi.webservices.jaxws.WSDbfetchClient;
 import uk.ac.ebi.webservices.jaxws.stubs.wsdbfetch.DbfNoEntryFoundException_Exception;
 import de.zbit.cache.InfoManagement;
 import de.zbit.exception.UnsuccessfulRetrieveException;
-import de.zbit.util.Utils;
+import de.zbit.util.StringUtil;
 import de.zbit.util.progressbar.AbstractProgressBar;
 import de.zbit.util.progressbar.ProgressBar;
 
@@ -472,7 +472,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
      *  result contains "ENOA_MOUSE" => result is a wrong mapping.
      */
     //return toCheck.contains(id);
-    return Utils.isWord(toCheck, id);
+    return StringUtil.isWord(toCheck, id);
   }
   
   /*

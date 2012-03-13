@@ -18,14 +18,20 @@ package de.zbit.io;
 
 
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
+import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +41,7 @@ import java.util.regex.Pattern;
 import de.zbit.util.Utils;
 
 /**
- * This class acts just like the Linux or Unix which command.
+ * This class contains various {@link File}-related tools and utils.
  * 
  * @author Clemens Wrzodek
  * @version $Rev$
@@ -359,6 +365,82 @@ public class FileTools {
       write(toWrite, out);
     }
     if (out instanceof Closeable)((Closeable)out).close();
+  }
+
+  /**
+   * Copies a file. Does NOT check if out already exists. Will overwrite out if it already exists.
+   * @param in
+   * @param out
+   * @return success.
+   */
+  public static boolean copyFile(File in, File out) {
+    if (!in.exists()) {System.err.println("File '" + in.getName() + "' does not exist."); return false;}
+    boolean success=false;
+    try {
+      FileChannel inChannel = new FileInputStream(in).getChannel();
+      FileChannel outChannel = new FileOutputStream(out).getChannel();
+      // magic number for Windows, 64Mb - 32Kb)
+      int maxCount = (64 * 1024 * 1024) - (32 * 1024);
+      long size = inChannel.size();
+      long position = 0;
+      while (position < size) {
+        position += inChannel.transferTo(position, maxCount, outChannel);
+      }
+      if (inChannel != null) inChannel.close();
+      if (outChannel != null) outChannel.close();
+      if (in.length()==out.length()) success=true;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return success;
+  }
+
+  /**
+   * Copy a stream to a file. This enables e.g. copying of
+   * resources inside jar-files to files.
+   * 
+   * Note: It's a good idea to buffer the input stream.
+   * 
+   * @param is - resource to read
+   * @param f - file to write
+   * @return true, if everything went fine.
+   */
+  public static void copyStream(final InputStream is, final File f) throws IOException {
+    
+      OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+      // Copy from input to output-stream.
+      byte[] buffer = new byte[4096];
+      int length;
+      while ((length = is.read(buffer)) > 0) {
+          os.write(buffer, 0, length);
+      }
+      os.close();
+      is.close();
+  
+  }
+
+  /**
+   * Returns the relative path, in which this file is contained.
+   * E.g. if fn is "res/home.dat", the return value will be "res/".
+   * 
+   * It is NOT recommended to use "new File(X).getParent()" because
+   * the path can be inside a jar and no real path.
+   * 
+   * @param fn - any input file and path combination.
+   * @return
+   */
+  public static String getPath(String fn) {
+    if (fn.contains("/")) {
+      // Exclisive file separator char, can be used in any os.
+      return fn.substring(0, fn.lastIndexOf("/")+1);
+    } else if (System.getProperty("file.separator").equals("\\") &&
+        fn.contains("\\")) {
+      // Unix filesystems can use \ to escape e.g. a whitespace. So
+      // this one should only be parsed when it is a valud file separator
+      return fn.substring(0, fn.lastIndexOf("\\")+1);
+    } else {
+      return "";
+    }
   }
   
 }
