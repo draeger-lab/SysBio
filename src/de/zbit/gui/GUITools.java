@@ -867,7 +867,7 @@ public class GUITools {
 			item.addActionListener(listener);
 		}
 		if (mnemonic != null) {
-			item.setMnemonic(mnemonic.charValue());
+			item.setMnemonic(Character.getNumericValue(mnemonic.charValue()));
 		}
 		if (command != null) {
 			item.setText(command.getName());

@@ -36,6 +36,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -419,12 +420,23 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	
 	/**
 	 * Adds a listener to this {@link BaseFrame} that is notified in case that the
-	 * user alters some preferences within the preferences dialog.
+	 * user alters some {@link SBPreferences} within the {@link PreferencesDialog}.
 	 * 
 	 * @param pcl
+	 * @return <code>true</code> (as specified by {@link Collection#add}).
+	 * @throws ClassCastException
+	 *         if the class of the specified element prevents it from being added
+	 *         to this list
+	 * @throws NullPointerException
+	 *         if the specified element is null and this list does not permit null
+	 *         elements
+	 * @throws IllegalArgumentException
+	 *         if some property of this element prevents it from being added to
+	 *         this list
 	 */
-	public void addPreferenceChangeListener(PreferenceChangeListener pcl) {
-		listOfPrefChangeListeners.add(pcl);
+	public boolean addPreferenceChangeListener(PreferenceChangeListener pcl)
+		throws ClassCastException, NullPointerException, IllegalArgumentException {
+		return listOfPrefChangeListeners.add(pcl);
 	}
 	
 	/**
@@ -1356,12 +1368,16 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * Removes the given listener from this {@link BaseFrame}.
 	 * 
 	 * @param pcl
+	 * @return <code>true</code> if this list contained the specified element
+	 * @throws NullPointerException
+	 *         if the specified element is <code>null</code> and this list does
+	 *         not permit <code>null</code> elements (optional)
 	 */
-	public void removePreferenceChangeListener(PreferenceChangeListener pcl) {
-		listOfPrefChangeListeners.remove(pcl);
+	public boolean removePreferenceChangeListener(PreferenceChangeListener pcl)
+		throws NullPointerException {
+		return listOfPrefChangeListeners.remove(pcl);
 	}
-	
-	
+
 	/**
    * Restores the window width, height and state from preferences.
    */
@@ -1381,7 +1397,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
       setExtendedState(state);
     }
   }
-
+	
 	/**
 	 * Saves some results or the current work in some {@link File}. If you use a
 	 * {@link JTabbedPane}, it is recommended to let your tabs implement the
@@ -1503,6 +1519,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				.getIcon("ICON_LICENSE_64"));
 	}
 	
+	
 	/**
 	 * Displays the online help in a {@link JHelpBrowser}.
 	 */
@@ -1515,8 +1532,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			resources.getString("ONLINE_HELP_FOR_THE_PROGRAM"),
 			getProgramNameAndVersion()), getURLOnlineHelp(), getCommandLineOptions());
 	}
-	
-	
+
 	/**
 	 * Updates the list of previously opened files in the {@link JMenuBar}. This
 	 * method is private because it relies on the correctness of the given

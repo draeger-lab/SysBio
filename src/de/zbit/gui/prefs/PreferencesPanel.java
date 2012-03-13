@@ -1054,8 +1054,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   @SuppressWarnings("rawtypes")
   private int insertOptionGroups(List<OptionGroup> groupList,
     int fileSelectors, List<Option<?>> unprocessedOptions, LayoutHelper lh) {
-    boolean twoColumn = ((groupList.size() - fileSelectors) % 2 == 0)
-        && (ungroupedOptions.size() == 0);
+		boolean twoColumn = ((groupList.size() - fileSelectors) % 2 == 0)
+				&& ((ungroupedOptions.size() == 0) || (!OptionGroup
+						.isAnyOptionVisible(ungroupedOptions)));
     boolean oneColumn = false;
     
     // First we create GUI elements for all groups

@@ -676,7 +676,15 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 		}
     // Special treatment for concrete lists (e.g., for classes).
     if (listOfAccpetedObjects != null) {
-      return listOfAccpetedObjects.contains(value);
+    	if (value instanceof Class) {
+    		for (Type clazz : listOfAccpetedObjects) {
+    			if (((Class<?>) clazz).isAssignableFrom((Class<?>) value)) {
+    				return true;
+    			}
+    		}
+    		return false;
+    	}
+    	return listOfAccpetedObjects.contains(value);
     }
     for (SubRange r : ranges) {
       if (r.isInRange(value)) {
