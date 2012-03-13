@@ -10,10 +10,9 @@ Florian Mittag (1)
   florian.mittag@uni-tuebingen.de
 Finja Büchel (1)
   finja.buechel@uni-tuebingen.de
-Adrian Schröder (1)
-  adrian.schroeder@uni-tuebingen.de
 Johannes Eichner (1)
   johannes.eichner@uni-tuebingen.de
+Roland Kellder (1)
   
 ###################
 #  Contributors   #
@@ -31,6 +30,8 @@ Andreas Zell (1)
 Hannes Borch
   h.borch@web.de
   hannes.borch@googlemail.com
+Adrian Schröder (1)
+  adrian.schroeder@uni-tuebingen.de
 
 ###################
 #  Institutions   #
