@@ -255,7 +255,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 */
 	private synchronized void initializeProgressBar() {
 		JProgressBar bar;
-		if (progressBar==null) {
+		if (progressBar == null) {
 			// Create a smaller panel for the statusBar
 			Dimension panelSize = new Dimension(100, 15);
 			JPanel panel = new JPanel();
