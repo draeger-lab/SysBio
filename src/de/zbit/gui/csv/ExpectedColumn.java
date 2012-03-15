@@ -209,14 +209,22 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
    * @see #hasRegexPatternForEachType()
    */
   public int[] getInitialSuggestions(CSVReader r) {
+    int[] ret = new int[type.length];
+    for (int i=0; i<ret.length; i++) {
+      ret[i] = -1;
+      ret[i] = r.getColumn(type[i].toString());
+    }
+    
     if (isSetRegExPatternForInitialSuggestion()) {
-      int[] ret = new int[regExPatternForInitialSuggestion.length];
       try {
         // match agains all patterns and return column with max matches
         PatternForColumnGuessing[] pat = r.getColumnByMatchingContent(regExPatternForInitialSuggestion,0,250);
         if (type!=null && type.length==regExPatternForInitialSuggestion.length) {
           for (int i=0;i<pat.length; i++) {
-            ret[i] = pat[i].getColumnWithMaximumNumberOfMatches();
+            int sug = pat[i].getColumnWithMaximumNumberOfMatches();
+            if (sug>=0) {
+              ret[i] = sug;
+            }
           }
         }
       } catch (IOException e) {}
