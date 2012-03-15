@@ -40,24 +40,128 @@ public class DatabaseIdentifiers {
   
   
   /**
-   * An enumeration of different gene identifiers.
+   * An enumeration of different gene identifiers in alphabetic order.
    * 
    * @author Clemens Wrzodek
    * @author Finja B&uuml;chel
    */
   public static enum IdentifierDatabases {
-    NCBI_GeneID, RefSeq, Ensembl, KeggGenes, GeneSymbol;
-  }  
+    /**
+     * Chemical Entities of Biological Interest (ChEBI) is a freely available dictionary 
+     * of molecular entities focused on 'small' chemical compounds.
+     */
+    ChEBI,
+    ChemicalAbstracts,
+    /**
+     * Evidence Code Ontology, Evidence codes can be used to specify the type of supporting 
+     * evidence for a piece of knowledge. This allows inference of a 'level of support' between 
+     * an entity and an annotation made to an entity.
+     */
+    /**
+     * Kegg compound
+     */
+    Compound,
+    ECO,
+    EMBL,
+    Ensembl,
+    EntrezGene,
+    EnzymeConsortium,
+    GenBank,
+    GeneSymbol, 
+    GeneOntology,
+    /**
+     * Kegg Glycan
+     */
+    Glycan,
+    GO,
+    /**
+     * Human Metabolome Database
+     */
+    HMDB,
+    HPRD,
+    KeggGenes, 
+    miRBase,
+    NCBI_GeneID,
+    NCBI_Taxonomy,
+    /**
+     *  Synonym of NCBI_Taxonoma, The taxonomy contains the relationships between all living forms 
+     *  for which nucleic acid or protein sequence have been determined.
+     */
+    NEWT,
+    Panther,
+    PubChem_compound,
+    PubMed,
+    /**
+     * Protein Modification Ontology, The Proteomics Standards Initiative modification ontology 
+     * (PSI-MOD) aims to define a concensus nomenclature and ontology reconciling, in a hierarchical 
+     * representation, the complementary descriptions of residue modifications.
+     */
+    PSI_MOD,
+    /**
+     * Molecular Interactions Ontology
+     */
+    PSI_MI,
+    Reactome,
+    Reactome_Database_ID,
+    RefSeq,
+    /**
+     * Synonym for {@link #UniProt}
+     */
+    SPACC,
+    Taxonomy,
+    UniProt,
+    /**
+     * Synonym for {@link #UniProt}
+     */
+    UniProtKB,
+    /**
+     * With this entry several web links are referenced
+     */
+    Website;
+  }   
   
   /**
    * Initialize the {@link #regExMap}.
    */
   static {
     // Do NOT append prefixes (^) or suffixes ($) or braces around the regex! 
-    regExMap.put(IdentifierDatabases.NCBI_GeneID, "\\d+");
-    regExMap.put(IdentifierDatabases.RefSeq, "(NC|AC|NG|NT|NW|NZ|NM|NR|XM|XR|NP|AP|XP|ZP)_\\d+");
-    regExMap.put(IdentifierDatabases.Ensembl, "ENS[A-Z]*[FPTG]\\d{11}");
-    regExMap.put(IdentifierDatabases.KeggGenes, "\\w+:[\\w\\d\\.-]*");
+    regExMap.put(IdentifierDatabases.ChEBI,                 "CHEBI:\\d+");
+    regExMap.put(IdentifierDatabases.ChemicalAbstracts,     "\\d{1,7}\\-\\d{2}\\-\\d");
+    regExMap.put(IdentifierDatabases.Compound,              "C\\d+");
+    regExMap.put(IdentifierDatabases.EMBL,                  "\\w+(\\_)?\\d+(\\.\\d+)?");
+    regExMap.put(IdentifierDatabases.Ensembl,               "ENS[A-Z]*[FPTG]\\d{11}");
+    regExMap.put(IdentifierDatabases.ECO,                   "ECO:\\d{7}");
+    regExMap.put(IdentifierDatabases.EntrezGene,            "\\d+");
+    regExMap.put(IdentifierDatabases.EnzymeConsortium,  
+        "\\d+\\.-\\.-\\.-|\\d+\\.\\d+\\.-\\.-|\\d+\\.\\d+\\.\\d+\\.-|\\d+\\.\\d+\\.\\d+\\.(n)?\\d+");
+    regExMap.put(IdentifierDatabases.GenBank,               "\\w+(\\_)?\\d+(\\.\\d+)?");
+    regExMap.put(IdentifierDatabases.GeneOntology,          "GO:\\d{7}");
+    regExMap.put(IdentifierDatabases.Glycan,                "G\\d+");
+    regExMap.put(IdentifierDatabases.GO,                    "GO:\\d{7}");
+    regExMap.put(IdentifierDatabases.HMDB,                  "HMDB\\d{5}");
+    regExMap.put(IdentifierDatabases.HPRD,                  "\\d+");
+    regExMap.put(IdentifierDatabases.KeggGenes,             "\\w+:[\\w\\d\\.-]*");
+    regExMap.put(IdentifierDatabases.miRBase,               "MI\\d{7}");
+    regExMap.put(IdentifierDatabases.NCBI_GeneID,           "\\d+");
+    regExMap.put(IdentifierDatabases.NCBI_Taxonomy,         "\\d+");
+    regExMap.put(IdentifierDatabases.NEWT,                  "\\d+");
+    regExMap.put(IdentifierDatabases.Panther,               "PTHR\\d{5}");
+    regExMap.put(IdentifierDatabases.PubChem_compound,      "\\d+");
+    regExMap.put(IdentifierDatabases.PubMed,                "\\d+");
+    regExMap.put(IdentifierDatabases.PSI_MI,                "MI:\\d{4}");
+    regExMap.put(IdentifierDatabases.PSI_MOD,               "MOD:\\d{5}");
+    regExMap.put(IdentifierDatabases.Reactome,              "REACT_\\d+(\\.\\d+)?");
+    regExMap.put(IdentifierDatabases.Reactome_Database_ID,  "\\d+(\\.\\d+)?");
+    regExMap.put(IdentifierDatabases.RefSeq,              
+        "(NC|AC|NG|NT|NW|NZ|NM|NR|XM|XR|NP|AP|XP|ZP)_\\d+");
+    regExMap.put(IdentifierDatabases.SPACC, 
+    "([A-N,R-Z][0-9][A-Z][A-Z, 0-9][A-Z, 0-9][0-9])|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])");
+    regExMap.put(IdentifierDatabases.Taxonomy,              "\\d+");
+    regExMap.put(IdentifierDatabases.UniProt, 
+        "([A-N,R-Z][0-9][A-Z][A-Z, 0-9][A-Z, 0-9][0-9])|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])");
+    regExMap.put(IdentifierDatabases.UniProtKB, 
+    "([A-N,R-Z][0-9][A-Z][A-Z, 0-9][A-Z, 0-9][0-9])|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])");
+    regExMap.put(IdentifierDatabases.Website,       "www.\\..\\."); //TODO: is this correct?
   }
   
   
