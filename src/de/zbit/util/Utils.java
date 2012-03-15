@@ -95,11 +95,11 @@ public class Utils {
   public static String ensureSlash(String path) {
     if (!path.endsWith("\\") && !path.endsWith("/")) {
       if (path.contains("/")) {
-      	path+="/";
+      	path += '/';
       } else if (path.contains("\\")) {
-      	path+="\\";
+      	path += '\\';
       } else {
-      	path+="/";
+      	path += '/';
       }
     }
     return path;
