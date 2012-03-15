@@ -228,8 +228,12 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 * Hide the {@link #progressBar} if it is visible.
 	 */
 	public synchronized void hideProgress() {
-		if (progressBar != null) {
-			progressBar.getProgressBar().setVisible(false);
+		if (progressBar != null && progressBar.getProgressBar()!=null) {
+      // Reset to 0% for the next usage
+		  JProgressBar bar = progressBar.getProgressBar();
+      bar.setValue(bar.getMinimum());
+      
+      bar.setVisible(false);
 		}
 		return;
 	}
@@ -275,26 +279,32 @@ public class StatusBar extends JPanel implements ProgressListener {
 		bar.setVisible(true);
 	}
 
-	/**
-	 * set a limit to the length of log messages
-	 * @param size	the maximum length of log messages
-	 */
-	public void limitLogMessageLength(int width){
-		maxLogSize = width;
-		limitLogLength = true;
-		
-		Dimension d = new Dimension(width, statusLabel.getHeight());
-		statusLabel.setPreferredSize(d);
-		statusLabel.setMaximumSize(d);
-	}
+	// WRZODEK: I Removed those methods because they don't work properly!
+	// Most stausBars have additional panel next to the log message (e.g.
+	// the progressBar). Setting the preffered with to
+	// this.getWidth() will allow no more space for all other panels!
+	// Please don't remove comments until this issue is fixed!
 	
-	public void unsetLogMessageLimit(){
-		limitLogLength = false;
-		Dimension d = new Dimension(this.getWidth(), statusLabel.getHeight());
-		statusLabel.setPreferredSize(d);
-		statusLabel.setMaximumSize(d);
-	}
-	
+//	/**
+//	 * set a limit to the length of log messages
+//	 * @param size	the maximum length of log messages
+//	 */
+//	public void limitLogMessageLength(int width){
+//		maxLogSize = width;
+//		limitLogLength = true;
+//		
+//		Dimension d = new Dimension(width, statusLabel.getHeight());
+//		statusLabel.setPreferredSize(d);
+//		statusLabel.setMaximumSize(d);
+//	}
+//	
+//	public void unsetLogMessageLimit(){
+//		limitLogLength = false;
+//		Dimension d = new Dimension(this.getWidth(), statusLabel.getHeight());
+//		statusLabel.setPreferredSize(d);
+//		statusLabel.setMaximumSize(d);
+//	}
+//	
 
 	/**
 	 * Set a nice icon for this status bar.
@@ -361,11 +371,9 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 * Reset to default state.
 	 */
 	public void reset() {
-		unsetLogMessageLimit();
+		//unsetLogMessageLimit();
 		statusLabel.setText(defaultText);
-		if (progressBar != null) {
-			progressBar.getProgressBar().setVisible(false);
-		}
+	  hideProgress();
 	}
 
 	private class LimitLogHandler extends Handler{
