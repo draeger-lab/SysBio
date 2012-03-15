@@ -34,7 +34,6 @@ import com.sun.imageio.plugins.common.ImageUtil;
 
 import de.zbit.gui.GUITools;
 import de.zbit.io.FileTools;
-import de.zbit.kegg.KeggTools;
 import de.zbit.math.MathUtils;
 import de.zbit.sequence.DNAsequenceUtils;
 
@@ -623,6 +622,22 @@ public class Utils {
     for (int i=0; i<arr.length; i++)
       if ((!ignoreCase && arr[i].equals(s)) || (ignoreCase && arr[i].equalsIgnoreCase(s))) return arr[i];
     return null;
+  }
+  
+  /**
+   * Converts a {@link Collection} to a {@link List} with the
+   * most effective available method.
+   * <p><i>NOTE: This is a wrapper method that simply calls
+   * {@link #iterableToList(Iterable)}.</i></p>
+   * @param <T>
+   * @param col
+   * @return
+   */
+  public static <T> List<T> collectionToList(Collection<T> col) {
+    // People where searching for "collectionToList" and not for
+    // "iterableToList". Thus, to enhance visibility, this method
+    // has been added.
+    return iterableToList(col);
   }
   
   /**

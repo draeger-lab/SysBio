@@ -848,7 +848,19 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     }
     if (headers != null) {
       for (int i = 0; i < headers.length; i++) {
+        String wordHeader = headers[i].replaceAll("\\W", "").replace("_", "");
         for (String target : names) {
+          
+          // Try to remove non-word characters
+          String wordTarget = target.replaceAll("\\W", "").replace("_", "");
+          if (wordTarget.length()>0) {
+            if ((caseSensitive && wordHeader.equals(wordTarget))
+                || (!caseSensitive && wordHeader.equalsIgnoreCase(wordTarget))) {
+              return i;
+            }            
+          }
+          
+          // Take strings "as they are" if they include no word characters
           if ((caseSensitive && headers[i].equals(target))
               || (!caseSensitive && headers[i].equalsIgnoreCase(target))) {
             return i;

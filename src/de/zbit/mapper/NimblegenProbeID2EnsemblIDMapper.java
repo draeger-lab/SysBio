@@ -36,10 +36,10 @@ import de.zbit.util.progressbar.ProgressBar;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class NimblegenProbeID2EnsemblIDMaper extends AbstractMapper<String, String> {
+public class NimblegenProbeID2EnsemblIDMapper extends AbstractMapper<String, String> {
   private static final long serialVersionUID = 5831049646066089602L;
 
-  public static final Logger log = Logger.getLogger(NimblegenProbeID2EnsemblIDMaper.class.getName());
+  public static final Logger log = Logger.getLogger(NimblegenProbeID2EnsemblIDMapper.class.getName());
 
   /**
    * The species to map ids for.
@@ -60,11 +60,11 @@ public class NimblegenProbeID2EnsemblIDMaper extends AbstractMapper<String, Stri
   private boolean onlyTakeUniqueMappings;
   
   
-  public NimblegenProbeID2EnsemblIDMaper(Species species) throws IOException {
+  public NimblegenProbeID2EnsemblIDMapper(Species species) throws IOException {
     this(species, null);
   }
   
-  public NimblegenProbeID2EnsemblIDMaper (Species species, AbstractProgressBar progress) throws IOException {
+  public NimblegenProbeID2EnsemblIDMapper (Species species, AbstractProgressBar progress) throws IOException {
     this(species, progress, false, true);
   }
   
@@ -76,7 +76,7 @@ public class NimblegenProbeID2EnsemblIDMaper extends AbstractMapper<String, Stri
    * @param onlyTakeUniqueMappings see {@link #onlyTakeUniqueMappings}!
    * @throws IOException
    */
-  public NimblegenProbeID2EnsemblIDMaper(Species species, AbstractProgressBar progress,
+  public NimblegenProbeID2EnsemblIDMapper(Species species, AbstractProgressBar progress,
     boolean readExtendedFile, boolean onlyTakeUniqueMappings) throws IOException {
     // This constructor is called from every other!
     super(String.class, String.class, progress);
@@ -92,7 +92,7 @@ public class NimblegenProbeID2EnsemblIDMaper extends AbstractMapper<String, Stri
    */
   public static void main(String[] args) throws Exception {
     LogUtil.initializeLogging(Level.FINE);
-    NimblegenProbeID2EnsemblIDMaper mapper = new NimblegenProbeID2EnsemblIDMaper(new Species("mmu", "Mus musculus", "_MOUSE"), new ProgressBar(0));
+    NimblegenProbeID2EnsemblIDMapper mapper = new NimblegenProbeID2EnsemblIDMapper(new Species("mmu", "Mus musculus", "_MOUSE"), new ProgressBar(0));
     System.out.println(mapper.map("CHR10FS100050969")); // CYP2B20
     System.out.println(mapper.map("CHR09FS061876008")); // ENSMUSG00000032278
     
