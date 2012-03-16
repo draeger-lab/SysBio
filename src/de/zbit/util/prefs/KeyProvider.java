@@ -212,6 +212,7 @@ public interface KeyProvider {
 		 * @param headerRank wether you want to start with chapter (=0) or section (=1).
 		 * @return
 		 */
+    @SuppressWarnings("rawtypes")
 		public static String createLaTeXDocumentation(
 		  Class<? extends KeyProvider> keyProvider, int headerRank) {
 		  
@@ -219,9 +220,9 @@ public interface KeyProvider {
 		  sb.append(String.format("%s{%s}\n", getLaTeXSection(headerRank), createTitle(keyProvider)));
       //sb.append(createProgramUsage(2, "")); // TODO: LaTeX program usage
       
-      ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);          
-      List<OptionGroup> groupList = optionGroupList(keyProvider);
-      List<Option> optionList = optionList(keyProvider);
+      ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+			List<OptionGroup> groupList = optionGroupList(keyProvider);
+			List<Option> optionList = optionList(keyProvider);
       if (groupList.size() > 0) {
         for (OptionGroup<?> group : groupList) {
           if (group.getOptions().size() > 0) {
@@ -492,8 +493,10 @@ public interface KeyProvider {
 		public static <T> Entry<T> getField(Class<?> sourceClass, Class<T> clazz, int n) {
 			Field fields[] = sourceClass.getFields();
 			Object fieldValue;
+			logger.fine("Loading class " + sourceClass);
 			while (n < fields.length) {
 				try {
+					logger.fine("Processing field " + fields[n].getName());
 					fieldValue = fields[n].get(sourceClass);
 					if ((fieldValue != null) && fieldValue.getClass().isAssignableFrom(clazz)) { 
 						return new Entry<T>(n, (T) fieldValue); 

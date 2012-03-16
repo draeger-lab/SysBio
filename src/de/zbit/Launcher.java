@@ -439,16 +439,6 @@ public abstract class Launcher implements Runnable, Serializable {
   public abstract List<Class<? extends KeyProvider>> getInteractiveOptions();
   
   /**
-   * This is a list of options, given on the command-line (i.e. should also
-   * be contained in {@link #getCmdLineOptions()}), that are made persistent.
-   * @return
-   */
-  public List<Class<? extends KeyProvider>> getPersistentOptions() {
-    // Per definition, interactive options should be made persistent!
-    return getInteractiveOptions();
-  }
-
-  /**
    * This method returns the default log level that is the minimal {@link Level}
    * for log messages to be displayed to the user.
    * 
@@ -467,6 +457,16 @@ public abstract class Launcher implements Runnable, Serializable {
    */
   public String[] getLogPackages() {
     return new String[] {"de.zbit"};
+  }
+
+  /**
+   * This is a list of options, given on the command-line (i.e. should also
+   * be contained in {@link #getCmdLineOptions()}), that are made persistent.
+   * @return
+   */
+  public List<Class<? extends KeyProvider>> getPersistentOptions() {
+    // Per definition, interactive options should be made persistent!
+    return getInteractiveOptions();
   }
   
   /**
@@ -677,6 +677,12 @@ public abstract class Launcher implements Runnable, Serializable {
       LogUtil.changeLogLevel(Level.parse(logLevel.toUpperCase()));
     }
     
+    /* 
+     * Give the opertunity to load certain libraries or perform
+     * other necessary operations in order to initialize the program.
+     */
+    setUp();
+    
     // Should we start the GUI?
     if (showsGUI()) {
     	javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -702,12 +708,24 @@ public abstract class Launcher implements Runnable, Serializable {
     }
   }
 
-  /**
+	/**
    * @param terminateJVMwhenDone the terminateJVMwhenDone to set
    */
   public void setTerminateJVMwhenDone(boolean terminateJVMwhenDone) {
     this.terminateJVMwhenDone = terminateJVMwhenDone;
   }
+
+	/**
+	 * This method is called before launching the actual program, i.e., after all
+	 * commend-line arguments have been read, but before deciding if the graphical
+	 * user interface or the command-line mode of the program should be started.
+	 * This method gives derived objects an opportunity to initialize certain
+	 * resources, such as external libraries etc. By default, this method does
+	 * nothing.
+	 */
+  protected void setUp() {
+		// Empty method body. Implementation can be done in derived elements.
+	}
 
   /**
    * Decides whether or not to show a graphical user interface.
