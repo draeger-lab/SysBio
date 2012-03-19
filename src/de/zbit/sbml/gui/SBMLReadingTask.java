@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
@@ -33,7 +34,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
-import org.sbml.jsbml.util.StringTools;
 
 import de.zbit.gui.GUITools;
 import de.zbit.util.ResourceManager;
@@ -110,7 +110,7 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 		this.parent = parent;
 		this.sbmlFile = sbmlFile;
 		ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(parent,
-			String.format(bundle.getString("READING_SBML_FILE"), sbmlFile.getName()),
+			MessageFormat.format(bundle.getString("READING_SBML_FILE"), sbmlFile.getName()),
 			new FileInputStream(sbmlFile));
 		progressMonitor = pmis.getProgressMonitor();
 		this.inputStream = new BufferedInputStream(pmis);
@@ -124,10 +124,10 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 		Timer timer = new Timer();
 		try {
 			SBMLDocument doc = SBMLReader.read(inputStream);
-			logger.info(String.format(bundle.getString("READING_TIME"), StringTools.toString(timer.getAndReset(false))));
+			logger.info(MessageFormat.format(bundle.getString("READING_TIME"), timer.getAndReset(false)));
 			return doc;
 		} catch (com.ctc.wstx.exc.WstxIOException exc) {
-			logger.info(String.format(bundle.getString("CANCELING_AT_TIME"), StringTools.toString(timer.getAndReset(false))));
+			logger.info(MessageFormat.format(bundle.getString("CANCELING_AT_TIME"), timer.getAndReset(false)));
 			logger.fine(exc.getLocalizedMessage());
 			return null;
 		}
