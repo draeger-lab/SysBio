@@ -10,7 +10,15 @@
 	";". Otherwise, please use the suffix "_TOOLTIP" to indicate a tooltip 
 	for some label.
   </comment>
-  <entry key="READING_SBML_FILE">Fortschritt beim Lesen der SBML-Datei %s:</entry>
-  <entry key="READING_TIME">Lesedauer: %s s</entry>
-  <entry key="CANCELING_AT_TIME">Vorgang abgebrochen bei %s s</entry>
+
+  <!-- SBMLReadingTask -->
+  
+  <entry key="READING_SBML_FILE">Fortschritt beim Lesen der SBML-Datei {0}:</entry>
+  <entry key="READING_TIME">Lesedauer: {0,number} s</entry>
+  <entry key="CANCELING_AT_TIME">Vorgang abgebrochen nach: {0,number} s</entry>
+  
+  <!-- SBMLtools -->
+  
+  <entry key="COULD_NOT_SET_SBO_TERM">Der SBO-Ausdruck {0} für {1} mit Level = {2} und Version = {3} konnte nicht gesetzt werden.</entry>
+  
 </properties>
