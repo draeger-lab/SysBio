@@ -23,7 +23,20 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.JTextComponent;
 
 /**
- * A helpful class to filter the content of a {@link TableModel}.
+ * A helpful class to filter the content of a {@link TableModel}. Example usage:
+ * 
+ * <pre>
+ * MyTableModel tableModel = ... // MyTableModel extends AbstractTableModel;
+ * JTable table = new JTable(tableModel);
+ * table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+ * TableRowSorter<MyTableModel> sorter = new TableRowSorter<MyTableModel>(tableModel);
+ * table.setRowSorter(sorter);
+ * JTextField filterText = new JTextField(40);
+ * // Whenever filterText changes, invoke newFilter:
+ * filterText.getDocument().addDocumentListener(new DocumentFilterListener<MyTableModel>(filterText, sorter));
+ * // DocumentFilterListener is your filter class that extends AbstractDocumentFilterListener.
+ * // Don't forget to add text field and table to your GUI.
+ * </pre>
  * 
  * @author Andreas Dr&auml;ger
  * @since 1.1
