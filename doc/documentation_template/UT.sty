@@ -69,23 +69,6 @@
 \lstset{breaklines=true}
 \lstset{breakatwhitespace=true}
 \lstset{basicstyle=\small\ttfamily, stringstyle=\ttfamily, keywordstyle=\bf\ttfamily}
-\usepackage{html}   %  *always* load this for LaTeX2HTML
-\begin{htmlonly}
-  \usepackage{verbatim}
-  \providecommand{\lstinputlisting}[2][]{\verbatiminput{#2}}
-  \renewcommand{\lstset}[1]{}
-  \renewcommand{\Rightarrow}{ - }
-  \renewcommand{\textregistered}{\circledR } %®
-
-  %\renewcommand{``}{"} % Geht nicht...
-  \renewcommand{\tiny}{\small}
-  \renewcommand{\sim}{about }
-  \renewenvironment{lstlisting}[1]{ % Normale Syntax funzt nicht in tex2html
-  }
-  \renewenvironment{algorithm}[1]{
-    \hrule
-  }
-\end{htmlonly}
 
 \newcommand{\changefont}[3]{
 \fontfamily{#1} \fontseries{#2} \fontshape{#3} \selectfont} %Zum Ändern von Schriftarten  {\changefont{pcr}{m}{n}{}}
@@ -167,4 +150,3 @@ listOfProducts, listOfParameters, listOfModifiers, modifierSpeciesReference,
 }
 
 %\publishers{\includegraphics[width=100pt]{logo/JSBML_shaddow.pdf}}
-
