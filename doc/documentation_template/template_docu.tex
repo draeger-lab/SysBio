@@ -14,7 +14,7 @@
   titlepage
 ]{scrreprt}
 
-\usepackage{redStyle}
+\usepackage{UT}
 
 % booktabs is for toprule, bottomrule, etc. in tables.
 \usepackage{booktabs}
@@ -31,11 +31,10 @@
               breaklinks={true},
               colorlinks={false},
               pdfpagemode={UseOutlines},
-              pdftitle={Documentation for InCroMAP},
-              pdfauthor={Clemens Wrzodek},
-              pdfsubject={Software guide},
-              pdfkeywords={InCroMAP} {Integrator} {DNA} {methylation} {mRNA} {expression} {miRNA} {microRNA} {messengerRNA} {DNAmethylation} {protein} {phosphoprotein} {modification} {zeptosens} {affymetrix} {agilent} {nimblegen} {guide} {documentation},
-              pdfview={FitV},
+              pdftitle={YOUR SOFTWARE'S NAME},
+              pdfauthor={YOUR NAME},
+              pdfsubject={User's Guide},
+              pdfkeywords={Key word 1} {Key word 1} {...} {Key word n}
               pdftex,
               pdffitwindow={true},
               pdfstartview={FitV},
@@ -53,21 +52,27 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Gestaltung der Titelseite     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
 \newcolumntype{L}[1]{>{\centering\arraybackslash}p{#1}}
 
+\titlehead{\centering\includegraphics[width=0.75\textwidth]{img/UT_WBMW_mathnat_4C}}
+\subject{User's Guide}
 \title{
 \centering
 \begin{tabular}{C{5cm}L{5cm}}
-\includegraphics[width=0.35\columnwidth]{figures/puzzle_logo.png} & Documentation for InCroMAP \\
+\includegraphics[width=.3\columnwidth]{img/LOGO.png} &
+YOUR SOFTWARE'S NAME \\
 \end{tabular}
-\\ \vspace{5mm} \large{integrated analysis of microarray data from different platforms}\\
 }
+\subtitle{Interesting sub title}
 
 
-\author{Clemens Wrzodek}
+\author{Your Name\thanks{Corresponding author:
+\href{mailto:your.name@uni-tuebingen.de}{your.name@uni-tuebingen.de}}\and
+Second Author\and Third Author}
 \date{\today}
-\publishers{}
+\publishers{Center for Bioinformatics Tuebingen (ZBIT)}
 
 
 
@@ -85,7 +90,7 @@
 \pagenumbering{roman}		% kleine lateinische Seitenzahlen
 \maketitle
 \begin{abstract}
-\input{00_abstract}
+\include{tex/00_abstract}
 \end{abstract}
 
 \setcounter{tocdepth}{1}
@@ -102,7 +107,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\input{01_docuBody}
+\include{tex/01_docuBody}
 
 
 
@@ -111,6 +116,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliographystyle{natbib}
-\bibliography{template}
+\bibliography{tex/literature}
 
 \end{document}
