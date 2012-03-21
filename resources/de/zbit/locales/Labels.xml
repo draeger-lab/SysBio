@@ -231,6 +231,6 @@ to redistribute it under certain conditions.
   <entry key="WIZARD_BACK">Back</entry>
   <entry key="WIZARD_CANCEL">Cancel</entry>
   <entry key="WIZARD_FINISH">Finish</entry>
-  <entry key="WIZARD_Help">Help</entry>
+  <entry key="WIZARD_HELP">Help</entry>
   
 </properties>
