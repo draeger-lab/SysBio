@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.EventHandler;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -36,6 +37,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -43,6 +46,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
@@ -353,11 +357,95 @@ public class SBMLTree extends JTree implements ActionListener {
 	public void expandPath(TreeNode[] path) {
 		if (path != null) {
 			for (int i = 0; i < path.length; i++) {
+				((SBMLNode) path[i]).setVisible(true);
 				TreePath treePath = new TreePath(((DefaultTreeModel) this.getModel()).getPathToRoot(path[i]));
 				this.expandPath(treePath);
 				this.setSelectionPath(treePath);
 				this.scrollPathToVisible(treePath);
 			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param nodesOfInterest
+	 * @param expand
+	 * @param selected
+	 * @param bold
+	 * @param hideOthers
+	 */
+	public void properties(List<TreeNode> nodesOfInterest, boolean expand, boolean selected, boolean bold, boolean hideOthers) {
+		List<TreePath> paths = new ArrayList<>();
+		
+		setAllVisible();
+
+		SBMLNode.setShowInvisible(true);
+		properties((SBMLNode) getModel().getRoot(), nodesOfInterest, paths, expand, selected, bold, hideOthers);
+		SBMLNode.setShowInvisible(false);
+		
+		if (selected && paths.size() > 0) {
+			setSelectionPaths((TreePath[]) paths.toArray());
+			scrollPathToVisible(paths.get(0));
+		}
+		
+		//validate();
+		updateUI();
+		//reload();
+	}
+	
+	/**
+	 * 
+	 * @param currentNode
+	 * @param nodesOfInterest
+	 * @param paths
+	 * @param expand
+	 * @param selected
+	 * @param bold
+	 * @param hideOthers
+	 */
+	private void properties(SBMLNode currentNode, List<TreeNode> nodesOfInterest, List<TreePath> paths, 
+			boolean expand, boolean selected, boolean bold, boolean hideOthers) {
+		
+		SBase currentSbase = ((SBase) currentNode.getUserObject());
+		
+		currentNode.setVisible(!hideOthers);
+		currentNode.setBoldFont(false);
+		
+		for (TreeNode node : nodesOfInterest) {
+			boolean isChild = false;
+			boolean isCurrentNode = false;
+			
+			if (node instanceof SBase) {
+				SBase sbase = (SBase) node;
+				
+				isChild = currentNode.containsUserObject(sbase);
+				isCurrentNode = currentSbase.equals(sbase);
+			}
+			if (node instanceof SBMLNode) {
+				SBMLNode sbmlNode = (SBMLNode) node;
+				
+				isChild = currentNode.isNodeChild(sbmlNode);
+				isCurrentNode = currentNode.equals(sbmlNode);
+			}
+			
+			currentNode.setVisible(currentNode.isVisible() || !(!isChild && !isCurrentNode && hideOthers));
+			
+			currentNode.setBoldFont(currentNode.isBoldFont() || (isCurrentNode && bold));
+			
+			if (isCurrentNode) {
+				SBMLNode.setShowInvisible(true);
+				if (expand || selected) {
+					expandNode(currentNode);
+				}
+				if (selected) {
+					paths.add(new TreePath(((DefaultTreeModel)this.getModel()).getPathToRoot(currentNode)));
+				}
+				SBMLNode.setShowInvisible(true);
+			}
+		}
+		
+		for (int i = 0; i < currentNode.getChildCount(); i++) {
+			properties((SBMLNode) currentNode.getChildAt(i), nodesOfInterest, paths, expand, selected, bold, hideOthers);
 		}
 	}
 	

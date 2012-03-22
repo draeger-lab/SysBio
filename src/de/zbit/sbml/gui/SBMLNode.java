@@ -186,6 +186,20 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	public void collapse() {
 		this.expanded = false;
 	}
+	
+	public boolean containsUserObject(TreeNodeWithChangeSupport obj) {
+		if (getUserObject().equals(obj)){
+			return true;
+		} else if (isLeaf()) {
+			return false;
+		} else {
+			boolean result = false;
+			for (int i = 1; i < getChildCount(); i++) {
+				result = result || ((SBMLNode) getChildAt(i)).containsUserObject(obj);
+			}
+			return result;
+		}
+	}
 
 	/**
 	 * 
