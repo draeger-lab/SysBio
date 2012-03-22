@@ -92,7 +92,7 @@ public class SBMLTreeSearcher extends SwingWorker<List<TreeNode>, Void> {
 			RegexpSpeciesReferenceFilter specFilter = new RegexpSpeciesReferenceFilter(search, false);
 			RegexpAssignmentVariableFilter assFilter = new RegexpAssignmentVariableFilter(search, false);
 			OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
-			tree.search(filter, progressBar);
+			//tree.search(filter, progressBar);
 			if ((tree.getModel() != null) && (tree.getModel().getRoot() != null)) {
 				return ((SBMLNode) tree.getModel().getRoot()).getUserObject().filter(filter);
 			}
@@ -118,14 +118,15 @@ public class SBMLTreeSearcher extends SwingWorker<List<TreeNode>, Void> {
 		} else {
 			logger.log(Level.INFO, "Expanding...");
 			try {
-				tree.expandAll(list, true, progressBar);
+				//tree.expandAll(list, true, progressBar);
+				tree.properties(list, true, true, true, true);
 			} catch (Exception e) {}
 			if ((progressBar != null) && (progressBar instanceof ProgressBarSwing)) {
 				((ProgressBarSwing) progressBar).getProgressBar().setVisible(false);
 			}
 		}
 		logger.log(Level.INFO, "Ready.");
-		firePropertyChange("done", null, list);
+		firePropertyChange("done", null, null);
 	}
 	
 	/**

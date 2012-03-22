@@ -22,7 +22,9 @@ import java.awt.Font;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
+import org.sbml.jsbml.Species;
 
 /**
  * @author Sebastian Nagel
@@ -55,6 +57,11 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 				setFont(getFont().deriveFont(Font.BOLD));
 			} else {
 				setFont(getFont().deriveFont(Font.PLAIN));
+			}
+			if (node.getUserObject() instanceof Species) {
+				if (this.getText().toLowerCase().startsWith("sa")) {
+					System.out.println(this.getText()+ ": " + node.isVisible());
+				}
 			}
 			if (node.getUserObject() instanceof SimpleSpeciesReference){
 				this.setText(((SimpleSpeciesReference) node.getUserObject()).getSpeciesInstance().getName());
