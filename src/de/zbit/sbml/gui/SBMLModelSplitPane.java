@@ -255,7 +255,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	public void searchTree() {
 		swingTimer = null;
 		searchField.setEnabled(false);
-		logger.info("searching");
+		logger.fine("searching");
 		SBMLTreeSearcher worker = new SBMLTreeSearcher(this, searchField.getText(),
 			tree, progressBar);
 		worker.addPropertyChangeListener(this);
