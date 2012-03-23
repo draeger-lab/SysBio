@@ -25,8 +25,10 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -667,5 +669,48 @@ public class Utils {
     return l;
   }
 
+  /**
+   * Add a key value pair to a {@link HashMap} of {@link Collection}s of values!
+   * <pre>Map&lt;K, Collection&lt;V>></pre>
+   * @param <K>
+   * @param <V>
+   * @param map the actual map
+   * @param key
+   * @param listItem the new value to add in the list (or add in a new list).
+   */
+  public static <K, V> void addToMapOfSets(Map<K, Collection<V>> map, K key, V listItem) {
+    Collection<V> list = map.get(key);
+    if (list==null) {
+      list = new HashSet<V>();
+      map.put(key, list);
+    }
+    list.add(listItem);
+  }
+  
+  
+  
+  /**
+   * The reverse of {@link #addToMapOfSets(Map, Object, Object)}.
+   * Removes a value (i.e. <code>listItem</code>) from the sets
+   * of all given <code>keys</code>. Deletes keys if the corresponding
+   * sets are empty after the removal.
+   * @param <K>
+   * @param <V>
+   * @param map
+   * @param listItem
+   * @param keys
+   */
+  public static <K, V> void removeFromMapOfSets(Map<K, Collection<V>> map, V listItem, K... keys) {
+    for (K key: keys) {
+      Collection<V> list = map.get(key);
+      if (list!=null) {
+        list.remove(listItem);
+        if (list.size()<1) {
+          map.remove(key);
+        }
+      }
+    }
+  }
+  
   
 }

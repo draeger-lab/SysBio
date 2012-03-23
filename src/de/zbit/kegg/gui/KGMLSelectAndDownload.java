@@ -170,7 +170,13 @@ public class KGMLSelectAndDownload {
       if (FileDownload.ProgressBar!=null && FileDownload.ProgressBar instanceof AbstractProgressBar) {
         ((AbstractProgressBar)FileDownload.ProgressBar).finished();
       }
-      throw new Exception(String.format("Could not download the selected pathway for the selected organism (%s).", pwID));
+      // If HTTP Response was "OK", but no content is available
+      // then the pathway does not exist for the selected organism.
+      if (FileDownload.status==200) {
+        throw new Exception("The selected pathway is not available for the selected organism.");
+      } else {
+        throw new Exception(String.format("Could not download the selected pathway for the selected organism (%s).", pwID));
+      }
     }
     
     return localFile;

@@ -32,6 +32,7 @@ import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
+import de.zbit.kegg.parser.pathway.GraphicsType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
@@ -457,9 +458,14 @@ public class KeggTools {
   public static void removeWhiteNodes(Pathway p) {
     for (int i=0; i<p.getEntries().size(); i++) {
       Entry entry = p.getEntries().get(i);
-      if (entry.hasGraphics() && entry.getGraphics().isSetBGcolor() &&          
+      if ( // 1. Has a white background
+          entry.hasGraphics() && entry.getGraphics().isSetBGcolor() &&          
           entry.getGraphics().getBgcolor().toLowerCase().trim().endsWith("ffffff")
-          && (entry.getType() == EntryType.gene || entry.getType() == EntryType.ortholog)) {
+          // 2. Is a gene or ortholog (don't remove compounds or such)
+          && (entry.getType() == EntryType.gene || entry.getType() == EntryType.ortholog)
+          // 3. Is not a line (line are always drawn on white background)
+          && (entry.getGraphics().getType()!=GraphicsType.line && 
+              !entry.getGraphics().getFgcolor().toLowerCase().trim().endsWith("ffffff"))) {
         p.removeEntry(i);
         i--;
       }

@@ -506,6 +506,14 @@ public class StringUtil {
 		return a.substring(0, i);
 	}
 	
+	/**
+	 * Get the longest common prefix.
+	 * <p>Note: the LCP of ALG13 and ALG14 is ALG1... just
+	 * for your consideration.</p>
+	 * @param b
+	 * @param ignoreEmptyStrings
+	 * @return the longest common prefix of all elements in b.
+	 */
 	public static String getLongestCommonPrefix(String[] b, boolean ignoreEmptyStrings) {
 		int i;
 		

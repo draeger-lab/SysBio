@@ -41,6 +41,12 @@ public class FileDownload {
   public static final transient Logger log = Logger.getLogger(FileDownload.class.getName());
   public static Object ProgressBar;
   public static Object StatusLabel;
+  
+  /**
+   * Returns the last HTTP Status code (200 = OK, 
+   * values &gt;=400 are usually errors).
+   */
+  public static int status=-1;
 
   static {
     // Use the system proxy.
@@ -115,6 +121,7 @@ public class FileDownload {
         
         return; //404 und sowas ... >400 nur error codes. Normal:200 =>OK
       }
+      FileDownload.status = status;
       
       conn = url.openConnection();
       
@@ -160,7 +167,9 @@ public class FileDownload {
    * 
    * @param address
    * @param localFileName
-   * @return localFileName
+   * @return localFileName File might get renamed and moved to the
+   * systems temp directory if no write access to specified folder is
+   * granted. In these cases, the return value is the new file path.
    */
   public static String download(String address, String localFileName) {
     OutputStream out = null;
@@ -265,6 +274,7 @@ public class FileDownload {
           System.out.println("Failed: HTTP error (code " + status + ").");          
           break; //404 und sowas ... >400 nur error codes. Normal:200 =>OK
         }
+        FileDownload.status = status;
         conn = url.openConnection();
         
         in = conn.getInputStream();
