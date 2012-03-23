@@ -69,6 +69,7 @@ import javax.swing.UIManager;
 import de.zbit.AppConf;
 import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.gui.actioncommand.ActionCommandWithIcon;
+import de.zbit.gui.mac.MacOSXController;
 import de.zbit.gui.mac.MacOSXController2;
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
@@ -690,8 +691,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		JMenu fileHistory = createFileHistory();
 		String title = BaseAction.FILE.getName();
 		if (macOS) {
-			// Mac OS has its own "quit" menu item, so we don't want to create a separate one.
-			new MacOSXController2(this);
+			try {
+				// Mac OS has its own "quit" menu item, so we don't want to create a separate one.
+				new MacOSXController2(this);
+			} catch (Throwable exc) {
+				new MacOSXController(this);
+			}
 			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
 					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
 					closeFile);
