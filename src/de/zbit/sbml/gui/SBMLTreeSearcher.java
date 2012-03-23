@@ -116,7 +116,7 @@ public class SBMLTreeSearcher extends SwingWorker<List<TreeNode>, Void> {
 		if (list == null) {
 			SBMLNode.setShowInvisible(true);
 		} else {
-			logger.log(Level.INFO, "Expanding...");
+			logger.log(Level.FINE, "Expanding...");
 			try {
 				//tree.expandAll(list, true, progressBar);
 				tree.properties(list, true, true, true, true);
@@ -125,7 +125,7 @@ public class SBMLTreeSearcher extends SwingWorker<List<TreeNode>, Void> {
 				((ProgressBarSwing) progressBar).getProgressBar().setVisible(false);
 			}
 		}
-		logger.log(Level.INFO, "Ready.");
+		logger.log(Level.FINE, "Ready.");
 		firePropertyChange("done", null, null);
 	}
 	

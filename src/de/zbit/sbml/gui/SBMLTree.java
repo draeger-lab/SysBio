@@ -37,8 +37,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -46,7 +44,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
-import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
@@ -375,7 +372,7 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * @param hideOthers
 	 */
 	public void properties(List<TreeNode> nodesOfInterest, boolean expand, boolean selected, boolean bold, boolean hideOthers) {
-		List<TreePath> paths = new ArrayList<>();
+		List<TreePath> paths = new ArrayList<TreePath>();
 		
 		setAllVisible();
 
