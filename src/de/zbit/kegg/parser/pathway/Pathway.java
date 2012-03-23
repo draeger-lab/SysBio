@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
+import de.zbit.util.Utils;
 
 /**
  * Main Kegg document. Corresponding to the Kegg Pathway class
@@ -190,14 +191,14 @@ public class Pathway {
 	 */
 	void putEntryInNameMap(Entry e) {
 	  // Put whole name
-	  addToSet(nameMap, e.getName(), e);
+	  Utils.addToMapOfSets(nameMap, e.getName(), e);
 	  
 	  // Put splitted name (as whole name may be "hsa:12345 hsa:23456")
 	  if (e.getName().contains(" ")) {
 	    for (String ko_id:e.getName().split(" ")) {
 	      ko_id = ko_id.trim();
 	      if (ko_id.length()>0) {
-	        addToSet(nameMap, ko_id, e);
+	        Utils.addToMapOfSets(nameMap, ko_id, e);
 	      }
 	    }
 	  }
@@ -214,7 +215,7 @@ public class Pathway {
 	  for (String ko_id:synonyms.split("\\s")) {
 	    ko_id = ko_id.trim();
 	    if (ko_id.length()>0) {
-	      addToSet(nameMap, ko_id, e);
+	      Utils.addToMapOfSets(nameMap, ko_id, e);
 	    }
 	  }
 	}
@@ -236,46 +237,9 @@ public class Pathway {
 	    }
 	  }
 	  
-	  removeFromSet(nameMap, e, toRemove.toArray(new String[0]));
+	  Utils.removeFromMapOfSets(nameMap, e, toRemove.toArray(new String[0]));
 	}
 	
-	/**
-	 * Add a key value pair to a Hashet of Collections of values!
-	 * (Map<K, Collection<V>>).
-	 * @param <K>
-	 * @param <V>
-	 * @param map
-	 * @param key
-	 * @param listItem
-	 */
-  private static <K, V> void addToSet(Map<K, Collection<V>> map, K key, V listItem) {
-    Collection<V> list = map.get(key);
-    if (list==null) {
-      list = new HashSet<V>();
-      map.put(key, list);
-    }
-    list.add(listItem);
-  }
-  
-  /**
-   * The reverse of {@link #addToSet(Map, Object, Object)}.
-   * @param <K>
-   * @param <V>
-   * @param map
-   * @param listItem
-   * @param keys
-   */
-  private static <K, V> void removeFromSet(Map<K, Collection<V>> map, V listItem, K... keys) {
-    for (K key: keys) {
-      Collection<V> list = map.get(key);
-      if (list!=null) {
-        list.remove(listItem);
-        if (list.size()<1) {
-          map.remove(key);
-        }
-      }
-    }
-  }
 	
 	/**
 	 * If and only if e is a reactionModifier, it is
@@ -668,14 +632,14 @@ public class Pathway {
    */
   void registerReactionComponent(ReactionComponent rc, Reaction reaction) {
     // Put whole name
-    addToSet(reactionComponents, rc.getName(), reaction);
+    Utils.addToMapOfSets(reactionComponents, rc.getName(), reaction);
     
     // Put splitted name (as whole name may be "hsa:12345 hsa:23456")
     if (rc.getName().contains(" ")) {
       for (String name:rc.getName().split(" ")) {
         name = name.trim();
         if (name.length()>0) {
-          addToSet(reactionComponents, name, reaction);
+          Utils.addToMapOfSets(reactionComponents, name, reaction);
         }
       }
     }
@@ -702,7 +666,7 @@ public class Pathway {
       }
     }
     
-    removeFromSet(reactionComponents, reaction, toRemove.toArray(new String[0]));
+    Utils.removeFromMapOfSets(reactionComponents, reaction, toRemove.toArray(new String[0]));
   }
 
   /**

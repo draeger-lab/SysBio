@@ -18,6 +18,7 @@ package de.zbit.gui.mac;
 import java.io.File;
 import java.io.IOException;
 
+import de.zbit.io.FileTools;
 import de.zbit.util.Utils;
 
 /**
@@ -53,7 +54,7 @@ public class NativeLibraryLoader {
 	public static final void loadMacOSLibrary(String tmpDir) throws IOException {
 		File libFile = loader.createLibFile(tmpDir);
 		if (libFile.canWrite()) {
-			Utils.copyStream(NativeLibraryLoader.class.getResourceAsStream(libFile.getName()), libFile);
+		  FileTools.copyStream(NativeLibraryLoader.class.getResourceAsStream(libFile.getName()), libFile);
 			libFile.deleteOnExit();
 			System.load(libFile.getAbsolutePath());
 			System.loadLibrary(libFile.getName());

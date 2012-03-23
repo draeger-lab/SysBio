@@ -51,7 +51,7 @@ public class Graphics {
   /**
    * the width of this graphics object
    */
-  private int width=45;
+  private int width=46;
   /**
    * the height of this graphics object
    */
@@ -498,6 +498,13 @@ public class Graphics {
     g.setWidth(110);
     g.setType(GraphicsType.roundrectangle);
     return g;
+  }
+
+  /**
+   * @return TRUE if x and y are 0.
+   */
+  public boolean isDefaultPosition() {
+    return x==0&&y==0;
   }
   
 }
