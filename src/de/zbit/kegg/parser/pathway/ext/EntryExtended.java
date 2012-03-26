@@ -16,6 +16,8 @@
  */
 package de.zbit.kegg.parser.pathway.ext;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,18 +27,40 @@ import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.util.DatabaseIdentifiers;
+import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
+import de.zbit.util.Utils;
 
 /**
+ * An extended Version of an {@link Entry}. This allows to store more
+ * information for internal process than the original KGML
+ * specification permits.
+ * 
+ * @author Clemens Wrzodek
  * @author Finja B&uuml;chel
  * @version $Rev$
  */
 public class EntryExtended extends Entry {
   
+  /**
+   * This is a more fine-grained defintion of 
+   * {@link EntryType} and should ONLY be set when
+   * the definition of {@link EntryType} is too vague.
+   */
   GeneType geneType = null;
+  
+  /**
+   * This map should contain all identifiers for this element.
+   * No matter if these are uniprot, entrez gene, etc.
+   */
+  Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers = new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
+  
   
   //TODO: getter and setter
   //TODO: noch in equals, und hashCode aufnehmen?
+  
   String uniProtID;
+  
   int geneID;
   String GO;
   List<String> geneSymbolSynonyms;
@@ -125,6 +149,32 @@ public class EntryExtended extends Entry {
 
   public boolean isSetGeneType() {
     return geneType==null ? false : true;
+  }
+  
+  /**
+   * 
+   * @return <code>TRUE</code> if we have some {@link #identifiers}.
+   */
+  public boolean isSetDatabaseIdentifiers() {
+    return identifiers!=null && identifiers.size()>0;
+  }
+  
+  /**
+   * Add an identifier to this {@link Entry}.
+   * @param db
+   * @param id
+   */
+  public void addDatabaseIdentifier(IdentifierDatabases db, String id) {
+    Utils.addToMapOfSets(identifiers, db, id);
+  }
+  
+  /**
+   * Remove an identifier from this {@link Entry}.
+   * @param db
+   * @param id
+   */
+  public void removeDatabaseIdentifier(IdentifierDatabases db, String id) {
+    Utils.removeFromMapOfSets(identifiers, id, db);
   }
   
   /**

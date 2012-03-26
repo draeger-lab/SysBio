@@ -633,7 +633,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				}
 				String cvtString = cvt.toString();
 				LinkedList<String> replacedURIs = new LinkedList<String>();
-				for (int k = 0; k < cvt.getNumResources(); k++) {
+				for (int k = 0; k < cvt.getResourceCount(); k++) {
 					String uri = cvt.getResourceURI(k);
 					if (!replacedURIs.contains(uri)) {
 					  replacedURIs.add(uri);

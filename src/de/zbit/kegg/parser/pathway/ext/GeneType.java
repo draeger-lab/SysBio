@@ -16,9 +16,20 @@
  */
 package de.zbit.kegg.parser.pathway.ext;
 
+import de.zbit.kegg.parser.pathway.EntryType;
+
 
 /**
+ * 
+ * The GeneType is just an additional more fine-grained
+ * specification for the {@link EntryType}.
+ * 
+ * <p>If the {@link EntryType} is Compound (i.e. small molecule),
+ * it is not necessary to set a gene type. Thus, this can be
+ * Unknown!</p>
+ * 
  * @author Finja B&uuml;chel
+ * @author Clemens Wrzodek
  * @version $Rev$
  */
 public enum GeneType{
