@@ -95,8 +95,7 @@ public class DatabaseIdentifierTools {
       
       // Append all CV Terms
       Object id = ids.get(db);
-      // TODO: Get miriam_URNPrefix from DatabaseIdentifiers
-      String miriam_URNPrefix = "TODO:";
+      String miriam_URNPrefix = DatabaseIdentifiers.getMiriamURN(db);
       appendAllIds(id, mycv, miriam_URNPrefix);
       
       // Set BQB to IS or Has_Version

@@ -16,7 +16,9 @@
  */
 package de.zbit.util;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -33,11 +35,20 @@ public class DatabaseIdentifiers {
   private static final transient Logger log = Logger.getLogger(DatabaseIdentifiers.class.getName());
   
   /**
+   * list with all available {@link IdentifierDatabases}
+   */
+  private static Collection<IdentifierDatabases> identifiers = new HashSet<IdentifierDatabases>();
+  /**
    * Contains a map from any {@link IdentifierDatabases}
    * to the corresponding regular expression.
    */
   private static Map<IdentifierDatabases, String> regExMap = new HashMap<IdentifierDatabases, String>();
   
+  /**
+   * Contains a map from any {@link IdentifierDatabases}
+   * to the corresponding miriam URN.
+   */
+  private static Map<IdentifierDatabases, String> miriamMap = new HashMap<IdentifierDatabases, String>();
   
   /**
    * An enumeration of different gene identifiers in alphabetic order.
@@ -61,7 +72,14 @@ public class DatabaseIdentifiers {
      * Kegg compound
      */
     Compound,
+    /**
+     * ECOGene
+     */
     ECO,
+    /**
+     *  Nucleotide Sequence Database
+     *  http://www.ncbi.nlm.nih.gov/Genbank/
+     */
     EMBL,
     Ensembl,
     EntrezGene,
@@ -84,7 +102,7 @@ public class DatabaseIdentifiers {
     NCBI_GeneID,
     NCBI_Taxonomy,
     /**
-     *  Synonym of NCBI_Taxonoma, The taxonomy contains the relationships between all living forms 
+     *  Synonym of NCBI_Taxonomy, The taxonomy contains the relationships between all living forms 
      *  for which nucleic acid or protein sequence have been determined.
      */
     NEWT,
@@ -119,6 +137,45 @@ public class DatabaseIdentifiers {
      */
     Website;
   }   
+  
+  /**
+   * Initialize the {@link #identifiers}.
+   */
+  static {
+    // Do NOT append prefixes (^) or suffixes ($) or braces around the regex! 
+    identifiers.add(IdentifierDatabases.ChEBI);
+    identifiers.add(IdentifierDatabases.ChemicalAbstracts);
+    identifiers.add(IdentifierDatabases.Compound);
+    identifiers.add(IdentifierDatabases.EMBL);
+    identifiers.add(IdentifierDatabases.Ensembl);
+    identifiers.add(IdentifierDatabases.ECO);
+    identifiers.add(IdentifierDatabases.EntrezGene);
+    identifiers.add(IdentifierDatabases.EnzymeConsortium);
+    identifiers.add(IdentifierDatabases.GenBank);
+    identifiers.add(IdentifierDatabases.GeneOntology);
+    identifiers.add(IdentifierDatabases.Glycan);
+    identifiers.add(IdentifierDatabases.GO);
+    identifiers.add(IdentifierDatabases.HMDB);
+    identifiers.add(IdentifierDatabases.HPRD);
+    identifiers.add(IdentifierDatabases.KeggGenes);
+    identifiers.add(IdentifierDatabases.miRBase);
+    identifiers.add(IdentifierDatabases.NCBI_GeneID);
+    identifiers.add(IdentifierDatabases.NCBI_Taxonomy);
+    identifiers.add(IdentifierDatabases.NEWT);
+    identifiers.add(IdentifierDatabases.Panther);
+    identifiers.add(IdentifierDatabases.PubChem_compound);
+    identifiers.add(IdentifierDatabases.PubMed);
+    identifiers.add(IdentifierDatabases.PSI_MI);
+    identifiers.add(IdentifierDatabases.PSI_MOD);
+    identifiers.add(IdentifierDatabases.Reactome);
+    identifiers.add(IdentifierDatabases.Reactome_Database_ID);
+    identifiers.add(IdentifierDatabases.RefSeq);
+    identifiers.add(IdentifierDatabases.SPACC);
+    identifiers.add(IdentifierDatabases.Taxonomy);
+    identifiers.add(IdentifierDatabases.UniProt);
+    identifiers.add(IdentifierDatabases.UniProtKB);
+    identifiers.add(IdentifierDatabases.Website);
+  }
   
   /**
    * Initialize the {@link #regExMap}.
@@ -164,6 +221,42 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.Website,       "www.\\..\\."); //TODO: is this correct?
   }
   
+  /**
+   * Initialize the {@link #miriamMap}.
+   */
+  static {
+    miriamMap.put(IdentifierDatabases.ChEBI,                "urn:miriam:obo.chebi:");
+    miriamMap.put(IdentifierDatabases.ChemicalAbstracts,    "urn:miriam:cas:");
+    miriamMap.put(IdentifierDatabases.Compound,             "urn:miriam:kegg.compound:");
+    miriamMap.put(IdentifierDatabases.EMBL,                 "urn:miriam:insdc:");
+    miriamMap.put(IdentifierDatabases.Ensembl,              "urn:miriam:ensembl:");
+    miriamMap.put(IdentifierDatabases.ECO,                  "urn:miriam:ecogene:");
+    miriamMap.put(IdentifierDatabases.EntrezGene,           "urn:miriam:entrez.gene:");
+    miriamMap.put(IdentifierDatabases.EnzymeConsortium,     "urn:miriam:ec-code:");
+    miriamMap.put(IdentifierDatabases.GenBank,              "urn:miriam:insdc:");
+    miriamMap.put(IdentifierDatabases.GeneOntology,         "urn:miriam:obo.go:");
+    miriamMap.put(IdentifierDatabases.Glycan,               "urn:miriam:kegg.glycan:");
+    miriamMap.put(IdentifierDatabases.GO,                   "urn:miriam:obo.go:");
+    miriamMap.put(IdentifierDatabases.HMDB,                 "urn:miriam:hmdb:");
+    miriamMap.put(IdentifierDatabases.HPRD,                 "urn:miriam:irefweb:");
+    miriamMap.put(IdentifierDatabases.KeggGenes,            "urn:miriam:kegg.genes:");
+    miriamMap.put(IdentifierDatabases.miRBase,              "urn:miriam:mirbase:");
+    miriamMap.put(IdentifierDatabases.NCBI_GeneID,          "urn:miriam:entrez.gene:");
+    miriamMap.put(IdentifierDatabases.NCBI_Taxonomy,        "urn:miriam:taxonomy:");
+    miriamMap.put(IdentifierDatabases.NEWT,                 "urn:miriam:taxonomy:");
+    miriamMap.put(IdentifierDatabases.Panther,              "urn:miriam:panther:");
+    miriamMap.put(IdentifierDatabases.PubChem_compound,     "urn:miriam:pubchem.compound:");
+    miriamMap.put(IdentifierDatabases.PubMed,               "urn:miriam:pubmed:");
+    miriamMap.put(IdentifierDatabases.PSI_MI,               "urn:miriam:obo.mi:");
+    miriamMap.put(IdentifierDatabases.PSI_MOD,              "urn:miriam:obo.psi-mod:");
+    miriamMap.put(IdentifierDatabases.Reactome,             "urn:miriam:reactome:");
+    miriamMap.put(IdentifierDatabases.Reactome_Database_ID, "urn:miriam:reactome:");
+    miriamMap.put(IdentifierDatabases.RefSeq,               "urn:miriam:refseq:");
+    miriamMap.put(IdentifierDatabases.SPACC,                "urn:miriam:uniprot:");
+    miriamMap.put(IdentifierDatabases.Taxonomy,             "urn:miriam:taxonomy:");
+    miriamMap.put(IdentifierDatabases.UniProt,              "urn:miriam:uniprot:");
+    miriamMap.put(IdentifierDatabases.UniProtKB,            "urn:miriam:uniprot:");            
+  }
   
   /**
    * Return a regular expression to identify a certain identifier.
@@ -186,6 +279,30 @@ public class DatabaseIdentifiers {
       }
     }
     return regEx;
+  }
+  
+  /**
+   * returns the corresponding miriam urn to the enterede database identifier
+   * @param identifier
+   * @return
+   */
+  public static String getMiriamURN(IdentifierDatabases identifier) {
+    return miriamMap.get(identifier);
+  }
+
+  /**
+   * search the entered identifier and returns true if it exists
+   * @param db
+   * @return
+   */
+  public static IdentifierDatabases getIdentifier(String db) {
+    for (IdentifierDatabases identifier : identifiers) {
+      if (identifier.toString().equalsIgnoreCase(db) || 
+          (identifier.toString().replace("_", " ")).equalsIgnoreCase(db.replace("_", " "))){
+            return identifier;
+          }
+    }
+    return null;
   }
   
 }
