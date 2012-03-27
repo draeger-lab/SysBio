@@ -47,24 +47,58 @@ public class EntryExtended extends Entry {
    * {@link EntryType} and should ONLY be set when
    * the definition of {@link EntryType} is too vague.
    */
-  GeneType geneType = null;
+  EntryTypeExtended geneType = null;
   
   /**
    * This map should contain all identifiers for this element.
    * No matter if these are uniprot, entrez gene, etc.
    */
-  Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers = new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
+  Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers = 
+    new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
   
   
-  //TODO: getter and setter
-  //TODO: noch in equals, und hashCode aufnehmen?
+  /**
+   * cellular component
+   */
+  String compartment = null;
   
-  String uniProtID;
+  /**
+   * Data source
+   */
+  String dataSource = null;
   
-  int geneID;
-  String GO;
-  List<String> geneSymbolSynonyms;
-  //
+  public Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> getIdentifiers() {
+    return identifiers;
+  }
+
+  public void setIdentifiers(
+      Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers) {
+    this.identifiers = identifiers;
+  }
+
+  public String getCompartment() {
+    return compartment;
+  }
+
+  public void setCompartment(String compartment) {
+    this.compartment = compartment;
+  }
+  
+  public boolean isSetCompartment(){
+    return compartment!=null;
+  }
+  
+  public boolean isSetDataSource(){
+    return dataSource!=null;
+  }
+
+  public String getDataSource() {
+    return dataSource;
+  }
+
+  public void setDataSource(String dataSource) {
+    this.dataSource = dataSource;
+  }
 
   /**
    * @param parentPathway
@@ -84,18 +118,18 @@ public class EntryExtended extends Entry {
    * @param type
    */
   public EntryExtended(Pathway parentPathway, int id, String name,
-      EntryType etype, GeneType type) {
+      EntryType etype, EntryTypeExtended type) {
     super(parentPathway, id, name, etype);
     setGeneType(type);
   }
   
   public EntryExtended(Pathway parentPathway, int id, String name,
-      EntryType etype, GeneType type, Graphics graphics) {
+      EntryType etype, EntryTypeExtended type, Graphics graphics) {
     this(parentPathway, id, name, etype, type);    
     addGraphics(graphics);
   }
 
-  private void setGeneType(GeneType type) {
+  private void setGeneType(EntryTypeExtended type) {
    this.geneType = type;
   }
 
@@ -142,7 +176,7 @@ public class EntryExtended extends Entry {
     
   }
 
-  public GeneType getGeneType(){
+  public EntryTypeExtended getGeneType(){
     return geneType;
   }
   
@@ -169,6 +203,19 @@ public class EntryExtended extends Entry {
   }
   
   /**
+   * Add all identifier of the map to this {@link Entry}.
+   * @param db
+   * @param id
+   */
+  public void addDatabaseIdentifiers( Map<IdentifierDatabases, Collection<String>> map) {
+    for (java.util.Map.Entry<IdentifierDatabases, Collection<String>> entry : map.entrySet()) {
+      for (String value : entry.getValue()) {
+        Utils.addToMapOfSets(identifiers, entry.getKey(), value);
+      }
+    }    
+  }
+  
+  /**
    * Remove an identifier from this {@link Entry}.
    * @param db
    * @param id
@@ -186,6 +233,19 @@ public class EntryExtended extends Entry {
     
     if(isSetGeneType()){
       attributes.put("geneType", geneType.toString());
+    }    
+    if(isSetCompartment()){
+      attributes.put("compartment", compartment);
+    }
+    if(isSetDataSource()){
+      attributes.put("dataSource", dataSource);
+    }
+    if(isSetDatabaseIdentifiers()){
+      for (java.util.Map.Entry<IdentifierDatabases, Collection<String>> entry : identifiers.entrySet()) {
+        for (String value : entry.getValue()) {
+          attributes.put(entry.getKey().toString(), value);
+        }
+      }
     }
     
     return attributes;

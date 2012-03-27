@@ -32,7 +32,7 @@ import de.zbit.kegg.parser.pathway.EntryType;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public enum GeneType{
+public enum EntryTypeExtended{
   /**
    * protein
    */
