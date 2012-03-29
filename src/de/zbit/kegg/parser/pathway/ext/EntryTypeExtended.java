@@ -21,7 +21,7 @@ import de.zbit.kegg.parser.pathway.EntryType;
 
 /**
  * 
- * The GeneType is just an additional more fine-grained
+ * The {@link EntryTypeExtended} is just an additional more fine-grained
  * specification for the {@link EntryType}.
  * 
  * <p>If the {@link EntryType} is Compound (i.e. small molecule),
@@ -32,7 +32,7 @@ import de.zbit.kegg.parser.pathway.EntryType;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public enum EntryTypeExtended{
+public enum EntryTypeExtended {
   /**
    * protein
    */

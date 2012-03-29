@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -678,13 +680,14 @@ public class Utils {
    * @param key
    * @param listItem the new value to add in the list (or add in a new list).
    */
-  public static <K, V> void addToMapOfSets(Map<K, Collection<V>> map, K key, V listItem) {
+  public static <K, V> void addToMapOfSets(Map<K, Collection<V>> map, K key, V... listItem) {
     Collection<V> list = map.get(key);
     if (list==null) {
       list = new HashSet<V>();
       map.put(key, list);
     }
-    list.add(listItem);
+    
+    list.addAll(Arrays.asList(listItem));
   }
   
   

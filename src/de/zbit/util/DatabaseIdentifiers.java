@@ -16,11 +16,11 @@
  */
 package de.zbit.util;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class contains names and regular expressions to match various
@@ -35,10 +35,6 @@ public class DatabaseIdentifiers {
   private static final transient Logger log = Logger.getLogger(DatabaseIdentifiers.class.getName());
   
   /**
-   * list with all available {@link IdentifierDatabases}
-   */
-  private static Collection<IdentifierDatabases> identifiers = new HashSet<IdentifierDatabases>();
-  /**
    * Contains a map from any {@link IdentifierDatabases}
    * to the corresponding regular expression.
    */
@@ -49,14 +45,24 @@ public class DatabaseIdentifiers {
    * to the corresponding miriam URN.
    */
   private static Map<IdentifierDatabases, String> miriamMap = new HashMap<IdentifierDatabases, String>();
+
+  /**
+   * This map is used to describe the content of each database.
+   * See {@link DatabaseContent}.
+   */
+  private static Map<IdentifierDatabases, DatabaseContent> describedType = new HashMap<IdentifierDatabases, DatabaseContent>();
+  
   
   /**
-   * An enumeration of different gene identifiers in alphabetic order.
+   * An enumeration of different databases with identifiers in aplhabetical order.
    * 
    * @author Clemens Wrzodek
    * @author Finja B&uuml;chel
    */
   public static enum IdentifierDatabases {
+    /*
+     * PLEASE KEEP THE ALPHABETICAL ORDER!
+     */
     /**
      * Chemical Entities of Biological Interest (ChEBI) is a freely available dictionary 
      * of molecular entities focused on 'small' chemical compounds.
@@ -64,199 +70,414 @@ public class DatabaseIdentifiers {
     ChEBI,
     ChemicalAbstracts,
     /**
+     * The DrugBank database is a bioinformatics and chemoinformatics resource
+     * that combines detailed drug (i.e. chemical, pharmacological and
+     * pharmaceutical) data with comprehensive drug target (i.e. sequence,
+     * structure, and pathway) information.
+     */
+    DrugBank,
+    /**
      * Evidence Code Ontology, Evidence codes can be used to specify the type of supporting 
      * evidence for a piece of knowledge. This allows inference of a 'level of support' between 
      * an entity and an annotation made to an entity.
      */
-    /**
-     * Kegg compound
-     */
-    Compound,
-    /**
-     * ECOGene
-     */
     ECO,
-    /**
-     *  Nucleotide Sequence Database
-     *  http://www.ncbi.nlm.nih.gov/Genbank/
-     */
-    EMBL,
     Ensembl,
     EntrezGene,
-    EnzymeConsortium,
-    GenBank,
-    GeneSymbol, 
+    EC_code,
+    /**
+     * The International Nucleotide Sequence Database Collaboration (INSDC)
+     * consists of a joint effort to collect and disseminate databases
+     * containing DNA and RNA sequences.
+     */
+    GenBank, 
     GeneOntology,
     /**
-     * Kegg Glycan
+     * GlycomeDB is the result of a systematic data integration effort, and
+     * provides an overview of all carbohydrate structures available in public
+     * databases, as well as cross-links.
      */
-    Glycan,
-    GO,
+    GlycomeDB,
     /**
-     * Human Metabolome Database
+     * Human Metabolome Database - The Human Metabolome Database (HMDB) is a
+     * database containing detailed information about small molecule metabolites
+     * found in the human body.It contains or links 1) chemical 2) clinical and
+     * 3) molecular biology/biochemistry data.
      */
+
     HMDB,
-    HPRD,
-    KeggGenes, 
+    /**
+     * Human genome nomenclature (ID format: HGNC:\d{1,5}).
+     */
+    HGNC,
+    /**
+     * Actually not a real database identifier... 
+     */
+    GeneSymbol,
+    /**
+     * The International Protein Index (IPI) provides complete nonredundant data
+     * sets representing the human, mouse and rat proteomes, built from the
+     * Swiss-Prot, TrEMBL, Ensembl and RefSeq databases.
+     */
+    IPI,
+    /**
+     * iRefWeb is an interface to a relational database containing the latest
+     * build of the interaction Reference Index (iRefIndex) which integrates
+     * protein interaction data from ten different interaction databases:
+     * BioGRID, BIND, CORUM, DIP, HPRD, INTACT, MINT, MPPI, MPACT and OPHID. In
+     * addition, iRefWeb associates interactions with the PubMed record from
+     * which they are derived.
+     */
+    iRefWeb,
+    KEGG_Genes, 
+    KEGG_Compound,
+    KEGG_Glycan,
+    KEGG_Reaction,
+    KEGG_Drug,
+    KEGG_Pathway,
+    KEGG_Orthology,
+    KEGG_Genome,
+    KEGG_Metagenome,    
+    /**
+     * LipidBank is an open, publicly free database of natural lipids including
+     * fatty acids, glycerolipids, sphingolipids, steroids, and various
+     * vitamins.
+     */
+    LipidBank,
     miRBase,
-    NCBI_GeneID,
     NCBI_Taxonomy,
     /**
-     *  Synonym of NCBI_Taxonomy, The taxonomy contains the relationships between all living forms 
-     *  for which nucleic acid or protein sequence have been determined.
+     * Online Mendelian Inheritance in Man is a catalog of human genes and
+     * genetic disorders. Synonym: MIM
      */
-    NEWT,
+    OMIM,
+    /**
+     * The PANTHER (Protein ANalysis THrough Evolutionary Relationships)
+     * Classification System is a unique resource that classifies genes by their
+     * functions, using published scientific experimental evidence and
+     * evolutionary relationships to predict function even in the absence of
+     * direct experimental evidence.
+     */
     Panther,
+    /**
+     * Chemical Component Dictionary (also called PDB-CCD, PDBeChem) -- The
+     * Chemical Component Dictionary is as an external reference file describing
+     * all residue and small molecule components found in Protein Data Bank
+     * entries.
+     */
+    PDBeChem,
+    /**
+     * PubChem provides information on the biological activities of small
+     * molecules. It is a component of NIH's Molecular Libraries Roadmap
+     * Initiative. PubChem Compound archives chemical structures and records.
+     */
     PubChem_compound,
     PubMed,
     /**
-     * Protein Modification Ontology, The Proteomics Standards Initiative modification ontology 
-     * (PSI-MOD) aims to define a concensus nomenclature and ontology reconciling, in a hierarchical 
-     * representation, the complementary descriptions of residue modifications.
+     * Protein Modification Ontology, The Proteomics Standards Initiative
+     * modification ontology (PSI-MOD) aims to define a concensus nomenclature
+     * and ontology reconciling, in a hierarchical representation, the
+     * complementary descriptions of residue modifications.
      */
     PSI_MOD,
     /**
-     * Molecular Interactions Ontology
+     * Molecular Interactions Ontology -- The Molecular Interactions (MI)
+     * ontology forms a structured controlled vocabulary for the annotation of
+     * experiments concerned with protein-protein interactions. MI is developed
+     * by the HUPO Proteomics Standards Initiative.
      */
     PSI_MI,
+    /**
+     * The Reactome project is a collaboration to develop a curated resource of
+     * core pathways and reactions in human biology.
+     */
     Reactome,
-    Reactome_Database_ID,
     RefSeq,
     /**
-     * Synonym for {@link #UniProt}
+     * Actually 3DMET. 3DMET is a database collecting three-dimensional
+     * structures of natural metabolites.
      */
-    SPACC,
-    Taxonomy,
-    UniProt,
-    /**
-     * Synonym for {@link #UniProt}
-     */
-    UniProtKB,
-    /**
-     * With this entry several web links are referenced
-     */
-    Website;
-  }   
-  
-  /**
-   * Initialize the {@link #identifiers}.
-   */
-  static {
-    // Do NOT append prefixes (^) or suffixes ($) or braces around the regex! 
-    identifiers.add(IdentifierDatabases.ChEBI);
-    identifiers.add(IdentifierDatabases.ChemicalAbstracts);
-    identifiers.add(IdentifierDatabases.Compound);
-    identifiers.add(IdentifierDatabases.EMBL);
-    identifiers.add(IdentifierDatabases.Ensembl);
-    identifiers.add(IdentifierDatabases.ECO);
-    identifiers.add(IdentifierDatabases.EntrezGene);
-    identifiers.add(IdentifierDatabases.EnzymeConsortium);
-    identifiers.add(IdentifierDatabases.GenBank);
-    identifiers.add(IdentifierDatabases.GeneOntology);
-    identifiers.add(IdentifierDatabases.Glycan);
-    identifiers.add(IdentifierDatabases.GO);
-    identifiers.add(IdentifierDatabases.HMDB);
-    identifiers.add(IdentifierDatabases.HPRD);
-    identifiers.add(IdentifierDatabases.KeggGenes);
-    identifiers.add(IdentifierDatabases.miRBase);
-    identifiers.add(IdentifierDatabases.NCBI_GeneID);
-    identifiers.add(IdentifierDatabases.NCBI_Taxonomy);
-    identifiers.add(IdentifierDatabases.NEWT);
-    identifiers.add(IdentifierDatabases.Panther);
-    identifiers.add(IdentifierDatabases.PubChem_compound);
-    identifiers.add(IdentifierDatabases.PubMed);
-    identifiers.add(IdentifierDatabases.PSI_MI);
-    identifiers.add(IdentifierDatabases.PSI_MOD);
-    identifiers.add(IdentifierDatabases.Reactome);
-    identifiers.add(IdentifierDatabases.Reactome_Database_ID);
-    identifiers.add(IdentifierDatabases.RefSeq);
-    identifiers.add(IdentifierDatabases.SPACC);
-    identifiers.add(IdentifierDatabases.Taxonomy);
-    identifiers.add(IdentifierDatabases.UniProt);
-    identifiers.add(IdentifierDatabases.UniProtKB);
-    identifiers.add(IdentifierDatabases.Website);
+    ThreeDMET,
+    UniProt_AC;
   }
   
   /**
-   * Initialize the {@link #regExMap}.
+   * Use this enumeration to further specify the content of a particular database!
+   * @author Clemens Wrzodek
+   * @version $Rev$
+   */
+  public enum DatabaseContent {
+    /**
+     * The database contains information about smll molecules (also called compounds).
+     * Example: KEGG compound
+     */
+    small_molecule,
+    /**
+     * DB information about gnes, proteins, transcripts, etc. all kinds of omics data.
+     * Example: Ensembl.
+     */
+    omics,
+    /**
+     * DB contains info about genes.
+     * Example: EntrezGene
+     */
+    gene,
+    /**
+     * DB contains info about enzymes.
+     * Example: EC-Code
+     */
+    enzyme,
+    /**
+     * DB contains info about proteins.
+     * Example: UniProt
+     */
+    protein,
+    /**
+     * DB contains reactions
+     * Example: KEGG reactions.
+     */
+    reaction,
+    /**
+     * DB contains info specific desriptions or terms
+     * Example: Gene onotology
+     */
+    description,
+    /**
+     * DB contains info various annotations
+     * Example: ECO
+     */
+    annotation,
+    /**
+     * DB contains (DNA-, RNA-, Protein-) sequences.
+     * Example: RefSeq
+     */
+    sequences,
+    /**
+     * Database contains structures (chemical or 3D) of things.
+     * Example: 3DMet, PubChem
+     */
+    structures,
+    /**
+     * DB contains protein interactions.
+     * Example: String, Stitch
+     */
+    protein_interaction,
+    /**
+     * DB contains RNAs.
+     * Example: miRBase (microRNAs)
+     */
+    RNA,
+    /**
+     * Example: NCBI Taxonomy
+     */
+    taxonomy,
+    /**
+     * Example: Pubmed
+     */
+    publication,
+    /**
+     * Example: KEGG Pathway
+     */
+    pathway
+  }
+  
+  /**
+   * Search the entered identifier and returns the instance if it exists.
+   * @param dbIdentifier
+   * @return
+   */
+  public static IdentifierDatabases getDatabase(String dbIdentifier) {
+    IdentifierDatabases id = IdentifierDatabases.valueOf(dbIdentifier);
+    if (id==null) {
+      // Check against each database
+      String dbIdentifier2 = dbIdentifier.toLowerCase().replace("_", "").replace("-", "").replace(" ", "");
+      for (IdentifierDatabases identifier : IdentifierDatabases.values()) {
+        if (identifier.toString().replace("_", "").replace("-", "").replace(" ", "").equalsIgnoreCase(dbIdentifier2)) {
+          return identifier;
+        }
+        // TODO: _ID suffix. E.g. "KeggGenes" should also catch "KeggGene", KeggGeneID", etc.
+      }
+      
+      // Many databases have synonyms! Catch them here.
+      if (dbIdentifier2.equalsIgnoreCase("UniProtKB") ||
+          dbIdentifier2.equalsIgnoreCase("SPACC")){
+        return IdentifierDatabases.UniProt_AC;
+        
+      } else if (dbIdentifier2.equalsIgnoreCase("Taxonomy") ||
+          dbIdentifier2.equalsIgnoreCase("NEWT")) {
+        return IdentifierDatabases.NCBI_Taxonomy;
+        
+      } else if (dbIdentifier2.equalsIgnoreCase("NCBIGeneID") ||
+          dbIdentifier2.equalsIgnoreCase("GeneID")) {
+        return IdentifierDatabases.EntrezGene;
+        
+      } else if (dbIdentifier2.equalsIgnoreCase("GO")) {
+        return IdentifierDatabases.GeneOntology;
+        
+      } else if (dbIdentifier2.equalsIgnoreCase("INSDC")) {
+        return IdentifierDatabases.GenBank;
+        
+      } else if (dbIdentifier2.equalsIgnoreCase("3DMET")) {
+        return IdentifierDatabases.ThreeDMET;
+
+      } else if (dbIdentifier2.equalsIgnoreCase("PDBCCD")) {
+        return IdentifierDatabases.PDBeChem;
+        
+      } else if (dbIdentifier2.equalsIgnoreCase("BioGRID") ||
+          dbIdentifier2.equalsIgnoreCase("BIND") ||
+          dbIdentifier2.equalsIgnoreCase("CORUM") ||
+          dbIdentifier2.equalsIgnoreCase("DIP") ||
+          dbIdentifier2.equalsIgnoreCase("HPRD") ||
+          dbIdentifier2.equalsIgnoreCase("INTACT") ||
+          dbIdentifier2.equalsIgnoreCase("MINT") ||
+          dbIdentifier2.equalsIgnoreCase("MPPI") ||
+          dbIdentifier2.equalsIgnoreCase("MPACT ") ||
+          dbIdentifier2.equalsIgnoreCase("OPHID")) {
+        return IdentifierDatabases.iRefWeb;
+        
+      } else if (dbIdentifier2.equalsIgnoreCase("Symbol")) {
+        return IdentifierDatabases.GeneSymbol;
+
+      }
+      
+      log.warning(String.format("Could not get database identifier for '%s'.", dbIdentifier));
+    }
+    return null;
+  }
+  
+  
+  /**
+   * Initialize all maps.
    */
   static {
+    /*
+     * Initialize the {@link #regExMap}.
+     */
     // Do NOT append prefixes (^) or suffixes ($) or braces around the regex! 
     regExMap.put(IdentifierDatabases.ChEBI,                 "CHEBI:\\d+");
     regExMap.put(IdentifierDatabases.ChemicalAbstracts,     "\\d{1,7}\\-\\d{2}\\-\\d");
-    regExMap.put(IdentifierDatabases.Compound,              "C\\d+");
-    regExMap.put(IdentifierDatabases.EMBL,                  "\\w+(\\_)?\\d+(\\.\\d+)?");
+    regExMap.put(IdentifierDatabases.KEGG_Compound,         "C\\d{5}");
     regExMap.put(IdentifierDatabases.Ensembl,               "ENS[A-Z]*[FPTG]\\d{11}");
     regExMap.put(IdentifierDatabases.ECO,                   "ECO:\\d{7}");
     regExMap.put(IdentifierDatabases.EntrezGene,            "\\d+");
-    regExMap.put(IdentifierDatabases.EnzymeConsortium,  
-        "\\d+\\.-\\.-\\.-|\\d+\\.\\d+\\.-\\.-|\\d+\\.\\d+\\.\\d+\\.-|\\d+\\.\\d+\\.\\d+\\.(n)?\\d+");
+    regExMap.put(IdentifierDatabases.EC_code,  
+    "\\d+\\.-\\.-\\.-|\\d+\\.\\d+\\.-\\.-|\\d+\\.\\d+\\.\\d+\\.-|\\d+\\.\\d+\\.\\d+\\.(n)?\\d+");
     regExMap.put(IdentifierDatabases.GenBank,               "\\w+(\\_)?\\d+(\\.\\d+)?");
     regExMap.put(IdentifierDatabases.GeneOntology,          "GO:\\d{7}");
-    regExMap.put(IdentifierDatabases.Glycan,                "G\\d+");
-    regExMap.put(IdentifierDatabases.GO,                    "GO:\\d{7}");
+    regExMap.put(IdentifierDatabases.KEGG_Glycan,           "G\\d{5}");
     regExMap.put(IdentifierDatabases.HMDB,                  "HMDB\\d{5}");
-    regExMap.put(IdentifierDatabases.HPRD,                  "\\d+");
-    regExMap.put(IdentifierDatabases.KeggGenes,             "\\w+:[\\w\\d\\.-]*");
+    regExMap.put(IdentifierDatabases.iRefWeb,               "\\d+");
+    regExMap.put(IdentifierDatabases.KEGG_Genes,            "\\w+:[\\w\\d\\.-]*");
     regExMap.put(IdentifierDatabases.miRBase,               "MI\\d{7}");
-    regExMap.put(IdentifierDatabases.NCBI_GeneID,           "\\d+");
     regExMap.put(IdentifierDatabases.NCBI_Taxonomy,         "\\d+");
-    regExMap.put(IdentifierDatabases.NEWT,                  "\\d+");
     regExMap.put(IdentifierDatabases.Panther,               "PTHR\\d{5}");
     regExMap.put(IdentifierDatabases.PubChem_compound,      "\\d+");
     regExMap.put(IdentifierDatabases.PubMed,                "\\d+");
     regExMap.put(IdentifierDatabases.PSI_MI,                "MI:\\d{4}");
     regExMap.put(IdentifierDatabases.PSI_MOD,               "MOD:\\d{5}");
     regExMap.put(IdentifierDatabases.Reactome,              "REACT_\\d+(\\.\\d+)?");
-    regExMap.put(IdentifierDatabases.Reactome_Database_ID,  "\\d+(\\.\\d+)?");
-    regExMap.put(IdentifierDatabases.RefSeq,              
-        "(NC|AC|NG|NT|NW|NZ|NM|NR|XM|XR|NP|AP|XP|ZP)_\\d+");
-    regExMap.put(IdentifierDatabases.SPACC, 
+    regExMap.put(IdentifierDatabases.RefSeq,                
+    "(NC|AC|NG|NT|NW|NZ|NM|NR|XM|XR|NP|AP|XP|ZP)_\\d+");
+    regExMap.put(IdentifierDatabases.UniProt_AC, 
     "([A-N,R-Z][0-9][A-Z][A-Z, 0-9][A-Z, 0-9][0-9])|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])");
-    regExMap.put(IdentifierDatabases.Taxonomy,              "\\d+");
-    regExMap.put(IdentifierDatabases.UniProt, 
-        "([A-N,R-Z][0-9][A-Z][A-Z, 0-9][A-Z, 0-9][0-9])|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])");
-    regExMap.put(IdentifierDatabases.UniProtKB, 
-    "([A-N,R-Z][0-9][A-Z][A-Z, 0-9][A-Z, 0-9][0-9])|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])");
-    regExMap.put(IdentifierDatabases.Website,       "www.\\..\\."); //TODO: is this correct?
-  }
-  
-  /**
-   * Initialize the {@link #miriamMap}.
-   */
-  static {
+    regExMap.put(IdentifierDatabases.IPI,                   "IPI\\d{8}");    
+    regExMap.put(IdentifierDatabases.KEGG_Reaction,         "R\\d{5}");
+    regExMap.put(IdentifierDatabases.KEGG_Drug,             "D\\d{5}");
+    regExMap.put(IdentifierDatabases.KEGG_Pathway,          "\\w{2,4}\\d{5}");
+    regExMap.put(IdentifierDatabases.KEGG_Orthology,        "K\\d{5}");
+    regExMap.put(IdentifierDatabases.OMIM,                  "[*#+%^]?\\d{6}");
+    regExMap.put(IdentifierDatabases.DrugBank,              "DB\\d{5}");
+    regExMap.put(IdentifierDatabases.ThreeDMET,             "B\\d{5}");
+    regExMap.put(IdentifierDatabases.PDBeChem,              "\\w{3}");
+    regExMap.put(IdentifierDatabases.GlycomeDB,             "\\d+");
+    regExMap.put(IdentifierDatabases.LipidBank,             "\\w+\\d+");
+    regExMap.put(IdentifierDatabases.KEGG_Genome,           "(T0\\d+|\\w{3,4})");
+    regExMap.put(IdentifierDatabases.KEGG_Metagenome,       "T3\\d+");
+    
+    
+    
+    /* 
+     * Initialize the {@link #miriamMap}.
+     */
     miriamMap.put(IdentifierDatabases.ChEBI,                "urn:miriam:obo.chebi:");
     miriamMap.put(IdentifierDatabases.ChemicalAbstracts,    "urn:miriam:cas:");
-    miriamMap.put(IdentifierDatabases.Compound,             "urn:miriam:kegg.compound:");
-    miriamMap.put(IdentifierDatabases.EMBL,                 "urn:miriam:insdc:");
+    miriamMap.put(IdentifierDatabases.KEGG_Compound,        "urn:miriam:kegg.compound:");
     miriamMap.put(IdentifierDatabases.Ensembl,              "urn:miriam:ensembl:");
     miriamMap.put(IdentifierDatabases.ECO,                  "urn:miriam:ecogene:");
     miriamMap.put(IdentifierDatabases.EntrezGene,           "urn:miriam:entrez.gene:");
-    miriamMap.put(IdentifierDatabases.EnzymeConsortium,     "urn:miriam:ec-code:");
+    miriamMap.put(IdentifierDatabases.EC_code,              "urn:miriam:ec-code:");
     miriamMap.put(IdentifierDatabases.GenBank,              "urn:miriam:insdc:");
     miriamMap.put(IdentifierDatabases.GeneOntology,         "urn:miriam:obo.go:");
-    miriamMap.put(IdentifierDatabases.Glycan,               "urn:miriam:kegg.glycan:");
-    miriamMap.put(IdentifierDatabases.GO,                   "urn:miriam:obo.go:");
+    miriamMap.put(IdentifierDatabases.KEGG_Glycan,          "urn:miriam:kegg.glycan:");
     miriamMap.put(IdentifierDatabases.HMDB,                 "urn:miriam:hmdb:");
-    miriamMap.put(IdentifierDatabases.HPRD,                 "urn:miriam:irefweb:");
-    miriamMap.put(IdentifierDatabases.KeggGenes,            "urn:miriam:kegg.genes:");
+    miriamMap.put(IdentifierDatabases.iRefWeb,              "urn:miriam:irefweb:");
+    miriamMap.put(IdentifierDatabases.KEGG_Genes,           "urn:miriam:kegg.genes:");
     miriamMap.put(IdentifierDatabases.miRBase,              "urn:miriam:mirbase:");
-    miriamMap.put(IdentifierDatabases.NCBI_GeneID,          "urn:miriam:entrez.gene:");
     miriamMap.put(IdentifierDatabases.NCBI_Taxonomy,        "urn:miriam:taxonomy:");
-    miriamMap.put(IdentifierDatabases.NEWT,                 "urn:miriam:taxonomy:");
     miriamMap.put(IdentifierDatabases.Panther,              "urn:miriam:panther:");
     miriamMap.put(IdentifierDatabases.PubChem_compound,     "urn:miriam:pubchem.compound:");
     miriamMap.put(IdentifierDatabases.PubMed,               "urn:miriam:pubmed:");
     miriamMap.put(IdentifierDatabases.PSI_MI,               "urn:miriam:obo.mi:");
     miriamMap.put(IdentifierDatabases.PSI_MOD,              "urn:miriam:obo.psi-mod:");
     miriamMap.put(IdentifierDatabases.Reactome,             "urn:miriam:reactome:");
-    miriamMap.put(IdentifierDatabases.Reactome_Database_ID, "urn:miriam:reactome:");
     miriamMap.put(IdentifierDatabases.RefSeq,               "urn:miriam:refseq:");
-    miriamMap.put(IdentifierDatabases.SPACC,                "urn:miriam:uniprot:");
-    miriamMap.put(IdentifierDatabases.Taxonomy,             "urn:miriam:taxonomy:");
-    miriamMap.put(IdentifierDatabases.UniProt,              "urn:miriam:uniprot:");
-    miriamMap.put(IdentifierDatabases.UniProtKB,            "urn:miriam:uniprot:");            
+    miriamMap.put(IdentifierDatabases.UniProt_AC,           "urn:miriam:uniprot:");
+    miriamMap.put(IdentifierDatabases.IPI,                  "urn:miriam:ipi:");
+    miriamMap.put(IdentifierDatabases.KEGG_Reaction,        "urn:miriam:kegg.reaction:");
+    miriamMap.put(IdentifierDatabases.KEGG_Drug,            "urn:miriam:kegg.drug:");
+    miriamMap.put(IdentifierDatabases.KEGG_Pathway,         "urn:miriam:kegg.pathway:");
+    miriamMap.put(IdentifierDatabases.KEGG_Orthology,       "urn:miriam:kegg.orthology:");
+    miriamMap.put(IdentifierDatabases.OMIM,                 "urn:miriam:omim:");
+    miriamMap.put(IdentifierDatabases.DrugBank,             "urn:miriam:drugbank:");
+    miriamMap.put(IdentifierDatabases.ThreeDMET,            "urn:miriam:3dmet:");
+    miriamMap.put(IdentifierDatabases.PDBeChem,             "urn:miriam:pdb-ccd:");
+    miriamMap.put(IdentifierDatabases.GlycomeDB,            "urn:miriam:glycomedb:");
+    miriamMap.put(IdentifierDatabases.LipidBank,            "urn:miriam:lipidbank:");
+    miriamMap.put(IdentifierDatabases.KEGG_Genome,          "urn:miriam:kegg.genome:");
+    miriamMap.put(IdentifierDatabases.KEGG_Metagenome,      "urn:miriam:kegg.metagenome:");
+    
+    
+    /* 
+     * Initialize the {@link #describedType} map.
+     */
+    describedType.put(IdentifierDatabases.ChEBI,                 DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.ChemicalAbstracts,     DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.KEGG_Compound,         DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.Ensembl,               DatabaseContent.omics);
+    describedType.put(IdentifierDatabases.ECO,                   DatabaseContent.annotation);
+    describedType.put(IdentifierDatabases.EntrezGene,            DatabaseContent.gene);
+    describedType.put(IdentifierDatabases.EC_code,               DatabaseContent.enzyme);
+    describedType.put(IdentifierDatabases.GenBank,               DatabaseContent.sequences); // Actually DNA & RNA
+    describedType.put(IdentifierDatabases.GeneOntology,          DatabaseContent.description);
+    describedType.put(IdentifierDatabases.KEGG_Glycan,           DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.HMDB,                  DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.iRefWeb,               DatabaseContent.protein_interaction); // protein interactions
+    describedType.put(IdentifierDatabases.KEGG_Genes,            DatabaseContent.gene);
+    describedType.put(IdentifierDatabases.miRBase,               DatabaseContent.RNA);
+    describedType.put(IdentifierDatabases.NCBI_Taxonomy,         DatabaseContent.taxonomy);
+    describedType.put(IdentifierDatabases.Panther,               DatabaseContent.description);
+    describedType.put(IdentifierDatabases.PubChem_compound,      DatabaseContent.structures);
+    describedType.put(IdentifierDatabases.PubMed,                DatabaseContent.publication);
+    describedType.put(IdentifierDatabases.PSI_MI,                DatabaseContent.annotation); // Actually molecular interaction
+    describedType.put(IdentifierDatabases.PSI_MOD,               DatabaseContent.protein);
+    describedType.put(IdentifierDatabases.Reactome,              DatabaseContent.pathway); // Actually pathways and reactions
+    describedType.put(IdentifierDatabases.RefSeq,                DatabaseContent.sequences); // DNA, RNA and protein
+    describedType.put(IdentifierDatabases.UniProt_AC,            DatabaseContent.protein);
+    describedType.put(IdentifierDatabases.IPI,                   DatabaseContent.protein);
+    describedType.put(IdentifierDatabases.KEGG_Reaction,         DatabaseContent.reaction); // Actually Reaction
+    describedType.put(IdentifierDatabases.KEGG_Drug,             DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.KEGG_Pathway,          DatabaseContent.pathway);
+    describedType.put(IdentifierDatabases.KEGG_Orthology,        DatabaseContent.annotation);
+    describedType.put(IdentifierDatabases.OMIM,                  DatabaseContent.annotation);
+    describedType.put(IdentifierDatabases.DrugBank,              DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.ThreeDMET,             DatabaseContent.structures); // Actually protein structure
+    describedType.put(IdentifierDatabases.PDBeChem,              DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.GlycomeDB,             DatabaseContent.structures);
+    describedType.put(IdentifierDatabases.LipidBank,             DatabaseContent.structures);
+    describedType.put(IdentifierDatabases.KEGG_Genome,           DatabaseContent.annotation);
+    describedType.put(IdentifierDatabases.KEGG_Metagenome,       DatabaseContent.annotation);
   }
+  
   
   /**
    * Return a regular expression to identify a certain identifier.
@@ -289,19 +510,158 @@ public class DatabaseIdentifiers {
   public static String getMiriamURN(IdentifierDatabases identifier) {
     return miriamMap.get(identifier);
   }
-
+  
   /**
-   * search the entered identifier and returns true if it exists
+   * Get a MIRIAM URN for a specific database and identifier.
    * @param db
+   * @param identifier
+   * @return correctly formatted miriam urn or <code>NULL</code>
+   * if this failed.
+   */
+  public static String getMiriamURN(IdentifierDatabases db, String identifier) {
+    if (!checkID(db, identifier)) {
+      identifier = getFormattedID(db, identifier);
+      if (identifier==null) return null;
+    }
+    
+    String miriam = miriamMap.get(db);
+    if (miriam==null) {
+      log.warning(String.format("Missing MIRIAM identifier for database '%s'.", db));
+      return null;
+    }
+    
+    identifier = identifier.replace(":", "%3A");
+    return miriam + identifier;
+  }
+  
+  /**
+   * Get a MIRIAM URI for a specific database and identifier.
+   * @param db
+   * @param identifier
+   * @return correctly formatted miriam uri or <code>NULL</code>
+   * if this failed.
+   */
+  public static String getMiriamURI(IdentifierDatabases db, String identifier) {
+    String urn = getMiriamURN(db, identifier);
+    if (urn==null) return null;
+    
+    // Make the conversion to URI
+    Matcher m = Pattern.compile("urn:miriam:(.+?):(.+)").matcher(urn);
+    if (!m.find()) return null;
+    return String.format("http://identifiers.org/%s/%s", m.group(1), m.group(2));
+  }
+  
+  /**
+   * Returns the {@link DatabaseContent} of the given database.
+   * @param identifier
    * @return
    */
-  public static IdentifierDatabases getIdentifier(String db) {
-    for (IdentifierDatabases identifier : identifiers) {
-      if (identifier.toString().equalsIgnoreCase(db) || 
-          (identifier.toString().replace("_", " ")).equalsIgnoreCase(db.replace("_", " "))){
-            return identifier;
-          }
+  public static DatabaseContent getDatabaseType(IdentifierDatabases identifier) {
+    return describedType.get(identifier);
+  }
+  
+  /**
+   * Check if any identifier matches the regular expression of the
+   * corresponding database.
+   * @param database
+   * @param id
+   * @return <code>TRUE</code> if the <code>id</code> matches the regular
+   * expression of the <code>database</code>.
+   */
+  public static boolean checkID(IdentifierDatabases database, String id) {
+    // Get RegEx
+    String regEx = getRegularExpressionForIdentifier(database, false);
+    if (regEx == null) {
+      // unknown => in doubt, return true.
+      log.warning(String.format("Missing regular expression for database '%s'.", database));
+      return true;
     }
+    
+    // Check if id is correct
+    return (Pattern.matches(regEx, id));
+  }
+  
+  /**
+   * Formats the identifier as requested by the database.
+   * <p>Sometimes, databases have a prefix, but their identifiers don't.
+   * Or identifiers have prefixes that must be removed to get a real
+   * database identifier.
+   * <p>A good example are the KEGG databases. This method removes
+   * or adds the prefixes (e.g. "ko:") as required. Furthermore,
+   * the "ECO:\\d{7}" is a good example. if you just give a number,
+   * the 0's and ECO prefix will be prepended.
+   * 
+   * @param database
+   * @param id
+   * @return
+   */
+  public static String getFormattedID(IdentifierDatabases database, String id) {
+    // Get RegEx
+    String regEx = getRegularExpressionForIdentifier(database, false);
+    if (regEx == null) {
+      // can't do it.
+      log.warning(String.format("Missing regular expression for database '%s'.", database));
+      return id;
+    }
+    
+    // Check if id is correct
+    if (Pattern.matches(regEx, id)) {
+      // Perfect match.
+      return id;
+    }
+    
+    /* Many identifiers end with a number that must have n digits.
+     * We can try to prepend zeros to fix issues here.
+     * Example: regex is "^ECO:\\d{7}$" and id is "253" => will create "0000253"
+    */
+    if (Utils.isNumber(id, true)) {
+      Matcher m = Pattern.compile(".*?\\\\d\\{(\\d+)\\}[$]$").matcher(regEx);
+      if (m.matches()) {
+        // add leading zeros
+        id = String.format("%0"+m.group(1)+"d", Integer.parseInt(id));
+      }
+    }
+    
+    // Many databases have prefixes before numbers. This can be auto-corrected.
+    int posDid = id.indexOf(':');
+    int posDdb = regEx.indexOf(':');
+    if (posDdb>1 && posDid<0) {
+      // database has a prefix that is missing in id (start at 1 to trim ^).
+      String prefix = regEx.substring(1, posDdb);
+      if (Pattern.matches("\\w+", prefix)) {
+        String newId = String.format("%s:%s", prefix, id);
+        if (Pattern.matches(regEx, newId)) {
+          return newId;
+        }
+      }
+    } else if (posDdb<0 && posDid>1) {
+      // database has no prefix but the id has one
+      // (This is very often the case for all KEGG identifiers).
+      String newId = id.substring(posDid+1);
+      if (Pattern.matches(regEx, newId)) {
+        // Trim prefix and check id id is now ok.
+        return newId;
+      }
+    }
+    
+    // Prefixes without a ":"
+    Matcher mDB = Pattern.compile("[\\^]([a-zA-Z]+)\\\\d[\\+\\{\\}0-9]+[$]").matcher(regEx);
+    Matcher mID = Pattern.compile("([a-zA-Z]+)([0-9]+)").matcher(id);
+    if (mDB.matches() && !mID.matches()) {
+      String prefix = mDB.group(1);
+      String newId = String.format("%s%s", prefix, id);
+      if (Pattern.matches(regEx, newId)) {
+        return newId;
+      }
+    }
+    if (mID.matches() && !mDB.matches()) {
+      if (Pattern.matches(regEx, mID.group(2))) {
+        // Trim prefix and check id id is now ok.
+        return mID.group(2);
+      }
+    }
+    
+    // Doesn't match and could not be fixed.
     return null;
   }
   
