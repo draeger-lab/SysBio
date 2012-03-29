@@ -502,19 +502,32 @@ public class ArrayUtils {
    * @param element
    * @return
    */
-    @SuppressWarnings("unchecked")
-    public static <T> T[] insert(int insertAtPosition, T[] arr, T... element) {
+  @SuppressWarnings("unchecked")
+  public static <T> T[] insert(int insertAtPosition, T[] arr, T... element) {
     // Ensure that both are not null.
     if (arr==null) return element;
     if (element==null || element.length==1 && element[0]==null) return arr;
-    
+
     // Copy arrays
     T[] ret = (T[]) createNewArray(element, arr.length+element.length);
     System.arraycopy(arr, 0, ret, 0, insertAtPosition);
     System.arraycopy(element, 0, ret, insertAtPosition, element.length);
     System.arraycopy(arr, insertAtPosition, ret, insertAtPosition+element.length, arr.length-insertAtPosition);
-    
+
     return ret;
+  }
+
+  /**
+   * Merges all <code>collections</code> into <code>addHere</code>.
+   * @param addHere
+   * @param collections
+   */
+  public static void merge(Collection<String> addHere, Collection<String>... collections) {
+    for (Collection<String> col: collections) {
+      if (col!=null) {
+        addHere.addAll(col);
+      }
+    }
   }
 
 }

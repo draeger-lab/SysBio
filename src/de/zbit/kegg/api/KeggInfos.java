@@ -1048,9 +1048,11 @@ public class KeggInfos implements Serializable {
         && (et.equals(EntryType.gene) || et.equals(EntryType.ortholog))) {// z.B. hsa:00123, ko:00123
       ret = miriam_urn_kgGenes + keggId.trim().replace(":", "%3A"); // Be careful here: Don't trim to ':'! (Don't use suffix)
     } else {
-      log.warning("Please implement MIRIAM urn for: '" + keggId
+      log.fine("Please implement MIRIAM urn for: '" + keggId
           + ((et != null) ? "' (" + et.toString() + ")." : "."));
-      ret = null;
+      // TODO: Add support for EntryTypeExtended here, And make a WARNING out of the log above, and set ret to null
+      ret = miriam_urn_kgGenes + keggId.trim().replace(":", "%3A");
+//      ret = null;
     }
     return ret;
   }
