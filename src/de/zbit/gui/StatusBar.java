@@ -51,6 +51,10 @@ import de.zbit.util.progressbar.gui.ProgressBarSwing;
  * to display a status information (e.g., attached to a logger with
  * {@link #displayLogMessagesInStatusBar()}) and a
  * {@link AbstractProgressBar} at the bottom of a {@link java.awt.Window}.
+ * 
+ * <p>Please use the {@link BorderLayout#CENTER} of the 
+ * {@link #getRightPanel()} if you want to add additional information
+ * to the status bar.</p> 
  * @author Clemens Wrzodek
  * @version $Rev$
  */
@@ -79,6 +83,11 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 * The parent panel in west border that contains {@link #statusLabel} in left slot.
 	 */
 	private JPanel leftPanel;
+	
+  /**
+   * The parent panel in east border that contains {@link #progressBar} in right slot.
+   */
+  private JPanel rightPanel;	
 	
 	/**
 	 * An additional progressbar that can be visualized in the status bar.
@@ -138,6 +147,11 @@ public class StatusBar extends JPanel implements ProgressListener {
 
 		add(leftPanel, BorderLayout.WEST);
 		setBackground(SystemColor.control);
+		
+		// Add a right panel (that contains progressBar and custom user elements)
+    rightPanel = new JPanel(new BorderLayout());
+    rightPanel.setOpaque(false);
+    add(rightPanel, BorderLayout.EAST);
 	}
 
 
@@ -262,21 +276,32 @@ public class StatusBar extends JPanel implements ProgressListener {
 		if (progressBar == null) {
 			// Create a smaller panel for the statusBar
 			Dimension panelSize = new Dimension(100, 15);
-			JPanel panel = new JPanel();
-			panel.setOpaque(false);
-			panel.setPreferredSize(panelSize);
+			JPanel progressPanel = new JPanel();
+			progressPanel.setOpaque(false);
+			progressPanel.setMaximumSize(panelSize);
 			bar = new JProgressBar();
 			bar.setPreferredSize(new Dimension(panelSize.width, panelSize.height));
-			panel.add(bar);
+			progressPanel.add(bar);
 
 			progressBar = new ProgressBarSwing(bar);
-			leftPanel.add(panel, BorderLayout.CENTER);
 			bar.setStringPainted(false);
 			
+			rightPanel.add(progressPanel, BorderLayout.EAST);
 		} else {
 			bar = progressBar.getProgressBar();
 		}
 		bar.setVisible(true);
+	}
+	
+	/**
+	 * Returns the panel that is on the east of this window.
+	 * The Panel hast a {@link BorderLayout}.
+	 * <p>Please do NOT change the EAST slot of this panel, as
+	 * this contains the {@link #progressBar}.
+	 * @return
+	 */
+	public JPanel getRightPanel() {
+	  return rightPanel;
 	}
 
 	// WRZODEK: I Removed those methods because they don't work properly!
