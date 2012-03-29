@@ -34,11 +34,17 @@ import de.zbit.kegg.parser.pathway.EntryType;
  */
 public enum EntryTypeExtended {
   /**
-   * protein
+   * protein. Use {@link EntryType#gene} to encode a protein.
    */
+  @Deprecated
   protein,
   /**
-   * dna region
+   * Note that {@link EntryType#gene} represents a protein and thus,
+   * we need this enum entry to represent a gene.
+   */
+  gene,
+  /**
+   * dna region. E.g. a TFBS or such.
    */
   dna_region,
   /**
@@ -54,7 +60,7 @@ public enum EntryTypeExtended {
    */
   rna,
   /**
-   * unknown
+   * Actually not required. Same as {@link EntryType#other}.
    */
   unknown;
 

@@ -31,6 +31,8 @@ import org.w3c.dom.NodeList;
 
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
+import de.zbit.kegg.parser.pathway.ext.EntryExtended;
+import de.zbit.kegg.parser.pathway.ext.EntryTypeExtended;
 import de.zbit.util.StringUtil;
 
 /**
@@ -678,4 +680,56 @@ public class Entry {
     }
     return equals;
   }
+  
+  /**
+   * To be honest, the {@link EntryType} and {@link EntryTypeExtended}
+   * is a mess. Thus, this method checks them (return values of 
+   * {@link #getType()} and {@link EntryExtended#getGeneType()}) and
+   * returns a real string what this entity really is.
+   * @return one of "gene", "protein", "dna", "rna", "small_molecule",
+   * "complex" (of proteins), "pathway" (a pathway map), or <code>NULL</code>.
+   */
+  public String getRealType() {
+    if (this instanceof EntryExtended &&
+        ((EntryExtended)this).isSetGeneType()) {
+      EntryExtended ee = ((EntryExtended)this);
+      // Note: Only catch cases where we should NOT
+      // return the same string as the GeneType!
+      switch (ee.getGeneType()) {
+        case dna_region:
+          return "dna";
+        case rna_region:
+          return "rna";
+        case unknown:
+          break;
+        default:
+          return ee.getGeneType().toString();
+      }
+    }
+    
+    // Translate the type to "what-it-really-is".
+    if (isSetType()) {
+      switch (getType()) {
+        case compound:
+          return "small_molecule";
+        case enzyme:
+          return "protein";
+        case gene:
+          // Read tooltip of gene!
+          return "protein";
+        case genes:
+          return "complex";
+        case group:
+          return "complex";
+        case map:
+          return "pathway";
+        case ortholog:
+          return "ortholog";
+//        case other:          
+//        case reaction:
+      }
+    }
+    return null;
+  }
+  
 }
