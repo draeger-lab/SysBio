@@ -88,6 +88,8 @@ public class KGMLWriter {
 
   /**
    * 
+   * Uses the keggPW title to create a fileName
+   * 
    * @param keggPW
    * @return
    */

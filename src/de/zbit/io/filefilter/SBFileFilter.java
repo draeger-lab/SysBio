@@ -114,6 +114,10 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		MAP_FILES,
 		/**
+		 * A file filter for BioPax (OWL files).
+		 */
+		OWL_FILES,
+		/**
 		 * A file filter for portable document format files.
 		 */
 		PDF_FILES,
@@ -208,6 +212,9 @@ public class SBFileFilter extends GeneralFileFilter {
           break;
         case KGML_FILES:
           extensions.add("xml");
+          return extensions;
+        case OWL_FILES:
+          extensions.add("owl");
           return extensions;
         case SBGN_FILES:
         case SBML_FILES:
@@ -445,7 +452,14 @@ public class SBFileFilter extends GeneralFileFilter {
  public static SBFileFilter createMAPFileFilter() {
    return new SBFileFilter(FileType.MAP_FILES);
  }
-	
+ 
+ /**
+  * @return Filter for owl files
+  */
+ public static SBFileFilter createOWLFileFilter() {
+   return new SBFileFilter(FileType.OWL_FILES);
+ }
+ 	
 	/**
 	 * @return A filter for PDF files.
 	 */
@@ -672,6 +686,16 @@ public class SBFileFilter extends GeneralFileFilter {
     return false;
   }
 	
+  /**
+   * Returns true if the given file is a BioPax (OWL) file.
+   * 
+   * @param file
+   * @return
+   */
+  public static boolean isOWLFile(File file) {
+    return hasFileType(file, FileType.OWL_FILES);
+  }
+  
 	/**
 	 * @param f
 	 * @return
@@ -807,6 +831,14 @@ public class SBFileFilter extends GeneralFileFilter {
 	public boolean acceptsJPEGFiles() {
 		return type == FileType.JPEG_FILES;
 	}
+	
+	/**
+   * 
+   * @return
+   */
+  public boolean acceptsOWLFiles() {
+    return type == FileType.OWL_FILES;
+  }
 
   /**
 	 * 

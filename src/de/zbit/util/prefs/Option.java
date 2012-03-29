@@ -554,7 +554,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 	public Option(String optionName, Class<Type> requiredType,
 		String description, Range<Type> range, short numLeadingMinus,
 		String shortCmdName) {
-		this(optionName, requiredType, description, range, numLeadingMinus, null,
+		this(optionName, requiredType, description, range, numLeadingMinus, shortCmdName,
 			(Type) null);
 	}
 	

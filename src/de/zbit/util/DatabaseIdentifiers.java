@@ -294,7 +294,12 @@ public class DatabaseIdentifiers {
    * @return
    */
   public static IdentifierDatabases getDatabase(String dbIdentifier) {
-    IdentifierDatabases id = IdentifierDatabases.valueOf(dbIdentifier);
+    IdentifierDatabases id = null;
+    try {
+      id = IdentifierDatabases.valueOf(dbIdentifier);
+    } catch (Exception e) {
+      // Doesn't matter, is null then
+    }
     if (id==null) {
       // Check against each database
       String dbIdentifier2 = dbIdentifier.toLowerCase().replace("_", "").replace("-", "").replace(" ", "");
@@ -329,6 +334,9 @@ public class DatabaseIdentifiers {
 
       } else if (dbIdentifier2.equalsIgnoreCase("PDBCCD")) {
         return IdentifierDatabases.PDBeChem;
+
+      } else if (dbIdentifier2.equalsIgnoreCase("EnzymeConsortium")) {
+        return IdentifierDatabases.EC_code;
         
       } else if (dbIdentifier2.equalsIgnoreCase("BioGRID") ||
           dbIdentifier2.equalsIgnoreCase("BIND") ||
@@ -349,7 +357,7 @@ public class DatabaseIdentifiers {
       
       log.warning(String.format("Could not get database identifier for '%s'.", dbIdentifier));
     }
-    return null;
+    return id;
   }
   
   
