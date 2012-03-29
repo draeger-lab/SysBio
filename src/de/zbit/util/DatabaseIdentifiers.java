@@ -169,9 +169,9 @@ public class DatabaseIdentifiers {
     /**
      * PubChem provides information on the biological activities of small
      * molecules. It is a component of NIH's Molecular Libraries Roadmap
-     * Initiative. PubChem Compound archives chemical structures and records.
+     * Initiative. PubChem Substance archives chemical substance records.
      */
-    PubChem_compound,
+    PubChem_substance,
     PubMed,
     /**
      * Protein Modification Ontology, The Proteomics Standards Initiative
@@ -206,7 +206,7 @@ public class DatabaseIdentifiers {
    * @author Clemens Wrzodek
    * @version $Rev$
    */
-  public enum DatabaseContent {
+  public static enum DatabaseContent {
     /**
      * The database contains information about smll molecules (also called compounds).
      * Example: KEGG compound
@@ -232,6 +232,13 @@ public class DatabaseIdentifiers {
      * Example: UniProt
      */
     protein,
+    /**
+     * No concreate protein instances, bot orthology information
+     * classifing rather the function of a group of proteins,
+     * available in many organisms.
+     * Example: KEGG Orthology
+     */
+    ortholog,
     /**
      * DB contains reactions
      * Example: KEGG reactions.
@@ -371,7 +378,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.miRBase,               "MI\\d{7}");
     regExMap.put(IdentifierDatabases.NCBI_Taxonomy,         "\\d+");
     regExMap.put(IdentifierDatabases.Panther,               "PTHR\\d{5}");
-    regExMap.put(IdentifierDatabases.PubChem_compound,      "\\d+");
+    regExMap.put(IdentifierDatabases.PubChem_substance,     "\\d+");
     regExMap.put(IdentifierDatabases.PubMed,                "\\d+");
     regExMap.put(IdentifierDatabases.PSI_MI,                "MI:\\d{4}");
     regExMap.put(IdentifierDatabases.PSI_MOD,               "MOD:\\d{5}");
@@ -393,6 +400,8 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.LipidBank,             "\\w+\\d+");
     regExMap.put(IdentifierDatabases.KEGG_Genome,           "(T0\\d+|\\w{3,4})");
     regExMap.put(IdentifierDatabases.KEGG_Metagenome,       "T3\\d+");
+    regExMap.put(IdentifierDatabases.HGNC,                  "HGNC:\\d{1,5}");
+    regExMap.put(IdentifierDatabases.GeneSymbol,            "\\w+");
     
     
     
@@ -415,7 +424,7 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.miRBase,              "urn:miriam:mirbase:");
     miriamMap.put(IdentifierDatabases.NCBI_Taxonomy,        "urn:miriam:taxonomy:");
     miriamMap.put(IdentifierDatabases.Panther,              "urn:miriam:panther:");
-    miriamMap.put(IdentifierDatabases.PubChem_compound,     "urn:miriam:pubchem.compound:");
+    miriamMap.put(IdentifierDatabases.PubChem_substance,    "urn:miriam:pubchem.substance:");
     miriamMap.put(IdentifierDatabases.PubMed,               "urn:miriam:pubmed:");
     miriamMap.put(IdentifierDatabases.PSI_MI,               "urn:miriam:obo.mi:");
     miriamMap.put(IdentifierDatabases.PSI_MOD,              "urn:miriam:obo.psi-mod:");
@@ -435,6 +444,8 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.LipidBank,            "urn:miriam:lipidbank:");
     miriamMap.put(IdentifierDatabases.KEGG_Genome,          "urn:miriam:kegg.genome:");
     miriamMap.put(IdentifierDatabases.KEGG_Metagenome,      "urn:miriam:kegg.metagenome:");
+    miriamMap.put(IdentifierDatabases.HGNC,                 "urn:miriam:hgnc:");
+    //miriamMap.put(IdentifierDatabases.GeneSymbol,         ); // None available!
     
     
     /* 
@@ -456,7 +467,7 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.miRBase,               DatabaseContent.RNA);
     describedType.put(IdentifierDatabases.NCBI_Taxonomy,         DatabaseContent.taxonomy);
     describedType.put(IdentifierDatabases.Panther,               DatabaseContent.description);
-    describedType.put(IdentifierDatabases.PubChem_compound,      DatabaseContent.structures);
+    describedType.put(IdentifierDatabases.PubChem_substance,     DatabaseContent.structures);
     describedType.put(IdentifierDatabases.PubMed,                DatabaseContent.publication);
     describedType.put(IdentifierDatabases.PSI_MI,                DatabaseContent.annotation); // Actually molecular interaction
     describedType.put(IdentifierDatabases.PSI_MOD,               DatabaseContent.protein);
@@ -467,7 +478,7 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.KEGG_Reaction,         DatabaseContent.reaction); // Actually Reaction
     describedType.put(IdentifierDatabases.KEGG_Drug,             DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.KEGG_Pathway,          DatabaseContent.pathway);
-    describedType.put(IdentifierDatabases.KEGG_Orthology,        DatabaseContent.annotation);
+    describedType.put(IdentifierDatabases.KEGG_Orthology,        DatabaseContent.ortholog);
     describedType.put(IdentifierDatabases.OMIM,                  DatabaseContent.annotation);
     describedType.put(IdentifierDatabases.DrugBank,              DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.ThreeDMET,             DatabaseContent.structures); // Actually protein structure
@@ -476,6 +487,8 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.LipidBank,             DatabaseContent.structures);
     describedType.put(IdentifierDatabases.KEGG_Genome,           DatabaseContent.annotation);
     describedType.put(IdentifierDatabases.KEGG_Metagenome,       DatabaseContent.annotation);
+    describedType.put(IdentifierDatabases.HGNC,                  DatabaseContent.omics); // Gene symbols are not only for genes...
+    describedType.put(IdentifierDatabases.GeneSymbol,            DatabaseContent.omics); // Gene symbols are not only for genes...
   }
   
   
@@ -503,7 +516,10 @@ public class DatabaseIdentifiers {
   }
   
   /**
-   * returns the corresponding miriam urn to the enterede database identifier
+   * Returns the corresponding miriam urn to the enterede database identifier.
+   * <i>Note: this is just the prefix, to which the real identifier still need
+   * to be attached. Use {@link #getMiriamURN(IdentifierDatabases, String)} to
+   * get a final URN.</i>
    * @param identifier
    * @return
    */

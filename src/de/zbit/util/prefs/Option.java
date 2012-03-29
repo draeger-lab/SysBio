@@ -1412,7 +1412,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
   public <E> void addDependency(Option<E> option, E condition) {
 	  // Create a range with a single element.
 	  addDependency(option, new Range<E>((Class<E>)condition.getClass(),
-	      Arrays.asList(ArrayUtils.toArray(condition))));
+	      Arrays.asList(condition)));
 	}
 
 	/**

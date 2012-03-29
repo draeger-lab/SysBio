@@ -16,6 +16,7 @@
  */
 package de.zbit.util;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.CVTerm.Qualifier;
 
-import de.zbit.kegg.api.KeggInfos;
+import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.util.DatabaseIdentifiers.DatabaseContent;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
@@ -49,30 +50,30 @@ public class DatabaseIdentifierTools {
    * or any {@link Iterable} instance of strings, for multiple identifiers per
    * database.
    * @param myCVterm
-   * @param miriam_URNPrefix
+   * @param db
    */
   @SuppressWarnings("rawtypes")
-  private static void appendAllIds(Object ids, CVTerm myCVterm, String miriam_URNPrefix) {
+  private static void appendAllIds(Object ids, CVTerm myCVterm, IdentifierDatabases db) {
     // check if we have a single identifier
     if (ids==null) return;
     
     else if (ids instanceof String) {
-      String urn = miriam_URNPrefix + KeggInfos.suffix(ids.toString());
-      if (!myCVterm.getResources().contains(urn)) {
+      String urn = DatabaseIdentifiers.getMiriamURN(db, ids.toString().trim());
+      if (urn!=null && !myCVterm.getResources().contains(urn)) {
         myCVterm.addResource(urn);
       }
-    }
-    
-    else if (ids.getClass().isArray()) {
-      ids = Arrays.asList(ids);
-      appendAllIds(ids, myCVterm, miriam_URNPrefix);
       
     } else if (ids instanceof Iterable) {
       Iterator it = ((Iterable)ids).iterator();
       while (it.hasNext()) {
-        appendAllIds(it.next(), myCVterm, miriam_URNPrefix);
+        appendAllIds(it.next(), myCVterm, db);
       }
-      
+     
+    } else if (ids.getClass().isArray()) {
+      for (int i=0; i < Array.getLength(ids); i++) {
+        appendAllIds(Array.get(ids, i), myCVterm, db);
+      }
+        
     } else {
       log.warning("Can not add an identifier of type " + ids.getClass().getSimpleName());
     }
@@ -106,27 +107,11 @@ public class DatabaseIdentifierTools {
   public static List<CVTerm> getCVTerms(Map<DatabaseIdentifiers.IdentifierDatabases, ?> ids, String pointOfView) {
     List<CVTerm> ret = new ArrayList<CVTerm>();
     if (ids==null) return ret;
-    if (pointOfView==null||pointOfView.length()<1) {
-      pointOfView = "protein"; // Default point of view
-    }
     
     for (IdentifierDatabases db: ids.keySet()) {
       Object id = ids.get(db);
       
-      CVTerm mycv = new CVTerm();
-      mycv.setQualifierType(CVTerm.Type.BIOLOGICAL_QUALIFIER);
-      mycv.setBiologicalQualifierType(getBQBQualifier(db, pointOfView, getFirstString(id)));
-      
-      // Append all CV Terms
-      String miriam_URNPrefix = DatabaseIdentifiers.getMiriamURN(db);
-      appendAllIds(id, mycv, miriam_URNPrefix);
-      
-      // Set BQB to IS or Has_Version
-      if (mycv.getResourceCount() > 1 && 
-          mycv.getBiologicalQualifierType().equals(CVTerm.Qualifier.BQB_IS)) {
-        // Multiple proteins in one node
-        mycv.setBiologicalQualifierType(CVTerm.Qualifier.BQB_HAS_VERSION);
-      }
+      CVTerm mycv = getCVTerm(db, pointOfView, id);
       
       // Add to final list
       if (mycv.getResourceCount() > 0) {
@@ -135,6 +120,38 @@ public class DatabaseIdentifierTools {
     }
     
     return ret;
+  }
+
+
+  /**
+   * Get a CV Term.
+   * @param db
+   * @param pointOfView see {@link Entry#getRealType()}
+   * @param id can be either a single string, any {@link Iterable} or an array
+   * of identifiers.
+   * @return
+   */
+  public static CVTerm getCVTerm(IdentifierDatabases db, String pointOfView, Object id) {
+    if (pointOfView==null||pointOfView.length()<1) {
+      pointOfView = "protein"; // Default point of view
+    }
+
+    // Create actual term and set properties
+    CVTerm mycv = new CVTerm();
+    mycv.setQualifierType(CVTerm.Type.BIOLOGICAL_QUALIFIER);
+    mycv.setBiologicalQualifierType(getBQBQualifier(db, pointOfView, getFirstString(id)));
+    
+    // Append all CV Terms
+    appendAllIds(id, mycv, db);
+    
+    // Set BQB to IS or Has_Version
+    if (mycv.getResourceCount() > 1 && 
+        mycv.getBiologicalQualifierType().equals(CVTerm.Qualifier.BQB_IS)) {
+      // Multiple proteins in one node
+      mycv.setBiologicalQualifierType(CVTerm.Qualifier.BQB_HAS_VERSION);
+    }
+    
+    return mycv;
   }
   
   
@@ -150,7 +167,7 @@ public class DatabaseIdentifierTools {
       return ids.toString();
       
     } else if (ids.getClass().isArray()) {
-      ids = Arrays.asList(ids);
+      ids = Arrays.asList((Object[])ids);
       return getFirstString(ids);
       
     } else if (ids instanceof Iterable) {
@@ -181,7 +198,7 @@ public class DatabaseIdentifierTools {
    * database identifier and the described object.
    * @param db
    * @param pointOfView should determine if the described object is a "protein"
-   * or a "gene" or a "dna", etc.
+   * or a "gene" or a "dna", etc. See {@link Entry#getRealType()}
    * @param identifier the actual identifier for which you want to
    * determine the BQB qualifier
    * @return
@@ -192,10 +209,24 @@ public class DatabaseIdentifierTools {
     DatabaseContent c = DatabaseIdentifiers.getDatabaseType(db);
     if (c==null) return Qualifier.BQB_UNKNOWN;
     
-    // Catch all gene-gene, protein-protein, etc. cases
-    if (DatabaseContent.valueOf(pointOfView)!=null) {
+    // Catch all 1:1 (gene-gene, protein-protein, etc.) cases
+    try {
+      if (DatabaseContent.valueOf(pointOfView)!=null) {
+        if (DatabaseContent.valueOf(pointOfView) == c) {
+          return Qualifier.BQB_IS;
+        }
+      }
+    } catch (Exception e) {
+      // Ignore, because we do NOT require pointOfView to be in the
+      // DatabaseContent enum!
+    }
+    // KEGG genes is an extrodinary case: this represents proteins and genes
+    if (db.equals(IdentifierDatabases.KEGG_Genes) &&
+        (pointOfView.equalsIgnoreCase("protein") ||
+            pointOfView.equalsIgnoreCase("gene"))) {
       return Qualifier.BQB_IS;
     }
+    
     
     // Switch content and pointOfView
     switch (c) {
@@ -210,10 +241,13 @@ public class DatabaseIdentifierTools {
         return Qualifier.BQB_HAS_PROPERTY;
       case gene:
         if (pointOfView.equalsIgnoreCase("rna") || 
+            pointOfView.equalsIgnoreCase("ortholog") ||
             pointOfView.replaceAll("\\s_", "").equalsIgnoreCase("protein")) {
           return Qualifier.BQB_IS_ENCODED_BY;
         }
         break;
+      case ortholog:
+        return Qualifier.BQB_IS_HOMOLOG_TO;
       case omics:
         // Try to catch some "IS" cases
         if (identifier!=null) {
@@ -230,7 +264,7 @@ public class DatabaseIdentifierTools {
             && pointOfView.equalsIgnoreCase("protein"))) {
           return Qualifier.BQB_ENCODES;
         }
-        break;
+        return Qualifier.BQB_IS; // Mostly correct <= this also is used for gene symbols!
       case pathway:
         return Qualifier.BQB_OCCURS_IN;
       case protein:
@@ -260,38 +294,6 @@ public class DatabaseIdentifierTools {
     }
     
     return Qualifier.BQB_UNKNOWN;
-    
-    // TODO: check and remove if correct.
-    //cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
-    //cvtEntrezID.setBiologicalQualifierType(Qualifier.BQB_IS_ENCODED_BY);
-     //cvtOmimID.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-    //cvtEnsemblID.setBiologicalQualifierType(Qualifier.BQB_IS_ENCODED_BY);
-    
-    //cvtUniprotID.setBiologicalQualifierType(Qualifier.BQB_HAS_VERSION);
-    //cvtChebiID.setBiologicalQualifierType(Qualifier.BQB_IS);
-     //cvtDrugbankID.setBiologicalQualifierType(Qualifier.BQB_IS);
-//    cvtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
-//    cvtHGNCID.setBiologicalQualifierType(Qualifier.BQB_IS_ENCODED_BY);
-    
-//    cvtPubchemID.setBiologicalQualifierType()Qualifier.BQB_HAS_PROPERTY;
-//     cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-     
-//    cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-//    cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-//    // New as of October 2010:
-//     PDBeChem.setBiologicalQualifierType(Qualifier.BQB_IS);
-//     GlycomeDB.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-//    LipidBank.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-//     ECNumbers.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-     
-     /* Some Biological qualifier BQB is set later!
-      * - KEGG
-      * - Uniprot
-      * - Chebi
-      * - Drugbank
-      * - PDBeChem
-      */
-    
   }
 
 

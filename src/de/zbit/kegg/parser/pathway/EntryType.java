@@ -32,12 +32,12 @@ package de.zbit.kegg.parser.pathway;
  */
 public enum EntryType {
 	/**
-	 * the node is a KO (ortholog group)
-	 * Should be trated as 'protein'.
+	 * The node is a KO (ortholog group)<br/>
+	 * Should be trated as 'ortholog'/'protein'.
 	 */
 	ortholog,
 	/**
-	 * the node is an enzyme
+	 * The node is an enzyme<br/>
 	 * Should be trated as 'protein'.
 	 */
 	enzyme,
@@ -47,30 +47,35 @@ public enum EntryType {
 	 */
 	reaction,
 	/**
-	 * the node is a gene product (mostly a protein)
+	 * The node is a gene product (mostly a protein)
 	 * Should be trated as 'protein'.
+	 * <br/><b>THIS IS NOT A GENE</b> we need to call it gene though,
+	 * because the KGML specification does! But this does not
+	 * represent a gene!
 	 */
 	gene,
 	/**
 	 * the node is a complex of gene products (mostly a protein complex)
-	 * Should be trated as 'complex'.
+	 * <br/>Should be trated as 'complex'.
 	 */
 	group,
 	/**
 	 * the node is a chemical compound (including a glycan)
-	 * Should be trated as 'complex'.
+	 * <br/>Should be trated as 'small molecule'.
 	 */
 	compound,
 	/**
-	 * the node is a linked pathway map
-	 * Should be trated as 'complex'.
+	 * The node is a linked pathway map.
+	 * Should be trated as 'other', because it represents a
+	 * whoe pathway.
 	 */
 	map,
 	
   /**
    * !Added for compatibility for with KeggPathways version <0.7!
    * <p><b>Should not be used separately.
-   * <p><b>Should be treated as 'protein'.
+   * <p><b>Has been renamed to {@link #group} now, so it
+   * should be treated as 'complex'!
    */
   genes,
 	
@@ -78,5 +83,4 @@ public enum EntryType {
 	 * -Custom Enum-
 	 */
 	other
-	// protein Complex
 }

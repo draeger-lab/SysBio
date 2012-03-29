@@ -19,6 +19,7 @@ package de.zbit.kegg.api;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
@@ -27,6 +28,8 @@ import java.util.regex.Pattern;
 
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.EntryType;
+import de.zbit.util.DatabaseIdentifiers;
+import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 import de.zbit.util.Utils;
 
 /**
@@ -132,11 +135,13 @@ public class KeggInfos implements Serializable {
 	 */
 	private String LipidBank=null;
 	/**
+	 * There are three pubchem databases:
 	 * <ul>
 	 * <li>urn:miriam:pubchem.compound</li>
 	 * <li>urn:miriam:pubchem.substance</li>
 	 * <li>urn:miriam:pubchem.bioassay</li>
 	 * </ul>
+	 * This string cooresponds (mostly?) to pubchem.substance!
 	 */
 	private String pubchem = null;
 	/**
@@ -308,8 +313,8 @@ public class KeggInfos implements Serializable {
    * @return Complete MIRIAM URN Including the given ID. Or <code>NULL</code>
    * if no such MIRIAM URN is available!
 	 */
-	public static String getMiriamURIforKeggID(String keggId) {
-		return getMiriamURIforKeggID(keggId, null);
+	public static String getMiriamURNforKeggID(String keggId) {
+		return getMiriamURNforKeggID(keggId, null);
 	}
 
 	/**
@@ -391,15 +396,6 @@ public class KeggInfos implements Serializable {
 	 * 
 	 * @return
 	 */
-	public String getChebi_with_MiriamURN() {
-		return miriam_urn_chebi
-				+ (chebi.contains(":") ? chebi.trim() : "CHEBI:" + chebi.trim());
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
 	public String getDefinition() {
 		return definition;
 	}
@@ -431,14 +427,6 @@ public class KeggInfos implements Serializable {
 	 * 
 	 * @return
 	 */
-	public String getDrugbank_with_MiriamURN() {
-		return miriam_urn_drugbank + suffix(drugbank);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
 	public String getEnsembl_id() {
 		return ensembl_id;
 	}
@@ -447,25 +435,8 @@ public class KeggInfos implements Serializable {
 	 * 
 	 * @return
 	 */
-	public String getEnsembl_id_with_MiriamURN() {
-		return miriam_urn_ensembl + suffix(ensembl_id);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
 	public String getEntrez_id() {
 		return entrez_id;
-	}
-
-	/**
-	 * Be careful, fails to return the correct information if this class
-	 * holds a string with multiple entrez ids!
-	 * @return
-	 */
-	public String getEntrez_id_with_MiriamURN() {
-		return miriam_urn_entrezGene + suffix(entrez_id);
 	}
 
 	/**
@@ -535,16 +506,6 @@ public class KeggInfos implements Serializable {
 	}
 
 	/**
-	 * 
-	 * @return
-	 */
-	public String getHgnc_id_with_MiriamURN() {
-		return miriam_urn_hgnc
-				+ (hgnc_id.contains(":") ? hgnc_id.trim() : "HGNC:"
-						+ hgnc_id.trim());
-	}
-
-	/**
 	 * Deprecated because info is erased after parsing.
 	 * @return
 	 */
@@ -588,7 +549,7 @@ public class KeggInfos implements Serializable {
 	 * is available for the current KEGG ID.
 	 */
 	public String getKegg_ID_with_MiriamURN() {
-		return getMiriamURIforKeggID(this.Kegg_ID);
+		return getMiriamURNforKeggID(this.Kegg_ID);
 	}
 
 	/**
@@ -686,14 +647,6 @@ public class KeggInfos implements Serializable {
 	}
 
 	/**
-	 * 
-	 * @return
-	 */
-	public String getOmim_id_with_MiriamURN() {
-		return miriam_urn_omim + suffix(omim_id);
-	}
-
-	/**
 	 * Of REFENRECED pathways. not the actual queried one (if one queries a PW)
 	 * @return
 	 */
@@ -711,14 +664,15 @@ public class KeggInfos implements Serializable {
 
 	/**
 	 * 
-	 * @return
+	 * @return PubChem SUBSTANCE identifier!
 	 */
 	public String getPubchem() {
 		return pubchem;
 	}
 
 	/**
-	 * 
+	 * Please do not use this method!
+	 * Use the pendants in {@link DatabaseIdentifiers}.
 	 * @return
 	 */
 	public String getPubchem_with_MiriamURN() {
@@ -741,24 +695,8 @@ public class KeggInfos implements Serializable {
 	 * 
 	 * @return
 	 */
-	public String getReaction_id_with_MiriamURN() {
-		return miriam_urn_kgReaction + suffix(reaction_id);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
 	public String getTaxonomy() {
 		return taxonomy;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getTaxonomy_with_MiriamURN() {
-		return miriam_urn_taxonomy + suffix(taxonomy);
 	}
 
 	/**
@@ -773,24 +711,8 @@ public class KeggInfos implements Serializable {
 	 * 
 	 * @return
 	 */
-	public String getThree_dmet_with_MiriamURN() {
-		return miriam_urn_3dmet + suffix(three_dmet);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
 	public String getUniprot_id() {
 		return uniprot_id;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getUniprot_id_with_MiriamURN() {
-		return miriam_urn_uniprot + suffix(uniprot_id);
 	}
 	
 
@@ -1009,25 +931,74 @@ public class KeggInfos implements Serializable {
 	public boolean queryWasSuccessfull() {
 		return (informationFromKeggAdaptor != null);
 	}
-	
-	 /**
-   * 
-   * @param go_id
-   * @return
-   */
-  public static String getGo_id_with_MiriamURN(String go_id) {
-    // So aufgebaut, da GO_id mehrere enthaelt! Eine funktion muss also
-    // drueber iterieren und diese aufrugen.
-    return miriam_urn_geneOntology
-        + (go_id.contains(":") ? go_id.trim() : "GO:" + go_id.trim());
-  }
 
+	public static IdentifierDatabases getDatabaseForKeggID(String keggId, EntryType et) {
+    int pos = keggId.indexOf(':');
+    if (pos <= 0) {
+      // Try to infere prefix from id.
+      String newKeggId = appendPrefix(keggId);
+      pos = newKeggId.indexOf(':');
+      if (pos>0) {
+        log.info(String.format("Inferred prefix for partial KEGG ID. Was: '%s', is now: '%s'.", keggId, newKeggId));
+        keggId=newKeggId;
+      } else {
+        log.warning(String.format("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted: '%s'.", keggId));
+        return null;
+      }
+    }
+    String prefix = keggId.toLowerCase().trim();
+    String suffix = keggId.substring(pos + 1).trim();
+
+    // Add Kegg-id Miriam identifier
+    if (prefix.startsWith("cpd:")) {
+      return IdentifierDatabases.KEGG_Compound;
+    } else if (prefix.startsWith("glycan:") || prefix.startsWith("gl:")) {
+      return IdentifierDatabases.KEGG_Glycan;
+    } else if (prefix.startsWith("ec:")) {
+      return IdentifierDatabases.EC_code;
+    } else if (prefix.startsWith("dr:")) {
+      return IdentifierDatabases.KEGG_Drug;
+    } else if (prefix.startsWith("rn:")) {
+      return IdentifierDatabases.KEGG_Reaction;
+    } else if (prefix.startsWith("rp:") || prefix.startsWith("rc:")) {
+      // Unfortunately, miriam does not support reaction pairs or classes
+    } else if (prefix.startsWith("path:")) { // Link to another pathway
+      return IdentifierDatabases.KEGG_Pathway;
+    } else if (prefix.startsWith("ko:")) {
+      return IdentifierDatabases.KEGG_Orthology;
+    } else if (prefix.startsWith("ds:")) {
+      // Unfortunately no MIRIAM entry for KEGG DISEASES
+    } else if (prefix.startsWith("gn:")) {
+      if (DatabaseIdentifiers.checkID(IdentifierDatabases.KEGG_Genome, suffix)) {
+        return IdentifierDatabases.KEGG_Genome;
+      } else if (DatabaseIdentifiers.checkID(IdentifierDatabases.KEGG_Metagenome, suffix)) {
+        return IdentifierDatabases.KEGG_Metagenome;
+      }
+    } else if (prefix.startsWith("br:")) {
+      // KEGG BRITE - no official MIRIAM URN available as of 2011-11-07
+      // if it matches "^K\d+$", we can go with KEGG orthology, else
+      // we will have to skip it.
+      if (suffix.length()>2 && Character.toUpperCase(suffix.charAt(0))=='K' && 
+          Character.isDigit(suffix.charAt(1))) {
+        return IdentifierDatabases.KEGG_Orthology;
+      }
+    } else if (et == null || et != null
+        && (et.equals(EntryType.gene) || et.equals(EntryType.ortholog))) {// z.B. hsa:00123, ko:00123
+      return IdentifierDatabases.KEGG_Genes;
+    } else {
+      log.warning("Please implement MIRIAM urn for: '" + keggId + ((et != null) ? "' (" + et.toString() + ")." : "."));
+    }
+    return null;
+  }
+	
   /**
+   * XXX: Plese consider using the {@link DatabaseIdentifiers} class and
+   * the corresponding tools, rather than this one.
    * @param keggId
    * @return Complete MIRIAM URN Including the given ID. Or <code>NULL</code>
    * if no such MIRIAM URN is available!
    */
-  public static String getMiriamURIforKeggID(String keggId, EntryType et) {
+  public static String getMiriamURNforKeggID(String keggId, EntryType et) {
     int pos = keggId.indexOf(':');
     if (pos <= 0) {
       // Try to infere prefix from id.
@@ -1125,10 +1096,15 @@ public class KeggInfos implements Serializable {
           return "cpd:" + s;
         } else if (firstChar=='D') {
           return "dr:" + s;
+        } else if (firstChar=='H') {
+          return "ds:"+s; // KEGG DISEASES
+        } else if (firstChar=='T') {
+          return "gn:"+s; // KEGG GENOME
         } else if (firstChar=='G') {
           return "gl:" + s;
         } else if (firstChar=='K' || firstChar=='E') {
           // "ko:E3.1.4.11" is also possible
+          // K = KO group, E = Crude drug, etc. (KEGG ENVIRON)
           return "ko:" + s;
         } else if (firstChar=='R') {
           char secondChar = Character.toUpperCase(s.charAt(1));
@@ -1151,7 +1127,7 @@ public class KeggInfos implements Serializable {
         return "ec:"+s; // Enzyme codes
       } else {
         // genes, impossible without knowing the organism ("^\w+:[\w\d\.-]*$")
-        // e.g. "hsa:1738"; also impossible is KEGG brite ("br:*" ids)
+        // e.g. "hsa:1738"; also impossible is KEGG brite ("br:*", "jp:*" ids)
         log.warning(String.format("Warning: can not prepend unknown organism on possibly gene-id '%s'.", s));
         return s;
       }
@@ -1223,6 +1199,75 @@ public class KeggInfos implements Serializable {
     System.out.println(new KeggInfos("rn:R00100", manag).getNames());
     System.out.println("=============================");
 
+    
+  }
+
+  /**
+   * Adds all database identifiers, contained in this class (i.e. fetched
+   * from the KEGG API) to the given map.
+   * @param ids
+   */
+  public void addAllIdentifiers(Map<IdentifierDatabases, Collection<String>> ids) {
+    
+    // KEGG ids + sameAs
+    IdentifierDatabases keggDB = getDatabaseForKeggID(Kegg_ID, null);
+    if (keggDB!=null) {
+      Utils.addToMapOfSets(ids, keggDB, Kegg_ID);
+    }
+    if (getSameAs()!=null) {
+      keggDB = getDatabaseForKeggID(getSameAs(), null);
+      if (keggDB!=null) {
+        Utils.addToMapOfSets(ids, keggDB, getSameAs());
+      }
+    }
+    
+    // ECcodes can also extracted if query was NOT succesfull
+    Utils.addToMapOfSets(ids, IdentifierDatabases.EC_code, getECcodes().toArray(new String[0]));
+    
+    if (queryWasSuccessfull()) {
+      if (getEnsembl_id() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.Ensembl, getEnsembl_id().split("\\s"));
+      }
+      if (getChebi() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.ChEBI, getChebi().split("\\s"));
+      }
+      if (getDrugbank() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.DrugBank, getDrugbank().split("\\s"));
+      }
+      if (getEntrez_id() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.EntrezGene, getEntrez_id().split("\\s"));
+      }
+      if (getGo_id() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.GeneOntology, getGo_id().split("\\s"));
+      }
+      if (getHgnc_id() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.HGNC, getHgnc_id().split("\\s"));
+      }
+      if (getOmim_id() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.OMIM, getOmim_id().split("\\s"));
+      }
+      if (getPubchem() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.PubChem_substance, getPubchem().split("\\s"));
+      }
+      if (getThree_dmet() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.ThreeDMET, getThree_dmet().split("\\s"));
+      }
+      if (getUniprot_id() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.UniProt_AC, getUniprot_id().split("\\s"));
+      }
+      if (getTaxonomy() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.NCBI_Taxonomy, getTaxonomy().split("\\s"));
+      }
+      if (getPDBeChem()!= null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.PDBeChem, getPDBeChem().split("\\s"));
+      }
+      if (getGlycomeDB()!= null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.GlycomeDB, getGlycomeDB().split("\\s"));
+      }
+      if (getLipidBank()!= null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.LipidBank, getLipidBank().split("\\s"));
+      }
+    }
     
   }
 
