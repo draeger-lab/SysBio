@@ -94,6 +94,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
   @Override
   protected KeggInfos fetchInformation(String id) throws TimeoutException, UnsuccessfulRetrieveException {
     if (offlineMode) throw new TimeoutException(); // do not cache as "Unsuccessful" and retry next time.
+    if (id.toLowerCase().startsWith("unknown")) return null;
     hasChanged=true;
     
     if (adap==null) adap = getKeggAdaptor(); // create new one
@@ -167,7 +168,12 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     // out of memory errors! => Limit to maximal 50!
     ThreadManager APIstringParser = new ThreadManager();
     if (ids.length<=atATime) {
-      APIinfos = fetchMultipleInformationsUpTo100AtATime(ids);
+      try {
+        APIinfos = fetchMultipleInformationsUpTo100AtATime(ids);
+      } catch (UnsuccessfulRetrieveException e) {
+        // Do NOT pipie it through! else, everything is marked as unretrievable
+        APIinfos=null;
+      }
       
       // Jump progress bar to 50%
       if (progress!=null) {
@@ -189,7 +195,14 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
         String[] subArr = new String[Math.min(atATime, ids.length-j)];
         System.arraycopy(ids, j, subArr, 0, subArr.length);
 
-        String[] ret = fetchMultipleInformationsUpTo100AtATime(subArr);
+        String[] ret;
+        try {
+          ret = fetchMultipleInformationsUpTo100AtATime(subArr);
+        } catch (UnsuccessfulRetrieveException e) {
+          // Do NOT pipie it through! else, everything is marked as unretrievable
+          ret=null;
+        }
+        
         if (progress!=null) {
           synchronized (progress) {
             progress.setCallNr(progress.getCallNumber()+fetchInArun);
@@ -227,29 +240,41 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    * <code>ids</code> or <code>APIinfos</code> and  <code>realRet</code>.
    */
   private void parseAPI(final String[] ids, String[] APIinfos,
-      final KeggInfos[] realRet, ThreadManager APIstringParser, final int realRetOffset, final AbstractProgressBar progress) {
-    for (int i=0; i<APIinfos.length; i++) {
-      final int final_i = i;
-      final String apiInfos = APIinfos[final_i];
-      Runnable parser = new Runnable() {
-        /*
-         * (non-Javadoc)
-         * @see java.lang.Runnable#run()
-         */
-        public void run() {
-          if (apiInfos==null || apiInfos.length()<1) {
-            realRet[final_i+realRetOffset] = null;
-          } else {
-            realRet[final_i+realRetOffset] = new KeggInfos(ids[final_i], apiInfos);
-          }
-          if (progress!=null) {
-            synchronized (progress) {
-              progress.DisplayBar();
+    final KeggInfos[] realRet, ThreadManager APIstringParser, final int realRetOffset, final AbstractProgressBar progress) {
+    if (APIinfos==null) {
+      // None was succesfull!
+      for (int i=0; i<ids.length; i++) {
+        realRet[i+realRetOffset] = null;
+      }
+      if (progress!=null) {
+        synchronized (progress) {
+          progress.incrementCallNumber(ids.length);
+        }
+      }
+    } else {
+      for (int i=0; i<APIinfos.length; i++) {
+        final int final_i = i;
+        final String apiInfos = APIinfos[final_i];
+        Runnable parser = new Runnable() {
+          /*
+           * (non-Javadoc)
+           * @see java.lang.Runnable#run()
+           */
+          public void run() {
+            if (apiInfos==null || apiInfos.length()<1) {
+              realRet[final_i+realRetOffset] = null;
+            } else {
+              realRet[final_i+realRetOffset] = new KeggInfos(ids[final_i], apiInfos);
+            }
+            if (progress!=null) {
+              synchronized (progress) {
+                progress.DisplayBar();
+              }
             }
           }
-        }
-      };
-      APIstringParser.addToPool(parser);
+        };
+        APIstringParser.addToPool(parser);
+      }
     }
   }
 
@@ -266,6 +291,16 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     if (ids == null) return null;
     if (ids.length<1) return new String[0];
     hasChanged=true;
+    
+    // Check if we have at least one valid kegg id!
+    boolean allUnknown = true;
+    for (String id: ids) {
+      if (!id.toLowerCase().startsWith("unknown")) {
+        allUnknown=false;
+        break;
+      }
+    }
+    if (allUnknown) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember all.
     
     if (adap==null) adap = getKeggAdaptor(); // create new one
     String q = adap.getWithReturnInformation(concatenateKeggIDs(ids));
@@ -405,6 +440,7 @@ CLASS       Metabolism; [...]
    * @return
    */
   private String[] removeUnnecessaryInfos(String[] realRet) {
+    if (realRet==null) return realRet;
     for (int i=0; i<realRet.length; i++)
       realRet[i] = removeUnnecessaryInfos(realRet[i]);
     return realRet;

@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -942,7 +943,11 @@ public class KeggInfos implements Serializable {
         log.info(String.format("Inferred prefix for partial KEGG ID. Was: '%s', is now: '%s'.", keggId, newKeggId));
         keggId=newKeggId;
       } else {
-        log.warning(String.format("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted: '%s'.", keggId));
+        Level l = Level.WARNING;
+        if (keggId.toLowerCase().startsWith("unknown")) {
+          l = Level.FINE;
+        }
+        log.log(l, String.format("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted: '%s'.", keggId));
         return null;
       }
     }
@@ -1008,7 +1013,11 @@ public class KeggInfos implements Serializable {
         log.info(String.format("Inferred prefix for partial KEGG ID. Was: '%s', is now: '%s'.", keggId, newKeggId));
         keggId=newKeggId;
       } else {
-        log.warning(String.format("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted: '%s'.", keggId));
+        Level l = Level.WARNING;
+        if (keggId.toLowerCase().startsWith("unknown")) {
+          l = Level.FINE;
+        }
+        log.log(l, String.format("Invalid Kegg ID submitted. Please submit the full id e.g. 'cpd:12345'. You submitted: '%s'.", keggId));
         return null;
       }
     }
@@ -1130,7 +1139,11 @@ public class KeggInfos implements Serializable {
       } else {
         // genes, impossible without knowing the organism ("^\w+:[\w\d\.-]*$")
         // e.g. "hsa:1738"; also impossible is KEGG brite ("br:*", "jp:*" ids)
-        log.warning(String.format("Warning: can not prepend unknown organism on possibly gene-id '%s'.", s));
+        Level l = Level.WARNING;
+        if (s.toLowerCase().startsWith("unknown")) {
+          l = Level.FINE;
+        }
+        log.log(l, String.format("Can not prepend unknown organism on possibly gene-id '%s'.", s));
         return s;
       }
     } else {
