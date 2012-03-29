@@ -77,7 +77,7 @@ public class MappingUtils {
     switch (identifier) {
       case NCBI_GeneID:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
-          DatabaseIdentifiers.IdentifierDatabases.NCBI_GeneID, false);
+          DatabaseIdentifiers.IdentifierDatabases.EntrezGene, false);
       case RefSeq:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.RefSeq, false);
@@ -86,7 +86,7 @@ public class MappingUtils {
           DatabaseIdentifiers.IdentifierDatabases.Ensembl, false);
       case KeggGenes:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
-          DatabaseIdentifiers.IdentifierDatabases.KeggGenes, false);
+          DatabaseIdentifiers.IdentifierDatabases.KEGG_Genes, false);
       case GeneSymbol:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.GeneSymbol, false);

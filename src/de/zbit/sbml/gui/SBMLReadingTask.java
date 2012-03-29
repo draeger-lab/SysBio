@@ -126,7 +126,7 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 			SBMLDocument doc = SBMLReader.read(inputStream);
 			logger.info(MessageFormat.format(bundle.getString("READING_TIME"), timer.getAndReset(false)));
 			return doc;
-		} catch (com.ctc.wstx.exc.WstxIOException exc) {
+		} catch (Exception exc) {
 			logger.info(MessageFormat.format(bundle.getString("CANCELING_AT_TIME"), timer.getAndReset(false)));
 			logger.fine(exc.getLocalizedMessage());
 			return null;

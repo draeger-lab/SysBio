@@ -18,7 +18,6 @@ package de.zbit.kegg.parser.pathway.ext;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.NodeList;
@@ -47,59 +46,27 @@ public class EntryExtended extends Entry {
    * {@link EntryType} and should ONLY be set when
    * the definition of {@link EntryType} is too vague.
    */
-  EntryTypeExtended geneType = null;
+  private EntryTypeExtended geneType = null;
   
   /**
    * This map should contain all identifiers for this element.
    * No matter if these are uniprot, entrez gene, etc.
    */
-  Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers = 
+  private Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers = 
     new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
   
   
   /**
    * cellular component
    */
-  String compartment = null;
+  private String compartment = null;
   
   /**
    * Data source
+   * TODO: Please explain what is meant by dataSource. Do we really need it?
    */
-  String dataSource = null;
+  private String dataSource = null;
   
-  public Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> getIdentifiers() {
-    return identifiers;
-  }
-
-  public void setIdentifiers(
-      Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers) {
-    this.identifiers = identifiers;
-  }
-
-  public String getCompartment() {
-    return compartment;
-  }
-
-  public void setCompartment(String compartment) {
-    this.compartment = compartment;
-  }
-  
-  public boolean isSetCompartment(){
-    return compartment!=null;
-  }
-  
-  public boolean isSetDataSource(){
-    return dataSource!=null;
-  }
-
-  public String getDataSource() {
-    return dataSource;
-  }
-
-  public void setDataSource(String dataSource) {
-    this.dataSource = dataSource;
-  }
-
   /**
    * @param parentPathway
    * @param id
@@ -176,6 +143,7 @@ public class EntryExtended extends Entry {
     
   }
 
+  
   public EntryTypeExtended getGeneType(){
     return geneType;
   }
@@ -223,6 +191,41 @@ public class EntryExtended extends Entry {
   public void removeDatabaseIdentifier(IdentifierDatabases db, String id) {
     Utils.removeFromMapOfSets(identifiers, id, db);
   }
+  
+  /**
+   * Please be careful with this, as it returns
+   * internal data structures.
+   * @return complemente list of {@link #identifiers}.
+   */
+  public Map<IdentifierDatabases, Collection<String>> getDatabaseIdentifiers() {
+    return identifiers;
+  }
+  
+
+  public String getCompartment() {
+    return compartment;
+  }
+
+  public void setCompartment(String compartment) {
+    this.compartment = compartment;
+  }
+  
+  public boolean isSetCompartment(){
+    return compartment!=null;
+  }
+  
+  public boolean isSetDataSource(){
+    return dataSource!=null;
+  }
+
+  public String getDataSource() {
+    return dataSource;
+  }
+
+  public void setDataSource(String dataSource) {
+    this.dataSource = dataSource;
+  }
+
   
   /**
    * 

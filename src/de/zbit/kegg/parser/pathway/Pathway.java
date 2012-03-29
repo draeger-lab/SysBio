@@ -86,7 +86,14 @@ public class Pathway {
 	 * Comment of the source KGML file.
 	 */
 	private String comment = null;
+	
 	/**
+	 * A description for the origin data format. It all data originates,
+	 * e.g., from BioPax, this can be changed to BioPax.
+	 */
+	private String originFormatName = "KGML";
+
+  /**
 	 * Version number of the source KGML file
 	 */
 	private double version=0;
@@ -510,6 +517,20 @@ public class Pathway {
 
   public void setComment(String comment) {
     this.comment = comment;
+  }
+  
+  /**
+   * @return the originFormatName
+   */
+  public String getOriginFormatName() {
+    return originFormatName;
+  }
+
+  /**
+   * @param originFormatName the originFormatName to set
+   */
+  public void setOriginFormatName(String originFormatName) {
+    this.originFormatName = originFormatName;
   }
 
   public double getVersion() {
