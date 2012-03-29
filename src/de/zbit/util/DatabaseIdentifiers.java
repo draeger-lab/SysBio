@@ -18,6 +18,7 @@ package de.zbit.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -312,6 +313,7 @@ public class DatabaseIdentifiers {
       
       // Many databases have synonyms! Catch them here.
       if (dbIdentifier2.equalsIgnoreCase("UniProtKB") ||
+          dbIdentifier2.equalsIgnoreCase("UniProt") ||
           dbIdentifier2.equalsIgnoreCase("SPACC")){
         return IdentifierDatabases.UniProt_AC;
         
@@ -550,7 +552,12 @@ public class DatabaseIdentifiers {
     
     String miriam = miriamMap.get(db);
     if (miriam==null) {
-      log.warning(String.format("Missing MIRIAM identifier for database '%s'.", db));
+      // No need to issue a warning for gene symbol
+      Level l = Level.WARNING;
+      if (db.equals(IdentifierDatabases.GeneSymbol)) {
+        l = Level.FINE;
+      }
+      log.log(l, String.format("Missing MIRIAM identifier for database '%s'.", db));
       return null;
     }
     

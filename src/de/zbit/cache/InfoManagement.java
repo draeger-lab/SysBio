@@ -315,10 +315,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       try {
         ret = fetchInformation(id);
         if (ret==null) {
-          synchronized (unsuccessfulQueries) {
-            unsuccessfulQueries.add(id);
-          }
-          cacheChangedSinceLastLoading=true;
+          throw new UnsuccessfulRetrieveException();
         }
         break;
       } catch (TimeoutException e) {
@@ -329,12 +326,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
           break;
         }
       } catch (UnsuccessfulRetrieveException e) {
-        log.log(Level.FINE, "Unsuccessful retrieval, marking " + 
-          (id ==null?"null": id.toString()) + " as unretrievable", e);
-        synchronized (unsuccessfulQueries) {
-          unsuccessfulQueries.add(id);
-        }
-        cacheChangedSinceLastLoading=true;
+        markAsUnretrievable(id, e);
         break;
       } catch (Throwable t) {
         // do NOT retry and do NOT save anything... simply return the null
@@ -348,6 +340,19 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     }
     
     return ret;
+  }
+
+  /**
+   * @param id
+   * @param e
+   */
+  private void markAsUnretrievable(IDtype id, UnsuccessfulRetrieveException e) {
+    log.log(Level.FINE, "Unsuccessful retrieval, marking " + 
+      (id ==null?"null": id.toString()) + " as unretrievable", e);
+    synchronized (unsuccessfulQueries) {
+      unsuccessfulQueries.add(id);
+    }
+    cacheChangedSinceLastLoading=true;
   }
   
   
@@ -397,18 +402,11 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         
         // Cache the unsuccessfulQueries
         if (ret==null) {
-          synchronized (unsuccessfulQueries) {
-            unsuccessfulQueries.addAll(Arrays.asList(ids));
-          }
-          cacheChangedSinceLastLoading=true;
+          throw new UnsuccessfulRetrieveException();
         } else {
           for (int i=0; i<ids.length; i++) {
             if (ret[i]==null && ids[i]!=null && !ids[i].equals("")) {
-              //log.fine(String.format("No info for id '%s'.", ids[i]));
-              synchronized (unsuccessfulQueries) {
-                unsuccessfulQueries.add(ids[i]);
-              }
-              cacheChangedSinceLastLoading=true;
+              markAsUnretrievable(ids[i], null);
             }
           }
         }

@@ -240,6 +240,13 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
     
     this.callNr = callNr;
   }
+  
+  /**
+   * @param amount
+   */
+  public void incrementCallNumber(int amount) {
+    setCallNr(getCallNumber() + amount);
+  }
 
   /**
    * @param statusBar
