@@ -96,18 +96,18 @@ public class KGMLWriter {
   public static String createFileName(de.zbit.kegg.parser.pathway.Pathway keggPW) {
     String fileName = keggPW.getTitle() + ".xml";
     fileName = fileName.replace(" ", "_");
-    fileName = StringUtil.removeAllNonFileSystemCharacters(fileName);
 
     if (fileName == null) {
       fileName = keggPW.getName();
-      if (fileName == null)
+      if (fileName == null) {
         fileName = Integer.toString(keggPW.hashCode());
-      fileName = StringUtil.removeAllNonFileSystemCharacters(fileName);
+      }
     }
     if (!fileName.toLowerCase().endsWith(".xml")) {
       fileName += ".xml";
     }
 
+    fileName = StringUtil.removeAllNonFileSystemCharacters(fileName);
     return fileName;
   }
   

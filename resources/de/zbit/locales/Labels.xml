@@ -207,6 +207,10 @@ to redistribute it under certain conditions.
   <entry key="TSV_FILES">Text (Tab-separated) files</entry>
   <entry key="YGF_FILES">Y Graph Format files</entry>
   
+  <entry key="OWL_FILES">Web-Ontology-Language (OWL) files</entry>
+  <entry key="BioPAX_FILES">BioPAX files</entry>
+  <entry key="BioPAX_FILES_L2">BioPAX Level 2 files</entry>
+  <entry key="BioPAX_FILES_L3">BioPAX Level 3 files</entry>
   
   <!-- SBAcceptAllFileFilter -->
   

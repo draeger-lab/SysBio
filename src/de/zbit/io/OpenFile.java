@@ -252,6 +252,7 @@ public class OpenFile {
       
       // Native text file OR ret is not ready if file wasn't really a zip file.
       if (ret==null || !ret.ready()) {
+        // we could add , "UTF-8" here
         if (myStream!=null) ret = new BufferedReader(new InputStreamReader(searchFileAndGetInputStream(filename, searchInputRelativeToResource)));
       }
     } catch (Exception e) {e.printStackTrace();}
