@@ -202,6 +202,13 @@ bestimmten Bedingungen weiterverbreiten dürfen.
   <entry key="TSV_FILES">Textdateien (Tabstopp-getrennt)</entry>
   <entry key="YGF_FILES">Y-Graphformat-Dateien</entry>
   
+  <entry key="OWL_FILES">Web-Ontology-Language (OWL) Dateien</entry>
+  <entry key="BioPAX_FILES">BioPAX Dateien</entry>
+  <entry key="BioPAX_FILES_L2">BioPAX Level 2 Dateien</entry>
+  <entry key="BioPAX_FILES_L3">BioPAX Level 3 Dateien</entry>
+  
+  
+  
   <!-- SBAcceptAllFileFilter -->
   
   <entry key="ACCEPT_ALL_FILES">Alle Dateien (*)</entry>

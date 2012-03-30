@@ -390,11 +390,6 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	 * list of acceptable values.
 	 */
   private List<Type> listOfAccpetedObjects = null;
-
-  /**
-   * 
-   */
-  private Relation relation;
 	
 	/**
 	 * @return the constraints
@@ -410,7 +405,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	 */
 	public Range(Class<Type> requiredType, GeneralFileFilter filter) {
 		this(requiredType);
-		if (!requiredType.isAssignableFrom(File.class)) { 
+		if (!requiredType.isAssignableFrom(File.class)) {
       throw new IllegalArgumentException(
 			  String.format(ResourceManager.getBundle("de.zbit.locales.Warnings")
 				  	.getString("REQUIRED_TYPE_FOR_X_MUST_BE"), GeneralFileFilter.class
@@ -647,7 +642,9 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 					file = (File) value;
 				}
 				return ((GeneralFileFilter) constraints).accept(file);
+				
 			} else if (constraints instanceof ValuePair<?, ?>) {
+	      // XXX: What is this used for, besides the (FINE!) log-message???
 			  Relation relation = (Relation) ((ValuePair<?, ?>) constraints).getA();
         Option<? extends Comparable<Type>> option = (Option<? extends Comparable<Type>>) ((ValuePair<?, ?>) constraints)
             .getB();

@@ -89,7 +89,7 @@ public class Pathway {
 	
 	/**
 	 * A description for the origin data format. It all data originates,
-	 * e.g., from BioPax, this can be changed to BioPax.
+	 * e.g., from BioPAX, this can be changed to BioPax.
 	 */
 	private String originFormatName = "KGML";
 
@@ -858,15 +858,15 @@ public class Pathway {
     return attributes;
   }
   
-  private boolean isSetEntries(){
+  public boolean isSetEntries(){
     return entries!=null && entries.size()>0;
   }
   
-  private boolean isSetReactions(){
+  public boolean isSetReactions(){
     return reactions!=null && reactions.size()>0;
   }
   
-  private boolean isSetRelations(){
+  public boolean isSetRelations(){
     return relations!=null && relations.size()>0;
   }
   

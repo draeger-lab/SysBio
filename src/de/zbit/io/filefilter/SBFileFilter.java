@@ -114,7 +114,7 @@ public class SBFileFilter extends GeneralFileFilter {
 		 */
 		MAP_FILES,
 		/**
-		 * A file filter for BioPax (OWL files).
+		 * A file filter for Web-Ontology-Language (OWL files).
 		 */
 		OWL_FILES,
 		/**
@@ -165,6 +165,18 @@ public class SBFileFilter extends GeneralFileFilter {
      * To be selected if SBML files (XML files) of Level 3 Version 1 can be chosen.
      */
     SBML_FILES_L3V1,
+    /**
+     * To be selected if BioPAXL files (XML files) can be chosen.
+     */
+    BioPAX_FILES,
+    /**
+     * To be selected if BioPAXL files (XML files) of Level 2 can be chosen.
+     */
+    BioPAX_FILES_L2,
+    /**
+     * To be selected if BioPAXL files (XML files) of Level 3 can be chosen.
+     */
+    BioPAX_FILES_L3,
 		/**
      * To be selected if SVG files (Scalable Vector Graphics) can be chosen.
      */
@@ -213,9 +225,19 @@ public class SBFileFilter extends GeneralFileFilter {
         case KGML_FILES:
           extensions.add("xml");
           return extensions;
+          // ---- please keep the following order
+        case BioPAX_FILES:
+        case BioPAX_FILES_L2:
+          extensions.add("bp2");
+        case BioPAX_FILES_L3:
+          if (!this.equals(BioPAX_FILES_L2)) {
+            extensions.add("bp3");
+          }
         case OWL_FILES:
           extensions.add("owl");
+          extensions.add("xml");
           return extensions;
+       // ----
         case SBGN_FILES:
         case SBML_FILES:
         case SBML_FILES_L1V1:
@@ -246,29 +268,41 @@ public class SBFileFilter extends GeneralFileFilter {
      * @return a pattern for one of the top-most lines to be matched in order to
      *         accept a file of the given type.
      */
-    public Pattern getLinePattern() {
-      if (this == KGML_FILES) {
-        return Pattern.compile("<!DOCTYPE[\\p{ASCII}]*KGML[\\p{ASCII}]*>", Pattern.MULTILINE & Pattern.DOTALL);
-      }
-      if (this.toString().startsWith(SBML_FILES.toString())) {
-        String anyChar = "[\\s\\w\\p{ASCII}]*";
-        String whiteSpace = "[\\s]+";
-        String number = "[1-9]+[0-9]*";
-        String level = number, version = number;
-        String sbmlDef = "<sbml%s%s((level=\"%s\"%s%sversion=\"%s\")|(version=\"%s\"%s%slevel=\"%s\"))%s>";
-        if (this != SBML_FILES) {
-          level = this.toString().substring(12, 13);
-          version = this.toString().substring(14);
-        }
-				return Pattern.compile(String.format(sbmlDef, whiteSpace,
-					anyChar, level, whiteSpace, anyChar, version, version, whiteSpace,
-					anyChar, level, anyChar), Pattern.MULTILINE
-						& Pattern.DOTALL);
-      }
-      return null;
-    } 
+	  public Pattern getLinePattern() {
+	    if (this == KGML_FILES) {
+	      return Pattern.compile("<!DOCTYPE[\\p{ASCII}]*KGML[\\p{ASCII}]*>", Pattern.MULTILINE & Pattern.DOTALL);
+	    }
+	    if (this.toString().startsWith(SBML_FILES.toString())) {
+	      String anyChar = "[\\s\\w\\p{ASCII}]*";
+	      String whiteSpace = "[\\s]+";
+	      String number = "[1-9]+[0-9]*";
+	      String level = number, version = number;
+	      String sbmlDef = "<sbml%s%s((level=\"%s\"%s%sversion=\"%s\")|(version=\"%s\"%s%slevel=\"%s\"))%s>";
+	      if (this != SBML_FILES) {
+	        level = this.toString().substring(12, 13);
+	        version = this.toString().substring(14);
+	      }
+	      return Pattern.compile(String.format(sbmlDef, whiteSpace,
+	        anyChar, level, whiteSpace, anyChar, version, version, whiteSpace,
+	        anyChar, level, anyChar), Pattern.MULTILINE
+	        & Pattern.DOTALL);
+	    }
+	    
+	    if (this.toString().startsWith(BioPAX_FILES.toString())) {
+	      // Parse a level from file filter string
+	      Pattern levelPattern = Pattern.compile("BioPAX_FILES_L(\\d)+");
+	      int level = 0;
+	      Matcher m = levelPattern.matcher(this.toString());
+	      if (m.find()) {
+	        level = Integer.parseInt(m.group(1));
+	      }
+	      
+	      return Pattern.compile("biopax-level" + (level<=0?"\\d": level) + ".owl");
+	    }
+	    return null;
+	  }
 	}
-  
+	  
 	public static final Logger log = Logger.getLogger(SBFileFilter.class.getName());
 	
   /**
@@ -459,7 +493,28 @@ public class SBFileFilter extends GeneralFileFilter {
  public static SBFileFilter createOWLFileFilter() {
    return new SBFileFilter(FileType.OWL_FILES);
  }
+ 
+ /**
+  * @return A filter for SBML files
+  */
+ public static final SBFileFilter createBioPAXFileFilter() {
+   return new SBFileFilter(FileType.BioPAX_FILES);
+ }
+ 
+ /**
+  * @return Filter for owl files
+  */
+ public static SBFileFilter createBioPAXFileFilterL2() {
+   return new SBFileFilter(FileType.BioPAX_FILES_L2);
+ }
  	
+ /**
+  * @return Filter for owl files
+  */
+ public static SBFileFilter createBioPAXFileFilterL3() {
+   return new SBFileFilter(FileType.BioPAX_FILES_L3);
+ }
+ 
 	/**
 	 * @return A filter for PDF files.
 	 */
@@ -687,7 +742,7 @@ public class SBFileFilter extends GeneralFileFilter {
   }
 	
   /**
-   * Returns true if the given file is a BioPax (OWL) file.
+   * Returns true if the given file is an OWL file.
    * 
    * @param file
    * @return
@@ -864,6 +919,15 @@ public class SBFileFilter extends GeneralFileFilter {
 	public boolean acceptsSBMLFiles() {
 		return type == FileType.SBML_FILES;
 	}
+	
+	 /**
+   * Returns true if this file filter accepts SBML files.
+   * 
+   * @return
+   */
+  public boolean acceptsBioPAXFiles() {
+    return type == FileType.BioPAX_FILES;
+  }
 	
 	/**
 	 * 

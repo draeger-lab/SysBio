@@ -443,4 +443,82 @@ public class FileTools {
     }
   }
   
+  public static InputStream bufferedReader2InputStream(final BufferedReader r) {
+    return new InputStream() {
+      
+      
+      /* (non-Javadoc)
+       * @see java.io.InputStream#close()
+       */
+      @Override
+      public void close() throws IOException {
+        super.close();
+        r.close();
+      }
+      
+      /* (non-Javadoc)
+       * @see java.io.InputStream#mark(int)
+       */
+      @Override
+      public synchronized void mark(int readlimit) {
+        //super.mark(readlimit);
+        try {
+          r.mark(readlimit);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      
+      /* (non-Javadoc)
+       * @see java.io.InputStream#markSupported()
+       */
+      @Override
+      public boolean markSupported() {
+        return r.markSupported();
+      }
+      
+      /* (non-Javadoc)
+       * @see java.io.InputStream#read(byte[])
+       */
+      @Override
+      public int read(byte[] b) throws IOException {
+        return read(b, 0, b.length);
+      }
+      
+      /* (non-Javadoc)
+       * @see java.io.InputStream#read(byte[], int, int)
+       */
+      @Override
+      public int read(byte[] b, int off, int len) throws IOException {
+        char[] bToC = new char[b.length];
+        int ret = r.read(bToC, off, len);
+        for (int i=off; i<ret; i++) {
+          b[i] = (byte) bToC[i];
+        }
+        return ret;
+      }
+      
+      /* (non-Javadoc)
+       * @see java.io.InputStream#reset()
+       */
+      @Override
+      public synchronized void reset() throws IOException {
+        r.reset();
+      }
+      
+      /* (non-Javadoc)
+       * @see java.io.InputStream#skip(long)
+       */
+      @Override
+      public long skip(long n) throws IOException {
+        return r.skip(n);
+      }
+      
+      @Override
+      public int read() throws IOException {
+        return r.read();
+      }
+    };
+  }
+  
 }

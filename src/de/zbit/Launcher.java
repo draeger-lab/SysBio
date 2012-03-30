@@ -539,10 +539,10 @@ public abstract class Launcher implements Runnable, Serializable {
 				  getAppName(),
 				  getVersionNumber()));
 			} else {
-				logger.warning(String.format(
-				  "INCOMPLETE_CMD_ARG_LIST",
-				  getAppName(),
-				  getVersionNumber()));
+				logger.warning(String.format("INCOMPLETE_CMD_ARG_LIST",
+				  getAppName(),getVersionNumber()));
+			  // TODO: No arguments and no GUI => It would be good if we show
+				// the output of "--help" here!
 			}
 		}
 	}

@@ -146,7 +146,12 @@
   <entry key="TEXT_FILES">Text文件</entry>
   <entry key="TGF_FILES">Trivial图形格式文件</entry>
   <entry key="TSV_FILES">Text (Tab-separated)文件</entry>
-  <entry key="YGF_FILES">Y Graph Format文件</entry> 
+  <entry key="YGF_FILES">Y Graph Format文件</entry>
+  
+  <entry key="OWL_FILES">Web-Ontology-Language (OWL) 文件</entry>
+  <entry key="BioPAX_FILES">BioPAX 文件</entry>
+  <entry key="BioPAX_FILES_L2">BioPAX Level 2 文件</entry>
+  <entry key="BioPAX_FILES_L3">BioPAX Level 3 文件</entry> 
     
   <!-- SBPreferences -->
   
