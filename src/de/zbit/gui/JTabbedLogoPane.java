@@ -22,16 +22,15 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 import javax.swing.ImageIcon;
-import javax.swing.JTabbedPane;
 
 /**
- * This is a {@link javax.swing.JTabbedPane} with the single extension
+ * This is a {@link JTabbedPaneDraggableAndCloseable} with the single extension
  * that the TabbedPane without any tabs contains a centered logo image.
  * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
-public class JTabbedLogoPane extends JTabbedPane {
+public class JTabbedLogoPane extends JTabbedPaneDraggableAndCloseable {
   private static final long serialVersionUID = 6977541013827456374L;
   
   private ImageIcon img=null;
