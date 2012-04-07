@@ -176,7 +176,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		IOException {
 		SBasePanel sbPanel = new SBasePanel(sbase, namesIfAvailalbe, renderer);
 		JScrollPane scroll = new JScrollPane(sbPanel);
-		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		return scroll;
 	}
 	
@@ -216,10 +216,13 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		////////////////////////////////////////////////////
 		// Copied from previously separate method initTree:
 		TreePath path = null;
+		TreeNode[] savedState = null;
 		if (tree != null) {
 			path = tree.getSelectionPath();
+			savedState = tree.getSavedState();
 		}
 		tree = new SBMLTree(sbmlDoc);
+		tree.setSavedState(savedState);
 		
 		tree.setShowsRootHandles(true);
 		tree.setScrollsOnExpand(true);

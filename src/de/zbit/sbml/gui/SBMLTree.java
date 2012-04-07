@@ -140,6 +140,20 @@ public class SBMLTree extends JTree implements ActionListener {
 	private TreeNode[] savedState;
 	
 	/**
+	 * @param savedState the savedState to set
+	 */
+	public void setSavedState(TreeNode[] savedState) {
+		this.savedState = savedState;
+	}
+
+	/**
+	 * @return the savedState
+	 */
+	public TreeNode[] getSavedState() {
+		return savedState;
+	}
+
+	/**
 	 * Generate a tree that displays an ASTNode tree.
 	 * 
 	 * @param math
