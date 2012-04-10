@@ -1,6 +1,6 @@
 /*
- * $Id:  BooleanRendererYesNo.java 17:50:08 wrzodek $
- * $URL: BooleanRendererYesNo.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

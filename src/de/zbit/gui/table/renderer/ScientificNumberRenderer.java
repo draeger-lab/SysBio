@@ -1,6 +1,6 @@
 /*
- * $Id:  ScientificNumberRenderer.java 22:11:59 wrzodek $
- * $URL: ScientificNumberRenderer.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

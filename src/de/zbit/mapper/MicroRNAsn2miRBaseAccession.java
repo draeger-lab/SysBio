@@ -1,6 +1,6 @@
 /*
- * $Id:  MicroRNAsn2miRBaseAccession.java 13:47:21 wrzodek $
- * $URL: MicroRNAsn2miRBaseAccession.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

@@ -1,6 +1,6 @@
 /*
- * $Id:  ColorChooserWithPreview.java 16:13:55 wrzodek $
- * $URL: ColorChooserWithPreview.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

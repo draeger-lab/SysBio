@@ -1,6 +1,6 @@
 /*
- * $Id:  ExpandablePanel.java 10:28:01 wrzodek $
- * $URL: ExpandablePanel.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
