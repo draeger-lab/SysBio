@@ -1,6 +1,6 @@
 /*
- * $Id:  OptionRadioButton.java 12:08:35 wrzodek $
- * $URL: OptionRadioButton.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

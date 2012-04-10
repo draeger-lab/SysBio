@@ -1,6 +1,6 @@
 /*
- * $Id:  GeneIDMapper.java 17:57:03 wrzodek $
- * $URL: GeneIDMapper.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

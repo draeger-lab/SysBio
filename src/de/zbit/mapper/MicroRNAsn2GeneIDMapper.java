@@ -1,6 +1,6 @@
 /*
- * $Id:  MicroRNAsn2GeneIDMapper.java 14:07:35 wrzodek $
- * $URL: MicroRNAsn2GeneIDMapper.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
