@@ -957,6 +957,8 @@ public class Reflect {
   }
 
   /**
+   * Creates an {@link Enumeration} for the Values of all static final variables
+   * inside a given class.
    * @param clazz
    * @return
    */

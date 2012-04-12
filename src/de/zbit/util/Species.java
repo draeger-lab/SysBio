@@ -817,5 +817,12 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     // no tooltip.
     return null;
   }
+
+  /**
+   * @return
+   */
+  public boolean isSetScientificName() {
+    return scientificName!=null && scientificName.length()>0;
+  }
   
 }
