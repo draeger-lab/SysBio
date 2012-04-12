@@ -143,7 +143,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
    * @param sbase
    * @param namesIfAvailable
    */
-  public SBasePanel(SBase sbase, boolean namesIfAvailable, EquationRenderer renderer){
+  public SBasePanel(SBase sbase, boolean namesIfAvailable, EquationRenderer renderer) {
     super();
     this.namesIfAvailable = namesIfAvailable;
     this.renderer = renderer;
@@ -285,18 +285,20 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private void addProperties(ListOf<? extends SBase> list) {
 		JList l = new JList(list.toArray(new SBase[] {}));
-		l.setCellRenderer(new DefaultListCellRenderer(){
-			/*
-			 * (non-Javadoc)
+		l.setCellRenderer(new DefaultListCellRenderer() {
+			
+			/* (non-Javadoc)
 			 * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
 			 */
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
+			@Override
+			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if (value instanceof SimpleSpeciesReference){
+				if (value instanceof SimpleSpeciesReference) {
 					this.setText(((SimpleSpeciesReference) value).getSpeciesInstance().getName());
 				}
 				return this;
 			}
+			
 		});
 		l.setBorder(BorderFactory.createLoweredBevelBorder());
 		lh.add(new JScrollPane(l), 1, ++row, 3, 1, 1d, 1d);
@@ -854,7 +856,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				label = "Size: ";
 			} else {
 				Parameter p = (Parameter) s;
-				if (p.isSetValue()){
+				if (p.isSetValue()) {
 					val = p.getValue();
 				}
 				label = "Value: ";
@@ -894,8 +896,10 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		lh.add(unitSelection, 3, row, 1, 1, 1d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		lh.add(new JLabel("Mutiplier: "), 1, ++row, 1, 1, 0d, 0d);
-		JSpinner sMultiplier = new JSpinner(new SpinnerNumberModel(unit
-				.getMultiplier(), -1000, 1000, 1));
+		double multiplier = unit.getMultiplier();
+		JSpinner sMultiplier = new JSpinner(new SpinnerNumberModel(multiplier,
+			spinnerMinValue(multiplier), spinnerMaxValue(multiplier),
+			spinnerStepSize(multiplier)));
 		sMultiplier.setEnabled(editable);
 		lh.add(sMultiplier, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
@@ -914,12 +918,41 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		sScale.setEnabled(editable);
 		lh.add(sScale, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-		JSpinner sExponent = new JSpinner(new SpinnerNumberModel(unit
-				.getExponent(), -24, 24, 1));
+		double exponent = unit.getExponent();
+		JSpinner sExponent = new JSpinner(new SpinnerNumberModel(exponent,
+			spinnerMinValue(exponent), spinnerMaxValue(exponent),
+			spinnerStepSize(exponent)));
 		sExponent.setEnabled(editable);
 		lh.add(new JLabel("Exponent: "), 1, ++row, 1, 1, 0d, 0d);
 		lh.add(sExponent, 3, row, 1, 1, 1, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+	}
+
+	/**
+	 * 
+	 * @param multiplier
+	 * @return
+	 */
+	public double spinnerStepSize(double currVal) {
+		return (spinnerMaxValue(currVal) - spinnerMinValue(currVal)) / 50d;
+	}
+
+	/**
+	 * 
+	 * @param multiplier
+	 * @return
+	 */
+	public double spinnerMaxValue(double currVal) {
+		return -spinnerMinValue(-currVal);
+	}
+
+	/**
+	 * 
+	 * @param multiplier
+	 * @return
+	 */
+	public double spinnerMinValue(double currVal) {
+		return Math.min(currVal, -1E6d);
 	}
 
 	/**
