@@ -16,6 +16,7 @@
  */
 package de.zbit.kegg.parser.pathway;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,9 @@ import de.zbit.util.Reflect;
  */
 public class SubType {
 	// SubType is for RELATION
+  
+  public static final String COMPOUND = "compound";
+  public static final String HIDDEN_COMPOUND = "hidden compound";
   
   public static final String ACTIVATION = "activation";
   public static final String INHIBITION = "inhibition";
@@ -55,6 +59,8 @@ public class SubType {
   /**
    * Returns an enumeration, that contains all values of all
    * declared static final variables in this class.
+   * <p>You can iterate this enum by using, e.g.
+   * <pre>Collections.list(SubType.asEnum());</pre>
    * @return
    */
   public static Enumeration<String> asEnum() {

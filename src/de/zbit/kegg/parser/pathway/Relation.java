@@ -19,7 +19,6 @@ package de.zbit.kegg.parser.pathway;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class Relation {
   /**
    * 
    */
-  ArrayList<SubType> subtypes = new ArrayList<SubType>();
+  List<SubType> subtypes = new ArrayList<SubType>();
   
   /**
    * 
@@ -266,5 +265,16 @@ public class Relation {
     }
     return equals;
   }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Relation [entry1=" + entry1 + ", entry2=" + entry2 + ", type="
+        + type + ", subtypes=" + subtypes + "]";
+  }
+  
+  
 
 }

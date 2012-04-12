@@ -44,6 +44,7 @@ public enum EntryType {
 	/**
 	 * Since KGML 7.1
 	 * Some kind of a reaction node... KGML says: "the node is a reaction".
+	 * <p><b>AS this is HIGHLIGH INCONSISTENT, please do NOT USE IT!</b>
 	 */
 	reaction,
 	/**

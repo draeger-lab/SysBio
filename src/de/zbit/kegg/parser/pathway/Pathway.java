@@ -731,12 +731,12 @@ public class Pathway {
       rcEntry = rc.getCorrespondingEntry();
     }
     
-    if (rcEntry==null && rc.hasId()) {
+    if (rcEntry==null && rc.isSetID()) {
       // Id is a unique identifier and thus preferred!
       rcEntry = getEntryForId(rc.getId());
     } 
     
-    if (rcEntry==null && rc.hasName()){ // no id or invalid id.
+    if (rcEntry==null && rc.isSetName()){ // no id or invalid id.
       Collection<Entry> c = getEntriesForName(rc.getName());
       int size = c==null?0:c.size();
       
@@ -810,22 +810,22 @@ public class Pathway {
     return null;
   }
   
-  private boolean isSetName(){
-    return (name==null|| name.isEmpty()) ? false : true;
+  public boolean isSetName(){
+    return (name!=null && name.length()>0);
   }
   
 
-  private boolean isSetOrg() {
-    return (org==null || org.isEmpty()) ? false : true;
+  public boolean isSetOrg() {
+    return (org!=null && org.length()>0);
   }
   
 
-  private boolean isSetNumber() {
-    return number==0 ? false : true;
+  public boolean isSetNumber() {
+    return number!=0;
   }
 
-  private boolean isSetTitle() {
-    return (title==null || title.isEmpty()) ? false : true;
+  public boolean isSetTitle() {
+    return (title!=null && title.length()>0);
   }
   
   /**

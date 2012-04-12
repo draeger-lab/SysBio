@@ -92,7 +92,7 @@ public class KeggTools {
       boolean hasMultipleReactions = reactionIDs.length>1;
       if (crateOneReactionForEachID && hasMultipleReactions) {
         for (ReactionComponent rc: r.getReactants()) {
-          if (rc.hasId()) {
+          if (rc.isSetID()) {
             reactantName2reactant.put(rc.getName(), rc);
           }
         }
@@ -178,7 +178,7 @@ public class KeggTools {
                 
                 autocompleteLinkAndAddToPathway(p, entry);
               } else {
-                if (!rc.hasId()) {
+                if (!rc.isSetID()) {
                   rc.setId(found.getId());
                   rc.setCorrespondingEntry(found);
                 }
@@ -653,6 +653,7 @@ public class KeggTools {
                   if (reactantInstance!=null) {
                     reactantInstance.setStoichiometry(Integer.parseInt(m.group(3)));
                   } else {
+                    // This warning is mostly issued when autocomplete reactions is false!
                     log.log(Level.WARNING, "Could not get reaction component for " + reactant + " in " + r);
                   }
                 } catch (NumberFormatException e) {

@@ -277,7 +277,7 @@ public class KGMLWriter {
             Element newChild2 = doc.createElement("product");
             for (java.util.Map.Entry<String, String> att1 : (product.getKGMLAttributes()).entrySet()) {
               newChild2.setAttribute(att1.getKey(), att1.getValue());  
-              if (product.hasAlt()) {
+              if (product.isSetAlt()) {
                 Element newChild3 = doc.createElement("alt");
                 newChild3.setAttribute("name", product.getAlt().getName());
                 newChild2.appendChild(newChild3);
@@ -291,7 +291,7 @@ public class KGMLWriter {
             Element newChild2 = doc.createElement("substrate");
             for (java.util.Map.Entry<String, String> att1 : (substrate.getKGMLAttributes()).entrySet()) {
               newChild2.setAttribute(att1.getKey(), att1.getValue());  
-              if (substrate.hasAlt()) {
+              if (substrate.isSetAlt()) {
                 Element newChild3 = doc.createElement("alt");
                 newChild3.setAttribute("name", substrate.getAlt().getName());
                 newChild2.appendChild(newChild3);

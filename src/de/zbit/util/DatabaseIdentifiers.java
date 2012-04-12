@@ -195,6 +195,10 @@ public class DatabaseIdentifiers {
     Reactome,
     RefSeq,
     /**
+     * Systems Biology Ontology (SBO)
+     */
+    SBO,
+    /**
      * Actually 3DMET. 3DMET is a database collecting three-dimensional
      * structures of natural metabolites.
      */
@@ -412,6 +416,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.KEGG_Metagenome,       "T3\\d+");
     regExMap.put(IdentifierDatabases.HGNC,                  "HGNC:\\d{1,5}");
     regExMap.put(IdentifierDatabases.GeneSymbol,            "\\w+");
+    regExMap.put(IdentifierDatabases.SBO,                   "SBO:\\d{7}");
     
     
     
@@ -455,6 +460,7 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.KEGG_Genome,          "urn:miriam:kegg.genome:");
     miriamMap.put(IdentifierDatabases.KEGG_Metagenome,      "urn:miriam:kegg.metagenome:");
     miriamMap.put(IdentifierDatabases.HGNC,                 "urn:miriam:hgnc:");
+    miriamMap.put(IdentifierDatabases.SBO,                  "urn:miriam:biomodels.sbo:");
     //miriamMap.put(IdentifierDatabases.GeneSymbol,         ); // None available!
     
     
@@ -499,6 +505,7 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.KEGG_Metagenome,       DatabaseContent.annotation);
     describedType.put(IdentifierDatabases.HGNC,                  DatabaseContent.omics); // Gene symbols are not only for genes...
     describedType.put(IdentifierDatabases.GeneSymbol,            DatabaseContent.omics); // Gene symbols are not only for genes...
+    describedType.put(IdentifierDatabases.SBO,                   DatabaseContent.description);
   }
   
   

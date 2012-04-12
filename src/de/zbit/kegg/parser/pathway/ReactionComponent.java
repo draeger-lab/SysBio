@@ -131,10 +131,11 @@ public class ReactionComponent implements Cloneable {
   }
   
   /**
-   * 
+   * <code>TRUE</code> if an alternative {@link ReactionComponent}
+   * is available.
    * @return
    */
-  public boolean hasAlt() {
+  public boolean isSetAlt() {
     return (alt!=null);
   }
 
@@ -171,14 +172,14 @@ public class ReactionComponent implements Cloneable {
   /**
    * @return
    */
-  public boolean hasId() {
+  public boolean isSetID() {
     return id!=null && id.intValue()>0;
   }
 
   /**
    * @return
    */
-  public boolean hasName() {
+  public boolean isSetName() {
     return (this.name != null && this.name.length()>0);
   }
   
@@ -257,14 +258,6 @@ public class ReactionComponent implements Cloneable {
     
     return attributes;
   }
-
-  private boolean isSetName() {
-    return name!=null;
-  }
-
-  private boolean isSetID() {
-    return id!=null;
-  }
   
   @Override
   public int hashCode() {
@@ -273,7 +266,7 @@ public class ReactionComponent implements Cloneable {
       hash *= id;
     if(isSetName())
       hash *= name.hashCode();
-    if(hasAlt())
+    if(isSetAlt())
       hash *= alt.hashCode();
     return hash;
   }
@@ -291,8 +284,8 @@ public class ReactionComponent implements Cloneable {
       if(equals && isSetName()) 
         equals &= (o.getName().equals(this.getName()));
       
-      equals &= o.hasAlt()==this.hasAlt();
-      if(equals && hasAlt()) 
+      equals &= o.isSetAlt()==this.isSetAlt();
+      if(equals && isSetAlt()) 
         equals &= (o.getAlt().equals(this.getAlt()));
       
     }

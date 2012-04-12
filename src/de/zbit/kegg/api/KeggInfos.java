@@ -118,9 +118,13 @@ public class KeggInfos implements Serializable {
    */
   private String sameAsIDs = null;
 	/**
-   * 
+   * MASS or EXACT_MASS
    */
 	private String mass = null;
+	/**
+	 * Molecular weight (MOL_WEIGHT)
+	 */
+	private String molWeight = null;
 	/**
 	 * PDB-CCD
    * PDBeChem - Dictionary of chemical components (ligands, small molecules and monomers) referred in PDB entries and maintained by the wwPDB
@@ -560,6 +564,14 @@ public class KeggInfos implements Serializable {
 	public String getMass() {
 		return mass;
 	}
+	
+	/**
+	 * 
+	 * @return the {@link #molWeight}
+	 */
+	public String getMolecularWeight() {
+	  return molWeight;
+	}
 
 	/**
 	 * Hopefully the most meaningfull name (last in the ";"-dividedlist of getNames()).
@@ -813,6 +825,10 @@ public class KeggInfos implements Serializable {
 		// KNApSAcK, NIKKAJI, (CAS) missing
 		formula = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "FORMULA", null); // FORMULA C6H12O6
 		mass = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "MASS", null); // MASS 180.0634
+		if (mass==null) {
+		  mass = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "EXACT_MASS", null); // MASS 180.0634
+		}
+    molWeight = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "MOL_WEIGHT", null); // MASS 180.0634
 
 		pubchem = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "PUBCHEM:", "\n");
 		PDBeChem = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "PDB-CCD:", "\n");
@@ -907,6 +923,8 @@ public class KeggInfos implements Serializable {
       sameAsIDs = null;
 		if (mass != null && mass.trim().length() == 0)
 			mass = null;
+    if (molWeight != null && molWeight.trim().length() == 0)
+      molWeight = null;
 		if (chebi != null && chebi.trim().length() == 0)
 			chebi = null;
 		if (three_dmet != null && three_dmet.trim().length() == 0)
@@ -940,7 +958,7 @@ public class KeggInfos implements Serializable {
       String newKeggId = appendPrefix(keggId);
       pos = newKeggId.indexOf(':');
       if (pos>0) {
-        log.info(String.format("Inferred prefix for partial KEGG ID. Was: '%s', is now: '%s'.", keggId, newKeggId));
+        log.fine(String.format("Inferred prefix for partial KEGG ID. Was: '%s', is now: '%s'.", keggId, newKeggId));
         keggId=newKeggId;
       } else {
         Level l = Level.WARNING;

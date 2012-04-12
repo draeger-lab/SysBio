@@ -222,6 +222,10 @@ public class EntryExtended extends Entry {
     return dataSource;
   }
 
+  /*
+   * Marked as deprecated because it is completely unused!
+   */
+  @Deprecated
   public void setDataSource(String dataSource) {
     this.dataSource = dataSource;
   }

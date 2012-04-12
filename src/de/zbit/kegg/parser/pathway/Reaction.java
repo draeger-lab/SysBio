@@ -419,7 +419,7 @@ public class Reaction {
     return attributes;
   }
 
-  private boolean isSetType() {
+  public boolean isSetType() {
     return type!=null;
   }
 
