@@ -49,23 +49,6 @@ public class SBMLtools {
   
   /**
    * 
-   * @param sbase
-   * @param term
-   */
-  public static final void setSBOTerm(SBase sbase, int term) {
-    if (-1 < sbase.getLevelAndVersion().compareTo(Integer.valueOf(2),
-      Integer.valueOf(2))) {
-      sbase.setSBOTerm(term);
-    } else {
-    	ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.Messages");
-      logger.warning(MessageFormat.format(
-          bundle.getString("COULD_NOT_SET_SBO_TERM"), 
-          SBO.sboNumberString(term), sbase.getElementName(), sbase.getLevel(), sbase.getVersion()));
-    }
-  }
-  
-  /**
-   * 
    * @param <T>
    * @param listOf
    * @param element
@@ -77,6 +60,23 @@ public class SBMLtools {
     }
     listOf.add(element);
   }
+  
+  /**
+	 * Returns a name associated to this given {@link NamedSBase}. It first tries
+	 * the name, then the id, finally, the element's name.
+	 * 
+	 * @param nsb
+	 * @return a {@link String} describing the given element.
+	 */
+	public static String getName(NamedSBase nsb) {
+		if (nsb.isSetName()) {
+			return nsb.getName();
+		}
+		if (nsb.isSetId()) {
+			return nsb.getId();
+		}
+		return nsb.getElementName();
+	}
   
   /**
    * 
@@ -92,6 +92,23 @@ public class SBMLtools {
       if (child instanceof SBase) {
         setLevelAndVersion((SBase) child, level, version);
       }
+    }
+  }
+
+  /**
+   * 
+   * @param sbase
+   * @param term
+   */
+  public static final void setSBOTerm(SBase sbase, int term) {
+    if (-1 < sbase.getLevelAndVersion().compareTo(Integer.valueOf(2),
+      Integer.valueOf(2))) {
+      sbase.setSBOTerm(term);
+    } else {
+    	ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.Messages");
+      logger.warning(MessageFormat.format(
+          bundle.getString("COULD_NOT_SET_SBO_TERM"), 
+          SBO.sboNumberString(term), sbase.getElementName(), sbase.getLevel(), sbase.getVersion()));
     }
   }
   
