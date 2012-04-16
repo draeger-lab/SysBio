@@ -14,34 +14,34 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.gui;
+package de.zbit.graph.io;
 
-import java.io.File;
-
-import javax.swing.JMenuBar;
-import javax.swing.JToolBar;
+import y.view.Graph2D;
 
 /**
- * A common interface for all tabs, used in the {@link BaseFrame}.
+ * An interface that allows other classes to handle the writing
+ * of Graph2D files themselves.
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public interface BaseFrameTab {
+public interface Graph2Dwriteable {
+  
   
   /**
-   * Save the contents of this tab to a {@link File}.
-   * @return the saved {@link File}.
+   * @param document
+   * @param path
+   * @param format output file extension, e.g., "gif", "graphml", "gml", "jpg",...
+   * @throws Exception 
+   * @return <code>TRUE</code> if everything went fine.
    */
-  public File saveToFile();
+  public boolean writeToFile(Graph2D graph, String outFile, String format) throws Exception;
   
-	/**
-	 * Enable or disable the buttons of the given {@link JMenuBar} The
-	 * {@link JToolBar} might be <code>null</code> if your application does not
-	 * use a {@link JToolBar}.
-	 * 
-	 * @param menuBar
-	 * @param toolbar
-	 */
-  public void updateButtons(JMenuBar menuBar, JToolBar... toolbar);
+  /**
+   * 
+   * @param graph
+   * @param outFile
+   * @return
+   */
+  public boolean writeToFile(Graph2D graph, String outFile);
   
 }

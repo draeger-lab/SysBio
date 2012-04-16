@@ -941,4 +941,26 @@ public class Pathway {
     return equals;
   }
 
+  /**
+   * Generates a HTML-IMG-Tag from the given KEGG Id, that should
+   * point to an image for the compound.
+   * @param ko_id starting with "cpd:"
+   * @return an html image tag, containing a preview picture for the given compound.
+   */
+  public static String getCompoundPreviewPicture(String ko_id) {
+    return String.format("<img src=\"http://www.kegg.jp/Fig/compound/%s.gif\"/><br/>\n", ko_id.trim().substring(4).toUpperCase() );
+  }
+
+  /**
+   * Generates a HTML-IMG-Tag from the given KEGG Id, that should
+   * point to an image for the pathway. 
+   * @param ko_id starting with "path:"
+   * @return an html image tag, containing a preview picture for the given referenced pathway.
+   */
+  public static String getPathwayPreviewPicture(String ko_id) {
+    // KEGG provides picture for referenced pathways (e.g., "path:hsa00620" => "map00620.gif").
+    String mapNumber = Utils.getNumberFromStringRevAsString(ko_id.length(), ko_id);
+    return String.format("<img src=\"http://www.kegg.jp/kegg/misc/thumbnail/map%s.gif\"/><br/>\n", mapNumber );
+  }
+
 }
