@@ -130,6 +130,15 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   }
   
   /**
+   * Visualizes the given {@link SBMLDocument}.
+   * @param document
+   * @param showQualModel
+   */
+  public TranslatorSBMLgraphPanel (SBMLDocument document, boolean showQualModel) {
+    this((File)null, "SBML", null, document, showQualModel);
+  }
+  
+  /**
    * Initiates a download and translation of the given pathway.
    * @param downloadORTranslateWorker
    * @param outputFormat
