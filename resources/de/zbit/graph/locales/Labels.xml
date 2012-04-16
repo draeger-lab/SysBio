@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+	This configuration provides locale-dependent names for labels in
+	a (graphical) user interface. The separator ";" can be used to
+	separate actual labels from associated tool tips.
+  </comment>
+  
+  <!-- RestrictedEditMode (Property table on the upper right) -->
+  <entry key="nodeLabel">All names</entry>
+  <entry key="entrezIds">Entrez id(s)</entry>
+  <entry key="type">Type</entry>
+  <entry key="description">Description</entry>
+  <entry key="keggIds">Kegg id(s)</entry>
+  <entry key="uniprotIds">Uniprot id(s)</entry>
+  <entry key="ensemblIds">Ensembl id(s)</entry>
+  <entry key="url">URL</entry>
+  <entry key="nodeColor">Node color</entry>
+  <entry key="nodeName">Node name</entry>
+  <entry key="nodePosition">Node position</entry>
+  <entry key="nodeSize">Node size</entry>
+  <entry key="interactionType">Interaction type</entry>
+  
+</properties>
