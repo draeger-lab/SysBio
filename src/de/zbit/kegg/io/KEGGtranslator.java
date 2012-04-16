@@ -91,13 +91,5 @@ public interface KEGGtranslator <InternalOutputFormatDataStructure> {
    * @return true if and only if everything went fine.
    */
   public boolean writeToFile(InternalOutputFormatDataStructure doc, String outFile);
-  
-  /**
-   * Determine if this translator translates anything to a yFiles
-   * {@link Graph2D} data structure.
-   * @return <code>TRUE</code> if InternalOutputFormatDataStructure is
-   * a yFiles format.
-   */
-  public boolean is2Graph2D();
 
 }
