@@ -1056,7 +1056,16 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     int fileSelectors, List<Option<?>> unprocessedOptions, LayoutHelper lh) {
 		boolean twoColumn = ((groupList.size() - fileSelectors) % 2 == 0)
 				&& ((ungroupedOptions.size() == 0) || (!OptionGroup.isAnyOptionVisible(ungroupedOptions)));
-		if (fileSelectors<=0) twoColumn = false;
+		
+		if (fileSelectors<=0) twoColumn=false;
+		if (countOptions(groupList)>25) {
+		  /*
+		   * If we have too many options to fit it one column, always create a
+		   * two column layout (example: SBMLsqueezer).
+		   */
+		  twoColumn = true;
+		}
+		
     boolean oneColumn = false;
     
     // First we create GUI elements for all groups
@@ -1102,6 +1111,24 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     return elemCount;
   }
   
+  /**
+   * Count the number of total options in all {@link OptionGroup}s
+   * in <code>groupList</code>.
+   * @param groupList
+   * @return
+   */
+  @SuppressWarnings("rawtypes")
+  private int countOptions(List<OptionGroup> groupList) {
+    int counter = 0;
+    if (groupList==null) return counter;
+    
+    for (OptionGroup<?> g : groupList) {
+      counter += g.getOptions().size();
+    }
+    
+    return counter;
+  }
+
   /**
    * Method to test whether the current properties equal the default
    * configuration.
