@@ -211,7 +211,6 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @SuppressWarnings("unchecked")
-  @Override
   public synchronized void actionPerformed(ActionEvent e) {
     switch(e.getID()) {
       case 1:

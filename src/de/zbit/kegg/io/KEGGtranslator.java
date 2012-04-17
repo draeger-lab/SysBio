@@ -23,8 +23,6 @@ package de.zbit.kegg.io;
 import java.io.File;
 import java.io.IOException;
 
-import y.view.Graph2D;
-
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Pathway;
 
