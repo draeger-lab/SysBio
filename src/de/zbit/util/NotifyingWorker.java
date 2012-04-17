@@ -35,20 +35,29 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * @version $Rev$
  */
 public abstract class NotifyingWorker <T, V> extends SwingWorker<T, V> implements ActionListener {
+
   /**
    * 
    */
-  AbstractProgressBar progress=null;
+  AbstractProgressBar progress = null;
   
   /**
    * 
    */
-  List<ActionListener> listeners=null;
+  List<ActionListener> listeners = null;
   
+  /**
+   * 
+   * @param progress
+   */
   public void setProgressBar(AbstractProgressBar progress) {
     this.progress = progress;
   }
   
+  /**
+   * 
+   * @return
+   */
   public AbstractProgressBar getProgressBar() {
     return progress;
   }
@@ -58,7 +67,7 @@ public abstract class NotifyingWorker <T, V> extends SwingWorker<T, V> implement
    * @param listener
    */
   public void addActionListener(ActionListener listener) {
-    if (listeners==null) {
+    if (listeners == null) {
       listeners = new ArrayList<ActionListener>();
     }
     listeners.add(listener);
@@ -78,7 +87,6 @@ public abstract class NotifyingWorker <T, V> extends SwingWorker<T, V> implement
   /* (non-Javadoc)
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
-  @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getActionCommand()!=null) {
       if (e.getActionCommand().equals(TranslatorPanel.COMMAND_NEW_PROGRESSBAR)) {
@@ -86,6 +94,5 @@ public abstract class NotifyingWorker <T, V> extends SwingWorker<T, V> implement
       }
     }
   }
-  
 
 }

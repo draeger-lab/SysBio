@@ -53,7 +53,12 @@ public interface GraphBackgroundImageProvider {
   public void addBackgroundImage(Graph2DView pane, KEGGtranslator<?> translator, boolean waitUntilComplete)
     throws MalformedURLException;
   
-  
+  /**
+   * 
+   * @author Clemens Wrzodek
+   * @since 1.1
+   * @version $Rev$
+   */
   public static class Factory {
     
     /**
@@ -66,12 +71,16 @@ public interface GraphBackgroundImageProvider {
     public static GraphBackgroundImageProvider createStaticImageProvider(final URL imagePath) {
       return new GraphBackgroundImageProvider() {
         
-        @Override
+        /* (non-Javadoc)
+         * @see de.zbit.graph.gui.options.GraphBackgroundImageProvider#addBackgroundImage(y.view.Graph2DView, de.zbit.kegg.io.KEGGtranslator)
+         */
         public void addBackgroundImage(Graph2DView pane, KEGGtranslator<?> translator) throws MalformedURLException {
           addBackgroundImage(pane, translator, false);
         }
         
-        @Override
+        /* (non-Javadoc)
+         * @see de.zbit.graph.gui.options.GraphBackgroundImageProvider#addBackgroundImage(y.view.Graph2DView, de.zbit.kegg.io.KEGGtranslator, boolean)
+         */
         public void addBackgroundImage(Graph2DView pane, KEGGtranslator<?> translator, boolean waitUntilComplete)
           throws MalformedURLException {
           RestrictedEditMode.addBackgroundImage(imagePath, pane);
@@ -91,12 +100,16 @@ public interface GraphBackgroundImageProvider {
     public static GraphBackgroundImageProvider createDynamicImageProvider(final URL imagePath, final int brightenImagePercentage) {
       return new GraphBackgroundImageProvider() {
         
-        @Override
+        /* (non-Javadoc)
+         * @see de.zbit.graph.gui.options.GraphBackgroundImageProvider#addBackgroundImage(y.view.Graph2DView, de.zbit.kegg.io.KEGGtranslator)
+         */
         public void addBackgroundImage(Graph2DView pane, KEGGtranslator<?> translator) throws MalformedURLException {
           addBackgroundImage(pane, translator, false);
         }
         
-        @Override
+        /* (non-Javadoc)
+         * @see de.zbit.graph.gui.options.GraphBackgroundImageProvider#addBackgroundImage(y.view.Graph2DView, de.zbit.kegg.io.KEGGtranslator, boolean)
+         */
         public void addBackgroundImage(Graph2DView pane, KEGGtranslator<?> translator, boolean waitUntilComplete)
           throws MalformedURLException {
           if (imagePath!=null && imagePath.getPath()!=null && imagePath.getPath().length()>0) {
@@ -119,7 +132,9 @@ public interface GraphBackgroundImageProvider {
     public static GraphBackgroundImageProvider createDynamicTranslatorImageProvider(final int brightenImagePercentage) {
       return new GraphBackgroundImageProvider() {
         
-        @Override
+        /* (non-Javadoc)
+         * @see de.zbit.graph.gui.options.GraphBackgroundImageProvider#addBackgroundImage(y.view.Graph2DView, de.zbit.kegg.io.KEGGtranslator, boolean)
+         */
         public void addBackgroundImage(Graph2DView pane, KEGGtranslator<?> translator, boolean waitUntilComplete) throws MalformedURLException {
           if (translator==null) return;
           String image = translator.getLastTranslatedPathway().getImage();
@@ -128,7 +143,9 @@ public interface GraphBackgroundImageProvider {
           }
         }
         
-        @Override
+        /* (non-Javadoc)
+         * @see de.zbit.graph.gui.options.GraphBackgroundImageProvider#addBackgroundImage(y.view.Graph2DView, de.zbit.kegg.io.KEGGtranslator)
+         */
         public void addBackgroundImage(Graph2DView pane, KEGGtranslator<?> translator)
           throws MalformedURLException {
           addBackgroundImage(pane, translator, false);
