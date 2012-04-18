@@ -199,21 +199,13 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 		new DragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE, dgl);
 	}
 	
-	/**
-	 * 
-	 * @param i
-	 */
-	public void setTabComponentAt(int i) {
-		setTabComponentAt(i, (Icon) null);
-	}
-	
 	
 	/**
 	 * adds the close button and its MouseListener to the tab at index i
 	 * @param i
 	 * @param extraIcon 
 	 */
-	public void setTabComponentAt(int i, Icon extraIcon) {
+	private void addCloseIconToTabComponentAt(int i, Icon extraIcon) {
 		JLabel label = new JLabel(getTitleAt(i));
 		label.setIcon(extraIcon);
 		
@@ -312,7 +304,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	 */
 	private void addTab(String title, Component component, Icon extraIcon) {
 		super.addTab(title, extraIcon, component);
-		setTabComponentAt(getTabCount() - 1, extraIcon);
+		addCloseIconToTabComponentAt(getTabCount() - 1, extraIcon);
 	}
 	
 	/* (non-Javadoc)
@@ -459,17 +451,17 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 			remove(prev);
 			addTab(str, cmp);
 			setSelectedIndex(getTabCount()-1);
-			setTabComponentAt(getTabCount()-1, fileIcon);
+			addCloseIconToTabComponentAt(getTabCount()-1, fileIcon);
 		} else if (prev>next) {
 			remove(prev);
 			insertTab(str, null, cmp, null, next);
 			setSelectedIndex(next);
-			setTabComponentAt(next, fileIcon);
+			addCloseIconToTabComponentAt(next, fileIcon);
 		} else {
 			remove(prev);
 			insertTab(str, null, cmp, null, next-1);
 			setSelectedIndex(next-1);
-			setTabComponentAt(next-1, fileIcon);
+			addCloseIconToTabComponentAt(next-1, fileIcon);
 		}
 	}
 
