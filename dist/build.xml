@@ -1,0 +1,187 @@
+<!-- ANT build script for yfiles obfuscation           -->
+<!-- The java based ANT tool is available from         -->
+<!-- http://jakarta.apache.org/ant                     -->
+           	
+<project name="SysBio" default="obfuscate" basedir=".">
+
+  <target name="help">
+    <echo>
+      This is an ANT build script to build a stand-alone JAR for
+	  SysBio.
+	    	
+	  The resulting redistributable is the SIGNED jar file,
+	  stored in $appJar which is currently "SysBio.jar".
+    </echo>
+  </target>
+
+  <!-- define some properties that are used throughout the tasks -->
+  <target name="init">
+  	<echo>
+  	  PLESE MAKE SURE ALL PATHS ARE CORRECT AND DECIDE IF YOU WANT
+  	  TO USE THE LIB-JARs OR REFERENCED PROJECTS.
+  	</echo>
+  	<tstamp /> <!-- set ${TODAY} and ${TSTAMP} -->
+  		
+    <!-- the base directory of the SysBio repository -->
+    <property name="base" location=".."/>
+  	
+    <!-- the path to the SysBio sources -->
+  	<property name="src" location="${base}/src"/>
+  	
+  	<!-- the path to the SysBio sources -->
+  	<property name="doc" location="${base}/doc/JavaDoc"/>
+  	
+    <!-- the path to the SysBio binaries -->
+    <property name="classes" location="${base}/bin"/>
+    
+    <!-- the path to the SysBio libraries -->
+  	<property name="lib" location="${base}/lib"/>
+
+    <!-- the FINAL obfuscated signed application jar files -->
+    <property name="appJarRaw" value="SysBio_graph_unobfuscated.jar"/>
+    <property name="appJarWithGraph" value="SysBio_graph.jar"/>
+    <property name="appJar" value="SysBio.jar"/>
+  	
+    <!-- the yGuard jar file containing the obfuscation task -->
+    <property name="yGuardJar" value="yguard.jar"/>
+    
+    <!-- the log file geenrated by the obfuscation task -->
+    <property name="obfuscationLog" value="obfuscation-log.xml"/>
+  	
+  </target>
+
+  <!-- puts the application specific classes into application.jar. -->
+  <target name="jar" depends="init">
+    <delete file="${appJar}"/>
+    <jar jarfile="${appJar}">
+      <manifest>
+        <!-- TODO: An auto-generated About dialog as main class would be nice -->
+        <!-- <attribute name="Main-Class" value="org.sbml.simulator.SysBio"/> -->
+        <attribute name="Built-By" value="Center for Bioinformatics Tuebingen (ZBIT)"/>
+      </manifest>
+    	
+    	<!-- SysBio Classes -->
+          <fileset dir="${classes}">
+              <!-- TODO: Please uncomment the following lines, to meet your needs! -->
+    	      <!-- <exclude name="de/zbit/resources/**/*"/> -->
+    	      <!-- <exclude name="de/zbit/mapper/**/*"/> -->
+    	      <!-- <exclude name="de/zbit/gui/**/*"/> -->
+    	      <exclude name="de/zbit/graph/**/*"/>
+    	      <exclude name="**/package.html"/>
+    	      <exclude name="overview.html"/>
+    	    </fileset>
+    	  <!-- These libraries are required by most classes -->
+          <zipfileset excludes="META-INF/*" src="${lib}/commons-discovery.jar"/>
+          <zipfileset excludes="META-INF/*" src="${lib}/commons-logging.jar"/>
+          <zipfileset excludes="META-INF/*.SF" src="${lib}/jaxrpc.jar"/>
+          <zipfileset excludes="META-INF/*.SF" src="${lib}/wsdl4j.jar"/>
+          <zipfileset excludes="META-INF/*.SF" src="${lib}/axis.jar"/>
+          <zipfileset excludes="META-INF/*" src="${lib}/commons-cli-1.1.jar"/>
+          <zipfileset excludes="META-INF/*" src="${lib}/quaqua.jar"/>
+          <zipfileset excludes="META-INF/*" src="${lib}/sysbio-osx-support.jar"/>
+          
+          <!-- These libraries are required by just some classes (decide yourself if you want them) -->
+          <zipfileset excludes="META-INF/*.SF" src="${lib}/keggapi.jar"/>
+          <zipfileset excludes="META-INF/*.SF" src="${lib}/Java5/saaj.jar"/>
+          <zipfileset excludes="META-INF/*.SF" src="${lib}/WSDbfetch.jar"/>
+    </jar>
+    
+    
+    <!-- JAR including the yFiles, zbit-graph and SBGN packages -->
+    <delete file="${appJarRaw}"/>
+    <jar jarfile="${appJarRaw}">
+    	<!-- SysBio Classes -->
+        <fileset dir="${classes}">
+    	    <include name="de/zbit/graph/**/*"/>
+    	  </fileset>
+        <zipfileset excludes="META-INF/*" src="${lib}/graph/y.jar"/>
+    	  <zipfileset excludes="META-INF/*" src="${lib}/graph/org.sbgn.jar"/>
+        <zipfileset src="${appJar}"/>
+    </jar>
+  </target>
+
+
+  <!-- obfuscates y.jar and adjusts application.jar accordingly. -->
+  <!-- Generates the jar files yObf.jar and applicationObf.jar.  -->
+  <target name="obfuscate" depends="jar">
+    <taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="${yGuardJar}"/>
+    <yguard>
+    	
+      <!-- obfuscate yFiles for public deployment -->
+      <inoutpair in="${appJarRaw}" out="${appJarWithGraph}"/>
+
+      <!-- [OPTIONALLY] Keep the line number table and the source file attributes
+                 of the public part of the "application" -->
+      <attribute name="LineNumberTable,LocalVariableTable,SourceFile">
+        <patternset>
+          <include name="de.zbit.**"/>
+        </patternset>
+      </attribute>
+
+      <rename logfile="${obfuscationLog}" replaceClassNameStrings="true" mainclass="${main}">
+        <!-- conservemanifest="true" -->
+        <!-- use some unique package prefix for obfuscated classes to avoid name clashes -->
+        <property name="obfuscation-prefix" value="obfuscatedintegrator"/>
+
+
+        <keep>
+          <package>
+            <patternset>
+              <include name="de.**.*"/>
+            </patternset>
+          </package>
+
+          
+             <!-- Keep all method, field, and class names of the "application"             -->
+             <!-- This could be adjusted to your needs if you don't want to let            -->
+             <!-- your whole application unobfuscated.                                     -->
+             <!-- In that case simply add some more "exclude" statements as depicted below -->
+             <class classes="private" methods="private" fields="private">
+              <patternset>
+                <!-- Do not obfuscate anything, by default -->
+               <include name="**.*"/>
+
+                <!-- Obfuscate all classes that make use of y.jar -->
+              	<!-- We can NOT obfuscate de.zbit.graph.**.*, because there are some resources (labels) in there -->
+                <exclude name="de.zbit.graph.*"/>
+              	<exclude name="de.zbit.graph.gui.**.*"/>
+                <exclude name="de.zbit.graph.io.**.*"/>
+              	<exclude name="de.zbit.graph.sbgn.**.*"/>
+              	
+
+               <!-- Obfuscate the included y.jar -->
+               <exclude name="y.**.*"/>
+              </patternset>
+             </class>
+            
+        </keep>
+
+        <!-- make sure that the .properties files are renamed according to their               -->
+        <!-- corresponding class files, yFiles needs this to function properly when obfuscated -->
+        <adjust replaceName="true">
+          <include name="y/**/*.properties"/>
+        </adjust>
+      </rename>
+    </yguard>
+  	<delete file="${appJarRaw}"/>
+  </target>
+
+  <!-- Removes all that has been built -->
+  <target name="clean" depends="init">
+  	<delete file="${appJarRaw}"/>
+  	<delete file="${appJarWithGraph}"/>
+    <delete file="${appJar}"/>
+    <delete includeemptydirs="true" dir="${classes}"/>
+  </target>
+
+
+  	<target name="javadoc" description="Creates Javadoc for the SysBio Framework">
+  	<mkdir dir="${doc}"/>
+		<javadoc sourcepath="${src}"
+            destdir="${doc}"
+            packagenames="de.zbit.*"
+            footer="Generated ${TODAY}"/>
+	</target>	
+	
+	
+</project>
