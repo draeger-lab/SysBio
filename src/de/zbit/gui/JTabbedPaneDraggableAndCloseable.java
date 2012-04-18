@@ -19,6 +19,7 @@ package de.zbit.gui;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -47,6 +48,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
@@ -198,12 +200,13 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	}
 	
 	/**
-	 * adds the close button and its MouseListener to the tab at index i
+	 * 
 	 * @param i
 	 */
 	public void setTabComponentAt(int i) {
 		setTabComponentAt(i, (Icon) null);
 	}
+	
 	
 	/**
 	 * adds the close button and its MouseListener to the tab at index i
@@ -211,31 +214,20 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	 * @param extraIcon 
 	 */
 	public void setTabComponentAt(int i, Icon extraIcon) {
-		String title = getTitleAt(i);
+		JLabel label = new JLabel(getTitleAt(i));
+		label.setIcon(extraIcon);
+		
 		JPanel panel = new JPanel();
-		panel.add(new JLabel(title));
-		JLabel closeButton = new JLabel(new CloseIcon(extraIcon));
+		((FlowLayout) panel.getLayout()).setVgap(0);
+		panel.add(label);
+		
+		JLabel closeButton = new JLabel(new CloseIcon());
 		closeButton.setToolTipText(BASE.getString("FILE_CLOSE").split(";")[1]);
 		panel.setOpaque(false);
 		closeButton.addMouseListener(new MouseListener() {
-			/* (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-			 */
 			public void mouseReleased(MouseEvent e) {}
-			
-			/* (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-			 */
 			public void mousePressed(MouseEvent e) {}
-			
-			/* (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-			 */
 			public void mouseExited(MouseEvent e) {}
-			
-			/* (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-			 */
 			public void mouseEntered(MouseEvent e) {}
 			
 			/* (non-Javadoc)
@@ -244,8 +236,12 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 			public void mouseClicked(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1
 						&& e.getSource() instanceof Component) {
+					int choice = JOptionPane.showConfirmDialog(JTabbedPaneDraggableAndCloseable.this, 
+							"Would you like to close the document?",
+						    "Close",
+						    JOptionPane.YES_NO_OPTION); 
 					int tabIndex = getTabIndexByComponent((Component) e.getSource());
-					if (tabIndex >= 0) {
+					if (tabIndex >= 0 && choice == 0) {
 						JTabbedPaneDraggableAndCloseable.this.removeTabAt(tabIndex);
 						for (ChangeListener cl : getChangeListeners())
 							cl.stateChanged(new ChangeEvent(JTabbedPaneDraggableAndCloseable.this));
@@ -256,6 +252,28 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	
 		panel.add(closeButton);
 		setTabComponentAt(i, panel);
+	}
+	
+	/**
+	 * 
+	 * @param i
+	 * @return
+	 */
+	private Icon getFileIconAt(int i) {
+		Component cmp = getTabComponentAt(i);
+		
+		if (cmp != null) {
+			if (cmp instanceof JLabel) {
+				return ((JLabel) cmp).getIcon();
+			} else if (cmp instanceof JPanel) {
+				JPanel panel = (JPanel) cmp;
+				if (panel.getComponent(0) instanceof JLabel) {
+					return ((JLabel) panel.getComponent(0)).getIcon();
+				}
+			}
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -293,7 +311,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	 * @param extraIcon
 	 */
 	private void addTab(String title, Component component, Icon extraIcon) {
-		super.addTab(title, component);
+		super.addTab(title, extraIcon, component);
 		setTabComponentAt(getTabCount() - 1, extraIcon);
 	}
 	
@@ -435,26 +453,28 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 			return;
 		}
 		Component cmp = getComponentAt(prev);
+		Icon fileIcon = getFileIconAt(prev);
 		String str = getTitleAt(prev);
 		if (next==getTabCount()) {
 			remove(prev);
 			addTab(str, cmp);
 			setSelectedIndex(getTabCount()-1);
-			setTabComponentAt(getTabCount()-1);
+			setTabComponentAt(getTabCount()-1, fileIcon);
 		} else if (prev>next) {
 			remove(prev);
 			insertTab(str, null, cmp, null, next);
 			setSelectedIndex(next);
-			setTabComponentAt(next);
+			setTabComponentAt(next, fileIcon);
 		} else {
 			remove(prev);
 			insertTab(str, null, cmp, null, next-1);
 			setSelectedIndex(next-1);
-			setTabComponentAt(next-1);
+			setTabComponentAt(next-1, fileIcon);
 		}
 	}
 
 	/**
+	 * 
 	 * 
 	 * @param next
 	 */

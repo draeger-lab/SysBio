@@ -79,6 +79,13 @@ public class CloseIcon implements Icon {
 	private Icon fileIcon;
 
 	/**
+	 * @return the fileIcon
+	 */
+	public Icon getFileIcon() {
+		return fileIcon;
+	}
+
+	/**
 	 * 
 	 */
 	public CloseIcon(boolean border) {
