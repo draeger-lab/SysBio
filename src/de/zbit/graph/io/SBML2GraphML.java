@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.AbstractNamedSBase;
+import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
@@ -55,7 +56,6 @@ import y.view.Arrow;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.LineType;
-import y.view.NodePort;
 import y.view.NodeRealizer;
 import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.graph.sbgn.CloneMarker;
@@ -160,7 +160,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     }
     
     // Eventually get the layout extension
-    parseLayoutInformation(document);
+    parseLayoutInformation(document, species);
     
     // Create the yFiles nodes
     addSpeciesToGraph(species, document);
@@ -395,6 +395,18 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * @param document
    */
   private void parseLayoutInformation(SBMLDocument document) {
+    parseLayoutInformation(document, null);
+  }
+
+  /**
+   * Parses the layout information from the given <code>document</code>.
+   * This will set the {@link #useLayoutExtension} and
+   * {@link #id2layoutMap} variables.
+   * @param document
+   * @param species list of all species to draw. This helps identifying
+   * the correct layout.
+   */
+  private void parseLayoutInformation(SBMLDocument document, List<? extends AbstractNamedSBase> species) {
     SBasePlugin layoutExtension = document.getModel().getExtension(layoutNamespace);
     useLayoutExtension = layoutExtension!=null;
     id2layoutMap = null;
@@ -402,7 +414,32 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       if (((ExtendedLayoutModel)layoutExtension).isSetListOfLayouts()) {
         // TODO: For generic releases, it would be nice to have a JList
         // that let's the user choose the layout.
-        Layout l = ((ExtendedLayoutModel)layoutExtension).getLayout(0);
+        
+        // In many applications (KEGGtranslator, SBVC, etc.) there is one layout
+        // for core and one for qual => identify the required one.
+        ListOf<Layout> layouts = ((ExtendedLayoutModel)layoutExtension).getListOfLayouts();
+        Layout l = layouts.iterator().next(); // First one
+        for (int i=0; i<layouts.size(); i++) {
+          Layout toTest = ((ExtendedLayoutModel)layoutExtension).getLayout(i);
+          if (toTest.isSetListOfSpeciesGlyphs()) {
+            String anyID = toTest.getListOfSpeciesGlyphs().iterator().next().getSpecies();
+            if (species!=null && speciesListContainsID(species, anyID)) {
+              // we have a corresponding layout
+              l = toTest;
+              break;              
+            }
+            if (!showQualModel && document.getModel().getSpecies(anyID)!=null) {
+              // we have a core layout
+              l = toTest;
+              break;
+            } else {
+              // TODO: Implement the same getSpecies check also for QUAL.
+            }
+          }
+              
+        }
+        
+        // Parse layout and establish internal maps
         id2layoutMap = new HashMap<String, BoundingBox>();
         for (SpeciesGlyph sg: l.getListOfSpeciesGlyphs()) {
           if (sg.isSetBoundingBox()) {
@@ -421,6 +458,24 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     }
   }
 
+
+  /**
+   * Look for a species with a specific id.
+   * <p>Note: this is a standard-slow iterative approach.</p>
+   * @param species
+   * @param anyID
+   * @return <code>TRUE</code> if <code>species</code> contains
+   * any {@link AbstractNamedSBase} with ID <code>anyID</code>.
+   */
+  private boolean speciesListContainsID(
+    List<? extends AbstractNamedSBase> species, Object anyID) {
+    for(AbstractNamedSBase s : species) {
+      if (s.getId().equals(anyID)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   /**
    * @param t

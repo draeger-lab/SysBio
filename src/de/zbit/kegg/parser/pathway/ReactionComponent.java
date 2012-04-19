@@ -291,5 +291,12 @@ public class ReactionComponent implements Cloneable {
     }
     return equals;
   }
+
+  /**
+   * @return
+   */
+  public boolean isSetStoichiometry() {
+    return stoichiometry!=null;
+  }
   
 }
