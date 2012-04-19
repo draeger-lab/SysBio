@@ -27,6 +27,8 @@ import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.Unit;
+import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.filters.NameFilter;
 
 import de.zbit.util.ResourceManager;
@@ -37,6 +39,7 @@ import de.zbit.util.ResourceManager;
  * @author Andreas Dr&auml;ger
  * @author Sarah Rachel M&uuml;ller vom Hagen
  * @author Sebastian Nagel
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.1
  */
@@ -85,8 +88,30 @@ public class SBMLtools {
    * @param version
    */
   public static final void setLevelAndVersion(SBase sbase, int level, int version) {
+    
+    // Some hard-coded default stuff:
+    // Before SBML l3, exponent, scale and multiplier had default values.
+    // => Restore them when upgrading to l3
+    if (sbase instanceof Unit) {
+      Unit ud = ((Unit)sbase);
+      if (sbase.getLevel()<3 && level>=3) {
+        if (!ud.isSetExponent()) {
+          ud.setExponent(1d);
+        }
+        if (!ud.isSetScale()) {
+          ud.setScale(0);
+        }
+        if (!ud.isSetMultiplier()) {
+          ud.setMultiplier(1d);
+        }
+      }
+    }
+    
+    // Set level and version
     sbase.setVersion(version);
     sbase.setLevel(level);
+    
+    // Recurse to children
     for (int i = 0; i<sbase.getChildCount(); i++) {
       TreeNode child = sbase.getChildAt(i);
       if (child instanceof SBase) {

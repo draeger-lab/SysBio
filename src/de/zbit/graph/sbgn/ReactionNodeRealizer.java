@@ -138,26 +138,32 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     double[] meanDiff = new double[2];
     Arrays.fill(cases, 0);
     Arrays.fill(meanDiff, 0); // [0] = X, [1] = Y
-//    int reactantsAbove=0;
-//    int reactantsLeft=1;
-//    int productsAbove=2;
-//    int productsLeft=3;
+//    int reactantsLeft=0;
+//    int reactantsAbove=1;
+//    int productsLeft=2;
+//    int productsAbove=3;
     
     for (EdgeCursor ec = no.edges(); ec.ok(); ec.next()) {
       Edge v = ec.edge();
       Node other = v.opposite(no);
       NodeRealizer nr = graph.getRealizer(other);
       
-      if (products.contains(other)) {
-        if (nr.getX()<getCenterX()) cases[0]++;
-        if (nr.getY()<getCenterY()) cases[1]++;
-        meanDiff[0]+=Math.abs(getCenterX() - nr.getX());
-        meanDiff[1]+=Math.abs(getCenterY() - nr.getY());
-      } else if (reactants.contains(other)) {
-        if (nr.getX()<getCenterX()) cases[2]++;
-        if (nr.getY()<getCenterY()) cases[3]++;
-        meanDiff[0]+=Math.abs(getCenterX() - nr.getX());
-        meanDiff[1]+=Math.abs(getCenterY() - nr.getY());
+      double distanceX = Math.abs(getCenterX() - nr.getCenterX());
+      double distanceY = Math.abs(getCenterY() - nr.getCenterY());
+      if (reactants.contains(other)) {
+        meanDiff[0]+= distanceX;
+        meanDiff[1]+= distanceY;
+        
+        // Count cases, but require at least 5 pixels difference
+        if (distanceX>5 && nr.getCenterX()<getCenterX()) cases[0]++;
+        if (distanceY>5 && nr.getCenterY()<getCenterY()) cases[1]++;
+      } else if (products.contains(other)) {
+        meanDiff[0]+= distanceX;
+        meanDiff[1]+= distanceY;
+        
+        // Count cases, but require at least 5 pixels difference        
+        if (distanceX>5 && nr.getCenterX()<getCenterX()) cases[2]++;
+        if (distanceY>5 && nr.getCenterY()<getCenterY()) cases[3]++;
       }
     }
     
@@ -166,20 +172,21 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     boolean horizontal = isHorizontal();
     if (cases[0]==max && cases[1]==max ||
         cases[2]==max && cases[3]==max) {
+      // If same number is above and left, let the distance decide the orientation.
       if (meanDiff[0]>meanDiff[1]) { // X-Distance larger
         if (!horizontal) rotateNode();
       } else { // Y-Distance larger
         if (horizontal) rotateNode();
       }
     }
-    else if (cases[0]==max && horizontal) rotateNode();
-    else if (cases[1]==max && !horizontal) rotateNode();
-    else if (cases[2]==max && horizontal) rotateNode();
-    else if (cases[3]==max && !horizontal) rotateNode();
+    else if (cases[0]==max && !horizontal) rotateNode();
+    else if (cases[1]==max && horizontal) rotateNode();
+    else if (cases[2]==max && !horizontal) rotateNode();
+    else if (cases[3]==max && horizontal) rotateNode();
     
     // Dock all edges to the correct side
     if (isHorizontal()) {
-      if (cases[1]>cases[3]) {
+      if (cases[0]>cases[2]) {
         // Reactants are left of this node
         setEdgesToDockOnLeftSideOfNode(reactants);
         setEdgesToDockOnRightSideOfNode(products);
@@ -188,8 +195,8 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
         setEdgesToDockOnRightSideOfNode(reactants);
       }
     } else {
-      if (cases[0]>cases[2]) {
-        // Reactants are above this node
+      if (cases[1]>cases[3]) {
+        // Reactants are above this node;
         setEdgesToDockOnUpperSideOfNode(reactants);
         setEdgesToDockOnLowerSideOfNode(products);
       } else {

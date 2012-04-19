@@ -37,6 +37,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -445,7 +446,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @param fileList
 	 * @param fileHistory
 	 */
-	protected void addToFileHistory(List<File> fileList, JMenu... fileHistory) {
+	protected void addToFileHistory(Collection<File> fileList, JMenu... fileHistory) {
     if (getMaximalFileHistorySize() > 0) {
       // Create the list of files to update the file history in the menu.
       // In addition to the files that have just been opened (above), we
@@ -471,7 +472,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
       for (int i = 0; i < c_fileHistory.getItemCount(); i++) {
         file = new File(c_fileHistory.getItem(i).getToolTipText());
         if (file.exists() && file.canRead() && !fileList.contains(file)) {
-          fileList.add(file);
+          try {
+            fileList.add(file);
+          } catch (UnsupportedOperationException e) {
+            // Unmodifiable list as input => Convert to modifiable list.
+            List<File> copy = new ArrayList<File>(fileList);
+            copy.add(file);
+            fileList = copy;
+          }
         }
       }
       // update
@@ -1554,15 +1562,16 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
    *        count of this {@link JMenu} is zero at the end of this method, it
    *        will be disabled.
 	 */
-	private final void updateFileHistory(List<File> listOfFiles, JMenu... fileHistory) {
+	private final void updateFileHistory(Collection<File> listOfFiles, JMenu... fileHistory) {
 	  for (JMenu jMenu : fileHistory) {
 	    jMenu.removeAll(); 
     }
 		JMenuItem fileItem;
 		List<File> keepFiles = new LinkedList<File>();
 		short maximum = getMaximalFileHistorySize();
+		Iterator<File> it = listOfFiles.iterator();
 		for (int i = 0; i < Math.min(listOfFiles.size(), maximum); i++) {
-			final File file = listOfFiles.get(i);
+			final File file = it.next();
 			if (file.exists() && file.canRead()) {
 			  for (JMenu jMenu : fileHistory) {
 			    // One JMenuItem can only have one parent, thus, create it multiple times
