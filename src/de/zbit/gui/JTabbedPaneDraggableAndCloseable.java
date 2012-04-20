@@ -44,6 +44,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.Icon;
@@ -89,13 +93,20 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	private final Color lineColor= new Color(0, 100, 255);
 	private int dragTabIndex = -1;
 	private boolean hasGhost = true;
-	private JTabbedPaneCloseListener closeListener = null;
+	private List<JTabbedPaneCloseListener> closeListeners = new ArrayList<JTabbedPaneCloseListener>();
 
 	/**
-	 * @param closeListener the closeListener to set
+	 * @param closeListener the closeListener to add
 	 */
 	public void addCloseListener(JTabbedPaneCloseListener closeListener) {
-		this.closeListener = closeListener;
+		closeListeners.add(closeListener);
+	}
+	
+	/**
+	 * @param closeListener the closeListener to remove
+	 */
+	public void removeCloseListener(JTabbedPaneCloseListener closeListener) {
+		closeListeners.remove(closeListener);
 	}
 
 
@@ -255,13 +266,17 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	 * @see javax.swing.JTabbedPane#removeTabAt(int)
 	 */
 	public void removeTabAt(int index) {
-		if (closeListener == null) {
+		if (closeListeners.size() == 0) {
 			super.removeTabAt(index);
 		} else {
-			boolean closeTab = closeListener.tabAboutToBeClosed(index);
-			if (closeTab) {
-				super.removeTabAt(index);
-				closeListener.tabClosed(index);
+			TabCloseEvent evt = new TabCloseEvent(this);
+			
+			for (JTabbedPaneCloseListener closeListener : closeListeners) {
+				boolean closeTab = closeListener.tabAboutToBeClosed(evt);
+				if (closeTab) {
+					super.removeTabAt(index);
+					closeListener.tabClosed(evt);
+				}
 			}
 		}
 	}
@@ -565,6 +580,22 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 			g2.fill(lineRect);
 		}
 	}
+	
+	public class TabCloseEvent extends EventObject implements Serializable {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * @param source
+		 */
+		public TabCloseEvent(Object source) {
+			super(source);
+		}
+		
+	}
 }
 
 /**
@@ -620,5 +651,4 @@ class GhostGlassPane extends JPanel {
 	public void setPoint(Point location) {
 		this.location = location;
 	}
-
 }
