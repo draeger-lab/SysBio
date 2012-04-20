@@ -48,7 +48,6 @@ import java.util.ResourceBundle;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
@@ -90,6 +89,15 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	private final Color lineColor= new Color(0, 100, 255);
 	private int dragTabIndex = -1;
 	private boolean hasGhost = true;
+	private JTabbedPaneCloseListener closeListener = null;
+
+	/**
+	 * @param closeListener the closeListener to set
+	 */
+	public void addCloseListener(JTabbedPaneCloseListener closeListener) {
+		this.closeListener = closeListener;
+	}
+
 
 	/**
 	 * 
@@ -228,12 +236,8 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 			public void mouseClicked(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1
 						&& e.getSource() instanceof Component) {
-					int choice = JOptionPane.showConfirmDialog(JTabbedPaneDraggableAndCloseable.this, 
-							"Would you like to close the document?",
-						    "Close",
-						    JOptionPane.YES_NO_OPTION); 
 					int tabIndex = getTabIndexByComponent((Component) e.getSource());
-					if (tabIndex >= 0 && choice == 0) {
+					if (tabIndex >= 0) {
 						JTabbedPaneDraggableAndCloseable.this.removeTabAt(tabIndex);
 						for (ChangeListener cl : getChangeListeners())
 							cl.stateChanged(new ChangeEvent(JTabbedPaneDraggableAndCloseable.this));
@@ -244,6 +248,22 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	
 		panel.add(closeButton);
 		setTabComponentAt(i, panel);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.swing.JTabbedPane#removeTabAt(int)
+	 */
+	public void removeTabAt(int index) {
+		if (closeListener == null) {
+			super.removeTabAt(index);
+		} else {
+			boolean closeTab = closeListener.tabAboutToBeClosed(index);
+			if (closeTab) {
+				super.removeTabAt(index);
+				closeListener.tabClosed(index);
+			}
+		}
 	}
 	
 	/**
