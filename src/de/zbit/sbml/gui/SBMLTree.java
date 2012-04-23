@@ -577,7 +577,7 @@ public class SBMLTree extends JTree implements ActionListener {
 	public void search(Filter filter, AbstractProgressBar progressBar) {
 		SBMLNode.setShowInvisible(true);
 		SBMLNode root = (SBMLNode)this.getModel().getRoot();
-		List<TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
+		List<? extends TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
 		if (progressBar != null) {
 			progressBar.reset();
 			progressBar.setNumberOfTotalCalls(2 * SBMLNode.getNodeCount());
@@ -598,7 +598,7 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * @param progressBar
 	 * @param callNr
 	 */
-	private void search(SBMLNode node,Filter filter,List<TreeNode> list, final AbstractProgressBar progressBar) {
+	private void search(SBMLNode node,Filter filter,List<? extends TreeNode> list, final AbstractProgressBar progressBar) {
 		SBase sbase = ((SBase)node.getUserObject());
 		if (sbase.filter(filter).size() > 0) {
 			node.setVisible(true);

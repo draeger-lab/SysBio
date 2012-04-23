@@ -313,4 +313,68 @@ public abstract class SB_2GraphML <T> {
     
     return n;
   }
+  
+//  protected Node createGroupNode(String id, String label, int sboTerm, double x, double y, double width, double height, String... childrenID) {
+//    // Setup the node
+//    ///////////////////////////////////
+//    groupNodeChildren.add(e.getComponents());
+//    addThisNodeToGroupNodeList = true;
+//    
+//    
+//    // New Text
+//    String newText = null;
+//    if (nl.getText().length()==0 || nl.getText().startsWith("undefined")) {
+//      newText = "Group";
+//    }
+//    nr = KEGG2yGraph.setupGroupNode(nl, newText);
+//    
+//    // Create node and use hirarchy manager
+//    /////////////////////////////////////
+//    n = graph.createNode(nr);
+//    if (addThisNodeToGroupNodeList) {
+//      hm.convertToGroupNode(n);
+//      parentGroupNodes.add(n);
+//    }
+//    
+//    // Add children
+//    //////////////////////////////////////
+//
+//    // Make group node hirarchies
+//    for (int i=0; i<parentGroupNodes.size(); i++) {
+//      NodeList nl = new NodeList();
+//      double x=Double.MAX_VALUE,y=Double.MAX_VALUE,width=0,height=0;
+//      for (int n2: groupNodeChildren.get(i)) {
+//        Entry two = p.getEntryForId(n2);
+//        if (two==null) {
+//          System.out.println("WARNING: Missing node for id " + n2);
+//          continue;
+//        }
+//        Node twoNode = (Node) two.getCustom();
+//        NodeRealizer nr = graph.getRealizer(twoNode);
+//        x = Math.min(x, nr.getX());
+//        y = Math.min(y, nr.getY());
+//        width=Math.max(width, (nr.getWidth()+nr.getX()));
+//        height=Math.max(height, (nr.getHeight()+nr.getY()));
+//        
+//        nl.add(twoNode);
+//      }
+//      
+//      // Reposition group node to fit content
+//      if (nl.size()>0) {
+//        int offset = 5;
+//        graph.setLocation(parentGroupNodes.get(i), x-offset, y-offset-14);
+//        graph.setSize(parentGroupNodes.get(i), width-x+2*offset, height-y+2*offset+11);
+//        
+//        // Set hierarchy
+//        hm.setParentNode(nl, parentGroupNodes.get(i));
+//        
+//        // Reposition group node to fit content (2nd time is necessary. Maybe yFiles bug...)
+//        graph.setLocation(parentGroupNodes.get(i), x-offset, y-offset-14);
+//        graph.setSize(parentGroupNodes.get(i), width-x+2*offset, height-y+2*offset+11);
+//      }
+//    }
+//    
+//    
+//  } 
+//}
 }

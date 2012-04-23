@@ -94,7 +94,7 @@ public class SBMLTreeSearcher extends SwingWorker<List<TreeNode>, Void> {
 			OrFilter filter = new OrFilter(nameFilter, specFilter, assFilter);
 			tree.search(filter, progressBar);
 			if ((tree.getModel() != null) && (tree.getModel().getRoot() != null)) {
-				return ((SBMLNode) tree.getModel().getRoot()).getUserObject().filter(filter);
+				return (List<TreeNode>) ((SBMLNode) tree.getModel().getRoot()).getUserObject().filter(filter);
 			}
 			return null;
 		}
