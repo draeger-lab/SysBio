@@ -493,6 +493,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         
         Node source = id2node.get(i.getQualitativeSpecies());
         Node target = id2node.get(o.getQualitativeSpecies());
+        if (source==null || target==null) continue;
         
         Edge e = simpleGraph.createEdge(source, target);
         GraphElement2SBid.put(e, t.getId());

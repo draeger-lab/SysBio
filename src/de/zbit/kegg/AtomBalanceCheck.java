@@ -25,12 +25,16 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
+import de.zbit.util.DatabaseIdentifiers;
+import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
 
 
@@ -288,28 +292,31 @@ public final class AtomBalanceCheck {
     Map<String, Integer> atomCount = new TreeMap<String, Integer>();
     for (ReactionComponent component : listOfSpecRefs) {
       KeggInfos infos = KeggInfos.get(KeggInfos.appendPrefix(component.getName()), manager);
+      
 
       if (infos == null || !infos.queryWasSuccessfull()) {
         atomCount.clear();
         break;
       }
       
-        String formula = infos.getFormula();
-        if (formula != null) {
-          double st = component.getStoichiometry()==null?1d:component.getStoichiometry().doubleValue();
-          // TODO: consider better replacement.
-          Map<String, Integer> count = countAtoms(st,formula, replacement);
-          for (String key : count.keySet()) {
-            if (!atomCount.containsKey(key))
-              atomCount.put(key, Integer.valueOf(0));
-            atomCount.put(key, Integer.valueOf(atomCount.get(key)
-                .intValue() + count.get(key).intValue()));
+      // Component.getName() might be a glycan and the chemical formula is only given for compounds
+      // => Look if we have synonym identifers for KEGG compound and refetch
+      String formula = infos.getFormulaDirectOrFromSynonym(manager);
+      if (formula != null) {
+        double st = component.getStoichiometry()==null?1d:component.getStoichiometry().doubleValue();
+        // TODO: consider better replacement.
+        Map<String, Integer> count = countAtoms(st,formula, replacement);
+        for (String key : count.keySet()) {
+          if (!atomCount.containsKey(key)) {
+            atomCount.put(key, Integer.valueOf(0));
           }
-        } else {
-          atomCount.clear();
-          break;
+          atomCount.put(key, Integer.valueOf(atomCount.get(key).intValue() + count.get(key).intValue()));
         }
-
+      } else {
+        atomCount.clear();
+        break;
+      }
+      
     }
     // if (atomCount.containsKey("R"))
     // atomCount.clear();

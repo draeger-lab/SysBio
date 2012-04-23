@@ -484,6 +484,31 @@ public class KeggInfos implements Serializable {
 	}
 	
 	/**
+	 * Returns the {@link #formula} if it is available. Else, checks if
+	 * there are compound synonyms available and tries to parse the formula
+	 * from the compound synonyms.
+	 * @return
+	 */
+	public String getFormulaDirectOrFromSynonym(KeggInfoManagement manager) {
+    // Component.getName() might be a glycan and the chemical formula is only given for compounds
+    // => Look if we have synonym identifers for KEGG compound and refetch
+    if (getFormula()==null && getSameAs()!=null) {
+      // Parse the kegg compound identifier from list of synonyms...
+      Pattern pat = Pattern.compile(DatabaseIdentifiers.getRegularExpressionForIdentifier(IdentifierDatabases.KEGG_Compound, true));
+      Matcher m = pat.matcher(getSameAs());
+      if (m.find()) {
+        // ... and requery the database
+        KeggInfos infos = KeggInfos.get(KeggInfos.appendPrefix(m.group(1)), manager);
+        if (infos.queryWasSuccessfull()) {
+          return infos.getFormula(); // NOTE: might still return null
+        }
+      }
+    }
+    
+    return getFormula();
+	}
+	
+	/**
    * Kegg has synonyms for identifiers (in the "REMARK" part).
    * All of them should be treated as separat KEGG identifiers,
    * pointing to the same object. They do never contain a
