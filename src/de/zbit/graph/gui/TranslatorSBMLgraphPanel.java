@@ -36,8 +36,10 @@ import javax.swing.filechooser.FileFilter;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.ext.SBasePlugin;
+import org.sbml.jsbml.ext.groups.GroupModel;
 import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
+import org.sbml.jsbml.xml.parsers.GroupsParser;
 
 import y.view.Graph2D;
 import y.view.HitInfo;
@@ -229,18 +231,31 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
         }
         SBase base = null;
         if (sbmlID!=null) {
-          if (!showQualModel) {
-            base = document.getModel().getSpecies(sbmlID);
-            if (base==null ){
-              base = document.getModel().getReaction(sbmlID);
-            }
-          } else {
-            SBasePlugin qm = document.getModel().getExtension(QualConstant.namespaceURI);
-            if (qm!=null && qm instanceof QualitativeModel) {
-              QualitativeModel q = (QualitativeModel) qm;
-              base = q.getQualitativeSpecies(sbmlID);
+          
+          // First, try group (shared with core and qualitative modeling)
+          SBasePlugin gm = document.getModel().getExtension(GroupsParser.namespaceURI);
+          if (gm!=null && gm instanceof GroupModel) {
+            base = ((GroupModel)gm).getGroup(sbmlID);
+          }
+          
+          if (base==null) {
+            if (!showQualModel) {
+              // Try metabolic (core) model
+              base = document.getModel().getSpecies(sbmlID);
               if (base==null ){
-                base = q.getTransition(sbmlID);
+                base = document.getModel().getReaction(sbmlID);
+              }
+            } else {
+              // Try qualitative (qual) model
+              SBasePlugin qm = document.getModel().getExtension(QualConstant.namespaceURI);
+              if (qm!=null && qm instanceof QualitativeModel) {
+                QualitativeModel q = (QualitativeModel) qm;
+                base = q.getQualitativeSpecies(sbmlID);
+                if (base==null ){
+                  try {
+                    base = q.getTransition(sbmlID);
+                  } catch (Exception e) {};
+                }
               }
             }
           }

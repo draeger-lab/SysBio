@@ -37,6 +37,9 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.SBasePlugin;
+import org.sbml.jsbml.ext.groups.Group;
+import org.sbml.jsbml.ext.groups.GroupModel;
+import org.sbml.jsbml.ext.groups.Member;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
@@ -49,6 +52,7 @@ import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
+import org.sbml.jsbml.xml.parsers.GroupsParser;
 
 import y.base.Edge;
 import y.base.Node;
@@ -90,6 +94,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * If layout information is available (see {@link #useLayoutExtension})
    * this map, maps every id (of {@link org.sbml.jsbml.Species} or
    * {@link Reaction}) to the corresponding {@link BoundingBox}.
+   * TODO: Actually, one species can have multiple glyphs. This is not considered here.
    */
   private Map<String, BoundingBox> id2layoutMap = null;
   
@@ -107,6 +112,10 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * The namespace URI of the layout extension.
    */
   private final static String layoutNamespace = LayoutConstant.namespaceURI;
+  /**
+   * The namespace URI of the layout extension.
+   */
+  private final static String groupNamespace = GroupsParser.namespaceURI;
   
   public SBML2GraphML() {
     super();
@@ -161,6 +170,9 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     
     // Eventually get the layout extension
     parseLayoutInformation(document, species);
+
+    // Support for the groups extension
+    species = parseGroupInformation(document, species);
     
     // Create the yFiles nodes
     addSpeciesToGraph(species, document);
@@ -383,7 +395,20 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       }
       
       // Now create the real node
-      createNode(s.getId(), s.getName(), sboTerm, x, y, w, h);
+      if (s instanceof Group && ((Group) s).isSetListOfMembers()) {
+        // Create a group node (SBML-groups extension)
+        int size = ((Group)s).getListOfMembers().size();
+        String[] groupMembers = new String[size];
+        for (int i=0; i < size; i++) {
+          groupMembers[i] = ((Group)s).getMember(i).getSymbol();
+        }
+        createGroupNode(s.getId(), s.getName(), sboTerm, x, y, w, h, groupMembers);
+        
+      } else {
+        // A simple, normal node.
+        createNode(s.getId(), s.getName(), sboTerm, x, y, w, h);
+        
+      }
     }
   }
 
@@ -456,6 +481,36 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         useLayoutExtension = false;
       }
     }
+  }
+  
+  /**
+   * Parses the groups information from the given <code>document</code>.
+   * This will set the {@link #useLayoutExtension} and
+   * {@link #id2layoutMap} variables.
+   * @param document
+   * @param species list of all species to draw. This helps identifying
+   * the correct layout.
+   * @return 
+   */
+  private List<? extends AbstractNamedSBase> parseGroupInformation(SBMLDocument document, List<? extends AbstractNamedSBase> species) {
+    SBasePlugin groupExtension = document.getModel().getExtension(groupNamespace);
+    boolean useGroupExtension = groupExtension!=null;
+    if (useGroupExtension) {
+      if (((GroupModel)groupExtension).isSetListOfGroups()) {
+        ListOf<Group> groups = ((GroupModel)groupExtension).getListOfGroups();
+        
+        // Add all groups to our list
+        List<AbstractNamedSBase> speciesNew = new ArrayList<AbstractNamedSBase>(species);
+        // It is important to add all groups TO THE END of the list.
+        speciesNew.addAll(groups);
+        
+        return speciesNew;
+      } else {
+        useGroupExtension = false;
+      }
+    }
+    
+    return species;
   }
 
 
