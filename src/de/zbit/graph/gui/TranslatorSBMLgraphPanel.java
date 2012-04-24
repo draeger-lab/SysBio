@@ -135,7 +135,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * @param showQualModel
    */
   public TranslatorSBMLgraphPanel (SBMLDocument document, boolean showQualModel) {
-    this((File)null, "SBML", null, document, showQualModel);
+    this((File) null, "SBML", null, document, showQualModel);
   }
   
   /**

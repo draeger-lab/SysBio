@@ -55,6 +55,9 @@ public class CloseIcon implements Icon {
 		this.color = color;
 	}
 
+	/**
+	 * 
+	 */
 	private boolean border;
 
 	/**

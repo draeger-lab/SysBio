@@ -265,6 +265,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	 * (non-Javadoc)
 	 * @see javax.swing.JTabbedPane#removeTabAt(int)
 	 */
+	@Override
 	public void removeTabAt(int index) {
 		if (closeListeners.size() == 0) {
 			super.removeTabAt(index);
@@ -272,7 +273,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 			TabCloseEvent evt = new TabCloseEvent(this);
 			
 			for (JTabbedPaneCloseListener closeListener : closeListeners) {
-				boolean closeTab = closeListener.tabAboutToBeClosed(evt);
+				boolean closeTab = closeListener.tabClosing(evt);
 				if (closeTab) {
 					super.removeTabAt(index);
 					closeListener.tabClosed(evt);
@@ -581,7 +582,17 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 		}
 	}
 	
+	/**
+	 * 
+	 * @author Sebastian Nagel
+	 * @since 1.1
+	 * @version $Rev$
+	 */
 	public class TabCloseEvent extends EventObject implements Serializable {
+		
+		// TODO: Memorize also the index of the element that is closing.
+		// TODO: This should be a class in a separate file.
+		// TODO: Name it TabEvent because it could also be used for other things.s
 
 		/**
 		 * 
@@ -596,6 +607,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 		}
 		
 	}
+
 }
 
 /**
