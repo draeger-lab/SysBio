@@ -16,7 +16,6 @@
  */
 package de.zbit.gui;
 
-import java.awt.Event;
 import java.util.EventListener;
 
 import de.zbit.gui.JTabbedPaneDraggableAndCloseable.TabCloseEvent;
@@ -26,23 +25,23 @@ import de.zbit.gui.JTabbedPaneDraggableAndCloseable.TabCloseEvent;
  * @version $Rev$
  * @since 1.4
  */
-public interface JTabbedPaneCloseListener extends EventListener{
+public interface JTabbedPaneCloseListener extends EventListener {
 	
 	/**
 	 * called if a tab is about to be closed.
 	 * return true if tab should be closed, false otherwise
 	 * 
-	 * @param index of the tab
+	 * @param evt
 	 * @return
 	 */
-	public boolean tabAboutToBeClosed (TabCloseEvent evt0);
+	public boolean tabClosing(TabCloseEvent evt);
 	
 	
 	/**
 	 * called after the tab is successfully closed
 	 * 
-	 * @param index of the tab
+	 * @param evt
 	 */
-	public void tabClosed (TabCloseEvent evt0);
+	public void tabClosed(TabCloseEvent evt);
 
 }
