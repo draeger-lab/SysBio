@@ -24,18 +24,18 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 
 import y.view.NodeRealizer;
-import y.view.ShapeNodeRealizer;
+import y.view.hierarchy.GroupNodeRealizer;
 
 /**
  * The "Complex"-node is a kind of a <b>group node</b> in SBGN.
- * It is actually a normal rectangle with four cutted edges.
- * See {@link #getPolygon()} for an ASCII-art.
+ * This implementation extends {@link GroupNodeRealizer} and
+ * uses {@link ComplexNode} to draw it's content.
+ * <p>Thus, in yFiles terms, this is now a real group node.
  * 
- * @author Finja B&uuml;chel
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker {
+public class ComplexGroupNode extends GroupNodeRealizer implements SimpleCloneMarker {
   
   /**
    * Is this node a cloned node? (I.e. another
@@ -43,15 +43,15 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
    */
   private boolean isClonedNode=false;
 
-  public ComplexNode() {
-    super(ShapeNodeRealizer.ROUND_RECT);
+  public ComplexGroupNode() {
+    super(new ComplexNode());
   }
   
-  public ComplexNode(NodeRealizer nr) {
+  public ComplexGroupNode(NodeRealizer nr) {
     super(nr);
     // If the given node realizer is of this type, then apply copy semantics. 
-    if (nr instanceof ComplexNode) {
-      ComplexNode fnr = (ComplexNode) nr;
+    if (nr instanceof ComplexGroupNode) {
+      ComplexGroupNode fnr = (ComplexGroupNode) nr;
       // Copy the values of custom attributes (there are none). 
     }
     if (nr instanceof CloneMarker) {
@@ -60,7 +60,9 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
   }
   
   public NodeRealizer createCopy(NodeRealizer nr) {
-    return new ComplexNode(nr);
+    ComplexGroupNode cgr = new ComplexGroupNode(nr);
+    cgr.setNodeIsCloned(isClonedNode);
+    return cgr;
   }
   
   /* (non-Javadoc)
@@ -77,6 +79,7 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
     return isClonedNode;
   }
   
+
   /* (non-Javadoc)
    * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
    */
@@ -100,44 +103,11 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
   }
   
   /**
-   * See {@link #getPolygon(double, double, double, double)}
+   * See {@link ComplexNode#getPolygon(double, double, double, double)}
    * @return
    */
   private Polygon getPolygon() {
-    return getPolygon(getX(), getY(), getWidth(), getHeight());
+    return ComplexNode.getPolygon(getX(), getY(), getWidth(), getHeight());
   }
   
-  /**
-   *    * Paints the complex-node.
-   * <pre>
-   *       1 . . . . . 2
-   *     .               .
-   *   8                   3
-   *   .                   .
-   *   .                   .
-   *   7                   4
-   *    .                 .
-   *      6 . . . . . . 5
-   * </pre>
-   * @param x
-   * @param y
-   * @param w
-   * @param h
-   * @return
-   */
-  public static Polygon getPolygon(double x, double y, double w, double h) {
-    int arc = (int) (Math.min(w, h)/5);
-    Polygon nodeshape = new Polygon(); 
-    nodeshape.addPoint((int)  x+arc,             (int)y);                   // 1
-    nodeshape.addPoint((int) (x+w)-arc, (int)y);                   // 2
-    nodeshape.addPoint((int) (x+w),     (int)y+arc);               // 3
-    nodeshape.addPoint((int) (x+w),     (int)(y+h-arc)); // 4
-    nodeshape.addPoint((int) (x+w)-arc, (int)(y+h));     // 5
-    nodeshape.addPoint((int) (x+arc),            (int)(y+h));     // 6
-    nodeshape.addPoint((int)  x,                 (int)(y+h-arc)); // 7
-    nodeshape.addPoint((int)  x,                 (int)(y+arc));             // 8
-    nodeshape.addPoint((int)  x+arc,             (int)(y));                 // 1
-    
-    return nodeshape;    
-  }
 }
