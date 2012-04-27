@@ -41,8 +41,10 @@ import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.xml.parsers.GroupsParser;
 
+import y.base.Node;
 import y.view.Graph2D;
 import y.view.HitInfo;
+import y.view.NodeRealizer;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.SBML2GraphML;
 import de.zbit.gui.GUITools;
@@ -289,4 +291,16 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     
   }
   
+  /**
+   * Experimental work in progress...
+   * @param id
+   * @param value
+   */
+  public void dynamicChangeOfNode(String id, double value){
+      Node node = converter.getId2node().get(id);
+      converter.getSimpleGraph().setSize(node, value, value);
+      
+      converter.getSimpleGraph().updateViews();
+      System.out.println("GRAPHPANEL: updated");
+  }
 }
