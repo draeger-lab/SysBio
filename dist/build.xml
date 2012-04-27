@@ -175,7 +175,7 @@
   </target>
 
 
-  	<target name="javadoc" description="Creates Javadoc for the SysBio Framework">
+  <target name="javadoc" depends="init" description="Creates Javadoc for the SysBio Framework">
   	<mkdir dir="${doc}"/>
 		<javadoc sourcepath="${src}"
             destdir="${doc}"
