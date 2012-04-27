@@ -98,7 +98,8 @@ public class ThreadManager {
    * is currently not executing a task.
    */
   public boolean isFreeSlot() {
-    return (getPoolSize()<pool.getCorePoolSize());
+    //return (getPoolSize() < pool.getCorePoolSize());
+    return (pool.getActiveCount() < pool.getCorePoolSize());
     // TODO: ProgressListener, AllDoneListener (kein sleep!)
   }
   
@@ -110,6 +111,17 @@ public class ThreadManager {
     return pool.getCorePoolSize();
   }
   
+  /**
+   * Sets the number of slots that will be used for parallel execution of
+   * runnable's.
+   * 
+   * @param slots
+   */
+  public void setNumberOfSlots(int slots) {
+    pool.setCorePoolSize(slots);
+    pool.setMaximumPoolSize(slots);
+  }
+
   /**
    * Returns the approximate total number of tasks that
    * have been scheduled for execution. Because the states
@@ -124,6 +136,26 @@ public class ThreadManager {
     return (int) pool.getTaskCount();
   }
   
+  /**
+   * Returns the approximate number of threads that are actively
+   * executing tasks.
+   *
+   * @return the number of threads
+   */
+  public int getNumberOfActiveTasks() {
+    return pool.getActiveCount();
+  }
+
+  /**
+   * Returns the approximate number of threads that are waiting in the queue for
+   * execution.
+   *
+   * @return the number of threads
+   */
+  public int getNumberOfWaitingTasks() {
+    return pool.getQueue().size();
+  }
+
 //  /**
 //   * WARNING: this object is the core of this class.
 //   * Modifications might have a huge impact or even
@@ -273,8 +305,9 @@ public class ThreadManager {
   
   /**
    * Just for samples and demos.
+   * @throws InterruptedException 
    */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException {
     // The lock object is used for synchronizing the different tasks.
     Object lock = new Object();
     
@@ -291,12 +324,44 @@ public class ThreadManager {
       Runnable r = getNextDemoJob(i, lock);
       m.addToPool(r);
     }
-    
+
     synchronized (lock) {
       System.out.println("Currently " + m.getPoolSize() + 
-          " jobs in ThreadManager. Now awaiting termination.");
+      " jobs in ThreadManager. Now awaiting termination.");
     }
-    
+
+    while( !m.isAllDone() ) {
+      Thread.sleep(1000);
+      synchronized (lock) {
+        System.out.println("Poolsize=" + m.getPoolSize() + " - active=" + m.getNumberOfActiveTasks() + " - waiting=" + m.getNumberOfWaitingTasks() + " - free slots? = " + m.isFreeSlot());
+        if( m.getNumberOfWaitingTasks() <= 5 ) {
+          m.setNumberOfSlots(1);
+        }
+      }
+    }
+
+    synchronized (lock) {
+      System.out.println("Poolsize=" + m.getPoolSize() + " - active=" + m.getNumberOfActiveTasks() + " - waiting=" + m.getNumberOfWaitingTasks() + " - free slots? = " + m.isFreeSlot());
+      if( m.getNumberOfWaitingTasks() <= 5 ) {
+        m.setNumberOfSlots(2);
+      }
+    }
+
+    for (int i=0; i<(numberOfSlots*5); i++) {
+      Runnable r = getNextDemoJob(i, lock);
+      m.addToPool(r);
+    }
+
+    while( !m.isAllDone() ) {
+      Thread.sleep(1000);
+      synchronized (lock) {
+        System.out.println("Poolsize=" + m.getPoolSize() + " - active=" + m.getNumberOfActiveTasks() + " - waiting=" + m.getNumberOfWaitingTasks() + " - free slots? = " + m.isFreeSlot());
+        if( m.getNumberOfWaitingTasks() <= 5 ) {
+          m.setNumberOfSlots(2);
+        }
+      }
+    }
+
     // Wait until all calculations finished or interrupted.
     m.awaitTermination();
     
