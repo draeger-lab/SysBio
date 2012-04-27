@@ -301,6 +301,5 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       converter.getSimpleGraph().setSize(node, value, value);
       
       converter.getSimpleGraph().updateViews();
-      System.out.println("GRAPHPANEL: updated");
   }
 }
