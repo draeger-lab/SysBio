@@ -208,7 +208,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    */
   public void setBackgroundImageProvider(GraphBackgroundImageProvider imageProvider) {
     this.imageProvider = imageProvider;
-    if (graphLayer!=null) {
+    if (graphLayer!=null && isSetBackgroundImageProvider()) {
       try {
         getBackgroundImageProvider().addBackgroundImage(pane, getTranslator());
       } catch (MalformedURLException e) {
