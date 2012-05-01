@@ -20,11 +20,14 @@
  */
 package de.zbit.graph.gui;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -41,9 +44,11 @@ import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.xml.parsers.GroupsParser;
 
+import y.base.Edge;
 import y.base.Node;
 import y.view.Graph2D;
 import y.view.HitInfo;
+import y.view.LineType;
 import y.view.NodeRealizer;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.SBML2GraphML;
@@ -206,7 +211,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    */
   @Override
   public boolean isDetailPanelAvailable() {
-    return true;
+    return false;
   }
   
   /* (non-Javadoc)
@@ -299,7 +304,21 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   public void dynamicChangeOfNode(String id, double value){
       Node node = converter.getId2node().get(id);
       converter.getSimpleGraph().setSize(node, value, value);
-      
       converter.getSimpleGraph().updateViews();
+  }
+  
+  public void dynamicChangeOfReaction(String id, double value){
+//      System.out.println("start");
+//      for (Entry<String, LinkedList<Edge>> entry : converter.getId2edge().entrySet()) {
+//          System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//      }
+//      System.out.println("ende");
+      LinkedList<Edge> listOfEdges = converter.getId2edge().get(id);
+      for(Edge e : listOfEdges){
+          converter.getSimpleGraph().getRealizer(e).setLineColor(Color.green);
+//          converter.getSimpleGraph().getRealizer(e).setLineType(LineType.createLineType(arg0, arg1, arg2, arg3, arg4, arg5))
+          //TODO create linetypes with specific widths
+      }
+//      System.out.println(e);
   }
 }

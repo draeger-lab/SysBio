@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -117,6 +119,11 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    */
   private final static String groupNamespace = GroupsParser.namespaceURI;
   
+  /**
+   * map from reaction id to corresponding edge in graph
+   */
+  private Map<String, LinkedList<Edge>> id2edge = new HashMap<String, LinkedList<Edge>>();
+  
   public SBML2GraphML() {
     super();
   }
@@ -126,7 +133,12 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     this.showQualModel = showQualModel;
   }
   
-  
+  /**
+   * @return
+   */
+  public Map<String, LinkedList<Edge>> getId2edge(){
+      return id2edge;
+  }
   
   /**
    * @return <code>TRUE</code> if the qual model is shown.
@@ -236,8 +248,11 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     
     // Add all reactions to the graph
     Set<Node> usedEnzymes = new HashSet<Node>();
+    
     for (Reaction r : document.getModel().getListOfReactions()) {
-      
+        // List all edges corresponding to the same Reaction
+        LinkedList<Edge> listOfEdges = new LinkedList<Edge>();
+        
       if (r.isSetListOfReactants() && r.isSetListOfProducts()) {
         
         // Create the reaction node
@@ -289,6 +304,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
           if (source!=null) {
             Edge e = simpleGraph.createEdge(source, rNode);
             GraphElement2SBid.put(e, r.getId());
+            listOfEdges.add(e);
+//            System.out.println("ADDED " + e + " with " + r.getId());
             EdgeRealizer er = simpleGraph.getRealizer(e);
             if (r.isReversible()) {
               er.setSourceArrow(Arrow.STANDARD);
@@ -296,6 +313,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
               er.setSourceArrow(Arrow.NONE);
             }
             er.setArrow(Arrow.NONE);
+            
+
           }
         }
 
@@ -304,6 +323,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
           if (target!=null) {
             Edge e = simpleGraph.createEdge(rNode, target);
             GraphElement2SBid.put(e, r.getId());
+            listOfEdges.add(e);
+//            System.out.println("ADDED " + e + " with " + r.getId());
             EdgeRealizer er = simpleGraph.getRealizer(e);
             er.setArrow(Arrow.STANDARD);
             er.setSourceArrow(Arrow.NONE);
@@ -331,6 +352,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             }
             Edge e = simpleGraph.createEdge(source, rNode);
             GraphElement2SBid.put(e, r.getId());
+            listOfEdges.add(e);
+//            System.out.println("ADDED " + e + " with " + r.getId());
             EdgeRealizer er = simpleGraph.getRealizer(e);
             er.setArrow(Arrow.TRANSPARENT_CIRCLE);
             er.setLineType(LineType.LINE_1);
@@ -340,6 +363,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         }
         
       }
+      
+      id2edge.put(r.getId(), listOfEdges);
     }
     
     return reaction2node;
