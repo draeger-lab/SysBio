@@ -37,10 +37,21 @@
     <!-- the path to the SysBio libraries -->
   	<property name="lib" location="${base}/lib"/>
 
-    <!-- the FINAL obfuscated signed application jar files -->
-    <property name="appJarRaw" value="SysBio_graph_unobfuscated.jar"/>
-    <property name="appJarWithGraph" value="SysBio_graph.jar"/>
-    <property name="appJar" value="SysBio.jar"/>
+    <!-- the application jar file basenames (without ".jar") -->
+  	<!-- without graph package -->
+    <property name="appBaseJar" value="SysBio"/>
+    <!-- with graph package, unobfuscated -->
+    <property name="appBaseJarRaw" value="SysBio_graph_unobfuscated"/>
+    <!-- the FINAL obfuscated signed application jar -->
+    <property name="appBaseJarWithGraph" value="SysBio_graph"/>
+
+    <!-- the application jar file names -->
+    <!-- without graph package -->
+    <property name="appJar" value="${appBaseJar}.jar"/>
+    <!-- with graph package, unobfuscated -->
+    <property name="appJarRaw" value="${appBaseJarRaw}.jar"/>
+    <!-- the FINAL obfuscated signed application jar file -->
+    <property name="appJarWithGraph" value="${appBaseJarWithGraph}.jar"/>
   	
     <!-- the yGuard jar file containing the obfuscation task -->
     <property name="yGuardJar" value="yguard.jar"/>
@@ -198,12 +209,12 @@
 	    </exec>
       <echo message="Current revision is ${repository.revision}" />
 
-    <property name="appJarRevRaw" value="SysBio_graph_unobfuscated_r${repository.revision}.jar"/>
-    <property name="appJarRevWithGraph" value="SysBio_graph_r${repository.revision}.jar"/>
-    <property name="appJarRev" value="SysBio_r${repository.revision}.jar"/>
+    <property name="appJarRev" value="${appBaseJar}_r${repository.revision}.jar"/>
+    <property name="appJarRevRaw" value="${appBaseJarRaw}_r${repository.revision}.jar"/>
+    <property name="appJarRevWithGraph" value="${appBaseJarWithGraph}_r${repository.revision}.jar"/>
 	</target>
 	
-	<target name="jar_revision_number" depends="svnrevision" description="Renames the JAR revision number to its filename">
+	<target name="jar_revision_number" depends="obfuscate,svnrevision" description="Renames the JAR revision number to its filename">
     <!-- the FINAL obfuscated signed application jar files -->
 
 		<!--
