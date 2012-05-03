@@ -184,4 +184,38 @@
 	</target>	
 	
 	
+	<target name="svnrevision" depends="init">
+	    <exec executable="svnversion" outputproperty="repository.revision">
+	        <arg line="-c ${base}" />
+	        <redirector>
+	            <outputfilterchain>
+	                <tokenfilter>
+	                    <replaceregex pattern="[0-9]+\:" replace="" />
+	                    <replaceregex pattern="[PM]+" replace="" />
+	                </tokenfilter>
+	            </outputfilterchain>
+	        </redirector>
+	    </exec>
+      <echo message="Current revision is ${repository.revision}" />
+
+    <property name="appJarRevRaw" value="SysBio_graph_unobfuscated_r${repository.revision}.jar"/>
+    <property name="appJarRevWithGraph" value="SysBio_graph_r${repository.revision}.jar"/>
+    <property name="appJarRev" value="SysBio_r${repository.revision}.jar"/>
+	</target>
+	
+	<target name="jar_revision_number" depends="svnrevision" description="Renames the JAR revision number to its filename">
+    <!-- the FINAL obfuscated signed application jar files -->
+
+		<!--
+		<delete file="${appJarRev}"/>
+    <delete file="${appJarRevRaw}"/>
+    <delete file="${appJarRevWithGraph}"/>
+    -->
+    	
+		<move failonerror="false" tofile="${appJarRev}" file="${appJar}"/>
+    <move failonerror="false" tofile="${appJarRevRaw}" file="${appJarRaw}"/>
+    <move failonerror="false" tofile="${appJarRevWithGraph}" file="${appJarWithGraph}"/>
+  </target>
+		
+	
 </project>
