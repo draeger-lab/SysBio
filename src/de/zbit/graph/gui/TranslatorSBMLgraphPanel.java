@@ -26,8 +26,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -45,10 +43,9 @@ import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.xml.parsers.GroupsParser;
 
 import y.base.Edge;
-import y.base.Node;
 import y.view.Graph2D;
 import y.view.HitInfo;
-import y.view.LineType;
+import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.SBML2GraphML;
@@ -124,8 +121,8 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
 //  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document) {
 //    this(inputFile, outputFormat, translationResult, document, false);
 //  }
-  
-  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel) {
+
+public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel) {
     super(inputFile, outputFormat, translationResult, document);
     this.showQualModel = showQualModel;
     
@@ -211,7 +208,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    */
   @Override
   public boolean isDetailPanelAvailable() {
-    return false;
+    return true;
   }
   
   /* (non-Javadoc)
@@ -296,15 +293,37 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     
   }
   
+  
   /**
    * Experimental work in progress...
    * @param id
    * @param value
    */
-  public void dynamicChangeOfNode(String id, double value){
-      Node node = converter.getId2node().get(id);
-      converter.getSimpleGraph().setSize(node, value, value);
-      converter.getSimpleGraph().updateViews();
+  public void dynamicChangeOfNode(String id, double valueForGraph, double realValue, boolean labels){
+        NodeRealizer nr = converter.getSimpleGraph().getRealizer(
+                converter.getId2node().get(id));
+        nr.setSize(valueForGraph, valueForGraph);
+        nr.setFillColor(Color.CYAN);
+
+        /*
+         * Label Node with ID and real value at this timepoint.
+         * Last label will be treated as dynamic label
+         * TODO locale
+         */
+        if (labels){
+            if (nr.labelCount() > 1){
+                nr.getLabel(nr.labelCount() - 1).setText(id + ": " + realValue);
+            }else{
+                nr.addLabel(new NodeLabel(id + ": " + realValue));
+                NodeLabel nl = nr.getLabel(nr.labelCount() - 1);
+                nl.setModel(NodeLabel.SIDES);
+                nl.setPosition(NodeLabel.S); // South of node
+                nl.setDistance(-3);
+            }
+        }else if(nr.labelCount() > 1){
+            nr.removeLabel(nr.getLabel(nr.labelCount()-1));
+        }
+        converter.getSimpleGraph().updateViews();
   }
   
   public void dynamicChangeOfReaction(String id, double value){
@@ -314,11 +333,26 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
 //      }
 //      System.out.println("ende");
       LinkedList<Edge> listOfEdges = converter.getId2edge().get(id);
-      for(Edge e : listOfEdges){
-          converter.getSimpleGraph().getRealizer(e).setLineColor(Color.green);
+//      for(Edge e : listOfEdges){
+//          converter.getSimpleGraph().getRealizer(e).setLineColor(Color.green);
 //          converter.getSimpleGraph().getRealizer(e).setLineType(LineType.createLineType(arg0, arg1, arg2, arg3, arg4, arg5))
           //TODO create linetypes with specific widths
-      }
+//      }
 //      System.out.println(e);
+  }
+  
+  public void notSelected(String id){
+      if(converter.getId2node().get(id) != null){
+          NodeRealizer nr = converter.getSimpleGraph().getRealizer(
+                  converter.getId2node().get(id));
+          nr.setSize(7, 7); //TODO What is the default size?
+          nr.setFillColor(Color.GRAY);
+          
+          if(nr.labelCount() > 1){
+              //if not selected disable label
+              nr.removeLabel(nr.getLabel(nr.labelCount()-1));
+          }
+      }
+      converter.getSimpleGraph().updateViews();
   }
 }
