@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -295,9 +296,15 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
   
   
   /**
+   * =============================================================
    * Experimental work in progress...
+   * =============================================================
+   * 
+   * experimental, do not use
    * @param id
-   * @param value
+   * @param valueForGraph
+   * @param realValue
+   * @param labels
    */
   public void dynamicChangeOfNode(String id, double valueForGraph, double realValue, boolean labels){
         NodeRealizer nr = converter.getSimpleGraph().getRealizer(
@@ -310,11 +317,13 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
          * Last label will be treated as dynamic label
          * TODO locale
          */
+        NumberFormat round = NumberFormat.getInstance();
+        round.setMaximumFractionDigits(4); //round to four digits
         if (labels){
             if (nr.labelCount() > 1){
-                nr.getLabel(nr.labelCount() - 1).setText(id + ": " + realValue);
+                nr.getLabel(nr.labelCount() - 1).setText(id + ": " + round.format(realValue));
             }else{
-                nr.addLabel(new NodeLabel(id + ": " + realValue));
+                nr.addLabel(new NodeLabel(id + ": " + round.format(realValue)));
                 NodeLabel nl = nr.getLabel(nr.labelCount() - 1);
                 nl.setModel(NodeLabel.SIDES);
                 nl.setPosition(NodeLabel.S); // South of node
@@ -326,6 +335,11 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
         converter.getSimpleGraph().updateViews();
   }
   
+  /**
+   * experimental do not use
+   * @param id
+   * @param value
+   */
   public void dynamicChangeOfReaction(String id, double value){
 //      System.out.println("start");
 //      for (Entry<String, LinkedList<Edge>> entry : converter.getId2edge().entrySet()) {
@@ -341,11 +355,15 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
 //      System.out.println(e);
   }
   
+  /**
+   * experimental do not use
+   * @param id
+   */
   public void notSelected(String id){
       if(converter.getId2node().get(id) != null){
           NodeRealizer nr = converter.getSimpleGraph().getRealizer(
                   converter.getId2node().get(id));
-          nr.setSize(7, 7); //TODO What is the default size?
+          nr.setSize(8, 8);
           nr.setFillColor(Color.GRAY);
           
           if(nr.labelCount() > 1){
