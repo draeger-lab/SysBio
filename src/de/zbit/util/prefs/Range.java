@@ -423,7 +423,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
    * @param acceptedObjects
    */
   public Range(Class<Type> requiredType, Iterable<Type> acceptedObjects) {
-    this(requiredType, Range.toNiceRangeString(acceptedObjects));
+    this(requiredType, Range.toRangeString(acceptedObjects));
     // This requires a list => Convert to list
     if (!(acceptedObjects instanceof List<?>)) {
       List<Type> acceptedObjects2 = new LinkedList<Type>();
