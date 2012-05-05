@@ -17,13 +17,19 @@
 package de.zbit.sbml.gui;
 
 import java.util.Enumeration;
+import java.util.logging.Logger;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
+import org.sbml.jsbml.util.compilers.UnitException;
+import org.sbml.jsbml.util.compilers.UnitsCompiler;
 
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a
@@ -39,6 +45,11 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = 9057010975355065921L;
+	
+	/**
+	 * A {@link Logger} for this class.
+	 */
+	private static final Logger logger = Logger.getLogger(SBMLNode.class.getName());
 	
 	/**
 	 * true: show invisible nodes
@@ -69,13 +80,73 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	 * @param isVisible
 	 */
 	public SBMLNode(SBase sbase, boolean isVisible) {
-	    super(sbase);
-	    this.boldFont = false;
-	    this.expanded = false;
-	    this.isVisible = isVisible;
-	    nodeCount++;
+		this(sbase, isVisible, SBase.class);
 	}
 	
+	/**
+	 * 
+	 * @param ast
+	 */
+	public SBMLNode(ASTNode ast) {
+		this(ast, true, ASTNode.class);
+	}
+	
+	/**
+	 * 
+	 * @param node
+	 * @param isVisible
+	 * @param accepted
+	 */
+	private SBMLNode(TreeNode node, boolean isVisible, Class<? extends TreeNode> accepted) {
+		super(node);
+		this.boldFont = false;
+		this.expanded = false;
+		this.isVisible = isVisible;
+		nodeCount++;
+		for (int i = 0; i < node.getChildCount(); i++) {
+			TreeNode child = node.getChildAt(i);
+			if (accepted.isAssignableFrom(child.getClass())) {
+				add(new SBMLNode(child, isVisible, accepted));
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.tree.DefaultMutableTreeNode#toString()
+	 */
+	@Override
+	public String toString() {
+		TreeNodeWithChangeSupport node = getUserObject();
+		if (node instanceof SBase) {
+			return node.toString();
+		} else if (node instanceof ASTNode) {
+			StringBuilder sb = new StringBuilder();
+			ASTNode ast = (ASTNode) node;
+			int level = -1, version = -1;
+			MathContainer mc = ast.getParentSBMLObject();
+			if (mc != null) {
+				level = mc.getLevel();
+				version = mc.getVersion();
+			}
+			if (ast.isName()) {
+				sb.append(ast.getName());
+			} else if (ast.isNumber()) {
+				sb.append(ast.isInteger() ? Integer.toString(ast.getInteger()) : Double.toString(ast.getReal()));
+			} else {
+				sb.append(ast.getType());
+			}
+			sb.append(' ');
+			try {
+				sb.append(UnitDefinition.printUnits(ast.compile(new UnitsCompiler(level, version)).getUnits(), true));
+			} catch (UnitException exc) {
+				sb.append("invalid");
+				logger.fine(exc.getMessage());
+			}
+			return sb.toString();
+		}
+		return super.toString();
+	}
+
 	/* (non-Javadoc)
 	 * @see javax.swing.tree.DefaultMutableTreeNode#getUserObject()
 	 */
@@ -87,6 +158,7 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	/* (non-Javadoc)
 	 * @see javax.swing.tree.DefaultMutableTreeNode#getChildAt(int)
 	 */
+	@Override
 	public TreeNode getChildAt(int index) {
 		if (isShowInvisible()) {
 			return super.getChildAt(index);
@@ -115,6 +187,7 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	/* (non-Javadoc)
 	 * @see javax.swing.tree.DefaultMutableTreeNode#getChildCount()
 	 */
+	@Override
 	public int getChildCount() {
 		if (isShowInvisible()) {
 			return super.getChildCount();
@@ -187,6 +260,11 @@ public class SBMLNode extends DefaultMutableTreeNode {
 		this.expanded = false;
 	}
 	
+	/**
+	 * 
+	 * @param obj
+	 * @return
+	 */
 	public boolean containsUserObject(TreeNodeWithChangeSupport obj) {
 		if (getUserObject().equals(obj)){
 			return true;
@@ -225,4 +303,5 @@ public class SBMLNode extends DefaultMutableTreeNode {
 		// TODO: This will return the number of nodes FOR ALL SBMLNode instances!!!
 		return nodeCount;
 	}
+
 }

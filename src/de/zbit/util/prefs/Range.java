@@ -830,10 +830,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     if ((acceptedObjects != null) && iterator.hasNext() && (Class.class.isAssignableFrom(iterator.next().getClass()))) {
       List<Type> classStrings = new LinkedList<Type>();
       for (Type object : acceptedObjects) {
-        /* Simple name for classes doesn't work. It is not precise and 
-         * causes errors at other positions...
-         * Nope... works just fine for me!
-         */
+        // Not that this is only for a presentation to a user, not for the "real" RangeString.
         classStrings.add((Type) ((Class<Type>) object).getSimpleName());
       }
       accObjects = classStrings;

@@ -248,13 +248,33 @@ public abstract class SB_2GraphML <T> {
    * @param sboTerm
    * @return
    */
-  protected Node createNode(String id, String label, int sboTerm) {
+  public Node createNode(String id, String label, int sboTerm) {
     return createNode(id, label, sboTerm, Double.NaN, Double.NaN);
   }
-  protected Node createNode(String id, String label, int sboTerm, double x, double y) {
+  /**
+   * 
+   * @param id
+   * @param label
+   * @param sboTerm
+   * @param x
+   * @param y
+   * @return
+   */
+  public Node createNode(String id, String label, int sboTerm, double x, double y) {
     return createNode(id, label, sboTerm, x, y, 46d, 17d);
   }
-  protected Node createNode(String id, String label, int sboTerm, double x, double y, double width, double height) {
+  /**
+   * 
+   * @param id
+   * @param label
+   * @param sboTerm
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   * @return
+   */
+  public Node createNode(String id, String label, int sboTerm, double x, double y, double width, double height) {
     boolean nodeHadLayoutInformation = false;
     boolean nodeShouldBeACircle = false;
     
@@ -265,7 +285,7 @@ public abstract class SB_2GraphML <T> {
     
     // Set Node shape (and color) based on SBO-terms
     NodeRealizer nr;
-    if (sboTerm<=0) {
+    if (sboTerm <= 0) {
       nr = simpleGraph.getRealizer(n);
     } else {
       
@@ -276,7 +296,7 @@ public abstract class SB_2GraphML <T> {
     }
     
     // Setup node properties
-    if (label!=null && !(nr instanceof ReactionNodeRealizer) &&
+    if ((label != null) && !(nr instanceof ReactionNodeRealizer) &&
         !label.equalsIgnoreCase("undefined")) {
       nr.setLabelText(label);
     }

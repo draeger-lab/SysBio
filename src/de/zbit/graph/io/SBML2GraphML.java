@@ -158,7 +158,6 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   /* (non-Javadoc)
    * @see de.zbit.kegg.io.SB_2GraphML#createNodesAndEdges(java.lang.Object)
    */
-  @Override
   protected void createNodesAndEdges(SBMLDocument document) {
     
     // Check if we have anything to visualize
@@ -381,14 +380,14 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     
     for (AbstractNamedSBase s : species) {
       // Get the SBO-term (defining the shape and color)
-      int sboTerm=0;
+      int sboTerm = 0;
       /*
        * IMPORTANT ReactionModifiers (referencing to species)
        * should get the enzyme shape, even if the species is a gene!
        * The picture will otherwise show genes, catalyzing reactions
        * instead of enzymes!!!!!
        */
-      if (enzymeSpeciesIDs!=null && enzymeSpeciesIDs.contains(s.getId())) {
+      if ((enzymeSpeciesIDs != null) && enzymeSpeciesIDs.contains(s.getId())) {
         sboTerm = SBGNVisualizationProperties.macromolecule;
       } else if (s.isSetSBOTerm()) {
         sboTerm = s.getSBOTerm();
@@ -396,22 +395,22 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
 
       
       // Initialize default layout variables
-      double x=Double.NaN;
-      double y=Double.NaN;
-      double w=46;
-      double h=17;
+      double x = Double.NaN;
+      double y = Double.NaN;
+      double w = 46;
+      double h = 17;
       
       // Get information from the layout extension
       if (useLayoutExtension) {
         BoundingBox g = id2layoutMap.get(s.getId());
-        if (g!=null) {
+        if (g != null) {
           if (g.isSetDimensions()) {
             w = g.getDimensions().getWidth();
             h = g.getDimensions().getHeight();
           }
           if (g.isSetPosition()) {
             // Ignore 0|0 positions. They're due to default values
-            if (g.getPosition().getX()!=0d || g.getPosition().getY()!=0d) {
+            if ((g.getPosition().getX() != 0d) || (g.getPosition().getY() != 0d)) {
               x = g.getPosition().getX();
               y = g.getPosition().getY();
             }
@@ -420,19 +419,18 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       }
       
       // Now create the real node
-      if (s instanceof Group && ((Group) s).isSetListOfMembers()) {
+      if ((s instanceof Group) && ((Group) s).isSetListOfMembers()) {
         // Create a group node (SBML-groups extension)
-        int size = ((Group)s).getListOfMembers().size();
+        int size = ((Group) s).getListOfMembers().size();
         String[] groupMembers = new String[size];
         for (int i=0; i < size; i++) {
-          groupMembers[i] = ((Group)s).getMember(i).getSymbol();
+          groupMembers[i] = ((Group) s).getMember(i).getSymbol();
         }
         createGroupNode(s.getId(), s.getName(), sboTerm, x, y, w, h, groupMembers);
         
       } else {
         // A simple, normal node.
         createNode(s.getId(), s.getName(), sboTerm, x, y, w, h);
-        
       }
     }
   }
