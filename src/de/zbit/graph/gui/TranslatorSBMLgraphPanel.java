@@ -239,15 +239,15 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
           
           // First, try group (shared with core and qualitative modeling)
           SBasePlugin gm = document.getModel().getExtension(GroupsParser.namespaceURI);
-          if (gm!=null && gm instanceof GroupModel) {
-            base = ((GroupModel)gm).getGroup(sbmlID);
+          if ((gm != null) && gm instanceof GroupModel) {
+            base = ((GroupModel) gm).getGroup(sbmlID);
           }
           
-          if (base==null) {
+          if (base == null) {
             if (!showQualModel) {
               // Try metabolic (core) model
               base = document.getModel().getSpecies(sbmlID);
-              if (base==null ){
+              if (base==null ) {
                 base = document.getModel().getReaction(sbmlID);
               }
             } else {
@@ -256,7 +256,7 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
               if (qm!=null && qm instanceof QualitativeModel) {
                 QualitativeModel q = (QualitativeModel) qm;
                 base = q.getQualitativeSpecies(sbmlID);
-                if (base==null ){
+                if (base==null ) {
                   try {
                     base = q.getTransition(sbmlID);
                   } catch (Exception e) {};
@@ -306,7 +306,7 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
    * @param realValue
    * @param labels
    */
-  public void dynamicChangeOfNode(String id, double valueForGraph, double realValue, boolean labels){
+  public void dynamicChangeOfNode(String id, double valueForGraph, double realValue, boolean labels) {
         NodeRealizer nr = converter.getSimpleGraph().getRealizer(
                 converter.getId2node().get(id));
         nr.setSize(valueForGraph, valueForGraph);
@@ -319,8 +319,8 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
          */
         NumberFormat round = NumberFormat.getInstance();
         round.setMaximumFractionDigits(4); //round to four digits
-        if (labels){
-            if (nr.labelCount() > 1){
+        if (labels) {
+            if (nr.labelCount() > 1) {
                 nr.getLabel(nr.labelCount() - 1).setText(id + ": " + round.format(realValue));
             }else{
                 nr.addLabel(new NodeLabel(id + ": " + round.format(realValue)));
@@ -329,7 +329,7 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
                 nl.setPosition(NodeLabel.S); // South of node
                 nl.setDistance(-3);
             }
-        }else if(nr.labelCount() > 1){
+        }else if(nr.labelCount() > 1) {
             nr.removeLabel(nr.getLabel(nr.labelCount()-1));
         }
         converter.getSimpleGraph().updateViews();
@@ -340,37 +340,46 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
    * @param id
    * @param value
    */
-  public void dynamicChangeOfReaction(String id, double value){
+  public void dynamicChangeOfReaction(String id, double value) {
 //      System.out.println("start");
 //      for (Entry<String, LinkedList<Edge>> entry : converter.getId2edge().entrySet()) {
 //          System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
 //      }
 //      System.out.println("ende");
       LinkedList<Edge> listOfEdges = converter.getId2edge().get(id);
-//      for(Edge e : listOfEdges){
+//      for(Edge e : listOfEdges) {
 //          converter.getSimpleGraph().getRealizer(e).setLineColor(Color.green);
 //          converter.getSimpleGraph().getRealizer(e).setLineType(LineType.createLineType(arg0, arg1, arg2, arg3, arg4, arg5))
           //TODO create linetypes with specific widths
 //      }
 //      System.out.println(e);
   }
+ 
+  /**
+   * 
+   * @return
+   */
+	public SBML2GraphML getConverter() {
+		return converter;
+	}
   
   /**
    * experimental do not use
    * @param id
    */
-  public void notSelected(String id){
-      if(converter.getId2node().get(id) != null){
+  public void notSelected(String id) {
+      if(converter.getId2node().get(id) != null) {
           NodeRealizer nr = converter.getSimpleGraph().getRealizer(
                   converter.getId2node().get(id));
           nr.setSize(8, 8);
           nr.setFillColor(Color.GRAY);
           
-          if(nr.labelCount() > 1){
+          if(nr.labelCount() > 1) {
               //if not selected disable label
               nr.removeLabel(nr.getLabel(nr.labelCount()-1));
           }
       }
       converter.getSimpleGraph().updateViews();
   }
+
 }

@@ -39,7 +39,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -74,25 +73,6 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * A {@link Logger} for this class.
 	 */
 	private static final transient Logger logger = Logger.getLogger(SBMLTree.class.getName());
-	
-	/**
-	 * @param sbase
-	 * @return
-	 */
-	private static MutableTreeNode createNodes(TreeNode sbase) {
-		SBMLNode node = null;
-		if ((sbase instanceof SBase)) {
-			node = new SBMLNode((SBase) sbase);
-			MutableTreeNode child;
-			for (int i = 0; i < sbase.getChildCount(); i++) {
-				child = createNodes(sbase.getChildAt(i));
-				if (child != null) {
-					node.add(child);
-				}
-			}
-		} 
-		return node;
-	}
 	
 	/**
 	 * is path1 descendant of path2
@@ -154,12 +134,12 @@ public class SBMLTree extends JTree implements ActionListener {
 	}
 
 	/**
-	 * Generate a tree that displays an ASTNode tree.
+	 * Generate a tree that displays an {@link ASTNode} tree.
 	 * 
 	 * @param math
 	 */
 	public SBMLTree(ASTNode math) {
-		super(math);
+		super(new SBMLNode(math));
 		init();
 	}
 	
@@ -167,7 +147,7 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * @param sbase
 	 */
 	public SBMLTree(SBase sbase) {
-		super(createNodes(sbase));
+		super(new SBMLNode(sbase));
 		init();
 	}
 	
@@ -486,9 +466,12 @@ public class SBMLTree extends JTree implements ActionListener {
 			} else if (clickedOn instanceof DefaultMutableTreeNode) {
 					saveSelectionPath();
 			}
-			if (clickedOn instanceof ASTNode) {
-				ASTNode ast = (ASTNode) clickedOn;
-				logger.fine(UnitDefinition.printUnits(ast.deriveUnit(), true) + " : " + ast.toFormula());
+			if (clickedOn instanceof SBMLNode) {
+				Object userObject = ((SBMLNode) clickedOn).getUserObject();
+				if ((userObject != null) && (userObject instanceof ASTNode)) {
+					ASTNode ast = (ASTNode) userObject;
+					logger.fine(UnitDefinition.printUnits(ast.deriveUnit(), true) + " : " + ast.toFormula());
+				}
 			}
 		}
 		if (e.getButton() == MouseEvent.BUTTON3) {

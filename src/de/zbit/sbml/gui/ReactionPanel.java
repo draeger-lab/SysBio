@@ -199,14 +199,14 @@ public class ReactionPanel extends JPanel {
 		if (g != null) {
 			int fontSize = g.getFont().getSize(), x = 0, y = fontSize;
 			double length;
-			if (reaction.getNumModifiers() > 0) {
+			if (reaction.getModifierCount() > 0) {
 				y *= 2;
 			}
 			FontMetrics metrics = g.getFontMetrics();
 			String curr = createString(reaction.getListOfReactants(), false, true);
 			g.drawString(curr, x, y);
 			x += metrics.getStringBounds(curr, g).getWidth();
-			if (reaction.getNumModifiers() > 0) {
+			if (reaction.getModifierCount() > 0) {
 				curr = createString(reaction.getListOfModifiers(), true, true);
 				g.drawString(curr, x, y - fontSize);
 				length = metrics.getStringBounds(curr, g).getWidth();

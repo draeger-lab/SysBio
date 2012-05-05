@@ -17,7 +17,6 @@
 package de.zbit.io.csv;
 
 import de.zbit.exception.CorruptInputStreamException;
-import de.zbit.io.CSVwriteableTest2;
 
 /**
  * Interface that marks this class as CSVwriteable.

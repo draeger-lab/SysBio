@@ -80,6 +80,7 @@ public class SBMLTreeSearcher extends SwingWorker<List<TreeNode>, Void> {
 	/* (non-Javadoc)
 	 * @see javax.swing.SwingWorker#doInBackground()
 	 */
+	@SuppressWarnings("unchecked")
 	protected List<TreeNode> doInBackground() throws Exception {
 		tree.setAllVisible();
 		

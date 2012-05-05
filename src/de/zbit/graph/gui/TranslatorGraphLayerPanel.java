@@ -86,6 +86,13 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   Graph2DView pane;
 
   /**
+	 * @return the pane
+	 */
+	public Graph2DView getGraph2DView() {
+		return pane;
+	}
+
+	/**
    * This allows extending classes to build a panel with detailed
    * information that is shown on node-selection.
    */
