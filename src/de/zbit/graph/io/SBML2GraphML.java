@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,6 @@ import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.groups.Group;
 import org.sbml.jsbml.ext.groups.GroupModel;
-import org.sbml.jsbml.ext.groups.Member;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
@@ -430,7 +428,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         
       } else {
         // A simple, normal node.
-        createNode(s.getId(), s.getName(), sboTerm, x, y, w, h);
+      	// If no name is set, use the ID as label. Better than nothing.
+        createNode(s.getId(), s.isSetName() ? s.getName() : s.getId(), sboTerm, x, y, w, h);
       }
     }
   }

@@ -66,6 +66,10 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  */
 public abstract class TranslatorGraphLayerPanel <DocumentType> extends TranslatorPanel<DocumentType> {
+	
+	/**
+	 * Generated serial version identifier.
+	 */
   private static final long serialVersionUID = 3437289245211176473L;
   
   /**

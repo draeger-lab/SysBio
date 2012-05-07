@@ -20,11 +20,15 @@
  */
 package de.zbit.graph.io;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import org.sbml.jsbml.SBO;
 
 import y.base.DataMap;
 import y.base.Edge;
@@ -46,6 +50,7 @@ import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.graph.sbgn.ComplexGroupNode;
 import de.zbit.graph.sbgn.ComplexNode;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
+import de.zbit.util.ResourceManager;
 
 /**
  * This is an abstract superclass for various systems biology formats to create
@@ -58,10 +63,19 @@ import de.zbit.graph.sbgn.ReactionNodeRealizer;
  * @version $Rev$
  */
 public abstract class SB_2GraphML <T> {
-  public static final Logger log = Logger.getLogger(SB_2GraphML.class.getName());
+  
+	/**
+	 * A {@link Logger} for this class.
+	 */
+	private static final Logger log = Logger.getLogger(SB_2GraphML.class.getName());
+	
+	/**
+	 * Localization support.
+	 */
+	private static final transient ResourceBundle bundle = ResourceManager.getBundle("de.zbit.graph.locales.Labels");
   
   /**
-   * Use this hashmap to map every graph-object
+   * Use this {@link HashMap} to map every graph-object
    * to an SBML-identifier.
    */
   protected Map<Object, String> GraphElement2SBid = new HashMap<Object, String>();
@@ -286,14 +300,18 @@ public abstract class SB_2GraphML <T> {
     // Set Node shape (and color) based on SBO-terms
     NodeRealizer nr;
     if (sboTerm <= 0) {
-      nr = simpleGraph.getRealizer(n);
-    } else {
+    	// Default shape:
+      sboTerm = SBO.getSimpleMolecule();
+      // TODO: Localize
+			log.warning(MessageFormat.format(
+				bundle.getString("USING_DEFAULT_SBO_TERM"), 
+				SBO.getTerm(sboTerm).getName(), label));
+    } 
       
-      nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
-      nr = nr.createCopy(); // TODO: does this also copy pre-defined labels? (it should!)
-      simpleGraph.setRealizer(n, nr);
-      nodeShouldBeACircle = SBGNVisualizationProperties.isCircleShape(sboTerm);
-    }
+    nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
+    nr = nr.createCopy(); // TODO: does this also copy pre-defined labels? (it should!)
+    simpleGraph.setRealizer(n, nr);
+    nodeShouldBeACircle = SBGNVisualizationProperties.isCircleShape(sboTerm);
     
     // Setup node properties
     if ((label != null) && !(nr instanceof ReactionNodeRealizer) &&
@@ -305,8 +323,8 @@ public abstract class SB_2GraphML <T> {
     if (Double.isNaN(x) || Double.isNaN(y)) {
       int nodesWithoutCoordinates = unlayoutedNodes.size();
       // Make a simple grid-layout to set some initial coords
-      x = (nodesWithoutCoordinates%COLUMNS)*(width+width/2);
-      y = (nodesWithoutCoordinates/COLUMNS)*(height+height);
+      x = (nodesWithoutCoordinates % COLUMNS) * (width + width / 2);
+      y = (nodesWithoutCoordinates / COLUMNS) * (height + height);
       
       nodesWithoutCoordinates++;
       unlayoutedNodes.add(n);

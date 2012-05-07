@@ -325,7 +325,7 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
                 nl.setPosition(NodeLabel.S); // South of node
                 nl.setDistance(-3);
             }
-        }else if(nr.labelCount() > 1) {
+        }else if (nr.labelCount() > 1) {
             // labels switched off, therefore remove them, if there are any
             nr.removeLabel(nr.getLabel(nr.labelCount()-1));
         }
@@ -371,13 +371,13 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
    * @param id
    */
   public void notSelected(String id) {
-      if(converter.getId2node().get(id) != null) {
+      if (converter.getId2node().get(id) != null) {
           NodeRealizer nr = converter.getSimpleGraph().getRealizer(
                   converter.getId2node().get(id));
           nr.setSize(8, 8);
           nr.setFillColor(Color.LIGHT_GRAY);
           
-          if(nr.labelCount() > 1) {
+          if (nr.labelCount() > 1) {
               //if not selected disable label
               nr.removeLabel(nr.getLabel(nr.labelCount()-1));
           }

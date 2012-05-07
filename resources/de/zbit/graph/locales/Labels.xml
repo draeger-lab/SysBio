@@ -8,6 +8,7 @@
   </comment>
   
   <!-- RestrictedEditMode (Property table on the upper right) -->
+  
   <entry key="nodeLabel">All names</entry>
   <entry key="entrezIds">Entrez id(s)</entry>
   <entry key="type">Type</entry>
@@ -21,5 +22,9 @@
   <entry key="nodePosition">Node position</entry>
   <entry key="nodeSize">Node size</entry>
   <entry key="interactionType">Interaction type</entry>
+  
+  <!-- SB_2GraphML -->
+  
+  <entry key="USING_DEFAULT_SBO_TERM">No SBO term set for {1}, using default term "{0}".</entry>
   
 </properties>
