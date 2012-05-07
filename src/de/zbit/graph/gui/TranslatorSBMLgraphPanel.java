@@ -46,6 +46,7 @@ import org.sbml.jsbml.xml.parsers.GroupsParser;
 import y.base.Edge;
 import y.view.Graph2D;
 import y.view.HitInfo;
+import y.view.LineType;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import de.zbit.graph.GraphTools;
@@ -296,10 +297,6 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
   
   
   /**
-   * =============================================================
-   * Experimental work in progress...
-   * =============================================================
-   * 
    * experimental, do not use
    * @param id
    * @param valueForGraph
@@ -315,7 +312,6 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
         /*
          * Label Node with ID and real value at this timepoint.
          * Last label will be treated as dynamic label
-         * TODO locale
          */
         NumberFormat round = NumberFormat.getInstance();
         round.setMaximumFractionDigits(4); //round to four digits
@@ -330,6 +326,7 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
                 nl.setDistance(-3);
             }
         }else if(nr.labelCount() > 1) {
+            // labels switched off, therefore remove them, if there are any
             nr.removeLabel(nr.getLabel(nr.labelCount()-1));
         }
         converter.getSimpleGraph().updateViews();
@@ -347,12 +344,18 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
 //      }
 //      System.out.println("ende");
       LinkedList<Edge> listOfEdges = converter.getId2edge().get(id);
-//      for(Edge e : listOfEdges) {
-//          converter.getSimpleGraph().getRealizer(e).setLineColor(Color.green);
-//          converter.getSimpleGraph().getRealizer(e).setLineType(LineType.createLineType(arg0, arg1, arg2, arg3, arg4, arg5))
-          //TODO create linetypes with specific widths
-//      }
-//      System.out.println(e);
+        for (Edge e : listOfEdges){
+            float valueF = (float) value;
+            LineType currLinetype = converter.getSimpleGraph().getRealizer(e)
+                    .getLineType();
+            LineType newLineType = LineType.createLineType(valueF,
+                    currLinetype.getEndCap(), 
+                    currLinetype.getLineJoin(),
+                    currLinetype.getMiterLimit(),
+                    currLinetype.getDashArray(),
+                    currLinetype.getDashPhase());
+            converter.getSimpleGraph().getRealizer(e).setLineType(newLineType);
+      }
   }
  
   /**
@@ -372,7 +375,7 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
           NodeRealizer nr = converter.getSimpleGraph().getRealizer(
                   converter.getId2node().get(id));
           nr.setSize(8, 8);
-          nr.setFillColor(Color.GRAY);
+          nr.setFillColor(Color.LIGHT_GRAY);
           
           if(nr.labelCount() > 1) {
               //if not selected disable label
