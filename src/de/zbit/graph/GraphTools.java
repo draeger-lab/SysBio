@@ -76,6 +76,10 @@ public class GraphTools {
    */
   protected Map<String, DataMap> descriptor2Map=null;
   
+  /**
+   * 
+   * @param graph
+   */
   public GraphTools(Graph2D graph){
     super();
     this.graph=graph;
@@ -83,10 +87,13 @@ public class GraphTools {
     init();
   }
   
+  /**
+   * 
+   */
   @SuppressWarnings("unchecked")
   private void init() {
-    if (graph==null) {
-      descriptor2Map=null;
+    if (graph == null) {
+      descriptor2Map = null;
       return;
     }
     GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2Dwriter.mapDescription);
@@ -109,7 +116,6 @@ public class GraphTools {
 
     return false;
   }
-  
 
   /**
    * Update the enabled state of all registered views
@@ -129,7 +135,6 @@ public class GraphTools {
       yc.next();
     }
   }
-  
 
   /**
    * Layout the graph with the given layout.
