@@ -36,6 +36,7 @@ import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.SBasePlugin;
@@ -390,7 +391,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
        * instead of enzymes!!!!!
        */
       if ((enzymeSpeciesIDs != null) && enzymeSpeciesIDs.contains(s.getId())) {
-        sboTerm = SBGNVisualizationProperties.macromolecule;
+        sboTerm = SBO.getMacromolecule();
       } else if (s.isSetSBOTerm()) {
         sboTerm = s.getSBOTerm();
       }

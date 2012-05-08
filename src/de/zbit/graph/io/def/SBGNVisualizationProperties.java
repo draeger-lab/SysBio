@@ -55,30 +55,18 @@ public class SBGNVisualizationProperties {
    */
   public static Map<Integer, NodeRealizer> sbo2shape;
   
-  
   /**
    * default shape is an Ellipse
    */
   private final static ShapeNodeRealizer defaultShape = new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE);
   
   /**
-   * Examples of macromolecules include proteins, nucleic acids (RNA, DNA), and
-   * polysaccharides (glycogen, cellulose, starch, etc.).
-   * => Also use this for enzymes (as they are proteins)!
-   */
-  public static final int macromolecule = 245;
-  /**
-   * Other SBO terms that should be visualized in the same manner as {@link #macromolecule}.
+   * Other SBO terms that should be visualized in the same manner as {@link SBO.getMarcomolecule}.
    */
   private static final int[] macromolecule_synonyms = new int[]{248, 249, 246, 251, 252, 250};
 
   /**
-   * Simple chemicals (Ca2+,ATP, etc.)
-   */
-  public static final int simpleChemical = 247;
-  
-  /**
-   * Other SBO terms that should be visualized in the same manner as {@link #simpleChemical}s.
+   * Other SBO terms that should be visualized in the same manner as {@link SBO.getSimpleMolecule}s.
    * 327 = non-macromolecular ion
    * 328 = non-macromolecular radical
    */
@@ -97,7 +85,7 @@ public class SBGNVisualizationProperties {
   public static final int uncertainProcess = 396;
   
   /**
-   * Other SBO terms that should be visualized in the same manner as {@link #nonCovalentComplex}s.
+   * Other SBO terms that should be visualized in the same manner as {@link SBO.getNonCovalentComplex}s.
    * TODO: These complexes below are actually not correct. But Linking them to
    * ComplexNode is better than the default. But still, the real SBGN-conform
    * specification differs!
@@ -123,16 +111,17 @@ public class SBGNVisualizationProperties {
      */
     sbo2shape = new HashMap<Integer, NodeRealizer>();
    
-    sbo2shape.put(macromolecule, getEnzymeRelizerRaw()); // macromolecule - enzyme
+    sbo2shape.put(SBO.getMacromolecule(), getEnzymeRelizerRaw()); // macromolecule - enzyme
     // Sub-branches in the macromolecule-SBO-tree
+       
     for (int sbo:macromolecule_synonyms) {
-      sbo2shape.put(sbo, sbo2shape.get(macromolecule));
+      sbo2shape.put(sbo, sbo2shape.get(SBO.getMacromolecule()));
     }
     
-    sbo2shape.put(simpleChemical, new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE)); // simple chemical - simple chemical
+    sbo2shape.put(SBO.getSimpleMolecule(), new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE)); // simple chemical - simple chemical
     // Sub-branches in the simpleChemical-SBO-tree
     for (int sbo:simpleChemical_synonyms) {
-      sbo2shape.put(sbo, sbo2shape.get(simpleChemical));
+      sbo2shape.put(sbo, sbo2shape.get(SBO.getSimpleMolecule()));
     }
     
     sbo2shape.put(SBO.getGene(), new NucleicAcidFeatureNode()); // nucleic acid feature - gene
@@ -165,24 +154,21 @@ public class SBGNVisualizationProperties {
   }
   
   /**
-   * @return the color of the appropriate shabe
+   * @return the color of the appropriate shape
    */
   private static Color getColor(int sboTerm) {
-    if ((sboTerm == SBO.getNonCovalentComplex()) ||
-        Arrays.binarySearch(nonCovalentComplex_synonyms, sboTerm) >= 0) {
+    if (SBO.isChildOf(sboTerm, SBO.getNonCovalentComplex())){
       return new Color(24,116,205);    // DodgerBlue3
-    } else if (sboTerm == SBO.getGene()) {
+    } else if (SBO.isChildOf(sboTerm, SBO.getGene())){ 
       return new Color(255,255,0);    // Yellow
-    } else if ((sboTerm == macromolecule) ||
-        Arrays.binarySearch(macromolecule_synonyms, sboTerm) >= 0) {
+    } else if (SBO.isChildOf(sboTerm, SBO.getMacromolecule())){
       return new Color(0,205,0);       // Green 3
-    } else if ((sboTerm == simpleChemical) ||
-        Arrays.binarySearch(simpleChemical_synonyms, sboTerm) >= 0) {
+    } else if (SBO.isChildOf(sboTerm, SBO.getSimpleMolecule())){
       return new Color(176,226,255);   // LightSkyBlue1
     } else if ((sboTerm == map) || (sboTerm == submap)) {
       return new Color(224,238,238);   // azure2
     } else if (SBO.isChildOf(sboTerm, SBO.getEmptySet())) {
-    	return new Color(255, 204, 204);
+    	return new Color(255, 204, 204); // Pink
     } else {
       return new Color(144,238,144);   // LightGreen
     }
@@ -219,8 +205,7 @@ public class SBGNVisualizationProperties {
    * @return
    */
   public static boolean isCircleShape(int sboTerm) {
-    if (sboTerm == simpleChemical ||
-        Arrays.binarySearch(simpleChemical_synonyms, sboTerm)>=0) {
+    if (SBO.isChildOf(sboTerm, SBO.getSimpleMolecule())) {
       return true;
     } else {
       return false;
