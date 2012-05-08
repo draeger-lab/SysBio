@@ -16,30 +16,102 @@
  */ 
 package de.zbit.graph.sbgn;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.GeneralPath;
+
+import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 
 /**
  * 
  * @author Finja B&uuml;chel
+ * @author Stephanie Tscherneck
  * @since 1.1
  * @version $Rev$
  */
 public class EmptyNode extends ShapeNodeRealizer implements SimpleCloneMarker {
 
-  /* (non-Javadoc)
-   * @see de.zbit.graph.sbgn.CloneMarker#setNodeIsCloned(boolean)
-   */
-  public void setNodeIsCloned(boolean b) {
-    // TODO Auto-generated method stub
-    
-  }
+	/**
+	 * Is this node a cloned node? (I.e. another instance must exist in the same
+	 * graph).
+	 */
+	private boolean isClonedNode = false;
 
-  /* (non-Javadoc)
-   * @see de.zbit.graph.sbgn.CloneMarker#isNodeCloned()
-   */
-  public boolean isNodeCloned() {
-    // TODO Auto-generated method stub
-    return false;
-  }
+	public EmptyNode() {
+		super(ShapeNodeRealizer.ELLIPSE);
+	}
+
+	public EmptyNode(NodeRealizer nr) {
+		super(nr);
+		// If the given node realizer is of this type, then apply copy
+		// semantics.
+		if (nr instanceof EmptyNode) {
+			EmptyNode enr = (EmptyNode) nr;
+			// Copy the values of custom attributes (there are none).
+		}
+		if (nr instanceof CloneMarker) {
+			setNodeIsCloned(((CloneMarker) nr).isNodeCloned());
+		}
+	}
+
+	public NodeRealizer createCopy(NodeRealizer nr) {
+		return new EmptyNode(nr);
+	}
+
+	/* (non-Javadoc)
+	 * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
+	 */
+	@Override
+	protected void paintShapeBorder(Graphics2D gfx) {
+		gfx.setColor(getLineColor());
+		gfx.draw(getPath());
+	}
+
+	/* (non-Javadoc)
+	 * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
+	 */
+	@Override
+	protected void paintFilledShape(Graphics2D gfx) {
+		if (!isTransparent() && getFillColor() != null) {
+			gfx.setColor(Color.pink);
+			gfx.fill(getPath());
+
+			CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, getPath());
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	protected GeneralPath getPath() {
+		double halfHeight = getHeight() / 2;
+		GeneralPath path = new GeneralPath();
+
+		path.moveTo(getX(), getY() + getHeight());
+		path.lineTo(getX() + getHeight(), getY());
+
+		path.moveTo(getX(), getY() + halfHeight);
+		path.curveTo(getX(), getY(), getX() + getHeight(), getY(), getX()
+				+ getHeight(), getY() + halfHeight);
+		path.curveTo(getX() + getHeight(), getY() + getHeight(), getX(), getY()
+				+ getHeight(), getX(), getY() + halfHeight);
+		path.closePath();
+		return path;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.graph.sbgn.CloneMarker#setNodeIsCloned(boolean)
+	 */
+	public void setNodeIsCloned(boolean b) {
+		isClonedNode = b;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.graph.sbgn.CloneMarker#isNodeCloned()
+	 */
+	public boolean isNodeCloned() {
+		return isClonedNode;
+	}
 
 }
