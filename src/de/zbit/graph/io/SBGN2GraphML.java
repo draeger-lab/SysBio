@@ -22,6 +22,7 @@ package de.zbit.graph.io;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
+import org.sbgn.bindings.Port;
 import org.sbgn.bindings.Sbgn;
 
 import y.base.Node;
@@ -89,17 +91,34 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
     for (Arc a : document.getMap().getArc()) {
       // Get source and target node
       Node source = null, target = null;
-      if (a.getSource()!=null && a.getSource() instanceof Glyph) {
-        source = (Node) id2node.get(((Glyph)a.getSource()).getId());
+      if (a.getSource()!=null) {
+        if (a.getSource() instanceof Glyph) {
+          source = (Node) id2node.get(((Glyph)a.getSource()).getId());
+        } else if (a.getSource() instanceof Port) {
+          source = id2node.get(((Port) a.getSource()).getId());
+        }
       }
+      
       // TODO: These methods require glyphs to have an unique ID. But
       // the specification says, that one should identify glyphs by instance
       // and NOT by id...
-      if (a.getTarget()!=null && a.getTarget() instanceof Glyph) {
-        target = (Node) id2node.get(((Glyph)a.getTarget()).getId());
+      // TODO: Same ports should be translated to yFiles y.view.Port
+      // so that all dock at the same positions.
+      
+      if (a.getTarget()!=null) {
+        if (a.getTarget() instanceof Glyph) {
+          target = (Node) id2node.get(((Glyph)a.getTarget()).getId());
+        } else if (a.getTarget() instanceof Port) {
+          target = id2node.get(((Port) a.getTarget()).getId());
+        }
       }
       if (source==null || target==null) {
         log.warning(String.format("Missing %s glyph for arc %s.", source==null?"source":"target", a));
+        continue;
+      }
+      
+      if (simpleGraph.containsEdge(source, target)) {
+        log.fine("Skippind duplicate arc-edge.");
         continue;
       } 
       
@@ -127,7 +146,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
       simpleGraph.createEdge(source, target, er);
     }
   }
-
+  
   /**
    * @param document
    */
@@ -136,9 +155,10 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
     for (Glyph g : document.getMap().getGlyph()) {
       // Get the SBO-term (defining the shape and color)
       int sboTerm=0;
+      GlyphType gType=null;
       if (g.getClazz()!=null) {
-        GlyphType t = SBGNProperties.GlyphType.valueOfString(g.getClazz());
-        sboTerm = t.getSBOterm();
+        gType = SBGNProperties.GlyphType.valueOfString(g.getClazz());
+        sboTerm = gType.getSBOterm();
       }
       
 
@@ -147,6 +167,9 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
       double y=Double.NaN;
       double w=46;
       double h=17;
+      if (gType!=null && gType == GlyphType.process) {
+        w = h = 8;
+      }
       
       // Get information from the layout extension
       Bbox box = g.getBbox();
@@ -165,12 +188,22 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
       String label = null;
       if (g.getLabel()!=null) {
         label = g.getLabel().getText();
+      } else {
+        label = g.getId();
       }
       
       // Now create the real node
       Node n = createNode(g.getId(), label, sboTerm, x, y, w, h);
       if (simpleGraph.getRealizer(n) instanceof ReactionNodeRealizer) {
         reaction2node.put(g, (ReactionNodeRealizer)simpleGraph.getRealizer(n));
+      }
+      
+      // Associtate ports with this node
+      List<Port> ports = g.getPort();
+      for (Port p: ports) {
+        if (!id2node.containsKey(p.getId())) {
+          id2node.put(p.getId(), n);
+        }
       }
       
       // TODO: Draw the state (and also other attributes)
