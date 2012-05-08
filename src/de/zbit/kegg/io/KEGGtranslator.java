@@ -46,6 +46,13 @@ public interface KEGGtranslator <InternalOutputFormatDataStructure> {
    */
   public InternalOutputFormatDataStructure translate(File f) throws IOException;
   
+  /**
+   * Translates the given pathway to the target document.
+   * @param p - the Kegg Pathway.
+   * @return OutputFormat
+   */
+  public InternalOutputFormatDataStructure translate(Pathway p);
+  
 	/**
 	 * Translate a given KEGG Pathway and write it in the new format to outfile.
 	 * 
@@ -54,7 +61,8 @@ public interface KEGGtranslator <InternalOutputFormatDataStructure> {
 	 * @return true if and only if the conversion was successful and the outFile
 	 *         has been written.
 	 */
-	public boolean translate(Pathway p, String outFile);
+	public boolean translate(Pathway p, String outFile);	
+	
 
 	/**
 	 * Translate a KEGG Pathway from the KGML formatted infile and write it in

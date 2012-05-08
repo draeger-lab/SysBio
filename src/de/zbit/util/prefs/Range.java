@@ -815,8 +815,13 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
   /**
    * Returns a List of type String, that is parsable as Range by the
    * Range class.
-   * Tries to gain a nice formatting, e.g., {@link Class}es are
+   * 
+   * <p>Tries to gain a nice formatting, e.g., {@link Class}es are
    * represented by their simple name.
+   * <p>NOTE: THIS METHOD IS FOR *NICE* FORMATTED RANGES.
+   * IT IS *NOT* FOR ARGUMENT PARSING OR OTHER REAL
+   * USES (EXCEPT SYSOUTS/ HELP/ ETC.).
+   * See {@link #toRangeString(Iterable)} for argument parsing and others! 
    * @param <Type>
    * @param acceptedObjects - a simple list of all acceptable objects.
    * @return String
@@ -826,11 +831,14 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     Iterable<Type> accObjects = acceptedObjects;
     Iterator<Type> iterator = acceptedObjects.iterator();
     
+    /* 
+     */
+    
     //If the range consists of classes, use the simple class names
     if ((acceptedObjects != null) && iterator.hasNext() && (Class.class.isAssignableFrom(iterator.next().getClass()))) {
       List<Type> classStrings = new LinkedList<Type>();
       for (Type object : acceptedObjects) {
-        // Not that this is only for a presentation to a user, not for the "real" RangeString.
+        // Note that this is only for a presentation to a user, not for the "real" RangeString.
         classStrings.add((Type) ((Class<Type>) object).getSimpleName());
       }
       accObjects = classStrings;

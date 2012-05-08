@@ -915,7 +915,7 @@ public class KeggAdaptor {
       } catch (RemoteException e) {
         retried++;
         if (retried >= 3)
-          throw new TimeoutException();
+          throw new TimeoutException(e.getMessage());
       }
     }
 

@@ -1527,12 +1527,40 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @throws BackingStoreException
 	 */
 	public void save(Properties props) throws BackingStoreException {
-		if (!defaults.equals(props)) {
-			for (Map.Entry<Object, Object> e : props.entrySet()) {
-				prefs.put(e.getKey().toString(), e.getValue().toString());
-			}
-			prefs.flush();
-		}
+	  if (!defaults.equals(props)) {
+	    for (Map.Entry<Object, Object> e : props.entrySet()) {
+	      prefs.put(e.getKey().toString(), e.getValue().toString());
+	    }
+	    prefs.flush();
+	  }
+	}
+	
+	/**
+	 * Same as {@link #save(Properties)}, but only stores {@link Properties}
+	 * from <code>props</code>, that are contained in the {@link #keyProvider}!
+	 * @param props
+	 * @throws BackingStoreException
+	 */
+	@SuppressWarnings("rawtypes")
+	public void saveContainedOptions(Properties props) throws BackingStoreException {
+	  if (!defaults.equals(props)) {
+	    
+	    // Create a set of all contained options
+	    List<Option> optionList = KeyProvider.Tools.optionList(keyProvider);
+	    Set<String> options = new HashSet<String>();
+	    for (Option o: optionList) {
+	      options.add(o.toString());
+	    }
+	    
+	    // Put all contained options
+	    for (Map.Entry<Object, Object> e : props.entrySet()) {
+	      String keyString = e.getKey().toString();
+	      if (options.contains(keyString)) {
+	        prefs.put(keyString, e.getValue().toString());
+	      }
+	    }
+	    prefs.flush();
+	  }
 	}
 	
 	/**
@@ -1566,6 +1594,25 @@ public class SBPreferences implements Map<Object, Object> {
 	  }
 	}
 	
+	 /**
+   * This method restores the default value for all keys that
+   * have a default value.
+   */
+  @SuppressWarnings("rawtypes")
+  public void restoreDefaults() {
+    Iterator<Option> iterator = optionIterator();
+    Option<?> option;
+    while (iterator.hasNext()) {
+      option = iterator.next();
+      
+      Object defaultV = option.getDefaultValue();
+      if (defaultV!=null) {
+        logger.fine(String.format("Restored default value \"%s\" for %s in %s", (defaultV == null ? "NULL" : defaultV) , option, keyProvider));
+        put(option, defaultV);
+      }
+    }
+  }
+  
 	/* (non-Javadoc)
 	 * @see java.util.Map#size()
 	 */

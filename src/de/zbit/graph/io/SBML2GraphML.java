@@ -21,6 +21,7 @@
 package de.zbit.graph.io;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -65,6 +66,7 @@ import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.graph.sbgn.CloneMarker;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.math.MathUtils;
+import de.zbit.util.Utils;
 import de.zbit.util.objectwrapper.ValuePair;
 
 /**
@@ -96,7 +98,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * {@link Reaction}) to the corresponding {@link BoundingBox}.
    * TODO: Actually, one species can have multiple glyphs. This is not considered here.
    */
-  private Map<String, BoundingBox> id2layoutMap = null;
+  private Map<String, Collection<BoundingBox>> id2layoutMap = null;
   
   /**
    * This map helps to enhance the reactionNode-layout, after the graph
@@ -135,7 +137,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * @return
    */
   public Map<String, LinkedList<Edge>> getId2edge(){
-      return id2edge;
+    return id2edge;
   }
   
   /**
@@ -144,7 +146,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   public boolean isQualModel() {
     return showQualModel;
   }
-
+  
   /**
    * @param showQualModel <code>TRUE</code> if the qual model should
    * be converted, instead of the metabolic model.
@@ -179,7 +181,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     
     // Eventually get the layout extension
     parseLayoutInformation(document, species);
-
+    
     // Support for the groups extension
     species = parseGroupInformation(document, species);
     
@@ -204,8 +206,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     
     return;
   }
-
-
+  
+  
   /**
    * Fix ReactionNode nodes (determines 90° rotatable node orientation).
    * @param reaction2node
@@ -229,9 +231,9 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       en.getValue().fixLayout(reactants, products, modifier);      
     }
   }
-
   
-
+  
+  
   /**
    * Creates edges and pseude-reaction nodes (using {@link ReactionNodeRealizer})
    * and enzymes (also cloning them), etc. to visualize
@@ -247,9 +249,9 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     Set<Node> usedEnzymes = new HashSet<Node>();
     
     for (Reaction r : document.getModel().getListOfReactions()) {
-        // List all edges corresponding to the same Reaction
-        LinkedList<Edge> listOfEdges = new LinkedList<Edge>();
-        
+      // List all edges corresponding to the same Reaction
+      LinkedList<Edge> listOfEdges = new LinkedList<Edge>();
+      
       if (r.isSetListOfReactants() && r.isSetListOfProducts()) {
         
         // Create the reaction node
@@ -262,7 +264,9 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         double x=Double.NaN;
         double y=Double.NaN;
         if (useLayoutExtension) {
-          BoundingBox g = id2layoutMap.get(r.getId());
+          // reactions can not have mutliple glyphs... take first!
+          Collection<BoundingBox> layout = id2layoutMap.get(r.getId());
+          BoundingBox g = layout!=null && layout.size()>0?layout.iterator().next():null;
           if (g!=null) {
             if (g.isSetDimensions()) {
               nr.setWidth(g.getDimensions().getWidth());
@@ -302,7 +306,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             Edge e = simpleGraph.createEdge(source, rNode);
             GraphElement2SBid.put(e, r.getId());
             listOfEdges.add(e);
-//            System.out.println("ADDED " + e + " with " + r.getId());
+            //            System.out.println("ADDED " + e + " with " + r.getId());
             EdgeRealizer er = simpleGraph.getRealizer(e);
             if (r.isReversible()) {
               er.setSourceArrow(Arrow.STANDARD);
@@ -311,17 +315,17 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             }
             er.setArrow(Arrow.NONE);
             
-
+            
           }
         }
-
+        
         for (SpeciesReference sr : r.getListOfProducts()) {
           Node target = id2node.get(sr.getSpecies());
           if (target!=null) {
             Edge e = simpleGraph.createEdge(rNode, target);
             GraphElement2SBid.put(e, r.getId());
             listOfEdges.add(e);
-//            System.out.println("ADDED " + e + " with " + r.getId());
+            //            System.out.println("ADDED " + e + " with " + r.getId());
             EdgeRealizer er = simpleGraph.getRealizer(e);
             er.setArrow(Arrow.STANDARD);
             er.setSourceArrow(Arrow.NONE);
@@ -350,7 +354,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             Edge e = simpleGraph.createEdge(source, rNode);
             GraphElement2SBid.put(e, r.getId());
             listOfEdges.add(e);
-//            System.out.println("ADDED " + e + " with " + r.getId());
+            //            System.out.println("ADDED " + e + " with " + r.getId());
             EdgeRealizer er = simpleGraph.getRealizer(e);
             er.setArrow(Arrow.TRANSPARENT_CIRCLE);
             er.setLineType(LineType.LINE_1);
@@ -366,8 +370,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     
     return reaction2node;
   }
-
-
+  
+  
   /**
    * @param document
    * @param species
@@ -390,51 +394,87 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       } else if (s.isSetSBOTerm()) {
         sboTerm = s.getSBOTerm();
       }
-
       
-      // Initialize default layout variables
-      double x = Double.NaN;
-      double y = Double.NaN;
-      double w = 46;
-      double h = 17;
       
-      // Get information from the layout extension
+      // Eventually create multiple copies
+      List<BoundingBox> layouts = null;
+      boolean multipleCopiesAvailable=false;
+      
       if (useLayoutExtension) {
-        BoundingBox g = id2layoutMap.get(s.getId());
-        if (g != null) {
-          if (g.isSetDimensions()) {
-            w = g.getDimensions().getWidth();
-            h = g.getDimensions().getHeight();
-          }
-          if (g.isSetPosition()) {
-            // Ignore 0|0 positions. They're due to default values
-            if ((g.getPosition().getX() != 0d) || (g.getPosition().getY() != 0d)) {
-              x = g.getPosition().getX();
-              y = g.getPosition().getY();
-            }
-          }
+        Collection<BoundingBox> layoutsTemp = id2layoutMap.get(s.getId());
+        multipleCopiesAvailable = layoutsTemp!=null && layoutsTemp.size()>1;
+        /*
+         * Feature Deactivated until problems are resolved:
+         * - id2node and GraphElement2SBid maps (in SB_2GraphML) only take one node
+         * for each species
+         * - when visualization reactions/ relations, we don't know which of the
+         * multiple glyphs to use!
+         * 
+         * If these two problems are completely solved, we can reactive
+         * multiple glyphs for one species.
+         */
+        multipleCopiesAvailable = false;
+        if (layoutsTemp!=null) {
+          layouts = new ArrayList<BoundingBox>(layoutsTemp); // Convert to list
+          
         }
       }
       
-      // Now create the real node
-      if ((s instanceof Group) && ((Group) s).isSetListOfMembers()) {
-        // Create a group node (SBML-groups extension)
-        int size = ((Group) s).getListOfMembers().size();
-        String[] groupMembers = new String[size];
-        for (int i=0; i < size; i++) {
-          groupMembers[i] = ((Group) s).getMember(i).getSymbol();
-        }
-        createGroupNode(s.getId(), s.getName(), sboTerm, x, y, w, h, groupMembers);
+      for (int aktNode = 0; aktNode < (multipleCopiesAvailable?layouts.size():1); aktNode++) {
         
-      } else {
-        // A simple, normal node.
-      	// If no name is set, use the ID as label. Better than nothing.
-        createNode(s.getId(), s.isSetName() ? s.getName() : s.getId(), sboTerm, x, y, w, h);
+        // Initialize default layout variables
+        double x=Double.NaN;
+        double y=Double.NaN;
+        double w=46;
+        double h=17;
+        
+        // Get information from the layout extension
+        if (useLayoutExtension && layouts!=null) {
+          BoundingBox g = layouts.get(aktNode);
+          if (g!=null) {
+            if (g.isSetDimensions()) {
+              w = g.getDimensions().getWidth();
+              h = g.getDimensions().getHeight();
+            }
+            if (g.isSetPosition()) {
+              // Ignore 0|0 positions. They're due to default values
+              if (g.getPosition().getX()!=0d || g.getPosition().getY()!=0d) {
+                x = g.getPosition().getX();
+                y = g.getPosition().getY();
+              }
+            }
+          }
+          
+        }
+        
+        // Now create the real node
+        Node n;
+        if (s instanceof Group && ((Group) s).isSetListOfMembers()) {
+          // Create a group node (SBML-groups extension)
+          int size = ((Group)s).getListOfMembers().size();
+          String[] groupMembers = new String[size];
+          for (int i=0; i < size; i++) {
+            groupMembers[i] = ((Group)s).getMember(i).getSymbol();
+          }
+          n = createGroupNode(s.getId(), s.getName(), sboTerm, x, y, w, h, groupMembers);
+          
+        } else {
+          // A simple, normal node.
+          n = createNode(s.getId(), s.isSetName() ? s.getName() : s.getId(), sboTerm, x, y, w, h);
+        }
+        
+        // Eventually setip the clone marker
+        if (multipleCopiesAvailable) {
+          NodeRealizer nr = simpleGraph.getRealizer(n);
+          if (nr instanceof CloneMarker) {
+            ((CloneMarker) nr).setNodeIsCloned(true);
+          }
+        }
       }
     }
   }
-
-
+  
+  
   /**
    * Parses the layout information from the given <code>document</code>.
    * This will set the {@link #useLayoutExtension} and
@@ -444,7 +484,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   private void parseLayoutInformation(SBMLDocument document) {
     parseLayoutInformation(document, null);
   }
-
+  
   /**
    * Parses the layout information from the given <code>document</code>.
    * This will set the {@link #useLayoutExtension} and
@@ -483,19 +523,19 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
               // TODO: Implement the same getSpecies check also for QUAL.
             }
           }
-              
+          
         }
         
         // Parse layout and establish internal maps
-        id2layoutMap = new HashMap<String, BoundingBox>();
+        id2layoutMap = new HashMap<String, Collection<BoundingBox>>();
         for (SpeciesGlyph sg: l.getListOfSpeciesGlyphs()) {
           if (sg.isSetBoundingBox()) {
-            id2layoutMap.put(sg.getSpecies(), sg.getBoundingBox());
+            Utils.addToMapOfSets(id2layoutMap, sg.getSpecies(), sg.getBoundingBox());
           }
         }
         for (ReactionGlyph sg: l.getListOfReactionGlyphs()) {
           if (sg.isSetBoundingBox()) {
-            id2layoutMap.put(sg.getReaction(), sg.getBoundingBox());
+            Utils.addToMapOfSets(id2layoutMap, sg.getReaction(), sg.getBoundingBox());
           }
         }
         useLayoutExtension = id2layoutMap.size()>0;
@@ -534,8 +574,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     
     return species;
   }
-
-
+  
+  
   /**
    * Look for a species with a specific id.
    * <p>Note: this is a standard-slow iterative approach.</p>
@@ -553,7 +593,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     }
     return false;
   }
-
+  
   /**
    * @param t
    */
@@ -589,9 +629,9 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       }
     }
   }
-
-
-
+  
+  
+  
   /* (non-Javadoc)
    * @see de.zbit.kegg.io.SB_2GraphML#isAnyLayoutInformationAvailable()
    */
@@ -599,8 +639,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   protected boolean isAnyLayoutInformationAvailable() {
     return useLayoutExtension;
   }
-
-
+  
+  
   
   /**
    * First, calculates the mean of all x/y coordinates of all
@@ -623,7 +663,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     
     return new ValuePair<Double, Double>(MathUtils.mean(subs.getA(), prod.getA()), MathUtils.mean(subs.getB(), prod.getB()));
   }
-
+  
   /**
    * Calculates the mean x and y coordinates.
    * @param <T>
@@ -653,7 +693,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     return new ValuePair<Double, Double>(MathUtils.mean(xes), MathUtils.mean(yes));
   }
   
-
+  
   /**
    * Create a list of species (by identifier) that 
    * show an enzymatic activity. 
