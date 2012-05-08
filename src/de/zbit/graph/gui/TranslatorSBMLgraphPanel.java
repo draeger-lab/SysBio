@@ -298,100 +298,11 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   
   
   /**
-   * experimental, do not use
-   * @param id
-   * @param valueForGraph
-   * @param realValue
-   * @param labels
-   */
-  public void dynamicChangeOfNode(String id, double valueForGraph, double realValue, boolean labels) {
-      NodeRealizer nr = converter.getSimpleGraph().getRealizer(
-              converter.getId2node().get(id));
-      nr.setSize(valueForGraph, valueForGraph);
-      nr.setFillColor(new Color(176, 226, 255));
-
-      /*
-       * Label Node with ID and real value at this timepoint.
-       * Last label will be treated as dynamic label
-       */
-      if (labels) {
-          if (nr.labelCount() > 1) {
-              nr.getLabel(nr.labelCount() - 1).setText(MessageFormat.format("{0}: {1,number,0.0000}", new Object[]{id, realValue}));
-          }else{
-              nr.addLabel(new NodeLabel(MessageFormat.format("{0}: {1,number,0.0000}", new Object[]{id, realValue})));
-              NodeLabel nl = nr.getLabel(nr.labelCount() - 1);
-              nl.setModel(NodeLabel.SIDES);
-              nl.setPosition(NodeLabel.S); // South of node
-              nl.setDistance(-3);
-          }
-      }else if (nr.labelCount() > 1) {
-          // labels switched off, therefore remove them, if there are any
-          nr.removeLabel(nr.getLabel(nr.labelCount()-1));
-      }
-      converter.getSimpleGraph().updateViews();
-  }
-  
-  /**
-   * experimental do not use
-   * 
-   * TODO: As this method is not for general SBML visualization,
-   * please move it to another (better fitting) calss.
-   * E.g. DynamicView!
-   * 
-   * @param id
-   * @param value
-   */
-  public void dynamicChangeOfReaction(String id, double value) {
-    //      System.out.println("start");
-    //      for (Entry<String, LinkedList<Edge>> entry : converter.getId2edge().entrySet()) {
-    //          System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-    //      }
-    //      System.out.println("ende");
-    LinkedList<Edge> listOfEdges = converter.getId2edge().get(id);
-    for (Edge e : listOfEdges){
-      float valueF = (float) value;
-      LineType currLinetype = converter.getSimpleGraph().getRealizer(e)
-      .getLineType();
-      LineType newLineType = LineType.createLineType(valueF,
-        currLinetype.getEndCap(), 
-        currLinetype.getLineJoin(),
-        currLinetype.getMiterLimit(),
-        currLinetype.getDashArray(),
-        currLinetype.getDashPhase());
-      converter.getSimpleGraph().getRealizer(e).setLineType(newLineType);
-    }
-  }
-  
-  /**
    * 
    * @return
    */
   public SBML2GraphML getConverter() {
     return converter;
-  }
-  
-  /**
-   * experimental do not use
-   * 
-   * TODO: As this method is not for general SBML visualization,
-   * please move it to another (better fitting) calss.
-   * E.g. DynamicView!
-   * 
-   * @param id
-   */
-  public void notSelected(String id) {
-    if (converter.getId2node().get(id) != null) {
-      NodeRealizer nr = converter.getSimpleGraph().getRealizer(
-        converter.getId2node().get(id));
-      nr.setSize(8, 8);
-      nr.setFillColor(Color.LIGHT_GRAY);
-      
-      if (nr.labelCount() > 1) {
-        //if not selected disable label
-        nr.removeLabel(nr.getLabel(nr.labelCount()-1));
-      }
-    }
-    converter.getSimpleGraph().updateViews();
   }
   
 }
