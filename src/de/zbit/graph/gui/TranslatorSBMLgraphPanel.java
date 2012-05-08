@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -304,32 +305,30 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * @param labels
    */
   public void dynamicChangeOfNode(String id, double valueForGraph, double realValue, boolean labels) {
-    NodeRealizer nr = converter.getSimpleGraph().getRealizer(
-      converter.getId2node().get(id));
-    nr.setSize(valueForGraph, valueForGraph);
-    nr.setFillColor(Color.CYAN);
-    
-    /*
-     * Label Node with ID and real value at this timepoint.
-     * Last label will be treated as dynamic label
-     */
-    NumberFormat round = NumberFormat.getInstance();
-    round.setMaximumFractionDigits(4); //round to four digits
-    if (labels) {
-      if (nr.labelCount() > 1) {
-        nr.getLabel(nr.labelCount() - 1).setText(id + ": " + round.format(realValue));
-      }else{
-        nr.addLabel(new NodeLabel(id + ": " + round.format(realValue)));
-        NodeLabel nl = nr.getLabel(nr.labelCount() - 1);
-        nl.setModel(NodeLabel.SIDES);
-        nl.setPosition(NodeLabel.S); // South of node
-        nl.setDistance(-3);
+      NodeRealizer nr = converter.getSimpleGraph().getRealizer(
+              converter.getId2node().get(id));
+      nr.setSize(valueForGraph, valueForGraph);
+      nr.setFillColor(new Color(176, 226, 255));
+
+      /*
+       * Label Node with ID and real value at this timepoint.
+       * Last label will be treated as dynamic label
+       */
+      if (labels) {
+          if (nr.labelCount() > 1) {
+              nr.getLabel(nr.labelCount() - 1).setText(MessageFormat.format("{0}: {1,number,0.0000}", new Object[]{id, realValue}));
+          }else{
+              nr.addLabel(new NodeLabel(MessageFormat.format("{0}: {1,number,0.0000}", new Object[]{id, realValue})));
+              NodeLabel nl = nr.getLabel(nr.labelCount() - 1);
+              nl.setModel(NodeLabel.SIDES);
+              nl.setPosition(NodeLabel.S); // South of node
+              nl.setDistance(-3);
+          }
+      }else if (nr.labelCount() > 1) {
+          // labels switched off, therefore remove them, if there are any
+          nr.removeLabel(nr.getLabel(nr.labelCount()-1));
       }
-    }else if (nr.labelCount() > 1) {
-      // labels switched off, therefore remove them, if there are any
-      nr.removeLabel(nr.getLabel(nr.labelCount()-1));
-    }
-    converter.getSimpleGraph().updateViews();
+      converter.getSimpleGraph().updateViews();
   }
   
   /**
