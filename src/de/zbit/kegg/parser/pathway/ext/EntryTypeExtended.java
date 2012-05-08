@@ -62,6 +62,10 @@ public enum EntryTypeExtended {
   /**
    * Actually not required. Same as {@link EntryType#other}.
    */
-  unknown;
+  unknown,
+  /**
+	* defines an empty set
+    */
+  emptySet;
 
 }
