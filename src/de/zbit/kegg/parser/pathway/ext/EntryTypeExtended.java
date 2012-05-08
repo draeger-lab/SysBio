@@ -60,12 +60,12 @@ public enum EntryTypeExtended {
    */
   rna,
   /**
+   * defines an empty set
+   */
+  emptySet,
+  /**
    * Actually not required. Same as {@link EntryType#other}.
    */
-  unknown,
-  /**
-	* defines an empty set
-    */
-  emptySet;
+  unknown;
 
 }

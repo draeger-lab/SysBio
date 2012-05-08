@@ -75,8 +75,11 @@ import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
+import org.sbml.jsbml.util.StringTools;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
+
+import com.sun.org.apache.xml.internal.serializer.utils.StringToIntTable;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.SystemBrowser;
@@ -608,6 +611,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 						sbase.getNotesString().lastIndexOf('/') - 1);
 			}
 			text = text.trim().replace("/>", ">");
+			
+			// As long as there is no solution that breaks text at window length,
+			// I am inserting these temporary line breaks.
+			text = StringUtil.insertLineBreaks(text, 120, "<br/>");
+			
 			if (!text.startsWith("<body") && !text.endsWith("</body>"))
 				text = "<body>" + text + "</body>";
 			JEditorPane notesArea = new JEditorPane("text/html",

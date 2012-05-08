@@ -21,6 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.Header;
+
 import de.zbit.util.StringUtil;
 
 
@@ -505,6 +507,52 @@ public class Graphics {
    */
   public boolean isDefaultPosition() {
     return x==0&&y==0;
+  }
+
+  /**
+   * Tries to establish some reasonable initial defaults for
+   * {@link #width}, {@link #height}, {@link #type}, {@link #fgcolor} and
+   * {@link #bgcolor}, based on an {@link EntryType}.
+   * @param type
+   */
+  public void setDefaults(EntryType type) {
+    if (type!=null) {
+      fgcolor="#000000";
+      bgcolor="#FFFFFF";
+      
+      switch(type) {
+        case compound:
+          width=8;
+          height=8;
+          this.type = GraphicsType.circle;
+          break;
+        case ortholog:
+        case other:
+        case reaction:
+        case enzyme:
+        case gene:
+          width=46;
+          height=17;
+          bgcolor="#BFFFBF";
+          this.type = GraphicsType.rectangle;
+          break;
+        case genes:
+        case group:
+          // Hard to give defaults here
+          width=46;
+          height=34;
+          fgcolor="#000000";
+          bgcolor="#FFFFFF";
+          this.type = GraphicsType.rectangle;
+          break;
+        case map:
+          // Hard to give defaults here
+          width=76;
+          height=71;
+          this.type = GraphicsType.roundrectangle;
+          break;        
+      }
+    }
   }
   
 }

@@ -37,7 +37,9 @@ import y.base.NodeCursor;
 import y.base.NodeMap;
 import y.base.YCursor;
 import y.io.IOHandler;
+import y.layout.CanonicMultiStageLayouter;
 import y.layout.Layouter;
+import y.layout.MinNodeSizeStage;
 import y.layout.organic.SmartOrganicLayouter;
 import y.view.EdgeLabel;
 import y.view.Graph2D;
@@ -54,6 +56,7 @@ import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
+import de.zbit.kegg.parser.pathway.GraphicsType;
 
 /**
  * Various tools for {@link Graph2D} and also for
@@ -168,6 +171,13 @@ public class GraphTools {
 //    layouter.setCompactness(0.7d);
 //    layouter.setNodeSizeAware(true);
     
+    // Layouts raise an exception if nodes have 0 width or height
+    // => Ensure minimum node size
+    if (layouter instanceof CanonicMultiStageLayouter) {
+      ((CanonicMultiStageLayouter) layouter).prependStage(new MinNodeSizeStage(layouter, 1, 1));
+    }
+    
+    // Do actual layout
     try {
       Graph2DLayoutExecutor l = new Graph2DLayoutExecutor();
       l.doLayout(graph, layouter);
@@ -234,6 +244,11 @@ public class GraphTools {
     layouter.setCompactness(0.7d);
     layouter.setNodeSizeAware(true);
     
+    // Layouts raise an exception if nodes have 0 width or height
+    // => Ensure minimum node size
+    if (layouter instanceof CanonicMultiStageLayouter) {
+      ((CanonicMultiStageLayouter) layouter).prependStage(new MinNodeSizeStage(layouter, 1, 1));
+    }
     
 //    OrganicLayouter layouter = new OrganicLayouter();
 //    layouter.setSphereOfAction(OrganicLayouter.ONLY_SELECTION);
@@ -533,7 +548,8 @@ public class GraphTools {
     if (mapDescriptionMap==null) return null;
     for (int i=0; i<graph.getRegisteredNodeMaps().length; i++) {
       NodeMap nm = graph.getRegisteredNodeMaps()[i];
-      if (mapDescriptionMap.getV(nm).equals(descriptor)) {
+      String t = mapDescriptionMap.getV(nm);
+      if (t!=null && t.equals(descriptor)) {
         nodeMap = nm;
         break;
       }

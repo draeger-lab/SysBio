@@ -68,7 +68,7 @@ import de.zbit.util.NotifyingWorker;
  */
 public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocument> {
   private static final long serialVersionUID = 2361032893527709646L;
-
+  
   /**
    * The converter we used to generate the GraphML document
    * from our {@link SBMLDocument}.
@@ -80,51 +80,51 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * If true, shows the qual model.
    */
   private boolean showQualModel=false;
-
-//  /**
-//   * Create a new translator-panel and initiates the translation.
-//   * @param inputFile
-//   * @param outputFormat
-//   * @param translationResult
-//   */
-//  public TranslatorSBMLgraphPanel(File inputFile, ActionListener translationResult) {
-//    this(inputFile, "SBML", translationResult);
-//  }
-
-//  /**
-//   * Create a new translator-panel and initiates the translation.
-//   * @param inputFile
-//   * @param outputFormat
-//   * @param translationResult
-//   */
-//  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult) {
-//    super(inputFile, outputFormat, translationResult);
-//  }
-//
-//  /**
-//   * Initiates a download and translation of the given pathway.
-//   * @param pathwayID pathway identifier (e.g., "mmu00010")
-//   * @param outputFormat
-//   * @param translationResult
-//   */
-//  public TranslatorSBMLgraphPanel(String pathwayID, String outputFormat, ActionListener translationResult) {
-//    super(pathwayID, outputFormat, translationResult);
-//  }
-//  
-//  /**
-//   * Initiates a download and translation of the given pathway.
-//   * @param pathwayID pathway identifier (e.g., "mmu00010")
-//   * @param translationResult
-//   */
-//  public TranslatorSBMLgraphPanel(String pathwayID, ActionListener translationResult) {
-//    this(pathwayID, "SBML", translationResult);
-//  }
-//  
-//  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document) {
-//    this(inputFile, outputFormat, translationResult, document, false);
-//  }
-
-public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel) {
+  
+  //  /**
+  //   * Create a new translator-panel and initiates the translation.
+  //   * @param inputFile
+  //   * @param outputFormat
+  //   * @param translationResult
+  //   */
+  //  public TranslatorSBMLgraphPanel(File inputFile, ActionListener translationResult) {
+  //    this(inputFile, "SBML", translationResult);
+  //  }
+  
+  //  /**
+  //   * Create a new translator-panel and initiates the translation.
+  //   * @param inputFile
+  //   * @param outputFormat
+  //   * @param translationResult
+  //   */
+  //  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult) {
+  //    super(inputFile, outputFormat, translationResult);
+  //  }
+  //
+  //  /**
+  //   * Initiates a download and translation of the given pathway.
+  //   * @param pathwayID pathway identifier (e.g., "mmu00010")
+  //   * @param outputFormat
+  //   * @param translationResult
+  //   */
+  //  public TranslatorSBMLgraphPanel(String pathwayID, String outputFormat, ActionListener translationResult) {
+  //    super(pathwayID, outputFormat, translationResult);
+  //  }
+  //  
+  //  /**
+  //   * Initiates a download and translation of the given pathway.
+  //   * @param pathwayID pathway identifier (e.g., "mmu00010")
+  //   * @param translationResult
+  //   */
+  //  public TranslatorSBMLgraphPanel(String pathwayID, ActionListener translationResult) {
+  //    this(pathwayID, "SBML", translationResult);
+  //  }
+  //  
+  //  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document) {
+  //    this(inputFile, outputFormat, translationResult, document, false);
+  //  }
+  
+  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel) {
     super(inputFile, outputFormat, translationResult, document);
     this.showQualModel = showQualModel;
     
@@ -167,9 +167,9 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
     File inputFile, String outputFormat, ActionListener translationResult) {
     super(downloadORTranslateWorker, inputFile, outputFormat, translationResult);
   }
-
-
-
+  
+  
+  
   /* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#createGraphFromDocument(java.lang.Object)
    */
@@ -178,7 +178,7 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
     converter = new SBML2GraphML(showQualModel);
     return converter.createGraph(document);
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#getOutputFileFilterForRealDocument()
    */
@@ -188,21 +188,21 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
     ff.add(SBFileFilter.createSBMLFileFilter());
     return ff;
   }
-
-
+  
+  
   /* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#writeRealDocumentToFileUnchecked(java.io.File, java.lang.String)
    */
   @Override
   protected boolean writeRealDocumentToFileUnchecked(File file, String format)
-    throws Exception {
-//    if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file) || format.equals("tex") || format.equals("pdf")) {
-      // TODO: How to include SBML2LaTeX?
-//      TranslatorSBMLPanel.writeLaTeXReport(file, document);
-//      return true; // Void result... can't check.
-//    } else {
-      return ((KEGGtranslator<SBMLDocument>)getTranslator()).writeToFile(document, file.getPath());
-//    }
+  throws Exception {
+    //    if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file) || format.equals("tex") || format.equals("pdf")) {
+    // TODO: How to include SBML2LaTeX?
+    //      TranslatorSBMLPanel.writeLaTeXReport(file, document);
+    //      return true; // Void result... can't check.
+    //    } else {
+    return ((KEGGtranslator<SBMLDocument>)getTranslator()).writeToFile(document, file.getPath());
+    //    }
   }
   
   /* (non-Javadoc)
@@ -304,85 +304,95 @@ public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListe
    * @param labels
    */
   public void dynamicChangeOfNode(String id, double valueForGraph, double realValue, boolean labels) {
-        NodeRealizer nr = converter.getSimpleGraph().getRealizer(
-                converter.getId2node().get(id));
-        nr.setSize(valueForGraph, valueForGraph);
-        nr.setFillColor(Color.CYAN);
-
-        /*
-         * Label Node with ID and real value at this timepoint.
-         * Last label will be treated as dynamic label
-         */
-        NumberFormat round = NumberFormat.getInstance();
-        round.setMaximumFractionDigits(4); //round to four digits
-        if (labels) {
-            if (nr.labelCount() > 1) {
-                nr.getLabel(nr.labelCount() - 1).setText(id + ": " + round.format(realValue));
-            }else{
-                nr.addLabel(new NodeLabel(id + ": " + round.format(realValue)));
-                NodeLabel nl = nr.getLabel(nr.labelCount() - 1);
-                nl.setModel(NodeLabel.SIDES);
-                nl.setPosition(NodeLabel.S); // South of node
-                nl.setDistance(-3);
-            }
-        }else if (nr.labelCount() > 1) {
-            // labels switched off, therefore remove them, if there are any
-            nr.removeLabel(nr.getLabel(nr.labelCount()-1));
-        }
-        converter.getSimpleGraph().updateViews();
+    NodeRealizer nr = converter.getSimpleGraph().getRealizer(
+      converter.getId2node().get(id));
+    nr.setSize(valueForGraph, valueForGraph);
+    nr.setFillColor(Color.CYAN);
+    
+    /*
+     * Label Node with ID and real value at this timepoint.
+     * Last label will be treated as dynamic label
+     */
+    NumberFormat round = NumberFormat.getInstance();
+    round.setMaximumFractionDigits(4); //round to four digits
+    if (labels) {
+      if (nr.labelCount() > 1) {
+        nr.getLabel(nr.labelCount() - 1).setText(id + ": " + round.format(realValue));
+      }else{
+        nr.addLabel(new NodeLabel(id + ": " + round.format(realValue)));
+        NodeLabel nl = nr.getLabel(nr.labelCount() - 1);
+        nl.setModel(NodeLabel.SIDES);
+        nl.setPosition(NodeLabel.S); // South of node
+        nl.setDistance(-3);
+      }
+    }else if (nr.labelCount() > 1) {
+      // labels switched off, therefore remove them, if there are any
+      nr.removeLabel(nr.getLabel(nr.labelCount()-1));
+    }
+    converter.getSimpleGraph().updateViews();
   }
   
   /**
    * experimental do not use
+   * 
+   * TODO: As this method is not for general SBML visualization,
+   * please move it to another (better fitting) calss.
+   * E.g. DynamicView!
+   * 
    * @param id
    * @param value
    */
   public void dynamicChangeOfReaction(String id, double value) {
-//      System.out.println("start");
-//      for (Entry<String, LinkedList<Edge>> entry : converter.getId2edge().entrySet()) {
-//          System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-//      }
-//      System.out.println("ende");
-      LinkedList<Edge> listOfEdges = converter.getId2edge().get(id);
-        for (Edge e : listOfEdges){
-            float valueF = (float) value;
-            LineType currLinetype = converter.getSimpleGraph().getRealizer(e)
-                    .getLineType();
-            LineType newLineType = LineType.createLineType(valueF,
-                    currLinetype.getEndCap(), 
-                    currLinetype.getLineJoin(),
-                    currLinetype.getMiterLimit(),
-                    currLinetype.getDashArray(),
-                    currLinetype.getDashPhase());
-            converter.getSimpleGraph().getRealizer(e).setLineType(newLineType);
-      }
+    //      System.out.println("start");
+    //      for (Entry<String, LinkedList<Edge>> entry : converter.getId2edge().entrySet()) {
+    //          System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+    //      }
+    //      System.out.println("ende");
+    LinkedList<Edge> listOfEdges = converter.getId2edge().get(id);
+    for (Edge e : listOfEdges){
+      float valueF = (float) value;
+      LineType currLinetype = converter.getSimpleGraph().getRealizer(e)
+      .getLineType();
+      LineType newLineType = LineType.createLineType(valueF,
+        currLinetype.getEndCap(), 
+        currLinetype.getLineJoin(),
+        currLinetype.getMiterLimit(),
+        currLinetype.getDashArray(),
+        currLinetype.getDashPhase());
+      converter.getSimpleGraph().getRealizer(e).setLineType(newLineType);
+    }
   }
- 
+  
   /**
    * 
    * @return
    */
-	public SBML2GraphML getConverter() {
-		return converter;
-	}
+  public SBML2GraphML getConverter() {
+    return converter;
+  }
   
   /**
    * experimental do not use
+   * 
+   * TODO: As this method is not for general SBML visualization,
+   * please move it to another (better fitting) calss.
+   * E.g. DynamicView!
+   * 
    * @param id
    */
   public void notSelected(String id) {
-      if (converter.getId2node().get(id) != null) {
-          NodeRealizer nr = converter.getSimpleGraph().getRealizer(
-                  converter.getId2node().get(id));
-          nr.setSize(8, 8);
-          nr.setFillColor(Color.LIGHT_GRAY);
-          
-          if (nr.labelCount() > 1) {
-              //if not selected disable label
-              nr.removeLabel(nr.getLabel(nr.labelCount()-1));
-          }
+    if (converter.getId2node().get(id) != null) {
+      NodeRealizer nr = converter.getSimpleGraph().getRealizer(
+        converter.getId2node().get(id));
+      nr.setSize(8, 8);
+      nr.setFillColor(Color.LIGHT_GRAY);
+      
+      if (nr.labelCount() > 1) {
+        //if not selected disable label
+        nr.removeLabel(nr.getLabel(nr.labelCount()-1));
       }
-      converter.getSimpleGraph().updateViews();
+    }
+    converter.getSimpleGraph().updateViews();
   }
-
+  
 }

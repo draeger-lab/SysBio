@@ -66,10 +66,10 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  */
 public abstract class TranslatorGraphLayerPanel <DocumentType> extends TranslatorPanel<DocumentType> {
-	
-	/**
-	 * Generated serial version identifier.
-	 */
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = 3437289245211176473L;
   
   /**
@@ -88,20 +88,20 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * The current pane on which the {@link #graphLayer} is visualized.
    */
   Graph2DView pane;
-
+  
   /**
-	 * @return the pane
-	 */
-	public Graph2DView getGraph2DView() {
-		return pane;
-	}
-
-	/**
+   * @return the pane
+   */
+  public Graph2DView getGraph2DView() {
+    return pane;
+  }
+  
+  /**
    * This allows extending classes to build a panel with detailed
    * information that is shown on node-selection.
    */
   private JScrollPane detailPanel=null;
-
+  
   /**
    * Thread that updates the detail panel.
    */
@@ -113,8 +113,8 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * the corresponding panel.
    */
   private GraphBackgroundImageProvider imageProvider = null;
-
-
+  
+  
   /**
    * @return all available output file formats for GraphML files.
    */
@@ -133,46 +133,46 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   }
   
   
-//  /**
-//   * Create a new translator-panel and initiates the translation.
-//   * @param inputFile
-//   * @param outputFormat
-//   * @param translationResult
-//   */
-//  public TranslatorGraphLayerPanel(File inputFile, ActionListener translationResult) {
-//    this(inputFile, "JPG", translationResult);
-//  }
-//
-//  /**
-//   * Create a new translator-panel and initiates the translation.
-//   * @param inputFile
-//   * @param outputFormat
-//   * @param translationResult
-//   */
-//  public TranslatorGraphLayerPanel(File inputFile, String outputFormat,
-//    ActionListener translationResult) {
-//    super(inputFile, outputFormat, translationResult);
-//  }
-//
-//  /**
-//   * Initiates a download and translation of the given pathway.
-//   * @param pathwayID pathway identifier (e.g., "mmu00010")
-//   * @param outputFormat
-//   * @param translationResult
-//   */
-//  public TranslatorGraphLayerPanel(String pathwayID, String outputFormat,
-//    ActionListener translationResult) {
-//    super(pathwayID, outputFormat, translationResult);
-//  }
-//  
-//  /**
-//   * Initiates a download and translation of the given pathway.
-//   * @param pathwayID
-//   * @param translationResult
-//   */
-//  public TranslatorGraphLayerPanel(String pathwayID, ActionListener translationResult) {
-//    this(pathwayID, "JPG", translationResult);
-//  }
+  //  /**
+  //   * Create a new translator-panel and initiates the translation.
+  //   * @param inputFile
+  //   * @param outputFormat
+  //   * @param translationResult
+  //   */
+  //  public TranslatorGraphLayerPanel(File inputFile, ActionListener translationResult) {
+  //    this(inputFile, "JPG", translationResult);
+  //  }
+  //
+  //  /**
+  //   * Create a new translator-panel and initiates the translation.
+  //   * @param inputFile
+  //   * @param outputFormat
+  //   * @param translationResult
+  //   */
+  //  public TranslatorGraphLayerPanel(File inputFile, String outputFormat,
+  //    ActionListener translationResult) {
+  //    super(inputFile, outputFormat, translationResult);
+  //  }
+  //
+  //  /**
+  //   * Initiates a download and translation of the given pathway.
+  //   * @param pathwayID pathway identifier (e.g., "mmu00010")
+  //   * @param outputFormat
+  //   * @param translationResult
+  //   */
+  //  public TranslatorGraphLayerPanel(String pathwayID, String outputFormat,
+  //    ActionListener translationResult) {
+  //    super(pathwayID, outputFormat, translationResult);
+  //  }
+  //  
+  //  /**
+  //   * Initiates a download and translation of the given pathway.
+  //   * @param pathwayID
+  //   * @param translationResult
+  //   */
+  //  public TranslatorGraphLayerPanel(String pathwayID, ActionListener translationResult) {
+  //    this(pathwayID, "JPG", translationResult);
+  //  }
   
   /**
    * Use this constructor if the document has already been translated. This
@@ -244,7 +244,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     return imageProvider!=null;
   }
   
-
+  
   /* (non-Javadoc)
    * @see javax.swing.JComponent#setEnabled(boolean)
    */
@@ -272,7 +272,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     //((Graph2D)document).updateViews();
   }
   
-
+  
   /* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorPanel#createTabContent()
    */
@@ -314,7 +314,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
       JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pane, detailPanel);
       splitPane.setOneTouchExpandable(false);
       splitPane.setResizeWeight(0.8); // Make graph max visible
-
+      
       
       add(splitPane);
     } else {
@@ -362,7 +362,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     } catch (Throwable t) {} // Not really a problem
     pane.setFitContentOnResize(true);
   }
-
+  
   
   /**
    * Check if all nodes lay at the same X position.
@@ -383,8 +383,8 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     }
     return true;
   }
-
-
+  
+  
   /**
    * Please see {@link #updateDetailPanel(JPanel, HitInfo)}.
    * Please USE this method, BUT overwrite {@link #updateDetailPanel(JScrollPane, HitInfo)}!
@@ -416,7 +416,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     detailPanelUpdater = new Thread(buildDetailPanel);
     detailPanelUpdater.start();
   }
-
+  
   /**
    * Only if {@link #isDetailPanelAvailable()}, update the {@link #detailPanel}
    * to match current selection.
@@ -429,8 +429,8 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   protected void updateDetailPanel(JScrollPane detailPanel, HitInfo clickedObjects) {
     // Detail panel is disabled by default.
   }
-
-
+  
+  
   /**
    * Return true if not only the graph, but also a detail panel
    * that is activated on node-click should be visualized.
@@ -445,15 +445,15 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   public boolean isDetailPanelAvailable() {
     return false;
   }
-
-
+  
+  
   /**
    * Convert the given document to a visualizable graph file.
    * @param document
    * @return
    */
   protected abstract Graph2D createGraphFromDocument(DocumentType document);
-
+  
   
   /* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorPanel#getOutputFileFilter()
@@ -483,7 +483,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @return
    */
   protected abstract List<FileFilter> getOutputFileFilterForRealDocument();
-
+  
   
   /* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorPanel#writeToFileUnchecked(java.io.File, java.lang.String)
@@ -536,7 +536,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @throws Exception
    */
   protected abstract boolean writeRealDocumentToFileUnchecked(File file, String format) throws Exception;
-
-
+  
+  
   
 }
