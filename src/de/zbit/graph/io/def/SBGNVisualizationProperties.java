@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sbml.jsbml.SBO;
+
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import de.zbit.graph.sbgn.ComplexNode;
@@ -69,11 +71,7 @@ public class SBGNVisualizationProperties {
    * Other SBO terms that should be visualized in the same manner as {@link #macromolecule}.
    */
   private static final int[] macromolecule_synonyms = new int[]{248, 249, 246, 251, 252, 250};
-  
-  /**
-   * Empty set is used to represent the source of a creation process or the result of a degradation process.
-   */
-  private static final int emptyset = 291;
+
   /**
    * Simple chemicals (Ca2+,ATP, etc.)
    */
@@ -86,17 +84,6 @@ public class SBGNVisualizationProperties {
    */
   private static final int[] simpleChemical_synonyms = new int[]{327, 328};
   
-  
-  /**
-   * = informational molecule segment
-   * The Nucleic acid feature construct in SBGN is meant to represent a fragment
-   * of a macro- molecule carrying genetic information. A common use for this
-   * construct is to represent a gene or transcript. The label of this EPN and
-   * its units of information are often important for making the purpose clear
-   * to the reader of a map.
-   */
-  public static final int gene = 354;
-  
   public static final int materialEntityOfUnspecifiedNature = 285;
   
   /**
@@ -104,8 +91,6 @@ public class SBGNVisualizationProperties {
    */
   public static final int map = 552;
   public static final int submap = 395;
-  
-  public static final int nonCovalentComplex = 253;
   
   public static final int process = 375;
   public static final int omittedProcess = 397;
@@ -150,13 +135,13 @@ public class SBGNVisualizationProperties {
       sbo2shape.put(sbo, sbo2shape.get(simpleChemical));
     }
     
-    sbo2shape.put(gene, new NucleicAcidFeatureNode()); // nucleic acid feature - gene
+    sbo2shape.put(SBO.getGene(), new NucleicAcidFeatureNode()); // nucleic acid feature - gene
     sbo2shape.put(materialEntityOfUnspecifiedNature, new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE)); // unspecified - material entity of unspecified nature
     
-    sbo2shape.put(emptyset, new EmptyNode()); // empty set
-    sbo2shape.put(nonCovalentComplex, new ComplexNode()); // complex - non-covalent complex
-    for (int sbo:nonCovalentComplex_synonyms) {
-      sbo2shape.put(sbo, sbo2shape.get(nonCovalentComplex));
+    sbo2shape.put(SBO.getEmptySet(), new EmptyNode()); // empty set
+    sbo2shape.put(SBO.getNonCovalentComplex(), new ComplexNode()); // complex - non-covalent complex
+    for (int sbo : nonCovalentComplex_synonyms) {
+      sbo2shape.put(sbo, sbo2shape.get(SBO.getNonCovalentComplex()));
     }
     
     sbo2shape.put(map, new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.RECT)); // unspecified - empty set
@@ -183,19 +168,21 @@ public class SBGNVisualizationProperties {
    * @return the color of the appropriate shabe
    */
   private static Color getColor(int sboTerm) {
-    if (sboTerm == nonCovalentComplex ||
-        Arrays.binarySearch(nonCovalentComplex_synonyms, sboTerm)>=0) {
+    if ((sboTerm == SBO.getNonCovalentComplex()) ||
+        Arrays.binarySearch(nonCovalentComplex_synonyms, sboTerm) >= 0) {
       return new Color(24,116,205);    // DodgerBlue3
-    } else if (sboTerm == gene) {
-      return new Color( 255,255,0);    // Yellow
-    } else if (sboTerm == macromolecule ||
-        Arrays.binarySearch(macromolecule_synonyms, sboTerm)>=0) {
+    } else if (sboTerm == SBO.getGene()) {
+      return new Color(255,255,0);    // Yellow
+    } else if ((sboTerm == macromolecule) ||
+        Arrays.binarySearch(macromolecule_synonyms, sboTerm) >= 0) {
       return new Color(0,205,0);       // Green 3
-    } else if (sboTerm == simpleChemical ||
-        Arrays.binarySearch(simpleChemical_synonyms, sboTerm)>=0) {
+    } else if ((sboTerm == simpleChemical) ||
+        Arrays.binarySearch(simpleChemical_synonyms, sboTerm) >= 0) {
       return new Color(176,226,255);   // LightSkyBlue1
-    } else if (sboTerm == map || sboTerm == submap) {
+    } else if ((sboTerm == map) || (sboTerm == submap)) {
       return new Color(224,238,238);   // azure2
+    } else if (SBO.isChildOf(sboTerm, SBO.getEmptySet())) {
+    	return new Color(255, 204, 204);
     } else {
       return new Color(144,238,144);   // LightGreen
     }

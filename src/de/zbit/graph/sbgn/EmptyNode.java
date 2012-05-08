@@ -38,16 +38,23 @@ public class EmptyNode extends ShapeNodeRealizer implements SimpleCloneMarker {
 	 */
 	private boolean isClonedNode = false;
 
+	/**
+	 * 
+	 */
 	public EmptyNode() {
 		super(ShapeNodeRealizer.ELLIPSE);
 	}
 
+	/**
+	 * 
+	 * @param nr
+	 */
 	public EmptyNode(NodeRealizer nr) {
 		super(nr);
 		// If the given node realizer is of this type, then apply copy
 		// semantics.
 		if (nr instanceof EmptyNode) {
-			EmptyNode enr = (EmptyNode) nr;
+//			EmptyNode enr = (EmptyNode) nr;
 			// Copy the values of custom attributes (there are none).
 		}
 		if (nr instanceof CloneMarker) {
@@ -55,6 +62,10 @@ public class EmptyNode extends ShapeNodeRealizer implements SimpleCloneMarker {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+	 */
+	@Override
 	public NodeRealizer createCopy(NodeRealizer nr) {
 		return new EmptyNode(nr);
 	}
@@ -65,7 +76,8 @@ public class EmptyNode extends ShapeNodeRealizer implements SimpleCloneMarker {
 	@Override
 	protected void paintShapeBorder(Graphics2D gfx) {
 		gfx.setColor(getLineColor());
-		gfx.draw(getPath());
+		setWidth(getHeight());
+		super.paintShapeBorder(gfx);
 	}
 
 	/* (non-Javadoc)
@@ -73,31 +85,24 @@ public class EmptyNode extends ShapeNodeRealizer implements SimpleCloneMarker {
 	 */
 	@Override
 	protected void paintFilledShape(Graphics2D gfx) {
-		if (!isTransparent() && getFillColor() != null) {
-			gfx.setColor(Color.pink);
-			gfx.fill(getPath());
-
-			CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, getPath());
+		Color fillColor = getFillColor();
+		if (!isTransparent() && (fillColor != null)) {
+			// Create a filled circle
+			setWidth(getHeight());
+			gfx.setColor(fillColor);
+			super.paintFilledShape(gfx);
+			
+			// draw clone marker if needed
+			CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this,  shape);
+			
+			// Diagonal element:
+			gfx.setColor(getLineColor());
+			GeneralPath path = new GeneralPath();
+			path.moveTo(getX(), getY() + getHeight());
+			path.lineTo(getX() + getHeight(), getY());
+			path.closePath();
+			gfx.draw(path);
 		}
-	}
-
-	/**
-	 * @return
-	 */
-	protected GeneralPath getPath() {
-		double halfHeight = getHeight() / 2;
-		GeneralPath path = new GeneralPath();
-
-		path.moveTo(getX(), getY() + getHeight());
-		path.lineTo(getX() + getHeight(), getY());
-
-		path.moveTo(getX(), getY() + halfHeight);
-		path.curveTo(getX(), getY(), getX() + getHeight(), getY(), getX()
-				+ getHeight(), getY() + halfHeight);
-		path.curveTo(getX() + getHeight(), getY() + getHeight(), getX(), getY()
-				+ getHeight(), getX(), getY() + halfHeight);
-		path.closePath();
-		return path;
 	}
 
 	/* (non-Javadoc)

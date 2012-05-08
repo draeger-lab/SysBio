@@ -316,7 +316,7 @@ public abstract class SB_2GraphML <T> {
     
     // Setup node properties
     if ((label != null) && !(nr instanceof ReactionNodeRealizer) &&
-        !label.equalsIgnoreCase("undefined")) {
+        !label.equalsIgnoreCase("undefined") && !SBO.isChildOf(sboTerm, SBO.getEmptySet())) {
       if (height>30) {
         // Height is enough to insert a second line.
         label = StringUtil.insertLineBreaks(label,(int)(width/6), "\n");
