@@ -56,6 +56,10 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer implements SimpleC
     }
   }
   
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
+  @Override
   public NodeRealizer createCopy(NodeRealizer nr) {
     return new NucleicAcidFeatureNode(nr);
   }
@@ -74,7 +78,7 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer implements SimpleC
    */
   @Override
   protected void paintFilledShape(Graphics2D gfx) {
-   if (!isTransparent() && getFillColor()!=null) {
+   if (!isTransparent() && (getFillColor() != null)) {
       gfx.setColor(getFillColor());
       gfx.fill(getPath());
       
@@ -112,4 +116,5 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer implements SimpleC
   public boolean isNodeCloned() {
     return isClonedNode;
   }
+
 }
