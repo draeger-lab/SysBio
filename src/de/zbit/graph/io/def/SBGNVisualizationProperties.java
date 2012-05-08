@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import de.zbit.graph.sbgn.ComplexNode;
+import de.zbit.graph.sbgn.EmptyNode;
 import de.zbit.graph.sbgn.NucleicAcidFeatureNode;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
@@ -69,6 +70,10 @@ public class SBGNVisualizationProperties {
    */
   private static final int[] macromolecule_synonyms = new int[]{248, 249, 246, 251, 252, 250};
   
+  /**
+   * Empty set is used to represent the source of a creation process or the result of a degradation process.
+   */
+  private static final int emptyset = 291;
   /**
    * Simple chemicals (Ca2+,ATP, etc.)
    */
@@ -148,6 +153,7 @@ public class SBGNVisualizationProperties {
     sbo2shape.put(gene, new NucleicAcidFeatureNode()); // nucleic acid feature - gene
     sbo2shape.put(materialEntityOfUnspecifiedNature, new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE)); // unspecified - material entity of unspecified nature
     
+    sbo2shape.put(emptyset, new EmptyNode()); // empty set
     sbo2shape.put(nonCovalentComplex, new ComplexNode()); // complex - non-covalent complex
     for (int sbo:nonCovalentComplex_synonyms) {
       sbo2shape.put(sbo, sbo2shape.get(nonCovalentComplex));
