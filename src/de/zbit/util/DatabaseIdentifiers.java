@@ -204,6 +204,38 @@ public class DatabaseIdentifiers {
      */
     ThreeDMET,
     UniProt_AC;
+    
+    /**
+     * Tries to return the official database name as given by MIRIAM.
+     * @return the official name of the database.
+     */
+    public String getOfficialName() {
+      if (this==GeneOntology) {
+        return "Gene Ontology";
+      } else if (this==PubChem_substance) {
+        return "PubChem-substance";
+      } else if (this==UniProt_AC) {
+        return "UniProt";
+      } else if (this==EC_code) {
+        return "Enzyme Nomenclature";
+      } else if (this==EntrezGene) {
+        return "Entrez gene";
+      } else if (this==PDBeChem) {
+        return "Chemical Component Dictionary";
+      } else if (this==NCBI_Taxonomy) {
+        return "Taxonomy";
+        
+      } else {
+        
+        String s = toString();
+        s = s.replace("_", " ");
+        s = StringUtil.replaceIgnoreCase(s, "Three", Integer.toString(3));
+        s = StringUtil.replaceIgnoreCase(s, "Two", Integer.toString(2));
+        s = StringUtil.replaceIgnoreCase(s, "One", Integer.toString(1));
+      
+        return s;
+      }
+    }
   }
   
   /**
@@ -555,6 +587,10 @@ public class DatabaseIdentifiers {
     if (!checkID(db, identifier)) {
       identifier = getFormattedID(db, identifier);
       if (identifier==null) return null;
+      if (!DatabaseIdentifiers.checkID(db, identifier)) {
+        log.warning("Skipping invalid database entry " + identifier);
+        return null;
+      }
     }
     
     String miriam = miriamMap.get(db);
@@ -607,6 +643,10 @@ public class DatabaseIdentifiers {
    * expression of the <code>database</code>.
    */
   public static boolean checkID(IdentifierDatabases database, String id) {
+    if (id==null) {
+      return false;
+    }
+    
     // Get RegEx
     String regEx = getRegularExpressionForIdentifier(database, false);
     if (regEx == null) {
