@@ -1580,5 +1580,31 @@ public class StringUtil {
     StringBuffer a = new StringBuffer(s);
     return a.reverse().toString();
   }
+
+  /**
+   * Replaces all occurences of <code>toReplace</code> in 
+   * <code>containingString</code> with <code>replaceWith</code>.
+   * <p>Replace is case-insensitive.
+   * @param containingString
+   * @param toReplace
+   * @param replaceWith
+   * @return
+   */
+  public static String replaceIgnoreCase(String containingString, String toReplace, String replaceWith) {
+    StringBuilder sb = new StringBuilder(containingString.length());
+    
+    int i=0, lastI=0;
+    while ( (i = indexOfIgnoreCase(containingString, toReplace, i)) >=0) {
+      sb.append(containingString.substring(lastI, i));
+      sb.append(replaceWith);
+      i+=toReplace.length();
+      lastI=i;
+    }
+    
+    // Append suffix
+    sb.append(containingString.substring(lastI));
+    
+    return sb.toString();
+  }
   
 }

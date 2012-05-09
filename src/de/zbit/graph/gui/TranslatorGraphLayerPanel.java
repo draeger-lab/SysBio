@@ -510,6 +510,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
         f=null;
       }
       
+      // Get writer
       Graph2Dwriteable trans2;
       if (getTranslator() instanceof Graph2Dwriteable) {
         trans2 = (Graph2Dwriteable) getTranslator();
@@ -518,6 +519,12 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
       } else {
         trans2 = new Graph2Dwriter(new JPGIOHandler(), getTranslator());
       }
+      
+      // Eventually setup background
+      if (isSetBackgroundImageProvider() && (trans2 instanceof Graph2Dwriter)) {
+        ((Graph2Dwriter) trans2).setBackgroundImageProvider(getBackgroundImageProvider());
+      }
+        
       return ((Graph2Dwriteable)trans2).writeToFile(graphLayer, file.getPath(), format);
       
     } else {
