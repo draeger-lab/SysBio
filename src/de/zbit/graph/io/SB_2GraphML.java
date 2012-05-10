@@ -244,7 +244,7 @@ public abstract class SB_2GraphML <T> {
    * You may implement this method to perform a post-processing
    * on the complete graph, i.e., to enhance the reaction node layout.
    */
-  protected void improveReactionNodeLayout() {
+  public void improveReactionNodeLayout() {
     // OPTIONALLY
   }
   

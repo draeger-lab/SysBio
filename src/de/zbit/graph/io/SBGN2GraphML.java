@@ -216,7 +216,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
    * @param reaction2node
    */
   @Override
-  protected void improveReactionNodeLayout() {
+  public void improveReactionNodeLayout() {
     if (reaction2node==null) return;
     for (Map.Entry<Glyph,ReactionNodeRealizer> en : reaction2node.entrySet()) {
       // TODO Iterate through all ARCS, inspect source and target and classify into:
