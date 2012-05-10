@@ -295,6 +295,10 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
       new GraphTools(graphLayer).layout(OrganicEdgeRouter.class);
     }
     
+    // After all the layouting, maybe an extending class would like to do
+    // some post-processing...
+    finalize(graphLayer);
+    
     // Create a new visualization of the model.
     pane = new Graph2DView(graphLayer);
     
@@ -364,6 +368,17 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   }
   
   
+  /**
+   * Method might be implemented by extending classes to do 
+   * some post-processing after the graph has been layouted
+   * completely.
+   * @param graphLayer
+   */
+  private void finalize(Graph2D graphLayer) {
+    // Intentionally left blank
+  }
+
+
   /**
    * Check if all nodes lay at the same X position.
    * @param graph

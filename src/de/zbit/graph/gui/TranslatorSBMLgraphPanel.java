@@ -181,6 +181,17 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   }
   
   /* (non-Javadoc)
+   * @see java.lang.Object#finalize()
+   */
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    if (converter!=null) {
+      converter.improveReactionNodeLayout();
+    }
+  }
+  
+  /* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#getOutputFileFilterForRealDocument()
    */
   @Override

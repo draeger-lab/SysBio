@@ -614,7 +614,10 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			
 			// As long as there is no solution that breaks text at window length,
 			// I am inserting these temporary line breaks.
-			text = StringUtil.insertLineBreaks(text, 120, "<br/>");
+			// Problem 1: </p> is not recognized as a line break
+			text = StringUtil.replaceIgnoreCase(text, "</p>", "</p><br>");
+			text = StringUtil.insertLineBreaks(text, 120, "<br>");
+			text = StringUtil.replaceIgnoreCase(text, "</p><br>", "</p>");
 			
 			if (!text.startsWith("<body") && !text.endsWith("</body>"))
 				text = "<body>" + text + "</body>";
