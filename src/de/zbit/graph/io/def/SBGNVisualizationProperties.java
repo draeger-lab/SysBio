@@ -61,12 +61,12 @@ public class SBGNVisualizationProperties {
   private final static ShapeNodeRealizer defaultShape = new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE);
   
   /**
-   * Other SBO terms that should be visualized in the same manner as {@link SBO.getMarcomolecule}.
+   * Other SBO terms that should be visualized in the same manner as {@link SBO#getMacromolecule()}.
    */
   private static final int[] macromolecule_synonyms = new int[]{248, 249, 246, 251, 252, 250};
 
   /**
-   * Other SBO terms that should be visualized in the same manner as {@link SBO.getSimpleMolecule}s.
+   * Other SBO terms that should be visualized in the same manner as {@link SBO#getSimpleMolecule()}s.
    * 327 = non-macromolecular ion
    * 328 = non-macromolecular radical
    */
@@ -85,7 +85,7 @@ public class SBGNVisualizationProperties {
   public static final int uncertainProcess = 396;
   
   /**
-   * Other SBO terms that should be visualized in the same manner as {@link SBO.getNonCovalentComplex}s.
+   * Other SBO terms that should be visualized in the same manner as {@link SBO#getNonCovalentComplex()}s.
    * TODO: These complexes below are actually not correct. But Linking them to
    * ComplexNode is better than the default. But still, the real SBGN-conform
    * specification differs!
