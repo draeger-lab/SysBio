@@ -63,7 +63,6 @@ import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.LineType;
 import y.view.NodeRealizer;
-import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.graph.sbgn.CloneMarker;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.math.MathUtils;
@@ -125,6 +124,11 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    */
   private Map<String, LinkedList<Edge>> id2edge = new HashMap<String, LinkedList<Edge>>();
   
+  /**
+   * map from reactionID to reaction node
+   */
+  private Map<String, Node> reactionID2reactionNode = new HashMap<String, Node>();
+  
   public SBML2GraphML() {
     super();
   }
@@ -135,10 +139,19 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   }
   
   /**
+   * Returns mapping from reaction ID to all edges of this reaction.
    * @return
    */
   public Map<String, LinkedList<Edge>> getId2edge(){
     return id2edge;
+  }
+  
+  /**
+   * Returns mapping from the reaction ID to related reaction node.
+   * @return
+   */
+  public Map<String, Node> getReactionID2reactionNode(){
+      return reactionID2reactionNode;
   }
   
   /**
@@ -262,6 +275,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         reaction2node .put(r, (ReactionNodeRealizer) nr);
         Node rNode = simpleGraph.createNode(nr);
         GraphElement2SBid.put(rNode, r.getId());
+        reactionID2reactionNode.put(r.getId(), rNode);
         
         // Get information from the layout extension
         double x=Double.NaN;
