@@ -416,6 +416,21 @@ public class Pathway {
 	public String getName() {
 		return name;
 	}
+	
+	/**
+	 * Gives the pathway name as compatible with MIRIAM.
+	 * In other words: returns the same as {@link #getName()}
+	 * but trims the "path:" prefix if one is available.
+	 * @return
+	 */
+	public String getNameForMIRIAM() {
+    // We need to trim the "PATH"-Prefix
+    String pwID = getName();
+    if (pwID!=null && pwID.toLowerCase().startsWith("path:")) {
+      pwID = pwID.substring(5);
+    }
+    return pwID;
+	}
 
 	/**
 	 * Remember: Pathway number is an 5-digit integer. So if size < 5 you need
