@@ -80,7 +80,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * If false, shows the normal, quantitative SBML model.
    * If true, shows the qual model.
    */
-  private boolean showQualModel=false;
+  private boolean showQualModel = false;
   
   //  /**
   //   * Create a new translator-panel and initiates the translation.
@@ -125,10 +125,9 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   //    this(inputFile, outputFormat, translationResult, document, false);
   //  }
   
-  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel) {
-    super(inputFile, outputFormat, translationResult, document);
+  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel, boolean showDetailledPanel) {
+    super(inputFile, outputFormat, translationResult, document, showDetailledPanel);
     this.showQualModel = showQualModel;
-    
     try {
       createTabContent();
     } catch (Throwable e) {
@@ -139,12 +138,24 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   }
   
   /**
+   * 
+   * @param inputFile
+   * @param outputFormat
+   * @param translationResult
+   * @param document
+   * @param showQualModel
+   */
+  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel) {
+	  this(inputFile, outputFormat, translationResult, document, showQualModel, true);
+  }
+  
+  /**
    * Visualizes the given {@link SBMLDocument}.
    * @param document
    * @param showQualModel
    */
   public TranslatorSBMLgraphPanel (SBMLDocument document, boolean showQualModel) {
-    this((File) null, "SBML", null, document, showQualModel);
+	  this(document, showQualModel, true);
   }
   
   /**
@@ -169,9 +180,17 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     super(downloadORTranslateWorker, inputFile, outputFormat, translationResult);
   }
   
-  
-  
-  /* (non-Javadoc)
+  /**
+   * 
+   * @param document
+   * @param showQualModel
+   * @param showDetailedPanel
+   */
+  public TranslatorSBMLgraphPanel(SBMLDocument document, boolean showQualModel, boolean showDetailedPanel) {
+	  this((File) null, "SBML", null, document, showQualModel, showDetailedPanel);
+  }
+
+/* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#createGraphFromDocument(java.lang.Object)
    */
   @Override
@@ -186,7 +205,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
-    if (converter!=null) {
+    if (converter != null) {
       converter.improveReactionNodeLayout();
     }
   }
@@ -215,14 +234,6 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     //    } else {
     return ((KEGGtranslator<SBMLDocument>)getTranslator()).writeToFile(document, file.getPath());
     //    }
-  }
-  
-  /* (non-Javadoc)
-   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#isDetailPanelAvailable()
-   */
-  @Override
-  public boolean isDetailPanelAvailable() {
-    return true;
   }
   
   /* (non-Javadoc)

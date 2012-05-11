@@ -80,6 +80,11 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   public static Class<? extends TranslatorPanelOptions> optionClass = TranslatorPanelOptions.class;
   
   /**
+   * 
+   */
+  private boolean showDetailedPanel = true;
+  
+  /**
    * The current graph layer
    */
   Graph2D graphLayer;
@@ -182,12 +187,27 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @param outputFormat
    * @param translationResult
    * @param translatedDocument
+ * @param showDetailedPanel 
    * @throws Exception
    */
   protected TranslatorGraphLayerPanel(final File inputFile,
     final String outputFormat, ActionListener translationResult,
-    DocumentType translatedDocument) {
+    DocumentType translatedDocument, boolean showDetailedPanel) {
     super(inputFile, outputFormat, translationResult, translatedDocument);
+    this.showDetailedPanel = showDetailedPanel;
+  }
+  
+  /**
+   * 
+   * @param inputFile
+   * @param outputFormat
+   * @param translationResult
+   * @param translatedDocument
+   */
+  protected TranslatorGraphLayerPanel(final File inputFile,
+		    final String outputFormat, ActionListener translationResult,
+		    DocumentType translatedDocument) {
+	  this(inputFile, outputFormat, translationResult, translatedDocument, true);
   }
   
   /**
@@ -458,7 +478,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * graph should get visualized.
    */
   public boolean isDetailPanelAvailable() {
-    return false;
+    return showDetailedPanel;
   }
   
   
