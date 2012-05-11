@@ -39,9 +39,8 @@ import de.zbit.util.Utils;
  * @since 1.0
  */
 public class Pathway {
-  public static final transient Logger log = Logger.getLogger(Pathway.class.getName());
-  
-	/**
+  public static final transient Logger log = Logger.getLogger(Pathway.class.getName()); 
+  /**
 	 * keggid.type the KEGGID of this pathway map
 	 */
 	private String name = "";
@@ -81,7 +80,12 @@ public class Pathway {
 	/*
 	 *  Custom Variables, not in the KGML specification
 	 */
-	
+
+	/**
+   * additional text
+   */
+  private String additionalText = "";   
+
 	/**
 	 * Comment of the source KGML file.
 	 */
@@ -963,4 +967,17 @@ public class Pathway {
     return String.format("<img src=\"http://www.kegg.jp/kegg/misc/thumbnail/map%s.gif\"/><br/>\n", mapNumber );
   }
 
+  public String getAdditionalText() {
+    return additionalText;
+  }
+
+  public void setAdditionalText(String additionalText) {
+    this.additionalText = additionalText;
+  }
+  
+  public boolean isSetAdditionalText(){
+    if(additionalText!=null && !additionalText.isEmpty())
+      return true;
+    return false;
+  }
 }
