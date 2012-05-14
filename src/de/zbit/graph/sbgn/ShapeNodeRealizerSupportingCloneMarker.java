@@ -22,6 +22,8 @@ package de.zbit.graph.sbgn;
 
 import java.awt.Graphics2D;
 
+import org.sbml.jsbml.util.StringTools;
+
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 
@@ -36,10 +38,10 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
     implements SimpleCloneMarker {
   
   /**
-   * Is this node a cloned node? (I.e. another
-   * instance must exist in the same graph).
+   * Is this node a cloned node (i.e., another
+   * instance must exist in the same graph)?
    */
-  private boolean isClonedNode=false;
+  private boolean isClonedNode = false;
   
   
   /**
@@ -76,7 +78,6 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
       setNodeIsCloned(((CloneMarker) argNodeRealizer).isNodeCloned());
     }
   }
-
   
   /* (non-Javadoc)
    * @see y.view.NodeRealizer#createCopy()
@@ -105,10 +106,21 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
    */
   @Override
   protected void paintFilledShape(Graphics2D gfx) {
-    super.paintFilledShape(gfx);
-   if (!isTransparent() && getFillColor()!=null) {
-      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, shape);
-    }
+  	super.paintFilledShape(gfx);
+  	if (!isTransparent() && (getFillColor() != null)) {
+  		CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, shape);
+  	}
   }
-  
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return StringTools.concat(getClass().getSimpleName(), " [isClonedNode=",
+			isClonedNode, ", x=", x, ", y=", y, ", width=", width, ", height=",
+			height, ", fill=", getFillColor(), ", line=", getLineColor(),
+			"]").toString();
+	}
+
 }

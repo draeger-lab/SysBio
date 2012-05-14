@@ -481,7 +481,7 @@ public class SBMLTree extends JTree implements ActionListener {
 				Object userObject = node.getUserObject();
 				if (userObject instanceof SBMLDocument) {
 					currSBase = ((SBMLDocument) userObject).getModel();
-				} else {
+				} else if (userObject instanceof SBase) {
 					currSBase = (SBase) userObject;
 				}
 				if (popup != null) {

@@ -30,14 +30,8 @@ import y.view.ShapeNodeRealizer;
  * @since 1.1
  * @version $Rev$
  */
-public class EmptyNode extends ShapeNodeRealizer implements SimpleCloneMarker {
-
-	/**
-	 * Is this node a cloned node? (I.e. another instance must exist in the same
-	 * graph).
-	 */
-	private boolean isClonedNode = false;
-
+public class EmptyNode extends ShapeNodeRealizerSupportingCloneMarker {
+	
 	/**
 	 * 
 	 */
@@ -66,8 +60,16 @@ public class EmptyNode extends ShapeNodeRealizer implements SimpleCloneMarker {
 	 * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
 	 */
 	@Override
-	public NodeRealizer createCopy(NodeRealizer nr) {
+	public EmptyNode createCopy(NodeRealizer nr) {
 		return new EmptyNode(nr);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker#createCopy()
+	 */
+	@Override
+	public EmptyNode createCopy() {
+		return new EmptyNode(this);
 	}
 
 	/* (non-Javadoc)
@@ -87,13 +89,11 @@ public class EmptyNode extends ShapeNodeRealizer implements SimpleCloneMarker {
 	protected void paintFilledShape(Graphics2D gfx) {
 		Color fillColor = getFillColor();
 		if (!isTransparent() && (fillColor != null)) {
-			// Create a filled circle
 			setWidth(getHeight());
+			
+			// Create a filled circle
 			gfx.setColor(fillColor);
 			super.paintFilledShape(gfx);
-			
-			// draw clone marker if needed
-			CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this,  shape);
 			
 			// Diagonal element:
 			gfx.setColor(getLineColor());
@@ -103,20 +103,6 @@ public class EmptyNode extends ShapeNodeRealizer implements SimpleCloneMarker {
 			path.closePath();
 			gfx.draw(path);
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.graph.sbgn.CloneMarker#setNodeIsCloned(boolean)
-	 */
-	public void setNodeIsCloned(boolean b) {
-		isClonedNode = b;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.graph.sbgn.CloneMarker#isNodeCloned()
-	 */
-	public boolean isNodeCloned() {
-		return isClonedNode;
 	}
 
 }
