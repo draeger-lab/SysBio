@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ProgressMonitor;
@@ -128,7 +129,7 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 			return doc;
 		} catch (Exception exc) {
 			logger.info(MessageFormat.format(bundle.getString("CANCELING_AT_TIME"), timer.getAndReset(false)));
-			logger.fine(exc.getLocalizedMessage());
+			logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
 			return null;
 		}
 	}

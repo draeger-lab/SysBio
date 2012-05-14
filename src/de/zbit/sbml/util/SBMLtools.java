@@ -23,8 +23,11 @@ import java.util.logging.Logger;
 
 import javax.swing.tree.TreeNode;
 
+import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.ListOf;
+import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.NamedSBase;
+import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Unit;
@@ -136,5 +139,53 @@ public class SBMLtools {
           SBO.sboNumberString(term), sbase.getElementName(), sbase.getLevel(), sbase.getVersion()));
     }
   }
+  
+  /**
+   * 
+   * @param node
+   * @param unit
+   */
+  public static final void setUnits(ASTNode node, UnitDefinition unit) {
+  	setUnits(node, unit.getId());
+  }
+  
+  /**
+   * 
+   * @param node
+   * @param unit
+   */
+  public static final void setUnits(ASTNode node, Unit.Kind unit) {
+  	setUnits(node, unit.toString().toLowerCase());
+  }
+
+  /**
+   * 
+   * @param node
+   * @param unit
+   */
+	public static final void setUnits(ASTNode node, String unit) {
+		MathContainer container = node.getParentSBMLObject();
+		if ((container != null) && (container.getLevel() > 2)) {
+			node.setUnits(unit);
+		}
+	}
+	
+
+	/**
+	 * 
+	 * @param sbase
+	 * @param doc 
+	 */
+	public static void updateAnnotation(SBase sbase, SBMLDocument doc) {
+		if (sbase.isSetMetaId()) {
+			sbase.setMetaId(doc.nextMetaId());
+		}
+		for (int i = 0; i < sbase.getChildCount(); i++) {
+			TreeNode child = sbase.getChildAt(i);
+			if (child instanceof SBase) {
+				updateAnnotation((SBase) child, doc);
+			}
+		}
+	}
   
 }

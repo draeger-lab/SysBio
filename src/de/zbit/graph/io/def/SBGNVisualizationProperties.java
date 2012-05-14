@@ -205,11 +205,8 @@ public class SBGNVisualizationProperties {
    * @return
    */
   public static boolean isCircleShape(int sboTerm) {
-    if (SBO.isChildOf(sboTerm, SBO.getSimpleMolecule())) {
-      return true;
-    } else {
-      return false;
-    }
+		return SBO.isChildOf(sboTerm, SBO.getSimpleMolecule())
+				|| SBO.isChildOf(sboTerm, SBO.getEmptySet());
   }
   
   /**
