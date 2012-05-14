@@ -328,7 +328,9 @@ public class KeggParser extends DefaultHandler {
       if (name.equalsIgnoreCase("pathway") && node.hasChildNodes()) {
         
         if (!silent) System.out.println("Parsing pw...");
-        Pathway p = new Pathway(getNodeValue(att, "name"), getNodeValue(att, "org") , getNodeValueInt(att, "number"), getNodeValue(att, "title"), getNodeValue(att, "image"), getNodeValue(att, "link"));
+        Pathway p = new Pathway(getNodeValue(att, "name"), getNodeValue(att, "org") , 
+            getNodeValueInt(att, "number"), getNodeValue(att, "title"), getNodeValue(att, "image"), 
+            getNodeValue(att, "link"), getNodeValue(att, "additionalText"));
         parsePathway(node.getChildNodes(), p);
         pathways.add(p);
         

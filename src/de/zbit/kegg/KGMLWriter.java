@@ -205,6 +205,9 @@ public class KGMLWriter {
     for (java.util.Map.Entry<String, String> att : attributes.entrySet()) {
          rootElement.setAttribute(att.getKey(), att.getValue());
     }
+    if(writeEntryExtended && keggPW.isSetAdditionalText()){
+      rootElement.setAttribute("additionalText", keggPW.getAdditionalText());
+    }
     doc.appendChild(rootElement);
     
     // kegg entries
@@ -214,7 +217,11 @@ public class KGMLWriter {
         Element newChild = doc.createElement("entry");
         Map<String, String> entryMap = null;
         if(writeEntryExtended){
+          try{
           entryMap = ((EntryExtended)entry).getKGMLAttributes();
+          } catch (ClassCastException e){
+            entryMap = entry.getKGMLAttributes();  
+          }
         } else {
           entryMap = entry.getKGMLAttributes();
         }

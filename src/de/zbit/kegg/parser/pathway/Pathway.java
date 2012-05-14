@@ -179,6 +179,22 @@ public class Pathway {
 		setImage(image);
 		setLink(link);
 	}
+	
+	 /**
+   * 
+   * @param name
+   * @param org
+   * @param number
+   * @param title
+   * @param image
+   * @param link
+   * @param additionalText
+   */
+  public Pathway(String name, String org, int number, String title,
+      String image, String link, String additionalText) {
+    this(name, org, number, title, image, link);
+    setAdditionalText(additionalText);
+  }
 
 	/**
 	 * 
@@ -942,7 +958,7 @@ public class Pathway {
 
       equals &= o.isSetLink()==this.isSetLink();
       if(equals && isSetLink()) 
-        equals &= (o.getLink().equals(this.getLink()));
+        equals &= (o.getLink().equals(this.getLink()));      
       
       equals &= o.isSetEntries()==this.isSetEntries();
       if(equals && isSetEntries()) 
