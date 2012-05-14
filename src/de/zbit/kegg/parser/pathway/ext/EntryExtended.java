@@ -143,7 +143,34 @@ public class EntryExtended extends Entry {
     
   }
 
-  
+  /**
+   * Clone constructor for Entry to EntryExtended
+   * @param ke
+   */
+  public EntryExtended(Entry ke) {
+    super(ke.getParentPathway(),
+        ke.getId(),
+        ke.getName());
+//    if(ke.getParentPathway()!=null){
+//      this.setParentNode(ke.getParentNode());
+//    }
+//    if(ke.isSetID()){
+//      this.setId(ke.getId());
+//    }
+//    if(ke.isSetName()){
+//      this.setName(ke.getName());
+//    }
+    if(ke.isSetType()){
+      this.setType(ke.getType());
+    }
+    if(ke.isSetLink()){
+      this.setLink(ke.getLink());
+    }
+    if(ke.isSetReaction()){
+      this.setReaction(ke.getReactionString());
+    }
+  }
+
   public EntryTypeExtended getGeneType(){
     return geneType;
   }
