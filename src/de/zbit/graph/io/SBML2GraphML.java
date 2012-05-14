@@ -323,7 +323,6 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             Edge e = simpleGraph.createEdge(source, rNode);
             GraphElement2SBid.put(e, r.getId());
             listOfEdges.add(e);
-            //            System.out.println("ADDED " + e + " with " + r.getId());
             EdgeRealizer er = simpleGraph.getRealizer(e);
             if (r.isReversible()) {
               er.setSourceArrow(Arrow.STANDARD);
@@ -342,7 +341,6 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             Edge e = simpleGraph.createEdge(rNode, target);
             GraphElement2SBid.put(e, r.getId());
             listOfEdges.add(e);
-            //            System.out.println("ADDED " + e + " with " + r.getId());
             EdgeRealizer er = simpleGraph.getRealizer(e);
             er.setArrow(Arrow.STANDARD);
             er.setSourceArrow(Arrow.NONE);
@@ -371,7 +369,6 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             Edge e = simpleGraph.createEdge(source, rNode);
             GraphElement2SBid.put(e, r.getId());
             listOfEdges.add(e);
-            //            System.out.println("ADDED " + e + " with " + r.getId());
             EdgeRealizer er = simpleGraph.getRealizer(e);
             er.setArrow(Arrow.TRANSPARENT_CIRCLE);
             er.setLineType(LineType.LINE_1);
