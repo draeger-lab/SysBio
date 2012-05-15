@@ -33,7 +33,7 @@ import org.sbml.jsbml.SBO;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import de.zbit.graph.sbgn.ComplexNode;
-import de.zbit.graph.sbgn.EmptyNode;
+import de.zbit.graph.sbgn.EmptySetNode;
 import de.zbit.graph.sbgn.NucleicAcidFeatureNode;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
@@ -127,7 +127,7 @@ public class SBGNVisualizationProperties {
     sbo2shape.put(SBO.getGene(), new NucleicAcidFeatureNode()); // nucleic acid feature - gene
     sbo2shape.put(materialEntityOfUnspecifiedNature, new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE)); // unspecified - material entity of unspecified nature
     
-    sbo2shape.put(SBO.getEmptySet(), new EmptyNode()); // empty set
+    sbo2shape.put(SBO.getEmptySet(), new EmptySetNode()); // empty set
     sbo2shape.put(SBO.getNonCovalentComplex(), new ComplexNode()); // complex - non-covalent complex
     for (int sbo : nonCovalentComplex_synonyms) {
       sbo2shape.put(sbo, sbo2shape.get(SBO.getNonCovalentComplex()));
