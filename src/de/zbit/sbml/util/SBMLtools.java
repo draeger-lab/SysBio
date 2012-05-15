@@ -169,7 +169,6 @@ public class SBMLtools {
 			node.setUnits(unit);
 		}
 	}
-	
 
 	/**
 	 * 

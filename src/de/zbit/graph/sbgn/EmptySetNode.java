@@ -30,12 +30,12 @@ import y.view.ShapeNodeRealizer;
  * @since 1.1
  * @version $Rev$
  */
-public class EmptyNode extends ShapeNodeRealizerSupportingCloneMarker {
+public class EmptySetNode extends ShapeNodeRealizerSupportingCloneMarker {
 	
 	/**
 	 * 
 	 */
-	public EmptyNode() {
+	public EmptySetNode() {
 		super(ShapeNodeRealizer.ELLIPSE);
 	}
 
@@ -43,11 +43,11 @@ public class EmptyNode extends ShapeNodeRealizerSupportingCloneMarker {
 	 * 
 	 * @param nr
 	 */
-	public EmptyNode(NodeRealizer nr) {
+	public EmptySetNode(NodeRealizer nr) {
 		super(nr);
 		// If the given node realizer is of this type, then apply copy
 		// semantics.
-		if (nr instanceof EmptyNode) {
+		if (nr instanceof EmptySetNode) {
 //			EmptyNode enr = (EmptyNode) nr;
 			// Copy the values of custom attributes (there are none).
 		}
@@ -60,16 +60,16 @@ public class EmptyNode extends ShapeNodeRealizerSupportingCloneMarker {
 	 * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
 	 */
 	@Override
-	public EmptyNode createCopy(NodeRealizer nr) {
-		return new EmptyNode(nr);
+	public EmptySetNode createCopy(NodeRealizer nr) {
+		return new EmptySetNode(nr);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker#createCopy()
 	 */
 	@Override
-	public EmptyNode createCopy() {
-		return new EmptyNode(this);
+	public EmptySetNode createCopy() {
+		return new EmptySetNode(this);
 	}
 
 	/* (non-Javadoc)
