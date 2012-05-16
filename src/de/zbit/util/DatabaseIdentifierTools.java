@@ -276,7 +276,7 @@ public class DatabaseIdentifierTools {
       case protein_interaction:
         break;
       case publication:
-        break;
+        return Qualifier.BQB_IS_DESCRIBED_BY;
       case reaction:
         return Qualifier.BQB_OCCURS_IN; 
       case sequences:
