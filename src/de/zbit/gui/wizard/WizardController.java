@@ -75,7 +75,7 @@ public class WizardController implements ActionListener {
     wizard.close(Wizard.CANCEL_RETURN_CODE);
   }
 
-  private void nextButtonPressed() {
+  public void nextButtonPressed() {
 
     WizardModel model = wizard.getModel();
     WizardPanelDescriptor descriptor = model.getCurrentPanelDescriptor();
@@ -95,7 +95,7 @@ public class WizardController implements ActionListener {
 
   }
 
-  private void backButtonPressed() {
+  public void backButtonPressed() {
 
     WizardModel model = wizard.getModel();
     WizardPanelDescriptor descriptor = model.getCurrentPanelDescriptor();
