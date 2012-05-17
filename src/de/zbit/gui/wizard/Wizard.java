@@ -610,6 +610,20 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     wizardDialog.getContentPane().add(cardPanel, BorderLayout.CENTER);
     wizardDialog.getContentPane().add(warningPanel, BorderLayout.NORTH);
   }
+  
+  /**
+   * imitates a click on the next/finish button
+   */
+  public void goToNextPanel() {
+	  wizardController.nextButtonPressed();
+  }
+  
+  /**
+   * imitates a click on the back button
+   */
+  public void goToPreviousPanel() {
+	  wizardController.backButtonPressed();
+  }
 
   /**
    * If the user presses the close box on the dialog's window, treat it as a
