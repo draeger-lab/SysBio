@@ -20,6 +20,7 @@
  */
 package de.zbit.graph.sbgn;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Arrays;
@@ -43,6 +44,11 @@ import de.zbit.math.MathUtils;
  */
 public class ReactionNodeRealizer extends ShapeNodeRealizer {
   
+    /**
+     * line width of reaction node
+     */
+    private float lineWidth;
+    
   public ReactionNodeRealizer() {
     super(ShapeNodeRealizer.RECT);
     setHeight(10);
@@ -62,6 +68,16 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     return new ReactionNodeRealizer(nr);
   }
   
+    /**
+     * sets line width of {@link ReactionNodeRealizer}. If not settet, line
+     * width will be 1.
+     * 
+     * @param lineWidth
+     */
+  public void setLineWidth(float lineWidth){
+      this.lineWidth = lineWidth;
+  }
+  
   /* (non-Javadoc)
    * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
    */
@@ -69,6 +85,8 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
   protected void paintShapeBorder(Graphics2D gfx) {
     int extendBesidesBorder=0;
     gfx.setColor(Color.BLACK);
+    //line width
+    gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
     int x = (int) getX(); int y = (int) getY();
     double min = Math.min(getWidth(), getHeight());
     double offsetX = (getWidth()-min)/2.0;
