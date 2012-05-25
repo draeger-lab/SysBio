@@ -16,6 +16,7 @@
  */
 package de.zbit.gui.wizard;
 
+import java.awt.Component;
 import java.awt.event.ActionListener;
 
 import javax.swing.JDialog;
@@ -109,8 +110,14 @@ public class WizardController implements ActionListener {
   }
   
   private void helpButtonPressed() {
-    // TODO
-    JOptionPane.showMessageDialog(wizard.getDialog(), "NOT IMPLEMENTED!");
+
+    WizardModel model = wizard.getModel();
+    WizardPanelDescriptor descriptor = model.getCurrentPanelDescriptor();
+    Component helpComp = descriptor.getHelpAction();
+    
+    if (helpComp != null) {
+    	helpComp.setVisible(true);
+    }
   }
 
   void resetButtonsToPanelRules() {
