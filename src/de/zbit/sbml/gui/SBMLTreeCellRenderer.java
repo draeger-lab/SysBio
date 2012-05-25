@@ -63,7 +63,10 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 				}
 			}
 			if (node.getUserObject() instanceof SimpleSpeciesReference){
-				this.setText(((SimpleSpeciesReference) node.getUserObject()).getSpeciesInstance().getName());
+			  if (((SimpleSpeciesReference) node.getUserObject()).isSetSpeciesInstance() && 
+			      ((SimpleSpeciesReference) node.getUserObject()).getSpeciesInstance().isSetName()) {
+				  this.setText(((SimpleSpeciesReference) node.getUserObject()).getSpeciesInstance().getName());
+			  }
 			}
 		}
 		return this; 

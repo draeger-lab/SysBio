@@ -34,7 +34,6 @@ import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.io.filefilter.GeneralFileFilter;
 import de.zbit.io.filefilter.SBFileFilter;
-import de.zbit.util.ArrayUtils;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
@@ -1022,6 +1021,26 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 		this(optionName, requiredType, description, null, numLeadingMinus,
 			shortCmdName, defaultValue);
 	}
+	
+	/**
+	 * Same as {@link #Option(String, Class, String, short, String, Object))}, but with a
+	 * default visibility attribute.
+	 * @param optionName
+	 * @param requiredType
+	 * @param description
+	 * @param numLeadingMinus
+	 * @param shortCmdName
+	 * @param defaultValue
+	 * @param visibility
+	 */
+	public Option(String optionName, Class<Type> requiredType,
+	  String description, short numLeadingMinus, String shortCmdName,
+	  Type defaultValue, boolean visibility) {
+	  this(optionName, requiredType, description, numLeadingMinus,
+	    shortCmdName, defaultValue);
+	  setVisible(visibility);
+	}
+	 
 	
   /**
 	 * 

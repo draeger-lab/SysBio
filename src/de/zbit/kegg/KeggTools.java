@@ -517,17 +517,27 @@ public class KeggTools {
     boolean found = false;
     if (considerReactions) {
       for (Reaction r : p.getReactions()) {
-        for (ReactionComponent rc : r.getProducts())
+        for (ReactionComponent rc : r.getProducts()) {
+          if (rc.isSetID() && entry.isSetID() && rc.getId().intValue()==entry.getId()) {
+            found = true;
+            break;            
+          }
           if (rc.getName().equalsIgnoreCase(entry.getName())) {
             found = true;
             break;
           }
+        }
         if (!found) {
-          for (ReactionComponent rc : r.getSubstrates())
+          for (ReactionComponent rc : r.getSubstrates()) {
+            if (rc.isSetID() && entry.isSetID() && rc.getId().intValue()==entry.getId()) {
+              found = true;
+              break;            
+            }
             if (rc.getName().equalsIgnoreCase(entry.getName())) {
               found = true;
               break;
             }
+          }
         }
         if (found) break;
       }
