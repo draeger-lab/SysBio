@@ -156,21 +156,11 @@ public class WizardPanelDescriptor {
     /**
      * Returns an component which set to visible if the help button is
      * clicked.
-     * Needs to enable help button manually
-     * 
-     * TODO: enable help button automatically
+	 *
      * @return component
      */    
     public Component getHelpAction() {
         return null;
-    }
-    
-    /**
-     * Enable the help button and related help action
-     * @param enable
-     */
-    public void enableHelpAction (boolean enable) {
-    	getWizardModel().setHelpButtonEnabled(enable);
     }
 
     //  Override this method in the subclass if you wish it to be called
