@@ -313,6 +313,13 @@ public abstract class Launcher implements Runnable, Serializable {
   		
   		System.setProperty("app.name", title);
   		System.setProperty("app.version", getVersionNumber());
+  		if (getCitation(true)!=null) {
+  		  System.setProperty("app.citation.html", getCitation(true));
+  		}
+      if (getCitation(false)!=null) {
+        System.setProperty("app.citation", getCitation(false));
+      }
+  		
   		
   	} catch (AccessControlException exc) {
   		/* This happens when executing a program as a Java(TM) Web Start Application
@@ -323,6 +330,22 @@ public abstract class Launcher implements Runnable, Serializable {
   		 */
   		logger.warning(exc.getLocalizedMessage());
   	}
+  }
+  
+  /**
+   * Optional method that returns a citation for the implementing application.
+   * 
+   * @param HTMLstyle
+   *        if <code>TRUE</code>, a HTML style citation should be returned
+   *        (using HTML-special chars and formatting).
+   * @return complete citation string.
+   */
+  public String getCitation(boolean HTMLstyle) {
+    // Is implemented, because this method should be OPTIONAL.
+    // Example for a return in HTML-style could be:
+    // "KEGGtranslator: visualizing and converting the KEGG PATHWAY database to various formats. Wrzodek C, Dr&#228;ger A, Zell A.<i>Bioinformatics</i>. 2011, <b>27</b>:2314-2315"
+    // Please do not use HTML-names (such as "&auml;") but rather unicode encodings (as "&#228;").
+    return null;
   }
 
 	/* (non-Javadoc)

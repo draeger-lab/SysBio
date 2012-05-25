@@ -75,11 +75,8 @@ import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
-import org.sbml.jsbml.util.StringTools;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
-
-import com.sun.org.apache.xml.internal.serializer.utils.StringToIntTable;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.SystemBrowser;
@@ -297,7 +294,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 				if (value instanceof SimpleSpeciesReference) {
-					this.setText(((SimpleSpeciesReference) value).getSpeciesInstance().getName());
+	        if (((SimpleSpeciesReference) value).isSetSpeciesInstance() && 
+	            ((SimpleSpeciesReference) value).getSpeciesInstance().isSetName()) {
+	          this.setText(((SimpleSpeciesReference) value).getSpeciesInstance().getName());
+	        }
+
 				}
 				return this;
 			}
@@ -503,15 +504,21 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		String colNames[] = new String[] { "Reactants", "Modifiers", "Products" };
 		int count = 0;
 		for (SpeciesReference specRef : reaction.getListOfReactants()) {
-			rmp[count++][0] = specRef.getSpeciesInstance().toString();
+		  if (specRef.isSetSpeciesInstance()) {
+			  rmp[count++][0] = specRef.getSpeciesInstance().toString();
+		  }
 		}
 		count = 0;
 		for (ModifierSpeciesReference mSpecRef : reaction.getListOfModifiers()) {
-			rmp[count++][1] = mSpecRef.getSpeciesInstance().toString();
+		  if (mSpecRef.isSetSpeciesInstance()) {
+			  rmp[count++][1] = mSpecRef.getSpeciesInstance().toString();
+		  }
 		}
 		count = 0;
 		for (SpeciesReference specRef : reaction.getListOfProducts()) {
-			rmp[count++][2] = specRef.getSpeciesInstance().toString();
+		  if (specRef.isSetSpeciesInstance()) {
+			  rmp[count++][2] = specRef.getSpeciesInstance().toString();
+		  }
 		}
 		JTable table = new JTable(rmp, colNames);
 		table.setPreferredScrollableViewportSize(new Dimension(200, (table
