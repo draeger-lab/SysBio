@@ -278,20 +278,20 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         reactionID2reactionNode.put(r.getId(), rNode);
         
         // Get information from the layout extension
-        double x=Double.NaN;
-        double y=Double.NaN;
+        double x = Double.NaN;
+        double y = Double.NaN;
         if (useLayoutExtension) {
           // reactions can not have mutliple glyphs... take first!
           Collection<BoundingBox> layout = id2layoutMap.get(r.getId());
-          BoundingBox g = layout!=null && layout.size()>0?layout.iterator().next():null;
-          if (g!=null) {
+          BoundingBox g = (layout != null) && (layout.size() > 0) ? layout.iterator().next() : null;
+          if (g != null) {
             if (g.isSetDimensions()) {
               nr.setWidth(g.getDimensions().getWidth());
               nr.setHeight(g.getDimensions().getHeight());
             }
             if (g.isSetPosition()) {
               // Ignore 0|0 positions. They're due to default values
-              if (g.getPosition().getX()!=0d || g.getPosition().getY()!=0d) {
+              if ((g.getPosition().getX() != 0d) || (g.getPosition().getY() != 0d)) {
                 x = g.getPosition().getX();
                 y = g.getPosition().getY();
               }

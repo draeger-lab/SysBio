@@ -301,7 +301,7 @@ public class SBFileFilter extends GeneralFileFilter {
           level = Integer.parseInt(m.group(1));
         }
         
-        return Pattern.compile("biopax-level" + (level<=0?"\\d": level) + ".owl");
+        return Pattern.compile("biopax-level" + (level <= 0 ? "\\d" : level) + ".owl");
       }
       return null;
     }
@@ -863,11 +863,10 @@ public class SBFileFilter extends GeneralFileFilter {
     this.type = FileType.UNDEFINED;
   }
   
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
    */
+  @Override
   public boolean accept(File f) {
     if (f == null) {
       return false;

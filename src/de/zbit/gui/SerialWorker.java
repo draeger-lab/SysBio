@@ -129,7 +129,7 @@ public class SerialWorker implements PropertyChangeListener {
 		for (PropertyChangeListener listener : listOfPropertyChangeListeners) {
 			listener.propertyChange(evt);
 		}
-		if (evt.getPropertyName().equals("done")) {
+		if ((evt.getSource() instanceof SwingWorker) && ((SwingWorker<?, ?>) evt.getSource()).isDone()) {
 			if (evt.getSource() instanceof SwingWorker<?, ?>) {
 				((SwingWorker<?, ?>) evt.getSource()).removePropertyChangeListener(this);
 			}
