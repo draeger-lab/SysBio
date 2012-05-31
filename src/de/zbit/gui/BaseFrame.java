@@ -193,6 +193,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 					return UIManager.getIcon("ICON_PREFS_16");
 				case FILE_OPEN:
 					return UIManager.getIcon("ICON_OPEN_16");
+				case FILE_SAVE:
+					return UIManager.getIcon("ICON_SAVE_16");
 				case FILE_SAVE_AS:
 					return UIManager.getIcon("ICON_SAVE_16");
 				case FILE_CLOSE:
@@ -678,13 +680,17 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	protected JMenu createFileMenu(boolean loadDefaultFileMenuEntries) {
 		boolean macOS = GUITools.isMacOSX();
 		int ctr_down = macOS ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
-		JMenuItem openFile = null, saveFile = null, closeFile = null;
+		JMenuItem openFile = null, saveFile = null, saveFileAs = null, closeFile = null;
 		if (loadDefaultFileMenuEntries) {
 			openFile = GUITools.createJMenuItem(EventHandler.create(
 				ActionListener.class, this, "openFileAndLogHistory"),
 				BaseAction.FILE_OPEN, KeyStroke.getKeyStroke('O', ctr_down), 'O', true);
 			
 			saveFile = GUITools.createJMenuItem(EventHandler.create(
+					ActionListener.class, this, "saveFileToOriginal"),
+					BaseAction.FILE_SAVE, KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
+			
+			saveFileAs = GUITools.createJMenuItem(EventHandler.create(
 				ActionListener.class, this, "saveFileAndLogSaveDir"),
 				BaseAction.FILE_SAVE_AS, KeyStroke.getKeyStroke('S', ctr_down
 						| InputEvent.SHIFT_DOWN_MASK), 'S', false);
@@ -706,7 +712,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				new MacOSXController(this);
 			}
 			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
-					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, saveFileAs, items,
 					closeFile);
 		} else {
 			// On all other platforms we want to have a dedicated "exit" item.
@@ -714,10 +720,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				EventHandler.create(ActionListener.class, this, "exitPre"),
 				BaseAction.FILE_EXIT,
 				KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK));
-			boolean addSeparator = (openFile != null) || (saveFile != null)
+			boolean addSeparator = (openFile != null) || (saveFile != null) || (saveFileAs != null)
 					|| ((items != null) && (items.length > 0)) || (closeFile != null);
 			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
-					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, items,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, saveFileAs, items,
 					closeFile, addSeparator ? new JSeparator() : null, exit);
 		}
 		fileMenu.setActionCommand(BaseAction.FILE.toString());
@@ -1426,12 +1432,55 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	public abstract File saveFile();
 	
 	/**
+	 * Saves some results or the current work in some {@link File}. If you use a
+	 * {@link JTabbedPane}, it is recommended to let your tabs implement the
+	 * {@link BaseFrameTab} interface and simply call
+	 * {@link BaseFrameTab#saveToFile()}.
+	 * 
+	 * TODO: change to abstract method
+	 * 
+	 * @return the {@link File} into which the content has been saved. If the
+	 *         returned value is not <code>null</code>, the directory in which the
+	 *         {@link File} is located is stored as the
+	 *         {@link GUIOptions#SAVE_DIR} property of the current class (but only
+	 *         if it exists and can be read).
+	 */
+	public File saveFileAs(){
+		return null;
+	}
+	
+	/**
+	 * Calls {@link #saveFileAs()} and memorizes the directory in which a file was
+	 * stored as a {@link GUIOptions#SAVE_DIR} for the current {@link Class}
+	 * (which implements {@link GUIOptions}. While saving some file, the actions
+	 * {@link BaseAction#FILE_SAVE} and {@link BaseAction#FILE_SAVE_AS} are
+	 * disabled. When done, these are enabled again. Override this method if you
+	 * want a different behavior.
+	 * 
+	 * TODO: change saveFileAs() to saveFile()
+	 */
+	public void saveFileToOriginal() {
+		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
+				BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
+		File file = saveFileAs();
+		if (file != null) {
+			if (!file.isDirectory()) {
+				file = file.getParentFile();
+			}
+		}
+		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
+			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
+	}
+	
+	/**
 	 * Calls {@link #saveFile()} and memorizes the directory in which a file was
 	 * stored as a {@link GUIOptions#SAVE_DIR} for the current {@link Class}
 	 * (which implements {@link GUIOptions}. While saving some file, the actions
 	 * {@link BaseAction#FILE_SAVE} and {@link BaseAction#FILE_SAVE_AS} are
 	 * disabled. When done, these are enabled again. Override this method if you
 	 * want a different behavior.
+	 * 
+	 * TODO: change saveFile() to saveFileAs()
 	 */
 	public void saveFileAndLogSaveDir() {
 		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
@@ -1445,13 +1494,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
 				prefs.put(GUIOptions.SAVE_DIR, file.getAbsolutePath());
 				try {
-          prefs.flush();
-        } catch (BackingStoreException exc) {
-          // do NOT show this error, because the user really dosn't know
-          // how to handle a "The value for SAVE_DIR is out of range [...]"
-          // message.
-          logger.finest(exc.getLocalizedMessage());
-        };
+		          prefs.flush();
+		        } catch (BackingStoreException exc) {
+		          // do NOT show this error, because the user really dosn't know
+		          // how to handle a "The value for SAVE_DIR is out of range [...]"
+		          // message.
+		          logger.finest(exc.getLocalizedMessage());
+		        };
 			}
 		}
 		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
