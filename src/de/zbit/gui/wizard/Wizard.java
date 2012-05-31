@@ -570,7 +570,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     		KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
     		JComponent.WHEN_IN_FOCUSED_WINDOW);
     
-    // pressing the ESCAPE button triggers "Next"/"Finish"
+    // pressing the ENTER button triggers "Next"/"Finish"
     getDialog().getRootPane().setDefaultButton(nextButton);
     
     warningPanel = new JPanel();

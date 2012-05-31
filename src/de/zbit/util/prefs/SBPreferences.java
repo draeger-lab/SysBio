@@ -16,6 +16,7 @@
  */
 package de.zbit.util.prefs;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -1254,6 +1255,15 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param key
 	 * @return
 	 */
+	public File getFile(Object key) {
+		return new File(get(key));
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public short getShort(Object key) {
 		String k = key.toString();
 		return (short) prefs.getInt(k, getDefaultShort(k));
@@ -1449,6 +1459,17 @@ public class SBPreferences implements Map<Object, Object> {
 		  prefs.put(k, value);
 		}
 		return oldValue;
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @param file
+	 * @return
+	 */
+	public File put(Object key, File file) {
+		String prev = put(key, file.getAbsolutePath());
+		return new File(prev);
 	}
 	
 	/* (non-Javadoc)

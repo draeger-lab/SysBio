@@ -45,7 +45,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -86,6 +85,7 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerModel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -197,6 +197,43 @@ public class GUITools {
     	if (component != null) {
     		component.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
     	}
+    }
+  }
+  
+  /**
+   * 
+   * @param todo
+   */
+  public static void processOnSwingEventThread(Runnable todo) {
+    processOnSwingEventThread(todo, false);
+  }
+
+  /**
+   * 
+   * @param todo
+   * @param wait
+   */
+  public static void processOnSwingEventThread(Runnable todo, boolean wait) {
+    if (todo == null) {
+      throw new IllegalArgumentException("Runnable == null");
+    }
+
+    if (wait) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        todo.run();
+      } else {
+        try {
+          SwingUtilities.invokeAndWait(todo);
+        } catch (Exception ex) {
+          throw new RuntimeException(ex);
+        }
+      }
+    } else {
+      if (SwingUtilities.isEventDispatchThread()) {
+        todo.run();
+      } else {
+        SwingUtilities.invokeLater(todo);
+      }
     }
   }
   
@@ -1230,14 +1267,25 @@ public class GUITools {
     return msg;
   }
   
+  /**
+   * 
+   * @param c
+   * @param inspectWholeWindow
+   * @return
+   */
+  // TODO: rename to findOKButton
   public static AbstractButton getOKButton(Container c, boolean inspectWholeWindow) {
     // Search for parent window
     Container oldC = c;
-    if (inspectWholeWindow) c = getParentWindow(c);
-    if (c==null) c = oldC;
+    if (inspectWholeWindow) {
+    	c = getParentWindow(c);
+    }
+    if (c == null) {
+    	c = oldC;
+    }
     
     // Search for ok button and enable.
-    if (c!=null) {
+    if (c != null) {
       return (AbstractButton) searchFor(c, AbstractButton.class, "getText", getOkButtonText());
     } else {
       return null;
@@ -2204,51 +2252,6 @@ public class GUITools {
       showErrorMessage(owner, exc);
     }
   }
-  
-  /**
-   * Show the component in an information message context, but does not wait
-   * until the user clicks ok, but simply invokes this message dialog in a new
-   * thread.
-   * 
-   * Simply executes
-   * {@link javax.swing.JOptionPane#showMessageDialog(Component, Object, String, int)}
-   * in a new thread.
-   * 
-   * <b>WARNING: This might not work on all plattforms. Do not show messages in
-   * different threads. There is a GUI thread in which messages should be
-   * displayed, use other threads for computation. Do not go the opposite
-   * way!</b>
-   * 
-   * @param component
-   *        - the component to show
-   * @param caption
-   *        - the caption of the dialog
-   */
-  public static SwingWorker<Void, Void> showMessageDialogInNewThread(final Component component, final String caption) {
-    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-      /* (non-Javadoc)
-       * @see javax.swing.SwingWorker#doInBackground()
-       */
-      protected Void doInBackground() throws Exception {
-        JOptionPane.showMessageDialog(null, component,
-          caption, JOptionPane.INFORMATION_MESSAGE);
-        return null;
-      }
-    };
-    worker.execute();
-    
-    // Wait until the dialog is painted, before continuing
-    while (worker.getState() == SwingWorker.StateValue.PENDING) {
-      try {
-        Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
-      } catch (InterruptedException exc) {
-        logger.finest(exc.getLocalizedMessage());
-      }
-    }
-    
-    return worker;
-  }
-
 
   /**
    * 
@@ -2353,54 +2356,16 @@ public class GUITools {
    * way!</b>
    * 
    * @param p - the process to monitor.
-   * @param caption - the caption of the window
+   * @param f - the caption of the window
    * @param closeWindowAutomaticallyWhenDone - if set to
    * true, the window will be closed, as soon as the
    * process finished.
    * @return JTextArea
    */
-  public static JTextArea showProcessOutputInTextArea(final Process p, final String caption,
-    final boolean closeWindowAutomaticallyWhenDone) {
-    final JTextArea area = new JTextArea();
-    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-      /* (non-Javadoc)
-       * @see javax.swing.SwingWorker#doInBackground()
-       */
-      protected Void doInBackground() throws Exception {
-        
-        // Show a JTextArea in an information message in background
-        area.setEditable(false);
-        JScrollPane pane = new JScrollPane(
-          area, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        pane.setPreferredSize(new Dimension(480, 240));
-        
-        GUITools.showMessageDialogInNewThread(pane, caption);
-        
-        // Disable the ok-Button of the area
-        GUITools.disableOkButton(area);
-        
-        // Update the window, as the process is executing
-        String line;
-        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        while ((line = in.readLine()) != null) {
-          area.append(line+"\n");
-          // Scroll down
-          area.setCaretPosition(area.getDocument().getLength()); 
-        }
-        
-        // As soon as the process is done, enable the ok button again
-        Window w = getParentWindow(area);
-        if (closeWindowAutomaticallyWhenDone) {
-          if (w != null) {
-          	w.dispose();
-          }
-        } else {
-          enableOkButtonIfAllComponentsReady(w);
-        }
-        
-        return null;
-      }
-    };
+  public static JTextArea showProcessOutputInTextArea(final Process p, Frame f,
+    boolean closeWindowAutomaticallyWhenDone) {
+    JTextArea area = new JTextArea();
+    ProcessObservationWorker worker = new ProcessObservationWorker(p, area, f, closeWindowAutomaticallyWhenDone);
     worker.execute();
     
     // Wait until the dialog is painted, before continuing

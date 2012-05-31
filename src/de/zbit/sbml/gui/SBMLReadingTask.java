@@ -80,6 +80,11 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 	private static final transient ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.Messages");
 	
 	/**
+	 * Key used to notify listeners about success. 
+	 */
+	public static final String SBML_READING_SUCCESSFULLY_DONE = "SBML_READING_SUCCESSFULLY_DONE";
+	
+	/**
 	 * The stream from which the SBML content is to be read.
 	 */
 	private InputStream inputStream;
@@ -141,7 +146,7 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 	protected void done() {
 		progressMonitor.close();
 		try {
-			firePropertyChange("done", null, get());
+			firePropertyChange(SBML_READING_SUCCESSFULLY_DONE, null, get());
 		} catch (InterruptedException exc) {
 			GUITools.showErrorMessage(parent, exc.getLocalizedMessage());
 		} catch (ExecutionException exc) {
