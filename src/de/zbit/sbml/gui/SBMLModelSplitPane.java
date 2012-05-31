@@ -39,6 +39,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
@@ -46,6 +47,7 @@ import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.io.OpenedFile;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
@@ -103,6 +105,30 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 */
 	protected SBMLTree tree;
+	
+	/**
+	 * 
+	 */
+	private OpenedFile<Object, Model> openedFile;
+	
+	/**
+	 * @return the openedFile
+	 */
+	public OpenedFile<Object, Model> getOpenedFile() {
+		return openedFile;
+	}
+
+	/**
+	 * 
+	 * @param file
+	 * @param namesIfAvailable
+	 * @throws SBMLException
+	 * @throws IOException
+	 */
+	public SBMLModelSplitPane(OpenedFile<Object, Model> file, boolean namesIfAvailable) throws SBMLException, IOException {
+		this(file.getWorkingCopy().getSBMLDocument(), namesIfAvailable);
+		this.openedFile = file;
+	}
 	
 	/**
 	 * 
@@ -233,6 +259,10 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		tree.addTreeSelectionListener(this);
 		tree.setSelectionRow(0);                           //
 		/////////////////////////////////////////////////////
+		
+		if (openedFile != null) {
+			sbmlDoc.addTreeNodeChangeListener(openedFile);
+		}
 		
 		setLeftComponent(createLeftComponent());
 		setRightComponent(createRightComponent(doc));
