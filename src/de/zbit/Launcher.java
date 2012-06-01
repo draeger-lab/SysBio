@@ -617,12 +617,12 @@ public abstract class Launcher implements Runnable, Serializable {
 		}
 		logger.info(String.format(resources.getString("LAUNCHING_CMD_MODE"),
 			getAppName()));
-		commandLineMode(appConf);
 		try {
 			GUITools.hideSplashScreen();
 		} catch (Throwable t) {
 			// Ignore problems when dealing with splash screens in command line mode.
 		}
+		commandLineMode(appConf);
 		exit();
 	}
 
