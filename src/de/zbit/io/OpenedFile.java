@@ -21,12 +21,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 
-import javax.swing.tree.TreeNode;
-
-import org.sbml.jsbml.util.TreeNodeChangeListener;
-import org.sbml.jsbml.util.TreeNodeRemovedEvent;
-
-
 /**
  * Manage the changes for opened document
  * 
@@ -34,35 +28,35 @@ import org.sbml.jsbml.util.TreeNodeRemovedEvent;
  * @since 1.4
  * @version $Rev: 808 $
  */
-public class OpenedFile<T,V> extends Component implements PropertyChangeListener, TreeNodeChangeListener {
+public class OpenedFile<T> extends Component implements PropertyChangeListener{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private File file;
+	/**
+	 * 
+	 */
+	protected File file;
 	
-	private T original;
-	private V workingCopy;
+	/**
+	 * 
+	 */
+	protected T original;
 	
 	/**
 	 * 
 	 */
 	boolean changed = false;
 	
-	/**
-	 * @return the workingCopy
-	 */
-	public V getWorkingCopy() {
-		return workingCopy;
-	}
+
 
 	/**
-	 * @param workingCopy the workingCopy to set
+	 * @return
 	 */
-	public void setWorkingCopy(V workingCopy) {
-		this.workingCopy = workingCopy;
+	public File getFile() {
+		return file;
 	}
 
 	/**
@@ -91,28 +85,17 @@ public class OpenedFile<T,V> extends Component implements PropertyChangeListener
 	 * @param original
 	 */
 	public OpenedFile(T original) {
-		this(original, null);
-	}
-	
-	/**
-	 * 
-	 * @param original
-	 * @param workingCopy
-	 */
-	public OpenedFile(T original, V workingCopy) {
-		this(null,original,workingCopy);
+		this(null, original);
 	}
 	
 	/**
 	 * 
 	 * @param file
 	 * @param original
-	 * @param workingCopy
 	 */
-	public OpenedFile(File file, T original, V workingCopy) {
+	public OpenedFile(File file, T original) {
 		this.file = file;
 		this.original = original;
-		this.workingCopy = workingCopy;
 	}
 
 	/* (non-Javadoc)
@@ -121,34 +104,10 @@ public class OpenedFile<T,V> extends Component implements PropertyChangeListener
 	//@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("fileChanged")){
+			boolean previous = isChanged();
 			setChanged(true);
-			firePropertyChange("openedFileChanged", false, true);
+			firePropertyChange("openedFileChanged", previous, true);
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
-	 */
-	//@Override
-	public void nodeAdded(TreeNode node) {
-		setChanged(true);
-		firePropertyChange("openedFileChanged", false, true);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(org.sbml.jsbml.util.TreeNodeRemovedEvent)
-	 */
-	//@Override
-	public void nodeRemoved(TreeNodeRemovedEvent evt) {
-		setChanged(true);
-		firePropertyChange("openedFileChanged", false, true);
-	}
-
-	/**
-	 * @return
-	 */
-	public File getFile() {
-		return file;
 	}
 
 }

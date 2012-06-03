@@ -47,7 +47,7 @@ import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.layout.LayoutHelper;
-import de.zbit.io.OpenedFile;
+import de.zbit.sbml.io.OpenedFile;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
@@ -109,12 +109,12 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 */
-	private OpenedFile<Object, Model> openedFile;
+	private OpenedFile<Model> openedFile;
 	
 	/**
 	 * @return the openedFile
 	 */
-	public OpenedFile<Object, Model> getOpenedFile() {
+	public OpenedFile<Model> getOpenedFile() {
 		return openedFile;
 	}
 
@@ -125,7 +125,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * @throws SBMLException
 	 * @throws IOException
 	 */
-	public SBMLModelSplitPane(OpenedFile<Object, Model> file, boolean namesIfAvailable) throws SBMLException, IOException {
+	public SBMLModelSplitPane(OpenedFile<Model> file, boolean namesIfAvailable) throws SBMLException, IOException {
 		this(file.getWorkingCopy().getSBMLDocument(), namesIfAvailable);
 		this.openedFile = file;
 	}
