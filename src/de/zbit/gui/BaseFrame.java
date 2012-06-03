@@ -1475,6 +1475,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			if (!file.isDirectory()) {
 				file = file.getParentFile();
 			}
+		} else {
+			saveFile();
 		}
 		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
 			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
