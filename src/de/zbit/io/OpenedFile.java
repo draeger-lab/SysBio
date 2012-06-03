@@ -20,11 +20,11 @@ import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.List;
 
 import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.util.TreeNodeChangeListener;
+import org.sbml.jsbml.util.TreeNodeRemovedEvent;
 
 
 /**
@@ -34,7 +34,7 @@ import org.sbml.jsbml.util.TreeNodeChangeListener;
  * @since 1.4
  * @version $Rev: 808 $
  */
-public class OpenedFile<T,V> extends Component implements PropertyChangeListener, TreeNodeChangeListener{
+public class OpenedFile<T,V> extends Component implements PropertyChangeListener, TreeNodeChangeListener {
 	
 	/**
 	 * 
@@ -115,11 +115,10 @@ public class OpenedFile<T,V> extends Component implements PropertyChangeListener
 		this.workingCopy = workingCopy;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
-	@Override
+	//@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("fileChanged")){
 			setChanged(true);
@@ -130,17 +129,17 @@ public class OpenedFile<T,V> extends Component implements PropertyChangeListener
 	/* (non-Javadoc)
 	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
 	 */
-	@Override
+	//@Override
 	public void nodeAdded(TreeNode node) {
 		setChanged(true);
 		firePropertyChange("openedFileChanged", false, true);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(javax.swing.tree.TreeNode)
+	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(org.sbml.jsbml.util.TreeNodeRemovedEvent)
 	 */
-	@Override
-	public void nodeRemoved(TreeNode node) {
+	//@Override
+	public void nodeRemoved(TreeNodeRemovedEvent evt) {
 		setChanged(true);
 		firePropertyChange("openedFileChanged", false, true);
 	}
@@ -151,4 +150,5 @@ public class OpenedFile<T,V> extends Component implements PropertyChangeListener
 	public File getFile() {
 		return file;
 	}
+
 }
