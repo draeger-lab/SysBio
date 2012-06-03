@@ -686,9 +686,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				ActionListener.class, this, "openFileAndLogHistory"),
 				BaseAction.FILE_OPEN, KeyStroke.getKeyStroke('O', ctr_down), 'O', true);
 			
-			saveFile = GUITools.createJMenuItem(EventHandler.create(
+			saveFile = (showSaveMenuEntry()) ? GUITools.createJMenuItem(EventHandler.create(
 					ActionListener.class, this, "saveFileToOriginal"),
-					BaseAction.FILE_SAVE, KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
+					BaseAction.FILE_SAVE, KeyStroke.getKeyStroke('S', ctr_down), 'S', false) : null;
 			
 			saveFileAs = GUITools.createJMenuItem(EventHandler.create(
 				ActionListener.class, this, "saveFileAndLogSaveDir"),
@@ -712,7 +712,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				new MacOSXController(this);
 			}
 			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
-					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, saveFileAs, items,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, (showSaveMenuEntry()) ? saveFile : null, saveFileAs, items,
 					closeFile);
 		} else {
 			// On all other platforms we want to have a dedicated "exit" item.
@@ -723,11 +723,19 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			boolean addSeparator = (openFile != null) || (saveFile != null) || (saveFileAs != null)
 					|| ((items != null) && (items.length > 0)) || (closeFile != null);
 			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
-					BaseAction.FILE.getToolTip(), openFile, fileHistory, saveFile, saveFileAs, items,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, (showSaveMenuEntry()) ? saveFile : null, saveFileAs, items,
 					closeFile, addSeparator ? new JSeparator() : null, exit);
 		}
 		fileMenu.setActionCommand(BaseAction.FILE.toString());
 		return fileMenu;
+	}
+	
+	/**
+	 * show the "Save" menu entry if true 
+	 * @return
+	 */
+	protected boolean showSaveMenuEntry() {
+		return false;
 	}
 
 	/**
