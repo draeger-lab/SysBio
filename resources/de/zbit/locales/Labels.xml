@@ -211,6 +211,7 @@ to redistribute it under certain conditions.
   <entry key="BioPAX_FILES">BioPAX files</entry>
   <entry key="BioPAX_FILES_L2">BioPAX Level 2 files</entry>
   <entry key="BioPAX_FILES_L3">BioPAX Level 3 files</entry>
+  <entry key="SIF_FILES">Simple Interaction Format (SIF) files</entry>
   
   <!-- SBAcceptAllFileFilter -->
   

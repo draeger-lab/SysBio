@@ -622,6 +622,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     for (Input i: t.getListOfInputs()) {
       for (Output o: t.getListOfOutputs()) {
         
+        // You should use a predefined map here, since the source
+        // or target could also be a group!
         Node source = id2node.get(i.getQualitativeSpecies());
         Node target = id2node.get(o.getQualitativeSpecies());
         if (source==null || target==null) continue;

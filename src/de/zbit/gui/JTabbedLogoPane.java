@@ -70,6 +70,7 @@ public class JTabbedLogoPane extends JTabbedPane { //JTabbedPaneDraggableAndClos
 
   @Override
   public void paintComponent(Graphics g) {
+    // TODO: Please catch the "java.lang.OutOfMemoryError: Java heap space" Exception when calling 'super' and show an apporpriate message.
     super.paintComponent(g);
     if (g==null || img==null) return;
     
