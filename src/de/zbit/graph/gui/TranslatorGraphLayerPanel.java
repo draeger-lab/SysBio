@@ -80,7 +80,10 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   public static Class<? extends TranslatorPanelOptions> optionClass = TranslatorPanelOptions.class;
   
   /**
-   * 
+   * Please NEVER use this variable to check if the detail panel is available (also NOT internally
+   * in this class). The correct way to set this option is overwriting the {@link #isDetailPanelAvailable()}
+   * method. Hence, the correct way to check if the panel is available is calling the
+   * {@link #isDetailPanelAvailable()} method.
    */
   private boolean showDetailedPanel = true;
   
@@ -431,22 +434,27 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
       detailPanelUpdater.interrupt();
     }
     
+    // Set temporary progress bar
+    JProgressBar prog = new JProgressBar();
+    prog.setIndeterminate(true);
+    final JPanel p = new JPanel();
+    p.add(prog);
+    detailPanel.setViewportView(p);
+    
+    // Update panel
     Runnable buildDetailPanel = new Runnable() {
       public void run() {
         updateDetailPanel(detailPanel, hitInfo);
-        detailPanel.validate();
-        detailPanel.repaint();
         if (Thread.currentThread().isInterrupted()) return;
+        // If it did not change, simply remove the temporaray progress bar
+        if (detailPanel.getViewport().getView()!=null &&
+            detailPanel.getViewport().getView().equals(p)) {
+          detailPanel.setViewportView(null);
+        }
         detailPanel.validate();
         detailPanel.repaint();
       }
     };
-    
-    JProgressBar prog = new JProgressBar();
-    prog.setIndeterminate(true);
-    JPanel p = new JPanel();
-    p.add(prog);
-    detailPanel.setViewportView(p);
     
     detailPanelUpdater = new Thread(buildDetailPanel);
     detailPanelUpdater.start();

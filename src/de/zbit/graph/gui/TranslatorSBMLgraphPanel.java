@@ -20,12 +20,9 @@
  */
 package de.zbit.graph.gui;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -44,12 +41,8 @@ import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.xml.parsers.GroupsParser;
 
-import y.base.Edge;
 import y.view.Graph2D;
 import y.view.HitInfo;
-import y.view.LineType;
-import y.view.NodeLabel;
-import y.view.NodeRealizer;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.SBML2GraphML;
 import de.zbit.gui.GUITools;
@@ -125,8 +118,8 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   //    this(inputFile, outputFormat, translationResult, document, false);
   //  }
   
-  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel, boolean showDetailledPanel) {
-    super(inputFile, outputFormat, translationResult, document, showDetailledPanel);
+  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel, boolean showDetailPanel) {
+    super(inputFile, outputFormat, translationResult, document, showDetailPanel);
     this.showQualModel = showQualModel;
     try {
       createTabContent();
@@ -167,6 +160,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   public TranslatorSBMLgraphPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
     final String outputFormat, ActionListener translationResult) {
     super(downloadORTranslateWorker, outputFormat, translationResult);
+    // NOTE: the showDetailPanel variable is not explicitly set here!
   }
   
   /**
@@ -178,16 +172,17 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   public TranslatorSBMLgraphPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
     File inputFile, String outputFormat, ActionListener translationResult) {
     super(downloadORTranslateWorker, inputFile, outputFormat, translationResult);
+    // NOTE: the showDetailPanel variable is not explicitly set here!
   }
   
   /**
    * 
    * @param document
    * @param showQualModel
-   * @param showDetailedPanel
+   * @param showDetailPanel
    */
-  public TranslatorSBMLgraphPanel(SBMLDocument document, boolean showQualModel, boolean showDetailedPanel) {
-	  this((File) null, "SBML", null, document, showQualModel, showDetailedPanel);
+  public TranslatorSBMLgraphPanel(SBMLDocument document, boolean showQualModel, boolean showDetailPanel) {
+	  this((File) null, "SBML", null, document, showQualModel, showDetailPanel);
   }
 
 /* (non-Javadoc)
