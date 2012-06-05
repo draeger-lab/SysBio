@@ -85,7 +85,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * method. Hence, the correct way to check if the panel is available is calling the
    * {@link #isDetailPanelAvailable()} method.
    */
-  private boolean showDetailedPanel = true;
+  private final boolean showDetailedPanel;
   
   /**
    * The current graph layer
@@ -222,6 +222,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   public TranslatorGraphLayerPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
     final String outputFormat, ActionListener translationResult) {
     super(downloadORTranslateWorker, outputFormat, translationResult);
+    this.showDetailedPanel = true;
   }
   
   /**
@@ -233,6 +234,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   public TranslatorGraphLayerPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
     File inputFile, String outputFormat, ActionListener translationResult) {
     super(downloadORTranslateWorker, inputFile, outputFormat, translationResult);
+    this.showDetailedPanel = true;
   }
   
   

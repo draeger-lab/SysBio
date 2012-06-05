@@ -77,7 +77,7 @@ public abstract interface TranslatorPanelOptions extends KeyProvider{
    * Show a table with the node/edge properties on the right side.
    */
   public static final Option<Boolean> SHOW_PROPERTIES_TABLE = new Option<Boolean>("SHOW_PROPERTIES_TABLE",Boolean.class,
-      "If true, shows a properties table on the upper right corner of each graph.", false);
+      "If true, shows a properties table on the upper right corner of each graph.", true);
   
   /**
    * Layout edges everytime a graph is displayed
