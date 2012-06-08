@@ -22,6 +22,7 @@ import java.io.File;
 import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.util.TreeNodeChangeListener;
+import org.sbml.jsbml.util.TreeNodeRemovedEvent;
 
 /**
  * @author Sebastian Nagel
@@ -91,7 +92,8 @@ public class OpenedFile<V> extends de.zbit.io.OpenedFile<Object> implements Prop
 	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(javax.swing.tree.TreeNode)
 	 */
 	@Override
-	public void nodeRemoved(TreeNode node) {
-		nodeAdded(node);
+	public void nodeRemoved(TreeNodeRemovedEvent node) {
+		nodeAdded(node.getSource());
 	}
+
 }

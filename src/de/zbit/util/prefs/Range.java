@@ -286,7 +286,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 		  }
 		  
 		  // Check if ranges have a finite length
-		  double start=0, end=0;
+		  double start = 0, end = 0;
 		  if (Utils.isInteger(lBound.getClass())) {
 		  	start = ((Number) lBound).doubleValue();
 		  	end = ((Number) uBound).doubleValue();
