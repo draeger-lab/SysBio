@@ -670,7 +670,14 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       return null;
     }
     
-    String caption = ResourceManager.getBundle("de.zbit.graph.locales.Labels").getString(v);
+    String caption = null;
+    try {
+      caption = ResourceManager.getBundle("de.zbit.graph.locales.Labels").getString(v);
+    } catch (Exception e) {
+      // In extending applications (i.e. InCroMAP), different headings are used that are not
+      // in the resources file.
+      log.log(Level.FINE, "", e);
+    }
     if (caption!=null) {
       return caption;
     }
