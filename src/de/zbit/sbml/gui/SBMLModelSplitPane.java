@@ -109,12 +109,12 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 */
-	private OpenedFile<Model> openedFile;
+	private OpenedFile<SBMLDocument> openedFile;
 	
 	/**
 	 * @return the openedFile
 	 */
-	public OpenedFile<Model> getOpenedFile() {
+	public OpenedFile<SBMLDocument> getOpenedFile() {
 		return openedFile;
 	}
 
@@ -125,8 +125,8 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * @throws SBMLException
 	 * @throws IOException
 	 */
-	public SBMLModelSplitPane(OpenedFile<Model> file, boolean namesIfAvailable) throws SBMLException, IOException {
-		this(file.getWorkingCopy().getSBMLDocument(), namesIfAvailable);
+	public SBMLModelSplitPane(OpenedFile<SBMLDocument> file, boolean namesIfAvailable) throws SBMLException, IOException {
+		this(file.getDocument(), namesIfAvailable);
 		this.openedFile = file;
 	}
 	
