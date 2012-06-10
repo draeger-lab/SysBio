@@ -29,53 +29,29 @@ import org.sbml.jsbml.util.TreeNodeRemovedEvent;
  * @version $Rev$
  * @since 1.4
  */
-public class OpenedFile<V> extends de.zbit.io.OpenedFile<Object> implements PropertyChangeListener, TreeNodeChangeListener{
+public class OpenedFile<V> extends de.zbit.io.OpenedFile<V> implements PropertyChangeListener, TreeNodeChangeListener{
 
 	
+	/**
+	 * @param file
+	 * @param document
+	 */
+	public OpenedFile(File file, V document) {
+		super(file, document);
+	}
+	
+	/**
+	 * @param file
+	 * @param document
+	 */
+	public OpenedFile(V document) {
+		super(document);
+	}
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4542668375887299995L;
-	
-	/**
-	 * 
-	 */
-	V workingCopy;
-
-	
-	/**
-	 * @return the workingCopy
-	 */
-	public V getWorkingCopy() {
-		return workingCopy;
-	}
-
-	/**
-	 * @param workingCopy the workingCopy to set
-	 */
-	public void setWorkingCopy(V workingCopy) {
-		this.workingCopy = workingCopy;
-	}
-	
-	/**
-	 * 
-	 * @param original
-	 * @param workingCopy
-	 */
-	public OpenedFile(Object original, V workingCopy) {
-		this(null,original,workingCopy);
-	}
-	
-	/**
-	 * 
-	 * @param file
-	 * @param original
-	 * @param workingCopy
-	 */
-	public OpenedFile(File file, Object original, V workingCopy) {
-		super(file,original);
-		this.workingCopy = workingCopy;
-	}
 
 
 	/* (non-Javadoc)
@@ -92,8 +68,8 @@ public class OpenedFile<V> extends de.zbit.io.OpenedFile<Object> implements Prop
 	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(javax.swing.tree.TreeNode)
 	 */
 	@Override
-	public void nodeRemoved(TreeNodeRemovedEvent node) {
-		nodeAdded(node.getSource());
+	public void nodeRemoved(TreeNodeRemovedEvent evt) {
+		nodeAdded(evt.getSource());
 	}
 
 }
