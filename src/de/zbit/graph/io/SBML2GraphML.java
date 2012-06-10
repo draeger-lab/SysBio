@@ -45,7 +45,7 @@ import org.sbml.jsbml.ext.groups.GroupModel;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
-import org.sbml.jsbml.ext.layout.LayoutConstant;
+import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.qual.Input;
@@ -84,7 +84,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * If false, shows the normal, quantitative SBML model.
    * If true, shows the qual model.
    */
-  private boolean showQualModel=false;
+  private boolean showQualModel = false;
   
   /**
    * This is NO option that can be set. It is used as internal
@@ -113,7 +113,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   /**
    * The namespace URI of the layout extension.
    */
-  private final static String layoutNamespace = LayoutConstant.namespaceURI;
+  private final static String layoutNamespace = LayoutConstants.namespaceURI;
   /**
    * The namespace URI of the layout extension.
    */
