@@ -60,12 +60,7 @@ public class EntryExtended extends Entry {
    * cellular component
    */
   private String compartment = null;
-  
-  /**
-   * Data source
-   * TODO: Please explain what is meant by dataSource. Do we really need it?
-   */
-  private String dataSource = null;
+
   
   /**
    * @param parentPathway
@@ -240,22 +235,6 @@ public class EntryExtended extends Entry {
   public boolean isSetCompartment(){
     return compartment!=null;
   }
-  
-  public boolean isSetDataSource(){
-    return dataSource!=null;
-  }
-
-  public String getDataSource() {
-    return dataSource;
-  }
-
-  /*
-   * Marked as deprecated because it is completely unused!
-   */
-  @Deprecated
-  public void setDataSource(String dataSource) {
-    this.dataSource = dataSource;
-  }
 
   
   /**
@@ -270,9 +249,6 @@ public class EntryExtended extends Entry {
     }    
     if(isSetCompartment()){
       attributes.put("compartment", compartment);
-    }
-    if(isSetDataSource()){
-      attributes.put("dataSource", dataSource);
     }
     if(isSetDatabaseIdentifiers()){
       for (java.util.Map.Entry<IdentifierDatabases, Collection<String>> entry : identifiers.entrySet()) {
@@ -315,7 +291,11 @@ public class EntryExtended extends Entry {
       
       equals &= o.isSetGeneType()==this.isSetGeneType();
       if(equals && isSetGeneType()) 
-        equals &= (o.getGeneType().equals(this.getGeneType()));      
+        equals &= (o.getGeneType().equals(this.getGeneType()));    
+      
+      equals &= o.isSetCompartment()==this.isSetCompartment();
+      if(equals && isSetCompartment()) 
+        equals &= (o.getCompartment().equals(this.getCompartment()));
       
     }
     return equals;

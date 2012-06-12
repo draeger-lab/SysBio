@@ -361,7 +361,8 @@ public class DatabaseIdentifiers {
           dbIdentifier2.equalsIgnoreCase("GeneID")) {
         return IdentifierDatabases.EntrezGene;
         
-      } else if (dbIdentifier2.equalsIgnoreCase("GO")) {
+      } else if (dbIdentifier2.equalsIgnoreCase("GO") || 
+          dbIdentifier2.equalsIgnoreCase("Gene Ontology")) {        
         return IdentifierDatabases.GeneOntology;
         
       } else if (dbIdentifier2.equalsIgnoreCase("INSDC")) {
@@ -375,6 +376,9 @@ public class DatabaseIdentifiers {
 
       } else if (dbIdentifier2.equalsIgnoreCase("EnzymeConsortium")) {
         return IdentifierDatabases.EC_code;
+        
+      } else if (dbIdentifier2.startsWith("reactome")) {
+        return IdentifierDatabases.Reactome;
         
       } else if (dbIdentifier2.equalsIgnoreCase("BioGRID") ||
           dbIdentifier2.equalsIgnoreCase("BIND") ||
