@@ -7,6 +7,10 @@ import java.util.Arrays;
 
 import javax.swing.JToolBar;
 
+import org.sbml.jsbml.SBMLDocument;
+
+import de.zbit.sbml.io.OpenedFile;
+
 public class DragNDropTest extends BaseFrame {
 
   private static final long serialVersionUID = -2668467238882169768L;
@@ -45,7 +49,7 @@ public class DragNDropTest extends BaseFrame {
     return null;
   }
 
-  public File saveFile() {
+  public File saveFileAs() {
     return null;
   }
 
@@ -53,5 +57,23 @@ public class DragNDropTest extends BaseFrame {
     DragNDropTest test = new DragNDropTest();
     test.setVisible(true);
   }
+
+/* (non-Javadoc)
+ * @see de.zbit.gui.BaseFrame#openFile(de.zbit.sbml.io.OpenedFile<org.sbml.jsbml.SBMLDocument>[])
+ */
+@SuppressWarnings("unchecked")
+@Override
+protected OpenedFile<SBMLDocument>[] openFile(OpenedFile<SBMLDocument>... files) {
+    System.out.println(Arrays.toString(files));
+	return null;
+}
+
+/* (non-Javadoc)
+ * @see de.zbit.gui.BaseFrame#saveFile()
+ */
+@Override
+public File saveFile() {
+	return null;
+}
 
 }

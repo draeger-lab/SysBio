@@ -41,11 +41,17 @@ public class OpenedFile<V> extends de.zbit.io.OpenedFile<V> implements PropertyC
 	}
 	
 	/**
-	 * @param file
 	 * @param document
 	 */
 	public OpenedFile(V document) {
 		super(document);
+	}
+	
+	/**
+	 * @param file
+	 */
+	public OpenedFile(File file) {
+		super(file);
 	}
 
 	/**
