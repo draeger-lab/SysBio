@@ -135,10 +135,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   private Map<String, LinkedList<Edge>> id2edge = new HashMap<String, LinkedList<Edge>>();
   
   /**
-   * map from reactionID to reaction node
+   * 
    */
-  private Map<String, Node> reactionID2reactionNode = new HashMap<String, Node>();
-  
   public SBML2GraphML() {
     super();
   }
@@ -154,14 +152,6 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    */
   public Map<String, LinkedList<Edge>> getId2edge(){
     return id2edge;
-  }
-  
-  /**
-   * Returns mapping from the reaction ID to related reaction node.
-   * @return
-   */
-  public Map<String, Node> getReactionID2reactionNode(){
-      return reactionID2reactionNode;
   }
   
   /**
@@ -230,11 +220,137 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       reaction2node = createReactions(document);
     }
     
+    createCompartments(document);
+    
     return;
   }
   
   
-  /**
+  private void createCompartments(SBMLDocument doc) {
+  	/*
+     *  TODO: Add COMPARTMENTS
+     */
+    HierarchyManager hm = simpleGraph.getHierarchyManager();
+    if (hm == null) {
+      hm = new HierarchyManager(simpleGraph);
+      simpleGraph.setHierarchyManager(hm);
+    }
+    Map<String, List<String>> mapOfChildren = new HashMap<String, List<String>>();
+    if (doc.isSetModel()) {
+    	Model model = doc.getModel();
+    	SBasePlugin extension = model.getExtension(LayoutConstants.getNamespaceURI(model.getLevel(), model.getVersion()));
+    	if (extension != null) {
+    		ExtendedLayoutModel layoutModel = (ExtendedLayoutModel) extension;
+    		int layoutIndex = 0;
+    		if (layoutModel.isSetListOfLayouts()) {
+    			Layout layout = layoutModel.getLayout(layoutIndex);
+    			for (int i = 0; i < layout.getCompartmentGlyphCount(); i++) {
+    				CompartmentGlyph cg = layout.getCompartmentGlyph(i);
+    				NamedSBase nsb = cg.getNamedSBaseInstance();
+    				if (nsb != null) {
+    					nsb.putUserObject("GLYPH", cg);
+    				}
+    			}
+    		}
+    	}
+    	// Find children
+    	List<String> children;
+    	for (Species s : model.getListOfSpecies()) {
+    		Compartment c = s.getCompartmentInstance();
+    		if ((c != null) && s.isSetId()) {
+    			addChild(c.getId(), s.getId(), mapOfChildren);
+    		}
+    	}
+    	for (Reaction r : model.getListOfReactions()) {
+    		Compartment c = r.getCompartmentInstance();
+    		if (c != null) {
+    			if (r.isSetId()) {
+    				addChild(c.getId(), r.getId(), mapOfChildren);
+    			}
+    		} else {
+    			Set<Compartment> compartments = findCompartments(r.getListOfReactants());
+    			compartments.addAll(findCompartments(r.getListOfModifiers()));
+    			compartments.addAll(findCompartments(r.getListOfProducts()));
+    			if (compartments.size() == 1) {
+    				addChild(compartments.iterator().next().getId(), r.getId(), mapOfChildren);
+    			}
+    		}
+    	}
+    	
+    	// Sort compartments from outside to inside
+    	LinkedList<Compartment> compList = new LinkedList<Compartment>();
+    	LinkedList<Compartment> temp = new LinkedList<Compartment>(model.getListOfCompartments());
+    	while (temp.size() > 0) {
+    		Iterator<Compartment> it = temp.iterator();
+    		while (it.hasNext()) {
+    			Compartment curr = it.next();
+    			if (!curr.isSetOutside()) {
+    				compList.addFirst(curr);
+    				it.remove();
+    			} else {
+						Compartment outside = curr.getOutsideInstance();
+						if (outside == null) {
+							compList.add(curr);
+							it.remove();
+						} else {
+							int pi = compList.indexOf(outside);
+							if (pi >= 0) { // contains
+								compList.addLast(curr);
+								it.remove();
+							} else if (!temp.contains(outside)) {
+								compList.add(curr);
+								it.remove();
+							}
+						}
+    			}
+    		}
+    	}
+    	temp = null;
+    	
+    	
+    	for (int i = 0; i < compList.size(); i++) {
+    		Compartment c = compList.get(i);
+    		String id = c.getId();
+    		double x = Double.NaN, y = Double.NaN, w = 25d, h = 25d;
+    		if (c.containsUserObjectKey("GLYPH")) {
+    			CompartmentGlyph cg = (CompartmentGlyph) c.getUserObject("GLYPH");
+    			if (cg.isSetBoundingBox()) {
+    				BoundingBox bb = cg.getBoundingBox();
+    				if (bb.isSetPosition()) {
+    					Point p = bb.getPosition();
+    					x = p.getX();
+    					y = p.getY();
+    				}
+    				if (bb.isSetDimensions()) {
+    					Dimensions d = bb.getDimensions();
+    					w = d.getWidth();
+    					h = d.getHeight();
+    				}
+    			}
+    			id = cg.getId();
+    			
+    			Node n = createNode(id, c.isSetName() ? c.getName() : c.getId(), SBO.getCompartment(), x, y, w, h);
+    			NodeRealizer nr = new CompartmentRealizer();
+    			nr.setFillColor(new Color(243, 243, 191));
+    			nr.setLineColor(new Color(204, 204, 0));
+    			simpleGraph.setRealizer(n, nr);
+    	    simpleGraph.getHierarchyManager().convertToGroupNode(n);
+    	    if (c.isSetOutsideInstance()) {
+    	    	Node outside = id2node.get(c.getOutside());
+    	    	if (outside != null) {
+        	    simpleGraph.getHierarchyManager().setParentNode(n, outside);
+    	    	}
+    	    }
+    	    children = mapOfChildren.get(c.getId());
+    	    if ((children != null) && (children.size() > 0)) {
+    	    	addChildren(n, children.toArray(new String[] {}));
+    	    }
+    		}
+    	}
+    }
+	}
+
+	/**
    * Fix ReactionNode nodes (determines 90° rotatable node orientation).
    * @param reaction2node
    */
@@ -287,7 +403,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         reaction2node .put(r, (ReactionNodeRealizer) nr);
         Node rNode = simpleGraph.createNode(nr);
         GraphElement2SBid.put(rNode, r.getId());
-        reactionID2reactionNode.put(r.getId(), rNode);
+        id2node.put(r.getId(), rNode);
         
         // Get information from the layout extension
         double x = Double.NaN;
@@ -497,89 +613,6 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
           }
         }
       }
-    }
-    
-    /*
-     *  TODO: Add COMPARTMENTS
-     */
-    HierarchyManager hm = simpleGraph.getHierarchyManager();
-    if (hm == null) {
-      hm = new HierarchyManager(simpleGraph);
-      simpleGraph.setHierarchyManager(hm);
-    }
-    Map<String, List<String>> mapOfChildren = new HashMap<String, List<String>>();
-    if (document.isSetModel()) {
-    	Model model = document.getModel();
-    	SBasePlugin extension = model.getExtension(LayoutConstants.getNamespaceURI(model.getLevel(), model.getVersion()));
-    	if (extension != null) {
-    		ExtendedLayoutModel layoutModel = (ExtendedLayoutModel) extension;
-    		int layoutIndex = 0;
-    		if (layoutModel.isSetListOfLayouts()) {
-    			Layout layout = layoutModel.getLayout(layoutIndex);
-    			for (int i = 0; i < layout.getCompartmentGlyphCount(); i++) {
-    				CompartmentGlyph cg = layout.getCompartmentGlyph(i);
-    				NamedSBase nsb = cg.getNamedSBaseInstance();
-    				if (nsb != null) {
-    					nsb.putUserObject("GLYPH", cg);
-    				}
-    			}
-    		}
-    	}
-    	// Find children
-    	List<String> children;
-    	for (Species s : model.getListOfSpecies()) {
-    		Compartment c = s.getCompartmentInstance();
-    		if ((c != null) && s.isSetId()) {
-    			addChild(c.getId(), s.getId(), mapOfChildren);
-    		}
-    	}
-    	for (Reaction r : model.getListOfReactions()) {
-    		Compartment c = r.getCompartmentInstance();
-    		if (c != null) {
-    			if (r.isSetId()) {
-    				addChild(c.getId(), r.getId(), mapOfChildren);
-    			}
-    		} else {
-    			Set<Compartment> compartments = findCompartments(r.getListOfReactants());
-    			compartments.addAll(findCompartments(r.getListOfModifiers()));
-    			compartments.addAll(findCompartments(r.getListOfProducts()));
-    			if (compartments.size() == 1) {
-    				addChild(compartments.iterator().next().getId(), r.getId(), mapOfChildren);
-    			}
-    		}
-    	}
-    	
-    	for (int i = 0; i < model.getCompartmentCount(); i++) {
-    		Compartment c = model.getCompartment(i);
-    		String id = c.getId();
-    		double x, y, w, h;
-    		if (c.containsUserObjectKey("GLYPH")) {
-    			CompartmentGlyph cg = (CompartmentGlyph) c.getUserObject("GLYPH");
-    			BoundingBox bb = cg.getBoundingBox();
-    			Point p = bb.getPosition();
-    			Dimensions d = bb.getDimensions();
-    			x = p.getX();
-    			y = p.getY();
-    			w = d.getWidth();
-    			h = d.getHeight();
-    			id = cg.getId();
-    		} else {
-    			x = 1d;
-    			y = 1d;
-    			w = 25d;
-    			h = 25d;
-    		}
-    		Node n = createNode(id, c.isSetName() ? c.getName() : c.getId(), SBO.getCompartment(), x, y, w, h);
-  			NodeRealizer nr = new CompartmentRealizer();
-  			nr.setFillColor(new Color(243, 243, 191));
-  			nr.setLineColor(new Color(204, 204, 0));
-  			simpleGraph.setRealizer(n, nr);
-  	    simpleGraph.getHierarchyManager().convertToGroupNode(n);
-  	    children = mapOfChildren.get(c.getId());
-  	    if ((children != null) && (children.size() > 0)) {
-  	    	addChildren(n, children.toArray(new String[] {}));
-  	    }
-    	}
     }
   }
   
