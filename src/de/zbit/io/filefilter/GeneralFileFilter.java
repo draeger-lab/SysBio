@@ -78,6 +78,9 @@ public abstract class GeneralFileFilter extends FileFilter implements
    */
   @Override
   public boolean equals(Object obj) {
+  	if (obj == null) {
+  		return false;
+  	}
     if (obj.getClass().equals(getClass())) {
       return obj.hashCode() == hashCode();
     }

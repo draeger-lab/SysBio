@@ -47,6 +47,10 @@ public class ComplexGroupNode extends GroupNodeRealizer implements SimpleCloneMa
     super(new ComplexNode());
   }
   
+  /**
+   * 
+   * @param nr
+   */
   public ComplexGroupNode(NodeRealizer nr) {
     super(nr);
     // If the given node realizer is of this type, then apply copy semantics. 
@@ -59,6 +63,10 @@ public class ComplexGroupNode extends GroupNodeRealizer implements SimpleCloneMa
     }
   }
   
+  /* (non-Javadoc)
+   * @see y.view.hierarchy.GroupNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
+  @Override
   public NodeRealizer createCopy(NodeRealizer nr) {
     ComplexGroupNode cgr = new ComplexGroupNode(nr);
     cgr.setNodeIsCloned(isClonedNode);
@@ -78,7 +86,6 @@ public class ComplexGroupNode extends GroupNodeRealizer implements SimpleCloneMa
   public boolean isNodeCloned() {
     return isClonedNode;
   }
-  
 
   /* (non-Javadoc)
    * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
@@ -86,7 +93,7 @@ public class ComplexGroupNode extends GroupNodeRealizer implements SimpleCloneMa
   @Override
   protected void paintShapeBorder(Graphics2D gfx) {
     gfx.setColor(getLineColor());
-    gfx.draw(getPolygon());
+    gfx.draw(createPolygon());
   }
   
   /* (non-Javadoc)
@@ -96,18 +103,18 @@ public class ComplexGroupNode extends GroupNodeRealizer implements SimpleCloneMa
   protected void paintFilledShape(Graphics2D gfx) {
    if (!isTransparent() && getFillColor()!=null) {
       gfx.setColor(getFillColor());
-      gfx.fill(getPolygon());
+      gfx.fill(createPolygon());
       
-      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, getPolygon());
+      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, createPolygon());
     }
   }
   
   /**
-   * See {@link ComplexNode#getPolygon(double, double, double, double)}
+   * See {@link ComplexNode#createPolygon(double, double, double, double)}
    * @return
    */
-  private Polygon getPolygon() {
-    return ComplexNode.getPolygon(getX(), getY(), getWidth(), getHeight());
+  private Polygon createPolygon() {
+    return ComplexNode.createPolygon(getX(), getY(), getWidth(), getHeight());
   }
   
 }

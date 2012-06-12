@@ -1387,7 +1387,12 @@ public class GUITools {
         UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
         // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
       } else if (isMacOSX()) {
-        UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+      	String osVersion = System.getProperty("os.version");
+      	if (osVersion.startsWith("10.4") || osVersion.startsWith("10.5") || osVersion.startsWith("10.6")) {
+      		UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+      	} else {
+      		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());	
+      	}
       } else if (osName.contains("Windows")) {
         UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
       } else {

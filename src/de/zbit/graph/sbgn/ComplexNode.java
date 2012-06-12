@@ -29,7 +29,7 @@ import y.view.ShapeNodeRealizer;
 /**
  * The "Complex"-node is a kind of a <b>group node</b> in SBGN.
  * It is actually a normal rectangle with four cutted edges.
- * See {@link #getPolygon()} for an ASCII-art.
+ * See {@link #createPolygon()} for an ASCII-art.
  * 
  * @author Finja B&uuml;chel
  * @author Clemens Wrzodek
@@ -41,12 +41,19 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
    * Is this node a cloned node? (I.e. another
    * instance must exist in the same graph).
    */
-  private boolean isClonedNode=false;
+  private boolean isClonedNode = false;
 
+  /**
+   * 
+   */
   public ComplexNode() {
     super(ShapeNodeRealizer.ROUND_RECT);
   }
   
+  /**
+   * 
+   * @param nr
+   */
   public ComplexNode(NodeRealizer nr) {
     super(nr);
     // If the given node realizer is of this type, then apply copy semantics. 
@@ -59,6 +66,10 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
     }
   }
   
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
+  @Override
   public NodeRealizer createCopy(NodeRealizer nr) {
     return new ComplexNode(nr);
   }
@@ -83,7 +94,7 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
   @Override
   protected void paintShapeBorder(Graphics2D gfx) {
     gfx.setColor(getLineColor());
-    gfx.draw(getPolygon());
+    gfx.draw(createPolygon());
   }
   
   /* (non-Javadoc)
@@ -93,18 +104,18 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
   protected void paintFilledShape(Graphics2D gfx) {
    if (!isTransparent() && getFillColor()!=null) {
       gfx.setColor(getFillColor());
-      gfx.fill(getPolygon());
+      gfx.fill(createPolygon());
       
-      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, getPolygon());
+      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, createPolygon());
     }
   }
   
   /**
-   * See {@link #getPolygon(double, double, double, double)}
+   * See {@link #createPolygon(double, double, double, double)}
    * @return
    */
-  private Polygon getPolygon() {
-    return getPolygon(getX(), getY(), getWidth(), getHeight());
+  private Polygon createPolygon() {
+    return createPolygon(getX(), getY(), getWidth(), getHeight());
   }
   
   /**
@@ -125,7 +136,7 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
    * @param h
    * @return
    */
-  public static Polygon getPolygon(double x, double y, double w, double h) {
+  public static Polygon createPolygon(double x, double y, double w, double h) {
     int arc = (int) (Math.min(w, h)/5);
     Polygon nodeshape = new Polygon(); 
     nodeshape.addPoint((int)  x+arc,             (int)y);                   // 1
@@ -140,4 +151,5 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
     
     return nodeshape;    
   }
+
 }

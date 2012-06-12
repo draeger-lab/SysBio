@@ -392,7 +392,7 @@ public abstract class SB_2GraphML <T> {
   
   protected Node createGroupNode(String id, String label, int sboTerm, double x, double y, double width, double height, String... childrenID) {
     HierarchyManager hm = simpleGraph.getHierarchyManager();
-    if (hm==null) {
+    if (hm == null) {
       hm = new HierarchyManager(simpleGraph);
       simpleGraph.setHierarchyManager(hm);
     }
@@ -406,13 +406,24 @@ public abstract class SB_2GraphML <T> {
     simpleGraph.getHierarchyManager().convertToGroupNode(n);
     
     
-    // Add children
+    addChildren(n, childrenID);
+    
+    return n;
+  }
+
+  /**
+   * 
+   * @param n
+   * @param childrenID
+   */
+	protected void addChildren(Node n, String... childrenID) {
+	// Add children
     //////////////////////////////////////
     NodeList nl = new NodeList();
-    double x2=Double.MAX_VALUE,y2=Double.MAX_VALUE,width2=0,height2=0;
-    for (int i=0; i<childrenID.length; i++) {
+    double x2 = Double.MAX_VALUE,y2=Double.MAX_VALUE, width2 = 0, height2 = 0;
+    for (int i = 0; i < childrenID.length; i++) {
       Node twoNode = id2node.get(childrenID[i]);
-      if (twoNode==null) {
+      if (twoNode == null) {
         // Below info, because KEGGtranslator creates only one group node
         // for qualitative and core models. Thus, there are always missing
         // components (because they are duplicated) in group nodes...
@@ -422,26 +433,25 @@ public abstract class SB_2GraphML <T> {
       NodeRealizer nr2 = simpleGraph.getRealizer(twoNode);
       x2 = Math.min(x2, nr2.getX());
       y2 = Math.min(y2, nr2.getY());
-      width2=Math.max(width2, (nr2.getWidth()+nr2.getX()));
-      height2=Math.max(height2, (nr2.getHeight()+nr2.getY()));
+      width2 = Math.max(width2, (nr2.getWidth() + nr2.getX()));
+      height2 = Math.max(height2, (nr2.getHeight() + nr2.getY()));
       
       nl.add(twoNode);
     }
     
     // Reposition group node to fit content
-    if (nl.size()>0) {
+    if (nl.size() > 0) {
       int offset = 5;
-      simpleGraph.setLocation(n, x2-offset, y2-offset-14);
-      simpleGraph.setSize(n, width2-x2+2*offset, height2-y2+2*offset+11);
+      simpleGraph.setLocation(n, x2 - offset, y2 - offset - 14);
+      simpleGraph.setSize(n, width2 - x2 + 2 * offset, height2 - y2 + 2 * offset + 11);
       
       // Set hierarchy
       simpleGraph.getHierarchyManager().setParentNode(nl, n);
       
       // Reposition group node to fit content (2nd time is necessary. Maybe yFiles bug...)
-      simpleGraph.setLocation(n, x2-offset, y2-offset-14);
-      simpleGraph.setSize(n, width2-x2+2*offset, height2-y2+2*offset+11);
+      simpleGraph.setLocation(n, x2 - offset, y2 - offset - 14);
+      simpleGraph.setSize(n, width2 - x2 + 2 * offset, height2 - y2 + 2 * offset + 11);
     }
-    
-    return n;
-  } 
+	}
+
 }

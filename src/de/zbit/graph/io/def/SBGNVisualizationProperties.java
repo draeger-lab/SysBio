@@ -169,6 +169,8 @@ public class SBGNVisualizationProperties {
       return new Color(224,238,238);   // azure2
     } else if (SBO.isChildOf(sboTerm, SBO.getEmptySet())) {
     	return new Color(255, 204, 204); // Pink
+    } else if (SBO.isChildOf(sboTerm, SBO.getCompartment())) {
+    	return Color.WHITE;
     } else {
       return new Color(144,238,144);   // LightGreen
     }
