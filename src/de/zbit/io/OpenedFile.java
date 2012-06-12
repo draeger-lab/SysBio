@@ -58,12 +58,28 @@ public class OpenedFile<T> extends Component implements PropertyChangeListener{
 	public File getFile() {
 		return file;
 	}
+	
+	/**
+	 * set the File for saving changes
+	 * @param file
+	 */
+	public void setFile(File file) {
+		this.file = file;
+	}
 
 	/**
 	 * @return the original
 	 */
 	public T getDocument() {
 		return document;
+	}
+	
+	/**
+	 * 
+	 * @param document
+	 */
+	public void setDocument(T document) {
+		this.document = document;
 	}
 
 	/**
@@ -81,19 +97,19 @@ public class OpenedFile<T> extends Component implements PropertyChangeListener{
 	}
 	
 	/**
-	 * set the File for saving changes
-	 * @param file
+	 * 
+	 * @param original
 	 */
-	public void setFile(File file) {
-		this.file = file;
+	public OpenedFile(T document) {
+		this(null, document);
 	}
 	
 	/**
 	 * 
 	 * @param original
 	 */
-	public OpenedFile(T original) {
-		this(null, original);
+	public OpenedFile(File file) {
+		this(file, null);
 	}
 	
 	/**

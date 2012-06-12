@@ -67,6 +67,8 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
+import org.sbml.jsbml.SBMLDocument;
+
 import de.zbit.AppConf;
 import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.gui.actioncommand.ActionCommandWithIcon;
@@ -76,6 +78,7 @@ import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
+import de.zbit.sbml.io.OpenedFile;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
@@ -581,9 +584,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
         @SuppressWarnings("unchecked")
         public void actionPerformed(ActionEvent event) {
           if (event.getID() == FileDropHandler.FILE_DROPPED) {
-            openFileAndLogHistory((File) event.getSource());
+            openFileAndLogHistory(new OpenedFile<SBMLDocument>((File) event.getSource()));
           } else if (event.getID() == FileDropHandler.FILES_DROPPED) {
-            openFileAndLogHistory((File[])((List<File>) event.getSource()).toArray());
+        	File[] files = (File[])((List<File>) event.getSource()).toArray();
+        	OpenedFile<SBMLDocument>[] openedFiles = new OpenedFile[files.length];
+        	for (int i = 0; i < files.length; i++){
+        		openedFiles[i] = new OpenedFile<SBMLDocument>(files[i]);
+        	}
+            openFileAndLogHistory(openedFiles);
           }
         }
       }
@@ -1281,48 +1289,50 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * This method is linked to the {@link BaseAction#FILE_OPEN} and will be
 	 * called when ever any element associated with this action command is
 	 * activated. The intention of this method is that the user can either choose
-	 * which file to open or that one or multiple instances of {@link File} are
+	 * which file to open or that one or multiple instances of {@link OpenedFile} are
 	 * passed to this method. In both cases this method knows what to do with
-	 * these {@link File}s or their content. For instance, it might be necessary
+	 * these {@link OpenedFile}s or their content. For instance, it might be necessary
 	 * to change the content of this {@link BaseFrame}'s main component according
-	 * to the content of the selected or given {@link File}(s).
+	 * to the content of the selected or given {@link OpenedFile}(s).
 	 * </p>
 	 * <p>
 	 * However, this method will not be called directly in this case, it is rather
-	 * wrapped in {@link #openFileAndLogHistory(File...)}. This method tries to
+	 * wrapped in {@link #openFileAndLogHistory(OpenedFile...)}. This method tries to
 	 * memorize all opened files to make them accessible to the user more easily
 	 * in the {@link JMenuBar} of this {@link BaseFrame}. Therefore, it is
-	 * necessary that this method returns all {@link File} instances that are
+	 * necessary that this method returns all {@link OpenedFile} instances that are
 	 * selected by the user when executing this method.
 	 * </p>
 	 * <p>
-	 * In case that one or multiple instances of {@link File} are passed to this
-	 * method, here is the correct location to decide whether these {@link File}
+	 * In case that one or multiple instances of {@link OpenedFile} are passed to this
+	 * method, here is the correct location to decide whether these {@link OpenedFile}
 	 * objects can be processed. Maybe a warning must be displayed to the user or
-	 * maybe invalid input {@link File}s are simply to be ignored.
+	 * maybe invalid input {@link OpenedFile}s are simply to be ignored.
 	 * </p>
 	 * 
-	 * @return An array of all those {@link File} instances that are either
+	 * @return An array of all those {@link OpenedFile} instances that are either
 	 *         selected by the user or the left over from the given arguments,
-	 *         i.e., the subset of valid input files from the given {@link File}
+	 *         i.e., the subset of valid input files from the given {@link OpenedFile}
 	 *         arguments.
 	 * @see #createMainComponent()
 	 * @see #openFileAndLogHistory(File...)
 	 */
-	protected abstract File[] openFile(File... files);
+	@SuppressWarnings("unchecked")
+	protected abstract OpenedFile<SBMLDocument>[] openFile(OpenedFile<SBMLDocument>... files);
 	
 	/**
-	 * This method wraps {@link #openFileAndLogHistory(File...)} and simply
+	 * This method wraps {@link #openFileAndLogHistory(OpenedFile...)} and simply
 	 * provides a way to call this other method without the necessity to pass any
 	 * arguments to it.
 	 * 
-	 * @return An array of {@link File} objects that have been selected by the
+	 * @return An array of {@link OpenedFile} objects that have been selected by the
 	 *         user or null if the user cancels the operation.
-	 * @see #openFileAndLogHistory(File...)
-	 * @see #openFile(File...)
+	 * @see #openFileAndLogHistory(OpenedFile...)
+	 * @see #openFile(OpenedFile...)
 	 */
-	public final File[] openFileAndLogHistory() {
-		return openFileAndLogHistory(new File[0]);
+	@SuppressWarnings("unchecked")
+	public final OpenedFile<SBMLDocument>[] openFileAndLogHistory() {
+		return openFileAndLogHistory(new OpenedFile[0]);
 	}
 	
 	/**
@@ -1340,41 +1350,42 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *        {@link #openFile(File...)}.
 	 * @return the files that originate from the method {@link #openFile(File...)}.
 	 */
-	protected File[] openFileAndLogHistory(File... files) {
+	@SuppressWarnings("unchecked")
+	protected OpenedFile<SBMLDocument>[] openFileAndLogHistory(OpenedFile<SBMLDocument>... files) {
 		files = openFile(files);
 		// Remember the baseDir and put files into history.
-    if ((files != null) && (files.length > 0)) {
-      List<File> fileList = new LinkedList<File>();
-      // Process all those files that have just been opened.
-      String baseDir = null;
-      boolean sameBaseDir = true;
-      for (File file : files) {
-        if ((file != null) && file.exists() && file.canRead() && !fileList.contains(file)) {
-          if (baseDir == null) {
-            baseDir = file.getParent();
-          } else if (!baseDir.equals(file.getParent())) {
-            sameBaseDir = false;
-          }
-          fileList.add(file);
-        }
-      }
-      // Memorize the default open directory.
-      if (sameBaseDir && (baseDir != null)) {
-        SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
-        prefs.put(OPEN_DIR, baseDir);
-        try {
-          prefs.flush();
-        } catch (BackingStoreException exc) {
-          // do NOT show this error, because the user really dosn't know
-          // how to handle a "The value for OPEN_DIR is out of range [...]"
-          // message.
-          logger.finest(exc.getLocalizedMessage());
-        }
-      }
-      // Allow users to close the file(s) again
-      GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.FILE_CLOSE);
-      addToFileHistory(fileList);
-    }
+	    if ((files != null) && (files.length > 0)) {
+	      List<File> fileList = new LinkedList<File>();
+	      // Process all those files that have just been opened.
+	      String baseDir = null;
+	      boolean sameBaseDir = true;
+	      for (OpenedFile<SBMLDocument> file : files) {
+	        if ((file != null) && file.getFile().exists() && file.getFile().canRead() && !fileList.contains(file)) {
+	          if (baseDir == null) {
+	            baseDir = file.getFile().getParent();
+	          } else if (!baseDir.equals(file.getFile().getParent())) {
+	            sameBaseDir = false;
+	          }
+	          fileList.add(file.getFile());
+	        }
+	      }
+	      // Memorize the default open directory.
+	      if (sameBaseDir && (baseDir != null)) {
+	        SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+	        prefs.put(OPEN_DIR, baseDir);
+	        try {
+	          prefs.flush();
+	        } catch (BackingStoreException exc) {
+	          // do NOT show this error, because the user really dosn't know
+	          // how to handle a "The value for OPEN_DIR is out of range [...]"
+	          // message.
+	          logger.finest(exc.getLocalizedMessage());
+	        }
+	      }
+	      // Allow users to close the file(s) again
+	      GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.FILE_CLOSE);
+	      addToFileHistory(fileList);
+	    }
 		return files;
 	}
 	
@@ -1445,16 +1456,36 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * {@link BaseFrameTab} interface and simply call
 	 * {@link BaseFrameTab#saveToFile()}.
 	 * 
-	 * TODO: change to abstract method
-	 * 
 	 * @return the {@link File} into which the content has been saved. If the
 	 *         returned value is not <code>null</code>, the directory in which the
 	 *         {@link File} is located is stored as the
 	 *         {@link GUIOptions#SAVE_DIR} property of the current class (but only
 	 *         if it exists and can be read).
 	 */
-	public File saveFileAs(){
-		return null;
+	public abstract File saveFileAs();
+	
+	/**
+	 * Calls {@link #saveFile()} and memorizes the directory in which a file was
+	 * stored as a {@link GUIOptions#SAVE_DIR} for the current {@link Class}
+	 * (which implements {@link GUIOptions}. While saving some file, the actions
+	 * {@link BaseAction#FILE_SAVE} and {@link BaseAction#FILE_SAVE_AS} are
+	 * disabled. When done, these are enabled again. Override this method if you
+	 * want a different behavior. If {@link #saveFile()} returns null, than calls
+	 * {@link #saveFileAs()}
+	 */
+	public void saveFileToOriginal() {
+		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
+				BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
+		File file = saveFile();
+		if (file != null) {
+			if (!file.isDirectory()) {
+				file = file.getParentFile();
+			}
+		} else {
+			saveFileAs();
+		}
+		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
+			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
 	}
 	
 	/**
@@ -1464,38 +1495,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * {@link BaseAction#FILE_SAVE} and {@link BaseAction#FILE_SAVE_AS} are
 	 * disabled. When done, these are enabled again. Override this method if you
 	 * want a different behavior.
-	 * 
-	 * TODO: change saveFileAs() to saveFile()
-	 */
-	public void saveFileToOriginal() {
-		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
-				BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
-		File file = saveFileAs();
-		if (file != null) {
-			if (!file.isDirectory()) {
-				file = file.getParentFile();
-			}
-		} else {
-			saveFile();
-		}
-		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
-			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
-	}
-	
-	/**
-	 * Calls {@link #saveFile()} and memorizes the directory in which a file was
-	 * stored as a {@link GUIOptions#SAVE_DIR} for the current {@link Class}
-	 * (which implements {@link GUIOptions}. While saving some file, the actions
-	 * {@link BaseAction#FILE_SAVE} and {@link BaseAction#FILE_SAVE_AS} are
-	 * disabled. When done, these are enabled again. Override this method if you
-	 * want a different behavior.
-	 * 
-	 * TODO: change saveFile() to saveFileAs()
 	 */
 	public void saveFileAndLogSaveDir() {
 		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
 			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
-		File file = saveFile();
+		File file = saveFileAs();
 		if (file != null) {
 			if (!file.isDirectory()) {
 				file = file.getParentFile();
@@ -1645,8 +1649,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			      /* (non-Javadoc)
 			       * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			       */
-			      public void actionPerformed(ActionEvent e) {
-			        openFileAndLogHistory(file);
+			      @SuppressWarnings("unchecked")
+				public void actionPerformed(ActionEvent e) {
+			        openFileAndLogHistory(new OpenedFile<SBMLDocument>(file));
 			      }
 			    });
 			    
