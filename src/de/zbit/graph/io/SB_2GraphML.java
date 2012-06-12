@@ -417,6 +417,10 @@ public abstract class SB_2GraphML <T> {
    * @param childrenID
    */
 	protected void addChildren(Node n, String... childrenID) {
+		if (childrenID == null) {
+			return;
+		}
+		
 	// Add children
     //////////////////////////////////////
     NodeList nl = new NodeList();
