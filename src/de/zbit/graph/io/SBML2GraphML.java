@@ -20,6 +20,7 @@
  */
 package de.zbit.graph.io;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,20 +33,27 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.AbstractNamedSBase;
+import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.ListOf;
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
+import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SimpleSpeciesReference;
+import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.groups.Group;
 import org.sbml.jsbml.ext.groups.GroupModel;
 import org.sbml.jsbml.ext.layout.BoundingBox;
+import org.sbml.jsbml.ext.layout.CompartmentGlyph;
+import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
+import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.qual.Input;
@@ -63,7 +71,9 @@ import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.LineType;
 import y.view.NodeRealizer;
+import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.sbgn.CloneMarker;
+import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.math.MathUtils;
 import de.zbit.util.Utils;
@@ -175,7 +185,9 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   protected void createNodesAndEdges(SBMLDocument document) {
     
     // Check if we have anything to visualize
-    if (document==null || !document.isSetModel()) return;
+    if ((document == null) || !document.isSetModel()) {
+    	return;
+    }
     
     // Get list of species
     List<? extends AbstractNamedSBase> species;
@@ -392,7 +404,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    */
   private void addSpeciesToGraph(List<? extends AbstractNamedSBase> species, SBMLDocument document) {
     // Create a list of species with enzymatic activity.
-    Set<String> enzymeSpeciesIDs = document!=null? getListOfEnzymes(document) : null;
+    Set<String> enzymeSpeciesIDs = document != null ? getListOfEnzymes(document) : null;
     
     for (AbstractNamedSBase s : species) {
       // Get the SBO-term (defining the shape and color)
@@ -428,7 +440,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
          * multiple glyphs for one species.
          */
         multipleCopiesAvailable = false;
-        if (layoutsTemp!=null) {
+        if (layoutsTemp != null) {
           layouts = new ArrayList<BoundingBox>(layoutsTemp); // Convert to list
           
         }
@@ -437,10 +449,10 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       for (int aktNode = 0; aktNode < (multipleCopiesAvailable?layouts.size():1); aktNode++) {
         
         // Initialize default layout variables
-        double x=Double.NaN;
-        double y=Double.NaN;
-        double w=46;
-        double h=17;
+        double x = Double.NaN;
+        double y = Double.NaN;
+        double w = 46;
+        double h = 17;
         
         // Get information from the layout extension
         if (useLayoutExtension && layouts!=null) {
@@ -452,7 +464,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             }
             if (g.isSetPosition()) {
               // Ignore 0|0 positions. They're due to default values
-              if (g.getPosition().getX()!=0d || g.getPosition().getY()!=0d) {
+              if ((g.getPosition().getX() != 0d) || g.getPosition().getY() != 0d) {
                 x = g.getPosition().getX();
                 y = g.getPosition().getY();
               }
@@ -465,10 +477,10 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         Node n;
         if (s instanceof Group && ((Group) s).isSetListOfMembers()) {
           // Create a group node (SBML-groups extension)
-          int size = ((Group)s).getListOfMembers().size();
+          int size = ((Group) s).getListOfMembers().size();
           String[] groupMembers = new String[size];
-          for (int i=0; i < size; i++) {
-            groupMembers[i] = ((Group)s).getMember(i).getSymbol();
+          for (int i = 0; i < size; i++) {
+            groupMembers[i] = ((Group) s).getMember(i).getSymbol();
           }
           n = createGroupNode(s.getId(), s.getName(), sboTerm, x, y, w, h, groupMembers);
           
@@ -486,10 +498,129 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         }
       }
     }
+    
+    /*
+     *  TODO: Add COMPARTMENTS
+     */
+    HierarchyManager hm = simpleGraph.getHierarchyManager();
+    if (hm == null) {
+      hm = new HierarchyManager(simpleGraph);
+      simpleGraph.setHierarchyManager(hm);
+    }
+    Map<String, List<String>> mapOfChildren = new HashMap<String, List<String>>();
+    if (document.isSetModel()) {
+    	Model model = document.getModel();
+    	SBasePlugin extension = model.getExtension(LayoutConstants.getNamespaceURI(model.getLevel(), model.getVersion()));
+    	if (extension != null) {
+    		ExtendedLayoutModel layoutModel = (ExtendedLayoutModel) extension;
+    		int layoutIndex = 0;
+    		if (layoutModel.isSetListOfLayouts()) {
+    			Layout layout = layoutModel.getLayout(layoutIndex);
+    			for (int i = 0; i < layout.getCompartmentGlyphCount(); i++) {
+    				CompartmentGlyph cg = layout.getCompartmentGlyph(i);
+    				NamedSBase nsb = cg.getNamedSBaseInstance();
+    				if (nsb != null) {
+    					nsb.putUserObject("GLYPH", cg);
+    				}
+    			}
+    		}
+    	}
+    	// Find children
+    	List<String> children;
+    	for (Species s : model.getListOfSpecies()) {
+    		Compartment c = s.getCompartmentInstance();
+    		if ((c != null) && s.isSetId()) {
+    			addChild(c.getId(), s.getId(), mapOfChildren);
+    		}
+    	}
+    	for (Reaction r : model.getListOfReactions()) {
+    		Compartment c = r.getCompartmentInstance();
+    		if (c != null) {
+    			if (r.isSetId()) {
+    				addChild(c.getId(), r.getId(), mapOfChildren);
+    			}
+    		} else {
+    			Set<Compartment> compartments = findCompartments(r.getListOfReactants());
+    			compartments.addAll(findCompartments(r.getListOfModifiers()));
+    			compartments.addAll(findCompartments(r.getListOfProducts()));
+    			if (compartments.size() == 1) {
+    				addChild(compartments.iterator().next().getId(), r.getId(), mapOfChildren);
+    			}
+    		}
+    	}
+    	
+    	for (int i = 0; i < model.getCompartmentCount(); i++) {
+    		Compartment c = model.getCompartment(i);
+    		String id = c.getId();
+    		double x, y, w, h;
+    		if (c.containsUserObjectKey("GLYPH")) {
+    			CompartmentGlyph cg = (CompartmentGlyph) c.getUserObject("GLYPH");
+    			BoundingBox bb = cg.getBoundingBox();
+    			Point p = bb.getPosition();
+    			Dimensions d = bb.getDimensions();
+    			x = p.getX();
+    			y = p.getY();
+    			w = d.getWidth();
+    			h = d.getHeight();
+    			id = cg.getId();
+    		} else {
+    			x = 1d;
+    			y = 1d;
+    			w = 25d;
+    			h = 25d;
+    		}
+    		Node n = createNode(id, c.isSetName() ? c.getName() : c.getId(), SBO.getCompartment(), x, y, w, h);
+  			NodeRealizer nr = new CompartmentRealizer();
+  			nr.setFillColor(new Color(243, 243, 191));
+  			nr.setLineColor(new Color(204, 204, 0));
+  			simpleGraph.setRealizer(n, nr);
+  	    simpleGraph.getHierarchyManager().convertToGroupNode(n);
+  	    children = mapOfChildren.get(c.getId());
+  	    if ((children != null) && (children.size() > 0)) {
+  	    	addChildren(n, children.toArray(new String[] {}));
+  	    }
+    	}
+    }
   }
   
-  
   /**
+   * 
+   * @param listOfReactionParticipants
+   * @return
+   */
+  private Set<Compartment> findCompartments(ListOf<? extends SimpleSpeciesReference> listOfReactionParticipants) {
+  	Set<Compartment> setOfComp = new HashSet<Compartment>();
+		for (int i = 0; i < listOfReactionParticipants.size(); i++) {
+			SimpleSpeciesReference ref = listOfReactionParticipants.get(i);
+			Species s = ref.getSpeciesInstance();
+			if (s != null) {
+				Compartment curr = s.getCompartmentInstance();
+				if (curr != null) {
+					setOfComp.add(curr);
+				}
+			}
+		}
+		return setOfComp;
+	}
+
+	/**
+   * 
+   * @param compartmentID
+   * @param elementID
+   * @param mapOfChildren
+   */
+  private void addChild(String compartmentID, String elementID, Map<String, List<String>> mapOfChildren) {
+  	List<String> children = mapOfChildren.get(compartmentID);
+		if (children == null) {
+			children = new ArrayList<String>();
+			children.add(elementID);
+			mapOfChildren.put(compartmentID, children);
+		} else {
+			children.add(elementID);
+		}
+	}
+
+	/**
    * Parses the layout information from the given <code>document</code>.
    * This will set the {@link #useLayoutExtension} and
    * {@link #id2layoutMap} variables.

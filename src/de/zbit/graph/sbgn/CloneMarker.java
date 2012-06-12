@@ -53,7 +53,7 @@ import y.view.NodeRealizer;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public abstract interface CloneMarker {
+public interface CloneMarker {
   
   /**
    * This defines the exact amount of the lower part of a node,
@@ -73,8 +73,6 @@ public abstract interface CloneMarker {
    * @return
    */
   public boolean isNodeCloned();
-  
-
 
   /**
    * Provide some tools to help realize the {@link CloneMarker}.
@@ -84,26 +82,27 @@ public abstract interface CloneMarker {
    */
   public static class Tools {
     
-  /**
-   * Use this method, e.g., in your "y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)"
-   * method to make the lower part black.
-   * @param gfx
-   * @param nr
-   * @param shape
-   */
-  public static <T extends NodeRealizer & CloneMarker> void paintLowerBlackIfCloned(Graphics2D gfx, T nr, Shape shape) {
-    // Eventually paint the lower part black
-    if (nr.isNodeCloned()) {
-      // Create clip and draw black
-      gfx.setClip(shape);
-      gfx.clip(new Rectangle((int)nr.getX(), (int)(nr.getY()+nr.getHeight()*(1d-partToPaintBlack)), (int)nr.getWidth(), (int)Math.ceil((nr.getHeight()*partToPaintBlack))));
-      gfx.setColor(Color.BLACK);
-      gfx.fill(gfx.getClip());
-      // Reset
-      gfx.setClip(null);
-      gfx.setColor(nr.getFillColor());
-    }
-  }
+  	/**
+  	 * Use this method, e.g., in your "y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)"
+  	 * method to make the lower part black.
+  	 * @param gfx
+  	 * @param nr
+  	 * @param shape
+  	 */
+  	public static <T extends NodeRealizer & CloneMarker> void paintLowerBlackIfCloned(Graphics2D gfx, T nr, Shape shape) {
+  		// Eventually paint the lower part black
+  		if (nr.isNodeCloned()) {
+  			// Create clip and draw black
+  			gfx.setClip(shape);
+  			gfx.clip(new Rectangle((int) nr.getX(), (int)(nr.getY()+nr.getHeight()*(1d-partToPaintBlack)), (int)nr.getWidth(), (int) Math.ceil((nr.getHeight()*partToPaintBlack))));
+  			gfx.setColor(Color.BLACK);
+  			gfx.fill(gfx.getClip());
+  			// Reset
+  			gfx.setClip(null);
+  			gfx.setColor(nr.getFillColor());
+  		}
+  	}
+
   }
   
 }
