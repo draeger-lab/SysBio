@@ -307,7 +307,6 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     	}
     	temp = null;
     	
-    	
     	for (int i = 0; i < compList.size(); i++) {
     		Compartment c = compList.get(i);
     		String id = c.getId();
@@ -334,7 +333,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     			nr.setFillColor(new Color(243, 243, 191));
     			nr.setLineColor(new Color(204, 204, 0));
     			simpleGraph.setRealizer(n, nr);
-    	    simpleGraph.getHierarchyManager().convertToGroupNode(n);
+    	    hm.convertToGroupNode(n);
     	    if (c.isSetOutsideInstance()) {
     	    	Node outside = id2node.get(c.getOutside());
     	    	if (outside != null) {

@@ -32,6 +32,7 @@ import org.sbml.jsbml.SBO;
 
 import y.base.DataMap;
 import y.base.Edge;
+import y.base.EdgeCursor;
 import y.base.Node;
 import y.base.NodeList;
 import y.base.NodeMap;
@@ -371,7 +372,7 @@ public abstract class SB_2GraphML <T> {
    */
   public static NodeRealizer setupGroupNode(NodeLabel nl) {
     GroupNodeRealizer nr = new ComplexGroupNode();
-    ((GroupNodeRealizer)nr).setGroupClosed(false);
+    ((GroupNodeRealizer) nr).setGroupClosed(false);
     //    nr.setTransparent(true);
     
     // Eliminate the expanding/ collapsing icons
@@ -390,13 +391,19 @@ public abstract class SB_2GraphML <T> {
     return nr;
   }
   
+  /**
+   * 
+   * @param id
+   * @param label
+   * @param sboTerm
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   * @param childrenID
+   * @return
+   */
   protected Node createGroupNode(String id, String label, int sboTerm, double x, double y, double width, double height, String... childrenID) {
-    HierarchyManager hm = simpleGraph.getHierarchyManager();
-    if (hm == null) {
-      hm = new HierarchyManager(simpleGraph);
-      simpleGraph.setHierarchyManager(hm);
-    }
-    
     // First, create a plain node.
     Node n = createNode(id, label, sboTerm, x, y, width, height);
     
@@ -450,7 +457,23 @@ public abstract class SB_2GraphML <T> {
       simpleGraph.setSize(n, width2 - x2 + 2 * offset, height2 - y2 + 2 * offset + 11);
       
       // Set hierarchy
-      simpleGraph.getHierarchyManager().setParentNode(nl, n);
+      HierarchyManager hm = simpleGraph.getHierarchyManager();
+      if (hm == null) {
+        hm = new HierarchyManager(simpleGraph);
+        simpleGraph.setHierarchyManager(hm);
+      }
+      hm.setParentNode(nl, n);
+      
+      for (int i = 0; i < nl.size(); i++) {
+      	Node node = (Node) nl.get(i);
+      	EdgeCursor ec = node.edges();
+      	for (int j = 0; j < ec.size(); j++, ec.next()) {
+      		Edge edge = ec.edge();
+      		if ((hm.getParentNode(edge.source()) == n) || (hm.getParentNode(edge.target()) == n)) {
+      			hm.convertToInterEdge(edge, edge.source(), edge.target());
+      		}
+      	}
+      }
       
       // Reposition group node to fit content (2nd time is necessary. Maybe yFiles bug...)
       simpleGraph.setLocation(n, x2 - offset, y2 - offset - 14);

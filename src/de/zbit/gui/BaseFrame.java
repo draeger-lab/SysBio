@@ -67,8 +67,6 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
-import org.sbml.jsbml.SBMLDocument;
-
 import de.zbit.AppConf;
 import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.gui.actioncommand.ActionCommandWithIcon;
@@ -571,7 +569,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
    * Adds a drag'n drop functionality to this panel. This should
    * be called, whenever the user decides to have a "File Open"
    * option on his menu bar.
-   * It uses the {@link #openFileAndLogHistory(File...)} method
+   * It uses the {@link #openFileAndLogHistory(OpenedFile...)} method
    * to open the file(s).
    */
   private void createDragNDropFunctionality() {
@@ -581,22 +579,23 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
       	/* (non-Javadoc)
       	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
       	 */
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        //@Override
         public void actionPerformed(ActionEvent event) {
           if (event.getID() == FileDropHandler.FILE_DROPPED) {
-            openFileAndLogHistory(new OpenedFile<SBMLDocument>((File) event.getSource()));
+            openFileAndLogHistory(new OpenedFile((File) event.getSource()));
           } else if (event.getID() == FileDropHandler.FILES_DROPPED) {
-        	File[] files = (File[])((List<File>) event.getSource()).toArray();
-        	OpenedFile<SBMLDocument>[] openedFiles = new OpenedFile[files.length];
-        	for (int i = 0; i < files.length; i++){
-        		openedFiles[i] = new OpenedFile<SBMLDocument>(files[i]);
-        	}
-            openFileAndLogHistory(openedFiles);
+          	File[] files = ((List<File>) event.getSource()).toArray(new File[] {});
+						OpenedFile[] openedFiles = new OpenedFile[files.length];
+          	for (int i = 0; i < files.length; i++) {
+          		openedFiles[i] = new OpenedFile(files[i]);
+          	}
+          	openFileAndLogHistory(openedFiles);
           }
         }
       }
     );
-    this.setTransferHandler(dragNdrop);
+    setTransferHandler(dragNdrop);
   }
 	
 	/**
@@ -1317,8 +1316,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @see #createMainComponent()
 	 * @see #openFileAndLogHistory(File...)
 	 */
-	@SuppressWarnings("unchecked")
-	protected abstract OpenedFile<SBMLDocument>[] openFile(OpenedFile<SBMLDocument>... files);
+	protected abstract <T> OpenedFile<T>[] openFile(OpenedFile<T>... files);
 	
 	/**
 	 * This method wraps {@link #openFileAndLogHistory(OpenedFile...)} and simply
@@ -1331,7 +1329,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @see #openFile(OpenedFile...)
 	 */
 	@SuppressWarnings("unchecked")
-	public final OpenedFile<SBMLDocument>[] openFileAndLogHistory() {
+	public final <T> OpenedFile<T>[] openFileAndLogHistory() {
 		return openFileAndLogHistory(new OpenedFile[0]);
 	}
 	
@@ -1350,8 +1348,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *        {@link #openFile(File...)}.
 	 * @return the files that originate from the method {@link #openFile(File...)}.
 	 */
-	@SuppressWarnings("unchecked")
-	protected OpenedFile<SBMLDocument>[] openFileAndLogHistory(OpenedFile<SBMLDocument>... files) {
+	protected <T> OpenedFile<T>[] openFileAndLogHistory(OpenedFile<T>... files) {
 		files = openFile(files);
 		// Remember the baseDir and put files into history.
 	    if ((files != null) && (files.length > 0)) {
@@ -1359,7 +1356,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	      // Process all those files that have just been opened.
 	      String baseDir = null;
 	      boolean sameBaseDir = true;
-	      for (OpenedFile<SBMLDocument> file : files) {
+	      for (OpenedFile<T> file : files) {
 	        if ((file != null) && file.getFile().exists() && file.getFile().canRead() && !fileList.contains(file)) {
 	          if (baseDir == null) {
 	            baseDir = file.getFile().getParent();
@@ -1649,10 +1646,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			      /* (non-Javadoc)
 			       * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			       */
-			      @SuppressWarnings("unchecked")
-				public void actionPerformed(ActionEvent e) {
-			        openFileAndLogHistory(new OpenedFile<SBMLDocument>(file));
-			      }
+			    	@SuppressWarnings({ "unchecked", "rawtypes" })
+			    	public void actionPerformed(ActionEvent e) {
+			    		openFileAndLogHistory(new OpenedFile(file));
+			    	}
 			    });
 			    
 			    jMenu.add(fileItem);
