@@ -156,7 +156,7 @@ public class SBGNVisualizationProperties {
   /**
    * @return the color of the appropriate shape
    */
-  private static Color getColor(int sboTerm) {
+  public static Color getFillColor(int sboTerm) {
     if (SBO.isChildOf(sboTerm, SBO.getNonCovalentComplex())){
       return new Color(24,116,205);    // DodgerBlue3
     } else if (SBO.isChildOf(sboTerm, SBO.getGene())){ 
@@ -170,10 +170,23 @@ public class SBGNVisualizationProperties {
     } else if (SBO.isChildOf(sboTerm, SBO.getEmptySet())) {
     	return new Color(255, 204, 204); // Pink
     } else if (SBO.isChildOf(sboTerm, SBO.getCompartment())) {
-    	return Color.WHITE;
+    	return new Color(243, 243, 191);
     } else {
       return new Color(144,238,144);   // LightGreen
     }
+  }
+  
+  /**
+   * 
+   * @param sboTerm
+   * @return
+   */
+  public static Color getLineColor(int sboTerm) {
+  	if (SBO.isChildOf(sboTerm, SBO.getCompartment())) {
+  		// dark yellow
+  		return new Color(204, 204, 0);
+  	}
+  	return Color.BLACK;
   }
 
   /**
@@ -193,7 +206,7 @@ public class SBGNVisualizationProperties {
     }
     
     // Set a common color
-    ret.setFillColor(getColor(sboTerm));
+    ret.setFillColor(getFillColor(sboTerm));
     
     return ret;
   }

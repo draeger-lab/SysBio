@@ -464,16 +464,16 @@ public abstract class SB_2GraphML <T> {
       }
       hm.setParentNode(nl, n);
       
-      for (int i = 0; i < nl.size(); i++) {
-      	Node node = (Node) nl.get(i);
-      	EdgeCursor ec = node.edges();
-      	for (int j = 0; j < ec.size(); j++, ec.next()) {
-      		Edge edge = ec.edge();
-      		if ((hm.getParentNode(edge.source()) == n) || (hm.getParentNode(edge.target()) == n)) {
-      			hm.convertToInterEdge(edge, edge.source(), edge.target());
-      		}
-      	}
-      }
+//      for (int i = 0; i < nl.size(); i++) {
+//      	Node node = (Node) nl.get(i);
+//      	EdgeCursor ec = node.edges();
+//      	for (int j = 0; j < ec.size(); j++, ec.next()) {
+//      		Edge edge = ec.edge();
+//      		if ((hm.getParentNode(edge.source()) == n) || (hm.getParentNode(edge.target()) == n)) {
+//      			hm.convertToInterEdge(edge, edge.source(), edge.target());
+//      		}
+//      	}
+//      }
       
       // Reposition group node to fit content (2nd time is necessary. Maybe yFiles bug...)
       simpleGraph.setLocation(n, x2 - offset, y2 - offset - 14);

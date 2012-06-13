@@ -16,12 +16,7 @@
  */
 package de.zbit.graph.sbgn;
 
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
 import java.io.Serializable;
 
@@ -31,7 +26,7 @@ import java.io.Serializable;
  * @since 1.1
  * @version $Rev$
  */
-public class CompartmentShape implements Shape, Serializable {
+public class CompartmentShape extends Area implements Serializable {
 
 	/**
 	 * Generated serial version identifier.
@@ -57,12 +52,14 @@ public class CompartmentShape implements Shape, Serializable {
 		double arcWfac = 1.5d, arcHfac = 4.5d;
 		int arc = computeArc(w, h);
     outer = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
+    add(new Area(outer));
     x = x + thickness;
     y = y + thickness;
     w = w - 2d * thickness;
     h = h - 2d * thickness;
     arc = computeArc(w, h);
     inner = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
+    subtract(new Area(inner));
 	}
 	
 	/**
@@ -74,155 +71,13 @@ public class CompartmentShape implements Shape, Serializable {
 	public int computeArc(double w, double h) {
 		return (int) (Math.min(w, h) / 5d);
 	}
-
-	@Override
-	public boolean contains(Point2D point) {
-		return inner.contains(point);
-	}
-
-	@Override
-	public boolean contains(Rectangle2D r) {
-		return inner.contains(r);
-	}
-
-	@Override
-	public boolean contains(double x, double y) {
-		return inner.contains(x, y);
-	}
-
-	@Override
-	public boolean contains(double x, double y, double w, double h) {
-		return inner.contains(x, y, w, h);
-	}
-
-	@Override
-	public Rectangle getBounds() {
-		return outer.getBounds();
-	}
-
-	@Override
-	public Rectangle2D getBounds2D() {
-		return outer.getBounds2D();
-	}
-
-	@Override
-	public PathIterator getPathIterator(final AffineTransform at) {
-		return new PathIterator() {
-			
-			private PathIterator outerIterator = outer.getPathIterator(at);
-			private PathIterator innerIterator = inner.getPathIterator(at);
-			
-			@Override
-			public void next() {
-				if (!outerIterator.isDone()) {
-					outerIterator.next();
-				} else {
-					innerIterator.next();
-				}
-			}
-			
-			@Override
-			public boolean isDone() {
-				return outerIterator.isDone() && innerIterator.isDone();
-			}
-			
-			@Override
-			public int getWindingRule() {
-				if (!outerIterator.isDone()) {
-					return outerIterator.getWindingRule();
-				}
-				return innerIterator.getWindingRule();
-			}
-			
-			@Override
-			public int currentSegment(double[] coords) {
-				if (!outerIterator.isDone()) {
-					return outerIterator.currentSegment(coords);
-				}
-				return innerIterator.currentSegment(coords);
-			}
-			
-			@Override
-			public int currentSegment(float[] coords) {
-				if (!outerIterator.isDone()) {
-					return outerIterator.currentSegment(coords);
-				}
-				return innerIterator.currentSegment(coords);
-			}
-		};
-	}
-
-	@Override
-	public PathIterator getPathIterator(final AffineTransform at, final double flatness) {
-		return new PathIterator() {
-			
-			private PathIterator outerIterator = outer.getPathIterator(at, flatness);
-			private PathIterator innerIterator = inner.getPathIterator(at, flatness);
-			
-			@Override
-			public void next() {
-				if (!outerIterator.isDone()) {
-					outerIterator.next();
-				} else {
-					innerIterator.next();
-				}
-			}
-			
-			@Override
-			public boolean isDone() {
-				return outerIterator.isDone() && innerIterator.isDone();
-			}
-			
-			@Override
-			public int getWindingRule() {
-				if (!outerIterator.isDone()) {
-					return outerIterator.getWindingRule();
-				}
-				return innerIterator.getWindingRule();
-			}
-			
-			@Override
-			public int currentSegment(double[] coords) {
-				if (!outerIterator.isDone()) {
-					return outerIterator.currentSegment(coords);
-				}
-				return innerIterator.currentSegment(coords);
-			}
-			
-			@Override
-			public int currentSegment(float[] coords) {
-				if (!outerIterator.isDone()) {
-					return outerIterator.currentSegment(coords);
-				}
-				return innerIterator.currentSegment(coords);
-			}
-		};
-	}
-
-	@Override
-	public boolean intersects(Rectangle2D r) {
-		return outer.intersects(r) || inner.intersects(r);
-	}
-
-	@Override
-	public boolean intersects(double x, double y, double w, double h) {
-		return outer.intersects(x, y, w, h) || inner.intersects(x, y, w, h);
-	}
-
+	
 	/**
 	 * 
 	 * @return
 	 */
-	public Shape getOuterShape() {
-		return outer;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public Shape getInnerShape() {
+	public RoundRectangle2D getInnerArea() {
 		return inner;
 	}
-	
+
 }

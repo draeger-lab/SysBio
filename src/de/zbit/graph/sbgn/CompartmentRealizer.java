@@ -32,6 +32,22 @@ import y.view.hierarchy.GroupNodeRealizer;
  */
 public class CompartmentRealizer extends GroupNodeRealizer {
 	
+	private Color interFillColor;
+	
+	/**
+	 * @return the interFillColor
+	 */
+	public Color getInterFillColor() {
+		return interFillColor;
+	}
+
+	/**
+	 * @param interFillColor the interFillColor to set
+	 */
+	public void setInterFillColor(Color interFillColor) {
+		this.interFillColor = interFillColor;
+	}
+
 	/**
 	 * 
 	 */
@@ -75,8 +91,11 @@ public class CompartmentRealizer extends GroupNodeRealizer {
    */
   @Override
   protected void paintShapeBorder(Graphics2D gfx) {
+  	CompartmentShape shape = createCompartmentShape();
     gfx.setColor(getLineColor());
-    gfx.draw(createCompartmentShape());
+    gfx.draw(shape);
+    gfx.setColor(getInterFillColor());
+    gfx.fill(shape);
   }
   
   /* (non-Javadoc)
@@ -84,12 +103,10 @@ public class CompartmentRealizer extends GroupNodeRealizer {
    */
   @Override
   protected void paintFilledShape(Graphics2D gfx) {
-  	if (!isTransparent() && getFillColor() != null) {
+  	if (!isTransparent() && (getFillColor() != null)) {
   		CompartmentShape shape = createCompartmentShape();
   		gfx.setColor(getFillColor());
-  		gfx.fill(shape.getOuterShape());
-  		gfx.setColor(Color.WHITE);
-  		gfx.fill(shape.getInnerShape());
+  		gfx.fill(shape.getInnerArea());
   	}
   }
   
