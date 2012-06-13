@@ -72,6 +72,7 @@ import y.view.Graph2D;
 import y.view.LineType;
 import y.view.NodeRealizer;
 import y.view.hierarchy.HierarchyManager;
+import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.graph.sbgn.CloneMarker;
 import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
@@ -329,9 +330,10 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     			id = cg.getId();
     			
     			Node n = createNode(id, c.isSetName() ? c.getName() : c.getId(), SBO.getCompartment(), x, y, w, h);
-    			NodeRealizer nr = new CompartmentRealizer();
-    			nr.setFillColor(new Color(243, 243, 191));
-    			nr.setLineColor(new Color(204, 204, 0));
+    			CompartmentRealizer nr = new CompartmentRealizer();
+    			nr.setFillColor(null);
+    			nr.setInterFillColor(SBGNVisualizationProperties.getFillColor(SBO.getCompartment()));
+    			nr.setLineColor(SBGNVisualizationProperties.getLineColor(SBO.getCompartment()));
     			simpleGraph.setRealizer(n, nr);
     	    hm.convertToGroupNode(n);
     	    if (c.isSetOutsideInstance()) {
