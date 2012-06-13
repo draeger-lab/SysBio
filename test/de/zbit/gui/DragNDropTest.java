@@ -59,16 +59,6 @@ public class DragNDropTest extends BaseFrame {
   }
 
 /* (non-Javadoc)
- * @see de.zbit.gui.BaseFrame#openFile(de.zbit.sbml.io.OpenedFile<org.sbml.jsbml.SBMLDocument>[])
- */
-@SuppressWarnings("unchecked")
-@Override
-protected OpenedFile<SBMLDocument>[] openFile(OpenedFile<SBMLDocument>... files) {
-    System.out.println(Arrays.toString(files));
-	return null;
-}
-
-/* (non-Javadoc)
  * @see de.zbit.gui.BaseFrame#saveFile()
  */
 @Override

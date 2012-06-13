@@ -201,26 +201,6 @@ public class BaseGUI extends BaseFrame {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#openFile(de.zbit.sbml.io.OpenedFile<org.sbml.jsbml.SBMLDocument>[])
-	 */
-	@Override
-	protected OpenedFile<SBMLDocument>[] openFile(
-			OpenedFile<SBMLDocument>... openedFiles) {
-		if ((openedFiles != null) && (openedFiles.length > 0)) {
-			File[] files = new File[openedFiles.length];
-			for (int i = 0; i < openedFiles.length; i++) {
-				files[i] = openedFiles[i].getFile();
-			}
-			System.out.printf("files opened:%s\n", Arrays.toString(files));
-		} else {
-			SBPreferences prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-			File[] files = GUITools.openFileDialog(this, prefs.get(GUIOptions.OPEN_DIR),
-				true, true, JFileChooser.FILES_ONLY);
-		}
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#saveFileAs()
 	 */
 	@Override
