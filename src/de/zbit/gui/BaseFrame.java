@@ -76,7 +76,6 @@ import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
-import de.zbit.sbml.io.OpenedFile;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
@@ -569,7 +568,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
    * Adds a drag'n drop functionality to this panel. This should
    * be called, whenever the user decides to have a "File Open"
    * option on his menu bar.
-   * It uses the {@link #openFileAndLogHistory(OpenedFile...)} method
+   * It uses the {@link #openFileAndLogHistory(File...)} method
    * to open the file(s).
    */
   private void createDragNDropFunctionality() {
@@ -579,18 +578,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
       	/* (non-Javadoc)
       	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
       	 */
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @SuppressWarnings({ "unchecked" })
         //@Override
         public void actionPerformed(ActionEvent event) {
           if (event.getID() == FileDropHandler.FILE_DROPPED) {
-            openFileAndLogHistory(new OpenedFile((File) event.getSource()));
+            openFileAndLogHistory((File) event.getSource());
           } else if (event.getID() == FileDropHandler.FILES_DROPPED) {
           	File[] files = ((List<File>) event.getSource()).toArray(new File[] {});
-						OpenedFile[] openedFiles = new OpenedFile[files.length];
-          	for (int i = 0; i < files.length; i++) {
-          		openedFiles[i] = new OpenedFile(files[i]);
-          	}
-          	openFileAndLogHistory(openedFiles);
+          	openFileAndLogHistory(files);
           }
         }
       }
@@ -1288,49 +1283,48 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * This method is linked to the {@link BaseAction#FILE_OPEN} and will be
 	 * called when ever any element associated with this action command is
 	 * activated. The intention of this method is that the user can either choose
-	 * which file to open or that one or multiple instances of {@link OpenedFile} are
+	 * which file to open or that one or multiple instances of {@link File} are
 	 * passed to this method. In both cases this method knows what to do with
-	 * these {@link OpenedFile}s or their content. For instance, it might be necessary
+	 * these {@link File}s or their content. For instance, it might be necessary
 	 * to change the content of this {@link BaseFrame}'s main component according
-	 * to the content of the selected or given {@link OpenedFile}(s).
+	 * to the content of the selected or given {@link File}(s).
 	 * </p>
 	 * <p>
 	 * However, this method will not be called directly in this case, it is rather
-	 * wrapped in {@link #openFileAndLogHistory(OpenedFile...)}. This method tries to
+	 * wrapped in {@link #openFileAndLogHistory(File...)}. This method tries to
 	 * memorize all opened files to make them accessible to the user more easily
 	 * in the {@link JMenuBar} of this {@link BaseFrame}. Therefore, it is
-	 * necessary that this method returns all {@link OpenedFile} instances that are
+	 * necessary that this method returns all {@link File} instances that are
 	 * selected by the user when executing this method.
 	 * </p>
 	 * <p>
-	 * In case that one or multiple instances of {@link OpenedFile} are passed to this
-	 * method, here is the correct location to decide whether these {@link OpenedFile}
+	 * In case that one or multiple instances of {@link File} are passed to this
+	 * method, here is the correct location to decide whether these {@link File}
 	 * objects can be processed. Maybe a warning must be displayed to the user or
-	 * maybe invalid input {@link OpenedFile}s are simply to be ignored.
+	 * maybe invalid input {@link File}s are simply to be ignored.
 	 * </p>
 	 * 
-	 * @return An array of all those {@link OpenedFile} instances that are either
+	 * @return An array of all those {@link File} instances that are either
 	 *         selected by the user or the left over from the given arguments,
-	 *         i.e., the subset of valid input files from the given {@link OpenedFile}
+	 *         i.e., the subset of valid input files from the given {@link File}
 	 *         arguments.
 	 * @see #createMainComponent()
 	 * @see #openFileAndLogHistory(File...)
 	 */
-	protected abstract <T> OpenedFile<T>[] openFile(OpenedFile<T>... files);
+	protected abstract File[] openFile(File... files);
 	
 	/**
-	 * This method wraps {@link #openFileAndLogHistory(OpenedFile...)} and simply
+	 * This method wraps {@link #openFileAndLogHistory(File...)} and simply
 	 * provides a way to call this other method without the necessity to pass any
 	 * arguments to it.
 	 * 
-	 * @return An array of {@link OpenedFile} objects that have been selected by the
+	 * @return An array of {@link File} objects that have been selected by the
 	 *         user or null if the user cancels the operation.
-	 * @see #openFileAndLogHistory(OpenedFile...)
-	 * @see #openFile(OpenedFile...)
+	 * @see #openFileAndLogHistory(File...)
+	 * @see #openFile(File...)
 	 */
-	@SuppressWarnings("unchecked")
-	public final <T> OpenedFile<T>[] openFileAndLogHistory() {
-		return openFileAndLogHistory(new OpenedFile[0]);
+	public final File[] openFileAndLogHistory() {
+		return openFileAndLogHistory(new File[0]);
 	}
 	
 	/**
@@ -1348,22 +1342,22 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *        {@link #openFile(File...)}.
 	 * @return the files that originate from the method {@link #openFile(File...)}.
 	 */
-	protected <T> OpenedFile<T>[] openFileAndLogHistory(OpenedFile<T>... files) {
+	protected File[] openFileAndLogHistory(File... files) {
 		files = openFile(files);
 		// Remember the baseDir and put files into history.
 	    if ((files != null) && (files.length > 0)) {
-	      List<File> fileList = new LinkedList<File>();
+		  List<File> fileList = new LinkedList<File>();
 	      // Process all those files that have just been opened.
 	      String baseDir = null;
 	      boolean sameBaseDir = true;
-	      for (OpenedFile<T> file : files) {
-	        if ((file != null) && file.getFile().exists() && file.getFile().canRead() && !fileList.contains(file)) {
+	      for (File file : files) {
+	        if ((file != null) && file.exists() && file.canRead() && !fileList.contains(file)) {
 	          if (baseDir == null) {
-	            baseDir = file.getFile().getParent();
-	          } else if (!baseDir.equals(file.getFile().getParent())) {
+	            baseDir = file.getParent();
+	          } else if (!baseDir.equals(file.getParent())) {
 	            sameBaseDir = false;
 	          }
-	          fileList.add(file.getFile());
+	          fileList.add(file);
 	        }
 	      }
 	      // Memorize the default open directory.
@@ -1646,9 +1640,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			      /* (non-Javadoc)
 			       * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			       */
-			    	@SuppressWarnings({ "unchecked", "rawtypes" })
 			    	public void actionPerformed(ActionEvent e) {
-			    		openFileAndLogHistory(new OpenedFile(file));
+			    		openFileAndLogHistory(file);
 			    	}
 			    });
 			    
