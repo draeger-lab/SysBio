@@ -21,7 +21,6 @@ import java.awt.Graphics2D;
 
 import y.geom.YInsets;
 import y.layout.DiscreteNodeLabelModel;
-import y.layout.NodeLabelModel;
 import y.view.NodeRealizer;
 import y.view.hierarchy.GroupNodeRealizer;
 
