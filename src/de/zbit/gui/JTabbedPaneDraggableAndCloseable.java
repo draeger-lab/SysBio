@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -71,10 +72,11 @@ import de.zbit.util.ResourceManager;
  * closes the tab.
  * 
  * @author Sebastian Nagel
+ * @author Clemens Wrzodek
  * @since 1.1
  * @version $Rev$
  */
-public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements DropTargetListener{
+public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements DropTargetListener{
 	
 	/**
 	 * Generated serial version id
@@ -94,6 +96,8 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	private int dragTabIndex = -1;
 	private boolean hasGhost = true;
 	private List<JTabbedPaneCloseListener> closeListeners = new ArrayList<JTabbedPaneCloseListener>();
+
+  private boolean showCloseIcon = true;
 
 	/**
 	 * @param closeListener the closeListener to add
@@ -219,6 +223,17 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	}
 	
 	
+  /**
+   * Construct a new {@link JTabbedPaneDraggableAndCloseable} that displays
+   * the given image if no tab is currently on the
+   * {@link javax.swing.JTabbedPane}.
+   * @param img
+   */
+  public JTabbedPaneDraggableAndCloseable(ImageIcon img) {
+    this();
+    setLogoImage(img);
+  }
+	
 	/**
 	 * adds the close button and its MouseListener to the tab at index i
 	 * @param i
@@ -340,7 +355,9 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 	 */
 	private void addTab(String title, Component component, Icon extraIcon) {
 		super.addTab(title, extraIcon, component);
-		addCloseIconToTabComponentAt(getTabCount() - 1, extraIcon);
+		if (showCloseIcon) {
+		  addCloseIconToTabComponentAt(getTabCount() - 1, extraIcon);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -487,17 +504,23 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 			remove(prev);
 			addTab(str, cmp);
 			setSelectedIndex(getTabCount()-1);
-			addCloseIconToTabComponentAt(getTabCount()-1, fileIcon);
+			if (showCloseIcon) {
+			  addCloseIconToTabComponentAt(getTabCount()-1, fileIcon);
+			}
 		} else if (prev>next) {
 			remove(prev);
 			insertTab(str, null, cmp, null, next);
 			setSelectedIndex(next);
-			addCloseIconToTabComponentAt(next, fileIcon);
+			if (showCloseIcon) {
+			  addCloseIconToTabComponentAt(next, fileIcon);
+			}
 		} else {
 			remove(prev);
 			insertTab(str, null, cmp, null, next-1);
 			setSelectedIndex(next-1);
-			addCloseIconToTabComponentAt(next-1, fileIcon);
+			if (showCloseIcon) {
+			  addCloseIconToTabComponentAt(next-1, fileIcon);
+			}
 		}
 	}
 
@@ -607,6 +630,15 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedPane implements Dro
 		}
 		
 	}
+
+  /**
+   * Does not show the close icon on any new added tab. Does not affect
+   * already added tabs.
+   * @param b
+   */
+  public void setShowCloseIcon(boolean b) {
+    showCloseIcon  = false;
+  }
 
 }
 

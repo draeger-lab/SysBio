@@ -23,14 +23,13 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
-import de.zbit.kegg.api.cache.KeggFunctionManagement;
-import de.zbit.kegg.api.cache.KeggInfoManagement;
-
 import keggapi.Definition;
 import keggapi.KEGGLocator;
 import keggapi.KEGGPortType;
 import keggapi.LinkDBRelation;
 import keggapi.SSDBRelation;
+import de.zbit.kegg.api.cache.KeggFunctionManagement;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 
 /**
  * A Kegg Adaptor, that directly retrieves informations from the
@@ -82,7 +81,7 @@ public class KeggAdaptor {
     printEachOutputToScreen = true;
     KeggAdaptor adap = new KeggAdaptor();
     
-
+    adap.getOrganisms();
     String ret = adap.get("rn:R02189");
     System.out.println("---\n"+KeggAdaptor.extractInfo(ret, "PATHWAY")+"\n---");
     

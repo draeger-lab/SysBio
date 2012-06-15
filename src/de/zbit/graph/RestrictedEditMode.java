@@ -143,7 +143,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     allowLabelSelection(false);
     allowEdgeCreation(false);
     allowNodeCreation(false);
-    allowMoveLabels(false);
+    allowMoveLabels(true);
     
     
     /*
@@ -255,6 +255,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     }
     if (nm!=null) {
       for (int i=0; i<nm.length;i++) {
+        if (nm[i]==null) continue;
         Object c = nm[i].get(n);
         if (c==null || c.toString().length()<1) continue;
         String mapDescription = mapDescriptionMap.getV(nm[i]);

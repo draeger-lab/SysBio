@@ -312,6 +312,12 @@ public class OrganismSelector extends JPanel {
           KeggQuery query = new KeggQuery(KeggQuery.getOrganisms,null);
           CustomObject<Object> answer = manag.getInformation(query);
           Definition[] organisms = (Definition[]) answer.getObject();
+          if (organisms!=null && organisms.length<1) {
+            // Delete invalid objects from cache
+            manag.removeInformation(query);
+            answer = manag.getInformation(query);
+            organisms = (Definition[]) answer.getObject();
+          }
           
           if (organisms == null || organisms.length<1) {
             GUITools.showErrorMessage(this, "Could not retrieve list of organisms from KEGG.");
