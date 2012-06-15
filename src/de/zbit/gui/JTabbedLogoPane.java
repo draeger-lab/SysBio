@@ -34,7 +34,18 @@ import javax.swing.JTabbedPane;
 public class JTabbedLogoPane extends JTabbedPane { //JTabbedPaneDraggableAndCloseable {
   private static final long serialVersionUID = 6977541013827456374L;
   
+  /**
+   * The image to paint if no tabs are contained.
+   */
   private ImageIcon img=null;
+  
+  /**
+   * 
+   */
+  public JTabbedLogoPane() {
+    super();
+  }
+  
   
   /**
    * Construct a new {@link #JTabbedLogoPane(ImageIcon)} that displays
@@ -43,7 +54,7 @@ public class JTabbedLogoPane extends JTabbedPane { //JTabbedPaneDraggableAndClos
    * @param img
    */
   public JTabbedLogoPane(ImageIcon img) {
-    super();
+    this();
     this.img = img;
   }
   

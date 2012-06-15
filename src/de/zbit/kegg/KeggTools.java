@@ -513,6 +513,16 @@ public class KeggTools {
       return false;
     }
     
+    if (entry.hasGraphics() && entry.getGraphics().getType()==GraphicsType.line) {
+      if (considerRelations) {
+        /* This is an approximative solution to the problem that all lines, 
+         * e.g., in "metabolic pathways"-pathway being removed if one removed
+         * orphans!
+         */
+        return false;
+      }
+    }
+    
     // Loop through all reactions and look for the node.
     boolean found = false;
     if (considerReactions) {

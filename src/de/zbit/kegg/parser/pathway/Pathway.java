@@ -628,7 +628,7 @@ public class Pathway {
   }
   /**
    * Remove the entry at the given index in the {@link #entries} list.
-   * @param index - index of the entry to remove.
+   * @param index index of the entry to remove.
    */
   public void removeEntry(int index) {
     // Comment [wrzodek 2010-07-01]: Entry may still be in other entries compound (group node) list.
@@ -640,9 +640,11 @@ public class Pathway {
     idMap.remove(e.getId());
     nameMap.remove(e.getName());
     removeReactionModifier(e);
-    if (maxId==e.getId()) resetMaxId(e);
+    if (maxId==e.getId()) {
+      resetMaxId(e);
+    }
     
-    // Really remove this entry from out list
+    // Really remove this entry from our list
     entries.remove(index);
     
     e.setName(Entry.removedNodeName);
@@ -650,7 +652,7 @@ public class Pathway {
   }
 
   /**
-   * Get a list with reactions in which this {@link Entry}
+   * Get a list with ALL reactions in which this {@link Entry}
    * is involved as substrate or product. Does NOT return
    * reactions in which this {@link Entry} is involved
    * as reaction modifier. Use {@link #getReactionModifiers(String)}

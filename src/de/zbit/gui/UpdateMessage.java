@@ -289,7 +289,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 		URL url = new URL(urlPrefix + "latest.txt");
 		latestVersion = (new Scanner(url.openStream())).next();
 		String notes = "releaseNotes" + latestVersion;
-		if (notes.endsWith(".0")) {
+		while (notes.endsWith(".0")) {
 			notes = notes.substring(0, notes.length() - 2);
 		}
 		this.url = urlPrefix.toString() + notes;
@@ -308,19 +308,25 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 	private boolean compareVersionNumbers(String prog, String url) {
 		StringTokenizer progToken = new StringTokenizer(prog);
 		StringTokenizer urlToken = new StringTokenizer(url);
-		boolean lastTokenComp = false;
+//		boolean lastTokenComp = false;
 		while (progToken.hasMoreElements() && urlToken.hasMoreElements()) {
 			int localVers = Integer.parseInt(progToken.nextToken("."));
 			int latestVers = Integer.parseInt(urlToken.nextToken("."));
-			if (localVers <= latestVers) {
-				if ((localVers < latestVers) && lastTokenComp) { return true; }
-				lastTokenComp = true;
-			} else {
-				lastTokenComp = false;
-			}
+			
+			if (localVers<latestVers) return true;
+			else if (localVers>latestVers) return false;
+			
+//			if (localVers <= latestVers) {
+//				if ((localVers < latestVers) && lastTokenComp) { return true; }
+//				lastTokenComp = true;
+//			} else {
+//				lastTokenComp = false;
+//			}
 		}
+//		if (urlToken.hasMoreElements()
+//				&& (Integer.parseInt(urlToken.nextToken(".")) > 0) && lastTokenComp) { return true; }
 		if (urlToken.hasMoreElements()
-				&& (Integer.parseInt(urlToken.nextToken(".")) > 0) && lastTokenComp) { return true; }
+      && (Integer.parseInt(urlToken.nextToken(".")) > 0)) { return true; }
 		return false;
 	}
 	

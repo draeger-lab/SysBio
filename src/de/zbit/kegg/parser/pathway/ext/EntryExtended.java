@@ -233,7 +233,7 @@ public class EntryExtended extends Entry {
   }
   
   public boolean isSetCompartment(){
-    return compartment!=null;
+    return compartment!=null && compartment.length()>0;
   }
 
   
