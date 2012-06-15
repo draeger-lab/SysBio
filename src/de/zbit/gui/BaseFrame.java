@@ -688,9 +688,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				ActionListener.class, this, "openFileAndLogHistory"),
 				BaseAction.FILE_OPEN, KeyStroke.getKeyStroke('O', ctr_down), 'O', true);
 			
-			saveFile = (showSaveMenuEntry()) ? GUITools.createJMenuItem(EventHandler.create(
+			if (showSaveMenuEntry()) {
+				saveFile =  GUITools.createJMenuItem(EventHandler.create(
 					ActionListener.class, this, "saveFileToOriginal"),
-					BaseAction.FILE_SAVE, KeyStroke.getKeyStroke('S', ctr_down), 'S', false) : null;
+					BaseAction.FILE_SAVE, KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
+			}
 			
 			saveFileAs = GUITools.createJMenuItem(EventHandler.create(
 				ActionListener.class, this, "saveFileAndLogSaveDir"),
@@ -1432,6 +1434,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * {@link JTabbedPane}, it is recommended to let your tabs implement the
 	 * {@link BaseFrameTab} interface and simply call
 	 * {@link BaseFrameTab#saveToFile()}.
+	 * <p>
+	 * By default, a call to this method is redirected to {@link #saveFileAs()},
+	 * because not every program might offer the possibility to save some data in
+	 * an opened input file again. If this is possible in your program, you should
+	 * override this method.
 	 * 
 	 * @return the {@link File} into which the content has been saved. If the
 	 *         returned value is not <code>null</code>, the directory in which the
@@ -1439,7 +1446,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *         {@link GUIOptions#SAVE_DIR} property of the current class (but only
 	 *         if it exists and can be read).
 	 */
-	public abstract File saveFile();
+	public File saveFile() {
+		// DO NOT MAKE THIS METHOD ABSTRACT! NOT EVERY PROGRAM ALLOWS STORING DATA
+		// IN OPENED INPUT FILES AGAIN!
+		return saveFileAs();
+	}
 	
 	/**
 	 * Saves some results or the current work in some {@link File}. If you use a
@@ -1468,15 +1479,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
 				BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
 		File file = saveFile();
-		if (file != null) {
-			if (!file.isDirectory()) {
-				file = file.getParentFile();
-			}
-		} else {
-			saveFileAs();
+		if (file == null) {
+			saveFileAndLogSaveDir();
 		}
 		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
-			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
+			BaseAction.FILE_SAVE_AS);
 	}
 	
 	/**
@@ -1509,7 +1516,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			}
 		}
 		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
-			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
+			BaseAction.FILE_SAVE_AS);
 	}
 	
 	/**
