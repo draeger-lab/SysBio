@@ -339,7 +339,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public static Species getSpeciesWithKEGGIDInList(String kegg, BufferedReader br){
     List<Species> speciesList = null;
     try {
-      speciesList = Species.generateSpeciesDataStructure(br);
+      speciesList = Species.generateSpeciesDataStructure(br, true);
     } catch (IOException e) {
       System.err.printf("Error while generating species list", e);
       System.exit(0);
@@ -357,13 +357,32 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   }
   
   /**
+   *   
+   * @param kegg identifier, i.e. "hsa"
+   * @param br UniProtList uniprotSpeciesFile from the UniProt homepage under <a href="http://www.uniprot.org/docs/speclist">http://www.uniprot.org/docs/speclist</a>
+   * @return species, if the species is not found it returns null
+   */
+  public static Species getSpeciesWithTaxonomyIDInList(Integer tax, BufferedReader br, 
+      boolean keggNecessary){
+    List<Species> speciesList = null;
+    try {
+      speciesList = Species.generateSpeciesDataStructure(br, keggNecessary);
+    } catch (IOException e) {
+      System.err.printf("Error while generating species list", e);
+      System.exit(0);
+    }   
+            
+    return Species.search(speciesList, tax.toString(), NCBI_TAX_ID);
+  }
+  
+  /**
    * 
    * @return a list with the species 
    *  
    */
   public static List<Species> generateSpeciesDataStructure() throws IOException {
     BufferedReader in = new BufferedReader(new InputStreamReader(Resource.class.getResourceAsStream("speclist.txt")));
-    List<Species> a = generateSpeciesDataStructure(in);
+    List<Species> a = generateSpeciesDataStructure(in, true);
     return a;
   }
   
@@ -376,7 +395,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    */
   public static List<Species> generateSpeciesDataStructureExcToSto(BufferedReader uniprotSpeciesFile) {
     try {
-      return generateSpeciesDataStructure(uniprotSpeciesFile);
+      return generateSpeciesDataStructure(uniprotSpeciesFile, true);
     } catch (IOException e) {
       e.printStackTrace();
       System.exit(1);// TODO: Is this good or exist something more convenient?
@@ -390,16 +409,23 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    * @return
    * @throws IOException
    */
-  public static List<Species> generateSpeciesDataStructure(BufferedReader in) throws IOException {
+  public static List<Species> generateSpeciesDataStructure(BufferedReader in,
+      boolean keggNecessary) throws IOException {
     List<Species> allSpec = new SortedArrayList<Species>();
-    Species spec = null;
+    
     
     if (in!=null) { // Read uniprot species taxon file.
       boolean startReading=false;
       String line;
+      String uniprot = "";
+      String scientificName = "";
+      String commonName = "";
+      Integer tax = null;
+      List<String> syns = new ArrayList<String>();
+      
       while ((line=in.readLine())!=null) {
         if (line.trim().length()<1) continue;
-        else if (startReading) {
+        else if (startReading) {          
           if (line.contains("====================================")) {
             startReading=false;
             break; // done reading.
@@ -417,30 +443,40 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
           //                          C=AAV-2
           
           // Create the current species object, if a new entry starts here.
-          String uniprot = "_" + line.substring(0,6).trim();
-          if(!uniprot.equals("_")) {
-            spec = (new Species(null));
-            spec.uniprotExtension=uniprot;
-            
-            // Taxon ID is always in line with uniprot species name
-            String taxon_id = line.substring(7, 14).trim();
-            if (taxon_id.length()>0) {
-              spec.ncbi_tax_id = Integer.parseInt(taxon_id);
+          uniprot = "_" + line.substring(0,6).trim();
+          if(!uniprot.equals("_")) {                        
+            // Add to list here, because the scientific name is required.
+            if(!uniprot.isEmpty() && tax!=null && 
+                !scientificName.isEmpty() &&!commonName.isEmpty()){
+              Species s = new Species(scientificName, uniprot, commonName, null, tax.intValue());
+              allSpec.add(s);
+              
+              uniprot = "";
+              scientificName = "";
+              commonName = "";
+              tax = null;
+              syns = new ArrayList<String>();
             }
+          }
+
+          // Taxon ID is always in line with uniprot species name
+          String taxon_id = line.substring(7, 14).trim();
+          if (taxon_id.length()>0) {
+            tax = Integer.parseInt(taxon_id);
           }
           
           // Start at position 16 are Common-, Scientific Name and Synonyms.
           String help = line.substring(16, line.length());
           String[] split = help.split("=");
-          if(split[0].equals("N"))
-            spec.scientificName=split[1].trim();
-          else if (split[0].equals("C"))
-            spec.commonName=split[1].trim();
-          else if (split[0].equals("S"))
-            spec.addSynonym(split[1].trim());
-          
-          // Add to list here, because the scientific name is required.
-          if(!uniprot.equals("_")) allSpec.add(spec);
+          if (split.length>=2){
+            if(split[0].equals("N") && split[1]!=null && !split[1].isEmpty())
+              scientificName = split[1].trim();
+            else if (split[0].equals("C") && split[1]!=null && !split[1].isEmpty()){              
+              commonName = split[1].trim();
+            }
+            else if (split[0].equals("S") && split[1]!=null && !split[1].isEmpty())
+              syns.add(split[1].trim());  
+          }           
         } else if (line.contains("____________________________________")) {
           startReading = true;
         }
@@ -504,8 +540,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
               allSpec.get(i).setShortName(keggAbbr);
               contained=true;
             }
-          }
-          
+          }          
         }
         
         
@@ -524,28 +559,23 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     int counter = 0;
     List<Species> speciesWithoutKeggAbbr = new SortedArrayList<Species>();
     List<Species> speciesWithKeggAbbr = new SortedArrayList<Species>();
-    for (Species species : allSpec) {
-      if(species.getKeggAbbr()!=null){
-        counter++;
-        speciesWithKeggAbbr.add(species);
-      }
-      else
-        speciesWithoutKeggAbbr.add(species);
+    if (keggNecessary){      
+      for (Species species : allSpec) {
+        System.out.println(species.getNCBITaxonID());
+        if(species.getKeggAbbr()!=null){
+          counter++;
+          speciesWithKeggAbbr.add(species);
+        }
+        else{
+          if (species.getNCBITaxonID().equals((Integer)6706))System.out.println("FUCK");
+          speciesWithoutKeggAbbr.add(species);
+        }
+      }  
+    } else {
+      speciesWithKeggAbbr = allSpec;
     }
     
-//    System.out.println("KeggOrgs.length: " + keggOrgs.length + ", speciesWithKeggAbbr: " + speciesWithKeggAbbr.size() + 
-//                       ", speciesWithoutKeggAbbr: " + speciesWithoutKeggAbbr.size());
-//    for (int i = 0; i < speciesWithoutKeggAbbr.size(); i++) {
-//    Species species = speciesWithoutKeggAbbr.get(i);
-//      System.out.println(i + "\t" + species.getScientificName() + "\t" + species.getKeggAbbr());
-//    }
-    
-//    for (int i = 0; i < speciesWithKeggAbbr.size(); i++) {
-//      Species species = speciesWithKeggAbbr.get(i);
-//      System.out.println(i + "\t" + species.getScientificName() + "\t" + species.getKeggAbbr());
-//    }
-    
-    if (manag.isCacheChangedSinceLastLoading()) {
+     if (manag.isCacheChangedSinceLastLoading()) {
       InfoManagement.saveToFilesystem("kgFct.dat", manag);
     }
     

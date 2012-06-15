@@ -440,7 +440,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.IPI,                   "IPI\\d{8}");    
     regExMap.put(IdentifierDatabases.KEGG_Reaction,         "R\\d{5}");
     regExMap.put(IdentifierDatabases.KEGG_Drug,             "D\\d{5}");
-    regExMap.put(IdentifierDatabases.KEGG_Pathway,          "\\w{2,4}\\d{5}");
+    regExMap.put(IdentifierDatabases.KEGG_Pathway,          "\\a{2,4}\\d{5}");
     regExMap.put(IdentifierDatabases.KEGG_Orthology,        "K\\d{5}");
     regExMap.put(IdentifierDatabases.OMIM,                  "[*#+%^]?\\d{6}");
     regExMap.put(IdentifierDatabases.DrugBank,              "DB\\d{5}");
@@ -707,11 +707,19 @@ public class DatabaseIdentifiers {
     // Many databases have prefixes before numbers. This can be auto-corrected.
     int posDid = id.indexOf(':');
     int posDdb = regEx.indexOf(':');
+    char PrefixAndNumberDivisor=':';
+    if (posDdb<0 && posDid<0) {
+      // Some others (e.g., reactome) use an underscore
+      posDid = id.indexOf('_');
+      posDdb = regEx.indexOf('_');
+      PrefixAndNumberDivisor='_';
+    }
+    
     if (posDdb>1 && posDid<0) {
       // database has a prefix that is missing in id (start at 1 to trim ^).
       String prefix = regEx.substring(1, posDdb);
       if (Pattern.matches("\\w+", prefix)) {
-        String newId = String.format("%s:%s", prefix, id);
+        String newId = String.format("%s%s%s", prefix, PrefixAndNumberDivisor, id);
         if (Pattern.matches(regEx, newId)) {
           return newId;
         }

@@ -20,6 +20,7 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.zbit.kegg.parser.KeggParser;
+import de.zbit.util.DatabaseIdentifiers;
+import de.zbit.util.Utils;
+import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
 /**
  * Corresponding to the Kegg Reaction class (see {@link http://www.genome.jp/kegg/xml/docs/})
@@ -59,6 +63,15 @@ public class Reaction {
    * Products
    */
   ArrayList<ReactionComponent> product = new ArrayList<ReactionComponent>(); // 1..*
+  
+  // the following objects are no KGML objects
+  
+  /**
+   * This map should contain all identifiers for this element.
+   * No matter if these are uniprot, entrez gene, etc.
+   */
+  private Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers = 
+    new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
   
   /**
    * The parent pathway object.
@@ -396,6 +409,45 @@ public class Reaction {
       b.append(product.get(i).getName());
     }
     return b.toString();
+  }
+  
+  /**
+   * Please be careful with this, as it returns
+   * internal data structures.
+   * @return complemente list of {@link #identifiers}.
+   */
+  public Map<IdentifierDatabases, Collection<String>> getDatabaseIdentifiers() {
+    return identifiers;
+  }
+  
+  /**
+   * 
+   * @return <code>TRUE</code> if we have some {@link #identifiers}.
+   */
+  public boolean isSetDatabaseIdentifiers() {
+    return identifiers!=null && identifiers.size()>0;
+  }
+  
+  /**
+   * Add an identifier to this {@link Entry}.
+   * @param db
+   * @param id
+   */
+  public void addDatabaseIdentifier(IdentifierDatabases db, String id) {
+    Utils.addToMapOfSets(identifiers, db, id);
+  }
+  
+  /**
+   * Add all identifier of the map to this {@link Entry}.
+   * @param db
+   * @param id
+   */
+  public void addDatabaseIdentifiers( Map<IdentifierDatabases, Collection<String>> map) {
+    for (java.util.Map.Entry<IdentifierDatabases, Collection<String>> entry : map.entrySet()) {
+      for (String value : entry.getValue()) {
+        Utils.addToMapOfSets(identifiers, entry.getKey(), value);
+      }
+    }    
   }
   
   /**

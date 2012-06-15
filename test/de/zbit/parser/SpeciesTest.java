@@ -15,7 +15,7 @@ public class SpeciesTest {
             new InputStreamReader(Resource.class.getResourceAsStream("speclist.txt")))).getScientificName());
             
     List<Species> list = Species.generateSpeciesDataStructure(new BufferedReader(
-        new InputStreamReader(Resource.class.getResourceAsStream("speclist.txt"))));
+        new InputStreamReader(Resource.class.getResourceAsStream("speclist.txt"))), true);
     
     System.out.println(list.get(list.indexOf(new Species("HoMo sapiEns"))).getKeggAbbr());
     System.out.println(list.get(list.indexOf(new Species("Mus musculus"))).getKeggAbbr());
