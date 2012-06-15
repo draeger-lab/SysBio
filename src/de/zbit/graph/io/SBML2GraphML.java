@@ -20,7 +20,6 @@
  */
 package de.zbit.graph.io;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -312,23 +311,26 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     		Compartment c = compList.get(i);
     		String id = c.getId();
     		double x = Double.NaN, y = Double.NaN, w = 25d, h = 25d;
-    		if (c.containsUserObjectKey("GLYPH")) {
-    			CompartmentGlyph cg = (CompartmentGlyph) c.getUserObject("GLYPH");
-    			if (cg.isSetBoundingBox()) {
-    				BoundingBox bb = cg.getBoundingBox();
-    				if (bb.isSetPosition()) {
-    					Point p = bb.getPosition();
-    					x = p.getX();
-    					y = p.getY();
+    		if (c.containsUserObjectKey("GLYPH") || c.isSetOutside()) {
+    			if (c.containsUserObjectKey("GLYPH")) {
+    				CompartmentGlyph cg = (CompartmentGlyph) c.getUserObject("GLYPH");
+    				if (cg.isSetBoundingBox()) {
+    					BoundingBox bb = cg.getBoundingBox();
+    					if (bb.isSetPosition()) {
+    						Point p = bb.getPosition();
+    						x = p.getX();
+    						y = p.getY();
+    					}
+    					if (bb.isSetDimensions()) {
+    						Dimensions d = bb.getDimensions();
+    						w = d.getWidth();
+    						h = d.getHeight();
+    					}
     				}
-    				if (bb.isSetDimensions()) {
-    					Dimensions d = bb.getDimensions();
-    					w = d.getWidth();
-    					h = d.getHeight();
-    				}
+    				id = cg.getId();
+    			} else {
+    				id = c.getId();
     			}
-    			id = cg.getId();
-    			
     			Node n = createNode(id, c.isSetName() ? c.getName() : c.getId(), SBO.getCompartment(), x, y, w, h);
     			CompartmentRealizer nr = new CompartmentRealizer();
     			nr.setFillColor(null);
