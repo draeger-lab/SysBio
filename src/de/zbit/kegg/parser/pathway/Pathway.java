@@ -27,7 +27,9 @@ import java.util.logging.Logger;
 
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
+import de.zbit.util.DatabaseIdentifiers;
 import de.zbit.util.Utils;
+import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
 /**
  * Main Kegg document. Corresponding to the Kegg Pathway class
@@ -90,6 +92,13 @@ public class Pathway {
 	 * Comment of the source KGML file.
 	 */
 	private String comment = null;
+	
+  /**
+   * This map should contain all identifiers for this element.
+   * No matter if these are uniprot, entrez gene, etc.
+   */
+  private Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers = 
+    new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
 	
 	/**
 	 * A description for the origin data format. It all data originates,
@@ -863,6 +872,45 @@ public class Pathway {
 
   public boolean isSetTitle() {
     return (title!=null && title.length()>0);
+  }
+  
+  /**
+   * Please be careful with this, as it returns
+   * internal data structures.
+   * @return complemente list of {@link #identifiers}.
+   */
+  public Map<IdentifierDatabases, Collection<String>> getDatabaseIdentifiers() {
+    return identifiers;
+  }
+  
+  /**
+   * 
+   * @return <code>TRUE</code> if we have some {@link #identifiers}.
+   */
+  public boolean isSetDatabaseIdentifiers() {
+    return identifiers!=null && identifiers.size()>0;
+  }
+  
+  /**
+   * Add an identifier to this {@link Entry}.
+   * @param db
+   * @param id
+   */
+  public void addDatabaseIdentifier(IdentifierDatabases db, String id) {
+    Utils.addToMapOfSets(identifiers, db, id);
+  }
+  
+  /**
+   * Add all identifier of the map to this {@link Entry}.
+   * @param db
+   * @param id
+   */
+  public void addDatabaseIdentifiers( Map<IdentifierDatabases, Collection<String>> map) {
+    for (java.util.Map.Entry<IdentifierDatabases, Collection<String>> entry : map.entrySet()) {
+      for (String value : entry.getValue()) {
+        Utils.addToMapOfSets(identifiers, entry.getKey(), value);
+      }
+    }    
   }
   
   /**
