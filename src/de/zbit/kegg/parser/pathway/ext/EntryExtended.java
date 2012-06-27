@@ -91,7 +91,7 @@ public class EntryExtended extends Entry {
     addGraphics(graphics);
   }
 
-  private void setGeneType(EntryTypeExtended type) {
+  public void setGeneType(EntryTypeExtended type) {
    this.geneType = type;
   }
 
