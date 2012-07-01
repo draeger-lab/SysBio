@@ -80,7 +80,7 @@ public class GeneID2MSigDB_Mapper extends AbstractEnrichmentMapper<Integer, Stri
   @SuppressWarnings("unchecked")
   public GeneID2MSigDB_Mapper(String inputFileOrURL, Species species, AbstractProgressBar progress) throws IOException {
     // This constructor is called from every other!
-    super(Integer.class, (Class<Collection<String>>) new ArrayList<String>().getClass(), progress);
+    super(Integer.class, (Class<Collection<String>>) ((Collection<String>) new ArrayList<String>()).getClass(), progress);
     this.downloadURL = inputFileOrURL;
     this.species = species;
     init();

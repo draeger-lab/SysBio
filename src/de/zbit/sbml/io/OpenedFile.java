@@ -63,7 +63,6 @@ public class OpenedFile<V> extends de.zbit.io.OpenedFile<V> implements PropertyC
 	/* (non-Javadoc)
 	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
 	 */
-	@Override
 	public void nodeAdded(TreeNode node) {
 		boolean previous = isChanged();
 		setChanged(true);
@@ -73,7 +72,6 @@ public class OpenedFile<V> extends de.zbit.io.OpenedFile<V> implements PropertyC
 	/* (non-Javadoc)
 	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(javax.swing.tree.TreeNode)
 	 */
-	@Override
 	public void nodeRemoved(TreeNodeRemovedEvent evt) {
 		nodeAdded(evt.getSource());
 	}

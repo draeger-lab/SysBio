@@ -93,7 +93,7 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
   public KeggID2PathwayMapper(String speciesKEGGPrefix, AbstractProgressBar progress)
   throws IOException {
     // This constructor is called from every other!
-    super(String.class, (Class<Collection<String>>) new ArrayList<String>().getClass(), progress);
+    super(String.class, (Class<Collection<String>>) ((Collection<String>) new ArrayList<String>()).getClass(), progress);
     this.organism_kegg_abbr = speciesKEGGPrefix;
     init();
   }
