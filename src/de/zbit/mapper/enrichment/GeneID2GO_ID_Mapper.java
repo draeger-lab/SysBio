@@ -74,7 +74,7 @@ public class GeneID2GO_ID_Mapper extends AbstractEnrichmentMapper<Integer, Strin
   public GeneID2GO_ID_Mapper(int ncbi_tax_id, AbstractProgressBar progress)
   throws IOException {
     // This constructor is called from every other!
-    super(Integer.class, (Class<Collection<String>>) new ArrayList<String>().getClass(), progress);
+    super(Integer.class, (Class<Collection<String>>) ((Collection<String>) new ArrayList<String>()).getClass(), progress);
     this.ncbi_tax_id = ncbi_tax_id;
     init();
   }
