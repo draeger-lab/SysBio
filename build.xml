@@ -59,7 +59,7 @@
 		<!-- add everything needed to the classpath -->
 		<!-- adjust the settings to your local environment -->
 		<path id="classpath">
-			<fileset dir="${jars.dir}" includes="*.jar *.zip" />
+			<fileset dir="${jars.dir}" includes="*.jar *.zip"  excludes="**/jsbml-0.8-*.jar"/>
 			<fileset dir="${jars.graph.dir}" includes="*.jar *.zip" />
 			<fileset dir="${jars.java5.dir}" includes="*.jar *.zip" />
 		</path>	
@@ -207,7 +207,7 @@
 	<!-- =================================================================== -->
 	<target name="jar-src" depends="prepare-src">
 
-		<jar jarfile="${build.dir}/${name}-${version}-src.jar" basedir="${build.src}" includes="**/*.java"/>
+		<jar jarfile="${build.dir}/${name}-${version}-src.jar" basedir="${build.src}" includes="**/*.java"  manifest="${build.dest}/META-INF/MANIFEST.MF" />
 
 	</target>
 
@@ -226,8 +226,8 @@
 		</copy>
 		<jar jarfile="${build.dir}/${name}-${version}-with-dependencies.jar"
          basedir="${build.dest}"  manifest="${build.dest}/META-INF/MANIFEST.MF">
-			<zipgroupfileset dir="${jars.dir}" includes="*.jar" />
-
+			<zipgroupfileset dir="${jars.dir}" includes="*.jar" excludes="**/jsbml-0.8-*.jar, **/junit-4.3.1.jar" />
+			<zipfileset excludes="META-INF/ECLIPSE*, META-INF/eclipse*" src="${jars.dir}/junit-4.3.1.jar" />
 		</jar>
 	</target>
 
