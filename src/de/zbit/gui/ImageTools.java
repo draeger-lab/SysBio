@@ -20,6 +20,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
@@ -39,7 +41,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import de.zbit.io.filefilter.SBFileFilter;
@@ -519,5 +523,31 @@ public static BufferedImage brightenImage(BufferedImage image, float percent) {
 			return image2BufferedImage(img, false);
 		}
 	}
+
+  /**
+   * @param icon
+   * @return
+   */
+  public static Icon flipHorizontally(Icon icon) {
+    BufferedImage image = iconToImage(icon);
+    
+    // Flip the image horizontally
+    AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+    tx.translate(-image.getWidth(null), 0);
+    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    BufferedImage bufferedImage = op.filter(image, null);
+    
+    return new ImageIcon(bufferedImage);
+  }
+
+  /**
+   * @param icon
+   * @return
+   */
+  public static BufferedImage iconToImage(Icon icon) {
+    BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+    icon.paintIcon(new JPanel(), image.getGraphics(), 0, 0);
+    return image;
+  }
 
 }

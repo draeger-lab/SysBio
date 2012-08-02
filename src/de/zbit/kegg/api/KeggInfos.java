@@ -839,12 +839,28 @@ public class KeggInfos implements Serializable {
 		 * Mostly uninteresting... Product, Substrate, REACTION, Class
 		 */
 
-		// Ortholog (e.g. "ko:K01204")
-		// DBLINKS (RN, GO); GENES (actual orthologous genes)
-		// //urn:miriam:kegg.reaction (R00100)
-		reaction_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, " RN:", "\n"); // DBLINKS
-		// RN:
-		// R05966
+
+		//urn:miriam:kegg.reaction (R00100) RN:R05966
+		reaction_id = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, " RN:", "\n");
+		String more_reaction = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "ALL_REAC", null);
+		if (more_reaction!=null) {
+		  Pattern pat = Pattern.compile(DatabaseIdentifiers.getRegularExpressionForIdentifier(IdentifierDatabases.KEGG_Reaction, true));
+		  Matcher m = pat.matcher(more_reaction);
+		  
+		  StringBuffer rctBuf = new StringBuffer();
+		  while(m.find()) {
+		    rctBuf.append(m.group(1));
+		    rctBuf.append(' ');
+		  }
+		  
+		  if (reaction_id==null) {
+        reaction_id  = "";
+      } else {
+        reaction_id += " ";
+      }
+		  reaction_id += rctBuf.substring(0, rctBuf.length()-1);
+		}
+
 
 		// in small molecules (compound eg. "cpd:C00031")
 		// KNApSAcK, NIKKAJI, (CAS) missing

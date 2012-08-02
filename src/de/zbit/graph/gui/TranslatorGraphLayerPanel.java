@@ -351,9 +351,13 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     }
     
     
-    // Important to draw nodes last, edges should be BELOW nodes.
-    if (pane.getGraph2DRenderer() instanceof DefaultGraph2DRenderer ){
-      ((DefaultGraph2DRenderer) pane.getGraph2DRenderer()).setDrawEdgesFirst(true);
+    // Draw edges on top or below nodes
+    if (pane.getGraph2DRenderer() instanceof DefaultGraph2DRenderer) {
+      if (TranslatorPanelOptions.DRAW_EDGES_ON_TOP_OF_NODES.getValue(prefs)) {
+        ((DefaultGraph2DRenderer) pane.getGraph2DRenderer()).setDrawEdgesFirst(false);
+      } else {
+        ((DefaultGraph2DRenderer) pane.getGraph2DRenderer()).setDrawEdgesFirst(true);
+      }
     }
     
     // Make group nodes collapsible.

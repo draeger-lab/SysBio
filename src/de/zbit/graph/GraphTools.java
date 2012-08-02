@@ -41,6 +41,8 @@ import y.layout.CanonicMultiStageLayouter;
 import y.layout.Layouter;
 import y.layout.MinNodeSizeStage;
 import y.layout.organic.SmartOrganicLayouter;
+import y.layout.partial.PartialLayouter;
+import y.layout.router.OrthogonalEdgeRouter;
 import y.view.EdgeLabel;
 import y.view.Graph2D;
 import y.view.Graph2DLayoutExecutor;
@@ -56,7 +58,6 @@ import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
-import de.zbit.kegg.parser.pathway.GraphicsType;
 
 /**
  * Various tools for {@link Graph2D} and also for
@@ -164,6 +165,12 @@ public class GraphTools {
       SmartOrganicLayouter la = ((SmartOrganicLayouter) layouter);
       la.setMinimalNodeDistance(15);
       la.setCompactness(0.7d);
+      //la.setNodeOverlapsAllowed(false);
+      //la.setConsiderNodeLabelsEnabled(true);
+    }
+    
+    if (layouter instanceof OrthogonalEdgeRouter) {
+      ((OrthogonalEdgeRouter)layouter).setConsiderNodeLabelsEnabled(true);
     }
 //    layouter.setSmartComponentLayoutEnabled(true);
 //    layouter.setNodeOverlapsAllowed(false);
@@ -239,10 +246,13 @@ public class GraphTools {
     // nicely, BUT orphans are being moved, too :-(
 //    layouter.setSmartComponentLayoutEnabled(true);
     layouter.setSmartComponentLayoutEnabled(strict);
-    layouter.setNodeOverlapsAllowed(newNodes.size()>75);
-    layouter.setConsiderNodeLabelsEnabled(true);
     layouter.setCompactness(0.7d);
+    layouter.setMinimalNodeDistance(15);
+    //layouter.setNodeOverlapsAllowed(newNodes.size()>75);
     layouter.setNodeSizeAware(true);
+    layouter.setNodeOverlapsAllowed(false);
+    layouter.setConsiderNodeLabelsEnabled(true);
+    
     
     // Layouts raise an exception if nodes have 0 width or height
     // => Ensure minimum node size
@@ -275,7 +285,7 @@ public class GraphTools {
             nr.setCenter(targetRealizer.getCenterX(), targetRealizer.getCenterY()-nr.getHeight()*1.5);
           }
         }
-      }catch (Exception e2) {
+      } catch (Exception e2) {
         e2.printStackTrace();
       }
     }
@@ -329,6 +339,46 @@ public class GraphTools {
     resetLayout(Arrays.asList(graph.getNodeArray())); //resetLayout
   }
   
+  /**
+   * This will layout a subset of nodes.
+   * <p>This method is recommended for fixing the
+   * layout of a SMALL subset of existing nodes, whereas {@link #layoutNodeSubset(Set)} is recommended
+   * for <i>de novo</i> layouts of novel nodes.
+   * @param newNodes
+   */
+  public void layoutSubset(Set<Node> newNodes) {
+    final PartialLayouter partialLayouter = new PartialLayouter();
+    SmartOrganicLayouter layouter = new SmartOrganicLayouter();
+    layouter.setNodeSizeAware(true);
+    layouter.setNodeOverlapsAllowed(false);
+    layouter.setConsiderNodeLabelsEnabled(true);
+    layouter.setCompactness(0.7d);
+    layouter.setMinimalNodeDistance(15);
+    partialLayouter.setCoreLayouter(layouter);
+    
+    partialLayouter.setComponentAssignmentStrategy(PartialLayouter.COMPONENT_ASSIGNMENT_STRATEGY_SINGLE);
+    partialLayouter.setPositioningStrategy(PartialLayouter.SUBGRAPH_POSITIONING_STRATEGY_FROM_SKETCH);
+    partialLayouter.setEdgeRoutingStrategy(PartialLayouter.EDGE_ROUTING_STRATEGY_STRAIGHTLINE);
+    partialLayouter.setConsiderNodeAlignment(true);
+    partialLayouter.setMirroringAllowed(false);
+    partialLayouter.setMinimalNodeDistance(15);
+    partialLayouter.setLayoutOrientation(PartialLayouter.ORIENTATION_AUTO_DETECTION);
+    
+    graph.unselectAll();
+    for (Node n : newNodes) {
+      graph.setSelected(n, true);
+    }
+    
+    PartialElementsMarkers ps = new PartialElementsMarkers();
+    boolean selectionExists = ps.markBySelection(graph);
+    if (selectionExists) {
+      Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
+      layoutExecutor.doLayout(graph, partialLayouter);
+    }
+  }
+  
+
+
   /**
    * Returns the actual objects that are contained in <code>clickedObjects</code>.
    * @param clickedObjects
@@ -572,6 +622,5 @@ public class GraphTools {
   public static String getKeggIDs(Node n) {
     return getNodeInfoIDs(n, GraphMLmaps.NODE_KEGG_ID);
   }
-  
   
 }

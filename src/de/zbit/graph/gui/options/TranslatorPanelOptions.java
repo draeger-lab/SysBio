@@ -80,10 +80,17 @@ public abstract interface TranslatorPanelOptions extends KeyProvider{
       "If true, shows a properties table on the upper right corner of each graph.", true);
   
   /**
-   * Layout edges everytime a graph is displayed
+   * Layout edges everytime a graph is displayed.
+   * Default should be false as this changes the docking of SBML edges to reaction nodes!
    */
   public static final Option<Boolean> LAYOUT_EDGES = new Option<Boolean>("LAYOUT_EDGES",Boolean.class,
       "If true, performs an organic edge routing algorithm for every graph.", false);
+  
+  /**
+   * Draw edges on top. This was requested (with default=true) by some reviewers.
+   */
+  public static final Option<Boolean> DRAW_EDGES_ON_TOP_OF_NODES = new Option<Boolean>("DRAW_EDGES_ON_TOP_OF_NODES",Boolean.class,
+      "If this is selected, edges are drawn on top of nodes. Else, edges will be drawn first and subsequently, they will be below all nodes.", true);
   
   
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -91,7 +98,7 @@ public abstract interface TranslatorPanelOptions extends KeyProvider{
       "Graph-panel visualization options",
       "Define various options that control the look and feel of GraphML visualizing panels.",
       //SHOW_LOGO_IN_GRAPH_BACKGROUND, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, BRIGHTEN_KEGG_BACKGROUND_IMAGE,
-      SHOW_NAVIGATION_AND_OVERVIEW_PANELS, SHOW_PROPERTIES_TABLE, LAYOUT_EDGES);
+      SHOW_NAVIGATION_AND_OVERVIEW_PANELS, SHOW_PROPERTIES_TABLE, LAYOUT_EDGES, DRAW_EDGES_ON_TOP_OF_NODES);
   
   
   
