@@ -440,7 +440,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.IPI,                   "IPI\\d{8}");    
     regExMap.put(IdentifierDatabases.KEGG_Reaction,         "R\\d{5}");
     regExMap.put(IdentifierDatabases.KEGG_Drug,             "D\\d{5}");
-    regExMap.put(IdentifierDatabases.KEGG_Pathway,          "\\a{2,4}\\d{5}");
+    regExMap.put(IdentifierDatabases.KEGG_Pathway,          "[a-zA-Z]{2,4}\\d{5}");
     regExMap.put(IdentifierDatabases.KEGG_Orthology,        "K\\d{5}");
     regExMap.put(IdentifierDatabases.OMIM,                  "[*#+%^]?\\d{6}");
     regExMap.put(IdentifierDatabases.DrugBank,              "DB\\d{5}");
@@ -566,6 +566,16 @@ public class DatabaseIdentifiers {
       }
     }
     return regEx;
+  }
+  
+  /**
+   * The same as {@link #getRegularExpressionForIdentifier(IdentifierDatabases, boolean)} but does not
+   * modify the regEx with anything.
+   * @param identifier
+   * @return
+   */
+  public static String getPlainRegularExpressionForIdentifier(IdentifierDatabases identifier) {
+    return regExMap.get(identifier);
   }
   
   /**

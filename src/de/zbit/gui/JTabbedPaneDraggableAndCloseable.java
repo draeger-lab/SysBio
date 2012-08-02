@@ -40,10 +40,13 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.dnd.InvalidDnDOperationException;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.beans.EventHandler;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EventObject;
@@ -54,12 +57,16 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.zbit.gui.actioncommand.ActionCommandWithIcon;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.StringUtil;
 
 /**
  * A special {@link JTabbedPane} which has a close ('X') icon on each tab,
@@ -111,6 +118,17 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	 */
 	public void removeCloseListener(JTabbedPaneCloseListener closeListener) {
 		closeListeners.remove(closeListener);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean closeCurrentTab() {
+	  int idx = getSelectedIndex();
+	  if (idx < 0 || idx >= getTabCount()) return false;
+	  removeTabAt(idx);
+	  return true;
 	}
 
 
@@ -220,8 +238,88 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 
 		new DropTarget(glassPane, DnDConstants.ACTION_COPY_OR_MOVE, this, true);
 		new DragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE, dgl);
+		
+		
+		// Add right mouse context menu
+    class PopClickListener extends MouseAdapter {
+      public void mousePressed(MouseEvent e){
+        if (e.isPopupTrigger()) doPop(e);
+      }
+      public void mouseReleased(MouseEvent e){
+        if (e.isPopupTrigger()) doPop(e);
+      }
+      private void doPop(MouseEvent e){
+        createRightMousePopup().show(e.getComponent(), e.getX(), e.getY());
+      }
+    }
+    addMouseListener(new PopClickListener());
 	}
 	
+	
+	/**
+   * All available right mouse click options are listed here.
+   * @author Clemens Wrzodek
+   */
+  public static enum RightMouseClickOptions implements ActionCommandWithIcon {
+    CLOSE_CURRENT_TAB,
+    MOVE_TO_LEFT,
+    MOVE_TO_RIGHT;
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.zbit.gui.ActionCommand#getName()
+     */
+    public String getName() {
+      return StringUtil.firstLetterUpperCase(toString().toLowerCase().replace('_', ' '));
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.zbit.gui.ActionCommand#getToolTip()
+     */
+    public String getToolTip() {
+      return null; // Deactivate
+    }
+    
+    /* (non-Javadoc)
+     * @see de.zbit.gui.ActionCommandWithIcon#getIcon()
+     */
+    @Override
+    public Icon getIcon() {
+      switch (this) {
+        case CLOSE_CURRENT_TAB:
+          return new CloseIcon();
+          //return UIManager.getIcon("InternalFrame.closeIcon");
+        case MOVE_TO_LEFT:
+          return ImageTools.flipHorizontally(UIManager.getIcon("Menu.arrowIcon"));
+        case MOVE_TO_RIGHT:
+          return UIManager.getIcon("Menu.arrowIcon");
+          
+        default:
+          return null; // No icon
+      }
+    }
+    
+  }
+  
+	 /**
+   * Create a popup menu that allows a selection of available
+   * {@link AbstractEnrichment}s.
+   * @param l
+   * @return
+   */
+  public JPopupMenu createRightMousePopup() {
+    JPopupMenu append = new JPopupMenu("TabbedPane");
+    
+    append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.CLOSE_CURRENT_TAB));
+    //append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.MOVE_TO_LEFT));
+    //append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.MOVE_TO_RIGHT));
+    
+    return append;
+  }
+
 	
   /**
    * Construct a new {@link JTabbedPaneDraggableAndCloseable} that displays

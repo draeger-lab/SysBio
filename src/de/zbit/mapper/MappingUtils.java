@@ -19,6 +19,8 @@ package de.zbit.mapper;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import de.zbit.mapper.probes.ProbeID2GeneIDMapper;
+import de.zbit.mapper.probes.ProbeID2GeneIDMapper.Manufacturer;
 import de.zbit.util.DatabaseIdentifiers;
 import de.zbit.util.Species;
 import de.zbit.util.progressbar.AbstractProgressBar;
@@ -48,7 +50,7 @@ public class MappingUtils {
     // We can not use the "DatabaseIdentifiers" class here, because
     // we need a subset of identifiers that are mappabla to geneID
     // and have an actual 2GeneID implementation here.
-    Unknown, NCBI_GeneID, RefSeq, Ensembl, KeggGenes, GeneSymbol;
+    Unknown, NCBI_GeneID, RefSeq, Ensembl, KeggGenes, GeneSymbol, Affymetrix, Agilent, Illumina;
   }
   
   /**
@@ -90,6 +92,12 @@ public class MappingUtils {
       case GeneSymbol:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.GeneSymbol, false);
+      case Affymetrix:
+        return "\\d+(_[a-z])?_at";
+      case Agilent:
+        return "A_\\d{2}_[A-Z0-9]{6,8}";
+      case Illumina:
+        return "ILMN_\\d+";
       default:
         return null;
     }
@@ -116,6 +124,12 @@ public class MappingUtils {
       mapper = new GeneSymbol2GeneIDMapper(species.getCommonName(), progress);
     } else if (sourceIDtype.equals(IdentifierType.KeggGenes)) {
       mapper = new KeggGenesID2GeneID(species.getKeggAbbr(), progress);
+    } else if (sourceIDtype.equals(IdentifierType.Affymetrix)) {
+      mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Affymetrix, species.getCommonName());
+    } else if (sourceIDtype.equals(IdentifierType.Agilent)) {
+      mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Agilent, species.getCommonName());
+    } else if (sourceIDtype.equals(IdentifierType.Illumina)) {
+      mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Illumina, species.getCommonName());
     }
     return mapper;
   }
