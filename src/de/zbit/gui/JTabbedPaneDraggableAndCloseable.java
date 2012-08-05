@@ -286,7 +286,6 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
     /* (non-Javadoc)
      * @see de.zbit.gui.ActionCommandWithIcon#getIcon()
      */
-    @Override
     public Icon getIcon() {
       switch (this) {
         case CLOSE_CURRENT_TAB:
