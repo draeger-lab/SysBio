@@ -235,6 +235,10 @@ public class KeggAdaptor {
       if (pos < 0 || pos>=completeOriginalString.length())
         return null;
       int lPos = completeOriginalString.lastIndexOf('\n', pos);
+      if (endsWith!=null) {
+        // We do not want a complete block, but a sub-section of an existing block.
+        lPos = Math.max(lPos, completeOriginalString.lastIndexOf("  ", pos));
+      }
       String toCheck = completeOriginalString.substring(Math.max(lPos, 0), pos);
       // Wenn was zwischen unserem Treffer und newLine steht => abort.
       if (toCheck.replaceAll("\\s", "").length()>0)
