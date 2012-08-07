@@ -47,6 +47,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   
   
   
+  @Override
   public int size() {
     int size = 0;
     for( K key : map.keySet() ) {
@@ -58,12 +59,14 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
 
   
   
+  @Override
   public boolean isEmpty() {
     return size() == 0;
   }
 
   
   
+  @Override
   public boolean put(K key, V value) {
     Collection<V> coll = null;
     if( !map.containsKey(key) ) {
@@ -82,6 +85,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
 
   
   
+  @Override
   public boolean remove(K key, V value) {
     Collection<V> coll = null;
     if( !map.containsKey(key) ) {
@@ -102,6 +106,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
 
   
   
+  @Override
   public Collection<V> get(K key) {
     if( !map.containsKey(key) ) {
       return null;
@@ -115,6 +120,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
 
   
   
+  @Override
   public boolean putAll(K key, Iterable<? extends V> values) {
     Collection<V> coll = null;
     if( !map.containsKey(key) ) {
@@ -135,6 +141,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
 
   
   
+  @Override
   public boolean putAll(MultiMap<? extends K, ? extends V> multimap) {
     boolean changed = false;
     for( Entry<? extends K, ? extends V> entry : multimap.entries() ) {
@@ -145,6 +152,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
 
   
   
+  @Override
   public Collection<V> removeAll(K key) {
     if( map.containsKey(key) ) {
       return map.remove(key);
@@ -155,18 +163,21 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
 
   
   
+  @Override
   public boolean containsKey(K key) {
     return map.containsKey(key);
   }
 
   
   
+  @Override
   public boolean containsValue(V value) {
     return values().contains(value);
   }
 
   
   
+  @Override
   public boolean containsEntry(K key, V value) {
     if( map.containsKey(key) ) {
       return get(key).contains(value);
@@ -176,18 +187,21 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
 
   
   
+  @Override
   public void clear() {
     map.clear();
   }
 
   
   
+  @Override
   public Set<K> keySet() {
     return map.keySet();
   }
 
   
   
+  @Override
   public Collection<V> values() {
     List<V> coll = new ArrayList<V>();
     for( K key : map.keySet() ) {
@@ -198,6 +212,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
 
   
   
+  @Override
   public Collection<Entry<K, V>> entries() {
     Collection<Entry<K, V>> coll = new HashSet<Entry<K,V>>();
     for( K key : map.keySet() ) {
