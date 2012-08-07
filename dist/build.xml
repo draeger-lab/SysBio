@@ -2,17 +2,29 @@
 <!-- The java based ANT tool is available from         -->
 <!-- http://jakarta.apache.org/ant                     -->
            	
-<project name="SysBio" default="obfuscate" basedir=".">
-
-  <target name="help">
-    <echo>
-      This is an ANT build script to build a stand-alone JAR for
-	  SysBio.
-	    	
-	  The resulting redistributable is the SIGNED jar file,
-	  stored in $appJar which is currently "SysBio.jar".
-    </echo>
-  </target>
+<project name="SysBio" default="usage" basedir=".">
+	
+	<!-- =================================================================== -->
+	<!-- Help on usage                                                       -->
+	<!-- =================================================================== -->
+	<target name="usage" depends="init">
+		<echo message=""/>
+		<echo message=""/>
+		<echo message=" ${appBaseJar} Build file"/>
+		<echo message=" -------------------------------------------------------------"/>
+		<echo message=""/>
+		<echo message=" available targets are:"/>
+		<echo message=""/>
+		<echo message="   jar         --> generates unobfuscated ${appBaseJarRaw}.jar file"/>
+		<echo message="   obfuscate   --> generates obfuscated signed ${appBaseJarWithGraph}.jar file"/>
+		<echo message="   javadoc     --> generates javadoc for the SysBio framework"/>
+		<echo message="   clean       --> cleans up the directory"/>
+		<echo message=""/>
+		<echo message=" See the comments inside the build.xml file for more details."/>
+		<echo message=" -------------------------------------------------------------"/>
+		<echo message=""/>
+		<echo message=""/>
+	</target>
 
   <!-- define some properties that are used throughout the tasks -->
   <target name="init">
