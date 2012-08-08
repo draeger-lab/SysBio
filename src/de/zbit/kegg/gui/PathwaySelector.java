@@ -46,7 +46,7 @@ import de.zbit.util.objectwrapper.CustomObject;
  * @version $Rev$
  * @since 1.0
  */
-public class PathwaySelector extends JPanel {
+public class PathwaySelector extends JPanel implements PWSel {
   private static final long serialVersionUID = -7398698588689150610L;
   
   /**
@@ -450,16 +450,18 @@ public class PathwaySelector extends JPanel {
     
   }
   
-  /**
-   * @return the selected Pathway.
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.PWSel#getSelectedPathway()
    */
+  @Override
   public String getSelectedPathway() {
     return pathwaySelector.getSelectedItem().toString();
   }
   
-  /**
-   * @return the kegg id for the selected organism-specific Pathway (e.g. hsa05410).
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.PWSel#getSelectedPathwayID()
    */
+  @Override
   public String getSelectedPathwayID() {
     // Get the KEY of the selected pathway
     String selID = null;
@@ -496,8 +498,8 @@ public class PathwaySelector extends JPanel {
    * @return {@link #PathwaySelector}
    * @throws Exception 
    */
-  public static PathwaySelector createPathwaySelectorPanel() throws Exception {
-    PathwaySelector ret = new PathwaySelector();
+  public static PWSel createPathwaySelectorPanel() throws Exception {
+    PWSel ret = new PathwaySelector();
     
     return ret;
   }
