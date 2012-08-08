@@ -32,8 +32,8 @@ import org.w3c.dom.NodeList;
 
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.util.DatabaseIdentifiers;
-import de.zbit.util.Utils;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
+import de.zbit.util.Utils;
 
 /**
  * Corresponding to the Kegg Relation class (see {@link http://www.genome.jp/kegg/xml/docs/})
@@ -69,7 +69,12 @@ public class Relation {
    */
   private Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> identifiers = 
     new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
-  
+
+  /**
+   * The source of this relation. If null, it is considered to be from KEGG.
+   * Else, please specify the source (e.g., "Biocarta") here.
+   */
+  private String source;
   
   /**
    * 
@@ -122,6 +127,30 @@ public class Relation {
    */
   public int getEntry2() {
     return entry2;
+  }
+  
+  /**
+   * @see #source
+   * @return the source. If null, it is considered to be KEGG.
+   */
+  public String getSource() {
+    return source;
+  }
+
+  /**
+   * @param source the source of this relation. Only set if it is NOT from KEGG.
+   * @see #source
+   */
+  public void setSource(String source) {
+    this.source = source;
+  }
+  
+  /**
+   * @see #source
+   * @return
+   */
+  public boolean isSetSource() {
+    return source!=null && source.length()>0;
   }
   
   /**
@@ -328,6 +357,5 @@ public class Relation {
       }
     }    
   }
-  
 
 }
