@@ -203,6 +203,15 @@ public class SBGNProperties {
 	    public String toString(){
 	    	return this.name().replaceAll("_", " ");
 	    }
+	    
+	    /**
+	     * @param arg0
+	     * @return reverse of {@link #toString()}
+	     */
+	    public static ArcType valueOfString(String arg0) {
+	      return valueOf(arg0.replace(' ', '_'));
+	    }
+	    
 	}
 	
 	/**
