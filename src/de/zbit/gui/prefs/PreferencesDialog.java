@@ -368,9 +368,11 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 *        The element to be put on the content pane.
 	 */
 	public void setPreferencesPanel(PreferencesPanel panel) {
+    // pressing the ESCAPE button triggers "Cancel"
 		getRootPane().registerKeyboardAction(this, CANCEL,
 			KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
 			JComponent.WHEN_IN_FOCUSED_WINDOW);
+    // pressing the ENTER button triggers "OK"
 		getRootPane().registerKeyboardAction(this, OK,
 			KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
 			JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -384,8 +386,10 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		JButton cancel = createButton(CANCEL, true);
 		apply = createButton(APPLY, false);
 		ok = createButton(OK, true);
-		ok.setSelected(true);
 		
+    // define the OK button as default action
+    getRootPane().setDefaultButton(ok);
+    
 		GUITools.calculateAndSetMaxWidth(defaults, cancel, apply, ok);
 		
 		p.add(cancel);
