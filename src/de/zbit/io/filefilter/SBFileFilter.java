@@ -56,6 +56,10 @@ public class SBFileFilter extends GeneralFileFilter {
    * @author Clemens Wrzodek
    * 
    */
+  /**
+   * @author Florian Mittag
+   * @version $Rev$
+   */
   public static enum FileType {
     /**
      * A filter for assoc files
@@ -125,6 +129,10 @@ public class SBFileFilter extends GeneralFileFilter {
      * File filter for PED_FILES
      */
     PED_FILES,
+    /**
+     * PLINK genotype files (.ped and .bed)
+     */
+    PLINK_GENOTYPE_FILES,
     /**
      * True if this filter accepts portable network graphic files.
      */
@@ -242,6 +250,10 @@ public class SBFileFilter extends GeneralFileFilter {
           extensions.add("xml");
           return extensions;
           // ----
+        case PLINK_GENOTYPE_FILES:
+          extensions.add("ped");
+          extensions.add("bed");
+          return extensions;
         case SBGN_FILES:
         case SBML_FILES:
         case SBML_FILES_L1V1:
@@ -538,6 +550,13 @@ public class SBFileFilter extends GeneralFileFilter {
    */
   public static SBFileFilter createPEDFileFilter() {
     return new SBFileFilter(FileType.PED_FILES);
+  }
+  
+  /**
+   * @return A filter for PLINK genotype files
+   */
+  public static SBFileFilter createPlinkGenotypeFileFilter() {
+    return new SBFileFilter(FileType.PLINK_GENOTYPE_FILES);
   }
   
   /**
