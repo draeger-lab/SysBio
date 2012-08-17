@@ -190,6 +190,7 @@ to redistribute it under certain conditions.
   <entry key="MAP_FILES">MAP files</entry>
   <entry key="PDF_FILES">Portable Document Format files</entry>
   <entry key="PED_FILES">Plain text PLINK genotype files</entry>
+  <entry key="PLINK_GENOTYPE_FILES">PLINK genotype files</entry>
   <entry key="PNG_FILES">Portable Network Graphics files</entry>
   <entry key="SBGN_FILES">SBGN files</entry>
   <entry key="SBML_FILES">SBML files</entry>
