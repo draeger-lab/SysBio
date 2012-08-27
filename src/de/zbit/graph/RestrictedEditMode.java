@@ -155,6 +155,27 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     }
   }
   
+  /* (non-Javadoc)
+   * @see y.view.ViewMode#mousePressedMiddle(double, double)
+   */
+//  public void mousePressedMiddle(double x, double y) {
+//    // Removes everything that is selected, when the middle mouse button is pressed.
+//    // Useful for manual picture creation (e.g., for papers).
+//    NodeCursor yc = getGraph2D().selectedNodes();
+//    while (yc.ok()){
+//      getGraph2D().removeNode(yc.node());
+//      yc.next();
+//    }
+//    
+//    EdgeCursor ec = getGraph2D().selectedEdges();
+//    while (ec.ok()){
+//      getGraph2D().removeEdge(ec.edge());
+//      ec.next();
+//    }
+//    
+//    getGraph2D().updateViews();
+//  }
+  
   /**
    * @param listener this is used to fire an action with command {@link #OPEN_PATHWAY}
    * if the user double clicked a pathway reference node.
