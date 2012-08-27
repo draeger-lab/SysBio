@@ -28,8 +28,8 @@ import java.util.logging.Logger;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.util.DatabaseIdentifiers;
-import de.zbit.util.Utils;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
+import de.zbit.util.Utils;
 
 /**
  * Main Kegg document. Corresponding to the Kegg Pathway class
@@ -1035,7 +1035,47 @@ public class Pathway {
   public static String getCompoundPreviewPicture(String ko_id) {
     return String.format("<img src=\"http://www.kegg.jp/Fig/compound/%s.gif\"/><br/>\n", ko_id.trim().substring(4).toUpperCase() );
   }
-
+  
+  /**
+   * Generates a HTML-IMG-Tag, preferably from ChEBI but with fallback to the 
+   * given KEGG Id, that should point to an image for the compound.
+   * @param ko_id starting with "cpd:"
+   * @param infos API information for this ID
+   * @return an html image tag, containing a preview picture for the given compound.
+   */
+  public static String getCompoundPreviewPicture(String ko_id, KeggInfos infos) {
+    
+    // Get ChEBI from KEGG API
+    // XXX: Deactivated, because JSBML cannot write '&' characters.
+    // NOTE: If multiple ChEBI ids (e.g., "1234 5678") are contained, this will also
+    // be considerd a non-valid ChEBI ID and cause a Fallback to KEGG.
+    /*if (infos!=null && infos.queryWasSuccessfull()) {
+      String ChEBI = infos.getChebi();
+      if (ChEBI!=null) {
+        // Extract numerical suffix (pattern is CHEBI:\\d+), but
+        // API sometimes just returns \\d+
+        String numericalID = null;
+        if (!Utils.isNumber(ChEBI, true)) {
+          ChEBI = ChEBI.toUpperCase().trim();
+          if (ChEBI.startsWith("CHEBI:")) ChEBI = ChEBI.substring(6).trim();
+          if (Utils.isNumber(ChEBI, true)) {
+            numericalID = ChEBI;
+          }
+        } else {
+          numericalID = ChEBI;
+        }
+        
+        // If we could extract a valid ChEBI numer, use this for generating an image.
+        if (numericalID!=null && numericalID.length()>0) {
+          return String.format("<img src=\"http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage&#61;true&#38;chebiId&#61;%s&#38;dimensions&#61;300\"/><br/>\n", ChEBI);
+        }
+      }
+    }*/
+    
+    // Fallback on KEGG ID.
+    return getCompoundPreviewPicture(ko_id);
+  }
+  
   /**
    * Generates a HTML-IMG-Tag from the given KEGG Id, that should
    * point to an image for the pathway. 

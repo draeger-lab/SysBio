@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -622,9 +624,10 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			// As long as there is no solution that breaks text at window length,
 			// I am inserting these temporary line breaks.
 			// Problem 1: </p> is not recognized as a line break
-			text = StringUtil.replaceIgnoreCase(text, "</p>", "</p><br>");
-			text = StringUtil.insertLineBreaks(text, 120, "<br>");
-			text = StringUtil.replaceIgnoreCase(text, "</p><br>", "</p>");
+			// WARNING: This places <br> tags also inside HTML code!
+//			text = StringUtil.replaceIgnoreCase(text, "</p>", "</p><br>");
+//			text = StringUtil.insertLineBreaks(text, 150, "<br>");
+//			text = StringUtil.replaceIgnoreCase(text, "</p><br>", "</p>");
 			
 			if (!text.startsWith("<body") && !text.endsWith("</body>"))
 				text = "<body>" + text + "</body>";
@@ -636,7 +639,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			notesArea.setDoubleBuffered(true);
 			notesArea.setBorder(BorderFactory.createLoweredBevelBorder());
 			JScrollPane scroll = new JScrollPane(notesArea);
-			//scroll.setPreferredSize(new Dimension(preferedWidth, 200));
+			scroll.setMaximumSize(notesArea.getMaximumSize());
+			// We NEED to set a PreferredSize on the scroll. Else, Long description strings
+			// are printed on one large line without a line break!
+			// Setting a maximum size has (unfortunately) no influence on this behaviour
+			scroll.setPreferredSize(new Dimension(preferedWidth, 500));
 			lh.add(scroll, 3, row, 1, 1, 1d, 1d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
