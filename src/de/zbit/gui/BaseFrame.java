@@ -373,7 +373,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * 
 	 * @return An array of {@link JMenuItem}s that are added to the Edit menu
 	 *         above of the preferences entry if it exists. This method may return
-	 *         null.
+	 *         {@code null}.
 	 */
 	protected JMenuItem[] additionalEditMenuItems() {
 		// empty method
@@ -387,7 +387,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * {@link JSeparator} over the {@link BaseAction#FILE_EXIT}.
 	 * 
 	 * @return An array of {@link JMenuItem}s that are added to the File menu
-	 *         above of the exit entry. This method may return null.
+	 *         above of the exit entry. This method may return {@code null}.
 	 */
 	protected JMenuItem[] additionalFileMenuItems() {
 		// Intentionally left blank
@@ -400,7 +400,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * this one exists, otherwise in a higher position).
 	 * 
 	 * @return An array of {@link JMenuItem}s that are added to the Help menu.
-	 *         This method may return null.
+	 *         This method may return {@code null}.
 	 */
 	protected JMenuItem[] additionalHelpMenuItems() {
 		// empty method
@@ -415,7 +415,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * 
 	 * @return An array of {@link JMenu}s that are to be placed in this
 	 *         {@link BaseFrame}'s {@link JMenuBar} left of the Help menu if it
-	 *         exists. This method may return null.
+	 *         exists. This method may return {@code null}.
 	 */
 	protected JMenu[] additionalMenus() {
 		// empty method
@@ -427,12 +427,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * user alters some {@link SBPreferences} within the {@link PreferencesDialog}.
 	 * 
 	 * @param pcl
-	 * @return <code>true</code> (as specified by {@link Collection#add}).
+	 * @return {@code true} (as specified by {@link Collection#add}).
 	 * @throws ClassCastException
 	 *         if the class of the specified element prevents it from being added
 	 *         to this list
 	 * @throws NullPointerException
-	 *         if the specified element is null and this list does not permit null
+	 *         if the specified element is {@code null} and this list does not permit {@code null}
 	 *         elements
 	 * @throws IllegalArgumentException
 	 *         if some property of this element prevents it from being added to
@@ -596,7 +596,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	/**
 	 * Creates a {@link JMenu} for user edit operations.
 	 * 
-	 * @return a {@link JMenu} might be <code>null</code> or empty (zero
+	 * @return a {@link JMenu} might be {@code null} or empty (zero
 	 *         {@link JMenuItem}s).
 	 */
 	protected JMenu createEditMenu() {
@@ -676,7 +676,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * Creates a {@link JMenu} for dealing with files.
 	 * 
 	 * @param loadDefaultFileMenuEntries
-	 * @return a {@link JMenu} might be <code>null</code> or empty (zero
+	 * @return a {@link JMenu} might be {@code null} or empty (zero
 	 *         {@link JMenuItem}s).
 	 */
 	protected JMenu createFileMenu(boolean loadDefaultFileMenuEntries) {
@@ -745,7 +745,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	/**
 	 * Creates a {@link JMenu} for user help.
 	 * 
-	 * @return a {@link JMenu} might be <code>null</code> or empty (zero
+	 * @return a {@link JMenu} might be {@code null} or empty (zero
 	 *         {@link JMenuItem}s).
 	 */
 	protected JMenu createHelpMenu() {
@@ -795,15 +795,15 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * {@link JMenuBar}. You can also switch most of the entries in the File menu
 	 * off by passing false to this method (this is actually done by overriding
 	 * the method {@link #loadsDefaultFileMenuEntries()}, which returns
-	 * <code>true</code> by default). If you don't implement the methods
+	 * {@code true} by default). If you don't implement the methods
 	 * {@link #getURLOnlineHelp}, {@link #getURLAboutMessage()},
 	 * {@link #getURLLicense()} or {@link #getURLOnlineUpdate()}, there will be,
 	 * for instance no Help menu in this element's {@link JMenuBar}. Similarly, no
 	 * Edit menu will occur if there are no instances of {@link PreferencesPanel}
-	 * in package <code>de.zbit.gui.prefs</code>. Hence, this method will at least
+	 * in package {@link de.zbit.gui.prefs}. Hence, this method will at least
 	 * create a {@link JMenuBar} containing a single menu (File) which will at
 	 * least contain the entry for Exit. Everything else depends on either if all
-	 * methods mentioned above return a value distinct from null or if
+	 * methods mentioned above return a value distinct from {@code null} or if
 	 * user-defined {@link MenuItem}s or {@link JMenu}s have been declared by
 	 * overriding the dedicated methods.
 	 * </p>
@@ -866,10 +866,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	}
 
 	/**
-	 * By default this method simply returns null. You can override it to create
+	 * By default this method simply returns {@code null}. You can override it to create
 	 * your own tool bar.
 	 * 
-	 * @return an instance of {@link JToolBar} or null if no tool bar is desired.
+	 * @return an instance of {@link JToolBar} or {@code null} if no tool bar is desired.
 	 * @see #createDefaultToolBar()
 	 */
 	protected abstract JToolBar createJToolBar();
@@ -880,11 +880,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * field variable to your instance of {@link BaseFrame} to easily access and
 	 * manipulate this element later on. Please note that this method is called by
 	 * the constructor and therefore you should not set your main
-	 * {@link Component} to null in your derived constructor. The intention of
+	 * {@link Component} to {@code null} in your derived constructor. The intention of
 	 * this method is that you here create some empty {@link Component} and at any
 	 * later state you fill it with some content.
 	 * 
-	 * @return An instance of {@link Component}, which should not be null. It is
+	 * @return An instance of {@link Component}, which should not be {@code null}. It is
 	 *         advisable to let this method initialize a field member of a derived
 	 *         {@link Object}, which is manipulated at later states in the
 	 *         program.
@@ -930,13 +930,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * {@link JMenuItem}s in the {@link JMenuBar} of this {@link BaseFrame}. The
 	 * returned {@link Map} contains a mapping from each {@link BaseAction} to the
 	 * name that is to be associated with it. By default this method returns
-	 * <code>null</code>, but you may override this method in order to customize
+	 * {@code null}, but you may override this method in order to customize
 	 * the menu bar more easily. In this way, it is even possible to override
 	 * single entries of the {@link JMenu} instead of being forced to override the
 	 * entire list.
 	 * 
 	 * @return a mapping from {@link BaseAction} to its display name,
-	 *         <code>null</code> by default.
+	 *         {@code null} by default.
 	 */
   protected Map<BaseAction, String> getAlternativeBaseActionNames() {
 		return null;
@@ -997,7 +997,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	
 	/**
    * @return the {@link #toolBar} if it has been initialized in {@link #createJToolBar()}.
-   * Else, <code>null</code> is returned.
+   * Else, {@code null} is returned.
    */
   public JToolBar getJToolBar() {
     return toolBar;
@@ -1007,14 +1007,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * Override this message to change the texts of some or all {@link JMenuItem}s
 	 * including their tool tips and also of {@link JButton}s and so on. The
 	 * location given here must be a path that includes the package name, for
-	 * instance <code>de.zbit.locales.MyTexts</code>, where the file extension
-	 * <code>xml</code> is omitted, but the resource file is required to be an XML
+	 * instance {@link de.zbit.locales.MyTexts}, where the file extension
+	 * {@code xml} is omitted, but the resource file is required to be an XML
 	 * file in the format defined for {@link Properties}. The naming convention
 	 * for the resource file says that it should contain a suffix consisting of
 	 * underscore, language name, underscore, country name, e.g.,
-	 * <code>MyTexts_de_DE.xml</code>. You may omit this suffix.
+	 * {@code MyTexts_de_DE.xml}. You may omit this suffix.
 	 * 
-	 * @return By default, this method returns null, i.e., the default texts will
+	 * @return By default, this method returns {@code null}, i.e., the default texts will
 	 *         be set for all menu items depending on the {@link System}'s default
 	 *         {@link Locale}.
 	 */
@@ -1051,7 +1051,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	/**
 	 * This method creates a title from the values of
 	 * {@link #getApplicationName()} and {@link #getDottedVersionNumber()}. The
-	 * value returned may be an empty {@link String} but never null. In case
+	 * value returned may be an empty {@link String} but never {@code null}. In case
 	 * neither an application name nor a dotted version number are defined, an
 	 * empty {@link String} will be returned. If both values are defined, the
 	 * returned value will be application name white space version number. In case
@@ -1116,11 +1116,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	
 	/**
 	 * <p>
-	 * The online update expects to find a file called <code>latest.txt</code>
+	 * The online update expects to find a file called {@code latest.txt}
 	 * containing only the version number of the latest release of this program as
 	 * a {@link String} of digits that contains exactly one dot or at most two
 	 * dots. Furthermore, on the given destination must be a second file, called
-	 * <code>releaseNotes&lt;VersionNumber&gt;.htm[l]</code> which contains more
+	 * {@code releaseNotes&lt;VersionNumber&gt;.htm[l]}, which contains more
 	 * detailed information about the latest release.
 	 * </p>
 	 * <p>
@@ -1130,7 +1130,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * <li>latest.txt</li>
 	 * <li>releaseNotesX.Y.Z.htm</li>
 	 * </ul>
-	 * The file <code>latest.txt</code> contains exactly the dotted version number
+	 * The file {@code latest.txt} contains exactly the dotted version number
 	 * of the latest release of this software; nothing else! The release notes
 	 * file contains HTML code describing the latest changes and the file name
 	 * MUST end with the latest version number of the release.
@@ -1210,8 +1210,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			container.add(component, BorderLayout.CENTER);
 		}
 		
-		// Init status bar
+		// Initialize status bar
 		statusBar = initializeStatusBar();
+		// Add status bar to content pane
+		container.add(statusBar, BorderLayout.SOUTH);
 				
   	// Restore last window size and state
 		setMinimumSize(new Dimension(640, 480));
@@ -1222,22 +1224,31 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 
 	/**
 	 * Initialize the status bar. This method can be overwritten
-	 * and if null is returned, the status bar is disabled.
+	 * and if {@code null} is returned, the status bar is disabled.
 	 */
   protected StatusBar initializeStatusBar() {
-    // Create and put statusBar in south
-		return StatusBar.addStatusBar(this);
+		// Get current icon
+		Icon icon = getIconImage() != null ? new ImageIcon(getIconImage()) : null;
+
+		// Create the status bar
+		StatusBar statusBar = new StatusBar(icon, null);
+		statusBar.registerAsIconListenerFor(this);
+		
+		// Capture and display logging messages.
+		statusBar.displayLogMessagesInStatusBar();
+		
+		return statusBar;
   }
 
 	/**
    * This method decides whether or not the file menu should already be equipped
    * with the default entries for "open", "save", and "close". By default, this
-   * method returns <code>true</code>, i.e., the default File menu already
+   * method returns {@code true}, i.e., the default File menu already
    * contains all these three items. You may want to override this method and to
-   * return <code>false</code> instead to switch this behavior off.
+   * return {@code false} instead to switch this behavior off.
    * 
    * @return Whether or not to equip the file menu with the three entries
-   *         "open", "save", and "close". By default <code>true</code>
+   *         "open", "save", and "close". By default {@code true}
    */
   protected boolean loadsDefaultFileMenuEntries() {
     return true;
@@ -1254,12 +1265,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
   /**
 	 * This actually performs the online update, i.e., this method looks if an
 	 * update is available and shows a message if this is the case. If the option
-	 * hideErrorMessages is set to <code>false</code>, a message will also be
+	 * hideErrorMessages is set to {@code false}, a message will also be
 	 * shown if no update can be found or if an error occurs when searching for
 	 * the update. Otherwise, there will be no such method in case of failure.
 	 * 
 	 * @param hideErrorMessages
-	 *        if <code>true</code> no messages will be displayed to the user in
+	 *        if {@code true} no messages will be displayed to the user in
 	 *        case of an unsuccessful search for an update.
 	 */
 	private void onlineUpdate(boolean hideErrorMessages) {
@@ -1268,7 +1279,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			getURLOnlineUpdate(), getDottedVersionNumber(), hideErrorMessages);
 		
 		// Set the update window to use the same icon as this window.
-		if (this.getIconImage()!=null) {
+		if (this.getIconImage() != null) {
 		  update.setIcon(new ImageIcon(getIconImage()));
 		}
 		  
@@ -1321,7 +1332,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * arguments to it.
 	 * 
 	 * @return An array of {@link File} objects that have been selected by the
-	 *         user or null if the user cancels the operation.
+	 *         user or {@code null} if the user cancels the operation.
 	 * @see #openFileAndLogHistory(File...)
 	 * @see #openFile(File...)
 	 */
@@ -1399,10 +1410,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * Removes the given listener from this {@link BaseFrame}.
 	 * 
 	 * @param pcl
-	 * @return <code>true</code> if this list contained the specified element
+	 * @return {@code true} if this list contained the specified element
 	 * @throws NullPointerException
-	 *         if the specified element is <code>null</code> and this list does
-	 *         not permit <code>null</code> elements (optional)
+	 *         if the specified element is {@code null} and this list does
+	 *         not permit {@code null} elements (optional)
 	 */
 	public boolean removePreferenceChangeListener(PreferenceChangeListener pcl)
 		throws NullPointerException {
@@ -1441,7 +1452,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * override this method.
 	 * 
 	 * @return the {@link File} into which the content has been saved. If the
-	 *         returned value is not <code>null</code>, the directory in which the
+	 *         returned value is not {@code null}, the directory in which the
 	 *         {@link File} is located is stored as the
 	 *         {@link GUIOptions#SAVE_DIR} property of the current class (but only
 	 *         if it exists and can be read).
@@ -1459,7 +1470,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * {@link BaseFrameTab#saveToFile()}.
 	 * 
 	 * @return the {@link File} into which the content has been saved. If the
-	 *         returned value is not <code>null</code>, the directory in which the
+	 *         returned value is not {@code null}, the directory in which the
 	 *         {@link File} is located is stored as the
 	 *         {@link GUIOptions#SAVE_DIR} property of the current class (but only
 	 *         if it exists and can be read).
@@ -1472,7 +1483,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * (which implements {@link GUIOptions}. While saving some file, the actions
 	 * {@link BaseAction#FILE_SAVE} and {@link BaseAction#FILE_SAVE_AS} are
 	 * disabled. When done, these are enabled again. Override this method if you
-	 * want a different behavior. If {@link #saveFile()} returns null, than calls
+	 * want a different behavior. If {@link #saveFile()} returns {@code null}, than calls
 	 * {@link #saveFileAs()}
 	 */
 	public void saveFileToOriginal() {
@@ -1531,11 +1542,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	/**
 	 * Enables the {@link JButton} in the {@link JToolBar} (if there is any) and
 	 * the entry in the {@link JMenu} that allows the user to search for an online
-	 * update if the given {@link String} equals <code>onlineUpdateExecuted</code>
+	 * update if the given {@link String} equals {@code onlineUpdateExecuted}
 	 * .
 	 * 
 	 * @param command
-	 *        If this command equals <code>onlineUpdateExecuted</code> the online
+	 *        If this command equals {@code onlineUpdateExecuted} the online
 	 *        update button will be enabled.
 	 */
 	public final void setOnlineUpdateEnabled(String command) {

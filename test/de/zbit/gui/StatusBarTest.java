@@ -15,6 +15,8 @@
  */
 package de.zbit.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
@@ -37,7 +39,12 @@ public class StatusBarTest {
 		frame.setBounds(200, 200, 600, 200);
 		frame.setTitle("Status bar test");
 
-		StatusBar.addStatusBar(frame);
+		StatusBar bar = new StatusBar();
+		Container c = frame.getContentPane();
+		c.setLayout(new BorderLayout());
+		c.add(bar, BorderLayout.SOUTH);
+		
+		bar.registerAsIconListenerFor(frame);
 
 		log.warning("Test log message.");
 

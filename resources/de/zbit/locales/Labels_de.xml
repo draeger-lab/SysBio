@@ -133,18 +133,18 @@
   
   <entry key="SCANNING_CMD_ARGS">Lese Kommandozeilenargumente...</entry>
   <entry key="COULD_NOT_INITIALIZE_GUI">"Es konnte keine graphische Nutzerschnittstelle erstellt werden."</entry>
-  <entry key="LAUNCHING_CMD_MODE">Starte Kommandozeilenmodus für %s.</entry>
-  <entry key="NO_GUI_SUPPORTED">"Das Programm %s in Version %s unterstützt keine graphische Nutzerschnittstelle."</entry>
-  <entry key="INCOMPLETE_CMD_ARG_LIST">Unvollständige Liste von Kommandozeilenargumenten. Versuchen Sie, %s Version %s mit der Option --help erneut zu starten.</entry>
-    <entry key="COPYRIGHT_MESSAGE">%s
-Copyright © %d-%d Universität Tübingen,
+  <entry key="LAUNCHING_CMD_MODE">Starte Kommandozeilenmodus für {0}.</entry>
+  <entry key="NO_GUI_SUPPORTED">"Das Programm {0} in Version {1} unterstützt keine graphische Nutzerschnittstelle."</entry>
+  <entry key="INCOMPLETE_CMD_ARG_LIST">Unvollständige Liste von Kommandozeilenargumenten. Versuchen Sie, {0} Version {1} mit der Option --help erneut zu starten.</entry>
+    <entry key="COPYRIGHT_MESSAGE">{0}
+Copyright © {1,number,integer}-{2,number,integer} Universität Tübingen,
 Zentrum für Bioinformatik Tübingen (ZBIT).
 Dieses Programm wird unter AUSSCHLUSS JEGLICHER
 GEWÄHRLEISTUNG UND HAFTUNG kostenlos zur Verfügung
 gestellt. Dies ist freie Software, die Sie gern unter
 bestimmten Bedingungen weiterverbreiten dürfen.
 </entry>
-  <entry key="LINK_TO_LICENSE_FILE">Siehe %s für Details.</entry>
+  <entry key="LINK_TO_LICENSE_FILE">Siehe {0}.</entry>
   
   <!-- MultiplePreferencesPanel -->
   

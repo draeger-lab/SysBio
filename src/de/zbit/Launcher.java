@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessControlException;
+import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -557,12 +558,12 @@ public abstract class Launcher implements Runnable, Serializable {
 			ui.toFront();
 		} else {
 			if (appConf.getCmdArgs().getBooleanProperty(GUIOptions.GUI)) {
-				logger.warning(String.format(
+				logger.warning(MessageFormat.format(
 				  resources.getString("NO_GUI_SUPPORTED"),
 				  getAppName(),
 				  getVersionNumber()));
 			} else {
-				logger.warning(String.format("INCOMPLETE_CMD_ARG_LIST",
+				logger.warning(MessageFormat.format("INCOMPLETE_CMD_ARG_LIST",
 				  getAppName(),getVersionNumber()));
 			  // TODO: No arguments and no GUI => It would be good if we show
 				// the output of "--help" here!
@@ -615,7 +616,7 @@ public abstract class Launcher implements Runnable, Serializable {
 				logger.log(Level.FINE, exc.getMessage(), exc);
 			}
 		}
-		logger.info(String.format(resources.getString("LAUNCHING_CMD_MODE"),
+		logger.info(MessageFormat.format(resources.getString("LAUNCHING_CMD_MODE"),
 			getAppName()));
 		try {
 			GUITools.hideSplashScreen();
@@ -673,13 +674,13 @@ public abstract class Launcher implements Runnable, Serializable {
     }
     message.append(sb);
     message.append('\n');
-    message.append(String.format(resources.getString("COPYRIGHT_MESSAGE"),
+    message.append(MessageFormat.format(resources.getString("COPYRIGHT_MESSAGE"),
       getAppName(), getYearWhenProjectWasStarted(),
       getYearOfProgramRelease()));
     URL licenseFile = null;
     licenseFile = getURLlicenseFile();
     if (licenseFile != null) {
-      message.append(String.format(resources.getString("LINK_TO_LICENSE_FILE"),
+      message.append(MessageFormat.format(resources.getString("LINK_TO_LICENSE_FILE"),
         licenseFile.toString()));
     }
     message.append('\n');
@@ -701,7 +702,7 @@ public abstract class Launcher implements Runnable, Serializable {
     }
     
     /* 
-     * Give the opertunity to load certain libraries or perform
+     * Give the opportunity to load certain libraries or perform
      * other necessary operations in order to initialize the program.
      */
     setUp();
