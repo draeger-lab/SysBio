@@ -28,7 +28,7 @@ import java.io.File;
  * @since 1.4
  * @version $Rev: 808 $
  */
-public class OpenedFile<T> extends Component implements PropertyChangeListener{
+public class OpenedFile<T> extends Component implements PropertyChangeListener {
 	
 	/**
 	 * 

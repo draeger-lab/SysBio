@@ -18,7 +18,6 @@ package de.zbit.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -163,8 +162,22 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 */
 	public void displayLogMessagesInStatusBar() {
 		// Display with info message in all de.zbit packages.
-		displayLogMessagesInStatusBar(Level.INFO, LogUtil.getInitializedPackages());
+		displayLogMessagesInStatusBar(Level.INFO);
 	}
+	
+	/**
+	 * Display log messages starting at the given level, issued in
+	 * {@value LogUtil#basePackage} (currently: "de.zbit") and
+	 * {@link LogUtil#getInitializedPackages()} in the
+	 * {@link #statusLabel}.
+	 * 
+	 * @param level
+	 */
+	public void displayLogMessagesInStatusBar(Level level) {
+		// Display with info message in all de.zbit packages.
+		displayLogMessagesInStatusBar(level, LogUtil.getInitializedPackages());
+	}
+	
 	/**
 	 * Display log messages in the status bar.
 	 * @param level minimum level for a message to get displayed
@@ -186,19 +199,8 @@ public class StatusBar extends JPanel implements ProgressListener {
 	 * @param frame
 	 * @return
 	 */
-	public static StatusBar addStatusBar(final JFrame frame) {
-		// Ensure a border layout
-		Container contentPane = frame.getContentPane();
-		if (!contentPane.getLayout().getClass().equals(BorderLayout.class)) {
-			contentPane.setLayout(new BorderLayout());
-		}
-
-		// Get current icon
-		Icon icon = frame.getIconImage() != null ? new ImageIcon(frame.getIconImage()) : null;
-
-		// Create the status bar
-		final StatusBar statusBar = new StatusBar(icon, null);
-
+	public void registerAsIconListenerFor(final JFrame frame) {
+		final StatusBar statusBar = this;
 		// Change status bar icon with frame
 		frame.addPropertyChangeListener("iconImage", new PropertyChangeListener() {
 			/* (non-Javadoc)
@@ -206,18 +208,10 @@ public class StatusBar extends JPanel implements ProgressListener {
 			 */
 			public void propertyChange(PropertyChangeEvent evt) {
 				Icon icon = null;
-				icon = frame.getIconImage()!=null?new ImageIcon(frame.getIconImage()):null;
+				icon = frame.getIconImage() != null ? new ImageIcon(frame.getIconImage()) : null;
 				statusBar.setIcon(icon);
 			}
 		});
-
-		// Add status bar to content pane
-		contentPane.add(statusBar, BorderLayout.SOUTH);
-
-		// Capture and display logging messages.
-		statusBar.displayLogMessagesInStatusBar();
-
-		return statusBar;
 	}
 	
 	/**
