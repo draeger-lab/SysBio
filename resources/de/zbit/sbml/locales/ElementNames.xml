@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+    $Id$
+    $URL$
+    ---------------------------------------------------------------------
+    This file is part of the SysBio API library.
+ 
+    Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ 
+    This library is free software; you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as
+    published by the Free Software Foundation. A copy of the license
+    agreement is provided in the file named "LICENSE.txt" included with
+    this software distribution and also available online as
+    http://www.gnu.org/licenses/lgpl-3.0-standalone.html.
+    ---------------------------------------------------------------------
+  
+    This file collects locale-dependent user-visible names for SBML elements.
+    
+    version: $Rev$
+  </comment>
+  
+  <!-- SBML Core -->
+  
+  <entry key="algebraicRule">Algebraic rule</entry>
+  <entry key="annotation">Annotation</entry>
+  <entry key="assignmentRule">Assignment rule</entry>
+  <entry key="compartment">Compartment</entry>
+  <entry key="compartmentType">CompartmentType</entry>
+  <entry key="constraint">Constraint</entry>
+  <entry key="delay">Delay</entry>
+  <entry key="event">Event</entry>
+  <entry key="eventAssignment">Event assignment</entry>
+  <entry key="functionDefinition">Function definition</entry>
+  <entry key="initialAssignment">Initial assignment</entry>
+  <entry key="kineticLaw">Kinetic law</entry>
+  <entry key="listOfCompartments">Compartments</entry>
+  <entry key="listOfCompartmentTypes">Compartment types</entry>
+  <entry key="listOfConstraints">Constraints</entry>
+  <entry key="listOfEvents">Events</entry>
+  <entry key="listOfFunctionDefinitions">Function definitions</entry>
+  <entry key="listOfInitialAssignments">Initial assignments</entry>
+  <entry key="listOfLocalParameters">Parameters</entry> <!-- local or not is not relevant to the user. -->
+  <entry key="listOfModifiers">Modifiers</entry>
+  <entry key="listOfParameters">Parameters</entry>
+  <entry key="listOfProducts">Products</entry>
+  <entry key="listOfReactants">Reactants</entry>
+  <entry key="listOfReactions">Reactions</entry>
+  <entry key="listOfRules">Rules</entry>
+  <entry key="listOfSpecies">Species</entry>
+  <entry key="listOfSpeciesTypes">Species types</entry>
+  <entry key="listOfUnitDefinitions">Unit definitions</entry>
+  <entry key="listOfUnits">Units</entry>
+  <entry key="localParameter">Parameter</entry> <!-- local or not is not relevant to the user. -->
+  <entry key="model">Model</entry>
+  <entry key="modifierSpeciesReference">Modifier species reference</entry>
+  <entry key="parameter">Parameter</entry>
+  <entry key="priority">Priority</entry>
+  <entry key="rateRule">Rate rule</entry>
+  <entry key="reaction">Reaction</entry>
+  <entry key="specie">Species</entry>
+  <entry key="specieReference">Species reference</entry>
+  <entry key="species">Species</entry>
+  <entry key="speciesReference">Species reference</entry>
+  <entry key="speciesType">Species type</entry>
+  <entry key="stoichiometryMath">Stoichiometry math</entry>
+  <entry key="trigger">Trigger</entry>
+  <entry key="unit">Unit</entry>
+  <entry key="unitDefinition">Unit definition</entry>
+  
+</properties>

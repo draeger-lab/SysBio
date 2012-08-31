@@ -23,7 +23,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * ProgressBarSwing - a swing implementation that wraps the
- * AbstractProgressBar around a JProgressBar.
+ * AbstractProgressBar around a {@link JProgressBar}.
  * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
@@ -71,11 +71,11 @@ public class ProgressBarSwing extends AbstractProgressBar {
   
   public void initProgressBar() {
     // initializes Progress bar
-    if (progressBar!=null && progressBar instanceof JProgressBar) {
-      ((JProgressBar)progressBar).setMaximum(100);
-      ((JProgressBar)progressBar).setMinimum(0);
-      ((JProgressBar)progressBar).setValue(0);
-      ((JProgressBar)progressBar).setStringPainted(true);
+    if ((progressBar != null) && (progressBar instanceof JProgressBar)) {
+      ((JProgressBar) progressBar).setMaximum(100);
+      ((JProgressBar) progressBar).setMinimum(0);
+      ((JProgressBar) progressBar).setValue(0);
+      ((JProgressBar) progressBar).setStringPainted(true);
     }
   }
   
@@ -84,17 +84,17 @@ public class ProgressBarSwing extends AbstractProgressBar {
    */
   public void drawProgressBar(int percent, double miliSecondsRemaining, String additionalText) {
     if (progressBar instanceof JProgressBar) {
-      ((JProgressBar)progressBar).setValue(percent);
+      ((JProgressBar) progressBar).setValue(percent);
       
       String s = percent + " %";
       if (miliSecondsRemaining > 0) {
-        s +=" ETR: "+ Utils.getPrettyTimeString((long) miliSecondsRemaining);
+        s += " ETR: "+ Utils.getPrettyTimeString((long) miliSecondsRemaining);
       }
       if ((additionalText != null) && (additionalText.length() > 0)) {
         s += " - " + additionalText;
       }
       
-      ((JProgressBar)progressBar).setString(s);
+      ((JProgressBar) progressBar).setString(s);
     }
   }
 
@@ -103,7 +103,7 @@ public class ProgressBarSwing extends AbstractProgressBar {
    */
   public void finished_impl() {
     // Set Progressbar to 100%
-    drawProgressBar(100,0,"");
+    drawProgressBar(100, 0, "");
   }
 
 }

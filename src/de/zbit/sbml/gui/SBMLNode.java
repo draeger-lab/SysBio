@@ -16,7 +16,10 @@
  */
 package de.zbit.sbml.gui;
 
+import java.beans.PropertyChangeEvent;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.swing.JTree;
@@ -25,11 +28,18 @@ import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.MathContainer;
+import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.SimpleSpeciesReference;
+import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
+import org.sbml.jsbml.util.TreeNodeChangeListener;
+import org.sbml.jsbml.util.TreeNodeRemovedEvent;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 import org.sbml.jsbml.util.compilers.UnitException;
 import org.sbml.jsbml.util.compilers.UnitsCompiler;
+
+import de.zbit.util.ResourceManager;
 
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a
@@ -39,7 +49,7 @@ import org.sbml.jsbml.util.compilers.UnitsCompiler;
  * @version $Rev$
  * @since 1.4
  */
-public class SBMLNode extends DefaultMutableTreeNode {
+public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeListener {
 
 	/**
 	 * Generated serial version identifier.
@@ -50,6 +60,11 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	 * A {@link Logger} for this class.
 	 */
 	private static final Logger logger = Logger.getLogger(SBMLNode.class.getName());
+	
+	/**
+	 * Localization for SBML element names.
+	 */
+	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.ElementNames");
 	
 	/**
 	 * true: show invisible nodes
@@ -65,6 +80,12 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	 * 
 	 */
 	private boolean boldFont, expanded, isVisible;
+	
+	/**
+	 * Memorizes the result of the {@link #toString()} method.
+	 */
+	private String stringRepresentation;
+	
 
 	/**
 	 * 
@@ -109,6 +130,14 @@ public class SBMLNode extends DefaultMutableTreeNode {
 				add(new SBMLNode(child, isVisible, accepted));
 			}
 		}
+		stringRepresentation = null;
+		if (node instanceof TreeNodeWithChangeSupport) {
+			TreeNodeWithChangeSupport n = (TreeNodeWithChangeSupport) node;
+			List<TreeNodeChangeListener> listOfListeners = n.getListOfTreeNodeChangeListeners();
+			if (!listOfListeners.contains(this)) {
+				n.addTreeNodeChangeListener(this);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -118,31 +147,59 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	public String toString() {
 		TreeNodeWithChangeSupport node = getUserObject();
 		if (node instanceof SBase) {
+			if (node instanceof NamedSBase) {
+				NamedSBase nsb = (NamedSBase) node;
+				if (nsb.isSetName()) {
+					return nsb.getName();
+				} else if (node instanceof SimpleSpeciesReference) {
+					SimpleSpeciesReference specRef = (SimpleSpeciesReference) node;
+					if (specRef.isSetSpecies()) {
+						return specRef.toString();
+					}
+				} else if (node instanceof Unit) {
+					Unit u = (Unit) node;
+					if (u.isSetKind()) {
+						return u.toString();
+					}
+				} else if (node instanceof UnitDefinition) {
+					UnitDefinition ud = (UnitDefinition) node;
+					if (ud.getUnitCount() > 0) {
+						return ud.toString();
+					}
+				}
+			}
+			String elementName = ((SBase) node).getElementName();
+			if (bundle.containsKey(elementName)) {
+				return bundle.getString(elementName);
+			}
 			return node.toString();
 		} else if (node instanceof ASTNode) {
-			StringBuilder sb = new StringBuilder();
-			ASTNode ast = (ASTNode) node;
-			int level = -1, version = -1;
-			MathContainer mc = ast.getParentSBMLObject();
-			if (mc != null) {
-				level = mc.getLevel();
-				version = mc.getVersion();
+			if (stringRepresentation == null) {
+				StringBuilder sb = new StringBuilder();
+				ASTNode ast = (ASTNode) node;
+				int level = -1, version = -1;
+				MathContainer mc = ast.getParentSBMLObject();
+				if (mc != null) {
+					level = mc.getLevel();
+					version = mc.getVersion();
+				}
+				if (ast.isName()) {
+					sb.append(ast.getName());
+				} else if (ast.isNumber()) {
+					sb.append(ast.isInteger() ? Integer.toString(ast.getInteger()) : Double.toString(ast.getReal()));
+				} else {
+					sb.append(ast.getType());
+				}
+				sb.append(' ');
+				try {
+					sb.append(UnitDefinition.printUnits(ast.compile(new UnitsCompiler(level, version)).getUnits(), true));
+				} catch (UnitException exc) {
+					sb.append("invalid");
+					logger.fine(exc.getMessage());
+				}
+				stringRepresentation = sb.toString();
 			}
-			if (ast.isName()) {
-				sb.append(ast.getName());
-			} else if (ast.isNumber()) {
-				sb.append(ast.isInteger() ? Integer.toString(ast.getInteger()) : Double.toString(ast.getReal()));
-			} else {
-				sb.append(ast.getType());
-			}
-			sb.append(' ');
-			try {
-				sb.append(UnitDefinition.printUnits(ast.compile(new UnitsCompiler(level, version)).getUnits(), true));
-			} catch (UnitException exc) {
-				sb.append("invalid");
-				logger.fine(exc.getMessage());
-			}
-			return sb.toString();
+			return stringRepresentation;
 		}
 		return super.toString();
 	}
@@ -302,6 +359,33 @@ public class SBMLNode extends DefaultMutableTreeNode {
 	public static int getNodeCount() {
 		// TODO: This will return the number of nodes FOR ALL SBMLNode instances!!!
 		return nodeCount;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	//@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		stringRepresentation = null;
+		stringRepresentation = toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
+	 */
+	//@Override
+	public void nodeAdded(TreeNode node) {
+		stringRepresentation = null;
+		stringRepresentation = toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(org.sbml.jsbml.util.TreeNodeRemovedEvent)
+	 */
+	//@Override
+	public void nodeRemoved(TreeNodeRemovedEvent evt) {
+		stringRepresentation = null;
+		stringRepresentation = toString();
 	}
 
 }

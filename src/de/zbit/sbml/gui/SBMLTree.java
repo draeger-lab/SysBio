@@ -337,7 +337,7 @@ public class SBMLTree extends JTree implements ActionListener {
 	 */
 	public void expandNode(TreeNode node) {
 		if (node != null) {
-			expandPath(((DefaultTreeModel)this.getModel()).getPathToRoot(node));
+			expandPath(((DefaultTreeModel) this.getModel()).getPathToRoot(node));
 		}
 	}
 	
@@ -518,6 +518,7 @@ public class SBMLTree extends JTree implements ActionListener {
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dialog.pack();
 					dialog.setModal(true);
+					dialog.setResizable(true);
 					dialog.setLocationRelativeTo(null);
 					dialog.setVisible(true);
 				}

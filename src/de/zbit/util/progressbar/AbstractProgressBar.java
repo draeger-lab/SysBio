@@ -32,7 +32,7 @@ import java.util.Set;
  * The principle is, setting a number of "calls" and calling this class
  * exactly that often.
  * 
- * <br /><b>Example:</b></p>
+ * <br/><b>Example:</b></p>
  * <pre>
  * setNumberOfTotalCalls(5)
  * for (int i=0; i<5; i++) {
@@ -50,22 +50,22 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
   /*
    * Set these values.
    */
-  private long totalCalls=0;
+  private long totalCalls = 0;
   private boolean estimateTime=false;
   
   /*
    * Internal variables (not to set by user).
    */
-  private long callNr=0;
-  protected int lastPercentage=-1;
+  private long callNr = 0;
+  protected int lastPercentage = -1;
   
   /*
    * for time duration estimations
    */
   private long measureTime = 0;
   private int numMeasurements = 0;
-  private long lastCallTime=0;//System.currentTimeMillis();
-  private boolean callNumbersInSyncWithTimeMeasurements=true;
+  private long lastCallTime = 0;//System.currentTimeMillis();
+  private boolean callNumbersInSyncWithTimeMeasurements = true;
   
   /**
    * Listeners that are informed of progress changes.
@@ -73,22 +73,34 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
   Set<ProgressListener> listeners = null;
   
   public void reset() {
-    callNr=0;
+    callNr = 0;
     measureTime = 0;
     numMeasurements = 0;
-    lastCallTime=0;//System.currentTimeMillis();
-    callNumbersInSyncWithTimeMeasurements=true;
+    lastCallTime = 0;//System.currentTimeMillis();
+    callNumbersInSyncWithTimeMeasurements = true;
   }
   
+  /**
+   * 
+   * @param totalCalls
+   */
   public void setNumberOfTotalCalls(long totalCalls) {
     this.totalCalls = totalCalls;
     reset(); // Reset when changing number of total calls.
   }
   
+  /**
+   * 
+   * @return
+   */
   public long getNumberOfTotalCalls() {
     return this.totalCalls;
   }
   
+  /**
+   * 
+   * @param estimateTime
+   */
   public void setEstimateTime(boolean estimateTime) {
     this.estimateTime = estimateTime;
     if (estimateTime) lastCallTime = 0;//System.currentTimeMillis();
@@ -236,7 +248,7 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
    */
   public void setCallNr(long callNr) {
     // Remember this change when estimating the eta.
-    callNumbersInSyncWithTimeMeasurements=false;
+    callNumbersInSyncWithTimeMeasurements = false;
     
     this.callNr = callNr;
   }
@@ -252,8 +264,12 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
    * @param statusBar
    */
   public void addProgressListener(ProgressListener listener) {
-    if (listener.equals(this)) return;
-    if (listeners==null) listeners = new HashSet<ProgressListener>();
+    if (listener.equals(this)) {
+    	return;
+    }
+    if (listeners == null) {
+    	listeners = new HashSet<ProgressListener>();
+    }
     listeners.add(listener);
   }
   
@@ -261,7 +277,9 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
    * @param perc
    */
   private void fireListeners(int percent, double miliSecondsRemaining, String additionalText) {
-    if (listeners==null || listeners.size()<1) return;
+    if ((listeners == null) || (listeners.size() < 1)) {
+    	return;
+    }
     for (ProgressListener listener : listeners) {
       listener.percentageChanged(percent, miliSecondsRemaining, additionalText);
     }
