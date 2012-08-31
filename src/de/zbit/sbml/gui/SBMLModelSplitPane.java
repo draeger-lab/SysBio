@@ -242,19 +242,17 @@ public class SBMLModelSplitPane extends JSplitPane implements
 
 		TreePath path = null;
 		TreeNode[] savedState = null;
-		boolean copyPath = false;
 		if (tree != null) {
 			path = tree.getSelectionPath();
 			savedState = tree.getSavedState();
-			copyPath = true;
 		}
 		tree = new SBMLTree(sbmlDoc);
-		if (copyPath) {
+		if ((path != null) && (savedState != null)) {
 			// Copy the old treePath and savedState to the new tree structure
-			// TODO
+			path = tree.copyPath(path);
+			savedState = tree.copyPath(savedState);
 		}
 		tree.setSavedState(savedState);
-		
 		tree.setShowsRootHandles(true);
 		tree.setScrollsOnExpand(true);
 		if (path != null) {
@@ -275,7 +273,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		}
 		validate();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */

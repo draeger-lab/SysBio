@@ -47,6 +47,7 @@ import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.UnitDefinition;
+import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 import org.sbml.jsbml.util.filters.Filter;
 
 import de.zbit.util.progressbar.AbstractProgressBar;
@@ -179,6 +180,7 @@ public class SBMLTree extends JTree implements ActionListener {
 	 */
 	public void addPopupMenuItem(JMenuItem item, Class<? extends SBase>... types) {
 		if ((item == null) || (item.getName() == null) || (item.getActionCommand() == null)) {
+			// TODO: Localize
 			throw new NullPointerException("The given JMenuItem must not be null and its name or actionCommand must not be undefined!");
 		}
 		String key = item.getName() == null ? item.getActionCommand() : item.getName();
@@ -358,6 +360,54 @@ public class SBMLTree extends JTree implements ActionListener {
 	}
 	
 	/**
+	 * @param path
+	 * @return
+	 */
+	public TreePath copyPath(TreePath path) {
+		return new TreePath(copyPath(path.getPath()));
+	}
+	
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public TreeNode[] copyPath(TreeNode[] path) {
+		return copyPath((Object[]) path);
+	}
+	
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	private TreeNode[] copyPath(Object[] path) {
+		TreeNode newNode = (TreeNode) getModel().getRoot();
+		TreeNode currNode = null, tmpUserObject = null;
+		List<SBMLNode> newPath = new ArrayList<SBMLNode>();
+		newPath.add((SBMLNode) newNode);
+		for (int i = 1; i < path.length; i++) {
+			Object interrim = path[i];
+			if (interrim instanceof SBMLNode) {
+				SBMLNode oldNode = (SBMLNode) interrim;
+				TreeNodeWithChangeSupport oldUserObject = oldNode.getUserObject();
+				for (int j = 0; j < newNode.getChildCount(); j++) {
+					currNode = newNode.getChildAt(j);
+					if (currNode instanceof SBMLNode) {
+						tmpUserObject = ((SBMLNode) currNode).getUserObject();
+					}
+					if ((oldUserObject == tmpUserObject) || (oldNode.toString().equals(currNode.toString()))) {
+						newPath.add((SBMLNode) currNode);
+						newNode = currNode;
+						break;
+					}
+				}
+			}
+		}
+		return newPath.toArray(new TreeNode[] {});
+	}
+	
+	/**
 	 * 
 	 * @param nodesOfInterest
 	 * @param expand
@@ -530,7 +580,7 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * reload the tree model
 	 */
 	public void reload() {
-		((DefaultTreeModel)this.getModel()).reload();
+		((DefaultTreeModel) this.getModel()).reload();
 	}
 	
 	/**

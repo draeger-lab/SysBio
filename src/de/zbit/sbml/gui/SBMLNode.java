@@ -147,24 +147,27 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	public String toString() {
 		TreeNodeWithChangeSupport node = getUserObject();
 		if (node instanceof SBase) {
+			if (node instanceof Unit) {
+				Unit u = (Unit) node;
+				if (u.isSetKind()) {
+					return u.toString();
+				}
+			}
 			if (node instanceof NamedSBase) {
 				NamedSBase nsb = (NamedSBase) node;
-				if (nsb.isSetName()) {
+				if (nsb instanceof UnitDefinition) {
+					UnitDefinition ud = (UnitDefinition) nsb;
+					if (ud.isSetName() && bundle.containsKey(ud.getName())) {
+						return bundle.getString(ud.getName());
+					} else if (ud.getUnitCount() > 0) {
+						return ud.toString();
+					}
+				} else if (nsb.isSetName()) {
 					return nsb.getName();
-				} else if (node instanceof SimpleSpeciesReference) {
+				} else if (nsb instanceof SimpleSpeciesReference) {
 					SimpleSpeciesReference specRef = (SimpleSpeciesReference) node;
 					if (specRef.isSetSpecies()) {
 						return specRef.toString();
-					}
-				} else if (node instanceof Unit) {
-					Unit u = (Unit) node;
-					if (u.isSetKind()) {
-						return u.toString();
-					}
-				} else if (node instanceof UnitDefinition) {
-					UnitDefinition ud = (UnitDefinition) node;
-					if (ud.getUnitCount() > 0) {
-						return ud.toString();
 					}
 				}
 			}
