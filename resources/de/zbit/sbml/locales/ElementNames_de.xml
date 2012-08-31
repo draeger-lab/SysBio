@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+    $Id$
+    $URL$
+    ---------------------------------------------------------------------
+    This file is part of the SysBio API library.
+ 
+    Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ 
+    This library is free software; you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as
+    published by the Free Software Foundation. A copy of the license
+    agreement is provided in the file named "LICENSE.txt" included with
+    this software distribution and also available online as
+    http://www.gnu.org/licenses/lgpl-3.0-standalone.html.
+    ---------------------------------------------------------------------
+  
+    This file collects locale-dependent user-visible names for SBML elements.
+    
+    version: $Rev$
+  </comment>
+  
+  <!-- SBML Core -->
+  
+  <entry key="algebraicRule">Algebraische Regel</entry>
+  <entry key="annotation">Annotation</entry>
+  <entry key="assignmentRule">Zuweisungsregel</entry>
+  <entry key="compartment">Kompartiment</entry>
+  <entry key="compartmentType">Kompartimentart</entry>
+  <entry key="constraint">Nebenbedingung</entry>
+  <entry key="delay">Verzögerung</entry>
+  <entry key="event">Ereignis</entry>
+  <entry key="eventAssignment">Ereigniszuweisung</entry>
+  <entry key="functionDefinition">Funktionsdefinition</entry>
+  <entry key="initialAssignment">Anfangsbestimmung</entry>
+  <entry key="kineticLaw">Kinetisches Gesetz</entry>
+  <entry key="listOfCompartments">Kompartimente</entry>
+  <entry key="listOfCompartmentTypes">Kompartimentarten</entry>
+  <entry key="listOfConstraints">Nebenbedingungen</entry>
+  <entry key="listOfEvents">Ereignisse</entry>
+  <entry key="listOfFunctionDefinitions">Funktionsdefinitionen</entry>
+  <entry key="listOfInitialAssignments">Anfangsbestimmungen</entry>
+  <entry key="listOfLocalParameters">Parameter</entry> <!-- local or not is not relevant to the end-user. -->
+  <entry key="listOfModifiers">Modifizierer</entry>
+  <entry key="listOfParameters">Parameter</entry>
+  <entry key="listOfProducts">Produkte</entry>
+  <entry key="listOfReactants">Edukte</entry>
+  <entry key="listOfReactions">Reaktionen</entry>
+  <entry key="listOfRules">Regeln</entry>
+  <entry key="listOfSpecies">Spezies</entry>
+  <entry key="listOfSpeciesTypes">Speziesarten</entry>
+  <entry key="listOfUnitDefinitions">Einheitendefinitionen</entry>
+  <entry key="listOfUnits">Einheiten</entry>
+  <entry key="localParameter">Parameter</entry> <!-- local or not is not relevant to the end-user. -->
+  <entry key="model">Modell</entry>
+  <entry key="modifierSpeciesReference">Modifizierer-Speziesverweis</entry>
+  <entry key="parameter">Parameter</entry>
+  <entry key="priority">Priorität</entry>
+  <entry key="rateRule">Ratenregel</entry>
+  <entry key="reaction">Reaktion</entry>
+  <entry key="specie">Spezies</entry>
+  <entry key="specieReference">Speziesverweis</entry>
+  <entry key="species">Spezies</entry>
+  <entry key="speciesReference">Speziesverweis</entry>
+  <entry key="speciesType">Speziesart</entry>
+  <entry key="stoichiometryMath">Stoichiometrische Formel</entry>
+  <entry key="trigger">Auslöser</entry>
+  <entry key="unit">Einheit</entry>
+  <entry key="unitDefinition">Einheitendefinition</entry>
+  
+</properties>

@@ -27,8 +27,6 @@ import java.util.LinkedList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -167,7 +165,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
       addProperties((SimpleSpeciesReference) sbase);
     }
     if (sbase instanceof MathContainer) {
-      addProperties((MathContainer) sbase);
+    	addProperties((MathContainer) sbase);
     }
     if (sbase instanceof ListOf<?>) {
       addProperties((ListOf<?>) sbase);
@@ -289,6 +287,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		JList l = new JList(list.toArray(new SBase[] {}));
 		l.setCellRenderer(new DefaultListCellRenderer() {
 			
+			/**
+			 * Generated serial version identifier.
+			 */
+			private static final long serialVersionUID = -6340729864234481708L;
+
 			/* (non-Javadoc)
 			 * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
 			 */
@@ -321,8 +324,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				if (mc instanceof KineticLaw) {
 					KineticLaw k = (KineticLaw) mc;
 					laTeXpreview.append("v_");
-					laTeXpreview
-					.append(latex.mbox(k.getParentSBMLObject().getId()));
+					laTeXpreview.append(latex.mbox(k.getParentSBMLObject().getId()));
 					laTeXpreview.append('=');
 				} else if (mc instanceof FunctionDefinition) {
 					FunctionDefinition f = (FunctionDefinition) mc;

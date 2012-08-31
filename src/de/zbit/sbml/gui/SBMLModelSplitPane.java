@@ -22,6 +22,7 @@ import java.beans.EventHandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -237,16 +238,21 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		IOException {
 		int proportionalLocation = getDividerLocation();
 		
-		sbmlDoc = doc.getSBMLDocument();
-		////////////////////////////////////////////////////
-		// Copied from previously separate method initTree:
+		this.sbmlDoc = doc;
+
 		TreePath path = null;
 		TreeNode[] savedState = null;
+		boolean copyPath = false;
 		if (tree != null) {
 			path = tree.getSelectionPath();
 			savedState = tree.getSavedState();
+			copyPath = true;
 		}
 		tree = new SBMLTree(sbmlDoc);
+		if (copyPath) {
+			// Copy the old treePath and savedState to the new tree structure
+			// TODO
+		}
 		tree.setSavedState(savedState);
 		
 		tree.setShowsRootHandles(true);
@@ -256,8 +262,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			tree.expandPath(path);
 		}
 		tree.addTreeSelectionListener(this);
-		tree.setSelectionRow(0);                           //
-		/////////////////////////////////////////////////////
+		tree.setSelectionRow(0);
 		
 		if (openedFile != null) {
 			sbmlDoc.addTreeNodeChangeListener(openedFile);
@@ -336,7 +341,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 				}
 				setDividerLocation(proportionalLocation);
 			} else {
-				logger.warning(String.format("Unknown node class %s.", node.getClass().getSimpleName()));
+				logger.warning(MessageFormat.format("Unknown node class {0}.", node.getClass().getSimpleName()));
 			}
 		}
 	}

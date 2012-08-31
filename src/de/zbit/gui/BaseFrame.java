@@ -532,6 +532,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		}
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
 			menu = getJMenuBar().getMenu(i);
+			int buttonCount = 0; // avoids creating separators for empty menus
 			for (int j = 0; j < menu.getItemCount(); j++) {
 				item = menu.getItem(j);
 				if (item != null) {
@@ -549,10 +550,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 								.getActionListeners()[0], action, item.getToolTipText());
 						button.setEnabled(item.isEnabled());
 						toolBar.add(button);
+						buttonCount++;
 					}
 				}
 			}
-			if (i < getJMenuBar().getMenuCount() - 1) {
+			if ((i < getJMenuBar().getMenuCount() - 1) && (buttonCount > 0)) {
 				toolBar.add(new JToolBar.Separator());
 			}
 		}
@@ -688,16 +690,25 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				ActionListener.class, this, "openFileAndLogHistory"),
 				BaseAction.FILE_OPEN, KeyStroke.getKeyStroke('O', ctr_down), 'O', true);
 			
-			if (showSaveMenuEntry()) {
-				saveFile =  GUITools.createJMenuItem(EventHandler.create(
-					ActionListener.class, this, "saveFileToOriginal"),
-					BaseAction.FILE_SAVE, KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
-			}
-			
 			saveFileAs = GUITools.createJMenuItem(EventHandler.create(
 				ActionListener.class, this, "saveFileAndLogSaveDir"),
 				BaseAction.FILE_SAVE_AS, KeyStroke.getKeyStroke('S', ctr_down
 						| InputEvent.SHIFT_DOWN_MASK), 'S', false);
+			
+			if (showSaveMenuEntry()) {
+				saveFile =  GUITools.createJMenuItem(EventHandler.create(
+					ActionListener.class, this, "saveFileToOriginal"),
+					BaseAction.FILE_SAVE, KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
+				/*
+				 * The following is important, because otherwise the disk-icon would be
+				 * used twice - for save as AND for save. If we have both, only save
+				 * should have the icon. This is for two reasons:
+				 * 1) It looks strange to have the same icon twice in the menu.
+				 * 2) The default toolbar couldn't distinguish and would create
+				 *    two identical looking buttons with two different meanings.
+				 */
+				saveFileAs.setIcon(null);
+			}
 			
 			closeFile = GUITools.createJMenuItem(
 				EventHandler.create(ActionListener.class, this, "closeFile"),
