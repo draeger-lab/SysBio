@@ -32,6 +32,9 @@ public class WizardPanelNotFoundException extends RuntimeException {
    */
   private static final long serialVersionUID = -8496959079725112522L;
 
+  /**
+   * 
+   */
   public WizardPanelNotFoundException() {
     super();
   }

@@ -630,7 +630,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
    * 
    * @param WindowEvent The event passed in from AWT.
    */
-
+  @Override
   public void windowClosing(WindowEvent e) {
     returnCode = CANCEL_RETURN_CODE;
   }

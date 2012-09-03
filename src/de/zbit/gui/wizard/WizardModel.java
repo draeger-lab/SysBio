@@ -200,10 +200,18 @@ public class WizardModel {
 
   }
 
+  /**
+   * 
+   * @return
+   */
   String getBackButtonText() {
     return buttonTextHashmap.get(BACK_BUTTON_TEXT_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newText
+   */
   void setBackButtonText(String newText) {
 
     String oldText = getBackButtonText();
@@ -213,12 +221,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   String getNextFinishButtonText() {
     return buttonTextHashmap.get(NEXT_FINISH_BUTTON_TEXT_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newText
+   */
   void setNextFinishButtonText(String newText) {
-
     String oldText = getNextFinishButtonText();
     if (!newText.equals(oldText)) {
       buttonTextHashmap.put(NEXT_FINISH_BUTTON_TEXT_PROPERTY, newText);
@@ -226,12 +241,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   String getCancelButtonText() {
     return buttonTextHashmap.get(CANCEL_BUTTON_TEXT_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newText
+   */
   void setCancelButtonText(String newText) {
-
     String oldText = getCancelButtonText();
     if (!newText.equals(oldText)) {
       buttonTextHashmap.put(CANCEL_BUTTON_TEXT_PROPERTY, newText);
@@ -239,12 +261,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   String getHelpButtonText() {
     return buttonTextHashmap.get(HELP_BUTTON_TEXT_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newText
+   */
   void setHelpButtonText(String newText) {
-
     String oldText = getHelpButtonText();
     if (!newText.equals(oldText)) {
       buttonTextHashmap.put(HELP_BUTTON_TEXT_PROPERTY, newText);
@@ -256,19 +285,29 @@ public class WizardModel {
     return warningText;
   }
 
+  /**
+   * 
+   * @param newText
+   */
   void setWarningText(String newText) {
-
     String oldText = getWarningText();
     warningText = newText;
     firePropertyChange(WARNING_MESSAGE_TEXT_PROPERTY, oldText, newText);
   }
 
+  /**
+   * 
+   * @return
+   */
   Icon getBackButtonIcon() {
     return (Icon) buttonIconHashmap.get(BACK_BUTTON_ICON_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newIcon
+   */
   void setBackButtonIcon(Icon newIcon) {
-
     Icon oldIcon = getBackButtonIcon();
     if (!newIcon.equals(oldIcon)) {
       buttonIconHashmap.put(BACK_BUTTON_ICON_PROPERTY, newIcon);
@@ -276,12 +315,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   Icon getNextFinishButtonIcon() {
     return (Icon) buttonIconHashmap.get(NEXT_FINISH_BUTTON_ICON_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newIcon
+   */
   public void setNextFinishButtonIcon(Icon newIcon) {
-
     Icon oldIcon = getNextFinishButtonIcon();
     if (!newIcon.equals(oldIcon)) {
       buttonIconHashmap.put(NEXT_FINISH_BUTTON_ICON_PROPERTY, newIcon);
@@ -289,12 +335,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   Icon getCancelButtonIcon() {
     return (Icon) buttonIconHashmap.get(CANCEL_BUTTON_ICON_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newIcon
+   */
   void setCancelButtonIcon(Icon newIcon) {
-
     Icon oldIcon = getCancelButtonIcon();
     if (!newIcon.equals(oldIcon)) {
       buttonIconHashmap.put(CANCEL_BUTTON_ICON_PROPERTY, newIcon);
@@ -302,12 +355,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   Icon getHelpButtonIcon() {
     return (Icon) buttonIconHashmap.get(HELP_BUTTON_ICON_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newIcon
+   */
   void setHelpButtonIcon(Icon newIcon) {
-
     Icon oldIcon = getHelpButtonIcon();
     if (!newIcon.equals(oldIcon)) {
       buttonIconHashmap.put(HELP_BUTTON_ICON_PROPERTY, newIcon);
@@ -315,12 +375,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   Icon getWarningIcon() {
     return warningIcon;
   }
 
+  /**
+   * 
+   * @param newIcon
+   */
   void setWarningIcon(Icon newIcon) {
-
     Icon oldIcon = getWarningIcon();
     if (newIcon != oldIcon) {
       warningIcon = newIcon;
@@ -328,12 +395,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   Boolean getBackButtonEnabled() {
     return buttonEnabledHashmap.get(BACK_BUTTON_ENABLED_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newValue
+   */
   void setBackButtonEnabled(Boolean newValue) {
-
     Boolean oldValue = getBackButtonEnabled();
     if (newValue != oldValue) {
       buttonEnabledHashmap.put(BACK_BUTTON_ENABLED_PROPERTY, newValue);
@@ -341,12 +415,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   Boolean getNextFinishButtonEnabled() {
     return buttonEnabledHashmap.get(NEXT_FINISH_BUTTON_ENABLED_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newValue
+   */
   void setNextFinishButtonEnabled(Boolean newValue) {
-
     Boolean oldValue = getNextFinishButtonEnabled();
     if (newValue != oldValue) {
       buttonEnabledHashmap.put(NEXT_FINISH_BUTTON_ENABLED_PROPERTY, newValue);
@@ -354,12 +435,19 @@ public class WizardModel {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
   Boolean getCancelButtonEnabled() {
     return buttonEnabledHashmap.get(CANCEL_BUTTON_ENABLED_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newValue
+   */
   void setCancelButtonEnabled(Boolean newValue) {
-
     Boolean oldValue = getCancelButtonEnabled();
     if (newValue != oldValue) {
       buttonEnabledHashmap.put(CANCEL_BUTTON_ENABLED_PROPERTY, newValue);
@@ -367,12 +455,19 @@ public class WizardModel {
     }
   }
   
+  /**
+   * 
+   * @return
+   */
   Boolean getHelpButtonEnabled() {
     return buttonEnabledHashmap.get(HELP_BUTTON_ENABLED_PROPERTY);
   }
 
+  /**
+   * 
+   * @param newValue
+   */
   void setHelpButtonEnabled(Boolean newValue) {
-
     Boolean oldValue = getHelpButtonEnabled();
     if (newValue != oldValue) {
       buttonEnabledHashmap.put(HELP_BUTTON_ENABLED_PROPERTY, newValue);
@@ -380,14 +475,28 @@ public class WizardModel {
     }
   }
   
+  /**
+   * 
+   * @param p
+   */
   public void addPropertyChangeListener(PropertyChangeListener p) {
     propertyChangeSupport.addPropertyChangeListener(p);
   }
 
+  /**
+   * 
+   * @param p
+   */
   public void removePropertyChangeListener(PropertyChangeListener p) {
     propertyChangeSupport.removePropertyChangeListener(p);
   }
 
+  /**
+   * 
+   * @param propertyName
+   * @param oldValue
+   * @param newValue
+   */
   protected void firePropertyChange(String propertyName, Object oldValue,
                                     Object newValue) {
     propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);

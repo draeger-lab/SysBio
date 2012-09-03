@@ -17,6 +17,8 @@
 
 /**
  * A collection of classes for the creation of wizard dialogs.
+ * 
+ * @author Florian Mittag
  * @version $Rev$
  */
 package de.zbit.gui.wizard;
