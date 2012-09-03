@@ -45,7 +45,7 @@
   <entry key="listOfFunctionDefinitions">Funktionsdefinitionen</entry>
   <entry key="listOfInitialAssignments">Anfangsbestimmungen</entry>
   <entry key="listOfLocalParameters">Parameter</entry> <!-- local or not is not relevant to the end-user. -->
-  <entry key="listOfModifiers">Modifizierer</entry>
+  <entry key="listOfModifiers">Umwandler</entry>
   <entry key="listOfParameters">Parameter</entry>
   <entry key="listOfProducts">Produkte</entry>
   <entry key="listOfReactants">Edukte</entry>
@@ -57,7 +57,7 @@
   <entry key="listOfUnits">Grundeinheiten</entry>
   <entry key="localParameter">Parameter</entry> <!-- local or not is not relevant to the end-user. -->
   <entry key="model">Modell</entry>
-  <entry key="modifierSpeciesReference">Modifizierer-Speziesverweis</entry>
+  <entry key="modifierSpeciesReference">Umwandler-Speziesverweis</entry>
   <entry key="parameter">Parameter</entry>
   <entry key="priority">Priorität</entry>
   <entry key="rateRule">Ratenregel</entry>
