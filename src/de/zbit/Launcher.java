@@ -126,7 +126,7 @@ public abstract class Launcher implements Runnable, Serializable {
 	/**
    * Switch to decide if {@link System#exit(int)} should be called when the
    * execution of this {@link Launcher} is finished. This option should be set
-   * to <code>true</code> when using a graphical user interface, which will be
+   * to {@code true} when using a graphical user interface, which will be
    * launched in a separate {@link Thread}.
    */
 	private boolean terminateJVMwhenDone;
@@ -209,8 +209,8 @@ public abstract class Launcher implements Runnable, Serializable {
 	 * program should be displayed on a layer on top of the splash screen of the
 	 * program (if there is any).
 	 * 
-	 * @return <code>true</code> if the copyright message should be displayed,
-	 *         <code>false</code> otherwise.
+	 * @return {@code true} if the copyright message should be displayed,
+	 *         {@code false} otherwise.
 	 */
   protected boolean addCopyrightToSplashScreen() {
     return true;
@@ -220,8 +220,8 @@ public abstract class Launcher implements Runnable, Serializable {
 	 * Decides whether or not the version number of this program should be shown
 	 * on a layer on top of the program's splash screen (if there is any).
 	 * 
-	 * @return <code>true</code> if the version number should be displayed,
-	 *         <code>false</code> otherwise.
+	 * @return {@code true} if the version number should be displayed,
+	 *         {@code false} otherwise.
 	 */
   protected boolean addVersionNumberToSplashScreen() {
     return true;
@@ -337,7 +337,7 @@ public abstract class Launcher implements Runnable, Serializable {
    * Optional method that returns a citation for the implementing application.
    * 
    * @param HTMLstyle
-   *        if <code>TRUE</code>, a HTML style citation should be returned
+   *        if {@code true}, a HTML style citation should be returned
    *        (using HTML-special chars and formatting).
    * @return complete citation string.
    */
@@ -363,7 +363,7 @@ public abstract class Launcher implements Runnable, Serializable {
   }
   
   /**
-   * Calls #exit(java.awt.Window, boolean) with <code>null</code> as first
+   * Calls #exit(java.awt.Window, boolean) with {@code null} as first
    * argument. The second is taken from {@link #isTerminateJVMwhenDone()}.
    */
 	public void exit() {
@@ -372,7 +372,7 @@ public abstract class Launcher implements Runnable, Serializable {
 	
   /**
    * Calls {@link #exit(java.awt.Window, boolean)} with the given window as
-   * first argument, the second argument is set to <code>true</code>.
+   * first argument, the second argument is set to {@code true}.
    * 
    * @param window
    */
@@ -382,7 +382,7 @@ public abstract class Launcher implements Runnable, Serializable {
   
 	/**
 	 * Saves all interactive actions and closes this application (if
-	 * {@link #terminateJVMwhenDone} is set to <code>true</code>), this means that
+	 * {@link #terminateJVMwhenDone} is set to {@code true}), this means that
 	 * a call of this method will terminate the running Java Virtual Machine
 	 * (JVM).
 	 * 
@@ -517,7 +517,7 @@ public abstract class Launcher implements Runnable, Serializable {
 	/**
 	 * 
 	 * @return The (dotted) version number of this program, e.g., "0.9.3" (without
-	 *         quotes). Must not be <code>null</code>.
+	 *         quotes). Must not be {@code null}.
 	 */
 	public abstract String getVersionNumber();
 	
@@ -754,8 +754,8 @@ public abstract class Launcher implements Runnable, Serializable {
   /**
    * Decides whether or not to show a graphical user interface.
    * 
-   * @return <code>true</code> if a graphical user interface should be shown,
-   *         <code>false</code> otherwise.
+   * @return {@code true} if a graphical user interface should be shown,
+   *         {@code false} otherwise.
    */
   public boolean showsGUI() {
     return (props.size() < 1) || props.getBooleanProperty(GUIOptions.GUI);

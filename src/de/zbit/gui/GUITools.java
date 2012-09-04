@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -276,7 +277,7 @@ public class GUITools {
 			ResourceBundle resources = ResourceManager
 					.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 			
-			String cMessage = String.format(resources.getString("COPYRIGHT_MESSAGE"),
+			String cMessage = MessageFormat.format(resources.getString("COPYRIGHT_MESSAGE"),
 				"", yearOfProjectStart, yearOfRelease).trim();
 			int pos = StringUtil.indexOf(cMessage, ",", "\n");
 			if (pos > 0) {

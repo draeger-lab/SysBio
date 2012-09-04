@@ -16,9 +16,9 @@
  */
 package de.zbit.io;
 
-import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 
 /**
@@ -28,13 +28,13 @@ import java.io.File;
  * @since 1.4
  * @version $Rev: 808 $
  */
-public class OpenedFile<T> extends Component implements PropertyChangeListener {
-	
+public class OpenedFile<T> implements PropertyChangeListener {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-
+	private PropertyChangeSupport propertyChangeSupport;
+	
 	/**
 	 * 
 	 */
@@ -113,13 +113,22 @@ public class OpenedFile<T> extends Component implements PropertyChangeListener {
 	}
 	
 	/**
+	 * Bean constructor.
+	 */
+	public OpenedFile() {
+		super();
+	}
+	
+	/**
 	 * 
 	 * @param file
 	 * @param original
 	 */
 	public OpenedFile(File file, T document) {
+		this();
 		this.file = file;
 		this.document = document;
+		this.propertyChangeSupport = new PropertyChangeSupport(this);
 	}
 
 	/* (non-Javadoc)
@@ -134,4 +143,21 @@ public class OpenedFile<T> extends Component implements PropertyChangeListener {
 		}
 	}
 
+	/**
+	 * 
+	 */
+	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+	}
+	
+	/**
+	 * 
+	 * @param propertyName
+	 * @param listener
+	 */
+	public void addPropertyChangeListener(String propertyName,
+		PropertyChangeListener listener) {
+		propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+	}
+	
 }
