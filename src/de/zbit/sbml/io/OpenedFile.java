@@ -29,8 +29,14 @@ import org.sbml.jsbml.util.TreeNodeRemovedEvent;
  * @version $Rev$
  * @since 1.4
  */
-public class OpenedFile<V> extends de.zbit.io.OpenedFile<V> implements PropertyChangeListener, TreeNodeChangeListener{
+public class OpenedFile<V> extends de.zbit.io.OpenedFile<V> implements PropertyChangeListener, TreeNodeChangeListener {
 
+	/**
+	 * 
+	 */
+	public OpenedFile() {
+		super();
+	}
 	
 	/**
 	 * @param file
@@ -53,12 +59,6 @@ public class OpenedFile<V> extends de.zbit.io.OpenedFile<V> implements PropertyC
 	public OpenedFile(File file) {
 		super(file);
 	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4542668375887299995L;
-
 
 	/* (non-Javadoc)
 	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)

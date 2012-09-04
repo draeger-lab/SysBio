@@ -56,13 +56,16 @@ public class ProgressBarSwing extends AbstractProgressBar {
   public JProgressBar getProgressBar() {
     return progressBar;
   }
+  
   /**
    * 
    * @param progressBar
    */
   public void setProgressBar(JProgressBar progressBar) {
     this.progressBar = progressBar;
-    if (progressBar!=null) initProgressBar();
+    if (progressBar != null) {
+    	initProgressBar();
+    }
   }
   
   /*=====================================
