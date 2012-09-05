@@ -92,7 +92,7 @@ public class WizardController implements ActionListener, WizardFinishingListener
     if (nextPanelDescriptor instanceof WizardPanelDescriptor.FinishIdentifier) {
     	descriptor = model.getCurrentPanelDescriptor();
       descriptor.aboutToHidePanel();
-      if (descriptor.isImmediatelyFinishing()) {
+      if (descriptor.finish()) {
       	// Close wizard immediately
       	wizard.close(Wizard.FINISH_RETURN_CODE);
       } else {

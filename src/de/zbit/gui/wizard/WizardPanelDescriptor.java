@@ -211,15 +211,6 @@ public class WizardPanelDescriptor {
 	}
 
 	/**
-	 * Override this method if the method {@link #aboutToHidePanel} needs more complicated operations.
-	 * 
-	 * @return
-	 */
-	public boolean isImmediatelyFinishing() {
-		return true;
-	}
-
-	/**
 	 * 
 	 * @param listener
 	 * @return
@@ -229,6 +220,35 @@ public class WizardPanelDescriptor {
 			listOfFinishingListeners = new LinkedList<WizardFinishingListener>();
 		}
 		return this.listOfFinishingListeners.add(listener);
+	}
+
+	/**
+	 * This method is called when the user clicks at the button "Finish" in the
+	 * {@link Wizard}. By default, this method does nothing and just returns
+	 * {@code true} in order to indicate that the {@link Wizard} can be closed
+	 * immediately. In some cases, however, it might be necessary to conduct more
+	 * complex operations as soon as the {@link Wizard} itself is done. In this
+	 * cases, you should override this method, maybe start a new {@link Thread}
+	 * but should then return {@code false} to inform the {@link Wizard} that it
+	 * cannot directly be closed. In this case, you must not forget to call the
+	 * {@link WizardFinishingListener} that is registered to this descriptor when
+	 * done. To this end, call
+	 * 
+	 * <pre>
+	 * for (WizardFinishingListener listener : listOfFinishingListeners) {
+	 * 	listener.wizardFinished();
+	 * }
+	 * </pre>
+	 * 
+	 * at the end of this method.
+	 * 
+	 * @return {@code true} if no further operation takes place and the
+	 *         {@link Wizard} should immediately be closed, {@code false} if some
+	 *         {@link Thread} or other complex operation is started upon finishing
+	 *         this descriptor.
+	 */
+	public boolean finish() {
+		return true;
 	}
 	
 }

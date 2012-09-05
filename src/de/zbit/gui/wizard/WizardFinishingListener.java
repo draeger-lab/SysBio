@@ -23,7 +23,7 @@ import java.util.EventListener;
  * information when finishing a wizard. Note that a
  * {@link WizardPanelDescriptor} that is supposed to display, e.g., a progress
  * bar when finishing, must override its method
- * {@link WizardPanelDescriptor#isImmediatelyFinishing()} in order to indicate
+ * {@link WizardPanelDescriptor#finish()} in order to indicate
  * that it does not immediately finish, but is going to display further
  * information. It is also possible to add multiple
  * {@link WizardFinishingListener}s to one such descriptor in order to receive a
@@ -35,6 +35,10 @@ import java.util.EventListener;
  */
 public interface WizardFinishingListener extends EventListener {
 	
+	/**
+	 * This method is called in order to inform a {@link Wizard} that it is
+	 * finished and that its view can be closed.
+	 */
 	public void wizardFinished();
 	
 }

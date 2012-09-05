@@ -298,13 +298,13 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     //  be displayed. If the identifier passed in is null, then close
     //  the dialog.
 
-    if (id == null)
+    if (id == null) {
       close(ERROR_RETURN_CODE);
-
+    }
     WizardPanelDescriptor oldPanelDescriptor = wizardModel.getCurrentPanelDescriptor();
-    if (oldPanelDescriptor != null)
+    if (oldPanelDescriptor != null) {
       oldPanelDescriptor.aboutToHidePanel();
-
+    }
     wizardModel.setCurrentPanel(id);
     wizardModel.getCurrentPanelDescriptor().aboutToDisplayPanel();
 
