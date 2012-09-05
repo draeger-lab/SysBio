@@ -1884,8 +1884,11 @@ public class GUITools {
    * @param state
    *        if true buttons, items etc. are enabled, otherwise disabled.
    * @param menuBar
+   *        the JMenuBar that contains the menu items that should be updated
    * @param toolbar
+   *        the JToolBar that contains the menu items that should be updated
    * @param commands
+   *        the list of commands that identify the components to be updated
    */
   public static void setEnabled(boolean state, JMenuBar menuBar,
     JToolBar toolbar, Object... commands) {
