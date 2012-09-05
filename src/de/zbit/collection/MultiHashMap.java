@@ -223,4 +223,26 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
     return coll;
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return map.hashCode();
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if( obj.getClass() == MultiHashMap.class ) {
+      MultiHashMap<?, ?> mhm = (MultiHashMap<?, ?>)obj;
+      return map.equals(mhm.map);
+    }
+    
+    return false;
+  }
+
+  
 }
