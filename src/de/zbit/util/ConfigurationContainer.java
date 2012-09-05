@@ -115,17 +115,18 @@ public class ConfigurationContainer implements Map<Object, Object> {
     return getLong(key, 0);
   }
 
-  public String getString(Object key, long defaultValue) {
-    return (String)get(key, null);
+  public String getString(Object key, String defaultValue) {
+    return (String)get(key, defaultValue);
   }
   
   public String getString(Object key) {
-    return getString(key, 0);
+    return getString(key, null);
   }
 
   /* (non-Javadoc)
    * @see java.util.Map#size()
    */
+  @Override
   public int size() {
     return storage.size();
   }
@@ -133,6 +134,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#isEmpty()
    */
+  @Override
   public boolean isEmpty() {
     return storage.isEmpty();
   }
@@ -140,6 +142,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#containsKey(java.lang.Object)
    */
+  @Override
   public boolean containsKey(Object key) {
     return storage.containsKey(key);
   }
@@ -147,6 +150,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#containsValue(java.lang.Object)
    */
+  @Override
   public boolean containsValue(Object value) {
     return storage.containsValue(value);
   }
@@ -154,6 +158,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#get(java.lang.Object)
    */
+  @Override
   public Object get(Object key) {
     return storage.get(key);
   }
@@ -161,6 +166,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#put(java.lang.Object, java.lang.Object)
    */
+  @Override
   public Object put(Object key, Object value) {
     return storage.put(key, value);
   }
@@ -168,6 +174,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#remove(java.lang.Object)
    */
+  @Override
   public Object remove(Object key) {
     return storage.remove(key);
   }
@@ -175,6 +182,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#putAll(java.util.Map)
    */
+  @Override
   public void putAll(Map<? extends Object, ? extends Object> m) {
     storage.putAll(m);
   }
@@ -182,6 +190,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#clear()
    */
+  @Override
   public void clear() {
     storage.clear();
   }
@@ -189,6 +198,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#keySet()
    */
+  @Override
   public Set<Object> keySet() {
     return storage.keySet();
   }
@@ -196,6 +206,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#values()
    */
+  @Override
   public Collection<Object> values() {
     return storage.values();
   }
@@ -203,6 +214,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.util.Map#entrySet()
    */
+  @Override
   public Set<java.util.Map.Entry<Object, Object>> entrySet() {
     return storage.entrySet();
   }
@@ -210,6 +222,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(Object o) {
     return storage.equals(o);
   }
@@ -217,6 +230,7 @@ public class ConfigurationContainer implements Map<Object, Object> {
   /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return storage.hashCode();
   }
