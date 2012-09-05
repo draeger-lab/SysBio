@@ -506,23 +506,30 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		String rmp[][] = new String[Math.max(reaction.getNumReactants(), Math
 				.max(reaction.getNumModifiers(), reaction.getNumProducts()))][3];
 		String colNames[] = new String[] { "Reactants", "Modifiers", "Products" };
-		int count = 0;
-		for (SpeciesReference specRef : reaction.getListOfReactants()) {
-		  if (specRef.isSetSpeciesInstance()) {
-			  rmp[count++][0] = specRef.getSpeciesInstance().toString();
-		  }
+		int count;
+		if (reaction.isSetListOfReactants()) {
+			count = 0;
+			for (SpeciesReference specRef : reaction.getListOfReactants()) {
+				if (specRef.isSetSpeciesInstance()) {
+					rmp[count++][0] = specRef.getSpeciesInstance().toString();
+				}
+			}
 		}
-		count = 0;
-		for (ModifierSpeciesReference mSpecRef : reaction.getListOfModifiers()) {
-		  if (mSpecRef.isSetSpeciesInstance()) {
-			  rmp[count++][1] = mSpecRef.getSpeciesInstance().toString();
-		  }
+		if (reaction.isSetListOfModifiers()) {
+			count = 0;
+			for (ModifierSpeciesReference mSpecRef : reaction.getListOfModifiers()) {
+				if (mSpecRef.isSetSpeciesInstance()) {
+					rmp[count++][1] = mSpecRef.getSpeciesInstance().toString();
+				}
+			}
 		}
-		count = 0;
-		for (SpeciesReference specRef : reaction.getListOfProducts()) {
-		  if (specRef.isSetSpeciesInstance()) {
-			  rmp[count++][2] = specRef.getSpeciesInstance().toString();
-		  }
+		if (reaction.isSetListOfProducts()) {
+			count = 0;
+			for (SpeciesReference specRef : reaction.getListOfProducts()) {
+				if (specRef.isSetSpeciesInstance()) {
+					rmp[count++][2] = specRef.getSpeciesInstance().toString();
+				}
+			}
 		}
 		JTable table = new JTable(rmp, colNames);
 		table.setPreferredScrollableViewportSize(new Dimension(200, (table

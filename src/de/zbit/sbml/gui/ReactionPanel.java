@@ -82,11 +82,17 @@ public class ReactionPanel extends JPanel {
 		this.reaction = reaction;
 		this.namesIfAvailalbe = namesIfAvailalbe;
 		int fontSize = getFont().getSize();
-		this.preferredWith = (createString(reaction.getListOfReactants(), false,
-			true).length()
-				+ createString(reaction.getListOfModifiers(), true, true).length() + createString(
-			reaction.getListOfProducts(), true, false).length())
-				* fontSize;
+		this.preferredWith = 0;
+		if (reaction.isSetListOfReactants()) {
+		   preferredWith += createString(reaction.getListOfReactants(), false, true).length();
+		}
+		if (reaction.isSetListOfModifiers()) {
+		  preferredWith += createString(reaction.getListOfModifiers(), true, true).length(); 
+		}
+		if (reaction.isSetListOfProducts()) {
+			preferredWith += createString(reaction.getListOfProducts(), true, false).length();
+		}
+		preferredWith *= fontSize;
 		this.preferredHeight = reaction.isReversible() ? fontSize * 5
 				: fontSize * 3;
 	}
