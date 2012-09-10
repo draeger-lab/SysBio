@@ -82,13 +82,18 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 */
+	private OpenedFile<SBMLDocument> openedFile;
+	
+	/**
+	 * 
+	 */
 	private AbstractProgressBar progressBar;
 	
 	/**
 	 * The renderer to be used to display equations.
 	 */
 	private EquationRenderer renderer;
-	
+
 	/**
 	 * 
 	 */
@@ -98,7 +103,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 */
 	protected JTextField searchField;
-
+	
 	private Timer swingTimer;
 	
 	/**
@@ -106,18 +111,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 */
 	protected SBMLTree tree;
 	
-	/**
-	 * 
-	 */
-	private OpenedFile<SBMLDocument> openedFile;
-	
-	/**
-	 * @return the openedFile
-	 */
-	public OpenedFile<SBMLDocument> getOpenedFile() {
-		return openedFile;
-	}
-
 	/**
 	 * 
 	 * @param file
@@ -129,7 +122,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		this(file.getDocument(), namesIfAvailable);
 		this.openedFile = file;
 	}
-	
+
 	/**
 	 * 
 	 * @param document
@@ -191,7 +184,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		return leftPane;
 	}
 	
-	
 	/**
 	 * @param sbase
 	 * @return
@@ -202,15 +194,22 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		IOException {
 		SBasePanel sbPanel = new SBasePanel(sbase, namesIfAvailalbe, renderer);
 		JScrollPane scroll = new JScrollPane(sbPanel);
-		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		return scroll;
 	}
+	
 	
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.gui.EquationComponent#getRenderer()
 	 */
 	public EquationRenderer getEquationRenderer() {
 		return renderer;
+	}
+	
+	/**
+	 * @return the openedFile
+	 */
+	public OpenedFile<SBMLDocument> getOpenedFile() {
+		return openedFile;
 	}
 	
 	/**
@@ -297,19 +296,19 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		worker.execute();
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.gui.EquationComponent#setRenderer(de.zbit.sbml.gui.EquationRenderer)
+	 */
+	public void setEquationRenderer(EquationRenderer renderer) {
+		this.renderer = renderer;
+	}
+
 	/**
 	 * 
 	 * @param progressBar
 	 */
 	public void setProgressBar(AbstractProgressBar progressBar){
 		this.progressBar = progressBar;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.gui.EquationComponent#setRenderer(de.zbit.sbml.gui.EquationRenderer)
-	 */
-	public void setEquationRenderer(EquationRenderer renderer) {
-		this.renderer = renderer;
 	}
 	
 	/**
@@ -319,15 +318,16 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		this.tree = tree;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
+	/**
+	 * 
+	 * @param source
 	 */
-	public void valueChanged(TreeSelectionEvent e) {
-		TreeNode node = (TreeNode) tree.getLastSelectedPathComponent();
-		if (node == null) {
+	private void updateRightComponent(Object source) {
+		if ((source == null) || !(source instanceof TreeNode)) {
 			// Nothing is selected.
 			return;
 		}
+		TreeNode node = (TreeNode) source;
 		if (node instanceof SBMLNode) {
 			TreeNodeWithChangeSupport sbmlNode = ((SBMLNode) node).getUserObject();
 			if (sbmlNode instanceof SBase) {
@@ -343,4 +343,24 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			}
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.JSplitPane#updateUI()
+	 */
+	@Override
+	public void updateUI() {
+		if (this.tree != null) {
+			this.tree.updateUI();
+			updateRightComponent(this.tree.getLastSelectedPathComponent());
+		}
+		super.updateUI();
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
+	 */
+	public void valueChanged(TreeSelectionEvent evt) {
+		updateRightComponent(evt.getNewLeadSelectionPath().getLastPathComponent());
+	}
+	
 }

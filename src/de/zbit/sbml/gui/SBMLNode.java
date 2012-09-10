@@ -17,6 +17,7 @@
 package de.zbit.sbml.gui;
 
 import java.beans.PropertyChangeEvent;
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -27,10 +28,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
+import org.sbml.jsbml.Species;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
@@ -74,7 +77,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	/**
 	 * 
 	 */
-	private static int nodeCount = 0;
+	private int nodeCount = 0;
 	
 	/**
 	 * 
@@ -85,6 +88,8 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	 * Memorizes the result of the {@link #toString()} method.
 	 */
 	private String stringRepresentation;
+
+	private Class<? extends TreeNode> acceptedType;
 	
 
 	/**
@@ -120,14 +125,18 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	 */
 	private SBMLNode(TreeNode node, boolean isVisible, Class<? extends TreeNode> accepted) {
 		super(node);
+		this.acceptedType = accepted;
 		this.boldFont = false;
 		this.expanded = false;
 		this.isVisible = isVisible;
+		
 		nodeCount++;
+		
 		for (int i = 0; i < node.getChildCount(); i++) {
 			TreeNode child = node.getChildAt(i);
-			if (accepted.isAssignableFrom(child.getClass())) {
-				add(new SBMLNode(child, isVisible, accepted));
+			if (acceptedType.isAssignableFrom(child.getClass())) {
+				SBMLNode newChild = new SBMLNode(child, isVisible, acceptedType);
+				add(newChild);
 			}
 		}
 		stringRepresentation = null;
@@ -135,7 +144,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 			TreeNodeWithChangeSupport n = (TreeNodeWithChangeSupport) node;
 			List<TreeNodeChangeListener> listOfListeners = n.getListOfTreeNodeChangeListeners();
 			if (!listOfListeners.contains(this)) {
-				n.addTreeNodeChangeListener(this);
+				n.addTreeNodeChangeListener(this, false);
 			}
 		}
 	}
@@ -166,9 +175,16 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 					return nsb.getName();
 				} else if (nsb instanceof SimpleSpeciesReference) {
 					SimpleSpeciesReference specRef = (SimpleSpeciesReference) node;
-					if (specRef.isSetSpecies()) {
-						return specRef.toString();
+					if (specRef.isSetSpeciesInstance()) {
+						Species s = specRef.getSpeciesInstance();
+						return s.toString();
+					} else if (specRef.isSetSpecies()) {
+						return specRef.getSpecies();
 					}
+					return specRef.toString();
+				}
+				if (nsb.isSetId()) {
+					return nsb.getId();
 				}
 			}
 			String elementName = ((SBase) node).getElementName();
@@ -359,8 +375,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	 * 
 	 * @return
 	 */
-	public static int getNodeCount() {
-		// TODO: This will return the number of nodes FOR ALL SBMLNode instances!!!
+	public int getNodeCount() {
 		return nodeCount;
 	}
 
@@ -380,6 +395,38 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	public void nodeAdded(TreeNode node) {
 		stringRepresentation = null;
 		stringRepresentation = toString();
+		
+		// Add the new node to this tree
+		TreeNode parent = node.getParent();
+		if (parent == getUserObject()) {
+			boolean hasChild = false;
+			// Check if the node is already in the tree
+			for (int i = 0; !hasChild && (i < getChildCount()); i++) {
+				hasChild |= ((SBMLNode) getChildAt(i)).getUserObject() == node;
+			}
+			if (!hasChild) {
+				SBMLNode newChild = new SBMLNode(node, isVisible(), acceptedType);
+				add(newChild);
+				if (node instanceof TreeNodeWithChangeSupport) {
+					TreeNodeWithChangeSupport n = (TreeNodeWithChangeSupport) node;
+					if (!n.isRoot() && n.getListOfTreeNodeChangeListeners().contains(this)) {
+						logger.info(MessageFormat.format("Removing parent node {0} from list of listeners in {1}.", this, n));
+						n.removeTreeNodeChangeListener(this);
+					}
+				}
+				// Correct index
+				if ((parent instanceof ListOf<?>) && !isRoot() && (getParent().getParent() != null) && (parent.getParent() != null)) {
+					SBMLNode parentNode = (SBMLNode) getParent();
+					TreeNode root = parent.getParent();
+					int childIndex = root.getIndex(parent);
+					if (childIndex != parentNode.getIndex(this)) {
+						removeFromParent();
+						parentNode.insert(this, childIndex);
+					}
+				}
+				logger.info("adding " + node);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -389,6 +436,13 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	public void nodeRemoved(TreeNodeRemovedEvent evt) {
 		stringRepresentation = null;
 		stringRepresentation = toString();
+		
+		SBMLNode parentNode = (SBMLNode) getParent();
+		TreeNode parent = evt.getPreviousParent();
+		if ((parent == parentNode.getUserObject()) && (evt.getSource() == getUserObject())) {
+			parentNode.remove(this);
+			logger.info("removing " + evt.getSource());
+		}
 	}
 
 }

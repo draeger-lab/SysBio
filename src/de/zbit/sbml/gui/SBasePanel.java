@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -40,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.xml.stream.XMLStreamException;
@@ -73,6 +73,7 @@ import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.StoichiometryMath;
 import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Unit;
+import org.sbml.jsbml.Unit.Kind;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
@@ -144,72 +145,72 @@ public class SBasePanel extends JPanel implements EquationComponent {
    * @param namesIfAvailable
    */
   public SBasePanel(SBase sbase, boolean namesIfAvailable, EquationRenderer renderer) {
-    super();
-    this.namesIfAvailable = namesIfAvailable;
-    this.renderer = renderer;
-    GridBagLayout gbl = new GridBagLayout();
-    setLayout(gbl);
-		latex = new LaTeXCompiler(namesIfAvailable);
-    lh = new LayoutHelper(this, gbl);
-    editable = false;
-    row = -1;
-    String className = sbase.getClass().getCanonicalName();
-    className = className.substring(className.lastIndexOf('.') + 1);
-    setBorder(BorderFactory.createTitledBorder(" " + className + " "));
-    lh.add(new JPanel(), 0, ++row, 5, 1, 0d, 0d);
-    if (sbase instanceof NamedSBase) {
-      addProperties((NamedSBase) sbase);
-    }
-    addProperties(sbase);
-    if (sbase instanceof SimpleSpeciesReference) {
-      addProperties((SimpleSpeciesReference) sbase);
-    }
-    if (sbase instanceof MathContainer) {
-    	addProperties((MathContainer) sbase);
-    }
-    if (sbase instanceof ListOf<?>) {
-      addProperties((ListOf<?>) sbase);
-      // ListOf<?> list = (ListOf<?>) sbase;
-      // for (SBase s : list) {
-      // lh.add(new SBasePanel(s, settings));
-      // }
-    } else if (sbase instanceof Model) {
-      addProperties((Model) sbase);
-    } else if (sbase instanceof UnitDefinition) {
-      addProperties((UnitDefinition) sbase);
-    } else if (sbase instanceof Unit) {
-      addProperties((Unit) sbase);
-    } else if (sbase instanceof Compartment) {
-      addProperties((Compartment) sbase);
-    } else if (sbase instanceof Species) {
-      addProperties((Species) sbase);
-    } else if (sbase instanceof Parameter) {
-      addProperties((Parameter) sbase);
-    } else if (sbase instanceof LocalParameter) {
-		addProperties((LocalParameter) sbase);
-	} else if (sbase instanceof Constraint) {
-      addProperties((Constraint) sbase);
-    } else if (sbase instanceof Reaction) {
-    	try {
-			addProperties((Reaction) sbase);
-		} catch (XMLStreamException exc) {
-			exc.printStackTrace();
-			//added
-			GUITools.showErrorMessage(this, exc);
-		}
-    } else if (sbase instanceof Event) {
-      addProperties((Event) sbase);
-    }
-    if (sbase instanceof QuantityWithUnit) {
-		addProperties((QuantityWithUnit) sbase);
-	} else if (sbase instanceof SBaseWithDerivedUnit) {
-		addProperties((SBaseWithDerivedUnit) sbase);
-	}
-	if (sbase instanceof Variable) {
-		addProperties((Variable) sbase);
-	}
-
-	lh.add(new JPanel(), 1, ++row, 5, 1, 1, 0.001d);
+  	super();
+  	this.namesIfAvailable = namesIfAvailable;
+  	this.renderer = renderer;
+  	GridBagLayout gbl = new GridBagLayout();
+  	setLayout(gbl);
+  	latex = new LaTeXCompiler(namesIfAvailable);
+  	lh = new LayoutHelper(this, gbl);
+  	editable = false;
+  	row = -1;
+  	String className = sbase.getClass().getCanonicalName();
+  	className = className.substring(className.lastIndexOf('.') + 1);
+  	setBorder(BorderFactory.createTitledBorder(" " + className + " "));
+  	lh.add(new JPanel(), 0, ++row, 5, 1, 0d, 0d);
+  	if (sbase instanceof NamedSBase) {
+  		addProperties((NamedSBase) sbase);
+  	}
+  	addProperties(sbase);
+  	if (sbase instanceof SimpleSpeciesReference) {
+  		addProperties((SimpleSpeciesReference) sbase);
+  	}
+  	if (sbase instanceof MathContainer) {
+  		addProperties((MathContainer) sbase);
+  	}
+  	if (sbase instanceof ListOf<?>) {
+  		addProperties((ListOf<?>) sbase);
+  		// ListOf<?> list = (ListOf<?>) sbase;
+  		// for (SBase s : list) {
+  		// lh.add(new SBasePanel(s, settings));
+  		// }
+  	} else if (sbase instanceof Model) {
+  		addProperties((Model) sbase);
+  	} else if (sbase instanceof UnitDefinition) {
+  		addProperties((UnitDefinition) sbase);
+  	} else if (sbase instanceof Unit) {
+  		addProperties((Unit) sbase);
+  	} else if (sbase instanceof Compartment) {
+  		addProperties((Compartment) sbase);
+  	} else if (sbase instanceof Species) {
+  		addProperties((Species) sbase);
+  	} else if (sbase instanceof Parameter) {
+  		addProperties((Parameter) sbase);
+  	} else if (sbase instanceof LocalParameter) {
+  		addProperties((LocalParameter) sbase);
+  	} else if (sbase instanceof Constraint) {
+  		addProperties((Constraint) sbase);
+  	} else if (sbase instanceof Reaction) {
+  		try {
+  			addProperties((Reaction) sbase);
+  		} catch (XMLStreamException exc) {
+  			exc.printStackTrace();
+  			//added
+  			GUITools.showErrorMessage(this, exc);
+  		}
+  	} else if (sbase instanceof Event) {
+  		addProperties((Event) sbase);
+  	}
+  	if (sbase instanceof QuantityWithUnit) {
+  		addProperties((QuantityWithUnit) sbase);
+  	} else if (sbase instanceof SBaseWithDerivedUnit) {
+  		addProperties((SBaseWithDerivedUnit) sbase);
+  	}
+  	if (sbase instanceof Variable) {
+  		addProperties((Variable) sbase);
+  	}
+  	
+  	lh.add(new JPanel(), 1, ++row, 5, 1, 1, 0.001d);
   }
   
   /**
@@ -217,26 +218,20 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private void addProperties(Compartment c) {
 		if (c.isSetCompartmentType() || editable) {
-			lh.add(new JLabel("Compartment type: "), 1, ++row, 1, 1, 0d, 0d);
-			JTextField tf = new JTextField(c.getCompartmentTypeInstance()
-					.toString());
+			JTextField tf = new JTextField(c.getCompartmentTypeInstance().toString());
 			tf.setEditable(editable);
-			lh.add(tf, 3, ++row, 1, 1, 1, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			addLabeledComponent("Compartment type", tf);
 		}
 		if (c.isSetOutside() || editable) {
-			lh.add(new JLabel("Outside: "), 1, ++row, 1, 1, 0d, 0d);
 			JTextField tf = new JTextField(c.getOutsideInstance().toString());
 			tf.setEditable(editable);
-			lh.add(tf, 3, row, 1, 1, 1, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			addLabeledComponent("Outside", tf);
 		}
-		lh.add(new JLabel("Spatial dimensions: "), 1, ++row, 1, 1, 0d, 0d);
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(c
-				.getSpatialDimensions(), 0, 3, 1));
-		spinner.setEnabled(editable);
-		lh.add(spinner, 3, row, 1, 1, 1d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		if (c.isSetSpatialDimensions()) {
+			JSpinner spinner = new JSpinner(new SpinnerNumberModel(c.getSpatialDimensions(), 0, 3, 1));
+			spinner.setEnabled(editable);
+			addLabeledComponent("Spatial dimensions", spinner);
+		}
 		addProperties((Symbol) c);
 	}
   
@@ -245,11 +240,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private void addProperties(Constraint c) {
 		if (c.isSetMessage() || editable) {
-			lh.add(new JLabel("Message: "), 1, ++row, 1, 1, 1d, 1d);
 			JTextField tf = new JTextField(c.getMessageString());
 			tf.setEditable(editable);
-			lh.add(tf, 3, ++row, 1, 1, 1d, 1d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			addLabeledComponent("Message", tf);
 		}
 	}
 
@@ -257,8 +250,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @param e
 	 */
 	private void addProperties(Event e) {
-		JCheckBox check = new JCheckBox("Uses values from trigger time", e
-				.getUseValuesFromTriggerTime());
+		JCheckBox check = new JCheckBox("Uses values from trigger time", e.getUseValuesFromTriggerTime());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
@@ -285,30 +277,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private void addProperties(ListOf<? extends SBase> list) {
 		JList l = new JList(list.toArray(new SBase[] {}));
-		l.setCellRenderer(new DefaultListCellRenderer() {
-			
-			/**
-			 * Generated serial version identifier.
-			 */
-			private static final long serialVersionUID = -6340729864234481708L;
-
-			/* (non-Javadoc)
-			 * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
-			 */
-			@Override
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if (value instanceof SimpleSpeciesReference) {
-	        if (((SimpleSpeciesReference) value).isSetSpeciesInstance() && 
-	            ((SimpleSpeciesReference) value).getSpeciesInstance().isSetName()) {
-	          this.setText(((SimpleSpeciesReference) value).getSpeciesInstance().getName());
-	        }
-
-				}
-				return this;
-			}
-			
-		});
+		l.setCellRenderer(new SBMLlistCellRenderer());
 		l.setBorder(BorderFactory.createLoweredBevelBorder());
 		lh.add(new JScrollPane(l), 1, ++row, 3, 1, 1d, 1d);
 	}
@@ -362,81 +331,71 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @param label
+	 * @param component
+	 */
+	private void addLabeledComponent(Object label, Component component) {
+		Component jlabel = null;
+		if (label instanceof String) {
+			jlabel = new JLabel(label.toString().endsWith(": ") ? label.toString() : label + ": ");
+		} else if (label instanceof Component) {
+			jlabel = (Component) label;
+		}
+		lh.add(jlabel, 1, ++row, 1, 1, 0d, 0d);
+		lh.add(component, 3, row, 1, 1, 1, 0d);
+		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+	}
 
 	/**
-	 * @param m
+	 * @param model
 	 */
-	private void addProperties(Model m) {
-		if (m.isSetHistory()) {
-			History hist = m.getHistory();
-			lh.add(new JLabel("Model creators: "), 1, ++row, 1, 1, 0d, 0d);
-			String columnNames[] = new String[] { "Given name", "Family name",
-					"E-mail", "Organization" };
-			String rowData[][] = new String[hist.getNumCreators()][4];
-			int i = 0;
-			for (Creator mc : hist.getListOfCreators()) {
-				rowData[i][0] = mc.getGivenName();
-				rowData[i][1] = mc.getFamilyName();
-				rowData[i][2] = mc.getEmail();
-				rowData[i][3] = mc.getOrganization();
-				i++;
+	private void addProperties(Model model) {
+		if (model.getLevel() > 2) {
+			if (model.isSetConversionFactorInstance()) {
+				// TODO
 			}
-			JTable table = new JTable(rowData, columnNames);
-			table.setEnabled(editable);
-			table.setPreferredScrollableViewportSize(new Dimension(200, (table
-					.getRowCount() + 1)
-					* table.getRowHeight()));
-			JScrollPane scroll = new JScrollPane(table);
-			Dimension dim = table.getPreferredScrollableViewportSize();
-			scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
-					(int) dim.getHeight() + 18));
-			lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-			if (hist.isSetCreatedDate()) {
-				lh.add(new JLabel("Model creation: "), 1, ++row, 1, 1, 0d, 0d);
-				JTextField tf = new JTextField(hist.getCreatedDate().toString());
-				tf.setEditable(editable);
-				lh.add(tf, 3, row, 1, 1, 1, 0d);
-				lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			if (model.isSetAreaUnits()) {
+				addUnit("Area units", model.getAreaUnits(), model);
 			}
-			Vector<Date> modification = new Vector<Date>();
-			if (hist.isSetModifiedDate())
-				modification.add(hist.getModifiedDate());
-			for (i = 0; i < hist.getNumModifiedDates(); i++)
-				if (!modification.contains(hist.getModifiedDate(i)))
-					modification.add(hist.getModifiedDate(i));
-			if (modification.size() > 0) {
-				lh.add(new JLabel("Modification: "), 1, ++row, 1, 1, 0d, 0d);
-				JList l = new JList(modification);
-				l.setEnabled(editable);
-				JScrollPane scroll2 = new JScrollPane(l);
-				scroll2.setPreferredSize(new Dimension(preferedWidth,
-						modification.size() * 20));
-				scroll2.setBorder(BorderFactory.createLoweredBevelBorder());
-				lh.add(scroll2, 3, row, 1, 1, 1d, 1d);
-				lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			if (model.isSetLengthUnits()) {
+				addUnit("Length units", model.getLengthUnits(), model);
+			}
+			if (model.isSetExtentUnits()) {
+				addUnit("Extent units", model.getExtentUnits(), model);
+			}
+			if (model.isSetSubstanceUnits()) {
+				addUnit("Substance units", model.getSubstanceUnits(), model);
+			}
+			if (model.isSetTimeUnits()) {
+				addUnit("Time units", model.getTimeUnits(), model);
+			}
+			if (model.isSetVolumeUnits()) {
+				addUnit("Volume units", model.getVolumeUnits(), model);
 			}
 		}
 		String columnNames[] = new String[] { "Element", "Quantity" };
 		String rowData[][] = new String[][] {
 				{ "Function definitions",
-						Integer.toString(m.getNumFunctionDefinitions()) },
+						Integer.toString(model.getFunctionDefinitionCount()) },
 				{ "Unit definitions",
-						Integer.toString(m.getNumUnitDefinitions()) },
+						Integer.toString(model.getUnitDefinitionCount()) },
 				{ "Compartment types",
-						Integer.toString(m.getNumCompartmentTypes()) },
-				{ "Species types", Integer.toString(m.getNumSpeciesTypes()) },
-				{ "Compartments", Integer.toString(m.getNumCompartments()) },
-				{ "Species", Integer.toString(m.getNumSpecies()) },
-				{ "Global parameters", Integer.toString(m.getNumParameters()) },
+						Integer.toString(model.getCompartmentTypeCount()) },
+				{ "Species types", Integer.toString(model.getSpeciesTypeCount()) },
+				{ "Compartments", Integer.toString(model.getCompartmentCount()) },
+				{ "Species", Integer.toString(model.getSpeciesCount()) },
+				{ "Global parameters", Integer.toString(model.getParameterCount()) },
 				{ "Local parameters",
-						Integer.toString(m.getNumLocalParameters()) },
+						Integer.toString(model.getLocalParameterCount()) },
 				{ "Initial assignments",
-						Integer.toString(m.getNumInitialAssignments()) },
-				{ "Rules", Integer.toString(m.getNumRules()) },
-				{ "Constraints", Integer.toString(m.getNumConstraints()) },
-				{ "Reactions", Integer.toString(m.getNumReactions()) },
-				{ "Events", Integer.toString(m.getNumEvents()) } };
+						Integer.toString(model.getInitialAssignmentCount()) },
+				{ "Rules", Integer.toString(model.getRuleCount()) },
+				{ "Constraints", Integer.toString(model.getConstraintCount()) },
+				{ "Reactions", Integer.toString(model.getReactionCount()) },
+				{ "Events", Integer.toString(model.getEventCount()) } };
 		JTable table = new JTable(rowData, columnNames);
 		table.setEnabled(editable);
 		table.setPreferredScrollableViewportSize(new Dimension(200, table
@@ -451,6 +410,22 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	}
 
 	/**
+	 * 
+	 * @param label
+	 * @param areaUnits
+	 * @param m
+	 */
+	private void addUnit(String label, String areaUnits, Model m) {
+		int level = m.getLevel(), version = m.getVersion();
+		String ud = m.getAreaUnits();
+		if (Unit.Kind.isValidUnitKindString(ud, level, version)) {
+			addLabeledComponent(label, unitKindComboBox(Unit.Kind.valueOf(ud.toUpperCase())));
+		} else {
+			addLabeledComponent(label, unitPreview(m.getUnitDefinition(ud)));
+		}
+	}
+
+	/**
 	 * @param sbase
 	 */
 	private void addProperties(ModifierSpeciesReference msr) {
@@ -462,11 +437,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private void addProperties(NamedSBase nsb) {
 		if (nsb.isSetName() || nsb.isSetId() || editable) {
-			lh.add(new JLabel("Name: "), 1, ++row, 1, 1, 0d, 0d);
 			JTextField tf = new JTextField((nsb.isSetName()) ? nsb.getName() : nsb.getId());
 			tf.setEditable(editable);
-			lh.add(tf, 3, row, 1, 1, 1, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			addLabeledComponent("Name", tf);
 		}
 	}
 
@@ -482,10 +455,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @param q
 	 */
 	private void addProperties(QuantityWithUnit q) {
-		lh.add(new JLabel(q instanceof Species ? "Substance unit: "
-						: "Unit: "), 1, ++row, 1, 1, 0d, 0d);
-		lh.add(unitPreview(q.getUnitsInstance()), 3, row, 1, 1, 1, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		addLabeledComponent(q instanceof Species ? "Substance unit"	: "Unit", unitPreview(q.getUnitsInstance()));
 	}
 
 	/**
@@ -503,8 +473,8 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 
 		// Create Table of reactants, modifiers and products
-		String rmp[][] = new String[Math.max(reaction.getNumReactants(), Math
-				.max(reaction.getNumModifiers(), reaction.getNumProducts()))][3];
+		String rmp[][] = new String[Math.max(reaction.getReactantCount(), Math
+				.max(reaction.getModifierCount(), reaction.getProductCount()))][3];
 		String colNames[] = new String[] { "Reactants", "Modifiers", "Products" };
 		int count;
 		if (reaction.isSetListOfReactants()) {
@@ -569,7 +539,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			lh.add(new JLabel("Model creators: "), 1, ++row, 1, 1, 0d, 0d);
 			String columnNames[] = new String[] { "Given name", "Family name",
 					"E-mail", "Organization" };
-			String rowData[][] = new String[hist.getNumCreators()][4];
+			String rowData[][] = new String[hist.getCreatorCount()][4];
 			int i = 0;
 			for (Creator mc : hist.getListOfCreators()) {
 				rowData[i][0] = mc.getGivenName();
@@ -590,16 +560,14 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 			if (hist.isSetCreatedDate()) {
-				lh.add(new JLabel("Model creation: "), 1, ++row, 1, 1, 0d, 0d);
 				JTextField tf = new JTextField(hist.getCreatedDate().toString());
 				tf.setEditable(editable);
-				lh.add(tf, 3, row, 1, 1, 1, 0d);
-				lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+				addLabeledComponent("Model creation", tf);
 			}
 			Vector<Date> modification = new Vector<Date>();
 			if (hist.isSetModifiedDate())
 				modification.add(hist.getModifiedDate());
-			for (i = 0; i < hist.getNumModifiedDates(); i++)
+			for (i = 0; i < hist.getModifiedDateCount(); i++)
 				if (!modification.contains(hist.getModifiedDate(i)))
 					modification.add(hist.getModifiedDate(i));
 			if (modification.size() > 0) {
@@ -614,13 +582,6 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 			}
 		}
-//		if (sbase.isSetMetaId() || editable) {
-//			lh.add(new JLabel("Meta identifier: "), 1, ++row, 1, 1, 0d, 0d);
-//			JTextField tf = new JTextField(sbase.getMetaId());
-//			tf.setEditable(editable);
-//			lh.add(tf, 3, row, 1, 1, 1, 0d);
-//			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-//		}
 		if (sbase.isSetNotes() || editable) {
 			lh.add(new JLabel("Notes: "), 1, ++row, 1, 1, 0d, 0d);
 			String text = sbase.getNotesString();
@@ -629,15 +590,6 @@ public class SBasePanel extends JPanel implements EquationComponent {
 						sbase.getNotesString().lastIndexOf('/') - 1);
 			}
 			text = text.trim().replace("/>", ">");
-			
-			// As long as there is no solution that breaks text at window length,
-			// I am inserting these temporary line breaks.
-			// Problem 1: </p> is not recognized as a line break
-			// WARNING: This places <br> tags also inside HTML code!
-//			text = StringUtil.replaceIgnoreCase(text, "</p>", "</p><br>");
-//			text = StringUtil.insertLineBreaks(text, 150, "<br>");
-//			text = StringUtil.replaceIgnoreCase(text, "</p><br>", "</p>");
-			
 			if (!text.startsWith("<body") && !text.endsWith("</body>"))
 				text = "<body>" + text + "</body>";
 			JEditorPane notesArea = new JEditorPane("text/html",
@@ -656,15 +608,15 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			lh.add(scroll, 3, row, 1, 1, 1d, 1d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
-		if (sbase.getNumCVTerms() > 0) {
+		if (sbase.getCVTermCount() > 0) {
 			lh.add(new JLabel("MIRIAM annotation: "), 1, ++row, 1, 1, 0d, 0d);
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><body>");
-			if (sbase.getNumCVTerms() > 1) {
+			if (sbase.getCVTermCount() > 1) {
 				sb.append("<ul>");
 			}
 			for (CVTerm cvt : sbase.getCVTerms()) {
-				if (sbase.getNumCVTerms() > 1) {
+				if (sbase.getCVTermCount() > 1) {
 					sb.append("<li>");
 				}
 				String cvtString = cvt.toString();
@@ -695,11 +647,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 					}
 				}
 				sb.append(cvtString);
-				if (sbase.getNumCVTerms() > 1) {
+				if (sbase.getCVTermCount() > 1) {
 					sb.append("</li>");
 				}
 			}
-			if (sbase.getNumCVTerms() > 1) {
+			if (sbase.getCVTermCount() > 1) {
 				sb.append("</ul>");
 			}
 			sb.append("</body></html>");
@@ -715,20 +667,37 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			lh.add(scroll, 3, row, 1, 1, 1d, 1d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
-		lh.add(new JLabel("SBO term: "), 1, ++row, 1, 1, 0d, 0d);
-		JTextField sboTermField = new JTextField();
-		sboTermField.setEditable(editable);
 		if (sbase.isSetSBOTerm()) {
-		  try {
-		    sboTermField.setText(SBOTermFormatter.getShortDefinition(SBO.getTerm(sbase.getSBOTerm())));
-		  } catch (Exception e) {
-		    // NoSuchElementException if ontology file is outdated
-		    logger.log(Level.WARNING, "Could not get SBO identifier.", e);
-		  }
-		  sboTermField.setColumns(sboTermField.getText().length());
+			JPanel sboPanel = new JPanel();
+			sboPanel.setBorder(BorderFactory.createTitledBorder(" Systems Biology Ontology "));
+			LayoutHelper helper = new LayoutHelper(sboPanel);
+			
+			int columns = 35, innerRow = -1;
+			SBO.Term term = SBO.getTerm(sbase.getSBOTerm());
+			helper.add(new JLabel("Name: "), 1, ++innerRow, 1, 1, 0d, 0d);
+			JTextArea nameField = new JTextArea(term.getName(), 1, columns);
+			nameField.setEditable(editable);
+			nameField.setCaretPosition(0);
+			nameField.setWrapStyleWord(true);
+			helper.add(new JScrollPane(nameField), 3, innerRow, 1, 1, 1d, 0d);
+			helper.add(new JPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
+			
+			helper.add(new JLabel("Definition: "), 1, ++innerRow, 1, 1, 0d, 0d);
+			JTextArea sboTermField = new JTextArea(1, columns);
+			sboTermField.setCaretPosition(0);
+			sboTermField.setWrapStyleWord(true);
+			sboTermField.setEditable(editable);
+			try {
+				sboTermField.setText(SBOTermFormatter.getShortDefinition(SBO.getTerm(sbase.getSBOTerm())));
+			} catch (Exception exc) {
+				// NoSuchElementException if ontology file is outdated
+				logger.log(Level.WARNING, "Could not get SBO identifier.", exc);
+			}
+			helper.add(new JScrollPane(sboTermField), 3, innerRow, 1, 1, 1d, 0d);
+			helper.add(new JPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
+			
+			lh.add(helper.getContainer(), 1, ++row, 3, 1, 0d, 1d);
 		}
-		lh.add(sboTermField, 3, row, 1, 1, 1d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 	}
 
 	/**
@@ -736,12 +705,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @param sbase
 	 */
 	private void addProperties(SBaseWithDerivedUnit sbase) {
-		JEditorPane pane = unitPreview(sbase
-				.getDerivedUnitDefinition());
+		JEditorPane pane = unitPreview(sbase.getDerivedUnitDefinition());
 		pane.setBorder(BorderFactory.createLoweredBevelBorder());
-		lh.add(new JLabel("Derived unit: "), 1, ++row, 1, 1, 0d, 0d);
-		lh.add(pane, 3, row, 1, 1, 1d, 1d);
-		lh.add(new JPanel(), 1, ++row, 1, 1, 1d, 1d);
+		addLabeledComponent("Derived unit", pane);
 		JCheckBox chck = new JCheckBox("Contains undeclared units", sbase.containsUndeclaredUnits());
 		chck.setEnabled(false);
 		lh.add(chck, 1, ++row, 3, 1, 0d, 0d);
@@ -754,13 +720,14 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	private void addProperties(SimpleSpeciesReference ssr) {
 		if (ssr.isSetSpecies()) {
 			Model m = ssr.getModel();
-			String idsOrNames[] = new String[m.getNumSpecies()];
+			String idsOrNames[] = new String[m.getSpeciesCount()];
 			int index = 0;
-			for (int i = 0; i < m.getNumSpecies(); i++) {
+			for (int i = 0; i < m.getSpeciesCount(); i++) {
 				Species s = m.getSpecies(i);
 				idsOrNames[i] = s.isSetName() ? s.getName() : s.getId();
-				if (s.getId().equals(ssr.getSpecies()))
+				if (s.getId().equals(ssr.getSpecies())) {
 					index = i;
+				}
 			}
 			JComboBox combo = new JComboBox(idsOrNames);
 			combo.setSelectedIndex(index);
@@ -785,39 +752,27 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private void addProperties(Species species) {
 		if (species.isSetSpeciesType()) {
-			lh.add(new JLabel("Species type: "), 1, ++row, 1, 1, 0d, 0d);
-			JTextField tf = new JTextField(species.getSpeciesTypeInstance()
-					.toString());
+			JTextField tf = new JTextField(species.getSpeciesTypeInstance().toString());
 			tf.setEditable(editable);
-			lh.add(tf, 1, ++row, 1, 1, 1d, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			addLabeledComponent("Species type", tf);
 		}
-		lh.add(new JLabel("Compartment: "), 1, ++row, 1, 1, 0d, 0d);
-		JTextField tf = new JTextField(species.getCompartmentInstance()
-				.toString());
+		JTextField tf = new JTextField(species.getCompartmentInstance().toString());
 		tf.setEditable(editable);
-		lh.add(tf, 3, row, 1, 1, 1, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		addLabeledComponent("Compartment", tf);
 		if (species.isSetSpeciesType() || editable) {
-			lh.add(new JLabel("Species type: "), 1, row, 1, 1, 0d, 0d);
 			tf = new JTextField(species.getSpeciesTypeInstance().toString());
 			tf.setEditable(editable);
-			lh.add(tf, 1, row, 1, 1, 1, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			addLabeledComponent("Species type", tf);
 		}
 		JSpinner spinCharge = new JSpinner(new SpinnerNumberModel(species.getCharge(), -10, 10, 1));
-		lh.add(new JLabel("Charge: "), 1, ++row, 1, 1, 0d, 0d);
 		spinCharge.setEnabled(editable);
-		lh.add(spinCharge, 3, row, 1, 1, 1d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		addLabeledComponent("Charge", spinCharge);
 		addProperties((Symbol) species);
-		JCheckBox check = new JCheckBox("Boundary condition", species
-				.getBoundaryCondition());
+		JCheckBox check = new JCheckBox("Boundary condition", species.getBoundaryCondition());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-		check = new JCheckBox("Has only substance units", species
-				.getHasOnlySubstanceUnits());
+		check = new JCheckBox("Has only substance units", species.getHasOnlySubstanceUnits());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
@@ -866,6 +821,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		double val = Double.NaN;
 		double min = 0d;
 		double max = 9999.9;
+		Object label = null;
 		if (s instanceof Species) {
 			Species species = (Species) s;
 			String types[] = new String[] { "Initial amount",
@@ -880,122 +836,82 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			JComboBox type = new JComboBox(types);
 			type.setSelectedIndex(amount ? 0 : 1);
 			type.setEnabled(editable);
-			lh.add(type, 1, ++row, 1, 1, 0d, 0d);
+			label = type;
 		} else {
-			String label = null;
 			if (s instanceof Compartment) {
 				Compartment c = (Compartment) s;
-				if (c.isSetSize())
+				if (c.isSetSize()) {
 					val = c.getSize();
-				label = "Size: ";
+				}
+				label = "Size";
 			} else {
 				Parameter p = (Parameter) s;
 				if (p.isSetValue()) {
 					val = p.getValue();
 				}
-				label = "Value: ";
+				label = "Value";
 			}
-			lh.add(new JLabel(label), 1, ++row, 1, 1, 0d, 0d);
 		}
 		JSpinner spinValue = new JSpinner(new SpinnerNumberModel(val, Math.min(
 				val, min), Math.max(val, max), .1d));
 		spinValue.setEnabled(editable);
-		lh.add(spinValue, 3, row, 1, 1, 1d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-		// TODO duplicated?
-//		lh
-//				.add(new JLabel(s instanceof Species ? "Substance unit: "
-//						: "Unit: "), 1, ++row, 1, 1, 0d, 0d);
-//		lh.add(unitPreview(s.getUnitsInstance()), 3, row, 1, 1, 1d, 0d);
-//		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-//		JCheckBox check = new JCheckBox("Constant", s.isConstant());
-//		check.setEnabled(editable);
-//		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		addLabeledComponent(label, spinValue);
 	}
 
 	/**
 	 * @param unit
 	 */
 	private void addProperties(Unit unit) {
-		lh.add(new JLabel("Kind: "), 1, ++row, 1, 1, 0d, 0d);
-		JComboBox unitSelection = new JComboBox();
-		for (Unit.Kind unitKind : Unit.Kind.values()) {
-			unitSelection.addItem(unitKind);
-			if (unitKind.equals(unit.getKind()))
-				unitSelection.setSelectedItem(unitKind);
-		}
+		JComboBox unitSelection = unitKindComboBox(unit.getKind());
 		unitSelection.setEditable(false);
 		unitSelection.setEnabled(editable);
-		lh.add(unitSelection, 3, row, 1, 1, 1d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-		lh.add(new JLabel("Mutiplier: "), 1, ++row, 1, 1, 0d, 0d);
+		addLabeledComponent("Kind", unitSelection);
 		double multiplier = unit.getMultiplier();
-		JSpinner sMultiplier = new JSpinner(new SpinnerNumberModel(multiplier,
-			spinnerMinValue(multiplier), spinnerMaxValue(multiplier),
-			spinnerStepSize(multiplier)));
-		sMultiplier.setEnabled(editable);
-		lh.add(sMultiplier, 3, row, 1, 1, 1, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-		if (unit.getLevel() == 1
-				|| (unit.getLevel() == 2 && unit.getVersion() == 1)) {
-			lh.add(new JLabel("Offset: "), 1, ++row, 1, 1, 0d, 0d);
+		JSpinner sMultiplier = GUITools.createJSpinner(new SpinnerNumberModel(
+			multiplier, spinnerMinValue(multiplier), spinnerMaxValue(multiplier),
+			spinnerStepSize(multiplier)), "multiplier",
+			"The multiplier for the unit", editable);
+		addLabeledComponent("Mutiplier", sMultiplier);
+		if ((unit.getLevel() == 1)
+				|| ((unit.getLevel() == 2) && (unit.getVersion() == 1))) {
 			JSpinner sOffset = new JSpinner(new SpinnerNumberModel(unit
 					.getOffset(), -1000, 1000, 1));
 			sOffset.setEnabled(editable);
-			lh.add(sOffset, 3, row, 1, 1, 1d, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			addLabeledComponent("Offset", sOffset);
 		}
-		lh.add(new JLabel("Scale: "), 1, ++row, 1, 1, 0d, 0d);
 		JSpinner sScale = new JSpinner(new SpinnerNumberModel(unit.getScale(),
 				-1000, 1000, 1));
 		sScale.setEnabled(editable);
-		lh.add(sScale, 3, row, 1, 1, 1, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		addLabeledComponent("Scale", sScale);
 		double exponent = unit.getExponent();
 		JSpinner sExponent = new JSpinner(new SpinnerNumberModel(exponent,
 			spinnerMinValue(exponent), spinnerMaxValue(exponent),
 			spinnerStepSize(exponent)));
 		sExponent.setEnabled(editable);
-		lh.add(new JLabel("Exponent: "), 1, ++row, 1, 1, 0d, 0d);
-		lh.add(sExponent, 3, row, 1, 1, 1, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		addLabeledComponent("Exponent", sExponent);
 	}
 
 	/**
 	 * 
-	 * @param multiplier
+	 * @param kind
 	 * @return
 	 */
-	public double spinnerStepSize(double currVal) {
-		return (spinnerMaxValue(currVal) - spinnerMinValue(currVal)) / 50d;
-	}
-
-	/**
-	 * 
-	 * @param multiplier
-	 * @return
-	 */
-	public double spinnerMaxValue(double currVal) {
-		return -spinnerMinValue(-currVal);
-	}
-
-	/**
-	 * 
-	 * @param multiplier
-	 * @return
-	 */
-	public double spinnerMinValue(double currVal) {
-		return Math.min(currVal, -1E6d);
+	private JComboBox unitKindComboBox(Kind kind) {
+		JComboBox unitSelection = new JComboBox();
+		for (Unit.Kind unitKind : Unit.Kind.values()) {
+			unitSelection.addItem(unitKind);
+			if (unitKind.equals(kind)) {
+				unitSelection.setSelectedItem(unitKind);
+			}
+		}
+		return unitSelection;
 	}
 
 	/**
 	 * @param ud
 	 */
 	private void addProperties(UnitDefinition ud) {
-		lh.add(new JLabel("Definition: "), 1, ++row, 1, 1, 0d, 0d);
-		lh.add(unitPreview(ud), 3, row, 1, 1, 1d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		addLabeledComponent("Definition", unitPreview(ud));
 		for (Unit u : ud.getListOfUnits()) {
 			lh.add(new SBasePanel(u, namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
 		}
@@ -1025,7 +941,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	public boolean isEditable() {
 		return editable;
 	}
-	
+
 	/**
    * @return the namesIfAvailable
    */
@@ -1046,7 +962,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.gui.EquationComponent#setRenderer(de.zbit.sbml.gui.EquationRenderer)
 	 */
@@ -1055,7 +971,35 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	}
 
 	/**
-	 * Creates a JEditorPane that displays the given UnitDefinition as a HTML.
+	 * 
+	 * @param multiplier
+	 * @return
+	 */
+	public double spinnerMaxValue(double currVal) {
+		return -spinnerMinValue(-currVal);
+	}
+
+	/**
+	 * 
+	 * @param multiplier
+	 * @return
+	 */
+	public double spinnerMinValue(double currVal) {
+		return Math.min(currVal, -1E6d);
+	}
+
+	/**
+	 * 
+	 * @param multiplier
+	 * @return
+	 */
+	public double spinnerStepSize(double currVal) {
+		return (spinnerMaxValue(currVal) - spinnerMinValue(currVal)) / 50d;
+	}
+
+	/**
+	 * Creates a {@link JEditorPane} that displays the given
+	 * {@link UnitDefinition} as a HTML.
 	 * 
 	 * @param ud
 	 * @return
@@ -1067,4 +1011,5 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		preview.setBorder(BorderFactory.createLoweredBevelBorder());
 		return preview;
 	}
+
 }
