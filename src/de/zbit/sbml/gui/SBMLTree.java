@@ -610,11 +610,11 @@ public class SBMLTree extends JTree implements ActionListener {
 	 */
 	public void search(Filter filter, AbstractProgressBar progressBar) {
 		SBMLNode.setShowInvisible(true);
-		SBMLNode root = (SBMLNode)this.getModel().getRoot();
+		SBMLNode root = (SBMLNode) this.getModel().getRoot();
 		List<? extends TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
 		if (progressBar != null) {
 			progressBar.reset();
-			progressBar.setNumberOfTotalCalls(2 * SBMLNode.getNodeCount());
+			progressBar.setNumberOfTotalCalls(2 * root.getNodeCount());
 			if (progressBar instanceof ProgressBarSwing){
 				((ProgressBarSwing) progressBar).getProgressBar().setVisible(true);
 			}

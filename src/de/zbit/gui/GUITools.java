@@ -495,7 +495,7 @@ public class GUITools {
 	 * @param label
 	 * @param name
 	 *        The name for the component to be identifiable by the
-	 *        {@link ItemListener}. <code>null</code> allowed.
+	 *        {@link ItemListener}. {@code null} allowed.
 	 * @param selected
 	 * @param command
 	 * @param toolTip
@@ -544,15 +544,15 @@ public class GUITools {
 	 * 
 	 * @param items
 	 * @param renderer
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @param enabled
 	 * @param name
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @param tooltip
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @param selectedIndex
 	 * @param listeners
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @return
 	 */
 	public static JComboBox createJComboBox(Object[] items,
@@ -586,14 +586,14 @@ public class GUITools {
 	 * 
 	 * @param items
 	 * @param renderer
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @param enabled
 	 * @param name
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @param tooltip
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @param listeners
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @return
 	 */
 	public static JComboBox createJComboBox(Object[] items,
@@ -974,12 +974,12 @@ public class GUITools {
 	 * 
 	 * @param model
 	 * @param name
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @param tooltip
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @param enabled
 	 * @param cl
-	 *        <code>null</code> allowed.
+	 *        {@code null} allowed.
 	 * @return
 	 */
 	public static JSpinner createJSpinner(SpinnerModel model, String name,
