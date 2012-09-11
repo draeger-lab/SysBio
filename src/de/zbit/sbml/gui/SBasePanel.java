@@ -211,8 +211,6 @@ public class SBasePanel extends JPanel implements EquationComponent {
   	if (sbase instanceof Variable) {
   		addProperties((Variable) sbase);
   	}
-  	
-  	lh.add(new JPanel(), 1, ++row, 5, 1, 1, 0.001d);
   }
   
   /**
