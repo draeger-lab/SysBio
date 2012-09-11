@@ -84,7 +84,7 @@ public class Graph2Dwriter implements Graph2Dwriteable {
   private IOHandler outputHandler = null;
   
   /**
-   * <code>TRUE</code> if any file during {@link #writeToFile(Graph2D, String)}
+   * {@code true} if any file during {@link #writeToFile(Graph2D, String)}
    * has been overwritten.
    */
   private boolean lastFileWasOverwritten=false;

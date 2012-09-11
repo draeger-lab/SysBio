@@ -411,7 +411,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   /**
    * Check if all nodes lay at the same X position.
    * @param graph
-   * @return <code>TRUE</code> if all nodes in the graph
+   * @return {@code true} if all nodes in the graph
    * have the same center X coordinate.
    */
   private static boolean allNodesAtSamePosition(Graph2D graph) {
@@ -469,7 +469,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   /**
    * Only if {@link #isDetailPanelAvailable()}, update the {@link #detailPanel}
    * to match current selection.
-   * <p><code>clickedObjects</code> might explicitly be <code>NULL</code>
+   * <p><code>clickedObjects</code> might explicitly be {@code null}
    * if nothing is selected, so please implement this method accordingly.
    * 
    * @param detailPanel
@@ -487,8 +487,8 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * <p>This allows extending classes to build a panel with detailed
    * information that is shown on node-selection.
    * <p>Please overwrite this method to match your needs.
-   * @return <code>TRUE</code> if a split pane with more details for
-   * a node should be introduced, <code>FALSE</code> if only the
+   * @return {@code true} if a split pane with more details for
+   * a node should be introduced, {@code false} if only the
    * graph should get visualized.
    */
   public boolean isDetailPanelAvailable() {

@@ -37,7 +37,7 @@ public class SBOTermFormatter {
       definition = definition.substring(1);
     }
     int pos = definition.length() - 1;
-    String endWords[] = new String[] { "\n", "xmlns=", "[", "\"" };
+    String endWords[] = new String[] { "\n", "xmlns=", "[", "\"", "<math" };
     for (String word : endWords) {
       int end = definition.indexOf(word);
       if ((0 < end) && (end < pos)) {

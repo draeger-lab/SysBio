@@ -108,8 +108,8 @@ public class ExpandablePanel extends JPanel implements MouseListener {
    * @param label label of this {@link #ExpandablePanel(String, JPanel)}. This is
    * the text, the user may click on to expand or collapse the <code>panel</code>.
    * @param panel the panel to collapse of expand.
-   * @param collapsed set the initial state to collapsed (<code>TRUE</code>)
-   * or expanded (<code>FALSE</code>).
+   * @param collapsed set the initial state to collapsed ({@code true})
+   * or expanded ({@code false}).
    */
   public ExpandablePanel(String label, JPanel panel, boolean collapsed) {
     this(label, panel, collapsed, false);
@@ -120,8 +120,8 @@ public class ExpandablePanel extends JPanel implements MouseListener {
    * @param label label of this {@link #ExpandablePanel(String, JPanel)}. This is
    * the text, the user may click on to expand or collapse the <code>panel</code>.
    * @param panel the panel to collapse of expand.
-   * @param collapsed set the initial state to collapsed (<code>TRUE</code>)
-   * or expanded (<code>FALSE</code>).
+   * @param collapsed set the initial state to collapsed ({@code true})
+   * or expanded ({@code false}).
    * @param packParentWindow invoke the <code>pack()</code> method on the
    * parent window.
    */
@@ -406,7 +406,7 @@ public class ExpandablePanel extends JPanel implements MouseListener {
    * Notifies all listeners that have registered interest for
    * notification on this event type.
    *
-   * @param collapsed <code>TRUE</code> if you want to fire a collapse
+   * @param collapsed {@code true} if you want to fire a collapse
    * event. Else, a expanded event will be fired.
    * @see EventListenerList
    */

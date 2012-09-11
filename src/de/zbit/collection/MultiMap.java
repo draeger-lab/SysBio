@@ -40,10 +40,10 @@ public interface MultiMap<K, V> {
 
   
   /**
-   * Returns <code>true</code>, if the multimap is empty, <code>false</code>
+   * Returns {@code true}, if the multimap is empty, {@code false}
    * otherwise
    * 
-   * @return <code>true</code>, if the multimap is empty
+   * @return {@code true}, if the multimap is empty
    */
   boolean isEmpty();
 
@@ -56,7 +56,7 @@ public interface MultiMap<K, V> {
    * 
    * @param key the key
    * @param value the value
-   * @return Returns <code>true</code>, if there was no previous mapping from
+   * @return Returns {@code true}, if there was no previous mapping from
    *         the given key to the given value.
    */
   boolean put(K key, V value);
@@ -69,8 +69,8 @@ public interface MultiMap<K, V> {
    * 
    * @param key the key
    * @param value the value
-   * @return Returns <code>true</code>, if there was a mapping from the given
-   *         key to the given value, <code>false</code> otherwise.
+   * @return Returns {@code true}, if there was a mapping from the given
+   *         key to the given value, {@code false} otherwise.
    */
   boolean remove(K key, V value);
   
@@ -92,7 +92,7 @@ public interface MultiMap<K, V> {
    * 
    * @param key the key
    * @param values the values
-   * @return Returns <code>true</code>, if at least one mapping was added to the
+   * @return Returns {@code true}, if at least one mapping was added to the
    *         multimap.
    */
   boolean putAll(K key, Iterable<? extends V> values);
@@ -104,7 +104,7 @@ public interface MultiMap<K, V> {
    * added.
    * 
    * @param multimap the multimap
-   * @return Returns <code>true</code>, if at least one mapping was added to the
+   * @return Returns {@code true}, if at least one mapping was added to the
    *         multimap.
    */
   boolean putAll(MultiMap<? extends K, ? extends V> multimap);
@@ -116,40 +116,40 @@ public interface MultiMap<K, V> {
    * 
    * 
    * @param key the key
-   * @return Returns <code>true</code>, if there was a mapping from the given
-   *         key to the given value, <code>false</code> otherwise.
+   * @return Returns {@code true}, if there was a mapping from the given
+   *         key to the given value, {@code false} otherwise.
    */
   Collection<V> removeAll(K key);
   
   
   /**
-   * Returns <code>true</code> if at least on mapping for the given key exists
+   * Returns {@code true} if at least on mapping for the given key exists
    * in this multimap.
    * 
    * @param key the key
-   * @return <code>true</code> if at least on mapping for the given key exists
+   * @return {@code true} if at least on mapping for the given key exists
    *         in this multimap.
    */
   boolean containsKey(K key);
 
   /**
-   * Returns <code>true</code> if at least on mapping to the given value exists
+   * Returns {@code true} if at least on mapping to the given value exists
    * in this multimap.
    * 
    * @param value the value
-   * @return <code>true</code> if at least on mapping to the given value exists
+   * @return {@code true} if at least on mapping to the given value exists
    *         in this multimap.
    */
   boolean containsValue(V value);
 
   /**
-   * Returns <code>true</code> if the multimap contains a mapping the from the
-   * given key to the given value, <code>false</code> otherwise.
+   * Returns {@code true} if the multimap contains a mapping the from the
+   * given key to the given value, {@code false} otherwise.
    * 
    * @param key the key
    * @param value the value
-   * @return <code>true</code> if the multimap contains a mapping the from the
-   *         given key to the given value, <code>false</code> otherwise.
+   * @return {@code true} if the multimap contains a mapping the from the
+   *         given key to the given value, {@code false} otherwise.
    */
   boolean containsEntry(K key, V value);
 

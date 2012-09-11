@@ -90,7 +90,7 @@ public class DecimalCellRenderer extends DefaultTableCellRenderer {
 	 *        digits.
 	 * @param bgColors
 	 *        an array of background colors for the rows that will repeatedly be
-	 *        used to highlight a row. <code>null</code> values are allowed.
+	 *        used to highlight a row. {@code null} values are allowed.
 	 */
 	public DecimalCellRenderer(int integer, int fraction, int align, boolean exact, Color... bgColors) {
 		this();
@@ -124,7 +124,7 @@ public class DecimalCellRenderer extends DefaultTableCellRenderer {
 	 *        alignment (LEFT, CENTER, RIGHT)
 	 * @param bgColors
 	 *        an array of background colors for the rows that will repeatedly be used
-	 *        to highlight a row. <code>null</code> values are allowed.
+	 *        to highlight a row. {@code null} values are allowed.
 	 */
 	public DecimalCellRenderer(int integer, int fraction, int align,
 		Color... bgColors) {

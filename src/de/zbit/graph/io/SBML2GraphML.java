@@ -155,14 +155,14 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   }
   
   /**
-   * @return <code>TRUE</code> if the qual model is shown.
+   * @return {@code true} if the qual model is shown.
    */
   public boolean isQualModel() {
     return showQualModel;
   }
   
   /**
-   * @param showQualModel <code>TRUE</code> if the qual model should
+   * @param showQualModel {@code true} if the qual model should
    * be converted, instead of the metabolic model.
    */
   public void setShowQualModel(boolean showQualModel) {
@@ -762,7 +762,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * <p>Note: this is a standard-slow iterative approach.</p>
    * @param species
    * @param anyID
-   * @return <code>TRUE</code> if <code>species</code> contains
+   * @return {@code true} if <code>species</code> contains
    * any {@link AbstractNamedSBase} with ID <code>anyID</code>.
    */
   private boolean speciesListContainsID(

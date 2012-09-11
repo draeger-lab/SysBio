@@ -158,7 +158,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * datatype (Integer, Double, etc.),...
    * @param <T>
    * @param option
-   * @param initialValue might be <code>NULL</code>.
+   * @param initialValue might be {@code null}.
    * @return 
    */
   @SuppressWarnings({ "rawtypes" })

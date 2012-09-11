@@ -647,7 +647,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
   /**
    * Allows to override the progressBar.
    * <p>NOTE: This method does automatically set {@link #displayProgress}
-   * to <code>TRUE</code> (see {@link #setDisplayProgress(boolean)}).
+   * to {@code true} (see {@link #setDisplayProgress(boolean)}).
    * <p>If this method is called, whilst the FilePointer is not at position zero
    * (i.e. the file has already been read partially) this will not show
    * correct values.
@@ -1323,7 +1323,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * Initializes the {@link #progress} as new
    * {@link FileReadProgress}.
    * <p>Should only be called if {@link #displayProgress}
-   * is true and {@link #progress} is currently <code>NULL</code>.
+   * is true and {@link #progress} is currently {@code null}.
    */
   private void initializeFileReadProgress() {
     progress = new FileReadProgress(filename);

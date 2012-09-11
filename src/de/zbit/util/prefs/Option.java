@@ -1476,7 +1476,7 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
    * @param value
    * @param r
    * @param props the current properties of all options.
-   * @return <code>true</code> if <code>value</code> is in {@link Range} <code>r</code>.
+   * @return {@code true} if <code>value</code> is in {@link Range} <code>r</code>.
    */
   @SuppressWarnings("unchecked")
   public boolean castAndCheckRange(Object value, Range<?> r, SBProperties props) {
@@ -1853,8 +1853,8 @@ public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
   /**
 	 * Checks if a display name for this option has been set.
 	 * 
-	 * @return <code>true</code> if the display name has been set,
-	 *         <code>false</code> otherwise.
+	 * @return {@code true} if the display name has been set,
+	 *         {@code false} otherwise.
 	 */
 	public final boolean isSetDisplayName() {
 		return displayName != null;

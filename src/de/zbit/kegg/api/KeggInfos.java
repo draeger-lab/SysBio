@@ -315,7 +315,7 @@ public class KeggInfos implements Serializable {
 	 * method and submit {@link EntryType} if available.
 	 * 
 	 * @param keggId
-   * @return Complete MIRIAM URN Including the given ID. Or <code>NULL</code>
+   * @return Complete MIRIAM URN Including the given ID. Or {@code null}
    * if no such MIRIAM URN is available!
 	 */
 	public static String getMiriamURNforKeggID(String keggId) {
@@ -575,7 +575,7 @@ public class KeggInfos implements Serializable {
 
 	/**
 	 * 
-	 * @return may return <code>NULL</code> if no MIRIAM URN
+	 * @return may return {@code null} if no MIRIAM URN
 	 * is available for the current KEGG ID.
 	 */
 	public String getKegg_ID_with_MiriamURN() {
@@ -623,7 +623,7 @@ public class KeggInfos implements Serializable {
 	 * the definition and the orthology. Does NOT parse the "ENZYME" entry.
 	 * <p>Thus, this method is rather for genes, compounds, etc.
 	 * and NOT for queried reactions. 
-	 * @return non-<code>NULL</code> (but maybe empty) list
+	 * @return non-{@code null} (but maybe empty) list
 	 * of EC numbers (without ec: prefix) describing this object.
 	 * @see #getEnzymes()
 	 */
@@ -658,7 +658,7 @@ public class KeggInfos implements Serializable {
   /**
 	 * Extract enzyme codes (e.g. "EC:2.1.2.10") from any string.
    * @param ids any string
-   * @return EC Numbers if found (without ec: prefix) or <code>NULL</code>
+   * @return EC Numbers if found (without ec: prefix) or {@code null}
    */
 	public static Set<String> extractECNumbers(String ids) {
 	  Set<String> ecCodes = new HashSet<String>();
@@ -1059,7 +1059,7 @@ public class KeggInfos implements Serializable {
    * XXX: Plese consider using the {@link DatabaseIdentifiers} class and
    * the corresponding tools, rather than this one.
    * @param keggId
-   * @return Complete MIRIAM URN Including the given ID. Or <code>NULL</code>
+   * @return Complete MIRIAM URN Including the given ID. Or {@code null}
    * if no such MIRIAM URN is available!
    */
   public static String getMiriamURNforKeggID(String keggId, EntryType et) {

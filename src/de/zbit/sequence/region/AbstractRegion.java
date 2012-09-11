@@ -170,7 +170,7 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
   }
   
   /**
-   * @return <code>TRUE</code> if end is set.
+   * @return {@code true} if end is set.
    */
   public boolean isSetEnd() {
     int end = getEnd();

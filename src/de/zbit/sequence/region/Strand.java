@@ -30,24 +30,24 @@ public interface Strand {
   public final static String strandKey = "reverse_orientation";
   
   /**
-   * @return <code>TRUE</code> if element is on forward strand.
+   * @return {@code true} if element is on forward strand.
    */
   public boolean isOnForwardStrand();
   
   /**
-   * @return <code>TRUE</code> if element is on reverse strand.
+   * @return {@code true} if element is on reverse strand.
    */
   public boolean isOnReverseStrand();
 
   /**
-   * @return <code>TRUE</code> if orientation is known.
+   * @return {@code true} if orientation is known.
    */
   public boolean isStrandKnown();
 
   /**
    * Set the orientation
-   * @param onReverse <code>TRUE</code> if element is on reverse strand,
-   * <code>FALSE</code> if element is on forward strand.
+   * @param onReverse {@code true} if element is on reverse strand,
+   * {@code false} if element is on forward strand.
    */
   public void setIsOnReverseStrand(boolean onReverse);
   

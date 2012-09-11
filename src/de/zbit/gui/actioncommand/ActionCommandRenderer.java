@@ -65,7 +65,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
       .getLogger(ActionCommandRenderer.class.getName());
   
   /**
-   * If this is <code>TRUE</code>, each <code>value</code> of type
+   * If this is {@code true}, each <code>value</code> of type
    * {@link Class} will get {@link Class#getName()} as ToolTip.
    */
   public static boolean setToolTipToFullClassNameForClasses=true;

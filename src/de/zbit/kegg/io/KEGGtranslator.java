@@ -99,9 +99,9 @@ public interface KEGGtranslator <InternalOutputFormatDataStructure> {
   public boolean writeToFile(InternalOutputFormatDataStructure doc, String outFile);
   
   /**
-   * This should return <code>TRUE</code> if the output is
+   * This should return {@code true} if the output is
    * primarily for visualiazation purposes. For simulation and
-   * modeling purposes, <code>FALSE</code> should be returned.
+   * modeling purposes, {@code false} should be returned.
    * <p>This controles, e.g., if entries (nodes) corresponding to
    * reactions should be converted to reactions or should be kept
    * as nodes.</p>  

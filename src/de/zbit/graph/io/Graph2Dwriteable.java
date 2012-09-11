@@ -32,7 +32,7 @@ public interface Graph2Dwriteable {
    * @param path
    * @param format output file extension, e.g., "gif", "graphml", "gml", "jpg",...
    * @throws Exception 
-   * @return <code>TRUE</code> if everything went fine.
+   * @return {@code true} if everything went fine.
    */
   public boolean writeToFile(Graph2D graph, String outFile, String format) throws Exception;
   

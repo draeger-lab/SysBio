@@ -45,7 +45,7 @@ import de.zbit.util.Timer;
  * {@link PropertyChangeListener}s when done. In case that the reading process
  * takes some more time, a {@link ProgressMonitor} is displayed to the user. If
  * the user cancels the reading process, the resulting {@link SBMLDocument} will
- * be <code>null</code>. It is hence necessary to use this
+ * be {@code null}. It is hence necessary to use this
  * {@link SBMLReadingTask} as follows:
  * 
  * <pre>

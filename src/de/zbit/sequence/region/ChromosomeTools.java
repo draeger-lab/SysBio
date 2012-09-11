@@ -68,7 +68,7 @@ public final class ChromosomeTools {
   /**
    * Parse a chromosome from any string (using the {@link Chromosome#chromosome_regex}).
    * @param chromosome
-   * @return <code>NULL</code> if the regex did not match any expression.
+   * @return {@code null} if the regex did not match any expression.
    */
   public static String parseChromosomeFromString(String chromosome) {
     Matcher m = Chromosome.chromosome_regex.matcher(chromosome.trim());

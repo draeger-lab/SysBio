@@ -131,7 +131,7 @@ public class ReactionComponent implements Cloneable {
   }
   
   /**
-   * <code>TRUE</code> if an alternative {@link ReactionComponent}
+   * {@code true} if an alternative {@link ReactionComponent}
    * is available.
    * @return
    */
@@ -184,7 +184,7 @@ public class ReactionComponent implements Cloneable {
   }
   
   /**
-   * @return the stoichiometry (defaults to <code>NULL</code>, if not set manually by calling {@link #setStoichiometry(Integer)})
+   * @return the stoichiometry (defaults to {@code null}, if not set manually by calling {@link #setStoichiometry(Integer)})
    */
   public Integer getStoichiometry() {
     return stoichiometry;

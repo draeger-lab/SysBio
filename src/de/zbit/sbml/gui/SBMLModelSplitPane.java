@@ -360,7 +360,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
 	 */
 	public void valueChanged(TreeSelectionEvent evt) {
-		updateRightComponent(evt.getNewLeadSelectionPath().getLastPathComponent());
+		updateRightComponent(this.tree.getLastSelectedPathComponent());
 	}
 	
 }

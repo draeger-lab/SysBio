@@ -237,7 +237,7 @@ public class KeggTools {
    * or if they are swapped.
    * @param reaction
    * @param equation
-   * @return <code>TRUE</code> if substrates are on the RIGHT side of the equation.
+   * @return {@code true} if substrates are on the RIGHT side of the equation.
    */
   public static boolean isEquationReversed(Reaction reaction, String equation) {
     int dividerPos = equation.indexOf("<=>");

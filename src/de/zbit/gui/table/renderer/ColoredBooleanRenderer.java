@@ -19,6 +19,8 @@ import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
@@ -35,13 +37,7 @@ import de.zbit.gui.ColorPalette;
  * @since 1.1
  * @version $Rev$
  */
-public class ColoredBooleanRenderer extends JCheckBox implements
-		TableCellRenderer {
-	
-	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = 2699486332938892133L;
+public class ColoredBooleanRenderer implements TableCellRenderer {
 	
 	/**
 	 * An array that allows to store the background {@link Color}s of rows. The
@@ -66,7 +62,6 @@ public class ColoredBooleanRenderer extends JCheckBox implements
 	 */
 	public ColoredBooleanRenderer(Color... bgColors) {
 		super();
-		setHorizontalAlignment(JCheckBox.CENTER);
 		bg = bgColors;
 	}
 
@@ -75,20 +70,28 @@ public class ColoredBooleanRenderer extends JCheckBox implements
 	 */
 	public Component getTableCellRendererComponent(JTable table, Object value,
 		boolean isSelected, boolean hasFocus, int row, int column) {
-		if (isSelected) {
-      setForeground(table.getSelectionForeground());
-      setBackground(table.getSelectionBackground());
+		JComponent component;
+		if (value instanceof Boolean) {
+			component = new JCheckBox();
+			JCheckBox check = (JCheckBox) component;
+			check.setHorizontalAlignment(JCheckBox.CENTER);
+			check.setSelected(((value != null) && ((Boolean) value).booleanValue()));
 		} else {
-			setForeground(table.getForeground());
+			component = new JLabel(value != null ? value.toString() : "");
+		}
+		if (isSelected) {
+      component.setForeground(table.getSelectionForeground());
+      component.setBackground(table.getSelectionBackground());
+		} else {
+			component.setForeground(table.getForeground());
 			if ((bg != null) && (bg.length > 0)) {
-				setBackground(bg[row % bg.length]);
+				component.setBackground(bg[row % bg.length]);
 			} else {
-				setBackground(table.getBackground());
+				component.setBackground(table.getBackground());
 			}
 		}
-		setSelected(((value != null) && ((Boolean) value).booleanValue()));
-		setOpaque(true);
-		return this;
+		component.setOpaque(true);
+		return component;
 	}
 	
 }

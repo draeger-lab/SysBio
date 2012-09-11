@@ -82,6 +82,7 @@ import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.SystemBrowser;
 import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.gui.table.renderer.ColoredBooleanRenderer;
 import de.zbit.sbml.io.SBOTermFormatter;
 import de.zbit.util.StringUtil;
 
@@ -203,7 +204,8 @@ public class SBasePanel extends JPanel implements EquationComponent {
   	}
   	if (sbase instanceof QuantityWithUnit) {
   		addProperties((QuantityWithUnit) sbase);
-  	} else if (sbase instanceof SBaseWithDerivedUnit) {
+  	} else if ((sbase instanceof SBaseWithDerivedUnit) && !(sbase instanceof Reaction)) {
+  		// We exclude reactions because the information would be displayed twice in case that a kinetic law is set.
   		addProperties((SBaseWithDerivedUnit) sbase);
   	}
   	if (sbase instanceof Variable) {
@@ -317,12 +319,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				preview.add(this.renderer.renderEquation(laTeXpreview.toString()),
 					BorderLayout.CENTER);
 				preview.setBackground(Color.WHITE);
-				preview.setBorder(BorderFactory.createLoweredBevelBorder());
 				Dimension d = new Dimension(preferedWidth, 120);
 				JScrollPane scroll = new JScrollPane(preview);
 				scroll.setPreferredSize(new Dimension((int) d.getWidth() + 10,
 					(int) d.getHeight() + 10));
-				lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
+				lh.add(scroll, 1, ++row, 3, 1, 1d, 0d);
 				lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 			}
 			if (mc instanceof Assignment) {
@@ -401,6 +402,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		table.setPreferredScrollableViewportSize(new Dimension(200, table
 				.getRowCount()
 				* table.getRowHeight()));
+		for (int i = 0; i < table.getModel().getColumnCount(); i++) {
+			table.setDefaultRenderer(table.getModel().getColumnClass(i), new ColoredBooleanRenderer());
+		}
 		JScrollPane scroll = new JScrollPane(table);
 		Dimension dim = table.getPreferredScrollableViewportSize();
 		scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
@@ -506,6 +510,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				.getRowCount() + 1)
 				* table.getRowHeight()));
 		table.setEnabled(editable);
+		for (int i = 0; i < table.getModel().getColumnCount(); i++) {
+			table.setDefaultRenderer(table.getModel().getColumnClass(i), new ColoredBooleanRenderer());
+		}
 		JScrollPane scroll = new JScrollPane(table);
 		Dimension dim = table.getPreferredScrollableViewportSize();
 		scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
@@ -553,6 +560,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			table.setPreferredScrollableViewportSize(new Dimension(200, (table
 					.getRowCount() + 1)
 					* table.getRowHeight()));
+			for (int j = 0; j < table.getModel().getColumnCount(); j++) {
+				table.setDefaultRenderer(table.getModel().getColumnClass(j), new ColoredBooleanRenderer());
+			}
 			JScrollPane scroll = new JScrollPane(table);
 			Dimension dim = table.getPreferredScrollableViewportSize();
 			scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
@@ -565,11 +575,14 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				addLabeledComponent("Model creation", tf);
 			}
 			Vector<Date> modification = new Vector<Date>();
-			if (hist.isSetModifiedDate())
+			if (hist.isSetModifiedDate()) {
 				modification.add(hist.getModifiedDate());
-			for (i = 0; i < hist.getModifiedDateCount(); i++)
-				if (!modification.contains(hist.getModifiedDate(i)))
+			}
+			for (i = 0; i < hist.getModifiedDateCount(); i++) {
+				if (!modification.contains(hist.getModifiedDate(i))) {
 					modification.add(hist.getModifiedDate(i));
+				}
+			}
 			if (modification.size() > 0) {
 				lh.add(new JLabel("Modification: "), 1, ++row, 1, 1, 0d, 0d);
 				JList l = new JList(modification);
@@ -583,33 +596,39 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			}
 		}
 		if (sbase.isSetNotes() || editable) {
-			lh.add(new JLabel("Notes: "), 1, ++row, 1, 1, 0d, 0d);
 			String text = sbase.getNotesString();
 			if (text.startsWith("<notes") && text.endsWith("notes>")) {
 				text = text.substring(sbase.getNotesString().indexOf('>') + 1,
 						sbase.getNotesString().lastIndexOf('/') - 1);
 			}
 			text = text.trim().replace("/>", ">");
-			if (!text.startsWith("<body") && !text.endsWith("</body>"))
+			if (!text.startsWith("<body") && !text.endsWith("</body>")) {
 				text = "<body>" + text + "</body>";
+			}
 			JEditorPane notesArea = new JEditorPane("text/html",
 					"<html><head></head>" + text + "</html>");
+			System.out.println(notesArea.getText());
 			notesArea.setEditable(editable);
 			notesArea.addHyperlinkListener(new SystemBrowser());
-			notesArea.setMaximumSize(new Dimension(preferedWidth, 200));
+//			notesArea.setMaximumSize(new Dimension(preferedWidth, 200));
 			notesArea.setDoubleBuffered(true);
-			notesArea.setBorder(BorderFactory.createLoweredBevelBorder());
-			JScrollPane scroll = new JScrollPane(notesArea);
-			scroll.setMaximumSize(notesArea.getMaximumSize());
+//			notesArea.setBorder(BorderFactory.createLoweredBevelBorder());
+			JScrollPane editorScrollPane = new JScrollPane(notesArea);
+			//scroll.setMaximumSize(notesArea.getMaximumSize());
 			// We NEED to set a PreferredSize on the scroll. Else, Long description strings
 			// are printed on one large line without a line break!
 			// Setting a maximum size has (unfortunately) no influence on this behaviour
-			scroll.setPreferredSize(new Dimension(preferedWidth, 500));
-			lh.add(scroll, 3, row, 1, 1, 1d, 1d);
+//			scroll.setPreferredSize(new Dimension(preferedWidth, 500));
+			editorScrollPane.setPreferredSize(new Dimension(250, 145));
+      editorScrollPane.setMinimumSize(new Dimension(10, 10));
+			JPanel notesPanel = new JPanel();
+			notesPanel.setBorder(BorderFactory.createTitledBorder(" Notes "));
+			LayoutHelper helper = new LayoutHelper(notesPanel);
+			helper.add(editorScrollPane);
+			lh.add(notesPanel, 1, row, 3, 1, 1d, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		if (sbase.getCVTermCount() > 0) {
-			lh.add(new JLabel("MIRIAM annotation: "), 1, ++row, 1, 1, 0d, 0d);
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><body>");
 			if (sbase.getCVTermCount() > 1) {
@@ -661,10 +680,14 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			l.setBackground(Color.WHITE);
 			Dimension dim = new Dimension(preferedWidth, 125);
 			l.setMaximumSize(dim);
-			JScrollPane scroll = new JScrollPane(l);
-			scroll.setMaximumSize(dim);
-			scroll.setBorder(BorderFactory.createLoweredBevelBorder());
-			lh.add(scroll, 3, row, 1, 1, 1d, 1d);
+			JScrollPane editorScrollPane = new JScrollPane(l);
+			editorScrollPane.setPreferredSize(new Dimension(250, 145));
+      editorScrollPane.setMinimumSize(new Dimension(10, 10));
+			JPanel miriamPanel = new JPanel();
+			miriamPanel.setBorder(BorderFactory.createTitledBorder(" Minimal Information Required In the Annotation of Models (MIRIAM) "));
+			LayoutHelper helper = new LayoutHelper(miriamPanel);
+			helper.add(editorScrollPane);
+			lh.add(helper.getContainer(), 1, row, 3, 1, 1d, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		if (sbase.isSetSBOTerm()) {
@@ -675,20 +698,22 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			int columns = 35, innerRow = -1;
 			SBO.Term term = SBO.getTerm(sbase.getSBOTerm());
 			helper.add(new JLabel("Name: "), 1, ++innerRow, 1, 1, 0d, 0d);
-			JTextArea nameField = new JTextArea(term.getName(), 1, columns);
+			JTextArea nameField = new JTextArea(term.getName(), 2, columns);
 			nameField.setEditable(editable);
 			nameField.setCaretPosition(0);
+			nameField.setLineWrap(true);
 			nameField.setWrapStyleWord(true);
 			helper.add(new JScrollPane(nameField), 3, innerRow, 1, 1, 1d, 0d);
 			helper.add(new JPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
 			
 			helper.add(new JLabel("Definition: "), 1, ++innerRow, 1, 1, 0d, 0d);
-			JTextArea sboTermField = new JTextArea(1, columns);
+			JTextArea sboTermField = new JTextArea(5, columns);
 			sboTermField.setCaretPosition(0);
+			sboTermField.setLineWrap(true);
 			sboTermField.setWrapStyleWord(true);
 			sboTermField.setEditable(editable);
 			try {
-				sboTermField.setText(SBOTermFormatter.getShortDefinition(SBO.getTerm(sbase.getSBOTerm())));
+				sboTermField.setText(SBOTermFormatter.getShortDefinition(term));
 			} catch (Exception exc) {
 				// NoSuchElementException if ontology file is outdated
 				logger.log(Level.WARNING, "Could not get SBO identifier.", exc);
@@ -696,7 +721,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			helper.add(new JScrollPane(sboTermField), 3, innerRow, 1, 1, 1d, 0d);
 			helper.add(new JPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
 			
-			lh.add(helper.getContainer(), 1, ++row, 3, 1, 0d, 1d);
+			lh.add(helper.getContainer(), 1, ++row, 3, 1, 0d, 0d);
 		}
 	}
 

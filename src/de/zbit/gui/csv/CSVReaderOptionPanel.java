@@ -586,7 +586,7 @@ public class CSVReaderOptionPanel extends JPanel {
    * those, a {@link DocumentListener} should be added to
    * {@link JTextComponent#getDocument()}.
    * @param editorcomp
-   * @param fireOnKeyRelease an additional actionlistener (may be <code>NULL</code>)
+   * @param fireOnKeyRelease an additional actionlistener (may be {@code null})
    * that will be fired upon key release.
    */
   public static void createCharacterBox(final JTextComponent editorcomp, final ActionListener fireOnKeyRelease) {

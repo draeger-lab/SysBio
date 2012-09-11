@@ -277,7 +277,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 	/**
 	 * Checks if there is an update for a program available.
 	 * 
-	 * @return <code>true</code> if an update is available <code>false</code>
+	 * @return {@code true} if an update is available {@code false}
 	 *         otherwise.
 	 * @throws IOException
 	 *         If the {@link URL} to the update is incorrect or if there is

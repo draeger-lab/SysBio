@@ -71,7 +71,7 @@ public class NimblegenProbeID2EnsemblIDMapper extends AbstractMapper<String, Str
   /**
    * 
    * @param species only mapping data for this species is read. Currently mouse or rat is supported.
-   * @param progress any {@link AbstractProgressBar} or <code>NULL</code>.
+   * @param progress any {@link AbstractProgressBar} or {@code null}.
    * @param readExtendedFile see {@link #extended}!
    * @param onlyTakeUniqueMappings see {@link #onlyTakeUniqueMappings}!
    * @throws IOException

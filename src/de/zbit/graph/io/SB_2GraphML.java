@@ -129,7 +129,7 @@ public abstract class SB_2GraphML <T> {
   
   
   /**
-   * @param <code>TRUE</code> if every enzyme should be splitted for
+   * @param {@code true} if every enzyme should be splitted for
    * every reaction.
    */
   public void setSplitEnzymesToOnlyOccurOnceInAnyReaction(
@@ -250,7 +250,7 @@ public abstract class SB_2GraphML <T> {
   }
   
   /**
-   * Shoudl return <code>TRUE</code> if and only if any layout information
+   * Shoudl return {@code true} if and only if any layout information
    * of at least one node was available, during the translation (should one
    * be called AFTER a document is translated).
    * @return

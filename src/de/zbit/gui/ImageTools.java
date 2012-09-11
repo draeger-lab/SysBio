@@ -231,7 +231,7 @@ public static BufferedImage brightenImage(BufferedImage image, float percent) {
 	/**
    * 
    * @param listOfImages
-   * @param obs allows <code>null</code>
+   * @param obs allows {@code null}
    * @return
    */
 	public static Image getImageOfHighestResolution(List<Image> listOfImages, ImageObserver obs) {

@@ -740,7 +740,7 @@ public class Pathway {
    * Returns the corresponding {@link Entry} for a
    * {@link ReactionComponent}.
    * @param rc
-   * @return {@link Entry} or <code>NULL</code> of none found.
+   * @return {@link Entry} or {@code null} of none found.
    */
   public Entry getEntryForReactionComponent(ReactionComponent rc) {
     return getEntryForReactionComponent(rc, false);
@@ -885,7 +885,7 @@ public class Pathway {
   
   /**
    * 
-   * @return <code>TRUE</code> if we have some {@link #identifiers}.
+   * @return {@code true} if we have some {@link #identifiers}.
    */
   public boolean isSetDatabaseIdentifiers() {
     return identifiers!=null && identifiers.size()>0;

@@ -163,7 +163,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    *        ChangeListener (optional)
    * @param keyListener
    *        KeyListener (optional)
-   * @return JComponent or <code>NULL</code> if {@link Option#getRequiredType()}
+   * @return JComponent or {@code null} if {@link Option#getRequiredType()}
    *         is unknown.
    */
   @SuppressWarnings("unchecked")
@@ -1230,7 +1230,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * 
    * @param listener
    *        the element to be removed.
-   * @return <code>true</code> if the list contained the specified element.
+   * @return {@code true} if the list contained the specified element.
    */
   public boolean removeChangeListener(ChangeListener listener) {
     return changeListeners.remove(listener);
@@ -1242,7 +1242,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 	 * 
 	 * @param listener
 	 *        the element to be removed.
-	 * @return <code>true</code> if the list contained the specified element.
+	 * @return {@code true} if the list contained the specified element.
 	 */
   public boolean removeItemListener(ItemListener listener) {
     return itemListeners.remove(listener);

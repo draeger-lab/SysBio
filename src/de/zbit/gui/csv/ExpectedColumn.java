@@ -204,7 +204,7 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
    * please use {@link #getInitialSuggestion(CSVReader)}.
    * @param r
    * @return int array matching indices to {@link #type}, containing initial
-   * suggested column number. Or <code>NULL</code> if something went wrong.
+   * suggested column number. Or {@code null} if something went wrong.
    * @see #getInitialSuggestion(CSVReader)
    * @see #hasRegexPatternForEachType()
    */
@@ -374,7 +374,7 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
     return originalName.toString().compareTo(o.getOriginalName().toString());
   }
   /**
-   * @return <code>TRUE</code> if this {@link ExpectedColumn} has multiple {@link #type}s
+   * @return {@code true} if this {@link ExpectedColumn} has multiple {@link #type}s
    * and exactly the same numbers of {@link #regExPatternForInitialSuggestion}.
    */
   public boolean hasRegexPatternForEachType() {
@@ -401,7 +401,7 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
    * {@link #regExPatternForInitialSuggestion}.
    * @param anyContentLine any line, representing content of the CSV file.
    * The regEX will be checked agains this line.
-   * @return <code>FALSE</code> if any only if we have a regEx pattern,
+   * @return {@code false} if any only if we have a regEx pattern,
    * we have assigned columns, and the given regEX matches the
    * assigned column (in <code>anyContentLine</code>).
    */

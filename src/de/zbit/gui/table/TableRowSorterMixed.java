@@ -55,7 +55,7 @@ public class TableRowSorterMixed<M extends TableModel> extends TableRowSorter<M>
    * as the underlying <code>TableModel</code>.
    *
    * @param model the underlying <code>TableModel</code> to use,
-   *        <code>null</code> is treated as an empty model
+   *        {@code null} is treated as an empty model
    */
   public TableRowSorterMixed(M model) {
     super(model);

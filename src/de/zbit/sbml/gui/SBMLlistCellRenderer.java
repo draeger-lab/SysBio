@@ -16,6 +16,7 @@
  */
 package de.zbit.sbml.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.DefaultListCellRenderer;
@@ -26,6 +27,8 @@ import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
+
+import de.zbit.gui.ColorPalette;
 
 /**
  * A {@link ListCellRenderer} for SBML {@link ListOf}-Objects.
@@ -73,6 +76,8 @@ public class SBMLlistCellRenderer extends DefaultListCellRenderer {
 			NamedSBase nsb = (NamedSBase) value;
 			setText(nsb.isSetName() ? nsb.getName() : nsb.getId());
 		}
+		Color bg[] = new Color[] {ColorPalette.lightBlue, Color.WHITE}; 
+		setBackground(bg[index % bg.length]);
 		return this;
 	}
 	
