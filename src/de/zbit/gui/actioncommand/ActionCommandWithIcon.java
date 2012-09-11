@@ -26,7 +26,7 @@ public interface ActionCommandWithIcon extends ActionCommand {
   
   /**
    * Provides an {@link Icon} for this command.
-   * <p>Please return <code>NULL</code> if not icon is available.
+   * <p>Please return {@code null} if not icon is available.
    * @return
    */
   public Icon getIcon();

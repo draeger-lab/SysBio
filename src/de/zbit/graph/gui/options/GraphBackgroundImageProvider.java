@@ -46,7 +46,7 @@ public interface GraphBackgroundImageProvider {
    * @param pane
    * @param translator the last used translator, which also contains the
    * last translated pathway. You can ignore this if you don't need it.
-   * @param waitUntilComplete if this is <code>TRUE</code>, this method should
+   * @param waitUntilComplete if this is {@code true}, this method should
    * not return until the background image is completely set up!
    * @throws MalformedURLException
    */

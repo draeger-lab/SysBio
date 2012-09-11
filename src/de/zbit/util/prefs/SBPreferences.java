@@ -900,10 +900,10 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param option
 	 *        The option which is to be checked and whose associated value is to
 	 *        be checked.
-	 * @return <code>true</code> if this instance of {@link SBPreferences} contains the given
+	 * @return {@code true} if this instance of {@link SBPreferences} contains the given
 	 *         option and if the value belonging to this option is valid with
 	 *         respect to given constraints stored in a {@link Range} object
-	 *         associated to the {@link Option}. Returns <code>false</code> if this option is
+	 *         associated to the {@link Option}. Returns {@code false} if this option is
 	 *         not contained as a key in this {@link SBPreferences}.
 	 * @throws BackingStoreException
 	 *         If this object contains the given option but its associated value
@@ -1082,7 +1082,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @param key
 	 *        The search key.
-	 * @return <code>null</code> if no value exists associated with the given key,
+	 * @return {@code null} if no value exists associated with the given key,
 	 *         or an instance of {@link Class}.
 	 * @throws ClassNotFoundException
 	 *         if the value associated with the given key cannot successfully be
@@ -1122,7 +1122,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @param key
 	 *        The search key.
-	 * @return <code>null</code> if no value exists associated with the given key,
+	 * @return {@code null} if no value exists associated with the given key,
 	 *         or an instance of {@link Class}.
 	 * @throws ClassNotFoundException
 	 *         if the value associated with the given key cannot successfully be

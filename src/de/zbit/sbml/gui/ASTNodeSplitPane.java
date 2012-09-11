@@ -116,9 +116,9 @@ public class ASTNodeSplitPane extends JSplitPane implements EquationComponent, T
         setRightComponent(createRightComponent(ast));
         UnitDefinition ud = ast.deriveUnit();
 				if (ud != null) {
-					System.out.println(UnitDefinition.printUnits(ud, true));
+					logger.info(UnitDefinition.printUnits(ud, true));
 				} else {
-					System.out.println("null");
+					logger.warning("null");
 				}
       } catch (Exception exc) {
         GUITools.showErrorMessage(this, exc);

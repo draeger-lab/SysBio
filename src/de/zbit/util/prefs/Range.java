@@ -941,8 +941,8 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
   
 	/**
 	 * Returns a range specification for boolean values. This can be used to
-	 * specifiy that a boolean option expects an argument that is either <code>true</code> or
-	 * <code>false</code>.
+	 * specifiy that a boolean option expects an argument that is either {@code true} or
+	 * {@code false}.
 	 * 
 	 * @return a range specification for boolean values
 	 */

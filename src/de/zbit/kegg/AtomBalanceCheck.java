@@ -172,7 +172,7 @@ public final class AtomBalanceCheck {
     }
 
     /**
-     * @return <code>TRUE</code> if this equation is not balanced, i.e.
+     * @return {@code true} if this equation is not balanced, i.e.
      * has some missing atoms.
      */
     public boolean hasDefects() {

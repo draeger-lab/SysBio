@@ -36,7 +36,7 @@ public interface BaseFrameTab {
   
 	/**
 	 * Enable or disable the buttons of the given {@link JMenuBar} The
-	 * {@link JToolBar} might be <code>null</code> if your application does not
+	 * {@link JToolBar} might be {@code null} if your application does not
 	 * use a {@link JToolBar}.
 	 * 
 	 * @param menuBar

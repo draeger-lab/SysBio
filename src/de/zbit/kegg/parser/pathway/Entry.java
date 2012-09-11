@@ -687,7 +687,7 @@ public class Entry {
    * {@link #getType()} and {@link EntryExtended#getGeneType()}) and
    * returns a real string what this entity really is.
    * @return one of "gene", "protein", "dna", "rna", "small_molecule",
-   * "complex" (of proteins), "pathway" (a pathway map), or <code>NULL</code>.
+   * "complex" (of proteins), "pathway" (a pathway map), or {@code null}.
    */
   public String getRealType() {
     if (this instanceof EntryExtended &&

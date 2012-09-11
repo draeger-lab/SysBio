@@ -177,7 +177,7 @@ public class EntryExtended extends Entry {
   
   /**
    * 
-   * @return <code>TRUE</code> if we have some {@link #identifiers}.
+   * @return {@code true} if we have some {@link #identifiers}.
    */
   public boolean isSetDatabaseIdentifiers() {
     return identifiers!=null && identifiers.size()>0;

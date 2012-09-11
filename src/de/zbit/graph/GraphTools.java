@@ -107,7 +107,7 @@ public class GraphTools {
   /**
    * There is an optional extension available for yFiles
    * that allows to write graphs as SVG files. 
-   * @return <code>TRUE</code> if the extension is available.
+   * @return {@code true} if the extension is available.
    */
   @SuppressWarnings("unchecked")
   public static boolean isSVGextensionInstalled() {

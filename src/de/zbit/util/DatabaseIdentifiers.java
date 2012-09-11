@@ -594,7 +594,7 @@ public class DatabaseIdentifiers {
    * Get a MIRIAM URN for a specific database and identifier.
    * @param db
    * @param identifier
-   * @return correctly formatted miriam urn or <code>NULL</code>
+   * @return correctly formatted miriam urn or {@code null}
    * if this failed.
    */
   public static String getMiriamURN(IdentifierDatabases db, String identifier) {
@@ -626,7 +626,7 @@ public class DatabaseIdentifiers {
    * Get a MIRIAM URI for a specific database and identifier.
    * @param db
    * @param identifier
-   * @return correctly formatted miriam uri or <code>NULL</code>
+   * @return correctly formatted miriam uri or {@code null}
    * if this failed.
    */
   public static String getMiriamURI(IdentifierDatabases db, String identifier) {
@@ -653,7 +653,7 @@ public class DatabaseIdentifiers {
    * corresponding database.
    * @param database
    * @param id
-   * @return <code>TRUE</code> if the <code>id</code> matches the regular
+   * @return {@code true} if the <code>id</code> matches the regular
    * expression of the <code>database</code>.
    */
   public static boolean checkID(IdentifierDatabases database, String id) {

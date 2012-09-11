@@ -141,7 +141,7 @@ public class MultipleTableView<T extends TableModel> extends JPanel implements I
 	/**
 	 * Returns the table that has been selected by the user.
 	 * 
-	 * @return <code>null</code> if no table is selected or this view doesn't
+	 * @return {@code null} if no table is selected or this view doesn't
 	 *         contain any tables, the currently selected table otherwise.
 	 */
 	public T getSelectedTable() {

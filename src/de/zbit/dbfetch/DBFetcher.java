@@ -462,8 +462,8 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
    * 
    * @param id the ID to check
    * @param toCheck the string to check for occurence of the ID
-   * @return <code>true</code>, if the ID can be matched to the string,
-   *         otherwise <code>false</code>
+   * @return {@code true}, if the ID can be matched to the string,
+   *         otherwise {@code false}
    */
   public boolean matchIDtoInfo(String id, String toCheck) {
     /*

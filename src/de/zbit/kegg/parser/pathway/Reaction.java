@@ -325,8 +325,8 @@ public class Reaction {
   /**
    * Returns the reactant, but only if it is a substrate or product!
    * @param reactantKeggID the name of the reactant, e.g. "cpd:C05922".
-   * @param isSubstrate <code>TRUE</code> to only return the
-   * reactant if it occurs as substrate. <code>FALSE</code> to only return the
+   * @param isSubstrate {@code true} to only return the
+   * reactant if it occurs as substrate. {@code false} to only return the
    * reactant if it occurs as product.  
    * @return
    * @see #getReactant(String) the same method without boolean attribute
@@ -422,7 +422,7 @@ public class Reaction {
   
   /**
    * 
-   * @return <code>TRUE</code> if we have some {@link #identifiers}.
+   * @return {@code true} if we have some {@link #identifiers}.
    */
   public boolean isSetDatabaseIdentifiers() {
     return identifiers!=null && identifiers.size()>0;

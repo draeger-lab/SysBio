@@ -23,7 +23,6 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.sbml.jsbml.SimpleSpeciesReference;
-import org.sbml.jsbml.Species;
 
 /**
  * @author Sebastian Nagel
@@ -33,9 +32,9 @@ import org.sbml.jsbml.Species;
 public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 
 	/**
-	 * 
+	 * Generated serial version identifier
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -2809335076156082540L;
 
 	/**
 	 * 
@@ -56,11 +55,6 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 				setFont(getFont().deriveFont(Font.BOLD));
 			} else {
 				setFont(getFont().deriveFont(Font.PLAIN));
-			}
-			if (node.getUserObject() instanceof Species) {
-				if (this.getText().toLowerCase().startsWith("sa")) {
-					System.out.println(this.getText()+ ": " + node.isVisible());
-				}
 			}
 			if (node.getUserObject() instanceof SimpleSpeciesReference){
 			  if (((SimpleSpeciesReference) node.getUserObject()).isSetSpeciesInstance() && 

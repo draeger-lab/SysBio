@@ -52,8 +52,8 @@ public class PartialElementsMarkers {
    * {@link y.view.Graph2D#isSelected(y.base.Edge)} and
    * {@link y.view.Graph2D#isSelected(y.base.Node)}) of nodes and edges.
    * @param graph the graph for which selection markers are created.
-   * @return <code>true</code> if the specified graph has selected nodes
-   * and/or selected edges and <code>false</code> otherwise.
+   * @return {@code true} if the specified graph has selected nodes
+   * and/or selected edges and {@code false} otherwise.
    */
   boolean markBySelection(final Graph2D graph) {
     //store the old data provider
@@ -74,8 +74,8 @@ public class PartialElementsMarkers {
    * the specified partial edge color and a node if its state color equals
    * the specified partial node color.
    * @param graph the graph for which selection markers are created.
-   * @return <code>true</code> if the specified graph has nodes and/or edges
-   * with the appropriate state colors and <code>false</code> otherwise.
+   * @return {@code true} if the specified graph has nodes and/or edges
+   * with the appropriate state colors and {@code false} otherwise.
    */
   boolean markByColor(final Graph2D graph, final Color c) {
     //store the old data provider

@@ -479,7 +479,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
    * the message is displayed with an error icon.
    * 
    * @param enableNext the availability of the next/finish button
-   * @param message the message to be displayed (or <code>null</code> if there
+   * @param message the message to be displayed (or {@code null} if there
    *                is no warning or error)
    */
   public void setNextButtonAndWarningMessage(boolean enableNext, String message) {

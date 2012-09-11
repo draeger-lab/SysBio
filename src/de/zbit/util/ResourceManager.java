@@ -57,7 +57,7 @@ public class ResourceManager {
 	 * @see #getBundle(String, Locale)
 	 * @exception NullPointerException
 	 *            if <code>baseName</code>, <code>locales</code> or
-	 *            <code>control</code> is <code>null</code>
+	 *            <code>control</code> is {@code null}
 	 * @exception MissingResourceException
 	 *            if no resource bundle for the specified base name in any of the
 	 *            {@link Locale}s can be found.
@@ -83,7 +83,7 @@ public class ResourceManager {
 	 * @return
 	 * @exception NullPointerException
 	 *            if <code>baseName</code>, <code>locales</code> or
-	 *            <code>control</code> is <code>null</code>
+	 *            <code>control</code> is {@code null}
 	 * @exception MissingResourceException
 	 *            if no resource bundle for the specified base name in any of the
 	 *            {@link Locale}s can be found.
@@ -123,7 +123,7 @@ public class ResourceManager {
 	 * @return the desired {@link ResourceBundle}
 	 * @exception NullPointerException
 	 *            if <code>baseName</code>, <code>locales</code> or
-	 *            <code>control</code> is <code>null</code>
+	 *            <code>control</code> is {@code null}
 	 * @exception MissingResourceException
 	 *            if no resource bundle for the specified base name in any of the
 	 *            {@link Locale}s can be found.

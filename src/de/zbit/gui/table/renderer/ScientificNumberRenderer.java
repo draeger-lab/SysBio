@@ -70,7 +70,7 @@ public class ScientificNumberRenderer extends DefaultTableCellRenderer {
    * 
    * @param value instance of {@link Number}
    * @param formatter scientific number formatter to use.
-   * Set to <code>NULL</code> to automatically initialize a formatter.
+   * Set to {@code null} to automatically initialize a formatter.
    * @param boundary defines threshold when to use the scientific formatter.
    * Set to 0 to always use it. Recommended value: 100.
    * @return nice number string.

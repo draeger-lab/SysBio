@@ -347,11 +347,11 @@ public class SBFileFilter extends GeneralFileFilter {
    * {@link #MAX_CHARACTERS_TO_PARSE} characters. If a line pattern for the given expected
    * {@link FileType} is available (see {@link FileType#getLinePattern()}), it
    * then tries to match the String read so far to the pattern. In case it finds the
-   * expected pattern, this method will return <code>true</code>.
+   * expected pattern, this method will return {@code true}.
    * 
    * @param file
    * @param type
-   * @return <code>true</code> if the given {@link File} matches the line
+   * @return {@code true} if the given {@link File} matches the line
    *         pattern of the given {@link FileType}
    */
   private static boolean checkFileHead(File file, FileType type) {
@@ -1052,10 +1052,10 @@ public class SBFileFilter extends GeneralFileFilter {
   /**
    * 
    * @param inTheMiddleOfASentence
-   *        if <code>true</code>, will return a {@link String} that can be used
+   *        if {@code true}, will return a {@link String} that can be used
    *        "in the middle of a sentence". Else, a {@link String} that stands at
    *        the start of a sentence or by itself will be returned. E.g., if
-   *        <code>true</code>, "directories only" if false "Directories only".
+   *        {@code true}, "directories only" if false "Directories only".
    * @return
    * @see #getDescription()
    */

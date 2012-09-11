@@ -620,7 +620,7 @@ public class MathUtils {
   /**
    * @param values any iterable number collection.
    * @return minimum value in <code>values</code> or {@link Double#NaN}
-   * if <code>values</code> is <code>null</code> or contains no numbers.
+   * if <code>values</code> is {@code null} or contains no numbers.
    */
   public static <T extends Number> double min(Iterable<T> values) {
     if (values == null) return Double.NaN;
@@ -636,7 +636,7 @@ public class MathUtils {
   /**
    * @param values any iterable number collection.
    * @return maximum value in <code>values</code> or {@link Double#NaN}
-   * if <code>values</code> is <code>null</code> or contains no numbers.
+   * if <code>values</code> is {@code null} or contains no numbers.
    */
   public static <T extends Number> double max(Iterable<T> values) {
     if (values == null) return Double.NaN;

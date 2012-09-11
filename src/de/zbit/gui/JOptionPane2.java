@@ -43,7 +43,7 @@ public class JOptionPane2 extends JOptionPane {
    * <p>
    * If <code>optionType</code> is <code>YES_NO_OPTION</code>,
    * or <code>YES_NO_CANCEL_OPTION</code>
-   * and the <code>options</code> parameter is <code>null</code>,
+   * and the <code>options</code> parameter is {@code null},
    * then the options are
    * supplied by the look and feel.
    * <p>
@@ -52,7 +52,7 @@ public class JOptionPane2 extends JOptionPane {
    *
    * @param parentComponent determines the <code>Frame</code>
    *                  in which the dialog is displayed;  if
-   *                  <code>null</code>, or if the
+   *                  {@code null}, or if the
    *                  <code>parentComponent</code> has no
    *                  <code>Frame</code>, a
    *                  default <code>Frame</code> is used
@@ -76,18 +76,18 @@ public class JOptionPane2 extends JOptionPane {
    *                  are rendered properly; non-<code>String</code>
    *                  objects are
    *                  rendered using their <code>toString</code> methods;
-   *                  if this parameter is <code>null</code>,
+   *                  if this parameter is {@code null},
    *                  the options are determined by the Look and Feel
    * @param initialValue the object that represents the default selection
    *                  for the dialog; only meaningful if <code>options</code>
-   *                  is used; can be <code>null</code>
+   *                  is used; can be {@code null}
    * @param resizable decides whether or not the dialog should be resizable. 
    * @return an integer indicating the option chosen by the user,
    *                  or <code>CLOSED_OPTION</code> if the user closed
    *                  the dialog
    * @exception HeadlessException if
    *   <code>GraphicsEnvironment.isHeadless</code> returns
-   *   <code>true</code>
+   *   {@code true}
    * @see java.awt.GraphicsEnvironment#isHeadless
    */
   public static int showOptionDialog(Component parentComponent,

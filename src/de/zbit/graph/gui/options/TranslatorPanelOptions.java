@@ -35,12 +35,12 @@ import de.zbit.util.prefs.Range;
 public abstract interface TranslatorPanelOptions extends KeyProvider{
   
   /**
-   * A range that just contains <code>FALSE</code>.
+   * A range that just contains {@code false}.
    */
   static Range<Boolean> FALSE_RANGE = new Range<Boolean>(Boolean.class, Boolean.FALSE);
   
   /**
-   * A range that just contains <code>TRUE</code>.
+   * A range that just contains {@code true}.
    */
   static Range<Boolean> TRUE_RANGE = new Range<Boolean>(Boolean.class, Boolean.TRUE);
   

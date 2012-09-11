@@ -77,7 +77,7 @@ public class FileReadProgress {
    * Creates a new FileReadPrograss object for the given file.
    * 
    * @param file the file to be read from
-   * @param printProgressInSameLine if <code>true</code>, the output will always be in the same line
+   * @param printProgressInSameLine if {@code true}, the output will always be in the same line
    */
   public FileReadProgress(File file, boolean printProgressInSameLine) {
     this(file);
@@ -123,7 +123,7 @@ public class FileReadProgress {
    * be written in the same line (default) or a new line for each percentage.
    * 
    * @param filepath  the path of the file
-   * @param printProgessInSameLine if <code>true</code>, the output will always be in the same line
+   * @param printProgessInSameLine if {@code true}, the output will always be in the same line
    */
   public FileReadProgress(String filepath, boolean printProgressInSameLine) {
     this(filepath);

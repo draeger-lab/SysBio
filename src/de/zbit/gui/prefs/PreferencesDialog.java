@@ -109,7 +109,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	/**
 	 * 
 	 * @param provider
-	 * @return <code>true</code>, if and only if the user approved this dialog.
+	 * @return {@code true}, if and only if the user approved this dialog.
 	 */
 	public static final boolean showPreferencesDialog(Class<? extends KeyProvider>... provider) {
 		return showPreferencesDialog((Window) null, provider);
@@ -130,7 +130,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 *        A {@link PropertyChangeListener} that is notified about any changes
 	 *        in the user-preferences.
 	 * @param provider
-	 * @return <code>true</code>, if and only if the user approved this dialog.
+	 * @return {@code true}, if and only if the user approved this dialog.
 	 */
 	public static final boolean showPreferencesDialog(
 		List<PreferenceChangeListener> listeners, Class<? extends KeyProvider>... provider) {

@@ -589,7 +589,7 @@ public class Utils {
   /**
    * Performs the nasty comparison of two integers, for usage in CompareTo methods.
    * Performs Nullpointer checks, before performing the actual comparison and
-   * returns -1 if only one is <code>NULL</code>, 0 if both are <code>NULL</code>
+   * returns -1 if only one is {@code null}, 0 if both are {@code null}
    * and <pre>a-b</pre> if both are not null.
    * @param a
    * @param b
