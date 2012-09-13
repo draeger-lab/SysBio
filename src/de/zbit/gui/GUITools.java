@@ -1381,43 +1381,56 @@ public class GUITools {
   	
 		// 15 s for tooltips to be displayed
 		ToolTipManager.sharedInstance().setDismissDelay(15000);
-    try {	
-      UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
-      String osName = System.getProperty("os.name");
-      if (osName.equals("Linux") || osName.equals("FreeBSD")) {
-        UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-        // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-      } else if (isMacOSX()) {
-      	String osVersion = System.getProperty("os.version");
-      	if (osVersion.startsWith("10.4") || osVersion.startsWith("10.5") || osVersion.startsWith("10.6")) {
-      		UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
-      	} else {
-      		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());	
-      	}
-      } else if (osName.contains("Windows")) {
-        UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-      } else {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      }
-    } catch (Throwable e) {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Throwable e1) {
-	      // If Nimbus is not available, you can set the GUI to another look
-	      // and feel.
-	      // Native look and feel for Windows, MacOS X. GTK look and
-	      // feel for Linux, FreeBSD
-				try {
-					for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-						if ("Nimbus".equals(info.getName())) {
-							UIManager.setLookAndFeel(info.getClassName());
-							break;
-						}
-					}
-				} catch (Throwable exc) {
-					showErrorMessage(null, exc.getLocalizedMessage());
-				}
-			}
+		
+		// The user may have specified a custom LaF on the command line
+		// with "-Dswing.defaultlaf=XXX".
+		String def = System.getProperty("swing.defaultlaf");
+		Class<?> cl = null;
+		try {
+		  cl = Class.forName(def);
+		} catch (Throwable t) {}
+		
+		// Only if the user specified either no LaF or an invalid one, try to
+		// load an operating system dependent nice LaF.
+		if (def==null || cl==null) {
+		  try {
+		    UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
+		    String osName = System.getProperty("os.name");
+		    if (osName.equals("Linux") || osName.equals("FreeBSD")) {
+		      UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+		      // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+		    } else if (isMacOSX()) {
+		      String osVersion = System.getProperty("os.version");
+		      if (osVersion.startsWith("10.4") || osVersion.startsWith("10.5") || osVersion.startsWith("10.6")) {
+		        UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+		      } else {
+		        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());	
+		      }
+		    } else if (osName.contains("Windows")) {
+		      UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		    } else {
+		      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		    }
+		  } catch (Throwable e) {
+		    try {
+		      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		    } catch (Throwable e1) {
+		      // If Nimbus is not available, you can set the GUI to another look
+		      // and feel.
+		      // Native look and feel for Windows, MacOS X. GTK look and
+		      // feel for Linux, FreeBSD
+		      try {
+		        for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+		          if ("Nimbus".equals(info.getName())) {
+		            UIManager.setLookAndFeel(info.getClassName());
+		            break;
+		          }
+		        }
+		      } catch (Throwable exc) {
+		        showErrorMessage(null, exc.getLocalizedMessage());
+		      }
+		    }
+		  }
 		}
   }
   
