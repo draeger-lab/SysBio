@@ -290,8 +290,19 @@ public class JTableFilter extends JPanel {
     // Match all rows and store matcheds rows in list.
     for (int i=0; i<table.getRowCount(); i++) {
       if (Thread.currentThread().isInterrupted()) return null;
+
+      
       if (!c1.equals("")) { // Any operator selected
         Object val = table.getValueAt(i, col1);
+        
+        // Some columns contain rows in the order "N/A", "0.1, "0.2",...
+        // then, initially f1 is a String, because the first row ("N/A")
+        // is a string. Hence, eventually cast to Number later on.
+        if (val!=null && !Number.class.isAssignableFrom(f1.getClass()) && 
+            Number.class.isAssignableFrom(val.getClass())) {
+          f1=Option.parseOrCast(val.getClass(), f1);
+        }
+        
         if (matchOperator(c1, val, f1)) { // 1st condition ok
           if (or || c2.equals("")) {
             ret.add(i);
@@ -306,7 +317,18 @@ public class JTableFilter extends JPanel {
         // Check 2nd condition
         boolean secondConditionOk = !c2.equals("");
         if (secondConditionOk) { // if anything selected
-          secondConditionOk = matchOperator(c2, table.getValueAt(i, col2), f2);
+          
+          Object val2 = table.getValueAt(i, col2);
+          
+          // Some columns contain rows in the order "N/A", "0.1, "0.2",...
+          // then, initially f1 is a String, because the first row ("N/A")
+          // is a string. Hence, eventually cast to Number later on.
+          if (val2!=null && !Number.class.isAssignableFrom(f2.getClass()) && 
+              Number.class.isAssignableFrom(val2.getClass())) {
+            f2=Option.parseOrCast(val2.getClass(), f2);
+          }
+          
+          secondConditionOk = matchOperator(c2, val2, f2);
           if (andNot) secondConditionOk = !secondConditionOk;
         }
         if (secondConditionOk) {
@@ -330,9 +352,9 @@ public class JTableFilter extends JPanel {
    * @return
    */
   public static String[] getOperators() {
-    // TODO: Sch�ner w�re ala excep "entspricht", "entspricht nicht",...
-    // erm�glicht auch "beginnt mit", etc.
-    // �nderungen hier unbedingt mit matchOperator() abgleichen!
+    // TODO: Schöner wäre ala excep "entspricht", "entspricht nicht",...
+    // ermöglicht auch "beginnt mit", etc.
+    // Änderungen hier unbedingt mit matchOperator() abgleichen!
     return new String[]{"","=", "!=", ">=","<=",">","<"
         , "|>=|","|<=|","|>|","|<|", regexString};
   }
@@ -349,7 +371,38 @@ public class JTableFilter extends JPanel {
     }
     
     // Comparables coming... ensure comparable from here on!
-    if (!(val1 instanceof Comparable)) {
+    boolean bothToString = false;
+    if (!(val1 instanceof Comparable) ||
+        !(val2 instanceof Comparable)) {
+      bothToString = true;
+    }
+    // Both must be the same comparable (if one is number, the
+    // other one can't be a string!)
+    if (val1 instanceof Number) {
+      if (!(val2 instanceof Number)) {
+        Object Nval2 = toNumber(val2);
+        if (Nval2==null) {
+          bothToString = true;
+        } else {
+          val2 = Nval2;
+        }
+      }
+    } else if (val2 instanceof Number) {
+      if (!(val1 instanceof Number)) {
+        Object Nval1 = toNumber(val1);
+        if (Nval1==null) {
+          bothToString = true;
+        } else {
+          val1 = Nval1;
+        }
+      }
+    }
+    if (!val1.getClass().isAssignableFrom(val2.getClass())) {
+      bothToString = true;
+    }
+    
+    // If classes are incompatible, make string comparisons.
+    if (bothToString) {
       val1=val1.toString();
       val2=val2.toString();
     }
@@ -370,10 +423,14 @@ public class JTableFilter extends JPanel {
     }
     
     // Absoluate values coming...
-    if (val1 instanceof Number) {
+    if (val1 instanceof Number || val2 instanceof Number) {
       // should always be true
-      val1 = Math.abs(((Number)val1).doubleValue());
-      val2 = Math.abs(((Number)val2).doubleValue());
+      val1 = toNumber(val1);
+      val2 = toNumber(val2);
+      if (val1==null || val2==null) {
+        // incompatible data types.
+        return false;
+      }
     }
 
     if (operator.equals("|>=|")) {
@@ -387,6 +444,29 @@ public class JTableFilter extends JPanel {
     }
 
     return false;
+  }
+
+  /**
+   * @param val1
+   * @return
+   */
+  private Object toNumber(Object val1) {
+    if (val1 instanceof Number) {
+      return ((Number) val1).doubleValue();
+    }
+    
+    try {
+      val1 = Math.abs(((Number)val1).doubleValue());
+    } catch (Exception e) {
+      try {
+        val1 = Double.parseDouble(val1.toString());
+      } catch (Exception e2) {
+        //e2.printStackTrace(); //Mostly 'empty string'
+        //return false;
+        val1 = null;
+      }
+    }
+    return val1;
   }
 
   /**

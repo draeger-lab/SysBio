@@ -104,6 +104,7 @@ public class JOptionPane2 extends JOptionPane {
 
       JDialog dialog = pane.createDialog(parentComponent, title);
       dialog.setResizable(resizable);
+      dialog.pack();
 
       pane.selectInitialValue();
       dialog.setVisible(true);
@@ -125,5 +126,35 @@ public class JOptionPane2 extends JOptionPane {
       }
       return CLOSED_OPTION;
   }
-    
+  
+  
+  /**
+   * Brings up a dialog where the number of choices is determined
+   * by the <code>optionType</code> parameter. In contrast to the original
+   * {@link #showConfirmDialog(Component, Object)} method, the resulting
+   * dialog will be resizable.
+   * 
+   * @param parentComponent determines the <code>Frame</code> in which the
+   *      dialog is displayed; if <code>null</code>,
+   *      or if the <code>parentComponent</code> has no
+   *      <code>Frame</code>, a 
+   *                  default <code>Frame</code> is used
+   * @param message   the <code>Object</code> to display
+   * @param title     the title string for the dialog
+   * @param optionType an int designating the options available on the dialog:
+   *                  <code>YES_NO_OPTION</code>,
+   *                  <code>YES_NO_CANCEL_OPTION</code>,
+   *                  or <code>OK_CANCEL_OPTION</code>
+   * @return an int indicating the option selected by the user
+   * @exception HeadlessException if
+   *   <code>GraphicsEnvironment.isHeadless</code> returns
+   *   <code>true</code>
+   * @see java.awt.GraphicsEnvironment#isHeadless
+   */
+  public static int showConfirmDialogResizable(Component parentComponent,
+    Object message, String title, int optionType) throws HeadlessException {
+    return showOptionDialog(parentComponent, message, title, optionType,
+      QUESTION_MESSAGE, null, null, null, true);
+  }
+  
 }

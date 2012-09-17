@@ -17,12 +17,16 @@
 package de.zbit.gui.table.renderer;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+
+import de.zbit.gui.IntegratorUI;
 
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
@@ -34,6 +38,7 @@ import sun.swing.table.DefaultTableCellHeaderRenderer;
  */
 public class DefaultTableCellTwoRowHeaderRenderer extends DefaultTableCellHeaderRenderer {
   private static final long serialVersionUID = 4654088278313349629L;
+  public static final transient Logger log = Logger.getLogger(DefaultTableCellTwoRowHeaderRenderer.class.getName());
   
   /**
    * Column indices, whose left border should be painted bold.
@@ -89,5 +94,30 @@ public class DefaultTableCellTwoRowHeaderRenderer extends DefaultTableCellHeader
     }
   }
   
+  /* (non-Javadoc)
+   * @see javax.swing.JComponent#getPreferredSize()
+   */
+  @Override
+  public Dimension getPreferredSize() {
+    /* PROBLEM: we CANNOT set the preferred width of this renderer,
+     * because it get's out of sync with the content upon resize (java bug).
+     * HOWEVER, we cannot simply set a preferred height from outside
+     * this method. Thus, return a modified preferred height here.
+     * BECAUASE: we MUST change the height in order ot make two lines
+     * visible here.
+     */
+    Dimension pref = super.getPreferredSize();
+    pref.height = (int) (pref.height * 2.3);
+    return pref;
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.JComponent#setPreferredSize(java.awt.Dimension)
+   */
+  @Override
+  public void setPreferredSize(Dimension preferredSize) {
+    super.setPreferredSize(preferredSize);
+    log.warning("You changed the preferred size of the header column. If you are not setting the same preferred size on the content, you will see strange effects when resizing column! This is a serious warning, you should better avoid setting a preferred size.");
+  }
   
 }

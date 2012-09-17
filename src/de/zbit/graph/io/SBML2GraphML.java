@@ -608,7 +608,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
           n = createNode(s.getId(), s.isSetName() ? s.getName() : s.getId(), sboTerm, x, y, w, h);
         }
         
-        // Eventually setip the clone marker
+        // Eventually setup the clone marker
         if (multipleCopiesAvailable) {
           NodeRealizer nr = simpleGraph.getRealizer(n);
           if (nr instanceof CloneMarker) {
