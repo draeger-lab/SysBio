@@ -106,9 +106,18 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
   private SNPid2GeneIDmapper(AbstractProgressBar progress, int ncbi_tax_id, boolean initImmediately) throws IOException {
     super(Integer.class, Integer.class, progress);
     this.ncbi_tax_id = ncbi_tax_id;
-    // TODO: Download im web einrichten
+    /* Since the entrez file from fallBackDownloadURL is rather old
+     * and the official dbSNP mapping file contains many informations
+     * for many organisms (what results in a hughe download, and probably
+     * a Java out of memory exception (heap space)), we have created
+     * custom files with organism-specific filetered information
+     * that should be downloaded on demand.
+     * 
+     * Feel free to Update them! See the main method and generateInputFileForSpecies()
+     * for all required stuff to generate novel mapping files.
+     */
     if (ncbi_tax_id>0) {
-      primaryDownloadURL = String.format("http://cogsys.cs.uni-tuebingenTODO:..../%s.SNP2GeneID.gz", ncbi_tax_id);
+      primaryDownloadURL = String.format("http://cogsys.cs.uni-tuebingen.de/software/InCroMAP/downloads/mappings/%s.SNP2GeneID.gz", ncbi_tax_id);
       tryThisDownloadURL = primaryDownloadURL;
     }
     if (initImmediately) init();
