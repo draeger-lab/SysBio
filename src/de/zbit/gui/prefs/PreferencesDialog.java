@@ -27,6 +27,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -136,6 +138,19 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 		List<PreferenceChangeListener> listeners, Class<? extends KeyProvider>... provider) {
 		return showPreferencesDialog(null, listeners, provider);
 	}
+	
+  /**
+   * @param listener
+   *        A {@link PropertyChangeListener} that is notified about any changes
+   *        in the user-preferences.
+   * @param provider
+   * @return {@code true}, if and only if the user approved this dialog.
+   */
+	@SuppressWarnings("unchecked")
+  public static final boolean showPreferencesDialog(PreferenceChangeListener listener,
+    Class<? extends KeyProvider> provider) {
+    return showPreferencesDialog(null, new ArrayList<PreferenceChangeListener>(Collections.singleton(listener)), provider);
+  }
 	
 	/**
 	 * 

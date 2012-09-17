@@ -18,6 +18,7 @@ package de.zbit.kegg.api;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.zbit.io.csv.CSVReader;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.util.DatabaseIdentifiers;
@@ -307,6 +309,59 @@ public class KeggInfos implements Serializable {
    */
   private final static Pattern ECcodes = Pattern.compile("(\\d+\\.-\\.-\\.-|\\d+\\.\\d+\\.-\\.-|\\d+\\.\\d+\\.\\d+\\.-|\\d+\\.\\d+\\.\\d+\\.(n)?\\d+)");
   
+  /**
+   * Additional (for path2models) mapping from KEGG compound 2 ChEBI
+   * identifiers. The 'C' is removed from Kegg compounds and the
+   * 'CHEBI:' prefix is removed from ChEBI ids, in order to obtain a
+   * more memory-friendly int-int mapping.
+   */
+  private static Map<Integer, Integer> cpd2ChEBI = null;
+  
+  /**
+   * Only for path2models.
+   */
+  private static void readAdditionalKEGGcompound2ChEBImapping() {
+    cpd2ChEBI = new HashMap<Integer, Integer>();
+    try {
+      CSVReader r = new CSVReader("KEGGcompound2ChEBI.txt");
+      r.setAutoDetectContentStart(false);
+      r.setAutoDetectContainsHeaders(false);
+      r.setContainsHeaders(true);
+      String[] line;
+      while ((line=r.getNextLine()) != null) {
+        if (line.length>=5 && line[4]!=null && line[4].length()>1) {
+          int KEGGid = Integer.parseInt(line[0].substring(1)); //'C01929' -> 1929 
+          int ChEBIid = Integer.parseInt(line[4].substring(6)); //'CHEBI:64802' -> 64802
+          cpd2ChEBI.put(KEGGid, ChEBIid);
+        }
+      }
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "Could not read KEGG compound 2 ChEBI mapping file.", e);
+    }
+  }
+  
+  /**
+   * Map KEGG compound to ChEBI (ONLY FOR PATH2MODELS).
+   * @param compoundID
+   * @return
+   */
+  private static Integer mapCompoundToChEBI(String compoundID) {
+    try {
+      // Maybe init mapping
+      if (cpd2ChEBI==null) {
+        readAdditionalKEGGcompound2ChEBImapping();
+      }
+      
+      // Trim the last 5-digits ('[...]C01929' -> 1929 )
+      int compopundINT = Integer.parseInt(compoundID.substring(compoundID.length()-5));
+      
+      return cpd2ChEBI.get(compopundINT);
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "Could not map KEGG compound 2 ChEBI.", e);
+    }
+    return null;
+  }
+  
 
 	// GO, kgGenes, hgnc, chebi - require extra prefixes!
 
@@ -394,6 +449,33 @@ public class KeggInfos implements Serializable {
 	 * @return
 	 */
 	public String getChebi() {
+    // For path2models, try to get from manual mapping
+    /*if (chebi==null) {
+
+      // is it a compound?
+      boolean isCompound = false;
+      if (Kegg_ID.length()>2) {
+        if (Kegg_ID.contains(":")) {
+          if (Kegg_ID.substring(0, 3).toLowerCase().equals("cpd")) {
+            isCompound=true;
+          }
+        } else {
+          if ((Kegg_ID.startsWith("c") || Kegg_ID.startsWith("C")) && 
+              Character.isDigit(Kegg_ID.charAt(1))) {
+            isCompound=true;
+          }
+        }
+      }
+      
+      // Try to map if it is a compound
+      if (isCompound) {
+        Integer cheb = mapCompoundToChEBI(getKegg_ID());
+        if (cheb!=null && cheb>0) {
+          chebi = Integer.toString(cheb);
+        }
+      }
+    }*/
+    
 		return chebi;
 	}
 
@@ -1304,6 +1386,9 @@ public class KeggInfos implements Serializable {
       }
       if (getChebi() != null) {
         Utils.addToMapOfSets(ids, IdentifierDatabases.ChEBI, getChebi().split("\\s"));
+      }
+      if (getCas() != null) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.CAS, getCas().split("\\s"));
       }
       if (getDrugbank() != null) {
         Utils.addToMapOfSets(ids, IdentifierDatabases.DrugBank, getDrugbank().split("\\s"));

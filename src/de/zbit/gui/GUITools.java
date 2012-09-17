@@ -82,6 +82,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
@@ -435,7 +436,37 @@ public class GUITools {
    */
   public static JButton createJButton(ActionListener listener,
     ActionCommand command, Icon icon, Character mnemonic) {
-    JButton button = new JButton();
+    return (JButton)createJButton(listener, command, icon, mnemonic, JButton.class);
+  }
+  
+  /**
+   * 
+   * @param listener
+   * @param command
+   * @param icon
+   * @param mnemonic
+   * @param instance
+   *        defaults to {@link JButton}. Other options include, e.g.,
+   *        {@link JToggleButton}.
+   * @return
+   */
+  public static AbstractButton createJButton(ActionListener listener,
+    ActionCommand command, Icon icon, Character mnemonic,
+    Class<? extends AbstractButton> instance) {
+    
+    // Create an instance
+    if (instance == null) {
+      instance = JButton.class;
+    }
+    AbstractButton button;
+    try {
+      button = instance.newInstance();
+    } catch (Exception e) {
+      logger.log(Level.WARNING, "Could not instantiate custom button class.", e);
+      button = new JButton();
+    }
+    
+    // Configure button
     if (listener != null) {
       button.addActionListener(listener);
     }

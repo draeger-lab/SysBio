@@ -308,7 +308,7 @@ public abstract class SB_2GraphML <T> {
       log.warning(MessageFormat.format(
         bundle.getString("USING_DEFAULT_SBO_TERM"), 
         SBO.getTerm(sboTerm).getName(), label));
-    } 
+    }
     
     nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
     nr = nr.createCopy(); // TODO: does this also copy pre-defined labels? (it should!)

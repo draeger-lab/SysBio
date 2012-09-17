@@ -65,6 +65,11 @@ public class DatabaseIdentifiers {
      * PLEASE KEEP THE ALPHABETICAL ORDER!
      */
     /**
+     * CAS (Chemical Abstracts Service) is a division of the American Chemical
+     * Society and is the producer of comprehensive databases of chemical information.
+     */
+    CAS,
+    /**
      * Chemical Entities of Biological Interest (ChEBI) is a freely available dictionary 
      * of molecular entities focused on 'small' chemical compounds.
      */
@@ -371,6 +376,10 @@ public class DatabaseIdentifiers {
       } else if (dbIdentifier2.equalsIgnoreCase("3DMET")) {
         return IdentifierDatabases.ThreeDMET;
 
+      } else if (dbIdentifier2.equalsIgnoreCase("Chemical Abstracts Service") ||
+          dbIdentifier2.startsWith("CAS ") || dbIdentifier2.equalsIgnoreCase("CASRN")) {
+        return IdentifierDatabases.CAS;
+        
       } else if (dbIdentifier2.equalsIgnoreCase("PDBCCD")) {
         return IdentifierDatabases.PDBeChem;
 
@@ -410,7 +419,8 @@ public class DatabaseIdentifiers {
     /*
      * Initialize the {@link #regExMap}.
      */
-    // Do NOT append prefixes (^) or suffixes ($) or braces around the regex! 
+    // Do NOT append prefixes (^) or suffixes ($) or braces around the regex!
+    regExMap.put(IdentifierDatabases.CAS,                   "\\d{1,7}\\-\\d{2}\\-\\d");
     regExMap.put(IdentifierDatabases.ChEBI,                 "CHEBI:\\d+");
     regExMap.put(IdentifierDatabases.ChemicalAbstracts,     "\\d{1,7}\\-\\d{2}\\-\\d");
     regExMap.put(IdentifierDatabases.KEGG_Compound,         "C\\d{5}");
@@ -459,6 +469,7 @@ public class DatabaseIdentifiers {
     /* 
      * Initialize the {@link #miriamMap}.
      */
+    miriamMap.put(IdentifierDatabases.CAS,                  "urn:miriam:cas:");
     miriamMap.put(IdentifierDatabases.ChEBI,                "urn:miriam:obo.chebi:");
     miriamMap.put(IdentifierDatabases.ChemicalAbstracts,    "urn:miriam:cas:");
     miriamMap.put(IdentifierDatabases.KEGG_Compound,        "urn:miriam:kegg.compound:");
@@ -503,6 +514,7 @@ public class DatabaseIdentifiers {
     /* 
      * Initialize the {@link #describedType} map.
      */
+    describedType.put(IdentifierDatabases.CAS,                 DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.ChEBI,                 DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.ChemicalAbstracts,     DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.KEGG_Compound,         DatabaseContent.small_molecule);
