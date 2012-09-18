@@ -48,9 +48,9 @@ public class MappingUtils {
    */
   public static enum IdentifierType {
     // We can not use the "DatabaseIdentifiers" class here, because
-    // we need a subset of identifiers that are mappabla to geneID
+    // we need a subset of identifiers that are mappable to geneID
     // and have an actual 2GeneID implementation here.
-    Unknown, NCBI_GeneID, RefSeq, Ensembl, KeggGenes, GeneSymbol, Affymetrix, Agilent, Illumina;
+    Unknown, NCBI_GeneID, RefSeq, Ensembl, KeggGenes, UniProt, GeneSymbol, Affymetrix, Agilent, Illumina;
   }
   
   /**
@@ -89,6 +89,9 @@ public class MappingUtils {
       case KeggGenes:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.KEGG_Genes, false);
+      case UniProt:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.UniProt_AC, false);
       case GeneSymbol:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.GeneSymbol, false);
@@ -116,20 +119,24 @@ public class MappingUtils {
     log.info("Initializing 2GeneID mapper...");
     // Init mapper based on targetIDtype
     AbstractMapper<String, Integer> mapper = null;
-    if (sourceIDtype.equals(IdentifierType.RefSeq)) {
-      mapper = new RefSeq2GeneIDMapper(progress, species.getNCBITaxonID());
-    } else if (sourceIDtype.equals(IdentifierType.Ensembl)) {
-      mapper = new Ensembl2GeneIDMapper(species.getCommonName(), progress);
-    } else if (sourceIDtype.equals(IdentifierType.GeneSymbol)) {
-      mapper = new GeneSymbol2GeneIDMapper(species.getCommonName(), progress);
-    } else if (sourceIDtype.equals(IdentifierType.KeggGenes)) {
-      mapper = new KeggGenesID2GeneID(species.getKeggAbbr(), progress);
-    } else if (sourceIDtype.equals(IdentifierType.Affymetrix)) {
-      mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Affymetrix, species.getCommonName());
-    } else if (sourceIDtype.equals(IdentifierType.Agilent)) {
-      mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Agilent, species.getCommonName());
-    } else if (sourceIDtype.equals(IdentifierType.Illumina)) {
-      mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Illumina, species.getCommonName());
+    if (sourceIDtype!=null) {
+      if (sourceIDtype.equals(IdentifierType.RefSeq)) {
+        mapper = new RefSeq2GeneIDMapper(progress, species.getNCBITaxonID());
+      } else if (sourceIDtype.equals(IdentifierType.Ensembl)) {
+        mapper = new Ensembl2GeneIDMapper(species.getCommonName(), progress);
+      } else if (sourceIDtype.equals(IdentifierType.GeneSymbol)) {
+        mapper = new GeneSymbol2GeneIDMapper(species.getCommonName(), progress);
+      } else if (sourceIDtype.equals(IdentifierType.KeggGenes)) {
+        mapper = new KeggGenesID2GeneID(species.getKeggAbbr(), progress);
+      } else if (sourceIDtype.equals(IdentifierType.UniProt)) {
+        mapper = new UniProt2GeneIDmapper(species, progress);
+      } else if (sourceIDtype.equals(IdentifierType.Affymetrix)) {
+        mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Affymetrix, species.getCommonName());
+      } else if (sourceIDtype.equals(IdentifierType.Agilent)) {
+        mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Agilent, species.getCommonName());
+      } else if (sourceIDtype.equals(IdentifierType.Illumina)) {
+        mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Illumina, species.getCommonName());
+      }
     }
     return mapper;
   }
