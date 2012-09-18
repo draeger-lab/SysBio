@@ -428,7 +428,7 @@ public class StringUtil {
 	public static int[] getLongestCommonLength(String... b) {
 		/*
 		 * Can be implemented in o(n*n) runtime and o(1) memory usage OR o(n)
-		 * runtime and o(n) memory usage. This is the later implementation.
+		 * runtime and o(n) memory usage. This is the latter implementation.
 		 */
 		SortedArrayList<int[]> LengthAndCounts = new SortedArrayList<int[]>();
 		int maxLength = 0;

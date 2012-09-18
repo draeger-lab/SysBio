@@ -315,5 +315,21 @@ public class EntryExtended extends Entry {
     return equals;
   }
 
+  /**
+   * Is an identifier for a specific database available? <p>Note: This method
+   * does NOT consider identifiers that are added later by queries to
+   * the KEGG API.
+   * @param db any database from {@link IdentifierDatabases}.
+   * @return <code>TRUE</code> if and only if an identifier for the given
+   * <code>db</code> is currently annotated within this class (i.e., for this entry).
+   */
+  public boolean isSetIdentifierForDatabase(IdentifierDatabases db) {
+    if (identifiers==null || db==null) return false;
+    Collection<String> ids = identifiers.get(db);
+    if (ids==null || ids.size()<1) return false;
+    String anID = ids.iterator().next();
+    return anID!=null && anID.trim().length()>0;
+  }
+
 
 }
