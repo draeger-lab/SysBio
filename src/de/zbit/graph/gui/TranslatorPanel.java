@@ -247,7 +247,9 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
          * Any loading string can OPTIONALLY be in the ActionCommand.
          */
         generateLoadingPanel(this, e.getActionCommand()==null?"Translating pathway...":e.getActionCommand());
-        translator = (KEGGtranslator<?>) e.getSource();
+        if (e.getSource()!=null && e.getSource() instanceof KEGGtranslator) {
+          translator = (KEGGtranslator<?>) e.getSource();
+        }
         break;
         
       case 4:
@@ -288,7 +290,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
         break;
         
       default:
-        log.severe("Unkown Action Command: " + e);
+        log.warning("Unkown Action Command: " + e);
     }
   }
   
