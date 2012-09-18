@@ -26,8 +26,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 
-import de.zbit.gui.IntegratorUI;
-
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 /**
