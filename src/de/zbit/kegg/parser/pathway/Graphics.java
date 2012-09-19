@@ -21,8 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.Header;
-
 import de.zbit.util.StringUtil;
 
 
@@ -96,7 +94,7 @@ public class Graphics {
    * 
    * @param isGeneProduct - (EntryType==EntryType.gene)
    */
-  public Graphics( boolean isGeneProduct) {
+  public Graphics(boolean isGeneProduct) {
     this();
     if (isGeneProduct) bgcolor = "#BFFFBF"; // Default for gene product
   }
@@ -499,6 +497,32 @@ public class Graphics {
     g.setHeight(34);
     g.setWidth(110);
     g.setType(GraphicsType.roundrectangle);
+    return g;
+  }
+  
+  /**
+   * Creates a new graphics object, that is suitable for
+   * Group nodes, i.e., complexes.
+   * @param name
+   * @return {@link Graphics} object with the given <code>name</code>.
+   */
+  public static Graphics createGraphicsForGroupOrComplex(String name) {
+    Graphics g = new Graphics(name);
+    g.setBgcolor("#FFFFFF");
+    g.setHeight(34);
+    g.setType(GraphicsType.rectangle);
+    return g;
+  }
+  
+  /**
+   * Creates a new graphics object, that is suitable for
+   * proteins that are really contained in the organism (!= orthologs!!!).
+   * @param name
+   * @return {@link Graphics} object with the given <code>name</code>.
+   */
+  public static Graphics createGraphicsForProtein(String name) {
+    Graphics g = new Graphics(name);
+    g.setBgcolor("#BFFFBF");
     return g;
   }
 
