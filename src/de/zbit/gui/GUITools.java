@@ -2151,6 +2151,17 @@ public class GUITools {
     return retVal;
   }
   
+  /**
+   * 
+   * @param parent
+   * @param message
+   */
+  public static void showWarningMessage(Component parent, String message) {
+    logger.log(Level.WARNING, message);
+    String name = ("Warning");
+    JOptionPane.showMessageDialog(parent, StringUtil.toHTMLToolTip(message), name, JOptionPane.WARNING_MESSAGE);
+  }
+  
   
   /**
    * 

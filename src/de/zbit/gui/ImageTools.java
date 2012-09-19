@@ -176,7 +176,7 @@ public class ImageTools {
    * @param colorImage
    * @return grey scale {@link BufferedImage}.
    */
-  public BufferedImage grayScaleImage (Image colorImage) {
+  public static BufferedImage grayScaleImage (Image colorImage) {
     BufferedImage image = new BufferedImage(colorImage.getWidth(null), colorImage.getHeight(null), BufferedImage.TYPE_BYTE_GRAY);  
     Graphics g = image.getGraphics();  
     g.drawImage(colorImage, 0, 0, null);  

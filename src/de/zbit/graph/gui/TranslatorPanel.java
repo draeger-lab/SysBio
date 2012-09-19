@@ -489,8 +489,14 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     }
     
     // Create an output file suggestion
-    String outFileSuggestion = inputFile.getPath();
-    if (inputFile.getName().contains(".")) outFileSuggestion = inputFile.getPath().substring(0, inputFile.getPath().lastIndexOf('.'));
+    String outFileSuggestion = null;
+    if (inputFile!=null) {
+      outFileSuggestion = inputFile.getPath();
+      if (inputFile.getName().contains(".")) {
+        outFileSuggestion = inputFile.getPath().substring(0, inputFile.getPath().lastIndexOf('.'));
+      }
+    }
+    
     // Do not add an extension here! It is added automatically later on.  
     
     
@@ -501,7 +507,9 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       //JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
     JFileChooser fc = GUITools.createJFileChooser(saveDir.getAbsolutePath(), false,
       false, JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
-    fc.setSelectedFile(new File(outFileSuggestion));
+    if (outFileSuggestion!=null && outFileSuggestion.length()>0) {
+      fc.setSelectedFile(new File(outFileSuggestion));
+    }
     if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return null;
     
     // Check file

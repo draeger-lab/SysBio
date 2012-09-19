@@ -44,6 +44,7 @@ import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
 import y.view.HitInfo;
 import y.view.NodeRealizer;
+import y.view.hierarchy.GroupNodeRealizer;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.RestrictedEditMode;
 import de.zbit.graph.gui.options.GraphBackgroundImageProvider;
@@ -312,6 +313,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     
     // If all coordinates are at the same position, make some automatic layout
     if (allNodesAtSamePosition(graphLayer)) {
+      log.info("Layouting graph with SmartOrganicLayouter.");
       new GraphTools(graphLayer).layout(SmartOrganicLayouter.class);
       graphLayer.unselectAll();
     }
@@ -415,17 +417,37 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * have the same center X coordinate.
    */
   private static boolean allNodesAtSamePosition(Graph2D graph) {
+    double centerX = Double.NaN;
+    boolean isAllOnCenterX = true;
     double X = Double.NaN;
+    boolean isAllOnX = true;
     for (Node n : graph.getNodeArray()) {
       NodeRealizer re = graph.getRealizer(n);
-      
-      if (Double.isNaN(X)) X = re.getCenterX();
-      else if (re.getCenterX()!=X) {
-        return false;
+      if (re instanceof GroupNodeRealizer) {
+        // They somehow have a different default center than other nodes...
+        continue;
       }
       
+      if (Double.isNaN(centerX)) {
+        // Initial set
+        centerX = re.getCenterX();
+      } else if (re.getCenterX()!=centerX) {
+        isAllOnCenterX = false;
+      }
+      
+      if (Double.isNaN(X)) {
+        // Initial set
+        X = re.getX();
+      } else if (re.getX()!=X) {
+        isAllOnX = false;
+      }
+      
+      if (!isAllOnCenterX && !isAllOnX) {
+        break;
+      }
     }
-    return true;
+    
+    return isAllOnX || isAllOnCenterX;
   }
   
   

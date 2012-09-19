@@ -95,9 +95,11 @@ public interface GraphBackgroundImageProvider {
      * @param imagePath
      * @param brightenImagePercentage optional parameter that is used to
      * brighten the image (percentage 0 to 100). Set to 0 to disable.
+     * @param greyscale <code>TRUE</code> if the image should be 
+     * converted to a greyscale image.
      * @return
      */
-    public static GraphBackgroundImageProvider createDynamicImageProvider(final URL imagePath, final int brightenImagePercentage) {
+    public static GraphBackgroundImageProvider createDynamicImageProvider(final URL imagePath, final int brightenImagePercentage, final boolean greyscale) {
       return new GraphBackgroundImageProvider() {
         
         /* (non-Javadoc)
@@ -113,7 +115,7 @@ public interface GraphBackgroundImageProvider {
         public void addBackgroundImage(Graph2DView pane, KEGGtranslator<?> translator, boolean waitUntilComplete)
           throws MalformedURLException {
           if (imagePath!=null && imagePath.getPath()!=null && imagePath.getPath().length()>0) {
-            Thread t = RestrictedEditMode.addDynamicBackgroundImage(imagePath, pane, brightenImagePercentage);
+            Thread t = RestrictedEditMode.addDynamicBackgroundImage(imagePath, pane, brightenImagePercentage, greyscale);
             if (waitUntilComplete) {
               ThreadManager.awaitTermination(t);
             }
@@ -127,9 +129,10 @@ public interface GraphBackgroundImageProvider {
      * background image for the last translated KGML-formatted pathway.
      * @param translator the translator used for translation
      * @param brightenImagePercentage
+     * @param greyscale <code>TRUE</code> if the image should be converted to a greyscale image.
      * @return
      */
-    public static GraphBackgroundImageProvider createDynamicTranslatorImageProvider(final int brightenImagePercentage) {
+    public static GraphBackgroundImageProvider createDynamicTranslatorImageProvider(final int brightenImagePercentage, final boolean greyscale) {
       return new GraphBackgroundImageProvider() {
         
         /* (non-Javadoc)
@@ -139,7 +142,7 @@ public interface GraphBackgroundImageProvider {
           if (translator==null) return;
           String image = translator.getLastTranslatedPathway().getImage();
           if (image!=null && image.length()>0) {
-            createDynamicImageProvider(new URL(image), brightenImagePercentage).addBackgroundImage(pane, translator, waitUntilComplete);
+            createDynamicImageProvider(new URL(image), brightenImagePercentage, greyscale).addBackgroundImage(pane, translator, waitUntilComplete);
           }
         }
         
