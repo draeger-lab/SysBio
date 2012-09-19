@@ -67,10 +67,8 @@ public class KGMLWriter {
 
 
   /**
-   * if the fileName is not set it will be set automatically to the pathway
-   * name. The file will be saved in the current folder
-   * 
-   * then an {@link Document} an then writes it with the defined {@link KGMLWriter#indent}
+   * If the fileName is not set it will be set automatically to the pathway
+   * name. The file will be saved in the current folder.
    * 
    * @param keggPW
    * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended}, 
@@ -79,7 +77,7 @@ public class KGMLWriter {
    * @throws FileNotFoundException 
    */
   public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW, boolean writeEntryExtended)  {
-    if (keggPW.getEntries().size() > 0) {
+    if (keggPW!=null && keggPW.getEntries().size() > 0) {
       String fileName = createFileName(keggPW);
 
       writeKGML(keggPW, fileName, writeEntryExtended);
@@ -87,7 +85,6 @@ public class KGMLWriter {
   }
 
   /**
-   * 
    * Uses the keggPW title to create a fileName
    * 
    * @param keggPW
@@ -223,7 +220,7 @@ public class KGMLWriter {
             entryMap = entry.getKGMLAttributes();  
           }
         } else {
-          entryMap = entry.getKGMLAttributes();
+          entryMap = ((Entry)entry).getKGMLAttributes();
         }
         for (java.util.Map.Entry<String, String> att : entryMap.entrySet()) {
           newChild.setAttribute(att.getKey(), att.getValue());

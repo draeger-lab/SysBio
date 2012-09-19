@@ -1087,6 +1087,31 @@ public class Pathway {
     String mapNumber = Utils.getNumberFromStringRevAsString(ko_id.length(), ko_id);
     return String.format("<img src=\"http://www.kegg.jp/kegg/misc/thumbnail/map%s.gif\"/><br/>\n", mapNumber );
   }
+  
+  /**
+   * Generates a HTML-IMG-Tag from the given KEGG Id, that should
+   * point to an image for the reaction. 
+   * @param ko_id starting with "rn:"
+   * @return an html image tag, containing a preview picture for the given reaction.
+   */
+  public static String getReactionPreviewPicture(String ko_id) {
+    return getReactionPreviewPicture(ko_id, true);
+  }
+  
+  /**
+   * See {@link #getReactionPreviewPicture(String)}.
+   * @param ko_id
+   * @param withIMGtag if <code>TRUE</code>, the URL will be embedded into an HTML
+   * image tag. If <code>FALSE</code>, the raw URL will be returned.
+   * @return
+   */
+  public static String getReactionPreviewPicture(String ko_id, boolean withIMGtag) {
+    if (withIMGtag) {
+      return String.format("<img src=\"http://www.genome.jp/Fig/reaction/%s.gif\"/><br/>\n", KeggInfos.suffix(ko_id.toUpperCase()) );
+    } else {
+      return "http://www.genome.jp/Fig/reaction/" + KeggInfos.suffix(ko_id.toUpperCase()) + ".gif";
+    }
+  }
 
   public String getAdditionalText() {
     return additionalText;

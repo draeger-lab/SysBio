@@ -220,15 +220,19 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    * @param imagePath URL of the image to display
    * @param pane the content pane
    * @param brighten percentage for brightening the image. Set to 0 to disable.
+   * @param greyscale <code>TRUE</code> if the image should be converted to a greyscale image.
    * @return thread that is executing the task.
    */
-  public static Thread addDynamicBackgroundImage(final URL imagePath, final Graph2DView pane, final int brighten) {
+  public static Thread addDynamicBackgroundImage(final URL imagePath, final Graph2DView pane, final int brighten, final boolean greyscale) {
     Runnable run = new Runnable() {
       public void run() {
         try {
           DefaultBackgroundRenderer renderer = new DefaultBackgroundRenderer(pane);
           //renderer.setImageResource(imagePath);
           BufferedImage image = ImageTools.image2BufferedImage(new ImageIcon(imagePath).getImage());
+          if (greyscale) {
+            image = ImageTools.grayScaleImage(image);
+          }
           // First replace black by grey (can not be brightened else)
           ImageTools.replaceColor(image, Color.BLACK, Color.GRAY);
           // Brighten image by 50%

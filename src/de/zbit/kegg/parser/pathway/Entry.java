@@ -187,6 +187,7 @@ public class Entry {
       this.components = new ArrayList<Integer>();
     }
     this.components.addAll(components);
+    ((ArrayList<Integer>)this.components).trimToSize();
   }
   
   /**
@@ -339,7 +340,7 @@ public class Entry {
   
   public void addGraphics(Graphics gr){
     if(!isSetGraphics()){
-      graph = new ArrayList<Graphics>();
+      graph = new LinkedList<Graphics>();
     } 
     if(!graph.contains(gr))
       graph.add(gr);

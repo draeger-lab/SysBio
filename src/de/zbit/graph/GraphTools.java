@@ -19,6 +19,7 @@ package de.zbit.graph;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -257,7 +258,7 @@ public class GraphTools {
     // Layouts raise an exception if nodes have 0 width or height
     // => Ensure minimum node size
     if (layouter instanceof CanonicMultiStageLayouter) {
-      ((CanonicMultiStageLayouter) layouter).prependStage(new MinNodeSizeStage(layouter, 1, 1));
+      ((CanonicMultiStageLayouter) layouter).prependStage(new MinNodeSizeStage(layouter, 48, 17));
     }
     
 //    OrganicLayouter layouter = new OrganicLayouter();
@@ -266,7 +267,7 @@ public class GraphTools {
     try {
       Graph2DLayoutExecutor l = new Graph2DLayoutExecutor();
       l.doLayout(graph, layouter);
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.fine("Layout fallback on manual simple layout.");
       /* With LineNodeRealizer it is possible to get
        * java.lang.IllegalArgumentException: Graph contains nodes with zero width/height.
@@ -290,10 +291,11 @@ public class GraphTools {
       }
     }
     
+    
     // If we layout only a subset of nodes, the layout still moves
     // all other nodes by a constant offset! Undo this transformation
     DataMap nodeMap = descriptor2Map.get(GraphMLmaps.NODE_POSITION);
-    if (nodeMap!=null) {    
+    if (nodeMap!=null && otherNodes!=null && otherNodes.size()>0) {    
       String splitBy = Pattern.quote("|");
       int anyOldX = 0, anyOldY = 0;
       int anyNewX = 0, anyNewY = 0;
@@ -310,17 +312,27 @@ public class GraphTools {
         anyNewY = (int) nr.getY();
         break;
       }
-      graph.moveNodes(graph.nodes(), anyOldX-anyNewX, anyOldY-anyNewY);
+      if ((anyOldX-anyNewX)!=0 ||  (anyOldY-anyNewY)!=0) {
+        graph.moveNodes(graph.nodes(), anyOldX-anyNewX, anyOldY-anyNewY);
+      }
     }
     //---
     
     // Write initial position to node annotations
+    Map<Node, String> newPositionString = new HashMap<Node, String>();
     for (Node n:newNodes) {
       String orgPos = calculateNodeOriginalPosition(n);
       if (orgPos!=null) {
+        // Don't set info directly, as it affects other nodes!
+        //this.setInfo(n, GraphMLmaps.NODE_POSITION, orgPos);
+        newPositionString.put(n, orgPos);
+      }
+    }
+    for (Node n:newNodes) {
+      String orgPos = newPositionString.get(n);
+      if (orgPos!=null) {
         this.setInfo(n, GraphMLmaps.NODE_POSITION, orgPos);
       }
-      
       // Paint above other nodes.
       graph.moveToLast(n);
     }
@@ -515,6 +527,7 @@ public class GraphTools {
     if (n2Pos==null) return (int) nr.getX() + "|" + (int) nr.getY();
     
     // Calculate relative coordinates
+    // Keeps the distance to neighbors with previously fixed coordinates!
     NodeRealizer nro = graph.getRealizer(n2);
     int diffX = (int) (nro.getX() - nr.getX());
     int diffY = (int) (nro.getY() - nr.getY());
