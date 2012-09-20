@@ -242,18 +242,30 @@ public class EntryExtended extends Entry {
    * @return all the necessary XML attributes of this class
    */
   public Map<String, String> getKGMLAttributes() {
+    return getKGMLAttributes(true);
+  }
+  
+  /**
+   * 
+   * @param includeExtendedAttributes if <code>FALSE</code>, only
+   * the attributes as specified in the core KGML format are returned.
+   * @return all the necessary XML attributes of this class
+   */
+  public Map<String, String> getKGMLAttributes(boolean includeExtendedAttributes) {
     Map<String, String> attributes = super.getKGMLAttributes();
     
-    if(isSetGeneType()){
-      attributes.put("geneType", geneType.toString());
-    }    
-    if(isSetCompartment()){
-      attributes.put("compartment", compartment);
-    }
-    if(isSetDatabaseIdentifiers()){
-      for (java.util.Map.Entry<IdentifierDatabases, Collection<String>> entry : identifiers.entrySet()) {
-        for (String value : entry.getValue()) {
-          attributes.put(entry.getKey().toString(), value);
+    if (includeExtendedAttributes) {
+      if(isSetGeneType()){
+        attributes.put("geneType", geneType.toString());
+      }    
+      if(isSetCompartment()){
+        attributes.put("compartment", compartment);
+      }
+      if(isSetDatabaseIdentifiers()){
+        for (java.util.Map.Entry<IdentifierDatabases, Collection<String>> entry : identifiers.entrySet()) {
+          for (String value : entry.getValue()) {
+            attributes.put(entry.getKey().toString(), value);
+          }
         }
       }
     }
