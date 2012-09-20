@@ -127,6 +127,7 @@ public class Pathway {
 
   /**
    * Contains names of reactions and entries that modify this reactions (usually enzymes).
+   * Maps {@link Reaction#getName()} to {@link Entry}s.
    */
   private Map<String, Collection<Entry>> reactionModifiers = new HashMap<String, Collection<Entry>>();
   
@@ -1125,5 +1126,27 @@ public class Pathway {
     if(additionalText!=null && !additionalText.isEmpty())
       return true;
     return false;
+  }
+
+  /**
+   * @param e
+   * @param newName
+   */
+  public void changeNameOfEntry(Entry e, String newName) {
+    String oldName = e.getName();
+    e.setName(newName); // takes care of the "nameMap".
+    
+    // Take care of reactionComponents
+    Collection<Reaction> o = reactionComponents.get(oldName);
+    if (o!=null) {
+      reactionComponents.remove(oldName);
+      reactionComponents.put(newName, o);
+      
+      // Rename in reactions
+      for (Reaction r : o) {
+        r.getReactant(oldName).setName(newName);
+      }
+    }
+    
   }
 }

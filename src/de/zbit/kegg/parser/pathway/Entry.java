@@ -372,7 +372,8 @@ public class Entry {
   }
 
   /**
-   * 
+   * <b>IT IS STRONGLY SUGGESTED TO USE {@link Pathway#changeNameOfEntry(Entry, String)}
+   * IF THE ENTRY ALREADY HAS BEEN PARSED WITH A DIFFERENT NAME!</b>
    * @param name
    */
   public void setName(String name) {

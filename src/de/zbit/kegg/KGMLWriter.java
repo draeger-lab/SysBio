@@ -220,7 +220,11 @@ public class KGMLWriter {
             entryMap = entry.getKGMLAttributes();  
           }
         } else {
-          entryMap = ((Entry)entry).getKGMLAttributes();
+          if (entry instanceof EntryExtended) {
+            entryMap = ((EntryExtended) entry).getKGMLAttributes(false);
+          } else {
+            entryMap = ((Entry)entry).getKGMLAttributes();
+          }
         }
         for (java.util.Map.Entry<String, String> att : entryMap.entrySet()) {
           newChild.setAttribute(att.getKey(), att.getValue());
