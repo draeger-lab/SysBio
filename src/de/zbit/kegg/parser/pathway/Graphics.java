@@ -396,7 +396,7 @@ public class Graphics {
   }
 
   private boolean isSetName() {
-    return name!=null;
+    return name!=null && name.length()>0;
   }
   
   @Override
@@ -494,8 +494,8 @@ public class Graphics {
   public static Graphics createGraphicsForPathwayReference(String name) {
     Graphics g = new Graphics(name);
     g.setBgcolor("#C0C0C0");
-    g.setHeight(34);
-    g.setWidth(110);
+    g.setHeight(42);
+    g.setWidth(125);
     g.setType(GraphicsType.roundrectangle);
     return g;
   }
