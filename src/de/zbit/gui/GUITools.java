@@ -50,6 +50,7 @@ import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -723,6 +724,49 @@ public class GUITools {
   }
   
   /**
+   * Convenience method that creates a {@link JLabel} using the given
+   * localization ID to retrieve the text and the tooltip text from the given
+   * resource bundle.
+   * 
+   * @param labelLocalizationKey the name (not the {@link JLabel#getText()}) of
+   *        the {@link JLabel} to be created, also used as look-up key in
+   *        the given {@link ResourceBundle}.
+   * @param bundle where to look up the keys
+   * @return a new {@link JLabel}
+   */
+  public static JLabel createJLabel(String labelLocalizationKey, ResourceBundle bundle) {
+    JLabel label = new JLabel();
+    String text;
+    try {
+      text = bundle.getString(labelLocalizationKey);
+    }
+    catch( MissingResourceException e ) {
+      logger.log(Level.WARNING,
+          "Couldn't find localized string for label '" + labelLocalizationKey
+          + "'. Please report this bug.",
+          e);
+      text = labelLocalizationKey;
+    }
+    
+    String tooltip = null;
+    String key = labelLocalizationKey + "_TOOLTIP";
+    if (bundle.containsKey(key)) {
+      tooltip = bundle.getString(key);
+    } else if (text.contains(";")) {
+      String description[] = text.split(";");
+      label.setText(description[0]);
+      tooltip = description[1];
+    } else {
+      label.setText(text);
+    }
+    if (tooltip != null) {
+      label.setToolTipText(StringUtil.toHTML(tooltip,
+        StringUtil.TOOLTIP_LINE_LENGTH));
+    }
+    return label;
+  }
+  
+  /**
    * Creates a new JMenuItem with the given text as label and the mnemonic. All
    * given menu items are added to the menu.
    * 
@@ -1391,7 +1435,9 @@ public class GUITools {
         return;
       }
       splash.close();
-    } catch (Throwable t) {}
+    } catch (Throwable t) {
+      // intentionally left blank
+    }
   }
 
 
