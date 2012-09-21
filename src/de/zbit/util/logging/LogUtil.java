@@ -16,8 +16,12 @@
  */
 package de.zbit.util.logging;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 
@@ -43,6 +47,11 @@ public class LogUtil {
   private static String packages_to_log[];
 
   /**
+   * Keep references to configured Loggers so the garbage collector does not delete them
+   */
+  private static Map<String, Logger> loggerRefs = new TreeMap<String, Logger>();
+  
+  /**
    * Add a new handler
    * @param h
    * @param packages
@@ -59,44 +68,65 @@ public class LogUtil {
   }
   
   /**
-   * Change the log level of all packes for those logging has
+   * Change the log level of all packages for those logging has
    * been initialized with {@link #initializeLogging(Level, String...)}.
    * @param logLevel
    */
   public static void changeLogLevel(Level logLevel) {
     changeLogLevel(logLevel, false);
   }
-  
+
   /**
-   * Change the log level of all packages for those logging has
-   * been initialized with {@link #initializeLogging(Level, String...)}.
+   * Change the log level of the given packages.
+   * @param logLevel
+   * @param packages
+   */
+  public static void changeLogLevel(Level logLevel, String... packages) {
+    changeLogLevel(logLevel, false, packages);
+  }
+
+  /**
+   * Change the log level of the base package (de.zbit) and all packages for
+   * those logging has been initialized with
+   * {@link #initializeLogging(Level, String...)}.
    * 
    * @param logLevel
    * @param initOneLineFormatter also change the formatter of all
    * Handlers to the {@link OneLineFormatter}.
    */
   private static void changeLogLevel(Level logLevel, boolean initOneLineFormatter) {
-    for (Handler h : Logger.getLogger("").getHandlers()) {
-      h.setLevel(logLevel);
-      if (initOneLineFormatter) {
-        h.setFormatter(new OneLineFormatter());
-      }
-    }
     Logger.getLogger(basePackage).setLevel(logLevel);
     
     // additional packages to log
-    if (packages_to_log != null) {
-      for (String s : packages_to_log) {
-        for (Handler h : Logger.getLogger(s).getHandlers()) {
+    changeLogLevel(logLevel, initOneLineFormatter, packages_to_log);
+  }
+  
+  /**
+   * Change the log level of the given packages.
+   * 
+   * @param logLevel
+   * @param initOneLineFormatter
+   *          also change the formatter of all Handlers to the
+   *          {@link OneLineFormatter}.
+   * @param packages
+   */
+  private static void changeLogLevel(Level logLevel, boolean initOneLineFormatter, String... packages) {
+    // packages to change log level for
+    if (packages != null) {
+      for (String s : packages) {
+        Logger l = Logger.getLogger(s);
+        for (Handler h : l.getHandlers()) {
           h.setLevel(logLevel);
           if (initOneLineFormatter) {
             h.setFormatter(new OneLineFormatter());
           }
         }
-        Logger.getLogger(s).setLevel(logLevel);
+        l.setLevel(logLevel);
+        loggerRefs.put(s, l);
       }
     }
   }
+
   
   /**
    * 
@@ -123,10 +153,12 @@ public class LogUtil {
    *                 additionally
    */
   public static void initializeLogging(Level logLevel, String... packages ) {
-    // initialize logging
-    //if (showLoggingConsole) {
-    //  Logging.enableLoggingConsole();
-    //}
+    // set console handler to log everything
+    for (Handler h : Logger.getLogger("").getHandlers()) {
+      h.setLevel(Level.ALL);
+      h.setFormatter(new OneLineFormatter());
+    }
+    
     packages_to_log = packages;
     
     changeLogLevel(logLevel, true);
@@ -158,13 +190,15 @@ public class LogUtil {
       }
     }
   }
-
-  /*
-  public static void endLogging() {
-    if (Logging.loggingConsoleIsVisible()) {
-      Logging.deactivateLoggingConsole();
+  
+  public static void printLogLevels() {
+    LogManager lm = LogManager.getLogManager();
+    
+    for( String name : Collections.list(lm.getLoggerNames()) ) {
+      Level l = lm.getLogger(name).getLevel();
+      if( l != null ) {
+        System.out.println(name + " = " + l);
+      }
     }
   }
-  */
-  
 }
