@@ -143,7 +143,7 @@
   <entry key="NO_GUI_SUPPORTED">"No graphical user interface supported for {0} version {1}."</entry>
   <entry key="INCOMPLETE_CMD_ARG_LIST">Incomplete list of command-line arguments. Try to restart {0} version {1} with the --help option</entry>
     <entry key="COPYRIGHT_MESSAGE">{0}
-Copyright © {1,number,integer}-{2,number,integer} the University of Tuebingen,
+Copyright © {1,number,#}-{2,number,#} the University of Tuebingen,
 Center for Bioinformatics Tuebingen (ZBIT).
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome
