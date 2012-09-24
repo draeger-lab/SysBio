@@ -45,18 +45,18 @@ public class ListOfCallableSBases extends AbstractList<CallableSBase> {
 	 * @see java.util.AbstractList#get(int)
 	 */
 	public CallableSBase get(int index) {
-		if (index < model.getNumCompartments()) {
+		if (index < model.getCompartmentCount()) {
       return model.getCompartment(index);
     }
-    index -= model.getNumCompartments();
-    if (index < model.getNumSpecies()) {
+    index -= model.getCompartmentCount();
+    if (index < model.getSpeciesCount()) {
       return model.getSpecies(index);
     }
-    index -= model.getNumSpecies();
-    if (index < model.getNumParameters()) {
+    index -= model.getSpeciesCount();
+    if (index < model.getParameterCount()) {
       return model.getParameter(index);
     }
-    index -= model.getNumParameters();
+    index -= model.getParameterCount();
     return model.getReaction(index);
 	}
 
@@ -64,7 +64,7 @@ public class ListOfCallableSBases extends AbstractList<CallableSBase> {
 	 * @see java.util.AbstractCollection#size()
 	 */
 	public int size() {
-		return model.getNumSymbols() + model.getNumReactions();
+		return model.getSymbolCount() + model.getReactionCount();
 	}
 	
 }
