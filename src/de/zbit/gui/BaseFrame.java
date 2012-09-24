@@ -1366,7 +1366,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *        {@link #openFile(File...)}.
 	 * @return the files that originate from the method {@link #openFile(File...)}.
 	 */
-	protected File[] openFileAndLogHistory(File... files) {
+	public File[] openFileAndLogHistory(File... files) {
 		files = openFile(files);
 		// Remember the baseDir and put files into history.
 	    if ((files != null) && (files.length > 0)) {

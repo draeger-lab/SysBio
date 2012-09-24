@@ -16,8 +16,11 @@
  */
 package de.zbit.util.progressbar.gui;
 
+import java.text.MessageFormat;
+
 import javax.swing.JProgressBar;
 
+import de.zbit.util.ResourceManager;
 import de.zbit.util.Utils;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
@@ -29,7 +32,13 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * @since 1.0
  */
 public class ProgressBarSwing extends AbstractProgressBar {
+	
+	/**
+	 * Generated serial version identifier
+	 */
   private static final long serialVersionUID = 2754375775367568812L;
+  
+  private static final String REMAINING_TIME = ResourceManager.getBundle("de.zbit.locales.Labels").getString("REMAINING_TIME");
   
   /**
    * The actual component that is used to draw the progress.
@@ -37,8 +46,8 @@ public class ProgressBarSwing extends AbstractProgressBar {
   private JProgressBar progressBar;
   
   /**
-   * Create a new instance of AbstractProgressBar on the
-   * given JProgressBar.
+   * Create a new instance of {@link AbstractProgressBar} on the
+   * given {@link JProgressBar}.
    * @param progressBar
    */
   public ProgressBarSwing(JProgressBar progressBar) {
@@ -91,7 +100,7 @@ public class ProgressBarSwing extends AbstractProgressBar {
       
       String s = percent + " %";
       if (miliSecondsRemaining > 0) {
-        s += " ETR: "+ Utils.getPrettyTimeString((long) miliSecondsRemaining);
+        s += ' ' + MessageFormat.format(REMAINING_TIME, Utils.getPrettyTimeString((long) miliSecondsRemaining));
       }
       if ((additionalText != null) && (additionalText.length() > 0)) {
         s += " - " + additionalText;

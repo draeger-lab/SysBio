@@ -491,7 +491,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   /**
    * Only if {@link #isDetailPanelAvailable()}, update the {@link #detailPanel}
    * to match current selection.
-   * <p><code>clickedObjects</code> might explicitly be {@code null}
+   * <p>{@code clickedObjects} might explicitly be {@code null}
    * if nothing is selected, so please implement this method accordingly.
    * 
    * @param detailPanel

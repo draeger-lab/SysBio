@@ -457,7 +457,7 @@ public abstract class DBFetcher extends InfoManagement<String, String> {
   
   /**
    * Returns whether the given ID matches to the String to check. The default
-   * case implemented here performs a simple <code>contains</code> check.
+   * case implemented here performs a simple {@code contains} check.
    * Overwrite this method, if you want to have a different behavior.
    * 
    * @param id the ID to check

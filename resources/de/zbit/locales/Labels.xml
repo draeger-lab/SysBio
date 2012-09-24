@@ -168,6 +168,10 @@ to redistribute it under certain conditions.
   <entry key="OK">OK;Saves the current configuration and closes this dialog.</entry>
   <entry key="PREFERENCES">Preferences</entry>
   
+  <!-- ProgressBarSwing -->
+  
+  <entry key="REMAINING_TIME">Remaining time: {0}</entry>
+  
   <!-- SBPreferences -->
   
   <entry key="OPTIONS">options</entry>

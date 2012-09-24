@@ -392,7 +392,7 @@ public class GraphTools {
 
 
   /**
-   * Returns the actual objects that are contained in <code>clickedObjects</code>.
+   * Returns the actual objects that are contained in {@code clickedObjects}.
    * @param clickedObjects
    * @param translateLabelHitsToObjects true to return the node for a click on a
    * nodelabel. Same for edges and labels.
@@ -445,7 +445,7 @@ public class GraphTools {
   
   /**
    * Set information to a map, contained in the current {@link #graph}. If the map given by
-   * <code>descriptor</code> does not exist, it will be created.
+   * {@code descriptor} does not exist, it will be created.
    * @param node_or_edge any node or edge
    * @param descriptor descriptor of the map (e.g. "entrezIds", see {@link GraphMLmaps})
    * @param value value to set.
@@ -581,7 +581,7 @@ public class GraphTools {
 
   /**
    * Registers a map WITHIN THESE TOOLS and linked to the {@link GenericDataMap}
-   * <code>mapDescriptionMap</code>. Does not touch the graph itself!
+   * {@code mapDescriptionMap}. Does not touch the graph itself!
    * 
    * @param descriptor
    * @param map

@@ -99,7 +99,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   
   /**
    * Constructor. Initialize this InfoManagement object with a maximum cache
-   * size of <code>maxCacheSize</code> entries.
+   * size of {@code maxCacheSize} entries.
    * 
    * @param maxCacheSize the maximum number of cached entries
    */
