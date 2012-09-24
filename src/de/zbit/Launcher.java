@@ -51,17 +51,17 @@ import de.zbit.util.prefs.SBProperties;
  * <th>Content</th>
  * </tr>
  * <tr>
- * <td><code>app.name</code></td>
+ * <td>{@code app.name}</td>
  * <td>the name of the program</td>
  * </tr>
  * <tr>
- * <td><code>app.version</code></td>
+ * <td>{@code app.version}</td>
  * <td>the version number of the program</td>
  * </tr>
  * </table>
  * If the user operates on Mac OS X, all necessary {@link System}
  * {@link Properties} specific to this environment will also be set. This might
- * make using <code>-Xdock:name="Some title" -Xdock:icon=path/to/icon</code> on
+ * make using {@code -Xdock:name="Some title" -Xdock:icon=path/to/icon} on
  * command line unnecessary.
  * <p>
  * Further details of the program configuration can be
@@ -200,7 +200,9 @@ public abstract class Launcher implements Runnable, Serializable {
 	 */
 	public Launcher(String args[]) {
 	  this();
-	  parseCmdArgs(args);
+	  if ((args != null) && (args.length > 0)) {
+	  	parseCmdArgs(args);
+	  }
 		run();
 	}
 
@@ -314,10 +316,10 @@ public abstract class Launcher implements Runnable, Serializable {
   		
   		System.setProperty("app.name", title);
   		System.setProperty("app.version", getVersionNumber());
-  		if (getCitation(true)!=null) {
+  		if (getCitation(true) != null) {
   		  System.setProperty("app.citation.html", getCitation(true));
   		}
-      if (getCitation(false)!=null) {
+      if (getCitation(false) != null) {
         System.setProperty("app.citation", getCitation(false));
       }
   		
@@ -733,7 +735,7 @@ public abstract class Launcher implements Runnable, Serializable {
   }
 
 	/**
-   * @param terminateJVMwhenDone the terminateJVMwhenDone to set
+   * @param terminateJVMwhenDone the {@link #terminateJVMwhenDone} to set
    */
   public void setTerminateJVMwhenDone(boolean terminateJVMwhenDone) {
     this.terminateJVMwhenDone = terminateJVMwhenDone;

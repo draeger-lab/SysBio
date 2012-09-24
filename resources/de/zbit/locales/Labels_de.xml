@@ -162,6 +162,10 @@ bestimmten Bedingungen weiterverbreiten dürfen.
   <entry key="DEFAULTS">Zurücksetzen;Stellt die Standardkonfiguration wieder her, d.h., alle aktuellen Einstellungen werden durch die Standardwerte ersetzt.</entry>
   <entry key="OK">OK;Speichert die aktuelle Konfiguration und schließt diesen Dialog.</entry>
   <entry key="PREFERENCES">Einstellungen</entry>
+    
+  <!-- ProgressBarSwing -->
+  
+  <entry key="REMAINING_TIME">Verbleibende Zeit: {0}</entry>
   
   <!-- SBPreferences -->
   

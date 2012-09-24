@@ -209,11 +209,11 @@ public class Utils {
     if (days >= 1) {
       ret = cut(days) + " d " + cut(hours % 24d)  + " h";
     } else if (hours >= 1) {
-      ret = cut(hours % 24d)  + " h " + cut(minutes % 60) + " m";
+      ret = cut(hours % 24d)  + " h " + cut(minutes % 60) + " min";
     } else if (minutes >= 2) {
-      ret = cut(minutes % 60d) + " m";
+      ret = cut(minutes % 60d) + " min";
     } else if (minutes >= 1) {
-      ret = cut(minutes % 60) + " m " + cut(seconds % 60) + " s";
+      ret = cut(minutes % 60) + " min " + cut(seconds % 60) + " s";
     } else if (seconds >= 1) {
       ret = cut(seconds % 60) + " s";
     } else {

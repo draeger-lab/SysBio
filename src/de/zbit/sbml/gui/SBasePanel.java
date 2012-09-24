@@ -582,15 +582,13 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				}
 			}
 			if (modification.size() > 0) {
-				lh.add(new JLabel("Modification: "), 1, ++row, 1, 1, 0d, 0d);
 				JList l = new JList(modification);
 				l.setEnabled(editable);
 				JScrollPane scroll2 = new JScrollPane(l);
 				scroll2.setPreferredSize(new Dimension(preferedWidth,
 						modification.size() * 20));
 				scroll2.setBorder(BorderFactory.createLoweredBevelBorder());
-				lh.add(scroll2, 3, row, 1, 1, 1d, 1d);
-				lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+				addLabeledComponent("Modification", scroll2);
 			}
 		}
 		if (sbase.isSetNotes() || editable) {

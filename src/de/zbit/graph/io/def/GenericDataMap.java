@@ -132,7 +132,7 @@ public class GenericDataMap<K, V> implements DataMap {
   
   /**
    * Remove all {@link DataMap}s with a value that equals the
-   * given <code>value</code>.
+   * given {@code value}.
    * @param value
    * @return true if at least one map has been removed.
    */

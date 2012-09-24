@@ -661,7 +661,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * @see #setData(Object)
    * @param key key under which the object has been stored
    * @return the object, stored with {@link #setData(String, Object)}, using
-   * the given <code>key</code>.
+   * the given {@code key}.
    */
   public Object getData(String key) {
     if (additionalData==null) return null;

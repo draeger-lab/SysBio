@@ -657,7 +657,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
 	}
 
 	/**
-   * Parses the layout information from the given <code>document</code>.
+   * Parses the layout information from the given {@code document}.
    * This will set the {@link #useLayoutExtension} and
    * {@link #id2layoutMap} variables.
    * @param document
@@ -667,7 +667,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   }
   
   /**
-   * Parses the layout information from the given <code>document</code>.
+   * Parses the layout information from the given {@code document}.
    * This will set the {@link #useLayoutExtension} and
    * {@link #id2layoutMap} variables.
    * @param document
@@ -727,7 +727,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   }
   
   /**
-   * Parses the groups information from the given <code>document</code>.
+   * Parses the groups information from the given {@code document}.
    * This will set the {@link #useLayoutExtension} and
    * {@link #id2layoutMap} variables.
    * @param document
@@ -762,8 +762,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * <p>Note: this is a standard-slow iterative approach.</p>
    * @param species
    * @param anyID
-   * @return {@code true} if <code>species</code> contains
-   * any {@link AbstractNamedSBase} with ID <code>anyID</code>.
+   * @return {@code true} if {@code species} contains
+   * any {@link AbstractNamedSBase} with ID {@code anyID}.
    */
   private boolean speciesListContainsID(
     List<? extends AbstractNamedSBase> species, Object anyID) {
