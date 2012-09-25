@@ -74,20 +74,6 @@ public abstract class GeneralFileFilter extends FileFilter implements
   protected abstract GeneralFileFilter clone() throws CloneNotSupportedException;
 
   /* (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-  	if (obj == null) {
-  		return false;
-  	}
-    if (obj.getClass().equals(getClass())) {
-      return obj.hashCode() == hashCode();
-    }
-    return super.equals(obj);
-  }
-
-  /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
   @Override

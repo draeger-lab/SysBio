@@ -44,6 +44,7 @@ import de.zbit.util.objectwrapper.ValuePairUncomparable;
  * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
+ * @author Florian Mittag
  * @date 2007-08-03
  * @version $Rev$
  * @since 1.0
@@ -1107,6 +1108,34 @@ public class SBFileFilter extends GeneralFileFilter {
    */
   public Set<String> getExtensions() {
     return type.getFileExtensions();
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    // if object is of the same class
+    if (obj.getClass().equals(getClass())) {
+      SBFileFilter sbff = (SBFileFilter)obj;
+      boolean equal = true;
+      if( this.filter == null ) {
+        equal &= (sbff.filter == null);
+      } else {
+        equal &= this.filter.equals(sbff.filter);
+      }
+      if( this.type == null ) {
+        equal &= (sbff.type == null);
+      } else {
+        equal &= this.type.equals(sbff.type);
+      }
+      return equal;
+    }
+    // otherwise false
+    return false;
   }
   
   /* (non-Javadoc)
