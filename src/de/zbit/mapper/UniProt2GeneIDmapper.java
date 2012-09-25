@@ -121,6 +121,21 @@ public class UniProt2GeneIDmapper extends AbstractMapper<String, Integer> {
   public int getTargetColumn(CSVReader r) {
     return 2;
   }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#preProcessTargetID(java.lang.String)
+   */
+  @Override
+  protected String preProcessTargetID(String string) {
+    // Uniprot sometimes maps to muliple ids, e.g., "801; 805; 808".
+    // As there is no easy perfect solution (and luckily this is a rare case), simply take the first number.
+    int p = string.indexOf(';');
+    if (p>0) {
+      return string.substring(0, p);
+    }
+    return string;
+  }
+  
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#getSourceColumn(de.zbit.io.csv.CSVReader)
    */
