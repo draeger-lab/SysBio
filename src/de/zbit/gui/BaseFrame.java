@@ -68,6 +68,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import de.zbit.AppConf;
+import de.zbit.UserInterface;
 import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.gui.actioncommand.ActionCommandWithIcon;
 import de.zbit.gui.mac.MacOSXController;
@@ -97,7 +98,7 @@ import de.zbit.util.prefs.SBProperties;
  * @since 1.0
  */
 public abstract class BaseFrame extends JFrame implements FileHistory,
-    GUIOptions {
+    GUIOptions, UserInterface {
 	
 	/**
 	 * This {@link Enum} contains very basic actions of a graphical user interface.
@@ -489,12 +490,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     }
 	}
 	
-  /**
-	 * Closes a {@link File} that is currently open.
-	 * 
-	 * @return Whether or not calling this method lead to any change on this
-	 *         {@link BaseFrame}.
-	 */
+  /* (non-Javadoc)
+   * @see de.zbit.UserInterface#closeFile()
+   */
+	@Override
 	public abstract boolean closeFile();
 	
 	/**
@@ -953,11 +952,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		return null;
 	}
 	
-	/**
-	 * The name of this program.
-	 * 
-	 * @return
+	/* (non-Javadoc)
+	 * @see de.zbit.UserInterface#getApplicationName()
 	 */
+	@Override
 	public String getApplicationName() {
 	  if (this.appConf != null) {
 	    return appConf.getApplicationName();
@@ -965,14 +963,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	  return getClass().getSimpleName();
 	}
 	
-	/**
-	 * This is required to automatically include a list of possible command-line
-	 * options into the online help. The array of {@link KeyProvider} classes
-	 * contains all those {@link KeyProvider}s whose {@link Option} entries are
-	 * valid keys for the command line.
-	 * 
-	 * @return
+	/* (non-Javadoc)
+	 * @see de.zbit.UserInterface#getCommandLineOptions()
 	 */
+	@Override
 	public Class<? extends KeyProvider>[] getCommandLineOptions() {
 	  if (this.appConf != null) {
 	    return appConf.getCmdOptions();
@@ -980,13 +974,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	  return null;
 	}
 	
-	/**
-	 * The version number of this program. This must be a {@link String}
-	 * containing only digits and at least one dot or at most two dots. For
-	 * instance "1.2" or "1.2.3".
-	 * 
-	 * @return
+	/* (non-Javadoc)
+	 * @see de.zbit.UserInterface#getDottedVersionNumber()
 	 */
+	@Override
 	public String getDottedVersionNumber() {
 	  if (this.appConf != null) {
 	    return appConf.getVersionNumber();
@@ -1059,20 +1050,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     return new File(prefs.get(OPEN_DIR));
   }
 	
-	/**
-	 * This method creates a title from the values of
-	 * {@link #getApplicationName()} and {@link #getDottedVersionNumber()}. The
-	 * value returned may be an empty {@link String} but never {@code null}. In case
-	 * neither an application name nor a dotted version number are defined, an
-	 * empty {@link String} will be returned. If both values are defined, the
-	 * returned value will be application name white space version number. In case
-	 * that one of the values is missing, the returned {@link String} will be
-	 * shorter.
-	 * 
-	 * @return Creates and returns a {@link String} that combines the value
-	 *         returned by {@link #getApplicationName()} and
-	 *         {@link #getDottedVersionNumber()} to identify this program.
-	 */
+  /* (non-Javadoc)
+   * @see de.zbit.UserInterface#getProgramNameAndVersion()
+   */
+	@Override
 	public final String getProgramNameAndVersion() {
 		String name = getApplicationName() != null ? getApplicationName() : "";
 		if ((getDottedVersionNumber() == null)
@@ -1101,54 +1082,28 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     return statusBar;
   }
 	
-	/**
-	 * The {@link URL} where the about message for this program is located, i.e.,
-	 * an HTML file containing information about the people in charge for this
-	 * program.
-	 * 
-	 * @return
+	/* (non-Javadoc)
+	 * @see de.zbit.UserInterface#getURLAboutMessage()
 	 */
+	@Override
 	public abstract URL getURLAboutMessage();
 	
-	/**
-	 * The {@link URL} of the license file under which this application is
-	 * distributed.
-	 * 
-	 * @return
+	/* (non-Javadoc)
+	 * @see de.zbit.UserInterface#getURLLicense()
 	 */
+	@Override
 	public abstract URL getURLLicense();
 
-	/**
-	 * The {@link URL} of the online help file.
-	 * 
-	 * @return
+	/* (non-Javadoc)
+	 * @see de.zbit.UserInterface#getURLOnlineHelp()
 	 */
+	@Override
 	public abstract URL getURLOnlineHelp();
 	
-	/**
-	 * <p>
-	 * The online update expects to find a file called {@code latest.txt}
-	 * containing only the version number of the latest release of this program as
-	 * a {@link String} of digits that contains exactly one dot or at most two
-	 * dots. Furthermore, on the given destination must be a second file, called
-	 * {@code releaseNotes&lt;VersionNumber&gt;.htm[l]}, which contains more
-	 * detailed information about the latest release.
-	 * </p>
-	 * <p>
-	 * Summarizing, the web address or other directory address where we can find
-	 * at least the following two files:
-	 * <ul>
-	 * <li>latest.txt</li>
-	 * <li>releaseNotesX.Y.Z.htm</li>
-	 * </ul>
-	 * The file {@code latest.txt} contains exactly the dotted version number
-	 * of the latest release of this software; nothing else! The release notes
-	 * file contains HTML code describing the latest changes and the file name
-	 * MUST end with the latest version number of the release.
-	 * </p>
-	 * 
-	 * @return The {@link URL} to some directory where to look for the online update.
-	 */
+  /* (non-Javadoc)
+   * @see de.zbit.UserInterface#getURLOnlineUpdate()
+   */
+	@Override
 	public URL getURLOnlineUpdate() {
 	  if (this.appConf != null) {
 	    return appConf.getOnlineUpdate();
@@ -1366,6 +1321,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *        {@link #openFile(File...)}.
 	 * @return the files that originate from the method {@link #openFile(File...)}.
 	 */
+	@Override
 	public File[] openFileAndLogHistory(File... files) {
 		files = openFile(files);
 		// Remember the baseDir and put files into history.
@@ -1486,6 +1442,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *         {@link GUIOptions#SAVE_DIR} property of the current class (but only
 	 *         if it exists and can be read).
 	 */
+	@Override
 	public abstract File saveFileAs();
 	
 	/**
@@ -1585,6 +1542,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * Shows the about message, i.e., information about the authors of this
 	 * program in a {@link JOptionPane} of size 380x220.
 	 */
+	@Override
 	public final void showAboutMessage() {
 		ResourceBundle resources = ResourceManager
 				.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
@@ -1606,6 +1564,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * Displays the license under which this program is distributed in a
 	 * {@link JOptionPane} of size 640x480.
 	 */
+	@Override
 	public final void showLicense() {
 		ResourceBundle resources = ResourceManager
 				.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
@@ -1615,10 +1574,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				.getIcon("ICON_LICENSE_64"));
 	}
 	
-	
 	/**
 	 * Displays the online help in a {@link JHelpBrowser}.
 	 */
+	@Override
 	public final void showOnlineHelp() {
 		GUITools.setEnabled(false, getJMenuBar(), toolBar, BaseAction.HELP_ONLINE);
 		ResourceBundle resources = ResourceManager
