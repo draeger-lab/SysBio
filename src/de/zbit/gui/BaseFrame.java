@@ -694,7 +694,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				BaseAction.FILE_SAVE_AS, KeyStroke.getKeyStroke('S', ctr_down
 						| InputEvent.SHIFT_DOWN_MASK), 'S', false);
 			
-			if (showSaveMenuEntry()) {
+			if (showsSaveMenuEntry()) {
 				saveFile =  GUITools.createJMenuItem(EventHandler.create(
 					ActionListener.class, this, "saveFileToOriginal"),
 					BaseAction.FILE_SAVE, KeyStroke.getKeyStroke('S', ctr_down), 'S', false);
@@ -726,7 +726,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				new MacOSXController(this);
 			}
 			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
-					BaseAction.FILE.getToolTip(), openFile, fileHistory, (showSaveMenuEntry()) ? saveFile : null, saveFileAs, items,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, (showsSaveMenuEntry()) ? saveFile : null, saveFileAs, items,
 					closeFile);
 		} else {
 			// On all other platforms we want to have a dedicated "exit" item.
@@ -737,7 +737,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			boolean addSeparator = (openFile != null) || (saveFile != null) || (saveFileAs != null)
 					|| ((items != null) && (items.length > 0)) || (closeFile != null);
 			fileMenu = GUITools.createJMenu(title == null ? "File" : title,
-					BaseAction.FILE.getToolTip(), openFile, fileHistory, (showSaveMenuEntry()) ? saveFile : null, saveFileAs, items,
+					BaseAction.FILE.getToolTip(), openFile, fileHistory, (showsSaveMenuEntry()) ? saveFile : null, saveFileAs, items,
 					closeFile, addSeparator ? new JSeparator() : null, exit);
 		}
 		fileMenu.setActionCommand(BaseAction.FILE.toString());
@@ -748,7 +748,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * show the "Save" menu entry if true 
 	 * @return
 	 */
-	protected boolean showSaveMenuEntry() {
+	protected boolean showsSaveMenuEntry() {
 		return false;
 	}
 

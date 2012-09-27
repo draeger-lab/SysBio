@@ -1,15 +1,12 @@
 package de.zbit.gui;
 
 import java.awt.Component;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 
 import javax.swing.JToolBar;
-
-import org.sbml.jsbml.SBMLDocument;
-
-import de.zbit.sbml.io.OpenedFile;
 
 public class DragNDropTest extends BaseFrame {
 
@@ -64,6 +61,12 @@ public class DragNDropTest extends BaseFrame {
 @Override
 public File saveFile() {
 	return null;
+}
+
+@Override
+public void propertyChange(PropertyChangeEvent evt) {
+	// TODO Auto-generated method stub
+	
 }
 
 }

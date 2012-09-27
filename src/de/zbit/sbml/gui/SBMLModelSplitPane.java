@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.logging.Logger;
 
@@ -41,13 +40,12 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.SBMLDocument;
-import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.layout.LayoutHelper;
-import de.zbit.sbml.io.OpenedFile;
+import de.zbit.io.OpenedFile;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
@@ -115,10 +113,8 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 * @param file
 	 * @param namesIfAvailable
-	 * @throws SBMLException
-	 * @throws IOException
 	 */
-	public SBMLModelSplitPane(OpenedFile<SBMLDocument> file, boolean namesIfAvailable) throws SBMLException, IOException {
+	public SBMLModelSplitPane(OpenedFile<SBMLDocument> file, boolean namesIfAvailable) {
 		this(file.getDocument(), namesIfAvailable);
 		this.openedFile = file;
 	}
@@ -127,10 +123,8 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 * @param document
 	 * @param namesIfAvailable
-	 * @throws SBMLException
-	 * @throws IOException
 	 */
-	public SBMLModelSplitPane(SBMLDocument document, boolean namesIfAvailable) throws SBMLException, IOException {
+	public SBMLModelSplitPane(SBMLDocument document, boolean namesIfAvailable) {
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		this.namesIfAvailalbe = namesIfAvailable;
 		init(document, false);
@@ -161,11 +155,8 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * @param nodeInfo
 	 * @return
-	 * @throws SBMLException
-	 * @throws IOException
 	 */
-	protected JPanel createLeftComponent() throws SBMLException,
-		IOException {
+	protected JPanel createLeftComponent() {
 		JPanel leftPane = new JPanel();
 		JScrollPane treePane = new JScrollPane(tree);
 	  	
@@ -187,11 +178,8 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * @param sbase
 	 * @return
-	 * @throws SBMLException
-	 * @throws IOException
 	 */
-	protected JScrollPane createRightComponent(SBase sbase) throws SBMLException,
-		IOException {
+	protected JScrollPane createRightComponent(SBase sbase) {
 		SBasePanel sbPanel = new SBasePanel(sbase, namesIfAvailalbe, renderer);
 		JScrollPane scroll = new JScrollPane(sbPanel);
 		return scroll;
@@ -230,11 +218,8 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * @param doc
 	 * @param keepDivider
-	 * @throws SBMLException
-	 * @throws IOException
 	 */
-	public void init(SBMLDocument doc, boolean keepDivider) throws SBMLException,
-		IOException {
+	public void init(SBMLDocument doc, boolean keepDivider) {
 		int proportionalLocation = getDividerLocation();
 		
 		this.sbmlDoc = doc;
@@ -260,10 +245,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		}
 		tree.addTreeSelectionListener(this);
 		tree.setSelectionRow(0);
-		
-		if (openedFile != null) {
-			sbmlDoc.addTreeNodeChangeListener(openedFile);
-		}
 		
 		setLeftComponent(createLeftComponent());
 		setRightComponent(createRightComponent(doc));

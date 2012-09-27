@@ -22,13 +22,19 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 
 /**
- * Manage the changes for opened document
+ * Manage the changes for opened document in a {@link File}.
  * 
  * @author Sebastian Nagel
+ * @author Andreas Dr&auml;ger
  * @since 1.4
  * @version $Rev: 808 $
  */
 public class OpenedFile<T> implements PropertyChangeListener {
+
+	/**
+	 * File change event name.
+	 */
+	public static final String FILE_CHANGED_EVENT = "de.zbit.io.OpenedFile.fileChangedEvent";
 
 	/**
 	 * 
@@ -136,10 +142,10 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	 */
 	//@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("fileChanged")){
+		if (evt.getPropertyName().equals(FILE_CHANGED_EVENT)) {
 			boolean previous = isChanged();
 			setChanged(true);
-			firePropertyChange("openedFileChanged", previous, true);
+			firePropertyChange(FILE_CHANGED_EVENT, previous, true);
 		}
 	}
 
