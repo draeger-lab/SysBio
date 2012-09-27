@@ -32,6 +32,7 @@ import org.sbml.jsbml.SBO;
 
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.graph.sbgn.ComplexNode;
 import de.zbit.graph.sbgn.EmptySetNode;
 import de.zbit.graph.sbgn.NucleicAcidFeatureNode;
@@ -143,6 +144,11 @@ public class SBGNVisualizationProperties {
     ReactionNodeRealizer ucpr = new ReactionNodeRealizer();
     ucpr.setLabelText("?");
     sbo2shape.put(uncertainProcess, opr);
+    
+    sbo2shape.put(SBO.getPhysicalCompartment(), new CompartmentRealizer());
+    sbo2shape.put(SBO.getFunctionalCompartment(), sbo2shape.get(SBO.getPhysicalCompartment()));
+    sbo2shape.put(410, sbo2shape.get(SBO.getPhysicalCompartment())); // Implicit Compartment
+    
     
     // Sort all synonyms for allowing a binary search later
     Arrays.sort(nonCovalentComplex_synonyms);

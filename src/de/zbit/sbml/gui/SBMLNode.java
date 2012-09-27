@@ -21,7 +21,6 @@ import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JTree;
@@ -44,7 +43,6 @@ import org.sbml.jsbml.util.compilers.UnitException;
 import org.sbml.jsbml.util.compilers.UnitsCompiler;
 
 import de.zbit.util.ResourceManager;
-import de.zbit.util.logging.LogUtil;
 
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a
@@ -412,9 +410,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 				if (node instanceof TreeNodeWithChangeSupport) {
 					TreeNodeWithChangeSupport n = (TreeNodeWithChangeSupport) node;
 					if (!n.isRoot() && n.getListOfTreeNodeChangeListeners().contains(this)) {
-						if (LogUtil.getCurrentLogLevel().intValue() < Level.FINE.intValue()) {
-							logger.fine(MessageFormat.format("Removing parent node {0} from list of listeners in {1}.", this, n));
-						}
+					  logger.finer(MessageFormat.format("Removing parent node {0} from list of listeners in {1}.", this, n));
 						n.removeTreeNodeChangeListener(this);
 					}
 				}
@@ -428,9 +424,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 						parentNode.insert(this, childIndex);
 					}
 				}
-				if (LogUtil.getCurrentLogLevel().intValue() < Level.FINE.intValue()) {
-					logger.fine("adding " + node);
-				}
+				logger.finer("adding " + node);
 			}
 		}
 	}
@@ -447,9 +441,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 		TreeNode parent = evt.getPreviousParent();
 		if ((parent == parentNode.getUserObject()) && (evt.getSource() == getUserObject())) {
 			parentNode.remove(this);
-			if (LogUtil.getCurrentLogLevel().intValue() < Level.FINE.intValue()) {
-				logger.fine("removing " + evt.getSource());
-			}
+			logger.finer("removing " + evt.getSource());
 		}
 	}
 
