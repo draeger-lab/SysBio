@@ -17,6 +17,9 @@
 package de.zbit.garuda;
 
 /**
+ * A specialized {@link Exception} to be used in case that the Garuda backend
+ * has not yet been initialized.
+ * 
  * @author Andreas Dr&auml;ger
  * @date 09:05:28
  * @since 1.1

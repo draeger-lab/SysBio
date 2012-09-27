@@ -22,10 +22,12 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import jp.sbi.garuda.platform.commons.FileFormat;
@@ -38,8 +40,69 @@ import jp.sbi.garuda.platform.event.PlatformEventType;
 import jp.sbi.garuda.platform.software.CoreClientAPI;
 import de.zbit.UserInterface;
 import de.zbit.gui.GUITools;
+import de.zbit.io.FileTools;
+import de.zbit.util.ResourceManager;
 
 /**
+ * <p>
+ * An easily usable backend for Garuda support.
+ * <p>
+ * Here follows a minimal example of how to use it to Garuda-enable any
+ * software. When initializing your graphical user interface, which must be
+ * derived from {@link UserInterface}, just insert the following piece of code:
+ * 
+ * <pre>
+ * new Thread(new Runnable() {
+ * 	public void run() {
+ * 		try {
+ * 			GarudaSoftwareBackend garudaBackend = new GarudaSoftwareBackend(
+ * 				(UserInterface) gui);
+ * 			garudaBackend.addInputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
+ * 			// ... as many additional input file formats as supported
+ * 			garudaBackend.addOutputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
+ * 			// ... as many additional output file formats as supported
+ * 			garudaBackend.init();
+ * 			garudaBackend.registedSoftwareToGaruda();
+ * 		} catch (NetworkException exc) {
+ * 			GUITools.showErrorMessage(gui, exc);
+ * 		} catch (BackendNotInitializedException exc) {
+ * 			GUITools.showErrorMessage(gui, exc);
+ * 		} catch (Throwable exc) {
+ * 			logger.fine(exc.getLocalizedMessage());
+ * 		}
+ * 	}
+ * }).start();
+ * </pre>
+ * 
+ * In the above code, it is assumed that {@code gui} is some instance of a AWT
+ * or SWING element.
+ * <p>
+ * As any instance of {@link UserInterface}, also your one must extend
+ * {@link PropertyChangeListener}. In order to successfully enable Garuda in
+ * your application, do the following in your gui:
+ * 
+ * <pre>
+ * public void propertyChange(PropertyChangeEvent evt) {
+ * 	String propName = evt.getPropertyName();
+ * 	if (propName.equals(GarudaSoftwareBackend.GARUDA_ACTIVATED)) {
+ * 		this.garudaBackend = (GarudaSoftwareBackend) evt.getNewValue();
+ * 		if (supportedFileOpened) {
+ * 			enableGarudaInMenuBar();
+ * 		}
+ * 	}
+ * }
+ * </pre>
+ * 
+ * In this method, the instance of the {@link GarudaSoftwareBackend} can be
+ * stored in the GUI as a controller for Garuda.
+ * <p>
+ * In order to sent a file to other Garuda-enabled tools, you will have to add
+ * some buttons or menu items to your application. The action to sent a file can
+ * be performed by using the {@link GarudaFileSender}.
+ * <p>
+ * For localization support you can find an XML file containg several useful
+ * entries in the garuda resource folder.
+ * 
  * @author Andreas Dr&auml;ger
  * @date 17:42:09
  * @since 1.1
@@ -47,59 +110,32 @@ import de.zbit.gui.GUITools;
  */
 public class GarudaSoftwareBackend {
 
-	/**
-	 * 
-	 */
 	public static final String CONNECTION_NOT_INITIALIZED_ID = "de.zbit.garuda.GarudaSoftwareBackend.connectionNotInitialized";
-
-	/**
-	 * 
-	 */
 	public static final String CONNECTION_TERMINATED_ID = "de.zbit.garuda.GarudaSoftwareBackend.connectionTerminated";
-	/**
-   * 
-   */
-	private static final int GARUDA_CORE_PORT = 9000;
-	/**
-	 * 
-	 */
-  private static final int GARUDA_CORE_TIMEOUT = 1000;
-	/**
-	 * 
-	 */
 	public static final String GOT_ERRORS_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.gotErrors";
-	/**
-	 * 
-	 */
 	public static final String GOT_SOFTWARES_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.gotSoftwares";
-	/**
-	 * 
-	 */
 	public static final String LOAD_FILE_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.loadFile";
-	/**
-	 * 
-	 */
 	public static final String LOAD_GADGET_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.loadGadget";
+	public static final String SOFTWARE_DEREGISTRATION_ERROR_ID = "de.zbit.garuda.GarudaSoftwareBackend.softwareDeregistrationError";
+	public static final String SOFTWARE_REGISTRATION_ERROR_ID = "de.zbit.garuda.GarudaSoftwareBackend.softwareRegistrationError";
+	public static final String GARUDA_ACTIVATED = "de.zbit.garuda.GarudaSoftwareBackend.garudaActivated";
+
+	public static final String SOFTWARE_DEREGISTERED_ERROR = "Protocol Error: SoftwareNotRegistered";
+	public static final String SOFTWARE_REGISTERED_ERROR = "Protocol Error: SoftwareRegistered";
+
+	private static final int GARUDA_CORE_PORT = 9000;
+  private static final int GARUDA_CORE_TIMEOUT = 1000;
+
 	/**
 	 * A {@link Logger} for this class.
 	 */
 	private static final Logger logger = Logger.getLogger(GarudaSoftwareBackend.class.getName());
+	
 	/**
-	 * 
+	 * Localization support.
 	 */
-	public static final String SOFTWARE_DEREGISTERED_ERROR = "Protocol Error: SoftwareNotRegistered";
-  /**
-	 * 
-	 */
-	public static final String SOFTWARE_DEREGISTRATION_ERROR_ID = "de.zbit.garuda.GarudaSoftwareBackend.softwareDeregistrationError";
-	/**
-	 * 
-	 */
-	public static final String SOFTWARE_REGISTERED_ERROR = "Protocol Error: SoftwareRegistered";
-	/**
-	 * 
-	 */
-	public static final String SOFTWARE_REGISTRATION_ERROR_ID = "de.zbit.garuda.GarudaSoftwareBackend.softwareRegistrationError";
+	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels");
+	
 	/**
 	 * 
 	 */
@@ -132,6 +168,7 @@ public class GarudaSoftwareBackend {
 	 * 
 	 */
 	private GarudaSoftwareListener softwareListener;
+
 	/**
 	 * 
 	 * @param parent
@@ -145,8 +182,10 @@ public class GarudaSoftwareBackend {
 		this.listOfOutputFileFormats = new LinkedList<FileFormat>();
 		this.listOfInputFileFormats = new LinkedList<FileFormat>();
     this.softwareListener = new GarudaSoftwareListener(this);
-    addPropertyChangeListeners(parent);
+    addPropertyChangeListenerForAllProperties(this.softwareListener);
+    addPropertyChangeListenerForAllProperties(this.parent);
 	}
+	
 	/**
 	 * 
 	 * @param ff
@@ -201,17 +240,18 @@ public class GarudaSoftwareBackend {
 	
 	/**
 	 * 
-	 * @param parent
+	 * @param listener
 	 */
-	public void addPropertyChangeListeners (UserInterface parent) {
-		addPropertyChangeListener(LOAD_FILE_PROPERTY_CHANGE_ID, parent);
-		addPropertyChangeListener(LOAD_GADGET_PROPERTY_CHANGE_ID, parent);
-		addPropertyChangeListener(GOT_SOFTWARES_PROPERTY_CHANGE_ID, parent);
-		addPropertyChangeListener(GOT_ERRORS_PROPERTY_CHANGE_ID, parent);
-		addPropertyChangeListener(CONNECTION_TERMINATED_ID, parent);
-		addPropertyChangeListener(CONNECTION_NOT_INITIALIZED_ID, parent);
-		addPropertyChangeListener(SOFTWARE_REGISTRATION_ERROR_ID, parent);
-		addPropertyChangeListener(SOFTWARE_DEREGISTRATION_ERROR_ID, parent);
+	private void addPropertyChangeListenerForAllProperties(PropertyChangeListener listener) {
+		addPropertyChangeListener(LOAD_FILE_PROPERTY_CHANGE_ID, listener);
+		addPropertyChangeListener(LOAD_GADGET_PROPERTY_CHANGE_ID, listener);
+		addPropertyChangeListener(GOT_SOFTWARES_PROPERTY_CHANGE_ID, listener);
+		addPropertyChangeListener(GOT_ERRORS_PROPERTY_CHANGE_ID, listener);
+		addPropertyChangeListener(CONNECTION_TERMINATED_ID, listener);
+		addPropertyChangeListener(CONNECTION_NOT_INITIALIZED_ID, listener);
+		addPropertyChangeListener(SOFTWARE_REGISTRATION_ERROR_ID, listener);
+		addPropertyChangeListener(SOFTWARE_DEREGISTRATION_ERROR_ID, listener);
+		addPropertyChangeListener(GARUDA_ACTIVATED, listener);
 	}
 	
 	/**
@@ -225,7 +265,7 @@ public class GarudaSoftwareBackend {
 			throw new BackendNotInitializedException();
 		}
 		CoreClientAPI.getInstance().deregisterSoftware();
-		logger.fine("Software deregistered from the Core.");
+		logger.fine(bundle.getString("SOFTWARE_DEREGISTERED"));
 	}
 	
 	/* (non-Javadoc)
@@ -341,8 +381,9 @@ public class GarudaSoftwareBackend {
 	 */
 	public void init() throws NetworkException {
 		if (softwareListener == null) {
-			throw new IllegalStateException("Garuda Listener not initialized."); 
+			throw new IllegalStateException(bundle.getString("GARUDA_LISTENER_NOT_INITIALIZED")); 
 		}
+		
 		CoreClientAPI api = CoreClientAPI.getInstance();
 		
 		api.initialize(
@@ -352,12 +393,11 @@ public class GarudaSoftwareBackend {
 			softwareListener,
 			GARUDA_CORE_PORT,
 			GARUDA_CORE_TIMEOUT);
-		logger.fine("Garuda CoreClient Initialized");
+		logger.fine(bundle.getString("GARUDA_CORE_INITIALIZED"));
 		
 		api.start();
 		
-		logger.fine("Garuda CoreClient Initialized and started");
-		
+		logger.fine(bundle.getString("GARUDA_CORE_STARTED"));
 		
 		PlatformEventManager.getInstance().addListener(new PlatformEventListener() {
 			/* (non-Javadoc)
@@ -372,7 +412,7 @@ public class GarudaSoftwareBackend {
 			 * @see jp.sbi.garuda.platform.event.PlatformEventListener#fire(jp.sbi.garuda.platform.event.PlatformEvent)
 			 */
 			@Override
-			public void fire(PlatformEvent event) { 
+			public void fire(PlatformEvent event) {
 				String message = event.getMessage();
 				logger.warning(message);
 				if (!initialized) {
@@ -414,7 +454,8 @@ public class GarudaSoftwareBackend {
 		});
 		
 		api.activateSoftware();
-		logger.fine("Garuda CoreClient Initialized and software activated");		
+		logger.fine(bundle.getString("GARUDA_CORE_SOFTWARE_ACTIVATED"));
+		firePropertyChange(GARUDA_ACTIVATED, this);
 		
 		initialized = true;
 	}
@@ -446,7 +487,7 @@ public class GarudaSoftwareBackend {
 			throw new BackendNotInitializedException();
 		}
 		File parentFolder = new File(System.getProperty("user.dir"));
-		logger.fine("path for software is: " + parentFolder.getAbsolutePath());
+		logger.fine(MessageFormat.format(bundle.getString("PATH_FOR_SOFTWARE"), parentFolder.getAbsolutePath()));
 		//The path of the software that the core will use in order to launch it. Note that this 
 		//is the command that someone would use in order to launch the software. In this case we are 
 		//using the command to launch a jar file.
@@ -494,7 +535,7 @@ public class GarudaSoftwareBackend {
 		api.registerSoftware(filePath, workingDirectory,
 			listOfInputFileFormats, listOfOutputFileFormats, map);
 		
-		logger.fine("register software to Core " + parentFolder.getAbsolutePath());
+		logger.fine(MessageFormat.format(bundle.getString("REGISTERED_SOFTWARE_TO_CORE"), parentFolder.getAbsolutePath()));
 	}
 	
 	/**
@@ -503,6 +544,15 @@ public class GarudaSoftwareBackend {
 	 */
 	public void removePropertyChangeListener(PropertyChangeListener pcl) {
 		pcs.removePropertyChangeListener(pcl);
+	}
+	
+	/**
+	 * 
+	 * @param propertyName
+	 * @param pcl
+	 */
+	public void removePropertyChangeListener(String propertyName, PropertyChangeListener pcl) {
+		pcs.removePropertyChangeListener(propertyName, pcl);
 	}
 	
 	/**
@@ -518,9 +568,9 @@ public class GarudaSoftwareBackend {
 				softwareID,
 				selectedFile.getName().substring(
 					selectedFile.getName().indexOf('.') + 1));
-			logger.fine("Request to get the compatible softwares list sent for file " + selectedFile);
+			logger.fine(MessageFormat.format(bundle.getString("REQUESTED_COMPATIBLE_SOFTWARE"), selectedFile));
 		} else {
-			throw new IllegalStateException("No File selected");
+			throw new IllegalStateException(bundle.getString("NO_FILE_SELECTED"));
 		}
 	}
 	
@@ -534,19 +584,22 @@ public class GarudaSoftwareBackend {
 	public void sentFileToSoftware(File selectedFile, int indexOfSoftware)
 		throws NetworkException, IllegalStateException {
 		if ((selectedFile == null) || !selectedFile.exists()) {
-			throw new IllegalStateException("File to sent does not exist.");
+			throw new IllegalStateException(MessageFormat.format(bundle.getString("FILE_DOES_NOT_EXIST"), selectedFile));
 		}
 		if ((listOfCompatibleSoftware == null)
 				|| listOfCompatibleSoftware.isEmpty()
 				|| (listOfCompatibleSoftware.get(indexOfSoftware) == null)) {
-			throw new IllegalStateException("No compatible softwares.");
+			throw new IllegalStateException(MessageFormat.format(
+				bundle.getString("NO_COMPATIBLE_SOFTWARE_FOUND"),
+				FileTools.getExtension(selectedFile.getName())));
 		}
 		CoreClientAPI.getInstance().loadFileOntoSoftware(
 			listOfCompatibleSoftware.get(indexOfSoftware),
 			selectedFile.getAbsolutePath());
-		logger.fine("Request to load file " + selectedFile.getAbsolutePath()
-				+ " to software "
-				+ listOfCompatibleSoftware.get(indexOfSoftware).getName());
+		logger.fine(MessageFormat.format(
+			bundle.getString("FILE_LOADING_REQUEST"),
+			selectedFile.getAbsolutePath(),
+			listOfCompatibleSoftware.get(indexOfSoftware).getName()));
 	}
 	
 	/**
@@ -555,7 +608,7 @@ public class GarudaSoftwareBackend {
 	 */
 	public void setListOfCompatibleSoftware(List<Software> softwareList) {
 		this.listOfCompatibleSoftware = softwareList;
-  	firePropertyChange(GOT_SOFTWARES_PROPERTY_CHANGE_ID, null);
+  	firePropertyChange(GOT_SOFTWARES_PROPERTY_CHANGE_ID, softwareList);
 	}
 
 	/* (non-Javadoc)
@@ -564,7 +617,8 @@ public class GarudaSoftwareBackend {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("GarudaSoftwareBackend [softwareID=");
+		builder.append(getClass().getSimpleName());
+		builder.append(" [softwareID=");
 		builder.append(softwareID);
 		builder.append(", initialized=");
 		builder.append(initialized);

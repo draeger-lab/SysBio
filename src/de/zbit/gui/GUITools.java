@@ -1236,6 +1236,28 @@ public class GUITools {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param menuBar
+	 * @param command
+	 * @return
+	 */
+	public static JMenuItem find(JMenuBar menuBar, Object command) {
+		JMenu menu;
+		JMenuItem item;
+		for (int i = 0; i < menuBar.getMenuCount(); i++) {
+			menu = menuBar.getMenu(i);
+			if (menu.getActionCommand().equals(command)) {
+				return menu;
+			}
+			item = find(menu, command);
+			if (item != null) {
+				return item;
+			}
+		}
+		return null;
+	}
   
   /**
    * Tries to get the lokalized cancel Button Message, as it occurs
