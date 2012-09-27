@@ -402,6 +402,13 @@ public class Entry {
   
   /**
    * 
+   * @param components
+   */
+  public void setComponents(List<Integer> components) {
+    this.components = components;   
+  }
+  /**
+   * 
    * @param reaction
    */
   public void appendReaction(String reaction) {
