@@ -43,6 +43,9 @@ import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionType;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.RelationType;
+import de.zbit.kegg.parser.pathway.ext.EntryExtended;
+import de.zbit.kegg.parser.pathway.ext.EntryTypeExtended;
+import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
 
 /**
@@ -369,9 +372,48 @@ public class KeggParser extends DefaultHandler {
       String name = node.getNodeName().trim();
       
       NamedNodeMap att = node.getAttributes();
-      if (name.equalsIgnoreCase("entry")) {
+      if (name.equalsIgnoreCase("entry") || name.equalsIgnoreCase("entryExtended")) {
         if (!silent) System.out.println("Parsing Entry " + getNodeValue(att,"name") + "...");
-        Entry e = new Entry(p, getNodeValueInt(att, "id"), getNodeValue(att, "name"), EntryType.valueOf(getNodeValue(att,"type")), getNodeValue(att, "link"), getNodeValue(att, "reaction"), node.getChildNodes() );
+        
+        // Determine extended attributes
+        String extGeneType = getNodeValue(att, "geneType", true);
+        String extCompartment = getNodeValue(att, "compartment", true);
+        String extDBIdentifier = null; // Just any
+        for (IdentifierDatabases dbName : IdentifierDatabases.values()) {
+          extDBIdentifier = getNodeValue(att, dbName.toString(), true);
+          if (extDBIdentifier!=null) {
+            break;
+          }
+        }
+        
+        // Do we need an EntryExtended?
+        Entry e;
+        if (extGeneType!=null || extCompartment!=null || extDBIdentifier!=null) {
+          e = new EntryExtended(p, getNodeValueInt(att, "id"), getNodeValue(att, "name"), EntryType.valueOf(getNodeValue(att,"type")), getNodeValue(att, "link"), getNodeValue(att, "reaction"), node.getChildNodes() );
+          
+          ((EntryExtended) e).setCompartment(extCompartment);
+          if (extGeneType!=null) {
+            try {
+              ((EntryExtended) e).setGeneType(EntryTypeExtended.valueOf(extGeneType));
+            } catch (Exception ex) {
+              System.out.println("Invalid EntryExtendedType: " + extGeneType);
+            }
+          }
+          if (extDBIdentifier!=null) {
+            for (IdentifierDatabases dbName : IdentifierDatabases.values()) {
+              extDBIdentifier = getNodeValue(att, dbName.toString(), true);
+              if (extDBIdentifier!=null && extDBIdentifier.length()>0) {
+                ((EntryExtended) e).addDatabaseIdentifier(dbName, extDBIdentifier);
+              }
+            }
+          }
+          
+        } else {
+          // Nope, just a simple plain KGML entry.
+          e = new Entry(p, getNodeValueInt(att, "id"), getNodeValue(att, "name"), EntryType.valueOf(getNodeValue(att,"type")), getNodeValue(att, "link"), getNodeValue(att, "reaction"), node.getChildNodes() );
+        }
+         
+        
         p.addEntry(e);
       } else if (name.equalsIgnoreCase("reaction")) {
         if (!silent) System.out.println("Parsing Reaction " + getNodeValue(att,"name") + "...");
@@ -394,6 +436,28 @@ public class KeggParser extends DefaultHandler {
   public static String getNodeValue(NamedNodeMap n, String attribute) {
     Node no = n.getNamedItem(attribute);
     String att = no==null ? "":no.getNodeValue();
+    return att;
+  }
+  
+  /***
+   * 
+   * @param n
+   * @param attribute
+   * @param returnNullIfEmpty if {@code TRUE}, returns {@code NULL} instead
+   * of an empty return string. Else, returns always an empty string instead
+   * of {@code NULL}.
+   * @return
+   */
+  public static String getNodeValue(NamedNodeMap n, String attribute, boolean returnNullIfEmpty) {
+    Node no = n.getNamedItem(attribute);
+    String att = no==null ? null:no.getNodeValue();
+    if (att==null || att.trim().length()<1) {
+      if (returnNullIfEmpty) {
+        return null;
+      } else {
+        return "";
+      }
+    }
     return att;
   }
   
