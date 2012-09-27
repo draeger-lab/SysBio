@@ -115,7 +115,7 @@ public class Relation {
 
   /**
    * 
-   * @return
+   * @return id of entry1
    */
   public int getEntry1() {
     return entry1;
@@ -123,7 +123,7 @@ public class Relation {
   
   /**
    * 
-   * @return
+   * @return id of entry2
    */
   public int getEntry2() {
     return entry2;

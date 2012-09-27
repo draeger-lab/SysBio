@@ -276,8 +276,9 @@ public class EntryExtended extends Entry {
   @Override
   public int hashCode() {
     int hash = super.hashCode();
-    if(isSetGeneType())
+    if(isSetGeneType()) {
       hash *= geneType.hashCode();
+    }
     
     return hash;
   }
