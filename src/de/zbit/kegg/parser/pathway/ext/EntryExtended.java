@@ -143,9 +143,7 @@ public class EntryExtended extends Entry {
    * @param ke
    */
   public EntryExtended(Entry ke) {
-    super(ke.getParentPathway(),
-        ke.getId(),
-        ke.getName());
+    super(ke.getParentPathway(), ke.getId(), ke.getName());
 //    if(ke.getParentPathway()!=null){
 //      this.setParentNode(ke.getParentNode());
 //    }

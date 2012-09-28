@@ -53,6 +53,13 @@ public class DatabaseIdentifiers {
    */
   private static Map<IdentifierDatabases, DatabaseContent> describedType = new HashMap<IdentifierDatabases, DatabaseContent>();
   
+  /**
+   * Maps an official name (e.g., "Enzyme Nomenclature") to the
+   * corresponding {@link IdentifierDatabases} (e.g., {@link IdentifierDatabases#EC_code}).
+   * See {@link DatabaseContent}.
+   */
+  private static Map<String, IdentifierDatabases> officialNames = new HashMap<String, IdentifierDatabases>();
+  
   
   /**
    * An enumeration of different databases with identifiers in aplhabetical order.
@@ -406,6 +413,13 @@ public class DatabaseIdentifiers {
 
       }
       
+      // Check the official names list
+      for (String officialName : officialNames.keySet()) {
+        if (officialName.equalsIgnoreCase(dbIdentifier)) {
+          return officialNames.get(officialName);
+        }
+      }
+      
       log.warning(String.format("Could not get database identifier for '%s'.", dbIdentifier));
     }
     return id;
@@ -554,6 +568,11 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.HGNC,                  DatabaseContent.omics); // Gene symbols are not only for genes...
     describedType.put(IdentifierDatabases.GeneSymbol,            DatabaseContent.omics); // Gene symbols are not only for genes...
     describedType.put(IdentifierDatabases.SBO,                   DatabaseContent.description);
+    
+    
+    for (IdentifierDatabases db : IdentifierDatabases.values()) {
+      officialNames.put(db.getOfficialName(), db);
+    }
   }
   
   
