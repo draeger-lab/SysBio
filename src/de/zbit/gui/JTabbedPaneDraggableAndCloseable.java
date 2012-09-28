@@ -249,7 +249,9 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
         if (e.isPopupTrigger()) doPop(e);
       }
       private void doPop(MouseEvent e){
-        createRightMousePopup().show(e.getComponent(), e.getX(), e.getY());
+        if (getTabCount()>0) {
+          createRightMousePopup().show(e.getComponent(), e.getX(), e.getY());
+        }
       }
     }
     addMouseListener(new PopClickListener());

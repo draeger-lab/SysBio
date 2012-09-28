@@ -224,7 +224,7 @@ public class Utils {
   
   /** Nicht ganz korrekt da auch 4.345,2.1 als nummer erkannt wird, aber das reicht mir so. **/
   public static boolean isNumber(String s, boolean onlyDigits) {
-    if (s.trim().length()==0) return false;
+    if (s==null || s.trim().length()==0) return false;
     char[] a = s.trim().toCharArray();
     boolean atLeastOneDigit=false;
     for (int i=0; i< a.length; i++) {
