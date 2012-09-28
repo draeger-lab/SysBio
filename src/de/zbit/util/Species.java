@@ -854,5 +854,12 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public boolean isSetScientificName() {
     return scientificName!=null && scientificName.length()>0;
   }
+
+  /**
+   * @return
+   */
+  public boolean isSetKeggAbbr() {
+    return keggAbbr!=null && keggAbbr.length()>0;
+  }
   
 }
