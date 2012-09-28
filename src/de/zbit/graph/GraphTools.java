@@ -375,6 +375,7 @@ public class GraphTools {
     partialLayouter.setMirroringAllowed(false);
     partialLayouter.setMinimalNodeDistance(15);
     partialLayouter.setLayoutOrientation(PartialLayouter.ORIENTATION_AUTO_DETECTION);
+    partialLayouter.setFixedGroupResizingEnabled(true); // Group nodes need to be enlarged
     
     graph.unselectAll();
     for (Node n : newNodes) {
