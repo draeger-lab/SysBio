@@ -603,7 +603,6 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			}
 			JEditorPane notesArea = new JEditorPane("text/html",
 					"<html><head></head>" + text + "</html>");
-			System.out.println(notesArea.getText());
 			notesArea.setEditable(editable);
 			notesArea.addHyperlinkListener(new SystemBrowser());
 //			notesArea.setMaximumSize(new Dimension(preferedWidth, 200));
