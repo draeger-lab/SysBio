@@ -43,6 +43,11 @@
   <entry key="SOFTWARE_LIST">Software Liste</entry>
   <entry key="SELECT_SOFTWARE">Wählen Sie eine Garuda-Software</entry>
   
+  <!-- GarudaOptions -->
+  
+  <entry key="CONNECT_TO_GARUDA">Mit Garuda verbinden</entry>
+  <entry key="CONNECT_TO_GARUDA_TOOLTIP">Entscheidet, ob dieses Programm versuchen sollte, sich mit einem Garuda-Kern zu verbinden.</entry>
+  
   <!-- GarudaSoftwareBackend -->
   
   <entry key="FILE_DOES_NOT_EXIST">Datei {0} zum Senden existiert nicht.</entry>
