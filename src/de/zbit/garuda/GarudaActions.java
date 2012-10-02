@@ -31,10 +31,15 @@ import de.zbit.util.ResourceManager;
  * <pre>
  * JMenuItem sentFile = GUITools.createJMenuItem(this,
  * 	GarudaActions.SENT_TO_GARUDA, false);
- * ResourceBundle garudaBundle = ResourceManager.getBundle(&quot;de.zbit.garuda.locales.Labels&quot;);
- * JMenu garudaMenu = GUITools.createJMenu(garudaBundle.getString(&quot;GARUDA&quot;), sentFile);
+ * ResourceBundle garudaBundle = ResourceManager
+ * 		.getBundle(&quot;de.zbit.garuda.locales.Labels&quot;);
+ * JMenu garudaMenu = GUITools.createJMenu(garudaBundle.getString(&quot;GARUDA&quot;),
+ * 	sentFile);
  * garudaMenu.setToolTipText(garudaBundle.getString(&quot;GARUDA_TOOLTIP&quot;));
  * </pre>
+ * 
+ * Or you could directly use the {@link GarudaGUIfactory}, where this is already
+ * implemented.
  * 
  * @author Andreas Dr&auml;ger
  * @date 11:41:08
@@ -52,10 +57,6 @@ public enum GarudaActions implements ActionCommandWithIcon {
 	 * Localization support.
 	 */
 	private static final transient ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels"); 
-	
-	static {
-		GarudaSoftwareBackend.loadGarudaIcons();
-	}
 
 	/* (non-Javadoc)
 	 * @see de.zbit.gui.actioncommand.ActionCommand#getName()
