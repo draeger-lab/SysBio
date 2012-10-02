@@ -25,17 +25,10 @@
 	separate actual labels from associated tool tips.
   </comment>
   
-  <!-- GarudaSoftwareListener -->
+  <!-- GarudaActions -->
   
-  <entry key="COULD_NOT_ESTABLISH_CONNECTION">Could not establish connection to Garuda Core.</entry>
-  <entry key="LOADED_GADGET">Loaded Gadget {0}</entry>
-  <entry key="LOADED_FILE">Loaded File {0}</entry>
-  <entry key="LOST_CONNECTION_TO_CORE">Lost connection to Garuda Core.</entry>
-  <entry key="RECEIVED_NEW_SOFTWARE_LIST">Got new software list</entry>
-  <entry key="RECEIVED_COMPATIBLE_SOFTWARE_LIST">Received compatible software list: {0}</entry>
-  <entry key="RECEIVED_GADGET_REQUEST">Received load gadget request: {0}</entry>
-  <entry key="SOFTWARE_ALREADY_REGISTERED">Software already registered.</entry>
-  <entry key="SOFTWARE_STILL_NOT_REGISTERED">Software still not registered.</entry>
+  <entry key="SENT_TO_GARUDA">Sent current file to Garuda</entry>
+  <entry key="SENT_TO_GARUDA_TOOLTIP">Sents the current file to a compatible software in the Garuda platform.</entry>
   
   <!-- GarudaFileSender -->
   
@@ -62,11 +55,21 @@
   <entry key="SOFTWARE_DEREGISTERED">Software deregistered from the Garuda Core.</entry>
   <entry key="PATH_FOR_SOFTWARE">path for this software is: {0}</entry>
   
+  <!-- GarudaSoftwareListener -->
+  
+  <entry key="COULD_NOT_ESTABLISH_CONNECTION">Could not establish connection to Garuda Core.</entry>
+  <entry key="LOADED_GADGET">Loaded Gadget {0}</entry>
+  <entry key="LOADED_FILE">Loaded File {0}</entry>
+  <entry key="LOST_CONNECTION_TO_CORE">Lost connection to Garuda Core.</entry>
+  <entry key="RECEIVED_NEW_SOFTWARE_LIST">Got new software list</entry>
+  <entry key="RECEIVED_COMPATIBLE_SOFTWARE_LIST">Received compatible software list: {0}</entry>
+  <entry key="RECEIVED_GADGET_REQUEST">Received load gadget request: {0}</entry>
+  <entry key="SOFTWARE_ALREADY_REGISTERED">Software already registered.</entry>
+  <entry key="SOFTWARE_STILL_NOT_REGISTERED">Software still not registered.</entry>
+  
   <!-- User interface -->
   
   <entry key="GARUDA">Garuda</entry>
   <entry key="GARUDA_TOOLTIP">Interaction with other Garuda-enabled tools</entry>
-  <entry key="SENT_TO_GARUDA">Sent current file to Garuda</entry>
-  <entry key="SENT_TO_GARUDA_TOOLTIP">Sents the current file to a compatible software in the Garuda platform.</entry>
   
 </properties>
