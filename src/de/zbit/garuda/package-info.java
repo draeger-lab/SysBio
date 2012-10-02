@@ -54,6 +54,18 @@
  * particular software. Of course, the only thing you'll have to adapt are the
  * supported file formats.
  * <p>
+ * In order to avoid a time out because no Garuda Core is running, you can use
+ * the {@link de.zbit.garuda.GarudaOptions} class to add a command-line option
+ * to your software. You might want to surround Garuda loading with the
+ * following code in your {@link de.zbit.Launcher#initGUI(de.zbit.AppConf)}:
+ * 
+ * <pre>
+ * if (!appConf.getCmdArgs().containsKey(GarudaOptions.CONNECT_TO_GARUDA)
+ * 		|| appConf.getCmdArgs().getBoolean(GarudaOptions.CONNECT_TO_GARUDA)) {
+ *   // load Garuda as shown above.
+ * }
+ * </pre>
+ * <p>
  * Your user interface could provide a specialized {@link javax.swing.JMenu} for
  * interaction with Garuda. To this end, the
  * {@link de.zbit.garuda.GarudaGUIfactory} provides the method
