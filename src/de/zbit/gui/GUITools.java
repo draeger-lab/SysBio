@@ -837,7 +837,20 @@ public class GUITools {
    */
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command) {
-    return createJMenuItem(listener, command, (Icon) null);
+  	return createJMenuItem(listener, command, true);
+  }
+  
+  /**
+   * 
+   * @param listener
+   * @param command
+   * @param enabled
+   * @return
+   */
+  public static JMenuItem createJMenuItem(ActionListener listener,
+    ActionCommand command, boolean enabled) {
+  	Icon icon = (command instanceof ActionCommandWithIcon) ? ((ActionCommandWithIcon) command).getIcon() : null;
+    return createJMenuItem(listener, command, icon, enabled);
   }
   
   /**
@@ -848,7 +861,7 @@ public class GUITools {
    */
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, Icon icon) {
-    return createJMenuItem(listener, command, icon, null);
+    return createJMenuItem(listener, command, icon, true);
   }
   
   /**
@@ -912,7 +925,12 @@ public class GUITools {
    */
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, Icon icon, KeyStroke keyStroke) {
-    return createJMenuItem(listener, command, icon, keyStroke, null);
+  	return createJMenuItem(listener, command, icon, keyStroke, true);
+  }
+  
+  public static JMenuItem createJMenuItem(ActionListener listener,
+    ActionCommand command, Icon icon, KeyStroke keyStroke, boolean enabled) {
+  	return createJMenuItem(listener, command, icon, keyStroke, null, enabled);
   }
   
   /**
@@ -927,7 +945,7 @@ public class GUITools {
    */
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic) {
-    return createJMenuItem(listener, command, icon, ks, mnemonic, JMenuItem.class);
+    return createJMenuItem(listener, command, icon, ks, mnemonic, true);
   }
   
   /**
@@ -942,9 +960,7 @@ public class GUITools {
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic,
     boolean enabled) {
-    JMenuItem item = createJMenuItem(listener, command, icon, ks, mnemonic);
-    item.setEnabled(enabled);
-    return item;
+    return createJMenuItem(listener, command, icon, ks, mnemonic, JMenuItem.class, enabled);
   }
   
   /**
@@ -957,11 +973,12 @@ public class GUITools {
    * @param mnemonic
    * @param type may also be {@link JCheckBoxMenuItem} or other derivates
    * of {@link JMenuItem}.
+   * @param enabled 
    * @return
    */
 	public static JMenuItem createJMenuItem(ActionListener listener,
 		ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic,
-		Class<? extends JMenuItem> type) {
+		Class<? extends JMenuItem> type, boolean enabled) {
 		if (type == null) {
 			type = JMenuItem.class;
 		}
@@ -1000,6 +1017,8 @@ public class GUITools {
 		} else if (command instanceof ActionCommandWithIcon) {
 			item.setIcon(((ActionCommandWithIcon) command).getIcon());
 		}
+		
+		item.setEnabled(enabled);
 		
 		return item;
 	}
