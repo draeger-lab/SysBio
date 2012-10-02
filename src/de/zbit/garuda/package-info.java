@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id$ 
  * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
@@ -16,7 +16,104 @@
  */
 
 /**
+ * <p>
+ * Garuda is a kind of "App Store" for Bioinformatics and Systems Biology
+ * software. It basically allows Garuda-enabled tools to receive and sent files
+ * from/to other Garuda-enabled tools.
+ * <p>
+ * Here follows a minimal example of how to use it to Garuda-enable any
+ * software. When initializing your graphical user interface, which must be
+ * derived from {@link UserInterface}, just insert the following piece of code:
+ * 
+ * <pre>
+ * new Thread(new Runnable() {
+ * 	public void run() {
+ * 		try {
+ * 			GarudaSoftwareBackend garudaBackend = new GarudaSoftwareBackend(
+ * 				(UserInterface) gui);
+ * 			garudaBackend.addInputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
+ * 			// ... as many additional input file formats as supported
+ * 			garudaBackend.addOutputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
+ * 			// ... as many additional output file formats as supported
+ * 			garudaBackend.init();
+ * 			garudaBackend.registedSoftwareToGaruda();
+ * 		} catch (NetworkException exc) {
+ * 			GUITools.showErrorMessage(gui, exc);
+ * 		} catch (BackendNotInitializedException exc) {
+ * 			GUITools.showErrorMessage(gui, exc);
+ * 		} catch (Throwable exc) {
+ * 			logger.fine(exc.getLocalizedMessage());
+ * 		}
+ * 	}
+ * }).start();
+ * </pre>
+ * 
+ * In the above code, it is assumed that {@code gui} is some instance of a AWT
+ * or SWING element. Insert this code in the method
+ * {@link de.zbit.Launcher#initGUI(de.zbit.AppConf)} for the launcher of your
+ * particular software. Of course, the only thing you'll have to adapt are the
+ * supported file formats.
+ * <p>
+ * Your user interface could provide a specialized {@link javax.swing.JMenu} for
+ * interaction with Garuda. To this end, the
+ * {@link de.zbit.garuda.GarudaGUIfactory} provides the method
+ * {@link de.zbit.garuda.GarudaGUIfactory#createGarudaMenu(java.awt.event.ActionListener)}
+ * . You only have to pass some {@link java.awt.event.ActionListener} to this
+ * method and it will create a {@link javax.swing.JMenu} providing access to
+ * Garuda functions.
+ * <p>
+ * However, before you can react to action events comming from the Garuda Core,
+ * you'll have to register the {@link de.zbit.garuda.GarudaSoftwareBackend} in
+ * your application: As any instance of {@link UserInterface}, also your one
+ * must extend {@link PropertyChangeListener}. In order to successfully enable
+ * Garuda in your application, do the following in your gui:
+ * 
+ * <pre>
+ * public void propertyChange(PropertyChangeEvent evt) {
+ * 	String propName = evt.getPropertyName();
+ * 	if (propName.equals(GarudaSoftwareBackend.GARUDA_ACTIVATED)) {
+ * 		this.garudaBackend = (GarudaSoftwareBackend) evt.getNewValue();
+ * 		if (supportedFileOpened) {
+ * 			enableGarudaInMenuBar();
+ * 		}
+ * 	} else {
+ * 		// ... do whatever else could be necessary for your program.
+ * 	}
+ * }
+ * </pre>
+ * 
+ * In this method, the instance of the {@link GarudaSoftwareBackend} can be
+ * stored in the GUI as a controller for Garuda:
+ * 
+ * <pre>
+ * GarudaFileSender sender = new GarudaFileSender(parentComponent, garudaBackend,
+ * 	file);
+ * sender.execute();
+ * </pre>
+ * 
+ * This example will open a {@link javax.swing.JOptionPane} displaying
+ * compatible Garuda-enabled software as soon as it received the list of Garuda
+ * software from the core. If the user selects one of these programs, the
+ * {@link de.zbit.garuda.GarudaFileSender} will automatically sent the given
+ * {@link java.io.File} to that program. Note that it could be necessary to
+ * create a temporary {@link java.io.File} and saving the current document from
+ * your software to this {@link java.io.File} before sending the it to the
+ * Garuda Core.
+ * <p>
+ * In order to sent a file to other Garuda-enabled tools, you will have to add
+ * some buttons or menu items to your application. This can, for instance, be
+ * done by using the {@link de.zbit.garuda.GarudaGUIfactory}. The action to sent
+ * a file can be performed by using the {@link GarudaFileSender}.
+ * <p>
+ * For localization support you can find an XML file containg several useful
+ * entries in the Garuda resource folder. This folder also contains Garuda icons
+ * in several sizes. These icons and also the localization are automatically
+ * linked to {@link de.zbit.garuda.GarudaActions} and therefore already used
+ * when calling
+ * {@link de.zbit.garuda.GarudaGUIfactory#createGarudaMenu(java.awt.event.ActionListener)}.
+ * 
  * @author Andreas Dr&auml;ger
  * @version $Rev$
  */
 package de.zbit.garuda;
+

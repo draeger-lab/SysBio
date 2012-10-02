@@ -21,7 +21,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -30,9 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-
-import javax.swing.ImageIcon;
-import javax.swing.UIManager;
 
 import jp.sbi.garuda.platform.commons.FileFormat;
 import jp.sbi.garuda.platform.commons.Software;
@@ -48,70 +44,7 @@ import de.zbit.io.FileTools;
 import de.zbit.util.ResourceManager;
 
 /**
- * <p>
  * An easily usable backend for Garuda support.
- * <p>
- * Here follows a minimal example of how to use it to Garuda-enable any
- * software. When initializing your graphical user interface, which must be
- * derived from {@link UserInterface}, just insert the following piece of code:
- * 
- * <pre>
- * new Thread(new Runnable() {
- * 	public void run() {
- * 		try {
- * 			GarudaSoftwareBackend garudaBackend = new GarudaSoftwareBackend(
- * 				(UserInterface) gui);
- * 			garudaBackend.addInputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
- * 			// ... as many additional input file formats as supported
- * 			garudaBackend.addOutputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
- * 			// ... as many additional output file formats as supported
- * 			garudaBackend.init();
- * 			garudaBackend.registedSoftwareToGaruda();
- * 		} catch (NetworkException exc) {
- * 			GUITools.showErrorMessage(gui, exc);
- * 		} catch (BackendNotInitializedException exc) {
- * 			GUITools.showErrorMessage(gui, exc);
- * 		} catch (Throwable exc) {
- * 			logger.fine(exc.getLocalizedMessage());
- * 		}
- * 	}
- * }).start();
- * </pre>
- * 
- * In the above code, it is assumed that {@code gui} is some instance of a AWT
- * or SWING element.
- * <p>
- * You may also consider loading the Garuda icons by calling the method
- * {@link #loadGarudaIcons()}. If you do this, you can use these icons in your
- * graphical user interface by calling the {@link UIManager}. In case that you
- * use {@link GarudaActions}, you don't have to care about loading icons. It is
- * done automatically for you upon the first call to {@link GarudaActions}.
- * <p>
- * As any instance of {@link UserInterface}, also your one must extend
- * {@link PropertyChangeListener}. In order to successfully enable Garuda in
- * your application, do the following in your gui:
- * 
- * <pre>
- * public void propertyChange(PropertyChangeEvent evt) {
- * 	String propName = evt.getPropertyName();
- * 	if (propName.equals(GarudaSoftwareBackend.GARUDA_ACTIVATED)) {
- * 		this.garudaBackend = (GarudaSoftwareBackend) evt.getNewValue();
- * 		if (supportedFileOpened) {
- * 			enableGarudaInMenuBar();
- * 		}
- * 	}
- * }
- * </pre>
- * 
- * In this method, the instance of the {@link GarudaSoftwareBackend} can be
- * stored in the GUI as a controller for Garuda.
- * <p>
- * In order to sent a file to other Garuda-enabled tools, you will have to add
- * some buttons or menu items to your application. The action to sent a file can
- * be performed by using the {@link GarudaFileSender}.
- * <p>
- * For localization support you can find an XML file containg several useful
- * entries in the garuda resource folder.
  * 
  * @author Andreas Dr&auml;ger
  * @date 17:42:09
@@ -135,29 +68,6 @@ public class GarudaSoftwareBackend {
 
 	private static final int GARUDA_CORE_PORT = 9000;
   private static final int GARUDA_CORE_TIMEOUT = 1000;
-  
-	/**
-	 * Loads the Garuda icons into the {@link UIManager}. You can access the icons
-	 * using the keys
-	 * <ul>
-	 * <li>{@code ICON_GARUDA_16}</li>
-	 * <li>{@code ICON_GARUDA_32}</li>
-	 * <li>{@code ICON_GARUDA_48}</li>
-	 * </ul>
-	 */
-  public static void loadGarudaIcons() {
-  	String iconPaths[] = {
-  			"ICON_GARUDA_16.png",
-  			"ICON_GARUDA_32.png",
-  			"ICON_GARUDA_48.png"
-		};
-		for (String path : iconPaths) {
-			URL u = GarudaSoftwareBackend.class.getResource("img/" + path);
-			if (u != null) {
-				UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(u));
-			}
-		}
-  }
 
 	/**
 	 * A {@link Logger} for this class.
