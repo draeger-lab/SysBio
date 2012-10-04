@@ -45,6 +45,8 @@
   
   <!-- GarudaOptions -->
   
+  <entry key="GarudaOptions">Garuda-Einstellungen</entry>
+  <entry key="GarudaOptions_TOOLTIP">Einstellungen für die Kommunikation mit einem Garuda-Kern und damit dem Zugriff auf weitere Garuda-fähige Programme.</entry>
   <entry key="CONNECT_TO_GARUDA">Mit Garuda verbinden</entry>
   <entry key="CONNECT_TO_GARUDA_TOOLTIP">Entscheidet, ob dieses Programm versuchen sollte, sich mit einem Garuda-Kern zu verbinden.</entry>
   
