@@ -127,7 +127,7 @@ public class OptionGroup<T> implements ActionCommand,
 			
 			if (asRadioButtons) {
 				ButtonGroup group = new ButtonGroup();
-				for (Option opt : option) {
+				for (Option<?> opt : option) {
 					opt.setButtonGroup(group);
 				}
 			}
