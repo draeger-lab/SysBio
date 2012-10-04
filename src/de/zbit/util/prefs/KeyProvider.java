@@ -139,8 +139,7 @@ public interface KeyProvider {
 		private static StringBuilder createDocumantationContent(
 			Class<? extends KeyProvider> keyProvider, int headerRank) {
 			StringBuilder sb = new StringBuilder();
-			ResourceBundle bundle = ResourceManager
-					.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);					
+			ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);					
 			List<OptionGroup> groupList = optionGroupList(keyProvider);
 			List<Option> optionList = optionList(keyProvider);
 			if (groupList.size() > 0) {
@@ -148,10 +147,12 @@ public interface KeyProvider {
 					if (group.getOptions().size() > 0) {
 						if (group.isAnyOptionVisible()) {
 							sb.append(createHeadline(headerRank, group.getName()));
-							sb.append("      <p>");
-							sb.append(StringUtil.insertLineBreaks(group.getToolTip(), 70,
-								"\n      "));
-							sb.append("</p>\n");
+							String tooltip = group.getToolTip();
+							if ((tooltip != null) && (tooltip.trim().length() > 0)) {
+								sb.append("      <p>");
+								sb.append(StringUtil.insertLineBreaks(tooltip, 70, "\n      "));
+								sb.append("</p>\n");
+							}
 							writeOptionsToHTMLTable(sb, group.getOptions(), optionList);
 						}
 					}
@@ -209,7 +210,7 @@ public interface KeyProvider {
 		 * XXX: This method is work-in-progress!
 		 * 
 		 * @param keyProvider
-		 * @param headerRank wether you want to start with chapter (=0) or section (=1).
+		 * @param headerRank whether you want to start with chapter (=0) or section (=1).
 		 * @return
 		 */
     @SuppressWarnings("rawtypes")
@@ -274,7 +275,7 @@ public interface KeyProvider {
 		 * @param headerRank
 		 * @return
 		 */
-		private static String createProgramUsage(int headerRank, String programName) {
+		private static StringBuilder createProgramUsage(int headerRank, String programName) {
 			ResourceBundle bundle = ResourceManager
 					.getBundle("de.zbit.locales.Labels");
 			String explanation = String.format(bundle.getString("STARTS_PROGRAM"),
@@ -288,10 +289,11 @@ public interface KeyProvider {
 			sb.append(createHeadline(headerRank, bundle.getString("PROGRAM_USAGE")));
 			sb.append("<table cellspacing=\"1\" cellpadding=\"1\" border=\"0\" width=\"100%\">\n");
 			sb.append(createHTMLTableLine(SBPreferences.generateUsageString(), explanation, indentation));
-			sb.append(createHTMLTableLine("--help, -?", String.format(bundle.getString("COMMAND_LINE_HELP"), bundle
-				.getString("OPTIONS")), indentation));
+			sb.append(
+				createHTMLTableLine("--help, -?", 
+				String.format(bundle.getString("COMMAND_LINE_HELP"), bundle.getString("OPTIONS")), indentation));
 			sb.append("</table>\n\n");
-			return sb.toString();
+			return sb;
 		}
 		
 		/**
@@ -307,7 +309,7 @@ public interface KeyProvider {
 			sb.append(indentation1);
 			sb.append("<tr>\n");
 			sb.append(indentation2);
-			sb.append("<td colspan=\"2\" class=\"typewriter-blue\"> ");
+			sb.append("<td colspan=\"2\" class=\"typewriter-red\"> ");
 			sb.append(typeWriterText);
 			sb.append(" </td>\n");
 			sb.append(indentation1);
@@ -347,7 +349,7 @@ public interface KeyProvider {
 			StringBuilder sb = new StringBuilder();
 			ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 			String cmdArgs = bundle.getString("COMMAND_LINE_ARGUMENTS");
-			if (applicationName != null && applicationName.length()>0) {
+			if ((applicationName != null) && (applicationName.length() > 0)) {
 				sb.append(createDocumentationHeader(StringUtil.concat(applicationName,
 					" - ", cmdArgs).toString()));
 			} else {
@@ -356,15 +358,20 @@ public interface KeyProvider {
 			sb.append('\n');
 			sb.append(createProgramUsage(2, applicationName));
 			for (Class<? extends KeyProvider> keyProvider : keyProviders) {
-				sb.append(String.format("    <h2> %s </h2>\n\n",
-					createTitle(keyProvider)));
+				sb.append(String.format("    <h2> %s </h2>\n\n", createTitle(keyProvider)));
+				String description = createDescription(keyProvider);
+				if ((description != null) && (description.trim().length() > 0)) {
+					sb.append("    <p>\n");
+					sb.append(description);
+					sb.append("    </p>\n\n");
+				}
 				sb.append(createDocumantationContent(keyProvider, 3));
 				sb.append('\n');
 			}
 			sb.append(createDocumantationFooter());
 			return sb.toString();
 		}
-		
+
 		/**
 		 * Writes the complete command line documentation for an application into a
 		 * {@link File}.
@@ -415,9 +422,10 @@ public interface KeyProvider {
 			sb.append("        .typewriter {\n");
 			sb.append("           font-family:'courier new',courier,monospace;\n");
 			sb.append("        }\n");
-			sb.append("        .typewriter-blue {\n");
+			sb.append("        .typewriter-red {\n");
 			sb.append("           font-family:'courier new',courier,monospace;\n");
-			sb.append("           color:#0000C0;\n        }\n      -->\n");
+			sb.append("           font-weight: bold;\n");
+			sb.append("           color:#a51e37;\n        }\n      -->\n");
 			sb.append("    </style>\n");
 			sb.append("    <title> ");
 			sb.append(title);
@@ -438,20 +446,7 @@ public interface KeyProvider {
 		 */
 		public static String createTitle(Class<?> clazz) {
 			String title = clazz.getSimpleName();
-      ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
-      // Check if the given class contains an own ResourceBundle:
-      for (Field field : clazz.getFields()) {
-				try {
-					Object b = field.get(clazz);
-	      	if ((b != null) && (b instanceof ResourceBundle)) {
-	      		bundle = (ResourceBundle) b;
-	      		logger.fine("Found ResourceBundle " + bundle.toString());
-	      		break;
-	      	}
-				} catch (Throwable exc) {
-					// ignore
-				}
-      }
+      ResourceBundle bundle = findResourceBundleFor(clazz);
       if (bundle.containsKey(title)) {
         return bundle.getString(title);
       }
@@ -474,6 +469,44 @@ public interface KeyProvider {
 				}
 			}
 			return headLine.toString();
+		}
+		
+		/**
+		 * 
+		 * @param clazz
+		 * @return
+		 */
+		public static ResourceBundle findResourceBundleFor(Class<?> clazz) {
+			ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+      // Check if the given class contains an own ResourceBundle:
+      for (Field field : clazz.getFields()) {
+				try {
+					Object b = field.get(clazz);
+	      	if ((b != null) && (b instanceof ResourceBundle)) {
+	      		bundle = (ResourceBundle) b;
+	      		logger.fine("Found ResourceBundle " + bundle.toString());
+	      		break;
+	      	}
+				} catch (Throwable exc) {
+					// ignore
+					logger.finest(exc.getLocalizedMessage());
+				}
+      }
+			return bundle;
+		}
+
+		/**
+		 * 
+		 * @param keyProvider
+		 * @return
+		 */
+		public static String createDescription(Class<? extends KeyProvider> clazz) {
+			ResourceBundle bundle = findResourceBundleFor(clazz);
+			if (bundle != null) {
+				String key = clazz.getSimpleName() + "_TOOLTIP";
+				return bundle.containsKey(key) ? bundle.getString(key) : null;
+			}
+			return null;
 		}
 		
 		/**
@@ -722,10 +755,9 @@ public interface KeyProvider {
 				// Hide options that should not be visible, i.e., show only visible options.
 				if (option.isVisible()) {
 					sb.append("        <tr>\n          ");
-					sb.append("<td colspan=\"2\" class=\"typewriter-blue\">");
+					sb.append("<td colspan=\"2\" class=\"typewriter-red\">");
 					String shortName = option.getShortCmdName();
-					String requiredType = String.format("&#60;%s&#62;", option
-							.getRequiredType().getSimpleName());
+					String requiredType = String.format("&#60;%s&#62;", option.getRequiredType().getSimpleName());
 					/*
 					 * Special treatment of boolean arguments whose presents only is
 					 * already sufficient to switch some feature on.
@@ -761,7 +793,7 @@ public interface KeyProvider {
 						if ((list != null) && (list.size() > 0)) {
 							sb.append("<br/>\n          ");
 							sb.append(bundle.getString("ALL_POSSIBLE_VALUES_FOR_TYPE"));
-							sb.append(" <span class=typewriter>");
+							sb.append(" <span class=\"typewriter\">");
 							sb.append(requiredType);
 							sb.append("</span> ");
 							sb.append(bundle.getString("ARE"));
@@ -788,7 +820,7 @@ public interface KeyProvider {
                 } else {
                   value = element.toString();
                 }
-								sb.append("<span class=typewriter>");
+								sb.append("<span class=\"typewriter\">");
 								sb.append(value);
 								sb.append("</span>");
 								lineLength += value.length() + 30;
@@ -806,7 +838,7 @@ public interface KeyProvider {
 					if (defaultValue != null) {
 						sb.append("<br/>\n          ");
 						sb.append(bundle.getString("DEFAULT_VALUE"));
-						sb.append(": <span class=typewriter> ");
+						sb.append(": <span class=\"typewriter\"> ");
 						if (defaultValue instanceof Class<?>) {
 							sb.append(((Class<?>) defaultValue).getSimpleName());
 						} else {

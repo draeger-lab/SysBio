@@ -42,8 +42,7 @@ public class CommandLineHelp {
 	/**
 	 * Creates a nice title for this online help.
 	 */
-	private static final String title = KeyProvider.Tools
-			.createTitle(CommandLineHelp.class);
+	private static final String title = KeyProvider.Tools.createTitle(CommandLineHelp.class);
 	
 	/**
 	 * Creates a non-editable {@link JEditorPane} embedded in a
@@ -99,8 +98,7 @@ public class CommandLineHelp {
 	 * @return
 	 */
 	private static JEditorPane initJEditor(Class<? extends KeyProvider> clazz) {
-		JEditorPane editor = new JEditorPane("text/html", KeyProvider.Tools
-				.createDocumentation(clazz));
+		JEditorPane editor = new JEditorPane("text/html", KeyProvider.Tools.createDocumentation(clazz));
 		editor.setEditable(false);
 		editor.setEnabled(true);
 		editor.setBackground(Color.WHITE);
@@ -113,8 +111,7 @@ public class CommandLineHelp {
 	 * @return
 	 */
 	private static JEditorPane initJEditor(Class<? extends KeyProvider>... clazzes) {
-		JEditorPane editor = new JEditorPane("text/html", KeyProvider.Tools
-				.createDocumentation(clazzes));
+		JEditorPane editor = new JEditorPane("text/html", KeyProvider.Tools.createDocumentation(clazzes));
 		editor.setEditable(false);
 		editor.setEnabled(true);
 		editor.setCaretPosition(0); // Set Scrollbars to top of Frame.
@@ -162,4 +159,5 @@ public class CommandLineHelp {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
+
 }

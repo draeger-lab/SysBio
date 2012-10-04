@@ -38,6 +38,8 @@
   
   <!-- GarudaOptions -->
   
+  <entry key="GarudaOptions">Garuda options</entry>
+  <entry key="GarudaOptions_TOOLTIP">Settings for the communication with a Garuda Core and hence access to other Garuda-enabled tools.</entry>
   <entry key="CONNECT_TO_GARUDA">Connect to Garuda</entry>
   <entry key="CONNECT_TO_GARUDA_TOOLTIP">Decides whether or not the current application should attempt to connect to the Garuda Core.</entry>
   
