@@ -157,6 +157,10 @@ public class DatabaseIdentifiers {
      * vitamins.
      */
     LipidBank,
+    /**
+     * Molecular Interactions Ontology (PSI-MI)
+     */
+    MI,
     miRBase,
     NCBI_Taxonomy,
     /**
@@ -370,7 +374,9 @@ public class DatabaseIdentifiers {
         return IdentifierDatabases.NCBI_Taxonomy;
         
       } else if (dbIdentifier2.equalsIgnoreCase("NCBIGeneID") ||
-          dbIdentifier2.equalsIgnoreCase("GeneID")) {
+          dbIdentifier2.equalsIgnoreCase("GeneID") ||
+          dbIdentifier2.equalsIgnoreCase("LocusLink") ||
+          dbIdentifier2.equalsIgnoreCase("LL")) {
         return IdentifierDatabases.EntrezGene;
         
       } else if (dbIdentifier2.equalsIgnoreCase("GO") || 
@@ -477,6 +483,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.HGNC,                  "HGNC:\\d{1,5}");
     regExMap.put(IdentifierDatabases.GeneSymbol,            "\\w+");
     regExMap.put(IdentifierDatabases.SBO,                   "SBO:\\d{7}");
+    regExMap.put(IdentifierDatabases.MI,                    "MI:\\d{4}");
     
     
     
@@ -522,6 +529,7 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.KEGG_Metagenome,      "urn:miriam:kegg.metagenome:");
     miriamMap.put(IdentifierDatabases.HGNC,                 "urn:miriam:hgnc:");
     miriamMap.put(IdentifierDatabases.SBO,                  "urn:miriam:biomodels.sbo:");
+    miriamMap.put(IdentifierDatabases.MI,                   "urn:miriam:obo.mi:");
     //miriamMap.put(IdentifierDatabases.GeneSymbol,         ); // None available!
     
     
@@ -568,6 +576,7 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.HGNC,                  DatabaseContent.omics); // Gene symbols are not only for genes...
     describedType.put(IdentifierDatabases.GeneSymbol,            DatabaseContent.omics); // Gene symbols are not only for genes...
     describedType.put(IdentifierDatabases.SBO,                   DatabaseContent.description);
+    describedType.put(IdentifierDatabases.MI,                    DatabaseContent.description);
     
     
     for (IdentifierDatabases db : IdentifierDatabases.values()) {
