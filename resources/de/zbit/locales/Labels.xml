@@ -13,6 +13,8 @@
   <entry key="DEFAULT_TOOL_BAR_TITLE">Tools</entry>
   <entry key="LICENSE_OF_THE_PROGRAM">%s - License</entry>
   <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Online Help</entry>
+  <entry key="STATUS_BAR">Status Bar</entry>
+  <entry key="VIEW">View</entry>
   
   <!-- CSVImporter -->
   
