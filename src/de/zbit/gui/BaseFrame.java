@@ -28,6 +28,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowListener;
 import java.beans.EventHandler;
@@ -52,6 +54,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -424,6 +427,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	}
 	
 	/**
+	 * Override this method to create additional menu items for the 'view' menu.
+	 * @return
+	 */
+	protected JMenuItem[] additionalViewMenuItems() {
+		return null;
+	}
+	
+	/**
 	 * Adds a listener to this {@link BaseFrame} that is notified in case that the
 	 * user alters some {@link SBPreferences} within the {@link PreferencesDialog}.
 	 * 
@@ -444,7 +455,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		return listOfPrefChangeListeners.add(pcl);
 	}
 	
-	/**
+  /**
 	 * 
 	 * @param fileList
 	 * @param fileHistory
@@ -490,7 +501,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     }
 	}
 	
-  /* (non-Javadoc)
+	/* (non-Javadoc)
    * @see de.zbit.UserInterface#closeFile()
    */
 	@Override
@@ -743,14 +754,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		fileMenu.setActionCommand(BaseAction.FILE.toString());
 		return fileMenu;
 	}
-	
-	/**
-	 * show the "Save" menu entry if true 
-	 * @return
-	 */
-	protected boolean showsSaveMenuEntry() {
-		return false;
-	}
 
 	/**
 	 * Creates a {@link JMenu} for user help.
@@ -847,6 +850,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		
 		listOfMenus.add(createFileMenu(loadDefaultFileMenuEntries));
 		listOfMenus.add(createEditMenu());
+		listOfMenus.add(createViewMenu());
 		if (additionalMenus != null) {
 			listOfMenus.addAll(Arrays.asList(additionalMenus));
 		}
@@ -902,6 +906,35 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	protected abstract Component createMainComponent();
 
 	/**
+	 * 
+	 * @return
+	 */
+	public JMenu createViewMenu() {
+		ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+		JCheckBoxMenuItem showStatusBar = new JCheckBoxMenuItem(bundle.getString("STATUS_BAR"), true);
+		showStatusBar.addItemListener(new ItemListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+			 */
+			@Override
+			public void itemStateChanged(ItemEvent evt) {
+				Container container = getContentPane();
+				if (evt.getStateChange() == ItemEvent.SELECTED) {
+					container.add(statusBar, BorderLayout.SOUTH);
+					container.validate();
+				} else if (evt.getStateChange() == ItemEvent.DESELECTED) {
+					container.remove(statusBar);
+					container.validate();
+				}
+			}
+		});
+		JMenuItem items[] = additionalViewMenuItems();
+		
+		return GUITools.createJMenu(bundle.getString("VIEW"), items, showStatusBar);
+	}
+
+	/**
 	 * Method that is called on exit, i.e., when this {@link BaseFrame}
 	 * {@link Window} is closing.
 	 */
@@ -934,8 +967,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     // Call real exit method
     exit();
 	}
-  
-  /**
+
+	/**
 	 * This convenient method allows callers to change the entry names of
 	 * {@link JMenuItem}s in the {@link JMenuBar} of this {@link BaseFrame}. The
 	 * returned {@link Map} contains a mapping from each {@link BaseAction} to the
@@ -951,8 +984,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
   protected Map<BaseAction, String> getAlternativeBaseActionNames() {
 		return null;
 	}
-	
-	/* (non-Javadoc)
+  
+  /* (non-Javadoc)
 	 * @see de.zbit.UserInterface#getApplicationName()
 	 */
 	@Override
@@ -1050,7 +1083,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     return new File(prefs.get(OPEN_DIR));
   }
 	
-  /* (non-Javadoc)
+	/* (non-Javadoc)
    * @see de.zbit.UserInterface#getProgramNameAndVersion()
    */
 	@Override
@@ -1065,7 +1098,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		}
 	}
 	
-	/**
+  /**
 	 * Returns the default directory to save {@link File}s.
 	 * 
 	 * @return
@@ -1093,25 +1126,22 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 */
 	@Override
 	public abstract URL getURLLicense();
-
+	
 	/* (non-Javadoc)
 	 * @see de.zbit.UserInterface#getURLOnlineHelp()
 	 */
 	@Override
 	public abstract URL getURLOnlineHelp();
-	
-  /* (non-Javadoc)
+
+	/* (non-Javadoc)
    * @see de.zbit.UserInterface#getURLOnlineUpdate()
    */
 	@Override
 	public URL getURLOnlineUpdate() {
-	  if (this.appConf != null) {
-	    return appConf.getOnlineUpdate();
-	  }
-	  return null;
+	  return (appConf != null) ? appConf.getOnlineUpdate() : null;
 	}
 	
-	/**
+  /**
 	 * Initializes this graphical user interface.
 	 */
 	protected void init() {
@@ -1187,7 +1217,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		restoreWindowSizeAndState();
 		setLocationRelativeTo(null);
 	}
-
+	
 	/**
 	 * Initialize the status bar. This method can be overwritten
 	 * and if {@code null} is returned, the status bar is disabled.
@@ -1219,8 +1249,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
   protected boolean loadsDefaultFileMenuEntries() {
     return true;
   }
-  
-  /**
+
+	/**
    * Starts a search for an online update and shows error messages if no update
    * can be performed for some reason.
    */
@@ -1256,8 +1286,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			"getPropertyName"));
 		update.execute();
 	}
-	
-	/**
+  
+  /**
 	 * <p>
 	 * This method is linked to the {@link BaseAction#FILE_OPEN} and will be
 	 * called when ever any element associated with this action command is
@@ -1386,7 +1416,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		throws NullPointerException {
 		return listOfPrefChangeListeners.remove(pcl);
 	}
-
+	
 	/**
    * Restores the window width, height and state from preferences.
    */
@@ -1406,7 +1436,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
       setExtendedState(state);
     }
   }
-	
+
 	/**
 	 * Saves some results or the current work in some {@link File}. If you use a
 	 * {@link JTabbedPane}, it is recommended to let your tabs implement the
@@ -1428,6 +1458,39 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		// DO NOT MAKE THIS METHOD ABSTRACT! NOT EVERY PROGRAM ALLOWS STORING DATA
 		// IN OPENED INPUT FILES AGAIN!
 		return saveFileAs();
+	}
+	
+	/**
+	 * Calls {@link #saveFileAs()} and memorizes the directory in which a file was
+	 * stored as a {@link GUIOptions#SAVE_DIR} for the current {@link Class}
+	 * (which implements {@link GUIOptions}. While saving some file, the actions
+	 * {@link BaseAction#FILE_SAVE} and {@link BaseAction#FILE_SAVE_AS} are
+	 * disabled. When done, these are enabled again. Override this method if you
+	 * want a different behavior.
+	 */
+	public void saveFileAndLogSaveDir() {
+		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
+			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
+		File file = saveFileAs();
+		if (file != null) {
+			if (!file.isDirectory()) {
+				file = file.getParentFile();
+			}
+			if (file.exists() && file.canRead() && file.canWrite()) {
+				SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+				prefs.put(GUIOptions.SAVE_DIR, file.getAbsolutePath());
+				try {
+		          prefs.flush();
+		        } catch (BackingStoreException exc) {
+		          // do NOT show this error, because the user really dosn't know
+		          // how to handle a "The value for SAVE_DIR is out of range [...]"
+		          // message.
+		          logger.finest(exc.getLocalizedMessage());
+		        };
+			}
+		}
+		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
+			BaseAction.FILE_SAVE_AS);
 	}
 	
 	/**
@@ -1460,39 +1523,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		File file = saveFile();
 		if (file == null) {
 			saveFileAndLogSaveDir();
-		}
-		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
-			BaseAction.FILE_SAVE_AS);
-	}
-	
-	/**
-	 * Calls {@link #saveFileAs()} and memorizes the directory in which a file was
-	 * stored as a {@link GUIOptions#SAVE_DIR} for the current {@link Class}
-	 * (which implements {@link GUIOptions}. While saving some file, the actions
-	 * {@link BaseAction#FILE_SAVE} and {@link BaseAction#FILE_SAVE_AS} are
-	 * disabled. When done, these are enabled again. Override this method if you
-	 * want a different behavior.
-	 */
-	public void saveFileAndLogSaveDir() {
-		GUITools.setEnabled(false, getJMenuBar(), getJToolBar(),
-			BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS);
-		File file = saveFileAs();
-		if (file != null) {
-			if (!file.isDirectory()) {
-				file = file.getParentFile();
-			}
-			if (file.exists() && file.canRead() && file.canWrite()) {
-				SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
-				prefs.put(GUIOptions.SAVE_DIR, file.getAbsolutePath());
-				try {
-		          prefs.flush();
-		        } catch (BackingStoreException exc) {
-		          // do NOT show this error, because the user really dosn't know
-		          // how to handle a "The value for SAVE_DIR is out of range [...]"
-		          // message.
-		          logger.finest(exc.getLocalizedMessage());
-		        };
-			}
 		}
 		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
 			BaseAction.FILE_SAVE_AS);
@@ -1586,6 +1616,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			this, "activateOnlineHelpCommand", null, "windowClosed"), String.format(
 			resources.getString("ONLINE_HELP_FOR_THE_PROGRAM"),
 			getProgramNameAndVersion()), getURLOnlineHelp(), getCommandLineOptions());
+	}
+	
+	/**
+	 * show the "Save" menu entry if true 
+	 * @return
+	 */
+	protected boolean showsSaveMenuEntry() {
+		return false;
 	}
 
 	/**

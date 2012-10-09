@@ -13,6 +13,8 @@
   <entry key="DEFAULT_TOOL_BAR_TITLE">Werkzeuge</entry>
   <entry key="LICENSE_OF_THE_PROGRAM">%s - Nutzungsvereinbarung</entry>
   <entry key="ONLINE_HELP_FOR_THE_PROGRAM">%s - Hilfe-Webseite</entry>
+  <entry key="STATUS_BAR">Status-Leiste</entry>
+  <entry key="VIEW">Ansicht</entry>
   
   <!-- CSVImporter -->
   

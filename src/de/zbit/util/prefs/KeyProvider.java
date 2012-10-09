@@ -34,12 +34,27 @@ import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
+ * <p>
  * Base class for all those elements that provide a collection of {@link Option}
  * instances to be used in key-value pairs, e.g., in {@link SBPreferences} or
  * {@link SBProperties}. Note that there must not be more than one class that is
  * derived from {@link KeyProvider} in the same package because the package name
  * is the path to the position where user options are stored in the local
  * configuration.
+ * <p>
+ * In case that your {@link KeyProvider} contains some instance of
+ * {@link ResourceBundle} in form of a static variable, which in turn contains
+ * your {@link KeyProvider}'s simple class name (i.e.,
+ * {@link Class#getSimpleName()}) as one of its keys, and maybe this simple name
+ * plus the suffix "_TOOLTIP", the automatic HTML documentation tool within
+ * {@link Tools} can generate a customized head line and a description of your
+ * particular {@link KeyProvider}. One example: Your class that implements
+ * {@link KeyProvider} is named "MyKeyProvider". Now, there is a public static
+ * final variable of type {@link ResourceBundle}, e.g., "myBundle" in
+ * "MyKeyProvider". The file, to which "myBundle" points, contains two keys and
+ * corresponding descriptions: "MyKeyProvider" (description: a human readable
+ * name) and "MyKeyProvider_TOOLTIP" (description: a longer text explaining the
+ * purpose of the class).
  * 
  * @author Andreas Dr&auml;ger
  * @date 2010-11-04
@@ -309,7 +324,7 @@ public interface KeyProvider {
 			sb.append(indentation1);
 			sb.append("<tr>\n");
 			sb.append(indentation2);
-			sb.append("<td colspan=\"2\" class=\"typewriter-red\"> ");
+			sb.append("<td colspan=\"2\" class=\"typewriter-highlighted\"> ");
 			sb.append(typeWriterText);
 			sb.append(" </td>\n");
 			sb.append(indentation1);
@@ -422,7 +437,7 @@ public interface KeyProvider {
 			sb.append("        .typewriter {\n");
 			sb.append("           font-family:'courier new',courier,monospace;\n");
 			sb.append("        }\n");
-			sb.append("        .typewriter-red {\n");
+			sb.append("        .typewriter-highlighted {\n");
 			sb.append("           font-family:'courier new',courier,monospace;\n");
 			sb.append("           font-weight: bold;\n");
 			sb.append("           color:#a51e37;\n        }\n      -->\n");
@@ -755,7 +770,7 @@ public interface KeyProvider {
 				// Hide options that should not be visible, i.e., show only visible options.
 				if (option.isVisible()) {
 					sb.append("        <tr>\n          ");
-					sb.append("<td colspan=\"2\" class=\"typewriter-red\">");
+					sb.append("<td colspan=\"2\" class=\"typewriter-highlighted\">");
 					String shortName = option.getShortCmdName();
 					String requiredType = String.format("&#60;%s&#62;", option.getRequiredType().getSimpleName());
 					/*

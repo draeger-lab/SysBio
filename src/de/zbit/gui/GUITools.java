@@ -777,12 +777,13 @@ public class GUITools {
    *        {@link Object}s are ignored.
    * @return
    */
-  public static JMenu createJMenu(String text, char mnemonic,
-    Object... menuItems) {
+  public static JMenu createJMenu(String text, char mnemonic, Object... menuItems) {
     JMenu menu = new JMenu(text);
     menu.setMnemonic(mnemonic);
     for (Object item : menuItems) {
-      if (item instanceof JMenuItem) {
+    	if (item == null) {
+    		continue;
+    	} else if (item instanceof JMenuItem) {
         menu.add((JMenuItem) item);
       } else if (item instanceof JSeparator) {
         menu.add((JSeparator) item);
