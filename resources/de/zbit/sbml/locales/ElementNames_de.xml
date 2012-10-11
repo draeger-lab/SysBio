@@ -33,7 +33,7 @@
   <entry key="constraint">Nebenbedingung</entry>
   <entry key="delay">Verzögerung</entry>
   <entry key="event">Ereignis</entry>
-  <entry key="eventAssignment">Ereigniszuweisung</entry>
+  <entry key="eventAssignment">Ereignisbestimmung</entry>
   <entry key="functionDefinition">Funktionsdefinition</entry>
   <entry key="initialAssignment">Anfangsbestimmung</entry>
   <entry key="kineticLaw">Kinetisches Gesetz</entry>
@@ -42,6 +42,7 @@
   <entry key="listOfCompartmentTypes">Kompartimentarten</entry>
   <entry key="listOfConstraints">Nebenbedingungen</entry>
   <entry key="listOfEvents">Ereignisse</entry>
+  <entry key="listOfEventAssignments">Ereignisbestimmungen</entry>
   <entry key="listOfFunctionDefinitions">Funktionsdefinitionen</entry>
   <entry key="listOfInitialAssignments">Anfangsbestimmungen</entry>
   <entry key="listOfLocalParameters">Parameter</entry> <!-- local or not is not relevant to the end-user. -->
