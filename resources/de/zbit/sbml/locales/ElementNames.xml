@@ -40,6 +40,7 @@
   <entry key="listOfCompartmentTypes">Compartment types</entry>
   <entry key="listOfConstraints">Constraints</entry>
   <entry key="listOfEvents">Events</entry>
+  <entry key="listOfEventAssignments">Event assignments</entry>
   <entry key="listOfFunctionDefinitions">Function definitions</entry>
   <entry key="listOfInitialAssignments">Initial assignments</entry>
   <entry key="listOfLocalParameters">Parameters</entry> <!-- local or not is not relevant to the user. -->
