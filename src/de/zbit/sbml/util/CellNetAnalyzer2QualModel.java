@@ -57,8 +57,8 @@ public class CellNetAnalyzer2QualModel {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static SBMLDocument createQualitativeModel(String modelName, String modelID, String creator, String speciesFile, String reactionFile) throws IOException, ParseException {
-		SBMLDocument sbmlDoc = QualModelBuilding.initializeQualDocument(modelName, modelID, creator);
+	public static SBMLDocument createQualitativeModel(String modelName, String modelID, String creator, String speciesFile, String reactionFile, String taxon, String organism) throws IOException, ParseException {
+		SBMLDocument sbmlDoc = QualModelBuilding.initializeQualDocument(modelName, modelID, creator, taxon, organism);
 	  
 		Model model = QualModelBuilding.model;
 	    QualitativeModel qModel = QualModelBuilding.qualModel;
@@ -148,7 +148,7 @@ public class CellNetAnalyzer2QualModel {
 	}
 	
 	public static void main(String[] args) throws IOException, ParseException, SBMLException, XMLStreamException {
-		SBMLDocument sbmlDoc = createQualitativeModel("IL_6", "IL_6", "Roland Keller", args[0], args[1]);
+		SBMLDocument sbmlDoc = createQualitativeModel("IL_6", "IL_6", "Roland Keller", args[0], args[1], args[2], args[3]); // e.g.: .. , .. ,9606, human
 		SBMLWriter.write(sbmlDoc, args[2], "BuildToyModelTest", "1");
 	}
 	
