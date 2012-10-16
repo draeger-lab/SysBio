@@ -21,6 +21,7 @@ package de.zbit.sbml.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +50,11 @@ public class Transfac2QualModel {
 	private static QualitativeModel qModel;
 	
 	/**
+	 * contains the model
+	 */
+	private static Model model;
+	
+	/**
 	 * contains the level of the model
 	 */
 	private static int level;
@@ -61,7 +67,43 @@ public class Transfac2QualModel {
 	/**
 	 * counter for transitions
 	 */
-	private static int transition = 0;
+	private static int transitionCnt = 0;
+
+	/**
+	 * counter for encodingTransitions
+	 */
+	private static int encodingTransitions = 0;
+
+	/**
+	 * counter for regulationTransitions
+	 */
+	private static int regulationTransitions = 0;
+
+	/**
+	 * counter for interactionTransitions
+	 */
+	private static int interactionTransitions = 0;
+
+	/**
+	 * counter for selfInteractionTransitions
+	 */
+	private static int selfInteractionTransitions = 0;
+
+	/**
+	 * counter for complexingTransitions
+	 */
+	private static int complexingTransitions = 0;
+
+	/**
+	 * counter for superFamilyTransitions
+	 */
+	private static int superFamilyTransitions = 0;
+	
+	/**
+	 * counter for qualitative Species
+	 */
+	private static int qualSpeciesCnt = 0;
+	
 	
 	/**
 	 * contains the given model organisms
@@ -87,12 +129,13 @@ public class Transfac2QualModel {
 	 * @throws SBMLException
 	 * @throws XMLStreamException
 	 */
-	public Transfac2QualModel(String modelName, String modelID, String creator, String tfOrganisms, String bindingFactors, String bindingSites, String outputFile, String organism) throws IOException, SBMLException, XMLStreamException {
-		SBMLDocument doc = QualModelBuilding.initializeQualDocument(modelName, modelID, creator);
+	public Transfac2QualModel(String modelName, String modelID, String creator, String tfOrganisms, String bindingFactors, String bindingSites, String outputFile, String organisms, String taxonId, String modelOrganism) throws IOException, SBMLException, XMLStreamException {
+		SBMLDocument doc = QualModelBuilding.initializeQualDocument(modelName, modelID, creator, taxonId, modelOrganism);
 		
-		setModelOrganisms(organism.split(","));
+		setModelOrganisms(organisms.split(","));
 		
 	    qModel = QualModelBuilding.qualModel;
+	    model = QualModelBuilding.model;
 	    level = QualModelBuilding.model.getLevel();
 	    version = QualModelBuilding.model.getVersion();
 	    
@@ -100,7 +143,17 @@ public class Transfac2QualModel {
 	    createBindingFactors(bindingFactors, true);
 		createBindingSites(bindingSites, true);
 		
-		System.out.println(transition);
+		System.out.println("qualSpecies: " + qualSpeciesCnt);
+		System.out.println("Transitions: " + transitionCnt);
+		System.out.println("-------------------------------");
+		System.out.println("encoding: " + encodingTransitions);
+		System.out.println("regulation: " + regulationTransitions);
+		System.out.println("interaction: " + interactionTransitions);
+		System.out.println("self interaction: " + selfInteractionTransitions);
+		System.out.println("complexing: " + complexingTransitions);
+		System.out.println("super family: " + superFamilyTransitions);
+		
+		
 		
 		QualModelBuilding.writeSBMlDocument(doc, outputFile);
 		
@@ -114,27 +167,27 @@ public class Transfac2QualModel {
 	 */
 	private void readTfOrganisms(String tfOrganisms, boolean header) throws IOException {
 		String line;
+		String tfAC = "T00000";
 		
 		BufferedReader input = new BufferedReader(new FileReader(tfOrganisms));
 		while ((line = input.readLine()) != null) {
 			if (!header) {
 				String[] helper = line.split("\t");
-				if (helper.length !=2) {
+				if (helper.length !=3) {
 					System.out.println(helper.length);
 					System.out.println(line);
 					System.exit(0);
 				}
 				else {
 					
-					String tfAC = helper[0]; 		// tf ac (T00000)
-					String tfOrganism = helper[1]; 	// organism
+					tfAC = helper[0]; 		// tf ac (T00000)
+					String tfOrganism = helper[2]; 	// organism
 					
 					organismMap.put(tfAC, tfOrganism);	
 				}
 			}
 			else {header = false;}
 		}
-		
 	}
 
 	/**
@@ -148,7 +201,6 @@ public class Transfac2QualModel {
 		
 		BufferedReader input = new BufferedReader(new FileReader(bindingFactors));
 		while ((line = input.readLine()) != null) {
-//			System.out.println(line);
 			if (!header) {
 				String[] helper = line.split("\t");
 				if (helper.length !=11) {
@@ -165,8 +217,6 @@ public class Transfac2QualModel {
 					String interactingTFs = helper[8]; 	// interacting factors (T00000)
 					String complexPrecurser = helper[9];// complex precurser (T00000)
 					String superFamily = helper[10];	// super family (T00000)
-					
-//					System.out.print(tfId); // TODO
 					
 					if (isModelOrganism(organism)) {
 						addTranscriptionFactor(tfId, tfName);
@@ -208,7 +258,6 @@ public class Transfac2QualModel {
 					System.out.println(helper.length);
 				}
 				else {
-					
 					String regGeneId = helper[3]; 	// reg. Gene id (G000000)
 					String regGeneName = helper[4]; 	// reg. gene name
 					String bindingFactors = helper[5]; 		// binding factors (T00000)
@@ -217,13 +266,14 @@ public class Transfac2QualModel {
 					String[] bfs = bindingFactors.split(";");
 					for (int i = 0; i < bfs.length; i++) {
 						
-						if (qModel.getQualitativeSpecies(bfs[i]) != null) {
+						if (!(bfs[i].equals("none")) && qModel.getQualitativeSpecies(bfs[i]) != null) {
 							Transition t = addTransition("reg", SBO.getUnknownTransition());
 							t.createInput((t.getId() + regGeneId), qsGene, InputTransitionEffect.consumption);
 							t.createOutput((t.getId() + bfs[i]), qModel.getQualitativeSpecies(bfs[i]), OutputTransitionEffect.production);
+							regulationTransitions++;
 						}
 						else {
-							logger.info("one regulation skipped due to non matching organism TF");
+//							logger.info("one regulation skipped due to non matching organism TF");
 						}
 					}
 				}	
@@ -255,6 +305,7 @@ public class Transfac2QualModel {
 		Transition t = addTransition(("tr"), SBO.getTranscription());
 		t.createInput((t.getId() + encodGeneId), qsGene, InputTransitionEffect.consumption);
 		t.createOutput((t.getId() + tfId), qsTF, OutputTransitionEffect.production);
+		encodingTransitions++;
 	}
 
 	/**
@@ -269,50 +320,64 @@ public class Transfac2QualModel {
 		if (qsComplex != null) { // complex organism corresponds to the precurser organism 
 			Transition t = addTransition(("cx"), SBO.getStateTransition());
 			t.createOutput((t.getId() + complexId), qsComplex, OutputTransitionEffect.production);
+			complexingTransitions++;
 			
 			for (int i = 0; i < precurser.length; i++) {
 				QualitativeSpecies qsPre = addQualitativeSpecies(precurser[i], SBO.getMacromolecule());
 				if (qsPre != null) {
 				t.createInput((t.getId() + precurser[i]), qsPre, InputTransitionEffect.consumption);
 				}
-				else { // if at least one precurser species is not of model organism, unregister the transition and the complex
-					logger.info("complex transition unregistered due to non matching organism");
-					t.unregister(t);
-					qsComplex.unregister(qsComplex);
-					// TODO check unregistering
+				else { // if at least one precurser species is not of model organism, remove the transition and the complex species
+//					logger.info("complex transition removed due to non matching organism");
+					qModel.removeTransition(t);
+					qModel.removeQualitativeSpecies(qsComplex);
+					complexingTransitions--;
+					break;
 				}
 			}
 		}
 	}
 
 	/**
-	 * adds the interacting transcriptoin factors incl. the corresponding transition
+	 * adds the interacting transcription factors incl. the corresponding transition
 	 * @param tfId
 	 * @param interactingIds
 	 */
 	private void addInteractingTFs(String tfId, String[] interactingIds) {
 		QualitativeSpecies qsTF = addQualitativeSpecies(tfId, "", SBO.getMacromolecule());
-		
+//		System.out.print(tfId + " " + Arrays.toString(interactingIds) + ": "); // TODO
 		for (int i = 0; i < interactingIds.length; i++) {
 			QualitativeSpecies qsInt = addQualitativeSpecies(interactingIds[i], SBO.getMacromolecule());
 			if (qsInt != null) { // do not create a new transition if the interacting tf is not of the model organism
-				if (!tfId.equals(interactingIds[i])) {
-					Transition t = addTransition("int", SBO.getUnknownTransition());
-					t.createInput((t.getId() + tfId + "input"), qsTF, InputTransitionEffect.consumption);
-					t.createInput((t.getId() + interactingIds[i] + "input"), qsInt, InputTransitionEffect.consumption);
-					t.createOutput((t.getId() + tfId + "output"), qsTF, OutputTransitionEffect.production);
-					t.createOutput((t.getId() + interactingIds[i] + "output"), qsInt, OutputTransitionEffect.production);
+				Integer tf = Integer.valueOf(tfId.replace("T", ""));
+				Integer ia = Integer.valueOf(interactingIds[i].replace("T", ""));
+//				System.out.print(tf + " " + ia + "|"); // TODO
+				if (tf != ia) {
+//					System.out.println(tf + " " + ia); // TODO
+					if (tf<ia){ // only the first occurrence as interacting species
+						Transition t = addTransition("int", SBO.getUnknownTransition());
+						t.createInput((t.getId() + tfId + "input"), qsTF, InputTransitionEffect.consumption);
+						t.createInput((t.getId() + interactingIds[i] + "input"), qsInt, InputTransitionEffect.consumption);
+						t.createOutput((t.getId() + tfId + "output"), qsTF, OutputTransitionEffect.production);
+						t.createOutput((t.getId() + interactingIds[i] + "output"), qsInt, OutputTransitionEffect.production);
+						interactionTransitions++;
+					}
 				}
 				else {
+//					System.out.println(tfId + " " + interactingIds[i]);
 					Transition t = addTransition("int", SBO.getUnknownTransition());
 					t.createInput((t.getId() + tfId + "input"), qsTF, InputTransitionEffect.consumption);
 					t.createOutput((t.getId() + interactingIds[i] + "output"), qsInt, OutputTransitionEffect.production);
+					selfInteractionTransitions++;
 				}
 			}
 			else {
-				logger.info("one species skipped due to non matching organism");
+//				System.out.print("null "); // TODO
+//				logger.info("one species skipped due to non matching organism");
 			}
+//			System.out.print("+ ");
 		}
+//		System.out.println(); // TODO
 	}
 
 	/**
@@ -328,9 +393,10 @@ public class Transfac2QualModel {
 			Transition t = addTransition(("sf"), SBO.getStateTransition());
 			t.createInput((t.getId() + superFamilyId), qsSF, InputTransitionEffect.consumption);
 			t.createOutput((t.getId() + tfId), qsTF, OutputTransitionEffect.production);
+			superFamilyTransitions++;
 		}
 		else {
-			logger.info("one species skipped due to non matching organism");
+//			logger.info("one species skipped due to non matching organism");
 		}
 	}
 
@@ -347,6 +413,7 @@ public class Transfac2QualModel {
 				QualitativeSpecies qs = new QualitativeSpecies(id, name, level, version);
 				qModel.addSpecies(qs);
 				qs.setSBOTerm(sbo);
+				qualSpeciesCnt++;
 				return qs;
 			}
 			else {
@@ -365,10 +432,12 @@ public class Transfac2QualModel {
 	 */
 	private QualitativeSpecies addQualitativeSpecies(String id, int sbo) {
 		if (qModel.getQualitativeSpecies(id) == null) {
+//			System.out.println(organismMap.get(id)); // TODO
 			if (organismMap.get(id) != null && isModelOrganism(organismMap.get(id))){
 				QualitativeSpecies qs = new QualitativeSpecies(id, "", level, version);
 				qModel.addSpecies(qs);
 				qs.setSBOTerm(sbo);
+				qualSpeciesCnt++;
 				return qs;
 			}
 			else { // if deviating organism
@@ -404,11 +473,11 @@ public class Transfac2QualModel {
 	 * @return Transition
 	 */
 	private Transition addTransition(String prefix, int sbo) {
-		Transition t = qModel.createTransition(prefix + transition);
+		Transition t = qModel.createTransition(prefix + transitionCnt);
 		t.setName(t.getId());
 		t.setSBOTerm(sbo);
 		qModel.addTransition(t);
-		transition++;
+		transitionCnt++;
 		return t;
 	}
 	
@@ -434,8 +503,8 @@ public class Transfac2QualModel {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		if (args.length == 5) {
-			new Transfac2QualModel("qualitative Model of the Transfac database", "Transfac_human2012", "Stephanie Tscherneck", args[0], args[1], args[2], args[3], args[4]);
+		if (args.length == 7) {
+			new Transfac2QualModel("qualitative Model of the Transfac database", "Transfac_human2012", "Stephanie Tscherneck", args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
 		}
 		else {
 			throw new Exception("arguments: (space separated) organism-file bindingFactor-file bindingSites-file sbml-file and organisms (commaseparated)");
