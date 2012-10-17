@@ -16,7 +16,10 @@
  */
 package de.zbit.sbml.layout.y;
 
+import org.sbml.jsbml.SBO;
+
 import y.view.NodeRealizer;
+import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.sbml.layout.Macromolecule;
 
 /**
@@ -25,11 +28,21 @@ import de.zbit.sbml.layout.Macromolecule;
  */
 public class YMacromolecule extends Macromolecule<NodeRealizer> {
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
+	 */
 	@Override
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth) {
-		// TODO Auto-generated method stub
-		return null;
+		int sboTerm = SBO.getMacromolecule();
+		NodeRealizer nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
+		nr = nr.createCopy();
+		nr.setCenterX(x);
+		nr.setCenterY(y);
+		nr.setWidth(width);
+		nr.setHeight(height);
+		
+		return nr;
 	}
 
 }

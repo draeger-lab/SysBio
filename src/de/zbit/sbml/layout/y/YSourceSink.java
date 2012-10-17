@@ -16,7 +16,10 @@
  */
 package de.zbit.sbml.layout.y;
 
+import org.sbml.jsbml.SBO;
+
 import y.view.NodeRealizer;
+import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.sbml.layout.SourceSink;
 
 /**
@@ -31,8 +34,15 @@ public class YSourceSink extends SourceSink<NodeRealizer> {
 	@Override
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth) {
-		// TODO Auto-generated method stub
-		return null;
+		int sboTerm = SBO.getEmptySet();
+		NodeRealizer nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
+		nr = nr.createCopy();
+		nr.setCenterX(x);
+		nr.setCenterY(y);
+		nr.setWidth(width);
+		nr.setHeight(height);
+		
+		return nr;
 	}
 
 }

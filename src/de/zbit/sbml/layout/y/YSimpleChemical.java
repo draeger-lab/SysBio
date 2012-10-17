@@ -37,6 +37,7 @@ public class YSimpleChemical extends SimpleChemical<NodeRealizer> {
 		// simple chemical is synonymous with simple molecule (SBO term 247)
 		int sboTerm = SBO.getSimpleMolecule();
 		NodeRealizer nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
+		nr = nr.createCopy();
 		nr.setCenterX(x);
 		nr.setCenterY(y);
 		nr.setWidth(width);
