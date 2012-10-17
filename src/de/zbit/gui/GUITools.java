@@ -2502,7 +2502,7 @@ public class GUITools {
    * Hint: Consider setting {@link ProcessBuilder#redirectErrorStream()}
    * to true.
    * 
-   * <b>WARNING: This might not work on all plattforms. Do not show messages in
+   * <b>WARNING: This might not work on all platforms. Do not show messages in
    * different threads. There is a GUI thread in which messages should be
    * displayed, use other threads for computation. Do not go the opposite
    * way!</b>
@@ -2514,7 +2514,7 @@ public class GUITools {
    * process finished.
    * @return JTextArea
    */
-  public static JTextArea showProcessOutputInTextArea(final Process p, Frame f,
+  public static JTextArea showProcessOutputInTextArea(Process p, Frame f,
     boolean closeWindowAutomaticallyWhenDone) {
     JTextArea area = new JTextArea();
     ProcessObservationWorker worker = new ProcessObservationWorker(p, area, f, closeWindowAutomaticallyWhenDone);

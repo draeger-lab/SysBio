@@ -47,10 +47,6 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.EventObject;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.Icon;
@@ -102,23 +98,8 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	private final Color lineColor= new Color(0, 100, 255);
 	private int dragTabIndex = -1;
 	private boolean hasGhost = true;
-	private List<JTabbedPaneCloseListener> closeListeners = new ArrayList<JTabbedPaneCloseListener>();
 
   private boolean showCloseIcon = true;
-
-	/**
-	 * @param closeListener the closeListener to add
-	 */
-	public void addCloseListener(JTabbedPaneCloseListener closeListener) {
-		closeListeners.add(closeListener);
-	}
-	
-	/**
-	 * @param closeListener the closeListener to remove
-	 */
-	public void removeCloseListener(JTabbedPaneCloseListener closeListener) {
-		closeListeners.remove(closeListener);
-	}
 	
 	/**
 	 * 
@@ -373,27 +354,6 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	
 		panel.add(closeButton);
 		setTabComponentAt(i, panel);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.swing.JTabbedPane#removeTabAt(int)
-	 */
-	@Override
-	public void removeTabAt(int index) {
-		if (closeListeners.size() == 0) {
-			super.removeTabAt(index);
-		} else {
-			TabCloseEvent evt = new TabCloseEvent(this);
-			
-			for (JTabbedPaneCloseListener closeListener : closeListeners) {
-				boolean closeTab = closeListener.tabClosing(evt);
-				if (closeTab) {
-					super.removeTabAt(index);
-					closeListener.tabClosed(evt);
-				}
-			}
-		}
 	}
 	
 	/**
@@ -702,32 +662,6 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 			g2.setPaint(lineColor);
 			g2.fill(lineRect);
 		}
-	}
-	
-	/**
-	 * 
-	 * @author Sebastian Nagel
-	 * @since 1.1
-	 * @version $Rev$
-	 */
-	public class TabCloseEvent extends EventObject implements Serializable {
-		
-		// TODO: Memorize also the index of the element that is closing.
-		// TODO: This should be a class in a separate file.
-		// TODO: Name it TabEvent because it could also be used for other things.s
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * @param source
-		 */
-		public TabCloseEvent(Object source) {
-			super(source);
-		}
-		
 	}
 
   /**
