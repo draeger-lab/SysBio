@@ -498,7 +498,7 @@ public class Transfac2QualModel {
 			new Transfac2QualModel("qualitative Model of the Transfac database", "Transfac_human2012", "Stephanie Tscherneck", args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
 		}
 		else {
-			throw new Exception("arguments: [bindingFactor-file] [organism-file] [bindingSites-file] [sbml-file] [commaseparated allowed organisms (e.g., human,Mammalia)] [NCBI taxon ID, e.g. 9606] [model Organism, e.g. human]");
+			throw new Exception("arguments: [bindingFactor-file] [organism-file] [bindingSites-file] [sbml-file] [commaseparated allowed organisms (e.g., human,Mammalia)] [NCBI taxon ID, e.g. 9606] [model Organism, e.g. human]\n The first three files can be generated using the preparation scripts, which can be found in the folder files/transfacExtractionScripts/");
 		}
 	}
 }
