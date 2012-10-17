@@ -62,9 +62,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 
 	private static Logger logger = Logger.getLogger(YLayoutBuilder.class.toString());
 
-	
 	/**
-	 * A YFiles Graph is the product of this builder.
+	 * A YFiles Graph2D is the product of this builder.
 	 */
 	private Graph2D graph;
 	
@@ -87,6 +86,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	 * Method to initialize the graph2d structure.
 	 * 
 	 * @param layout
+	 * @see de.zbit.sbml.layout.LayoutBuilder#builderStart(org.sbml.jsbml.ext.layout.Layout)
 	 */
 	@Override
 	public void builderStart(Layout layout) {
@@ -94,7 +94,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 		// TODO for all p in progressListeners: progress.setNumberOfTotalCalls(xyz);
 	}
 	
-	// TODO method signature: argument type should be ProgressListener?
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#addProgressListener(de.zbit.util.progressbar.AbstractProgressBar)
+	 */
 	@Override
 	public void addProgressListener(AbstractProgressBar progress) {
 		progressListeners.add(progress);
@@ -102,6 +104,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 
 	/**
 	 * Method to add the compartment glyph representation to the graph.
+	 * @see de.zbit.sbml.layout.LayoutBuilder#buildCompartment(org.sbml.jsbml.ext.layout.CompartmentGlyph)
 	 */
 	@Override
 	public void buildCompartment(CompartmentGlyph compartmentGlyph) {
@@ -130,6 +133,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 		//new GraphTools (null).setInfo(node, GraphMLmaps.NODE_POSITION, "5|9");
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#buildEntityPoolNode(org.sbml.jsbml.ext.layout.SpeciesGlyph, boolean)
+	 */
 	@Override
 	public void buildEntityPoolNode(SpeciesGlyph speciesGlyph,
 			boolean cloneMarker) {
@@ -158,27 +164,46 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 		
 		Node ynode = graph.createNode();
 		graph.setRealizer(ynode, nodeRealizer);
-		logger.info(String.format("put %s=%s", speciesGlyph.getId(), ynode));
 		id2node.put(speciesGlyph.getId(), ynode);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#buildConnectingArc(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
+	 */
 	@Override
 	public void buildConnectingArc(SpeciesReferenceGlyph speciesReferenceGlyph) {
+		// TODO
+		logger.info(String.format("building reference glyph id=%s", speciesReferenceGlyph.getId()));
+		logger.info(speciesReferenceGlyph.toString());
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#buildLineSegment(org.sbml.jsbml.ext.layout.LineSegment)
+	 */
 	@Override
 	public void buildLineSegment(LineSegment lineSegment) {
+		// TODO
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#buildCubicBezier(org.sbml.jsbml.ext.layout.CubicBezier)
+	 */
 	@Override
 	public void buildCubicBezier(CubicBezier cubicBezier) {
+		// TODO
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#buildProcessNode(org.sbml.jsbml.ext.layout.ReactionGlyph, double)
+	 */
 	@Override
-	public void buildProcessNode(ReactionGlyph reactionGlyph,
-			double rotationAngle) {
+	public void buildProcessNode(ReactionGlyph reactionGlyph, double rotationAngle) {
+		// TODO
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#buildTextGlyph(org.sbml.jsbml.ext.layout.TextGlyph)
+	 */
 	@Override
 	public void buildTextGlyph(TextGlyph textGlyph) {
 		BoundingBox boundingBox = textGlyph.getBoundingBox();
@@ -210,6 +235,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 			text = textGlyph.getText();
 			logger.info(String.format("building text glyph element id=%s\n\tindependent text text='%s'",
 					textGlyph.getId(), text));
+			// TODO how to display independent text in yFiles graph?
+			Node ynode = graph.createNode();
+			NodeRealizer nr = graph.getRealizer(ynode);
+			nr.setLabelText(text);
+			nr.setFrame(x, y, width, height);
 		}
 		else if (textGlyph.isSetGraphicalObject() && textGlyph.isSetOriginOfText()) {
 			// label for a graphical object
@@ -234,66 +264,99 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 					 textGlyph.getId()));
 			return;
 		}
-		
-		// TODO
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#builderEnd()
+	 */
 	@Override
 	public void builderEnd() {
 		terminated = true;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#getProduct()
+	 */
 	@Override
 	public Graph2D getProduct() {
 		return graph;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#isProductReady()
+	 */
 	@Override
 	public boolean isProductReady() {
-		// TODO What are the options to detect that the graph is complete?
 		return terminated;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createMacromolecule()
+	 */
 	@Override
 	public Macromolecule<NodeRealizer> createMacromolecule() {
 		return new YMacromolecule();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createSourceSink()
+	 */
 	@Override
 	public SourceSink<NodeRealizer> createSourceSink() {
 		return new YSourceSink();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createUnspecifiedNode()
+	 */
 	@Override
 	public UnspecifiedNode<NodeRealizer> createUnspecifiedNode() {
 		return new YUnspecifiedNode();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createSimpleChemical()
+	 */
 	@Override
 	public SimpleChemical<NodeRealizer> createSimpleChemical() {
 		return new YSimpleChemical();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createCompartment()
+	 */
 	@Override
 	public Compartment<NodeRealizer> createCompartment() {
 		return new YCompartment();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createProduction()
+	 */
 	@Override
 	public Production<NodeRealizer> createProduction() {
 		return new YProduction();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createConsumption()
+	 */
 	@Override
 	public Consumption<NodeRealizer> createConsumption() {
 		return new YConsumption();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createCatalysis()
+	 */
 	@Override
 	public Catalysis<NodeRealizer> createCatalysis() {
 		return new YCatalysis();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createInhibition()
+	 */
 	@Override
 	public Inhibition<NodeRealizer> createInhibition() {
 		return new YInhibition();
