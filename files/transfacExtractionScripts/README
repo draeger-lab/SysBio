@@ -1,0 +1,12 @@
+preparation scripts for Transfac2QualModel.java
+
+factor.dat und site.dat are files from the Transfac database, which can be downloaded from the biobase website (http://www.biobase-international.com/ Login required).
+
+usage of the perl-scripts: 
+
+perl extract_factors.pl [factor.dat] [bindingFactor-file] [organism-file]
+perl extract_sites.pl [site.dat] [bindingSites-file]
+
+
+All transcriptionfactors will be extracted and can then be used to translate the data in a qualitative model.
+The class Transfac2Qualmodel.java requires these three output files and furthermore (i) the organisms which are allowed to include in the model, e.g., human and Mammalia, (ii) the taxon ID from NCBI, e.g., 9606 and (iii) the model organism, e.g., human.
