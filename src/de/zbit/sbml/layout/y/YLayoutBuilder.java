@@ -40,10 +40,9 @@ import org.sbml.jsbml.ext.layout.TextGlyph;
 import y.base.Node;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
-import de.zbit.graph.io.def.SBGNVisualizationProperties;
-import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
 import de.zbit.sbml.layout.Catalysis;
+import de.zbit.sbml.layout.Compartment;
 import de.zbit.sbml.layout.Consumption;
 import de.zbit.sbml.layout.Inhibition;
 import de.zbit.sbml.layout.Macromolecule;
@@ -61,7 +60,7 @@ import de.zbit.util.progressbar.ProgressListener;
  */
 public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> {
 
-	private static Logger logger = Logger.getLogger(YLayoutTest.class.toString());
+	private static Logger logger = Logger.getLogger(YLayoutBuilder.class.toString());
 
 	
 	/**
@@ -80,7 +79,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	private boolean terminated = false;
 
 	/**
-	 * Maps SBML ids to yFiles nodes.
+	 * Maps SBML identifiers to yFiles nodes.
 	 */
 	private Map<String, Node> id2node = new HashMap<String, Node>();
 
@@ -106,26 +105,27 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	 */
 	@Override
 	public void buildCompartment(CompartmentGlyph compartmentGlyph) {
+		// TODO compartmentGlpyh.getSBOTerm() returns -1
+		SBGNNode<NodeRealizer> node = getSBGNNode(SBO.getCompartment());
+		
 		BoundingBox boundingBox = compartmentGlyph.getBoundingBox();
 		Point point = boundingBox.getPosition();
 		Dimensions dimension = boundingBox.getDimensions();
-		double x, y, width, height;
+		double x, y, z, width, height, depth;
 		x = point.getX();
 		y = point.getY();
+		z = point.getZ();
 		width = dimension.getWidth();
 		height = dimension.getHeight();
+		depth = dimension.getDepth();
+
+		NodeRealizer nodeRealizer = node.draw(x, y, z, width, height, depth);
+		Node ynode = graph.createNode();
+		graph.setRealizer(ynode, nodeRealizer);
 		
-		logger.info("building compartmentGlpyh id="+compartmentGlyph.getId());
+		logger.info(String.format("building compartment glyph id=%s\n\tbounding box=%s",
+				compartmentGlyph.getId(), nodeRealizer.getBoundingBox()));
 		
-		// TODO does this return graph.sbgn instances?
-		NodeRealizer nr = SBGNVisualizationProperties.getNodeRealizer(SBO.getCompartment());
-		nr.setX(x);
-		nr.setCenterY(y);
-		nr.setWidth(width);
-		nr.setHeight(height);
-		// TODO Why is there no Compartment interface with a .draw method?
-		CompartmentRealizer cr = new CompartmentRealizer(nr);
-		graph.createNode(cr);
 		
 		//new GraphTools (null).setInfo(node, GraphMLmaps.NODE_POSITION, "5|9");
 	}
@@ -133,8 +133,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	@Override
 	public void buildEntityPoolNode(SpeciesGlyph speciesGlyph,
 			boolean cloneMarker) {
-		// SBO term look-up, then generation of node object with create* methods
-		// in this class
 		SBGNNode<NodeRealizer> node = getSBGNNode(speciesGlyph.getSBOTerm());
 		
 		if (cloneMarker) {
@@ -160,9 +158,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 		
 		Node ynode = graph.createNode();
 		graph.setRealizer(ynode, nodeRealizer);
-		logger.info(String.format("put %s=%s", speciesGlyph.getSpecies(), ynode));
-		id2node.put(speciesGlyph.getSpecies(), ynode);
-		logger.info(id2node.toString());
+		logger.info(String.format("put %s=%s", speciesGlyph.getId(), ynode));
+		id2node.put(speciesGlyph.getId(), ynode);
 	}
 
 	@Override
@@ -184,7 +181,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 
 	@Override
 	public void buildTextGlyph(TextGlyph textGlyph) {
-		logger.info(id2node.toString());
 		BoundingBox boundingBox = textGlyph.getBoundingBox();
 		Point point = boundingBox.getPosition();
 		Dimensions dimensions = boundingBox.getDimensions();
@@ -197,7 +193,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 		String text = "";
 		
 		/* Possibilities:
-		 * (See SBML Layout Extension documentation section "TextLabels"
+		 * (See SBML Layout Extension documentation section "TextLabels")
 		 * 1) independent text
 		 * 		if only text attribute is given
 		 * 2a) label for a graphical object
@@ -209,7 +205,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 		 * text overrides originOfText
 		 */
 		
-		if (textGlyph.isSetText()) {
+		if (textGlyph.isSetText() && !textGlyph.isSetGraphicalObject() && !textGlyph.isSetOriginOfText()) {
 			// independent text
 			text = textGlyph.getText();
 			logger.info(String.format("building text glyph element id=%s\n\tindependent text text='%s'",
@@ -217,17 +213,21 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 		}
 		else if (textGlyph.isSetGraphicalObject() && textGlyph.isSetOriginOfText()) {
 			// label for a graphical object
-			NamedSBase namedSBase = textGlyph.getOriginOfTextInstance();
-			text = namedSBase.getName();
-			logger.info(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
-					textGlyph.getId(), namedSBase.getId(), text));
-			Node origin = id2node.get(namedSBase.getId());
-			logger.info("origin: " + origin.toString());
+			Node origin = id2node.get(textGlyph.getGraphicalObject());
 			NodeRealizer originRealizer = graph.getRealizer(origin);
-			// TODO how to set node text?
-			// wrong: originRealizer.setLabelText(text);
+
+			if (textGlyph.isSetText()) {
+				text = textGlyph.getText();
+				logger.info(String.format("building text glyph element id=%s\n\torigin text overridden text='%s'",
+						textGlyph.getId(), text));
+			}
+			else {
+				NamedSBase namedSBase = textGlyph.getOriginOfTextInstance();
+				text = namedSBase.getName();
+				logger.info(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
+						textGlyph.getId(), namedSBase.getId(), text));
+			}
 			originRealizer.setLabelText(text);
-			// wrong: graph.setLabelText(origin, text);
 		}
 		else {
 			logger.info(String.format("illegal text glyph id=%s",
@@ -241,13 +241,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	@Override
 	public void builderEnd() {
 		terminated = true;
-		
-		logger.info(id2node.toString());
 	}
 
 	@Override
 	public Graph2D getProduct() {
-		return this.graph;
+		return graph;
 	}
 
 	@Override
@@ -274,6 +272,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	@Override
 	public SimpleChemical<NodeRealizer> createSimpleChemical() {
 		return new YSimpleChemical();
+	}
+
+	@Override
+	public Compartment<NodeRealizer> createCompartment() {
+		return new YCompartment();
 	}
 
 	@Override
