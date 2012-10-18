@@ -37,6 +37,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 
 import de.zbit.gui.GUITools;
+import de.zbit.io.OpenedFile;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.Timer;
 
@@ -83,6 +84,8 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 	 * Key used to notify listeners about success. 
 	 */
 	public static final String SBML_READING_SUCCESSFULLY_DONE = "SBML_READING_SUCCESSFULLY_DONE";
+
+	private static final String SBML_READING_SUCCESSFULLY_DONE_OPENED_FILE = "SBML_READING_SUCCESSFULLY_DONE_OPENED_FILE";
 	
 	/**
 	 * The stream from which the SBML content is to be read.
@@ -146,7 +149,10 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 	protected void done() {
 		progressMonitor.close();
 		try {
+			OpenedFile<SBMLDocument> openedFile = 
+					new OpenedFile<SBMLDocument>(sbmlFile, get());
 			firePropertyChange(SBML_READING_SUCCESSFULLY_DONE, null, get());
+			firePropertyChange(SBML_READING_SUCCESSFULLY_DONE_OPENED_FILE, null, openedFile);
 		} catch (InterruptedException exc) {
 			GUITools.showErrorMessage(parent, exc.getLocalizedMessage());
 		} catch (ExecutionException exc) {

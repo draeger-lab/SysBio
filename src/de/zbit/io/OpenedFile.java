@@ -72,6 +72,13 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	public void setFile(File file) {
 		this.file = file;
 	}
+	
+	/**
+	 * checks if Filepath is set
+	 */
+	public boolean isSetFile() {
+		return this.file != null;
+	}
 
 	/**
 	 * @return the original
@@ -165,5 +172,4 @@ public class OpenedFile<T> implements PropertyChangeListener {
 		PropertyChangeListener listener) {
 		propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
 	}
-	
 }
