@@ -22,8 +22,6 @@ import java.io.File;
 
 import javax.swing.JFrame;
 
-import org.sbml.totikz.TikZLayoutAlgorithm;
-
 import y.view.Graph2D;
 import y.view.Graph2DView;
 import de.zbit.sbml.layout.LayoutDirector;
@@ -66,7 +64,7 @@ public class YGraphView {
 		LayoutDirector<Graph2D> director =
 			new LayoutDirector<Graph2D>(in,
 					new YLayoutBuilder(),
-					new TikZLayoutAlgorithm());
+					new YLayoutAlgorithm());
 		director.run();
 
 		Graph2D product = director.getBuilder().getProduct();
