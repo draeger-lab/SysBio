@@ -42,12 +42,13 @@ import de.zbit.util.ResourceManager;
 import de.zbit.util.Timer;
 
 /**
- * Reads an SBML file and sends the resulting {@link SBMLDocument} to assigned
- * {@link PropertyChangeListener}s when done. In case that the reading process
- * takes some more time, a {@link ProgressMonitor} is displayed to the user. If
- * the user cancels the reading process, the resulting {@link SBMLDocument} will
- * be {@code null}. It is hence necessary to use this
- * {@link SBMLReadingTask} as follows:
+ * Reads an SBML file and sends the resulting {@link SBMLDocument} wrapped in an
+ * {@link OpenedFile} object (together with the {@link File} from which it was
+ * read) to assigned {@link PropertyChangeListener}s when done. In case that the
+ * reading process takes some more time, a {@link ProgressMonitor} is displayed
+ * to the user. If the user cancels the reading process, the resulting
+ * {@link SBMLDocument} and hence the {@link OpenedFile} will be {@code null}.
+ * It is hence necessary to use this {@link SBMLReadingTask} as follows:
  * 
  * <pre>
  * SBMLReadingTask task = new SBMLReadingTask(file, this);
@@ -60,8 +61,10 @@ import de.zbit.util.Timer;
  * <pre>
  * public void propertyChange(PropertyChangeEvent evt) {
  * 	if (evt.getPropertyName().equals(&quot;done&quot;)) {
- * 		if ((evt.getNewValue() != null) &amp;&amp; (evt.getNewValue() instanceof SBMLDocument)) {
- * 			// call some method here with the SBMLDocument
+ * 		if ((evt.getNewValue() != null)
+ * 				&amp;&amp; (evt.getNewValue() instanceof OpenedFile)) {
+ *       // call some method here with the OpenedFile containing 
+ *       // the original File and the resulting SBMLDocument.
  * 		} else {
  * 			// The user has canceled the reading or it was not successful.
  * 		}
@@ -84,8 +87,6 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 	 * Key used to notify listeners about success. 
 	 */
 	public static final String SBML_READING_SUCCESSFULLY_DONE = "SBML_READING_SUCCESSFULLY_DONE";
-
-	private static final String SBML_READING_SUCCESSFULLY_DONE_OPENED_FILE = "SBML_READING_SUCCESSFULLY_DONE_OPENED_FILE";
 	
 	/**
 	 * The stream from which the SBML content is to be read.
@@ -124,6 +125,22 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 		progressMonitor = pmis.getProgressMonitor();
 		this.inputStream = new BufferedInputStream(pmis);
 	}
+	
+	/**
+	 * 
+	 * @param sbmlFile
+	 * @param parent
+	 * @param changeListeners
+	 * @throws FileNotFoundException
+	 */
+	public SBMLReadingTask(File sbmlFile, Component parent, PropertyChangeListener...changeListeners) throws FileNotFoundException {
+		this(sbmlFile, parent);
+		if ((changeListeners != null) && (changeListeners.length > 0)) {
+			for (PropertyChangeListener listener : changeListeners) {
+				addPropertyChangeListener(listener);
+			}
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see javax.swing.SwingWorker#doInBackground()
@@ -149,10 +166,7 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 	protected void done() {
 		progressMonitor.close();
 		try {
-			OpenedFile<SBMLDocument> openedFile = 
-					new OpenedFile<SBMLDocument>(sbmlFile, get());
-			firePropertyChange(SBML_READING_SUCCESSFULLY_DONE, null, get());
-			firePropertyChange(SBML_READING_SUCCESSFULLY_DONE_OPENED_FILE, null, openedFile);
+			firePropertyChange(SBML_READING_SUCCESSFULLY_DONE, null, new OpenedFile<SBMLDocument>(sbmlFile, get()));
 		} catch (InterruptedException exc) {
 			GUITools.showErrorMessage(parent, exc.getLocalizedMessage());
 		} catch (ExecutionException exc) {
