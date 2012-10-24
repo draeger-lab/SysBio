@@ -44,6 +44,7 @@ import java.util.prefs.Preferences;
 import de.zbit.io.filefilter.GeneralFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
+import de.zbit.util.StringUtil;
 import de.zbit.util.argparser.ArgHolder;
 import de.zbit.util.argparser.ArgParser;
 
@@ -478,52 +479,114 @@ public class SBPreferences implements Map<Object, Object> {
 	 * @param defaults the default values
 	 * @return the mapping from {@link Option}s to their argument holders
 	 */
-	private static Map<Option<?>, ArgHolder<?>> configureArgParser(ArgParser parser,
+	@SuppressWarnings("rawtypes")
+  private static Map<Option<?>, ArgHolder<?>> configureArgParser(ArgParser parser,
 		Map<Option<?>, ArgHolder<?>> options, Class<? extends KeyProvider> keyProvider,
 		SBProperties props, Map<Object, Object> defaults) {
-		// Iterates over all field of the keyProvider
-		for (Field f : keyProvider.getFields()) {
-			try {
-			  Object fieldValue = f.get(keyProvider);
-			  ArgHolder<?> argHolder;
-				// If the current field is an Option, add it to the ArgParser
-				if (fieldValue instanceof Option<?>) {
-				  Option<?> option = (Option<?>) fieldValue;
-					String key = option.toString();
-					if ((defaults != null) && defaults.containsKey(option)) {
-						// We here set the default value as pre-defined value
-						// if the given Map contains the corresponding key.
-						// In this way we make sure that if the user does not
-						// give a command-line argument for this option, we will
-						// stick with the default value:
-						argHolder = option.createArgumentHolder(defaults.get(option));
-						props.getDefaults().put(key, defaults.get(option));
-					} else {
-						if ((defaults != null) && defaults.containsKey(key)) {
-							argHolder = option.createArgumentHolder(defaults.get(key));
-							props.getDefaults().put(key, defaults.get(key));
-						} else {
-							// If there is no default value available,
-							// we cannot do anything...
-							argHolder = option.createArgumentHolder();
-						}
-					}
-					parser.addOption(option.getSpecification(), argHolder,
-						option.isVisible());
-					options.put(option, argHolder);
-				}
-			} catch (Exception exc) {
-				// This may happen if there are other fields than static options
-				// in the key provider. Also happens if the wrong type of
-				// argHolder has been added or created! But this method should
-				// work fine... (I hope). You can check with -? option.
-				// Just ignore...
-			  // TODO: Then catch and ignore only this specific error, but still
-			  // print other errors
-				logger.fine(exc.getLocalizedMessage());
-			}
-		}
+
+	  
+    ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);         
+    List<OptionGroup> groupList = KeyProvider.Tools.optionGroupList(keyProvider);
+    List<Option> optionList = KeyProvider.Tools.optionList(keyProvider);
+    boolean atLeastOneOptionVisible = false;
+    // if there is at least on group for that KeyProvider
+    if (groupList.size() > 0) {
+      // for each group
+      for (OptionGroup<?> group : groupList) {
+        // if this group contains options and is visible
+        if (group.getOptions().size() > 0) {
+          if (group.isAnyOptionVisible()) {
+            // add a delimiter with the groups name
+            parser.addDelimiter(group.getName());
+            //String tooltip = group.getToolTip();
+
+            // for each option in that group
+            for( Option<?> option : group.getOptions() ) {
+              try {
+                // add the option to the parser and remove it from the optionList
+                addOptionToArgParser(option, props, parser, options, defaults);
+                optionList.remove(option);
+                atLeastOneOptionVisible = true;
+              } catch (Exception exc) {
+                // This may happen if there are other fields than static options
+                // in the key provider. Also happens if the wrong type of
+                // argHolder has been added or created! But this method should
+                // work fine... (I hope). You can check with -? option.
+                // Just ignore...
+                // TODO: Then catch and ignore only this specific error, but still
+                // print other errors
+                logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (optionList.size() > 0) {
+      if (OptionGroup.isAnyOptionVisible(optionList)) {
+        if (atLeastOneOptionVisible) {
+          parser.addDelimiter(bundle.getString("ADDITIONAL_OPTIONS"));
+        } else {
+          parser.addDelimiter(KeyProvider.Tools.createTitle(keyProvider));
+        }
+        for( Option option : optionList ) {
+          try {
+            addOptionToArgParser(option, props, parser, options, defaults);
+          } catch (Exception exc) {
+            // This may happen if there are other fields than static options
+            // in the key provider. Also happens if the wrong type of
+            // argHolder has been added or created! But this method should
+            // work fine... (I hope). You can check with -? option.
+            // Just ignore...
+            // TODO: Then catch and ignore only this specific error, but still
+            // print other errors
+            logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+          }
+          
+        }
+      }
+    }
+
+
 		return options;
+	}
+	
+	/**
+	 * Adds an option to the ArgParser and returns the ArgHolder for that option.
+	 * 
+	 * @param option the options to add
+	 * @param props the SBProperties object in which the default value of the
+	 *              option is to be stored
+	 * @param parser the ArgParser to be configured
+	 * @param options a mapping from Option objects to their ArgHolder objects
+	 * @param defaults the map containing the default values
+	 */
+	protected static void addOptionToArgParser(Option<?> option,
+	                                    SBProperties props, ArgParser parser,
+	                                    Map<Option<?>, ArgHolder<?>> options,
+	                                    Map<Object, Object> defaults) {
+    ArgHolder<?> argHolder;
+    String key = option.toString();
+    if ((defaults != null) && defaults.containsKey(option)) {
+      // We here set the default value as pre-defined value
+      // if the given Map contains the corresponding key.
+      // In this way we make sure that if the user does not
+      // give a command-line argument for this option, we will
+      // stick with the default value:
+      argHolder = option.createArgumentHolder(defaults.get(option));
+      props.getDefaults().put(key, defaults.get(option));
+    } else {
+      if ((defaults != null) && defaults.containsKey(key)) {
+        argHolder = option.createArgumentHolder(defaults.get(key));
+        props.getDefaults().put(key, defaults.get(key));
+      } else {
+        // If there is no default value available,
+        // we cannot do anything...
+        argHolder = option.createArgumentHolder();
+      }
+    }
+    parser.addOption(option.getSpecification(), argHolder, option.isVisible());
+    options.put(option, argHolder);
 	}
 	
 	/**
