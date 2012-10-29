@@ -38,6 +38,7 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
 import y.base.Node;
+import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
@@ -58,7 +59,7 @@ import de.zbit.util.progressbar.ProgressListener;
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> {
+public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,EdgeRealizer> {
 
 	private static Logger logger = Logger.getLogger(YLayoutBuilder.class.toString());
 
@@ -334,7 +335,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	 * @see de.zbit.sbml.layout.LayoutFactory#createProduction()
 	 */
 	@Override
-	public Production<NodeRealizer> createProduction() {
+	public Production<EdgeRealizer> createProduction() {
 		return new YProduction();
 	}
 
@@ -342,7 +343,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	 * @see de.zbit.sbml.layout.LayoutFactory#createConsumption()
 	 */
 	@Override
-	public Consumption<NodeRealizer> createConsumption() {
+	public Consumption<EdgeRealizer> createConsumption() {
 		return new YConsumption();
 	}
 
@@ -350,7 +351,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	 * @see de.zbit.sbml.layout.LayoutFactory#createCatalysis()
 	 */
 	@Override
-	public Catalysis<NodeRealizer> createCatalysis() {
+	public Catalysis<EdgeRealizer> createCatalysis() {
 		return new YCatalysis();
 	}
 
@@ -358,7 +359,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer> 
 	 * @see de.zbit.sbml.layout.LayoutFactory#createInhibition()
 	 */
 	@Override
-	public Inhibition<NodeRealizer> createInhibition() {
+	public Inhibition<EdgeRealizer> createInhibition() {
 		return new YInhibition();
 	}
 

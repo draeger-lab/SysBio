@@ -18,19 +18,20 @@ package de.zbit.sbml.layout.y;
 
 import org.sbml.jsbml.ext.layout.CurveSegment;
 
+import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Catalysis;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YCatalysis implements Catalysis {
+public class YCatalysis implements Catalysis<EdgeRealizer> {
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment)
 	 */
 	@Override
-	public Object draw(CurveSegment curveSegment) {
+	public EdgeRealizer draw(CurveSegment curveSegment) {
 		// TODO Auto-generated method stub
 		return null;
 	}

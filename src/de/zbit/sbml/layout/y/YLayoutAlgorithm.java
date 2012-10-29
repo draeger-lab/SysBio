@@ -47,16 +47,6 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createCompartmentGlyphBoundingBox(org.sbml.jsbml.ext.layout.CompartmentGlyph)
-	 */
-	@Override
-	public BoundingBox createCompartmentGlyphBoundingBox(
-			CompartmentGlyph previousCompartmentGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createCompartmentGlyphDimension(org.sbml.jsbml.ext.layout.CompartmentGlyph)
 	 */
 	@Override
@@ -106,16 +96,6 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createReactionGlyphBoundingBox(org.sbml.jsbml.ext.layout.ReactionGlyph)
-	 */
-	@Override
-	public BoundingBox createReactionGlyphBoundingBox(
-			ReactionGlyph reactionGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createReactionGlyphDimension(org.sbml.jsbml.ext.layout.ReactionGlyph)
 	 */
 	@Override
@@ -129,25 +109,6 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 */
 	@Override
 	public Position createReactionGlyphPosition(ReactionGlyph reactionGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphBoundingBox(org.sbml.jsbml.ext.layout.SpeciesGlyph)
-	 */
-	@Override
-	public BoundingBox createSpeciesGlyphBoundingBox(SpeciesGlyph speciesGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphBoundingBox(org.sbml.jsbml.ext.layout.SpeciesGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
-	 */
-	@Override
-	public BoundingBox createSpeciesGlyphBoundingBox(SpeciesGlyph speciesGlyph,
-			SpeciesReferenceGlyph speciesReferenceGlyph) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -181,17 +142,6 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesReferenceGlyphBoundingBox(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
-	 */
-	@Override
-	public BoundingBox createSpeciesReferenceGlyphBoundingBox(
-			ReactionGlyph reactionGlyph,
-			SpeciesReferenceGlyph speciesReferenceGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesReferenceGlyphDimension(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
 	 */
 	@Override
@@ -209,15 +159,6 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	public Position createSpeciesReferenceGlyphPosition(
 			ReactionGlyph reactionGlyph,
 			SpeciesReferenceGlyph speciesReferenceGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createTextGlyphBoundingBox(org.sbml.jsbml.ext.layout.TextGlyph)
-	 */
-	@Override
-	public BoundingBox createTextGlyphBoundingBox(TextGlyph textGlyph) {
 		// TODO Auto-generated method stub
 		return null;
 	}
