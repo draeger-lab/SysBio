@@ -53,13 +53,7 @@ public class YGraphView {
 	 * @throws Throwable 
 	 */
 	public YGraphView(String[] args) throws Throwable {
-		File in;
-		if (args.length == 1) {
-			in = new File(args[0]);
-		}
-		else {
-			in = new File("test/de/zbit/sbml/layout/y/sbml/reaction.sbml");
-		}
+		File in = new File(args[0]);
 
 		LayoutDirector<Graph2D> director =
 			new LayoutDirector<Graph2D>(in,
@@ -68,6 +62,7 @@ public class YGraphView {
 		director.run();
 
 		Graph2D product = director.getBuilder().getProduct();
+		
 		view = new Graph2DView(product);
 		Rectangle box = view.getGraph2D().getBoundingBox();  
 		Dimension dim = box.getSize();  
