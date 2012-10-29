@@ -89,15 +89,24 @@ public class DatabaseIdentifiers {
      * structure, and pathway) information.
      */
     DrugBank,
+    EC_code,
     /**
      * Evidence Code Ontology, Evidence codes can be used to specify the type of supporting 
      * evidence for a piece of knowledge. This allows inference of a 'level of support' between 
      * an entity and an annotation made to an entity.
      */
     ECO,
+    /**
+     * EMBL-Bank
+     */
+    ENA,
     Ensembl,
     EntrezGene,
-    EC_code,
+    /**
+     * FlyBase is the database of the Drosophila Genome Projects and 
+     * of associated literature.
+     */
+    FlyBase,
     /**
      * The International Nucleotide Sequence Database Collaboration (INSDC)
      * consists of a joint effort to collect and disseminate databases
@@ -164,6 +173,17 @@ public class DatabaseIdentifiers {
     miRBase,
     NCBI_Taxonomy,
     /**
+     * The Protein database is a collection of sequences from several sources, 
+     * including translations from annotated coding regions in GenBank, RefSeq 
+     * and TPA, as well as records from SwissProt, PIR, PRF, and PDB.
+     * Restrictions: This restriction is associated to data collections which 
+     * are an aggregated set of different types of data. For example, they could 
+     * allow identification of protein, DNA and RNA within the same collection. 
+     * One should therefore not expect each record within data collections with 
+     * this restriction to refer to directly comparable entities.
+     */
+    NCBI_Protein,
+    /**
      * Online Mendelian Inheritance in Man is a catalog of human genes and
      * genetic disorders. Synonym: MIM
      */
@@ -176,6 +196,11 @@ public class DatabaseIdentifiers {
      * direct experimental evidence.
      */
     Panther,
+    /**
+     * 	The Protein Data Bank is the single worldwide archive of structural data 
+     *  of biological macromolecules.
+     */
+    PDB,
     /**
      * Chemical Component Dictionary (also called PDB-CCD, PDBeChem) -- The
      * Chemical Component Dictionary is as an external reference file describing
@@ -219,6 +244,17 @@ public class DatabaseIdentifiers {
      * structures of natural metabolites.
      */
     ThreeDMET,
+    /**
+     * A UniGene entry is a set of transcript sequences that appear to come 
+     * from the same transcription locus (gene or expressed pseudogene), 
+     * together with information on protein similarities, gene expression, 
+     * cDNA clone reagents, and genomic location.
+     * Restrictions: The way this data collection is distributed prevents 
+     * linking to one specific entity. For example, access may require users 
+     * authentication or the data might be distributed as a whole set and 
+     * not individually.
+     */
+    UniGene,
     UniProt_AC;
     
     /**
@@ -444,6 +480,9 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.ChEBI,                 "CHEBI:\\d+");
     regExMap.put(IdentifierDatabases.ChemicalAbstracts,     "\\d{1,7}\\-\\d{2}\\-\\d");
     regExMap.put(IdentifierDatabases.KEGG_Compound,         "C\\d{5}");
+    regExMap.put(IdentifierDatabases.ENA,               	"[A-Z]+[0-9]+");
+    regExMap.put(IdentifierDatabases.UniGene,             	"\\d+");
+    regExMap.put(IdentifierDatabases.FlyBase,               "FB\\w{2}\\d{7}");
     regExMap.put(IdentifierDatabases.Ensembl,               "ENS[A-Z]*[FPTG]\\d{11}");
     regExMap.put(IdentifierDatabases.ECO,                   "ECO:\\d{7}");
     regExMap.put(IdentifierDatabases.EntrezGene,            "\\d+");
@@ -457,6 +496,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.KEGG_Genes,            "\\w+:[\\w\\d\\.-]*");
     regExMap.put(IdentifierDatabases.miRBase,               "MI\\d{7}");
     regExMap.put(IdentifierDatabases.NCBI_Taxonomy,         "\\d+");
+    regExMap.put(IdentifierDatabases.PDB,              		"[0-9][A-Za-z0-9]{3}");
     regExMap.put(IdentifierDatabases.Panther,               "PTHR\\d{5}");
     regExMap.put(IdentifierDatabases.PubChem_substance,     "\\d+");
     regExMap.put(IdentifierDatabases.PubMed,                "\\d+");
@@ -472,6 +512,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.KEGG_Drug,             "D\\d{5}");
     regExMap.put(IdentifierDatabases.KEGG_Pathway,          "[a-zA-Z]{2,4}\\d{5}");
     regExMap.put(IdentifierDatabases.KEGG_Orthology,        "K\\d{5}");
+    regExMap.put(IdentifierDatabases.NCBI_Protein,          "\\w+\\d+(\\.\\d+)?");
     regExMap.put(IdentifierDatabases.OMIM,                  "[*#+%^]?\\d{6}");
     regExMap.put(IdentifierDatabases.DrugBank,              "DB\\d{5}");
     regExMap.put(IdentifierDatabases.ThreeDMET,             "B\\d{5}");
@@ -506,6 +547,10 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.KEGG_Genes,           "urn:miriam:kegg.genes:");
     miriamMap.put(IdentifierDatabases.miRBase,              "urn:miriam:mirbase:");
     miriamMap.put(IdentifierDatabases.NCBI_Taxonomy,        "urn:miriam:taxonomy:");
+    miriamMap.put(IdentifierDatabases.ENA,   	            "urn:miriam:ena.embl:");
+    miriamMap.put(IdentifierDatabases.UniGene,   	        "urn:miriam:unigene:");
+    miriamMap.put(IdentifierDatabases.FlyBase,   	        "urn:miriam:flybase:");
+    miriamMap.put(IdentifierDatabases.PDB,	                "urn:miriam:pdb:");
     miriamMap.put(IdentifierDatabases.Panther,              "urn:miriam:panther:");
     miriamMap.put(IdentifierDatabases.PubChem_substance,    "urn:miriam:pubchem.substance:");
     miriamMap.put(IdentifierDatabases.PubMed,               "urn:miriam:pubmed:");
@@ -519,6 +564,7 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.KEGG_Drug,            "urn:miriam:kegg.drug:");
     miriamMap.put(IdentifierDatabases.KEGG_Pathway,         "urn:miriam:kegg.pathway:");
     miriamMap.put(IdentifierDatabases.KEGG_Orthology,       "urn:miriam:kegg.orthology:");
+    miriamMap.put(IdentifierDatabases.NCBI_Protein,         "urn:miriam:ncbiprotein:");
     miriamMap.put(IdentifierDatabases.OMIM,                 "urn:miriam:omim:");
     miriamMap.put(IdentifierDatabases.DrugBank,             "urn:miriam:drugbank:");
     miriamMap.put(IdentifierDatabases.ThreeDMET,            "urn:miriam:3dmet:");
@@ -536,7 +582,7 @@ public class DatabaseIdentifiers {
     /* 
      * Initialize the {@link #describedType} map.
      */
-    describedType.put(IdentifierDatabases.CAS,                 DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.CAS,                   DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.ChEBI,                 DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.ChemicalAbstracts,     DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.KEGG_Compound,         DatabaseContent.small_molecule);
@@ -550,8 +596,12 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.HMDB,                  DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.iRefWeb,               DatabaseContent.protein_interaction); // protein interactions
     describedType.put(IdentifierDatabases.KEGG_Genes,            DatabaseContent.gene);
+    describedType.put(IdentifierDatabases.ENA,               	 DatabaseContent.sequences);
+    describedType.put(IdentifierDatabases.UniGene,            	 DatabaseContent.sequences);
+    describedType.put(IdentifierDatabases.FlyBase,               DatabaseContent.sequences);
     describedType.put(IdentifierDatabases.miRBase,               DatabaseContent.RNA);
     describedType.put(IdentifierDatabases.NCBI_Taxonomy,         DatabaseContent.taxonomy);
+    describedType.put(IdentifierDatabases.PDB,	                 DatabaseContent.structures);
     describedType.put(IdentifierDatabases.Panther,               DatabaseContent.description);
     describedType.put(IdentifierDatabases.PubChem_substance,     DatabaseContent.structures);
     describedType.put(IdentifierDatabases.PubMed,                DatabaseContent.publication);
@@ -565,6 +615,7 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.KEGG_Drug,             DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.KEGG_Pathway,          DatabaseContent.pathway);
     describedType.put(IdentifierDatabases.KEGG_Orthology,        DatabaseContent.ortholog);
+    describedType.put(IdentifierDatabases.NCBI_Protein,          DatabaseContent.protein);
     describedType.put(IdentifierDatabases.OMIM,                  DatabaseContent.annotation);
     describedType.put(IdentifierDatabases.DrugBank,              DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.ThreeDMET,             DatabaseContent.structures); // Actually protein structure
