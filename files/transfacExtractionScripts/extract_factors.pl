@@ -12,6 +12,7 @@ $interaction = "";
 $precurser = "";
 $superfamily = "none";
 $organism = "";
+$annotation = "";
 
 if (length(@ARGV) < 3) {
 	print "usage: perl extract_factors.pl [factor.dat] [bindingFactor-file] [organism-file]\n";
@@ -22,7 +23,7 @@ open(IN, "<$ARGV[0]");
 open(OUT, ">$ARGV[1]");
 open(ORG, ">$ARGV[2]");
 
-print OUT "TF_AC\tTF_name\torganism\tTF_type\tbindingsites\tencoding_gene_ac\tencoding_gene_name\tcomplexes\tinteracting_factors\tprecurser\tsuperfamily\n";
+print OUT "TF_AC\tTF_name\torganism\tTF_type\tbindingsites\tencoding_gene_ac\tencoding_gene_name\tcomplexes\tinteracting_factors\tprecurser\tsuperfamily\tbindingsite_annotation\n";
 print ORG "TF_AC\tTFname\torganism\n";
 
 while (<IN>){
@@ -44,8 +45,12 @@ while (<IN>){
 			if (length($precurser) < 5) {
 				$precurser = "none";
 			}
+			chop($annotation);
+			if (length($annotation) < 5) {
+				$annotation = "none";
+			}
 
-			print OUT "$ac\t$name\t$organism\t$type\t$bindingsites\t$geneAC\t$geneName\t$complexes\t$interaction\t$precurser\t$superfamily\n";
+			print OUT "$ac\t$name\t$organism\t$type\t$bindingsites\t$geneAC\t$geneName\t$complexes\t$interaction\t$precurser\t$superfamily\t$annotation\n";
 		}
 
 		if (length($organism) < 2) {
@@ -68,6 +73,7 @@ while (<IN>){
 		$precurser = "";
 		$superfamily = "none";
 		$organism = "";
+		$annotation = "";
 
 		print "\n"; 
 	}
@@ -78,7 +84,7 @@ while (<IN>){
 	elsif (/^FA  (.*)/) {
 		$name = $1;
 	}
-	elsif (/^OS  ([A-Za-z\(\)]+),.+$/) {
+	elsif (/^OS  ([A-Za-z\(\) ]+),.+$/) {
 		$organism = $1;
 		print $organism;
 	}
@@ -107,6 +113,10 @@ while (<IN>){
 	}
 	elsif (/^HP  (T\d{5});.+/) {
 		$superfamily = $1;
+	}
+	elsif (/^DR  ([A-Za-z0-9: ]+);.+/) {
+		$dr = $1;
+		$annotation .= $dr.";";
 	}
 
 }

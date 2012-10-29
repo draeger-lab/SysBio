@@ -6,6 +6,7 @@ $geneName = "none";
 $geneAC = "none";
 $bindingfactor = "";
 $organism = "";
+$annotation = "";
 
 if (length(@ARGV) < 2) {
 	print "usage: perl extract_sites.pl [site.dat] [bindingSites-file]\n";
@@ -13,16 +14,21 @@ if (length(@ARGV) < 2) {
 open(IN, "<$ARGV[0]");
 open(OUT, ">$ARGV[1]");
 
-print OUT "regulation_ac\tregulation_id\torganism\tregulated_gene_ac\tregulated_gene_name\tbinding_factors\n";
+print OUT "regulation_ac\tregulation_id\torganism\tregulated_gene_ac\tregulated_gene_name\tbinding_factors\tannotation\n";
 
 while (<IN>){
 	if (/\/\//) { #new entry
-		if (!($ac =~/none/)) {
+		if (!($ac =~/none/) && !($geneAC =~/none/)) {
 			chop($bindingfactor);
 			if (length($bindingfactor) <5) {
 				$bindingfactor = "none";
 			}
-			print OUT "$ac\t$id\t$organism\t$geneAC\t$geneName\t$bindingfactor\n";
+			chop($annotation);
+			if (length($annotation) < 5) {
+				$annotation = "none";
+			}
+
+			print OUT "$ac\t$id\t$organism\t$geneAC\t$geneName\t$bindingfactor\t$annotation\n";
 		}
 
 		$ac = "none";
@@ -31,6 +37,7 @@ while (<IN>){
 		$geneAC = "none";
 		$bindingfactor = "";
 		$organism = "";
+		$annotation = "";
 
 		print "\n"; 
 	}
@@ -57,6 +64,10 @@ while (<IN>){
 	elsif (/^BF  (T\d{5});.+/) {
 		$bf = $1;
 		$bindingfactor .= $bf.";";
+	}
+	elsif (/^DR  ([A-Za-z0-9: ]+);.+/) {
+		$dr = $1;
+		$annotation .= $dr.";";
 	}
 
 }
