@@ -58,7 +58,8 @@ public class CellNetAnalyzer2QualModel {
 	 * @throws ParseException
 	 */
 	public static SBMLDocument createQualitativeModel(String modelName, String modelID, String creator, String speciesFile, String reactionFile, String taxon, String organism) throws IOException, ParseException {
-		SBMLDocument sbmlDoc = QualModelBuilding.initializeQualDocument(modelName, modelID, creator, taxon, organism);
+		String[] org = organism.split(",");
+		SBMLDocument sbmlDoc = QualModelBuilding.initializeQualDocument(modelName, modelID, creator, org);
 	  
 		Model model = QualModelBuilding.model;
 	    QualitativeModel qModel = QualModelBuilding.qualModel;
