@@ -2,6 +2,8 @@ package de.zbit.sbml.util;
 
 import java.io.FileNotFoundException;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -33,6 +35,11 @@ public abstract class QualModelBuilding {
 	protected final static String notesEndString = "</body></notes>";
 	
 	/**
+	 * contains the NCBI taxonomy identifier for organisms
+	 */
+	protected static Map<String, String> ncbiTaxonomyMap = new HashMap<String, String>();
+	
+	/**
 	 * 
 	 * @param modelName
 	 * @param modelID
@@ -41,20 +48,23 @@ public abstract class QualModelBuilding {
 	 * @param organism
 	 * @return
 	 */
-	public static SBMLDocument initializeQualDocument(String modelName, String modelID, String creator, String taxon, String organism) {
+	public static SBMLDocument initializeQualDocument(String modelName, String modelID, String creator, String[] organisms) {
 	    System.out.println("beginning");
-
+	    initTaxonomyMap();
+	    
 	    SBMLDocument doc = new SBMLDocument(3, 1);
 	    doc.addNamespace(QUAL_NS_PREFIX, "xmlns", QUAL_NS);
 		
 	    model = doc.createModel(modelID);
-	    CVTerm term = DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.NCBI_Taxonomy, null, taxon);
-	    model.addCVTerm(term);
-	    
+	    model.setMetaId("meta_" + modelID);
+	    for (int i = 0; i < organisms.length; i++) {
+	    	CVTerm term = DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.NCBI_Taxonomy, null, ncbiTaxonomyMap.get(organisms[i]));
+		    model.addCVTerm(term);
+		}
 	    
 	    StringBuffer notes = new StringBuffer(notesStartString);
-	    notes.append(String.format("<h1>%s (%s)</h1>\n", formatTextForHTMLnotes(modelName), organism));
-	    model.setName(String.format("%s (%s)", modelName, organism)); 
+	    notes.append(String.format("<h1>%s</h1>\n", formatTextForHTMLnotes(modelName)));
+	    model.setName(String.format("%s", modelName)); 
 	    
 	    notes.append(notesEndString);
 	    model.setNotes(notes.toString());
@@ -75,16 +85,31 @@ public abstract class QualModelBuilding {
 		return doc;
 	}
 	
-	  /**
-	   * Escapes all HTML-tags in the given string and
-	   * replaces new lines with a space. 
-	   * @param text
-	   * @return
-	   */
-	  public static String formatTextForHTMLnotes(String text) {
-	    if (text==null) return "";
-	    return EscapeChars.forHTML(text.replace('\n', ' '));
-	  }
+	/**
+	 * Escapes all HTML-tags in the given string and
+	 * replaces new lines with a space. 
+	 * @param text
+	 * @return
+	 */
+	public static String formatTextForHTMLnotes(String text) {
+		if (text==null) return "";
+		return EscapeChars.forHTML(text.replace('\n', ' '));
+	}
+	
+	/**
+	 * initializes the taxonomy identifier
+	 */
+	private static void initTaxonomyMap() {
+		ncbiTaxonomyMap.put("human", "9606");
+		ncbiTaxonomyMap.put("mouse", "10090");
+		ncbiTaxonomyMap.put("rat", "10114");
+		ncbiTaxonomyMap.put("yeast", "4932");
+		ncbiTaxonomyMap.put("fruit fly", "7227");
+		ncbiTaxonomyMap.put("clawed frog", "8355");
+		ncbiTaxonomyMap.put("monkey", "9533");
+		ncbiTaxonomyMap.put("chick", "9031");
+		ncbiTaxonomyMap.put("Mammalia", "40674");
+	}
 	
 	/**
 	 * 
