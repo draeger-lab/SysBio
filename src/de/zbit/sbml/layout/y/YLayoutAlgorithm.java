@@ -16,18 +16,35 @@
  */
 package de.zbit.sbml.layout.y;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
+
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.Dimensions;
+import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
+import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.Position;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
+import y.base.DataMap;
+import y.base.Node;
+import y.view.Graph2D;
+import y.view.NodeRealizer;
+import y.view.ShapeNodeRealizer;
+import de.zbit.graph.GraphTools;
+import de.zbit.graph.io.Graph2Dwriter;
+import de.zbit.graph.io.def.GenericDataMap;
+import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.sbml.layout.LayoutAlgorithm;
 
 /**
@@ -35,6 +52,142 @@ import de.zbit.sbml.layout.LayoutAlgorithm;
  * @version $Rev$
  */
 public class YLayoutAlgorithm implements LayoutAlgorithm {
+	
+	/**
+	 * Logger instance for informational output.
+	 */
+	private static Logger logger = Logger.getLogger(YLayoutAlgorithm.class.toString());
+	
+	/**
+	 * SBML Layout instance.
+	 */
+	private Layout layout;
+	
+	/**
+	 * Set to hold all layouted glyphs.
+	 */
+	private Set<GraphicalObject> setOfLayoutedGlyphs;
+
+	/**
+	 * Set to hold all unlayouted glyphs;
+	 */
+	private Set<GraphicalObject> setOfUnlayoutedGlyphs;
+	
+	/**
+	 * Mapping of YFiles nodes to glyphs, containing only nodes/glyphs which
+	 * need to be layouted.
+	 */
+	private Map<Node,GraphicalObject> nodeGlyphMap;
+	
+	/**
+	 * Output of the algorithm, i.e. the autolayouted previously unlayouted
+	 * glyphs of the input.
+	 */
+	private Set<GraphicalObject> output;
+	
+	/**
+	 * Graph2D structure neccessary for using layout algorithms provided by
+	 * YFiles.
+	 */
+	private Graph2D graph2D;
+	
+	/**
+	 * GraphTools instance to handle partial layouting.
+	 */
+	private GraphTools graphTools;
+
+	/**
+	 * 
+	 */
+	public YLayoutAlgorithm() {
+		this.setOfLayoutedGlyphs = new HashSet<GraphicalObject>();
+		this.setOfUnlayoutedGlyphs = new HashSet<GraphicalObject>();
+		this.output = new HashSet<GraphicalObject>();
+		graph2D = new Graph2D();
+		GenericDataMap<DataMap, String> mapDescriptionMap =
+			new GenericDataMap<DataMap, String>(Graph2Dwriter.mapDescription);
+		graph2D.addDataProvider(Graph2Dwriter.mapDescription, mapDescriptionMap);
+		graphTools = new GraphTools(graph2D);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#addLayoutedGlyph(org.sbml.jsbml.ext.layout.GraphicalObject)
+	 */
+	@Override
+	public void addLayoutedGlyph(GraphicalObject glyph) {
+		logger.info("add layouted glyph id=" + glyph.getId());
+		setOfLayoutedGlyphs.add(glyph);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#addUnlayoutedGlyph(org.sbml.jsbml.ext.layout.GraphicalObject)
+	 */
+	@Override
+	public void addUnlayoutedGlyph(GraphicalObject glyph) {
+		logger.info("add unlayouted glyph id=" + glyph.getId());
+		setOfUnlayoutedGlyphs.add(glyph);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#getAutolayoutedGlyphs()
+	 */
+	@Override
+	public Set<GraphicalObject> getAutolayoutedGlyphs() {
+		autolayout();
+		for (Entry<Node,GraphicalObject> entry : nodeGlyphMap.entrySet()) {
+			GraphicalObject glyph = entry.getValue();
+			output.add(glyph);
+		}
+		return output;
+	}
+	
+	/**
+	 * 
+	 */
+	private void autolayout() {
+		// Add all layouted glyphs to
+		logger.info("adding layouted glyphs");
+		for (GraphicalObject glyph : setOfLayoutedGlyphs) {
+			BoundingBox boundingBox = glyph.getBoundingBox();
+			Dimensions dimensions = boundingBox.getDimensions();
+			Point position = boundingBox.getPosition();
+			int x, y, width, height;
+			x = (int) position.getX();
+			y = (int) position.getY();
+			width = (int) dimensions.getWidth();
+			height = (int) dimensions.getHeight();
+			
+			// a) Graph2D structure, using a simple node realizer
+			NodeRealizer nodeRealizer = new ShapeNodeRealizer();
+			nodeRealizer.setX(x);
+			nodeRealizer.setY(y);
+			nodeRealizer.setWidth(width);
+			nodeRealizer.setHeight(width);
+			Node node = graph2D.createNode(nodeRealizer);
+			
+			// b) GraphTools helper
+			graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
+			graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+		}
+		
+		// Add all unlayouted glyphs to Graph2D structure
+		logger.info("adding unlayouted glyphs");
+		for (GraphicalObject glyph : setOfUnlayoutedGlyphs) {
+			NodeRealizer nodeRealizer = new ShapeNodeRealizer();
+			Node node = graph2D.createNode(nodeRealizer);
+			nodeGlyphMap.put(node, glyph);
+		}
+
+		// Set to hold all to-be-layouted YFiles nodes
+		Set<Node> setOfUnlayoutedNodes = new HashSet<Node>();
+		for (Entry<Node,GraphicalObject> entry : nodeGlyphMap.entrySet()) {
+			Node n = entry.getKey();
+			setOfUnlayoutedNodes.add(n);
+		}
+		
+		// Autolayout of subset using GraphTools
+		graphTools.layoutNodeSubset(setOfUnlayoutedNodes);
+	}
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#calculateReactionGlyphRotationAngle(org.sbml.jsbml.ext.layout.ReactionGlyph)
@@ -186,8 +339,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 */
 	@Override
 	public Layout getLayout() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.layout;
 	}
 
 	/* (non-Javadoc)
@@ -195,8 +347,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 */
 	@Override
 	public boolean isSetLayout() {
-		// TODO Auto-generated method stub
-		return false;
+		return (layout != null);
 	}
 
 	/* (non-Javadoc)
@@ -204,8 +355,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 */
 	@Override
 	public void setLayout(Layout layout) {
-		// TODO Auto-generated method stub
-		
+		this.layout = layout;
 	}
 
 }
