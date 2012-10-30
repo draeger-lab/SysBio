@@ -18,5 +18,8 @@
 /**
  * @author jmatthes
  * @version $Rev$
+ * 
+ * This package implements the generic LayoutBuilder and LayoutAlgorithm classes
+ * for usage with YFiles.
  */
 package de.zbit.sbml.layout.y;

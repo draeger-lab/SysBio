@@ -20,6 +20,7 @@ import org.sbml.jsbml.SBO;
 
 import y.view.NodeRealizer;
 import de.zbit.graph.io.def.SBGNVisualizationProperties;
+import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
 import de.zbit.sbml.layout.SimpleChemical;
 
 /**
@@ -34,25 +35,23 @@ public class YSimpleChemical extends SimpleChemical<NodeRealizer> {
 	@Override
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth) {
-		// simple chemical is synonymous with simple molecule (SBO term 247)
-		int sboTerm = SBO.getSimpleMolecule();
-		NodeRealizer nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
-		nr = nr.createCopy();
-		nr.setCenterX(x);
-		nr.setCenterY(y);
-		nr.setWidth(width);
-		nr.setHeight(height);
+		NodeRealizer nodeRealizer =
+			SBGNVisualizationProperties.getNodeRealizer(SBO.getSimpleMolecule());
+		ShapeNodeRealizerSupportingCloneMarker shapeNodeRealizer =
+			new ShapeNodeRealizerSupportingCloneMarker(nodeRealizer);
+		
+		shapeNodeRealizer.setNodeIsCloned(isSetCloneMarker());
+		shapeNodeRealizer.setLocation(x, y);
+		shapeNodeRealizer.setSize(width, height);
 
-		boolean nodeShouldBeACircle = SBGNVisualizationProperties.isCircleShape(sboTerm);
-		if (nodeShouldBeACircle) {
+		if (SBGNVisualizationProperties.isCircleShape(SBO.getSimpleMolecule())) {
 			// diameter of circle is minimum of width and height
 			double min = Math.min(width, height);
-			nr.setWidth(min);
-			nr.setHeight(min);
+			shapeNodeRealizer.setWidth(min);
+			shapeNodeRealizer.setHeight(min);
 		}
 		
-		// z coordinate and depth dimension are ignored
-		return nr;
+		return shapeNodeRealizer;
 	}
 
 }
