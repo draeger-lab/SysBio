@@ -207,15 +207,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 */
 	@Override
 	public void buildTextGlyph(TextGlyph textGlyph) {
-		BoundingBox boundingBox = textGlyph.getBoundingBox();
-		Point point = boundingBox.getPosition();
-		Dimensions dimensions = boundingBox.getDimensions();
-		double x, y, width, height;
-		x = point.getX();
-		y = point.getY();
-		width = dimensions.getWidth();
-		height = dimensions.getHeight();
-		
 		String text = "";
 		
 		/* Possibilities:
@@ -233,6 +224,15 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		
 		if (textGlyph.isSetText() && !textGlyph.isSetGraphicalObject() && !textGlyph.isSetOriginOfText()) {
 			// independent text
+			BoundingBox boundingBox = textGlyph.getBoundingBox();
+			Point point = boundingBox.getPosition();
+			Dimensions dimensions = boundingBox.getDimensions();
+			double x, y, width, height;
+			x = point.getX();
+			y = point.getY();
+			width = dimensions.getWidth();
+			height = dimensions.getHeight();
+			
 			text = textGlyph.getText();
 			logger.info(String.format("building text glyph element id=%s\n\tindependent text text='%s'",
 					textGlyph.getId(), text));
@@ -244,8 +244,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		}
 		else if (textGlyph.isSetGraphicalObject() && textGlyph.isSetOriginOfText()) {
 			// label for a graphical object
-			Node origin = id2node.get(textGlyph.getGraphicalObject());
-			NodeRealizer originRealizer = graph.getRealizer(origin);
+			// FIXME
+//			Node origin = id2node.get(textGlyph.getGraphicalObject());
+//			NodeRealizer originRealizer = graph.getRealizer(origin);
 
 			if (textGlyph.isSetText()) {
 				text = textGlyph.getText();
@@ -258,7 +259,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 				logger.info(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
 						textGlyph.getId(), namedSBase.getId(), text));
 			}
-			originRealizer.setLabelText(text);
+//			originRealizer.setLabelText(text);
 		}
 		else {
 			logger.info(String.format("illegal text glyph id=%s",
