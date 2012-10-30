@@ -34,15 +34,13 @@ public class YCompartment extends Compartment<NodeRealizer> {
 	@Override
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth) {
-		int sboTerm = SBO.getCompartment();
-		NodeRealizer nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
-		nr = nr.createCopy();
-		nr.setCenterX(x);
-		nr.setCenterY(y);
-		nr.setWidth(width);
-		nr.setHeight(height);
+		NodeRealizer nodeRealizer =
+			SBGNVisualizationProperties.getNodeRealizer(SBO.getCompartment());
+		nodeRealizer = nodeRealizer.createCopy();
+		nodeRealizer.setLocation(x, y);
+		nodeRealizer.setSize(width, height);
 		
-		return nr;
+		return nodeRealizer;
 	}
 
 }

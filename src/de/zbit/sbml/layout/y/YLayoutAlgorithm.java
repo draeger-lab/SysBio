@@ -56,6 +56,13 @@ import de.zbit.sbml.layout.LayoutDirector;
 public class YLayoutAlgorithm implements LayoutAlgorithm {
 	
 	/**
+	 * Default value for z-coordinates and depth as YFiles works in two
+	 * dimensional space but SBML allows three dimensional specifications.
+	 */
+	private static final double DEFAULT_Z_COORD = 0.0;
+	private static final double DEFAULT_DEPTH = 0.0;
+
+	/**
 	 * Logger instance for informational output.
 	 */
 	private static Logger logger = Logger.getLogger(YLayoutAlgorithm.class.toString());
@@ -97,9 +104,19 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 * GraphTools instance to handle partial layouting.
 	 */
 	private GraphTools graphTools;
+	
+	/**
+	 * SBML level
+	 */
+	private static int level;
+	
+	/**
+	 * SBML version
+	 */
+	private static int version;
 
 	/**
-	 * 
+	 * LayoutAlgorithm constructor.
 	 */
 	public YLayoutAlgorithm() {
 		this.setOfLayoutedGlyphs = new HashSet<GraphicalObject>();
@@ -138,11 +155,26 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	public Set<GraphicalObject> getAutolayoutedGlyphs() {
 		autolayout();
 		
-		// TODO go over nodeGlyphMap and copy node information to glyph
-		// information
-		
 		for (Entry<Node,GraphicalObject> entry : nodeGlyphMap.entrySet()) {
+			Node node = entry.getKey();
+			NodeRealizer nodeRealizer = graph2D.getRealizer(node);
 			GraphicalObject glyph = entry.getValue();
+			
+			BoundingBox boundingBox = glyph.isSetBoundingBox() ?
+					glyph.getBoundingBox() : glyph.createBoundingBox();
+			
+			if (!LayoutDirector.glyphHasPosition(glyph)) {
+				boundingBox.createPosition(nodeRealizer.getX(),
+						nodeRealizer.getY(),
+						DEFAULT_Z_COORD);
+			}
+			
+			if (!LayoutDirector.glyphHasDimensions(glyph)) {
+				boundingBox.createDimensions(nodeRealizer.getWidth(),
+						nodeRealizer.getHeight(),
+						DEFAULT_DEPTH);
+			}
+			
 			output.add(glyph);
 		}
 		return output;
@@ -153,8 +185,9 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 */
 	private void autolayout() {
 		// Add all layouted glyphs to
-		logger.info("adding layouted glyphs");
 		for (GraphicalObject glyph : setOfLayoutedGlyphs) {
+			logger.info("adding layouted glyphs");
+
 			// text glyphs which are not independent and do not have a
 			// bounding box are considered layouted and thus not processed here
 			if (glyph instanceof TextGlyph &&
@@ -177,7 +210,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 			nodeRealizer.setX(x);
 			nodeRealizer.setY(y);
 			nodeRealizer.setWidth(width);
-			nodeRealizer.setHeight(width);
+			nodeRealizer.setHeight(height);
 			Node node = graph2D.createNode(nodeRealizer);
 			
 			// b) GraphTools helper
@@ -186,24 +219,74 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 		}
 		
 		// Add all unlayouted glyphs to Graph2D structure
-		logger.info("adding unlayouted glyphs");
 		for (GraphicalObject glyph : setOfUnlayoutedGlyphs) {
-			// TODO check for partial information (position only, dimensions
-			// only)
+			logger.info("adding unlayouted glyphs");
 			NodeRealizer nodeRealizer = new ShapeNodeRealizer();
 			Node node = graph2D.createNode(nodeRealizer);
+			
+			if (LayoutDirector.glyphHasPosition(glyph)) {
+				BoundingBox boundingBox = glyph.getBoundingBox();
+				Point position = boundingBox.getPosition();
+				int x, y;
+				x = (int) position.getX();
+				y = (int) position.getY();
+				nodeRealizer.setX(x);
+				nodeRealizer.setY(y);
+				graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
+			}
+			if (LayoutDirector.glyphHasDimensions(glyph)) {
+				BoundingBox boundingBox = glyph.getBoundingBox();
+				Dimensions dimensions = boundingBox.getDimensions();
+				int width, height;
+				width = (int) dimensions.getWidth();
+				height = (int) dimensions.getHeight();
+				nodeRealizer.setWidth(width);
+				nodeRealizer.setHeight(height);
+				graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+			}
+			
 			nodeGlyphMap.put(node, glyph);
 		}
 
 		// Set to hold all to-be-layouted YFiles nodes
 		Set<Node> setOfUnlayoutedNodes = new HashSet<Node>();
 		for (Entry<Node,GraphicalObject> entry : nodeGlyphMap.entrySet()) {
-			Node n = entry.getKey();
-			setOfUnlayoutedNodes.add(n);
+			setOfUnlayoutedNodes.add(entry.getKey());
 		}
 		
 		// Autolayout of subset using GraphTools
 		graphTools.layoutNodeSubset(setOfUnlayoutedNodes);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createCurve(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
+	 */
+	@Override
+	public Curve createCurve(ReactionGlyph reactionGlyph,
+			SpeciesReferenceGlyph speciesReferenceGlyph) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createGlyphBoundingBox(org.sbml.jsbml.ext.layout.NamedSBaseGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
+	 */
+	@Override
+	public BoundingBox createGlyphBoundingBox(NamedSBaseGlyph glyph,
+			SpeciesReferenceGlyph specRefGlyph) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// -------------------------------------------------------------------------
+	
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createLayoutDimension()
+	 */
+	@Override
+	public Dimensions createLayoutDimension() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -227,45 +310,6 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createCompartmentGlyphPosition(org.sbml.jsbml.ext.layout.CompartmentGlyph)
-	 */
-	@Override
-	public Position createCompartmentGlyphPosition(
-			CompartmentGlyph previousCompartmentGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createCurve(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
-	 */
-	@Override
-	public Curve createCurve(ReactionGlyph reactionGlyph,
-			SpeciesReferenceGlyph speciesReferenceGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createGlyphBoundingBox(org.sbml.jsbml.ext.layout.NamedSBaseGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
-	 */
-	@Override
-	public BoundingBox createGlyphBoundingBox(NamedSBaseGlyph glyph,
-			SpeciesReferenceGlyph specRefGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createLayoutDimension()
-	 */
-	@Override
-	public Dimensions createLayoutDimension() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createReactionGlyphDimension(org.sbml.jsbml.ext.layout.ReactionGlyph)
 	 */
 	@Override
@@ -275,38 +319,10 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createReactionGlyphPosition(org.sbml.jsbml.ext.layout.ReactionGlyph)
-	 */
-	@Override
-	public Position createReactionGlyphPosition(ReactionGlyph reactionGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphDimension()
 	 */
 	@Override
 	public Dimensions createSpeciesGlyphDimension() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphPosition(org.sbml.jsbml.ext.layout.SpeciesGlyph)
-	 */
-	@Override
-	public Position createSpeciesGlyphPosition(SpeciesGlyph speciesGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphPosition(org.sbml.jsbml.ext.layout.SpeciesGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
-	 */
-	@Override
-	public Position createSpeciesGlyphPosition(SpeciesGlyph speciesGlyph,
-			SpeciesReferenceGlyph specieReferenceGlyph) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -323,30 +339,10 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesReferenceGlyphPosition(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
-	 */
-	@Override
-	public Position createSpeciesReferenceGlyphPosition(
-			ReactionGlyph reactionGlyph,
-			SpeciesReferenceGlyph speciesReferenceGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createTextGlyphDimension(org.sbml.jsbml.ext.layout.TextGlyph)
 	 */
 	@Override
 	public Dimensions createTextGlyphDimension(TextGlyph textGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createTextGlyphPosition(org.sbml.jsbml.ext.layout.TextGlyph)
-	 */
-	@Override
-	public Position createTextGlyphPosition(TextGlyph textGlyph) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -373,6 +369,60 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	@Override
 	public void setLayout(Layout layout) {
 		this.layout = layout;
+		this.level = layout.getLevel();
+		this.version = layout.getVersion();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createCompartmentGlyphPosition(org.sbml.jsbml.ext.layout.CompartmentGlyph)
+	 */
+	@Override
+	public Position createCompartmentGlyphPosition(
+			CompartmentGlyph previousCompartmentGlyph) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createReactionGlyphPosition(org.sbml.jsbml.ext.layout.ReactionGlyph)
+	 */
+	@Override
+	public Position createReactionGlyphPosition(ReactionGlyph reactionGlyph) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphPosition(org.sbml.jsbml.ext.layout.SpeciesGlyph)
+	 */
+	@Override
+	public Position createSpeciesGlyphPosition(SpeciesGlyph speciesGlyph) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphPosition(org.sbml.jsbml.ext.layout.SpeciesGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
+	 */
+	@Override
+	public Position createSpeciesGlyphPosition(SpeciesGlyph speciesGlyph,
+			SpeciesReferenceGlyph specieReferenceGlyph) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createTextGlyphPosition(org.sbml.jsbml.ext.layout.TextGlyph)
+	 */
+	@Override
+	public Position createTextGlyphPosition(TextGlyph textGlyph) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesReferenceGlyphPosition(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
+	 */
+	@Override
+	public Position createSpeciesReferenceGlyphPosition(
+			ReactionGlyph reactionGlyph,
+			SpeciesReferenceGlyph speciesReferenceGlyph) {
+		return null;
 	}
 
 }

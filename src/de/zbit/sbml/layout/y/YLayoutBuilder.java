@@ -244,9 +244,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		}
 		else if (textGlyph.isSetGraphicalObject() && textGlyph.isSetOriginOfText()) {
 			// label for a graphical object
-			// FIXME
-//			Node origin = id2node.get(textGlyph.getGraphicalObject());
-//			NodeRealizer originRealizer = graph.getRealizer(origin);
+			// FIXME collect labels until builderEnd is called
+			Node origin = id2node.get(textGlyph.getGraphicalObject());
+			assert origin != null;
+			NodeRealizer originRealizer = graph.getRealizer(origin);
+			assert originRealizer != null;
 
 			if (textGlyph.isSetText()) {
 				text = textGlyph.getText();
@@ -259,7 +261,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 				logger.info(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
 						textGlyph.getId(), namedSBase.getId(), text));
 			}
-//			originRealizer.setLabelText(text);
+			originRealizer.setLabelText(text);
 		}
 		else {
 			logger.info(String.format("illegal text glyph id=%s",

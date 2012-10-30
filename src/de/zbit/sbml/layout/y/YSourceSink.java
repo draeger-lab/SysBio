@@ -34,15 +34,13 @@ public class YSourceSink extends SourceSink<NodeRealizer> {
 	@Override
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth) {
-		int sboTerm = SBO.getEmptySet();
-		NodeRealizer nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
-		nr = nr.createCopy();
-		nr.setCenterX(x);
-		nr.setCenterY(y);
-		nr.setWidth(width);
-		nr.setHeight(height);
+		NodeRealizer nodeRealizer =
+			SBGNVisualizationProperties.getNodeRealizer(SBO.getEmptySet());
+		nodeRealizer = nodeRealizer.createCopy();
+		nodeRealizer.setLocation(x, y);
+		nodeRealizer.setSize(width, height);
 		
-		return nr;
+		return nodeRealizer;
 	}
 
 }
