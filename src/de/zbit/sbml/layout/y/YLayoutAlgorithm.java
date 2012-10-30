@@ -16,6 +16,7 @@
  */
 package de.zbit.sbml.layout.y;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,7 @@ import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.sbml.layout.LayoutAlgorithm;
+import de.zbit.sbml.layout.LayoutDirector;
 
 /**
  * @author Jakob Matthes
@@ -102,6 +104,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	public YLayoutAlgorithm() {
 		this.setOfLayoutedGlyphs = new HashSet<GraphicalObject>();
 		this.setOfUnlayoutedGlyphs = new HashSet<GraphicalObject>();
+		this.nodeGlyphMap = new HashMap<Node, GraphicalObject>();
 		this.output = new HashSet<GraphicalObject>();
 		graph2D = new Graph2D();
 		GenericDataMap<DataMap, String> mapDescriptionMap =
@@ -134,6 +137,10 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	@Override
 	public Set<GraphicalObject> getAutolayoutedGlyphs() {
 		autolayout();
+		
+		// TODO go over nodeGlyphMap and copy node information to glyph
+		// information
+		
 		for (Entry<Node,GraphicalObject> entry : nodeGlyphMap.entrySet()) {
 			GraphicalObject glyph = entry.getValue();
 			output.add(glyph);
@@ -148,6 +155,14 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 		// Add all layouted glyphs to
 		logger.info("adding layouted glyphs");
 		for (GraphicalObject glyph : setOfLayoutedGlyphs) {
+			// text glyphs which are not independent and do not have a
+			// bounding box are considered layouted and thus not processed here
+			if (glyph instanceof TextGlyph &&
+					!LayoutDirector.textGlyphIsIndependent((TextGlyph) glyph) &&
+					!glyph.isSetBoundingBox()) {
+				continue;
+			}
+			
 			BoundingBox boundingBox = glyph.getBoundingBox();
 			Dimensions dimensions = boundingBox.getDimensions();
 			Point position = boundingBox.getPosition();
@@ -173,6 +188,8 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 		// Add all unlayouted glyphs to Graph2D structure
 		logger.info("adding unlayouted glyphs");
 		for (GraphicalObject glyph : setOfUnlayoutedGlyphs) {
+			// TODO check for partial information (position only, dimensions
+			// only)
 			NodeRealizer nodeRealizer = new ShapeNodeRealizer();
 			Node node = graph2D.createNode(nodeRealizer);
 			nodeGlyphMap.put(node, glyph);
