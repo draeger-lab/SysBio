@@ -272,7 +272,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createGlyphBoundingBox(org.sbml.jsbml.ext.layout.NamedSBaseGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
 	 */
 	@Override
-	public BoundingBox createGlyphBoundingBox(NamedSBaseGlyph glyph,
+	public BoundingBox createGlyphBoundingBox(GraphicalObject glyph,
 			SpeciesReferenceGlyph specRefGlyph) {
 		// TODO Auto-generated method stub
 		return null;
