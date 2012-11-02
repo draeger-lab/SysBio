@@ -16,7 +16,6 @@
  */
 package de.zbit.kegg.parser.pathway;
 
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +23,8 @@ import java.util.Map;
 import de.zbit.util.Reflect;
 
 /**
- * Corresponding to the Kegg SubType class (see {@link http
- * ://www.genome.jp/kegg/xml/docs/})
+ * Corresponding to the Kegg SubType class (see
+ * {@link http://www.genome.jp/kegg/xml/docs/})
  * 
  * @author Clemens Wrzodek
  * @author Florian Mittag
@@ -53,6 +52,9 @@ public class SubType {
   public static final String PHOSPHORYLATION = "phosphorylation";
   public static final String DEPHOSPHORYLATION = "dephosphorylation";
   public static final String GLYCOSYLATION = "glycosylation";
+  /**
+   * OFTEN ERRORNOUSLY given as "ubiquination" in KGML documents!!!
+   */
   public static final String UBIQUITINATION = "ubiquitination";
   public static final String METHYLATION = "methylation";
   

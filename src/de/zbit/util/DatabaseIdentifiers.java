@@ -170,6 +170,13 @@ public class DatabaseIdentifiers {
      * Molecular Interactions Ontology (PSI-MI)
      */
     MI,
+    /**
+     * Protein Modification Ontology (PSI-MOD)
+     */
+    MOD,
+    /**
+     * 
+     */
     miRBase,
     NCBI_Taxonomy,
     /**
@@ -480,7 +487,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.ChEBI,                 "CHEBI:\\d+");
     regExMap.put(IdentifierDatabases.ChemicalAbstracts,     "\\d{1,7}\\-\\d{2}\\-\\d");
     regExMap.put(IdentifierDatabases.KEGG_Compound,         "C\\d{5}");
-    regExMap.put(IdentifierDatabases.ENA,               	"[A-Z]+[0-9]+");
+    regExMap.put(IdentifierDatabases.ENA,                   "[A-Z]+[0-9]+");
     regExMap.put(IdentifierDatabases.UniGene,             	"\\d+");
     regExMap.put(IdentifierDatabases.FlyBase,               "FB\\w{2}\\d{7}");
     regExMap.put(IdentifierDatabases.Ensembl,               "ENS[A-Z]*[FPTG]\\d{11}");
@@ -496,7 +503,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.KEGG_Genes,            "\\w+:[\\w\\d\\.-]*");
     regExMap.put(IdentifierDatabases.miRBase,               "MI\\d{7}");
     regExMap.put(IdentifierDatabases.NCBI_Taxonomy,         "\\d+");
-    regExMap.put(IdentifierDatabases.PDB,              		"[0-9][A-Za-z0-9]{3}");
+    regExMap.put(IdentifierDatabases.PDB,                   "[0-9][A-Za-z0-9]{3}");
     regExMap.put(IdentifierDatabases.Panther,               "PTHR\\d{5}");
     regExMap.put(IdentifierDatabases.PubChem_substance,     "\\d+");
     regExMap.put(IdentifierDatabases.PubMed,                "\\d+");
@@ -525,6 +532,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.GeneSymbol,            "\\w+");
     regExMap.put(IdentifierDatabases.SBO,                   "SBO:\\d{7}");
     regExMap.put(IdentifierDatabases.MI,                    "MI:\\d{4}");
+    regExMap.put(IdentifierDatabases.MOD,                    "MOD:\\d{5}");
     
     
     
@@ -547,9 +555,9 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.KEGG_Genes,           "urn:miriam:kegg.genes:");
     miriamMap.put(IdentifierDatabases.miRBase,              "urn:miriam:mirbase:");
     miriamMap.put(IdentifierDatabases.NCBI_Taxonomy,        "urn:miriam:taxonomy:");
-    miriamMap.put(IdentifierDatabases.ENA,   	            "urn:miriam:ena.embl:");
-    miriamMap.put(IdentifierDatabases.UniGene,   	        "urn:miriam:unigene:");
-    miriamMap.put(IdentifierDatabases.FlyBase,   	        "urn:miriam:flybase:");
+    miriamMap.put(IdentifierDatabases.ENA,                  "urn:miriam:ena.embl:");
+    miriamMap.put(IdentifierDatabases.UniGene,              "urn:miriam:unigene:");
+    miriamMap.put(IdentifierDatabases.FlyBase,              "urn:miriam:flybase:");
     miriamMap.put(IdentifierDatabases.PDB,	                "urn:miriam:pdb:");
     miriamMap.put(IdentifierDatabases.Panther,              "urn:miriam:panther:");
     miriamMap.put(IdentifierDatabases.PubChem_substance,    "urn:miriam:pubchem.substance:");
@@ -576,6 +584,7 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.HGNC,                 "urn:miriam:hgnc:");
     miriamMap.put(IdentifierDatabases.SBO,                  "urn:miriam:biomodels.sbo:");
     miriamMap.put(IdentifierDatabases.MI,                   "urn:miriam:obo.mi:");
+    miriamMap.put(IdentifierDatabases.MOD,                  "urn:miriam:obo.psi-mod:");
     //miriamMap.put(IdentifierDatabases.GeneSymbol,         ); // None available!
     
     
@@ -596,7 +605,7 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.HMDB,                  DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.iRefWeb,               DatabaseContent.protein_interaction); // protein interactions
     describedType.put(IdentifierDatabases.KEGG_Genes,            DatabaseContent.gene);
-    describedType.put(IdentifierDatabases.ENA,               	 DatabaseContent.sequences);
+    describedType.put(IdentifierDatabases.ENA,                   DatabaseContent.sequences);
     describedType.put(IdentifierDatabases.UniGene,            	 DatabaseContent.sequences);
     describedType.put(IdentifierDatabases.FlyBase,               DatabaseContent.sequences);
     describedType.put(IdentifierDatabases.miRBase,               DatabaseContent.RNA);
@@ -628,6 +637,7 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.GeneSymbol,            DatabaseContent.omics); // Gene symbols are not only for genes...
     describedType.put(IdentifierDatabases.SBO,                   DatabaseContent.description);
     describedType.put(IdentifierDatabases.MI,                    DatabaseContent.description);
+    describedType.put(IdentifierDatabases.MOD,                   DatabaseContent.description);
     
     
     for (IdentifierDatabases db : IdentifierDatabases.values()) {
