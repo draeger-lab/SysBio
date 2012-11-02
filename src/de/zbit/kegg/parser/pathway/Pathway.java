@@ -1045,12 +1045,25 @@ public class Pathway {
    * @return an html image tag, containing a preview picture for the given compound.
    */
   public static String getCompoundPreviewPicture(String ko_id, KeggInfos infos) {
+    return getCompoundPreviewPicture(ko_id, infos, false);
+  }
+  
+  /**
+   * Actually just for path2models: returns a compounds preview image from ChEBI
+   * instead of using the KEGG compound image, if {@code useChEBI} is {@code TRUE}.
+   * @see #getCompoundPreviewPicture(String, KeggInfos)
+   * @param ko_id
+   * @param infos
+   * @param useChEBI
+   * @return
+   */
+  public static String getCompoundPreviewPicture(String ko_id, KeggInfos infos, boolean useChEBI) {
     
     // Get ChEBI from KEGG API
     // XXX: Deactivated, because JSBML cannot write '&' characters.
     // NOTE: If multiple ChEBI ids (e.g., "1234 5678") are contained, this will also
     // be considerd a non-valid ChEBI ID and cause a Fallback to KEGG.
-    /*if (infos!=null && infos.queryWasSuccessfull()) {
+    if (useChEBI && (infos!=null && infos.queryWasSuccessfull())) {
       String ChEBI = infos.getChebi();
       if (ChEBI!=null) {
         // Extract numerical suffix (pattern is CHEBI:\\d+), but
@@ -1071,7 +1084,7 @@ public class Pathway {
           return String.format("<img src=\"http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage&#61;true&#38;chebiId&#61;%s&#38;dimensions&#61;300\"/><br/>\n", ChEBI);
         }
       }
-    }*/
+    }
     
     // Fallback on KEGG ID.
     return getCompoundPreviewPicture(ko_id);

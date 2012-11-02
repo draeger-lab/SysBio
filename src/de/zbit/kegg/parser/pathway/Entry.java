@@ -392,7 +392,8 @@ public class Entry {
   }
 
   /**
-   * 
+   * Mark this {@link Entry} as an ENZYME for the given reaction.
+   * Do not use it to associate a product or substrate to a reaction.
    * @param reaction
    */
   public void setReaction(String reaction) {

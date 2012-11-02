@@ -318,6 +318,16 @@ public class KeggInfos implements Serializable {
   private static Map<Integer, Integer> cpd2ChEBI = null;
   
   /**
+   * Adjusts the ChEBI methods to take an additional flat file as
+   * additional resource for mappings from KEGG COMPOUND 2 ChEBI
+   * identifiers. This is ONLY FOR THE PATH2MODELS PROJET and
+   * requires an additional "KEGGcompound2ChEBI.txt" mapping
+   * file in the current folder.
+   * <p><b>PLESE ALWAYS KEEP THE DEFAULT, INITIAL VALUE TO FALSE!</b>
+   */
+  public static boolean path2models = false;
+  
+  /**
    * Only for path2models.
    */
   private static void readAdditionalKEGGcompound2ChEBImapping() {
@@ -449,8 +459,18 @@ public class KeggInfos implements Serializable {
 	 * @return
 	 */
 	public String getChebi() {
+	  return getChebi(path2models);
+	}
+	
+	/**
+	 * 
+	 * @param useAdditionalPath2modelsMapping KEEP THIS FALSE, IF YOU ARE NOT
+	 * SURE WHAT IT IS!, See {@link #path2models}.
+	 * @return
+	 */
+	private String getChebi(boolean useAdditionalPath2modelsMapping) {
     // For path2models, try to get from manual mapping
-    /*if (chebi==null) {
+    if (useAdditionalPath2modelsMapping && chebi==null) {
 
       // is it a compound?
       boolean isCompound = false;
@@ -474,7 +494,7 @@ public class KeggInfos implements Serializable {
           chebi = Integer.toString(cheb);
         }
       }
-    }*/
+    }
     
 		return chebi;
 	}

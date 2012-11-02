@@ -170,7 +170,13 @@ public class KGMLWriter {
       transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "http://www.genome.jp/kegg/xml/KGML_v0.7.1_.dtd");
       DOMSource source = new DOMSource(doc);      
       
-      StreamResult result = new StreamResult(new File(fileName));
+      File outFile = new File(fileName);
+      try {
+        new File(outFile.getParent()).mkdirs();
+      } catch (Throwable t){
+        // Just ensure that the directory is available.
+      }
+      StreamResult result = new StreamResult(outFile);
 
       // Output to console for testing
       // StreamResult result = new StreamResult(System.out);
