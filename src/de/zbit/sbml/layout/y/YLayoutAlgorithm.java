@@ -23,13 +23,14 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Curve;
+import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
-import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.Position;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
@@ -38,7 +39,9 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
 import y.base.DataMap;
+import y.base.Edge;
 import y.base.Node;
+import y.geom.YPoint;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
@@ -46,8 +49,10 @@ import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
+import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.LayoutAlgorithm;
 import de.zbit.sbml.layout.LayoutDirector;
+import de.zbit.util.objectwrapper.ValuePairUncomparable;
 
 /**
  * @author Jakob Matthes
@@ -81,12 +86,20 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 * Set to hold all unlayouted glyphs;
 	 */
 	private Set<GraphicalObject> setOfUnlayoutedGlyphs;
+
+	private Set<ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>> setOfUnlayoutedEdges;
+	private Set<ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>> setOfLayoutedEdges;
 	
 	/**
 	 * Mapping of YFiles nodes to glyphs, containing only nodes/glyphs which
 	 * need to be layouted.
 	 */
-	private Map<Node,GraphicalObject> nodeGlyphMap;
+	private Map<Node,GraphicalObject> nodeIncompleteGlyphMap;
+	
+	/**
+	 * Mapping of glyph to the corresponding YFiles node.
+	 */
+	private Map<GraphicalObject,Node> glyphNodeMap;
 	
 	/**
 	 * Output of the algorithm, i.e. the autolayouted previously unlayouted
@@ -121,22 +134,85 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	public YLayoutAlgorithm() {
 		this.setOfLayoutedGlyphs = new HashSet<GraphicalObject>();
 		this.setOfUnlayoutedGlyphs = new HashSet<GraphicalObject>();
-		this.nodeGlyphMap = new HashMap<Node, GraphicalObject>();
+
+		this.setOfUnlayoutedEdges =
+			new HashSet<ValuePairUncomparable<SpeciesReferenceGlyph,ReactionGlyph>>();
+		this.setOfLayoutedEdges =
+			new HashSet<ValuePairUncomparable<SpeciesReferenceGlyph,ReactionGlyph>>();
+		
+		this.nodeIncompleteGlyphMap = new HashMap<Node, GraphicalObject>();
+		this.glyphNodeMap = new HashMap<GraphicalObject, Node>();
+		
 		this.output = new HashSet<GraphicalObject>();
+		
 		graph2D = new Graph2D();
 		GenericDataMap<DataMap, String> mapDescriptionMap =
 			new GenericDataMap<DataMap, String>(Graph2Dwriter.mapDescription);
 		graph2D.addDataProvider(Graph2Dwriter.mapDescription, mapDescriptionMap);
+		
 		graphTools = new GraphTools(graph2D);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#addLayoutedEdge(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph, org.sbml.jsbml.ext.layout.ReactionGlyph)
+	 */
+	@Override
+	public void addLayoutedEdge(SpeciesReferenceGlyph srg, ReactionGlyph rg) {
+		// edge creation has to be deferred
+		ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair =
+			new ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>(srg, rg);
+		setOfLayoutedEdges.add(pair);
+		addLayoutedGlyph(rg);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#addUnlayoutedEdge(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph, org.sbml.jsbml.ext.layout.ReactionGlyph)
+	 */
+	@Override
+	public void addUnlayoutedEdge(SpeciesReferenceGlyph srg, ReactionGlyph rg) {
+		// edge creation has to be deferred
+		ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair =
+			new ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>(srg, rg);
+		setOfUnlayoutedEdges.add(pair);
+		addUnlayoutedGlyph(rg);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#addLayoutedGlyph(org.sbml.jsbml.ext.layout.GraphicalObject)
 	 */
 	@Override
 	public void addLayoutedGlyph(GraphicalObject glyph) {
 		logger.info("add layouted glyph id=" + glyph.getId());
+		
+		// text glyphs which are not independent and do not have a
+		// bounding box are considered layouted and thus not processed here
+		if (glyph instanceof TextGlyph &&
+				!LayoutDirector.textGlyphIsIndependent((TextGlyph) glyph) &&
+				!glyph.isSetBoundingBox()) {
+			return;
+		}
+		
+		BoundingBox boundingBox = glyph.getBoundingBox();
+		Dimensions dimensions = boundingBox.getDimensions();
+		Point position = boundingBox.getPosition();
+		int x, y, width, height;
+		x = (int) position.getX();
+		y = (int) position.getY();
+		width = (int) dimensions.getWidth();
+		height = (int) dimensions.getHeight();
+		
+		// Graph2D structure
+		NodeRealizer nodeRealizer = new ShapeNodeRealizer();
+		nodeRealizer.setLocation(x, y);
+		nodeRealizer.setSize(width, height);
+		Node node = graph2D.createNode(nodeRealizer);
+		
+		// GraphTools helper
+		graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
+		graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+		
 		setOfLayoutedGlyphs.add(glyph);
+		glyphNodeMap.put(glyph, node);
 	}
 
 	/* (non-Javadoc)
@@ -145,6 +221,33 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	@Override
 	public void addUnlayoutedGlyph(GraphicalObject glyph) {
 		logger.info("add unlayouted glyph id=" + glyph.getId());
+		
+		NodeRealizer nodeRealizer = new ShapeNodeRealizer();
+		Node node = graph2D.createNode(nodeRealizer);
+		
+		// partially layouted: position only
+		if (LayoutDirector.glyphHasPosition(glyph)) {
+			BoundingBox boundingBox = glyph.getBoundingBox();
+			Point position = boundingBox.getPosition();
+			int x, y;
+			x = (int) position.getX();
+			y = (int) position.getY();
+			nodeRealizer.setLocation(x, y);
+			graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
+		}
+		// partially layouted: dimensions only
+		if (LayoutDirector.glyphHasDimensions(glyph)) {
+			BoundingBox boundingBox = glyph.getBoundingBox();
+			Dimensions dimensions = boundingBox.getDimensions();
+			int width, height;
+			width = (int) dimensions.getWidth();
+			height = (int) dimensions.getHeight();
+			nodeRealizer.setSize(width, height);
+			graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+		}
+		
+		nodeIncompleteGlyphMap.put(node, glyph);
+		glyphNodeMap.put(glyph, node);
 		setOfUnlayoutedGlyphs.add(glyph);
 	}
 
@@ -152,10 +255,18 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#getAutolayoutedGlyphs()
 	 */
 	@Override
-	public Set<GraphicalObject> getAutolayoutedGlyphs() {
-		autolayout();
+	public Set<GraphicalObject> completeGlyphs() {
+		// Set to hold all to-be-layouted YFiles nodes
+		Set<Node> setOfUnlayoutedNodes = new HashSet<Node>();
+		for (Entry<Node,GraphicalObject> entry : nodeIncompleteGlyphMap.entrySet()) {
+			setOfUnlayoutedNodes.add(entry.getKey());
+		}
 		
-		for (Entry<Node,GraphicalObject> entry : nodeGlyphMap.entrySet()) {
+		// Autolayout of subset using GraphTools
+		graphTools.layoutNodeSubset(setOfUnlayoutedNodes);
+		
+		// copy realizer information to glyph bounding box
+		for (Entry<Node,GraphicalObject> entry : nodeIncompleteGlyphMap.entrySet()) {
 			Node node = entry.getKey();
 			NodeRealizer nodeRealizer = graph2D.getRealizer(node);
 			GraphicalObject glyph = entry.getValue();
@@ -177,6 +288,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 			
 			output.add(glyph);
 		}
+		
 		return output;
 	}
 	
@@ -184,88 +296,64 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 * 
 	 */
 	private void autolayout() {
-		// Add all layouted glyphs to
-		for (GraphicalObject glyph : setOfLayoutedGlyphs) {
-			logger.info("adding layouted glyphs");
-
-			// text glyphs which are not independent and do not have a
-			// bounding box are considered layouted and thus not processed here
-			if (glyph instanceof TextGlyph &&
-					!LayoutDirector.textGlyphIsIndependent((TextGlyph) glyph) &&
-					!glyph.isSetBoundingBox()) {
-				continue;
-			}
-			
-			BoundingBox boundingBox = glyph.getBoundingBox();
-			Dimensions dimensions = boundingBox.getDimensions();
-			Point position = boundingBox.getPosition();
-			int x, y, width, height;
-			x = (int) position.getX();
-			y = (int) position.getY();
-			width = (int) dimensions.getWidth();
-			height = (int) dimensions.getHeight();
-			
-			// a) Graph2D structure, using a simple node realizer
-			NodeRealizer nodeRealizer = new ShapeNodeRealizer();
-			nodeRealizer.setX(x);
-			nodeRealizer.setY(y);
-			nodeRealizer.setWidth(width);
-			nodeRealizer.setHeight(height);
-			Node node = graph2D.createNode(nodeRealizer);
-			
-			// b) GraphTools helper
-			graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
-			graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+		// Create all edges
+		for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfLayoutedEdges) {
+			SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
+			ReactionGlyph reactionGlyph = pair.getB();
+			handleEdge(speciesReferenceGlyph, reactionGlyph);
 		}
-		
-		// Add all unlayouted glyphs to Graph2D structure
-		for (GraphicalObject glyph : setOfUnlayoutedGlyphs) {
-			logger.info("adding unlayouted glyphs");
-			NodeRealizer nodeRealizer = new ShapeNodeRealizer();
-			Node node = graph2D.createNode(nodeRealizer);
-			
-			if (LayoutDirector.glyphHasPosition(glyph)) {
-				BoundingBox boundingBox = glyph.getBoundingBox();
-				Point position = boundingBox.getPosition();
-				int x, y;
-				x = (int) position.getX();
-				y = (int) position.getY();
-				nodeRealizer.setX(x);
-				nodeRealizer.setY(y);
-				graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
-			}
-			if (LayoutDirector.glyphHasDimensions(glyph)) {
-				BoundingBox boundingBox = glyph.getBoundingBox();
-				Dimensions dimensions = boundingBox.getDimensions();
-				int width, height;
-				width = (int) dimensions.getWidth();
-				height = (int) dimensions.getHeight();
-				nodeRealizer.setWidth(width);
-				nodeRealizer.setHeight(height);
-				graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
-			}
-			
-			nodeGlyphMap.put(node, glyph);
+		for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfUnlayoutedEdges) {
+			SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
+			ReactionGlyph reactionGlyph = pair.getB();
+			handleEdge(speciesReferenceGlyph, reactionGlyph);
 		}
-
-		// Set to hold all to-be-layouted YFiles nodes
-		Set<Node> setOfUnlayoutedNodes = new HashSet<Node>();
-		for (Entry<Node,GraphicalObject> entry : nodeGlyphMap.entrySet()) {
-			setOfUnlayoutedNodes.add(entry.getKey());
-		}
-		
-		// Autolayout of subset using GraphTools
-		graphTools.layoutNodeSubset(setOfUnlayoutedNodes);
-	}
 	
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createCurve(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
+
+	}
+
+	private void handleEdge(SpeciesReferenceGlyph srg, ReactionGlyph rg) {
+		buildProcessNodeIfNecessary(rg);
+		Node processNode = glyphNodeMap.get(rg);
+		Node speciesGlyphNode = glyphNodeMap.get(srg.getSpeciesGlyphInstance());
+		assert processNode != null;
+		assert speciesGlyphNode != null;
+		assert graph2D != null;
+		
+		Edge edge = graph2D.createEdge(processNode, speciesGlyphNode);
+		
+		YPoint source = graph2D.getRealizer(edge).getSourcePoint();
+		Point start = new Point(source.getX(), source.getY(), 0.0);
+		YPoint target = graph2D.getRealizer(edge).getSourcePoint();
+		Point end = new Point(target.getX(), target.getY(), 0.0);
+		
+		CurveSegment curveSegment = new CurveSegment();
+		curveSegment.setStart(start);
+		curveSegment.setEnd(end);
+		
+		Curve curve = new Curve();
+		ListOf<CurveSegment> listOfCurveSegments = new ListOf<CurveSegment>();
+		listOfCurveSegments.add(curveSegment);
+		curve.setListOfCurveSegments(listOfCurveSegments);
+		
+		srg.setCurve(curve);
+		if (!output.contains(rg)) {
+			output.add(rg);
+		}
+	}
+
+	/**
+	 * @param rg
+	 * @return true if a new process node as been added 
 	 */
-	@Override
-	public Curve createCurve(ReactionGlyph reactionGlyph,
-			SpeciesReferenceGlyph speciesReferenceGlyph) {
-		// TODO Auto-generated method stub
-		return null;
+	private boolean buildProcessNodeIfNecessary(ReactionGlyph rg) {
+		Node maybeProcessNode = glyphNodeMap.get(rg.getId());
+		if (maybeProcessNode == null) {
+			ReactionNodeRealizer reactionNodeRealizer = new ReactionNodeRealizer();
+			Node processNode = graph2D.createNode(reactionNodeRealizer);
+			glyphNodeMap.put(rg, processNode);
+			return true;
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -285,6 +373,16 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 */
 	@Override
 	public Dimensions createLayoutDimension() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createCurve(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
+	 */
+	@Override
+	public Curve createCurve(ReactionGlyph reactionGlyph,
+			SpeciesReferenceGlyph speciesReferenceGlyph) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -18,9 +18,11 @@
 package de.zbit.sbml.layout.y;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.NamedSBase;
@@ -41,6 +43,7 @@ import y.base.Node;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
+import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
 import de.zbit.sbml.layout.Catalysis;
 import de.zbit.sbml.layout.Compartment;
@@ -48,6 +51,7 @@ import de.zbit.sbml.layout.Consumption;
 import de.zbit.sbml.layout.Inhibition;
 import de.zbit.sbml.layout.Macromolecule;
 import de.zbit.sbml.layout.Production;
+import de.zbit.sbml.layout.SBGNArc;
 import de.zbit.sbml.layout.SBGNNode;
 import de.zbit.sbml.layout.SimpleChemical;
 import de.zbit.sbml.layout.SourceSink;
@@ -74,7 +78,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	private List<ProgressListener> progressListeners = new LinkedList<ProgressListener>();
 
 	/**
-	 * Indicates whether graph generation has terminated or not.
+	 * Indicates whether graph generation has finished or not.
 	 */
 	private boolean terminated = false;
 
@@ -82,6 +86,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 * Maps SBML identifiers to yFiles nodes.
 	 */
 	private Map<String, Node> id2node = new HashMap<String, Node>();
+	
+	/**
+	 * Set to hold all text glyphs which label a specific node.
+	 */
+	Set<TextGlyph> labelTextGlyphs;
 
 	/**
 	 * Method to initialize the graph2d structure.
@@ -92,6 +101,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	@Override
 	public void builderStart(Layout layout) {
 		graph = new Graph2D();
+		labelTextGlyphs = new HashSet<TextGlyph>();
 		// TODO for all p in progressListeners: progress.setNumberOfTotalCalls(xyz);
 	}
 	
@@ -129,9 +139,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		
 		logger.info(String.format("building compartment glyph id=%s\n\tbounding box=%s",
 				compartmentGlyph.getId(), nodeRealizer.getBoundingBox()));
-		
-		
-		//new GraphTools (null).setInfo(node, GraphMLmaps.NODE_POSITION, "5|9");
 	}
 
 	/* (non-Javadoc)
@@ -179,6 +186,30 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	}
 
 	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutBuilder#buildConnectingArc(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph, org.sbml.jsbml.ext.layout.ReactionGlyph)
+	 */
+	@Override
+	public void buildConnectingArc(SpeciesReferenceGlyph srg, ReactionGlyph rg) {
+		Node processNode = id2node.get(rg.getId());
+		Node speciesGlyphNode = id2node.get(srg.getSpeciesGlyph());
+		assert processNode != null;
+		assert speciesGlyphNode != null;
+		
+		SBGNArc<EdgeRealizer> arc;
+		if (srg.isSetSBOTerm()) {
+			arc = getSBGNArc(srg.getSBOTerm());
+		} else {
+			arc = getSBGNArc(srg.getSpeciesReferenceRole());
+		}
+		
+		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve());
+		
+		graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
+		
+		logger.info(String.format("create edge between %s and %s", srg.getId(), rg.getId()));
+	}
+
+	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutBuilder#buildLineSegment(org.sbml.jsbml.ext.layout.LineSegment)
 	 */
 	@Override
@@ -199,7 +230,13 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 */
 	@Override
 	public void buildProcessNode(ReactionGlyph reactionGlyph, double rotationAngle) {
-		// TODO
+		// check if process node has already been built
+		Node maybeProcesNode = id2node.get(reactionGlyph.getId());
+		if (maybeProcesNode == null) {
+			ReactionNodeRealizer reactionNodeRealizer = new ReactionNodeRealizer();
+			Node processNode = graph.createNode(reactionNodeRealizer);
+			id2node.put(reactionGlyph.getId(), processNode);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -209,20 +246,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	public void buildTextGlyph(TextGlyph textGlyph) {
 		String text = "";
 		
-		/* Possibilities:
-		 * (See SBML Layout Extension documentation section "TextLabels")
-		 * 1) independent text
-		 * 		if only text attribute is given
-		 * 2a) label for a graphical object
-		 * 		if graphicalObject attributes contains the id of any graphicalObject
-		 * 2b) label for a SBML model object
-		 * 		if originOfText contains the id of a SBML model object, take text
-		 * 		from name attribute of that object
-		 * 
-		 * text overrides originOfText
-		 */
-		
-		if (textGlyph.isSetText() && !textGlyph.isSetGraphicalObject() && !textGlyph.isSetOriginOfText()) {
+		if (textGlyph.isSetText() &&
+				!textGlyph.isSetGraphicalObject() &&
+				!textGlyph.isSetOriginOfText()) {
 			// independent text
 			BoundingBox boundingBox = textGlyph.getBoundingBox();
 			Point point = boundingBox.getPosition();
@@ -242,32 +268,41 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 			nr.setLabelText(text);
 			nr.setFrame(x, y, width, height);
 		}
-		else if (textGlyph.isSetGraphicalObject() && textGlyph.isSetOriginOfText()) {
+		else if (textGlyph.isSetGraphicalObject() &&
+				textGlyph.isSetOriginOfText()) {
 			// label for a graphical object
-			// FIXME collect labels until builderEnd is called
-			Node origin = id2node.get(textGlyph.getGraphicalObject());
-			assert origin != null;
-			NodeRealizer originRealizer = graph.getRealizer(origin);
-			assert originRealizer != null;
-
-			if (textGlyph.isSetText()) {
-				text = textGlyph.getText();
-				logger.info(String.format("building text glyph element id=%s\n\torigin text overridden text='%s'",
-						textGlyph.getId(), text));
-			}
-			else {
-				NamedSBase namedSBase = textGlyph.getOriginOfTextInstance();
-				text = namedSBase.getName();
-				logger.info(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
-						textGlyph.getId(), namedSBase.getId(), text));
-			}
-			originRealizer.setLabelText(text);
+			// label text glyphs are collected and built as a last step of the builder
+			labelTextGlyphs.add(textGlyph);
 		}
 		else {
 			logger.info(String.format("illegal text glyph id=%s",
 					 textGlyph.getId()));
-			return;
 		}
+	}
+
+	/**
+	 * Realizes a text glyph as a label of an already existing node.
+	 * @param textGlyph
+	 */
+	private void buildTextGlyphAsLabel(TextGlyph textGlyph) {
+		Node origin = id2node.get(textGlyph.getGraphicalObject());
+		NodeRealizer originRealizer = graph.getRealizer(origin);
+
+		String text;
+		if (textGlyph.isSetText()) {
+			text = textGlyph.getText();
+			logger.info(String.format("building text glyph element id=%s\n\torigin text overridden text='%s'",
+					textGlyph.getId(), text));
+		}
+		else {
+			NamedSBase namedSBase = textGlyph.getOriginOfTextInstance();
+			text = namedSBase.getName();
+			logger.info(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
+					textGlyph.getId(), namedSBase.getId(), text));
+		}
+		
+		// use NodeLabel to specify position of text
+		originRealizer.setLabelText(text);
 	}
 
 	/* (non-Javadoc)
@@ -275,6 +310,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 */
 	@Override
 	public void builderEnd() {
+		// build label text glyphs
+		for (TextGlyph textGlyph : labelTextGlyphs) {
+			buildTextGlyphAsLabel(textGlyph);
+		}
+		
 		terminated = true;
 	}
 

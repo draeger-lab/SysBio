@@ -14,36 +14,29 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.sbml.layout.y;
-
-import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
-
-import y.view.EdgeRealizer;
-import de.zbit.sbml.layout.Production;
+package de.zbit.sbml.layout;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YProduction implements Production<EdgeRealizer> {
-
+public abstract class ProcessNode<T> implements SBGNNode<T> {
+	
+	// process nodes do not have a clone marker
+	private final boolean cloneMarker = false;
+	
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment)
+	 * @see de.zbit.sbml.layout.SBGNNode#setCloneMarker()
 	 */
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment) {
-		// TODO Auto-generated method stub
-		return null;
+	public void setCloneMarker() {
+		
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
+	 * @see de.zbit.sbml.layout.SBGNNode#isSetCloneMarker()
 	 */
-	@Override
-	public EdgeRealizer draw(Curve curve) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean isSetCloneMarker() {
+		return cloneMarker;
 	}
-
+	
 }
