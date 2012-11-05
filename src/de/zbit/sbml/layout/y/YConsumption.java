@@ -16,9 +16,12 @@
  */
 package de.zbit.sbml.layout.y;
 
+import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
+import org.sbml.jsbml.ext.layout.Point;
 
 import y.view.EdgeRealizer;
+import y.view.GenericEdgeRealizer;
 import de.zbit.sbml.layout.Consumption;
 
 /**
@@ -26,6 +29,26 @@ import de.zbit.sbml.layout.Consumption;
  * @version $Rev$
  */
 public class YConsumption implements Consumption<EdgeRealizer> {
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment)
+	 */
+	@Override
+	public EdgeRealizer draw(Curve curve) {
+		EdgeRealizer edgeRealizer = new GenericEdgeRealizer();
+		
+		// TODO handle beziers
+
+		for (CurveSegment curveSegment : curve.getListOfCurveSegments()) {
+			Point start = curveSegment.getStart();
+			Point end = curveSegment.getEnd();
+			edgeRealizer.addPoint(start.getX(), start.getY());
+			edgeRealizer.addPoint(end.getX(), end.getY());
+		}
+		System.err.println("consumption");
+		// TODO handle arrows
+		return edgeRealizer;
+	}
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment)

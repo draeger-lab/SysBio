@@ -16,6 +16,7 @@
  */
 package de.zbit.sbml.layout.y;
 
+import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.EdgeRealizer;
@@ -32,6 +33,15 @@ public class YInhibition implements Inhibition<EdgeRealizer> {
 	 */
 	@Override
 	public EdgeRealizer draw(CurveSegment curveSegment) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
+	 */
+	@Override
+	public EdgeRealizer draw(Curve curve) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -16,34 +16,26 @@
  */
 package de.zbit.sbml.layout.y;
 
-import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
-
-import y.view.EdgeRealizer;
-import de.zbit.sbml.layout.Production;
+import y.view.NodeRealizer;
+import de.zbit.graph.sbgn.ReactionNodeRealizer;
+import de.zbit.sbml.layout.ProcessNode;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YProduction implements Production<EdgeRealizer> {
+public class YProcessNode extends ProcessNode<NodeRealizer> {
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment)
+	 * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
 	 */
 	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
-	 */
-	@Override
-	public EdgeRealizer draw(Curve curve) {
-		// TODO Auto-generated method stub
-		return null;
+	public NodeRealizer draw(double x, double y, double z, double width,
+			double height, double depth) {
+		ReactionNodeRealizer reactionNodeRealizer = new ReactionNodeRealizer();
+		reactionNodeRealizer.setLocation(x, y);
+		reactionNodeRealizer.setSize(width, height);
+		return reactionNodeRealizer;
 	}
 
 }
