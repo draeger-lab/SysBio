@@ -271,15 +271,18 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 			NodeRealizer nodeRealizer = graph2D.getRealizer(node);
 			GraphicalObject glyph = entry.getValue();
 			
+			// get or create bounding box for glyphs
 			BoundingBox boundingBox = glyph.isSetBoundingBox() ?
 					glyph.getBoundingBox() : glyph.createBoundingBox();
 			
+			// copy position
 			if (!LayoutDirector.glyphHasPosition(glyph)) {
 				boundingBox.createPosition(nodeRealizer.getX(),
 						nodeRealizer.getY(),
 						DEFAULT_Z_COORD);
 			}
 			
+			// copy dimensions
 			if (!LayoutDirector.glyphHasDimensions(glyph)) {
 				boundingBox.createDimensions(nodeRealizer.getWidth(),
 						nodeRealizer.getHeight(),

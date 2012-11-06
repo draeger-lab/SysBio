@@ -38,12 +38,13 @@ public class YConsumption implements Consumption<EdgeRealizer> {
 		EdgeRealizer edgeRealizer = new GenericEdgeRealizer();
 		
 		// TODO handle beziers
-
-		for (CurveSegment curveSegment : curve.getListOfCurveSegments()) {
-			Point start = curveSegment.getStart();
-			Point end = curveSegment.getEnd();
-			edgeRealizer.addPoint(start.getX(), start.getY());
-			edgeRealizer.addPoint(end.getX(), end.getY());
+		if (curve != null && curve.isSetListOfCurveSegments()) {
+			for (CurveSegment curveSegment : curve.getListOfCurveSegments()) {
+				Point start = curveSegment.getStart();
+				Point end = curveSegment.getEnd();
+				edgeRealizer.addPoint(start.getX(), start.getY());
+				edgeRealizer.addPoint(end.getX(), end.getY());
+			}
 		}
 		System.err.println("consumption");
 		// TODO handle arrows
