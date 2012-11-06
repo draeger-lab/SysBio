@@ -40,8 +40,10 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
 import y.base.Node;
+import y.geom.OrientedRectangle;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
+import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
@@ -288,6 +290,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		Node origin = id2node.get(textGlyph.getGraphicalObject());
 		NodeRealizer originRealizer = graph.getRealizer(origin);
 
+		System.out.println(originRealizer.hashCode());
+
 		String text;
 		if (textGlyph.isSetText()) {
 			text = textGlyph.getText();
@@ -301,8 +305,32 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 					textGlyph.getId(), namedSBase.getId(), text));
 		}
 		
-		// use NodeLabel to specify position of text
-		originRealizer.setLabelText(text);
+		// TODO use NodeLabel to specify position of text
+		NodeLabel nodeLabel;
+		if (textGlyph.isSetBoundingBox() &&
+				textGlyph.getBoundingBox().isSetPosition() &&
+				textGlyph.getBoundingBox().isSetDimensions()) {
+			Point position = textGlyph.getBoundingBox().getPosition();
+			double x = position.getX();
+			double y = position.getY();
+			
+			Dimensions dimensions = textGlyph.getBoundingBox().getDimensions();
+			double width = dimensions.getWidth();
+			double height = dimensions.getHeight();
+			
+			OrientedRectangle orientedRectangle =
+				new OrientedRectangle(x, y, width, height);
+			nodeLabel = new NodeLabel(text); // TODO changes model for all labels
+//			nodeLabel.setModel(arg0)
+			Object param = nodeLabel.getBestModelParameterForBounds(orientedRectangle);
+			if (param != null) {
+				nodeLabel.setModelParameter(param);
+			}
+			originRealizer.setLabel(nodeLabel);
+		}
+		else {
+			originRealizer.setLabelText(text);
+		}
 	}
 
 	/* (non-Javadoc)
