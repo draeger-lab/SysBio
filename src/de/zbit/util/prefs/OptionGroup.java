@@ -92,8 +92,8 @@ public class OptionGroup<T> implements ActionCommand,
    */
 	public OptionGroup(String optionGroupId, ResourceBundle bundle,
 		Option<? extends T>... option) {
-		this(bundle.getString(optionGroupId), bundle.getString(optionGroupId),
-			option);
+		//this(bundle.getString(optionGroupId), bundle.getString(optionGroupId), option);
+    this(bundle.getString(optionGroupId), (String)null, option);
 		String key = optionGroupId + "_TOOLTIP";
 		if (bundle.containsKey(key)) {
 			setToolTip(bundle.getString(key));
