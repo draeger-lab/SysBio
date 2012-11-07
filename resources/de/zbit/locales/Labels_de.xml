@@ -29,17 +29,17 @@
   
   <entry key="CSVOptions">CSV-Optionen</entry>
   <entry key="CSV_FILE">Wählen Sie eine CSV-Datei</entry>
-  <entry key="CSV_FILE_TOOLTIP">Eine Datei mit komma-separarierten Einträgen, die geöffnet werden soll.</entry>
+  <entry key="CSV_FILE_TOOLTIP">Eine Datei mit Zeichen-separarierten Einträgen, die geöffnet werden soll.</entry>
   <entry key="CSV_FILES_OPEN_DIR">Lade-Verzeichnis für CSV-Dateien</entry>
-  <entry key="CSV_FILES_OPEN_DIR_TOOLTIP">Hiermit wird das Standard-Verzeichnis angegeben, in dem sich zu öffnende CSV-Dateien befinden (Dateien mit komma-separierten Einträgen).</entry>
+  <entry key="CSV_FILES_OPEN_DIR_TOOLTIP">Hiermit wird das Standard-Verzeichnis angegeben, in dem sich zu öffnende CSV-Dateien befinden (Dateien mit Zeichen-separierten Einträgen).</entry>
   <entry key="CSV_FILES_QUOTE_CHAR">Anführungszeichen in CSV-Dateien</entry>
-  <entry key="CSV_FILES_QUOTE_CHAR_TOOLTIP">Das Zeichen, mit dem zusammenhängende Zeichenketten innerhalb einer Datei mit komma-separierten Werten angebeben werden können, um eine Falsche Deutung von Leerzeichen als Trennzeichen zu verhindern.</entry>
+  <entry key="CSV_FILES_QUOTE_CHAR_TOOLTIP">Das Zeichen, mit dem zusammenhängende Zeichenketten innerhalb einer Datei mit Zeichen-separierten Werten angebeben werden können, um eine Falsche Deutung von Leerzeichen als Trennzeichen zu verhindern.</entry>
   <entry key="CSV_FILES_SAVE_DIR">Speicher-Verzeichnis für CSV-Dateien</entry>
-  <entry key="CSV_FILES_SAVE_DIR_TOOLTIP">Das Standard-Verzeichnis, in dem CSV-Dateien (Dateien mit komma-separierten Werten) abgespeichert werden.</entry>
+  <entry key="CSV_FILES_SAVE_DIR_TOOLTIP">Das Standard-Verzeichnis, in dem CSV-Dateien (Dateien mit Zeichen-separierten Werten) abgespeichert werden.</entry>
   <entry key="CSV_FILES_SEPARATOR_CHAR">Trennzeichen in CSV-Dateien</entry>
-  <entry key="CSV_FILES_SEPARATOR_CHAR_TOOLTIP">Das Zeichen, mit dem die Werte in einer CSV-Datei getrennt werden sollen. Dies müssen keine Kommas im eigentlichen Sinne sein. Prinzipiell kann jedes UTF8-Zeichen als Separator genutzt werden.</entry>
+  <entry key="CSV_FILES_SEPARATOR_CHAR_TOOLTIP">Das Zeichen, mit dem die Werte in einer CSV-Datei getrennt werden sollen. Dies müssen nicht unbedingt Kommas sein. Prinzipiell kann jedes UTF8-Zeichen als Separator genutzt werden.</entry>
   <entry key="CSV_FILE_SELECTION">CSV-Datei öffnen</entry>
-  <entry key="CSV_FILE_SELECTION_TOOLTIP">Wählen Sie eine zu öffnende CSV-Datei, also eine Datei mit komma-separierten Einträgen.</entry>
+  <entry key="CSV_FILE_SELECTION_TOOLTIP">Wählen Sie eine zu öffnende CSV-Datei, also eine Datei mit Zeichen-separierten Einträgen.</entry>
   <entry key="CSV_FILE_CHARACTERS">Zeichen in CSV-Dateien</entry>
   <entry key="CSV_FILE_CHARACTERS_TOOLTIP">Legen Sie die Zeichen in CSV-Dateien fest, die Werte voneinander trennen, oder zur Kennzeichnung von Zeichenketten genutzt werden.</entry>
     

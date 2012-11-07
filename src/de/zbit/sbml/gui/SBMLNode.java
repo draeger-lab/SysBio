@@ -131,7 +131,9 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 		this.isVisible = isVisible;
 		
 		nodeCount++;
-		
+		if (node == null) {
+			return;
+		}
 		for (int i = 0; i < node.getChildCount(); i++) {
 			TreeNode child = node.getChildAt(i);
 			if (acceptedType.isAssignableFrom(child.getClass())) {
