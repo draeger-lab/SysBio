@@ -45,6 +45,11 @@ import org.sbml.jsbml.ext.qual.Transition;
 import de.zbit.util.DatabaseIdentifierTools;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
+/**
+ * @author Stephanie Tscherneck
+ * @version $Rev$
+ */
+
 public class Transfac2QualModel {
 	
 	private static final transient Logger logger = Logger.getLogger(Transfac2QualModel.class.getName());

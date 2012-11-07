@@ -46,6 +46,11 @@ import org.sbml.jsbml.text.parser.ParseException;
 
 import de.zbit.io.csv.CSVReader;
 
+/**
+ * @author Roland Keller
+ * @version $Rev$
+ */
+
 public class CellNetAnalyzer2QualModel {
 	
 	/**
