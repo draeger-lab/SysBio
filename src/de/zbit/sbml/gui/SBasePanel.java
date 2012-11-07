@@ -155,61 +155,63 @@ public class SBasePanel extends JPanel implements EquationComponent {
   	lh = new LayoutHelper(this, gbl);
   	editable = false;
   	row = -1;
-  	String className = sbase.getClass().getCanonicalName();
-  	className = className.substring(className.lastIndexOf('.') + 1);
-  	setBorder(BorderFactory.createTitledBorder(" " + className + " "));
-  	lh.add(new JPanel(), 0, ++row, 5, 1, 0d, 0d);
-  	if (sbase instanceof NamedSBase) {
-  		addProperties((NamedSBase) sbase);
-  	}
-  	addProperties(sbase);
-  	if (sbase instanceof SimpleSpeciesReference) {
-  		addProperties((SimpleSpeciesReference) sbase);
-  	}
-  	if (sbase instanceof MathContainer) {
-  		addProperties((MathContainer) sbase);
-  	}
-  	if (sbase instanceof ListOf<?>) {
-  		addProperties((ListOf<?>) sbase);
-  		// ListOf<?> list = (ListOf<?>) sbase;
-  		// for (SBase s : list) {
-  		// lh.add(new SBasePanel(s, settings));
-  		// }
-  	} else if (sbase instanceof Model) {
-  		addProperties((Model) sbase);
-  	} else if (sbase instanceof UnitDefinition) {
-  		addProperties((UnitDefinition) sbase);
-  	} else if (sbase instanceof Unit) {
-  		addProperties((Unit) sbase);
-  	} else if (sbase instanceof Compartment) {
-  		addProperties((Compartment) sbase);
-  	} else if (sbase instanceof Species) {
-  		addProperties((Species) sbase);
-  	} else if (sbase instanceof Parameter) {
-  		addProperties((Parameter) sbase);
-  	} else if (sbase instanceof LocalParameter) {
-  		addProperties((LocalParameter) sbase);
-  	} else if (sbase instanceof Constraint) {
-  		addProperties((Constraint) sbase);
-  	} else if (sbase instanceof Reaction) {
-  		try {
-  			addProperties((Reaction) sbase);
-  		} catch (XMLStreamException exc) {
-  			exc.printStackTrace();
-  			//added
-  			GUITools.showErrorMessage(this, exc);
+  	if (sbase != null) {
+  		String className = sbase.getClass().getCanonicalName();
+  		className = className.substring(className.lastIndexOf('.') + 1);
+  		setBorder(BorderFactory.createTitledBorder(" " + className + " "));
+  		lh.add(new JPanel(), 0, ++row, 5, 1, 0d, 0d);
+  		if (sbase instanceof NamedSBase) {
+  			addProperties((NamedSBase) sbase);
   		}
-  	} else if (sbase instanceof Event) {
-  		addProperties((Event) sbase);
-  	}
-  	if (sbase instanceof QuantityWithUnit) {
-  		addProperties((QuantityWithUnit) sbase);
-  	} else if ((sbase instanceof SBaseWithDerivedUnit) && !(sbase instanceof Reaction)) {
-  		// We exclude reactions because the information would be displayed twice in case that a kinetic law is set.
-  		addProperties((SBaseWithDerivedUnit) sbase);
-  	}
-  	if (sbase instanceof Variable) {
-  		addProperties((Variable) sbase);
+  		addProperties(sbase);
+  		if (sbase instanceof SimpleSpeciesReference) {
+  			addProperties((SimpleSpeciesReference) sbase);
+  		}
+  		if (sbase instanceof MathContainer) {
+  			addProperties((MathContainer) sbase);
+  		}
+  		if (sbase instanceof ListOf<?>) {
+  			addProperties((ListOf<?>) sbase);
+  			// ListOf<?> list = (ListOf<?>) sbase;
+  			// for (SBase s : list) {
+  			// lh.add(new SBasePanel(s, settings));
+  			// }
+  		} else if (sbase instanceof Model) {
+  			addProperties((Model) sbase);
+  		} else if (sbase instanceof UnitDefinition) {
+  			addProperties((UnitDefinition) sbase);
+  		} else if (sbase instanceof Unit) {
+  			addProperties((Unit) sbase);
+  		} else if (sbase instanceof Compartment) {
+  			addProperties((Compartment) sbase);
+  		} else if (sbase instanceof Species) {
+  			addProperties((Species) sbase);
+  		} else if (sbase instanceof Parameter) {
+  			addProperties((Parameter) sbase);
+  		} else if (sbase instanceof LocalParameter) {
+  			addProperties((LocalParameter) sbase);
+  		} else if (sbase instanceof Constraint) {
+  			addProperties((Constraint) sbase);
+  		} else if (sbase instanceof Reaction) {
+  			try {
+  				addProperties((Reaction) sbase);
+  			} catch (XMLStreamException exc) {
+  				exc.printStackTrace();
+  				//added
+  				GUITools.showErrorMessage(this, exc);
+  			}
+  		} else if (sbase instanceof Event) {
+  			addProperties((Event) sbase);
+  		}
+  		if (sbase instanceof QuantityWithUnit) {
+  			addProperties((QuantityWithUnit) sbase);
+  		} else if ((sbase instanceof SBaseWithDerivedUnit) && !(sbase instanceof Reaction)) {
+  			// We exclude reactions because the information would be displayed twice in case that a kinetic law is set.
+  			addProperties((SBaseWithDerivedUnit) sbase);
+  		}
+  		if (sbase instanceof Variable) {
+  			addProperties((Variable) sbase);
+  		}
   	}
   }
   

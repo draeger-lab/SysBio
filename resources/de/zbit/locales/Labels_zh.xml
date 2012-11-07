@@ -34,7 +34,7 @@
   <entry key="FILE_PREVIEW">文件预览</entry>
   <entry key="FILE_CONTAINS_HEADERS">包含了文件头的文件</entry>
   <entry key="INDICATE_IF_COLUMN_DESCRIPTIONS_ARE_GIVEN">指示文件是否包含了行描述。</entry>
-  <entry key="SEPARATOR_CHAR">分隔符 </entry>
+  <entry key="SEPARATOR_CHAR">分隔符</entry>
   <entry key="SEPARATOR_CHAR_TOOLTIP">用于分隔这些行的分隔字符。</entry>
   <entry key="TREAT_CONSECUTIVE_SEPARATORS_AS_ONE">将连续的分隔符处理为一个</entry>
   <entry key="TREAT_CONSECUTIVE_SEPARATORS_AS_ONE_TOOLTIP">指示是否应该将连续的分隔符处理为一个。</entry>

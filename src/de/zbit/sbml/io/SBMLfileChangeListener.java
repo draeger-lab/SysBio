@@ -49,7 +49,10 @@ public class SBMLfileChangeListener implements TreeNodeChangeListener {
 	public SBMLfileChangeListener(OpenedFile<SBMLDocument> openedFile) {
 		super();
 		this.openedFile = openedFile;
-		this.openedFile.getDocument().addTreeNodeChangeListener(this);
+		SBMLDocument doc = this.openedFile.getDocument();
+		if (doc != null) {
+			doc.addTreeNodeChangeListener(this);
+		}
 	}
 	
 	/* (non-Javadoc)
