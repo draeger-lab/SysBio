@@ -22,6 +22,11 @@ import de.zbit.util.DatabaseIdentifierTools;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
+/**
+ * @author Roland Keller, Stephanie Tscherneck
+ * @version $Rev$
+ */
+
 public abstract class QualModelBuilding {
 
 	public static final String QUAL_NS = "http://www.sbml.org/sbml/level3/version1/qual/version1";
