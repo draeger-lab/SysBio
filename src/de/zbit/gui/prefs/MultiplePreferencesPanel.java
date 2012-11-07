@@ -140,7 +140,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
   protected static Class<PreferencesPanel>[] getPredefinedPanels() {
     String pckName = MultiplePreferencesPanel.class.getPackage().getName();
     String panelClass = pckName + ".PreferencePanels";
-    Class<PreferencesPanel>[] classes = null;
+    Class<PreferencesPanel>[] foundPanelClasses = null;
     
     // If the panels have been predefined, load them instead of using reflections.
     Object o = null;
@@ -151,24 +151,24 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
       o = con.newInstance();
     } catch (Exception e1) {
       // Mainly ClassNotFoundException
-      logger.log(Level.FINER, String.format("%s not found.", panelClass), e1);
+      logger.finer(String.format("No predefined preference panel found for %s", pckName));
+      logger.log(Level.FINEST, String.format("%s not found.", panelClass), e1);
     }
     
     // If a predefined 'panelClass'-instance exits, load the classes array from it.
     if (o != null) {
       try {
-        classes = (Class<PreferencesPanel>[]) Reflect.invokeIfContains(o,
+        foundPanelClasses = (Class<PreferencesPanel>[]) Reflect.invokeIfContains(o,
           "getPreferencesClasses");
-        if (classes != null) {
+        if (foundPanelClasses != null) {
           logger.finer(String.format("Found preferences panels in %s", panelClass));
         }
       } catch (Exception e) {
         e.printStackTrace();
       }
-    } else {
     }
     
-    return classes;
+    return foundPanelClasses;
   }
 
 	/**
