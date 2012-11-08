@@ -737,7 +737,8 @@ public class DatabaseIdentifiers {
     // Make the conversion to URI
     Matcher m = Pattern.compile("urn:miriam:(.+?):(.+)").matcher(urn);
     if (!m.find()) return null;
-    return String.format("http://identifiers.org/%s/%s", m.group(1), m.group(2));
+    // As a side-note: In contrast to the URNs, URIs are allowed to contain a ':'. 
+    return String.format("http://identifiers.org/%s/%s", m.group(1), m.group(2).replace("%3A", ":").replace("%3a", ":"));
   }
   
   /**

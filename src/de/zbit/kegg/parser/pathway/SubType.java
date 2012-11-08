@@ -32,7 +32,7 @@ import de.zbit.util.Reflect;
  * @version $Rev$
  * @since 1.0
  */
-public class SubType {
+public class SubType implements Cloneable {
 	// SubType is for RELATION
   
   public static final String COMPOUND = "compound";
@@ -254,6 +254,16 @@ public class SubType {
       hash *= value.hashCode();
         
     return hash;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public SubType clone() {
+    SubType st = new SubType(this.name, this.value);
+    st.setEdgeColor(this.edgeColor);
+    return st;
   }
   
   @Override

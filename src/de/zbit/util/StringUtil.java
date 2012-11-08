@@ -1606,5 +1606,39 @@ public class StringUtil {
     
     return sb.toString();
   }
+
+  /**
+   * Allows only digits, letters and underscores. Removes all other
+   * characters (thereby replacing spaces with underscores)
+   * from the given string and returns it.
+   * <p>Example: "5hallo Fak!e " would be returned as "5hallo_Fake".
+   * @param string
+   * @return
+   */
+  public static String toWord(String string) {
+    if (string==null) {
+      return "";
+    }
+    string = string.trim();
+    StringBuilder ret2 = new StringBuilder(string.length());
+    char c;
+    
+    // May contain letters, digits or '_'
+    for (int i = 0; i < string.length(); i++) {
+      c = string.charAt(i);
+      if (c==' ') {
+        c='_'; // Replace spaces with "_"
+      }
+      
+      // Character.isLetter(c) also accepts ß and other unusual chars...
+      if ((c>=97 && c<=122) || (c>=65 && c<=90)) {
+        ret2.append(c);
+      } else if (Character.isDigit(c) || c == '_') {
+        ret2.append(c);
+      } // else: skip invalid characters
+    }
+    
+    return ret2.toString();
+  }
   
 }

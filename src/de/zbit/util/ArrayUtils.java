@@ -19,6 +19,7 @@ package de.zbit.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -191,7 +192,20 @@ public class ArrayUtils {
    * @return
    */
   public static <T> String implode(Iterable<T> arr, String sep) {
+    return implode(arr, sep, false);
+  }
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public static <T> String implode(Iterable<T> arr, String sep, boolean sorted) {
     if (arr==null || sep==null || !arr.iterator().hasNext()) return null;
+    
+    if (sorted) {
+      arr = new ArrayList<T>(Utils.iterableToList(arr));
+      try {
+        Collections.sort((List<Comparable>) arr);
+      } catch (Exception e) {
+        // We cannot sort non-comparable objects...
+      }
+    }
     
     StringBuilder ret = new StringBuilder();
     Iterator<T> it = arr.iterator();
