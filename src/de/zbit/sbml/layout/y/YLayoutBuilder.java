@@ -32,7 +32,6 @@ import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.CubicBezier;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.Layout;
-import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
@@ -52,6 +51,7 @@ import de.zbit.sbml.layout.Compartment;
 import de.zbit.sbml.layout.Consumption;
 import de.zbit.sbml.layout.Inhibition;
 import de.zbit.sbml.layout.Macromolecule;
+import de.zbit.sbml.layout.ProcessNode;
 import de.zbit.sbml.layout.Production;
 import de.zbit.sbml.layout.SBGNArc;
 import de.zbit.sbml.layout.SBGNNode;
@@ -209,14 +209,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
 		
 		logger.info(String.format("create edge between %s and %s", srg.getId(), rg.getId()));
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutBuilder#buildLineSegment(org.sbml.jsbml.ext.layout.LineSegment)
-	 */
-	@Override
-	public void buildLineSegment(LineSegment lineSegment) {
-		// TODO
 	}
 
 	/* (non-Javadoc)
@@ -432,6 +424,15 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	@Override
 	public Inhibition<EdgeRealizer> createInhibition() {
 		return new YInhibition();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createProcessNode()
+	 */
+	@Override
+	public ProcessNode<NodeRealizer> createProcessNode() {
+		return new YProcessNode();
 	}
 
 }

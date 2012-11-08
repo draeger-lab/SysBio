@@ -16,6 +16,9 @@
  */
 package de.zbit.sbml.layout.y;
 
+import org.sbml.jsbml.ext.layout.LineSegment;
+import org.sbml.jsbml.ext.layout.Point;
+
 import y.view.NodeRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.ProcessNode;
@@ -36,6 +39,29 @@ public class YProcessNode extends ProcessNode<NodeRealizer> {
 		reactionNodeRealizer.setLocation(x, y);
 		reactionNodeRealizer.setSize(width, height);
 		return reactionNodeRealizer;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.sbml.layout.ProcessNode#drawLineSegment(org.sbml.jsbml.ext.layout.LineSegment, double, org.sbml.jsbml.ext.layout.Point)
+	 */
+	@Override
+	public String drawLineSegment(LineSegment lineSegment,
+			double rotationAngle, Point rotationCenter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.sbml.layout.ProcessNode#draw(double, double, double, double, double, double, double, org.sbml.jsbml.ext.layout.Point)
+	 */
+	@Override
+	public String draw(double x, double y, double z, double width,
+			double height, double depth, double rotationAngle,
+			Point rotationCenter) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
