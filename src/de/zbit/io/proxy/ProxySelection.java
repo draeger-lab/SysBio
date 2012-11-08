@@ -118,8 +118,10 @@ public interface ProxySelection extends KeyProvider {
           settingValue = host;
           if (host==null || host.trim().length()<1) {
             System.setProperty("proxySet", "false");
+            System.setProperty("http.proxySet", "false");
           } else {
             System.setProperty("proxySet", "true");
+            System.setProperty("http.proxySet", "true");
           }
         } else if (i==1) {
           settingName = "Port";
@@ -141,7 +143,7 @@ public interface ProxySelection extends KeyProvider {
         if (settingValue!=null) {
           System.setProperty("proxy"+settingName, settingValue);
           System.setProperty("http.proxy"+settingName, settingValue);
-          System.setProperty("htttps.proxy"+settingName, settingValue);
+          System.setProperty("https.proxy"+settingName, settingValue);
           System.setProperty("ftp.proxy"+settingName, settingValue);
           System.setProperty("ftp.prox"+settingName, settingValue);
           System.setProperty("socks.proxy"+settingName, settingValue);
@@ -149,7 +151,7 @@ public interface ProxySelection extends KeyProvider {
         } else {
           System.clearProperty("proxy"+settingName);
           System.clearProperty("http.proxy"+settingName);
-          System.clearProperty("htttps.proxy"+settingName);
+          System.clearProperty("https.proxy"+settingName);
           System.clearProperty("ftp.proxy"+settingName);
           System.clearProperty("ftp.prox"+settingName);
           System.clearProperty("socks.proxy"+settingName);
