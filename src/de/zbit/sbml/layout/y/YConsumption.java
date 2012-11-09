@@ -51,11 +51,12 @@ public class YConsumption implements Consumption<EdgeRealizer> {
 		return edgeRealizer;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment)
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
 	 */
 	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment) {
+	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
 		// TODO Auto-generated method stub
 		return null;
 	}
