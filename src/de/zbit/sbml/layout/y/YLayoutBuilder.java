@@ -181,7 +181,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 * @see de.zbit.sbml.layout.LayoutBuilder#buildConnectingArc(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
 	 */
 	@Override
-	public void buildConnectingArc(SpeciesReferenceGlyph speciesReferenceGlyph) {
+	public void buildConnectingArc(SpeciesReferenceGlyph speciesReferenceGlyph, double curveWidth) {
 		// TODO
 		logger.info(String.format("building reference glyph id=%s", speciesReferenceGlyph.getId()));
 		logger.info(speciesReferenceGlyph.toString());
@@ -191,7 +191,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 * @see de.zbit.sbml.layout.LayoutBuilder#buildConnectingArc(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph, org.sbml.jsbml.ext.layout.ReactionGlyph)
 	 */
 	@Override
-	public void buildConnectingArc(SpeciesReferenceGlyph srg, ReactionGlyph rg) {
+	public void buildConnectingArc(SpeciesReferenceGlyph srg, ReactionGlyph rg, double curveWidth) {
 		Node processNode = id2node.get(rg.getId());
 		Node speciesGlyphNode = id2node.get(srg.getSpeciesGlyph());
 		assert processNode != null;
@@ -223,7 +223,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 * @see de.zbit.sbml.layout.LayoutBuilder#buildProcessNode(org.sbml.jsbml.ext.layout.ReactionGlyph, double)
 	 */
 	@Override
-	public void buildProcessNode(ReactionGlyph reactionGlyph, double rotationAngle) {
+	public void buildProcessNode(ReactionGlyph reactionGlyph, double rotationAngle, double curveWidth) {
 		// check if process node has already been built
 		Node maybeProcesNode = id2node.get(reactionGlyph.getId());
 		if (maybeProcesNode == null) {

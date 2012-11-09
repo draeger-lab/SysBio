@@ -64,4 +64,16 @@ public class YProcessNode extends ProcessNode<NodeRealizer> {
 		return null;
 	}
 
+	@Override
+	public double getLineWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setLineWidth(double lineWidth) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

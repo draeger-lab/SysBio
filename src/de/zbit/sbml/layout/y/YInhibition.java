@@ -28,20 +28,22 @@ import de.zbit.sbml.layout.Inhibition;
  */
 public class YInhibition implements Inhibition<EdgeRealizer> {
 
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment)
-	 */
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
 	 */
 	@Override
 	public EdgeRealizer draw(Curve curve) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
+	 */
+	@Override
+	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
 		// TODO Auto-generated method stub
 		return null;
 	}
