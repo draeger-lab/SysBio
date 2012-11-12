@@ -182,9 +182,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 */
 	@Override
 	public void buildConnectingArc(SpeciesReferenceGlyph speciesReferenceGlyph, double curveWidth) {
-		// TODO
-		logger.info(String.format("building reference glyph id=%s", speciesReferenceGlyph.getId()));
-		logger.info(speciesReferenceGlyph.toString());
 	}
 
 	/* (non-Javadoc)
@@ -192,6 +189,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 */
 	@Override
 	public void buildConnectingArc(SpeciesReferenceGlyph srg, ReactionGlyph rg, double curveWidth) {
+		logger.info(String.format("building arc srgId=%s to rgId=%s", srg.getId(), rg.getId()));
+		
 		Node processNode = id2node.get(rg.getId());
 		Node speciesGlyphNode = id2node.get(srg.getSpeciesGlyph());
 		assert processNode != null;
@@ -282,8 +281,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		Node origin = id2node.get(textGlyph.getGraphicalObject());
 		NodeRealizer originRealizer = graph.getRealizer(origin);
 
-		System.out.println(originRealizer.hashCode());
-
 		String text;
 		if (textGlyph.isSetText()) {
 			text = textGlyph.getText();
@@ -343,6 +340,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 */
 	@Override
 	public Graph2D getProduct() {
+		logger.info("returning graph");
+		assert graph != null;
+		assert !graph.isEmpty();
+		assert graph.getBoundingBox() != null;
 		return graph;
 	}
 

@@ -46,7 +46,7 @@ public class YConsumption implements Consumption<EdgeRealizer> {
 				edgeRealizer.addPoint(end.getX(), end.getY());
 			}
 		}
-		System.err.println("consumption");
+
 		// TODO handle arrows
 		return edgeRealizer;
 	}
