@@ -39,12 +39,7 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	/**
 	 * 
 	 */
-	boolean changed = false;
-	
-	/**
-	 * 
-	 */
-	protected T document;
+	private PropertyChangeSupport propertyChangeSupport;
 	
 	/**
 	 * 
@@ -54,15 +49,72 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	/**
 	 * 
 	 */
-	private PropertyChangeSupport propertyChangeSupport;
+	protected T document;
+	
+	/**
+	 * 
+	 */
+	boolean changed = false;
 	
 
 
 	/**
-	 * Bean constructor.
+	 * @return
 	 */
-	public OpenedFile() {
-		super();
+	public File getFile() {
+		return file;
+	}
+	
+	/**
+	 * set the File for saving changes
+	 * @param file
+	 */
+	public void setFile(File file) {
+		this.file = file;
+	}
+	
+	/**
+	 * checks if Filepath is set
+	 */
+	public boolean isSetFile() {
+		return this.file != null;
+	}
+
+	/**
+	 * @return the original
+	 */
+	public T getDocument() {
+		return document;
+	}
+	
+	/**
+	 * 
+	 * @param document
+	 */
+	public void setDocument(T document) {
+		this.document = document;
+	}
+
+	/**
+	 * @return the changed
+	 */
+	public boolean isChanged() {
+		return changed;
+	}
+
+	/**
+	 * @param changed the changed to set
+	 */
+	public void setChanged(boolean changed) {
+		this.changed = changed;
+	}
+	
+	/**
+	 * 
+	 * @param original
+	 */
+	public OpenedFile(T document) {
+		this(null, document);
 	}
 	
 	/**
@@ -74,6 +126,13 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	}
 	
 	/**
+	 * Bean constructor.
+	 */
+	public OpenedFile() {
+		super();
+	}
+	
+	/**
 	 * 
 	 * @param file
 	 * @param original
@@ -82,69 +141,8 @@ public class OpenedFile<T> implements PropertyChangeListener {
 		this();
 		this.file = file;
 		this.document = document;
+		this.setChanged(true);
 		this.propertyChangeSupport = new PropertyChangeSupport(this);
-	}
-
-	/**
-	 * 
-	 * @param original
-	 */
-	public OpenedFile(T document) {
-		this(null, document);
-	}
-	
-	/**
-	 * 
-	 * @param propertyName
-	 * @param listener
-	 */
-	public void addPropertyChangeListener(String propertyName,
-		PropertyChangeListener listener) {
-		propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
-	}
-
-	/**
-	 * 
-	 */
-	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
-	}
-
-	/**
-	 * @return the original
-	 */
-	public T getDocument() {
-		return document;
-	}
-	
-	/**
-	 * @return
-	 */
-	public File getFile() {
-		return file;
-	}
-	
-	/**
-	 * @return the changed
-	 */
-	public boolean isChanged() {
-		return changed;
-	}
-	
-	/**
-	 * Checks if the document within this {@link OpenedFile} is not {@code null}.
-	 * 
-	 * @return
-	 */
-	public boolean isSetDocument() {
-		return document != null;
-	}
-	
-	/**
-	 * checks if Filepath is set
-	 */
-	public boolean isSetFile() {
-		return this.file != null;
 	}
 
 	/* (non-Javadoc)
@@ -160,26 +158,32 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	}
 
 	/**
-	 * @param changed the changed to set
+	 * 
 	 */
-	public void setChanged(boolean changed) {
-		this.changed = changed;
+	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
 	}
 	
 	/**
 	 * 
-	 * @param document
+	 * @param propertyName
+	 * @param listener
 	 */
-	public void setDocument(T document) {
-		this.document = document;
+	public void addPropertyChangeListener(String propertyName,
+		PropertyChangeListener listener) {
+		propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
 	}
 
-	/**
-	 * set the File for saving changes
-	 * @param file
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public void setFile(File file) {
-		this.file = file;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof OpenedFile<?>) {
+			return this.file.getAbsolutePath().equals(((OpenedFile<?>) obj).file.getAbsolutePath());
+		}
+		return false;
 	}
-
+	
+	
 }
