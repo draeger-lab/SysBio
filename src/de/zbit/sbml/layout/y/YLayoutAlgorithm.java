@@ -16,6 +16,7 @@
  */
 package de.zbit.sbml.layout.y;
 
+import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,7 +35,6 @@ import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.Position;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
-import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
@@ -49,7 +49,6 @@ import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
-import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.LayoutAlgorithm;
 import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.util.objectwrapper.ValuePairUncomparable;
@@ -97,9 +96,9 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	private Map<Node,GraphicalObject> nodeIncompleteGlyphMap;
 	
 	/**
-	 * Mapping of glyph to the corresponding YFiles node.
+	 * Mapping of glyph id to the corresponding YFiles node.
 	 */
-	private Map<GraphicalObject,Node> glyphNodeMap;
+	private Map<String,Node> glyphNodeMap;
 	
 	/**
 	 * Output of the algorithm, i.e. the autolayouted previously unlayouted
@@ -121,12 +120,12 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	/**
 	 * SBML level
 	 */
-	private static int level;
+	private int level;
 	
 	/**
 	 * SBML version
 	 */
-	private static int version;
+	private int version;
 
 	/**
 	 * LayoutAlgorithm constructor.
@@ -141,7 +140,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 			new HashSet<ValuePairUncomparable<SpeciesReferenceGlyph,ReactionGlyph>>();
 		
 		this.nodeIncompleteGlyphMap = new HashMap<Node, GraphicalObject>();
-		this.glyphNodeMap = new HashMap<GraphicalObject, Node>();
+		this.glyphNodeMap = new HashMap<String, Node>();
 		
 		this.output = new HashSet<GraphicalObject>();
 		
@@ -212,7 +211,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 		graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
 		
 		setOfLayoutedGlyphs.add(glyph);
-		glyphNodeMap.put(glyph, node);
+		glyphNodeMap.put(glyph.getId(), node);
 	}
 
 	/* (non-Javadoc)
@@ -247,7 +246,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 		}
 		
 		nodeIncompleteGlyphMap.put(node, glyph);
-		glyphNodeMap.put(glyph, node);
+		glyphNodeMap.put(glyph.getId(), node);
 		setOfUnlayoutedGlyphs.add(glyph);
 	}
 
@@ -262,7 +261,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 			setOfUnlayoutedNodes.add(entry.getKey());
 		}
 		
-		// Autolayout of subset using GraphTools
+		// Autolayout of node subset using GraphTools
 		graphTools.layoutNodeSubset(setOfUnlayoutedNodes);
 		
 		// copy realizer information to glyph bounding box
@@ -289,74 +288,62 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 						DEFAULT_DEPTH);
 			}
 			
+			logger.info("finished glyphId=%s" + glyph.getId());
+			
 			output.add(glyph);
+			
+			// Create all edges
+			for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfLayoutedEdges) {
+				SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
+				ReactionGlyph reactionGlyph = pair.getB();
+				handleEdge(speciesReferenceGlyph, reactionGlyph);
+			}
+			for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfUnlayoutedEdges) {
+				SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
+				ReactionGlyph reactionGlyph = pair.getB();
+				handleEdge(speciesReferenceGlyph, reactionGlyph);
+			}
 		}
 		
 		return output;
 	}
-	
-	/**
-	 * 
-	 */
-	private void autolayout() {
-		// Create all edges
-		for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfLayoutedEdges) {
-			SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
-			ReactionGlyph reactionGlyph = pair.getB();
-			handleEdge(speciesReferenceGlyph, reactionGlyph);
-		}
-		for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfUnlayoutedEdges) {
-			SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
-			ReactionGlyph reactionGlyph = pair.getB();
-			handleEdge(speciesReferenceGlyph, reactionGlyph);
-		}
-	
-
-	}
 
 	private void handleEdge(SpeciesReferenceGlyph srg, ReactionGlyph rg) {
-		buildProcessNodeIfNecessary(rg);
-		Node processNode = glyphNodeMap.get(rg);
-		Node speciesGlyphNode = glyphNodeMap.get(srg.getSpeciesGlyphInstance());
+		Node processNode = glyphNodeMap.get(rg.getId());
+		Node speciesGlyphNode = glyphNodeMap.get(srg.getSpeciesGlyph());
+		assert glyphNodeMap.containsKey(rg.getId());
 		assert processNode != null;
 		assert speciesGlyphNode != null;
 		assert graph2D != null;
 		
+		// create edge
 		Edge edge = graph2D.createEdge(processNode, speciesGlyphNode);
 		
-		YPoint source = graph2D.getRealizer(edge).getSourcePoint();
-		Point start = new Point(source.getX(), source.getY(), 0.0);
-		YPoint target = graph2D.getRealizer(edge).getSourcePoint();
-		Point end = new Point(target.getX(), target.getY(), 0.0);
+		// copy edge data to curve of species reference glyph
+		if (!srg.isSetCurve() || srg.getCurve().getListOfCurveSegments().isEmpty()) {
+			YPoint source = graph2D.getRealizer(edge).getSourcePoint();
+			Point start = new Point(source.getX(), source.getY(), 0.0);
+			YPoint target = graph2D.getRealizer(edge).getSourcePoint();
+			Point end = new Point(target.getX(), target.getY(), 0.0);
+
+			logger.info(String.format("add curve for rgId=%s  srgId=%s  start=%s  end=%s",
+					rg.getId(), srg.getId(), start.toString(), end.toString()));
+
+			CurveSegment curveSegment = new CurveSegment();
+			curveSegment.setStart(start);
+			curveSegment.setEnd(end);
+
+			Curve curve = new Curve();
+			ListOf<CurveSegment> listOfCurveSegments = new ListOf<CurveSegment>();
+			listOfCurveSegments.add(curveSegment);
+			curve.setListOfCurveSegments(listOfCurveSegments);
+
+			srg.setCurve(curve);
+		}
 		
-		CurveSegment curveSegment = new CurveSegment();
-		curveSegment.setStart(start);
-		curveSegment.setEnd(end);
-		
-		Curve curve = new Curve();
-		ListOf<CurveSegment> listOfCurveSegments = new ListOf<CurveSegment>();
-		listOfCurveSegments.add(curveSegment);
-		curve.setListOfCurveSegments(listOfCurveSegments);
-		
-		srg.setCurve(curve);
 		if (!output.contains(rg)) {
 			output.add(rg);
 		}
-	}
-
-	/**
-	 * @param rg
-	 * @return true if a new process node as been added 
-	 */
-	private boolean buildProcessNodeIfNecessary(ReactionGlyph rg) {
-		Node maybeProcessNode = glyphNodeMap.get(rg.getId());
-		if (maybeProcessNode == null) {
-			ReactionNodeRealizer reactionNodeRealizer = new ReactionNodeRealizer();
-			Node processNode = graph2D.createNode(reactionNodeRealizer);
-			glyphNodeMap.put(rg, processNode);
-			return true;
-		}
-		return false;
 	}
 
 	/* (non-Javadoc)
@@ -376,8 +363,13 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 */
 	@Override
 	public Dimensions createLayoutDimension() {
-		// TODO Auto-generated method stub
-		return null;
+		Rectangle graphBoundingBox = graph2D.getBoundingBox();
+		Dimensions dimensions = new Dimensions(graphBoundingBox.getWidth(),
+				graphBoundingBox.getHeight(),
+				DEFAULT_DEPTH,
+				level, version);
+		logger.info(dimensions.toString());
+		return dimensions;
 	}
 
 	/* (non-Javadoc)
@@ -480,49 +472,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	@Override
 	public Position createCompartmentGlyphPosition(
 			CompartmentGlyph previousCompartmentGlyph) {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createReactionGlyphPosition(org.sbml.jsbml.ext.layout.ReactionGlyph)
-	 */
-	@Override
-	public Position createReactionGlyphPosition(ReactionGlyph reactionGlyph) {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphPosition(org.sbml.jsbml.ext.layout.SpeciesGlyph)
-	 */
-	@Override
-	public Position createSpeciesGlyphPosition(SpeciesGlyph speciesGlyph) {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphPosition(org.sbml.jsbml.ext.layout.SpeciesGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
-	 */
-	@Override
-	public Position createSpeciesGlyphPosition(SpeciesGlyph speciesGlyph,
-			SpeciesReferenceGlyph specieReferenceGlyph) {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createTextGlyphPosition(org.sbml.jsbml.ext.layout.TextGlyph)
-	 */
-	@Override
-	public Position createTextGlyphPosition(TextGlyph textGlyph) {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesReferenceGlyphPosition(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
-	 */
-	@Override
-	public Position createSpeciesReferenceGlyphPosition(
-			ReactionGlyph reactionGlyph,
-			SpeciesReferenceGlyph speciesReferenceGlyph) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
