@@ -39,12 +39,7 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	/**
 	 * 
 	 */
-	private PropertyChangeSupport propertyChangeSupport;
-	
-	/**
-	 * 
-	 */
-	protected File file;
+	boolean changed = false;
 	
 	/**
 	 * 
@@ -54,67 +49,20 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	/**
 	 * 
 	 */
-	boolean changed = false;
-	
-
-
-	/**
-	 * @return
-	 */
-	public File getFile() {
-		return file;
-	}
-	
-	/**
-	 * set the File for saving changes
-	 * @param file
-	 */
-	public void setFile(File file) {
-		this.file = file;
-	}
-	
-	/**
-	 * checks if Filepath is set
-	 */
-	public boolean isSetFile() {
-		return this.file != null;
-	}
-
-	/**
-	 * @return the original
-	 */
-	public T getDocument() {
-		return document;
-	}
+	protected File file;
 	
 	/**
 	 * 
-	 * @param document
 	 */
-	public void setDocument(T document) {
-		this.document = document;
-	}
-
-	/**
-	 * @return the changed
-	 */
-	public boolean isChanged() {
-		return changed;
-	}
-
-	/**
-	 * @param changed the changed to set
-	 */
-	public void setChanged(boolean changed) {
-		this.changed = changed;
-	}
+	private PropertyChangeSupport propertyChangeSupport;
 	
+
+
 	/**
-	 * 
-	 * @param original
+	 * Bean constructor.
 	 */
-	public OpenedFile(T document) {
-		this(null, document);
+	public OpenedFile() {
+		super();
 	}
 	
 	/**
@@ -123,13 +71,6 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	 */
 	public OpenedFile(File file) {
 		this(file, null);
-	}
-	
-	/**
-	 * Bean constructor.
-	 */
-	public OpenedFile() {
-		super();
 	}
 	
 	/**
@@ -145,23 +86,12 @@ public class OpenedFile<T> implements PropertyChangeListener {
 		this.propertyChangeSupport = new PropertyChangeSupport(this);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	 */
-	//@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals(FILE_CHANGED_EVENT)) {
-			boolean previous = isChanged();
-			setChanged(true);
-			firePropertyChange(FILE_CHANGED_EVENT, previous, true);
-		}
-	}
-
 	/**
 	 * 
+	 * @param original
 	 */
-	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+	public OpenedFile(T document) {
+		this(null, document);
 	}
 	
 	/**
@@ -183,6 +113,84 @@ public class OpenedFile<T> implements PropertyChangeListener {
 			return this.file.getAbsolutePath().equals(((OpenedFile<?>) obj).file.getAbsolutePath());
 		}
 		return false;
+	}
+
+	/**
+	 * 
+	 */
+	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+	}
+	
+	/**
+	 * @return the original
+	 */
+	public T getDocument() {
+		return document;
+	}
+	
+	/**
+	 * @return
+	 */
+	public File getFile() {
+		return file;
+	}
+	
+	/**
+	 * @return the changed
+	 */
+	public boolean isChanged() {
+		return changed;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isSetDocument() {
+		return document != null;
+	}
+
+	/**
+	 * checks if Filepath is set
+	 */
+	public boolean isSetFile() {
+		return this.file != null;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	//@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if (evt.getPropertyName().equals(FILE_CHANGED_EVENT)) {
+			boolean previous = isChanged();
+			setChanged(true);
+			firePropertyChange(FILE_CHANGED_EVENT, previous, true);
+		}
+	}
+	
+	/**
+	 * @param changed the changed to set
+	 */
+	public void setChanged(boolean changed) {
+		this.changed = changed;
+	}
+
+	/**
+	 * 
+	 * @param document
+	 */
+	public void setDocument(T document) {
+		this.document = document;
+	}
+
+	/**
+	 * set the File for saving changes
+	 * @param file
+	 */
+	public void setFile(File file) {
+		this.file = file;
 	}
 	
 	
