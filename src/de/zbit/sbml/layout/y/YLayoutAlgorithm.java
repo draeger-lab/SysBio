@@ -218,6 +218,15 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	public void addUnlayoutedGlyph(GraphicalObject glyph) {
 		logger.info("add unlayouted glyph id=" + glyph.getId());
 		
+		
+		// text glyphs which are not independent and do not have a
+		// bounding box are considered layouted and thus not processed here
+		if (glyph instanceof TextGlyph &&
+				!LayoutDirector.textGlyphIsIndependent((TextGlyph) glyph) &&
+				!glyph.isSetBoundingBox()) {
+			return;
+		}
+		
 		NodeRealizer nodeRealizer = new ShapeNodeRealizer();
 		Node node = graph2D.createNode(nodeRealizer);
 		
@@ -241,6 +250,8 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 			nodeRealizer.setSize(width, height);
 			graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
 		}
+		
+		// TODO handle reaction glyphs differently
 		
 		nodeIncompleteGlyphMap.put(node, glyph);
 		glyphNodeMap.put(glyph.getId(), node);

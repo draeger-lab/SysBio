@@ -19,7 +19,6 @@ package de.zbit.sbml.layout.y;
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 
-import y.view.Arrow;
 import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Consumption;
 
@@ -35,7 +34,6 @@ public class YConsumption implements Consumption<EdgeRealizer> {
 	@Override
 	public EdgeRealizer draw(Curve curve) {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
-		edgeRealizer.setTargetArrow(Arrow.DELTA);
 		return edgeRealizer;
 	}
 

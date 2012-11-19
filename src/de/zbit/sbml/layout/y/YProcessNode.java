@@ -36,7 +36,6 @@ public class YProcessNode extends ProcessNode<NodeRealizer> {
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth) {
 		ReactionNodeRealizer reactionNodeRealizer = new ReactionNodeRealizer();
-		System.err.format("x y = %f %f\n", x, y);
 		reactionNodeRealizer.setLocation(x, y);
 		reactionNodeRealizer.setSize(width, height);
 		return reactionNodeRealizer;
