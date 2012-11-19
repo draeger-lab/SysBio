@@ -45,4 +45,10 @@ public class YCatalysis implements Catalysis<EdgeRealizer> {
 		return null;
 	}
 
+	@Override
+	public EdgeRealizer draw(Curve curve, double lineWidth) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
