@@ -17,6 +17,7 @@
 
 package de.zbit.sbml.layout.y;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -27,10 +28,12 @@ import java.util.logging.Logger;
 
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBO;
+import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.CubicBezier;
 import org.sbml.jsbml.ext.layout.Curve;
+import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
@@ -39,14 +42,19 @@ import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
+import org.sbml.jsbml.util.StringTools;
 
 import y.base.Node;
 import y.geom.OrientedRectangle;
+import y.layout.FreeNodeLabelModel;
+import y.view.BezierEdgeRealizer;
+import y.view.EdgeLabel;
 import y.view.EdgeRealizer;
 import y.view.GenericEdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
+import y.view.PolyLineEdgeRealizer;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
 import de.zbit.sbml.layout.Catalysis;
 import de.zbit.sbml.layout.Compartment;
@@ -55,6 +63,8 @@ import de.zbit.sbml.layout.Inhibition;
 import de.zbit.sbml.layout.Macromolecule;
 import de.zbit.sbml.layout.Modulation;
 import de.zbit.sbml.layout.NecessaryStimulation;
+import de.zbit.sbml.layout.NucleicAcidFeature;
+import de.zbit.sbml.layout.PerturbingAgent;
 import de.zbit.sbml.layout.ProcessNode;
 import de.zbit.sbml.layout.Production;
 import de.zbit.sbml.layout.SBGNArc;
@@ -209,14 +219,23 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		SBGNArc<EdgeRealizer> arc;
 		if (srg.isSetSBOTerm()) {
 			arc = getSBGNArc(srg.getSBOTerm());
-			logger.info("SBO term is " + srg.getSBOTerm());
+			logger.info("SRG sbo term " + srg.getSBOTerm());
 		} else {
 			arc = getSBGNArc(srg.getSpeciesReferenceRole());
-			logger.info("SBO term is role " + srg.getSpeciesReferenceRole());
+			logger.info("SRG role " + srg.getSpeciesReferenceRole());
 		}
 		
 		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve());
 		edgeRealizer = edgeRealizer.createCopy();
+		
+		if (srg.isSetSpeciesReference() && srg.isSetSpeciesReference()) {
+			SpeciesReference speciesReference = (SpeciesReference) srg.getSpeciesReferenceInstance();
+			if (speciesReference.isSetStoichiometry()) {
+				EdgeLabel edgeLabel = new EdgeLabel(StringTools.toString(speciesReference.getStoichiometry()));
+				edgeLabel.setLineColor(Color.BLACK);
+				edgeRealizer.addLabel(edgeLabel);
+			}
+		}
 		
 		graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
 		
@@ -228,7 +247,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 */
 	@Override
 	public void buildCubicBezier(CubicBezier cubicBezier) {
-		// TODO
 	}
 
 	/* (non-Javadoc)
@@ -280,8 +298,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 			text = textGlyph.getText();
 			logger.info(String.format("building text glyph element id=%s\n\tindependent text text='%s'",
 					textGlyph.getId(), text));
-			// TODO how to display independent text in yFiles graph?
+
 			Node ynode = graph.createNode();
+			// TODO maybe implement a IndependentTextRealizer for better presentation
 			NodeRealizer nr = graph.getRealizer(ynode);
 			nr.setLabelText(text);
 			nr.setFrame(x, y, width, height);
@@ -293,8 +312,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 			labelTextGlyphs.add(textGlyph);
 		}
 		else {
-			logger.info(String.format("illegal text glyph id=%s",
-					 textGlyph.getId()));
+			logger.info(String.format("illegal text glyph id=%s", textGlyph.getId()));
 		}
 	}
 
@@ -319,14 +337,33 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 					textGlyph.getId(), namedSBase.getId(), text));
 		}
 		
-		// TODO use NodeLabel to specify position of text
-		NodeLabel nodeLabel;
 		if (textGlyph.isSetBoundingBox() &&
 				textGlyph.getBoundingBox().isSetPosition() &&
 				textGlyph.getBoundingBox().isSetDimensions()) {
+			logger.info("using nodelabel for textglyph " + textGlyph.getId());
+			NodeLabel nodeLabel;
+			nodeLabel = new NodeLabel(text);
+			nodeLabel.setLabelModel(new FreeNodeLabelModel());
+			originRealizer.setLabel(nodeLabel);
+			
+			// text glyph position
 			Point position = textGlyph.getBoundingBox().getPosition();
-			double x = position.getX();
-			double y = position.getY();
+			double glyphX = position.getX();
+			double glyphY = position.getY();
+			// species glyph position
+			SpeciesGlyph speciesGlyph = layout.getSpeciesGlyph(textGlyph.getGraphicalObject());
+			position = speciesGlyph.getBoundingBox().getPosition();
+			double sglyphX = position.getX();
+			double sglyphY = position.getY();
+			// node position
+			double nodeX = originRealizer.getX();
+			double nodeY = originRealizer.getY();
+			// calculate text glyph position
+			double x = nodeX - (sglyphX - glyphX);
+			double y = nodeY - (sglyphY - glyphY);
+			
+			logger.info(String.format("ynode: %f,%f  text should be: %f,%f", nodeX, nodeY, x, y));
+			
 			
 			Dimensions dimensions = textGlyph.getBoundingBox().getDimensions();
 			double width = dimensions.getWidth();
@@ -334,13 +371,12 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 			
 			OrientedRectangle orientedRectangle =
 				new OrientedRectangle(x, y, width, height);
-			nodeLabel = new NodeLabel(text); // TODO changes model for all labels
-//			nodeLabel.setModel(arg0)
+			logger.info(orientedRectangle.toString());
 			Object param = nodeLabel.getBestModelParameterForBounds(orientedRectangle);
 			if (param != null) {
+				logger.info("using extra positioning for textglyph " + textGlyph.getId());
 				nodeLabel.setModelParameter(param);
 			}
-			originRealizer.setLabel(nodeLabel);
 		}
 		else {
 			originRealizer.setLabelText(text);
@@ -353,17 +389,40 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		 */
 		public static EdgeRealizer createEdgeRealizerFromCurve(Curve curve) {
 			EdgeRealizer edgeRealizer = new GenericEdgeRealizer();
-			edgeRealizer = edgeRealizer.createCopy();
-	
-	//		// TODO handle beziers
-	//		if (curve != null && curve.isSetListOfCurveSegments()) {
-	//			for (CurveSegment curveSegment : curve.getListOfCurveSegments()) {
-	//				Point start = curveSegment.getStart();
-	//				Point end = curveSegment.getEnd();
-	//				edgeRealizer.addPoint(start.getX(), start.getY());
-	//				edgeRealizer.addPoint(end.getX(), end.getY());
-	//			}
-	//		}
+			
+			// Note: if multiple curve segments (beziers) are specified, the resulting
+			// representation will not be standard compliant.
+
+			if (curve != null && curve.isSetListOfCurveSegments()) {
+				List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
+
+				// if all curve segments are beziers, use BezierEdgeRealizer, else use PolyLineEdgeRealizer
+				boolean drawBezier = true;
+				for (CurveSegment curveSegment : listOfCurveSegments) {
+					// TODO there should be a constant for this string
+					drawBezier = drawBezier && curveSegment.getType().equals("CubicBezier");
+					if (!drawBezier) {
+						break;
+					}
+				}
+				
+				edgeRealizer = drawBezier ? new BezierEdgeRealizer() : new PolyLineEdgeRealizer();
+
+				for (int i = listOfCurveSegments.size()-1; i >= 0; i--) {
+					CurveSegment curveSegment = listOfCurveSegments.get(i);
+					
+					Point end = curveSegment.getEnd();
+					edgeRealizer.addPoint(end.getX(), end.getY());
+					if (drawBezier) {
+						Point basePoint2 = curveSegment.getBasePoint2();
+						edgeRealizer.addPoint(basePoint2.getX(), basePoint2.getY());
+						Point basePoint1 = curveSegment.getBasePoint1();
+						edgeRealizer.addPoint(basePoint1.getX(), basePoint1.getY());
+					}
+					Point start = curveSegment.getStart();
+					edgeRealizer.addPoint(start.getX(), start.getY());
+				}
+			}
 	
 			return edgeRealizer;
 		}
@@ -441,6 +500,22 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	@Override
 	public SimpleChemical<NodeRealizer> createSimpleChemical() {
 		return new YSimpleChemical();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createNucleicAcidFeature()
+	 */
+	@Override
+	public NucleicAcidFeature<NodeRealizer> createNucleicAcidFeature() {
+		return new YNucleicAcidFeature();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createPerturbingAgent()
+	 */
+	@Override
+	public PerturbingAgent<NodeRealizer> createPerturbingAgent() {
+		return new YPerturbingAgent();
 	}
 
 	/* (non-Javadoc)
