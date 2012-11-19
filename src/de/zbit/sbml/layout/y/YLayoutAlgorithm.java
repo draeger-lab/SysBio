@@ -24,11 +24,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
@@ -41,7 +39,6 @@ import org.sbml.jsbml.ext.layout.TextGlyph;
 import y.base.DataMap;
 import y.base.Edge;
 import y.base.Node;
-import y.geom.YPoint;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
@@ -261,6 +258,18 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 			setOfUnlayoutedNodes.add(entry.getKey());
 		}
 		
+		// Create all edges
+		for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfLayoutedEdges) {
+			SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
+			ReactionGlyph reactionGlyph = pair.getB();
+			handleEdge(speciesReferenceGlyph, reactionGlyph);
+		}
+		for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfUnlayoutedEdges) {
+			SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
+			ReactionGlyph reactionGlyph = pair.getB();
+			handleEdge(speciesReferenceGlyph, reactionGlyph);
+		}
+		
 		// Autolayout of node subset using GraphTools
 		graphTools.layoutNodeSubset(setOfUnlayoutedNodes);
 		
@@ -270,12 +279,14 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 			NodeRealizer nodeRealizer = graph2D.getRealizer(node);
 			GraphicalObject glyph = entry.getValue();
 			
+			
 			// get or create bounding box for glyphs
 			BoundingBox boundingBox = glyph.isSetBoundingBox() ?
 					glyph.getBoundingBox() : glyph.createBoundingBox();
 			
 			// copy position
 			if (!LayoutDirector.glyphHasPosition(glyph)) {
+				logger.info("completing glyph position id=" + glyph.getId());
 				boundingBox.createPosition(nodeRealizer.getX(),
 						nodeRealizer.getY(),
 						DEFAULT_Z_COORD);
@@ -283,26 +294,13 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 			
 			// copy dimensions
 			if (!LayoutDirector.glyphHasDimensions(glyph)) {
+				logger.info("completing glyph dimensions id=" + glyph.getId());
 				boundingBox.createDimensions(nodeRealizer.getWidth(),
 						nodeRealizer.getHeight(),
 						DEFAULT_DEPTH);
 			}
 			
-			logger.info("finished glyphId=%s" + glyph.getId());
-			
 			output.add(glyph);
-			
-			// Create all edges
-			for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfLayoutedEdges) {
-				SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
-				ReactionGlyph reactionGlyph = pair.getB();
-				handleEdge(speciesReferenceGlyph, reactionGlyph);
-			}
-			for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfUnlayoutedEdges) {
-				SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
-				ReactionGlyph reactionGlyph = pair.getB();
-				handleEdge(speciesReferenceGlyph, reactionGlyph);
-			}
 		}
 		
 		return output;
@@ -320,23 +318,24 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 		Edge edge = graph2D.createEdge(processNode, speciesGlyphNode);
 		
 		// copy edge data to curve of species reference glyph
-		if (!srg.isSetCurve() || srg.getCurve().getListOfCurveSegments().isEmpty()) {
-			YPoint source = graph2D.getRealizer(edge).getSourcePoint();
-			Point start = new Point(source.getX(), source.getY(), 0.0);
-			YPoint target = graph2D.getRealizer(edge).getSourcePoint();
-			Point end = new Point(target.getX(), target.getY(), 0.0);
+		if (!srg.isSetCurve()) {
+//		if (!srg.isSetCurve() || srg.getCurve().getListOfCurveSegments().isEmpty()) {
+//			YPoint source = graph2D.getRealizer(edge).getSourcePoint();
+//			Point start = new Point(source.getX(), source.getY(), 0.0);
+//			YPoint target = graph2D.getRealizer(edge).getSourcePoint();
+//			Point end = new Point(target.getX(), target.getY(), 0.0);
 
-			logger.info(String.format("add curve for rgId=%s  srgId=%s  start=%s  end=%s",
-					rg.getId(), srg.getId(), start.toString(), end.toString()));
+//			logger.info(String.format("add curve for rgId=%s  srgId=%s  start=%s  end=%s",
+//					rg.getId(), srg.getId(), start.toString(), end.toString()));
 
-			CurveSegment curveSegment = new CurveSegment();
-			curveSegment.setStart(start);
-			curveSegment.setEnd(end);
+//			CurveSegment curveSegment = new CurveSegment();
+//			curveSegment.setStart(start);
+//			curveSegment.setEnd(end);
 
 			Curve curve = new Curve();
-			ListOf<CurveSegment> listOfCurveSegments = new ListOf<CurveSegment>();
-			listOfCurveSegments.add(curveSegment);
-			curve.setListOfCurveSegments(listOfCurveSegments);
+//			ListOf<CurveSegment> listOfCurveSegments = new ListOf<CurveSegment>();
+//			listOfCurveSegments.add(curveSegment);
+//			curve.setListOfCurveSegments(listOfCurveSegments);
 
 			srg.setCurve(curve);
 		}

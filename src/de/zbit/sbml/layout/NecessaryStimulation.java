@@ -14,35 +14,12 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.sbml.layout.y;
-
-import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
-
-import y.view.Arrow;
-import y.view.EdgeRealizer;
-import de.zbit.sbml.layout.Catalysis;
+package de.zbit.sbml.layout;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YCatalysis implements Catalysis<EdgeRealizer> {
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
-	 */
-	@Override
-	public EdgeRealizer draw(Curve curve) {
-		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
-		edgeRealizer.setSourceArrow(Arrow.TRANSPARENT_CIRCLE);
-		return edgeRealizer;
-	}
-
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+public interface NecessaryStimulation<T> extends SBGNArc<T> {
 
 }

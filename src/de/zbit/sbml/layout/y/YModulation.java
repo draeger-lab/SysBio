@@ -21,13 +21,22 @@ import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import de.zbit.sbml.layout.Catalysis;
+import de.zbit.sbml.layout.Modulation;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YCatalysis implements Catalysis<EdgeRealizer> {
+public class YModulation implements Modulation<EdgeRealizer> {
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
+	 */
+	@Override
+	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
+		// TODO Auto-generated method stub
+		return null;		
+	}
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
@@ -35,14 +44,8 @@ public class YCatalysis implements Catalysis<EdgeRealizer> {
 	@Override
 	public EdgeRealizer draw(Curve curve) {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
-		edgeRealizer.setSourceArrow(Arrow.TRANSPARENT_CIRCLE);
+		edgeRealizer.setSourceArrow(Arrow.WHITE_DIAMOND);
 		return edgeRealizer;
-	}
-
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
