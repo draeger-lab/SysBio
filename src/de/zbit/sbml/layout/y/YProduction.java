@@ -19,6 +19,7 @@ package de.zbit.sbml.layout.y;
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 
+import y.view.Arrow;
 import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Production;
 
@@ -33,8 +34,9 @@ public class YProduction implements Production<EdgeRealizer> {
 	 */
 	@Override
 	public EdgeRealizer draw(Curve curve) {
-		// TODO Auto-generated method stub
-		return null;
+		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
+		edgeRealizer.setTargetArrow(Arrow.DELTA);
+		return edgeRealizer;
 	}
 
 	/*
