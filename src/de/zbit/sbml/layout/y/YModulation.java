@@ -48,4 +48,10 @@ public class YModulation implements Modulation<EdgeRealizer> {
 		return edgeRealizer;
 	}
 
+	@Override
+	public EdgeRealizer draw(Curve curve, double lineWidth) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
