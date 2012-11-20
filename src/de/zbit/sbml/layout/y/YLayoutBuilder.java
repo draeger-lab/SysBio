@@ -46,6 +46,7 @@ import org.sbml.jsbml.util.StringTools;
 
 import y.base.Node;
 import y.geom.OrientedRectangle;
+import y.layout.DiscreteEdgeLabelModel;
 import y.layout.FreeNodeLabelModel;
 import y.view.BezierEdgeRealizer;
 import y.view.EdgeLabel;
@@ -71,6 +72,7 @@ import de.zbit.sbml.layout.SBGNArc;
 import de.zbit.sbml.layout.SBGNNode;
 import de.zbit.sbml.layout.SimpleChemical;
 import de.zbit.sbml.layout.SourceSink;
+import de.zbit.sbml.layout.Stimulation;
 import de.zbit.sbml.layout.UnspecifiedNode;
 import de.zbit.util.progressbar.AbstractProgressBar;
 import de.zbit.util.progressbar.ProgressListener;
@@ -230,13 +232,23 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		
 		if (srg.isSetSpeciesReference() && srg.isSetSpeciesReference()) {
 			SpeciesReference speciesReference = (SpeciesReference) srg.getSpeciesReferenceInstance();
-			if (speciesReference.isSetStoichiometry()) {
+			if (speciesReference.isSetStoichiometry() && speciesReference.getStoichiometry() != 1) {
+				// stoichiometry number
 				EdgeLabel edgeLabel = new EdgeLabel(StringTools.toString(speciesReference.getStoichiometry()));
+
+				// placement
+				DiscreteEdgeLabelModel elModel = new DiscreteEdgeLabelModel();  
+				elModel.setDistance(0.0);
+				edgeLabel.setLabelModel(elModel);
+				edgeLabel.setModelParameter(DiscreteEdgeLabelModel.createPositionParameter(DiscreteEdgeLabelModel.TTAIL));
+				
+				// border
 				edgeLabel.setLineColor(Color.BLACK);
+				
 				edgeRealizer.addLabel(edgeLabel);
 			}
 		}
-		
+
 		graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
 		
 		logger.info(String.format("create edge between %s and %s", srg.getId(), rg.getId()));
@@ -564,6 +576,14 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	@Override
 	public Modulation<EdgeRealizer> createModulation() {
 		return new YModulation();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createStimulation()
+	 */
+	@Override
+	public Stimulation<EdgeRealizer> createStimulation() {
+		return new YStimulation();
 	}
 
 	/* (non-Javadoc)
