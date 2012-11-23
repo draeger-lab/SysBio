@@ -105,4 +105,15 @@ public class EmptySetNode extends ShapeNodeRealizerSupportingCloneMarker {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
+	 */
+	@Override
+	public void paintSloppy(Graphics2D g) {
+//		g.draw(new Ellipse2D.Double(getX(), getY(), 1d, 1d));
+		super.paintSloppy(g);
+	}
+	
+	
+
 }
