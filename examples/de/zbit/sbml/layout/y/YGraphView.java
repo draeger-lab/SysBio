@@ -123,13 +123,12 @@ public class YGraphView implements PropertyChangeListener {
 	 * @param doc
 	 */
 	private void setSBMLDocument(SBMLDocument doc) {
-		LayoutDirector<Graph2D> director =
-				new LayoutDirector<Graph2D>(doc,
+		LayoutDirector<ILayoutGraph> director =
+				new LayoutDirector<ILayoutGraph>(doc,
 						new YLayoutBuilder(),
 						new YLayoutAlgorithm());
 			director.run();
-
-			Graph2D product = director.getBuilder().getProduct();
+			Graph2D product = director.getBuilder().getProduct().getGraph2D();
 			
 			int width = 960, height = 720;
 			

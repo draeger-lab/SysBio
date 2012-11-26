@@ -37,12 +37,13 @@ public class YSimpleChemical extends SimpleChemical<NodeRealizer> {
 			double height, double depth) {
 		NodeRealizer nodeRealizer =
 			SBGNVisualizationProperties.getNodeRealizer(SBO.getSimpleMolecule());
+		
 		ShapeNodeRealizerSupportingCloneMarker shapeNodeRealizer =
 			new ShapeNodeRealizerSupportingCloneMarker(nodeRealizer);
 		
 		shapeNodeRealizer.setNodeIsCloned(isSetCloneMarker());
-		shapeNodeRealizer.setLocation(x, y);
 		shapeNodeRealizer.setSize(width, height);
+		shapeNodeRealizer.setLocation(x, y);
 
 		if (SBGNVisualizationProperties.isCircleShape(SBO.getSimpleMolecule())) {
 			// diameter of circle is minimum of width and height

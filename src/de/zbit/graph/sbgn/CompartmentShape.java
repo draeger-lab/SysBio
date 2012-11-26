@@ -49,17 +49,18 @@ public class CompartmentShape extends Area implements Serializable {
 		super();
 		double minThickness = 6d;
 		double thickness = Math.min(minThickness, ((x + w) * (y + h)) / minThickness);
-		double arcWfac = 1.5d, arcHfac = 4.5d;
+		//double arcWfac = 1.5, arcHfac = 4.5d;
+		double arcWfac = 2.5d, arcHfac = .3d;
 		int arc = computeArc(w, h);
-    outer = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
-    add(new Area(outer));
-    x = x + thickness;
-    y = y + thickness;
-    w = w - 2d * thickness;
-    h = h - 2d * thickness;
-    arc = computeArc(w, h);
-    inner = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
-    subtract(new Area(inner));
+		outer = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
+		add(new Area(outer));
+		x = x + thickness;
+		y = y + thickness;
+		w = w - 2d * thickness;
+		h = h - 2d * thickness;
+		arc = computeArc(w, h);
+		inner = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
+		subtract(new Area(inner));
 	}
 	
 	/**
