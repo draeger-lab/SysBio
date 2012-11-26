@@ -41,8 +41,8 @@ public class YNucleicAcidFeature extends NucleicAcidFeature<NodeRealizer> {
 			new ShapeNodeRealizerSupportingCloneMarker(nodeRealizer);
 
 		shapeNodeRealizer.setNodeIsCloned(isSetCloneMarker());
-		shapeNodeRealizer.setLocation(x, y);
 		shapeNodeRealizer.setSize(width, height);
+		shapeNodeRealizer.setLocation(x, y);
 		
 		return shapeNodeRealizer;
 	}

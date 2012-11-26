@@ -20,8 +20,8 @@ import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.ext.layout.BoundingBox;
@@ -45,6 +45,7 @@ import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
+import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.sbml.layout.SimpleLayoutAlgorithm;
 import de.zbit.util.objectwrapper.ValuePairUncomparable;
@@ -95,6 +96,11 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 	private Set<GraphicalObject> output;
 	
 	/**
+	 * Set to hold all reaction glyphs which need positioning.
+	 */
+	private Set<ReactionGlyph> reactionNodes;
+	
+	/**
 	 * Graph2D structure neccessary for using layout algorithms provided by
 	 * YFiles.
 	 */
@@ -118,6 +124,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		
 		this.nodeIncompleteGlyphMap = new HashMap<Node, GraphicalObject>();
 		this.glyphNodeMap = new HashMap<String, Node>();
+		this.reactionNodes = new HashSet<ReactionGlyph>();
 		
 		this.output = new HashSet<GraphicalObject>();
 		
@@ -158,7 +165,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 	 */
 	@Override
 	public void addLayoutedGlyph(GraphicalObject glyph) {
-		logger.info("add layouted glyph id=" + glyph.getId());
+		logger.fine("add layouted glyph id=" + glyph.getId());
 		
 		// text glyphs which are not independent and do not have a
 		// bounding box are considered layouted and thus not processed here
@@ -183,6 +190,8 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		nodeRealizer.setSize(width, height);
 		Node node = graph2D.createNode(nodeRealizer);
 		
+		logger.fine(String.format("%d,%d %dx%d", x, y, width, height));
+		
 		// GraphTools helper
 		graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
 		graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
@@ -196,7 +205,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 	 */
 	@Override
 	public void addUnlayoutedGlyph(GraphicalObject glyph) {
-		logger.info("add unlayouted glyph id=" + glyph.getId());
+		logger.fine("add unlayouted glyph id=" + glyph.getId());
 		
 		
 		// text glyphs which are not independent and do not have a
@@ -207,35 +216,61 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			return;
 		}
 		
-		NodeRealizer nodeRealizer = new ShapeNodeRealizer();
-		Node node = graph2D.createNode(nodeRealizer);
-		
-		// partially layouted: position only
-		if (LayoutDirector.glyphHasPosition(glyph)) {
-			BoundingBox boundingBox = glyph.getBoundingBox();
-			Point position = boundingBox.getPosition();
-			int x, y;
-			x = (int) position.getX();
-			y = (int) position.getY();
-			nodeRealizer.setLocation(x, y);
-			graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
-		}
-		// partially layouted: dimensions only
-		if (LayoutDirector.glyphHasDimensions(glyph)) {
-			BoundingBox boundingBox = glyph.getBoundingBox();
-			Dimensions dimensions = boundingBox.getDimensions();
-			int width, height;
-			width = (int) dimensions.getWidth();
-			height = (int) dimensions.getHeight();
-			nodeRealizer.setSize(width, height);
-			graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+		NodeRealizer nodeRealizer;
+		Node node;
+		if (!(glyph instanceof ReactionGlyph)) {
+			nodeRealizer = new ShapeNodeRealizer();
+			node = graph2D.createNode(nodeRealizer);
+
+			// partially layouted: position only
+			if (LayoutDirector.glyphHasPosition(glyph)) {
+				BoundingBox boundingBox = glyph.getBoundingBox();
+				Point position = boundingBox.getPosition();
+				int x, y;
+				x = (int) position.getX();
+				y = (int) position.getY();
+				nodeRealizer.setLocation(x, y);
+				graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
+			}
+			// partially layouted: dimensions only
+			if (LayoutDirector.glyphHasDimensions(glyph)) {
+				BoundingBox boundingBox = glyph.getBoundingBox();
+				Dimensions dimensions = boundingBox.getDimensions();
+				int width, height;
+				width = (int) dimensions.getWidth();
+				height = (int) dimensions.getHeight();
+				nodeRealizer.setSize(width, height);
+				graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+			}
+			
+
+			setOfUnlayoutedGlyphs.add(glyph);
+			nodeIncompleteGlyphMap.put(node, glyph);
 		}
 		
 		// TODO handle reaction glyphs differently
-		
-		nodeIncompleteGlyphMap.put(node, glyph);
+		else {
+			nodeRealizer = new ReactionNodeRealizer();
+			node = graph2D.createNode(nodeRealizer);
+			
+			if (!LayoutDirector.glyphHasDimensions(glyph)) {
+				Dimensions dimensions = createReactionGlyphDimension((ReactionGlyph) glyph);
+				int width, height;
+				width = (int) dimensions.getWidth();
+				height = (int) dimensions.getHeight();
+				nodeRealizer.setSize(width, height);
+				graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+				if (glyph.isSetBoundingBox()) {
+					glyph.getBoundingBox().setDimensions(dimensions);
+				}
+				else {
+					glyph.createBoundingBox(dimensions);
+				}
+			}
+			reactionNodes.add((ReactionGlyph) glyph);
+		}
+
 		glyphNodeMap.put(glyph.getId(), node);
-		setOfUnlayoutedGlyphs.add(glyph);
 	}
 
 	/* (non-Javadoc)
@@ -292,6 +327,66 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			}
 			
 			output.add(glyph);
+		}
+		
+		// position process nodes
+		for (ReactionGlyph reactionGlyph : reactionNodes) {
+//			Set<Node> reactants = new HashSet<Node>(), products = new HashSet<Node>(), modifiers = new HashSet<Node>();
+//			Set<SpeciesGlyph> positionSpecifyingGlyphs = new HashSet<SpeciesGlyph>();
+//			for (SpeciesReferenceGlyph srg : reactionGlyph.getListOfSpeciesReferenceGlyphs()) {
+//				// TODO discrimination does not work
+//				if (LayoutDirector.isSubstrate(srg)) {
+//					reactants.add(glyphNodeMap.get(srg.getSpeciesGlyph()));
+//				}
+//				else if (LayoutDirector.isProduct(srg)) {
+//					products.add(glyphNodeMap.get(srg.getSpeciesGlyph()));
+//					positionSpecifyingGlyphs.add(srg.getSpeciesGlyphInstance());
+//				}
+//				else {
+//					modifiers.add(glyphNodeMap.get(srg.getSpeciesGlyph()));
+//					positionSpecifyingGlyphs.add(srg.getSpeciesGlyphInstance());
+//				}
+//			}
+			
+			assert glyphNodeMap.get(reactionGlyph.getId()) != null;
+			ReactionNodeRealizer reactionNodeRealizer = (ReactionNodeRealizer) graph2D.getRealizer(glyphNodeMap.get(reactionGlyph.getId()));
+			
+//			double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);
+			Position position = createReactionGlyphPositionNew(reactionGlyph);
+			reactionNodeRealizer.setLocation(position.getX(), position.getY());
+			
+			BoundingBox rgBoundingBox = reactionGlyph.isSetBoundingBox() ?
+					reactionGlyph.getBoundingBox() : reactionGlyph.createBoundingBox();
+			rgBoundingBox.setPosition(position);
+			
+			
+			// TODO replace with better calculation
+			// position: mean of center coordinates
+//			double xsum = 0, ysum = 0;
+//			int xcount = 0, ycount = 0;
+//			for (SpeciesGlyph speciesGlyph : positionSpecifyingGlyphs) {
+//				Point position = speciesGlyph.getBoundingBox().getPosition();
+//				Dimensions dimensions = speciesGlyph.getBoundingBox().getDimensions();
+//				
+//				double centerX = position.getX() + dimensions.getWidth()/2;
+//				xsum += centerX;
+//				xcount++;
+//				
+//				double centerY = position.getY() + dimensions.getHeight()/2;
+//				ysum += centerY;
+//				ycount++;
+//				
+//				logger.fine(String.format("original (%f,%f)  center (%f,%f)", position.getX(), position.getY(), centerX, centerY));
+//			}
+//			
+//			double xmean = xsum/(double) xcount - reactionNodeRealizer.getWidth()/2;
+//			double ymean = ysum/(double) ycount - reactionNodeRealizer.getHeight()/2;
+//			BoundingBox rgBoundingBox = reactionGlyph.isSetBoundingBox() ?
+//					reactionGlyph.getBoundingBox() : reactionGlyph.createBoundingBox();
+//			rgBoundingBox.setPosition(new Point(xmean, ymean, DEFAULT_Z_COORD, level, version));
+			
+			// orientation
+			//reactionNodeRealizer.fixLayout(reactants, products, modifiers);
 		}
 		
 		return output;
@@ -369,7 +464,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 				graphBoundingBox.getHeight(),
 				DEFAULT_DEPTH,
 				level, version);
-		logger.info(dimensions.toString());
+		logger.fine(dimensions.toString());
 		return dimensions;
 	}
 
@@ -394,12 +489,11 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphDimension()
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createReactionGlyphDimension(org.sbml.jsbml.ext.layout.ReactionGlyph)
 	 */
 	@Override
-	public Dimensions createSpeciesGlyphDimension() {
-		// TODO Auto-generated method stub
-		return null;
+	public Dimensions createReactionGlyphDimension(ReactionGlyph reactionGlyph) {
+		return new Dimensions(20, 10, 0, level, version);
 	}
 
 	/* (non-Javadoc)
@@ -430,6 +524,14 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			CompartmentGlyph previousCompartmentGlyph) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphDimension()
+	 */
+	@Override
+	public Dimensions createSpeciesGlyphDimension() {
+		return new Dimensions(100, 100, 0, level, version);
 	}
 
 }

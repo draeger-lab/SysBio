@@ -18,6 +18,7 @@
 package de.zbit.sbml.layout.y;
 
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,7 +83,7 @@ import de.zbit.util.progressbar.ProgressListener;
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,EdgeRealizer> {
+public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeRealizer,EdgeRealizer> {
 
 	private static Logger logger = Logger.getLogger(YLayoutBuilder.class.toString());
 
@@ -105,6 +106,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 * Maps SBML identifiers to yFiles nodes.
 	 */
 	private Map<String, Node> id2node = new HashMap<String, Node>();
+	
+	/**
+	 * Map species to all yfiles nodes.
+	 */
+	private Map<String, Set<Node>> speciesId2Node; 
 	
 	/**
 	 * Set to hold all text glyphs which label a specific node.
@@ -150,19 +156,15 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		BoundingBox boundingBox = compartmentGlyph.getBoundingBox();
 		Point point = boundingBox.getPosition();
 		Dimensions dimension = boundingBox.getDimensions();
-		double x, y, z, width, height, depth;
-		x = point.getX();
-		y = point.getY();
-		z = point.getZ();
-		width = dimension.getWidth();
-		height = dimension.getHeight();
-		depth = dimension.getDepth();
+		double x = point.getX(), y = point.getY(), z = point.getZ();
+		double width = dimension.getWidth(), height = dimension.getHeight(), depth = dimension.getDepth();
 
 		NodeRealizer nodeRealizer = node.draw(x, y, z, width, height, depth);
 		Node ynode = graph.createNode();
 		graph.setRealizer(ynode, nodeRealizer);
-		
-		logger.info(String.format("building compartment glyph id=%s\n\tbounding box=%s",
+		id2node.put(compartmentGlyph.getId(), ynode);
+
+		logger.fine(String.format("building compartment glyph id=%s\n\tbounding box=%s",
 				compartmentGlyph.getId(), nodeRealizer.getBoundingBox()));
 	}
 
@@ -191,7 +193,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 
 		NodeRealizer nodeRealizer = node.draw(x, y, z, width, height, depth);
 		
-		logger.info(String.format("building EPN element id=%s sbo=%d (%s)\n\tbounding box= %s %s",
+		logger.fine(String.format("building EPN element id=%s sbo=%d (%s)\n\tbounding box= %s %s",
 				speciesGlyph.getId(), speciesGlyph.getSBOTerm(), SBO.convertSBO2Alias(speciesGlyph.getSBOTerm()),
 				speciesGlyph.getBoundingBox().getPosition(), nodeRealizer.getBoundingBox()));
 		
@@ -212,7 +214,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 */
 	@Override
 	public void buildConnectingArc(SpeciesReferenceGlyph srg, ReactionGlyph rg, double curveWidth) {
-		logger.info(String.format("building arc srgId=%s to rgId=%s", srg.getId(), rg.getId()));
+		logger.fine(String.format("building arc srgId=%s to rgId=%s", srg.getId(), rg.getId()));
 		
 		Node processNode = id2node.get(rg.getId());
 		Node speciesGlyphNode = id2node.get(srg.getSpeciesGlyph());
@@ -222,21 +224,25 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		SBGNArc<EdgeRealizer> arc;
 		if (srg.isSetSBOTerm()) {
 			arc = getSBGNArc(srg.getSBOTerm());
-			logger.info("SRG sbo term " + srg.getSBOTerm());
+			logger.fine("SRG sbo term " + srg.getSBOTerm());
 		} else {
 			arc = getSBGNArc(srg.getSpeciesReferenceRole());
-			logger.info("SRG role " + srg.getSpeciesReferenceRole());
+			logger.fine("SRG role " + srg.getSpeciesReferenceRole());
 		}
 		
 		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve());
 		edgeRealizer = edgeRealizer.createCopy();
 		
-		if (srg.isSetSpeciesReference() && srg.isSetSpeciesReference()) {
+		// to dock correctly use
+		// edgeRealizer.setSourcePoint(yp);
+		
+		if (srg.isSetSpeciesReference()) {
 			SpeciesReference speciesReference = (SpeciesReference) srg.getSpeciesReferenceInstance();
 			if (speciesReference.isSetStoichiometry() && speciesReference.getStoichiometry() != 1) {
 				// stoichiometry number
 				EdgeLabel edgeLabel = new EdgeLabel(StringTools.toString(speciesReference.getStoichiometry()));
 
+				// TODO maybe create extra EdgeLabel subclass for stoichiometry labels
 				// placement
 				DiscreteEdgeLabelModel elModel = new DiscreteEdgeLabelModel();  
 				elModel.setDistance(0.0);
@@ -251,8 +257,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		}
 
 		graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
-		
-		logger.info(String.format("create edge between %s and %s", srg.getId(), rg.getId()));
 	}
 
 	/* (non-Javadoc)
@@ -282,9 +286,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		NodeRealizer reactionNodeRealizer = processNode.draw(x, y, z, width, height, depth);
 		
 		Node processYNode = graph.createNode(reactionNodeRealizer);
-//		graph.setLabelText(processYNode, "PN-" + reactionGlyph.getId());
 		id2node.put(reactionGlyph.getId(), processYNode);
-		logger.info(MessageFormat.format("building PN id={0} bounding box={1} {2}",
+		logger.fine(MessageFormat.format("building PN id={0} bounding box={1} {2}",
 				reactionGlyph.getId(), reactionGlyph.getBoundingBox().getPosition(), reactionNodeRealizer.getBoundingBox()));
 	}
 
@@ -309,7 +312,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 			height = dimensions.getHeight();
 			
 			text = textGlyph.getText();
-			logger.info(String.format("building text glyph element id=%s\n\tindependent text text='%s'",
+			logger.fine(String.format("building text glyph element id=%s\n\tindependent text text='%s'",
 					textGlyph.getId(), text));
 
 			Node ynode = graph.createNode();
@@ -319,13 +322,13 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 			nr.setFrame(x, y, width, height);
 		}
 		else if (textGlyph.isSetGraphicalObject() &&
-				textGlyph.isSetOriginOfText()) {
+				(textGlyph.isSetOriginOfText() || textGlyph.isSetText())) {
 			// label for a graphical object
 			// label text glyphs are collected and built as a last step of the builder
 			labelTextGlyphs.add(textGlyph);
 		}
 		else {
-			logger.info(String.format("illegal text glyph id=%s", textGlyph.getId()));
+			logger.warning(String.format("illegal text glyph id=%s", textGlyph.getId()));
 		}
 	}
 
@@ -340,23 +343,25 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		}
 		NodeRealizer originRealizer = graph.getRealizer(origin);
 
+		// TODO special positions for CompartmentGlyphs
+		
 		String text;
 		if (textGlyph.isSetText()) {
 			text = textGlyph.getText();
-			logger.info(String.format("building text glyph element id=%s\n\torigin text overridden text='%s'",
+			logger.fine(String.format("building text glyph element id=%s\n\torigin text overridden text='%s'",
 					textGlyph.getId(), text));
 		}
 		else {
 			NamedSBase namedSBase = textGlyph.getOriginOfTextInstance();
 			text = namedSBase.getName();
-			logger.info(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
+			logger.fine(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
 					textGlyph.getId(), namedSBase.getId(), text));
 		}
 		
 		if (textGlyph.isSetBoundingBox() &&
 				textGlyph.getBoundingBox().isSetPosition() &&
 				textGlyph.getBoundingBox().isSetDimensions()) {
-			logger.info("using nodelabel for textglyph " + textGlyph.getId());
+			logger.fine("using nodelabel for textglyph " + textGlyph.getId());
 			NodeLabel nodeLabel;
 			nodeLabel = new NodeLabel(text);
 			nodeLabel.setLabelModel(new FreeNodeLabelModel());
@@ -387,10 +392,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 			
 			OrientedRectangle orientedRectangle =
 				new OrientedRectangle(x, y, width, height);
-			logger.info(orientedRectangle.toString());
+			logger.fine("oriented rectangle is " + orientedRectangle.toString());
 			Object param = nodeLabel.getBestModelParameterForBounds(orientedRectangle);
 			if (param != null) {
-				logger.info("using extra positioning for textglyph " + textGlyph.getId());
+				logger.fine("using extra positioning for textglyph " + textGlyph.getId());
 				nodeLabel.setModelParameter(param);
 			}
 		}
@@ -454,19 +459,16 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		}
 		
 		terminated = true;
-		
-		debugIdNodeMap();
 	}
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutBuilder#getProduct()
 	 */
 	@Override
-	public Graph2D getProduct() {
-		logger.info("returning graph");
-		assert graph != null;
-		assert !graph.isEmpty();
-		return graph;
+	public ILayoutGraph getProduct() {
+		// TODO use actual values
+		ILayoutGraph layoutGraph = new LayoutGraph(null, null, null, graph);
+		return layoutGraph;
 	}
 
 	/* (non-Javadoc)
@@ -599,7 +601,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	}
 	
 	private void debugIdNodeMap() {
-		System.out.println("ID\tGLYPH POSITION DIMENSIONS\tNODE BB");
+		System.out.println("glyphId             GLYPH POSITION DIMENSIONS  -- NODE BB");
 		for (Map.Entry<String, Node> entry : id2node.entrySet()) {
 			String glyphId = entry.getKey();
 			Node ynode = entry.getValue();
@@ -610,13 +612,22 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 			if (glyph == null) {
 				glyph = layout.getTextGlyph(glyphId);
 			}
+			if (glyph == null) {
+				glyph = layout.getCompartmentGlyph(glyphId);
+			}
 			if (glyph != null) {
 				BoundingBox boundingBox = glyph.getBoundingBox();
 				Dimensions d = boundingBox.getDimensions();
 				Point p = boundingBox.getPosition();
+				double gX = p.getX(), gY = p.getY();
+				double gW = d.getWidth(), gH = d.getHeight();
 				
-				System.out.format("%s\t%s %s\t%s\n", glyphId, p, d,
-						graph.getRealizer(ynode).getBoundingBox());
+				Rectangle2D nodeBB = graph.getRealizer(ynode).getBoundingBox();
+				double nX = nodeBB.getX(), nY = nodeBB.getY();
+				double nW = nodeBB.getWidth(), nH = nodeBB.getHeight();
+				
+				System.out.format("%20s\t%.2f, %.2f %.2f x %.2f  -- %.2f, %.2f %.2f x %.2f\n",
+						glyph.getId(), gX, gY, gW, gH, nX, nY, nW, nH);
 			}
 		}
 	}

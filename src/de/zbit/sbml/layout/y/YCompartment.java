@@ -37,8 +37,8 @@ public class YCompartment extends Compartment<NodeRealizer> {
 		NodeRealizer nodeRealizer =
 			SBGNVisualizationProperties.getNodeRealizer(SBO.getCompartment());
 		nodeRealizer = nodeRealizer.createCopy();
-		nodeRealizer.setLocation(x, y);
 		nodeRealizer.setSize(width, height);
+		nodeRealizer.setLocation(x, y);
 		
 		return nodeRealizer;
 	}

@@ -16,31 +16,38 @@
  */
 package de.zbit.sbml.layout.y;
 
-import org.sbml.jsbml.SBO;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import y.view.NodeRealizer;
-import de.zbit.graph.io.def.SBGNVisualizationProperties;
-import de.zbit.sbml.layout.SourceSink;
+import y.base.Edge;
+import y.base.Node;
+import y.view.Graph2D;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YSourceSink extends SourceSink<NodeRealizer> {
+public interface ILayoutGraph {
 
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
+	/**
+	 * @return the species id -> set of species nodes map.
 	 */
-	@Override
-	public NodeRealizer draw(double x, double y, double z, double width,
-			double height, double depth) {
-		NodeRealizer nodeRealizer =
-			SBGNVisualizationProperties.getNodeRealizer(SBO.getEmptySet());
-		nodeRealizer = nodeRealizer.createCopy();
-		nodeRealizer.setSize(width, height);
-		nodeRealizer.setLocation(x, y);
-		
-		return nodeRealizer;
-	}
-
+	public Map<String, Set<Node>> getSpeciesId2nodes();
+	
+	/**
+	 * @return the compartment id -> set of compartment nodes map.
+	 */
+	public Map<String, Set<Node>> getCompartmentId2nodes();
+	
+	/**
+	 * Each value 
+	 * @return the reaction id -> set of sets of edges map.
+	 */
+	public Map<String, Set<List<Edge>>> getReactionId2edges();
+	
+	/**
+	 * @return the Graph2D visual representation.
+	 */
+	public Graph2D getGraph2D();
 }
