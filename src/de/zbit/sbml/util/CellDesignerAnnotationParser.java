@@ -54,13 +54,15 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceRole;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
 
-
 /**
  * @author Stephanie Tscherneck
  * @version $Rev$
  */
 public class CellDesignerAnnotationParser implements Runnable {
 
+	/**
+	 * A {@link Logger} for this class.
+	 */
 	private static final transient Logger logger = Logger.getLogger(CellDesignerAnnotationParser.class.getName());
 	
 	/**
@@ -203,7 +205,7 @@ public class CellDesignerAnnotationParser implements Runnable {
 //							y = Double.valueOf(streamReader.getAttributeValue(i));
 //						}
 //					}
-					createTextGlyph(aliasID, model.getCompartment(actualId).getName());
+					createTextGlyph(actualId, aliasID);
 				}
 				else if ((newSpeciesAlias || newCompartmentAlias) && streamReader.getLocalName().equals("bounds")) {
 					for (int i = 0; i < streamReader.getAttributeCount(); i++) {
@@ -281,9 +283,10 @@ public class CellDesignerAnnotationParser implements Runnable {
 	 * @throws XMLStreamException
 	 */
 	private void createGlyphsForReaction(Reaction reaction, String annotationBlockOfReaction) throws XMLStreamException {
-		String rgID = "reaction_" + reaction.getName();
+		String rgID = "reaction_" + reaction.getId();
 		String specRefGlyphIDbasis = "specRef_" + reaction.getId() + "_"; 
 		ReactionGlyph rg = new ReactionGlyph(rgID, layout.getLevel(), layout.getVersion());
+		rg.setReaction(reaction);
 
 		XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 		XMLStreamReader streamReader = inputFactory.createXMLStreamReader(new BufferedReader(new StringReader(annotationBlockOfReaction)));
@@ -368,11 +371,11 @@ public class CellDesignerAnnotationParser implements Runnable {
 	 * @param originGlyphID
 	 * @param text
 	 */
-	private void createTextGlyph(String originGlyphID, String text) {
+	private void createTextGlyph(String originID, String originGlyphID) {
 		String tgID = "text_" + originGlyphID;
 		TextGlyph tg = new TextGlyph(tgID, layout.getLevel(), layout.getVersion());
-		tg.setText(text);
-		tg.setOriginOfText(originGlyphID);
+		tg.setGraphicalObject(originGlyphID);
+		tg.setOriginOfText(originID);
 		layout.addTextGlyph(tg);
 	}
 	
@@ -407,7 +410,7 @@ public class CellDesignerAnnotationParser implements Runnable {
 		sg.setSpecies(speciesID);
 		layout.addSpeciesGlyph(sg);
 		setBoundingBox(sg,x,y,width,height);
-		createTextGlyph(sg.getId(), model.getSpecies(speciesID).getName());
+		createTextGlyph(speciesID, sg.getId());
 		return sg;
 	}
 
@@ -517,4 +520,5 @@ public class CellDesignerAnnotationParser implements Runnable {
 			}
 		}
 	}
+
 }

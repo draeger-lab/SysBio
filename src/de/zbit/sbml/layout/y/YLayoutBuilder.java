@@ -18,6 +18,7 @@
 package de.zbit.sbml.layout.y;
 
 import java.awt.Color;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -283,7 +284,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 		Node processYNode = graph.createNode(reactionNodeRealizer);
 //		graph.setLabelText(processYNode, "PN-" + reactionGlyph.getId());
 		id2node.put(reactionGlyph.getId(), processYNode);
-		logger.info(String.format("building PN id=%s bounding box=%s %s",
+		logger.info(MessageFormat.format("building PN id={0} bounding box={1} {2}",
 				reactionGlyph.getId(), reactionGlyph.getBoundingBox().getPosition(), reactionNodeRealizer.getBoundingBox()));
 	}
 
@@ -334,6 +335,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<Graph2D,NodeRealizer,E
 	 */
 	private void buildTextGlyphAsLabel(TextGlyph textGlyph) {
 		Node origin = id2node.get(textGlyph.getGraphicalObject());
+		if (origin == null) {
+			return;
+		}
 		NodeRealizer originRealizer = graph.getRealizer(origin);
 
 		String text;

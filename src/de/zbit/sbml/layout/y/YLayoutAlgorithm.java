@@ -20,8 +20,8 @@ import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.ext.layout.BoundingBox;
@@ -29,7 +29,6 @@ import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
-import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.Position;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
@@ -46,44 +45,36 @@ import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
-import de.zbit.sbml.layout.LayoutAlgorithm;
 import de.zbit.sbml.layout.LayoutDirector;
+import de.zbit.sbml.layout.SimpleLayoutAlgorithm;
 import de.zbit.util.objectwrapper.ValuePairUncomparable;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YLayoutAlgorithm implements LayoutAlgorithm {
+public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 	
 	/**
 	 * Default value for z-coordinates and depth as YFiles works in two
 	 * dimensional space but SBML allows three dimensional specifications.
 	 */
-	private static final double DEFAULT_Z_COORD = 0.0;
-	private static final double DEFAULT_DEPTH = 0.0;
+	private static final double DEFAULT_Z_COORD = 0.0d;
+	private static final double DEFAULT_DEPTH = 0.0d;
 
 	/**
 	 * Logger instance for informational output.
 	 */
 	private static Logger logger = Logger.getLogger(YLayoutAlgorithm.class.toString());
-	
-	/**
-	 * SBML Layout instance.
-	 */
-	private Layout layout;
-	
-	/**
-	 * Set to hold all layouted glyphs.
-	 */
-	private Set<GraphicalObject> setOfLayoutedGlyphs;
 
 	/**
-	 * Set to hold all unlayouted glyphs;
+	 * 
 	 */
-	private Set<GraphicalObject> setOfUnlayoutedGlyphs;
-
 	private Set<ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>> setOfUnlayoutedEdges;
+
+	/**
+	 * 
+	 */
 	private Set<ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>> setOfLayoutedEdges;
 	
 	/**
@@ -113,24 +104,13 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	 * GraphTools instance to handle partial layouting.
 	 */
 	private GraphTools graphTools;
-	
-	/**
-	 * SBML level
-	 */
-	private int level;
-	
-	/**
-	 * SBML version
-	 */
-	private int version;
 
 	/**
 	 * LayoutAlgorithm constructor.
 	 */
 	public YLayoutAlgorithm() {
-		this.setOfLayoutedGlyphs = new HashSet<GraphicalObject>();
-		this.setOfUnlayoutedGlyphs = new HashSet<GraphicalObject>();
-
+		super();
+		
 		this.setOfUnlayoutedEdges =
 			new HashSet<ValuePairUncomparable<SpeciesReferenceGlyph,ReactionGlyph>>();
 		this.setOfLayoutedEdges =
@@ -221,7 +201,7 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 		
 		// text glyphs which are not independent and do not have a
 		// bounding box are considered layouted and thus not processed here
-		if (glyph instanceof TextGlyph &&
+		if ((glyph instanceof TextGlyph) &&
 				!LayoutDirector.textGlyphIsIndependent((TextGlyph) glyph) &&
 				!glyph.isSetBoundingBox()) {
 			return;
@@ -362,7 +342,18 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	@Override
 	public BoundingBox createGlyphBoundingBox(GraphicalObject glyph,
 			SpeciesReferenceGlyph specRefGlyph) {
-		// TODO Auto-generated method stub
+		 if (glyph instanceof ReactionGlyph) {
+			 BoundingBox boundingBox = createBoundingBoxWithLevelAndVersion();
+			ReactionGlyph reactionGlyph = (ReactionGlyph) glyph;
+			if (specRefGlyph != null) {
+				boundingBox.setDimensions(createSpeciesReferenceGlyphDimension(reactionGlyph, specRefGlyph));
+				boundingBox.setPosition(createSpeciesReferenceGlyphPosition(reactionGlyph, specRefGlyph));
+			} else {
+				boundingBox.setDimensions(createReactionGlyphDimension(reactionGlyph));
+				boundingBox.setPosition(createReactionGlyphPosition(reactionGlyph));
+			}
+			return boundingBox;
+		 }
 		return null;
 	}
 
@@ -393,30 +384,11 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#calculateReactionGlyphRotationAngle(org.sbml.jsbml.ext.layout.ReactionGlyph)
-	 */
-	@Override
-	public double calculateReactionGlyphRotationAngle(
-			ReactionGlyph reactionGlyph) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createCompartmentGlyphDimension(org.sbml.jsbml.ext.layout.CompartmentGlyph)
 	 */
 	@Override
 	public Dimensions createCompartmentGlyphDimension(
 			CompartmentGlyph previousCompartmentGlyph) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#createReactionGlyphDimension(org.sbml.jsbml.ext.layout.ReactionGlyph)
-	 */
-	@Override
-	public Dimensions createReactionGlyphDimension(ReactionGlyph reactionGlyph) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -448,32 +420,6 @@ public class YLayoutAlgorithm implements LayoutAlgorithm {
 	public Dimensions createTextGlyphDimension(TextGlyph textGlyph) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#getLayout()
-	 */
-	@Override
-	public Layout getLayout() {
-		return this.layout;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#isSetLayout()
-	 */
-	@Override
-	public boolean isSetLayout() {
-		return (layout != null);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutAlgorithm#setLayout(org.sbml.jsbml.ext.layout.Layout)
-	 */
-	@Override
-	public void setLayout(Layout layout) {
-		this.layout = layout;
-		this.level = layout.getLevel();
-		this.version = layout.getVersion();
 	}
 
 	/* (non-Javadoc)

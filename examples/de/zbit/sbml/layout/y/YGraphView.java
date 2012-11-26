@@ -33,6 +33,7 @@ import y.view.Graph2DViewMouseWheelZoomListener;
 import de.zbit.io.OpenedFile;
 import de.zbit.sbml.gui.SBMLReadingTask;
 import de.zbit.sbml.layout.LayoutDirector;
+import de.zbit.util.logging.LogUtil;
 
 /**
  * Simple GUI to display a Graph2DView.
@@ -51,6 +52,7 @@ public class YGraphView implements PropertyChangeListener {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
+		LogUtil.initializeLogging(YGraphView.class.getPackage().toString());
 		final File in = new File(args[0]);
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			/* (non-Javadoc)
@@ -110,7 +112,8 @@ public class YGraphView implements PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals(SBMLReadingTask.SBML_READING_SUCCESSFULLY_DONE)) {
 			@SuppressWarnings("unchecked")
-			SBMLDocument doc = ((OpenedFile<SBMLDocument>) evt.getNewValue()).getDocument();
+		  OpenedFile<SBMLDocument> openedFile = (OpenedFile<SBMLDocument>) evt.getNewValue();
+			SBMLDocument doc = openedFile.getDocument();
 			setSBMLDocument(doc);
 		}
 	}
