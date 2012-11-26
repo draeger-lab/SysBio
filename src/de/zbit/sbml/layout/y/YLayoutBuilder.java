@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.NamedSBase;
+import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.layout.BoundingBox;
@@ -39,6 +40,7 @@ import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
+import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
@@ -46,6 +48,7 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 import org.sbml.jsbml.util.StringTools;
 
+import y.base.Edge;
 import y.base.Node;
 import y.geom.OrientedRectangle;
 import y.layout.DiscreteEdgeLabelModel;
@@ -63,6 +66,7 @@ import de.zbit.sbml.layout.Catalysis;
 import de.zbit.sbml.layout.Compartment;
 import de.zbit.sbml.layout.Consumption;
 import de.zbit.sbml.layout.Inhibition;
+import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.sbml.layout.Macromolecule;
 import de.zbit.sbml.layout.Modulation;
 import de.zbit.sbml.layout.NecessaryStimulation;
@@ -108,9 +112,19 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	private Map<String, Node> id2node = new HashMap<String, Node>();
 	
 	/**
-	 * Map species to all yfiles nodes.
+	 * Map species id to all yfiles nodes.
 	 */
-	private Map<String, Set<Node>> speciesId2Node; 
+	private Map<String, Set<Node>> speciesId2Node = new HashMap<String, Set<Node>>();
+	
+	/**
+	 * Map compartment id to all yfiles nodes.
+	 */
+	private Map<String, Set<Node>> compartmentId2Node = new HashMap<String, Set<Node>>();
+	
+	/**
+	 * Map reaction glyph id to set of adjoining edges.
+	 */
+	private Map<String, Set<Edge>> reactionGlyphId2edges = new HashMap<String, Set<Edge>>();
 	
 	/**
 	 * Set to hold all text glyphs which label a specific node.
@@ -150,7 +164,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	 */
 	@Override
 	public void buildCompartment(CompartmentGlyph compartmentGlyph) {
-		// TODO compartmentGlpyh.getSBOTerm() returns -1
+		// TODO compartmentGlyph.getSBOTerm() returns -1
 		SBGNNode<NodeRealizer> node = getSBGNNode(SBO.getCompartment());
 		
 		BoundingBox boundingBox = compartmentGlyph.getBoundingBox();
@@ -163,6 +177,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		Node ynode = graph.createNode();
 		graph.setRealizer(ynode, nodeRealizer);
 		id2node.put(compartmentGlyph.getId(), ynode);
+		putInMapSet(compartmentId2Node, compartmentGlyph.getCompartment(), ynode);
 
 		logger.fine(String.format("building compartment glyph id=%s\n\tbounding box=%s",
 				compartmentGlyph.getId(), nodeRealizer.getBoundingBox()));
@@ -200,6 +215,26 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		Node ynode = graph.createNode();
 		graph.setRealizer(ynode, nodeRealizer);
 		id2node.put(speciesGlyph.getId(), ynode);
+		putInMapSet(speciesId2Node, speciesGlyph.getSpecies(), ynode);
+	}
+
+	/**
+	 * @param <T>
+	 * @param speciesId2Node2
+	 * @param species
+	 * @param ynode
+	 */
+	private <T> void putInMapSet(Map<String, Set<T>> id2Nodes,
+			String id, T object) {
+		if (id2Nodes.get(id) == null) {
+			HashSet<T> hashSet = new HashSet<T>();
+			hashSet.add(object);
+			id2Nodes.put(id, hashSet);
+		}
+		else {
+			HashSet<T> hashSet = (HashSet<T>) id2Nodes.get(id);
+			hashSet.add(object);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -256,7 +291,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 			}
 		}
 
-		graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
+		Edge edge = graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
+		putInMapSet(reactionGlyphId2edges, rg.getId(), edge);
 	}
 
 	/* (non-Javadoc)
@@ -466,8 +502,20 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	 */
 	@Override
 	public ILayoutGraph getProduct() {
-		// TODO use actual values
-		ILayoutGraph layoutGraph = new LayoutGraph(null, null, null, graph);
+		Map<String, Set<List<Edge>>> reactionId2Edge = new HashMap<String, Set<List<Edge>>>();
+		for (Reaction reaction : layout.getModel().getListOfReactions()) {
+			String reactionId = reaction.getId();
+			Set<List<Edge>> edgeListSet= new HashSet<List<Edge>>();
+			List<NamedSBaseGlyph> reactionGlyphs = (List<NamedSBaseGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
+			for (NamedSBaseGlyph reactionGlyph : reactionGlyphs) {
+				edgeListSet.add(new LinkedList<Edge>(reactionGlyphId2edges.get(reactionGlyph.getId())));
+			}
+			reactionId2Edge.put(reactionId, edgeListSet);
+		}
+		ILayoutGraph layoutGraph = new LayoutGraph(speciesId2Node,
+				compartmentId2Node,
+				reactionId2Edge, 
+				graph);
 		return layoutGraph;
 	}
 
