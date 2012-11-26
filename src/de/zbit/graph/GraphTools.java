@@ -206,7 +206,9 @@ public class GraphTools {
     layoutNodeSubset(newNodes, false);
   }
   public void layoutNodeSubset(Set<Node> newNodes, boolean strict) {
-    if (newNodes==null || newNodes.size()<1) return;
+    if ((newNodes == null) || (newNodes.size() < 1)) {
+    	return;
+    }
     graph.unselectAll();
     
     // Create a selection map that contains all new nodes.
