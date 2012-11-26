@@ -110,7 +110,9 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof OpenedFile<?>) {
-			return this.file.getAbsolutePath().equals(((OpenedFile<?>) obj).file.getAbsolutePath());
+			OpenedFile<?> other = (OpenedFile<?>) obj;
+			return this.isSetFile() && other.isSetFile() &&
+					this.file.equals(other.file);
 		}
 		return false;
 	}
