@@ -21,6 +21,7 @@ import java.awt.Graphics2D;
 
 import y.geom.YInsets;
 import y.layout.DiscreteNodeLabelModel;
+import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.hierarchy.GroupNodeRealizer;
 
@@ -62,8 +63,11 @@ public class CompartmentRealizer extends GroupNodeRealizer {
     
     setMinimalInsets(new YInsets(7, 7, 7, 7)); // top, left, bottom, right
     setAutoBoundsEnabled(true);
-    getLabel().setLabelModel(new DiscreteNodeLabelModel(DiscreteNodeLabelModel.BOTTOM));
-    getLabel().setBackgroundColor(null);
+    NodeLabel label = getLabel();
+    // TODO DiscreteNodeLabelModel does not work as intended
+	label.setLabelModel(new DiscreteNodeLabelModel(DiscreteNodeLabelModel.BOTTOM, 5d));
+    label.setBackgroundColor(null);
+    label.setTextColor(Color.BLACK);
 	}
 	
 	/**

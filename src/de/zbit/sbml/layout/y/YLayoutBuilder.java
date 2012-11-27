@@ -61,6 +61,7 @@ import y.view.Graph2D;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.PolyLineEdgeRealizer;
+import y.view.ShapeNodeRealizer;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
 import de.zbit.sbml.layout.Catalysis;
 import de.zbit.sbml.layout.Compartment;
@@ -165,6 +166,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	@Override
 	public void buildCompartment(CompartmentGlyph compartmentGlyph) {
 		// TODO compartmentGlyph.getSBOTerm() returns -1
+		// see below for EPNs, are species sbo copied to species glyph sbo by layoutdirector?
 		SBGNNode<NodeRealizer> node = getSBGNNode(SBO.getCompartment());
 		
 		BoundingBox boundingBox = compartmentGlyph.getBoundingBox();
@@ -173,12 +175,12 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		double x = point.getX(), y = point.getY(), z = point.getZ();
 		double width = dimension.getWidth(), height = dimension.getHeight(), depth = dimension.getDepth();
 
-		NodeRealizer nodeRealizer = node.draw(x, y, z, width, height, depth);
+		ShapeNodeRealizer nodeRealizer = (ShapeNodeRealizer) node.draw(x, y, z, width, height, depth);
 		Node ynode = graph.createNode();
 		graph.setRealizer(ynode, nodeRealizer);
 		id2node.put(compartmentGlyph.getId(), ynode);
 		putInMapSet(compartmentId2Node, compartmentGlyph.getCompartment(), ynode);
-
+		
 		logger.fine(String.format("building compartment glyph id=%s\n\tbounding box=%s",
 				compartmentGlyph.getId(), nodeRealizer.getBoundingBox()));
 	}
@@ -206,7 +208,14 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		height = dimension.getHeight();
 		depth = dimension.getDepth();
 
-		NodeRealizer nodeRealizer = node.draw(x, y, z, width, height, depth);
+		ShapeNodeRealizer nodeRealizer = (ShapeNodeRealizer) node.draw(x, y, z, width, height, depth);
+		
+//		nodeRealizer.setDropShadowColor(new Color(0, 0, 0, 64));
+//	    nodeRealizer.setDropShadowOffsetX((byte) 3);
+//	    nodeRealizer.setDropShadowOffsetY((byte) 3);
+//	    Color fillColor = nodeRealizer.getFillColor();
+//	    nodeRealizer.setFillColor2(fillColor.brighter());
+//	    nodeRealizer.setFillColor(fillColor);
 		
 		logger.fine(String.format("building EPN element id=%s sbo=%d (%s)\n\tbounding box= %s %s",
 				speciesGlyph.getId(), speciesGlyph.getSBOTerm(), SBO.convertSBO2Alias(speciesGlyph.getSBOTerm()),
@@ -407,27 +416,15 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 			Point position = textGlyph.getBoundingBox().getPosition();
 			double glyphX = position.getX();
 			double glyphY = position.getY();
-			// species glyph position
-			SpeciesGlyph speciesGlyph = layout.getSpeciesGlyph(textGlyph.getGraphicalObject());
-			position = speciesGlyph.getBoundingBox().getPosition();
-			double sglyphX = position.getX();
-			double sglyphY = position.getY();
-			// node position
-			double nodeX = originRealizer.getX();
-			double nodeY = originRealizer.getY();
-			// calculate text glyph position
-			double x = nodeX - (sglyphX - glyphX);
-			double y = nodeY - (sglyphY - glyphY);
 			
-			logger.info(String.format("ynode: %f,%f  text should be: %f,%f", nodeX, nodeY, x, y));
-			
+			logger.fine(String.format("text position is %.2f,%.2f", glyphX, glyphY));
 			
 			Dimensions dimensions = textGlyph.getBoundingBox().getDimensions();
 			double width = dimensions.getWidth();
 			double height = dimensions.getHeight();
 			
 			OrientedRectangle orientedRectangle =
-				new OrientedRectangle(x, y, width, height);
+				new OrientedRectangle(glyphX, glyphY, width, height);
 			logger.fine("oriented rectangle is " + orientedRectangle.toString());
 			Object param = nodeLabel.getBestModelParameterForBounds(orientedRectangle);
 			if (param != null) {
@@ -518,6 +515,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 				compartmentId2Node,
 				reactionId2Edge, 
 				graph);
+		
 		return layoutGraph;
 	}
 
