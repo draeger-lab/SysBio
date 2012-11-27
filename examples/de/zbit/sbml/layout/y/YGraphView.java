@@ -68,22 +68,11 @@ public class YGraphView implements PropertyChangeListener {
 			}
 		});
 	}
-
-	/**
-	 * Frame to hold graphical elements.
-	 */
-	private JFrame frame;
-
-	/**
-	 * The main graph view component.
-	 */
-	private Graph2DView view;
 	
 	/**
 	 * 
 	 */
 	public YGraphView() {
-		frame = new JFrame();
 	}
 	
 	/**
@@ -92,7 +81,7 @@ public class YGraphView implements PropertyChangeListener {
 	 */
 	public YGraphView(File inputFile) throws Throwable {
 		this();
-		SBMLReadingTask readingTask = new SBMLReadingTask(inputFile, frame, this);
+		SBMLReadingTask readingTask = new SBMLReadingTask(inputFile, null, this);
 		readingTask.execute();
 	}
 
@@ -132,7 +121,7 @@ public class YGraphView implements PropertyChangeListener {
 			
 			int width = 960, height = 720;
 			
-			view = new Graph2DView(product);
+			Graph2DView view = new Graph2DView(product);
 			Rectangle box = view.getGraph2D().getBoundingBox();  
 			Dimension dim = box.getSize();  
 			view.setSize(dim);  
@@ -150,7 +139,8 @@ public class YGraphView implements PropertyChangeListener {
 	    }
 	    view.setFitContentOnResize(true);
 
-			frame.setTitle(YGraphView.class.getSimpleName());
+	    JFrame frame = new JFrame();
+      frame.setTitle(YGraphView.class.getSimpleName());
 			frame.add(view);
 			frame.setMinimumSize(new Dimension(width, height));
 			frame.pack();
