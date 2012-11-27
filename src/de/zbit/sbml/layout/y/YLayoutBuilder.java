@@ -507,8 +507,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 			String reactionId = reaction.getId();
 			Set<List<Edge>> edgeListSet= new HashSet<List<Edge>>();
 			List<NamedSBaseGlyph> reactionGlyphs = (List<NamedSBaseGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
-			for (NamedSBaseGlyph reactionGlyph : reactionGlyphs) {
-				edgeListSet.add(new LinkedList<Edge>(reactionGlyphId2edges.get(reactionGlyph.getId())));
+			if (reactionGlyphs != null) {
+				for (NamedSBaseGlyph reactionGlyph : reactionGlyphs) {
+					edgeListSet.add(new LinkedList<Edge>(reactionGlyphId2edges.get(reactionGlyph.getId())));
+				}
 			}
 			reactionId2Edge.put(reactionId, edgeListSet);
 		}
