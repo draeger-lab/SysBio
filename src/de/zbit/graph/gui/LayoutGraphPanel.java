@@ -16,21 +16,23 @@
  */
 package de.zbit.graph.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.sbml.jsbml.ext.layout.Layout;
 
 import y.view.EditMode;
 import y.view.Graph2DView;
+import y.view.Graph2DViewMouseWheelZoomListener;
+import de.zbit.graph.RestrictedEditMode;
 import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.sbml.layout.y.ILayoutGraph;
 import de.zbit.sbml.layout.y.YLayoutAlgorithm;
 import de.zbit.sbml.layout.y.YLayoutBuilder;
 
-/**
- * @author Jan Rudolph
- * @version $Rev$
- */
 /**
  * @author Jan Rudolph
  * @version $Rev$
@@ -64,7 +66,7 @@ public class LayoutGraphPanel extends JPanel {
 	 * @param editMode : the editMode to enable lasting graph manipulation
 	 */
 	public LayoutGraphPanel(Layout layout, EditMode editMode) {
-		super();
+		super(new BorderLayout());
 		this.document = layout;
 		this.editMode = editMode;
 		LayoutDirector<ILayoutGraph> director = 
@@ -72,9 +74,38 @@ public class LayoutGraphPanel extends JPanel {
 		director.run();
 		this.layoutGraph = director.getProduct();
 		this.graph2DView = new Graph2DView(layoutGraph.getGraph2D());
-		this.add(graph2DView);
+		init();
+	}
+	
+	public void init() {
+		this.add(graph2DView, BorderLayout.CENTER);
+//		int width = 960, height = 720;
+//		Rectangle box = this.graph2DView.getGraph2D().getBoundingBox();  
+//		Dimension dim = box.getSize();  
+//		this.graph2DView.setSize(dim);  
+//		Dimension minimumSize = new Dimension( (int)Math.max(this.graph2DView.getMinimumSize().getWidth(), 100), (int) Math.max(this.graph2DView.getMinimumSize().getHeight(), height/2) );
+//		this.graph2DView.setMinimumSize(minimumSize);
+		print(this);
+		print(graph2DView);
+//		this.graph2DView.setOpaque(false);
+//		((DefaultGraph2DRenderer) this.graph2DView.getGraph2DRenderer()).setDrawEdgesFirst(false);
+		this.graph2DView.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
+		try {
+			this.graph2DView.fitContent(true);
+		} catch (Throwable t) {
+			// Not really a problem
+		}
+		RestrictedEditMode.addOverviewAndNavigation(this.graph2DView);
+		this.graph2DView.setFitContentOnResize(true);
 	}
 
+	/**
+	 * 
+	 */
+	private void print(JComponent comp) {
+		System.out.println("min/max " + comp.getMinimumSize() + ":" + comp.getMaximumSize());
+		System.out.println("pre/act " + comp.getPreferredSize() + ":" + comp.getSize());
+	}
 	/**
 	 * @return the layoutGraph
 	 */
