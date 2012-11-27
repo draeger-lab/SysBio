@@ -213,6 +213,7 @@ public class SBGNVisualizationProperties {
     
     // Set a common color
     ret.setFillColor(getFillColor(sboTerm));
+    ret.setLineColor(SBGNVisualizationProperties.getLineColor(sboTerm));
     
     return ret;
   }
