@@ -81,7 +81,7 @@ public class FileReadProgress {
    */
   public FileReadProgress(File file, boolean printProgressInSameLine) {
     this(file);
-    this.printProgressInSameLine = printProgressInSameLine;
+    setPrintProgessInSameLine(printProgressInSameLine);
   }
 
   /**
@@ -93,7 +93,9 @@ public class FileReadProgress {
     super();
     // This is called from every other constructor.
     setFileLength(length);
-    if (progressBar==null) setProgressBar(new ProgressBar(length));
+    if (progressBar==null) {
+      setProgressBar(new ProgressBar(length));
+    }
   }
   
   /**
