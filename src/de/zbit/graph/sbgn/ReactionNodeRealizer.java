@@ -23,6 +23,7 @@ package de.zbit.graph.sbgn;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -44,17 +45,26 @@ import de.zbit.math.MathUtils;
  */
 public class ReactionNodeRealizer extends ShapeNodeRealizer {
   
-    /**
-     * line width of reaction node
-     */
-    private float lineWidth;
+	/**
+	 * line width of reaction node
+	 */
+	private float lineWidth;
+	private double rotationAngle;
+	private Point rotationCenter;
     
+	/**
+	 * 
+	 */
   public ReactionNodeRealizer() {
     super(ShapeNodeRealizer.RECT);
     setHeight(10);
-    setWidth(getHeight()*2);
+    setWidth(getHeight() * 2);
   }
   
+  /**
+   * 
+   * @param nr
+   */
   public ReactionNodeRealizer(NodeRealizer nr) {
     super(nr);
     // If the given node realizer is of this type, then apply copy semantics. 
@@ -64,87 +74,17 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     }
   }
   
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
   public NodeRealizer createCopy(NodeRealizer nr) {
     return new ReactionNodeRealizer(nr);
-  }
-  
-    /**
-     * sets line width of {@link ReactionNodeRealizer}. If not settet, line
-     * width will be 1.
-     * 
-     * @param lineWidth
-     */
-  public void setLineWidth(float lineWidth){
-      this.lineWidth = lineWidth;
-  }
-  
-  /* (non-Javadoc)
-   * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
-   */
-  @Override
-  protected void paintShapeBorder(Graphics2D gfx) {
-    int extendBesidesBorder=0;
-    gfx.setColor(Color.BLACK);
-    //line width
-    gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
-    int x = (int) getX(); int y = (int) getY();
-    double min = Math.min(getWidth(), getHeight());
-    double offsetX = (getWidth()-min)/2.0;
-    double offsetY = (getHeight()-min)/2.0;
-    
-    // Draw the reaction node rectangle
-    gfx.drawRect((int)offsetX+x, (int)offsetY+y, (int)min, (int)min);
-    
-    if (isHorizontal()) {
-      int halfHeight = (int)(getHeight()/2.0);
-      
-      // Draw the small reaction lines on both sides, where substrates
-      // and products should dock.
-      gfx.drawLine(0+x-extendBesidesBorder, halfHeight+y, (int)offsetX+x, halfHeight+y);
-      gfx.drawLine((int)(offsetX+min)+x, halfHeight+y, (int)getWidth()+x+extendBesidesBorder, halfHeight+y);
-      
-    } else {
-      // Rotate node by 90°
-      int halfWidth = (int)(getWidth()/2.0);
-      
-      // Draw the small reaction lines on both sides, where substrates
-      // and products should dock.
-      gfx.drawLine(halfWidth+x, 0+y-extendBesidesBorder, halfWidth+x, (int)offsetY+y);
-      gfx.drawLine(halfWidth+x, (int)(offsetY+min)+y, halfWidth+x, (int)getHeight()+y+extendBesidesBorder);
-      
-    }
-  }
-  
-  /* (non-Javadoc)
-   * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
-   */
-  @Override
-  protected void paintFilledShape(Graphics2D gfx) {
-    // Do NOT fill it.
-  }
-  
-  /**
-   * True if the node is painted in a horizontal layout.
-   * Use {@link #rotateNode()} to change the rotation.
-   */
-  public boolean isHorizontal() {
-    return getWidth()>=getHeight();
-  }
-  
-  /**
-   * Rotates the node by 90°.
-   */
-  public void rotateNode() {
-    double width = getWidth();
-    double height = getHeight();
-    setWidth(height);
-    setHeight(width);
   }
   
   /**
    * Configures the orientation of this node and the docking point
    * for all adjacent edges to match the given parameters.
-   * <p>Still, you should make sure that all reatants are on one side
+   * <p>Still, you should make sure that all reactants are on one side
    * of the node and all products on the other one!
    */
   public void fixLayout(Set<Node> reactants, Set<Node> products, Set<Node> modifier) {
@@ -225,39 +165,23 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     // TODO: reaction modifiers dock on square
     
   }
-
+  
   /**
-   * @param adjacentNodes
+   * 
+   * @return
    */
-  private void setEdgesToDockOnLowerSideOfNode(Set<Node> adjacentNodes) {
-    YPoint dockToPoint = new YPoint(0,getHeight()/2);
-    letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
-  }
-
+	public float getLineWidth() {
+		return lineWidth;
+	}
+  
   /**
-   * @param adjacentNodes
+   * True if the node is painted in a horizontal layout.
+   * Use {@link #rotateNode()} to change the rotation.
    */
-  private void setEdgesToDockOnUpperSideOfNode(Set<Node> adjacentNodes) {
-    YPoint dockToPoint = new YPoint(0,getHeight()/2*-1);
-    letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
+  public boolean isHorizontal() {
+    return getWidth() >= getHeight();
   }
-
-  /**
-   * @param adjacentNodes
-   */
-  private void setEdgesToDockOnRightSideOfNode(Set<Node> adjacentNodes) {
-    YPoint dockToPoint = new YPoint(getWidth()/2,0);
-    letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
-  }
-
-  /**
-   * @param adjacentNodes
-   */
-  private void setEdgesToDockOnLeftSideOfNode(Set<Node> adjacentNodes) {
-    YPoint dockToPoint = new YPoint(getWidth()/2*-1,0);
-    letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
-  }
-
+  
   /**
    * @param adjacentNodes
    * @param dockToPoint
@@ -282,5 +206,130 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
       }
     }
   }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
+   */
+  @Override
+  protected void paintFilledShape(Graphics2D gfx) {
+    // Do NOT fill it.
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
+   */
+  @Override
+  protected void paintShapeBorder(Graphics2D gfx) {
+    int extendBesidesBorder = 0;
+    int x = (int) getX(); int y = (int) getY();
+    double min = Math.min(getWidth(), getHeight());
+    double offsetX = (getWidth() - min)/2d;
+    double offsetY = (getHeight() - min)/2d;
+
+    rotate(gfx, rotationAngle, rotationCenter);
+    
+    gfx.setColor(Color.BLACK);
+    //line width
+    gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
+    // Draw the reaction node rectangle
+    gfx.drawRect((int) offsetX + x, (int) offsetY + y, (int) min, (int) min);
+    
+//    if (isHorizontal()) {
+      int halfHeight = (int) (getHeight()/2d);
+      
+      // Draw the small reaction lines on both sides, where substrates
+      // and products should dock.
+      gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) offsetX + x, halfHeight + y);
+      gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) getWidth() + x + extendBesidesBorder, halfHeight + y);
+      
+//    } else {
+//      // Rotate node by 90°
+//      int halfWidth = (int) (getWidth()/2d);
+//      
+//      // Draw the small reaction lines on both sides, where substrates
+//      // and products should dock.
+//      gfx.drawLine(halfWidth + x, 0 + y - extendBesidesBorder, halfWidth + x, (int) offsetY + y);
+//      gfx.drawLine(halfWidth + x, (int) (offsetY + min) + y, halfWidth + x, (int) getHeight() + y + extendBesidesBorder);
+//    }
+    
+    rotate(gfx, -rotationAngle, rotationCenter);
+      
+  }
+
+  /**
+   * 
+   * @param gfx
+   * @param rotationAngle
+   * @param rotationCenter
+   */
+  private void rotate(Graphics2D gfx, double rotationAngle, Point rotationCenter) {
+  	if (rotationAngle % 180 != 0) {
+    	if (rotationCenter != null) {
+    		gfx.rotate(Math.toRadians(rotationAngle), rotationCenter.getX(), rotationCenter.getY());
+    	} else {
+    		gfx.rotate(Math.toRadians(rotationAngle));
+    	}
+    }
+	}
+
+	/**
+   * Rotates the node by 90°.
+   */
+  public void rotateNode() {
+    double width = getWidth();
+    double height = getHeight();
+    setWidth(height);
+    setHeight(width);
+  }
+
+  /**
+   * @param adjacentNodes
+   */
+  private void setEdgesToDockOnLeftSideOfNode(Set<Node> adjacentNodes) {
+    YPoint dockToPoint = new YPoint(getWidth()/2*-1,0);
+    letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
+  }
+
+  /**
+   * @param adjacentNodes
+   */
+  private void setEdgesToDockOnLowerSideOfNode(Set<Node> adjacentNodes) {
+    YPoint dockToPoint = new YPoint(0,getHeight()/2);
+    letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
+  }
+
+  /**
+   * @param adjacentNodes
+   */
+  private void setEdgesToDockOnRightSideOfNode(Set<Node> adjacentNodes) {
+    YPoint dockToPoint = new YPoint(getWidth()/2,0);
+    letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
+  }
+
+  /**
+   * @param adjacentNodes
+   */
+  private void setEdgesToDockOnUpperSideOfNode(Set<Node> adjacentNodes) {
+    YPoint dockToPoint = new YPoint(0,getHeight()/2*-1);
+    letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
+  }
+
+  /**
+   * sets line width of {@link ReactionNodeRealizer}. If not set, line
+   * width will be 1.
+   * 
+   * @param lineWidth
+   */
+  public void setLineWidth(float lineWidth) {
+  	this.lineWidth = lineWidth;
+  }
+
+	public void setRotationAngle(double rotationAngle) {
+		this.rotationAngle = rotationAngle;
+	}
+
+	public void setRotationCenter(Point rotationCenter) {
+		this.rotationCenter = rotationCenter;
+	}
   
 }

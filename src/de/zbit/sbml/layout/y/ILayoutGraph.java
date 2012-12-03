@@ -50,4 +50,5 @@ public interface ILayoutGraph {
 	 * @return the Graph2D visual representation.
 	 */
 	public Graph2D getGraph2D();
+
 }

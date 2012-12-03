@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
@@ -29,6 +30,8 @@ import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.SBMLWriter;
+import org.sbml.jsbml.SBO;
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.Unit;
@@ -78,7 +81,12 @@ public class SBMLcorrectorL3 {
 			String namespace = LayoutConstants.getNamespaceURI(m.getLevel(), m.getVersion());
 			if (m.getExtension(namespace) != null) {
 				ExtendedLayoutModel layoutPlugin = (ExtendedLayoutModel) m.getExtension(namespace);
+				int i = 1;
 				for (Layout layout : layoutPlugin.getListOfLayouts()) {
+					if (!layout.isSetId()) {
+						layout.setId("layout_" + SBO.sboNumberString(i));
+						logger.info("Created id for layout " + layout.getId());
+					}
 					correctTextGlyphs(layout);
 					//findExtremeSpeciesGlyphs(layout);
 //					for (ReactionGlyph rg : layout.getListOfReactionGlyphs()) {
@@ -103,6 +111,35 @@ public class SBMLcorrectorL3 {
 //		}
 //	}
 
+	public static void removeCellDesignerAnnotation(SBase sbase) {
+		if (sbase.isSetAnnotation()) {
+			Annotation annotation = sbase.getAnnotation();
+			String nonRDF = annotation.getNonRDFannotation();
+			if ((nonRDF != null) && (nonRDF.length() > 0) && nonRDF.contains("<celldesigner:extension>")) {
+				StringBuilder sb = new StringBuilder();
+				sb.append(nonRDF.substring(0, nonRDF.indexOf("<celldesigner:extension>")));
+				sb.append(nonRDF.substring(nonRDF.indexOf("</celldesigner:extension>") + 25, nonRDF.length()));
+				String newAnnotation = sb.toString().trim();
+				if (newAnnotation.length() == 0) {
+					annotation.unsetNonRDFannotation();
+					if (annotation.isEmpty()) {
+						logger.info("Removed the complete annotation from " + sbase);
+						sbase.unsetAnnotation();
+					} else {
+						logger.info("Removed CellDesigner annotation from " + sbase);
+					}
+				} else if (newAnnotation.length() != nonRDF.length()) {
+					logger.info("Removed CellDesigner annotation from " + sbase);
+					annotation.setNonRDFAnnotation(newAnnotation);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param r
+	 */
 	public static void correctReaction(Reaction r) {
 		if (!r.isSetReversible()) {
 			logger.info("Setting reversible on " + r);
@@ -121,6 +158,7 @@ public class SBMLcorrectorL3 {
 		for (ModifierSpeciesReference specRef : r.getListOfModifiers()) {
 			correctModifierSpeciesReference(specRef);
 		}
+		removeCellDesignerAnnotation(r);
 	}
 
 	/**
@@ -129,7 +167,7 @@ public class SBMLcorrectorL3 {
 	 */
 	public static void correctModifierSpeciesReference(
 		ModifierSpeciesReference specRef) {
-		// TODO Auto-generated method stub
+		removeCellDesignerAnnotation(specRef);
 	}
 
 	/**
@@ -141,6 +179,11 @@ public class SBMLcorrectorL3 {
 			logger.info("Setting constant on " + specRef);
 			specRef.setConstant(true);
 		}
+		if (!specRef.isSetStoichiometry() && !specRef.isSetStoichiometryMath()) {
+			logger.info("Setting stoichiometry of " + specRef + " to 1.0");
+			specRef.setStoichiometry(1d);
+		}
+		removeCellDesignerAnnotation(specRef);
 	}
 
 	/**
@@ -160,6 +203,7 @@ public class SBMLcorrectorL3 {
 			logger.info("Setting constant on " + s);
 			s.setConstant(false);
 		}
+		removeCellDesignerAnnotation(s);
 	}
 
 	/**
@@ -202,7 +246,9 @@ public class SBMLcorrectorL3 {
 			if (change) {
 				logger.info("Had to correct unit in " + ud);
 			}
+			removeCellDesignerAnnotation(u);
 		}
+		removeCellDesignerAnnotation(ud);
 	}
 
 	/**
