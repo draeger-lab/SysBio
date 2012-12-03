@@ -24,14 +24,19 @@ import java.io.File;
 
 import javax.swing.JFrame;
 
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
+import org.sbml.jsbml.ext.layout.LayoutConstants;
 
 import y.view.DefaultGraph2DRenderer;
 import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
+import de.zbit.graph.RestrictedEditMode;
 import de.zbit.io.OpenedFile;
 import de.zbit.sbml.gui.SBMLReadingTask;
+import de.zbit.sbml.layout.GlyphCreator;
 import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.util.logging.LogUtil;
 
@@ -112,6 +117,13 @@ public class YGraphView implements PropertyChangeListener {
 	 * @param doc
 	 */
 	private void setSBMLDocument(SBMLDocument doc) {
+		Model model = doc.getModel();
+		ExtendedLayoutModel ext = (ExtendedLayoutModel) model.getExtension(LayoutConstants.getNamespaceURI(doc.getLevel(), doc.getVersion()));
+		if (ext == null) {
+			new GlyphCreator(model).create();
+			ext = (ExtendedLayoutModel) model.getExtension(LayoutConstants.getNamespaceURI(doc.getLevel(), doc.getVersion()));
+
+		}
 		LayoutDirector<ILayoutGraph> director =
 				new LayoutDirector<ILayoutGraph>(doc,
 						new YLayoutBuilder(),
@@ -137,6 +149,7 @@ public class YGraphView implements PropertyChangeListener {
 	    } catch (Throwable t) {
 	    	// Not really a problem
 	    }
+			RestrictedEditMode.addOverviewAndNavigation(view);
 	    view.setFitContentOnResize(true);
 
 	    JFrame frame = new JFrame();
