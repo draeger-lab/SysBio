@@ -39,56 +39,61 @@ import de.zbit.graph.sbgn.ReactionNodeRealizer;
  * @version $Rev$
  */
 public class SBMLCreateEdgeMode extends CreateEdgeMode {
-   
-  Logger logger = Logger.getLogger(SBMLCreateEdgeMode.class.getName());
+	
 	/**
-   * Creates a reaction node and the edges to and from that node.
-   * 
-   * @param graph
-   * @param start
-   * @param target
-   * @param realizer
-   * @param reversible
-   * @return the created node
-   */
-  public Node createEdgeNode(Graph2D graph, Node start, Node target, EdgeRealizer realizer, boolean reversible) {
-    ReactionNodeRealizer nre = new ReactionNodeRealizer();
-    Node reactionNode = graph.createNode(nre);
+	 * A {@link Logger} for this class.
+	 */
+	private static final Logger logger = Logger.getLogger(SBMLCreateEdgeMode.class.getName());
+	
+	/**
+	 * Creates a reaction node and the edges to and from that node.
+	 * 
+	 * @param graph
+	 * @param start
+	 * @param target
+	 * @param realizer
+	 * @param reversible
+	 * @return the created node
+	 */
+	public Node createEdgeNode(Graph2D graph, Node start, Node target, EdgeRealizer realizer, boolean reversible) {
+		ReactionNodeRealizer nre = new ReactionNodeRealizer();
+		Node reactionNode = graph.createNode(nre);
+		
+		Edge e1 = graph.createEdge(reactionNode, start);
+		Edge e2 = graph.createEdge(reactionNode, target);;
+		
+		nre.setCenter((graph.getRealizer(start).getCenterX() + graph.getRealizer(target).getCenterX())/2d, (graph.getRealizer(start).getCenterY() + graph.getRealizer(target).getCenterY())/2d);
+		((EdgeRealizer)graph.getRealizer(e2)).setArrow(Arrow.DELTA);
+		
+		if (reversible) {
+			((EdgeRealizer) graph.getRealizer(e1)).setArrow(Arrow.DELTA);
+		}
+		return reactionNode;
+	}
+	
+	/**
+	 * Creates an edge between the start SpeciesGlyph node and the target ReactionGlyph node for a modifier.
+	 * If the SBO-term for the modifier isn't Inhibitor or Catalyst, the edge has a CONCAVE arrow by default.
+	 * 
+	 * @param graph
+	 * @param start
+	 * @param target
+	 * @param realizer
+	 * @param sbo
+	 */
+	public void createEdge(Graph2D graph, Node start, Node target, EdgeRealizer realizer, int sbo) {
+		logger.info("SBO: " + SBO.convertSBO2Alias(sbo));
+		if (graph.getRealizer(target) instanceof ReactionNodeRealizer) {
+			Edge e = super.createEdge(graph, start, target, realizer);
+			if (sbo == SBO.getCatalyst()) {
+				// FIXME never entered -> SBO: MODULATION
+				graph.getRealizer(e).setArrow(Arrow.TRANSPARENT_CIRCLE);
+			} else if (sbo == SBO.getInhibitor()) {
+				graph.getRealizer(e).setArrow(Arrow.T_SHAPE);
+			} else {
+				graph.getRealizer(e).setArrow(Arrow.CONCAVE);
+			}
+		}
+	}
 
-    Edge e1 = graph.createEdge(reactionNode, start);
-    Edge e2 = graph.createEdge(reactionNode, target);;
-    
-    nre.setCenter((graph.getRealizer(start).getCenterX() + graph.getRealizer(target).getCenterX())/2d, (graph.getRealizer(start).getCenterY() + graph.getRealizer(target).getCenterY())/2d);
-    ((EdgeRealizer)graph.getRealizer(e2)).setArrow(Arrow.DELTA);
-    
-    if (reversible) {
-      ((EdgeRealizer) graph.getRealizer(e1)).setArrow(Arrow.DELTA);
-    }
-    return reactionNode;
-  }
-  
-  /**
-   * Creates an edge between the start SpeciesGlyph node and the target ReactionGlyph node for a modifier.
-   * If the SBO-term for the modifier isn't Inhibitor or Catalyst, the edge has a CONCAVE arrow by default.
-   * 
-   * @param graph
-   * @param start
-   * @param target
-   * @param realizer
-   * @param sbo
-   */
-  public void createEdge(Graph2D graph, Node start, Node target, EdgeRealizer realizer, int sbo) {
-  	logger.info("SBO: " + SBO.convertSBO2Alias(sbo));
-    if (graph.getRealizer(target) instanceof ReactionNodeRealizer) {
-    	Edge e = super.createEdge(graph, start, target, realizer);
-      if (sbo == SBO.getCatalyst()) {
-      	// FIXME never entered -> SBO: MODULATION
-        graph.getRealizer(e).setArrow(Arrow.TRANSPARENT_CIRCLE);
-      } else if (sbo == SBO.getInhibitor()) {
-        graph.getRealizer(e).setArrow(Arrow.T_SHAPE);
-      } else {
-        graph.getRealizer(e).setArrow(Arrow.CONCAVE);
-      }
-    }
-  }
 }

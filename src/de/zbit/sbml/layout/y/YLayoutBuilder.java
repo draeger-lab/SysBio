@@ -328,7 +328,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		depth = dimension.getDepth();
 		
 		ProcessNode<NodeRealizer> processNode = createProcessNode();
-		NodeRealizer reactionNodeRealizer = processNode.draw(x, y, z, width, height, depth);
+		NodeRealizer reactionNodeRealizer = processNode.draw(
+			x, y, z, width, height, depth, rotationAngle,
+			new Point(x + width / 2d, y + height / 2d, z + depth / 2d));
 		
 		Node processYNode = graph.createNode(reactionNodeRealizer);
 		id2node.put(reactionGlyph.getId(), processYNode);
@@ -390,14 +392,15 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 
 		// TODO special positions for CompartmentGlyphs
 		
-		String text;
+		String text = null;
+		NamedSBase namedSBase = null;
 		if (textGlyph.isSetText()) {
 			text = textGlyph.getText();
 			logger.fine(String.format("building text glyph element id=%s\n\torigin text overridden text='%s'",
 					textGlyph.getId(), text));
 		}
-		else {
-			NamedSBase namedSBase = textGlyph.getOriginOfTextInstance();
+		else if (textGlyph.isSetOriginOfText()) {
+			namedSBase = textGlyph.getOriginOfTextInstance();
 			text = namedSBase.getName();
 			logger.fine(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
 					textGlyph.getId(), namedSBase.getId(), text));
@@ -432,7 +435,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 				nodeLabel.setModelParameter(param);
 			}
 		}
-		else {
+		else if (text != null) {
 			originRealizer.setLabelText(text);
 		}
 	}
@@ -503,6 +506,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		for (Reaction reaction : layout.getModel().getListOfReactions()) {
 			String reactionId = reaction.getId();
 			Set<List<Edge>> edgeListSet= new HashSet<List<Edge>>();
+			@SuppressWarnings("unchecked")
 			List<NamedSBaseGlyph> reactionGlyphs = (List<NamedSBaseGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
 			if (reactionGlyphs != null) {
 				for (NamedSBaseGlyph reactionGlyph : reactionGlyphs) {
@@ -527,8 +531,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		return terminated;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutFactory#createProcessNode()
 	 */
 	@Override
@@ -648,6 +651,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		return new YNecessaryStimulation();
 	}
 	
+	/**
+	 * 
+	 */
 	private void debugIdNodeMap() {
 		System.out.println("glyphId             GLYPH POSITION DIMENSIONS  -- NODE BB");
 		for (Map.Entry<String, Node> entry : id2node.entrySet()) {

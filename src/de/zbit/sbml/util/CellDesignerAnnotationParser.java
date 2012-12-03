@@ -114,7 +114,7 @@ public class CellDesignerAnnotationParser implements Runnable {
 		if ((model != null) && (model.getExtension(LayoutConstants.namespaceURI) == null)) {
 			ExtendedLayoutModel layoutExt = new ExtendedLayoutModel(model);
 			model.addExtension(LayoutConstants.namespaceURI, layoutExt);
-			layout = layoutExt.createLayout();
+			layout = layoutExt.createLayout("l1");
 		}
 		// need to set level 3 version 1, necessary for layout extension
 		sbmlDocument.setLevel(3);

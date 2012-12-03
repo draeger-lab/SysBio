@@ -29,6 +29,7 @@ import y.view.Graph2D;
  * @version $Rev$
  */
 public class LayoutGraph implements ILayoutGraph {
+
 	private Map<String, Set<Node>> speciesId2nodes;
 	private Map<String, Set<Node>> compartmentId2nodes;
 	private Map<String, Set<List<Edge>>> reactionId2edges;
@@ -48,30 +49,33 @@ public class LayoutGraph implements ILayoutGraph {
 		this.reactionId2edges = reactionId2edges;
 		graph2D = graph2d;
 	}
+
 	/**
 	 * @return the speciesId2nodes
 	 */
 	public Map<String, Set<Node>> getSpeciesId2nodes() {
 		return speciesId2nodes;
 	}
+
 	/**
 	 * @return the compartmentId2nodes
 	 */
 	public Map<String, Set<Node>> getCompartmentId2nodes() {
 		return compartmentId2nodes;
 	}
+
 	/**
 	 * @return the reactionId2edges
 	 */
 	public Map<String, Set<List<Edge>>> getReactionId2edges() {
 		return reactionId2edges;
 	}
+
 	/**
 	 * @return the graph2D
 	 */
 	public Graph2D getGraph2D() {
 		return graph2D;
 	}
-	
 	
 }
