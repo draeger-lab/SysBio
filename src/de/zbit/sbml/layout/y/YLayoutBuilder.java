@@ -78,11 +78,9 @@ import de.zbit.sbml.layout.Production;
 import de.zbit.sbml.layout.SBGNArc;
 import de.zbit.sbml.layout.SBGNNode;
 import de.zbit.sbml.layout.SimpleChemical;
-import de.zbit.sbml.layout.SimpleLayoutAlgorithm;
 import de.zbit.sbml.layout.SourceSink;
 import de.zbit.sbml.layout.Stimulation;
 import de.zbit.sbml.layout.UnspecifiedNode;
-import de.zbit.sbml.layout.SimpleLayoutAlgorithm.RelativePosition;
 import de.zbit.util.progressbar.AbstractProgressBar;
 import de.zbit.util.progressbar.ProgressListener;
 
@@ -472,7 +470,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 				boolean drawBezier = true;
 				for (CurveSegment curveSegment : listOfCurveSegments) {
 					// TODO there should be a constant for this string
-					drawBezier = drawBezier && curveSegment.getType().equals("CubicBezier");
+					drawBezier = drawBezier && curveSegment.isSetType() && curveSegment.getType().equals("CubicBezier");
 					if (!drawBezier) {
 						break;
 					}
