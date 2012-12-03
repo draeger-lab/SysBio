@@ -18,7 +18,6 @@
 package de.zbit.sbml.layout.y;
 
 import java.awt.Color;
-import java.awt.geom.Rectangle2D;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +30,7 @@ import java.util.logging.Logger;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBO;
+import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
@@ -38,7 +38,6 @@ import org.sbml.jsbml.ext.layout.CubicBezier;
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
-import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
 import org.sbml.jsbml.ext.layout.Point;
@@ -62,6 +61,7 @@ import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.PolyLineEdgeRealizer;
 import y.view.ShapeNodeRealizer;
+import y.view.hierarchy.HierarchyManager;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
 import de.zbit.sbml.layout.Catalysis;
 import de.zbit.sbml.layout.Compartment;
@@ -78,9 +78,11 @@ import de.zbit.sbml.layout.Production;
 import de.zbit.sbml.layout.SBGNArc;
 import de.zbit.sbml.layout.SBGNNode;
 import de.zbit.sbml.layout.SimpleChemical;
+import de.zbit.sbml.layout.SimpleLayoutAlgorithm;
 import de.zbit.sbml.layout.SourceSink;
 import de.zbit.sbml.layout.Stimulation;
 import de.zbit.sbml.layout.UnspecifiedNode;
+import de.zbit.sbml.layout.SimpleLayoutAlgorithm.RelativePosition;
 import de.zbit.util.progressbar.AbstractProgressBar;
 import de.zbit.util.progressbar.ProgressListener;
 
@@ -147,6 +149,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	public void builderStart(Layout layout) {
 		this.layout = layout;
 		graph = new Graph2D();
+	    HierarchyManager hm = graph.getHierarchyManager();
+	    if (hm == null) {
+	      hm = new HierarchyManager(graph);
+	      graph.setHierarchyManager(hm);
+	    }
 		labelTextGlyphs = new HashSet<TextGlyph>();
 		// TODO for all p in progressListeners: progress.setNumberOfTotalCalls(xyz);
 	}
@@ -222,6 +229,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 				speciesGlyph.getBoundingBox().getPosition(), nodeRealizer.getBoundingBox()));
 		
 		Node ynode = graph.createNode();
+		Node compartmentYNode = id2node.get(((Species) speciesGlyph.getSpeciesInstance()).getCompartment());
+		if (compartmentYNode != null) {
+			graph.getHierarchyManager().setParentNode(ynode, compartmentYNode);
+		}
 		graph.setRealizer(ynode, nodeRealizer);
 		id2node.put(speciesGlyph.getId(), ynode);
 		putInMapSet(speciesId2Node, speciesGlyph.getSpecies(), ynode);
@@ -275,11 +286,13 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		}
 		
 		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve());
+		// TODO EdgeRealizer edgeRealizer = arc.draw(srg.getCurve(), width);
+		// also set line width on process node
 		edgeRealizer = edgeRealizer.createCopy();
 		
 		// to dock correctly use
 		// edgeRealizer.setSourcePoint(yp);
-		
+				
 		if (srg.isSetSpeciesReference()) {
 			SpeciesReference speciesReference = (SpeciesReference) srg.getSpeciesReferenceInstance();
 			if (speciesReference.isSetStoichiometry() && speciesReference.getStoichiometry() != 1) {
@@ -328,9 +341,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		depth = dimension.getDepth();
 		
 		ProcessNode<NodeRealizer> processNode = createProcessNode();
+		Point rotationCenter = new Point(x + width / 2d, y + height / 2d, z + depth / 2d);
 		NodeRealizer reactionNodeRealizer = processNode.draw(
-			x, y, z, width, height, depth, rotationAngle,
-			new Point(x + width / 2d, y + height / 2d, z + depth / 2d));
+			x, y, z, width, height, depth, rotationAngle, rotationCenter);
+		logger.info(MessageFormat.format("Process node position: {0} rotationAngle: {1} rotationCenter: {2}",
+				point, rotationAngle, rotationCenter));
 		
 		Node processYNode = graph.createNode(reactionNodeRealizer);
 		id2node.put(reactionGlyph.getId(), processYNode);
@@ -500,6 +515,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutBuilder#getProduct()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public ILayoutGraph getProduct() {
 		Map<String, Set<List<Edge>>> reactionId2Edge = new HashMap<String, Set<List<Edge>>>();
@@ -649,41 +665,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	@Override
 	public NecessaryStimulation<EdgeRealizer> createNecessaryStimulation() {
 		return new YNecessaryStimulation();
-	}
-	
-	/**
-	 * 
-	 */
-	private void debugIdNodeMap() {
-		System.out.println("glyphId             GLYPH POSITION DIMENSIONS  -- NODE BB");
-		for (Map.Entry<String, Node> entry : id2node.entrySet()) {
-			String glyphId = entry.getKey();
-			Node ynode = entry.getValue();
-			GraphicalObject glyph = layout.getSpeciesGlyph(glyphId);
-			if (glyph == null) {
-				glyph = layout.getReactionGlyph(glyphId);
-			}
-			if (glyph == null) {
-				glyph = layout.getTextGlyph(glyphId);
-			}
-			if (glyph == null) {
-				glyph = layout.getCompartmentGlyph(glyphId);
-			}
-			if (glyph != null) {
-				BoundingBox boundingBox = glyph.getBoundingBox();
-				Dimensions d = boundingBox.getDimensions();
-				Point p = boundingBox.getPosition();
-				double gX = p.getX(), gY = p.getY();
-				double gW = d.getWidth(), gH = d.getHeight();
-				
-				Rectangle2D nodeBB = graph.getRealizer(ynode).getBoundingBox();
-				double nX = nodeBB.getX(), nY = nodeBB.getY();
-				double nW = nodeBB.getWidth(), nH = nodeBB.getHeight();
-				
-				System.out.format("%20s\t%.2f, %.2f %.2f x %.2f  -- %.2f, %.2f %.2f x %.2f\n",
-						glyph.getId(), gX, gY, gW, gH, nX, nY, nW, nH);
-			}
-		}
 	}
 
 }
