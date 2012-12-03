@@ -25,7 +25,9 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.ListOf;
+import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Reaction;
+import org.sbml.jsbml.Species;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Curve;
@@ -35,6 +37,7 @@ import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.Position;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
+import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
@@ -45,6 +48,7 @@ import y.geom.YPoint;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.Graph2Dwriter;
@@ -82,6 +86,11 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 	 * 
 	 */
 	private Set<ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>> setOfLayoutedEdges;
+	
+	/**
+	 * 
+	 */
+	private Map<String, Node> compartmentGlyphMap;
 	
 	/**
 	 * Mapping of YFiles nodes to glyphs, containing only nodes/glyphs which
@@ -130,7 +139,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		this.nodeIncompleteGlyphMap = new HashMap<Node, GraphicalObject>();
 		this.glyphNodeMap = new HashMap<String, Node>();
 		this.reactionNodes = new HashSet<ReactionGlyph>();
-		
+		this.compartmentGlyphMap = new HashMap<String, Node>();
 		this.output = new HashSet<GraphicalObject>();
 		
 		graph2D = new Graph2D();
@@ -138,11 +147,11 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			new GenericDataMap<DataMap, String>(Graph2Dwriter.mapDescription);
 		graph2D.addDataProvider(Graph2Dwriter.mapDescription, mapDescriptionMap);
 		
-	    HierarchyManager hm = graph2D.getHierarchyManager();
-	    if (hm == null) {
-	      hm = new HierarchyManager(graph2D);
-	      graph2D.setHierarchyManager(hm);
-	    }
+		HierarchyManager hm = graph2D.getHierarchyManager();
+		if (hm == null) {
+			hm = new HierarchyManager(graph2D);
+			graph2D.setHierarchyManager(hm);
+		}
 		
 		graphTools = new GraphTools(graph2D);
 	}
@@ -196,12 +205,14 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		height = (int) dimensions.getHeight();
 		
 		// Graph2D structure
-		NodeRealizer nodeRealizer = new ShapeNodeRealizer();
+		NodeRealizer nodeRealizer = (glyph instanceof CompartmentGlyph) ? new GroupNodeRealizer() : new ShapeNodeRealizer();
 		nodeRealizer.setSize(width, height);
 		nodeRealizer.setLocation(x, y);
 		Node node = graph2D.createNode(nodeRealizer);
 		
 		logger.fine(String.format("%d,%d %dx%d", x, y, width, height));
+			
+		handleHierarchy(glyph, node);
 		
 		// GraphTools helper
 		graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
@@ -209,6 +220,39 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		
 		setOfLayoutedGlyphs.add(glyph);
 		glyphNodeMap.put(glyph.getId(), node);
+	}
+
+	/**
+	 * @param glyph
+	 * @param node
+	 */
+	private void handleHierarchy(GraphicalObject glyph, Node node) {
+		HierarchyManager hm = graph2D.getHierarchyManager();
+		if (glyph instanceof CompartmentGlyph) {
+			hm.convertToGroupNode(node);
+			CompartmentGlyph compartmentGlyph = (CompartmentGlyph) glyph;
+			logger.info(compartmentGlyph.getCompartment());
+			compartmentGlyphMap.put(compartmentGlyph.getCompartment(), node);
+		}
+		else if (glyph instanceof ReactionGlyph) {
+			Reaction r = (Reaction) ((ReactionGlyph) glyph).getReactionInstance();
+			if (r.isSetCompartment()) {
+				Node comp = compartmentGlyphMap.get(r.getCompartment());
+				if (comp != null) {
+					hm.setParentNode(node, comp);
+				}
+			}
+		}
+		else if (glyph instanceof SpeciesGlyph) {
+			Species s = (Species) ((SpeciesGlyph) glyph).getSpeciesInstance();
+			if (s.isSetCompartment()) {
+				logger.info(s.getId() + " " + s.getCompartment());
+				Node comp = compartmentGlyphMap.get(s.getCompartment());
+				if(comp != null) {
+					hm.setParentNode(node, comp);
+				}
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -229,7 +273,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		NodeRealizer nodeRealizer;
 		Node node;
 		if (!(glyph instanceof ReactionGlyph)) {
-			nodeRealizer = new ShapeNodeRealizer();
+			nodeRealizer = (glyph instanceof CompartmentGlyph) ? new GroupNodeRealizer() : new ShapeNodeRealizer();
 			node = graph2D.createNode(nodeRealizer);
 
 			// partially layouted: position only
@@ -252,11 +296,13 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 				nodeRealizer.setSize(width, height);
 				graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
 			}
+			
 
 			setOfUnlayoutedGlyphs.add(glyph);
 			nodeIncompleteGlyphMap.put(node, glyph);
 		}
 		
+		// handle reaction glyphs differently
 		else {
 			// glyph is ReactionGlyph
 			nodeRealizer = new ReactionNodeRealizer();
@@ -276,11 +322,12 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 					glyph.createBoundingBox(dimensions);
 				}
 			}
-			
 			reactionNodes.add((ReactionGlyph) glyph);
 		}
 
 		glyphNodeMap.put(glyph.getId(), node);
+		
+		handleHierarchy(glyph, node);
 	}
 
 	/* (non-Javadoc)
@@ -314,6 +361,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			Node node = entry.getKey();
 			NodeRealizer nodeRealizer = graph2D.getRealizer(node);
 			GraphicalObject glyph = entry.getValue();
+			
 			
 			// get or create bounding box for glyphs
 			BoundingBox boundingBox = glyph.isSetBoundingBox() ?
