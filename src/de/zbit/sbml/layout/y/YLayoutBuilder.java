@@ -533,7 +533,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 				compartmentId2Node,
 				reactionId2Edge, 
 				graph);
-		
+
 		return layoutGraph;
 	}
 
