@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBO;
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.layout.BoundingBox;
@@ -47,11 +48,16 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 import org.sbml.jsbml.util.StringTools;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 import y.base.Edge;
 import y.base.Node;
 import y.geom.OrientedRectangle;
 import y.layout.DiscreteEdgeLabelModel;
+import y.layout.DiscreteNodeLabelModel;
 import y.layout.FreeNodeLabelModel;
+import y.layout.LabelCandidate;
+import y.layout.NodeLabelModel;
 import y.view.BezierEdgeRealizer;
 import y.view.EdgeLabel;
 import y.view.EdgeRealizer;
@@ -147,11 +153,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	public void builderStart(Layout layout) {
 		this.layout = layout;
 		graph = new Graph2D();
-	    HierarchyManager hm = graph.getHierarchyManager();
-	    if (hm == null) {
-	      hm = new HierarchyManager(graph);
-	      graph.setHierarchyManager(hm);
-	    }
+		HierarchyManager hm = graph.getHierarchyManager();
+		if (hm == null) {
+			hm = new HierarchyManager(graph);
+			graph.setHierarchyManager(hm);
+		}
 		labelTextGlyphs = new HashSet<TextGlyph>();
 		// TODO for all p in progressListeners: progress.setNumberOfTotalCalls(xyz);
 	}
@@ -397,6 +403,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	 * @param textGlyph
 	 */
 	private void buildTextGlyphAsLabel(TextGlyph textGlyph) {
+		NamedSBase namedSBase = null;
+		if (textGlyph.isSetOriginOfText()) {
+			namedSBase = textGlyph.getOriginOfTextInstance();
+		}
 		Node origin = id2node.get(textGlyph.getGraphicalObject());
 		if (origin == null) {
 			return;
@@ -406,7 +416,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		// TODO special positions for CompartmentGlyphs
 		
 		String text = null;
-		NamedSBase namedSBase = null;
 		if (textGlyph.isSetText()) {
 			text = textGlyph.getText();
 			logger.fine(String.format("building text glyph element id=%s\n\torigin text overridden text='%s'",
@@ -414,9 +423,13 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		}
 		else if (textGlyph.isSetOriginOfText()) {
 			namedSBase = textGlyph.getOriginOfTextInstance();
-			text = namedSBase.getName();
-			logger.fine(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
+			if (namedSBase != null) {
+				text = namedSBase.getName();
+				logger.fine(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
 					textGlyph.getId(), namedSBase.getId(), text));
+			} else {
+				logger.warning(MessageFormat.format("No such element defined {0}", textGlyph.getOriginOfText()));
+			}
 		}
 		
 		if (textGlyph.isSetBoundingBox() &&
@@ -449,7 +462,16 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 			}
 		}
 		else if (text != null) {
-			originRealizer.setLabelText(text);
+			if ((namedSBase != null) && (namedSBase instanceof org.sbml.jsbml.Compartment)) {
+				NodeLabel nodeLabel;
+				nodeLabel = new NodeLabel(text);
+				nodeLabel.setModel(NodeLabel.INTERNAL);
+				nodeLabel.setPosition(NodeLabel.TOP_RIGHT);
+				nodeLabel.setDistance(20d);
+				originRealizer.setLabel(nodeLabel);
+			} else {
+				originRealizer.setLabelText(text);
+			}
 		}
 	}
 

@@ -59,19 +59,19 @@ public class YGraphView implements PropertyChangeListener {
 	public static void main(final String[] args) {
 		LogUtil.initializeLogging(YGraphView.class.getPackage().toString());
 		final File in = new File(args[0]);
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			/* (non-Javadoc)
-			 * @see java.lang.Runnable#run()
-			 */
-			@Override
-			public void run() {
+//		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+//			/* (non-Javadoc)
+//			 * @see java.lang.Runnable#run()
+//			 */
+//			@Override
+//			public void run() {
 				try {
 					new YGraphView(in);
 				} catch (Throwable e) {
 					e.printStackTrace();
 				}
-			}
-		});
+//			}
+//		});
 	}
 	
 	/**
