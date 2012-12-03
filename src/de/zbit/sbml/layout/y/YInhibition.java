@@ -40,19 +40,15 @@ public class YInhibition implements Inhibition<EdgeRealizer> {
 		return edgeRealizer;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
-	 */
 	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
+	public EdgeRealizer draw(Curve curve, double lineWidth) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		// TODO Auto-generated method stub
+	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
+		// Partial drawing of an EdgeRealizer not possible.
 		return null;
 	}
 

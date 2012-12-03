@@ -20,6 +20,7 @@ import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.EdgeRealizer;
+import y.view.LineType;
 import de.zbit.sbml.layout.Consumption;
 
 /**
@@ -37,19 +38,23 @@ public class YConsumption implements Consumption<EdgeRealizer> {
 		return edgeRealizer;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
-	 */
 	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// TODO Auto-generated method stub
-		return null;
+	public EdgeRealizer draw(Curve curve, double lineWidth) {
+		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
+		LineType currentLineType = edgeRealizer.getLineType();
+		LineType lineType = LineType.createLineType((float) lineWidth,
+				currentLineType.getEndCap(),
+				currentLineType.getLineJoin(),
+				currentLineType.getMiterLimit(),
+				currentLineType.getDashArray(),
+				currentLineType.getDashPhase());
+		edgeRealizer.setLineType(lineType);
+		return edgeRealizer;
 	}
 
 	@Override
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		// TODO Auto-generated method stub
+	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
+		// Partial drawing of an EdgeRealizer not possible.
 		return null;
 	}
 

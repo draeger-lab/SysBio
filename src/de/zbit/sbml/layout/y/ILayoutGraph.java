@@ -25,6 +25,9 @@ import y.base.Node;
 import y.view.Graph2D;
 
 /**
+ * Interface to define a data structure which contains a Graph2D and useful
+ * id-node maps.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */
@@ -42,7 +45,7 @@ public interface ILayoutGraph {
 	
 	/**
 	 * Each value 
-	 * @return the reaction id -> set of sets of edges map.
+	 * @return the reaction id -> set of list of edges map.
 	 */
 	public Map<String, Set<List<Edge>>> getReactionId2edges();
 	

@@ -25,6 +25,8 @@ import y.base.Node;
 import y.view.Graph2D;
 
 /**
+ * Product type used by YLayoutBuilder. All maps are built by YLayoutBuilder.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

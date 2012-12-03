@@ -41,6 +41,7 @@ import y.base.Node;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
@@ -132,6 +133,12 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		GenericDataMap<DataMap, String> mapDescriptionMap =
 			new GenericDataMap<DataMap, String>(Graph2Dwriter.mapDescription);
 		graph2D.addDataProvider(Graph2Dwriter.mapDescription, mapDescriptionMap);
+		
+	    HierarchyManager hm = graph2D.getHierarchyManager();
+	    if (hm == null) {
+	      hm = new HierarchyManager(graph2D);
+	      graph2D.setHierarchyManager(hm);
+	    }
 		
 		graphTools = new GraphTools(graph2D);
 	}
@@ -248,7 +255,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			nodeIncompleteGlyphMap.put(node, glyph);
 		}
 		
-		// TODO handle reaction glyphs differently
+		// handle reaction glyphs differently
 		else {
 			nodeRealizer = new ReactionNodeRealizer();
 			node = graph2D.createNode(nodeRealizer);
@@ -352,41 +359,13 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			ReactionNodeRealizer reactionNodeRealizer = (ReactionNodeRealizer) graph2D.getRealizer(glyphNodeMap.get(reactionGlyph.getId()));
 			
 //			double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);
-			Position position = createReactionGlyphPositionNew(reactionGlyph);
+//			reactionGlyph.putUserObject("ROTATION", rotationAngle);
+			Position position = createReactionGlyphPosition(reactionGlyph);
 			reactionNodeRealizer.setLocation(position.getX(), position.getY());
 			
 			BoundingBox rgBoundingBox = reactionGlyph.isSetBoundingBox() ?
 					reactionGlyph.getBoundingBox() : reactionGlyph.createBoundingBox();
 			rgBoundingBox.setPosition(position);
-			
-			
-			// TODO replace with better calculation
-			// position: mean of center coordinates
-//			double xsum = 0, ysum = 0;
-//			int xcount = 0, ycount = 0;
-//			for (SpeciesGlyph speciesGlyph : positionSpecifyingGlyphs) {
-//				Point position = speciesGlyph.getBoundingBox().getPosition();
-//				Dimensions dimensions = speciesGlyph.getBoundingBox().getDimensions();
-//				
-//				double centerX = position.getX() + dimensions.getWidth()/2;
-//				xsum += centerX;
-//				xcount++;
-//				
-//				double centerY = position.getY() + dimensions.getHeight()/2;
-//				ysum += centerY;
-//				ycount++;
-//				
-//				logger.fine(String.format("original (%f,%f)  center (%f,%f)", position.getX(), position.getY(), centerX, centerY));
-//			}
-//			
-//			double xmean = xsum/(double) xcount - reactionNodeRealizer.getWidth()/2;
-//			double ymean = ysum/(double) ycount - reactionNodeRealizer.getHeight()/2;
-//			BoundingBox rgBoundingBox = reactionGlyph.isSetBoundingBox() ?
-//					reactionGlyph.getBoundingBox() : reactionGlyph.createBoundingBox();
-//			rgBoundingBox.setPosition(new Point(xmean, ymean, DEFAULT_Z_COORD, level, version));
-			
-			// orientation
-			//reactionNodeRealizer.fixLayout(reactants, products, modifiers);
 		}
 		
 		return output;
