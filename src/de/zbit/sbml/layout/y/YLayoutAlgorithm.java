@@ -227,11 +227,20 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		if (glyph instanceof CompartmentGlyph) {
 			hm.convertToGroupNode(node);
 			CompartmentGlyph compartmentGlyph = (CompartmentGlyph) glyph;
-			logger.info(compartmentGlyph.getCompartment());
+			/*
+			 * this can happen when a glyph is graphical information only and not intended to be
+			 * used for calculations in the model
+			 */
+			if (!compartmentGlyph.isSetCompartment()) return;
 			compartmentGlyphMap.put(compartmentGlyph.getCompartment(), node);
 		}
 		else if (glyph instanceof ReactionGlyph) {
 			Reaction r = (Reaction) ((ReactionGlyph) glyph).getReactionInstance();
+			/*
+			 * this can happen when a glyph is graphical information only and not intended to be
+			 * used for calculations in the model
+			 */
+			if (r == null) return; 
 			if (r.isSetCompartment()) {
 				Node comp = compartmentGlyphMap.get(r.getCompartment());
 				if (comp != null) {
@@ -241,8 +250,12 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		}
 		else if (glyph instanceof SpeciesGlyph) {
 			Species s = (Species) ((SpeciesGlyph) glyph).getSpeciesInstance();
+			/*
+			 * this can happen when a glyph is graphical information only and not intended to be
+			 * used for calculations in the model
+			 */
+			if (s == null) return;
 			if (s.isSetCompartment()) {
-				logger.info(s.getId() + " " + s.getCompartment());
 				Node comp = compartmentGlyphMap.get(s.getCompartment());
 				if(comp != null) {
 					hm.setParentNode(node, comp);
