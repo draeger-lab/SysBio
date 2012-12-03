@@ -226,6 +226,11 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     double offsetX = (getWidth() - min)/2d;
     double offsetY = (getHeight() - min)/2d;
 
+    // FIXME
+//    if (isHorizontal() && (rotationAngle == 0)) {
+//    	rotationAngle = 90;
+//    }
+    
     rotate(gfx, rotationAngle, rotationCenter);
     
     gfx.setColor(Color.BLACK);
@@ -234,23 +239,12 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     // Draw the reaction node rectangle
     gfx.drawRect((int) offsetX + x, (int) offsetY + y, (int) min, (int) min);
     
-//    if (isHorizontal()) {
-      int halfHeight = (int) (getHeight()/2d);
-      
-      // Draw the small reaction lines on both sides, where substrates
-      // and products should dock.
-      gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) offsetX + x, halfHeight + y);
-      gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) getWidth() + x + extendBesidesBorder, halfHeight + y);
-      
-//    } else {
-//      // Rotate node by 90°
-//      int halfWidth = (int) (getWidth()/2d);
-//      
-//      // Draw the small reaction lines on both sides, where substrates
-//      // and products should dock.
-//      gfx.drawLine(halfWidth + x, 0 + y - extendBesidesBorder, halfWidth + x, (int) offsetY + y);
-//      gfx.drawLine(halfWidth + x, (int) (offsetY + min) + y, halfWidth + x, (int) getHeight() + y + extendBesidesBorder);
-//    }
+    int halfHeight = (int) (getHeight()/2d);
+    
+    // Draw the small reaction lines on both sides, where substrates
+    // and products should dock.
+    gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) offsetX + x, halfHeight + y);
+    gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) getWidth() + x + extendBesidesBorder, halfHeight + y);
     
     rotate(gfx, -rotationAngle, rotationCenter);
       
@@ -324,12 +318,21 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
   	this.lineWidth = lineWidth;
   }
 
+  /**
+   * 
+   * @param rotationAngle
+   */
 	public void setRotationAngle(double rotationAngle) {
 		this.rotationAngle = rotationAngle;
 	}
 
+	/**
+	 * 
+	 * @param rotationCenter
+	 */
 	public void setRotationCenter(Point rotationCenter) {
 		this.rotationCenter = rotationCenter;
 	}
   
 }
+
