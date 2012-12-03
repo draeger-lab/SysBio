@@ -24,14 +24,11 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.sbml.jsbml.ListOf;
-import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Point;
@@ -44,7 +41,6 @@ import org.sbml.jsbml.ext.layout.TextGlyph;
 import y.base.DataMap;
 import y.base.Edge;
 import y.base.Node;
-import y.geom.YPoint;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
@@ -402,8 +398,12 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			
 			// TODO calculate docking points for each SpeciesReferenceGlyph of
 			// this reaction
-			Reaction reaction = (Reaction) reactionGlyph.getReactionInstance();
-			logger.info("now calculate docking positions for " + reaction.getListOfProducts());
+//			Reaction reaction = (Reaction) reactionGlyph.getReactionInstance();
+//			for (SpeciesReferenceGlyph sRG : reactionGlyph.getListOfSpeciesReferenceGlyphs()) {
+//				logger.info("now calculate docking positions for " + sRG.getSpeciesGlyph());
+//				Point speciesDocking = calculateReactionGlyphDockingPointForSpecies(reactionGlyph, rotationAngle, sRG);
+//				logger.info(speciesDocking.toString());
+//			}
 		}
 		
 		return output;
@@ -421,24 +421,24 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		Edge edge = graph2D.createEdge(processNode, speciesGlyphNode);
 		
 		// copy edge data to curve of species reference glyph
-//		if (!srg.isSetCurve()) {
-		if (!srg.isSetCurve() || srg.getCurve().getListOfCurveSegments().isEmpty()) {
-			YPoint source = graph2D.getRealizer(edge).getSourcePoint();
-			Point start = new Point(source.getX(), source.getY(), 0.0);
-			YPoint target = graph2D.getRealizer(edge).getSourcePoint();
-			Point end = new Point(target.getX(), target.getY(), 0.0);
-
-			logger.info(String.format("add curve for rgId=%s  srgId=%s  start=%s  end=%s",
-					rg.getId(), srg.getId(), start.toString(), end.toString()));
-
-			CurveSegment curveSegment = new CurveSegment();
-			curveSegment.setStart(start);
-			curveSegment.setEnd(end);
+		if (!srg.isSetCurve()) {
+//		if (!srg.isSetCurve() || srg.getCurve().getListOfCurveSegments().isEmpty()) {
+//			YPoint source = graph2D.getRealizer(edge).getSourcePoint();
+//			Point start = new Point(source.getX(), source.getY(), 0.0);
+//			YPoint target = graph2D.getRealizer(edge).getSourcePoint();
+//			Point end = new Point(target.getX(), target.getY(), 0.0);
+//
+//			logger.info(String.format("add curve for rgId=%s  srgId=%s  start=%s  end=%s",
+//					rg.getId(), srg.getId(), start.toString(), end.toString()));
+//
+//			CurveSegment curveSegment = new CurveSegment();
+//			curveSegment.setStart(start);
+//			curveSegment.setEnd(end);
 
 			Curve curve = new Curve();
-			ListOf<CurveSegment> listOfCurveSegments = new ListOf<CurveSegment>();
-			listOfCurveSegments.add(curveSegment);
-			curve.setListOfCurveSegments(listOfCurveSegments);
+//			ListOf<CurveSegment> listOfCurveSegments = new ListOf<CurveSegment>();
+//			listOfCurveSegments.add(curveSegment);
+//			curve.setListOfCurveSegments(listOfCurveSegments);
 
 			srg.setCurve(curve);
 		}
