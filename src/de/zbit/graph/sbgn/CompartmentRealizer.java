@@ -61,7 +61,7 @@ public class CompartmentRealizer extends GroupNodeRealizer {
     setClosedGroupIcon(null);
     setOpenGroupIcon(null);
     
-    setMinimalInsets(new YInsets(7, 7, 7, 7)); // top, left, bottom, right
+    setMinimalInsets(new YInsets(15, 15, 15, 15)); // top, left, bottom, right
     setAutoBoundsEnabled(true);
     NodeLabel label = getLabel();
     // TODO DiscreteNodeLabelModel does not work as intended
