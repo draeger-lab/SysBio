@@ -221,7 +221,6 @@ public class GraphTools {
     for (Node n : graph.getNodeArray()) {
       dp.setBool(n, newNodes.contains(n));
       // Do never layout contents of any group node except for compartment nodes.
-      System.err.println(graph.getRealizer(n));
       if (hm!=null && hm.isGroupNode(n) &&
     		  (!(graph.getRealizer(n) instanceof CompartmentRealizer))) {
         ((GroupNodeRealizer)graph.getRealizer(n)).updateAutoSizeBounds();
@@ -495,8 +494,11 @@ public class GraphTools {
     }
     log.fine("Resetting layout for certain nodes.");
     
+    
     String splitBy = Pattern.quote("|");
     for (Node n: nodesToReset) {
+    	// keep compartment layout
+    	if (graph.getRealizer(n) instanceof CompartmentRealizer) continue;
       Object pos = nodeMap.get(n);
       if (pos==null) continue;
       // pos is always X|Y
