@@ -59,6 +59,7 @@ import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
+import de.zbit.graph.sbgn.CompartmentRealizer;
 
 /**
  * Various tools for {@link Graph2D} and also for
@@ -219,8 +220,10 @@ public class GraphTools {
     List<Node> otherNodes = new ArrayList<Node>();
     for (Node n : graph.getNodeArray()) {
       dp.setBool(n, newNodes.contains(n));
-      // Do never layout contents of any group node.
-      if (hm!=null && hm.isGroupNode(n)) {
+      // Do never layout contents of any group node except for compartment nodes.
+      System.err.println(graph.getRealizer(n));
+      if (hm!=null && hm.isGroupNode(n) &&
+    		  (!(graph.getRealizer(n) instanceof CompartmentRealizer))) {
         ((GroupNodeRealizer)graph.getRealizer(n)).updateAutoSizeBounds();
         dp2.set(n, SmartOrganicLayouter.GROUP_NODE_MODE_FIX_CONTENTS);
       }
