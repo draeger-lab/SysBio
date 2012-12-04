@@ -50,6 +50,7 @@ import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
+import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.sbml.layout.SimpleLayoutAlgorithm;
@@ -201,7 +202,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		height = (int) dimensions.getHeight();
 		
 		// Graph2D structure
-		NodeRealizer nodeRealizer = (glyph instanceof CompartmentGlyph) ? new GroupNodeRealizer() : new ShapeNodeRealizer();
+		NodeRealizer nodeRealizer = (glyph instanceof CompartmentGlyph) ? new CompartmentRealizer() : new ShapeNodeRealizer();
 		nodeRealizer.setSize(width, height);
 		nodeRealizer.setLocation(x, y);
 		Node node = graph2D.createNode(nodeRealizer);
@@ -282,7 +283,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		NodeRealizer nodeRealizer;
 		Node node;
 		if (!(glyph instanceof ReactionGlyph)) {
-			nodeRealizer = (glyph instanceof CompartmentGlyph) ? new GroupNodeRealizer() : new ShapeNodeRealizer();
+			nodeRealizer = (glyph instanceof CompartmentGlyph) ? new CompartmentRealizer() : new ShapeNodeRealizer();
 			node = graph2D.createNode(nodeRealizer);
 
 			// partially layouted: position only
