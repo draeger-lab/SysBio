@@ -1517,7 +1517,6 @@ public class GUITools {
 		    String osName = System.getProperty("os.name");
 		    if (osName.equals("Linux") || osName.equals("FreeBSD")) {
 		      UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-		      UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
 		      // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
 		    } else if (isMacOSX()) {
 		      String osVersion = System.getProperty("os.version");
@@ -1630,7 +1629,7 @@ public class GUITools {
    */
   public static String openFileDialog(final Component parent,
     String dialogTitle, boolean acceptURLs) {
-  	JFileChooser chooser = createJFileChooser(null, true,
+    JFileChooser chooser = createJFileChooser(null, true,
       false, JFileChooser.FILES_ONLY, (FileFilter)null);
     if (dialogTitle!=null) chooser.setDialogTitle(dialogTitle);
     if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
@@ -1674,9 +1673,6 @@ public class GUITools {
   public static File[] openFileDialog(final Component parent, String dir,
     boolean allFilesAcceptable, boolean multiSelectionAllowed, int mode,
     FileFilter... filter) {
-  	if ("GTK look and feel".equals(UIManager.getLookAndFeel().getName())){
-  	  UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
-  	}
     File[] ret = null;
     JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
       multiSelectionAllowed, mode, filter);
