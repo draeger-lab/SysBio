@@ -35,6 +35,7 @@ public class YPerturbingAgent extends PerturbingAgent<NodeRealizer> {
 	@Override
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth) {
+		// FIXME: Macromolecule is not the correct SBO term for perturbing agent! We need a different shape here!
 		NodeRealizer nodeRealizer =
 			SBGNVisualizationProperties.getNodeRealizer(SBO.getMacromolecule());
 		ShapeNodeRealizerSupportingCloneMarker shapeNodeRealizer =
