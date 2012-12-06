@@ -44,7 +44,6 @@ import y.base.Node;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
-import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.io.Graph2Dwriter;
@@ -186,7 +185,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		
 		// text glyphs (non-indepentend) without bounding box are considered
 		// layouted (positioning in center of graphical object)
-		if (glyph instanceof TextGlyph &&
+		if ((glyph instanceof TextGlyph) &&
 				!LayoutDirector.textGlyphIsIndependent((TextGlyph) glyph) &&
 				!glyph.isSetBoundingBox()) {
 			return;
@@ -560,7 +559,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 	 */
 	@Override
 	public Dimensions createSpeciesGlyphDimension() {
-		return new Dimensions(100, 100, 0, level, version);
+		return new Dimensions(100d, 100d, 0d, level, version);
 	}
 
 }

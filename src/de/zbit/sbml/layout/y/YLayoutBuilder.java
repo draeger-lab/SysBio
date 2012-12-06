@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBO;
-import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.layout.BoundingBox;
@@ -48,16 +47,11 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 import org.sbml.jsbml.util.StringTools;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 import y.base.Edge;
 import y.base.Node;
 import y.geom.OrientedRectangle;
 import y.layout.DiscreteEdgeLabelModel;
-import y.layout.DiscreteNodeLabelModel;
 import y.layout.FreeNodeLabelModel;
-import y.layout.LabelCandidate;
-import y.layout.NodeLabelModel;
 import y.view.BezierEdgeRealizer;
 import y.view.EdgeLabel;
 import y.view.EdgeRealizer;
@@ -460,14 +454,19 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 				logger.fine("using extra positioning for textglyph " + textGlyph.getId());
 				nodeLabel.setModelParameter(param);
 			}
-		}
-		else if (text != null) {
-			if ((namedSBase != null) && (namedSBase instanceof org.sbml.jsbml.Compartment)) {
+		} else if (text != null) {
+			if (namedSBase != null) {
 				NodeLabel nodeLabel;
 				nodeLabel = new NodeLabel(text);
-				nodeLabel.setModel(NodeLabel.INTERNAL);
-				nodeLabel.setPosition(NodeLabel.TOP_RIGHT);
-				nodeLabel.setDistance(20d);
+				if (namedSBase instanceof org.sbml.jsbml.Compartment) {
+					nodeLabel.setModel(NodeLabel.INTERNAL);
+					nodeLabel.setPosition(NodeLabel.TOP_RIGHT);
+					nodeLabel.setDistance(20d);	
+				} else if (namedSBase instanceof org.sbml.jsbml.Reaction) {
+					nodeLabel = new NodeLabel(text);
+					nodeLabel.setModel(NodeLabel.CORNERS);
+					nodeLabel.setPosition(NodeLabel.SE);	
+				}
 				originRealizer.setLabel(nodeLabel);
 			} else {
 				originRealizer.setLabelText(text);
