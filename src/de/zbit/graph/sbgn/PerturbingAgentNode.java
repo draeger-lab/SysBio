@@ -86,6 +86,9 @@ public class PerturbingAgentNode extends ShapeNodeRealizerSupportingCloneMarker 
     }
   }
 
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
   @Override
   public NodeRealizer createCopy(NodeRealizer nr) {
   	return new PerturbingAgentNode(nr);
