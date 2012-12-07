@@ -38,7 +38,7 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer implements SimpleC
    * Is this node a cloned node? (I.e. another
    * instance must exist in the same graph).
    */
-  private boolean isClonedNode=false;
+  private boolean isClonedNode = false;
   
   public NucleicAcidFeatureNode() {
     super(ShapeNodeRealizer.RECT);
@@ -91,14 +91,13 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer implements SimpleC
    */
   protected GeneralPath getPath() {
     int arc = (int) (getWidth()/10);
-    
     GeneralPath path = new GeneralPath();
     path.moveTo(getX(), getY());
-    path.lineTo(getX()+getWidth(), getY());
-    path.lineTo(getX()+getWidth(), getY()+getHeight()-arc);
-    path.quadTo(getX()+getWidth(), getY()+getHeight(), getX()+getWidth()-arc, getY()+getHeight());
-    path.lineTo(getX()+arc, getY()+getHeight());
-    path.quadTo(getX(), getY()+getHeight(), getX(), getY()+getHeight()-arc);
+    path.lineTo(getX() + getWidth(), getY());
+    path.lineTo(getX() + getWidth(), getY() + getHeight() - arc);
+    path.quadTo(getX() + getWidth(), getY() + getHeight(), getX() + getWidth() - arc, getY() + getHeight());
+    path.lineTo(getX() + arc, getY() + getHeight());
+    path.quadTo(getX(), getY() + getHeight(), getX(), getY() + getHeight() - arc);
     path.closePath();
     return path;
   }

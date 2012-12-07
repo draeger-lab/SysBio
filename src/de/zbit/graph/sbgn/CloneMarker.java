@@ -59,7 +59,7 @@ public interface CloneMarker {
    * This defines the exact amount of the lower part of a node,
    * that should be painted black.
    */
-  public final static double partToPaintBlack=1d/5d;
+  public final static double partToPaintBlack = 1d/5d;
   
   /**
    * Add or remove a clone marker to this node.
@@ -94,7 +94,9 @@ public interface CloneMarker {
   		if (nr.isNodeCloned()) {
   			// Create clip and draw black
   			gfx.setClip(shape);
-  			gfx.clip(new Rectangle((int) nr.getX(), (int)(nr.getY()+nr.getHeight()*(1d-partToPaintBlack)), (int)nr.getWidth(), (int) Math.ceil((nr.getHeight()*partToPaintBlack))));
+				gfx.clip(new Rectangle((int) nr.getX(), (int) (nr.getY() + nr
+						.getHeight() * (1d - partToPaintBlack)), (int) nr.getWidth(),
+					(int) Math.ceil((nr.getHeight() * partToPaintBlack))));
   			gfx.setColor(Color.BLACK);
   			gfx.fill(gfx.getClip());
   			// Reset

@@ -20,7 +20,7 @@ import org.sbml.jsbml.SBO;
 
 import y.view.NodeRealizer;
 import de.zbit.graph.io.def.SBGNVisualizationProperties;
-import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
+import de.zbit.graph.sbgn.CloneMarker;
 import de.zbit.sbml.layout.PerturbingAgent;
 
 /**
@@ -35,17 +35,16 @@ public class YPerturbingAgent extends PerturbingAgent<NodeRealizer> {
 	@Override
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth) {
-		// FIXME: Macromolecule is not the correct SBO term for perturbing agent! We need a different shape here!
 		NodeRealizer nodeRealizer =
-			SBGNVisualizationProperties.getNodeRealizer(SBO.getMacromolecule());
-		ShapeNodeRealizerSupportingCloneMarker shapeNodeRealizer =
-			new ShapeNodeRealizerSupportingCloneMarker(nodeRealizer);
+			SBGNVisualizationProperties.getNodeRealizer(SBO.getPertubingAgent()).createCopy();
 
-		shapeNodeRealizer.setNodeIsCloned(isSetCloneMarker());
-		shapeNodeRealizer.setSize(width, height);
-		shapeNodeRealizer.setLocation(x, y);
+		if (nodeRealizer instanceof CloneMarker) {
+			((CloneMarker) nodeRealizer).setNodeIsCloned(isSetCloneMarker());
+		}
+		nodeRealizer.setSize(width, height);
+		nodeRealizer.setLocation(x, y);
 		
-		return shapeNodeRealizer;
+		return nodeRealizer;
 	}
 
 }

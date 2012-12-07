@@ -36,6 +36,7 @@ import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.graph.sbgn.ComplexNode;
 import de.zbit.graph.sbgn.EmptySetNode;
 import de.zbit.graph.sbgn.NucleicAcidFeatureNode;
+import de.zbit.graph.sbgn.PerturbingAgentNode;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
 
@@ -129,6 +130,7 @@ public class SBGNVisualizationProperties {
     sbo2shape.put(materialEntityOfUnspecifiedNature, new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE)); // unspecified - material entity of unspecified nature
     
     sbo2shape.put(SBO.getEmptySet(), new EmptySetNode()); // empty set
+    sbo2shape.put(SBO.getPertubingAgent(), new PerturbingAgentNode()); // perturbing agent
     sbo2shape.put(SBO.getNonCovalentComplex(), new ComplexNode()); // complex - non-covalent complex
     for (int sbo : nonCovalentComplex_synonyms) {
       sbo2shape.put(sbo, sbo2shape.get(SBO.getNonCovalentComplex()));
@@ -177,6 +179,8 @@ public class SBGNVisualizationProperties {
     	return new Color(255, 204, 204); // Pink
     } else if (SBO.isChildOf(sboTerm, SBO.getCompartment())) {
     	return new Color(243, 243, 191);
+    } else if (SBO.isChildOf(sboTerm, SBO.getPertubingAgent())) {
+    	return new Color(255, 0, 255); // Drug pink
     } else {
       return new Color(144,238,144);   // LightGreen
     }
