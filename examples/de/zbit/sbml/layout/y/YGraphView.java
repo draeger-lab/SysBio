@@ -23,10 +23,12 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
+import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
 
 import y.view.DefaultGraph2DRenderer;
@@ -124,44 +126,57 @@ public class YGraphView implements PropertyChangeListener {
 		if (ext == null) {
 			new GlyphCreator(model).create();
 			ext = (ExtendedLayoutModel) model.getExtension(LayoutConstants.getNamespaceURI(doc.getLevel(), doc.getVersion()));
-
+		}
+		int layoutIndex = 0;
+		if (ext.getLayoutCount() > 1) {
+			String layouts[] = new String[ext.getLayoutCount()];
+			for (int i = 0; i < ext.getLayoutCount(); i++) {
+				Layout layout = ext.getLayout(i);
+				layouts[i] = layout.isSetName() ? layout.getName() : layout.getId();
+			}
+			layoutIndex = JOptionPane.showOptionDialog(null,
+				"Select the layout to be displayed", "Layout selection",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+				layouts, layouts[0]);
+			if (layoutIndex < 0) {
+				System.exit(0);
+			}
 		}
 		LayoutDirector<ILayoutGraph> director =
-				new LayoutDirector<ILayoutGraph>(doc,
-						new YLayoutBuilder(),
-						new YLayoutAlgorithm());
-			director.run();
-			Graph2D product = director.getBuilder().getProduct().getGraph2D();
-			
-			int width = 960, height = 720;
-			
-			Graph2DView view = new Graph2DView(product);
-			Rectangle box = view.getGraph2D().getBoundingBox();  
-			Dimension dim = box.getSize();  
-			view.setSize(dim);  
-	    // view.zoomToArea(box.getX() - 10, box.getY() - 10, box.getWidth() + 20, box.getHeight() + 20);
-			Dimension minimumSize = new Dimension( (int)Math.max(view.getMinimumSize().getWidth(), 100), (int) Math.max(view.getMinimumSize().getHeight(), height/2) );
-	    view.setMinimumSize(minimumSize);
-	    view.setPreferredSize(new Dimension(100, (int) Math.max(height * 0.6, 50)));
-			view.setOpaque(false);
-			((DefaultGraph2DRenderer) view.getGraph2DRenderer()).setDrawEdgesFirst(false);
-	    view.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
-	    try {
-	      view.fitContent(true);
-	    } catch (Throwable t) {
-	    	// Not really a problem
-	    }
-			RestrictedEditMode.addOverviewAndNavigation(view);
-	    view.setFitContentOnResize(true);
-
-	    JFrame frame = new JFrame();
-      frame.setTitle(YGraphView.class.getSimpleName());
-			frame.add(view);
-			frame.setMinimumSize(new Dimension(width, height));
-			frame.pack();
-			frame.setLocationRelativeTo(null);
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setVisible(true);
+				new LayoutDirector<ILayoutGraph>(doc, new YLayoutBuilder(), new YLayoutAlgorithm());
+		director.setLayoutIndex(layoutIndex);
+		director.run();
+		Graph2D product = director.getBuilder().getProduct().getGraph2D();
+		
+		int width = 960, height = 720;
+		
+		Graph2DView view = new Graph2DView(product);
+		Rectangle box = view.getGraph2D().getBoundingBox();  
+		Dimension dim = box.getSize();  
+		view.setSize(dim);  
+		// view.zoomToArea(box.getX() - 10, box.getY() - 10, box.getWidth() + 20, box.getHeight() + 20);
+		Dimension minimumSize = new Dimension( (int)Math.max(view.getMinimumSize().getWidth(), 100), (int) Math.max(view.getMinimumSize().getHeight(), height/2) );
+		view.setMinimumSize(minimumSize);
+		view.setPreferredSize(new Dimension(100, (int) Math.max(height * 0.6, 50)));
+		view.setOpaque(false);
+		((DefaultGraph2DRenderer) view.getGraph2DRenderer()).setDrawEdgesFirst(false);
+		view.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
+		try {
+			view.fitContent(true);
+		} catch (Throwable t) {
+			// Not really a problem
+		}
+		RestrictedEditMode.addOverviewAndNavigation(view);
+		view.setFitContentOnResize(true);
+		
+		JFrame frame = new JFrame();
+		frame.setTitle(YGraphView.class.getSimpleName());
+		frame.add(view);
+		frame.setMinimumSize(new Dimension(width, height));
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
 	}
 
 }
