@@ -45,6 +45,7 @@ public class YSimpleChemical extends SimpleChemical<NodeRealizer> {
 		shapeNodeRealizer.setSize(width, height);
 		shapeNodeRealizer.setLocation(x, y);
 
+		// TODO move this code up and perform circulation on glyphs, not on nodes
 		if (SBGNVisualizationProperties.isCircleShape(SBO.getSimpleMolecule())) {
 			// diameter of circle is minimum of width and height
 			double min = Math.min(width, height);

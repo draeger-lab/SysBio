@@ -296,7 +296,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		
 		// to dock correctly use
 		// edgeRealizer.setSourcePoint(yp);
-				
+		Point relativeDockingAtPN = (Point) srg.getUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT);
+		if (relativeDockingAtPN != null) {
+			edgeRealizer.setSourcePoint(new YPoint(relativeDockingAtPN.getX(), relativeDockingAtPN.getY()));
+		}
+		
 		if (srg.isSetSpeciesReference()) {
 			SpeciesReference speciesReference = (SpeciesReference) srg.getSpeciesReferenceInstance();
 			if (speciesReference.isSetStoichiometry() && speciesReference.getStoichiometry() != 1) {
