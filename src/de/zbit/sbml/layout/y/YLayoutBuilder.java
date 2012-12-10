@@ -50,6 +50,7 @@ import org.sbml.jsbml.util.StringTools;
 import y.base.Edge;
 import y.base.Node;
 import y.geom.OrientedRectangle;
+import y.geom.YPoint;
 import y.layout.DiscreteEdgeLabelModel;
 import y.layout.FreeNodeLabelModel;
 import y.view.BezierEdgeRealizer;
@@ -342,11 +343,12 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		Point rotationCenter = new Point(x + width / 2d, y + height / 2d, z + depth / 2d);
 		NodeRealizer reactionNodeRealizer = processNode.draw(
 			x, y, z, width, height, depth, rotationAngle, rotationCenter);
-		logger.info(MessageFormat.format("Process node position: {0} rotationAngle: {1} rotationCenter: {2}",
+		logger.fine(MessageFormat.format("Process node position: {0} rotationAngle: {1} rotationCenter: {2}",
 				point, rotationAngle, rotationCenter));
 		
 		Node processYNode = graph.createNode(reactionNodeRealizer);
 		id2node.put(reactionGlyph.getId(), processYNode);
+		putInMapSet(speciesId2Node, reactionGlyph.getReaction(), processYNode);
 		logger.fine(MessageFormat.format("building PN id={0} bounding box={1} {2}",
 				reactionGlyph.getId(), reactionGlyph.getBoundingBox().getPosition(), reactionNodeRealizer.getBoundingBox()));
 	}
@@ -407,8 +409,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		}
 		NodeRealizer originRealizer = graph.getRealizer(origin);
 
-		// TODO special positions for CompartmentGlyphs
-		
 		String text = null;
 		if (textGlyph.isSetText()) {
 			text = textGlyph.getText();
