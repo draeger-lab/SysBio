@@ -301,6 +301,12 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 			edgeRealizer.setSourcePoint(new YPoint(relativeDockingAtPN.getX(), relativeDockingAtPN.getY()));
 		}
 		
+		Point relativeDockingAtSpecies = (Point) srg.getUserObject(LayoutDirector.SPECIES_RELATIVE_DOCKING_POINT);
+		if (relativeDockingAtSpecies != null) {
+			logger.fine(relativeDockingAtSpecies.toString());
+			edgeRealizer.setTargetPoint(new YPoint(relativeDockingAtSpecies.getX(), relativeDockingAtSpecies.getY()));
+		}
+		
 		if (srg.isSetSpeciesReference()) {
 			SpeciesReference speciesReference = (SpeciesReference) srg.getSpeciesReferenceInstance();
 			if (speciesReference.isSetStoichiometry() && speciesReference.getStoichiometry() != 1) {
