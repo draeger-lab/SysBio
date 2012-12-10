@@ -185,6 +185,8 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 	@Override
 	public void addLayoutedGlyph(GraphicalObject glyph) {
 		logger.fine("add layouted glyph id=" + glyph.getId());
+
+		correctDimensions(glyph);
 		
 		// text glyphs (non-indepentend) without bounding box are considered
 		// layouted (positioning in center of graphical object)
@@ -425,16 +427,42 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			logger.fine("PN center: " + centerPosition);
 			for (SpeciesReferenceGlyph sRG : reactionGlyph.getListOfSpeciesReferenceGlyphs()) {
 				Point speciesDockingAtPN = calculateReactionGlyphDockingPointForSpecies(reactionGlyph, rotationAngle, sRG);
-				// make Point relative to center of PN
+				// make point relative to center of PN
 				Point relativeDockingAtPN = new Point(speciesDockingAtPN.getX() - centerPosition.getX(),
 						speciesDockingAtPN.getY() - centerPosition.getY(), DEFAULT_Z_COORD);
 				sRG.putUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT, relativeDockingAtPN);
 				
-				// TODO continue here
-//				SpeciesGlyph speciesGlyph = sRG.getSpeciesGlyphInstance();
-//				Point middleOfSpecies = calculateCenter(speciesGlyph);
-//				RelativePosition relativeSpeciesGlyphPosition;
-//				Point speciesDockingAtSelf = calculateSpeciesGlyphDockingPosition(middleOfSpecies, relativeSpeciesGlyphPosition, speciesGlyph);
+				SpeciesGlyph speciesGlyph = sRG.getSpeciesGlyphInstance();
+				Point middleOfSpecies = calculateCenter(speciesGlyph);
+				BoundingBox sgBoundingBox = speciesGlyph.getBoundingBox();
+				
+				SpeciesReferenceRole specRefRole = sRG.getSpeciesReferenceRole();
+				Point averageSubstratePosition = calculateAverageSpeciesPosition(SpeciesReferenceRole.SUBSTRATE, reactionGlyph.getListOfSpeciesReferenceGlyphs());
+				Point averageProductPosition = calculateAverageSpeciesPosition(SpeciesReferenceRole.PRODUCT, reactionGlyph.getListOfSpeciesReferenceGlyphs());
+
+				BoundingBox helpingBB1 = createBoundingBoxWithLevelAndVersion();
+				helpingBB1.setPosition(averageSubstratePosition);
+				helpingBB1.createDimensions(0, 0, 0);
+				BoundingBox helpingBB2 = createBoundingBoxWithLevelAndVersion();
+				helpingBB2.setPosition(averageProductPosition);
+				helpingBB2.createDimensions(0, 0, 0);
+				
+				RelativePosition relativeSpeciesGlyphPosition = null;
+				if (specRefRole.equals(SpeciesReferenceRole.PRODUCT)) {
+					relativeSpeciesGlyphPosition = getRelativePosition(helpingBB1, helpingBB2);
+				} else if (specRefRole.equals(SpeciesReferenceRole.SUBSTRATE)) {
+					relativeSpeciesGlyphPosition = getRelativePosition(helpingBB2, helpingBB1);
+				} else {
+					relativeSpeciesGlyphPosition = getRelativePosition(rgBoundingBox, sgBoundingBox);
+				}
+				
+				Point speciesDockingAtSelf = calculateSpeciesGlyphDockingPosition(middleOfSpecies, relativeSpeciesGlyphPosition, speciesGlyph);
+				// make point relative to center of species
+				Point relativeDockingAtSelf = new Point(speciesDockingAtSelf.getX() - middleOfSpecies.getX(),
+						speciesDockingAtSelf.getY() - middleOfSpecies.getY(), DEFAULT_Z_COORD);
+				sRG.putUserObject(LayoutDirector.SPECIES_RELATIVE_DOCKING_POINT, relativeDockingAtSelf);
+				
+				logger.fine(sRG.getId() + " docks relative at species " + relativeDockingAtSelf.toString());
 				logger.fine(sRG.getId() + " docks relative at PN " + relativeDockingAtPN.toString());
 			}
 		}
