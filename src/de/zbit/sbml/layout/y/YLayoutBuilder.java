@@ -124,6 +124,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	private Map<String, Set<Node>> compartmentId2Node = new HashMap<String, Set<Node>>();
 	
 	/**
+	 * Map reaction id to all yfiles process nodes.
+	 */
+	private Map<String, Set<Node>> reactionId2Node = new HashMap<String, Set<Node>>();
+	
+	/**
 	 * Map reaction glyph id to set of adjoining edges.
 	 */
 	private Map<String, Set<Edge>> reactionGlyphId2edges = new HashMap<String, Set<Edge>>();
@@ -348,7 +353,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		
 		Node processYNode = graph.createNode(reactionNodeRealizer);
 		id2node.put(reactionGlyph.getId(), processYNode);
-		putInMapSet(speciesId2Node, reactionGlyph.getReaction(), processYNode);
+		putInMapSet(reactionId2Node, reactionGlyph.getReaction(), processYNode);
 		logger.fine(MessageFormat.format("building PN id={0} bounding box={1} {2}",
 				reactionGlyph.getId(), reactionGlyph.getBoundingBox().getPosition(), reactionNodeRealizer.getBoundingBox()));
 	}
@@ -552,7 +557,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		}
 		ILayoutGraph layoutGraph = new LayoutGraph(speciesId2Node,
 				compartmentId2Node,
-				reactionId2Edge, 
+				reactionId2Node,
+				reactionId2Edge,
 				graph);
 
 		return layoutGraph;

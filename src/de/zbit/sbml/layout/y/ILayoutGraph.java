@@ -44,7 +44,12 @@ public interface ILayoutGraph {
 	public Map<String, Set<Node>> getCompartmentId2nodes();
 	
 	/**
-	 * Each value 
+	 * @return the reaction id -> set of process nodes map.
+	 */
+	
+	public Map<String, Set<Node>> getReactionId2nodes();
+	
+	/**
 	 * @return the reaction id -> set of list of edges map.
 	 */
 	public Map<String, Set<List<Edge>>> getReactionId2edges();
