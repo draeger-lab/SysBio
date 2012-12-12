@@ -40,8 +40,17 @@
     <!-- the path to the SysBio sources -->
   	<property name="src" location="${base}/src"/>
   	
+  	<!-- the version of the current release -->
+  	<property name="version" value="1.2"/>
+  	
+  	<!-- path to examples folder -->
+  	<property name="examples" location="${base}/examples"/>
+  	
+  	<!-- path to MacOSX support -->
+  	<property name="mac_support" location="${base}/src_mac_api"/>
+  	
   	<!-- the path to the SysBio sources -->
-  	<property name="doc" location="${base}/doc/JavaDoc"/>
+  	<property name="doc" location="${base}/doc/api"/>
   	
     <!-- the path to the SysBio binaries -->
     <property name="classes" location="${base}/bin"/>
@@ -198,14 +207,45 @@
   </target>
 
 
-  <target name="javadoc" depends="init" description="Creates Javadoc for the SysBio Framework">
+  <target
+  	name="javadoc"
+  	depends="init"
+  	description="Creates Javadoc for the SysBio Framework">
+  	
   	<mkdir dir="${doc}"/>
-		<javadoc sourcepath="${src}"
-            destdir="${doc}"
-            packagenames="de.zbit.*"
-            footer="Generated ${TODAY}"/>
-	</target>	
-	
+  	<mkdir dir="${doc}/version_${version}"/>
+	<javadoc
+      sourcepath="${src}:${test}:${resources}:${examples}:${mac_support}"
+      destdir="${doc}/version_${version}"
+      packagenames="de.zbit.*"
+      footer="Generated ${TODAY}"
+      access="protected"
+      author="true"
+      doctitle="SysBio Library ${version}"
+      nodeprecated="false"
+      nodeprecatedlist="false"
+      noindex="false"
+      nonavbar="false"
+      notree="false"
+      source="1.6"
+      splitindex="true"
+      use="true"
+      stylesheetfile="${doc}/javadoc-style.css" 
+      overview="${src}/overview.html"
+      classpath="${lib}/junit-4.3.1.jar:${lib}/jsbml-1.0-a1-with-dependencies.jar:${lib}/jaxrpc.jar:${lib}/axis.jar:${lib}/commons-cli-1.1.jar:${lib}/commons-discovery.jar:${lib}/commons-logging.jar:${lib}/jaxrpc.jar:${lib}/keggapi.jar:${lib}/WSDbfetch.jar:${lib}/wsdl4j.jar:${lib}/quaqua.jar:${lib}/graph/org.sbgn.jar:${lib}/graph/y.jar:${lib}/garuda/garuda-csr.jar:${lib}/garuda/jsonic-1.2.10.jar:${lib}/garuda/log4j-1.2.16.jar"
+      version="true">
+		<link href="http://commons.apache.org/io/api-1.4/"/>
+		<link href="http://commons.apache.org/math/api-2.2/"/>
+		<link href="http://download.oracle.com/javase/6/docs/api/"/>
+		<link href="http://javasourcecode.org/html/open-source/junit/junit-4.8/"/>
+		<link href="http://jaxen.codehaus.org/apidocs/"/>
+		<link href="http://sbml.org/Special/Software/JSBML/latest-stable/build/apidocs/"/>
+		<link href="http://www.jdom.org/docs/apidocs.1.1/"/>
+		<link href="http://www.xom.nu/apidocs/"/>
+		<link href="http://docs.yworks.com/yfiles/doc/api/"/>
+    </javadoc>
+  	
+  </target>
 	
 	<target name="svnrevision" depends="init">
 	    <exec executable="svnversion" outputproperty="repository.revision">
