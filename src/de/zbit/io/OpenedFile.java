@@ -82,7 +82,6 @@ public class OpenedFile<T> implements PropertyChangeListener {
 		this();
 		this.file = file;
 		this.document = document;
-		this.setChanged(true);
 		this.propertyChangeSupport = new PropertyChangeSupport(this);
 	}
 
