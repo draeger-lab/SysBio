@@ -179,7 +179,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       // Initially define 100 steps between minimum and maximum.
       double d = (maximum.doubleValue() - minimum.doubleValue()) / 100;
       try {
-        // 0.95 is INTEGER paresed to "0" => round before doing that
+        // 0.95 is INTEGER parsed to "0" => round before doing that
         //stepSize = option.parseOrCast(d);
         if (Utils.isInteger(option.getRequiredType())) {
           d = Math.ceil(d);
@@ -202,7 +202,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField().setColumns(TEXTFIELD_COLUMNS);
     }
     
-    // Show smaller numbers if data type us double
+    // Show smaller numbers if data type is double
     if (Double.class.isAssignableFrom(initialValue.getClass())) {
       spinner.setEditor(new JSpinner.NumberEditor(spinner, "#." + StringUtil.replicateCharacter("#", TEXTFIELD_COLUMNS - 2)));
       JSpinner.NumberEditor editor = (JSpinner.NumberEditor) spinner.getEditor();
