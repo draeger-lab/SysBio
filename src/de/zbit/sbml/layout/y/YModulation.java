@@ -50,8 +50,9 @@ public class YModulation implements Modulation<EdgeRealizer> {
 
 	@Override
 	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		// TODO Auto-generated method stub
-		return null;
+		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
+		edgeRealizer.setSourceArrow(Arrow.WHITE_DIAMOND);
+		return edgeRealizer;
 	}
 
 }

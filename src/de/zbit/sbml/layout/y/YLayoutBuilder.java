@@ -17,7 +17,6 @@
 
 package de.zbit.sbml.layout.y;
 
-import java.awt.Color;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,7 +50,6 @@ import y.base.Edge;
 import y.base.Node;
 import y.geom.OrientedRectangle;
 import y.geom.YPoint;
-import y.layout.DiscreteEdgeLabelModel;
 import y.layout.FreeNodeLabelModel;
 import y.view.BezierEdgeRealizer;
 import y.view.EdgeLabel;
@@ -134,6 +132,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	private Map<String, Set<Edge>> reactionGlyphId2edges = new HashMap<String, Set<Edge>>();
 	
 	/**
+	 * Map a species id to the set of reactions the species is involved in.
+	 */
+	private Map<String, Set<String>> speciesId2reactions = new HashMap<String, Set<String>>();
+	
+	/**
 	 * Set to hold all text glyphs which label a specific node.
 	 */
 	Set<TextGlyph> labelTextGlyphs;
@@ -176,8 +179,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	 */
 	@Override
 	public void buildCompartment(CompartmentGlyph compartmentGlyph) {
-		// TODO compartmentGlyph.getSBOTerm() returns -1
-		// see below for EPNs, are species sbo copied to species glyph sbo by layoutdirector?
+		// TODO concerning compartmentGlyph.getSBOTerm
+		// LayoutDirector copies species SBO to glyph, but not for compartments
 		SBGNNode<NodeRealizer> node = getSBGNNode(SBO.getCompartment());
 		
 		BoundingBox boundingBox = compartmentGlyph.getBoundingBox();
@@ -276,6 +279,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		logger.fine(String.format("building arc srgId=%s to rgId=%s", srg.getId(), rg.getId()));
 		
 		Node processNode = id2node.get(rg.getId());
+		SpeciesGlyph speciesGlyph = srg.getSpeciesGlyphInstance();
+		String speciesId = speciesGlyph.getSpecies();
 		Node speciesGlyphNode = id2node.get(srg.getSpeciesGlyph());
 		assert processNode != null;
 		assert speciesGlyphNode != null;
@@ -288,47 +293,30 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 			arc = getSBGNArc(srg.getSpeciesReferenceRole());
 			logger.fine("SRG role " + srg.getSpeciesReferenceRole());
 		}
+
+		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve(), curveWidth);
 		
-		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve());
-		// TODO EdgeRealizer edgeRealizer = arc.draw(srg.getCurve(), width);
-		// also set line width on process node
-		edgeRealizer = edgeRealizer.createCopy();
-		
-		// to dock correctly use
-		// edgeRealizer.setSourcePoint(yp);
+		// dock correctly at process node
 		Point relativeDockingAtPN = (Point) srg.getUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT);
 		if (relativeDockingAtPN != null) {
 			edgeRealizer.setSourcePoint(new YPoint(relativeDockingAtPN.getX(), relativeDockingAtPN.getY()));
 		}
 		
-		Point relativeDockingAtSpecies = (Point) srg.getUserObject(LayoutDirector.SPECIES_RELATIVE_DOCKING_POINT);
-		if (relativeDockingAtSpecies != null) {
-			logger.fine(relativeDockingAtSpecies.toString());
-			edgeRealizer.setTargetPoint(new YPoint(relativeDockingAtSpecies.getX(), relativeDockingAtSpecies.getY()));
-		}
+		// docking at species works automatically, YFiles points the edge towards the center of the node
 		
+		// display stoichiometry labels
 		if (srg.isSetSpeciesReference()) {
 			SpeciesReference speciesReference = (SpeciesReference) srg.getSpeciesReferenceInstance();
 			if (speciesReference.isSetStoichiometry() && speciesReference.getStoichiometry() != 1) {
-				// stoichiometry number
-				EdgeLabel edgeLabel = new EdgeLabel(StringTools.toString(speciesReference.getStoichiometry()));
-
-				// TODO maybe create extra EdgeLabel subclass for stoichiometry labels
-				// placement
-				DiscreteEdgeLabelModel elModel = new DiscreteEdgeLabelModel();  
-				elModel.setDistance(0.0);
-				edgeLabel.setLabelModel(elModel);
-				edgeLabel.setModelParameter(DiscreteEdgeLabelModel.createPositionParameter(DiscreteEdgeLabelModel.TTAIL));
-				
-				// border
-				edgeLabel.setLineColor(Color.BLACK);
-				
+				String value = StringTools.toString(speciesReference.getStoichiometry());
+				EdgeLabel edgeLabel = new StoichiometryLabel(value);
 				edgeRealizer.addLabel(edgeLabel);
 			}
 		}
 
 		Edge edge = graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
 		putInMapSet(reactionGlyphId2edges, rg.getId(), edge);
+		putInMapSet(speciesId2reactions, speciesId, rg.getReaction());
 	}
 
 	/* (non-Javadoc)
@@ -336,6 +324,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	 */
 	@Override
 	public void buildCubicBezier(CubicBezier cubicBezier) {
+		// partial edge drawing is not supported
 	}
 
 	/* (non-Javadoc)
@@ -396,7 +385,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 			// TODO maybe implement a IndependentTextRealizer for better presentation
 			NodeRealizer nr = graph.getRealizer(ynode);
 			nr.setLabelText(text);
-			nr.setFrame(x, y, width, height);
+			nr.setSize(width, height);
+			nr.setLocation(x, y);
 		}
 		else if (textGlyph.isSetGraphicalObject() &&
 				(textGlyph.isSetOriginOfText() || textGlyph.isSetText())) {
@@ -556,7 +546,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		for (Reaction reaction : layout.getModel().getListOfReactions()) {
 			String reactionId = reaction.getId();
 			Set<List<Edge>> edgeListSet= new HashSet<List<Edge>>();
-			@SuppressWarnings("unchecked")
 			List<NamedSBaseGlyph> reactionGlyphs = (List<NamedSBaseGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
 			if (reactionGlyphs != null) {
 				for (NamedSBaseGlyph reactionGlyph : reactionGlyphs) {
@@ -569,6 +558,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 				compartmentId2Node,
 				reactionId2Node,
 				reactionId2Edge,
+				speciesId2reactions,
 				graph);
 
 		return layoutGraph;

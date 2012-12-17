@@ -414,8 +414,9 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 				position = reactionGlyph.getBoundingBox().getPosition();
 			}
 			else {
-				position = createReactionGlyphPosition(reactionGlyph);
+				position = createReactionGlyphPositionNew(reactionGlyph);
 			}
+			logger.info(position.toString());
 			reactionNodeRealizer.setLocation(position.getX(), position.getY());
 			
 			BoundingBox rgBoundingBox = reactionGlyph.isSetBoundingBox() ?

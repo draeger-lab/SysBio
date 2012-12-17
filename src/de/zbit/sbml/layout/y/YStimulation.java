@@ -41,8 +41,9 @@ public class YStimulation implements Stimulation<EdgeRealizer> {
 
 	@Override
 	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		// TODO Auto-generated method stub
-		return null;
+		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
+		edgeRealizer.setSourceArrow(Arrow.WHITE_DELTA);
+		return edgeRealizer;
 	}
 
 	@Override

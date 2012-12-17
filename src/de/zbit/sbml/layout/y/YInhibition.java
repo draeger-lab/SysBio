@@ -42,8 +42,9 @@ public class YInhibition implements Inhibition<EdgeRealizer> {
 
 	@Override
 	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		// TODO Auto-generated method stub
-		return null;
+		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
+		edgeRealizer.setSourceArrow(Arrow.T_SHAPE);
+		return edgeRealizer;
 	}
 
 	@Override

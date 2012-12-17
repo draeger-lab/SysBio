@@ -55,6 +55,11 @@ public interface ILayoutGraph {
 	public Map<String, Set<List<Edge>>> getReactionId2edges();
 	
 	/**
+	 * @return the species id -> set of reaction species is involved in
+	 */
+	public Map<String, Set<String>> getSpeciesId2reactions();
+	
+	/**
 	 * @return the Graph2D visual representation.
 	 */
 	public Graph2D getGraph2D();
