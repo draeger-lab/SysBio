@@ -43,8 +43,10 @@ public class YNecessaryStimulation implements
 
 	@Override
 	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		// TODO Auto-generated method stub
-		return null;
+		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
+		// TODO wrong arrow
+		edgeRealizer.setSourceArrow(Arrow.PLAIN);
+		return edgeRealizer;
 	}
 
 	@Override

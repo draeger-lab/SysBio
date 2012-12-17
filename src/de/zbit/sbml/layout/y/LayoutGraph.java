@@ -36,6 +36,7 @@ public class LayoutGraph implements ILayoutGraph {
 	private Map<String, Set<Node>> compartmentId2nodes;
 	private Map<String, Set<Node>> reactionId2nodes;
 	private Map<String, Set<List<Edge>>> reactionId2edges;
+	private Map<String, Set<String>> speciesId2reactions;
 	private Graph2D graph2D;
 	
 	/**
@@ -47,11 +48,13 @@ public class LayoutGraph implements ILayoutGraph {
 	public LayoutGraph(Map<String, Set<Node>> speciesId2nodes,
 			Map<String, Set<Node>> compartmentId2nodes,
 			Map<String, Set<Node>> reactionId2nodes,
-			Map<String, Set<List<Edge>>> reactionId2edges, Graph2D graph2d) {
+			Map<String, Set<List<Edge>>> reactionId2edges,
+			Map<String, Set<String>> speciesId2reactions, Graph2D graph2d) {
 		this.speciesId2nodes = speciesId2nodes;
 		this.compartmentId2nodes = compartmentId2nodes;
 		this.reactionId2edges = reactionId2edges;
 		this.reactionId2nodes = reactionId2nodes;
+		this.speciesId2reactions = speciesId2reactions;
 		graph2D = graph2d;
 	}
 
@@ -93,6 +96,14 @@ public class LayoutGraph implements ILayoutGraph {
 	@Override
 	public Map<String, Set<Node>> getReactionId2nodes() {
 		return reactionId2nodes;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.y.ILayoutGraph#getSpeciesId2reactions()
+	 */
+	@Override
+	public Map<String, Set<String>> getSpeciesId2reactions() {
+		return speciesId2reactions;
 	}
 	
 }
