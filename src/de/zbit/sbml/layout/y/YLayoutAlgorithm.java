@@ -416,7 +416,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			else {
 				position = createReactionGlyphPositionNew(reactionGlyph);
 			}
-			logger.info(position.toString());
+
 			reactionNodeRealizer.setLocation(position.getX(), position.getY());
 			
 			BoundingBox rgBoundingBox = reactionGlyph.isSetBoundingBox() ?
@@ -432,7 +432,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 				Point relativeDockingAtPN = new Point(speciesDockingAtPN.getX() - centerPosition.getX(),
 						speciesDockingAtPN.getY() - centerPosition.getY(), DEFAULT_Z_COORD);
 				sRG.putUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT, relativeDockingAtPN);
-				
+				/*
 				SpeciesGlyph speciesGlyph = sRG.getSpeciesGlyphInstance();
 				Point middleOfSpecies = calculateCenter(speciesGlyph);
 				BoundingBox sgBoundingBox = speciesGlyph.getBoundingBox();
@@ -464,6 +464,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 				sRG.putUserObject(LayoutDirector.SPECIES_RELATIVE_DOCKING_POINT, relativeDockingAtSelf);
 				
 				logger.fine(sRG.getId() + " docks relative at species " + relativeDockingAtSelf.toString());
+				*/
 				logger.fine(sRG.getId() + " docks relative at PN " + relativeDockingAtPN.toString());
 			}
 		}
