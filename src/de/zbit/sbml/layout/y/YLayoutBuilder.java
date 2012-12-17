@@ -43,6 +43,7 @@ import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
+import org.sbml.jsbml.ext.layout.SpeciesReferenceRole;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 import org.sbml.jsbml.util.StringTools;
 
@@ -138,6 +139,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	
 	/**
 	 * Map a species id to the set of reactions the species is involved in.
+	 * For each species only the reactions where species is necessary are listed.
 	 */
 	private Map<String, Set<String>> speciesId2reactions = new HashMap<String, Set<String>>();
 	
@@ -322,7 +324,35 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 
 		Edge edge = graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
 		putInMapSet(reactionGlyphId2edges, rg.getId(), edge);
-		putInMapSet(speciesId2reactions, speciesId, rg.getReaction());
+		if (neccessary(srg)) {
+			putInMapSet(speciesId2reactions, speciesId, rg.getReaction());
+		}
+	}
+
+	/**
+	 * checks if given SpeciesReferenceGlyph is necessary for
+	 * the reaction to take place
+	 * @param srg
+	 * @return
+	 */
+	private boolean neccessary(SpeciesReferenceGlyph srg) {
+		if (srg.isSetSBOTerm()) {
+			int sbo = srg.getSBOTerm();
+			if (SBO.isChildOf(sbo, SBO.getProduct())
+					|| SBO.isChildOf(sbo, SBO.getReactant())
+					|| SBO.isChildOf(sbo, SBO.getEssentialActivator())) {
+				return true;
+			}
+			return false;
+		}
+		else {
+			SpeciesReferenceRole role = srg.getSpeciesReferenceRole(); 
+			switch (role) {
+				case INHIBITOR: return false;
+				case ACTIVATOR: return false; //TODO not sure
+			}
+			return true;
+		}
 	}
 
 	/* (non-Javadoc)
