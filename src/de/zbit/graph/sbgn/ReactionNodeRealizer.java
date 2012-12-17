@@ -23,9 +23,10 @@ package de.zbit.graph.sbgn;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.util.Arrays;
 import java.util.Set;
+
+import org.sbml.jsbml.util.StringTools;
 
 import y.base.Edge;
 import y.base.EdgeCursor;
@@ -50,7 +51,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
 	 */
 	private float lineWidth;
 	private double rotationAngle;
-	private Point rotationCenter;
+	private java.awt.geom.Point2D.Double rotationCenter;
     
 	/**
 	 * 
@@ -243,7 +244,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     
     // Draw the small reaction lines on both sides, where substrates
     // and products should dock.
-    gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) offsetX + x, halfHeight + y);
+    gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
     gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) getWidth() + x + extendBesidesBorder, halfHeight + y);
     
     rotate(gfx, -rotationAngle, rotationCenter);
@@ -256,7 +257,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
    * @param rotationAngle
    * @param rotationCenter
    */
-  private void rotate(Graphics2D gfx, double rotationAngle, Point rotationCenter) {
+  private void rotate(Graphics2D gfx, double rotationAngle, java.awt.geom.Point2D.Double rotationCenter) {
   	if (rotationAngle % 180 != 0) {
     	if (rotationCenter != null) {
     		gfx.rotate(Math.toRadians(rotationAngle), rotationCenter.getX(), rotationCenter.getY());
@@ -330,9 +331,26 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
 	 * 
 	 * @param rotationCenter
 	 */
-	public void setRotationCenter(Point rotationCenter) {
+	public void setRotationCenter(java.awt.geom.Point2D.Double rotationCenter) {
 		this.rotationCenter = rotationCenter;
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return StringTools.concat(getClass().getSimpleName(),
+				" [x=", x,
+				", y=", y,
+				", width=", width,
+				", height=", height,
+				", rotationCenter=", rotationCenter,
+				", rotationAngle=", rotationAngle,
+				", fill=", getFillColor(), ", line=", getLineColor(),
+				"]").toString();
+	}
+
   
 }
 

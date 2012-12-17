@@ -89,6 +89,11 @@ import de.zbit.util.progressbar.ProgressListener;
  */
 public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeRealizer,EdgeRealizer> {
 
+	/**
+	 * curve segment type cubic bezier
+	 */
+	private static final String CURVESEGMENT_CUBICBEZIER = "CubicBezier";
+
 	private static Logger logger = Logger.getLogger(YLayoutBuilder.class.toString());
 
 	/**
@@ -179,8 +184,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	 */
 	@Override
 	public void buildCompartment(CompartmentGlyph compartmentGlyph) {
-		// TODO concerning compartmentGlyph.getSBOTerm
-		// LayoutDirector copies species SBO to glyph, but not for compartments
 		SBGNNode<NodeRealizer> node = getSBGNNode(SBO.getCompartment());
 		
 		BoundingBox boundingBox = compartmentGlyph.getBoundingBox();
@@ -298,8 +301,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		
 		// dock correctly at process node
 		Point relativeDockingAtPN = (Point) srg.getUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT);
+		double x = relativeDockingAtPN.getX();
+		double y = relativeDockingAtPN.getY();
+//		relativeDockingAtPN = new Point(0, 0, 0, relativeDockingAtPN.getLevel(), relativeDockingAtPN.getVersion());
 		if (relativeDockingAtPN != null) {
-			edgeRealizer.setSourcePoint(new YPoint(relativeDockingAtPN.getX(), relativeDockingAtPN.getY()));
+			edgeRealizer.setSourcePoint(new YPoint(x, y));
 		}
 		
 		// docking at species works automatically, YFiles points the edge towards the center of the node
@@ -495,8 +501,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 				// if all curve segments are beziers, use BezierEdgeRealizer, else use PolyLineEdgeRealizer
 				boolean drawBezier = true;
 				for (CurveSegment curveSegment : listOfCurveSegments) {
-					// TODO there should be a constant for this string
-					drawBezier = drawBezier && curveSegment.isSetType() && curveSegment.getType().equals("CubicBezier");
+					drawBezier = drawBezier && curveSegment.isSetType() && curveSegment.getType().equals(CURVESEGMENT_CUBICBEZIER);
 					if (!drawBezier) {
 						break;
 					}

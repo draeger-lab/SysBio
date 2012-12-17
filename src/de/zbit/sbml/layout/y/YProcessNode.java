@@ -16,6 +16,8 @@
  */
 package de.zbit.sbml.layout.y;
 
+import java.awt.geom.Point2D;
+
 import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
 
@@ -73,7 +75,7 @@ public class YProcessNode extends ProcessNode<NodeRealizer> {
 		if ((rotationAngle % 180) != 0) {
 			reactionNodeRealizer.setRotationAngle(rotationAngle);
 			if (rotationCenter != null) {
-				java.awt.Point point = new java.awt.Point();
+				java.awt.geom.Point2D.Double point = new Point2D.Double();
 				point.setLocation(rotationCenter.getX(), rotationCenter.getY());
 				reactionNodeRealizer.setRotationCenter(point);
 			}
