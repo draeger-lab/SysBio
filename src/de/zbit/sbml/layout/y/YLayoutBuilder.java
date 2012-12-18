@@ -303,6 +303,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		
 		// dock correctly at process node
 		Point relativeDockingAtPN = (Point) srg.getUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT);
+		logger.fine(MessageFormat.format("srg={0} rg={1} dock relative at PN {2}", srg.getId(), rg.getId(), relativeDockingAtPN));
 		double x = relativeDockingAtPN.getX();
 		double y = relativeDockingAtPN.getY();
 //		relativeDockingAtPN = new Point(0, 0, 0, relativeDockingAtPN.getLevel(), relativeDockingAtPN.getVersion());
@@ -418,11 +419,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 					textGlyph.getId(), text));
 
 			Node ynode = graph.createNode();
-			// TODO maybe implement a IndependentTextRealizer for better presentation
-			NodeRealizer nr = graph.getRealizer(ynode);
-			nr.setLabelText(text);
-			nr.setSize(width, height);
-			nr.setLocation(x, y);
+			YIndependentTextRealizer textRealizer =
+				new YIndependentTextRealizer(x, y, width, height,text);
+			graph.setRealizer(ynode, textRealizer);
 		}
 		else if (textGlyph.isSetGraphicalObject() &&
 				(textGlyph.isSetOriginOfText() || textGlyph.isSetText())) {
