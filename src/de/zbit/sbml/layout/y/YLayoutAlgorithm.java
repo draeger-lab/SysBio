@@ -17,11 +17,12 @@
 package de.zbit.sbml.layout.y;
 
 import java.awt.Rectangle;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.ListOf;
@@ -417,7 +418,16 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 				position = createReactionGlyphPositionNew(reactionGlyph);
 			}
 
-			reactionNodeRealizer.setLocation(position.getX(), position.getY());
+			double x = 0d, y = 0d;
+			if (position != null) {
+				x = position.getX();
+				y = position.getY();
+			} else {
+				logger.warning(MessageFormat.format(
+					"No position given for reaction glyph {0}",
+					reactionGlyph));
+			}
+			reactionNodeRealizer.setLocation(x, y);
 			
 			BoundingBox rgBoundingBox = reactionGlyph.isSetBoundingBox() ?
 					reactionGlyph.getBoundingBox() : reactionGlyph.createBoundingBox();

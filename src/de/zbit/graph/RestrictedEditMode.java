@@ -220,7 +220,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    * @param imagePath URL of the image to display
    * @param pane the content pane
    * @param brighten percentage for brightening the image. Set to 0 to disable.
-   * @param greyscale <code>TRUE</code> if the image should be converted to a greyscale image.
+   * @param greyscale {@code true} if the image should be converted to a greyscale image.
    * @return thread that is executing the task.
    */
   public static Thread addDynamicBackgroundImage(final URL imagePath, final Graph2DView pane, final int brighten, final boolean greyscale) {
@@ -352,15 +352,15 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       if (kgId!=null && kgId.toLowerCase().startsWith("path:")) {
         // Dirty check if it is the title node via green color of title nodes.
         Object color = (GraphTools.getNodeInfoIDs(n, GraphMLmaps.NODE_COLOR));
-        if (((color!=null && color.equals("#00FF00")) || aListener==null) && 
-            url!=null && url.toString().toLowerCase().startsWith("http")) {
+        if ((((color != null) && color.equals("#00FF00")) || (aListener == null)) && 
+            (url != null) && url.toString().toLowerCase().startsWith("http")) {
           SystemBrowser.openURL(url.toString());
           ev.consume();
           return;
         }
           
         // Open clicked pathway in a new tab
-        if (aListener!=null) {
+        if (aListener != null) {
         	// TODO: Yes and No are already localized by standard JAVA. Use those!
           int ret = GUITools.showQuestionMessage(null, "Do you want to download and open the referenced pathway in a new tab?", 
           	System.getProperty("app.name"), new Object[]{"Yes", "No"});
@@ -372,7 +372,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
         }
       } else {
         // All non-pathway reference nodes
-        if (url!=null && url.toString().toLowerCase().startsWith("http")) {
+        if ((url != null) && url.toString().toLowerCase().startsWith("http")) {
           SystemBrowser.openURL(url.toString());
           ev.consume();
         }
@@ -448,7 +448,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     }
     Box rightPanel = new Box(BoxLayout.Y_AXIS);
     
-    if (propTable==null) {
+    if (propTable == null) {
       propTable = createPropertiesTable();
     }
     JScrollPane scrollPane = new JScrollPane(propTable);
@@ -524,7 +524,11 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     return propTable;
   }
   
-  
+  /**
+   * 
+   * @param view
+   * @return
+   */
   private static Overview createOverview(Graph2DView view) {
     Overview ov = new Overview(view);
     /* customize the overview */
@@ -544,6 +548,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     ov.setBorder(BorderFactory.createEtchedBorder());
     return ov;
   }
+  /**
+   * 
+   * @param view
+   * @param scrollStepSize
+   * @param scrollTimerDelay
+   * @return
+   */
   private static NavigationComponent createNavigationComponent(Graph2DView view, double scrollStepSize, int scrollTimerDelay) {
     //create the NavigationComponent itself
     final NavigationComponent navigation = new NavigationComponent(view);
@@ -558,12 +569,20 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     //add a mouse listener that will make a semi transparent background, as soon as the mouse enters this component
     navigation.setBackground(new Color(255, 255, 255, 0));
     MouseAdapter navigationToolListener = new MouseAdapter() {
-      public void mouseEntered(MouseEvent e) {
+      /* (non-Javadoc)
+       * @see java.awt.event.MouseAdapter#mouseEntered(java.awt.event.MouseEvent)
+       */
+    	@Override
+    	public void mouseEntered(MouseEvent e) {
         super.mouseEntered(e);
         Color background = navigation.getBackground();
         //add some semi transparent background
         navigation.setBackground(new Color(background.getRed(), background.getGreen(), background.getBlue(), 196));
       }
+      /* (non-Javadoc)
+       * @see java.awt.event.MouseAdapter#mouseExited(java.awt.event.MouseEvent)
+       */
+      @Override
       public void mouseExited(MouseEvent e) {
         super.mouseExited(e);
         Color background = navigation.getBackground();
@@ -590,8 +609,8 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     // this listener is fired.
     
     //Update the properties table
-    if (propTable==null || (parent!=null && !parent.isEnabled()) ) {
-      if (eastPanel!=null && eastPanel.isVisible()) {
+    if ((propTable == null) || ((parent != null) && !parent.isEnabled())) {
+      if ((eastPanel != null) && eastPanel.isVisible()) {
         eastPanel.setVisible(false);
       }
       return;
@@ -599,13 +618,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     
     if (e.getSubject() instanceof Node) {
       Node node = (Node) e.getSubject();
-      if(getGraph2D().isSelected(node)) {
+      if (getGraph2D().isSelected(node)) {
         updatePropertiesTable(node);
       }
       eastPanel.setVisible((propTable.getModel().getRowCount()>0));
     } else if (e.getSubject() instanceof Edge) {
       Edge edge = (Edge) e.getSubject();
-      if(getGraph2D().isSelected(edge)) {
+      if (getGraph2D().isSelected(edge)) {
         updatePropertiesTable(edge);
       }
       

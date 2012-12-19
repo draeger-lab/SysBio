@@ -21,6 +21,7 @@ import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -121,6 +122,10 @@ public class YGraphView implements PropertyChangeListener {
 	 * @param doc
 	 */
 	private void setSBMLDocument(SBMLDocument doc) {
+		if (doc == null) {
+			Logger.getLogger(YGraphView.class.getName()).warning("No SBML document given.");
+			System.exit(1);
+		}
 		Model model = doc.getModel();
 		ExtendedLayoutModel ext = (ExtendedLayoutModel) model.getExtension(LayoutConstants.getNamespaceURI(doc.getLevel(), doc.getVersion()));
 		if (ext == null) {
@@ -155,9 +160,11 @@ public class YGraphView implements PropertyChangeListener {
 		Dimension dim = box.getSize();  
 		view.setSize(dim);  
 		// view.zoomToArea(box.getX() - 10, box.getY() - 10, box.getWidth() + 20, box.getHeight() + 20);
-		Dimension minimumSize = new Dimension( (int)Math.max(view.getMinimumSize().getWidth(), 100), (int) Math.max(view.getMinimumSize().getHeight(), height/2) );
+		Dimension minimumSize = new Dimension(
+			(int) Math.max(view.getMinimumSize().getWidth(), 100),
+			(int) Math.max(view.getMinimumSize().getHeight(), height/2d));
 		view.setMinimumSize(minimumSize);
-		view.setPreferredSize(new Dimension(100, (int) Math.max(height * 0.6, 50)));
+		view.setPreferredSize(new Dimension(100, (int) Math.max(height * 0.6d, 50d)));
 		view.setOpaque(false);
 		((DefaultGraph2DRenderer) view.getGraph2DRenderer()).setDrawEdgesFirst(false);
 		view.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
@@ -167,6 +174,7 @@ public class YGraphView implements PropertyChangeListener {
 			// Not really a problem
 		}
 		RestrictedEditMode.addOverviewAndNavigation(view);
+		//view.addViewMode(new RestrictedEditMode());
 		view.setFitContentOnResize(true);
 		
 		JFrame frame = new JFrame();
