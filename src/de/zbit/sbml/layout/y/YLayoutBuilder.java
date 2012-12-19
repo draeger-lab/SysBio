@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBO;
+import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.layout.BoundingBox;
@@ -241,9 +242,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 				speciesGlyph.getBoundingBox().getPosition(), nodeRealizer.getBoundingBox()));
 		
 		Node ynode = graph.createNode();
-		Node compartmentYNode = id2node.get(((Species) speciesGlyph.getSpeciesInstance()).getCompartment());
-		if (compartmentYNode != null) {
-			graph.getHierarchyManager().setParentNode(ynode, compartmentYNode);
+		if (speciesGlyph.isSetSpecies()) {
+			Node compartmentYNode = id2node.get(((Species) speciesGlyph.getSpeciesInstance()).getCompartment());
+			if (compartmentYNode != null) {
+				graph.getHierarchyManager().setParentNode(ynode, compartmentYNode);
+			}
 		}
 		graph.setRealizer(ynode, nodeRealizer);
 		id2node.put(speciesGlyph.getId(), ynode);
@@ -315,11 +318,14 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		
 		// display stoichiometry labels
 		if (srg.isSetSpeciesReference()) {
-			SpeciesReference speciesReference = (SpeciesReference) srg.getSpeciesReferenceInstance();
-			if (speciesReference.isSetStoichiometry() && speciesReference.getStoichiometry() != 1) {
-				String value = StringTools.toString(speciesReference.getStoichiometry());
-				EdgeLabel edgeLabel = new StoichiometryLabel(value);
-				edgeRealizer.addLabel(edgeLabel);
+			SimpleSpeciesReference speciesReference = (SimpleSpeciesReference) srg.getSpeciesReferenceInstance();
+			if (speciesReference instanceof SpeciesReference) {
+				SpeciesReference specRef = (SpeciesReference) speciesReference;
+				if (specRef.isSetStoichiometry() && (specRef.getStoichiometry() != 1)) {
+					String value = StringTools.toString(specRef.getStoichiometry());
+					EdgeLabel edgeLabel = new StoichiometryLabel(value);
+					edgeRealizer.addLabel(edgeLabel);
+				}
 			}
 		}
 
@@ -331,7 +337,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	}
 
 	/**
-	 * checks if given SpeciesReferenceGlyph is necessary for
+	 * checks if given {@link SpeciesReferenceGlyph} is necessary for
 	 * the reaction to take place
 	 * @param srg
 	 * @return
@@ -372,13 +378,25 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		BoundingBox boundingBox = reactionGlyph.getBoundingBox();
 		Point point = boundingBox.getPosition();
 		Dimensions dimension = boundingBox.getDimensions();
-		double x, y, z, width, height, depth;
-		x = point.getX();
-		y = point.getY();
-		z = point.getZ();
-		width = dimension.getWidth();
-		height = dimension.getHeight();
-		depth = dimension.getDepth();
+		double x = 0d, y = 0d, z = 0d, width = 1d, height = 1d, depth = 1d;
+		if (point != null) {
+			x = point.getX();
+			y = point.getY();
+			z = point.getZ();
+		} else {
+			logger.warning(MessageFormat.format(
+				"No position given for reaction glyph {0} - using default values", 
+				reactionGlyph));
+		}
+		if (dimension != null) {
+			width = dimension.getWidth();
+			height = dimension.getHeight();
+			depth = dimension.getDepth();
+		} else {
+			logger.warning(MessageFormat.format(
+					"No dimension given for reaction glyph {0} - using default values", 
+					reactionGlyph));
+		}
 		
 		ProcessNode<NodeRealizer> processNode = createProcessNode();
 		Point rotationCenter = new Point(x + width / 2d, y + height / 2d, z + depth / 2d);
