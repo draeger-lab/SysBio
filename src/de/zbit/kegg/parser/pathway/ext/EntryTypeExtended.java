@@ -44,7 +44,7 @@ public enum EntryTypeExtended {
    */
   gene,
   /**
-   * dna region. E.g. a TFBS or such.
+   * dna region. E.g., a TFBS or such.
    */
   dna_region,
   /**

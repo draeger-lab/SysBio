@@ -21,11 +21,11 @@
 package de.zbit.graph.io.def;
 
 import java.awt.Color;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.SBO;
@@ -89,20 +89,21 @@ public class SBGNVisualizationProperties {
   /**
    * Other SBO terms that should be visualized in the same manner as {@link SBO#getNonCovalentComplex()}s.
    * TODO: These complexes below are actually not correct. But Linking them to
-   * ComplexNode is better than the default. But still, the real SBGN-conform
+   * {@link ComplexNode} is better than the default. But still, the real SBGN-conform
    * specification differs!
    */
-  private static final int[] nonCovalentComplex_synonyms = new int[]{
-  //macromolecular complex-branch
-  296, 420, 543, 297,
-  // Multimere branch
-  286, 418, 419, 420, 421};
+  private static final int[] nonCovalentComplex_synonyms = new int[] {
+  	//macromolecular complex-branch
+  	296, 420, 543, 297,
+  	// Multimere branch
+  	286, 418, 419, 420, 421
+  };
   
   
   /**
    * Static constructor to fill our static maps.
    */
-  {
+  static {
     init();
   }
 
@@ -199,12 +200,13 @@ public class SBGNVisualizationProperties {
   	return Color.BLACK;
   }
 
-  /**
-   * 
-   * @param sboTerm
-   * @return the adaquate {@link ShapeNodeRealizer}, if for this sboterm no {@link ShapeNodeRealizer}
-   * is available it return the {@link #defaultShape}
-   */
+	/**
+	 * 
+	 * @param sboTerm
+	 * @return the adequate {@link ShapeNodeRealizer}, if for this sboterm no
+	 *         {@link ShapeNodeRealizer} is available it return the
+	 *         {@link #defaultShape}
+	 */
   public static NodeRealizer getNodeRealizer(int sboTerm) {
     if (sbo2shape == null) {
       init();
@@ -212,7 +214,9 @@ public class SBGNVisualizationProperties {
     NodeRealizer ret = sbo2shape.get(sboTerm);
     if (ret == null) {
       ret = defaultShape;
-      log.log(Level.WARNING, "sboTerm: " + sboTerm + " couldn't be assigned to a shape, default shape is used");
+			log.warning(MessageFormat.format(
+				"sboTerm: {0,number,integer} couldn't be assigned to a shape, default shape is used",
+				sboTerm));
     }
     
     // Set a common color
@@ -223,7 +227,7 @@ public class SBGNVisualizationProperties {
   }
 
   /**
-   * Most graphics suites (e.g. yFiles) don't distinct an elipse
+   * Most graphics suites (e.g., yFiles) don't distinct an elipse
    * and a circle, but SBGN does. If this returns true, a node
    * realizer, even if it is an eliptical realizer, should have
    * the same with and height (resulting in a circle).

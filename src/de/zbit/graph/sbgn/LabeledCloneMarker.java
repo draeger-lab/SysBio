@@ -55,4 +55,5 @@ public interface LabeledCloneMarker extends CloneMarker {
    * @return
    */
   public String getCloneMarkerLabel();
+
 }

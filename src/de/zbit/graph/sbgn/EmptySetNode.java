@@ -18,6 +18,8 @@ package de.zbit.graph.sbgn;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 
 import y.view.NodeRealizer;
@@ -89,20 +91,30 @@ public class EmptySetNode extends ShapeNodeRealizerSupportingCloneMarker {
 	protected void paintFilledShape(Graphics2D gfx) {
 		Color fillColor = getFillColor();
 		if (!isTransparent() && (fillColor != null)) {
-			setWidth(getHeight());
+			double diameter = Math.max(getWidth(), getHeight());
+			setWidth(diameter);
+			setHeight(diameter);
 			
 			// Create a filled circle
 			gfx.setColor(fillColor);
 			super.paintFilledShape(gfx);
+			CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this,
+				new Ellipse2D.Double(getX(), getY(), getWidth(), getHeight()));
 			
 			// Diagonal element:
 			gfx.setColor(getLineColor());
-			GeneralPath path = new GeneralPath();
-			path.moveTo(getX(), getY() + getHeight());
-			path.lineTo(getX() + getHeight(), getY());
-			path.closePath();
-			gfx.draw(path);
+			gfx.draw(createDiagonal());
 		}
+	}
+
+	private Shape createDiagonal() {
+		double x = getX(), y = getY(), width = getWidth(), height = getHeight();
+		double diameter = Math.max(width, height);
+		GeneralPath path = new GeneralPath();
+		path.moveTo(x, y + diameter);
+		path.lineTo(x + diameter, y);
+		path.closePath();
+		return path;
 	}
 
 	/* (non-Javadoc)
@@ -110,10 +122,15 @@ public class EmptySetNode extends ShapeNodeRealizerSupportingCloneMarker {
 	 */
 	@Override
 	public void paintSloppy(Graphics2D g) {
-//		g.draw(new Ellipse2D.Double(getX(), getY(), 1d, 1d));
-		super.paintSloppy(g);
+		double diameter = Math.max(getWidth(), getHeight());
+		Color fillColor = Color.BLUE;
+		if (!isTransparent() && (fillColor != null)) {
+			g.setColor(getFillColor());
+			g.fill(new Ellipse2D.Double(getX(), getY(), diameter, diameter));
+		}
+		g.setColor(getLineColor());
+		g.draw(new Ellipse2D.Double(getX(), getY(), diameter, diameter));
+		//g.draw(createDiagonal());
 	}
 	
-	
-
 }

@@ -16,11 +16,11 @@
  */
 package de.zbit.graph.sbgn;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 
 import y.view.NodeRealizer;
-import y.view.ShapeNodeRealizer;
 
 /**
  * @author Andreas Dr&auml;ger
@@ -70,7 +70,7 @@ public class PerturbingAgentNode extends ShapeNodeRealizerSupportingCloneMarker 
   @Override
   protected void paintShapeBorder(Graphics2D gfx) {
     gfx.setColor(getLineColor());
-    gfx.draw(getPath());
+    gfx.draw(createPath());
   }
   
   /* (non-Javadoc)
@@ -80,9 +80,9 @@ public class PerturbingAgentNode extends ShapeNodeRealizerSupportingCloneMarker 
   protected void paintFilledShape(Graphics2D gfx) {
    if (!isTransparent() && (getFillColor() != null)) {
       gfx.setColor(getFillColor());
-      gfx.fill(getPath());
+      gfx.fill(createPath());
       
-      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, getPath());
+      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, createPath());
     }
   }
 
@@ -101,11 +101,29 @@ public class PerturbingAgentNode extends ShapeNodeRealizerSupportingCloneMarker 
 	public NodeRealizer createCopy() {
 		return new PerturbingAgentNode(this);
 	}
+	
+	/* (non-Javadoc)
+	 * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
+	 */
+	@Override
+	public void paintSloppy(Graphics2D g) {
+		Color color = getFillColor();
+		if (color != null) {
+			g.setColor(color);
+		}
+		GeneralPath path = createPath();
+		g.fill(path);
+		color = getLineColor();
+		if (color != null) {
+			g.setColor(color);
+		}
+		g.draw(path);
+	}
 
 	/**
    * @return
    */
-  protected GeneralPath getPath() {
+  protected GeneralPath createPath() {
     GeneralPath path = new GeneralPath();
     double x = getX(), y = getY(), w = getWidth(), h = getHeight(), h_2 = h/2d;
     int a = (int) (w/10d);
