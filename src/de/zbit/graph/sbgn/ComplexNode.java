@@ -102,7 +102,7 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
    */
   @Override
   protected void paintFilledShape(Graphics2D gfx) {
-   if (!isTransparent() && getFillColor()!=null) {
+   if (!isTransparent() && (getFillColor() != null)) {
       gfx.setColor(getFillColor());
       gfx.fill(createPolygon());
       
@@ -139,15 +139,15 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
   public static Polygon createPolygon(double x, double y, double w, double h) {
     int arc = (int) (Math.min(w, h)/5);
     Polygon nodeshape = new Polygon(); 
-    nodeshape.addPoint((int)  x+arc,             (int)y);                   // 1
-    nodeshape.addPoint((int) (x+w)-arc, (int)y);                   // 2
-    nodeshape.addPoint((int) (x+w),     (int)y+arc);               // 3
-    nodeshape.addPoint((int) (x+w),     (int)(y+h-arc)); // 4
-    nodeshape.addPoint((int) (x+w)-arc, (int)(y+h));     // 5
-    nodeshape.addPoint((int) (x+arc),            (int)(y+h));     // 6
-    nodeshape.addPoint((int)  x,                 (int)(y+h-arc)); // 7
-    nodeshape.addPoint((int)  x,                 (int)(y+arc));             // 8
-    nodeshape.addPoint((int)  x+arc,             (int)(y));                 // 1
+    nodeshape.addPoint((int)  x+arc,       (int) y);                   // 1
+    nodeshape.addPoint((int) (x+w)-arc,    (int) y);                   // 2
+    nodeshape.addPoint((int) (x+w),        (int) y+arc);               // 3
+    nodeshape.addPoint((int) (x+w),        (int) (y+h-arc));           // 4
+    nodeshape.addPoint((int) (x+w)-arc,    (int) (y+h));               // 5
+    nodeshape.addPoint((int) (x+arc),      (int) (y+h));               // 6
+    nodeshape.addPoint((int)  x,           (int) (y+h-arc));           // 7
+    nodeshape.addPoint((int)  x,           (int) (y+arc));             // 8
+    nodeshape.addPoint((int)  x+arc,       (int) (y));                 // 1
     
     return nodeshape;    
   }

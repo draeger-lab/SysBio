@@ -139,8 +139,9 @@ public class OBO2GraphViz {
 				nodes.add(triple.getObject());
 				arc = triple.toString().replace(
 						triple.getPredicate().getName(), "->").replace(":", "");
-				if (!arcs.contains(arc))
+				if (!arcs.contains(arc)) {
 					arcs.add(arc);
+				}
 				traverse(triple.getSubject());
 			}
 		}
@@ -161,10 +162,12 @@ public class OBO2GraphViz {
 		// return true;
 		Set<Triple> relations = ontology.getTriples(subject, null, null);
 		for (Triple triple : relations) {
-			if (triple.getObject().equals(object))
+			if (triple.getObject().equals(object)) {
 				return true;
-			if (isChildOf(triple.getObject(), object))
+			}
+			if (isChildOf(triple.getObject(), object)) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -175,8 +178,9 @@ public class OBO2GraphViz {
 	public static void main(String[] args) {
 		try {
 			String exclude[] = new String[args.length - 4];
-			for (int i = 4; i < args.length; i++)
+			for (int i = 4; i < args.length; i++) {
 				exclude[i - 4] = args[i];
+			}
 			new OBO2GraphViz(args[0], args[1], args[2], args[3], exclude);
 		} catch (ParseException e) {
 			e.printStackTrace();

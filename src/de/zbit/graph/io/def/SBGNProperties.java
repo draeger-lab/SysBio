@@ -69,8 +69,13 @@ public class SBGNProperties {
         return GlyphType.unspecified_entity;
     }
 	}
-	
 
+	/**
+	 * 
+	 * @author Clemens Wrzodek
+	 * @since 1.1
+	 * @version $Rev$
+	 */
 	public static enum GlyphType
 	{
 	    unspecified_entity,
@@ -115,7 +120,10 @@ public class SBGNProperties {
 	    location,
 	    cardinality;
 	    
-	    
+	    /* (non-Javadoc)
+	     * @see java.lang.Enum#toString()
+	     */
+	    @Override
 	    public String toString(){
 	    	return this.name().replace('_', ' ');
 	    }
@@ -128,6 +136,10 @@ public class SBGNProperties {
 	      return valueOf(arg0.replace(' ', '_'));
 	    }
 	    
+	    /**
+	     * 
+	     * @return
+	     */
 	    public int getSBOterm() {
 	      switch(this) {
           case association:
@@ -171,6 +183,12 @@ public class SBGNProperties {
 	    }
 	}
 	
+	/**
+	 * 
+	 * @author Clemens Wrzodek
+	 * @since 1.1
+	 * @version $Rev$
+	 */
 	public static enum GlyphOrientation
 	{
         horizontal,
@@ -181,37 +199,47 @@ public class SBGNProperties {
         down,
 	}
 	
+	/**
+	 * 
+	 * @author Clemens Wrzodek
+	 * @since 1.1
+	 * @version $Rev$
+	 */
 	public static enum ArcType
 	{
-        production,
-        consumption,
-        catalysis,
-        modulation,
-        stimulation,
-        inhibition,
-        assignment,
-        interaction,
-        absolute_inhibition,
-        absolute_stimulation,
-        positive_influence,
-        negative_influence,
-        unknown_influence,
-        equivalence_arc,
-        necessary_stimulation,
-        logic_arc;
-        
-	    public String toString(){
-	    	return this.name().replaceAll("_", " ");
-	    }
-	    
-	    /**
-	     * @param arg0
-	     * @return reverse of {@link #toString()}
-	     */
-	    public static ArcType valueOfString(String arg0) {
-	      return valueOf(arg0.replace(' ', '_'));
-	    }
-	    
+		production,
+		consumption,
+		catalysis,
+		modulation,
+		stimulation,
+		inhibition,
+		assignment,
+		interaction,
+		absolute_inhibition,
+		absolute_stimulation,
+		positive_influence,
+		negative_influence,
+		unknown_influence,
+		equivalence_arc,
+		necessary_stimulation,
+		logic_arc;
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Enum#toString()
+		 */
+		 @Override
+		 public String toString(){
+			 return this.name().replaceAll("_", " ");
+		 }
+		 
+		 /**
+		  * @param arg0
+		  * @return reverse of {@link #toString()}
+		  */
+		 public static ArcType valueOfString(String arg0) {
+			 return valueOf(arg0.replace(' ', '_'));
+		 }
+		 
 	}
 	
 	/**
@@ -264,6 +292,10 @@ public class SBGNProperties {
 	    return 0;
 	  }
 	  
+	  /**
+	   * 
+	   * @return
+	   */
 	  public String getLabel() {
 	    switch(this) {
 	      // Special cases
@@ -285,9 +317,14 @@ public class SBGNProperties {
 	    }
 	  }
 	  
+	  /**
+	   * 
+	   * @return
+	   */
 	  public String getName() {
 	    return toString();
 	  }
+
 	}
 	
 }

@@ -65,7 +65,7 @@ public class CompartmentRealizer extends GroupNodeRealizer {
     setAutoBoundsEnabled(true);
     NodeLabel label = getLabel();
     // TODO DiscreteNodeLabelModel does not work as intended
-	label.setLabelModel(new DiscreteNodeLabelModel(DiscreteNodeLabelModel.BOTTOM, 5d));
+    label.setLabelModel(new DiscreteNodeLabelModel(DiscreteNodeLabelModel.BOTTOM, 5d));
     label.setBackgroundColor(null);
     label.setTextColor(Color.BLACK);
 	}
@@ -114,7 +114,27 @@ public class CompartmentRealizer extends GroupNodeRealizer {
   	}
   }
   
-  /**
+  /* (non-Javadoc)
+	 * @see y.view.hierarchy.GroupNodeRealizer#paintSloppy(java.awt.Graphics2D)
+	 */
+	@Override
+	public void paintSloppy(Graphics2D g) {
+		Color color = getFillColor();
+		if (!isTransparent() && (color != null)) {
+			g.setColor(color);
+  		CompartmentShape shape = createCompartmentShape();
+			g.fill(shape.getInnerArea());
+			color = getLineColor();
+			if (color != null) {
+				g.setColor(color);
+				g.draw(shape.getInnerArea());
+			}
+		} else {
+			super.paintSloppy(g);
+		}
+	}
+
+	/**
    * 
    * @return
    */

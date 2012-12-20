@@ -22,7 +22,10 @@ package de.zbit.graph.sbgn;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -129,8 +132,8 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     // Determine orientation of this node
     double max = MathUtils.max(Arrays.asList(cases));
     boolean horizontal = isHorizontal();
-    if (cases[0]==max && cases[1]==max ||
-        cases[2]==max && cases[3]==max) {
+    if (cases[0] == max && cases[1] == max ||
+        cases[2] == max && cases[3] == max) {
       // If same number is above and left, let the distance decide the orientation.
       if (meanDiff[0]>meanDiff[1]) { // X-Distance larger
         if (!horizontal) rotateNode();
@@ -138,10 +141,10 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
         if (horizontal) rotateNode();
       }
     }
-    else if (cases[0]==max && !horizontal) rotateNode();
-    else if (cases[1]==max && horizontal) rotateNode();
-    else if (cases[2]==max && !horizontal) rotateNode();
-    else if (cases[3]==max && horizontal) rotateNode();
+    else if (cases[0] == max && !horizontal) rotateNode();
+    else if (cases[1] == max && horizontal) rotateNode();
+    else if (cases[2] == max && !horizontal) rotateNode();
+    else if (cases[3] == max && horizontal) rotateNode();
     
     // Dock all edges to the correct side
     if (isHorizontal()) {
@@ -154,7 +157,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
         setEdgesToDockOnRightSideOfNode(reactants);
       }
     } else {
-      if (cases[1]>cases[3]) {
+      if (cases[1] > cases[3]) {
         // Reactants are above this node;
         setEdgesToDockOnUpperSideOfNode(reactants);
         setEdgesToDockOnLowerSideOfNode(products);
@@ -223,9 +226,10 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
   protected void paintShapeBorder(Graphics2D gfx) {
     int extendBesidesBorder = 0;
     int x = (int) getX(); int y = (int) getY();
-    double min = Math.min(getWidth(), getHeight());
-    double offsetX = (getWidth() - min)/2d;
-    double offsetY = (getHeight() - min)/2d;
+    double width = getWidth(), height = getHeight();
+    double min = Math.min(width, height);
+    double offsetX = (width - min)/2d;
+    double offsetY = (height - min)/2d;
 
     // FIXME
 //    if (isHorizontal() && (rotationAngle == 0)) {
@@ -234,24 +238,34 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     
     rotate(gfx, rotationAngle, rotationCenter);
     
-    gfx.setColor(Color.BLACK);
+    gfx.setColor(getLineColor());
     //line width
     gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
     // Draw the reaction node rectangle
     gfx.drawRect((int) offsetX + x, (int) offsetY + y, (int) min, (int) min);
     
-    int halfHeight = (int) (getHeight()/2d);
+    int halfHeight = (int) (height/2d);
     
     // Draw the small reaction lines on both sides, where substrates
     // and products should dock.
     gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
-    gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) getWidth() + x + extendBesidesBorder, halfHeight + y);
+    gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
     
     rotate(gfx, -rotationAngle, rotationCenter);
-      
   }
 
-  /**
+  /* (non-Javadoc)
+	 * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
+	 */
+	@Override
+	public void paintSloppy(Graphics2D g) {
+		paintShapeBorder(g);
+//		g.draw(new Rectangle(
+//			new Point((int) Math.round(getX()), (int) Math.round(getY())),
+//			new Dimension((int) Math.round(getWidth()), (int) Math.round(getHeight()))));
+	}
+
+	/**
    * 
    * @param gfx
    * @param rotationAngle
@@ -271,8 +285,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
    * Rotates the node by 90°.
    */
   public void rotateNode() {
-    double width = getWidth();
-    double height = getHeight();
+    double width = getWidth(), height = getHeight();
     setWidth(height);
     setHeight(width);
   }

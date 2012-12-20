@@ -20,7 +20,10 @@
  */
 package de.zbit.graph.sbgn;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 
 import org.sbml.jsbml.util.StringTools;
 
@@ -111,6 +114,28 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
   		CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, shape);
   	}
   }
+
+	/* (non-Javadoc)
+	 * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
+	 */
+	@Override
+	public void paintSloppy(Graphics2D g) {
+		Color color = getFillColor();
+		if (color != null) {
+			g.setColor(color);
+		}
+		if (getShapeType() == ELLIPSE) {
+			Ellipse2D ellipse = new Ellipse2D.Double(getX(), getY(), getWidth(), getHeight());
+			g.fill(ellipse);
+			color = getLineColor();
+			if (color != null) {
+				g.setColor(color);
+				g.draw(ellipse);
+			}
+		} else {
+			super.paintSloppy(g);
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()

@@ -20,6 +20,7 @@
  */
 package de.zbit.graph.sbgn;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 
@@ -70,7 +71,7 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer implements SimpleC
   @Override
   protected void paintShapeBorder(Graphics2D gfx) {
     gfx.setColor(getLineColor());
-    gfx.draw(getPath());
+    gfx.draw(createPath());
   }
   
   /* (non-Javadoc)
@@ -80,29 +81,47 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer implements SimpleC
   protected void paintFilledShape(Graphics2D gfx) {
    if (!isTransparent() && (getFillColor() != null)) {
       gfx.setColor(getFillColor());
-      gfx.fill(getPath());
-      
-      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, getPath());
+      gfx.fill(createPath());
+      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, createPath());
     }
   }
 
   /**
    * @return
    */
-  protected GeneralPath getPath() {
-    int arc = (int) (getWidth()/10);
+  protected GeneralPath createPath() {
+  	double x = getX(), y = getY(), width = getWidth(), height = getHeight();
+    int arc = (int) (width/10d);
     GeneralPath path = new GeneralPath();
-    path.moveTo(getX(), getY());
-    path.lineTo(getX() + getWidth(), getY());
-    path.lineTo(getX() + getWidth(), getY() + getHeight() - arc);
-    path.quadTo(getX() + getWidth(), getY() + getHeight(), getX() + getWidth() - arc, getY() + getHeight());
-    path.lineTo(getX() + arc, getY() + getHeight());
-    path.quadTo(getX(), getY() + getHeight(), getX(), getY() + getHeight() - arc);
+    path.moveTo(x, y);
+    path.lineTo(x + width, y);
+    path.lineTo(x + width, y + height - arc);
+    path.quadTo(x + width, y + height, x + width - arc, y + height);
+    path.lineTo(x + arc, y + height);
+    path.quadTo(x, y + height, x, y + height - arc);
     path.closePath();
     return path;
   }
-
+  
   /* (non-Javadoc)
+	 * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
+	 */
+	@Override
+	public void paintSloppy(Graphics2D g) {
+		GeneralPath path = createPath();
+		Color color = getFillColor();
+		if (color != null) {
+			g.setColor(color);
+		}
+		g.fill(path);
+		color = getLineColor();
+		if (color != null) {
+			g.setColor(color);
+		}
+		g.draw(path);
+	}
+
+	/* (non-Javadoc)
    * @see de.zbit.graph.CloneMarker#setNodeIsCloned(boolean)
    */
   public void setNodeIsCloned(boolean b) {
