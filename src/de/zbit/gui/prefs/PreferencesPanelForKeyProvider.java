@@ -77,7 +77,7 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
 	  // Better read fields of actual key-provider. These are the
 	  // Keys we want to have in the properties!!
 	  try {
-      return (provider.getField(key.toString())!=null);
+      return (provider.getField(key.toString()) != null);
     } catch (SecurityException e) {
       return false;
     } catch (NoSuchFieldException e) {

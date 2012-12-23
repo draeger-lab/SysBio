@@ -25,18 +25,37 @@ import y.base.Node;
 import y.view.Graph2D;
 
 /**
- * Product type used by YLayoutBuilder. All maps are built by YLayoutBuilder.
+ * Product type used by {@link YLayoutBuilder}. All maps are built by
+ * {@link YLayoutBuilder}.
  * 
  * @author Jakob Matthes
  * @version $Rev$
  */
 public class LayoutGraph implements ILayoutGraph {
 
+	/**
+	 * 
+	 */
 	private Map<String, Set<Node>> speciesId2nodes;
+	/**
+	 * 
+	 */
 	private Map<String, Set<Node>> compartmentId2nodes;
+	/**
+	 * 
+	 */
 	private Map<String, Set<Node>> reactionId2nodes;
+	/**
+	 * 
+	 */
 	private Map<String, Set<List<Edge>>> reactionId2edges;
+	/**
+	 * 
+	 */
 	private Map<String, Set<String>> speciesId2reactions;
+	/**
+	 * 
+	 */
 	private Graph2D graph2D;
 	
 	/**

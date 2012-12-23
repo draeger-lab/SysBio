@@ -103,7 +103,7 @@ public class PerturbingAgentNode extends ShapeNodeRealizerSupportingCloneMarker 
 	}
 	
 	/* (non-Javadoc)
-	 * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
+	 * @see de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker#paintSloppy(java.awt.Graphics2D)
 	 */
 	@Override
 	public void paintSloppy(Graphics2D g) {

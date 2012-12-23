@@ -22,8 +22,8 @@ package de.zbit.graph.sbgn;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.RoundRectangle2D;
 
 import org.sbml.jsbml.util.StringTools;
 
@@ -56,6 +56,13 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
 
   /**
    * @param type
+   */
+  public ShapeNodeRealizerSupportingCloneMarker(byte type) {
+    super(type);
+  }
+
+  /**
+   * @param type
    * @param x
    * @param y
    * @param label
@@ -63,13 +70,6 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
   public ShapeNodeRealizerSupportingCloneMarker(byte type, double x, double y,
     String label) {
     super(type, x, y, label);
-  }
-
-  /**
-   * @param type
-   */
-  public ShapeNodeRealizerSupportingCloneMarker(byte type) {
-    super(type);
   }
 
   /**
@@ -91,19 +91,12 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
   }
   
   /* (non-Javadoc)
-   * @see de.zbit.graph.CloneMarker#setNodeIsCloned(boolean)
-   */
-  public void setNodeIsCloned(boolean b) {
-    isClonedNode = b;
-  }
-
-  /* (non-Javadoc)
    * @see de.zbit.graph.CloneMarker#isNodeCloned()
    */
   public boolean isNodeCloned() {
     return isClonedNode;
   }
-  
+
   /* (non-Javadoc)
    * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
    */
@@ -114,8 +107,8 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
   		CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, shape);
   	}
   }
-
-	/* (non-Javadoc)
+  
+  /* (non-Javadoc)
 	 * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
 	 */
 	@Override
@@ -124,18 +117,38 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
 		if (color != null) {
 			g.setColor(color);
 		}
-		if (getShapeType() == ELLIPSE) {
-			Ellipse2D ellipse = new Ellipse2D.Double(getX(), getY(), getWidth(), getHeight());
-			g.fill(ellipse);
-			color = getLineColor();
-			if (color != null) {
-				g.setColor(color);
-				g.draw(ellipse);
-			}
-		} else {
-			super.paintSloppy(g);
+		switch (getShapeType()) {
+			case ELLIPSE:
+				Ellipse2D ellipse = new Ellipse2D.Double(getX(), getY(), getWidth(), getHeight());
+				g.fill(ellipse);
+				color = getLineColor();
+				if (color != null) {
+					g.setColor(color);
+					g.draw(ellipse);
+				}
+			case ROUND_RECT:
+				double x = getX(), y = getY(), width = getWidth(), height = getHeight();
+				RoundRectangle2D rectangle = new RoundRectangle2D.Double(
+					x, y, width, height, width * .25d, height * .25d);
+				g.fill(rectangle);
+				color = getLineColor();
+				if (color != null) {
+					g.setColor(color);
+					g.draw(rectangle);
+				}
+				break;
+			default:
+				super.paintSloppy(g);
+				break;
 		}
 	}
+
+	/* (non-Javadoc)
+   * @see de.zbit.graph.CloneMarker#setNodeIsCloned(boolean)
+   */
+  public void setNodeIsCloned(boolean b) {
+    isClonedNode = b;
+  }
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
