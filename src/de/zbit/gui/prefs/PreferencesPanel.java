@@ -25,6 +25,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -746,7 +747,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       JComponent jc = null;
       if (properties.containsKey(option)) {
         // Check if we already have an element for this option
-        // Unfortunately is no good choice: this renderse the
+        // Unfortunately is no good choice: this render the
         // "reset defaults" button useless...
         //jc = option2component.get(option);
         
@@ -873,7 +874,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    */
   Component createGroup(OptionGroup<?> optGrp,
     List<Option<?>> unprocessedOptions) {
-    
+  	
     // Create a new panel for the group
     JPanel groupPanel = new JPanel();
     groupPanel.setOpaque(true);
@@ -1025,6 +1026,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     preferences = loadPreferences();
     if (preferences != null) {
       String k;
+      // TODO: In cases that there is an old configuration of preferences in memory it might be necessary to call SBPreferences.getPreferencesFor(myKeyProvider).flush() before all options can be displayed. The reason is that here all keys are taken from the preferences, instead using the actual options from the keyprovider!
       for (Object key : preferences.keySetFull()) {
         if (accepts(key)) {
           // Accept only key from KeyProvider!
@@ -1033,7 +1035,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           properties.put(k, preferences.get(k));
           properties.getDefaults().put(k, preferences.getDefault(k));
         } else {
-          log.finer(String.format("Rejecting key: %s", key));
+          log.finer(MessageFormat.format("Rejecting key: {0}", key));
         }
       }
     }
@@ -1057,8 +1059,10 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
 		boolean twoColumn = ((groupList.size() - fileSelectors) % 2 == 0)
 				&& ((ungroupedOptions.size() == 0) || (!OptionGroup.isAnyOptionVisible(ungroupedOptions)));
 		
-		if (fileSelectors<=0) twoColumn=false;
-		if (countOptions(groupList)>25) {
+		if (fileSelectors <= 0) {
+			twoColumn = false;
+		}
+		if (countOptions(groupList) > 25) {
 		  /*
 		   * If we have too many options to fit it one column, always create a
 		   * two column layout (example: SBMLsqueezer).
@@ -1072,11 +1076,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     int column = 0;
     int row = 0;
     int elemCount = 0;
-    Component c;
+    Component optionGroupComponent;
     for (OptionGroup<?> optGrp : groupList) {
       if (optGrp.isVisible()) {
         // Group is visible => Generate components.
-        c = createGroup(optGrp, unprocessedOptions);
+        optionGroupComponent = createGroup(optGrp, unprocessedOptions);
         if (twoColumn) {
           for (Option<?> opt : optGrp) {
             if (opt.getRequiredType().equals(File.class)) {
@@ -1086,11 +1090,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           }
           if (oneColumn) {
             column = 0;
-            lh.add(c, column, row++, 2, 1);
+            lh.add(optionGroupComponent, column, row++, 2, 1);
             elemCount++;
             oneColumn = false;
           } else {
-            lh.add(c, column++, row, 1, 1);
+            lh.add(optionGroupComponent, column++, row, 1, 1);
             elemCount++;
             if (column == 2) {
               column = 0;
@@ -1098,7 +1102,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
             }
           }
         } else {
-          lh.add(c);
+          lh.add(optionGroupComponent);
           elemCount++;
         }
       } else {

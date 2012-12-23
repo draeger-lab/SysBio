@@ -20,13 +20,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sbml.jsbml.Compartment;
+import org.sbml.jsbml.Reaction;
+import org.sbml.jsbml.Species;
+
+import de.zbit.sbml.layout.ProcessNode;
+
 import y.base.Edge;
 import y.base.Node;
 import y.view.Graph2D;
 
 /**
- * Interface to define a data structure which contains a Graph2D and useful
- * id-node maps.
+ * Interface to define a data structure which contains a {@link Graph2D} and
+ * useful id-node maps.
  * 
  * @author Jakob Matthes
  * @version $Rev$
@@ -34,33 +40,38 @@ import y.view.Graph2D;
 public interface ILayoutGraph {
 
 	/**
-	 * @return the species id -> set of species nodes map.
+	 * @return the {@link Species}' id -> {@link Set} of {@link SpeciesNode}s
+	 *         {@link Map}.
 	 */
 	public Map<String, Set<Node>> getSpeciesId2nodes();
 	
 	/**
-	 * @return the compartment id -> set of compartment nodes map.
+	 * @return the {@link Compartment} id -> set of {@link CompartmentNode}s
+	 *         {@link Map}.
 	 */
 	public Map<String, Set<Node>> getCompartmentId2nodes();
 	
 	/**
-	 * @return the reaction id -> set of process nodes map.
+	 * @return the {@link Reaction}'s id -> set of {@link ProcessNode}s
+	 *         {@link Map}.
 	 */
 	
 	public Map<String, Set<Node>> getReactionId2nodes();
 	
 	/**
-	 * @return the reaction id -> set of list of edges map.
+	 * @return the {@link Reaction}'s id -> set of list of {@link Edge}s
+	 *         {@link Map}.
 	 */
 	public Map<String, Set<List<Edge>>> getReactionId2edges();
 	
 	/**
-	 * @return the species id -> set of reaction species is involved in
+	 * @return the {@link Species}' id -> set of {@link Reaction}s in which a
+	 *         {@link Species} is involved in
 	 */
 	public Map<String, Set<String>> getSpeciesId2reactions();
 	
 	/**
-	 * @return the Graph2D visual representation.
+	 * @return the {@link Graph2D} visual representation.
 	 */
 	public Graph2D getGraph2D();
 

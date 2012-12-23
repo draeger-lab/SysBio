@@ -75,11 +75,12 @@ public class OptionGroup<T> implements ActionCommand,
     this(null, (String) null);
   }
   
-  /**
-   * 
-   * @param optionGroupId
-   * @param bundle
-   *        This {@link ResourceBundle} looks for the optionGroupId as key for a
+	/**
+	 * 
+	 * @param optionGroupId
+	 *        the identifier of this {@link OptionGroup}
+	 * @param bundle
+	 *        This {@link ResourceBundle} looks for the optionGroupId as key for a
 	 *        human-readable display name. It also looks for the key
 	 *        <code>optionGroupId + "_TOOLTIP"</code> in order to obtain a more
 	 *        detailed description of this option. If no such description can be
@@ -88,8 +89,9 @@ public class OptionGroup<T> implements ActionCommand,
 	 *        human-readable name contains this symbol it assumes that the part
 	 *        before the semicolon is intended to be a short name and everything
 	 *        written after it is assumed to be a tooltip.
-   * @param option
-   */
+	 * @param option
+	 *        a certain number of {@link Option}s to be grouped (zero or more).
+	 */
 	public OptionGroup(String optionGroupId, ResourceBundle bundle,
 		Option<? extends T>... option) {
 		//this(bundle.getString(optionGroupId), bundle.getString(optionGroupId), option);

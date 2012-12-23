@@ -89,7 +89,7 @@ import de.zbit.util.progressbar.ProgressListener;
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeRealizer,EdgeRealizer> {
+public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeRealizer, EdgeRealizer> {
 
 	/**
 	 * curve segment type cubic bezier
@@ -261,13 +261,12 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	 */
 	private <T> void putInMapSet(Map<String, Set<T>> id2Nodes,
 			String id, T object) {
-		if (id2Nodes.get(id) == null) {
-			HashSet<T> hashSet = new HashSet<T>();
+		if (!id2Nodes.containsKey(id)) {
+			Set<T> hashSet = new HashSet<T>();
 			hashSet.add(object);
 			id2Nodes.put(id, hashSet);
-		}
-		else {
-			HashSet<T> hashSet = (HashSet<T>) id2Nodes.get(id);
+		} else {
+			Set<T> hashSet = (HashSet<T>) id2Nodes.get(id);
 			hashSet.add(object);
 		}
 	}
@@ -533,47 +532,47 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 	}
 
 	/**
-		 * @param curve
-		 * @return
-		 */
-		public static EdgeRealizer createEdgeRealizerFromCurve(Curve curve) {
-			EdgeRealizer edgeRealizer = new GenericEdgeRealizer();
+	 * @param curve
+	 * @return
+	 */
+	public static EdgeRealizer createEdgeRealizerFromCurve(Curve curve) {
+		EdgeRealizer edgeRealizer = new GenericEdgeRealizer();
+		
+		// Note: if multiple curve segments (beziers) are specified, the resulting
+		// representation will not be standard compliant.
+		
+		if ((curve != null) && curve.isSetListOfCurveSegments()) {
+			List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
 			
-			// Note: if multiple curve segments (beziers) are specified, the resulting
-			// representation will not be standard compliant.
-
-			if (curve != null && curve.isSetListOfCurveSegments()) {
-				List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
-
-				// if all curve segments are beziers, use BezierEdgeRealizer, else use PolyLineEdgeRealizer
-				boolean drawBezier = true;
-				for (CurveSegment curveSegment : listOfCurveSegments) {
-					drawBezier = drawBezier && curveSegment.isSetType() && curveSegment.getType().equals(CURVESEGMENT_CUBICBEZIER);
-					if (!drawBezier) {
-						break;
-					}
-				}
-				
-				edgeRealizer = drawBezier ? new BezierEdgeRealizer() : new PolyLineEdgeRealizer();
-
-				for (int i = listOfCurveSegments.size()-1; i >= 0; i--) {
-					CurveSegment curveSegment = listOfCurveSegments.get(i);
-					
-					Point end = curveSegment.getEnd();
-					edgeRealizer.addPoint(end.getX(), end.getY());
-					if (drawBezier) {
-						Point basePoint2 = curveSegment.getBasePoint2();
-						edgeRealizer.addPoint(basePoint2.getX(), basePoint2.getY());
-						Point basePoint1 = curveSegment.getBasePoint1();
-						edgeRealizer.addPoint(basePoint1.getX(), basePoint1.getY());
-					}
-					Point start = curveSegment.getStart();
-					edgeRealizer.addPoint(start.getX(), start.getY());
+			// if all curve segments are beziers, use BezierEdgeRealizer, else use PolyLineEdgeRealizer
+			boolean drawBezier = true;
+			for (CurveSegment curveSegment : listOfCurveSegments) {
+				drawBezier = drawBezier && curveSegment.isSetType() && curveSegment.getType().equals(CURVESEGMENT_CUBICBEZIER);
+				if (!drawBezier) {
+					break;
 				}
 			}
-	
-			return edgeRealizer;
+			
+			edgeRealizer = drawBezier ? new BezierEdgeRealizer() : new PolyLineEdgeRealizer();
+			
+			for (int i = listOfCurveSegments.size()-1; i >= 0; i--) {
+				CurveSegment curveSegment = listOfCurveSegments.get(i);
+				
+				Point end = curveSegment.getEnd();
+				edgeRealizer.addPoint(end.getX(), end.getY());
+				if (drawBezier) {
+					Point basePoint2 = curveSegment.getBasePoint2();
+					edgeRealizer.addPoint(basePoint2.getX(), basePoint2.getY());
+					Point basePoint1 = curveSegment.getBasePoint1();
+					edgeRealizer.addPoint(basePoint1.getX(), basePoint1.getY());
+				}
+				Point start = curveSegment.getStart();
+				edgeRealizer.addPoint(start.getX(), start.getY());
+			}
 		}
+		
+		return edgeRealizer;
+	}
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutBuilder#builderEnd()
@@ -597,7 +596,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph,NodeReali
 		Map<String, Set<List<Edge>>> reactionId2Edge = new HashMap<String, Set<List<Edge>>>();
 		for (Reaction reaction : layout.getModel().getListOfReactions()) {
 			String reactionId = reaction.getId();
-			Set<List<Edge>> edgeListSet= new HashSet<List<Edge>>();
+			Set<List<Edge>> edgeListSet = new HashSet<List<Edge>>();
 			List<NamedSBaseGlyph> reactionGlyphs = (List<NamedSBaseGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
 			if (reactionGlyphs != null) {
 				for (NamedSBaseGlyph reactionGlyph : reactionGlyphs) {
