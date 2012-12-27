@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 import jp.sbi.garuda.platform.commons.protocol.ProtocolResults;
 import jp.sbi.garuda.platform.commons.protocol.c2s.LoadFileRequest;
 import jp.sbi.garuda.platform.commons.protocol.c2s.LoadGadgetRequest;
-import jp.sbi.garuda.platform.commons.protocol.s2c.GetLoadableSoftwaresResponse;
+import jp.sbi.garuda.platform.commons.protocol.s2c.GetCompatibleSoftwareListResponse;
 import jp.sbi.garuda.platform.software.handler.SoftwareRequestListener;
 import jp.sbi.garuda.platform.software.handler.SoftwareResponseListener;
 import de.zbit.UserInterface;
@@ -69,10 +69,10 @@ public class GarudaSoftwareListener implements PropertyChangeListener, SoftwareR
 	}
 	
 	/* (non-Javadoc)
-	 * @see jp.sbi.garuda.platform.software.handler.SoftwareResponseListener#getLoadableSoftwares(jp.sbi.garuda.platform.commons.protocol.s2c.GetLoadableSoftwaresResponse)
+	 * @see jp.sbi.garuda.platform.software.handler.SoftwareResponseListener#getCompatibleSoftwareList(jp.sbi.garuda.platform.commons.protocol.s2c.GetCompatibleSoftwareListResponse)
 	 */
 	@Override
-	public void getLoadableSoftwares(GetLoadableSoftwaresResponse response) {
+	public void getCompatibleSoftwareList(GetCompatibleSoftwareListResponse response) {
 		logger.fine(MessageFormat.format(bundle.getString("RECEIVED_COMPATIBLE_SOFTWARE_LIST"), response.toString()));
 		backend.setListOfCompatibleSoftware(response.getSoftwareList());
 	}

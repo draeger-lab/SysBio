@@ -31,6 +31,7 @@ import javax.swing.SwingWorker;
 
 import jp.sbi.garuda.platform.commons.Software;
 import jp.sbi.garuda.platform.commons.exception.NetworkException;
+import jp.sbi.garuda.platform.commons.net.GarudaConnectionNotInitializedException;
 import de.zbit.garuda.GarudaSoftwareBackend;
 import de.zbit.gui.GUITools;
 import de.zbit.io.FileTools;
@@ -66,6 +67,11 @@ public class GarudaFileSender extends SwingWorker<Void, Software> {
 	private File file;
 
 	/**
+	 * The type of accepted files that the filtering of the list will be depended upon.
+	 */
+	private String fileType;
+
+	/**
 	 * Initializes this file sender.
 	 * 
 	 * @param parent
@@ -76,11 +82,12 @@ public class GarudaFileSender extends SwingWorker<Void, Software> {
 	 * @param file
 	 *        The file for which compatible software is to be searched.
 	 */
-	public GarudaFileSender(Component parent, GarudaSoftwareBackend garudaBackend, File file) {
+	public GarudaFileSender(Component parent, GarudaSoftwareBackend garudaBackend, File file, String fileType) {
 		super();
 		this.parent = parent;
 		this.garudaBackend = garudaBackend;
 		this.file = file;
+		this.fileType = fileType;
 	}
 
 	/* (non-Javadoc)
@@ -106,7 +113,7 @@ public class GarudaFileSender extends SwingWorker<Void, Software> {
 			}
 
 		});
-		garudaBackend.requestForLoadableSoftwares(file);
+		garudaBackend.requestForLoadableSoftwares(file, fileType);
 		return null;
 	}
 
@@ -137,6 +144,8 @@ public class GarudaFileSender extends SwingWorker<Void, Software> {
 					} catch (IllegalStateException exc) {
 						GUITools.showErrorMessage(parent, exc);
 					} catch (NetworkException exc) {
+						GUITools.showErrorMessage(parent, exc);
+					} catch (GarudaConnectionNotInitializedException exc) {
 						GUITools.showErrorMessage(parent, exc);
 					}
 				}

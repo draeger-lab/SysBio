@@ -23,7 +23,8 @@
  * <p>
  * Here follows a minimal example of how to use it to Garuda-enable any
  * software. When initializing your graphical user interface, which must be
- * derived from {@link UserInterface}, just insert the following piece of code:
+ * derived from {@link de.zbit.UserInterface}, just insert the following piece 
+ * of code:
  * 
  * <pre>
  * new Thread(new Runnable() {
@@ -54,7 +55,7 @@
  * particular software. Of course, the only thing you'll have to adapt are the
  * supported file formats.
  * <p>
- * In order to avoid a time out because no Garuda Core is running, you can use
+ * In order to avoid a timeout because no Garuda Core is running, you can use
  * the {@link de.zbit.garuda.GarudaOptions} class to add a command-line option
  * to your software. You might want to surround Garuda loading with the
  * following code in your {@link de.zbit.Launcher#initGUI(de.zbit.AppConf)}:
@@ -76,9 +77,9 @@
  * <p>
  * However, before you can react to action events comming from the Garuda Core,
  * you'll have to register the {@link de.zbit.garuda.GarudaSoftwareBackend} in
- * your application: As any instance of {@link UserInterface}, also your one
- * must extend {@link PropertyChangeListener}. In order to successfully enable
- * Garuda in your application, do the following in your gui:
+ * your application: As any instance of {@link de.zbit.UserInterface}, also your
+ * one must extend {@link PropertyChangeListener}. In order to successfully 
+ * enable Garuda in your application, do the following in your gui:
  * 
  * <pre>
  * public void propertyChange(PropertyChangeEvent evt) {
@@ -95,27 +96,27 @@
  * </pre>
  * 
  * In this method, the instance of the {@link GarudaSoftwareBackend} can be
- * stored in the GUI as a controller for Garuda:
+ * stored in the GUI as a controller for Garuda.
  * 
+ * How to send a file to another Garuda-enabled software:
  * <pre>
  * GarudaFileSender sender = new GarudaFileSender(parentComponent, garudaBackend,
  * 	file);
  * sender.execute();
  * </pre>
- * 
  * This example will open a {@link javax.swing.JOptionPane} displaying
  * compatible Garuda-enabled software as soon as it received the list of Garuda
  * software from the core. If the user selects one of these programs, the
  * {@link de.zbit.garuda.GarudaFileSender} will automatically sent the given
  * {@link java.io.File} to that program. Note that it could be necessary to
  * create a temporary {@link java.io.File} and saving the current document from
- * your software to this {@link java.io.File} before sending the it to the
- * Garuda Core.
+ * your software to this {@link java.io.File} before sending it to the Garuda
+ * Core.
  * <p>
  * In order to sent a file to other Garuda-enabled tools, you will have to add
  * some buttons or menu items to your application. This can, for instance, be
  * done by using the {@link de.zbit.garuda.GarudaGUIfactory}. The action to sent
- * a file can be performed by using the {@link GarudaFileSender}.
+ * a file can be performed by using the {@link de.zbit.garuda.GarudaFileSender}.
  * <p>
  * For localization support you can find an XML file containg several useful
  * entries in the Garuda resource folder. This folder also contains Garuda icons

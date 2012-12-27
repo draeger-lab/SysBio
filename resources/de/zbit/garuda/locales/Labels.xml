@@ -47,15 +47,18 @@
   
   <entry key="FILE_DOES_NOT_EXIST">File {0} to sent does not exist.</entry>
   <entry key="FILE_LOADING_REQUEST">Request to load file {0} into software {1}</entry>
-  <entry key="GARUDA_CORE_INITIALIZED">Garuda Core Client initialized</entry>
+  <entry key="NO_FILE_SELECTED">No File selected</entry>
+  <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Request to get the compatible softwares list to sent file {0}</entry>
+  <entry key="PATH_FOR_SOFTWARE">path for this software is: {0}</entry>
+  
+  <!-- // Obsolete: -->
+  <entry key="REGISTERED_SOFTWARE_TO_CORE">registered software to Garuda Core {0}</entry>
   <entry key="GARUDA_CORE_SOFTWARE_ACTIVATED">Garuda Core Client initialized and software activated</entry>
   <entry key="GARUDA_CORE_STARTED">Garuda Core Client initialized and started</entry>
+  <entry key="GARUDA_CORE_INITIALIZED">Garuda Core Client initialized</entry>
   <entry key="GARUDA_LISTENER_NOT_INITIALIZED">Garuda listener not initialized.</entry>
-  <entry key="NO_FILE_SELECTED">No File selected</entry>
-  <entry key="REGISTERED_SOFTWARE_TO_CORE">registered software to Garuda Core {0}</entry>
-  <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Request to get the compatible softwares list to sent file {0}</entry>
-  <entry key="SOFTWARE_DEREGISTERED">Software deregistered from the Garuda Core.</entry>
-  <entry key="PATH_FOR_SOFTWARE">path for this software is: {0}</entry>
+  <entry key="SOFTWARE_DEREGISTERED">Software deregistered from the Garuda Core.</entry> 
+  <!-- -->
   
   <!-- GarudaSoftwareListener -->
   
