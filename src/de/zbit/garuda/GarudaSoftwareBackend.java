@@ -23,16 +23,15 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import jp.sbi.garuda.platform.commons.FileFormat;
 import jp.sbi.garuda.platform.commons.Software;
 import jp.sbi.garuda.platform.commons.exception.NetworkException;
+import jp.sbi.garuda.platform.commons.net.GarudaConnectionNotInitializedException;
 import jp.sbi.garuda.platform.event.PlatformEvent;
 import jp.sbi.garuda.platform.event.PlatformEventListener;
 import jp.sbi.garuda.platform.event.PlatformEventManager;
@@ -53,11 +52,11 @@ import de.zbit.util.ResourceManager;
  */
 public class GarudaSoftwareBackend {
 
+	public static final String LOAD_FILE_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.loadFilePropertyChangeId";
 	public static final String CONNECTION_NOT_INITIALIZED_ID = "de.zbit.garuda.GarudaSoftwareBackend.connectionNotInitialized";
 	public static final String CONNECTION_TERMINATED_ID = "de.zbit.garuda.GarudaSoftwareBackend.connectionTerminated";
 	public static final String GOT_ERRORS_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.gotErrors";
 	public static final String GOT_SOFTWARES_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.gotSoftwares";
-	public static final String LOAD_FILE_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.loadFile";
 	public static final String LOAD_GADGET_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.loadGadget";
 	public static final String SOFTWARE_DEREGISTRATION_ERROR_ID = "de.zbit.garuda.GarudaSoftwareBackend.softwareDeregistrationError";
 	public static final String SOFTWARE_REGISTRATION_ERROR_ID = "de.zbit.garuda.GarudaSoftwareBackend.softwareRegistrationError";
@@ -105,7 +104,7 @@ public class GarudaSoftwareBackend {
 	/**
 	 * 
 	 */
-	private String softwareID;
+	private Software sourceSoftware;
 	
 	/**
 	 * 
@@ -118,7 +117,12 @@ public class GarudaSoftwareBackend {
 	 */
 	public GarudaSoftwareBackend(UserInterface parent) {
 		super();
-		this.softwareID = parent.getApplicationName(); 
+		
+		sourceSoftware = new Software();
+		sourceSoftware.setId(parent.getClass().getSimpleName());
+		sourceSoftware.setVersion(parent.getDottedVersionNumber());
+		sourceSoftware.setName(parent.getApplicationName());
+		
 		this.listOfCompatibleSoftware = null;
 		this.parent = parent;
 		this.pcs = new PropertyChangeSupport(parent);
@@ -201,9 +205,10 @@ public class GarudaSoftwareBackend {
 	 * 
 	 * @throws NetworkException
 	 * @throws BackendNotInitializedException
+	 * @throws GarudaConnectionNotInitializedException 
 	 */
 	public void deregisterSoftwareFromGaruda() throws NetworkException,
-		BackendNotInitializedException {
+		BackendNotInitializedException, GarudaConnectionNotInitializedException {
 		if (!initialized) {
 			throw new BackendNotInitializedException();
 		}
@@ -250,11 +255,11 @@ public class GarudaSoftwareBackend {
 		} else if (!parent.equals(other.parent)) {
 			return false;
 		}
-		if (softwareID == null) {
-			if (other.softwareID != null) {
+		if (sourceSoftware == null) {
+			if (other.sourceSoftware != null) {
 				return false; 
 			}
-		} else if (!softwareID.equals(other.softwareID)) {
+		} else if (!sourceSoftware.equals(other.sourceSoftware)) {
 			return false; 
 		}
 		if (softwareListener == null) {
@@ -313,7 +318,7 @@ public class GarudaSoftwareBackend {
 		result = prime * result + ((listOfInputFileFormats == null) ? 0 : listOfInputFileFormats .hashCode());
 		result = prime * result + ((listOfOutputFileFormats == null) ? 0 : listOfOutputFileFormats .hashCode());
 		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
-		result = prime * result + ((softwareID == null) ? 0 : softwareID.hashCode());
+		result = prime * result + ((sourceSoftware == null) ? 0 : sourceSoftware.hashCode());
 		result = prime * result + ((softwareListener == null) ? 0 : softwareListener.hashCode());
 		return result;
 	}
@@ -321,8 +326,9 @@ public class GarudaSoftwareBackend {
 	/**
 	 * 
 	 * @throws NetworkException
+	 * @throws GarudaConnectionNotInitializedException 
 	 */
-	public void init() throws NetworkException {
+	public void init() throws NetworkException, GarudaConnectionNotInitializedException {
 		if (softwareListener == null) {
 			throw new IllegalStateException(bundle.getString("GARUDA_LISTENER_NOT_INITIALIZED")); 
 		}
@@ -330,7 +336,7 @@ public class GarudaSoftwareBackend {
 		CoreClientAPI api = CoreClientAPI.getInstance();
 		
 		api.initialize(
-			softwareID,
+			sourceSoftware.getId(),
 			parent.getDottedVersionNumber(),
 			parent.getApplicationName(),
 			softwareListener,
@@ -423,9 +429,10 @@ public class GarudaSoftwareBackend {
 	 * 
 	 * @throws NetworkException
 	 * @throws BackendNotInitializedException
+	 * @throws GarudaConnectionNotInitializedException 
 	 */
 	public void registedSoftwareToGaruda() throws NetworkException,
-		BackendNotInitializedException {
+		BackendNotInitializedException, GarudaConnectionNotInitializedException {
 		if (!initialized) {
 			throw new BackendNotInitializedException();
 		}
@@ -463,20 +470,14 @@ public class GarudaSoftwareBackend {
 			filePath = "java -jar " + filePath;
 		}
 		
-		//The working directory of the software. It would be advisable to make it the same with the one the 
-		//software is in.
-		String workingDirectory = parentFolder.getAbsolutePath().toString();
-		
 		//List of the file outputs from this software
-		
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("HOME", "home");
+		//...
 		
 		//The register call for this software to the Core.
 		
 		CoreClientAPI api = CoreClientAPI.getInstance();
-		api.registerSoftware(filePath, workingDirectory,
-			listOfInputFileFormats, listOfOutputFileFormats, map);
+		api.registerSoftware(filePath,
+			listOfInputFileFormats, listOfOutputFileFormats);
 		
 		logger.fine(MessageFormat.format(bundle.getString("REGISTERED_SOFTWARE_TO_CORE"), parentFolder.getAbsolutePath()));
 	}
@@ -503,14 +504,14 @@ public class GarudaSoftwareBackend {
 	 * @param selectedFile
 	 * @throws NetworkException
 	 * @throws IllegalStateException
+	 * @throws GarudaConnectionNotInitializedException 
 	 */
-	public void requestForLoadableSoftwares(File selectedFile) throws NetworkException,
-		IllegalStateException {
+	public void requestForLoadableSoftwares(File selectedFile, String fileType) throws NetworkException,
+		IllegalStateException, GarudaConnectionNotInitializedException {
 		if (selectedFile != null) {
 			CoreClientAPI.getInstance().doGetLoadableSoftwares(
-				softwareID,
 				selectedFile.getName().substring(
-					selectedFile.getName().indexOf('.') + 1));
+					selectedFile.getName().indexOf('.') + 1), fileType);
 			logger.fine(MessageFormat.format(bundle.getString("REQUESTED_COMPATIBLE_SOFTWARE"), selectedFile));
 		} else {
 			throw new IllegalStateException(bundle.getString("NO_FILE_SELECTED"));
@@ -523,9 +524,10 @@ public class GarudaSoftwareBackend {
 	 * @param indexOfSoftware
 	 * @throws NetworkException
 	 * @throws IllegalStateException
+	 * @throws GarudaConnectionNotInitializedException 
 	 */
 	public void sentFileToSoftware(File selectedFile, int indexOfSoftware)
-		throws NetworkException, IllegalStateException {
+		throws NetworkException, IllegalStateException, GarudaConnectionNotInitializedException {
 		if ((selectedFile == null) || !selectedFile.exists()) {
 			throw new IllegalStateException(MessageFormat.format(bundle.getString("FILE_DOES_NOT_EXIST"), selectedFile));
 		}
@@ -537,7 +539,7 @@ public class GarudaSoftwareBackend {
 				FileTools.getExtension(selectedFile.getName())));
 		}
 		CoreClientAPI.getInstance().loadFileOntoSoftware(
-			listOfCompatibleSoftware.get(indexOfSoftware),
+			listOfCompatibleSoftware.get(indexOfSoftware), sourceSoftware,
 			selectedFile.getAbsolutePath());
 		logger.fine(MessageFormat.format(
 			bundle.getString("FILE_LOADING_REQUEST"),
@@ -562,7 +564,7 @@ public class GarudaSoftwareBackend {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getClass().getSimpleName());
 		builder.append(" [softwareID=");
-		builder.append(softwareID);
+		builder.append(sourceSoftware.getId());
 		builder.append(", initialized=");
 		builder.append(initialized);
 		builder.append(", listOfInputFileFormats=");

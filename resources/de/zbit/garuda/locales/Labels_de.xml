@@ -54,15 +54,18 @@
   
   <entry key="FILE_DOES_NOT_EXIST">Datei {0} zum Senden existiert nicht.</entry>
   <entry key="FILE_LOADING_REQUEST">Anfrage, um Datei {0} in Software {1} zu laden</entry>
-  <entry key="GARUDA_CORE_INITIALIZED">Garuda-Kern-Klient wurde initialisiert</entry>
+  <entry key="NO_FILE_SELECTED">Keine Datei ausgewählt</entry>
+  <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Anfrage nach der liste kompatibler Software, um Datei {0} zu senden</entry>
+  <entry key="PATH_FOR_SOFTWARE">Der Pfad dieser Software lautet: {0}</entry>
+  
+  <!-- // Obsolete: -->
+  <entry key="REGISTERED_SOFTWARE_TO_CORE">Registrierte Software für Garuda-Kern {0}</entry>
   <entry key="GARUDA_CORE_SOFTWARE_ACTIVATED">Garuda-Kern-Klient wurde initialisiert und Software aktiviert.</entry>
   <entry key="GARUDA_CORE_STARTED">Garuda-Kern-Klient initialisiert und gestartet</entry>
+  <entry key="GARUDA_CORE_INITIALIZED">Garuda-Kern-Klient wurde initialisiert</entry>
   <entry key="GARUDA_LISTENER_NOT_INITIALIZED">Garuda-Lauscher nicht initialisiert.</entry>
-  <entry key="NO_FILE_SELECTED">Keine Datei ausgewählt</entry>
-  <entry key="REGISTERED_SOFTWARE_TO_CORE">Registrierte Software für Garuda-Kern {0}</entry>
-  <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Anfrage nach der liste kompatibler Software, um Datei {0} zu senden</entry>
-  <entry key="SOFTWARE_DEREGISTERED">Software abgemeldet vom Garuda-Kern.</entry>
-  <entry key="PATH_FOR_SOFTWARE">Der Pfad dieser Software lautet: {0}</entry>
+  <entry key="SOFTWARE_DEREGISTERED">Software abgemeldet vom Garuda-Kern.</entry> 
+  <!-- -->
   
   <!-- User interface -->
   
