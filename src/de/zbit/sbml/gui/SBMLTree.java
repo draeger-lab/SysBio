@@ -599,10 +599,6 @@ public class SBMLTree extends JTree implements ActionListener {
 		}
 	}
 	
-	public void search(Filter filter) {
-		search(filter, null);
-	}
-	
 	/**
 	 * 
 	 * @param filter
@@ -611,14 +607,14 @@ public class SBMLTree extends JTree implements ActionListener {
 	public void search(Filter filter, AbstractProgressBar progressBar) {
 		SBMLNode.setShowInvisible(true);
 		SBMLNode root = (SBMLNode) this.getModel().getRoot();
-		List<? extends TreeNode> list = ((SBase)root.getUserObject()).filter(filter);
 		if (progressBar != null) {
 			progressBar.reset();
-			progressBar.setNumberOfTotalCalls(2 * root.getNodeCount());
-			if (progressBar instanceof ProgressBarSwing){
+			progressBar.setNumberOfTotalCalls(2 * root.getChildCount());
+			if (progressBar instanceof ProgressBarSwing) {
 				((ProgressBarSwing) progressBar).getProgressBar().setVisible(true);
 			}
 		}
+		List<? extends TreeNode> list = ((SBase) root.getUserObject()).filter(filter, true, false);
 		search(root, filter, list, progressBar);
 		reload();
 		SBMLNode.setShowInvisible(false);
@@ -632,17 +628,19 @@ public class SBMLTree extends JTree implements ActionListener {
 	 * @param progressBar
 	 * @param callNr
 	 */
-	private void search(SBMLNode node,Filter filter,List<? extends TreeNode> list, final AbstractProgressBar progressBar) {
-		SBase sbase = ((SBase)node.getUserObject());
-		if (sbase.filter(filter).size() > 0) {
-			node.setVisible(true);
-			node.setBoldFont(false);
-		} else if (list.contains(sbase)) {
-			node.setBoldFont(true);
-			node.setVisible(true);
-		} else {
-			node.setBoldFont(false);
-			node.setVisible(false);
+	private void search(SBMLNode node, Filter filter, List<? extends TreeNode> list, final AbstractProgressBar progressBar) {
+		SBase sbase = ((SBase) node.getUserObject());
+		if (list.size() > 0) {
+			if (list.remove(sbase)) {
+				if (filter.accepts(sbase)) {
+					logger.fine("Changed font face to bold for " + sbase);
+					node.setBoldFont(true);
+				}
+				node.setVisible(true);
+			} else {
+				node.setBoldFont(false);
+				node.setVisible(false);
+			}
 		}
 		for (int i = 0; i < node.getChildCount(); ++i) {
 			SBMLNode child = (SBMLNode) node.getChildAt(i);

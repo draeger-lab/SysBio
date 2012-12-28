@@ -17,6 +17,7 @@ package de.zbit.sbml.gui;
 
 import java.awt.Component;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +31,7 @@ import de.zbit.gui.GUITools;
 import de.zbit.sbml.util.RegexpAssignmentVariableFilter;
 import de.zbit.sbml.util.RegexpNameFilter;
 import de.zbit.sbml.util.RegexpSpeciesReferenceFilter;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.progressbar.AbstractProgressBar;
 import de.zbit.util.progressbar.gui.ProgressBarSwing;
 
@@ -126,7 +128,8 @@ public class SBMLTreeSearcher extends SwingWorker<List<TreeNode>, Void> {
 				((ProgressBarSwing) progressBar).getProgressBar().setVisible(false);
 			}
 		}
-		logger.log(Level.FINE, "Ready.");
+		ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
+		logger.log(Level.FINE, bundle.getString("READY"));
 		firePropertyChange("done", null, null);
 	}
 	
