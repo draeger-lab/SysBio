@@ -17,7 +17,6 @@
 package de.zbit.sbml.gui;
 
 import java.awt.Component;
-import java.awt.Font;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -51,16 +50,14 @@ public class SBMLTreeCellRenderer extends DefaultTreeCellRenderer {
 		super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 		if (value instanceof SBMLNode) {
 			SBMLNode node = (SBMLNode) value;
-			if (node.isBoldFont()) {
-				setFont(getFont().deriveFont(Font.BOLD));
-			} else {
-				setFont(getFont().deriveFont(Font.PLAIN));
-			}
-			if (node.getUserObject() instanceof SimpleSpeciesReference){
+			if (node.getUserObject() instanceof SimpleSpeciesReference) {
 			  if (((SimpleSpeciesReference) node.getUserObject()).isSetSpeciesInstance() && 
 			      ((SimpleSpeciesReference) node.getUserObject()).getSpeciesInstance().isSetName()) {
 				  this.setText(((SimpleSpeciesReference) node.getUserObject()).getSpeciesInstance().getName());
 			  }
+			}
+			if (node.isBoldFont()) {
+				setText("<html><b>" + getText() + "</b></html>");
 			}
 		}
 		return this; 

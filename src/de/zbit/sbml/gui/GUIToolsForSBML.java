@@ -29,7 +29,7 @@ import de.zbit.util.StringUtil;
  * @version $Rev$
  */
 public class GUIToolsForSBML {
-
+	
   /**
 	 * Creates a JEditorPane that displays the given UnitDefinition as a HTML.
 	 * 
@@ -43,4 +43,5 @@ public class GUIToolsForSBML {
 		preview.setBorder(BorderFactory.createLoweredBevelBorder());
 		return preview;
 	}
+
 }

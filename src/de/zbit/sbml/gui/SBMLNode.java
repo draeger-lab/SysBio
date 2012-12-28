@@ -55,6 +55,11 @@ import de.zbit.util.ResourceManager;
 public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeListener {
 
 	/**
+	 * Localization for SBML element names.
+	 */
+	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.ElementNames");
+	
+	/**
 	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = 9057010975355065921L;
@@ -65,19 +70,9 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	private static final Logger logger = Logger.getLogger(SBMLNode.class.getName());
 	
 	/**
-	 * Localization for SBML element names.
-	 */
-	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.ElementNames");
-	
-	/**
 	 * true: show invisible nodes
 	 */
 	private static boolean showInvisible = false;
-	
-	/**
-	 * 
-	 */
-	private int nodeCount = 0;
 	
 	/**
 	 * 
@@ -130,7 +125,6 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 		this.expanded = false;
 		this.isVisible = isVisible;
 		
-		nodeCount++;
 		if (node == null) {
 			return;
 		}
@@ -371,14 +365,6 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	 */
 	public static void setShowInvisible(boolean showInvisible) {
 		SBMLNode.showInvisible = showInvisible;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getNodeCount() {
-		return nodeCount;
 	}
 
 	/* (non-Javadoc)

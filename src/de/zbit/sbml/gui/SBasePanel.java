@@ -24,6 +24,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,6 +85,7 @@ import de.zbit.gui.SystemBrowser;
 import de.zbit.gui.layout.LayoutHelper;
 import de.zbit.gui.table.renderer.ColoredBooleanRenderer;
 import de.zbit.sbml.io.SBOTermFormatter;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
@@ -104,6 +106,14 @@ public class SBasePanel extends JPanel implements EquationComponent {
    */
   public static final transient Logger logger = Logger.getLogger(SBasePanel.class.getName());
   
+	/**
+	 * Localization for SBML element names.
+	 */
+	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.ElementNames");
+	
+  /**
+   * 
+   */
 	private static final int preferedWidth = 450;
 
 	/**
@@ -156,9 +166,13 @@ public class SBasePanel extends JPanel implements EquationComponent {
   	editable = false;
   	row = -1;
   	if (sbase != null) {
-  		String className = sbase.getClass().getCanonicalName();
-  		className = className.substring(className.lastIndexOf('.') + 1);
-  		setBorder(BorderFactory.createTitledBorder(" " + className + " "));
+  		String elementName = sbase.getElementName();
+  		if (bundle.containsKey(elementName)) {
+  			elementName = bundle.getString(elementName);
+  		} else if (elementName.equals(ListOf.Type.other.toString())) {
+  			elementName = sbase.getClass().getSimpleName();
+  		}
+  		setBorder(BorderFactory.createTitledBorder(' ' + elementName + ' '));
   		lh.add(new JPanel(), 0, ++row, 5, 1, 0d, 0d);
   		if (sbase instanceof NamedSBase) {
   			addProperties((NamedSBase) sbase);
@@ -609,7 +623,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			notesArea.addHyperlinkListener(new SystemBrowser());
 //			notesArea.setMaximumSize(new Dimension(preferedWidth, 200));
 			notesArea.setDoubleBuffered(true);
-//			notesArea.setBorder(BorderFactory.createLoweredBevelBorder());
+			notesArea.setBorder(BorderFactory.createLoweredBevelBorder());
 			JScrollPane editorScrollPane = new JScrollPane(notesArea);
 			//scroll.setMaximumSize(notesArea.getMaximumSize());
 			// We NEED to set a PreferredSize on the scroll. Else, Long description strings
@@ -675,6 +689,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			l.addHyperlinkListener(new SystemBrowser());
 			l.setEditable(editable);
 			l.setBackground(Color.WHITE);
+			l.setBorder(BorderFactory.createLoweredBevelBorder());
 			Dimension dim = new Dimension(preferedWidth, 125);
 			l.setMaximumSize(dim);
 			JScrollPane editorScrollPane = new JScrollPane(l);
