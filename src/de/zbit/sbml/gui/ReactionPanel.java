@@ -21,13 +21,10 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.sbml.jsbml.ListOf;
-import org.sbml.jsbml.Model;
 import org.sbml.jsbml.Reaction;
-import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
@@ -56,22 +53,9 @@ public class ReactionPanel extends JPanel {
 	 */
 	private Reaction reaction;
 	/**
-	 * prefs.getBoolean(LaTeXOptions.PRINT_NAMES_IF_AVAILABLE)
+	 * 
 	 */
 	private boolean namesIfAvailalbe;
-	
-	
-	public static void main(String args[]) {
-	  SBMLDocument doc = new SBMLDocument(2, 4);
-	  Model model = doc.createModel("test");
-	  Species s1 = model.createSpecies("s1", model.createCompartment("c1"));
-	  Species s2 = model.createSpecies("s2", s1.getCompartmentInstance());
-	  Reaction r1 = model.createReaction("r1");
-	  r1.createReactant(s1);
-	  r1.createProduct(s2);
-	  r1.setReversible(false);
-	  JOptionPane.showMessageDialog(null, new ReactionPanel(r1, true));
-	}
 	
 	/**
 	 * 
