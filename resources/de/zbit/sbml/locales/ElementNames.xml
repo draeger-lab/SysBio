@@ -21,8 +21,56 @@
     
     version: $Rev$
   </comment>
+
+  <!-- Attributes -->
   
-  <!-- SBML Core -->
+  <entry key="areaUnits">Area units</entry>
+  <entry key="boundaryCondition">Boundary condition</entry>
+  <entry key="charge">Charge</entry>
+  <entry key="constant">Constant</entry>
+  <entry key="containsUndeclaredUnits">Contains undeclared units</entry>
+  <entry key="dateOfModelCreation">Model creation</entry>
+  <entry key="dateOfModelModification">Modification</entry>
+  <entry key="definition">Definition</entry>
+  <entry key="derivedUnit">Derived unit</entry>
+  <entry key="eMail">E-mail</entry>
+  <entry key="element">Element</entry>
+  <entry key="exponent">Exponent</entry>
+  <entry key="extentUnits">Extent units</entry>
+  <entry key="familyName">Family name</entry>
+  <entry key="fast">Fast</entry>
+  <entry key="givenName">Given name</entry>
+  <entry key="hasOnlySubstanceUnits">Has only substance units</entry>
+  <entry key="initialAmount">Initial amount</entry>
+  <entry key="initialConcentration">Initial concentration</entry>
+  <entry key="kind">Kind</entry>
+  <entry key="lengthUnits">Length units</entry>
+  <entry key="listOfCreators">Creators</entry>
+  <entry key="message">Message</entry>
+  <entry key="multiplier">Multiplier</entry>
+  <entry key="multiplier_tooltip">The multiplier for the unit</entry>
+  <entry key="MIRIAM">Minimal Information Required In the Annotation of Models (MIRIAM)</entry>
+  <entry key="name">Name</entry>
+  <entry key="notes">Notes</entry>
+  <entry key="offset">Offset</entry>
+  <entry key="organization">Organization</entry>
+  <entry key="outside">Outside</entry>
+  <entry key="quantity">Quantity</entry>
+  <entry key="reactionEquation">Reaction equation</entry>
+  <entry key="reversible">Reversible</entry>
+  <entry key="scale">Scale</entry>
+  <entry key="size">Size</entry>
+  <entry key="spatialDimensions">Spatial dimensions</entry>
+  <entry key="stoichiometry">Stoichiometry</entry>
+  <entry key="substanceUnits">Substance units</entry>
+  <entry key="substanceUnit">Substance unit</entry>
+  <entry key="SBO">Systems Biology Ontology</entry>
+  <entry key="timeUnits">Time units</entry>
+  <entry key="usesValuesFromTriggerTime">Uses values from trigger time</entry>
+  <entry key="value">Value</entry>
+  <entry key="volumeUnits">Volume units</entry>
+  
+  <!-- Core SBML -->
   
   <entry key="algebraicRule">Algebraic rule</entry>
   <entry key="annotation">Annotation</entry>
@@ -70,5 +118,71 @@
   <entry key="trigger">Trigger</entry>
   <entry key="unit">Unit</entry>
   <entry key="unitDefinition">Unit definition</entry>
+
+  <!-- FBC -->
+
+  <entry key="fluxBound">Flux bound</entry>
+  <entry key="fluxObjective">Flux objective</entry>
+  <entry key="listOfFluxBounds">Flux bounds</entry>
+  <entry key="listOfFluxObjectives">Flux objectives</entry>
+  <entry key="listOfObjectives">Objectives</entry>
+  <entry key="objective">Objective</entry>
   
+  <!-- Groups -->
+  
+  <entry key="classification">Classification</entry>
+  <entry key="collection">Collection</entry>
+  <entry key="group">Group</entry>
+  <entry key="listOfGroups">Groups</entry>
+  <entry key="listOfMembers">Members</entry>
+  <entry key="member">Member</entry>
+  <entry key="partonomy">Partonomy</entry>
+  
+  <!-- Layout -->
+  
+  <entry key="basePoint1">Base point 1</entry>
+  <entry key="basePoint2">Base point 2</entry>
+  <entry key="boundingBox">Bounding box</entry>
+  <entry key="compartmentGlyph">Compartment glyph</entry>
+  <entry key="cubicBezier">Cubic bezier</entry>
+  <entry key="curve">Curve</entry>
+  <entry key="curveSegment">Curve segment</entry>
+  <entry key="dimensions">Dimensions</entry>
+  <entry key="end">End</entry>
+  <entry key="layout">Layout</entry>  
+  <entry key="listOfCompartmentGlyphs">Compartment glyphs</entry>
+  <entry key="listOfCurveSegments">Curve segments</entry>
+  <entry key="listOfLayouts">Layouts</entry>
+  <entry key="listOfReactionGlyphs">Reaction glyphs</entry>
+  <entry key="listOfSpeciesGlyphs">Species glyphs</entry>
+  <entry key="listOfSpeciesReferenceGlyphs">Species reference glyphs</entry>
+  <entry key="listOfTextGlyphs">Text glyphs</entry>
+  <entry key="position">Position</entry>  
+  <entry key="reactionGlyph">Reaction glyph</entry>
+  <entry key="speciesGlyph">Species glyph</entry>
+  <entry key="speciesReferenceGlyph">Species reference glyph</entry>
+  <entry key="start">Start</entry>
+  <entry key="textGlyph">Text glyph</entry>
+  
+  <!-- Qual -->
+  
+  <entry key="assignmentLevel">Assignment level</entry>
+  <entry key="consumption">Consumption</entry>
+  <entry key="functionTerm">Function term</entry>
+  <entry key="input">Input</entry>
+  <entry key="inputTransitionEffect">Input transition effect</entry>
+  <entry key="listOfFunctionTerms">Function terms</entry>
+  <entry key="listOfInputs">Inputs</entry>
+  <entry key="listOfOutputs">Outputs</entry>
+  <entry key="listOfQualitativeSpecies">Qualitative species</entry>
+  <entry key="listOfSymbolicValues">Symbolic values</entry>
+  <entry key="listOfTransitions">Transitions</entry>
+  <entry key="none">none</entry>
+  <entry key="output">Output</entry>
+  <entry key="outputTransitionEffect">Output transition effect</entry>
+  <entry key="production">Production</entry>
+  <entry key="qualitativeSpecies">Qualitative species</entry>
+  <entry key="sign">Sign</entry>
+  <entry key="transition">Transition</entry>
+
 </properties>

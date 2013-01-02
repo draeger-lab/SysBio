@@ -110,6 +110,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * Localization for SBML element names.
 	 */
 	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.ElementNames");
+	private static final ResourceBundle bundleWarnings = ResourceManager.getBundle("de.zbit.sbml.locales.Warnings");
 	
   /**
    * 
@@ -166,13 +167,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
   	editable = false;
   	row = -1;
   	if (sbase != null) {
-  		String elementName = sbase.getElementName();
-  		if (bundle.containsKey(elementName)) {
-  			elementName = bundle.getString(elementName);
-  		} else if (elementName.equals(ListOf.Type.other.toString())) {
-  			elementName = sbase.getClass().getSimpleName();
-  		}
-  		setBorder(BorderFactory.createTitledBorder(' ' + elementName + ' '));
+  		setBorder(BorderFactory.createTitledBorder(' ' + createPanelTitle(sbase) + ' '));
   		lh.add(new JPanel(), 0, ++row, 5, 1, 0d, 0d);
   		if (sbase instanceof NamedSBase) {
   			addProperties((NamedSBase) sbase);
@@ -230,23 +225,38 @@ public class SBasePanel extends JPanel implements EquationComponent {
   }
   
   /**
+   * 
+   * @param sbase
+   * @return
+   */
+  public String createPanelTitle(SBase sbase) {
+		String elementName = sbase.getElementName();
+		if (bundle.containsKey(elementName)) {
+			elementName = bundle.getString(elementName);
+		} else if (elementName.equals(ListOf.Type.other.toString())) {
+			elementName = sbase.getClass().getSimpleName();
+		}
+		return elementName;
+	}
+
+	/**
 	 * @param c
 	 */
 	private void addProperties(Compartment c) {
 		if (c.isSetCompartmentType() || editable) {
 			JTextField tf = new JTextField(c.getCompartmentTypeInstance().toString());
 			tf.setEditable(editable);
-			addLabeledComponent("Compartment type", tf);
+			addLabeledComponent(bundle.getString("compartmentType"), tf);
 		}
 		if (c.isSetOutside() || editable) {
 			JTextField tf = new JTextField(c.getOutsideInstance().toString());
 			tf.setEditable(editable);
-			addLabeledComponent("Outside", tf);
+			addLabeledComponent(bundle.getString("outside"), tf);
 		}
 		if (c.isSetSpatialDimensions()) {
 			JSpinner spinner = new JSpinner(new SpinnerNumberModel(c.getSpatialDimensions(), 0, 3, 1));
 			spinner.setEnabled(editable);
-			addLabeledComponent("Spatial dimensions", spinner);
+			addLabeledComponent(bundle.getString("spatialDimensions"), spinner);
 		}
 		addProperties((Symbol) c);
 	}
@@ -258,7 +268,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		if (c.isSetMessage() || editable) {
 			JTextField tf = new JTextField(c.getMessageString());
 			tf.setEditable(editable);
-			addLabeledComponent("Message", tf);
+			addLabeledComponent(bundle.getString("message"), tf);
 		}
 	}
 
@@ -266,7 +276,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @param e
 	 */
 	private void addProperties(Event e) {
-		JCheckBox check = new JCheckBox("Uses values from trigger time", e.getUseValuesFromTriggerTime());
+		JCheckBox check = new JCheckBox(bundle.getString("useValuesFromTriggerTime"), e.getUseValuesFromTriggerTime());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
@@ -324,8 +334,8 @@ public class SBasePanel extends JPanel implements EquationComponent {
 						.replace("mathrm", "mbox").replace("text", "mbox")
 						.replace("mathtt", "mbox"));
 				} catch (Throwable e) {
-					logger.log(Level.FINE, "Could not create LaTeX code from syntax tree.", e);
-					laTeXpreview.append("invalid");
+					logger.log(Level.WARNING, bundleWarnings.getString("COULD_NOT_CREATE_LATEX_FROM_ASTNODE"), e);
+					laTeXpreview.append(bundleWarnings.getString("invalid"));
 					//e.printStackTrace();
 				}
 				laTeXpreview.append(LaTeXCompiler.eqEnd);
@@ -369,48 +379,48 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private void addProperties(Model model) {
 		if (model.getLevel() > 2) {
-			if (model.isSetConversionFactorInstance()) {
+			if (model.isSetConversionFactor()) {
 				// TODO
 			}
 			if (model.isSetAreaUnits()) {
-				addUnit("Area units", model.getAreaUnits(), model);
+				addUnit(bundle.getString("areaUnits"), model.getAreaUnits(), model);
 			}
 			if (model.isSetLengthUnits()) {
-				addUnit("Length units", model.getLengthUnits(), model);
+				addUnit(bundle.getString("lengthUnits"), model.getLengthUnits(), model);
 			}
 			if (model.isSetExtentUnits()) {
-				addUnit("Extent units", model.getExtentUnits(), model);
+				addUnit(bundle.getString("extentUnits"), model.getExtentUnits(), model);
 			}
 			if (model.isSetSubstanceUnits()) {
-				addUnit("Substance units", model.getSubstanceUnits(), model);
+				addUnit(bundle.getString("substanceUnits"), model.getSubstanceUnits(), model);
 			}
 			if (model.isSetTimeUnits()) {
-				addUnit("Time units", model.getTimeUnits(), model);
+				addUnit(bundle.getString("timeUnits"), model.getTimeUnits(), model);
 			}
 			if (model.isSetVolumeUnits()) {
-				addUnit("Volume units", model.getVolumeUnits(), model);
+				addUnit(bundle.getString("volumeUnits"), model.getVolumeUnits(), model);
 			}
 		}
-		String columnNames[] = new String[] { "Element", "Quantity" };
+		String columnNames[] = new String[] { bundle.getString("element"), bundle.getString("quantity") };
 		String rowData[][] = new String[][] {
-				{ "Function definitions",
+				{ bundle.getString("listOfFunctionDefinitions"),
 						Integer.toString(model.getFunctionDefinitionCount()) },
-				{ "Unit definitions",
+				{ bundle.getString("listOfUnitDefinitions"),
 						Integer.toString(model.getUnitDefinitionCount()) },
-				{ "Compartment types",
+				{ bundle.getString("listOfCompartmentTypes"),
 						Integer.toString(model.getCompartmentTypeCount()) },
-				{ "Species types", Integer.toString(model.getSpeciesTypeCount()) },
-				{ "Compartments", Integer.toString(model.getCompartmentCount()) },
-				{ "Species", Integer.toString(model.getSpeciesCount()) },
-				{ "Global parameters", Integer.toString(model.getParameterCount()) },
-				{ "Local parameters",
+				{ bundle.getString("listOfSpeciesTypes"), Integer.toString(model.getSpeciesTypeCount()) },
+				{ bundle.getString("listOfCompartments"), Integer.toString(model.getCompartmentCount()) },
+				{ bundle.getString("listOfSpecies"), Integer.toString(model.getSpeciesCount()) },
+				{ bundle.getString("listOfParameters"), Integer.toString(model.getParameterCount()) },
+				{ bundle.getString("listOfLocalParameters"),
 						Integer.toString(model.getLocalParameterCount()) },
-				{ "Initial assignments",
+				{ bundle.getString("listOfInitialAssignments"),
 						Integer.toString(model.getInitialAssignmentCount()) },
-				{ "Rules", Integer.toString(model.getRuleCount()) },
-				{ "Constraints", Integer.toString(model.getConstraintCount()) },
-				{ "Reactions", Integer.toString(model.getReactionCount()) },
-				{ "Events", Integer.toString(model.getEventCount()) } };
+				{ bundle.getString("listOfRules"), Integer.toString(model.getRuleCount()) },
+				{ bundle.getString("listOfConstraints"), Integer.toString(model.getConstraintCount()) },
+				{ bundle.getString("listOfReactions"), Integer.toString(model.getReactionCount()) },
+				{ bundle.getString("listOfEvents"), Integer.toString(model.getEventCount()) } };
 		JTable table = new JTable(rowData, columnNames);
 		table.setEnabled(editable);
 		table.setPreferredScrollableViewportSize(new Dimension(200, table
@@ -457,7 +467,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		if (nsb.isSetName() || nsb.isSetId() || editable) {
 			JTextField tf = new JTextField((nsb.isSetName()) ? nsb.getName() : nsb.getId());
 			tf.setEditable(editable);
-			addLabeledComponent("Name", tf);
+			addLabeledComponent(bundle.getString("name"), tf);
 		}
 	}
 
@@ -473,7 +483,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @param q
 	 */
 	private void addProperties(QuantityWithUnit q) {
-		addLabeledComponent(q instanceof Species ? "Substance unit"	: "Unit", unitPreview(q.getUnitsInstance()));
+		addLabeledComponent(q instanceof Species ? bundle.getString("substanceUnit")	: bundle.getString("unit"), unitPreview(q.getUnitsInstance()));
 	}
 
 	/**
@@ -481,11 +491,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @throws XMLStreamException
 	 */
 	private void addProperties(Reaction reaction) throws XMLStreamException {
-		JCheckBox check = new JCheckBox("Reversible", reaction.getReversible());
+		JCheckBox check = new JCheckBox(bundle.getString("reversible"), reaction.getReversible());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-		check = new JCheckBox("Fast", reaction.getFast());
+		check = new JCheckBox(bundle.getString("fast"), reaction.getFast());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
@@ -493,7 +503,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		// Create Table of reactants, modifiers and products
 		String rmp[][] = new String[Math.max(reaction.getReactantCount(), Math
 				.max(reaction.getModifierCount(), reaction.getProductCount()))][3];
-		String colNames[] = new String[] { "Reactants", "Modifiers", "Products" };
+		String colNames[] = new String[] { bundle.getString("listOfReactants"), bundle.getString("listOfModifiers"), bundle.getString("listOfProducts") };
 		int count;
 		if (reaction.isSetListOfReactants()) {
 			count = 0;
@@ -540,7 +550,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		s.setBorder(BorderFactory.createLoweredBevelBorder());
 		s.setPreferredSize(new Dimension(preferedWidth, 50));
 		rEqPanel.add(s, BorderLayout.CENTER);
-		rEqPanel.setBorder(BorderFactory.createTitledBorder(" Reaction equation "));
+		rEqPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("reactionEquation") + ' '));
 		lh.add(rEqPanel, 1, ++row, 3, 1, 1d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		if (reaction.isSetKineticLaw()) {
@@ -557,9 +567,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		lh.add(new JPanel(), 2, row, 1, 1, 0d, 0d);
 		if (sbase.isSetHistory()) {
 			History hist = sbase.getHistory();
-			lh.add(new JLabel("Model creators: "), 1, ++row, 1, 1, 0d, 0d);
-			String columnNames[] = new String[] { "Given name", "Family name",
-					"E-mail", "Organization" };
+			lh.add(new JLabel(bundle.getString("listOfCreators")), 1, ++row, 1, 1, 0d, 0d);
+			String columnNames[] = new String[] { bundle.getString("givenName"), bundle.getString("familyName"),
+				bundle.getString("eMail"), bundle.getString("organization") };
 			String rowData[][] = new String[hist.getCreatorCount()][4];
 			int i = 0;
 			for (Creator mc : hist.getListOfCreators()) {
@@ -586,7 +596,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			if (hist.isSetCreatedDate()) {
 				JTextField tf = new JTextField(hist.getCreatedDate().toString());
 				tf.setEditable(editable);
-				addLabeledComponent("Model creation", tf);
+				addLabeledComponent(bundle.getString("dateOfModelCreation"), tf);
 			}
 			Vector<Date> modification = new Vector<Date>();
 			if (hist.isSetModifiedDate()) {
@@ -604,7 +614,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				scroll2.setPreferredSize(new Dimension(preferedWidth,
 						modification.size() * 20));
 				scroll2.setBorder(BorderFactory.createLoweredBevelBorder());
-				addLabeledComponent("Modification", scroll2);
+				addLabeledComponent(bundle.getString("dateOfModelModification"), scroll2);
 			}
 		}
 		if (sbase.isSetNotes() || editable) {
@@ -628,12 +638,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			//scroll.setMaximumSize(notesArea.getMaximumSize());
 			// We NEED to set a PreferredSize on the scroll. Else, Long description strings
 			// are printed on one large line without a line break!
-			// Setting a maximum size has (unfortunately) no influence on this behaviour
+			// Setting a maximum size has (unfortunately) no influence on this behavior
 //			scroll.setPreferredSize(new Dimension(preferedWidth, 500));
 			editorScrollPane.setPreferredSize(new Dimension(250, 145));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
 			JPanel notesPanel = new JPanel();
-			notesPanel.setBorder(BorderFactory.createTitledBorder(" Notes "));
+			notesPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("notes") + ' '));
 			LayoutHelper helper = new LayoutHelper(notesPanel);
 			helper.add(editorScrollPane);
 			lh.add(notesPanel, 1, row, 3, 1, 1d, 0d);
@@ -696,7 +706,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			editorScrollPane.setPreferredSize(new Dimension(250, 145));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
 			JPanel miriamPanel = new JPanel();
-			miriamPanel.setBorder(BorderFactory.createTitledBorder(" Minimal Information Required In the Annotation of Models (MIRIAM) "));
+			miriamPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("MIRIAM") + ' '));
 			LayoutHelper helper = new LayoutHelper(miriamPanel);
 			helper.add(editorScrollPane);
 			lh.add(helper.getContainer(), 1, row, 3, 1, 1d, 0d);
@@ -704,12 +714,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		}
 		if (sbase.isSetSBOTerm()) {
 			JPanel sboPanel = new JPanel();
-			sboPanel.setBorder(BorderFactory.createTitledBorder(" Systems Biology Ontology "));
+			sboPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("SBO") + ' '));
 			LayoutHelper helper = new LayoutHelper(sboPanel);
 			
 			int columns = 35, innerRow = -1;
 			SBO.Term term = SBO.getTerm(sbase.getSBOTerm());
-			helper.add(new JLabel("Name: "), 1, ++innerRow, 1, 1, 0d, 0d);
+			helper.add(new JLabel(bundle.getString("name")), 1, ++innerRow, 1, 1, 0d, 0d);
 			JTextArea nameField = new JTextArea(term.getName(), 2, columns);
 			nameField.setEditable(editable);
 			nameField.setCaretPosition(0);
@@ -718,7 +728,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			helper.add(new JScrollPane(nameField), 3, innerRow, 1, 1, 1d, 0d);
 			helper.add(new JPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
 			
-			helper.add(new JLabel("Definition: "), 1, ++innerRow, 1, 1, 0d, 0d);
+			helper.add(new JLabel(bundle.getString("definition")), 1, ++innerRow, 1, 1, 0d, 0d);
 			JTextArea sboTermField = new JTextArea(5, columns);
 			sboTermField.setCaretPosition(0);
 			sboTermField.setLineWrap(true);
@@ -728,7 +738,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				sboTermField.setText(SBOTermFormatter.getShortDefinition(term));
 			} catch (Exception exc) {
 				// NoSuchElementException if ontology file is outdated
-				logger.log(Level.WARNING, "Could not get SBO identifier.", exc);
+				logger.log(Level.WARNING, bundleWarnings.getString("COULD_NOT_GET_SBO_IDENTIFIER"), exc);
 			}
 			helper.add(new JScrollPane(sboTermField), 3, innerRow, 1, 1, 1d, 0d);
 			helper.add(new JPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
@@ -744,8 +754,8 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	private void addProperties(SBaseWithDerivedUnit sbase) {
 		JEditorPane pane = unitPreview(sbase.getDerivedUnitDefinition());
 		pane.setBorder(BorderFactory.createLoweredBevelBorder());
-		addLabeledComponent("Derived unit", pane);
-		JCheckBox chck = new JCheckBox("Contains undeclared units", sbase.containsUndeclaredUnits());
+		addLabeledComponent(bundle.getString("derivedUnit"), pane);
+		JCheckBox chck = new JCheckBox(bundle.getString("containsUndeclaredUnits"), sbase.containsUndeclaredUnits());
 		chck.setEnabled(false);
 		lh.add(chck, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 0, ++row, 1, 1, 0d, 0d);
@@ -769,7 +779,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			JComboBox combo = new JComboBox(idsOrNames);
 			combo.setSelectedIndex(index);
 			combo.setEnabled(editable);
-			lh.add(new JLabel("Species"), 1, ++row, 1, 1, 0d, 0d);
+			lh.add(new JLabel(bundle.getString("species")), 1, ++row, 1, 1, 0d, 0d);
 			lh.add(combo, 3, row, 1, 1, 1d, 0d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
@@ -791,25 +801,25 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		if (species.isSetSpeciesType()) {
 			JTextField tf = new JTextField(species.getSpeciesTypeInstance().toString());
 			tf.setEditable(editable);
-			addLabeledComponent("Species type", tf);
+			addLabeledComponent(bundle.getString("speciesType"), tf);
 		}
 		JTextField tf = new JTextField(species.getCompartmentInstance().toString());
 		tf.setEditable(editable);
-		addLabeledComponent("Compartment", tf);
+		addLabeledComponent(bundle.getString("compartment"), tf);
 		if (species.isSetSpeciesType() || editable) {
 			tf = new JTextField(species.getSpeciesTypeInstance().toString());
 			tf.setEditable(editable);
-			addLabeledComponent("Species type", tf);
+			addLabeledComponent(bundle.getString("speciesType"), tf);
 		}
 		JSpinner spinCharge = new JSpinner(new SpinnerNumberModel(species.getCharge(), -10, 10, 1));
 		spinCharge.setEnabled(editable);
-		addLabeledComponent("Charge", spinCharge);
+		addLabeledComponent(bundle.getString("charge"), spinCharge);
 		addProperties((Symbol) species);
-		JCheckBox check = new JCheckBox("Boundary condition", species.getBoundaryCondition());
+		JCheckBox check = new JCheckBox(bundle.getString("boundaryCondition"), species.getBoundaryCondition());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-		check = new JCheckBox("Has only substance units", species.getHasOnlySubstanceUnits());
+		check = new JCheckBox(bundle.getString("hasOnlySubstanceUnits"), species.getHasOnlySubstanceUnits());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
@@ -822,7 +832,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		if (specRef.isSetStoichiometryMath()) {
 			StoichiometryMath sMath = specRef.getStoichiometryMath();
 			JPanel p = new JPanel(new GridLayout(1, 1));
-			p.setBorder(BorderFactory.createTitledBorder(" "
+			p.setBorder(BorderFactory.createTitledBorder(' '
 					+ sMath.getClass().getCanonicalName() + ' '));
 			
 			if (isRendererAvailable()) {
@@ -831,7 +841,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 					l = sMath.getMath().compile(latex).toString().replace("\\\\",
 							"\\");
 				} catch (SBMLException e) {
-					l = "invalid";
+					l = bundleWarnings.getString("invalid");
 				}
 				JComponent eqn = this.renderer.renderEquation(l);
 				eqn.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -841,7 +851,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			lh.add(p, 3, ++row, 1, 1, 1d, 1d);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
 		} else {
-			lh.add(new JLabel("Stoichiometry"), 1, ++row, 1, 1, 0d, 0d);
+			lh.add(new JLabel(bundle.getString("stoichiometry")), 1, ++row, 1, 1, 0d, 0d);
 			JSpinner spinner = new JSpinner(new SpinnerNumberModel(specRef
 					.getStoichiometry(), specRef.getStoichiometry() - 1000,
 					specRef.getStoichiometry() + 1000, .1d));
@@ -861,8 +871,8 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		Object label = null;
 		if (s instanceof Species) {
 			Species species = (Species) s;
-			String types[] = new String[] { "Initial amount",
-					"Initial concentration" };
+			String types[] = new String[] { bundle.getString("initialAmount"),
+					bundle.getString("initialConcentration") };
 			boolean amount = true;
 			if (species.isSetInitialAmount()) {
 				val = species.getInitialAmount();
@@ -880,13 +890,13 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				if (c.isSetSize()) {
 					val = c.getSize();
 				}
-				label = "Size";
+				label = bundle.getString("size");
 			} else {
 				Parameter p = (Parameter) s;
 				if (p.isSetValue()) {
 					val = p.getValue();
 				}
-				label = "Value";
+				label = bundle.getString("value");
 			}
 		}
 		JSpinner spinValue = new JSpinner(new SpinnerNumberModel(val, Math.min(
@@ -894,7 +904,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		spinValue.setEnabled(editable);
 		addLabeledComponent(label, spinValue);
 	}
-
+	
 	/**
 	 * @param unit
 	 */
@@ -902,30 +912,30 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		JComboBox unitSelection = unitKindComboBox(unit.getKind());
 		unitSelection.setEditable(false);
 		unitSelection.setEnabled(editable);
-		addLabeledComponent("Kind", unitSelection);
+		addLabeledComponent(bundle.getString("kind"), unitSelection);
 		double multiplier = unit.getMultiplier();
 		JSpinner sMultiplier = GUITools.createJSpinner(new SpinnerNumberModel(
 			multiplier, spinnerMinValue(multiplier), spinnerMaxValue(multiplier),
-			spinnerStepSize(multiplier)), "multiplier",
-			"The multiplier for the unit", editable);
-		addLabeledComponent("Mutiplier", sMultiplier);
+			spinnerStepSize(multiplier)), bundle.getString("multiplier"),
+			bundle.getString("multiplier_tooltip"), editable);
+		addLabeledComponent(bundle.getString("multiplier"), sMultiplier);
 		if ((unit.getLevel() == 1)
 				|| ((unit.getLevel() == 2) && (unit.getVersion() == 1))) {
 			JSpinner sOffset = new JSpinner(new SpinnerNumberModel(unit
 					.getOffset(), -1000, 1000, 1));
 			sOffset.setEnabled(editable);
-			addLabeledComponent("Offset", sOffset);
+			addLabeledComponent(bundle.getString("offset"), sOffset);
 		}
 		JSpinner sScale = new JSpinner(new SpinnerNumberModel(unit.getScale(),
 				-1000, 1000, 1));
 		sScale.setEnabled(editable);
-		addLabeledComponent("Scale", sScale);
+		addLabeledComponent(bundle.getString("scale"), sScale);
 		double exponent = unit.getExponent();
 		JSpinner sExponent = new JSpinner(new SpinnerNumberModel(exponent,
 			spinnerMinValue(exponent), spinnerMaxValue(exponent),
 			spinnerStepSize(exponent)));
 		sExponent.setEnabled(editable);
-		addLabeledComponent("Exponent", sExponent);
+		addLabeledComponent(bundle.getString("exponent"), sExponent);
 	}
 
 	/**
@@ -948,7 +958,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @param ud
 	 */
 	private void addProperties(UnitDefinition ud) {
-		addLabeledComponent("Definition", unitPreview(ud));
+		addLabeledComponent(bundle.getString("definition"), unitPreview(ud));
 		for (Unit u : ud.getListOfUnits()) {
 			lh.add(new SBasePanel(u, namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
 		}
@@ -959,7 +969,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @param v
 	 */
 	private void addProperties(Variable v) {
-		JCheckBox check = new JCheckBox("Constant", v.isConstant());
+		JCheckBox check = new JCheckBox(bundle.getString("constant"), v.isConstant());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);

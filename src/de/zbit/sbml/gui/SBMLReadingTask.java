@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
+import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.util.TreeNodeRemovedEvent;
 
@@ -179,7 +180,9 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 					 */
 					@Override
 					public void propertyChange(PropertyChangeEvent evt) {
-						openedFile.propertyChange(new PropertyChangeEvent(evt.getSource(), OpenedFile.FILE_CHANGED_EVENT, evt.getOldValue(), evt.getNewValue()));
+						if (!evt.getPropertyName().equals(TreeNodeChangeEvent.userObject)) {
+							openedFile.propertyChange(new PropertyChangeEvent(evt.getSource(), OpenedFile.FILE_CHANGED_EVENT, evt.getOldValue(), evt.getNewValue()));
+						}
 					}
 					
 					/* (non-Javadoc)
