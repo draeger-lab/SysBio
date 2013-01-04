@@ -16,7 +16,6 @@
 package de.zbit.sbml.gui;
 
 import java.awt.Component;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -32,17 +31,14 @@ import java.util.logging.Logger;
 import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
 import javax.swing.SwingWorker;
-import javax.swing.tree.TreeNode;
 import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
-import org.sbml.jsbml.util.TreeNodeChangeEvent;
-import org.sbml.jsbml.util.TreeNodeChangeListener;
-import org.sbml.jsbml.util.TreeNodeRemovedEvent;
 
 import de.zbit.gui.GUITools;
 import de.zbit.io.OpenedFile;
+import de.zbit.sbml.io.SBMLfileChangeListener;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.Timer;
 
@@ -65,7 +61,7 @@ import de.zbit.util.Timer;
  * 
  * <pre>
  * public void propertyChange(PropertyChangeEvent evt) {
- * 	if (evt.getPropertyName().equals(&quot;done&quot;)) {
+ * 	if (evt.getPropertyName().equals(SBMLReadingTask.SBML_READING_SUCCESSFULLY_DONE)) {
  * 		if ((evt.getNewValue() != null)
  * 				&amp;&amp; (evt.getNewValue() instanceof OpenedFile)) {
  *       // call some method here with the OpenedFile containing 
@@ -173,35 +169,7 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
 		try {
 			final OpenedFile<SBMLDocument> openedFile = new OpenedFile<SBMLDocument>(sbmlFile, get());
 			if (openedFile.isSetDocument()) {
-				openedFile.getDocument().addTreeNodeChangeListener(new TreeNodeChangeListener() {
-					
-					/* (non-Javadoc)
-					 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-					 */
-					@Override
-					public void propertyChange(PropertyChangeEvent evt) {
-						if (!evt.getPropertyName().equals(TreeNodeChangeEvent.userObject)) {
-							openedFile.propertyChange(new PropertyChangeEvent(evt.getSource(), OpenedFile.FILE_CHANGED_EVENT, evt.getOldValue(), evt.getNewValue()));
-						}
-					}
-					
-					/* (non-Javadoc)
-					 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(org.sbml.jsbml.util.TreeNodeRemovedEvent)
-					 */
-					@Override
-					public void nodeRemoved(TreeNodeRemovedEvent evt) {
-						openedFile.propertyChange(new PropertyChangeEvent(evt.getSource(), OpenedFile.FILE_CHANGED_EVENT, evt.getPreviousParent(), null));
-					}
-					
-					/* (non-Javadoc)
-					 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
-					 */
-					@Override
-					public void nodeAdded(TreeNode node) {
-						openedFile.propertyChange(new PropertyChangeEvent(node.getParent(), OpenedFile.FILE_CHANGED_EVENT, null, node));
-					}
-					
-				});
+				openedFile.getDocument().addTreeNodeChangeListener(new SBMLfileChangeListener(openedFile));
 			}
 			firePropertyChange(SBML_READING_SUCCESSFULLY_DONE, null, openedFile);
 		} catch (InterruptedException exc) {

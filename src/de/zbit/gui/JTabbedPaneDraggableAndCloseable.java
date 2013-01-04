@@ -47,6 +47,8 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.Icon;
@@ -100,6 +102,11 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	private boolean hasGhost = true;
 
   private boolean showCloseIcon = true;
+  
+  /**
+   * 
+   */
+  private List<TabClosingListener> listOfTabCloseListeners = new LinkedList<TabClosingListener>();
 	
 	/**
 	 * 
@@ -107,7 +114,9 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	 */
 	public boolean closeCurrentTab() {
 	  int idx = getSelectedIndex();
-	  if (idx < 0 || idx >= getTabCount()) return false;
+	  if ((idx < 0) || (idx >= getTabCount())) {
+	  	return false;
+	  }
 	  removeTabAt(idx);
 	  return true;
 	}
@@ -204,7 +213,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 			public void dragGestureRecognized(DragGestureEvent e) {
 				Point tabPt = e.getDragOrigin();
 				dragTabIndex = indexAtLocation(tabPt.x, tabPt.y);
-				if (dragTabIndex<0) {
+				if (dragTabIndex < 0) {
 					return;
 				}
 				initGlassPane(e.getComponent(), e.getDragOrigin());
@@ -223,12 +232,24 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 		
 		// Add right mouse context menu
     class PopClickListener extends MouseAdapter {
+    	/* (non-Javadoc)
+    	 * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
+    	 */
+    	@Override
       public void mousePressed(MouseEvent e){
         if (e.isPopupTrigger()) doPop(e);
       }
+    	/* (non-Javadoc)
+    	 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
+    	 */
+    	@Override
       public void mouseReleased(MouseEvent e){
         if (e.isPopupTrigger()) doPop(e);
       }
+    	/**
+    	 * 
+    	 * @param e
+    	 */
       private void doPop(MouseEvent e){
         if (getTabCount()>0) {
           createRightMousePopup().show(e.getComponent(), e.getX(), e.getY());
@@ -244,22 +265,27 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
    * @author Clemens Wrzodek
    */
   public static enum RightMouseClickOptions implements ActionCommandWithIcon {
+  	/**
+  	 * 
+  	 */
     CLOSE_CURRENT_TAB,
+    /**
+     * 
+     */
     MOVE_TO_LEFT,
+    /**
+     * 
+     */
     MOVE_TO_RIGHT;
     
-    /*
-     * (non-Javadoc)
-     * 
+    /* (non-Javadoc)
      * @see de.zbit.gui.ActionCommand#getName()
      */
     public String getName() {
       return StringUtil.firstLetterUpperCase(toString().toLowerCase().replace('_', ' '));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /* (non-Javadoc)
      * @see de.zbit.gui.ActionCommand#getToolTip()
      */
     public String getToolTip() {
@@ -272,7 +298,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
     public Icon getIcon() {
       switch (this) {
         case CLOSE_CURRENT_TAB:
-          return new CloseIcon();
+        	return new CloseIcon();
           //return UIManager.getIcon("InternalFrame.closeIcon");
         case MOVE_TO_LEFT:
           return ImageTools.flipHorizontally(UIManager.getIcon("Menu.arrowIcon"));
@@ -294,7 +320,6 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
    */
   public JPopupMenu createRightMousePopup() {
     JPopupMenu append = new JPopupMenu("TabbedPane");
-    
     append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.CLOSE_CURRENT_TAB));
     //append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.MOVE_TO_LEFT));
     //append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.MOVE_TO_RIGHT));
@@ -327,26 +352,52 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 		((FlowLayout) panel.getLayout()).setVgap(0);
 		panel.add(label);
 		
-		JLabel closeButton = new JLabel(new CloseIcon());
+		final CloseIcon closeIcon = new CloseIcon();
+		closeIcon.setColor(ColorPalette.ANTHRACITE);
+		final JLabel closeButton = new JLabel(closeIcon);
 		closeButton.setToolTipText(BASE.getString("FILE_CLOSE").split(";")[1]);
 		panel.setOpaque(false);
 		closeButton.addMouseListener(new MouseListener() {
+			/* (non-Javadoc)
+			 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+			 */
 			public void mouseReleased(MouseEvent e) {}
+			/* (non-Javadoc)
+			 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+			 */
 			public void mousePressed(MouseEvent e) {}
-			public void mouseExited(MouseEvent e) {}
-			public void mouseEntered(MouseEvent e) {}
+			/* (non-Javadoc)
+			 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+			 */
+			public void mouseExited(MouseEvent e) {
+				closeIcon.setColor(ColorPalette.ANTHRACITE);
+				closeButton.repaint();
+			}
+			/* (non-Javadoc)
+			 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+			 */
+			public void mouseEntered(MouseEvent e) {
+				closeIcon.setColor(ColorPalette.SECOND_180);
+				closeButton.repaint();
+			}
 			
 			/* (non-Javadoc)
 			 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
 			 */
 			public void mouseClicked(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON1
-						&& e.getSource() instanceof Component) {
+				if ((e.getButton() == MouseEvent.BUTTON1)
+						&& (e.getSource() instanceof Component)) {
 					int tabIndex = getTabIndexByComponent((Component) e.getSource());
 					if (tabIndex >= 0) {
+						for (TabClosingListener listener : listOfTabCloseListeners) {
+							if (!listener.tabClosing(tabIndex)) {
+								return;
+							}
+						}
 						JTabbedPaneDraggableAndCloseable.this.removeTabAt(tabIndex);
-						for (ChangeListener cl : getChangeListeners())
+						for (ChangeListener cl : getChangeListeners()) {
 							cl.stateChanged(new ChangeEvent(JTabbedPaneDraggableAndCloseable.this));
+						}
 					}
 				}
 			}
@@ -354,6 +405,24 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	
 		panel.add(closeButton);
 		setTabComponentAt(i, panel);
+	}
+	
+	/**
+	 * 
+	 * @param listener
+	 * @return
+	 */
+	public boolean addTabClosingListener(TabClosingListener listener) {
+		return listOfTabCloseListeners.add(listener);
+	}
+	
+	/**
+	 * 
+	 * @param listener
+	 * @return
+	 */
+	public boolean removeTabClosingListener(TabClosingListener listener) {
+		return listOfTabCloseListeners.remove(listener);
 	}
 	
 	/**
@@ -385,7 +454,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	 * @return
 	 */
 	public int getTabIndexByComponent(Component comp) {
-		for (int i=0; i<this.getTabCount(); i++) {
+		for (int i = 0; i < this.getTabCount(); i++) {
 			if (this.getTabComponentAt(i) instanceof JPanel) {
 				JPanel panel = (JPanel) this.getTabComponentAt(i);
 				for (Component c : panel.getComponents()) {
@@ -728,4 +797,5 @@ class GhostGlassPane extends JPanel {
 	public void setPoint(Point location) {
 		this.location = location;
 	}
+
 }
