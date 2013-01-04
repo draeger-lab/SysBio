@@ -7,7 +7,7 @@
     ---------------------------------------------------------------------
     This file is part of the SysBio API library.
  
-    Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+    Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  
     This library is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -29,8 +29,9 @@
   <entry key="charge">Ladung</entry>
   <entry key="constant">Konstant</entry>
   <entry key="containsUndeclaredUnits">Enthält undefinierte Einheiten</entry>
-  <entry key="dateOfModelCreation">Modellerstellung</entry>
-  <entry key="dateOfModelModification">Modifikation</entry>
+  <entry key="conversionFactor">Konvertierungsfaktor</entry>
+  <entry key="dateOfCreation">Datum der Erstellung</entry>
+  <entry key="dateOfModification">Datum der Änderung</entry>
   <entry key="definition">Definition</entry>
   <entry key="derivedUnit">Hergeleitete Einheit</entry>
   <entry key="eMail">E-Mail</entry>
@@ -64,7 +65,7 @@
   <entry key="stoichiometry">Stöichiometrie</entry>
   <entry key="substanceUnits">Substanzeinheiten</entry>
   <entry key="substanceUnit">Substanzeinheit</entry>
-  <entry key="SBO">Systembiology-Ontologie</entry>
+  <entry key="SBO">Systembiologie-Ontologie</entry>
   <entry key="timeUnits">Zeiteinheit</entry>
   <entry key="usesValuesFromTriggerTime">Benutzt Werte von der Auslöserzeit</entry>
   <entry key="value">Wert</entry>
@@ -120,7 +121,7 @@
   <entry key="substance">Substanz</entry>
   <entry key="time">Zeit</entry>
   <entry key="trigger">Auslöser</entry>
-  <entry key="unit">Grundeinheit</entry>
+  <entry key="unit">Einheit</entry>
   <entry key="unitDefinition">Einheitendefinition</entry>
   <entry key="volume">Volumen</entry>
 

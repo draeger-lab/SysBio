@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -96,6 +96,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	 */
 	private static final String CURVESEGMENT_CUBICBEZIER = "CubicBezier";
 
+	/**
+	 * A {@link Logger} for this class.
+	 */
 	private static Logger logger = Logger.getLogger(YLayoutBuilder.class.toString());
 
 	/**
@@ -456,6 +459,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	 * @param textGlyph
 	 */
 	private void buildTextGlyphAsLabel(TextGlyph textGlyph) {
+		// TODO: We need some option for the default font size!
+		int fontSize = 18;
 		NamedSBase namedSBase = null;
 		if (textGlyph.isSetOriginOfText()) {
 			namedSBase = textGlyph.getOriginOfTextInstance();
@@ -469,14 +474,14 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		String text = null;
 		if (textGlyph.isSetText()) {
 			text = textGlyph.getText();
-			logger.fine(String.format("building text glyph element id=%s\n\torigin text overridden text='%s'",
+			logger.fine(MessageFormat.format("building text glyph element id={0}\n\torigin text overridden text='{1}'",
 					textGlyph.getId(), text));
 		}
 		else if (textGlyph.isSetOriginOfText()) {
 			namedSBase = textGlyph.getOriginOfTextInstance();
 			if (namedSBase != null) {
 				text = namedSBase.getName();
-				logger.fine(String.format("building text glyph element id=%s\n\ttext from origin id=%s text='%s'",
+				logger.fine(MessageFormat.format("building text glyph element id={0}\n\ttext from origin id={1} text='{2}'",
 					textGlyph.getId(), namedSBase.getId(), text));
 			} else {
 				logger.warning(MessageFormat.format("No such element defined {0}", textGlyph.getOriginOfText()));
@@ -490,6 +495,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 			NodeLabel nodeLabel;
 			nodeLabel = new NodeLabel(text);
 			nodeLabel.setLabelModel(new FreeNodeLabelModel());
+			nodeLabel.setFontSize(fontSize);
 			originRealizer.setLabel(nodeLabel);
 			
 			// text glyph position
@@ -524,9 +530,12 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 					nodeLabel.setModel(NodeLabel.CORNERS);
 					nodeLabel.setPosition(NodeLabel.SE);	
 				}
+				nodeLabel.setFontSize(fontSize);
 				originRealizer.setLabel(nodeLabel);
 			} else {
 				originRealizer.setLabelText(text);
+				NodeLabel nodeLabel = originRealizer.getLabel();
+				nodeLabel.setFontSize(fontSize);
 			}
 		}
 	}

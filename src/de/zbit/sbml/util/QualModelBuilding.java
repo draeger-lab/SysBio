@@ -1,3 +1,19 @@
+/*
+ * $Id$
+ * $URL$
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2012-2013 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
+ */
 package de.zbit.sbml.util;
 
 import java.io.FileNotFoundException;
@@ -7,7 +23,6 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.sbgn.bindings.SBGNBase.Notes;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
@@ -19,14 +34,13 @@ import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 
 import de.zbit.util.DatabaseIdentifierTools;
-import de.zbit.util.EscapeChars;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
+import de.zbit.util.EscapeChars;
 
 /**
  * @author Roland Keller, Stephanie Tscherneck
  * @version $Rev$
  */
-
 public abstract class QualModelBuilding {
 
 	public static final String QUAL_NS = "http://www.sbml.org/sbml/level3/version1/qual/version1";

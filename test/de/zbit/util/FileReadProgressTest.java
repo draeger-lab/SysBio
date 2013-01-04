@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,9 @@
  */
 package de.zbit.util;
 
-import static org.junit.Assert.*;
-
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import de.zbit.util.progressbar.FileReadProgress;
 

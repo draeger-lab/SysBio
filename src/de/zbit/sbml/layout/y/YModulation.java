@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -48,6 +48,9 @@ public class YModulation implements Modulation<EdgeRealizer> {
 		return edgeRealizer;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve, double)
+	 */
 	@Override
 	public EdgeRealizer draw(Curve curve, double lineWidth) {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);

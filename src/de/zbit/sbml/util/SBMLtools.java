@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -185,6 +185,25 @@ public class SBMLtools {
 				updateAnnotation((SBase) child, doc);
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param sbase
+	 * @return
+	 */
+	public static String createHTMLfromNotes(SBase sbase) {
+		String text = sbase.getNotesString();
+		if (text.startsWith("<notes") && text.endsWith("notes>")) {
+			text = text.substring(sbase.getNotesString().indexOf('>') + 1,
+					sbase.getNotesString().lastIndexOf('/') - 1);
+		}
+		text = text.trim().replace("/>", ">");
+		if (!text.startsWith("<body") && !text.endsWith("</body>")) {
+			text = "<body>" + text + "</body>";
+		}
+		text = "<html><head></head>" + text + "</html>";
+		return text;
 	}
   
 }

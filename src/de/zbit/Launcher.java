@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -273,16 +273,28 @@ public abstract class Launcher implements Runnable, Serializable {
   			/* 
   			 * Note: the xDock name property must be set before parsing 
   			 * command-line arguments! See above!
+  			 * See
+  			 * http://developer.apple.com/library/mac/#documentation/Java/Reference/Java_PropertiesRef/Articles/JavaSystemProperties.html
+  			 * for details.
   			 */
-  			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
-  			
   			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+  			System.setProperty("apple.awt.showGrowBox", "true");
+  			// These are actually already the default values:
+  			//  			System.setProperty("apple.awt.UIElement", "false");
+  			//  			System.setProperty("apple.awt.fileDialogForDirectories", "false");
+  			//  			System.setProperty("apple.awt.brushMetalLook", "false");
+  			//  			System.setProperty("apple.awt.fakefullscreen", "false");
+  			System.setProperty("apple.awt.TextAntialiasing", "true");
+  			
   			System.setProperty("apple.laf.useScreenMenuBar", "true");
+  			
   			System.setProperty("com.apple.macos.smallTabs", "true");
   			System.setProperty("com.apple.macos.useScreenMenuBar", "true");
   			
+  			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
   			System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
   			System.setProperty("com.apple.mrj.application.live-resize", "true");
+  			
   			
   			String classPath = System.getProperty("java.class.path");
   			String javaSystemDir = "/System/Library/Java";

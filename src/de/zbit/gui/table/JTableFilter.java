@@ -1,3 +1,19 @@
+/*
+ * $Id: package-info.java 994 2012-08-31 13:56:13Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/util/package-info.java $
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2011-2013 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
+ */
 package de.zbit.gui.table;
 
 import java.awt.Component;
