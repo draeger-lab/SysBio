@@ -7,7 +7,7 @@
     ---------------------------------------------------------------------
     This file is part of the SysBio API library.
  
-    Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+    Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  
     This library is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -29,8 +29,9 @@
   <entry key="charge">Charge</entry>
   <entry key="constant">Constant</entry>
   <entry key="containsUndeclaredUnits">Contains undeclared units</entry>
-  <entry key="dateOfModelCreation">Model creation</entry>
-  <entry key="dateOfModelModification">Modification</entry>
+  <entry key="conversionFactor">Conversion factor</entry>
+  <entry key="dateOfCreation">Date of creation</entry>
+  <entry key="dateOfModification">Date of modification</entry>
   <entry key="definition">Definition</entry>
   <entry key="derivedUnit">Derived unit</entry>
   <entry key="eMail">E-mail</entry>

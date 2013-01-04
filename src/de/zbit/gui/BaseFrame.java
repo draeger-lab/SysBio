@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -501,12 +501,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     }
 	}
 	
-	/* (non-Javadoc)
-   * @see de.zbit.UserInterface#closeFile()
-   */
-	@Override
-	public abstract boolean closeFile();
-	
 	/**
 	 * This method runs over all {@link JMenu}s in this {@link BaseFrame}'s
 	 * {@link JMenuBar} and looks on every {@link JMenuItem}. If the current
@@ -525,19 +519,24 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 *         action command as the corresponding {@link JMenuItem}.
 	 */
 	public JToolBar createDefaultToolBar() {
+		boolean isOSX = GUITools.isMacOSX();
 		JMenu menu;
 		JMenuItem item;
+		JButton button;
 		Object action = null;
 		ResourceBundle resources = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
 		JToolBar toolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
 		toolBar.setOpaque(true);
-		if (GUITools.isMacOSX()
+		if (isOSX
 				&& (((appConf != null) && (appConf.getInteractiveOptions() != null) && 
-						(appConf.getInteractiveOptions().length > 0))
-				|| (MultiplePreferencesPanel.getPossibleTabCount() > 0))) {
-			toolBar.add(GUITools.createButton(BaseAction.EDIT_PREFERENCES.getIcon(),
+						(appConf.getInteractiveOptions().length > 0)) || 
+						(MultiplePreferencesPanel.getPossibleTabCount() > 0))) {
+			button = GUITools.createButton(BaseAction.EDIT_PREFERENCES.getIcon(),
 				EventHandler.create(ActionListener.class, this, "preferences"), action,
-				BaseAction.EDIT_PREFERENCES.getToolTip()));
+				BaseAction.EDIT_PREFERENCES.getToolTip());
+			button.setOpaque(true);
+			button.setBorderPainted(false);
+			toolBar.add(button);
 			toolBar.add(new JToolBar.Separator());
 		}
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
@@ -556,8 +555,16 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 					}
 					if ((item.getIcon() != null) && (action != null)
 							&& (item.getActionListeners().length > 0)) {
-						JButton button = GUITools.createButton(item.getIcon(), item
+						button = GUITools.createButton(item.getIcon(), item
 								.getActionListeners()[0], action, item.getToolTipText());
+						if (isOSX && (action == BaseAction.HELP_ONLINE)) {
+							button.setIcon(null);
+							button.putClientProperty("JButton.buttonType", "help");
+							button.putClientProperty("JComponent.sizeVariant", "mini");
+						} else {
+							button.setBorderPainted(false);
+							button.setOpaque(true);	
+						}
 						button.setEnabled(item.isEnabled());
 						toolBar.add(button);
 						buttonCount++;
@@ -568,10 +575,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				toolBar.add(new JToolBar.Separator());
 			}
 		}
-		if (GUITools.isMacOSX()) {
-			toolBar.add(GUITools.createButton(BaseAction.HELP_ABOUT.getIcon(),
+		if (isOSX) {
+			button = GUITools.createButton(BaseAction.HELP_ABOUT.getIcon(),
 				EventHandler.create(ActionListener.class, this, "showAboutMessage"),
-				action, BaseAction.HELP_ABOUT.getToolTip()));
+				action, BaseAction.HELP_ABOUT.getToolTip());
+			button.setOpaque(true);
+			button.setBorderPainted(false);
+			toolBar.add(button);
 		}
 		return toolBar;
 	}
@@ -1114,24 +1124,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
   public StatusBar getStatusBar() {
     return statusBar;
   }
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.UserInterface#getURLAboutMessage()
-	 */
-	@Override
-	public abstract URL getURLAboutMessage();
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.UserInterface#getURLLicense()
-	 */
-	@Override
-	public abstract URL getURLLicense();
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.UserInterface#getURLOnlineHelp()
-	 */
-	@Override
-	public abstract URL getURLOnlineHelp();
 
 	/* (non-Javadoc)
    * @see de.zbit.UserInterface#getURLOnlineUpdate()
@@ -1457,7 +1449,12 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	public File saveFile() {
 		// DO NOT MAKE THIS METHOD ABSTRACT! NOT EVERY PROGRAM ALLOWS STORING DATA
 		// IN OPENED INPUT FILES AGAIN!
-		return saveFileAs();
+		File done = saveFileAs();
+		if (done != null) {
+			// Important to mark the appearance of the window as not modified...
+			getRootPane().putClientProperty("Window.documentModified", Boolean.FALSE);
+		}
+		return done;
 	}
 	
 	/**

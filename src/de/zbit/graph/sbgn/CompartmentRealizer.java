@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -108,6 +108,7 @@ public class CompartmentRealizer extends GroupNodeRealizer {
   @Override
   protected void paintFilledShape(Graphics2D gfx) {
   	if (!isTransparent() && (getFillColor() != null)) {
+  		// TODO: Decide if inner part should be filled
   		CompartmentShape shape = createCompartmentShape();
   		gfx.setColor(getFillColor());
   		gfx.fill(shape.getInnerArea());

@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -60,19 +60,68 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.ElementNames");
 	
 	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = 9057010975355065921L;
-	
-	/**
 	 * A {@link Logger} for this class.
 	 */
 	private static final Logger logger = Logger.getLogger(SBMLNode.class.getName());
 	
 	/**
+	 * Generated serial version identifier.
+	 */
+	private static final long serialVersionUID = 9057010975355065921L;
+	
+	/**
 	 * true: show invisible nodes
 	 */
 	private static boolean showInvisible = false;
+	
+	/**
+	 * Helper method, necessary because the tree might hide some nodes... Index
+	 * determination of child elements is therefore a bit more complicated.
+	 * 
+	 * @param parent
+	 * @param child
+	 * @param acceptedType
+	 * @return
+	 */
+  private static int indexOf(TreeNode parent, TreeNode child, Class<? extends TreeNode> acceptedType) {
+    if (child == null) {
+      throw new IllegalArgumentException("Argument is null.");
+    }
+    // linear search
+    @SuppressWarnings("unchecked")
+		Enumeration<TreeNode> e = parent.children();
+    int index = 0;
+    while (e.hasMoreElements()) {
+      TreeNode elem = e.nextElement();
+      if ((child == elem) || child.equals(elem)) {
+        return index;
+      }
+      if (acceptedType.isAssignableFrom(elem.getClass())) {
+      	index++;
+      }
+    }
+    // not found => node is not a child.
+    return -1;
+  }
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static boolean isShowInvisible() {
+		return showInvisible;
+	}
+
+	/**
+	 * 
+	 * @param showInvisible
+	 */
+	public static void setShowInvisible(boolean showInvisible) {
+		SBMLNode.showInvisible = showInvisible;
+	}
+	
+
+	private Class<? extends TreeNode> acceptedType;
 	
 	/**
 	 * 
@@ -83,9 +132,14 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	 * Memorizes the result of the {@link #toString()} method.
 	 */
 	private String stringRepresentation;
-
-	private Class<? extends TreeNode> acceptedType;
 	
+	/**
+	 * 
+	 * @param ast
+	 */
+	public SBMLNode(ASTNode ast) {
+		this(ast, true, ASTNode.class);
+	}
 
 	/**
 	 * 
@@ -94,7 +148,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	public SBMLNode(SBase sbase) {
 		this(sbase, true);
 	}
-	
+
 	/**
 	 * 
 	 * @param sbase
@@ -102,14 +156,6 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	 */
 	public SBMLNode(SBase sbase, boolean isVisible) {
 		this(sbase, isVisible, SBase.class);
-	}
-	
-	/**
-	 * 
-	 * @param ast
-	 */
-	public SBMLNode(ASTNode ast) {
-		this(ast, true, ASTNode.class);
 	}
 	
 	/**
@@ -143,6 +189,209 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 				n.addTreeNodeChangeListener(this, false);
 			}
 		}
+	}
+
+	/**
+	 * 
+	 */
+	public void collapse() {
+		this.expanded = false;
+	}
+	
+	/**
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	public boolean containsUserObject(TreeNodeWithChangeSupport obj) {
+		if (getUserObject().equals(obj)){
+			return true;
+		} else if (isLeaf()) {
+			return false;
+		} else {
+			boolean result = false;
+			for (int i = 1; i < getChildCount(); i++) {
+				result = result || ((SBMLNode) getChildAt(i)).containsUserObject(obj);
+			}
+			return result;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void expand() {
+		this.expanded = true;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.tree.DefaultMutableTreeNode#getChildAt(int)
+	 */
+	@Override
+	public TreeNode getChildAt(int index) {
+		if (isShowInvisible()) {
+			return super.getChildAt(index);
+		}
+		if (this.children == null) {
+			throw new ArrayIndexOutOfBoundsException("node has no children");
+		}
+		
+		int realIndex = -1;
+		int visibleIndex = -1;
+		Enumeration<?> e = this.children.elements();
+		while (e.hasMoreElements()) {
+			SBMLNode node = (SBMLNode) e.nextElement();
+			if (node.isVisible()) {
+				visibleIndex++;
+			}
+			realIndex++;
+			if (visibleIndex == index) {
+				return (TreeNode) this.children.elementAt(realIndex);
+			}
+		}
+		
+		throw new ArrayIndexOutOfBoundsException("index unmatched");
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.tree.DefaultMutableTreeNode#getChildCount()
+	 */
+	@Override
+	public int getChildCount() {
+		if (isShowInvisible()) {
+			return super.getChildCount();
+		}
+		if (this.children == null) {
+			return 0;
+		}
+		int count = 0;
+		Enumeration<?> e = this.children.elements();
+		while (e.hasMoreElements()) {
+			SBMLNode node = (SBMLNode) e.nextElement();
+			if (node.isVisible()) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	/* (non-Javadoc)
+	 * @see javax.swing.tree.DefaultMutableTreeNode#getUserObject()
+	 */
+	@Override
+	public TreeNodeWithChangeSupport getUserObject() {
+	  return (TreeNodeWithChangeSupport) super.getUserObject();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isBoldFont() {
+		return boldFont;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isExpanded() {
+		return expanded;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isVisible() {
+		return isVisible;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
+	 */
+	//@Override
+	public void nodeAdded(TreeNode node) {
+		stringRepresentation = null;
+		stringRepresentation = toString();
+		
+		// Add the new node to this tree
+		TreeNode parent = node.getParent();
+		if (parent == getUserObject()) {
+			boolean hasChild = false;
+			// Check if the node is already in the tree
+			for (int i = 0; !hasChild && (i < getChildCount()); i++) {
+				hasChild |= ((SBMLNode) getChildAt(i)).getUserObject() == node;
+			}
+			if (!hasChild) {
+				if (node instanceof TreeNodeWithChangeSupport) {
+					TreeNodeWithChangeSupport n = (TreeNodeWithChangeSupport) node;
+					if (!n.isRoot() && n.getListOfTreeNodeChangeListeners().contains(this)) {
+					  logger.finer(MessageFormat.format("Removing parent node {0} from list of listeners in {1}.", this, n));
+						n.removeTreeNodeChangeListener(this);
+					}
+				}
+				SBMLNode newChild = new SBMLNode(node, isVisible(), acceptedType);
+				add(newChild);
+				// Correct index
+				/* The problem is that in SBML empty lists are usually not considered
+				 * as children! So we cannot determine the correct index of a child
+				 * that is an empty list in the SBML tree structure!
+				 */
+				if ((parent instanceof ListOf<?>) && !isRoot() && (getParent().getParent() != null) && (parent.getParent() != null)) {
+					SBMLNode parentNode = (SBMLNode) getParent();
+					TreeNode root = parent.getParent();
+					int childIndex = indexOf(root, parent, acceptedType);
+					int currIndex = parentNode.getIndex(this);
+					if (childIndex != currIndex) {
+						removeFromParent();
+						parentNode.insert(this, childIndex);
+					}
+				}
+				logger.finer("adding " + node);
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(org.sbml.jsbml.util.TreeNodeRemovedEvent)
+	 */
+	//@Override
+	public void nodeRemoved(TreeNodeRemovedEvent evt) {
+		stringRepresentation = null;
+		stringRepresentation = toString();
+		
+		SBMLNode parentNode = (SBMLNode) getParent();
+		TreeNode parent = evt.getPreviousParent();
+		if ((parent == parentNode.getUserObject()) && (evt.getSource() == getUserObject())) {
+			parentNode.remove(this);
+			logger.finer("removing " + evt.getSource());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	//@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		stringRepresentation = null;
+		stringRepresentation = toString();
+	}
+
+	/**
+	 * 
+	 * @param boldFont
+	 */
+	public void setBoldFont(boolean boldFont) {
+		this.boldFont = boldFont;
+	}
+	
+	/**
+	 * 
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
+		this.isVisible = visible;
 	}
 
 	/* (non-Javadoc)
@@ -217,220 +466,6 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 			return stringRepresentation;
 		}
 		return super.toString();
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.tree.DefaultMutableTreeNode#getUserObject()
-	 */
-	@Override
-	public TreeNodeWithChangeSupport getUserObject() {
-	  return (TreeNodeWithChangeSupport) super.getUserObject();
-	}
-	
-	/* (non-Javadoc)
-	 * @see javax.swing.tree.DefaultMutableTreeNode#getChildAt(int)
-	 */
-	@Override
-	public TreeNode getChildAt(int index) {
-		if (isShowInvisible()) {
-			return super.getChildAt(index);
-		}
-		if (this.children == null) {
-			throw new ArrayIndexOutOfBoundsException("node has no children");
-		}
-		
-		int realIndex = -1;
-		int visibleIndex = -1;
-		Enumeration<?> e = this.children.elements();
-		while (e.hasMoreElements()) {
-			SBMLNode node = (SBMLNode) e.nextElement();
-			if (node.isVisible()) {
-				visibleIndex++;
-			}
-			realIndex++;
-			if (visibleIndex == index) {
-				return (TreeNode) this.children.elementAt(realIndex);
-			}
-		}
-		
-		throw new ArrayIndexOutOfBoundsException("index unmatched");
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.tree.DefaultMutableTreeNode#getChildCount()
-	 */
-	@Override
-	public int getChildCount() {
-		if (isShowInvisible()) {
-			return super.getChildCount();
-		}
-		if (this.children == null) {
-			return 0;
-		}
-		int count = 0;
-		Enumeration<?> e = this.children.elements();
-		while (e.hasMoreElements()) {
-			SBMLNode node = (SBMLNode) e.nextElement();
-			if (node.isVisible()) {
-				count++;
-			}
-		}
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param boldFont
-	 */
-	public void setBoldFont(boolean boldFont) {
-		this.boldFont = boldFont;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isBoldFont() {
-		return boldFont;
-	}
-
-	/**
-	 * 
-	 * @param visible
-	 */
-	public void setVisible(boolean visible) {
-		this.isVisible = visible;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isVisible() {
-		return isVisible;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isExpanded() {
-		return expanded;
-	}
-	
-	/**
-	 * 
-	 */
-	public void expand() {
-		this.expanded = true;
-	}
-	
-	/**
-	 * 
-	 */
-	public void collapse() {
-		this.expanded = false;
-	}
-	
-	/**
-	 * 
-	 * @param obj
-	 * @return
-	 */
-	public boolean containsUserObject(TreeNodeWithChangeSupport obj) {
-		if (getUserObject().equals(obj)){
-			return true;
-		} else if (isLeaf()) {
-			return false;
-		} else {
-			boolean result = false;
-			for (int i = 1; i < getChildCount(); i++) {
-				result = result || ((SBMLNode) getChildAt(i)).containsUserObject(obj);
-			}
-			return result;
-		}
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public static boolean isShowInvisible() {
-		return showInvisible;
-	}
-
-	/**
-	 * 
-	 * @param showInvisible
-	 */
-	public static void setShowInvisible(boolean showInvisible) {
-		SBMLNode.showInvisible = showInvisible;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	 */
-	//@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		stringRepresentation = null;
-		stringRepresentation = toString();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
-	 */
-	//@Override
-	public void nodeAdded(TreeNode node) {
-		stringRepresentation = null;
-		stringRepresentation = toString();
-		
-		// Add the new node to this tree
-		TreeNode parent = node.getParent();
-		if (parent == getUserObject()) {
-			boolean hasChild = false;
-			// Check if the node is already in the tree
-			for (int i = 0; !hasChild && (i < getChildCount()); i++) {
-				hasChild |= ((SBMLNode) getChildAt(i)).getUserObject() == node;
-			}
-			if (!hasChild) {
-				SBMLNode newChild = new SBMLNode(node, isVisible(), acceptedType);
-				add(newChild);
-				if (node instanceof TreeNodeWithChangeSupport) {
-					TreeNodeWithChangeSupport n = (TreeNodeWithChangeSupport) node;
-					if (!n.isRoot() && n.getListOfTreeNodeChangeListeners().contains(this)) {
-					  logger.finer(MessageFormat.format("Removing parent node {0} from list of listeners in {1}.", this, n));
-						n.removeTreeNodeChangeListener(this);
-					}
-				}
-				// Correct index
-				if ((parent instanceof ListOf<?>) && !isRoot() && (getParent().getParent() != null) && (parent.getParent() != null)) {
-					SBMLNode parentNode = (SBMLNode) getParent();
-					TreeNode root = parent.getParent();
-					int childIndex = root.getIndex(parent);
-					if (childIndex != parentNode.getIndex(this)) {
-						removeFromParent();
-						parentNode.insert(this, childIndex);
-					}
-				}
-				logger.finer("adding " + node);
-			}
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(org.sbml.jsbml.util.TreeNodeRemovedEvent)
-	 */
-	//@Override
-	public void nodeRemoved(TreeNodeRemovedEvent evt) {
-		stringRepresentation = null;
-		stringRepresentation = toString();
-		
-		SBMLNode parentNode = (SBMLNode) getParent();
-		TreeNode parent = evt.getPreviousParent();
-		if ((parent == parentNode.getUserObject()) && (evt.getSource() == getUserObject())) {
-			parentNode.remove(this);
-			logger.finer("removing " + evt.getSource());
-		}
 	}
 
 }

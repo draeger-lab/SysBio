@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -35,6 +35,15 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	 * File change event name.
 	 */
 	public static final String FILE_CHANGED_EVENT = "de.zbit.io.OpenedFile.fileChangedEvent";
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "OpenedFile [file=" + file + ", changed=" + changed + ", document=" + document
+				+ ']';
+	}
 
 	/**
 	 * 
@@ -153,7 +162,7 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	}
 
 	/**
-	 * checks if Filepath is set
+	 * checks if file path is set
 	 */
 	public boolean isSetFile() {
 		return this.file != null;

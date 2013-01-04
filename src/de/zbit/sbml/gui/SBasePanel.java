@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,8 +20,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
@@ -85,6 +87,7 @@ import de.zbit.gui.SystemBrowser;
 import de.zbit.gui.layout.LayoutHelper;
 import de.zbit.gui.table.renderer.ColoredBooleanRenderer;
 import de.zbit.sbml.io.SBOTermFormatter;
+import de.zbit.sbml.util.SBMLtools;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
@@ -157,7 +160,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
    * @param namesIfAvailable
    */
   public SBasePanel(SBase sbase, boolean namesIfAvailable, EquationRenderer renderer) {
-  	super();
+  	super(true);
   	this.namesIfAvailable = namesIfAvailable;
   	this.renderer = renderer;
   	GridBagLayout gbl = new GridBagLayout();
@@ -168,7 +171,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
   	row = -1;
   	if (sbase != null) {
   		setBorder(BorderFactory.createTitledBorder(' ' + createPanelTitle(sbase) + ' '));
-  		lh.add(new JPanel(), 0, ++row, 5, 1, 0d, 0d);
+  		lh.add(createJPanel(), 0, ++row, 5, 1, 0d, 0d);
   		if (sbase instanceof NamedSBase) {
   			addProperties((NamedSBase) sbase);
   		}
@@ -226,6 +229,25 @@ public class SBasePanel extends JPanel implements EquationComponent {
   
   /**
    * 
+   * @return
+   */
+  private JPanel createJPanel() {
+		return createJPanel(new FlowLayout());
+	}
+
+  /**
+   * 
+   * @param layout
+   * @return
+   */
+	private JPanel createJPanel(LayoutManager layout) {
+		JPanel p = new JPanel(layout, true);
+		p.setOpaque(true);
+		return p;
+	}
+
+	/**
+   * 
    * @param sbase
    * @return
    */
@@ -279,22 +301,22 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		JCheckBox check = new JCheckBox(bundle.getString("useValuesFromTriggerTime"), e.getUseValuesFromTriggerTime());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		if (e.isSetTrigger()) {
 			lh.add(new SBasePanel(e.getTrigger(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		if (e.isSetDelay()) {
 			lh.add(new SBasePanel(e.getDelay(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		if (e.isSetTimeUnits()) {
 			lh.add(new SBasePanel(e.getTimeUnitsInstance(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		for (EventAssignment ea : e.getListOfEventAssignments()) {
 			lh.add(new SBasePanel(ea, namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 	}
 
@@ -339,7 +361,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 					//e.printStackTrace();
 				}
 				laTeXpreview.append(LaTeXCompiler.eqEnd);
-				JPanel preview = new JPanel(new BorderLayout());
+				JPanel preview = createJPanel(new BorderLayout());
 				preview.add(this.renderer.renderEquation(laTeXpreview.toString()),
 					BorderLayout.CENTER);
 				preview.setBackground(Color.WHITE);
@@ -348,7 +370,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				scroll.setPreferredSize(new Dimension((int) d.getWidth() + 10,
 					(int) d.getHeight() + 10));
 				lh.add(scroll, 1, ++row, 3, 1, 1d, 0d);
-				lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+				lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 			}
 			if (mc instanceof Assignment) {
 				lh.add(new SBasePanel(((Assignment) mc)
@@ -371,7 +393,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		}
 		lh.add(jlabel, 1, ++row, 1, 1, 0d, 0d);
 		lh.add(component, 3, row, 1, 1, 1, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 	}
 
 	/**
@@ -380,7 +402,10 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	private void addProperties(Model model) {
 		if (model.getLevel() > 2) {
 			if (model.isSetConversionFactor()) {
-				// TODO
+				Parameter conversionFactor = model.getConversionFactorInstance();
+				JTextField tf = new JTextField(conversionFactor.isSetName() ? conversionFactor.getName() : conversionFactor.getId());
+				tf.setEditable(editable);
+				addLabeledComponent(bundle.getString("conversionFactor"), tf);
 			}
 			if (model.isSetAreaUnits()) {
 				addUnit(bundle.getString("areaUnits"), model.getAreaUnits(), model);
@@ -434,22 +459,21 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
 				(int) dim.getHeight() + 18));
 		lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 	}
 
 	/**
 	 * 
 	 * @param label
-	 * @param areaUnits
+	 * @param units
 	 * @param m
 	 */
-	private void addUnit(String label, String areaUnits, Model m) {
+	private void addUnit(String label, String units, Model m) {
 		int level = m.getLevel(), version = m.getVersion();
-		String ud = m.getAreaUnits();
-		if (Unit.Kind.isValidUnitKindString(ud, level, version)) {
-			addLabeledComponent(label, unitKindComboBox(Unit.Kind.valueOf(ud.toUpperCase())));
+		if (Unit.Kind.isValidUnitKindString(units, level, version)) {
+			addLabeledComponent(label, unitKindComboBox(Unit.Kind.valueOf(units.toUpperCase())));
 		} else {
-			addLabeledComponent(label, unitPreview(m.getUnitDefinition(ud)));
+			addLabeledComponent(label, unitPreview(m.getUnitDefinition(units)));
 		}
 	}
 
@@ -494,11 +518,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		JCheckBox check = new JCheckBox(bundle.getString("reversible"), reaction.getReversible());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		check = new JCheckBox(bundle.getString("fast"), reaction.getFast());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 
 		// Create Table of reactants, modifiers and products
 		String rmp[][] = new String[Math.max(reaction.getReactantCount(), Math
@@ -542,8 +566,8 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
 				(int) dim.getHeight() + 18));
 		lh.add(scroll, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
-		JPanel rEqPanel = new JPanel(new BorderLayout());
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
+		JPanel rEqPanel = createJPanel(new BorderLayout());
 		ReactionPanel reactionPanel = new ReactionPanel(reaction, namesIfAvailable);
 		reactionPanel.setBackground(Color.WHITE);
 		JScrollPane s = new JScrollPane(reactionPanel);
@@ -552,7 +576,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		rEqPanel.add(s, BorderLayout.CENTER);
 		rEqPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("reactionEquation") + ' '));
 		lh.add(rEqPanel, 1, ++row, 3, 1, 1d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		if (reaction.isSetKineticLaw()) {
 			lh.add(new SBasePanel(reaction.getKineticLaw(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 0d, 0d);
 		}
@@ -562,9 +586,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @param sbase
 	 */
 	private void addProperties(SBase sbase) {
-		lh.add(new JPanel(), 0, row, 1, 1, 0d, 0d);
-		lh.add(new JPanel(), 4, row, 1, 1, 0d, 0d);
-		lh.add(new JPanel(), 2, row, 1, 1, 0d, 0d);
+		lh.add(createJPanel(), 0, row, 1, 1, 0d, 0d);
+		lh.add(createJPanel(), 4, row, 1, 1, 0d, 0d);
+		lh.add(createJPanel(), 2, row, 1, 1, 0d, 0d);
 		if (sbase.isSetHistory()) {
 			History hist = sbase.getHistory();
 			lh.add(new JLabel(bundle.getString("listOfCreators")), 1, ++row, 1, 1, 0d, 0d);
@@ -592,11 +616,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
 					(int) dim.getHeight() + 18));
 			lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 			if (hist.isSetCreatedDate()) {
 				JTextField tf = new JTextField(hist.getCreatedDate().toString());
 				tf.setEditable(editable);
-				addLabeledComponent(bundle.getString("dateOfModelCreation"), tf);
+				addLabeledComponent(bundle.getString("dateOfCreation"), tf);
 			}
 			Vector<Date> modification = new Vector<Date>();
 			if (hist.isSetModifiedDate()) {
@@ -614,25 +638,18 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				scroll2.setPreferredSize(new Dimension(preferedWidth,
 						modification.size() * 20));
 				scroll2.setBorder(BorderFactory.createLoweredBevelBorder());
-				addLabeledComponent(bundle.getString("dateOfModelModification"), scroll2);
+				addLabeledComponent(bundle.getString("dateOfModification"), scroll2);
 			}
 		}
 		if (sbase.isSetNotes() || editable) {
-			String text = sbase.getNotesString();
-			if (text.startsWith("<notes") && text.endsWith("notes>")) {
-				text = text.substring(sbase.getNotesString().indexOf('>') + 1,
-						sbase.getNotesString().lastIndexOf('/') - 1);
-			}
-			text = text.trim().replace("/>", ">");
-			if (!text.startsWith("<body") && !text.endsWith("</body>")) {
-				text = "<body>" + text + "</body>";
-			}
-			JEditorPane notesArea = new JEditorPane("text/html",
-					"<html><head></head>" + text + "</html>");
+			JEditorPane notesArea = new JEditorPane("text/html", SBMLtools.createHTMLfromNotes(sbase));
+			notesArea.setDoubleBuffered(true);
 			notesArea.setEditable(editable);
 			notesArea.addHyperlinkListener(new SystemBrowser());
 //			notesArea.setMaximumSize(new Dimension(preferedWidth, 200));
 			notesArea.setDoubleBuffered(true);
+			notesArea.setAutoscrolls(true);
+			notesArea.setPreferredSize(new Dimension(preferedWidth, 200));
 			notesArea.setBorder(BorderFactory.createLoweredBevelBorder());
 			JScrollPane editorScrollPane = new JScrollPane(notesArea);
 			//scroll.setMaximumSize(notesArea.getMaximumSize());
@@ -642,12 +659,13 @@ public class SBasePanel extends JPanel implements EquationComponent {
 //			scroll.setPreferredSize(new Dimension(preferedWidth, 500));
 			editorScrollPane.setPreferredSize(new Dimension(250, 145));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
-			JPanel notesPanel = new JPanel();
+			JPanel notesPanel = createJPanel();
 			notesPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("notes") + ' '));
+			notesPanel.setOpaque(true);
 			LayoutHelper helper = new LayoutHelper(notesPanel);
 			helper.add(editorScrollPane);
 			lh.add(notesPanel, 1, row, 3, 1, 1d, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		if (sbase.getCVTermCount() > 0) {
 			StringBuilder sb = new StringBuilder();
@@ -696,7 +714,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			}
 			sb.append("</body></html>");
 			JEditorPane l = new JEditorPane("text/html", sb.toString());
+			l.setAutoscrolls(true);
 			l.addHyperlinkListener(new SystemBrowser());
+			l.setDoubleBuffered(true);
 			l.setEditable(editable);
 			l.setBackground(Color.WHITE);
 			l.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -705,15 +725,16 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			JScrollPane editorScrollPane = new JScrollPane(l);
 			editorScrollPane.setPreferredSize(new Dimension(250, 145));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
-			JPanel miriamPanel = new JPanel();
+			JPanel miriamPanel = createJPanel();
+			miriamPanel.setOpaque(true);
 			miriamPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("MIRIAM") + ' '));
 			LayoutHelper helper = new LayoutHelper(miriamPanel);
 			helper.add(editorScrollPane);
 			lh.add(helper.getContainer(), 1, row, 3, 1, 1d, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		if (sbase.isSetSBOTerm()) {
-			JPanel sboPanel = new JPanel();
+			JPanel sboPanel = createJPanel();
 			sboPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("SBO") + ' '));
 			LayoutHelper helper = new LayoutHelper(sboPanel);
 			
@@ -726,7 +747,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			nameField.setLineWrap(true);
 			nameField.setWrapStyleWord(true);
 			helper.add(new JScrollPane(nameField), 3, innerRow, 1, 1, 1d, 0d);
-			helper.add(new JPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
+			helper.add(createJPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
 			
 			helper.add(new JLabel(bundle.getString("definition")), 1, ++innerRow, 1, 1, 0d, 0d);
 			JTextArea sboTermField = new JTextArea(5, columns);
@@ -741,7 +762,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				logger.log(Level.WARNING, bundleWarnings.getString("COULD_NOT_GET_SBO_IDENTIFIER"), exc);
 			}
 			helper.add(new JScrollPane(sboTermField), 3, innerRow, 1, 1, 1d, 0d);
-			helper.add(new JPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
+			helper.add(createJPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
 			
 			lh.add(helper.getContainer(), 1, ++row, 3, 1, 0d, 0d);
 		}
@@ -758,7 +779,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		JCheckBox chck = new JCheckBox(bundle.getString("containsUndeclaredUnits"), sbase.containsUndeclaredUnits());
 		chck.setEnabled(false);
 		lh.add(chck, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 0, ++row, 1, 1, 0d, 0d);
+		lh.add(createJPanel(), 0, ++row, 1, 1, 0d, 0d);
 	}
 
 	/**
@@ -781,7 +802,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			combo.setEnabled(editable);
 			lh.add(new JLabel(bundle.getString("species")), 1, ++row, 1, 1, 0d, 0d);
 			lh.add(combo, 3, row, 1, 1, 1d, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		if (ssr instanceof SpeciesReference) {
 			addProperties((SpeciesReference) ssr);
@@ -818,11 +839,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		JCheckBox check = new JCheckBox(bundle.getString("boundaryCondition"), species.getBoundaryCondition());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		check = new JCheckBox(bundle.getString("hasOnlySubstanceUnits"), species.getHasOnlySubstanceUnits());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 	}
 
 	/**
@@ -831,7 +852,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	private void addProperties(SpeciesReference specRef) {
 		if (specRef.isSetStoichiometryMath()) {
 			StoichiometryMath sMath = specRef.getStoichiometryMath();
-			JPanel p = new JPanel(new GridLayout(1, 1));
+			JPanel p = createJPanel(new GridLayout(1, 1));
 			p.setBorder(BorderFactory.createTitledBorder(' '
 					+ sMath.getClass().getCanonicalName() + ' '));
 			
@@ -849,7 +870,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			}
 
 			lh.add(p, 3, ++row, 1, 1, 1d, 1d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		} else {
 			lh.add(new JLabel(bundle.getString("stoichiometry")), 1, ++row, 1, 1, 0d, 0d);
 			JSpinner spinner = new JSpinner(new SpinnerNumberModel(specRef
@@ -857,7 +878,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 					specRef.getStoichiometry() + 1000, .1d));
 			spinner.setEnabled(editable);
 			lh.add(spinner, 3, row, 1, 1, 1d, 0d);
-			lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 	}
 
@@ -972,7 +993,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		JCheckBox check = new JCheckBox(bundle.getString("constant"), v.isConstant());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 0d, 0d);
-		lh.add(new JPanel(), 1, ++row, 5, 1, 0d, 0d);
+		lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 	}
 
 	/* (non-Javadoc)
@@ -1054,7 +1075,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	private JEditorPane unitPreview(UnitDefinition ud) {
 		JEditorPane preview = new JEditorPane("text/html", StringUtil
 				.toHTML(ud != null ? HTMLFormula.toHTML(ud) : ""));
-		preview.setEditable(false);
+		preview.setEditable(editable);
 		preview.setBorder(BorderFactory.createLoweredBevelBorder());
 		return preview;
 	}
