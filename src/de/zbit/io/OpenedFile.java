@@ -46,26 +46,24 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	}
 
 	/**
-	 * 
+	 * Flag to indicate if the document has been changed.
 	 */
 	boolean changed = false;
 	
 	/**
-	 * 
+	 * The content of the {@link File}, i.e., the result of some parsing.
 	 */
 	protected T document;
 	
 	/**
-	 * 
+	 * The file that has been opened.
 	 */
 	protected File file;
 	
 	/**
-	 * 
+	 * Notifies listeners about changes within the document.
 	 */
 	private PropertyChangeSupport propertyChangeSupport;
-	
-
 
 	/**
 	 * Bean constructor.
@@ -127,6 +125,10 @@ public class OpenedFile<T> implements PropertyChangeListener {
 
 	/**
 	 * 
+	 * @param propertyName
+	 * @param oldValue
+	 * @param newValue
+	 * @see PropertyChangeSupport#firePropertyChange(String, boolean, boolean)
 	 */
 	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
 		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
@@ -140,7 +142,8 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	}
 	
 	/**
-	 * @return
+	 * 
+	 * @return the {@link File} object.
 	 */
 	public File getFile() {
 		return file;
@@ -154,8 +157,8 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Checks if the document is not null.
+	 * @return {@code true} if the document is not null, {@code false} otherwise.
 	 */
 	public boolean isSetDocument() {
 		return document != null;
@@ -175,8 +178,8 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals(FILE_CHANGED_EVENT)) {
 			boolean previous = isChanged();
-			setChanged(true);
-			firePropertyChange(FILE_CHANGED_EVENT, previous, true);
+			setChanged(Boolean.parseBoolean(evt.getNewValue().toString()));
+			firePropertyChange(FILE_CHANGED_EVENT, previous, changed);
 		}
 	}
 	
@@ -202,6 +205,5 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	public void setFile(File file) {
 		this.file = file;
 	}
-	
 	
 }

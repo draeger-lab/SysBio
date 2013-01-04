@@ -21,6 +21,7 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.util.TreeNodeRemovedEvent;
 
@@ -37,7 +38,7 @@ import de.zbit.io.OpenedFile;
 public class SBMLfileChangeListener implements TreeNodeChangeListener {
 	
 	/**
-	 * 
+	 * The {@link OpenedFile} object whose change events should be forwarded.
 	 */
 	private OpenedFile<SBMLDocument> openedFile;
 
@@ -56,30 +57,30 @@ public class SBMLfileChangeListener implements TreeNodeChangeListener {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
+	 */
+	@Override
+	public void nodeAdded(TreeNode node) {
+		openedFile.propertyChange(new PropertyChangeEvent(node.getParent(), OpenedFile.FILE_CHANGED_EVENT, Boolean.valueOf(openedFile.isChanged()), Boolean.TRUE));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(org.sbml.jsbml.util.TreeNodeRemovedEvent)
+	 */
+	@Override
+	public void nodeRemoved(TreeNodeRemovedEvent evt) {
+		openedFile.propertyChange(new PropertyChangeEvent(evt.getSource(), OpenedFile.FILE_CHANGED_EVENT, Boolean.valueOf(openedFile.isChanged()), Boolean.TRUE));
+	}
+	
+	/* (non-Javadoc)
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (!openedFile.isChanged()) {
-			openedFile.propertyChange(evt);
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
-	 */
-	public void nodeAdded(TreeNode node) {
-		if (!openedFile.isChanged()) {
-			propertyChange(new PropertyChangeEvent(node, OpenedFile.FILE_CHANGED_EVENT, Boolean.FALSE, Boolean.TRUE));
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(javax.swing.tree.TreeNode)
-	 */
-	public void nodeRemoved(TreeNodeRemovedEvent evt) {
-		if (!openedFile.isChanged()) {
-			propertyChange(new PropertyChangeEvent(evt, OpenedFile.FILE_CHANGED_EVENT, Boolean.FALSE, Boolean.TRUE));
+		if (!evt.getPropertyName().equals(TreeNodeChangeEvent.userObject)) {
+			Object oldVal = evt.getOldValue(), newVal = evt.getNewValue();
+			boolean changed = ((oldVal == null) && (newVal != null)) || ((oldVal != null) && (newVal == null)) || (oldVal != newVal) || !oldVal.equals(newVal);
+			openedFile.propertyChange(new PropertyChangeEvent(evt.getSource(), OpenedFile.FILE_CHANGED_EVENT, Boolean.valueOf(openedFile.isChanged()), Boolean.valueOf(changed)));
 		}
 	}
 	

@@ -33,10 +33,9 @@ import javax.swing.Icon;
  * @version $Rev$
  */
 public class CloseIcon implements Icon {
-	private int x_pos;
-	private int y_pos;
-	private int width;
-	private int height;
+	
+	private int x, y;
+	private int width, height;
 	private Color color;
 
 	/**
@@ -112,15 +111,15 @@ public class CloseIcon implements Icon {
 		width = 16;
 		height = 16;
 		border = true;
-		color = Color.black;
+		color = Color.BLACK;
 	}
 
 	/* (non-Javadoc)
 	 * @see javax.swing.Icon#paintIcon(java.awt.Component, java.awt.Graphics, int, int)
 	 */
 	public void paintIcon(Component c, Graphics g, int x, int y) {
-		this.x_pos = x;
-		this.y_pos = y;
+		this.x = x;
+		this.y = y;
 
 		Color col = g.getColor();
 
@@ -164,7 +163,7 @@ public class CloseIcon implements Icon {
 	 * @return
 	 */
 	public Rectangle getBounds() {
-		return new Rectangle(x_pos, y_pos, width, height);
+		return new Rectangle(x, y, width, height);
 	}
 
 }
