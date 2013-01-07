@@ -61,7 +61,7 @@ public class SBMLfileChangeListener implements TreeNodeChangeListener {
 	 */
 	@Override
 	public void nodeAdded(TreeNode node) {
-		openedFile.propertyChange(new PropertyChangeEvent(node.getParent(), OpenedFile.FILE_CHANGED_EVENT, Boolean.valueOf(openedFile.isChanged()), Boolean.TRUE));
+		openedFile.setChanged(true);
 	}
 	
 	/* (non-Javadoc)
@@ -69,7 +69,7 @@ public class SBMLfileChangeListener implements TreeNodeChangeListener {
 	 */
 	@Override
 	public void nodeRemoved(TreeNodeRemovedEvent evt) {
-		openedFile.propertyChange(new PropertyChangeEvent(evt.getSource(), OpenedFile.FILE_CHANGED_EVENT, Boolean.valueOf(openedFile.isChanged()), Boolean.TRUE));
+		openedFile.setChanged(true);
 	}
 	
 	/* (non-Javadoc)
@@ -79,8 +79,7 @@ public class SBMLfileChangeListener implements TreeNodeChangeListener {
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (!evt.getPropertyName().equals(TreeNodeChangeEvent.userObject)) {
 			Object oldVal = evt.getOldValue(), newVal = evt.getNewValue();
-			boolean changed = ((oldVal == null) && (newVal != null)) || ((oldVal != null) && (newVal == null)) || (oldVal != newVal) || !oldVal.equals(newVal);
-			openedFile.propertyChange(new PropertyChangeEvent(evt.getSource(), OpenedFile.FILE_CHANGED_EVENT, Boolean.valueOf(openedFile.isChanged()), Boolean.valueOf(changed)));
+			openedFile.setChanged(((oldVal == null) && (newVal != null)) || ((oldVal != null) && (newVal == null)) || (oldVal != newVal) || !oldVal.equals(newVal));
 		}
 	}
 	

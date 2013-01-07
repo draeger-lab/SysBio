@@ -36,6 +36,7 @@ import java.beans.EventHandler;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -63,6 +64,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
@@ -80,6 +82,7 @@ import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.MultiplePreferencesPanel;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
+import de.zbit.io.OpenedFile;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
@@ -1523,6 +1526,66 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		}
 		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
 			BaseAction.FILE_SAVE_AS);
+	}
+
+	/**
+	 * This method modifies the title of this {@link BaseFrame} depending on the
+	 * state of the given selected file. If you pass {@code null} to this method,
+	 * the title will be the plain application's name together with the version
+	 * number (see also {@link #getApplicationName()} and
+	 * {@link #getDottedVersionNumber()}). If the given argument is not
+	 * {@code null}, the effect of this method will be different depending on the
+	 * platform that is used. For Mac OS X, the title will be marked with the
+	 * Mac-specific properties {@code "Window.documentFile"} and
+	 * {@code "Window.documentModified"}. The actual title will not be changed.
+	 * For all other platforms, the title will be changed to a {@link String}
+	 * consisting of the application's name followed by the version number, a
+	 * dash, and the name of the file wrapped within the given {@link OpenedFile}.
+	 * In this case, the file name will be marked with an asterisk if the file has
+	 * been indicated to be changed according to the
+	 * {@link OpenedFile#isChanged()} method. Finally, this method also influences
+	 * the {@link JMenuBar} and the {@link JToolBar} linked to this frame (if
+	 * set). Thereby, the possible user commands {@link BaseAction#FILE_SAVE},
+	 * {@link BaseAction#FILE_SAVE_AS}, and {@link BaseAction#FILE_CLOSE} are
+	 * manipulated accordingly.
+	 * 
+	 * @param selectedFile
+	 *        the currently selected file that has been opened by the user in this
+	 *        program, can be {@code null}. If it is null, the title will be
+	 *        changed to its plain form, otherwise, depending on the operating
+	 *        system, the title bar will indicate the file and if it is changed.
+	 * @see #getProgramNameAndVersion()
+	 */
+	protected <T> void setFileStateMark(OpenedFile<T> selectedFile) {
+		if ((selectedFile == null) || !selectedFile.isSetFile()) {
+			logger.fine("Removing file entry from window view if necessary.");
+			GUITools.setEnabled(false, getJMenuBar(), getJToolBar(), BaseAction.FILE_SAVE, BaseAction.FILE_SAVE_AS, BaseAction.FILE_CLOSE);
+			if (GUITools.isMacOSX()) {
+				JRootPane root = getRootPane();
+				root.putClientProperty("Window.documentFile", null);
+				root.putClientProperty("Window.documentModified", false);
+			} else {
+				setTitle(getProgramNameAndVersion());
+			}
+			return;
+		}
+		
+		File file = selectedFile.getFile();
+		logger.fine(MessageFormat.format("Adding file {0} to window view.", file.getName()));
+		if (GUITools.isMacOSX()) {
+			JRootPane root = getRootPane();
+			root.putClientProperty("Window.documentFile", file);
+			root.putClientProperty("Window.documentModified", Boolean.valueOf(selectedFile.isChanged()));
+		} else {
+			char changeMark = '*';
+			if (selectedFile.isChanged()) {
+				setTitle(getProgramNameAndVersion() + " - " + file.getName() + changeMark);
+			} else {
+				setTitle(getProgramNameAndVersion() + " - " + file.getName());
+			}
+		}
+		GUITools.setEnabled(selectedFile.isChanged(), getJMenuBar(), getJToolBar(), BaseAction.FILE_SAVE);
+		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(), BaseAction.FILE_SAVE_AS, BaseAction.FILE_CLOSE);
 	}
 	
 	/**
