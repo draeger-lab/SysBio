@@ -437,7 +437,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			logger.fine("PN position: " + position);
 			logger.fine("PN center: " + centerPosition);
 			for (SpeciesReferenceGlyph sRG : reactionGlyph.getListOfSpeciesReferenceGlyphs()) {
-				Point speciesDockingAtPN = calculateReactionGlyphDockingPointForSpecies(reactionGlyph, rotationAngle, sRG);
+				Point speciesDockingAtPN = calculateReactionGlyphDockingPoint(reactionGlyph, rotationAngle, sRG);
 				// make point relative to center of PN
 				Point relativeDockingAtPN = new Point(speciesDockingAtPN.getX() - centerPosition.getX(),
 						speciesDockingAtPN.getY() - centerPosition.getY(), DEFAULT_Z_COORD);
@@ -632,7 +632,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 
 			double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);
 
-			rgCurvePoint = calculateReactionGlyphDockingPointForSpecies(reactionGlyph, rotationAngle, specRefGlyph);
+			rgCurvePoint = calculateReactionGlyphDockingPoint(reactionGlyph, rotationAngle, specRefGlyph);
 
 //			/*
 //			 * check the different cases for cubicBezier: ABOVE, BELOW, LEFT, RIGHT
