@@ -16,7 +16,6 @@
  */
 package de.zbit.io;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -29,20 +28,29 @@ import java.io.File;
  * @since 1.4
  * @version $Rev: 808 $
  */
-public class OpenedFile<T> implements PropertyChangeListener {
+public class OpenedFile<T> {
 
 	/**
-	 * File change event name.
+	 * {@link File} content change event name.
+	 */
+	public static final String FILE_CONTENT_CHANGED_EVENT = "de.zbit.io.OpenedFile.fileContentChangedEvent";
+	
+	/**
+	 * {@link File} change event name.
 	 */
 	public static final String FILE_CHANGED_EVENT = "de.zbit.io.OpenedFile.fileChangedEvent";
+	
+	/**
+	 * Event name used to indicate that the document associated to the file in this object has been parsed.
+	 */
+	public static final String DOCUMENT_SET_EVENT = "de.zbit.io.OpenedFile.documentSetEvent";
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "OpenedFile [file=" + file + ", changed=" + changed + ", document=" + document
-				+ ']';
+		return "OpenedFile [file=" + file + ", changed=" + changed + ", document=" + document + ']';
 	}
 
 	/**
@@ -122,17 +130,6 @@ public class OpenedFile<T> implements PropertyChangeListener {
 		}
 		return false;
 	}
-
-	/**
-	 * 
-	 * @param propertyName
-	 * @param oldValue
-	 * @param newValue
-	 * @see PropertyChangeSupport#firePropertyChange(String, boolean, boolean)
-	 */
-	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
-	}
 	
 	/**
 	 * @return the original
@@ -170,24 +167,14 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	public boolean isSetFile() {
 		return this.file != null;
 	}
-
-	/* (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	 */
-	//@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals(FILE_CHANGED_EVENT)) {
-			boolean previous = isChanged();
-			setChanged(Boolean.parseBoolean(evt.getNewValue().toString()));
-			firePropertyChange(FILE_CHANGED_EVENT, previous, changed);
-		}
-	}
 	
 	/**
 	 * @param changed the changed to set
 	 */
 	public void setChanged(boolean changed) {
+		boolean previous = isChanged();
 		this.changed = changed;
+		propertyChangeSupport.firePropertyChange(FILE_CONTENT_CHANGED_EVENT, Boolean.valueOf(previous), Boolean.valueOf(changed));		
 	}
 
 	/**
@@ -195,7 +182,9 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	 * @param document
 	 */
 	public void setDocument(T document) {
+		T previousDoc = getDocument();
 		this.document = document;
+		propertyChangeSupport.firePropertyChange(DOCUMENT_SET_EVENT, previousDoc, document);
 	}
 
 	/**
@@ -203,7 +192,17 @@ public class OpenedFile<T> implements PropertyChangeListener {
 	 * @param file
 	 */
 	public void setFile(File file) {
+		File oldFile = getFile();
 		this.file = file;
+		propertyChangeSupport.firePropertyChange(FILE_CHANGED_EVENT, oldFile, file);
+	}
+
+	/**
+	 * Removes the pointer to the underlying file. This call is equal to calling
+	 * {@code setFile(null)}.
+	 */
+	public void unsetFile() {
+		setFile(null);
 	}
 	
 }

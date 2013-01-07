@@ -2039,13 +2039,15 @@ public class GUITools {
             boolean containsCommand = false;
             for (int k = 0; k < m.getItemCount(); k++) {
               JMenuItem it = m.getItem(k);
-              if (it != null && it.getActionCommand() != null
+              if ((it != null) && (it.getActionCommand() != null)
                   && setOfCommands.contains(it.getActionCommand())) {
                 it.setEnabled(state);
                 containsCommand = true;
               }
             }
-            if (containsCommand) m.setEnabled(state);
+            if (containsCommand) {
+            	m.setEnabled(state);
+            }
           }
           if ((item != null) && (item.getActionCommand() != null)
               && setOfCommands.contains(item.getActionCommand())) {
@@ -2054,18 +2056,20 @@ public class GUITools {
         }
       }
     }
-    if (toolbar != null) for (i = 0; i < toolbar.getComponentCount(); i++) {
-      Object o = toolbar.getComponent(i);
-      if (o instanceof JButton) {
-        JButton b = (JButton) o;
-        if (setOfCommands.contains(b.getActionCommand())) {
-          b.setEnabled(state);
-          // if (b.getIcon() != null
-          // && b.getIcon() instanceof CloseIcon)
-          // ((CloseIcon) b.getIcon())
-          // .setColor(state ? Color.BLACK : Color.GRAY);
-        }
-      }
+    if (toolbar != null) {
+    	for (i = 0; i < toolbar.getComponentCount(); i++) {
+    		Object o = toolbar.getComponent(i);
+    		if (o instanceof JButton) {
+    			JButton b = (JButton) o;
+    			if (setOfCommands.contains(b.getActionCommand())) {
+    				b.setEnabled(state);
+    				// if (b.getIcon() != null
+    				// && b.getIcon() instanceof CloseIcon)
+    				// ((CloseIcon) b.getIcon())
+    				// .setColor(state ? Color.BLACK : Color.GRAY);
+    			}
+    		}
+    	}
     }
   }
   

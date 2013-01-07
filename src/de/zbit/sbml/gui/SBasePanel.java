@@ -58,7 +58,6 @@ import org.sbml.jsbml.FunctionDefinition;
 import org.sbml.jsbml.History;
 import org.sbml.jsbml.KineticLaw;
 import org.sbml.jsbml.ListOf;
-import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
@@ -200,8 +199,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
   			addProperties((Species) sbase);
   		} else if (sbase instanceof Parameter) {
   			addProperties((Parameter) sbase);
-  		} else if (sbase instanceof LocalParameter) {
+  		/* This is not necessary because on other information than in
+  		 * QuantityWithUnit (see below) is added; so we would have a duplication
+  		 * of information:
+  		 * } else if (sbase instanceof LocalParameter) {
   			addProperties((LocalParameter) sbase);
+  		 */
   		} else if (sbase instanceof Constraint) {
   			addProperties((Constraint) sbase);
   		} else if (sbase instanceof Reaction) {
@@ -740,16 +743,17 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			
 			int columns = 35, innerRow = -1;
 			SBO.Term term = SBO.getTerm(sbase.getSBOTerm());
-			helper.add(new JLabel(bundle.getString("name")), 1, ++innerRow, 1, 1, 0d, 0d);
+			helper.add(new JLabel(bundle.getString("name")), 0, ++innerRow, 1, 1, 0d, 0d);
 			JTextArea nameField = new JTextArea(term.getName(), 2, columns);
 			nameField.setEditable(editable);
 			nameField.setCaretPosition(0);
 			nameField.setLineWrap(true);
 			nameField.setWrapStyleWord(true);
 			helper.add(new JScrollPane(nameField), 3, innerRow, 1, 1, 1d, 0d);
-			helper.add(createJPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
+			helper.add(createJPanel(), 1, innerRow, 1, 1, .1d, 0d);
+			helper.add(createJPanel(), 0, ++innerRow, 6, 1, 1d, 0d);
 			
-			helper.add(new JLabel(bundle.getString("definition")), 1, ++innerRow, 1, 1, 0d, 0d);
+			helper.add(new JLabel(bundle.getString("definition")), 0, ++innerRow, 1, 1, 0d, 0d);
 			JTextArea sboTermField = new JTextArea(5, columns);
 			sboTermField.setCaretPosition(0);
 			sboTermField.setLineWrap(true);

@@ -141,8 +141,8 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 			 */
 			public void dragExit(DragSourceEvent e) {
 				e.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
-				lineRect.setRect(0,0,0,0);
-				glassPane.setPoint(new Point(-1000,-1000));
+				lineRect.setRect(0, 0, 0, 0);
+				glassPane.setPoint(new Point(-1000, -1000));
 				glassPane.repaint();
 			}
 			
@@ -176,6 +176,9 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 				}
 			}
 			
+			/* (non-Javadoc)
+			 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.DragSourceDragEvent)
+			 */
 			public void dropActionChanged(DragSourceDragEvent e) {}
 		};
 		final Transferable t = new Transferable() {
@@ -236,22 +239,22 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
     	 * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
     	 */
     	@Override
-      public void mousePressed(MouseEvent e){
+      public void mousePressed(MouseEvent e) {
         if (e.isPopupTrigger()) doPop(e);
       }
     	/* (non-Javadoc)
     	 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
     	 */
     	@Override
-      public void mouseReleased(MouseEvent e){
+      public void mouseReleased(MouseEvent e) {
         if (e.isPopupTrigger()) doPop(e);
       }
     	/**
     	 * 
     	 * @param e
     	 */
-      private void doPop(MouseEvent e){
-        if (getTabCount()>0) {
+      private void doPop(MouseEvent e) {
+        if (getTabCount() > 0) {
           createRightMousePopup().show(e.getComponent(), e.getX(), e.getY());
         }
       }
@@ -504,7 +507,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	 * @see java.awt.dnd.DropTargetListener#dragOver(java.awt.dnd.DropTargetDragEvent)
 	 */
 	public void dragOver(final DropTargetDragEvent e) {
-		if (getTabPlacement()==JTabbedPane.TOP || getTabPlacement()==JTabbedPane.BOTTOM) {
+		if ((getTabPlacement() == JTabbedPane.TOP) || (getTabPlacement() == JTabbedPane.BOTTOM)) {
 			initTargetLeftRightLine(getTargetTabIndex(e.getLocation()));
 		} else {
 			initTargetTopBottomLine(getTargetTabIndex(e.getLocation()));
@@ -536,11 +539,11 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	 */
 	public boolean isDragAcceptable(DropTargetDragEvent e) {
 		Transferable t = e.getTransferable();
-		if (t==null) {
+		if (t == null) {
 			return false;
 		}
 		DataFlavor[] f = e.getCurrentDataFlavors();
-		if (t.isDataFlavorSupported(f[0]) && dragTabIndex>=0) {
+		if (t.isDataFlavorSupported(f[0]) && (dragTabIndex >= 0)) {
 			return true;
 		}
 		return false;
@@ -553,11 +556,11 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	 */
 	public boolean isDropAcceptable(DropTargetDropEvent e) {
 		Transferable t = e.getTransferable();
-		if (t==null) {
+		if (t == null) {
 			return false;
 		}
 		DataFlavor[] f = t.getTransferDataFlavors();
-		return (t.isDataFlavorSupported(f[0]) && dragTabIndex>=0);
+		return (t.isDataFlavorSupported(f[0]) && (dragTabIndex >= 0));
 	}
 	
 	/* (non-Javadoc)
@@ -628,14 +631,14 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 		Component cmp = getComponentAt(prev);
 		Icon fileIcon = getFileIconAt(prev);
 		String str = getTitleAt(prev);
-		if (next==getTabCount()) {
+		if (next == getTabCount()) {
 			remove(prev);
 			addTab(str, cmp);
-			setSelectedIndex(getTabCount()-1);
+			setSelectedIndex(getTabCount() - 1);
 			if (showCloseIcon) {
-			  addCloseIconToTabComponentAt(getTabCount()-1, fileIcon);
+			  addCloseIconToTabComponentAt(getTabCount() - 1, fileIcon);
 			}
-		} else if (prev>next) {
+		} else if (prev > next) {
 			remove(prev);
 			insertTab(str, null, cmp, null, next);
 			setSelectedIndex(next);
@@ -644,10 +647,10 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 			}
 		} else {
 			remove(prev);
-			insertTab(str, null, cmp, null, next-1);
-			setSelectedIndex(next-1);
+			insertTab(str, null, cmp, null, next - 1);
+			setSelectedIndex(next - 1);
 			if (showCloseIcon) {
-			  addCloseIconToTabComponentAt(next-1, fileIcon);
+			  addCloseIconToTabComponentAt(next - 1, fileIcon);
 			}
 		}
 	}
@@ -726,8 +729,8 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if (dragTabIndex>=0) {
-			Graphics2D g2 = (Graphics2D)g;
+		if (dragTabIndex >= 0) {
+			Graphics2D g2 = (Graphics2D) g;
 			g2.setPaint(lineColor);
 			g2.fill(lineRect);
 		}
@@ -739,7 +742,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
    * @param b
    */
   public void setShowCloseIcon(boolean b) {
-    showCloseIcon  = false;
+    showCloseIcon = b;
   }
 
 }
