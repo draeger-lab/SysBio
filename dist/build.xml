@@ -113,7 +113,6 @@
           <zipfileset excludes="META-INF/*" src="${lib}/sysbio-osx-support.jar"/>
           
           <!-- These libraries are required by just some classes (decide yourself if you want them) -->
-          <zipfileset excludes="META-INF/*.SF" src="${lib}/keggapi.jar"/>
           <zipfileset excludes="META-INF/*.SF" src="${lib}/Java5/saaj.jar"/>
           <zipfileset excludes="META-INF/*.SF" src="${lib}/WSDbfetch.jar"/>
     </jar>

@@ -55,7 +55,9 @@ public class FileDownload {
 
   
   /**
-   * 
+   * Downloads the given {@code address} and <b>stores the 
+   * results in a file on hard disk.</b>
+   *  
    * @param address
    * @return the path and filename of the downloaded file,
    * relative to the current folder. NOT the file content. 
@@ -98,26 +100,42 @@ public class FileDownload {
    * @throws IOException 
    */
   public static void download(String address, OutputStream out) throws IOException {
-    if (out==null) return;
+    download(address, out, true);
+  }
+  
+  /**
+   * 
+   * @param address
+   * @param out
+   * @param verbose if {@code TRUE}, this method will issue log messages and use the progress bar.
+   * @throws IOException
+   */
+  public static void download(String address, OutputStream out, boolean verbose) throws IOException {
+    if (out==null) return; // we have no place to write the results
     URLConnection conn = null;
     InputStream  in = null;
-    String statusLabelText = "Downloading '" + address + "' ";
-    log.info(statusLabelText);
     
     AbstractProgressBar progress = null;
-    if (ProgressBar!=null && ProgressBar instanceof AbstractProgressBar)
-      progress = (AbstractProgressBar) ProgressBar;
+    if (verbose) {
+      String statusLabelText = "Downloading '" + address + "' ";
+      log.info(statusLabelText);
+      
+      if (ProgressBar!=null && ProgressBar instanceof AbstractProgressBar) {
+        progress = (AbstractProgressBar) ProgressBar;
+      }
+    }
     
     try {
       URL url = new URL(address);
       int status = 0;
-      if (address.toLowerCase().startsWith("http:"))
+      if (address.toLowerCase().startsWith("http:")) {
         status = ((HttpURLConnection) url.openConnection()).getResponseCode();
-      else //if (address.toLowerCase().startsWith("ftp:"))
+      } else { //if (address.toLowerCase().startsWith("ftp:"))
         url.openConnection(); //status = ((URLConnection) url.openConnection()).getResponseCode();
+      }
       
       if (status>=400) {
-        System.err.println("Failed: HTTP error (code " + status + ").");
+        log.warning("Failed: HTTP error (code " + status + "). " + address);
         
         return; //404 und sowas ... >400 nur error codes. Normal:200 =>OK
       }
@@ -132,11 +150,11 @@ public class FileDownload {
       
       final int reportEveryXKB = 50; // Set progressbar every X kb. = StepSize
       //guiOperations.SetProgressBarMAXThreadlike(Math.max(conn.getContentLength(), in.available()), ProgressBar);
-      if (progress!=null) progress.setNumberOfTotalCalls((long)((double)Math.max(conn.getContentLength(), in.available())/(double)(buffer.length*reportEveryXKB)));
+      if (verbose && progress!=null) progress.setNumberOfTotalCalls((long)((double)Math.max(conn.getContentLength(), in.available())/(double)(buffer.length*reportEveryXKB)));
       
       int calls = 0;
       while ((numRead = in.read(buffer)) != -1) {
-        if (progress!=null &&  (calls%reportEveryXKB) == 0) {
+        if (verbose && progress!=null && (calls%reportEveryXKB) == 0) {
           if (Thread.currentThread().isInterrupted()) break;
           double mb = (Math.round(numWritten/1024.0/1024.0*10.0)/10.0);
           //if (ProgressBar!=null) guiOperations.SetProgressBarVALUEThreadlike((int)numWritten, true, ProgressBar);
