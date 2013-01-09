@@ -114,11 +114,11 @@ public class KeggFunctionManagement extends InfoManagement<KeggQuery, CustomObje
     
     //try {
       if (j==KeggQuery.getGenesByPathway) {
-        answer = adap.getGenesByPathwayWithTimeout(id.getQuery());
+        answer = adap.getGenesByPathway(id.getQuery());
       } else if (j==KeggQuery.getIdentifier) {
-        answer = adap.getIdentifierWithTimeout(id.getQuery());
+        answer = adap.getIdentifier(id.getQuery());
       } else if (j==KeggQuery.getPathways) {
-        answer = adap.getPathwaysWithTimeout(id.getQuery());
+        answer = adap.getPathways(id.getQuery());
       } else if (j==KeggQuery.getKEGGIdentifierForAGeneSymbol) {
     	  answer = adap.getKEGGIdentifierForAGeneSymbol(id.getQuery(), null);
       } else if (j==KeggQuery.getOrganisms) {

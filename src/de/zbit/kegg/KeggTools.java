@@ -303,7 +303,7 @@ public class KeggTools {
     AbstractProgressBar progress) {
     // PreFetch infos. Enormous performance improvement!
     Collection<String> preFetchIDs = new HashSet<String>();
-    preFetchIDs.add("GN:" + p.getOrg());
+    preFetchIDs.add("gn:" + p.getOrg());
     preFetchIDs.add(p.getName());
     for (Entry entry : p.getEntries()) {
       for (String ko_id : entry.getName().split(" ")) {
@@ -362,7 +362,11 @@ public class KeggTools {
         KeggInfos reaInfo = KeggInfos.get(ko_id, manager);
         
         if (reaInfo!=null && reaInfo.getSameAs()!=null) {
-          p.putEntrySynonymsInNameMap(entry, reaInfo.getSameAs());
+          for (String id : reaInfo.getSameAs().split("\\s")) {
+            if (id!=null && id.trim().length()>0) {
+              p.putEntrySynonymsInNameMap(entry, id);
+            }
+          }
         }
       }
     }
