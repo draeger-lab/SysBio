@@ -887,7 +887,7 @@ public class KeggInfos implements Serializable {
 		// 0006096
 		// 0006094
 
-		// Mainly Organism specific (eg. "GN:hsa")
+		// Mainly Organism specific (eg. "gn:hsa")
 		taxonomy = KeggAdaptor.extractInfoCaseSensitive(infos, uInfos, "TAXONOMY", "\n"); // e.g.
 		// "TAXONOMY    TAX:9606"
 		// =>
@@ -1391,9 +1391,13 @@ public class KeggInfos implements Serializable {
       Utils.addToMapOfSets(ids, keggDB, Kegg_ID);
     }
     if (getSameAs()!=null) {
-      keggDB = getDatabaseForKeggID(getSameAs(), null);
-      if (keggDB!=null) {
-        Utils.addToMapOfSets(ids, keggDB, getSameAs());
+      for (String id : getSameAs().split("\\s")) {
+        if (id!=null && id.trim().length()>0) {
+          keggDB = getDatabaseForKeggID(id, null);
+          if (keggDB!=null) {
+            Utils.addToMapOfSets(ids, keggDB, id);
+          }
+        }
       }
     }
     

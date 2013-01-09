@@ -16,20 +16,21 @@
  */
 package de.zbit.kegg.api;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import keggapi.Definition;
-import keggapi.KEGGLocator;
-import keggapi.KEGGPortType;
-import keggapi.LinkDBRelation;
-import keggapi.SSDBRelation;
+import de.zbit.io.FileDownload;
 import de.zbit.kegg.api.cache.KeggFunctionManagement;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
+import de.zbit.util.StringUtil;
 
 /**
  * A Kegg Adaptor, that directly retrieves informations from the
@@ -39,9 +40,11 @@ import de.zbit.kegg.api.cache.KeggInfoManagement;
  * or {@link KeggFunctionManagement} for directly accessing certain
  * methods.
  * 
- * This class does not implement the whole Kegg interface. Please see
- * {@link http://www.genome.jp/kegg/docs/keggapi_manual.html} and feel
- * free to add new methods to this class.
+ * <p>Since 2013, the old SOAP API has been deactivated (the api JAR is
+ * NOT required anymore) and information is retrieved with a simple
+ * REST (URL-download-based) interface.</p>
+ * 
+ * See http://www.kegg.jp/kegg/rest/keggapi.html
  * 
  * <p>NOTE: As a backup system, there is an URL based mirror at
  * http://togows.dbcls.jp
@@ -62,16 +65,15 @@ public class KeggAdaptor {
   public static boolean printEachOutputToScreen = false;
 
   /**
-   * The servlet that handles all queries.
+   * KEE API is accessed with:
+   * <pre>
+   * http://rest.kegg.jp/(operation)/(argument)/(argument2 or option)
+   * 
+   * (operation) = info | list | find | get | conv | link
+   * (argument) = (database) | (dbentries)
+   * </pre>
    */
-  private KEGGPortType serv;
-
-  /**
-   * Initializes a new Kegg Adaptor with a new servlet.
-   */
-  public KeggAdaptor() {
-    serv = getServlet();
-  }
+  protected final static String KEGG_API_REST_PREFIX = "http://rest.kegg.jp/";
   
 
   /**
@@ -80,9 +82,12 @@ public class KeggAdaptor {
   public static void main(String[] args) {
     printEachOutputToScreen = true;
     KeggAdaptor adap = new KeggAdaptor();
+
     
-    adap.getOrganisms();
-    String ret = adap.get("rn:R02189");
+    adap.get("cpd:C00103 hsa:8491 rn:R05964 q:243 glycan:G00181");
+    if (true) return;
+    
+    String ret = adap.get("rn:R07618");
     System.out.println("---\n"+KeggAdaptor.extractInfo(ret, "PATHWAY")+"\n---");
     
     String ttt = adap.get("path:hsa04010");
@@ -133,7 +138,7 @@ public class KeggAdaptor {
     System.out.println("======================");
     adap.get("dr:D00694");
 
-    // adap.get("GN:hsa");
+    // adap.get("gn:hsa");
     if (true)
       return;
     adap.get("cpd:C00338");
@@ -145,43 +150,15 @@ public class KeggAdaptor {
     System.out.println(extractInfo(infos, "DEFINITION"));
     System.out.println(extractInfo(infos, "GENES"));
 
-    adap.getGenesForKO("ko:K04349", "hsa");
     adap.get("ko:K04349");
     adap.get("hsa:8491");
     if (true)
       return;
 
-    adap.getDatabases();
     adap.getOrganisms();
 
     adap.find("genes homer1");
-
-    if (true)
-      return;
-    // NCBI-GeneID: 8491
-    adap.getEntrezIDs("hsa:8491");
-    if (true)
-      return;
-
-    adap.getGenesForKO("ko:K04349", "hsa"); // RASGRF
-    // getBestNeighborsByGene("eco:b0002");
-
-    adap.getDatabases();
-    // getOrganisms();
-    // getPathways("hsa");
-
-    adap.get("path:map04010");
-    if (true)
-      return;
-
-    String s = "ko:K04344 ko:K04849 ko:K04850 ko:K04851 ko:K04852 ko:K04853 ko:K04854 ko:K04855 ko:K04856 ko:K04857 ko:K05315 ko:K04858 ko:K04859 ko:K04860 ko:K04861 ko:K05316 ko:K04862 ko:K04863 ko:K04864 ko:K04865 ko:K05317 ko:K04866 ko:K04867 ko:K04868 ko:K04869 ko:K04870 ko:K04871 ko:K04872 ko:K04873";
-    for (int i = 0; i < s.split(" ").length; i++) {
-      adap.getGenesForKO(s.split(" ")[i], "hsa");
-    }
-
-    // adap.get("cpd:C00076");
-    // adap.find("map kinase");
-
+    
   }
   
   
@@ -294,77 +271,7 @@ public class KeggAdaptor {
     return ret;
   }
 
-  /**
-   * 
-   * @return
-   */
-  private static KEGGPortType getServlet() {
-    KEGGLocator locator = new KEGGLocator();
-    KEGGPortType serv = null;
-    try {
-      serv = locator.getKEGGPort();
-    } catch (Throwable e) {
-      System.err.println("Unable to initilize Kegg Servlet: " + e.getMessage());
-      e.printStackTrace();
-    }
-    return serv;
-  }
   
-  /**
-   * 
-   * @param results
-   */
-  private static void printToScreen(Definition[] results) {
-    if (results == null) {
-      System.out.println("NULL result.");
-      return;
-    }
-    System.out.println(results.length + " definition results :");
-    for (int i = 0; i < results.length; i++) {
-      System.out.println(results[i].getEntry_id() + " => "
-          + results[i].getDefinition());
-    }
-  }
-
-  /**
-   * 
-   * @param results
-   */
-  private static void printToScreen(SSDBRelation[] results) {
-    if (results == null) {
-      System.out.println("NULL result.");
-      return;
-    }
-    System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXX");
-    System.out.println(+results.length + " results by genes:");
-    for (int i = 0; i < results.length; i++) {
-      String gene1 = results[i].getGenes_id1();
-      String gene2 = results[i].getGenes_id2();
-      int score = results[i].getSw_score();
-      System.out.println(gene1 + " -> " + gene2 + "\t SWscore:" + score);
-    }
-    System.out.println("=====================\n" + results.length
-        + " results by definition:");
-    for (int i = 0; i < results.length; i++) {
-      String gene1 = results[i].getDefinition1();
-      String gene2 = results[i].getDefinition2();
-      float score = results[i].getBit_score();
-      System.out.println(gene1 + " -> " + gene2 + "\t BitScore:" + score);
-    }
-    System.out.println("=====================\n" + results.length
-        + " results by other attributes:");
-    for (int i = 0; i < results.length; i++) {
-      System.out.print("Start " + i + ": " + results[i].getStart_position1()
-          + " -> " + results[i].getStart_position2());
-      System.out.print(" \t|End " + i + ": " + results[i].getEnd_position1()
-          + " -> " + results[i].getEnd_position2());
-      System.out.print(" \t|Length " + i + ": " + results[i].getLength1()
-          + " -> " + results[i].getLength2());
-      System.out.println(" \t|Overlap+Identity " + i + ": "
-          + results[i].getOverlap() + " --- " + results[i].getIdentity());
-    }
-    System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXX");
-  }
   /**
    * 
    * @param results
@@ -379,19 +286,55 @@ public class KeggAdaptor {
       System.out.println(results[i]);
     }
   }
+  
+  /**
+   * This is the core method of the KEGG API. See
+   * http://www.kegg.jp/kegg/rest/keggapi.html for instructions how to use.
+   * 
+   * @param operation
+   *        one of info, list, find, get, conv, link
+   * @param arguments
+   *        database or dbentries
+   * @return answer from the KEGG database.
+   * @throws IOException
+   */
+  public String get(String operation, String... arguments ) throws IOException {
+    // Assemble the KEGG API URL
+    StringBuffer address = new StringBuffer(KEGG_API_REST_PREFIX);
+    address.append(operation);
+    if (arguments!=null) {
+      for (String argument : arguments) {
+        address.append('/');
+        address.append(argument);
+      }
+    }
+    
+    // Get the requested information
+    ByteArrayOutputStream bs = new ByteArrayOutputStream();
+    BufferedOutputStream out = new BufferedOutputStream(bs);
+    FileDownload.download(address.toString(), out, false);
+    
+    // Return the result
+    return bs.toString();
+  }
 
 
   /**
    * See http://www.genome.jp/dbget-bin/show_man?bfind
    * 
-   * @param id
+   * @param id format: "%database% %id1%+%id2%+...".
    * @return
    */
   public String find(String id) {
     String results = "";
+    
+    int pos = id.indexOf(' ');
+    String db = id.substring(0, pos);
+    String query = id.substring(pos+1, id.length()).replace(' ', '+');
+      
     try {
-      results = serv.bfind(id);
-    } catch (RemoteException e) {
+      results = get("find", db,query);
+    } catch (Exception e) {
       e.printStackTrace();
     }
 
@@ -404,254 +347,77 @@ public class KeggAdaptor {
    * see http://www.genome.jp/dbget-bin/show_man?bget
    * http://www.genome.jp/dbget/dbget_manual.html
    * 
-   * @param id
+   * @param id MAXIMUM 10 identifiers, since 2013-01-01!
    * @return
    */
   public String get(String id) {
     String results = "";
     int retried = 0;
 
+    // In a previous release of the KEGG API, multiple ids had to be separated with a space. Now it is a plus.
+    id = id.replace(' ', '+');
+    // Furthermore, since 2013-01-01, the prefixes (hsa:, ko:, ec:, etc.) need to be lowercased!
+    id = id.toLowerCase();
+    
     // Wenn mehrere Threads/ Instanzen gleichzeitig laufen, kommts zu starken
     // delays. deshalb: 3x probieren.
     while (retried < 3) {
       try {
-        results = serv.bget(id); // <--
+        results = get("get", id);
         break;
-      } catch (RemoteException e) {
+      } catch (Exception e) {
         retried++;
-        if (retried == 3)
+        if (retried == 3) {
           e.printStackTrace();
+        }
       }
     }
 
     if (printEachOutputToScreen)
       System.out.println(results);
+    
     return results;
-  }
-
-  /**
-   * 
-   * @param genes_id
-   * @return
-   */
-  public SSDBRelation[] getBestBestNeighborsByGene(String genes_id) {
-    return getBestNeighborsByGene(genes_id, 1, 50);
-  }
-
-  /**
-   * 
-   * @param genes_id
-   * @param offset
-   * @param limit
-   * @return
-   */
-  public SSDBRelation[] getBestBestNeighborsByGene(String genes_id, int offset,
-      int limit) {
-    SSDBRelation[] results = new SSDBRelation[0];
-    try {
-      results = serv.get_best_best_neighbors_by_gene(genes_id, offset, limit);
-    } catch (RemoteException e) {
-      e.printStackTrace();
-    }
-
-    if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
-  }
-
-  /**
-   * 
-   * @param genes_id
-   * @return
-   */
-  public SSDBRelation[] getBestNeighborsByGene(String genes_id) {
-    return getBestNeighborsByGene(genes_id, 1, 50);
-  }
-
-  /**
-   * 
-   * @param genes_id
-   * @param offset
-   * @param limit
-   * @return
-   */
-  public SSDBRelation[] getBestNeighborsByGene(String genes_id, int offset,
-      int limit) {
-    SSDBRelation[] results = new SSDBRelation[0];
-    try {
-      results = serv.get_best_neighbors_by_gene(genes_id, offset, limit);
-    } catch (RemoteException e) {
-      e.printStackTrace();
-    }
-
-    if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
-  }
-
-  /**
-   * 
-   * @param entry_id, i.e. "path:hsa05012"
-   * @param db, database, that should be queried, i.e. "pathway"
-   * @param offset, number which 
-   * @param limit
-   * @return an ArrayOfLinkDBRelations, of the entry_id, if the results are available, else null is returned
-   */
-  public LinkDBRelation[] get_linkdb_by_entry(String entry_id, String db, int offset, int limit){
-   LinkDBRelation[] results = null;
-  try {
-    results = serv.get_linkdb_by_entry(entry_id, db, offset, limit);
-  } catch (RemoteException e) {
-    e.printStackTrace();
-  }
-  if( printEachOutputToScreen && results != null && results.length>0)
-    for (LinkDBRelation res : results) {
-      System.out.println(res.getEntry_id1() + "\t" + res.getEntry_id2() + "\t" + res.getPath() + "\t" + res.getType());
-    }
-   
-   return results;
   }
   
-  
-  /**
-   * 
-   * @param id
-   * @return
-   */
-  public String[] getCompounds(String id) {
-    String[] results = new String[0];
-    try {
-      results = serv.get_reactions_by_compound(id);
-      if (printEachOutputToScreen)
-        printToScreen(results);
-
-      results = serv.get_pathways_by_compounds(new String[] { id });
-      if (printEachOutputToScreen)
-        printToScreen(results);
-
-      results = serv.get_compounds_by_pathway(id);
-      if (printEachOutputToScreen)
-        printToScreen(results);
-
-      results = serv.search_compounds_by_name(id);
-      if (printEachOutputToScreen)
-        printToScreen(results);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    // if (printEachOutputToScreen) printToScreen(results);
-    return results;
-  }
-
-  /**
-   * 
-   * @return
-   */
-  public Definition[] getDatabases() {
-    Definition[] results = new Definition[0];
-    try {
-      results = serv.list_databases();
-    } catch (RemoteException e) {
-      e.printStackTrace();
-    }
-
-    if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
-  }
-
-  /**
-   * 
-   * @param in_id
-   * @return
-   */
-  public String getEnsEmblIDs(String in_id) { // z.B. "hsa:8491"
-    return getVariousIDs(in_id, 2);
-  }
-  
-  /**
-   * 
-   * @param in_id
-   * @return
-   */
-  public String getEntrezIDs(String in_id) { // z.B. "hsa:8491"
-    return getVariousIDs(in_id, 0);
-  }
-
   /**
    * 
    * @param pathway_id e.g. 'path:hsa00650'
    * @return String array with all genes of the pathway, e.g. 'hsa:10327', 'hsa:123'
    */
   public String[] getGenesByPathway(String pathway_id) {
-    String[] results = new String[0];
-    try {
-      results = serv.get_genes_by_pathway(pathway_id);
-    } catch (RemoteException e) {
-      e.printStackTrace();
-    }
     
-    if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
-  }
-
-  /**
-   * 
-   * @param pathway_id
-   * @return
-   * @throws TimeoutException
-   */
-  public String[] getGenesByPathwayWithTimeout(String pathway_id) throws TimeoutException{
-    String[] results = null;
-    int retried=0;
-    while (retried < 3) {
-      try {
-        results = serv.get_genes_by_pathway(pathway_id); // <--
+    String content = get(pathway_id);
+    String genesInPW = extractInfo(content, "GENE");
+    /* genesInPW now contains lines like:
+     * "5214  PFKP; phosphofructokinase, platelet [KO:K00850] [EC:2.7.1.11]" */
+    
+    // Extract the organism prefix from "path:hsa00650" or "hsa00650"
+    String organismPrefix = "";
+    int pos = pathway_id.indexOf(":");
+    if (pos<0) pos = 0;
+    while (pos<pathway_id.length()) {
+      char c = pathway_id.charAt(pos);
+      if (Character.isLetter(c)) {
+        organismPrefix+=c;
+      } else {
         break;
-      } catch (RemoteException e) {
-        retried++;
-        if (retried >= 3) throw new TimeoutException();
       }
+      pos++;
+    }
+    
+    // Create return array;
+    String[] list = genesInPW.split("\n");
+    String[] returns = new String[list.length];
+    int i=0;
+    for (String line : list) {
+      int num = de.zbit.util.Utils.getNumberFromString(0, line.trim());
+      returns[i++] = String.format("%s:%s", organismPrefix, num);
     }
     
     if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
-  }
-
-  /**
-   * 
-   * @param ko_id
-   * @return
-   */
-  public Definition[] getGenesForKO(String ko_id) {
-    return getGenesForKO(ko_id, "");
-  }
-  
-  /**
-   * z.B."GAPDH; glyceraldehyde-3-phosphate dehydrogenase (EC:1.2.1.12); K00134 glyceraldehyde 3-phosphate dehydrogenase [EC:1.2.1.12]"
-   * 
-   * @param ko_id - Kegg orthologous id STARTING WITH KO.
-   * @param org
-   * @return
-   */
-  public Definition[] getGenesForKO(String ko_id, String org) {
-    Definition[] results = new Definition[0];
-
-    try {
-      if (org != null && org.trim().length()>0)
-        results = serv.get_genes_by_ko(ko_id, org);
-      else
-        results = serv.get_genes_by_ko(ko_id, "");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
+      printToScreen(returns);
+    
+    return returns;
   }
 
   /**
@@ -664,37 +430,14 @@ public class KeggAdaptor {
   public String getIdentifier(String id) {
     String s = "";
     try {
-      s = serv.btit(id);
-    } catch (RemoteException e) {
+      s = get("list", id.replace(' ', '+'));
+    } catch (Exception e) {
       e.printStackTrace();
     }
     
     if (printEachOutputToScreen)
       if (s!=null && s.length()>0) System.out.println(s);
-    return s;
-  }
-  
-  /**
-   * 
-   * @param id
-   * @return
-   * @throws TimeoutException
-   */
-  public String getIdentifierWithTimeout(String id) throws TimeoutException {
-    String s=null;
-    int retried=0;
-    while (retried < 3) {
-      try {
-        s = serv.btit(id);
-        break;
-      } catch (RemoteException e) {
-        retried++;
-        if (retried >= 3) throw new TimeoutException();
-      }
-    }
     
-    if (printEachOutputToScreen)
-      if (s!=null && s.length()>0) System.out.println(s);
     return s;
   }
   
@@ -710,7 +453,7 @@ public class KeggAdaptor {
 
     try {
       String gg = "genes " + gene;
-      s = serv.bfind(gg);
+      s = find(gg);
       BufferedReader br = new BufferedReader(new StringReader(s));
       String line;
       while ((line = br.readLine()) != null) {
@@ -727,40 +470,49 @@ public class KeggAdaptor {
     }
     return identifiers;
   }
-
+  
   /**
+   * Retrieves a list of available organisms from KEGG.
    * 
-   * @param class_id
-   * @return
-   */
-  public Definition[] getKoClasses(String class_id) {
-    Definition[] results = new Definition[0];
-    try {
-      results = serv.list_ko_classes(class_id);
-    } catch (RemoteException e) {
-      e.printStackTrace();
-    }
-
-    if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
-  }
-
-  /**
-   * 
-   * @return
+   * @return a list if valuepairs with KEGG abbreviation (e.g., mmu) and full
+   *         name (e.g., "mus musculus"). Returns {@code null} if an error
+   *         occurs.
    */
   public Definition[] getOrganisms() {
-    Definition[] results = new Definition[0];
+    String results = null;
+    
     try {
-      results = serv.list_organisms();
-    } catch (RemoteException e) {
+      results = get("list", "organism");
+    } catch (Exception e) {
       e.printStackTrace();
     }
+    
+    if (results == null) return null;
+    if (printEachOutputToScreen) {
+      System.out.println(results);
+    }
+    
+    // results is now a single string consisting of lines that look like:
+    // T00727 min Methylacidiphilum infernorum  Prokaryotes;Bacteria;Verrucomicrobia;Methylacidiphilum
+    List<Definition> org = splitMatrixStringToDefinition(results, 1, 2);
+    
+    return org.toArray(new Definition[0]);
+  }
 
-    if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
+
+
+  /**
+   * @param results
+   * @return
+   */
+  private List<Definition> splitMatrixStringToDefinition(String results, int col_entry_id, int col_definition) {
+    if (results == null) return null;
+    List<Definition> org = new ArrayList<Definition>();
+    for (String line : results.split("\n")) {
+      String[] cells = line.split("\t");
+      org.add(new Definition(cells[col_entry_id], cells[col_definition]));
+    }
+    return org;
   }
 
   /**
@@ -770,46 +522,33 @@ public class KeggAdaptor {
    */
   public ArrayList<String> getPathwayList(String org) {
     ArrayList<String> pws = new ArrayList<String>();
-    Definition[] results = new Definition[0];
+    
     try {
-      results = serv.list_pathways(org);
-      for (Definition definition : results) {
-        pws.add(definition.getEntry_id());
-        if (printEachOutputToScreen)
-          System.out.println(definition.getEntry_id());
+      String result = get("list", "pathway", org);
+      if (result == null) {
+        return null;
       }
-    } catch (RemoteException e) {
+      
+      int pos = 0;
+      while(pos>=0) {
+        int ePos = result.indexOf('\t', pos+1);
+        if (pos>=0 && ePos > pos) {
+          pws.add(result.substring(pos, ePos).trim());
+        }
+        
+        pos = result.indexOf('\n', pos+1);
+      }
+      
+    } catch (Exception e) {
       e.printStackTrace();
     }
     
-    return pws;
-  }
-
-  /**
-   * 
-   * @param org
-   * @return
-   * @throws TimeoutException
-   */
-  public ArrayList<String> getPathwayListWithTimeout(String org) throws TimeoutException {
-    ArrayList<String> pws = null;
-    int retried=0;
-    while (retried < 3) {
-      try {
-        Definition[] results = new Definition[0];
-        results = serv.list_pathways(org);
-        pws = new ArrayList<String>(results.length+1);
-        for (Definition definition : results) {
-          pws.add(definition.getEntry_id());
-          if (printEachOutputToScreen)
-            System.out.println(definition.getEntry_id());
-        }
-        break;
-      } catch (RemoteException e) {
-        retried++;
-        if (retried >= 3) throw new TimeoutException();
+    if (printEachOutputToScreen) {
+      for (String s : pws) {
+        System.out.println(s);
       }
     }
+    
     return pws;
   }
 
@@ -819,16 +558,22 @@ public class KeggAdaptor {
    * @return
    */
   public Definition[] getPathways(String org) {
-    Definition[] results = new Definition[0];
+    String result=null;
     try {
-      results = serv.list_pathways(org);
-    } catch (RemoteException e) {
+      result = get("list", "pathway", org);
+    } catch (Exception e) {
       e.printStackTrace();
     }
+    
+    if (result == null) {
+      return null;
+    }
+    
 
     if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
+      System.out.println(result);
+    
+    return splitMatrixStringToDefinition(result, 0, 1).toArray(new Definition[0]);
   }
 
   /**
@@ -838,131 +583,73 @@ public class KeggAdaptor {
    *          can be 1
    * @return pathways identifiers (e.g. 'path:hsa04110') in a String array 
    */
-  public String[] getPathwaysByGenes(String[] geneList) {
+  public String[] getPathwaysByGenes(String... geneList) {
     String[] pathways = new String[0];
+    
+    String result;
     try {
-      pathways = serv.get_pathways_by_genes(geneList);
-    } catch (RemoteException e) {
+      result = get("link", "pathway", StringUtil.implode(geneList, "+"));
+      
+      // result is a matrix with two columns. We need an array of the second one.
+      ArrayList<String> pws = new ArrayList<String>();
+      int pos = 0;
+      while(pos>=0) {
+        int ePos = result.indexOf('\t', pos+1);
+        pos = result.indexOf('\n', pos+1);
+        
+        // Don't forget the last entry
+        if (ePos>0 && pos<0) {
+          pos = result.length();
+        }
+        if (pos>=0 && ePos < pos) {
+          pws.add(result.substring(ePos, pos).trim());
+        }
+      }
+      pathways = pws.toArray(new String[0]);
+      
+    } catch (Exception e) {
       e.printStackTrace();
     }
 
     if (printEachOutputToScreen)
       printToScreen(pathways);
+    
     return pathways;
   }
 
   /**
    * 
-   * @param org
-   * @return
-   * @throws TimeoutException
-   */
-  public Definition[] getPathwaysWithTimeout(String org) throws TimeoutException {
-    Definition[] results = null;
-    int retried=0;
-    while (retried < 3) {
-      try {
-        results = serv.list_pathways(org);
-        break;
-      } catch (RemoteException e) {
-        retried++;
-        if (retried >= 3) throw new TimeoutException();
-      }
-    }
-    
-    if (printEachOutputToScreen)
-      printToScreen(results);
-    return results;
-  }
-
-  /**
-   * 
-   * @param in_id - e.g.. "hsa:8491"
-   * @return
-   */
-  public String getUniprotIDs(String in_id) {
-    return getVariousIDs(in_id, 1);
-  }
-
-  /**
-   * 
-   * @param in_id - e.g.. "hsa:8491"
-   * @param index - id to return: 0=entret, 1=uniprot, 2=ensembl
-   * @return requested id.
-   */
-  private String getVariousIDs(String in_id, int index) {
-    //if (!in_id.equalsIgnoreCase(last_in_id))
-    String[] last_id_results = retrieveVariousIDs(in_id);
-
-    if (printEachOutputToScreen)
-      System.out.println(last_id_results[index]);
-    return last_id_results[index];
-  }
-
-  /**
-   * 
-   * @param id
+   * @param id MAXIMUM 10 identifiers, since 2013-01-01!
    * @return
    * @throws TimeoutException
    */
   public String getWithReturnInformation(String id) throws TimeoutException {
-    String results = null;
+    String results = "";
     int retried = 0;
 
+    // In a previous release of the KEGG API, multiple ids had to be separated with a space. Now it is a plus.
+    id = id.replace(' ', '+');
+    // Furthermore, since 2013-01-01, the prefixes (hsa:, ko:, ec:, etc.) need to be lowercased!
+    id = id.toLowerCase();
+    
     // Wenn mehrere Threads/ Instanzen gleichzeitig laufen, kommts zu starken
     // delays. deshalb: 3x probieren.
     while (retried < 3) {
       try {
-        results = serv.bget(id); // <--
+        results = get("get", id);
         break;
-      } catch (RemoteException e) {
+      } catch (Exception e) {
         retried++;
-        if (retried >= 3)
+        if (retried <= 3) {
           throw new TimeoutException(e.getMessage());
+        }
       }
     }
 
     if (printEachOutputToScreen)
       System.out.println(results);
+    
     return results;
-  }
-
-  /**
-   * @param in_id - kegg id.
-   * @return "NCBI-GeneID:", "UniProt:", "Ensembl:"
-   */
-  private String[] retrieveVariousIDs(String in_id) { // z.B. "hsa:8491"
-    String key[] = new String[] { "NCBI-GeneID:", "UniProt:", "Ensembl:" }; // Siehe 2 Zeilen drueber
-
-    String[] last_id_results = new String[3];
-    //String last_in_id = new String(in_id);
-    
-    in_id = in_id.replace(",", " ");
-    String[] split = in_id.split(" ");
-
-    for (int k = 0; k < key.length; k++)
-      last_id_results[k] = "";
-
-    for (String s : split) { // NCBI-GeneID: 8491
-      String r = get(s);
-      for (int k = 0; k < key.length; k++) {
-        String ke = key[k];
-        int pos = r.indexOf(ke);
-        if (pos < 0)
-          continue;
-
-        String te = r.substring(pos + ke.length(), r.indexOf("\n", pos)).trim();
-        if (te.length()!=0)
-          last_id_results[k] += te + ",";
-      }
-    }
-
-    for (int k = 0; k < key.length; k++)
-      if (last_id_results[k].length() > 0 && last_id_results[k].endsWith(","))
-        last_id_results[k] = last_id_results[k].substring(0, last_id_results[k]
-            .length() - 1);
-    
-    return last_id_results;
   }
 
 }

@@ -152,7 +152,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
   @Override
   protected KeggInfos[] fetchMultipleInformations(String[] ids,
     AbstractProgressBar progress) throws TimeoutException, UnsuccessfulRetrieveException {
-    final int atATime = 100;
+    final int atATime = 10; // Since 2013-01-01, KEGG limited the amount of ids that can be retrieved simultaneously to 10!
     
     int fetchInArun = Math.min(atATime, ids.length);
     int fetchRuns = (int) Math.ceil(((double)ids.length)/((double)atATime));
@@ -357,7 +357,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       while (idIndex<ids.length) {
         idIndex = i+numMissing;
         if (idIndex>= ids.length) {
-          // z.B. Query (GN:)"HSA" liefert eine Entry ID "T01001" zur�ck. Das findet man nicht so einfach. Deshalb komplett durchlaufen lassen
+          // z.B. Query (gn:)"HSA" liefert eine Entry ID "T01001" zur�ck. Das findet man nicht so einfach. Deshalb komplett durchlaufen lassen
           // und spaeter noch mal unschaerfer suchen.
           numMissing = minNumMissing;
           idIndex = i+numMissing;

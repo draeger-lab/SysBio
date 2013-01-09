@@ -309,7 +309,7 @@ public class OrganismSelector extends JPanel {
     try {
       synchronized (defaultSelection) { // Just anything static and not-null.
         if (organismMap==null || organismMap.size()<1) {
-          KeggQuery query = new KeggQuery(KeggQuery.getOrganisms,null);
+          KeggQuery query = new KeggQuery(KeggQuery.getOrganisms, null);
           CustomObject<Object> answer = manag.getInformation(query);
           Definition[] organisms = (Definition[]) answer.getObject();
           if (organisms!=null && organisms.length<1) {
