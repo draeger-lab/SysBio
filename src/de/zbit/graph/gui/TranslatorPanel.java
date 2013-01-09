@@ -246,7 +246,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
          * The KEGGTranslator MUST BE the source.
          * Any loading string can OPTIONALLY be in the ActionCommand.
          */
-        generateLoadingPanel(this, e.getActionCommand()==null?"Translating pathway...":e.getActionCommand());
+        generateLoadingPanel(this, e.getActionCommand()==null?"Reconstructing pathway with online information from KEGG...":e.getActionCommand());
         if (e.getSource()!=null && e.getSource() instanceof KEGGtranslator) {
           translator = (KEGGtranslator<?>) e.getSource();
         }
