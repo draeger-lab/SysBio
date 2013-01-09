@@ -84,7 +84,12 @@ public class KeggAdaptor {
     KeggAdaptor adap = new KeggAdaptor();
 
     
-    adap.get("cpd:C00103 hsa:8491 rn:R05964 q:243 glycan:G00181");
+    try {
+      adap.getWithReturnInformation("mmu:436049");
+    } catch (TimeoutException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
     if (true) return;
     
     String ret = adap.get("rn:R07618");

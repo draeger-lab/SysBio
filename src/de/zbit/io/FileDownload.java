@@ -135,7 +135,9 @@ public class FileDownload {
       }
       
       if (status>=400) {
-        log.warning("Failed: HTTP error (code " + status + "). " + address);
+        //log.warning("Failed: HTTP error (code " + status + ").");
+        System.err.println("Failed: HTTP error (code " + status + ").");
+        // This should not logged to warning. Errors include not-existing KEGG IDs and such.
         
         return; //404 und sowas ... >400 nur error codes. Normal:200 =>OK
       }
