@@ -628,7 +628,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 
 			// Set the SpeciesGlyph 
 			Point middleOfSpecies = calculateCenter(speciesGlyph);
-			sgCurvePoint = calculateSpeciesGlyphDockingPosition(middleOfSpecies , relativeSpeciesGlyphPosition, speciesGlyph);
+			sgCurvePoint = calculateOldSpeciesGlyphDockingPosition(middleOfSpecies , relativeSpeciesGlyphPosition, speciesGlyph);
 
 			double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);
 
