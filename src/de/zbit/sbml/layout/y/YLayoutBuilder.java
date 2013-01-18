@@ -64,15 +64,18 @@ import y.view.PolyLineEdgeRealizer;
 import y.view.ShapeNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
+import de.zbit.sbml.layout.AssociationNode;
 import de.zbit.sbml.layout.Catalysis;
 import de.zbit.sbml.layout.Compartment;
 import de.zbit.sbml.layout.Consumption;
+import de.zbit.sbml.layout.DissociationNode;
 import de.zbit.sbml.layout.Inhibition;
 import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.sbml.layout.Macromolecule;
 import de.zbit.sbml.layout.Modulation;
 import de.zbit.sbml.layout.NecessaryStimulation;
 import de.zbit.sbml.layout.NucleicAcidFeature;
+import de.zbit.sbml.layout.OmittedProcessNode;
 import de.zbit.sbml.layout.PerturbingAgent;
 import de.zbit.sbml.layout.ProcessNode;
 import de.zbit.sbml.layout.Production;
@@ -81,6 +84,7 @@ import de.zbit.sbml.layout.SBGNNode;
 import de.zbit.sbml.layout.SimpleChemical;
 import de.zbit.sbml.layout.SourceSink;
 import de.zbit.sbml.layout.Stimulation;
+import de.zbit.sbml.layout.UncertainProcessNode;
 import de.zbit.sbml.layout.UnspecifiedNode;
 import de.zbit.util.progressbar.AbstractProgressBar;
 import de.zbit.util.progressbar.ProgressListener;
@@ -750,6 +754,58 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	@Override
 	public NecessaryStimulation<EdgeRealizer> createNecessaryStimulation() {
 		return new YNecessaryStimulation();
+	}
+
+	@Override
+	public void buildAssociationNode(ReactionGlyph reactionGlyph,
+			double rotationAngle, double curveWidth) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void buildDissociationNode(ReactionGlyph reactionGlyph,
+			double rotationAngle, double curveWidth) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void buildOmittedProcessNode(ReactionGlyph reactionGlyph,
+			double rotationAngle, double curveWidth) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void buildUncertainProcessNode(ReactionGlyph reactionGlyph,
+			double rotationAngle, double curveWidth) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public OmittedProcessNode<NodeRealizer> createOmittedProcessNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AssociationNode<NodeRealizer> createAssociationNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DissociationNode<NodeRealizer> createDissociationNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UncertainProcessNode<NodeRealizer> createUncertainProcessNode() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
