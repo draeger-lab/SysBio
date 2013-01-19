@@ -56,7 +56,7 @@ public class YProcessNode extends ProcessNode<NodeRealizer> {
 	 * @see de.zbit.sbml.layout.ProcessNode#drawLineSegment(org.sbml.jsbml.ext.layout.LineSegment, double, org.sbml.jsbml.ext.layout.Point)
 	 */
 	@Override
-	public String drawLineSegment(LineSegment lineSegment,
+	public NodeRealizer drawLineSegment(LineSegment lineSegment,
 			double rotationAngle, Point rotationCenter) {
 		// TODO Auto-generated method stub
 		return null;

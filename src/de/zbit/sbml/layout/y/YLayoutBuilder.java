@@ -757,34 +757,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	}
 
 	@Override
-	public void buildAssociationNode(ReactionGlyph reactionGlyph,
-			double rotationAngle, double curveWidth) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void buildDissociationNode(ReactionGlyph reactionGlyph,
-			double rotationAngle, double curveWidth) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void buildOmittedProcessNode(ReactionGlyph reactionGlyph,
-			double rotationAngle, double curveWidth) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void buildUncertainProcessNode(ReactionGlyph reactionGlyph,
-			double rotationAngle, double curveWidth) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public OmittedProcessNode<NodeRealizer> createOmittedProcessNode() {
 		// TODO Auto-generated method stub
 		return null;
