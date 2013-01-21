@@ -514,7 +514,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 			double height = dimensions.getHeight();
 			
 			OrientedRectangle orientedRectangle =
-				new OrientedRectangle(glyphX, glyphY, width, height);
+				new OrientedRectangle(glyphX, glyphY + height, width, height, 0f, -1f);
 			logger.fine("oriented rectangle is " + orientedRectangle.toString());
 			Object param = nodeLabel.getBestModelParameterForBounds(orientedRectangle);
 			if (param != null) {
