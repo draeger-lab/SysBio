@@ -279,13 +279,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutBuilder#buildConnectingArc(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
-	 */
-	@Override
-	public void buildConnectingArc(SpeciesReferenceGlyph speciesReferenceGlyph, double curveWidth) {
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutBuilder#buildConnectingArc(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph, org.sbml.jsbml.ext.layout.ReactionGlyph)
 	 */
 	@Override
@@ -567,10 +560,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 			}
 			
 			edgeRealizer = drawBezier ? new BezierEdgeRealizer() : new PolyLineEdgeRealizer();
-			
+
 			for (int i = listOfCurveSegments.size()-1; i >= 0; i--) {
 				CurveSegment curveSegment = listOfCurveSegments.get(i);
-				
+
 				Point end = curveSegment.getEnd();
 				edgeRealizer.addPoint(end.getX(), end.getY());
 				if (drawBezier) {
