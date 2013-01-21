@@ -619,11 +619,11 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 
 			RelativePosition relativeSpeciesGlyphPosition = null;
 			if (specRefRole.equals(SpeciesReferenceRole.PRODUCT)) {
-				relativeSpeciesGlyphPosition = getRelativePosition(helpingBB1, helpingBB2);
+				relativeSpeciesGlyphPosition = getRelativePosition(averageSubstratePosition, averageProductPosition);
 			} else if (specRefRole.equals(SpeciesReferenceRole.SUBSTRATE)) {
-				relativeSpeciesGlyphPosition = getRelativePosition(helpingBB2, helpingBB1);
+				relativeSpeciesGlyphPosition = getRelativePosition(averageProductPosition, averageSubstratePosition);
 			} else {
-				relativeSpeciesGlyphPosition = getRelativePosition(rgBoundingBox, sgBoundingBox);
+				relativeSpeciesGlyphPosition = getRelativePosition(rgBoundingBox.getPosition(), sgBoundingBox.getPosition());
 			}
 
 			// Set the SpeciesGlyph 
