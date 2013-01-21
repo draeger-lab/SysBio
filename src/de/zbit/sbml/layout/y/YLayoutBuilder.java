@@ -293,12 +293,29 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		assert speciesGlyphNode != null;
 		
 		SBGNArc<EdgeRealizer> arc;
+		int sboTerm = -1;
+		SpeciesReferenceRole speciesReferenceRole = null;
 		if (srg.isSetSBOTerm()) {
-			arc = getSBGNArc(srg.getSBOTerm());
-			logger.fine("SRG sbo term " + srg.getSBOTerm());
+			sboTerm = srg.getSBOTerm();
+			arc = getSBGNArc(sboTerm);
+			logger.fine("SRG sbo term " + sboTerm);
 		} else {
-			arc = getSBGNArc(srg.getSpeciesReferenceRole());
-			logger.fine("SRG role " + srg.getSpeciesReferenceRole());
+			speciesReferenceRole = srg.getSpeciesReferenceRole();
+			arc = getSBGNArc(speciesReferenceRole);
+			logger.fine("SRG role " + speciesReferenceRole);
+		}
+		
+		Reaction reaction = (Reaction) rg.getReactionInstance();
+		boolean reactionIsReversible = (reaction != null) &&
+			reaction.isSetReversible() && reaction.isReversible();
+		
+		if (reactionIsReversible &&
+				(((sboTerm != -1) && SBO.isChildOf(sboTerm, 394)) ||
+						((speciesReferenceRole != null) &&
+								((speciesReferenceRole == SpeciesReferenceRole.SUBSTRATE) ||
+										(speciesReferenceRole == SpeciesReferenceRole.SIDESUBSTRATE))))) {
+			// consumption in reversible reaction needs an arrow
+			arc = getSBGNArc(393);
 		}
 
 		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve(), curveWidth);
