@@ -31,6 +31,7 @@ import org.sbml.jsbml.SBMLWriter;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
+import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 
 import de.zbit.util.DatabaseIdentifierTools;
@@ -43,9 +44,6 @@ import de.zbit.util.EscapeChars;
  */
 public abstract class QualModelBuilding {
 
-	public static final String QUAL_NS = "http://www.sbml.org/sbml/level3/version1/qual/version1";
-	public static final String QUAL_NS_PREFIX = "qual";
-	
 	public static QualitativeModel qualModel;
 	public static Layout layout;
 	public static Model model;
@@ -68,11 +66,10 @@ public abstract class QualModelBuilding {
 	 * @return
 	 */
 	public static SBMLDocument initializeQualDocument(String modelName, String modelID, String creator, String[] organisms) {
-	    System.out.println("beginning");
 	    initTaxonomyMap();
 	    
 	    SBMLDocument doc = new SBMLDocument(3, 1);
-	    doc.addNamespace(QUAL_NS_PREFIX, "xmlns", QUAL_NS);
+	    doc.addNamespace(QualConstant.shortLabel, "xmlns", QualConstant.namespaceURI);
 		
 	    model = doc.createModel(modelID);
 	    model.setMetaId("meta_" + modelID);
@@ -95,7 +92,7 @@ public abstract class QualModelBuilding {
 	    }
 	    
 	    qualModel = new QualitativeModel(model);
-	    model.addExtension(QUAL_NS, QualModelBuilding.qualModel);
+	    model.addExtension(QualConstant.namespaceURI, QualModelBuilding.qualModel);
 		
 	    ExtendedLayoutModel layoutExt = new ExtendedLayoutModel(model);
 		model.addExtension(LayoutConstants.namespaceURI, layoutExt);
@@ -132,6 +129,24 @@ public abstract class QualModelBuilding {
 	
 	/**
 	 * 
+	 * @param {@link SBMLDocument}
+	 * @return {@link QualitativeModel} if existing
+	 */
+	public static QualitativeModel getQualitativeModel(SBMLDocument doc) {
+		if (doc != null) {
+			Model m = doc.getModel();
+			if (m != null) {
+				QualitativeModel qModel = (QualitativeModel)m.getExtension(QualConstant.namespaceURI);
+				if (qModel != null) {
+					return qModel;
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 
 	 * @param doc
 	 * @param outputFile
 	 * @throws SBMLException
@@ -140,7 +155,6 @@ public abstract class QualModelBuilding {
 	 */
 	public static void writeSBMlDocument(SBMLDocument doc, String outputFile) throws SBMLException, FileNotFoundException, XMLStreamException {
 		SBMLWriter.write(doc, outputFile, "Sysbio-Project", "1");
-		System.out.println("ready");
 	}
 
 }
