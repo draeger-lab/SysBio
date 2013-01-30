@@ -382,7 +382,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	 * @see de.zbit.sbml.layout.LayoutBuilder#buildCubicBezier(org.sbml.jsbml.ext.layout.CubicBezier)
 	 */
 	@Override
-	public void buildCubicBezier(CubicBezier cubicBezier) {
+	public void buildCubicBezier(CubicBezier cubicBezier, double lineWidth) {
 		// partial edge drawing is not supported
 	}
 
