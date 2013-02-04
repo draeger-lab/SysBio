@@ -141,9 +141,10 @@ public class GetSubRegulationNetwork {
 	 * @param depth
 	 */
 	private void extractSubRegulationNetworkFromSpecies(String searchStrings) {
-		String[] search = searchStrings.split(",");
-//			String[] ids = getSpeciesIdsFromName(search[i]);
+		String[] search = searchStrings.split(";");
 			transferTransitions(search,0);
+//			String[] ids = getSpeciesIdsFromName(search[i]);
+			
 	}
 
 	/**
@@ -155,7 +156,7 @@ public class GetSubRegulationNetwork {
 			for (int i = 0; i < qualSpeciesID.length; i++) {
 				
 			if (species2transition.get(qualSpeciesID[i]) != null) {
-			String[] trIds = species2transition.get(qualSpeciesID[i]).split(","); 
+			String[] trIds = species2transition.get(qualSpeciesID[i]).split(";"); 
 			
 //			if (trIds != null && trIds.length > 0) {
 				for (int j = 0; j < trIds.length; i++) {
@@ -237,7 +238,7 @@ public class GetSubRegulationNetwork {
 							helper = "";
 						}
 						
-						String trList = helper + t.getId() + ",";
+						String trList = helper + t.getId() + ";";
 //						Transition tClone = t.clone();
 //						tClone.unregister(transitions);
 //						trList.add(tClone);
