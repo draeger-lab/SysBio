@@ -36,6 +36,7 @@ import java.beans.EventHandler;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URL;
+import java.text.ChoiceFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -688,10 +689,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 						StringUtil.TOOLTIP_LINE_LENGTH, false));
 				}
 			}
-			SBPreferences history = SBPreferences
-					.getPreferencesFor(getFileHistoryKeyProvider());
-			String fileList = (history != null) ? history
-					.get(FileHistory.LAST_OPENED) : null;
+			SBPreferences history = SBPreferences.getPreferencesFor(getFileHistoryKeyProvider());
+			String fileList = (history != null) ? history.get(FileHistory.LAST_OPENED) : null;
 			updateFileHistory(FileHistory.Tools.parseList(fileList), fileHistory);
 		}
     return fileHistory;
@@ -1087,9 +1086,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	}
 	
 	/**
-	 * Returns the default directory to open {@link File}s.
-	 * 
-	 * @return
+	 * @return the default directory to open {@link File}s.
 	 */
   public File getOpenDir() {
     SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
@@ -1348,40 +1345,62 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 */
 	@Override
 	public File[] openFileAndLogHistory(File... files) {
+		if ((files != null) && (files.length > 0)) {
+			// check all files if these can be accessed:
+			List<File> readableFiles = new ArrayList<File>(files.length);
+			List<File> unreadableFiles = new ArrayList<File>(files.length);
+			for (File file : files) {
+				if (file.exists() && file.canRead()) {
+					readableFiles.add(file);
+				} else {
+					unreadableFiles.add(file);
+				}
+			}
+			if (!unreadableFiles.isEmpty()) {
+				showErrorCouldNotLoadFiles(false, unreadableFiles.toArray(new File[] {}));
+				if (unreadableFiles.size() == files.length) {
+					// This check is important to avoid that further files are opened.
+					return null;
+				}
+			}
+			files = readableFiles.toArray(new File[] {});
+		}
+		
+		// select files to be processed:
 		files = openFile(files);
 		// Remember the baseDir and put files into history.
-	    if ((files != null) && (files.length > 0)) {
-		  List<File> fileList = new LinkedList<File>();
-	      // Process all those files that have just been opened.
-	      String baseDir = null;
-	      boolean sameBaseDir = true;
-	      for (File file : files) {
-	        if ((file != null) && file.exists() && file.canRead() && !fileList.contains(file)) {
-	          if (baseDir == null) {
-	            baseDir = file.getParent();
-	          } else if (!baseDir.equals(file.getParent())) {
-	            sameBaseDir = false;
-	          }
-	          fileList.add(file);
-	        }
-	      }
-	      // Memorize the default open directory.
-	      if (sameBaseDir && (baseDir != null)) {
-	        SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
-	        prefs.put(OPEN_DIR, baseDir);
-	        try {
-	          prefs.flush();
-	        } catch (BackingStoreException exc) {
-	          // do NOT show this error, because the user really dosn't know
-	          // how to handle a "The value for OPEN_DIR is out of range [...]"
-	          // message.
-	          logger.finest(exc.getLocalizedMessage());
-	        }
-	      }
-	      // Allow users to close the file(s) again
-	      GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.FILE_CLOSE);
-	      addToFileHistory(fileList);
-	    }
+		if ((files != null) && (files.length > 0)) {
+			List<File> fileList = new LinkedList<File>();
+			// Process all those files that have just been opened.
+			String baseDir = null;
+			boolean sameBaseDir = true;
+			for (File file : files) {
+				if ((file != null) && file.exists() && file.canRead() && !fileList.contains(file)) {
+					if (baseDir == null) {
+						baseDir = file.getParent();
+					} else if (!baseDir.equals(file.getParent())) {
+						sameBaseDir = false;
+					}
+					fileList.add(file);
+				}
+			}
+			// Memorize the default open directory.
+			if (sameBaseDir && (baseDir != null)) {
+				SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
+				prefs.put(OPEN_DIR, baseDir);
+				try {
+					prefs.flush();
+				} catch (BackingStoreException exc) {
+					// do NOT show this error, because the user really dosn't know
+					// how to handle a "The value for OPEN_DIR is out of range [...]"
+					// message.
+					logger.finest(exc.getLocalizedMessage());
+				}
+			}
+			// Allow users to close the file(s) again
+			GUITools.setEnabled(true, getJMenuBar(), toolBar, BaseAction.FILE_CLOSE);
+			addToFileHistory(fileList);
+		}
 		return files;
 	}
 	
@@ -1420,10 +1439,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
     // Avoid that the window may be bigger as the screen. This may cause problems on
     // some computers, e.g., MacOS.
     Dimension screenDimension = getToolkit().getScreenSize();
-    int width = Math.min(WINDOW_WIDTH.getValue(prefs), (int) screenDimension
-        .getWidth());
-    int height = Math.min(WINDOW_HEIGHT.getValue(prefs), (int) screenDimension
-        .getHeight());
+    int width = Math.min(WINDOW_WIDTH.getValue(prefs), (int) screenDimension.getWidth());
+    int height = Math.min(WINDOW_HEIGHT.getValue(prefs), (int) screenDimension.getHeight());
     int state = WINDOW_STATE.getValue(prefs);
     setSize(new Dimension(width, height));
     if (state != Frame.ICONIFIED) {
@@ -1651,6 +1668,29 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	}
 	
 	/**
+	 * @param history
+	 * @param unreadableFiles
+	 */
+	protected void showErrorCouldNotLoadFiles(boolean history, File... unreadableFiles) {
+		ResourceBundle bundleWarnings = ResourceManager.getBundle("de.zbit.locales.Warnings");
+		MessageFormat form = new MessageFormat(bundleWarnings.getString(history ? "FILES_NOT_ACCEPTABLE" : "COULD_NOT_LOAD_FILES"));
+		ChoiceFormat fileform = new ChoiceFormat(new double[] {0d, 1d, 2d}, bundleWarnings.getStringArray("FILE_PART"));
+		form.setFormatByArgumentIndex(0, fileform);
+		ChoiceFormat fileExistForm = new ChoiceFormat(new double[] {0d, 1d, 2d}, bundleWarnings.getStringArray("FILE_EXISTENCE"));
+		form.setFormatByArgumentIndex(1, fileExistForm);
+		
+		String fileList = Arrays.toString(unreadableFiles);
+		fileList = fileList.substring(1, fileList.length() - 1);
+		int lastComma = fileList.lastIndexOf(',');
+		if (lastComma > 0) {
+			fileList = fileList.substring(0, lastComma) + bundleWarnings.getString("AND") + fileList.substring(lastComma + 1);
+		}
+		String message = form.format(
+			new Object[] {Long.valueOf(unreadableFiles.length), Long.valueOf(unreadableFiles.length), fileList});
+		GUITools.showErrorMessage(this, message);
+	}
+	
+	/**
 	 * Displays the license under which this program is distributed in a
 	 * {@link JOptionPane} of size 640x480.
 	 */
@@ -1677,7 +1717,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			resources.getString("ONLINE_HELP_FOR_THE_PROGRAM"),
 			getProgramNameAndVersion()), getURLOnlineHelp(), getCommandLineOptions());
 	}
-	
+
 	/**
 	 * show the "Save" menu entry if true 
 	 * @return
@@ -1710,6 +1750,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		List<File> keepFiles = new LinkedList<File>();
 		short maximum = getMaximalFileHistorySize();
 		Iterator<File> it = listOfFiles.iterator();
+		List<File> listOfUnreadableFiles = new ArrayList<File>();
 		for (int i = 0; i < Math.min(listOfFiles.size(), maximum); i++) {
 			final File file = it.next();
 			if (file.exists() && file.canRead()) {
@@ -1734,11 +1775,16 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			    jMenu.add(fileItem);
 			  }
 			  keepFiles.add(file);
+			} else {
+				listOfUnreadableFiles.add(file);
 			}
 		}
-    for (JMenu jMenu : fileHistory) {
-      jMenu.setEnabled(jMenu.getItemCount() > 0);
-    }
+		for (JMenu jMenu : fileHistory) {
+			jMenu.setEnabled(jMenu.getItemCount() > 0);
+		}
+		if (!listOfUnreadableFiles.isEmpty()) {
+			showErrorCouldNotLoadFiles(true, listOfUnreadableFiles.toArray(new File[] {}));
+		}
 		// This removes files that cannot be read from the history.
 		SBPreferences history = SBPreferences.getPreferencesFor(getFileHistoryKeyProvider());
 		history.put(FileHistory.LAST_OPENED, FileHistory.Tools.toString(keepFiles));

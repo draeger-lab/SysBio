@@ -50,14 +50,14 @@ import java.util.Set;
 public class XMLResourceBundleControl extends Control {
 	
 	/**
-	 * An adapter class that wrapps a {@link Properties} class and provides its
+	 * An adapter class that wraps a {@link Properties} class and provides its
 	 * functionality as a {@link ResourceBundle}.
 	 * 
 	 * Usually, this will simply return the elements for a given key as it would
 	 * be in an instance of {@link Properties}. The only difference is the support
 	 * for {@link String} arrays: If a returned element is surrounded with square
-	 * brackets (<code>'['</code> and <code>']'</code>), these brackets are
-	 * removed from the string and the separator char <code>';'</code> is used to
+	 * brackets ({@code '['} and {@code ']'}), these brackets are
+	 * removed from the string and the separator char {@code ';'} is used to
 	 * split the given {@link String} into an array of {@link String}s.
 	 * 
 	 * @author Andreas Dr&auml;ger

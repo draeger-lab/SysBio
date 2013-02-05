@@ -174,7 +174,7 @@ public class OpenedFile<T> {
 	public void setChanged(boolean changed) {
 		boolean previous = isChanged();
 		this.changed = changed;
-		propertyChangeSupport.firePropertyChange(FILE_CONTENT_CHANGED_EVENT, Boolean.valueOf(previous), Boolean.valueOf(changed));		
+		propertyChangeSupport.firePropertyChange(FILE_CONTENT_CHANGED_EVENT, previous, changed);
 	}
 
 	/**

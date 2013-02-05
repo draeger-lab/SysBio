@@ -6,6 +6,14 @@
 	and error messages in a (graphical) user interface.
   </comment>
   
+  <!-- BaseFrame -->
+  
+  <entry key="FILES_NOT_ACCEPTABLE">Es ist nicht möglich, auf {0} aus dem Verlauf zuzugreifen. Bitte überprüfen Sie, ob {1} und Sie noch immer über Leserechte dafür verfügen. Vorerst war es notwendig, diese {0} aus dem Verlauf zu entfernen.</entry>
+  <entry key="COULD_NOT_LOAD_FILES">Es war nicht möglich, {0} zu öffnen. Überprüfen Sie bitte, ob {1} sowie ob Sie Leserechte darauf besitzen.</entry>
+  <entry key="FILE_PART">[Dateien;eine Datei;{0,number,integer} Dateien]</entry>
+  <entry key="FILE_EXISTENCE">[überhaupt Dateien vorhanden sind;die Datei {2} existiert;die Dateien {2} existieren]</entry>
+  <entry key="AND"> und</entry>
+    
   <!-- CSVReaderColumnCooser -->
   
   <entry key="INVALID_CSV-FILE">Ungültige oder leere CSV-Datei.</entry>
@@ -29,7 +37,11 @@
   <!-- Option -->
   
   <entry key="VALUE_MUST_BE_POSITIVE">%s muss eine positive Zahl sein.</entry>
-    
+  
+  <!-- OpenFile -->
+  
+  <entry key="ERROR_OPENING_FILE">Fehler beim Öffnen der Datei {0}. Bitte überprüfen Sie, ob die Datei existiert und ob Sie Lesezugriff darauf besitzen.</entry>
+  
   <!-- Range -->
   
   <entry key="CLASS_NOT_COMPARABLE">Klasse %s kann nicht verglichen werden. Implementieren Sie bitte die Schnittstelle "Comparable".</entry>

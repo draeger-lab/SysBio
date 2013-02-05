@@ -250,6 +250,10 @@ public class FormatDescription implements Comparable<FormatDescription> {
     shortName = newValue;
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
   public String toString() {
     final String PRIMARY_SEPARATOR = "\t";
     final String SECONDARY_SEPARATOR = ",";
@@ -284,4 +288,5 @@ public class FormatDescription implements Comparable<FormatDescription> {
     sb.append(PRIMARY_SEPARATOR);
     return sb.toString();
   }
+
 }

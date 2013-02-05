@@ -71,11 +71,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * The renderer to be used to display equations.
 	 */
 	private EquationRenderer renderer;
-
-	/**
-	 * 
-	 */
-	protected SBMLDocument sbmlDoc;
 	
 	/**
 	 * 
@@ -88,19 +83,10 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * @param namesIfAvailable
 	 */
 	public SBMLModelSplitPane(OpenedFile<SBMLDocument> file, boolean namesIfAvailable) {
-		this(file.getDocument(), namesIfAvailable);
-		this.openedFile = file;
-	}
-	
-	/**
-	 * 
-	 * @param document
-	 * @param namesIfAvailable
-	 */
-	public SBMLModelSplitPane(SBMLDocument document, boolean namesIfAvailable) {
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
+		this.openedFile = file;
 		this.namesIfAvailalbe = namesIfAvailable;
-		init(document, false);
+		init(file.getDocument(), false);
 	}
 	
 	
@@ -133,14 +119,14 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * @return
 	 */
 	public SBMLDocument getSBMLDocument() {
-		return sbmlDoc;
+		return openedFile.getDocument();
 	}
 	
 	/**
 	 * @return the tree
 	 */
 	public SBMLTree getTree() {
-		if (sbmlDoc == null) {
+		if (!openedFile.isSetDocument()) {
 			return null;
 		}
 		return ((SBMLTreeSearchComponent) getLeftComponent()).getTree();
@@ -152,8 +138,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 */
 	public void init(SBMLDocument doc, boolean keepDivider) {
 		int proportionalLocation = getDividerLocation();
-		
-		this.sbmlDoc = doc;
 		
 		SBMLTreeSearchComponent treeSearchComponent = new SBMLTreeSearchComponent(doc);
 		setLeftComponent(treeSearchComponent);
@@ -204,7 +188,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 */
 	@Override
 	public void updateUI() {
-		if (this.sbmlDoc != null) {
+		if ((openedFile != null) && openedFile.isSetDocument()) {
 			SBMLTreeSearchComponent leftComponent = (SBMLTreeSearchComponent) getLeftComponent(); 
 			leftComponent.updateUI();
 			updateRightComponent(leftComponent.getTree().getLastSelectedPathComponent());
