@@ -20,6 +20,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.util.logging.Logger;
 
+import javax.swing.ProgressMonitorInputStream;
+
 import de.zbit.io.OpenFile;
 
 /**
@@ -28,11 +30,12 @@ import de.zbit.io.OpenFile;
  * 
  * <p>NOTE: Theoretically, this class can be used for displaying more types of
  * progress than just reading in files.</p>
- * 
+ *
  * @author Clemens Wrzodek
  * @author Florian Mittag
  * @version $Rev$
  * @since 1.0
+ * @see ProgressMonitorInputStream
  */
 public class FileReadProgress {
   public static final transient Logger log = Logger.getLogger(FileReadProgress.class.getName());
@@ -40,11 +43,11 @@ public class FileReadProgress {
   /**
    * Total file length
    */
-  private long fileLength=0;
+  private long fileLength = 0;
   /**
    * Bytes that have currently been read from the file
    */
-  private long bytesRead=0;
+  private long bytesRead = 0;
   /**
    * If true, output should only take one line
    */
@@ -55,7 +58,7 @@ public class FileReadProgress {
    * input file has \n line breaks.
    * @see #fileUsesWindowsLinebreaks(String)
    */
-  private boolean fileUsesWindowsLinebreaks=false;
+  private boolean fileUsesWindowsLinebreaks = false;
   
   /**
    * This enables a custom progress bar to use.
@@ -266,21 +269,25 @@ public class FileReadProgress {
   }
   
   /**
-   * Determines if a file uses windows (\r\n) or Unix (\n) line brakes.
-   * @return true for windows, false for Unix line brakes.
+   * Determines if a file uses Windows ({@code \r\n}) or Unix ({@code \n}) line brakes.
+   * @return {@code true} for Windows, false for Unix line brakes.
    */
   private static boolean fileUsesWindowsLinebreaks(String file) {
     // OpenFile.openFile may be replaced by BufferedReader(new FileReader(file))
     try {
       // Read line with predefined method
-      boolean oldVerbose = OpenFile.verbose;
-      OpenFile.verbose = false;
+      boolean oldVerbose = OpenFile.isVerbose();
+      OpenFile.setVerbose(false);
       BufferedReader inStream = OpenFile.openFile(file);
-      OpenFile.verbose = oldVerbose;
-      if (inStream==null || !inStream.ready()) return false;
+      OpenFile.setVerbose(oldVerbose);
+      if ((inStream == null) || !inStream.ready()) {
+      	return false;
+      }
       String line = inStream.readLine();
       inStream.close();
-      if (line==null) return false;
+      if (line == null) {
+      	return false;
+      }
       
       // Custom read line
       inStream = OpenFile.openFile(file);
@@ -288,10 +295,13 @@ public class FileReadProgress {
       inStream.skip(line.length());
       inStream.read(buff);
       inStream.close();
-      if (buff[buff.length-1]=='\n' && buff[buff.length-2]=='\r') return true;
-      else return false;
-    
-    } catch (Throwable t) {return false;}
+      if ((buff[buff.length-1] == '\n') && (buff[buff.length-2] == '\r')) {
+      	return true;
+      }
+      return false;
+    } catch (Throwable t) {
+    	return false;
+    }
   }
   
 }

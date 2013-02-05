@@ -359,6 +359,8 @@ public class SBFileFilter extends GeneralFileFilter {
     Pattern pattern = type.getLinePattern();
     boolean retVal = pattern == null;
     if (!retVal) {
+    	boolean oldVerbose = OpenFile.isVerbose();
+    	OpenFile.setVerbose(false);
       BufferedReader br = OpenFile.openFile(file.getAbsolutePath());
       Matcher matcher;
       try {
@@ -377,10 +379,13 @@ public class SBFileFilter extends GeneralFileFilter {
         return false;
       } finally {
         try {
-          if (br != null) br.close();
+          if (br != null) {
+          	br.close();
+          }
         } catch (IOException e) {
           return false;
         }
+        OpenFile.setVerbose(oldVerbose);
       }
     }
     return retVal;
@@ -896,9 +901,8 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     Set<String> extensions = type.getFileExtensions();
     return f.isDirectory()
-    || (((extensions == null) || extensions.isEmpty() || extensions
-        .contains(getExtension(f))) && (!f.exists() || (checkFileHead(f,
-          type))));
+    || (((extensions == null) || extensions.isEmpty() || extensions.contains(getExtension(f))) 
+    		&& (!f.exists() || (checkFileHead(f, type))));
   }
   
   /**

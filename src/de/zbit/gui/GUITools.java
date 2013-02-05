@@ -1374,14 +1374,22 @@ public class GUITools {
    * @return
    */
   private static String getMessage(Throwable exc) {
-    if (exc==null) return "NULL";
+    if (exc == null) {
+    	return "NULL";
+    }
     String msg = exc.getLocalizedMessage();
     if ((msg == null) && (exc.getCause() != null)) {
       msg = exc.getCause().getLocalizedMessage();
     }
-    if (msg == null) msg = exc.getMessage();
-    if (msg == null) msg = exc.toString(); // Axis Faults have all messages null
-    if (msg == null) msg = "NULL";
+    if (msg == null) {
+    	msg = exc.getMessage();
+    }
+    if (msg == null) {
+    	msg = exc.toString(); // Axis Faults have all messages null
+    }
+    if (msg == null) {
+    	msg = "NULL";
+    }
     return msg;
   }
   
@@ -2633,6 +2641,7 @@ public class GUITools {
 			item1.setAccelerator(ks2);
 			item2.setAccelerator(ks1);
 		}
+		jMenuBar.updateUI();
 	}
 
 }

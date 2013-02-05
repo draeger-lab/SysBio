@@ -81,7 +81,7 @@ import de.zbit.util.StringUtil;
  * @since 1.1
  * @version $Rev$
  */
-public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements DropTargetListener{
+public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements DropTargetListener {
 	
 	/**
 	 * Generated serial version id
@@ -94,10 +94,10 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	public static final transient ResourceBundle BASE = ResourceManager.getBundle("de.zbit.locales.BaseAction");
 	
 	private static final int LINEWIDTH = 3;
-	private static final String NAME = "test";
+	private static final String NAME = JTabbedPaneDraggableAndCloseable.class.getName();
 	private final GhostGlassPane glassPane = new GhostGlassPane();
 	private final Rectangle2D lineRect = new Rectangle2D.Double();
-	private final Color lineColor= new Color(0, 100, 255);
+	private final Color lineColor = new Color(0, 100, 255);
 	private int dragTabIndex = -1;
 	private boolean hasGhost = true;
 
@@ -120,7 +120,6 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	  removeTabAt(idx);
 	  return true;
 	}
-
 
 	/**
 	 * 
@@ -233,33 +232,35 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 		new DragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE, dgl);
 		
 		
-		// Add right mouse context menu
-    class PopClickListener extends MouseAdapter {
-    	/* (non-Javadoc)
-    	 * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
-    	 */
-    	@Override
-      public void mousePressed(MouseEvent e) {
-        if (e.isPopupTrigger()) doPop(e);
-      }
-    	/* (non-Javadoc)
-    	 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
-    	 */
-    	@Override
-      public void mouseReleased(MouseEvent e) {
-        if (e.isPopupTrigger()) doPop(e);
-      }
-    	/**
-    	 * 
-    	 * @param e
-    	 */
-      private void doPop(MouseEvent e) {
-        if (getTabCount() > 0) {
-          createRightMousePopup().show(e.getComponent(), e.getX(), e.getY());
-        }
-      }
-    }
-    addMouseListener(new PopClickListener());
+		/** 
+		 * Add right mouse context menu
+		 */
+		class PopClickListener extends MouseAdapter {
+			/* (non-Javadoc)
+			 * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
+			 */
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) doPop(e);
+			}
+			/* (non-Javadoc)
+			 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
+			 */
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) doPop(e);
+			}
+			/**
+			 * 
+			 * @param e
+			 */
+			private void doPop(MouseEvent e) {
+				if (getTabCount() > 0) {
+					createRightMousePopup().show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		}
+		addMouseListener(new PopClickListener());
 	}
 	
 	
@@ -307,7 +308,6 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
           return ImageTools.flipHorizontally(UIManager.getIcon("Menu.arrowIcon"));
         case MOVE_TO_RIGHT:
           return UIManager.getIcon("Menu.arrowIcon");
-          
         default:
           return null; // No icon
       }
@@ -315,22 +315,21 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
     
   }
   
-	 /**
+  /**
    * Create a popup menu that allows a selection of available
    * {@link AbstractEnrichment}s.
    * @param l
    * @return
    */
   public JPopupMenu createRightMousePopup() {
-    JPopupMenu append = new JPopupMenu("TabbedPane");
-    append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.CLOSE_CURRENT_TAB));
-    //append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.MOVE_TO_LEFT));
-    //append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.MOVE_TO_RIGHT));
-    
-    return append;
+  	JPopupMenu append = new JPopupMenu("TabbedPane");
+  	append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.CLOSE_CURRENT_TAB));
+  	//append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.MOVE_TO_LEFT));
+  	//append.add(GUITools.createJMenuItem(EventHandler.create(ActionListener.class, this, "closeCurrentTab"), RightMouseClickOptions.MOVE_TO_RIGHT));
+  	
+  	return append;
   }
 
-	
   /**
    * Construct a new {@link JTabbedPaneDraggableAndCloseable} that displays
    * the given image if no tab is currently on the
@@ -475,7 +474,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	 */
 	@Override
 	public void addTab(String title, Component component) {
-		this.addTab(title, component, null);
+		addTab(title, component, null);
 	}
 
 	/**
@@ -529,7 +528,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 		} else {
 			e.dropComplete(false);
 		}
-		repaint();
+		validate();
 	}
 	
 	/**
@@ -599,12 +598,12 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	private int getTargetTabIndex(Point glassPt) {
 		Point tabPt = SwingUtilities.convertPoint(glassPane, glassPt, JTabbedPaneDraggableAndCloseable.this);
 		boolean isTB = (getTabPlacement() == JTabbedPane.TOP) || (getTabPlacement() == JTabbedPane.BOTTOM);
-		for(int i=0;i<getTabCount();i++) {
+		for (int i = 0; i < getTabCount(); i++) {
 			Rectangle r = getBoundsAt(i);
 			if (isTB) {
-				r.setRect(r.x-r.width/2, r.y,r.width, r.height);
+				r.setRect(r.x - r.width / 2, r.y, r.width, r.height);
 			} else {
-				r.setRect(r.x, r.y-r.height/2, r.width, r.height);
+				r.setRect(r.x, r.y - r.height / 2, r.width, r.height);
 			}
 			if (r.contains(tabPt)) {
 				return i;
@@ -616,7 +615,7 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 		} else {
 			r.setRect(r.x, r.y + r.height / 2, r.width, r.height);
 		}
-		return r.contains(tabPt)?getTabCount():-1;
+		return r.contains(tabPt) ? getTabCount() : -1;
 	}
 	
 	/**
@@ -663,15 +662,15 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 	private void initTargetLeftRightLine(int next) {
 		if ((next < 0) || (dragTabIndex == next) || (next - dragTabIndex == 1)) {
 			lineRect.setRect(0, 0, 0, 0);
-		} else if (next==getTabCount()) {
-			Rectangle rect = getBoundsAt(getTabCount()-1);
-			lineRect.setRect(rect.x+rect.width-LINEWIDTH/2,rect.y,LINEWIDTH,rect.height);
-		} else if (next==0) {
+		} else if (next == getTabCount()) {
+			Rectangle rect = getBoundsAt(getTabCount() - 1);
+			lineRect.setRect(rect.x + rect.width - LINEWIDTH / 2, rect.y, LINEWIDTH, rect.height);
+		} else if (next == 0) {
 			Rectangle rect = getBoundsAt(0);
-			lineRect.setRect(-LINEWIDTH/2,rect.y,LINEWIDTH,rect.height);
+			lineRect.setRect(-LINEWIDTH / 2, rect.y, LINEWIDTH, rect.height);
 		} else {
 			Rectangle rect = getBoundsAt(next - 1);
-			lineRect.setRect(rect.x+rect.width-LINEWIDTH/2,rect.y,LINEWIDTH,rect.height);
+			lineRect.setRect(rect.x+rect.width-LINEWIDTH / 2, rect.y, LINEWIDTH, rect.height);
 		}
 	}
 	
@@ -683,14 +682,14 @@ public class JTabbedPaneDraggableAndCloseable extends JTabbedLogoPane implements
 		if ((next < 0) || (dragTabIndex == next) || (next - dragTabIndex == 1)) {
 			lineRect.setRect(0, 0, 0, 0);
 		} else if (next == getTabCount()) {
-			Rectangle rect = getBoundsAt(getTabCount()-1);
-			lineRect.setRect(rect.x,rect.y+rect.height-LINEWIDTH/2,rect.width,LINEWIDTH);
+			Rectangle rect = getBoundsAt(getTabCount() - 1);
+			lineRect.setRect(rect.x, rect.y + rect.height - LINEWIDTH / 2, rect.width, LINEWIDTH);
 		} else if (next == 0) {
 			Rectangle rect = getBoundsAt(0);
-			lineRect.setRect(rect.x,-LINEWIDTH / 2,rect.width,LINEWIDTH);
+			lineRect.setRect(rect.x,-LINEWIDTH / 2, rect.width,LINEWIDTH);
 		} else {
 			Rectangle rect = getBoundsAt(next - 1);
-			lineRect.setRect(rect.x,rect.y+rect.height-LINEWIDTH/2,rect.width,LINEWIDTH);
+			lineRect.setRect(rect.x,rect.y+rect.height-LINEWIDTH / 2, rect.width,LINEWIDTH);
 		}
 	}
 
@@ -780,8 +779,8 @@ class GhostGlassPane extends JPanel {
 		}
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setComposite(composite);
-		double xx = location.getX() - (draggingGhost.getWidth(this) /2d);
-		double yy = location.getY() - (draggingGhost.getHeight(this)/2d);
+		double xx = location.getX() - (draggingGhost.getWidth(this) / 2d);
+		double yy = location.getY() - (draggingGhost.getHeight(this)/ 2d);
 		g2.drawImage(draggingGhost, (int) xx, (int) yy , null);
 	}
 

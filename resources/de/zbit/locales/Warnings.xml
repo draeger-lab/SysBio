@@ -6,6 +6,14 @@
 	and error messages in a (graphical) user interface.
   </comment>
   
+  <!-- BaseFrame -->
+  
+  <entry key="FILES_NOT_ACCEPTABLE">It is not possible to access {0} from the file history. Please check if {1} and if you still have reading permissions. For now, it was necessary to remove {0} from the file history.</entry>
+  <entry key="COULD_NOT_LOAD_FILES">It was not possible to open {0}. Please check if {1} and if you have reading access.</entry>
+  <entry key="FILE_PART">[any files;one file;{0,number,integer} files]</entry>
+  <entry key="FILE_EXISTENCE">[any files exist;the file {2} exists;the files {2} exist]</entry>
+  <entry key="AND"> and</entry>
+  
   <!-- CSVReaderColumnCooser -->
   
   <entry key="INVALID_CSV-FILE">Invalid or empty CSV file.</entry>
@@ -29,6 +37,10 @@
   <!-- Option -->
   
   <entry key="VALUE_MUST_BE_POSITIVE">%s must be a positive number.</entry>
+  
+  <!-- OpenFile -->
+  
+  <entry key="ERROR_OPENING_FILE">Error opening file {0}. Please check if this file exists and if you have reading access to it.</entry>
   
   <!-- Range -->
   
