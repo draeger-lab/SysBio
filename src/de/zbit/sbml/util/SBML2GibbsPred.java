@@ -168,7 +168,8 @@ public class SBML2GibbsPred {
 		File file = new File(args[0]);
 		String outputFile = file.getPath().replaceAll(file.getName(), "") + "reactions_" + file.getName() + ".txt";
 //		File output = new File(outputFile);
-		new SBML2GibbsPred((File) file, outputFile);
+//		new SBML2GibbsPred((File) file, outputFile);
+		new SBML2GibbsPred((File) file, args[1]);
 		
 	}
 
