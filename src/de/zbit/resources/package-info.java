@@ -16,6 +16,10 @@
  */
 
 /**
+ * All resources, such as images, configuration files, or HTML pages, that can
+ * be loaded by this library are located in this package together with the class
+ * Resource for loading these files.
+ * 
  * @version $Rev$
  */
 package de.zbit.resources;
