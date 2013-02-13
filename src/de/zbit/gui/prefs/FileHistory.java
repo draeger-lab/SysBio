@@ -103,12 +103,14 @@ public interface FileHistory extends KeyProvider {
 				if (fileList.endsWith("]")) {
 					fileList = fileList.substring(0, fileList.length() - 1);
 				}
-				String files[] = fileList.split(FileHistory.SEPARATOR);
-				File file;
-				for (String filePath : files) {
-					file = new File(filePath);
-					if (!listOfFiles.contains(file)) {
-						listOfFiles.add(file);
+				if (fileList.length() > 0) {
+					String files[] = fileList.split(FileHistory.SEPARATOR);
+					File file;
+					for (String filePath : files) {
+						file = new File(filePath);
+						if (!listOfFiles.contains(file)) {
+							listOfFiles.add(file);
+						}
 					}
 				}
 			}

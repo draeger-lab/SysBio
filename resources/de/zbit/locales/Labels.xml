@@ -144,14 +144,14 @@
   <entry key="LAUNCHING_CMD_MODE">Launching command-line mode of {0}.</entry>
   <entry key="NO_GUI_SUPPORTED">"No graphical user interface supported for {0} version {1}."</entry>
   <entry key="INCOMPLETE_CMD_ARG_LIST">Incomplete list of command-line arguments. Try to restart {0} version {1} with the --help option</entry>
-    <entry key="COPYRIGHT_MESSAGE">{0}
-Copyright © {1,number,#}-{2,number,#} the University of Tuebingen,
+    <entry key="COPYRIGHT_MESSAGE">{0} version {1}
+Copyright © {2,number,#}-{3,number,#} the University of Tuebingen,
 Center for Bioinformatics Tuebingen (ZBIT).
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome
 to redistribute it under certain conditions.
 </entry>
-  <entry key="LINK_TO_LICENSE_FILE">See {0} for details.</entry>
+  <entry key="LINK_TO_LICENSE_FILE">See {0}.</entry>
   
   <!-- MultiplePreferencesPanel -->
   

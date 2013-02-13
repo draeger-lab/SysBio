@@ -1684,6 +1684,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		int lastComma = fileList.lastIndexOf(',');
 		if (lastComma > 0) {
 			fileList = fileList.substring(0, lastComma) + bundleWarnings.getString("AND") + fileList.substring(lastComma + 1);
+		} else if (fileList.length() == 0) {
+			fileList = "\"\""; // \u2423
 		}
 		String message = form.format(
 			new Object[] {Long.valueOf(unreadableFiles.length), Long.valueOf(unreadableFiles.length), fileList});
@@ -1743,14 +1745,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
    *        will be disabled.
 	 */
 	private final void updateFileHistory(Collection<File> listOfFiles, JMenu... fileHistory) {
-	  for (JMenu jMenu : fileHistory) {
-	    jMenu.removeAll(); 
-    }
+		for (JMenu jMenu : fileHistory) {
+			jMenu.removeAll(); 
+		}
 		JMenuItem fileItem;
-		List<File> keepFiles = new LinkedList<File>();
+		List<File> keepFiles = new ArrayList<File>(listOfFiles.size());
 		short maximum = getMaximalFileHistorySize();
 		Iterator<File> it = listOfFiles.iterator();
-		List<File> listOfUnreadableFiles = new ArrayList<File>();
+		List<File> listOfUnreadableFiles = new ArrayList<File>(listOfFiles.size());
 		for (int i = 0; i < Math.min(listOfFiles.size(), maximum); i++) {
 			final File file = it.next();
 			if (file.exists() && file.canRead()) {
@@ -1787,7 +1789,11 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		}
 		// This removes files that cannot be read from the history.
 		SBPreferences history = SBPreferences.getPreferencesFor(getFileHistoryKeyProvider());
-		history.put(FileHistory.LAST_OPENED, FileHistory.Tools.toString(keepFiles));
+		if (!keepFiles.isEmpty()) {
+			history.put(FileHistory.LAST_OPENED, FileHistory.Tools.toString(keepFiles));
+		} else {
+			history.remove(FileHistory.LAST_OPENED);
+		}
 		try {
 			history.flush();
 		} catch (BackingStoreException exc) {

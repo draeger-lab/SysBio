@@ -364,15 +364,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 					//e.printStackTrace();
 				}
 				laTeXpreview.append(LaTeXCompiler.eqEnd);
-				JPanel preview = createJPanel(new BorderLayout());
-				preview.add(this.renderer.renderEquation(laTeXpreview.toString()),
-					BorderLayout.CENTER);
-				preview.setBackground(Color.WHITE);
-				Dimension d = new Dimension(preferedWidth, 120);
-				JScrollPane scroll = new JScrollPane(preview);
-				scroll.setPreferredSize(new Dimension((int) d.getWidth() + 10,
-					(int) d.getHeight() + 10));
-				lh.add(scroll, 1, ++row, 3, 1, 1d, 0d);
+				lh.add(renderer.renderEquation(laTeXpreview.toString()), 1, ++row, 3, 1, 1d, 0d);
 				lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 			}
 			if (mc instanceof Assignment) {
@@ -406,8 +398,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		if (model.getLevel() > 2) {
 			if (model.isSetConversionFactor()) {
 				Parameter conversionFactor = model.getConversionFactorInstance();
-				JTextField tf = new JTextField(conversionFactor.isSetName() ? conversionFactor.getName() : conversionFactor.getId());
-				tf.setEditable(editable);
+				JTextField tf = createNameField(conversionFactor);
 				addLabeledComponent(bundle.getString("conversionFactor"), tf);
 			}
 			if (model.isSetAreaUnits()) {
@@ -467,6 +458,19 @@ public class SBasePanel extends JPanel implements EquationComponent {
 
 	/**
 	 * 
+	 * @param nsb
+	 * @return
+	 */
+	private JTextField createNameField(NamedSBase nsb) {
+		JTextField tf = new JTextField(nsb.isSetName() ? nsb.getName() : nsb.getId());
+		tf.setEditable(editable);
+		tf.setColumns(25);
+		tf.setCaretPosition(0);
+		return tf;
+	}
+
+	/**
+	 * 
 	 * @param label
 	 * @param units
 	 * @param m
@@ -492,8 +496,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private void addProperties(NamedSBase nsb) {
 		if (nsb.isSetName() || nsb.isSetId() || editable) {
-			JTextField tf = new JTextField((nsb.isSetName()) ? nsb.getName() : nsb.getId());
-			tf.setEditable(editable);
+			JTextField tf = createNameField(nsb);
 			addLabeledComponent(bundle.getString("name"), tf);
 		}
 	}
@@ -868,7 +871,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				} catch (SBMLException e) {
 					l = bundleWarnings.getString("invalid");
 				}
-				JComponent eqn = this.renderer.renderEquation(l);
+				JComponent eqn = renderer.renderEquation(l);
 				eqn.setBorder(BorderFactory.createLoweredBevelBorder());
 				p.add(eqn);
 			}

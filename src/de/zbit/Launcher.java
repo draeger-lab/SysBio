@@ -689,7 +689,7 @@ public abstract class Launcher implements Runnable, Serializable {
     message.append(sb);
     message.append('\n');
     message.append(MessageFormat.format(resources.getString("COPYRIGHT_MESSAGE"),
-      getAppName(), getYearWhenProjectWasStarted(),
+      getAppName(), getVersionNumber(), getYearWhenProjectWasStarted(),
       getYearOfProgramRelease()));
     URL licenseFile = null;
     licenseFile = getURLlicenseFile();

@@ -138,8 +138,8 @@
   <entry key="LAUNCHING_CMD_MODE">Starte Kommandozeilenmodus für {0}.</entry>
   <entry key="NO_GUI_SUPPORTED">"Das Programm {0} in Version {1} unterstützt keine graphische Nutzerschnittstelle."</entry>
   <entry key="INCOMPLETE_CMD_ARG_LIST">Unvollständige Liste von Kommandozeilenargumenten. Versuchen Sie, {0} Version {1} mit der Option --help erneut zu starten.</entry>
-    <entry key="COPYRIGHT_MESSAGE">{0}
-Copyright © {1,number,#}-{2,number,#} Universität Tübingen,
+    <entry key="COPYRIGHT_MESSAGE">{0} Version {1}
+Copyright © {2,number,#}-{3,number,#} Universität Tübingen,
 Zentrum für Bioinformatik Tübingen (ZBIT).
 Dieses Programm wird unter AUSSCHLUSS JEGLICHER
 GEWÄHRLEISTUNG UND HAFTUNG kostenlos zur Verfügung
