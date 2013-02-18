@@ -55,13 +55,9 @@ public class LayoutGraph implements ILayoutGraph {
 	 * 
 	 */
 	private Map<String, Set<String>> speciesId2reactions;
-<<<<<<< .mine
+
 	private Map<Node, NamedSBaseGlyph> node2glyph;
-=======
-	/**
-	 * 
-	 */
->>>>>>> .r1159
+
 	private Graph2D graph2D;
 	
 	/**
