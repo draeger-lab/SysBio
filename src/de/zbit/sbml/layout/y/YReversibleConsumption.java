@@ -16,39 +16,24 @@
  */
 package de.zbit.sbml.layout.y;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
-import org.sbml.jsbml.ext.layout.Point;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import de.zbit.sbml.layout.Production;
+import de.zbit.sbml.layout.SBGNArc;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YProduction implements Production<EdgeRealizer> {
+public class YReversibleConsumption implements SBGNArc<EdgeRealizer> {
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
 	 */
 	@Override
 	public EdgeRealizer draw(Curve curve) {
-		if ((curve != null) && curve.isSetListOfCurveSegments()) {
-			List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
-			Collections.reverse(listOfCurveSegments);
-			for (CurveSegment curveSegment : listOfCurveSegments) {
-				Point start = curveSegment.getStart().clone();
-				Point end = curveSegment.getEnd();
-				curveSegment.setEnd(start);
-				curveSegment.setStart(end);
-			}
-		}
-		
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
 		edgeRealizer.setTargetArrow(Arrow.DELTA);
 		return edgeRealizer;
@@ -67,7 +52,6 @@ public class YProduction implements Production<EdgeRealizer> {
 	 */
 	@Override
 	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

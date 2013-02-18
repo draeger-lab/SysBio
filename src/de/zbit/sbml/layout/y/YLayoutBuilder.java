@@ -315,7 +315,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 								((speciesReferenceRole == SpeciesReferenceRole.SUBSTRATE) ||
 										(speciesReferenceRole == SpeciesReferenceRole.SIDESUBSTRATE))))) {
 			// consumption in reversible reaction needs an arrow
-			arc = getSBGNArc(393);
+			arc = createReversibleConsumption();
 		}
 
 		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve(), curveWidth);
@@ -323,11 +323,14 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		// dock correctly at process node
 		Point relativeDockingAtPN = (Point) srg.getUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT);
 		logger.fine(MessageFormat.format("srg={0} rg={1} dock relative at PN {2}", srg.getId(), rg.getId(), relativeDockingAtPN));
-		double x = relativeDockingAtPN.getX();
-		double y = relativeDockingAtPN.getY();
 //		relativeDockingAtPN = new Point(0, 0, 0, relativeDockingAtPN.getLevel(), relativeDockingAtPN.getVersion());
 		if (relativeDockingAtPN != null) {
+			double x = relativeDockingAtPN.getX();
+			double y = relativeDockingAtPN.getY();
 			edgeRealizer.setSourcePoint(new YPoint(x, y));
+		}
+		else {
+			logger.warning(MessageFormat.format("No relative docking position at PN given for srg {0}", srg.getId()));
 		}
 		
 		// docking at species works automatically, YFiles points the edge towards the center of the node
@@ -724,6 +727,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	@Override
 	public Consumption<EdgeRealizer> createConsumption() {
 		return new YConsumption();
+	}
+
+	private SBGNArc<EdgeRealizer> createReversibleConsumption() {
+		return new YReversibleConsumption();
 	}
 
 	/* (non-Javadoc)
