@@ -112,6 +112,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * Localization for SBML element names.
 	 */
 	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.ElementNames");
+	/**
+	 * 
+	 */
 	private static final ResourceBundle bundleWarnings = ResourceManager.getBundle("de.zbit.sbml.locales.Warnings");
 	
   /**
@@ -228,6 +231,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
   			addProperties((Variable) sbase);
   		}
   	}
+  	GUITools.setOpaqueForAllElements(this, true);
   }
   
   /**
@@ -656,8 +660,8 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			notesArea.setDoubleBuffered(true);
 			notesArea.setAutoscrolls(true);
 			notesArea.setPreferredSize(new Dimension(preferedWidth, 200));
-			notesArea.setBorder(BorderFactory.createLoweredBevelBorder());
 			JScrollPane editorScrollPane = new JScrollPane(notesArea);
+			editorScrollPane.setViewportBorder(BorderFactory.createLoweredBevelBorder());
 			//scroll.setMaximumSize(notesArea.getMaximumSize());
 			// We NEED to set a PreferredSize on the scroll. Else, Long description strings
 			// are printed on one large line without a line break!
@@ -665,12 +669,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 //			scroll.setPreferredSize(new Dimension(preferedWidth, 500));
 			editorScrollPane.setPreferredSize(new Dimension(250, 145));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
-			JPanel notesPanel = createJPanel();
+			JPanel notesPanel = createJPanel(new BorderLayout());
 			notesPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("notes") + ' '));
 			notesPanel.setOpaque(true);
-			LayoutHelper helper = new LayoutHelper(notesPanel);
-			helper.add(editorScrollPane);
-			lh.add(notesPanel, 1, row, 3, 1, 1d, 0d);
+			notesPanel.add(editorScrollPane, BorderLayout.CENTER);
+			lh.add(notesPanel, 1, ++row, 3, 1, 1d, 0d);
 			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		if (sbase.getCVTermCount() > 0) {
@@ -725,18 +728,17 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			l.setDoubleBuffered(true);
 			l.setEditable(editable);
 			l.setBackground(Color.WHITE);
-			l.setBorder(BorderFactory.createLoweredBevelBorder());
 			Dimension dim = new Dimension(preferedWidth, 125);
 			l.setMaximumSize(dim);
 			JScrollPane editorScrollPane = new JScrollPane(l);
 			editorScrollPane.setPreferredSize(new Dimension(250, 145));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
-			JPanel miriamPanel = createJPanel();
+      editorScrollPane.setViewportBorder(BorderFactory.createLoweredBevelBorder());
+			JPanel miriamPanel = createJPanel(new BorderLayout());
 			miriamPanel.setOpaque(true);
 			miriamPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("MIRIAM") + ' '));
-			LayoutHelper helper = new LayoutHelper(miriamPanel);
-			helper.add(editorScrollPane);
-			lh.add(helper.getContainer(), 1, row, 3, 1, 1d, 0d);
+			miriamPanel.add(editorScrollPane, BorderLayout.CENTER);
+			lh.add(miriamPanel, 1, ++row, 3, 1, 1d, 0d);
 			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
 		if (sbase.isSetSBOTerm()) {

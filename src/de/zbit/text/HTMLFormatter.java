@@ -25,12 +25,16 @@ import java.io.IOException;
  * @since 1.1
  * @version $Rev$
  */
-public class HTMLFormatter {
+public class HTMLFormatter implements FormatBuilder {
 
 	public HTMLFormatter() {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.text.FormatBuilder#init(java.io.BufferedWriter, java.lang.String)
+	 */
+	@Override
 	public void init(BufferedWriter bw, String title) throws IOException {
 		bw.append("<html>");
 		bw.newLine();
@@ -44,6 +48,10 @@ public class HTMLFormatter {
 		bw.newLine();
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.zbit.text.FormatBuilder#close(java.io.BufferedWriter)
+	 */
+	@Override
 	public void close(BufferedWriter bw) throws IOException {
 		bw.append("  </body>");
 		bw.newLine();
@@ -51,6 +59,10 @@ public class HTMLFormatter {
 		bw.newLine();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.text.FormatBuilder#createTableHead(java.io.BufferedWriter, java.lang.String)
+	 */
+	@Override
 	public void createTableHead(BufferedWriter bw, String... entry) throws IOException {
 		bw.append("      <tr>");
 		bw.newLine();
@@ -64,11 +76,19 @@ public class HTMLFormatter {
 		bw.newLine();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.text.FormatBuilder#closeTable(java.io.BufferedWriter)
+	 */
+	@Override
 	public void closeTable(BufferedWriter bw) throws IOException {
 		bw.append("    </table>");
 		bw.newLine();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.text.FormatBuilder#createTableRow(java.io.BufferedWriter, java.lang.String)
+	 */
+	@Override
 	public void createTableRow(BufferedWriter bw, String... columns) throws IOException {
 		bw.append("      <tr>");
 		bw.newLine();
@@ -82,17 +102,33 @@ public class HTMLFormatter {
 		bw.newLine();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.text.FormatBuilder#createTable(java.io.BufferedWriter)
+	 */
+	@Override
 	public void createTable(BufferedWriter bw) throws IOException {
 		bw.append("    <table>");
 		bw.newLine();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.text.FormatBuilder#createLink(java.io.BufferedWriter, java.lang.String, java.lang.String)
+	 */
+	@Override
 	public void createLink(BufferedWriter bw, String location, String text) throws IOException {
 		bw.append("<a href=\"");
 		bw.append(location);
 		bw.append("\">");
 		bw.append(text);
 		bw.append("</a>");
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.text.FormatBuilder#createProtectedBlank()
+	 */
+	@Override
+	public String createProtectedBlank() {
+		return "&nbsp;";
 	}
 	
 }

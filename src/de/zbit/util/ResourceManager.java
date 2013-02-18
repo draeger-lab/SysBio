@@ -56,15 +56,15 @@ public class ResourceManager {
 	 * @return
 	 * @see #getBundle(String, Locale)
 	 * @exception NullPointerException
-	 *            if <code>baseName</code>, <code>locales</code> or
-	 *            <code>control</code> is {@code null}
+	 *            if {@code baseName} is {@code null}
 	 * @exception MissingResourceException
 	 *            if no resource bundle for the specified base name in any of the
 	 *            {@link Locale}s can be found.
 	 * @exception IllegalArgumentException
-	 *            if the given <code>control</code> doesn't perform properly
-	 *            (e.g., <code>control.getCandidateLocales</code> returns null.)
-	 *            Note that validation of <code>control</code> is performed as
+	 *            if the given {@code control} doesn't perform properly
+	 *            (e.g., {@code control.getCandidateLocales} returns
+	 *            {@code null}.)
+	 *            Note that validation of {@code control} is performed as
 	 *            needed.
 	 */
 	public static ResourceBundle getBundle(String baseName) {
@@ -82,15 +82,15 @@ public class ResourceManager {
 	 * @param locale
 	 * @return
 	 * @exception NullPointerException
-	 *            if <code>baseName</code>, <code>locales</code> or
-	 *            <code>control</code> is {@code null}
+	 *            if {@code baseName}, {@code locales} or
+	 *            {@code control} is {@code null}
 	 * @exception MissingResourceException
 	 *            if no resource bundle for the specified base name in any of the
 	 *            {@link Locale}s can be found.
 	 * @exception IllegalArgumentException
-	 *            if the given <code>control</code> doesn't perform properly
-	 *            (e.g., <code>control.getCandidateLocales</code> returns null.)
-	 *            Note that validation of <code>control</code> is performed as
+	 *            if the given {@code control} doesn't perform properly
+	 *            (e.g., {@code control.getCandidateLocales} returns {@code null}.)
+	 *            Note that validation of {@code control} is performed as
 	 *            needed.
 	 */
 	public static ResourceBundle getBundle(String baseName, Locale locale) {
@@ -122,15 +122,15 @@ public class ResourceManager {
 	 * @param locale
 	 * @return the desired {@link ResourceBundle}
 	 * @exception NullPointerException
-	 *            if <code>baseName</code>, <code>locales</code> or
-	 *            <code>control</code> is {@code null}
+	 *            if {@code baseName}, {@code locales} or
+	 *            {@code control} is {@code null}
 	 * @exception MissingResourceException
 	 *            if no resource bundle for the specified base name in any of the
 	 *            {@link Locale}s can be found.
 	 * @exception IllegalArgumentException
-	 *            if the given <code>control</code> doesn't perform properly
-	 *            (e.g., <code>control.getCandidateLocales</code> returns null.)
-	 *            Note that validation of <code>control</code> is performed as
+	 *            if the given {@code control} doesn't perform properly
+	 *            (e.g., {@code control.getCandidateLocales} returns {@code null}.)
+	 *            Note that validation of {@code control} is performed as
 	 *            needed.
 	 */
 	private static ResourceBundle loadBundle(String baseName, Locale locale) {

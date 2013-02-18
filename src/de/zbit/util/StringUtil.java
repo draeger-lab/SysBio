@@ -680,8 +680,10 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String getWordForNumber(int number) {
-		if ((number < Integer.MIN_VALUE) || (Integer.MAX_VALUE < number)) { return Integer
-				.toString(number); }
+		if ((number < Integer.MIN_VALUE) || (Integer.MAX_VALUE < number)) {
+			return Integer.toString(number);
+		}
+		// TODO: Localize!
 		switch (number) {
 			case 0:
 				return "no";
