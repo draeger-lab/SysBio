@@ -312,7 +312,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 			logger.fine("SRG role " + speciesReferenceRole);
 		}
 		
-		Reaction reaction = (Reaction) rg.getReactionInstance();
+		Reaction reaction = (Reaction) reactionGlyph.getReactionInstance();
 		boolean reactionIsReversible = (reaction != null) &&
 			reaction.isSetReversible() && reaction.isReversible();
 		

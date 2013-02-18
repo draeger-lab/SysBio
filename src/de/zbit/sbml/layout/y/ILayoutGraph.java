@@ -23,12 +23,12 @@ import java.util.Set;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Species;
-
-import de.zbit.sbml.layout.ProcessNode;
+import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
 
 import y.base.Edge;
 import y.base.Node;
 import y.view.Graph2D;
+import de.zbit.sbml.layout.ProcessNode;
 
 /**
  * Interface to define a data structure which contains a {@link Graph2D} and
@@ -74,5 +74,10 @@ public interface ILayoutGraph {
 	 * @return the {@link Graph2D} visual representation.
 	 */
 	public Graph2D getGraph2D();
+
+	/**
+	 * @return
+	 */
+	public Map<Node, NamedSBaseGlyph> getNode2glyph();
 
 }

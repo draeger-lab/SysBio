@@ -493,29 +493,6 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		// create edge
 		Edge edge = graph2D.createEdge(processNode, speciesGlyphNode);
 		
-		// copy edge data to curve of species reference glyph
-//		if (!srg.isSetCurve()) {
-//		if (!srg.isSetCurve() || srg.getCurve().getListOfCurveSegments().isEmpty()) {
-//			YPoint source = graph2D.getRealizer(edge).getSourcePoint();
-//			Point start = new Point(source.getX(), source.getY(), 0.0);
-//			YPoint target = graph2D.getRealizer(edge).getSourcePoint();
-//			Point end = new Point(target.getX(), target.getY(), 0.0);
-//
-//			logger.info(String.format("add curve for rgId=%s  srgId=%s  start=%s  end=%s",
-//					rg.getId(), srg.getId(), start.toString(), end.toString()));
-//
-//			CurveSegment curveSegment = new CurveSegment();
-//			curveSegment.setStart(start);
-//			curveSegment.setEnd(end);
-
-//			Curve curve = new Curve();
-//			ListOf<CurveSegment> listOfCurveSegments = new ListOf<CurveSegment>();
-//			listOfCurveSegments.add(curveSegment);
-//			curve.setListOfCurveSegments(listOfCurveSegments);
-//			Curve curve = createCurve(rg, srg);
-//			srg.setCurve(curve);
-//		}
-		
 		output.add(rg);
 	}
 
@@ -633,51 +610,6 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);
 
 			rgCurvePoint = calculateReactionGlyphDockingPoint(reactionGlyph, rotationAngle, specRefGlyph);
-
-//			/*
-//			 * check the different cases for cubicBezier: ABOVE, BELOW, LEFT, RIGHT
-//			 */
-//			if (relativeSpeciesGlyphPosition.equals(RelativePosition.ABOVE)) {
-//				if (!specRefRole.equals(SpeciesReferenceRole.PRODUCT) ||
-//						!specRefRole.equals(SpeciesReferenceRole.SIDEPRODUCT) ||
-//						!specRefRole.equals(SpeciesReferenceRole.SUBSTRATE) ||
-//						!specRefRole.equals(SpeciesReferenceRole.SIDESUBSTRATE)) {
-//					//if substrates or products are at the same side as the given species
-//					if (relativeSubstratePosition.equals(RelativePosition.ABOVE) ||
-//							relativeSubstratePosition.equals(RelativePosition.BELOW)) {
-//						//CubicBezier to the right side of the ReactionGlyhp, in the middle
-//						basePoint = new Point((1.5 * Math.max((sgX + sgWidth), (rgX + rgWidth))), (sgY + (sgHeight / 2d)), 0, layoutLevel, layoutVersion);
-//					} 
-//				}
-//			}
-//			if (relativeSpeciesGlyphPosition.equals(RelativePosition.BELOW)) {
-//				// species glyph below the reaction glyph
-//				if (!specRefRole.equals(SpeciesReferenceRole.PRODUCT) ||
-//						!specRefRole.equals(SpeciesReferenceRole.SIDEPRODUCT) ||
-//						!specRefRole.equals(SpeciesReferenceRole.SUBSTRATE) ||
-//						!specRefRole.equals(SpeciesReferenceRole.SIDESUBSTRATE)) {
-//					//if substrates or products are at the same side as the given species
-//					if (relativeSubstratePosition.equals(RelativePosition.ABOVE) ||
-//							relativeSubstratePosition.equals(RelativePosition.BELOW)) {
-//						//CubicBezier to the left side of the ReactionGlyhp, in the middle
-//						basePoint = new Point((0.5 * Math.min(sgX, rgX)), (sgY + (sgHeight / 2d)), 0, layoutLevel, layoutVersion);
-//					}
-//				}
-//			}
-//			if (relativeSpeciesGlyphPosition.equals(RelativePosition.LEFT) || relativeSpeciesGlyphPosition.equals(RelativePosition.RIGHT)) {
-//				//species glyph at the left of the reaction glyph
-//				if (!specRefRole.equals(SpeciesReferenceRole.PRODUCT) ||
-//						!specRefRole.equals(SpeciesReferenceRole.SIDEPRODUCT) ||
-//						!specRefRole.equals(SpeciesReferenceRole.SUBSTRATE) ||
-//						!specRefRole.equals(SpeciesReferenceRole.SIDESUBSTRATE)) {
-//					//if substrates or products are at the same side as the given species
-//					if (relativeSubstratePosition.equals(RelativePosition.LEFT) ||
-//							relativeSubstratePosition.equals(RelativePosition.RIGHT)) {
-//						//CubicBezier to the middle of the top of the ReactionGlyhp
-//						basePoint = new Point((sgX + (sgWidth / 2d)), (0.5 * Math.min(sgY, rgY)), 0, layoutLevel, layoutVersion);
-//					} 
-//				}
-//			}
 
 			if (specRefRole.equals(SpeciesReferenceRole.PRODUCT) || specRefRole.equals(SpeciesReferenceRole.SIDEPRODUCT)) {
 				//curve goes from reaction glyph to species glyph
