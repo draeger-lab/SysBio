@@ -34,6 +34,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 
 import de.zbit.io.filefilter.SBFileFilter;
+import de.zbit.text.FormatBuilder;
 import de.zbit.text.HTMLFormatter;
 import de.zbit.util.logging.LogUtil;
 
@@ -54,7 +55,7 @@ public class SBMLTestsuiteOverview {
 			withInitAssignments, withRules, withConstraints, withReactions,
 			withEvents, withAlgebraicRules, withAssignmentRules, withRateRules;
 	
-	public SBMLTestsuiteOverview(File inputFile, File outputFile, HTMLFormatter formatter) throws XMLStreamException, IOException {
+	public SBMLTestsuiteOverview(File inputFile, File outputFile, FormatBuilder formatter) throws XMLStreamException, IOException {
 		super();
 		BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
 		withFuncDef = new TreeSet<File>();
@@ -99,7 +100,7 @@ public class SBMLTestsuiteOverview {
 		bw.close();
 	}
 
-	private String createLinks(HTMLFormatter formatter, Set<File> fileList) throws IOException {
+	private String createLinks(FormatBuilder formatter, Set<File> fileList) throws IOException {
 		if (fileList.isEmpty()) {
 			return " ";
 		}
