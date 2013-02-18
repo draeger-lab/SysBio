@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
+
 import y.base.Edge;
 import y.base.Node;
 import y.view.Graph2D;
@@ -53,9 +55,13 @@ public class LayoutGraph implements ILayoutGraph {
 	 * 
 	 */
 	private Map<String, Set<String>> speciesId2reactions;
+<<<<<<< .mine
+	private Map<Node, NamedSBaseGlyph> node2glyph;
+=======
 	/**
 	 * 
 	 */
+>>>>>>> .r1159
 	private Graph2D graph2D;
 	
 	/**
@@ -68,12 +74,15 @@ public class LayoutGraph implements ILayoutGraph {
 			Map<String, Set<Node>> compartmentId2nodes,
 			Map<String, Set<Node>> reactionId2nodes,
 			Map<String, Set<List<Edge>>> reactionId2edges,
-			Map<String, Set<String>> speciesId2reactions, Graph2D graph2d) {
+			Map<String, Set<String>> speciesId2reactions, 
+			Map<Node, NamedSBaseGlyph> node2glyph,
+			Graph2D graph2d) {
 		this.speciesId2nodes = speciesId2nodes;
 		this.compartmentId2nodes = compartmentId2nodes;
 		this.reactionId2edges = reactionId2edges;
 		this.reactionId2nodes = reactionId2nodes;
 		this.speciesId2reactions = speciesId2reactions;
+		this.node2glyph = node2glyph;
 		graph2D = graph2d;
 	}
 
@@ -123,6 +132,14 @@ public class LayoutGraph implements ILayoutGraph {
 	@Override
 	public Map<String, Set<String>> getSpeciesId2reactions() {
 		return speciesId2reactions;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.y.ILayoutGraph#node2speciesReferenceGlyph()
+	 */
+	@Override
+	public Map<Node, NamedSBaseGlyph> getNode2glyph() {
+		return node2glyph;
 	}
 	
 }

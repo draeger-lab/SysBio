@@ -152,6 +152,12 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	private Map<String, Set<String>> speciesId2reactions = new HashMap<String, Set<String>>();
 	
 	/**
+	 * Maps yfiles node to the represented SRG
+	 * TODO merge / replace with id2node map
+	 */
+	private Map<Node, NamedSBaseGlyph> node2glyph = new HashMap<Node, NamedSBaseGlyph>();
+	
+	/**
 	 * Set to hold all text glyphs which label a specific node.
 	 */
 	Set<TextGlyph> labelTextGlyphs;
@@ -207,7 +213,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		graph.setRealizer(ynode, nodeRealizer);
 		id2node.put(compartmentGlyph.getId(), ynode);
 		putInMapSet(compartmentId2Node, compartmentGlyph.getCompartment(), ynode);
-		
+		node2glyph.put(ynode, compartmentGlyph);
 		logger.fine(String.format("building compartment glyph id=%s\n\tbounding box=%s",
 				compartmentGlyph.getId(), nodeRealizer.getBoundingBox()));
 	}
@@ -258,6 +264,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		graph.setRealizer(ynode, nodeRealizer);
 		id2node.put(speciesGlyph.getId(), ynode);
 		putInMapSet(speciesId2Node, speciesGlyph.getSpecies(), ynode);
+		node2glyph.put(ynode, speciesGlyph);
 	}
 
 	/**
@@ -282,10 +289,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	 * @see de.zbit.sbml.layout.LayoutBuilder#buildConnectingArc(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph, org.sbml.jsbml.ext.layout.ReactionGlyph)
 	 */
 	@Override
-	public void buildConnectingArc(SpeciesReferenceGlyph srg, ReactionGlyph rg, double curveWidth) {
-		logger.fine(String.format("building arc srgId=%s to rgId=%s", srg.getId(), rg.getId()));
+	public void buildConnectingArc(SpeciesReferenceGlyph srg, ReactionGlyph reactionGlyph, double curveWidth) {
+		logger.fine(String.format("building arc srgId=%s to rgId=%s", srg.getId(), reactionGlyph.getId()));
 		
-		Node processNode = id2node.get(rg.getId());
+		Node processNode = id2node.get(reactionGlyph.getId());
 		SpeciesGlyph speciesGlyph = srg.getSpeciesGlyphInstance();
 		String speciesId = speciesGlyph.getSpecies();
 		Node speciesGlyphNode = id2node.get(srg.getSpeciesGlyph());
@@ -322,7 +329,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		
 		// dock correctly at process node
 		Point relativeDockingAtPN = (Point) srg.getUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT);
-		logger.fine(MessageFormat.format("srg={0} rg={1} dock relative at PN {2}", srg.getId(), rg.getId(), relativeDockingAtPN));
+		logger.fine(MessageFormat.format("srg={0} rg={1} dock relative at PN {2}", srg.getId(), reactionGlyph.getId(), relativeDockingAtPN));
 //		relativeDockingAtPN = new Point(0, 0, 0, relativeDockingAtPN.getLevel(), relativeDockingAtPN.getVersion());
 		if (relativeDockingAtPN != null) {
 			double x = relativeDockingAtPN.getX();
@@ -349,10 +356,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		}
 
 		Edge edge = graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
-		putInMapSet(reactionGlyphId2edges, rg.getId(), edge);
+		putInMapSet(reactionGlyphId2edges, reactionGlyph.getId(), edge);
 		if (neccessary(srg)) {
-			putInMapSet(speciesId2reactions, speciesId, rg.getReaction());
+			putInMapSet(speciesId2reactions, speciesId, reactionGlyph.getReaction());
 		}
+		node2glyph.put(processNode, reactionGlyph);
 	}
 
 	/**
@@ -636,6 +644,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 				reactionId2Node,
 				reactionId2Edge,
 				speciesId2reactions,
+				node2glyph,
 				graph);
 
 		return layoutGraph;
