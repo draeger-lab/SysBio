@@ -21,6 +21,7 @@ import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
+import y.view.LineType;
 import de.zbit.sbml.layout.SBGNArc;
 
 /**
@@ -44,7 +45,16 @@ public class YReversibleConsumption implements SBGNArc<EdgeRealizer> {
 	 */
 	@Override
 	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		return draw(curve);
+		EdgeRealizer edgeRealizer = draw(curve);
+		LineType currentLineType = edgeRealizer.getLineType();
+		LineType lineType = LineType.createLineType((float) lineWidth,
+				currentLineType.getEndCap(),
+				currentLineType.getLineJoin(),
+				currentLineType.getMiterLimit(),
+				currentLineType.getDashArray(),
+				currentLineType.getDashPhase());
+		edgeRealizer.setLineType(lineType);
+		return edgeRealizer;
 	}
 
 	/* (non-Javadoc)

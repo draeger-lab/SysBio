@@ -40,7 +40,7 @@ public class YConsumption implements Consumption<EdgeRealizer> {
 
 	@Override
 	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
+		EdgeRealizer edgeRealizer = draw(curve);
 		LineType currentLineType = edgeRealizer.getLineType();
 		LineType lineType = LineType.createLineType((float) lineWidth,
 				currentLineType.getEndCap(),
