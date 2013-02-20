@@ -24,6 +24,9 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 
 /**
+ * A {@link NodeRealizer} to display independent text (i.e. text which is not a
+ * label for a graphical object).
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

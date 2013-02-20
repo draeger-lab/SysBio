@@ -21,6 +21,7 @@ import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
+import y.view.LineType;
 import de.zbit.sbml.layout.Inhibition;
 
 /**
@@ -42,8 +43,15 @@ public class YInhibition implements Inhibition<EdgeRealizer> {
 
 	@Override
 	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
-		edgeRealizer.setSourceArrow(Arrow.T_SHAPE);
+		EdgeRealizer edgeRealizer = draw(curve);
+		LineType currentLineType = edgeRealizer.getLineType();
+		LineType lineType = LineType.createLineType((float) lineWidth,
+				currentLineType.getEndCap(),
+				currentLineType.getLineJoin(),
+				currentLineType.getMiterLimit(),
+				currentLineType.getDashArray(),
+				currentLineType.getDashPhase());
+		edgeRealizer.setLineType(lineType);
 		return edgeRealizer;
 	}
 

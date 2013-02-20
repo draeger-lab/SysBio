@@ -21,6 +21,7 @@ import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
+import y.view.LineType;
 import de.zbit.sbml.layout.Catalysis;
 
 /**
@@ -44,8 +45,15 @@ public class YCatalysis implements Catalysis<EdgeRealizer> {
 	 */
 	@Override
 	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
-		edgeRealizer.setSourceArrow(Arrow.TRANSPARENT_CIRCLE);
+		EdgeRealizer edgeRealizer = draw(curve);
+		LineType currentLineType = edgeRealizer.getLineType();
+		LineType lineType = LineType.createLineType((float) lineWidth,
+				currentLineType.getEndCap(),
+				currentLineType.getLineJoin(),
+				currentLineType.getMiterLimit(),
+				currentLineType.getDashArray(),
+				currentLineType.getDashPhase());
+		edgeRealizer.setLineType(lineType);
 		return edgeRealizer;
 	}
 
