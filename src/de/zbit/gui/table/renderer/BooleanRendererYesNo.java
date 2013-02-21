@@ -22,7 +22,7 @@ import javax.swing.table.TableCellRenderer;
 
 /**
  * A {@link TableCellRenderer} that can be used to render {@link Boolean}s
- * as <code>Yes</code> or <code>No</code>.
+ * as {@code Yes} or {@code No}.
  * @author Clemens Wrzodek
  * @version $Rev$
  */

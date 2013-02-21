@@ -427,8 +427,8 @@ public class MathUtils {
   }
 
   /**
-   * Returns the value at relative (percentage) index <code>quantilke</code>
-   * in the sorted list <code>values</code>.
+   * Returns the value at relative (percentage) index {@code quantilke}
+   * in the sorted list {@code values}.
    * @param values
    * @param quantile
    * @param listIsAlreadySorted in doubt, set to false.
@@ -619,8 +619,8 @@ public class MathUtils {
 
   /**
    * @param values any iterable number collection.
-   * @return minimum value in <code>values</code> or {@link Double#NaN}
-   * if <code>values</code> is {@code null} or contains no numbers.
+   * @return minimum value in {@code values} or {@link Double#NaN}
+   * if {@code values} is {@code null} or contains no numbers.
    */
   public static <T extends Number> double min(Iterable<T> values) {
     if (values == null) return Double.NaN;
@@ -635,8 +635,8 @@ public class MathUtils {
 
   /**
    * @param values any iterable number collection.
-   * @return maximum value in <code>values</code> or {@link Double#NaN}
-   * if <code>values</code> is {@code null} or contains no numbers.
+   * @return maximum value in {@code values} or {@link Double#NaN}
+   * if {@code values} is {@code null} or contains no numbers.
    */
   public static <T extends Number> double max(Iterable<T> values) {
     if (values == null) return Double.NaN;

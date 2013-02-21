@@ -282,8 +282,8 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
 	 * @throws IOException
 	 *         If the {@link URL} to the update is incorrect or if there is
 	 *         neither a file with the name
-	 *         <code>releaseNotes&lt;latestVersion&gt;.htm</code> or
-	 *         <code>releaseNotes&lt;latestVersion&gt;.html</code>.
+	 *         {@code releaseNotes&lt;latestVersion&gt;.htm} or
+	 *         {@code releaseNotes&lt;latestVersion&gt;.html}.
 	 */
 	public boolean checkForUpdate() throws IOException {
 		URL url = new URL(urlPrefix + "latest.txt");

@@ -767,7 +767,7 @@ public class Pathway {
    * before calling this method.</p> 
    * @param rc
    * @param supressWarning
-   * @param manag for qerying synonyms of <code>rc</code>
+   * @param manag for qerying synonyms of {@code rc}
    * @return
    * @see #getEntryForReactionComponent(ReactionComponent)
    */
@@ -821,13 +821,13 @@ public class Pathway {
   /**
    * Sometimes, {@link #getEntriesForName(String)} returnes multiple results.
    * This means, that multiple entries in the source pathway are available,
-   * in which the given <code>keggName</code> is contained.
+   * in which the given {@code keggName} is contained.
    * 
    * This method checks, if there is a unique entry, describing only the
-   * <code>keggName</code> and returns this. Else, it returns any of the entries.
+   * {@code keggName} and returns this. Else, it returns any of the entries.
    * The results are reported at log level fine.
    * @param keggName
-   * @param c all entries matching to <code>keggName</code>.
+   * @param c all entries matching to {@code keggName}.
    * See {@link #getEntriesForName(String)} to generate this collection
    * @return any or best matching entry.
    */
@@ -1050,7 +1050,7 @@ public class Pathway {
   
   /**
    * Actually just for path2models: returns a compounds preview image from ChEBI
-   * instead of using the KEGG compound image, if {@code useChEBI} is {@code TRUE}.
+   * instead of using the KEGG compound image, if {@code useChEBI} is {@code true}.
    * @see #getCompoundPreviewPicture(String, KeggInfos)
    * @param ko_id
    * @param infos
@@ -1115,8 +1115,8 @@ public class Pathway {
   /**
    * See {@link #getReactionPreviewPicture(String)}.
    * @param ko_id
-   * @param withIMGtag if <code>TRUE</code>, the URL will be embedded into an HTML
-   * image tag. If <code>FALSE</code>, the raw URL will be returned.
+   * @param withIMGtag if {@code true}, the URL will be embedded into an HTML
+   * image tag. If {@code false}, the raw URL will be returned.
    * @return
    */
   public static String getReactionPreviewPicture(String ko_id, boolean withIMGtag) {

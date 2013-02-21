@@ -37,7 +37,7 @@ import java.util.Map;
 public class ArrayUtils {
 
   /**
-   * Converts a list of Double values to a <code>double[]</code> array.
+   * Converts a list of Double values to a {@code double[]} array.
    * 
    * @param list
    * @return
@@ -112,7 +112,7 @@ public class ArrayUtils {
   /**
    * @param arr
    * @param s
-   * @return true if <code>s</code> is in <code>arr</code>.
+   * @return true if {@code s} is in {@code arr}.
    */
   public static <T> boolean contains(T[] arr, T s) {
     return indexOf(arr, s)>=0;
@@ -123,15 +123,15 @@ public class ArrayUtils {
    * such that arr[i].equals(s) OR arr[i].equalsIgnoreCase(s).
    * @param arr
    * @param s
-   * @return true if <code>s</code> is in <code>arr</code>.
+   * @return true if {@code s} is in {@code arr}.
    */
   public static boolean containsIgnoreCase(String[] arr, String s) {
     return indexOfIgnoreCase(arr, s)>=0;
   }
   
   /**
-   * Checks if any element from <code>arr</code>toString()
-   * is containe in <code>s</code>.
+   * Checks if any element from {@code arr}toString()
+   * is containe in {@code s}.
    * @param <T>
    * @param arr
    * @param s
@@ -464,8 +464,8 @@ public class ArrayUtils {
    * @param rangeStart index to place as first element in the resulting list
    * @param rangeEnde stop placing further items in the list, when this
    * index is reached
-   * @return array, containing all elements of <code>add</code> between
-   * <code>rangeStart</code> and <code>rangeEnde</code> in preserved order.
+   * @return array, containing all elements of {@code add} between
+   * {@code rangeStart} and {@code rangeEnde} in preserved order.
    */
   @SuppressWarnings("unchecked")
   public static <T> T[] toSubArray(T[] arr, int rangeStart, int rangeEnde) {
@@ -482,8 +482,8 @@ public class ArrayUtils {
    * @param rangeStart index to place as first element in the resulting list
    * @param rangeEnde stop placing further items in the list, when this
    * index is reached
-   * @return list, containing all elements of <code>add</code> between
-   * <code>rangeStart</code> and <code>rangeEnde</code> in preserved order.
+   * @return list, containing all elements of {@code add} between
+   * {@code rangeStart} and {@code rangeEnde} in preserved order.
    */
   public static <T> List<T> asList(T[] arr, int rangeStart, int rangeEnde) {
     return Arrays.asList(toSubArray(arr, rangeStart, rangeEnde));
@@ -532,7 +532,7 @@ public class ArrayUtils {
   }
 
   /**
-   * Merges all <code>collections</code> into <code>addHere</code>.
+   * Merges all {@code collections} into {@code addHere}.
    * @param addHere
    * @param collections
    */

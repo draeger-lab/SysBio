@@ -38,10 +38,10 @@ public interface KEGGtranslator <InternalOutputFormatDataStructure> {
   
   /**
    * This method converts a given KGML file into the
-   * specified <code>InternalOutputFormatDataStructure</code>.
+   * specified {@code InternalOutputFormatDataStructure}.
    * 
    * @param f the input file.
-   * @return the generated document in <code>InternalOutputFormatDataStructure</code>.
+   * @return the generated document in {@code InternalOutputFormatDataStructure}.
    * @throws IOException if the input file is not readable.
    */
   public InternalOutputFormatDataStructure translate(File f) throws IOException;

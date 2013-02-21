@@ -287,7 +287,7 @@ public class OrganismSelector extends JPanel {
   }
   
   /**
-   * Get organisms from <code>onlyShowThese</code>.
+   * Get organisms from {@code onlyShowThese}.
    * @param onlyShowThese
    * @return HashMap<Abbreviation, Description>. E.g. Key: "hsa", Value: "Homo sapiens (human)"
    */

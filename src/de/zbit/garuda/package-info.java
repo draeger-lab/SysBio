@@ -31,7 +31,13 @@
  * 	public void run() {
  * 		try {
  * 			GarudaSoftwareBackend garudaBackend = new GarudaSoftwareBackend(
- * 				(UserInterface) gui);
+ *        uuid, // a unique identifier for your gadget
+ * 				(UserInterface) gui, // the user interface of the gadget
+ *        icon, // an icon of size 128x128 for the Garuda dash-board
+ *        description, // a few sentences describing the program
+ *        keywords, // a list of Strings giving the categories for the gadget
+ *        screenshots // a list of example images of the gadget
+ *      );
  * 			garudaBackend.addInputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
  * 			// ... as many additional input file formats as supported
  * 			garudaBackend.addOutputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
@@ -70,12 +76,12 @@
  * Your user interface could provide a specialized {@link javax.swing.JMenu} for
  * interaction with Garuda. To this end, the
  * {@link de.zbit.garuda.GarudaGUIfactory} provides the method
- * {@link de.zbit.garuda.GarudaGUIfactory#createGarudaMenu(java.awt.event.ActionListener)}
- * . You only have to pass some {@link java.awt.event.ActionListener} to this
+ * {@link de.zbit.garuda.GarudaGUIfactory#createGarudaMenu(java.awt.event.ActionListener)}.
+ * You only have to pass some {@link java.awt.event.ActionListener} to this
  * method and it will create a {@link javax.swing.JMenu} providing access to
  * Garuda functions.
  * <p>
- * However, before you can react to action events comming from the Garuda Core,
+ * However, before you can react to action events coming from the Garuda Core,
  * you'll have to register the {@link de.zbit.garuda.GarudaSoftwareBackend} in
  * your application: As any instance of {@link de.zbit.UserInterface}, also your
  * one must extend {@link PropertyChangeListener}. In order to successfully 
@@ -87,7 +93,7 @@
  * 	if (propName.equals(GarudaSoftwareBackend.GARUDA_ACTIVATED)) {
  * 		this.garudaBackend = (GarudaSoftwareBackend) evt.getNewValue();
  * 		if (supportedFileOpened) {
- * 			enableGarudaInMenuBar();
+ * 			GUITools.setEnabled(true, getJMenuBar(), getJToolBar(), GarudaActions.SENT_TO_GARUDA);
  * 		}
  * 	} else {
  * 		// ... do whatever else could be necessary for your program.
@@ -100,8 +106,7 @@
  * 
  * How to send a file to another Garuda-enabled software:
  * <pre>
- * GarudaFileSender sender = new GarudaFileSender(parentComponent, garudaBackend,
- * 	file);
+ * GarudaFileSender sender = new GarudaFileSender(parentComponent, garudaBackend, file, fileType);
  * sender.execute();
  * </pre>
  * This example will open a {@link javax.swing.JOptionPane} displaying
@@ -111,14 +116,15 @@
  * {@link java.io.File} to that program. Note that it could be necessary to
  * create a temporary {@link java.io.File} and saving the current document from
  * your software to this {@link java.io.File} before sending it to the Garuda
- * Core.
+ * Core. Here, {@code fileType} is a String giving, e.g., &quot;SBML&quot;,
+ * giving the exact type of file to be sended to other gadgets.
  * <p>
  * In order to sent a file to other Garuda-enabled tools, you will have to add
  * some buttons or menu items to your application. This can, for instance, be
  * done by using the {@link de.zbit.garuda.GarudaGUIfactory}. The action to sent
  * a file can be performed by using the {@link de.zbit.garuda.GarudaFileSender}.
  * <p>
- * For localization support you can find an XML file containg several useful
+ * For localization support you can find an XML file containing several useful
  * entries in the Garuda resource folder. This folder also contains Garuda icons
  * in several sizes. These icons and also the localization are automatically
  * linked to {@link de.zbit.garuda.GarudaActions} and therefore already used
@@ -126,7 +132,8 @@
  * {@link de.zbit.garuda.GarudaGUIfactory#createGarudaMenu(java.awt.event.ActionListener)}.
  * 
  * @author Andreas Dr&auml;ger
- * @version $Rev$
+ * @version $Rev: 1158$
  */
 package de.zbit.garuda;
+
 

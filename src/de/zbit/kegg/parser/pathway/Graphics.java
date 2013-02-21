@@ -474,7 +474,7 @@ public class Graphics {
    * Creates a new graphics object, that is suitable for compounds
    * or small molecules. 
    * @param name
-   * @return {@link Graphics} object with the given <code>name</code>.
+   * @return {@link Graphics} object with the given {@code name}.
    */
   public static Graphics createGraphicsForCompound(String name) {
     Graphics g = new Graphics(name);
@@ -489,7 +489,7 @@ public class Graphics {
    * Creates a new graphics object, that is suitable for
    * Pathway References. 
    * @param name
-   * @return {@link Graphics} object with the given <code>name</code>.
+   * @return {@link Graphics} object with the given {@code name}.
    */
   public static Graphics createGraphicsForPathwayReference(String name) {
     Graphics g = new Graphics(name);
@@ -504,7 +504,7 @@ public class Graphics {
    * Creates a new graphics object, that is suitable for
    * Group nodes, i.e., complexes.
    * @param name
-   * @return {@link Graphics} object with the given <code>name</code>.
+   * @return {@link Graphics} object with the given {@code name}.
    */
   public static Graphics createGraphicsForGroupOrComplex(String name) {
     Graphics g = new Graphics(name);
@@ -518,7 +518,7 @@ public class Graphics {
    * Creates a new graphics object, that is suitable for
    * proteins that are really contained in the organism (!= orthologs!!!).
    * @param name
-   * @return {@link Graphics} object with the given <code>name</code>.
+   * @return {@link Graphics} object with the given {@code name}.
    */
   public static Graphics createGraphicsForProtein(String name) {
     Graphics g = new Graphics(name);

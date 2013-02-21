@@ -469,7 +469,7 @@ public class SBPreferences implements Map<Object, Object> {
 	 * configured to use these as default values for the argument holders and they
 	 * are stored as default values in the given {@link SBProperties} object. 
 	 * Also, the mapping of {@link Option}s to their argument holder is stored in
-	 * the given <code>options</code> map.
+	 * the given {@code options} map.
 	 * 
 	 * @param parser the {@link ArgParser} to be configured
 	 * @param options a mapping from {@link Option}s to their argument holders
@@ -616,8 +616,8 @@ public class SBPreferences implements Map<Object, Object> {
 	
 	/**
 	 * Generates a usage/synopsis string for the given mainClass. Looks if the
-	 * class is inside a jar. If yes, <code>java -jar [NAME].jar</code> is the usage string.
-	 * Else <code>java package.ClassName</code> is the usage string.
+	 * class is inside a jar. If yes, {@code java -jar [NAME].jar} is the usage string.
+	 * Else {@code java package.ClassName} is the usage string.
 	 * 
 	 * @param mainClass
 	 *        of your project
@@ -852,6 +852,7 @@ public class SBPreferences implements Map<Object, Object> {
 	public SBPreferences(Class<? extends KeyProvider> keyProvider) {
 		this.keyProvider = keyProvider;
 		this.prefs = Preferences.userNodeForPackage(keyProvider);
+		logger.fine("Loading preferences for " + keyProvider.getName() + ": " + prefs.absolutePath());
 		this.defaults = loadDefaults(keyProvider);
 		if (clean) {
 			this.cleanUserPrefs();
@@ -1621,7 +1622,7 @@ public class SBPreferences implements Map<Object, Object> {
 	
 	/**
 	 * Same as {@link #save(Properties)}, but only stores {@link Properties}
-	 * from <code>props</code>, that are contained in the {@link #keyProvider}!
+	 * from {@code props}, that are contained in the {@link #keyProvider}!
 	 * @param props
 	 * @throws BackingStoreException
 	 */

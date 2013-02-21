@@ -545,7 +545,7 @@ public class Utils {
    * @param stringWithMultipleNumbers e.g. "HSA: 1026(CDKN1A)\nPTR: 747442(CDKN1A)"
    * @param leftOfEachNumber a string that must be left of each number
    * @param rightOfEachNumber a string that must be right of each number
-   * @return in the example above, if (<code>leftOfEachNumber</code>=" ") int[]{1026, 747442}
+   * @return in the example above, if ({@code leftOfEachNumber}=" ") int[]{1026, 747442}
    */
   public static List<Integer> getNumbersFromString(String stringWithMultipleNumbers, String leftOfEachNumber, String rightOfEachNumber) {
     List<Integer> ret = new ArrayList<Integer>();
@@ -609,9 +609,9 @@ public class Utils {
   }
   
   /**
-   * Returns a {@link String} from <code>arr</code> that is
-   * equal (or equal ignoring case if <code>ignoreCase</code>
-   * is true) to <code>s</code>.
+   * Returns a {@link String} from {@code arr} that is
+   * equal (or equal ignoring case if {@code ignoreCase}
+   * is true) to {@code s}.
    * <p>Note: This is usefull, either for
    * <br>-replacing a string pointer with another pointer
    * that is already available OR
@@ -694,8 +694,8 @@ public class Utils {
   
   /**
    * The reverse of {@link #addToMapOfSets(Map, Object, Object)}.
-   * Removes a value (i.e. <code>listItem</code>) from the sets
-   * of all given <code>keys</code>. Deletes keys if the corresponding
+   * Removes a value (i.e. {@code listItem}) from the sets
+   * of all given {@code keys}. Deletes keys if the corresponding
    * sets are empty after the removal.
    * @param <K>
    * @param <V>

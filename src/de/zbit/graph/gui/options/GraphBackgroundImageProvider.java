@@ -95,7 +95,7 @@ public interface GraphBackgroundImageProvider {
      * @param imagePath
      * @param brightenImagePercentage optional parameter that is used to
      * brighten the image (percentage 0 to 100). Set to 0 to disable.
-     * @param greyscale <code>TRUE</code> if the image should be 
+     * @param greyscale {@code true} if the image should be 
      * converted to a greyscale image.
      * @return
      */
@@ -129,7 +129,7 @@ public interface GraphBackgroundImageProvider {
      * background image for the last translated KGML-formatted pathway.
      * @param translator the translator used for translation
      * @param brightenImagePercentage
-     * @param greyscale <code>TRUE</code> if the image should be converted to a greyscale image.
+     * @param greyscale {@code true} if the image should be converted to a greyscale image.
      * @return
      */
     public static GraphBackgroundImageProvider createDynamicTranslatorImageProvider(final int brightenImagePercentage, final boolean greyscale) {

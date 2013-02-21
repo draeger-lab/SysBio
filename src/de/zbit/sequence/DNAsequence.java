@@ -172,7 +172,7 @@ public class DNAsequence implements java.io.Serializable, Comparable<DNAsequence
   /**
    * Reverse method for {@link #getDNAcharacter(boolean, boolean)}.
    * @param dna
-   * @return binary pair, coding for given <code>dna</code> character.
+   * @return binary pair, coding for given {@code dna} character.
    * @throws IOException if a character other than a,c,g or t occurs.
    */
   private boolean[] getBinaryPair(char dna) throws IOException {

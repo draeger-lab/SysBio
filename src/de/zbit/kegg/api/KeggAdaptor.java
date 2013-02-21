@@ -199,11 +199,11 @@ public class KeggAdaptor {
    * Considering the case once and than calling this method internally is faster
    * than always performing the case-conversion.
    * @param completeOriginalString original cased complete string
-   * @param uCaseComplete upper-cased <code>completeOriginalString</code>
+   * @param uCaseComplete upper-cased {@code completeOriginalString}
    * @param startsWith upper-cased startswith string
    * @param endsWith upper-cased endswith string
-   * @return String from <code>completeOriginalString</code> between <code>startsWith</code>
-   * and <code>startsWith</code> (or to the end, if startsWith is null).
+   * @return String from {@code completeOriginalString} between {@code startsWith}
+   * and {@code startsWith} (or to the end, if startsWith is null).
    * @see #extractInfo(String, String)
    */
   static String extractInfoCaseSensitive(String completeOriginalString, String uCaseComplete, String startsWith, String endsWith) {

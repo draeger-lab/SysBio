@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+    $Id$
+    $URL$
+    ---------------------------------------------------------------------
+    This file is part of the SysBio API library.
+
+    Copyright (C) 2009-2013 by the University of Tuebingen, Germany.
+
+    This library is free software; you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as
+    published by the Free Software Foundation. A copy of the license
+    agreement is provided in the file named "LICENSE.txt" included with
+    this software distribution and also available online as
+    http://www.gnu.org/licenses/lgpl-3.0-standalone.html.
+    ---------------------------------------------------------------------
+    Version: $Rev$
+  
+  	This configuration provides locale-dependent names to be displayed when
+  	launching an application.
+  	
+  	Note that String arrays can be stored by enclosing the Strings in square
+  	brackets and using the semicolon as separator between the items.
+  </comment>
+  
+  <entry key="SCANNING_CMD_ARGS">Scanning command-line arguments...</entry>
+  <entry key="COULD_NOT_INITIALIZE_GUI">Could not initialize graphical user interface.</entry>
+  <entry key="LAUNCHING_CMD_MODE">Launching command-line mode of {0}.</entry>
+  <entry key="NO_GUI_SUPPORTED">No graphical user interface supported for {0} version {1}.</entry>
+  <entry key="INCOMPLETE_CMD_ARG_LIST">Incomplete list of command-line arguments. Try to restart {0} version {1} with the --help option</entry>
+  <entry key="PROGRAM_NAME_AND_VERSION">{0} version {1}</entry>
+  <entry key="COPYRIGHT_HOLDER">Copyright © {0,number,#}-{1,number,#} {2}</entry>
+  <entry key="PROVIDER">{0},
+{1}</entry>
+  <entry key="ORGANIZATION">University of Tuebingen</entry>
+  <entry key="INSTITUTE">Center for Bioinformatics Tuebingen (ZBIT)</entry>
+  <entry key="COPYRIGHT_MESSAGE">
+{0}
+{1}.
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome
+to redistribute it under certain conditions.
+</entry>
+  <entry key="LINK_TO_LICENSE_FILE">See {0}.</entry>
+  
+</properties>

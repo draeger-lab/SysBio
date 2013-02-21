@@ -96,7 +96,7 @@ public class ExpandablePanel extends JPanel implements MouseListener {
    * Creates a new panel that may be expanded or collapsed at a
    * mouse click on a header.
    * @param label label of this {@link #ExpandablePanel(String, JPanel)}. This is
-   * the text, the user may click on to expand or collapse the <code>panel</code>.
+   * the text, the user may click on to expand or collapse the {@code panel}.
    * @param panel the panel to collapse of expand.
    */
   public ExpandablePanel(String label, JPanel panel) {
@@ -106,7 +106,7 @@ public class ExpandablePanel extends JPanel implements MouseListener {
    * Creates a new panel that may be expanded or collapsed at a
    * mouse click on a header.
    * @param label label of this {@link #ExpandablePanel(String, JPanel)}. This is
-   * the text, the user may click on to expand or collapse the <code>panel</code>.
+   * the text, the user may click on to expand or collapse the {@code panel}.
    * @param panel the panel to collapse of expand.
    * @param collapsed set the initial state to collapsed ({@code true})
    * or expanded ({@code false}).
@@ -118,11 +118,11 @@ public class ExpandablePanel extends JPanel implements MouseListener {
    * Creates a new panel that may be expanded or collapsed at a
    * mouse click on a header.
    * @param label label of this {@link #ExpandablePanel(String, JPanel)}. This is
-   * the text, the user may click on to expand or collapse the <code>panel</code>.
+   * the text, the user may click on to expand or collapse the {@code panel}.
    * @param panel the panel to collapse of expand.
    * @param collapsed set the initial state to collapsed ({@code true})
    * or expanded ({@code false}).
-   * @param packParentWindow invoke the <code>pack()</code> method on the
+   * @param packParentWindow invoke the {@code pack()} method on the
    * parent window.
    */
   public ExpandablePanel(String label, JPanel panel, boolean collapsed, boolean packParentWindow) {
@@ -348,7 +348,7 @@ public class ExpandablePanel extends JPanel implements MouseListener {
   
   
   /**
-   * @return true if the <code>pack()</code> method on the
+   * @return true if the {@code pack()} method on the
    * parent window is invoked upon state change.
    */
   public boolean isPackParentWindow() {
@@ -356,7 +356,7 @@ public class ExpandablePanel extends JPanel implements MouseListener {
   }
   
   /**
-   * @param packParentWindow if true, invokes the <code>pack()</code>
+   * @param packParentWindow if true, invokes the {@code pack()}
    * method on the parent window upon state change.
    */
   public void setPackParentWindow(boolean packParentWindow) {
@@ -365,7 +365,7 @@ public class ExpandablePanel extends JPanel implements MouseListener {
   
   
   /**
-   * Adds a listener for <code>TreeExpansion</code> events.
+   * Adds a listener for {@code TreeExpansion} events.
    *
    * @param tel a TreeExpansionListener that will be notified when
    * a tree node is expanded or collapsed (a "negative expansion")
@@ -384,18 +384,18 @@ public class ExpandablePanel extends JPanel implements MouseListener {
   }
   
   /**
-   * Removes a listener for <code>TreeExpansion</code> events.
-   * @param tel the <code>TreeExpansionListener</code> to remove
+   * Removes a listener for {@code TreeExpansion} events.
+   * @param tel the {@code TreeExpansionListener} to remove
    */
   public void removeTreeExpansionListener(TreeExpansionListener tel) {
     listenerList.remove(TreeExpansionListener.class, tel);
   }
   
   /**
-   * Returns an array of all the <code>TreeExpansionListener</code>s added
+   * Returns an array of all the {@code TreeExpansionListener}s added
    * to this JTree with addTreeExpansionListener().
    *
-   * @return all of the <code>TreeExpansionListener</code>s added or an empty
+   * @return all of the {@code TreeExpansionListener}s added or an empty
    *         array if no listeners have been added
    */
   public TreeExpansionListener[] getTreeExpansionListeners() {

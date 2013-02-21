@@ -186,7 +186,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   }
   
   /**
-   * Returns the position where <code>s</code> should
+   * Returns the position where {@code s} should
    * be inserted.
    * @param s
    * @return
@@ -234,7 +234,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   }
   
   /**
-   * Adds <code>s</code> to this list if and only if it is not already
+   * Adds {@code s} to this list if and only if it is not already
    * in the list. This is a more efficient method than writing
    * <pre>if (!contains(s)) add(s)</pre>
    * <p>Compares the elements based on the compareTo method, and uses
@@ -257,7 +257,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   }
   
   /**
-   * Performs a <code>compareTo==0</code> check with the implemented special treatment
+   * Performs a {@code compareTo==0} check with the implemented special treatment
    * of arrays and using the compareTo, not the equals method!
    * @param element1
    * @param element2

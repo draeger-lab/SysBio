@@ -755,8 +755,8 @@ public class DatabaseIdentifiers {
    * corresponding database.
    * @param database
    * @param id
-   * @return {@code true} if the <code>id</code> matches the regular
-   * expression of the <code>database</code>.
+   * @return {@code true} if the {@code id} matches the regular
+   * expression of the {@code database}.
    */
   public static boolean checkID(IdentifierDatabases database, String id) {
     if (id==null) {

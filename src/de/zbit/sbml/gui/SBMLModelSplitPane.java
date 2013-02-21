@@ -16,6 +16,7 @@
  */
 package de.zbit.sbml.gui;
 
+import java.awt.Point;
 import java.text.MessageFormat;
 import java.util.logging.Logger;
 
@@ -97,6 +98,8 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	protected JScrollPane createRightComponent(SBase sbase) {
 		SBasePanel sbPanel = new SBasePanel(sbase, namesIfAvailalbe, renderer);
 		JScrollPane scroll = new JScrollPane(sbPanel);
+		scroll.setBorder(null);
+		scroll.getViewport().setViewPosition(new Point(0, 0));
 		return scroll;
 	}
 	

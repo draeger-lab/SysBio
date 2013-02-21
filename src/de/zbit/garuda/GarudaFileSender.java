@@ -29,10 +29,9 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import jp.sbi.garuda.platform.commons.Software;
+import jp.sbi.garuda.platform.commons.Gadget;
 import jp.sbi.garuda.platform.commons.exception.NetworkException;
 import jp.sbi.garuda.platform.commons.net.GarudaConnectionNotInitializedException;
-import de.zbit.garuda.GarudaSoftwareBackend;
 import de.zbit.gui.GUITools;
 import de.zbit.io.FileTools;
 import de.zbit.util.ResourceManager;
@@ -43,10 +42,10 @@ import de.zbit.util.ResourceManager;
  * successful.
  * 
  * @author Andreas Dr&auml;ger
- * @version $Rev$
+ * @version $Rev: 1158$
  * @since 1.1
  */
-public class GarudaFileSender extends SwingWorker<Void, Software> {
+public class GarudaFileSender extends SwingWorker<Void, Gadget> {
 	
 	/**
 	 * Localization support.
@@ -54,11 +53,12 @@ public class GarudaFileSender extends SwingWorker<Void, Software> {
 	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels");
 	
 	/**
-	 * The GUI component acting as the parent for {@link JOptionPane}s to be opened by this class.
+	 * The GUI component acting as the parent for {@link JOptionPane}s to be
+	 * opened by this class.
 	 */
 	private Component parent;
 	/**
-	 * The backend to communicate with the Garuda Core.
+	 * The back-end to communicate with the Garuda Core.
 	 */
 	private GarudaSoftwareBackend garudaBackend;
 	/**
@@ -67,7 +67,8 @@ public class GarudaFileSender extends SwingWorker<Void, Software> {
 	private File file;
 
 	/**
-	 * The type of accepted files that the filtering of the list will be depended upon.
+	 * The type of accepted files that the filtering of the list will be depended
+	 * upon.
 	 */
 	private String fileType;
 
@@ -107,8 +108,8 @@ public class GarudaFileSender extends SwingWorker<Void, Software> {
 					garudaBackend.removePropertyChangeListener(GarudaSoftwareBackend.GOT_SOFTWARES_PROPERTY_CHANGE_ID, this);
 					
 					@SuppressWarnings("unchecked")
-					List<Software> listOfCompatibleSoftare = (List<Software>) evt.getNewValue();
-					publish(listOfCompatibleSoftare.toArray(new Software[] {}));
+					List<Gadget> listOfCompatibleSoftare = (List<Gadget>) evt.getNewValue();
+					publish(listOfCompatibleSoftare.toArray(new Gadget[] {}));
 				}
 			}
 
@@ -121,7 +122,7 @@ public class GarudaFileSender extends SwingWorker<Void, Software> {
 	 * @see javax.swing.SwingWorker#process(java.util.List)
 	 */
 	@Override
-	protected void process(List<Software> listOfCompatibleSoftare) {
+	protected void process(List<Gadget> listOfCompatibleSoftare) {
 		if (listOfCompatibleSoftare.isEmpty()) {
 			JOptionPane.showMessageDialog(parent, MessageFormat.format(
 				bundle.getString("NO_COMPATIBLE_SOFTWARE_FOUND"),
@@ -129,8 +130,8 @@ public class GarudaFileSender extends SwingWorker<Void, Software> {
 		} else {
 			String softwareNames[] = new String[listOfCompatibleSoftare.size()];
 			int i = 0;
-			for (Software software : listOfCompatibleSoftare) {
-				softwareNames[i++] = software.getName() + ' ' + software.getVersion();
+			for (Gadget software : listOfCompatibleSoftare) {
+				softwareNames[i++] = software.getName();
 			}
 			JComboBox compatibleSoftwaresComboBox = new JComboBox(softwareNames);
 			compatibleSoftwaresComboBox.setPreferredSize(new Dimension(150, 20));

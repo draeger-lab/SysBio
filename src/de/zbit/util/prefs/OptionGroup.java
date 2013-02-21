@@ -82,7 +82,7 @@ public class OptionGroup<T> implements ActionCommand,
 	 * @param bundle
 	 *        This {@link ResourceBundle} looks for the optionGroupId as key for a
 	 *        human-readable display name. It also looks for the key
-	 *        <code>optionGroupId + "_TOOLTIP"</code> in order to obtain a more
+	 *        {@code optionGroupId + "_TOOLTIP"} in order to obtain a more
 	 *        detailed description of this option. If no such description can be
 	 *        found, it tries to split the human-readable name connected with the
 	 *        optionGroupId using the character ';' (semicolon). If the
@@ -112,7 +112,7 @@ public class OptionGroup<T> implements ActionCommand,
 	   * @param bundle
 	   *        This {@link ResourceBundle} looks for the optionGroupId as key for a
 	   *        human-readable display name. It also looks for the key
-	   *        <code>optionGroupId + "_TOOLTIP"</code> in order to obtain a more
+	   *        {@code optionGroupId + "_TOOLTIP"} in order to obtain a more
 	   *        detailed description of this option. If no such description can be
 	   *        found, it tries to split the human-readable name connected with the
 	   *        optionGroupId using the character ';' (semicolon). If the

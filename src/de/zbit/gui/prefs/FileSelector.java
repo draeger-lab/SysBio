@@ -477,7 +477,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 	/**
 	 * Creates a new {@link FileSelector} of the desired type, i.e., to
 	 * {@link Type#OPEN} or {@link Type#SAVE}, for directories. The base directory
-	 * of browsing will be given by the {@link System} property <code>user.dir</code>.
+	 * of browsing will be given by the {@link System} property {@code user.dir}.
 	 * 
 	 * @param type
 	 */
@@ -488,7 +488,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 	/**
 	 * Creates a new {@link FileSelector} of the desired type, i.e., to
 	 * {@link Type#OPEN} or {@link Type#SAVE}, whose selection starts at the
-	 * directory specified by the {@link System} property <code>user.dir</code> as the base
+	 * directory specified by the {@link System} property {@code user.dir} as the base
 	 * directory. The filters can be null or empty. In this case this object will
 	 * allow to select directories only.
 	 * 
@@ -594,7 +594,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 	 * {@link FileSelector} has been configured to select files, or the selected
 	 * directory itself otherwise. If no change has been performed by the user,
 	 * the returned directory path is the one that was specified when initializing
-	 * this object, i.e., either given by the {@link System} property <code>user.dir</code>
+	 * this object, i.e., either given by the {@link System} property {@code user.dir}
 	 * or directly specified.
 	 * 
 	 * @return the baseDir
@@ -824,7 +824,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
 	
 	/**
 	 * Define the directory where the selection should be start. By default this
-	 * will be given by the {@link System} property <code>user.dir</code>, i.e., the working
+	 * will be given by the {@link System} property {@code user.dir}, i.e., the working
 	 * directory of this program.
 	 * 
 	 * @param baseDir

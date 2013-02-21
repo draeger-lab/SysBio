@@ -400,8 +400,8 @@ public class LayoutHelper {
 	}
 	
 	/**
-	 * Add a {@link JLabel} with text <code>label</code> and width
-	 * <code>width</code> to the current {@link Container}.
+	 * Add a {@link JLabel} with text {@code label} and width
+	 * {@code width} to the current {@link Container}.
 	 * @param label
 	 * @param width
 	 */

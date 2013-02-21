@@ -255,7 +255,7 @@ public class PreferencesPanelDependencies {
    * @param c any {@link Container}
    * @return a set of all {@link JComponent}s, implementing the
    * {@link JComponentForOption} interface that are in the given
-   * {@link Container}<code>c</code> or any of its sub-containers.
+   * {@link Container}{@code c} or any of its sub-containers.
    */
   public static Set<JComponentForOption> getAllJComponentsForOptions(Container c) {
     Set<JComponentForOption> list = new HashSet<JComponentForOption>();
@@ -277,15 +277,15 @@ public class PreferencesPanelDependencies {
   }
   
   /**
-   * Processes the dependencies of the <code>dependant</code> and adds listeners
+   * Processes the dependencies of the {@code dependant} and adds listeners
    * to all dependent JComponents from the given list that automatically enable
-   * or disable the <code>dependant</code>, based on the current value of the
+   * or disable the {@code dependant}, based on the current value of the
    * dependent JComponents.
    * 
    * @param jcomponents
-   *        components that control <code>dependant</code>
+   *        components that control {@code dependant}
    * @param dependant
-   *        option and component that depends on <code>jcomponents</code>.
+   *        option and component that depends on {@code jcomponents}.
    */
   private void createDependencyActionListeners(Iterable<? extends JComponentForOption> jcomponents, final JComponentForOption dependant) {
     

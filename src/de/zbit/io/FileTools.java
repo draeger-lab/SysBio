@@ -75,7 +75,7 @@ public class FileTools {
    * @param localFile
    * @param sourcePackage - if the file is inside a jar, searches for the file,
    * relative to the given sourcePackage.
-   * @return true if and only if the file or URL denoted by <code>localFile</code>
+   * @return true if and only if the file or URL denoted by {@code localFile}
    * is available and contains data.
    */
   public static boolean checkInputResource(String localFile, Class<?> sourcePackage) {
@@ -102,7 +102,7 @@ public class FileTools {
   
   /**
    * @param name any filename
-   * @return file extension of <code>name</code>
+   * @return file extension of {@code name}
    */
   public static String getExtension(String name) {
     if ((name != null) && (name.length() > 0)) {

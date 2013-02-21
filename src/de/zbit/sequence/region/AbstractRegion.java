@@ -186,7 +186,7 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
   }
   
   /**
-   * Get all regions from <code>all</code>, overlapping with <code>intersectWith</code>. 
+   * Get all regions from {@code all}, overlapping with {@code intersectWith}. 
    * <p><b>This is for unsorted lists, please use {@link #getAllIntersections(List, Region, boolean)}
    * for sorted lists!</b></p>
    * @param all
@@ -217,7 +217,7 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
    * If it is not sorted, the results are undefined.</p>
    * 
    * <p>NOTE: If you itend to call this method multiple times, it is much faster to calculate
-   * the maximum region length of all regions in <code>allRegionsSorted</code> iteratively
+   * the maximum region length of all regions in {@code allRegionsSorted} iteratively
    * and use {@link #getAllIntersections(List, Region, boolean, int)}</p>
    *  
    * @param <T> Actual implementing class
@@ -242,7 +242,7 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
    * and secondary by {@link #getStart()} prior to making this call (see {@link AbstractRegion#getComparator()}.
    * If it is not sorted, the results are undefined.</p>
    * 
-   * <p>NOTE: If you know the <code>maximumRegionSize</code>, this is the fastest method!</p>
+   * <p>NOTE: If you know the {@code maximumRegionSize}, this is the fastest method!</p>
    * @param <T> Actual implementing class
    * @param <K> May be T, may also be any {@link AbstractRegion}
    * @param allRegionsSorted sorted list of all regions
@@ -250,7 +250,7 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
    * @param getClosestIfIntersectionIsEmpty get the single, closest region if no intersecting
    * region could be found. 
    * @param maximumRegionSize values &lt; 1 will be interpreted as unknwon!
-   * If you know the maximum length of your regions in <code>allRegionsSorted</code>,
+   * If you know the maximum length of your regions in {@code allRegionsSorted},
    * you should specify this here. This will speedup the whole process enormously.
    * 
    * @return List of all intersecting {@link Region}s, or single closest.

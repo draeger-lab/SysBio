@@ -386,7 +386,7 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
    * Copy assigned values from another instance. Just copies values, that
    * can be changed by the user. Not properties or configurations of this
    * instance.
-   * <p>You MUST take care that <code>cache</code> refers to an {@link ExpectedColumn}
+   * <p>You MUST take care that {@code cache} refers to an {@link ExpectedColumn}
    * of the same type as this instance with same configuration
    * (especially the {@link #originalName}).
    * @param cache another instance of this class with the same configuration.
@@ -403,7 +403,7 @@ public class ExpectedColumn implements Comparable<ExpectedColumn>, Serializable 
    * The regEX will be checked agains this line.
    * @return {@code false} if any only if we have a regEx pattern,
    * we have assigned columns, and the given regEX matches the
-   * assigned column (in <code>anyContentLine</code>).
+   * assigned column (in {@code anyContentLine}).
    */
   public boolean regEXmatches(String[] anyContentLine) {
     if (!isSetRegExPatternForInitialSuggestion() ||

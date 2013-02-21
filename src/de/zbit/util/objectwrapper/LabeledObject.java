@@ -39,11 +39,11 @@ public class LabeledObject<T> implements ActionCommand, Cloneable,
   private static final long serialVersionUID = 2091985992659785789L;
 
   /**
-   * Returns the index of <code>object</code> inside
-   * {@link #getObject()} in <code>arr</code>.
+   * Returns the index of {@code object} inside
+   * {@link #getObject()} in {@code arr}.
    * @param arr array of {@link LabeledObject}s
    * @param object to search for (ignoring the label)
-   * @return index of <code>object</code> in <code>arr</code>.
+   * @return index of {@code object} in {@code arr}.
    */
   public static <T> int getIndexOfObject(LabeledObject<T>[] arr,
       T object) {
@@ -74,7 +74,7 @@ public class LabeledObject<T> implements ActionCommand, Cloneable,
   
   /**
    * Does the same as {@link #getIndexOfObject(LabeledObject[], NameAndSignalsTab)}
-   * but casts each element of <code>arr</code> to
+   * but casts each element of {@code arr} to
    * {@link LabeledObject}.
    * @param arr
    * @param object

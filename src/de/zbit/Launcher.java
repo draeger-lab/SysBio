@@ -91,8 +91,8 @@ public abstract class Launcher implements Runnable, Serializable {
 	/**
 	 * A resource bundle containing label texts for this object.
 	 */
-	private static final transient ResourceBundle resources = ResourceManager
-			.getBundle("de.zbit.locales.Labels");
+	private static final transient ResourceBundle resources = 
+			ResourceManager.getBundle("de.zbit.locales.Launcher");
 
 	/**
    * Generated serial version identifier.
@@ -630,7 +630,8 @@ public abstract class Launcher implements Runnable, Serializable {
 				logger.log(Level.FINE, exc.getMessage(), exc);
 			}
 		}
-		logger.info(MessageFormat.format(resources.getString("LAUNCHING_CMD_MODE"),
+		logger.info(MessageFormat.format(
+			resources.getString("LAUNCHING_CMD_MODE"),
 			getAppName()));
 		try {
 			GUITools.hideSplashScreen();
@@ -687,14 +688,27 @@ public abstract class Launcher implements Runnable, Serializable {
       sb.append('-');
     }
     message.append(sb);
-    message.append('\n');
-    message.append(MessageFormat.format(resources.getString("COPYRIGHT_MESSAGE"),
-      getAppName(), getVersionNumber(), getYearWhenProjectWasStarted(),
-      getYearOfProgramRelease()));
+    message.append(MessageFormat.format(
+    	resources.getString("COPYRIGHT_MESSAGE"),
+    	MessageFormat.format(
+    		resources.getString("PROGRAM_NAME_AND_VERSION"),
+    		getAppName(), getVersionNumber()),
+    	MessageFormat.format(
+    		resources.getString("COPYRIGHT_HOLDER"),
+    		getYearWhenProjectWasStarted(),
+    		getYearOfProgramRelease(),
+    		MessageFormat.format(
+    			resources.getString("PROVIDER"),
+    			resources.getString("ORGANIZATION"),
+    			resources.getString("INSTITUTE"))
+    		)
+    	)
+    );
     URL licenseFile = null;
     licenseFile = getURLlicenseFile();
     if (licenseFile != null) {
-      message.append(MessageFormat.format(resources.getString("LINK_TO_LICENSE_FILE"),
+      message.append(MessageFormat.format(
+      	resources.getString("LINK_TO_LICENSE_FILE"),
         licenseFile.toString()));
     }
     message.append('\n');
