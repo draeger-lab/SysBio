@@ -107,7 +107,7 @@ public class FileDownload {
    * 
    * @param address
    * @param out
-   * @param verbose if {@code TRUE}, this method will issue log messages and use the progress bar.
+   * @param verbose if {@code true}, this method will issue log messages and use the progress bar.
    * @throws IOException
    */
   public static void download(String address, OutputStream out, boolean verbose) throws IOException {

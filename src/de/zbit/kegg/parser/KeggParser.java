@@ -443,7 +443,7 @@ public class KeggParser extends DefaultHandler {
    * 
    * @param n
    * @param attribute
-   * @param returnNullIfEmpty if {@code TRUE}, returns {@code NULL} instead
+   * @param returnNullIfEmpty if {@code true}, returns {@code NULL} instead
    * of an empty return string. Else, returns always an empty string instead
    * of {@code NULL}.
    * @return
@@ -465,7 +465,7 @@ public class KeggParser extends DefaultHandler {
    * 
    * @param n
    * @param attribute
-   * @return 0 if any error occurs, or the int value, represented by <code>attribute</code>.
+   * @return 0 if any error occurs, or the int value, represented by {@code attribute}.
    */
   public static int getNodeValueInt(NamedNodeMap n, String attribute) {
     int number = 0;

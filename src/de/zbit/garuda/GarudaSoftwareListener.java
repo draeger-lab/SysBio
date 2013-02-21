@@ -25,11 +25,11 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import jp.sbi.garuda.platform.commons.protocol.ProtocolResults;
-import jp.sbi.garuda.platform.commons.protocol.c2s.LoadFileRequest;
+import jp.sbi.garuda.platform.commons.protocol.c2s.LoadDataRequest;
 import jp.sbi.garuda.platform.commons.protocol.c2s.LoadGadgetRequest;
-import jp.sbi.garuda.platform.commons.protocol.s2c.GetCompatibleSoftwareListResponse;
-import jp.sbi.garuda.platform.software.handler.SoftwareRequestListener;
-import jp.sbi.garuda.platform.software.handler.SoftwareResponseListener;
+import jp.sbi.garuda.platform.commons.protocol.s2c.GetCompatibleGadgetListResponse;
+import jp.sbi.garuda.platform.gadget.handler.GadgetRequestListener;
+import jp.sbi.garuda.platform.gadget.handler.GadgetResponseListener;
 import de.zbit.UserInterface;
 import de.zbit.gui.GUITools;
 import de.zbit.util.ResourceManager;
@@ -42,8 +42,8 @@ import de.zbit.util.ResourceManager;
  * @since 1.1
  * @version $Rev$
  */
-public class GarudaSoftwareListener implements PropertyChangeListener, SoftwareRequestListener,
-		SoftwareResponseListener {
+public class GarudaSoftwareListener implements PropertyChangeListener, GadgetRequestListener,
+		GadgetResponseListener {
 	
 	/**
 	 * Localization support.
@@ -69,20 +69,20 @@ public class GarudaSoftwareListener implements PropertyChangeListener, SoftwareR
 	}
 	
 	/* (non-Javadoc)
-	 * @see jp.sbi.garuda.platform.software.handler.SoftwareResponseListener#getCompatibleSoftwareList(jp.sbi.garuda.platform.commons.protocol.s2c.GetCompatibleSoftwareListResponse)
+	 * @see jp.sbi.garuda.platform.gadget.handler.GadgetResponseListener#getCompatibleGadgetList(jp.sbi.garuda.platform.commons.protocol.s2c.GetCompatibleGadgetListResponse)
 	 */
 	@Override
-	public void getCompatibleSoftwareList(GetCompatibleSoftwareListResponse response) {
+	public void getCompatibleGadgetList(GetCompatibleGadgetListResponse response) {
 		logger.fine(MessageFormat.format(bundle.getString("RECEIVED_COMPATIBLE_SOFTWARE_LIST"), response.toString()));
-		backend.setListOfCompatibleSoftware(response.getSoftwareList());
+		backend.setListOfCompatibleSoftware(response.body.gadgets);
 	}
 	
 	/* (non-Javadoc)
-	 * @see jp.sbi.garuda.platform.software.handler.SoftwareRequestListener#loadFile(jp.sbi.garuda.platform.commons.protocol.c2s.LoadFileRequest)
+	 * @see jp.sbi.garuda.platform.gadget.handler.GadgetRequestListener#loadData(jp.sbi.garuda.platform.commons.protocol.c2s.LoadDataRequest)
 	 */
 	@Override
-	public String loadFile(LoadFileRequest request) {
-		backend.openFile(new File(request.body.filePath));
+	public String loadData(LoadDataRequest request) {
+		backend.openFile(new File(request.body.data));
 		return ProtocolResults.SUCCESS;
 	}
 	
@@ -92,7 +92,7 @@ public class GarudaSoftwareListener implements PropertyChangeListener, SoftwareR
 	@Override
 	public String loadGadget(LoadGadgetRequest request) {
 		logger.fine(MessageFormat.format("RECEIVED_GADGET_REQUEST", request.toString()));
-		backend.firePropertyChange(GarudaSoftwareBackend.LOAD_GADGET_PROPERTY_CHANGE_ID, request.body.filePath);
+		backend.firePropertyChange(GarudaSoftwareBackend.LOAD_GADGET_PROPERTY_CHANGE_ID, request.body.loadableGadgetName);
 		return ProtocolResults.SUCCESS ;
 	}
 	

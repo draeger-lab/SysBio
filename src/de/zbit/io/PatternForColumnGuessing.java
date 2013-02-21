@@ -61,7 +61,7 @@ public class PatternForColumnGuessing {
   }
   
   /**
-   * Match the current pattern agains all columns in <code>line</code>
+   * Match the current pattern agains all columns in {@code line}
    * and increnment counters.
    * @param line
    */

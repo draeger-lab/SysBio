@@ -1117,7 +1117,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
   
   /**
    * Count the number of total options in all {@link OptionGroup}s
-   * in <code>groupList</code>.
+   * in {@code groupList}.
    * @param groupList
    * @return
    */

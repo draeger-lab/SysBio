@@ -525,7 +525,6 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	public JToolBar createDefaultToolBar() {
 		boolean isOSX = GUITools.isMacOSX();
 		JMenu menu;
-		JMenuItem item;
 		JButton button;
 		Object action = null;
 		ResourceBundle resources = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
@@ -545,36 +544,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		}
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
 			menu = getJMenuBar().getMenu(i);
-			int buttonCount = 0; // avoids creating separators for empty menus
-			for (int j = 0; j < menu.getItemCount(); j++) {
-				item = menu.getItem(j);
-				if (item != null) {
-					try {
-						action = BaseAction.valueOf(item.getActionCommand());
-						if (action == BaseAction.FILE_EXIT) {
-							action = null;
-						}
-					} catch (Throwable exc) {
-						action = item.getActionCommand();
-					}
-					if ((item.getIcon() != null) && (action != null)
-							&& (item.getActionListeners().length > 0)) {
-						button = GUITools.createButton(item.getIcon(), item
-								.getActionListeners()[0], action, item.getToolTipText());
-						if (isOSX && (action == BaseAction.HELP_ONLINE)) {
-							button.setIcon(null);
-							button.putClientProperty("JButton.buttonType", "help");
-							button.putClientProperty("JComponent.sizeVariant", "mini");
-						} else {
-							button.setBorderPainted(false);
-							button.setOpaque(true);	
-						}
-						button.setEnabled(item.isEnabled());
-						toolBar.add(button);
-						buttonCount++;
-					}
-				}
-			}
+			int buttonCount = collectMenuItems(menu, toolBar, isOSX);
 			if ((i < getJMenuBar().getMenuCount() - 1) && (buttonCount > 0)) {
 				toolBar.add(new JToolBar.Separator());
 			}
@@ -590,6 +560,61 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		return toolBar;
 	}
 	
+	/**
+	 * Recursively collects all {@link JMenuItem}s with an icon from the given
+	 * {@link JMenu}.
+	 * 
+	 * @param menu
+	 *        the current menu.
+	 * @param toolBar
+	 *        the {@link JToolBar} where to add the buttons.
+	 * @param isOSX
+	 *        to save repeatedly performing a check if we are on Mac OS X, this
+	 *        variable is given.
+	 * @return The number of buttons created for this particular menu. This avoids
+	 *         creating separators for empty menus.
+	 */
+	private int collectMenuItems(JMenu menu, JToolBar toolBar, boolean isOSX) {
+		int buttonCount = 0;
+		JMenuItem item;
+		JButton button;
+		Object action;
+		for (int j = 0; j < menu.getItemCount(); j++) {
+			item = menu.getItem(j);
+			if (item instanceof JMenu) {
+				// recursive call:
+				buttonCount += collectMenuItems((JMenu) item, toolBar, isOSX);
+			}
+			if (item != null) {
+				try {
+					action = BaseAction.valueOf(item.getActionCommand());
+					if (action == BaseAction.FILE_EXIT) {
+						action = null;
+					}
+				} catch (Throwable exc) {
+					action = item.getActionCommand();
+				}
+				if ((item.getIcon() != null) && (action != null)
+						&& (item.getActionListeners().length > 0)) {
+					button = GUITools.createButton(item.getIcon(), item
+							.getActionListeners()[0], action, item.getToolTipText());
+					if (isOSX && (action == BaseAction.HELP_ONLINE)) {
+						button.setIcon(null);
+						button.putClientProperty("JButton.buttonType", "help");
+						button.putClientProperty("JComponent.sizeVariant", "mini");
+					} else {
+						button.setBorderPainted(false);
+						button.setOpaque(true);	
+					}
+					button.setEnabled(item.isEnabled());
+					toolBar.add(button);
+					buttonCount++;
+				}
+			}
+		}
+		return buttonCount;
+	}
+
 	/**
    * Adds a drag'n drop functionality to this panel. This should
    * be called, whenever the user decides to have a "File Open"

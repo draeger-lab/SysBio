@@ -237,7 +237,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    * @param realRet target array to write the {@link KeggInfos}
    * @param APIstringParser {@link ThreadManager} to handle the threads
    * @param realRetOffset optional (set to 0 by default) offset between
-   * <code>ids</code> or <code>APIinfos</code> and  <code>realRet</code>.
+   * {@code ids} or {@code APIinfos} and  {@code realRet}.
    */
   private void parseAPI(final String[] ids, String[] APIinfos,
     final KeggInfos[] realRet, ThreadManager APIstringParser, final int realRetOffset, final AbstractProgressBar progress) {

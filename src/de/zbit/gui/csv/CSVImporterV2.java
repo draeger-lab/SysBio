@@ -604,8 +604,8 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
   }
 
   /**
-   * Resets all <code>assignedColumns</code> and 
-   * <code>assignedTypeForEachColumn</code> attributes of
+   * Resets all {@code assignedColumns} and 
+   * {@code assignedTypeForEachColumn} attributes of
    * all {@link ExpectedColumn}s.
    */
   private void removeSelectionsFromObjects() {

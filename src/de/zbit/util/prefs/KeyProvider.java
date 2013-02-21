@@ -269,7 +269,7 @@ public interface KeyProvider {
     }
     
     /**
-     * Returns a latex section definition, based on the <code>headerRank</code>.
+     * Returns a latex section definition, based on the {@code headerRank}.
      * 
      * @param headerRank 0 will return "chapter", 1 is "section", 2 is "subsection", etc.
      * @return
@@ -541,7 +541,7 @@ public interface KeyProvider {
 		public static <T> Entry<T> getField(Class<?> sourceClass, Class<T> clazz, int n) {
 			Field fields[] = sourceClass.getFields();
 			Object fieldValue;
-			logger.fine("Loading class " + sourceClass);
+			logger.fine("Loading class " + sourceClass.getName());
 			while (n < fields.length) {
 				try {
 					logger.fine("Processing field " + fields[n].getName());

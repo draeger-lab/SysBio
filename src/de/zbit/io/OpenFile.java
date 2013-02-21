@@ -55,7 +55,7 @@ public class OpenFile {
   private static SortedArrayList<String[]> downloadedFiles = new SortedArrayList<String[]>();
   
   /**
-   * Contains <code>System.getProperty("user.dir")</code>
+   * Contains {@code System.getProperty("user.dir")}
    */
   public final static String curDir;
   
@@ -76,7 +76,7 @@ public class OpenFile {
   private static final ResourceBundle warningsBundle = ResourceManager.getBundle("de.zbit.locales.Warnings");
   
   /**
-   * Initializes the <code>curDir</code> variable.
+   * Initializes the {@code curDir} variable.
    */
   static {
     String cd = System.getProperty("user.dir");
@@ -377,7 +377,7 @@ public class OpenFile {
   }
 
   /**
-   * Get the number of readable bytes of the given <code>filename</code>.
+   * Get the number of readable bytes of the given {@code filename}.
    * I.e. the uncompressed file size for ZIP or GZIPED files and
    * the raw file length for other files.
    * @param filename

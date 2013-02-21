@@ -29,14 +29,14 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import jp.sbi.garuda.platform.commons.FileFormat;
-import jp.sbi.garuda.platform.commons.Software;
+import jp.sbi.garuda.platform.commons.Gadget;
 import jp.sbi.garuda.platform.commons.exception.NetworkException;
 import jp.sbi.garuda.platform.commons.net.GarudaConnectionNotInitializedException;
 import jp.sbi.garuda.platform.event.PlatformEvent;
 import jp.sbi.garuda.platform.event.PlatformEventListener;
 import jp.sbi.garuda.platform.event.PlatformEventManager;
 import jp.sbi.garuda.platform.event.PlatformEventType;
-import jp.sbi.garuda.platform.software.CoreClientAPI;
+import jp.sbi.garuda.platform.gadget.CoreClientAPI;
 import de.zbit.UserInterface;
 import de.zbit.gui.GUITools;
 import de.zbit.io.FileTools;
@@ -86,7 +86,7 @@ public class GarudaSoftwareBackend {
 	/**
 	 * 
 	 */
-	private List<Software> listOfCompatibleSoftware;
+	private List<Gadget> listOfCompatibleSoftware;
 	/**
 	 * 
 	 */
@@ -104,24 +104,61 @@ public class GarudaSoftwareBackend {
 	/**
 	 * 
 	 */
-	private Software sourceSoftware;
+	private Gadget sourceGadget;
 	
 	/**
 	 * 
 	 */
 	private GarudaSoftwareListener softwareListener;
-
+	
 	/**
 	 * 
-	 * @param parent
 	 */
-	public GarudaSoftwareBackend(UserInterface parent) {
+	private String iconPath;
+	
+	/**
+	 * 
+	 */
+	private List<String> listOfCategories;
+	
+	/**
+	 * The name of the provider of this gadget.
+	 */
+	private String provider;
+	
+	/**
+	 * A short description of this gadget.
+	 */
+	private String description;
+	
+	/**
+	 * A list of paths to screenshots of this gadget.
+	 */
+	private List<String> listOfScreenshots;
+
+	/**
+	 * Creates a connection to the Garuda core.
+	 * 
+	 * @param uid
+	 *        a unique identifier for your gadget
+	 * @param parent
+	 *        the user interface of the gadget
+	 * @param iconPath
+	 *        an icon of size 128x128 for the Garuda dash-board
+	 * @param description
+	 *        a few sentences describing the program
+	 * @param categories
+	 *        a list of Strings giving the categories for the gadget
+	 * @param screenshots
+	 *        a list of example images of the gadget
+	 */
+	public GarudaSoftwareBackend(String uid, UserInterface parent, String iconPath,
+		String description, List<String> categories, List<String> screenshots) {
 		super();
 		
-		sourceSoftware = new Software();
-		sourceSoftware.setId(parent.getClass().getSimpleName());
-		sourceSoftware.setVersion(parent.getDottedVersionNumber());
-		sourceSoftware.setName(parent.getApplicationName());
+		sourceGadget = new Gadget();
+		sourceGadget.setUUID(uid);
+		sourceGadget.setName(parent.getApplicationName());
 		
 		this.listOfCompatibleSoftware = null;
 		this.parent = parent;
@@ -129,6 +166,13 @@ public class GarudaSoftwareBackend {
 		this.listOfOutputFileFormats = new LinkedList<FileFormat>();
 		this.listOfInputFileFormats = new LinkedList<FileFormat>();
     this.softwareListener = new GarudaSoftwareListener(this);
+    
+    this.iconPath = iconPath;
+    this.provider = ResourceManager.getBundle("de.zbit.locales.Launcher").getString("PROVIDER");
+    this.description = description;
+    this.listOfCategories = categories;
+    this.listOfScreenshots = screenshots;
+    
     addPropertyChangeListenerForAllProperties(this.softwareListener);
     addPropertyChangeListenerForAllProperties(this.parent);
 	}
@@ -212,7 +256,7 @@ public class GarudaSoftwareBackend {
 		if (!initialized) {
 			throw new BackendNotInitializedException();
 		}
-		CoreClientAPI.getInstance().deregisterSoftware();
+		CoreClientAPI.getInstance().deregisterGadget();
 		logger.fine(bundle.getString("SOFTWARE_DEREGISTERED"));
 	}
 	
@@ -255,11 +299,11 @@ public class GarudaSoftwareBackend {
 		} else if (!parent.equals(other.parent)) {
 			return false;
 		}
-		if (sourceSoftware == null) {
-			if (other.sourceSoftware != null) {
+		if (sourceGadget == null) {
+			if (other.sourceGadget != null) {
 				return false; 
 			}
-		} else if (!sourceSoftware.equals(other.sourceSoftware)) {
+		} else if (!sourceGadget.equals(other.sourceGadget)) {
 			return false; 
 		}
 		if (softwareListener == null) {
@@ -295,7 +339,7 @@ public class GarudaSoftwareBackend {
 	/**
 	 * @return the listOfCompatibleSoftware
 	 */
-	public List<Software> getListOfCompatibleSoftware() {
+	public List<Gadget> getListOfCompatibleSoftware() {
 		return listOfCompatibleSoftware;
 	}
 	
@@ -318,7 +362,7 @@ public class GarudaSoftwareBackend {
 		result = prime * result + ((listOfInputFileFormats == null) ? 0 : listOfInputFileFormats .hashCode());
 		result = prime * result + ((listOfOutputFileFormats == null) ? 0 : listOfOutputFileFormats .hashCode());
 		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
-		result = prime * result + ((sourceSoftware == null) ? 0 : sourceSoftware.hashCode());
+		result = prime * result + ((sourceGadget == null) ? 0 : sourceGadget.hashCode());
 		result = prime * result + ((softwareListener == null) ? 0 : softwareListener.hashCode());
 		return result;
 	}
@@ -336,9 +380,9 @@ public class GarudaSoftwareBackend {
 		CoreClientAPI api = CoreClientAPI.getInstance();
 		
 		api.initialize(
-			sourceSoftware.getId(),
-			parent.getDottedVersionNumber(),
+			sourceGadget.getUUID(),
 			parent.getApplicationName(),
+			iconPath,
 			softwareListener,
 			GARUDA_CORE_PORT,
 			GARUDA_CORE_TIMEOUT);
@@ -402,7 +446,7 @@ public class GarudaSoftwareBackend {
 			}
 		});
 		
-		api.activateSoftware();
+		api.activateGadget();
 		logger.fine(bundle.getString("GARUDA_CORE_SOFTWARE_ACTIVATED"));
 		firePropertyChange(GARUDA_ACTIVATED, this);
 		
@@ -476,8 +520,15 @@ public class GarudaSoftwareBackend {
 		//The register call for this software to the Core.
 		
 		CoreClientAPI api = CoreClientAPI.getInstance();
-		api.registerSoftware(filePath,
-			listOfInputFileFormats, listOfOutputFileFormats);
+		api.registerGadget(
+			filePath,
+			iconPath,
+			listOfInputFileFormats,
+			listOfOutputFileFormats,
+			listOfCategories,
+			provider,
+			description,
+			listOfScreenshots);
 		
 		logger.fine(MessageFormat.format(bundle.getString("REGISTERED_SOFTWARE_TO_CORE"), parentFolder.getAbsolutePath()));
 	}
@@ -509,9 +560,9 @@ public class GarudaSoftwareBackend {
 	public void requestForLoadableSoftwares(File selectedFile, String fileType) throws NetworkException,
 		IllegalStateException, GarudaConnectionNotInitializedException {
 		if (selectedFile != null) {
-			CoreClientAPI.getInstance().doGetLoadableSoftwares(
-				selectedFile.getName().substring(
-					selectedFile.getName().indexOf('.') + 1), fileType);
+			CoreClientAPI.getInstance().doGetLoadableGadgets(
+				selectedFile.getName().substring(selectedFile.getName().indexOf('.') + 1), 
+				fileType);
 			logger.fine(MessageFormat.format(bundle.getString("REQUESTED_COMPATIBLE_SOFTWARE"), selectedFile));
 		} else {
 			throw new IllegalStateException(bundle.getString("NO_FILE_SELECTED"));
@@ -538,8 +589,8 @@ public class GarudaSoftwareBackend {
 				bundle.getString("NO_COMPATIBLE_SOFTWARE_FOUND"),
 				FileTools.getExtension(selectedFile.getName())));
 		}
-		CoreClientAPI.getInstance().loadFileOntoSoftware(
-			listOfCompatibleSoftware.get(indexOfSoftware), sourceSoftware,
+		CoreClientAPI.getInstance().loadFileOntoGadget(
+			listOfCompatibleSoftware.get(indexOfSoftware), sourceGadget,
 			selectedFile.getAbsolutePath());
 		logger.fine(MessageFormat.format(
 			bundle.getString("FILE_LOADING_REQUEST"),
@@ -551,7 +602,7 @@ public class GarudaSoftwareBackend {
 	 * 
 	 * @param softwareList
 	 */
-	public void setListOfCompatibleSoftware(List<Software> softwareList) {
+	public void setListOfCompatibleSoftware(List<Gadget> softwareList) {
 		this.listOfCompatibleSoftware = softwareList;
   	firePropertyChange(GOT_SOFTWARES_PROPERTY_CHANGE_ID, softwareList);
 	}
@@ -564,7 +615,7 @@ public class GarudaSoftwareBackend {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getClass().getSimpleName());
 		builder.append(" [softwareID=");
-		builder.append(sourceSoftware.getId());
+		builder.append(sourceGadget.getUUID());
 		builder.append(", initialized=");
 		builder.append(initialized);
 		builder.append(", listOfInputFileFormats=");

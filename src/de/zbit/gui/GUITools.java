@@ -123,14 +123,20 @@ public class GUITools {
    */
   private static final Logger logger = Logger.getLogger(GUITools.class.getName());
   
-  /**
-   * Build a panel with cancel and ok buttons.
-   * When any button is pressed, it will trigger setVisible(false).
-   * <p>You can check if ok has been pressed with
-   * <pre> ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).isSelected()</pre>
-   * @param parentDialog the dialog to close (hide) with ok and cancel.
-   * @return
-   */
+	/**
+	 * Build a panel with cancel and ok buttons. When any button is pressed, it
+	 * will trigger setVisible(false).
+	 * <p>
+	 * You can check if ok has been pressed with
+	 * 
+	 * <pre>
+	 * ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).isSelected()
+	 * </pre>
+	 * 
+	 * @param parentDialog
+	 *        the dialog to close (hide) with ok and cancel.
+	 * @return
+	 */
   public static JPanel buildOkCancelButtons(final Component parentDialog) {
     JPanel southPanel = new JPanel(new BorderLayout());
 
@@ -254,10 +260,11 @@ public class GUITools {
 		boolean showCopyright) {
 		int distanceToBorder = 7;
 		SplashScreen splash = SplashScreen.getSplashScreen();
-		Graphics2D g = splash == null ? null : splash.createGraphics();
+		Graphics2D g = (splash == null) ? null : splash.createGraphics();
 		if ((g == null) || (!showVersionNumber && !showCopyright)) { 
 			return;
 		}
+		ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Launcher");
 		
 		// Decrease font size and set color
 		g.setFont(g.getFont().deriveFont((g.getFont().getSize() * 0.8f)));
@@ -269,23 +276,18 @@ public class GUITools {
 		// Show version number in lower right corner
 		if (showVersionNumber) {
 			Rectangle2D stringBounds = m.getStringBounds(versionNumber, g);
-			g.drawString(versionNumber,
-				(int) (b.getWidth() - stringBounds.getWidth() - distanceToBorder),
+			g.drawString("v" + versionNumber,
+				(int) (b.getWidth() - stringBounds.getWidth() - 1 - distanceToBorder),
 				(int) (b.getHeight() - distanceToBorder));
 		}
 		
 		// Show copyright in lower left corner
 		if (showCopyright) {
-			ResourceBundle resources = ResourceManager
-					.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
-			
-			String cMessage = MessageFormat.format(resources.getString("COPYRIGHT_MESSAGE"),
-				"", yearOfProjectStart, yearOfRelease).trim();
-			int pos = StringUtil.indexOf(cMessage, ",", "\n");
-			if (pos > 0) {
-				cMessage = cMessage.substring(0, pos);
-			}
-			
+			String cMessage = resources.getString("COPYRIGHT_HOLDER");
+			cMessage = MessageFormat.format(cMessage,
+				yearOfProjectStart,
+				yearOfRelease,
+				resources.getString("ORGANIZATION"));
 			g.drawString(cMessage, distanceToBorder,
 				(int) (b.getHeight() - distanceToBorder));
 		}
@@ -638,15 +640,15 @@ public class GUITools {
   /**
    * Creates a new {@link JDropDownButton} using the entries from the given
    * {@link ResourceBundle}. It is assumed that the bundle contains at least the
-   * key specified by the given <code>name</code>. It then tries to obtain an
+   * key specified by the given {@code name}. It then tries to obtain an
    * associated tooltip by first looking for the key
-   * <code>name + "_TOOLTIP"</code>. If such a key is present, it uses this
+   * {@code name + "_TOOLTIP"}. If such a key is present, it uses this
    * tooltip. Otherwise it will try to split the text of the
-   * {@link JDropDownButton} using the separator character <code>';'</code>.
+   * {@link JDropDownButton} using the separator character {@code ';'}.
    * Remember, the text is defined by the entry in the {@link ResourceBundle}
-   * for the <code>name</code> key. If it is not possible obtain a tooltip by
+   * for the {@code name} key. If it is not possible obtain a tooltip by
    * splitting or concatanation of the name with the suffix
-   * <code>"_TOOLTIP"</code>, no tooltip will be set.
+   * {@code "_TOOLTIP"}, no tooltip will be set.
    * 
    * @param name
    *        the name (not the {@link JDropDownButton#getText()}) of the
@@ -1209,7 +1211,7 @@ public class GUITools {
    * disabled and b) all other elements on this container and all
    * contained containers are enabled.
    * @param c
-   * @param searchInWholeWindow if true, will not only look inside <code>c</code>
+   * @param searchInWholeWindow if true, will not only look inside {@code c}
    * for an ok button, but in the whole windows.
    * @return
    */
@@ -1903,7 +1905,7 @@ public class GUITools {
   }
   
   /**
-   * Scrolls to the top of the given <code>scrollPanel</code>.
+   * Scrolls to the top of the given {@code scrollPanel}.
    * @param scrollPanel
    */
   public static void scrollToTop(final JScrollPane scrollPanel) {

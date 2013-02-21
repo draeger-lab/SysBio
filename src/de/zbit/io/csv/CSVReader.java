@@ -410,7 +410,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * That means, that the actual table may start SOMEWHERE below
    * this number of lines but not before that much lines.</b>
    * 
-   * <p>Default: <code>0</code>
+   * <p>Default: {@code 0}
    * @see #setAutoDetectContentStart(boolean)
    */
   public void setSkipLines(int skipLines) {
@@ -1103,7 +1103,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * @param regex
    * @param patternOptions
    * @param maxLinesToCheck
-   * @return array of same length as <code>regex</code>, containing
+   * @return array of same length as {@code regex}, containing
    * the number of matches for each regex and each column.
    * @throws IOException
    */
@@ -1471,7 +1471,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
   
   /**
    * Remove string indicators from cell start and end
-   * from every cell in <code>row</code>.
+   * from every cell in {@code row}.
    * @param row
    * @return
    * @see #removeStringIndicators(String)

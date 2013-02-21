@@ -52,8 +52,8 @@ public class ScientificNumberRenderer extends DefaultTableCellRenderer {
   /**
    * @param boundary a boundary when to apply the {@link ScientificNumberRenderer}.
    * If the value is greater than or equal to this value, or smaller than
-   * 1/<code>boundary</code>, the {@link ScientificNumberRenderer} is applied.
-   * Set to <code>0</code> to always apply this renderer.
+   * 1/{@code boundary}, the {@link ScientificNumberRenderer} is applied.
+   * Set to {@code 0} to always apply this renderer.
    */
   public ScientificNumberRenderer(double boundary) {
     super();

@@ -156,12 +156,12 @@ public class StringUtil {
 
 	
 	/**
-   * Checks if <code>parentString</code> contains any of the strings
-   * in <code>strings</code>.
+   * Checks if {@code parentString} contains any of the strings
+   * in {@code strings}.
    * @param strings to search for
    * @param parentString to search in
-   * @return index of (first) string of <code>strings</code>
-   * that is contained in <code>parentString</code>, or -1. 
+   * @return index of (first) string of {@code strings}
+   * that is contained in {@code parentString}, or -1. 
    */
   public static int containsAny(String[] strings, String parentString) {
       if (strings==null) return -1;
@@ -217,7 +217,7 @@ public class StringUtil {
 	/**
    * @param string
    * @param toCount
-   * @return number of occurrences of <code>toCount</code> in <code>string</code>.
+   * @return number of occurrences of {@code toCount} in {@code string}.
    */
   public static int countChar(String string, char toCount) {
     int counter = 0;
@@ -233,7 +233,7 @@ public class StringUtil {
 	/**
    * @param string
    * @param toCount
-   * @return number of occurrences of <code>toCount</code> in <code>string</code>.
+   * @return number of occurrences of {@code toCount} in {@code string}.
    */
   public static int countString(String string, String toCount) {
     int counter = 0;
@@ -314,7 +314,7 @@ public class StringUtil {
 	
 	
 	/**
-	 * Escape all HTML Characters in <code>string</code>.
+	 * Escape all HTML Characters in {@code string}.
 	 * @param string
 	 * @return string with escaped characters.
 	 */
@@ -334,7 +334,7 @@ public class StringUtil {
 	 * Return the given string filled up to the given length with the given
 	 * character. If the length of the input string is equal or greater than the
 	 * target length, it will be return unchanged, i.e., it will NOT be shortened.
-	 * The <code>prepend</code> parameter defines whether the fill character
+	 * The {@code prepend} parameter defines whether the fill character
 	 * should be prepended (or appended).
 	 * 
 	 * @param input
@@ -931,8 +931,8 @@ public class StringUtil {
 	 * delimiter. Useful for constructing queries from arrays.
 	 * </p>
 	 * <p>
-	 * Example: The array <code>{"a", "b", "c"}</code> and delimiter
-	 * <code>"--"</code> will results in <code>"a--b--c"</code>.
+	 * Example: The array {@code {"a", "b", "c"}} and delimiter
+	 * {@code "--"} will results in {@code "a--b--c"}.
 	 * 
 	 * @param ary
 	 *        the array of strings to concatenate
@@ -955,7 +955,7 @@ public class StringUtil {
    * Perform an indexOf with mutliple strings.
    * @param string
    * @param lookFor multiple strings to search for. Returns 
-   * @return the first occurance of any of <code>lookFor</code> strings.
+   * @return the first occurance of any of {@code lookFor} strings.
    */
   public static int indexOf(String string, String... lookFor) {
     int firstMatch = -1;
@@ -1020,7 +1020,7 @@ public class StringUtil {
    * @return  if the string argument occurs as a substring within this
    *          object, then the index of the first character of the first
    *          such substring is returned; if it does not occur as a
-   *          substring, <code>-1</code> is returned.
+   *          substring, {@code -1} is returned.
    */
   public static int indexOfIgnoreCase(String source, String str) {
     return indexOfIgnoreCase(source, str, 0);
@@ -1091,8 +1091,8 @@ public class StringUtil {
    * @param lineBreak
    * @param lineBreakSymbol
    * @param breakBeforeLineBreak if false, breaks after a line is longer than
-   * <code>lineBreak</code> characters. If true, ensures that no line is longer
-   * than <code>lineBreak</code> characters, i.e., breaks before that number
+   * {@code lineBreak} characters. If true, ensures that no line is longer
+   * than {@code lineBreak} characters, i.e., breaks before that number
    * of chars.
    * @return String with lineBreaks and number of inserted lineBreaks
    */
@@ -1108,8 +1108,8 @@ public class StringUtil {
    * @param lineBreakSymbol
    * @param padString TODO
    * @param breakBeforeLineBreak if false, breaks after a line is longer than
-   * <code>lineBreak</code> characters. If true, ensures that no line is longer
-   * than <code>lineBreak</code> characters, i.e., breaks before that number
+   * {@code lineBreak} characters. If true, ensures that no line is longer
+   * than {@code lineBreak} characters, i.e., breaks before that number
    * of chars.
    * @return String with lineBreaks and number of inserted lineBreaks
    */
@@ -1189,8 +1189,8 @@ public class StringUtil {
 	}
 
   /**
-   * Append or increment a numbered suffix to <code>newString</code> if
-   * it already exists in <code>existingStrings</code>
+   * Append or increment a numbered suffix to {@code newString} if
+   * it already exists in {@code existingStrings}
    * <p>Example: existingStrings contains "A", "A_1" and "B".
    * newString is "A". Return value will be "A_2".
    * <p> Detects the following suffixes (examples):
@@ -1524,8 +1524,8 @@ public class StringUtil {
    * @param containingLine
    * @param startPosition
    * @param ignoreDigits
-   * @return the next word in <code>containingLine</code>, starting from <code>startPosition</code>
-   * only including letters and if <code>ignoreDigits</code> is false, also digits.
+   * @return the next word in {@code containingLine}, starting from {@code startPosition}
+   * only including letters and if {@code ignoreDigits} is false, also digits.
    */
   public static String getWord(String containingLine, int startPosition, boolean ignoreDigits) {
     // get next word
@@ -1584,8 +1584,8 @@ public class StringUtil {
   }
 
   /**
-   * Replaces all occurences of <code>toReplace</code> in 
-   * <code>containingString</code> with <code>replaceWith</code>.
+   * Replaces all occurences of {@code toReplace} in 
+   * {@code containingString} with {@code replaceWith}.
    * <p>Replace is case-insensitive.
    * @param containingString
    * @param toReplace

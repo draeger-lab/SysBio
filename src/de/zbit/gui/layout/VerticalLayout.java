@@ -27,7 +27,7 @@ import java.util.Hashtable;
  *
  * A vertical layout manager similar to java.awt.FlowLayout.
  * Like FlowLayout components do not expand to fill available space except when the horizontal alignment
- * is <code>BOTH</code>
+ * is {@code BOTH}
  * in which case components are stretched horizontally. Unlike FlowLayout, components will not wrap to form another
  * column if there isn't enough space vertically. VerticalLayout can optionally anchor components to the top or bottom
  * of the display area or center them between the top and bottom.
@@ -94,7 +94,7 @@ public class VerticalLayout implements LayoutManager{
    * Constructs a VerticalLayout instance anchored to the top with the specified vgap and horizontal alignment
    *
    * @param vgap An int value indicating the vertical seperation of the components
-   * @param alignment An int value which is one of <code>RIGHT, LEFT, CENTER, BOTH</code> for the horizontal alignment.
+   * @param alignment An int value which is one of {@code RIGHT, LEFT, CENTER, BOTH} for the horizontal alignment.
    */
   public VerticalLayout(int vgap,int alignment){
     this(vgap,alignment,TOP);
@@ -103,8 +103,8 @@ public class VerticalLayout implements LayoutManager{
    * Constructs a VerticalLayout instance with the specified vgap, horizontal alignment and anchoring
    *
    * @param vgap An int value indicating the vertical seperation of the components
-   * @param alignment An int value which is one of <code>RIGHT, LEFT, CENTER, BOTH</code> for the horizontal alignment.
-   * @param anchor An int value which is one of <code>TOP, BOTTOM, CENTER</code> indicating where the components are
+   * @param alignment An int value which is one of {@code RIGHT, LEFT, CENTER, BOTH} for the horizontal alignment.
+   * @param anchor An int value which is one of {@code TOP, BOTTOM, CENTER} indicating where the components are
    * to appear if the display area exceeds the minimum necessary.
    */
   public VerticalLayout(int vgap,int alignment,int anchor){

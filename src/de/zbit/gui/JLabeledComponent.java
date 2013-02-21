@@ -311,8 +311,8 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   
   /**
    * Show a dialog with multiple {@link JLabeledComponent}s. Each component
-   * has the label given in <code>fields</code> and the selections from the
-   * <code>suggestions</code> variable.
+   * has the label given in {@code fields} and the selections from the
+   * {@code suggestions} variable.
    * @param parent the parent to which this dialog is modal
    * @param title  title for this dialog
    * @param fields labels for {@link JLabeledComponent}s
@@ -502,7 +502,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * Adds a listener to this {@link #colChooser}, if the
    * current {@link #colChooser} supports {@link ChangeListener}s.
    * 
-   * @param listener the <code>ChangeListener</code> to add
+   * @param listener the {@code ChangeListener} to add
    */
   public void addChangeListener(ChangeListener listener) {
     // For JSpinners
@@ -856,9 +856,9 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   }
   
   /**
-   * Removes a <code>ChangeListener</code> from this {@link #colChooser}.
+   * Removes a {@code ChangeListener} from this {@link #colChooser}.
    *
-   * @param listener the <code>ChangeListener</code> to remove
+   * @param listener the {@code ChangeListener} to remove
    */
   public void removeChangeListener(ChangeListener listener) {
     // For JSpinners

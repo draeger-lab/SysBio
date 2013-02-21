@@ -85,7 +85,7 @@ public interface Region extends Chromosome {
    *    ((start2 >= start && start2 <= end) || (start >= start2 && start <= end2));
    * </pre>
    * @param other
-   * @return {@code true} if this region intersects <code>other</code>.
+   * @return {@code true} if this region intersects {@code other}.
    */
   public boolean intersects(Region other);
   

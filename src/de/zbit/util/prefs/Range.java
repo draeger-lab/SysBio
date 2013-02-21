@@ -487,20 +487,20 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
    *
    * <p><b>Examples:</b>
    *
-   * <p>A range spec of <code>{2,4,8,16}</code> for an integer
+   * <p>A range spec of {@code {2,4,8,16}} for an integer
    * value will allow the integers 2, 4, 8, or 16.
    *
-   * <p>A range spec of <code>{[-1.0,1.0]}</code> for a floating
+   * <p>A range spec of {@code {[-1.0,1.0]}} for a floating
    * point value will allow any floating point number in the
    * range (including) -1.0 to 1.0.
    * 
-   * <p>A range spec of <code>{(-88,100],1000}</code> for an integer
+   * <p>A range spec of {@code {(-88,100],1000}} for an integer
    * value will allow values > -88 and <= 100, as well as 1000.
    *
-   * <p>A range spec of <code>{"foo", "bar", ["aaa","zzz")} </code> for a
-   * string value will allow strings equal to <code>"foo"</code> or
-   * <code>"bar"</code>, plus any string lexically greater than or equal
-   * to <code>"aaa"</code> but less then <code>"zzz"</code>.
+   * <p>A range spec of {@code {"foo", "bar", ["aaa","zzz")} } for a
+   * string value will allow strings equal to {@code "foo"} or
+   * {@code "bar"}, plus any string lexically greater than or equal
+   * to {@code "aaa"} but less then {@code "zzz"}.
    *
    * @param requiredType - The class object of the Type.
    * @param rangeSpec - as defined above.
@@ -862,7 +862,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
    * @param <Type>
    * @param acceptedNumbers list of all acceptable numbers
    * @return instance of {@link Range}, that exclusively accepts all given
-   * <code>acceptedNumbers</code>.
+   * {@code acceptedNumbers}.
    */
   @SuppressWarnings("unchecked")
   public static <Type extends Number & Comparable<? super Type>> Range<Type> toIntegerRange(Collection<Type> acceptedNumbers) {
@@ -908,7 +908,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	
 	/**
 	 * Builds a range string that accepts exclusively all
-	 * given <code>constants</code>.
+	 * given {@code constants}.
 	 * @param <T>
 	 * @param constants
 	 * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.

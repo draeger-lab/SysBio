@@ -297,7 +297,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       
       // Add final panel
       if (Thread.currentThread().isInterrupted()) return;
-      if (p.getComponentCount()>0) {
+      if (p.getComponentCount() > 0) {
         synchronized (detailPanel) {
           ((JScrollPane) detailPanel).setViewportView(p);
           

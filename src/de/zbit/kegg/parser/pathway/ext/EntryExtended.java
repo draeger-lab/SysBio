@@ -245,7 +245,7 @@ public class EntryExtended extends Entry {
   
   /**
    * 
-   * @param includeExtendedAttributes if <code>FALSE</code>, only
+   * @param includeExtendedAttributes if {@code false}, only
    * the attributes as specified in the core KGML format are returned.
    * @return all the necessary XML attributes of this class
    */
@@ -331,8 +331,8 @@ public class EntryExtended extends Entry {
    * does NOT consider identifiers that are added later by queries to
    * the KEGG API.
    * @param db any database from {@link IdentifierDatabases}.
-   * @return <code>TRUE</code> if and only if an identifier for the given
-   * <code>db</code> is currently annotated within this class (i.e., for this entry).
+   * @return {@code true} if and only if an identifier for the given
+   * {@code db} is currently annotated within this class (i.e., for this entry).
    */
   public boolean isSetIdentifierForDatabase(IdentifierDatabases db) {
     if (identifiers==null || db==null) return false;

@@ -279,7 +279,7 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
   }
   
   /**
-   * Deselects this button in <code>millis</code> milliseconds.
+   * Deselects this button in {@code millis} milliseconds.
    * @param millis
    */
   public void deselect(final int millis) {

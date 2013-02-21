@@ -44,17 +44,17 @@ public class TableRowSorterMixed<M extends TableModel> extends TableRowSorter<M>
           new CheckedComparableComparator();
   
   /**
-   * Creates a <code>TableRowSorterMixed</code> with an empty model.
+   * Creates a {@code TableRowSorterMixed} with an empty model.
    */
   public TableRowSorterMixed() {
       super();
   }
 
   /**
-   * Creates a <code>TableRowSorterMixed</code> using <code>model</code>
-   * as the underlying <code>TableModel</code>.
+   * Creates a {@code TableRowSorterMixed} using {@code model}
+   * as the underlying {@code TableModel}.
    *
-   * @param model the underlying <code>TableModel</code> to use,
+   * @param model the underlying {@code TableModel} to use,
    *        {@code null} is treated as an empty model
    */
   public TableRowSorterMixed(M model) {

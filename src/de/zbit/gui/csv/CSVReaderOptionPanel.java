@@ -579,7 +579,7 @@ public class CSVReaderOptionPanel extends JPanel {
     createCharacterBox(editorcomp, null);
   }
   /**
-   * Adds a {@link KeyListener} to the <code>editorcomp</code> that ensures
+   * Adds a {@link KeyListener} to the {@code editorcomp} that ensures
    * a length of one.
    * 
    * <p>Please note, that paste-actions are not covered by the KeyListener. For

@@ -343,6 +343,9 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	private void addProperties(MathContainer mc) {
 		if (mc.isSetMath()) {
 			if (isRendererAvailable()) {
+				String equation = mc.getMath().compile(latex).toString()
+						.replace("mathrm", "mbox").replace("text", "mbox")
+						.replace("mathtt", "mbox");
 				StringBuffer laTeXpreview = new StringBuffer();
 				laTeXpreview.append(LaTeXCompiler.eqBegin);
 				if (mc instanceof KineticLaw) {
@@ -353,15 +356,14 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				} else if (mc instanceof FunctionDefinition) {
 					FunctionDefinition f = (FunctionDefinition) mc;
 					laTeXpreview.append(latex.mbox(f.getId()));
+					equation = equation.substring(7);
 				} else if (mc instanceof Assignment) {
 					Assignment ea = (Assignment) mc;
 					laTeXpreview.append(latex.mbox(ea.getVariable()));
 					laTeXpreview.append('=');
 				}
 				try {
-					laTeXpreview.append(mc.getMath().compile(latex).toString()
-						.replace("mathrm", "mbox").replace("text", "mbox")
-						.replace("mathtt", "mbox"));
+					laTeXpreview.append(equation);
 				} catch (Throwable e) {
 					logger.log(Level.WARNING, bundleWarnings.getString("COULD_NOT_CREATE_LATEX_FROM_ASTNODE"), e);
 					laTeXpreview.append(bundleWarnings.getString("invalid"));
@@ -652,14 +654,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			}
 		}
 		if (sbase.isSetNotes() || editable) {
-			JEditorPane notesArea = new JEditorPane("text/html", SBMLtools.createHTMLfromNotes(sbase));
-			notesArea.setDoubleBuffered(true);
-			notesArea.setEditable(editable);
-			notesArea.addHyperlinkListener(new SystemBrowser());
-//			notesArea.setMaximumSize(new Dimension(preferedWidth, 200));
-			notesArea.setDoubleBuffered(true);
-			notesArea.setAutoscrolls(true);
-			notesArea.setPreferredSize(new Dimension(preferedWidth, 200));
+			JEditorPane notesArea = createHTMLPane(SBMLtools.createHTMLfromNotes(sbase));
 			JScrollPane editorScrollPane = new JScrollPane(notesArea);
 			editorScrollPane.setViewportBorder(BorderFactory.createLoweredBevelBorder());
 			//scroll.setMaximumSize(notesArea.getMaximumSize());
@@ -722,14 +717,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				sb.append("</ul>");
 			}
 			sb.append("</body></html>");
-			JEditorPane l = new JEditorPane("text/html", sb.toString());
-			l.setAutoscrolls(true);
-			l.addHyperlinkListener(new SystemBrowser());
-			l.setDoubleBuffered(true);
-			l.setEditable(editable);
-			l.setBackground(Color.WHITE);
-			Dimension dim = new Dimension(preferedWidth, 125);
-			l.setMaximumSize(dim);
+			JEditorPane l = createHTMLPane(sb.toString());
 			JScrollPane editorScrollPane = new JScrollPane(l);
 			editorScrollPane.setPreferredSize(new Dimension(250, 145));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
@@ -775,6 +763,25 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			
 			lh.add(helper.getContainer(), 1, ++row, 3, 1, 0d, 0d);
 		}
+	}
+
+	/**
+	 * 
+	 * @param text
+	 * @return
+	 */
+	private JEditorPane createHTMLPane(String text) {
+		Dimension dimension = new Dimension(preferedWidth, 200);
+		JEditorPane area = new JEditorPane("text/html", text);
+		area.setDoubleBuffered(true);
+		area.setEditable(editable);
+		area.addHyperlinkListener(new SystemBrowser());
+		area.setAutoscrolls(true);
+		area.setPreferredSize(dimension);
+		area.setBackground(Color.WHITE);
+		area.setMaximumSize(dimension);
+		area.setCaretPosition(0);
+		return area;
 	}
 
 	/**
