@@ -21,11 +21,7 @@
 package de.zbit.graph.sbgn;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -74,7 +70,9 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     // If the given node realizer is of this type, then apply copy semantics. 
     if (nr instanceof ReactionNodeRealizer) {
       ReactionNodeRealizer fnr = (ReactionNodeRealizer) nr;
-      // TODO: Copy the values of custom attributes. 
+      lineWidth = fnr.lineWidth;
+      rotationAngle = fnr.rotationAngle;
+      rotationCenter = fnr.rotationCenter;
     }
   }
   
@@ -230,11 +228,6 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     double min = Math.min(width, height);
     double offsetX = (width - min)/2d;
     double offsetY = (height - min)/2d;
-
-    // FIXME
-//    if (isHorizontal() && (rotationAngle == 0)) {
-//    	rotationAngle = 90;
-//    }
     
     rotate(gfx, rotationAngle, rotationCenter);
     
