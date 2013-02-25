@@ -30,17 +30,17 @@ import y.view.ShapeNodeRealizer;
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YIndependentTextRealizer extends ShapeNodeRealizer {
+public class IndependentTextRealizer extends ShapeNodeRealizer {
 	
 	private String text;
 
 	/**
 	 * copy constructor
 	 */
-	public YIndependentTextRealizer(NodeRealizer nr) {
+	public IndependentTextRealizer(NodeRealizer nr) {
 		super(nr);
-		if (nr instanceof YIndependentTextRealizer) {
-			YIndependentTextRealizer textNr = (YIndependentTextRealizer) nr;
+		if (nr instanceof IndependentTextRealizer) {
+			IndependentTextRealizer textNr = (IndependentTextRealizer) nr;
 			text = textNr.text;
 		}
 	}
@@ -52,7 +52,7 @@ public class YIndependentTextRealizer extends ShapeNodeRealizer {
 	 * @param height
 	 * @param text
 	 */
-	public YIndependentTextRealizer(double x, double y, double width,
+	public IndependentTextRealizer(double x, double y, double width,
 			double height, String text) {
 		this.text = text;
 		setLabelText(text);

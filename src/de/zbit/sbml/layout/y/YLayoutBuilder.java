@@ -464,8 +464,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 					textGlyph.getId(), text));
 
 			Node ynode = graph.createNode();
-			YIndependentTextRealizer textRealizer =
-				new YIndependentTextRealizer(x, y, width, height,text);
+			IndependentTextRealizer textRealizer =
+				new IndependentTextRealizer(x, y, width, height,text);
 			graph.setRealizer(ynode, textRealizer);
 		}
 		else if (textGlyph.isSetGraphicalObject() &&
