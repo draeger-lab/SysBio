@@ -25,20 +25,22 @@ import org.sbml.jsbml.ext.layout.Point;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import y.view.LineType;
 import de.zbit.sbml.layout.Production;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YProduction implements Production<EdgeRealizer> {
+public class YProduction extends YAbstractSBGNArc implements Production<EdgeRealizer> {
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
 	 */
 	@Override
 	public EdgeRealizer draw(Curve curve) {
+		// Reverse order of curve segments an of start and end points because
+		// curves are always specified in the direction of the reaction
+		// (from substrate process node, from process node to product).
 		if ((curve != null) && curve.isSetListOfCurveSegments()) {
 			List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
 			Collections.reverse(listOfCurveSegments);
@@ -53,32 +55,6 @@ public class YProduction implements Production<EdgeRealizer> {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
 		edgeRealizer.setTargetArrow(Arrow.DELTA);
 		return edgeRealizer;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve, double)
-	 */
-	@Override
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = draw(curve);
-		LineType currentLineType = edgeRealizer.getLineType();
-		LineType lineType = LineType.createLineType((float) lineWidth,
-				currentLineType.getEndCap(),
-				currentLineType.getLineJoin(),
-				currentLineType.getMiterLimit(),
-				currentLineType.getDashArray(),
-				currentLineType.getDashPhase());
-		edgeRealizer.setLineType(lineType);
-		return edgeRealizer;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
-	 */
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

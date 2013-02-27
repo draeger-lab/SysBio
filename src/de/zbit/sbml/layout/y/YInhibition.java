@@ -17,19 +17,16 @@
 package de.zbit.sbml.layout.y;
 
 import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import y.view.LineType;
 import de.zbit.sbml.layout.Inhibition;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YInhibition implements Inhibition<EdgeRealizer> {
-
+public class YInhibition extends YAbstractSBGNArc implements Inhibition<EdgeRealizer> {
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
@@ -39,26 +36,6 @@ public class YInhibition implements Inhibition<EdgeRealizer> {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
 		edgeRealizer.setSourceArrow(Arrow.T_SHAPE);
 		return edgeRealizer;
-	}
-
-	@Override
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = draw(curve);
-		LineType currentLineType = edgeRealizer.getLineType();
-		LineType lineType = LineType.createLineType((float) lineWidth,
-				currentLineType.getEndCap(),
-				currentLineType.getLineJoin(),
-				currentLineType.getMiterLimit(),
-				currentLineType.getDashArray(),
-				currentLineType.getDashPhase());
-		edgeRealizer.setLineType(lineType);
-		return edgeRealizer;
-	}
-
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// Partial drawing of an EdgeRealizer not possible.
-		return null;
 	}
 
 }

@@ -17,18 +17,21 @@
 package de.zbit.sbml.layout.y;
 
 import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import y.view.LineType;
 import de.zbit.sbml.layout.SBGNArc;
 
 /**
+ * Consumptions in reversible reactions have to display an arrow. This class
+ * represents a consumption in a reversible reaction.
+ * 
+ * Note: This is not a dedicated SBGN arc by specification.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YReversibleConsumption implements SBGNArc<EdgeRealizer> {
+public class YReversibleConsumption extends YAbstractSBGNArc implements SBGNArc<EdgeRealizer> {
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
@@ -38,31 +41,6 @@ public class YReversibleConsumption implements SBGNArc<EdgeRealizer> {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
 		edgeRealizer.setTargetArrow(Arrow.DELTA);
 		return edgeRealizer;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve, double)
-	 */
-	@Override
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = draw(curve);
-		LineType currentLineType = edgeRealizer.getLineType();
-		LineType lineType = LineType.createLineType((float) lineWidth,
-				currentLineType.getEndCap(),
-				currentLineType.getLineJoin(),
-				currentLineType.getMiterLimit(),
-				currentLineType.getDashArray(),
-				currentLineType.getDashPhase());
-		edgeRealizer.setLineType(lineType);
-		return edgeRealizer;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
-	 */
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		return null;
 	}
 
 }

@@ -81,7 +81,7 @@ public class IndependentTextRealizer extends ShapeNodeRealizer {
 	 */
 	@Override
 	public void paintSloppy(Graphics2D gfx) {
-		// no sloppy representation
+		// No sloppy representation.
 	}
 
 	/* (non-Javadoc)

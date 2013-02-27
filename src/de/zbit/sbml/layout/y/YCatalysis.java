@@ -17,18 +17,16 @@
 package de.zbit.sbml.layout.y;
 
 import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import y.view.LineType;
 import de.zbit.sbml.layout.Catalysis;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YCatalysis implements Catalysis<EdgeRealizer> {
+public class YCatalysis extends YAbstractSBGNArc implements Catalysis<EdgeRealizer> {
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
@@ -38,32 +36,6 @@ public class YCatalysis implements Catalysis<EdgeRealizer> {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
 		edgeRealizer.setSourceArrow(Arrow.TRANSPARENT_CIRCLE);
 		return edgeRealizer;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
-	 */
-	@Override
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = draw(curve);
-		LineType currentLineType = edgeRealizer.getLineType();
-		LineType lineType = LineType.createLineType((float) lineWidth,
-				currentLineType.getEndCap(),
-				currentLineType.getLineJoin(),
-				currentLineType.getMiterLimit(),
-				currentLineType.getDashArray(),
-				currentLineType.getDashPhase());
-		edgeRealizer.setLineType(lineType);
-		return edgeRealizer;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve, double)
-	 */
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// Partial drawing of an EdgeRealizer not possible.
-		return null;
 	}
 
 }
