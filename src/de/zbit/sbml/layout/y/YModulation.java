@@ -17,27 +17,16 @@
 package de.zbit.sbml.layout.y;
 
 import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import y.view.LineType;
 import de.zbit.sbml.layout.Modulation;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YModulation implements Modulation<EdgeRealizer> {
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
-	 */
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// Partial drawing of an EdgeRealizer is not possible.
-		return null;		
-	}
+public class YModulation extends YAbstractSBGNArc implements Modulation<EdgeRealizer> {
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
@@ -46,23 +35,6 @@ public class YModulation implements Modulation<EdgeRealizer> {
 	public EdgeRealizer draw(Curve curve) {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
 		edgeRealizer.setSourceArrow(Arrow.WHITE_DIAMOND);
-		return edgeRealizer;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve, double)
-	 */
-	@Override
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = draw(curve);
-		LineType currentLineType = edgeRealizer.getLineType();
-		LineType lineType = LineType.createLineType((float) lineWidth,
-				currentLineType.getEndCap(),
-				currentLineType.getLineJoin(),
-				currentLineType.getMiterLimit(),
-				currentLineType.getDashArray(),
-				currentLineType.getDashPhase());
-		edgeRealizer.setLineType(lineType);
 		return edgeRealizer;
 	}
 

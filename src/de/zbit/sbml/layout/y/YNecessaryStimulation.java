@@ -16,19 +16,18 @@
  */
 package de.zbit.sbml.layout.y;
 
+
 import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import y.view.LineType;
 import de.zbit.sbml.layout.NecessaryStimulation;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YNecessaryStimulation implements
+public class YNecessaryStimulation extends YAbstractSBGNArc implements
 		NecessaryStimulation<EdgeRealizer> {
 
 	/* (non-Javadoc)
@@ -37,29 +36,14 @@ public class YNecessaryStimulation implements
 	@Override
 	public EdgeRealizer draw(Curve curve) {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
-		// TODO wrong arrow
-		edgeRealizer.setSourceArrow(Arrow.PLAIN);
+		DashTriangleArrowDrawable dashTriangleArrowDrawable = new DashTriangleArrowDrawable();
+		Arrow.addCustomArrow(DashTriangleArrowDrawable.DASH_TRIANGLE,
+				dashTriangleArrowDrawable,
+				dashTriangleArrowDrawable.getBounds().getWidth(),
+				0d);
+		edgeRealizer.setSourceArrow(
+				Arrow.getCustomArrow(DashTriangleArrowDrawable.DASH_TRIANGLE));
 		return edgeRealizer;
-	}
-
-	@Override
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = draw(curve);
-		LineType currentLineType = edgeRealizer.getLineType();
-		LineType lineType = LineType.createLineType((float) lineWidth,
-				currentLineType.getEndCap(),
-				currentLineType.getLineJoin(),
-				currentLineType.getMiterLimit(),
-				currentLineType.getDashArray(),
-				currentLineType.getDashPhase());
-		edgeRealizer.setLineType(lineType);
-		return edgeRealizer;
-	}
-
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// Partial drawing of an EdgeRealizer not possible.
-		return null;
 	}
 
 }

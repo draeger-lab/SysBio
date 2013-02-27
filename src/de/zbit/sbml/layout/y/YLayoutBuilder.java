@@ -302,14 +302,16 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		SBGNArc<EdgeRealizer> arc;
 		int sboTerm = -1;
 		SpeciesReferenceRole speciesReferenceRole = null;
-		if (srg.isSetSBOTerm()) {
-			sboTerm = srg.getSBOTerm();
-			arc = getSBGNArc(sboTerm);
-			logger.fine("SRG sbo term " + sboTerm);
-		} else {
+		if (srg.isSetSpeciesReferenceRole() &&
+				srg.getSpeciesReferenceRole() != null) {
 			speciesReferenceRole = srg.getSpeciesReferenceRole();
 			arc = getSBGNArc(speciesReferenceRole);
 			logger.fine("SRG role " + speciesReferenceRole);
+		}
+		else {
+			sboTerm = srg.getSBOTerm();
+			arc = getSBGNArc(sboTerm);
+			logger.fine("SRG sbo term " + sboTerm);
 		}
 		
 		Reaction reaction = (Reaction) reactionGlyph.getReactionInstance();

@@ -22,6 +22,8 @@ import y.layout.DiscreteEdgeLabelModel;
 import y.view.EdgeLabel;
 
 /**
+ * EdgeLabel subclass for stoichiometry values on reaction edges.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

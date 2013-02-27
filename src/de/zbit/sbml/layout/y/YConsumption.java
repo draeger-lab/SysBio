@@ -17,17 +17,15 @@
 package de.zbit.sbml.layout.y;
 
 import org.sbml.jsbml.ext.layout.Curve;
-import org.sbml.jsbml.ext.layout.CurveSegment;
 
 import y.view.EdgeRealizer;
-import y.view.LineType;
 import de.zbit.sbml.layout.Consumption;
 
 /**
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YConsumption implements Consumption<EdgeRealizer> {
+public class YConsumption extends YAbstractSBGNArc implements Consumption<EdgeRealizer> {
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment)
@@ -36,26 +34,6 @@ public class YConsumption implements Consumption<EdgeRealizer> {
 	public EdgeRealizer draw(Curve curve) {
 		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
 		return edgeRealizer;
-	}
-
-	@Override
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = draw(curve);
-		LineType currentLineType = edgeRealizer.getLineType();
-		LineType lineType = LineType.createLineType((float) lineWidth,
-				currentLineType.getEndCap(),
-				currentLineType.getLineJoin(),
-				currentLineType.getMiterLimit(),
-				currentLineType.getDashArray(),
-				currentLineType.getDashPhase());
-		edgeRealizer.setLineType(lineType);
-		return edgeRealizer;
-	}
-
-	@Override
-	public EdgeRealizer draw(CurveSegment curveSegment, double width) {
-		// Partial drawing of an EdgeRealizer not possible.
-		return null;
 	}
 
 }
