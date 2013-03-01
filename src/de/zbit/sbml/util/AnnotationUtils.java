@@ -33,6 +33,7 @@ import org.sbml.jsbml.AbstractNamedSBase;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.Compartment;
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
@@ -40,11 +41,9 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.SBMLWriter;
 import org.sbml.jsbml.Species;
-import org.sbml.jsbml.util.filters.CVTermFilter;
 
 import de.zbit.cache.InfoManagement;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
-import de.zbit.sbml.util.Annotate;
 import de.zbit.util.progressbar.ProgressBar;
 
 /**
@@ -116,20 +115,25 @@ public class AnnotationUtils {
     }
     
     KeggInfoManagement manager = loadInfoManager();
-    
-    Object[] elements = new Object[doc.getModel().getNumSpecies()
-        + doc.getModel().getReactionCount()
-        + doc.getModel().getNumCompartments()];
-    System.arraycopy(doc.getModel().getListOfSpecies().toArray(), 0, elements,
-      0, doc.getModel().getNumSpecies());
-    System.arraycopy(doc.getModel().getListOfReactions().toArray(), 0,
-      elements, doc.getModel().getNumSpecies(), doc.getModel()
-          .getReactionCount());
-    System
-        .arraycopy(doc.getModel().getListOfCompartments().toArray(), 0,
-          elements, doc.getModel().getReactionCount()
-              + doc.getModel().getNumSpecies(), doc.getModel()
-              .getNumCompartments());
+    Model model = doc.getModel();
+    Object[] elements = new Object[model.getSpeciesCount()
+        + model.getReactionCount()
+        + model.getCompartmentCount()];
+    if (model.isSetListOfSpecies()) {
+    	System.arraycopy(model.getListOfSpecies().toArray(), 0, elements,
+    		0, model.getSpeciesCount());
+    }
+    if (model.isSetListOfReactions()) {
+    	System.arraycopy(model.getListOfReactions().toArray(), 0,
+    		elements, model.getSpeciesCount(), model
+    		.getReactionCount());
+    }
+    if (model.isSetListOfCompartments()) {
+    	System.arraycopy(model.getListOfCompartments().toArray(), 0,
+    		elements, model.getReactionCount()
+    		+ model.getSpeciesCount(), model
+    		.getCompartmentCount());
+    }
     int total = 0, matched = 0, notMatched = 0;
     ProgressBar prog = new ProgressBar(elements.length);
     
@@ -141,7 +145,7 @@ public class AnnotationUtils {
       
       
       
-      if (element.getAnnotation().getNumCVTerms() > 0) {
+      if (element.getAnnotation().getCVTermCount() > 0) {
         matched++;
         continue;
       }
@@ -171,7 +175,7 @@ public class AnnotationUtils {
           Reaction r = (Reaction) element;
           
           //identify transport reactions
-          if ((r.getProductCount() == 1) && (r.getNumReactants() == 1)) {
+          if ((r.getProductCount() == 1) && (r.getReactantCount() == 1)) {
             Species product = r.getProduct(0).getSpeciesInstance();
             Species reactant = r.getReactant(0).getSpeciesInstance();
             Set<String> resources = new HashSet<String>();
@@ -307,51 +311,54 @@ public class AnnotationUtils {
       }
     }
     //add modifiers 
-    for (Object o : doc.getModel().getListOfReactions().toArray()) {
-      Reaction r = (Reaction) o;
-      for (int i = 0; i != r.getAnnotation().getNumCVTerms(); i++) {
-        for (String ann : r.getAnnotation().getCVTerm(i)
-            .filterResources("urn:miriam:ec-code:")) {
-          String annotation = ann.replaceFirst("urn:miriam:ec-code:", "");
-          if (modifiers.get(annotation) != null) {
-            for (String modifierID : modifiers.get(annotation)) {
-              Species modifier = doc.getModel().getSpecies(modifierID);
-              if (modifier == null) {
-                modifier = doc.getModel().createSpecies(modifierID);
-                Compartment c = r.getCompartmentInstance();
-                if (c == null) {
-                  if (r.getNumReactants() > 0) {
-                    Species s = r.getReactant(0).getSpeciesInstance();
-                    if (s != null) {
-                      c = s.getCompartmentInstance();
-                    }
-                  }
-                }
-                if (c == null) {
-                  if (r.getProductCount() > 0) {
-                    Species s = r.getProduct(0).getSpeciesInstance();
-                    if (s != null) {
-                      c = s.getCompartmentInstance();
-                    }
-                  }
-                }
-                if (c != null) {
-                  modifier.setCompartment(c);
-                }
-                modifier.setName(modifierID);
-                modifier.setMetaId(modifier.getId());
-                //TODO SBOTerms
-                if (annotationMap.get(modifierID) != null) {
-                  for (String a : annotationMap.get(modifierID)) {
-                    annotateSpecies(modifier, a, loadInfoManager());
-                  }
-                }
-              }
-              r.addModifier(new ModifierSpeciesReference(modifier));
-            }
-          }
-        }
-      }
+    Model model = doc.getModel();
+    if (model.isSetListOfReactions()) {
+    	for (Object o : model.getListOfReactions()) {
+    		Reaction r = (Reaction) o;
+    		for (int i = 0; i != r.getAnnotation().getCVTermCount(); i++) {
+    			for (String ann : r.getAnnotation().getCVTerm(i)
+    					.filterResources("urn:miriam:ec-code:")) {
+    				String annotation = ann.replaceFirst("urn:miriam:ec-code:", "");
+    				if (modifiers.get(annotation) != null) {
+    					for (String modifierID : modifiers.get(annotation)) {
+    						Species modifier = model.getSpecies(modifierID);
+    						if (modifier == null) {
+    							modifier = model.createSpecies(modifierID);
+    							Compartment c = r.getCompartmentInstance();
+    							if (c == null) {
+    								if (r.getReactantCount() > 0) {
+    									Species s = r.getReactant(0).getSpeciesInstance();
+    									if (s != null) {
+    										c = s.getCompartmentInstance();
+    									}
+    								}
+    							}
+    							if (c == null) {
+    								if (r.getProductCount() > 0) {
+    									Species s = r.getProduct(0).getSpeciesInstance();
+    									if (s != null) {
+    										c = s.getCompartmentInstance();
+    									}
+    								}
+    							}
+    							if (c != null) {
+    								modifier.setCompartment(c);
+    							}
+    							modifier.setName(modifierID);
+    							modifier.setMetaId(modifier.getId());
+    							//TODO SBOTerms
+    							if (annotationMap.get(modifierID) != null) {
+    								for (String a : annotationMap.get(modifierID)) {
+    									annotateSpecies(modifier, a, loadInfoManager());
+    								}
+    							}
+    						}
+    						r.addModifier(new ModifierSpeciesReference(modifier));
+    					}
+    				}
+    			}
+    		}
+    	}
     }
     SBMLWriter w = new SBMLWriter();
     w.write(doc, outputFile);
@@ -471,20 +478,26 @@ public class AnnotationUtils {
       e1.printStackTrace();
     }
     
-    Object[] elements = new Object[doc.getModel().getNumSpecies()
-        + doc.getModel().getReactionCount()
-        + doc.getModel().getNumCompartments()];
-    System.arraycopy(doc.getModel().getListOfSpecies().toArray(), 0, elements,
-      0, doc.getModel().getNumSpecies());
-    System.arraycopy(doc.getModel().getListOfReactions().toArray(), 0,
-      elements, doc.getModel().getNumSpecies(), doc.getModel()
-          .getReactionCount());
-    System
-        .arraycopy(doc.getModel().getListOfCompartments().toArray(), 0,
-          elements, doc.getModel().getReactionCount()
-              + doc.getModel().getNumSpecies(), doc.getModel()
-              .getNumCompartments());
-    
+    Model model = doc.getModel();
+    Object[] elements = new Object[model.getSpeciesCount()
+        + model.getReactionCount()
+        + model.getCompartmentCount()];
+    if (model.isSetListOfSpecies()) {
+    	System.arraycopy(model.getListOfSpecies().toArray(), 0, elements,
+    		0, model.getSpeciesCount());
+    }
+    if (model.isSetListOfReactions()) {
+    	System.arraycopy(model.getListOfReactions().toArray(), 0,
+    		elements, model.getSpeciesCount(), model
+    		.getReactionCount());
+    }
+    if (model.isSetListOfCompartments()) {
+    	System
+    	.arraycopy(model.getListOfCompartments().toArray(), 0,
+    		elements, model.getReactionCount()
+    		+ model.getSpeciesCount(), model
+    		.getCompartmentCount());
+    }
     
     for (Object el : elements) {
       AbstractNamedSBase element = (AbstractNamedSBase) el;
@@ -492,10 +505,10 @@ public class AnnotationUtils {
       
       Integer sbo=sboMap.get(symbol);
       
-      if(sbo!=null) {
+      if (sbo!=null) {
         element.setSBOTerm(sbo);
       }
-      else if(!element.isSetAnnotation()){
+      else if (!element.isSetAnnotation()){
         System.out.println(element.getId());
       }
       

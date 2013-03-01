@@ -47,22 +47,24 @@ public class SetStoichiometry {
 	}
 
 	private void checkAndSetStoichiometry(Model m) {
-		ListOf<Reaction> rList = m.getListOfReactions();
-		for (Reaction r : rList) {
-			ListOf<SpeciesReference> sr_reacList = r.getListOfReactants();
-			for (SpeciesReference sr : sr_reacList) {
-				if ((!sr.isSetStoichiometry()) && (m.getLevel() < 3)) {
-					sr.setStoichiometry(1.0);
+		if (m.isSetListOfReactions()) {
+			for (Reaction r : m.getListOfReactions()) {
+				if (r.isSetListOfReactants()) {
+					for (SpeciesReference sr : r.getListOfReactants()) {
+						if ((!sr.isSetStoichiometry()) && (m.getLevel() < 3)) {
+							sr.setStoichiometry(1d);
+						}
+					}
 				}
-			}
-			ListOf<SpeciesReference> sr_prodList = r.getListOfProducts();
-			for (SpeciesReference sr : sr_prodList) {
-				if ((!sr.isSetStoichiometry()) && (m.getLevel() < 3)) {
-					sr.setStoichiometry(1.0);
+				if (r.isSetListOfProducts()) {
+					for (SpeciesReference sr : r.getListOfProducts()) {
+						if ((!sr.isSetStoichiometry()) && (m.getLevel() < 3)) {
+							sr.setStoichiometry(1d);
+						}
+					}
 				}
 			}
 		}
-		
 	}
 	
 	private void writeDocument(File modelFile) throws SBMLException, XMLStreamException, IOException {

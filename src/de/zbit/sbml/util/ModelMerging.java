@@ -197,82 +197,88 @@ public class ModelMerging {
     
     Compartment c = newDoc.getModel().createCompartment("compartment");
     //species
-    for (Species sp : model.getListOfSpecies()) {
-      
-      List<CVTerm> cvTerms = sp.getCVTerms();
-      String name = sp.getName();
-      String oldId = sp.getId();
-      sp.setId("_"
-          + name.replace(",", "_").replace("(", "_").replace(")", "_")
-              .replace("-", "_").replace("+", "plus"));
-      sp.setMetaId(sp.getId());
-      sp.setCompartment(c);
-      ids.put(oldId, sp.getId());
-      newDoc.getModel().addSpecies(sp);
-      if (cvTerms.size() != 0) {
-        sp.setAnnotation(new Annotation());
-      }
-      
-      for (CVTerm current : cvTerms) {
-        sp.addCVTerm(current);
-        if (current.getBiologicalQualifierType().equals(Qualifier.BQB_IS)) {
-          
-          for (String s : current.getResources()) {
-            List<AbstractSBase> list = speciesAnnotationMap.get(s);
-            if (list == null) {
-              list = new LinkedList<AbstractSBase>();
-            }
-            list.add(sp);
-            speciesAnnotationMap.put(s, list);
-          }
-        }
-      }
-      
+    if (model.isSetListOfSpecies()) {
+    	for (Species sp : model.getListOfSpecies()) {
+    		
+    		List<CVTerm> cvTerms = sp.getCVTerms();
+    		String name = sp.getName();
+    		String oldId = sp.getId();
+    		sp.setId("_"
+    				+ name.replace(",", "_").replace("(", "_").replace(")", "_")
+    				.replace("-", "_").replace("+", "plus"));
+    		sp.setMetaId(sp.getId());
+    		sp.setCompartment(c);
+    		ids.put(oldId, sp.getId());
+    		newDoc.getModel().addSpecies(sp);
+    		if (cvTerms.size() != 0) {
+    			sp.setAnnotation(new Annotation());
+    		}
+    		
+    		for (CVTerm current : cvTerms) {
+    			sp.addCVTerm(current);
+    			if (current.getBiologicalQualifierType().equals(Qualifier.BQB_IS)) {
+    				
+    				for (String s : current.getResources()) {
+    					List<AbstractSBase> list = speciesAnnotationMap.get(s);
+    					if (list == null) {
+    						list = new LinkedList<AbstractSBase>();
+    					}
+    					list.add(sp);
+    					speciesAnnotationMap.put(s, list);
+    				}
+    			}
+    		}
+    		
+    	}
     }
-    
     //reactions
-    for (Reaction r : model.getListOfReactions()) {
-      if (r.getSBOTerm() == 185) {
-        continue;
-      }
-      
-      for (SpeciesReference sr : r.getListOfProducts()) {
-        String newSpeciesId = ids.get(sr.getSpecies());
-        sr.setSpecies(newSpeciesId);
-      }
-      for (ModifierSpeciesReference sr : r.getListOfModifiers()) {
-        String newSpeciesId = ids.get(sr.getSpecies());
-        sr.setSpecies(newSpeciesId);
-      }
-      for (SpeciesReference sr : r.getListOfReactants()) {
-        String newSpeciesId = ids.get(sr.getSpecies());
-        sr.setSpecies(newSpeciesId);
-      }
-      List<CVTerm> cvTerms = r.getCVTerms();
-      
-      newDoc.getModel().addReaction(r);
-      if (cvTerms.size() != 0) {
-        r.setAnnotation(new Annotation());
-      }
-      
-      for (CVTerm current : cvTerms) {
-        r.addCVTerm(current);
-        if (current.getBiologicalQualifierType().equals(Qualifier.BQB_IS)) {
-          
-          for (String s : current.getResources()) {
-            if (s.contains("urn:miriam:kegg.reaction")) {
-              List<AbstractSBase> list = reactionAnnotationMap.get(s);
-              if (list == null) {
-                list = new LinkedList<AbstractSBase>();
-              }
-              list.add(r);
-              reactionAnnotationMap.put(s, list);
-            }
-          }
-        }
-      }
+    if (model.isSetListOfReactions()) {
+    	for (Reaction r : model.getListOfReactions()) {
+    		if (r.getSBOTerm() == 185) {
+    			continue;
+    		}
+    		if (r.isSetListOfProducts()) {
+    			for (SpeciesReference sr : r.getListOfProducts()) {
+    				String newSpeciesId = ids.get(sr.getSpecies());
+    				sr.setSpecies(newSpeciesId);
+    			}
+    		}
+    		if (r.isSetListOfModifiers()) {
+    			for (ModifierSpeciesReference sr : r.getListOfModifiers()) {
+    				String newSpeciesId = ids.get(sr.getSpecies());
+    				sr.setSpecies(newSpeciesId);
+    			}
+    		}
+    		if (r.isSetListOfReactants()) {
+    			for (SpeciesReference sr : r.getListOfReactants()) {
+    				String newSpeciesId = ids.get(sr.getSpecies());
+    				sr.setSpecies(newSpeciesId);
+    			}
+    		}
+    		
+    		newDoc.getModel().addReaction(r);
+    		if (r.getCVTermCount() > 0) {
+    			r.setAnnotation(new Annotation());
+    			
+    			for (CVTerm current : r.getCVTerms()) {
+    				r.addCVTerm(current);
+    				if (current.getBiologicalQualifierType().equals(Qualifier.BQB_IS)) {
+    					
+    					for (String s : current.getResources()) {
+    						if (s.contains("urn:miriam:kegg.reaction")) {
+    							List<AbstractSBase> list = reactionAnnotationMap.get(s);
+    							if (list == null) {
+    								list = new LinkedList<AbstractSBase>();
+    							}
+    							list.add(r);
+    							reactionAnnotationMap.put(s, list);
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
     }
-    
     //remove elements with the same annotation and SBOTerm
     
     //species
@@ -304,58 +310,68 @@ public class ModelMerging {
   
   private static void merge(AbstractSBase abstractSBase,
     AbstractSBase abstractSBase2, SBMLDocument doc) {
+  	Model model = doc.getModel();
     if ((abstractSBase instanceof Reaction)
         && (abstractSBase2 instanceof Reaction)) {
       Reaction r = (Reaction) abstractSBase2;
-      doc.getModel().removeReaction(r);
+      model.removeReaction(r);
       
     } else if ((abstractSBase instanceof Species)
         && (abstractSBase2 instanceof Species)) {
       Species s1 = (Species) abstractSBase;
       Species s2 = (Species) abstractSBase2;
-      for (Reaction r : doc.getModel().getListOfReactions()) {
-        
-        for (SpeciesReference sr : r.getListOfProducts()) {
-          if (sr.getSpeciesInstance() == s2) {
-            if (r.getId().equals("r0422")) {
-              System.out.println();
-            }
-            sr.setSpecies(s1);
-          }
-        }
-        for (SpeciesReference sr : r.getListOfReactants()) {
-          
-          if (sr.getSpeciesInstance() == s2) {
-            if (r.getId().equals("r0422")) {
-              System.out.println();
-            }
-            sr.setSpecies(s1);
-          }
-        }
-        for (ModifierSpeciesReference sr : r.getListOfModifiers()) {
-          if (sr.getSpeciesInstance() == s2) {
-            sr.setSpecies(s1);
-          }
-        }
+      if (model.isSetListOfReactions()) {
+      	for (Reaction r : model.getListOfReactions()) {
+      		if (r.isSetListOfProducts()) {
+      			for (SpeciesReference sr : r.getListOfProducts()) {
+      				if (sr.getSpeciesInstance() == s2) {
+      					if (r.getId().equals("r0422")) {
+      						System.out.println();
+      					}
+      					sr.setSpecies(s1);
+      				}
+      			}
+      		}
+      		if (r.isSetListOfReactants()) {
+      			for (SpeciesReference sr : r.getListOfReactants()) {
+      				if (sr.getSpeciesInstance() == s2) {
+      					if (r.getId().equals("r0422")) {
+      						System.out.println();
+      					}
+      					sr.setSpecies(s1);
+      				}
+      			}
+      		}
+      		if (r.isSetListOfModifiers()) {
+      			for (ModifierSpeciesReference sr : r.getListOfModifiers()) {
+      				if (sr.getSpeciesInstance() == s2) {
+      					sr.setSpecies(s1);
+      				}
+      			}
+      		}
+      	}
       }
-      doc.getModel().removeSpecies(s2);
+      model.removeSpecies(s2);
     } else if ((abstractSBase instanceof Compartment)
         && (abstractSBase2 instanceof Compartment)) {
       Compartment c1 = (Compartment) abstractSBase;
       Compartment c2 = (Compartment) abstractSBase2;
-      
-      for (Species s : doc.getModel().getListOfSpecies()) {
-        if (s.getCompartmentInstance() == c2) {
-          s.setCompartment(c1);
-        }
+      if (model.isSetListOfSpecies()) {
+      	for (Species s : model.getListOfSpecies()) {
+      		if (s.getCompartmentInstance() == c2) {
+      			s.setCompartment(c1);
+      		}
+      	}
       }
-      for (Reaction r : doc.getModel().getListOfReactions()) {
-        if (r.getCompartmentInstance() != null
-            && r.getCompartmentInstance() == c2) {
-          r.setCompartment(c1);
-        }
+      if (model.isSetListOfReactions()) {
+      	for (Reaction r : model.getListOfReactions()) {
+      		if (r.getCompartmentInstance() != null
+      				&& r.getCompartmentInstance() == c2) {
+      			r.setCompartment(c1);
+      		}
+      	}
       }
-      doc.getModel().removeCompartment(c2.getId());
+      model.removeCompartment(c2.getId());
     }
   }
   

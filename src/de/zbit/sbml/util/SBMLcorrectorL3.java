@@ -66,32 +66,42 @@ public class SBMLcorrectorL3 {
 		SBMLDocument doc = SBMLReader.read(new File(args[0]));
 		if (doc.isSetModel()) {
 			Model m = doc.getModel();
-			for (UnitDefinition ud : m.getListOfUnitDefinitions()) {
-				correctUnits(ud);
+			if (m.isSetListOfUnitDefinitions()) {
+				for (UnitDefinition ud : m.getListOfUnitDefinitions()) {
+					correctUnits(ud);
+				}
 			}
-			for (Compartment c : m.getListOfCompartments()) {
-				correctCompartment(c);
+			if (m.isSetListOfCompartments()) {
+				for (Compartment c : m.getListOfCompartments()) {
+					correctCompartment(c);
+				}
 			}
-			for (Species s : m.getListOfSpecies()) {
-				correctSpecies(s);
+			if (m.isSetListOfSpecies()) {
+				for (Species s : m.getListOfSpecies()) {
+					correctSpecies(s);
+				}
 			}
-			for (Reaction r : m.getListOfReactions()) {
-				correctReaction(r);
+			if (m.isSetListOfReactions()) {
+				for (Reaction r : m.getListOfReactions()) {
+					correctReaction(r);
+				}
 			}
 			String namespace = LayoutConstants.getNamespaceURI(m.getLevel(), m.getVersion());
 			if (m.getExtension(namespace) != null) {
 				ExtendedLayoutModel layoutPlugin = (ExtendedLayoutModel) m.getExtension(namespace);
 				int i = 1;
-				for (Layout layout : layoutPlugin.getListOfLayouts()) {
-					if (!layout.isSetId()) {
-						layout.setId("layout_" + SBO.sboNumberString(i));
-						logger.info("Created id for layout " + layout.getId());
+				if (layoutPlugin.isSetListOfLayouts()) {
+					for (Layout layout : layoutPlugin.getListOfLayouts()) {
+						if (!layout.isSetId()) {
+							layout.setId("layout_" + SBO.sboNumberString(i));
+							logger.info("Created id for layout " + layout.getId());
+						}
+						correctTextGlyphs(layout);
+						//findExtremeSpeciesGlyphs(layout);
+						//					for (ReactionGlyph rg : layout.getListOfReactionGlyphs()) {
+						//						correctReactionGlyph(rg);
+						//					}
 					}
-					correctTextGlyphs(layout);
-					//findExtremeSpeciesGlyphs(layout);
-//					for (ReactionGlyph rg : layout.getListOfReactionGlyphs()) {
-//						correctReactionGlyph(rg);
-//					}
 				}
 			}
 		}
@@ -149,14 +159,20 @@ public class SBMLcorrectorL3 {
 			logger.info("Setting fast on " + r);
 			r.setFast(false);
 		}
-		for (SpeciesReference specRef : r.getListOfReactants()) {
-			correctSpeciesReference(specRef);
+		if (r.isSetListOfReactants()) {
+			for (SpeciesReference specRef : r.getListOfReactants()) {
+				correctSpeciesReference(specRef);
+			}
 		}
-		for (SpeciesReference specRef : r.getListOfProducts()) {
-			correctSpeciesReference(specRef);
+		if (r.isSetListOfProducts()) {
+			for (SpeciesReference specRef : r.getListOfProducts()) {
+				correctSpeciesReference(specRef);
+			}
 		}
-		for (ModifierSpeciesReference specRef : r.getListOfModifiers()) {
-			correctModifierSpeciesReference(specRef);
+		if (r.isSetListOfModifiers()) {
+			for (ModifierSpeciesReference specRef : r.getListOfModifiers()) {
+				correctModifierSpeciesReference(specRef);
+			}
 		}
 		removeCellDesignerAnnotation(r);
 	}
@@ -226,29 +242,31 @@ public class SBMLcorrectorL3 {
 	 * @param ud
 	 */
 	public static void correctUnits(UnitDefinition ud) {
-		for (Unit u : ud.getListOfUnits()) {
-			boolean change = false;
-			if (!u.isSetExponent()) {
-				logger.info("Setting exponent to 1d");
-				u.setExponent(1d);
-				change = true;
+		if (ud.isSetListOfUnits()) {
+			for (Unit u : ud.getListOfUnits()) {
+				boolean change = false;
+				if (!u.isSetExponent()) {
+					logger.info("Setting exponent to 1d");
+					u.setExponent(1d);
+					change = true;
+				}
+				if (!u.isSetScale()) {
+					logger.info("Setting scale to 0");
+					u.setScale(0);
+					change = true;
+				}
+				if (!u.isSetMultiplier()) {
+					logger.info("Setting multiplier to 1d");
+					u.setMultiplier(1d);
+					change = true;
+				}
+				if (change) {
+					logger.info("Had to correct unit in " + ud);
+				}
+				removeCellDesignerAnnotation(u);
 			}
-			if (!u.isSetScale()) {
-				logger.info("Setting scale to 0");
-				u.setScale(0);
-				change = true;
-			}
-			if (!u.isSetMultiplier()) {
-				logger.info("Setting multiplier to 1d");
-				u.setMultiplier(1d);
-				change = true;
-			}
-			if (change) {
-				logger.info("Had to correct unit in " + ud);
-			}
-			removeCellDesignerAnnotation(u);
+			removeCellDesignerAnnotation(ud);
 		}
-		removeCellDesignerAnnotation(ud);
 	}
 
 	/**
@@ -258,51 +276,53 @@ public class SBMLcorrectorL3 {
 	public static void findExtremeSpeciesGlyphs(Layout layout) {
 		SpeciesGlyph extreme[] = new SpeciesGlyph[4];
 		final int leftMost = 0, topMost = 1, rightMost = 2, bottomMost = 3;
-		for (SpeciesGlyph sg : layout.getListOfSpeciesGlyphs()) {
-			for (int i = 0; i < extreme.length; i++) {
-				if (extreme[i] == null) {
-					extreme[i] = sg;
-				} else if (sg.isSetBoundingBox() && sg.getBoundingBox().isSetPosition()) {
-					double x, y, z;
-					switch (i) {
-						case leftMost:
-							x = Double.MAX_VALUE;
-							if (extreme[i].isSetBoundingBox() && extreme[i].getBoundingBox().isSetPosition()) {
-								x = extreme[i].getBoundingBox().getPosition().getX();
-							}
-							if (sg.getBoundingBox().getPosition().getX() < x) {
-								extreme[i] = sg;
-							}
-							break;
-						case topMost:
-							y = Double.MAX_VALUE;
-							if (extreme[i].isSetBoundingBox() && extreme[i].getBoundingBox().isSetPosition()) {
-								y = extreme[i].getBoundingBox().getPosition().getY();
-							}
-							if (sg.getBoundingBox().getPosition().getY() < y) {
-								extreme[i] = sg;
-							}
-							break;
-						case rightMost:
-							x = Double.MIN_VALUE;
-							if (extreme[i].isSetBoundingBox() && extreme[i].getBoundingBox().isSetPosition()) {
-								x = extreme[i].getBoundingBox().getPosition().getX();
-							}
-							if (sg.getBoundingBox().getPosition().getX() > x) {
-								extreme[i] = sg;
-							}
-							break;
-						case bottomMost:
-							y = -Double.MAX_VALUE;
-							if (extreme[i].isSetBoundingBox() && extreme[i].getBoundingBox().isSetPosition()) {
-								y = extreme[i].getBoundingBox().getPosition().getY();
-							}
-							if (sg.getBoundingBox().getPosition().getY() > y) {
-								extreme[i] = sg;
-							}
-							break;
-						default:
-							break;
+		if (layout.isSetListOfSpeciesGlyphs()) {
+			for (SpeciesGlyph sg : layout.getListOfSpeciesGlyphs()) {
+				for (int i = 0; i < extreme.length; i++) {
+					if (extreme[i] == null) {
+						extreme[i] = sg;
+					} else if (sg.isSetBoundingBox() && sg.getBoundingBox().isSetPosition()) {
+						double x, y, z;
+						switch (i) {
+							case leftMost:
+								x = Double.MAX_VALUE;
+								if (extreme[i].isSetBoundingBox() && extreme[i].getBoundingBox().isSetPosition()) {
+									x = extreme[i].getBoundingBox().getPosition().getX();
+								}
+								if (sg.getBoundingBox().getPosition().getX() < x) {
+									extreme[i] = sg;
+								}
+								break;
+							case topMost:
+								y = Double.MAX_VALUE;
+								if (extreme[i].isSetBoundingBox() && extreme[i].getBoundingBox().isSetPosition()) {
+									y = extreme[i].getBoundingBox().getPosition().getY();
+								}
+								if (sg.getBoundingBox().getPosition().getY() < y) {
+									extreme[i] = sg;
+								}
+								break;
+							case rightMost:
+								x = Double.MIN_VALUE;
+								if (extreme[i].isSetBoundingBox() && extreme[i].getBoundingBox().isSetPosition()) {
+									x = extreme[i].getBoundingBox().getPosition().getX();
+								}
+								if (sg.getBoundingBox().getPosition().getX() > x) {
+									extreme[i] = sg;
+								}
+								break;
+							case bottomMost:
+								y = -Double.MAX_VALUE;
+								if (extreme[i].isSetBoundingBox() && extreme[i].getBoundingBox().isSetPosition()) {
+									y = extreme[i].getBoundingBox().getPosition().getY();
+								}
+								if (sg.getBoundingBox().getPosition().getY() > y) {
+									extreme[i] = sg;
+								}
+								break;
+							default:
+								break;
+						}
 					}
 				}
 			}
@@ -318,13 +338,15 @@ public class SBMLcorrectorL3 {
 	 * @param layout
 	 */
 	public static void correctTextGlyphs(Layout layout) {
-		for (TextGlyph tg : layout.getListOfTextGlyphs()) {
-			if (tg.isSetOriginOfText() && tg.isSetGraphicalObject() && tg.getOriginOfText().equals(tg.getGraphicalObject())) {
-				GraphicalObject go = tg.getGraphicalObjectInstance();
-				if (go instanceof NamedSBaseGlyph) {
-					NamedSBaseGlyph nsbg = (NamedSBaseGlyph) go;
-					if (nsbg.isSetNamedSBase()) {
-						tg.setOriginOfText(nsbg.getNamedSBase());
+		if (layout.isSetListOfTextGlyphs()) {
+			for (TextGlyph tg : layout.getListOfTextGlyphs()) {
+				if (tg.isSetOriginOfText() && tg.isSetGraphicalObject() && tg.getOriginOfText().equals(tg.getGraphicalObject())) {
+					GraphicalObject go = tg.getGraphicalObjectInstance();
+					if (go instanceof NamedSBaseGlyph) {
+						NamedSBaseGlyph nsbg = (NamedSBaseGlyph) go;
+						if (nsbg.isSetNamedSBase()) {
+							tg.setOriginOfText(nsbg.getNamedSBase());
+						}
 					}
 				}
 			}

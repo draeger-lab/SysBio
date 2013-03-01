@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
@@ -60,24 +59,24 @@ public class AddSubstanceUnits2Model {
 	public AddSubstanceUnits2Model(SBMLDocument doc, String output) throws IOException, SBMLException, XMLStreamException{
 		logger.info("SBML Document is read.");
 		Model m = doc.getModel();
-		ListOf<Species> speciesList = m.getListOfSpecies();
 				
-		for(Species sp : speciesList){
-			if (!sp.isSetHasOnlySubstanceUnits()){
-				sp.setHasOnlySubstanceUnits(false);
-				logger.info("hasOnlySubstanceUnits wasn't set: " + sp.isHasOnlySubstanceUnits());
-			}
-			
-			if (sp.getSubstanceUnits().isEmpty()){
-				sp.setSubstanceUnits("substance");
-			}
-
-			if (sp.getHasOnlySubstanceUnits()){
-				sp.setHasOnlySubstanceUnits(false);
-				logger.info("hasOnlySubstanceUnits is now set to: " + sp.getHasOnlySubstanceUnits());
+		if (m.isSetListOfSpecies()) {
+			for (Species sp : m.getListOfSpecies()) {
+				if (!sp.isSetHasOnlySubstanceUnits()) {
+					sp.setHasOnlySubstanceUnits(false);
+					logger.info("hasOnlySubstanceUnits wasn't set: " + sp.isHasOnlySubstanceUnits());
+				}
+				
+				if (sp.getSubstanceUnits().isEmpty()) {
+					sp.setSubstanceUnits("substance");
+				}
+				
+				if (sp.getHasOnlySubstanceUnits()) {
+					sp.setHasOnlySubstanceUnits(false);
+					logger.info("hasOnlySubstanceUnits is now set to: " + sp.getHasOnlySubstanceUnits());
+				}
 			}
 		}
-
 		SBMLWriter w = new SBMLWriter();
 		w.write(doc, output);
 		logger.info("SBML Document is written to " + output);

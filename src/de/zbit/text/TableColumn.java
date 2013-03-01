@@ -24,44 +24,73 @@ package de.zbit.text;
 public class TableColumn {
 	
 	public enum Align {
-		left,
 		center,
+		left,
 		right;
 	}
 	
 	public enum VAlign {
-		top,
+		bottom,
 		center,
-		bottom;
+		top;
 	}
 	
 	private Align align;
+	private int colspan;
+	private int height;
+	private String heightUnit;
+	private int rowspan;
 	private VAlign valign;
 	private int width;
-	private int height;
-	private int rowspan;
-	private int colspan;
+	private String widthUnit;
 	
 	public TableColumn(Align align) {
 		this.align = align;
 	}
-	
+
 	public TableColumn(Align align, int width) {
 		this(align);
 		setWidth(width);
 	}
 	
+	public TableColumn(Align align, int width, String widthUnit) {
+		this(align, width);
+		setWidthUnit(widthUnit);
+	}
+
 	/**
 	 * @return the align
 	 */
 	public Align getAlign() {
 		return align;
 	}
+
 	/**
-	 * @param align the align to set
+	 * @return the colspan
 	 */
-	public void setAlign(Align align) {
-		this.align = align;
+	public int getColspan() {
+		return colspan;
+	}
+
+	/**
+	 * @return the height
+	 */
+	public int getHeight() {
+		return height;
+	}
+	
+	/**
+	 * @return the heightUnit
+	 */
+	public String getHeightUnit() {
+		return heightUnit;
+	}
+	
+	/**
+	 * @return the rowspan
+	 */
+	public int getRowspan() {
+		return rowspan;
 	}
 	/**
 	 * @return the valign
@@ -70,28 +99,28 @@ public class TableColumn {
 		return valign;
 	}
 	/**
-	 * @param valign the valign to set
-	 */
-	public void setValign(VAlign valign) {
-		this.valign = valign;
-	}
-	/**
 	 * @return the width
 	 */
 	public int getWidth() {
 		return width;
 	}
 	/**
-	 * @param width the width to set
+	 * @return the withUnit
 	 */
-	public void setWidth(int width) {
-		this.width = width;
+	public String getWidthUnit() {
+		return widthUnit;
 	}
 	/**
-	 * @return the height
+	 * @param align the align to set
 	 */
-	public int getHeight() {
-		return height;
+	public void setAlign(Align align) {
+		this.align = align;
+	}
+	/**
+	 * @param colspan the colspan to set
+	 */
+	public void setColspan(int colspan) {
+		this.colspan = colspan;
 	}
 	/**
 	 * @param height the height to set
@@ -100,10 +129,10 @@ public class TableColumn {
 		this.height = height;
 	}
 	/**
-	 * @return the rowspan
+	 * @param heightUnit the heightUnit to set
 	 */
-	public int getRowspan() {
-		return rowspan;
+	public void setHeightUnit(String heightUnit) {
+		this.heightUnit = heightUnit;
 	}
 	/**
 	 * @param rowspan the rowspan to set
@@ -112,16 +141,22 @@ public class TableColumn {
 		this.rowspan = rowspan;
 	}
 	/**
-	 * @return the colspan
+	 * @param valign the valign to set
 	 */
-	public int getColspan() {
-		return colspan;
+	public void setValign(VAlign valign) {
+		this.valign = valign;
 	}
 	/**
-	 * @param colspan the colspan to set
+	 * @param width the width to set
 	 */
-	public void setColspan(int colspan) {
-		this.colspan = colspan;
+	public void setWidth(int width) {
+		this.width = width;
+	}
+	/**
+	 * @param widthUnit the widthUnit to set
+	 */
+	public void setWidthUnit(String widthUnit) {
+		this.widthUnit = widthUnit;
 	}
 	
 }

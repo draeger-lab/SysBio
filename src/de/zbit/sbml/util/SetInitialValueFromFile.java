@@ -121,32 +121,30 @@ public class SetInitialValueFromFile {
 
 		}
 		Model model = doc.getModel();
-		
-		ListOf<Species> spList= model.getListOfSpecies();
-		
-		for (Species species : spList) {
-			if (concentration) {
-				// in case of setting initialConcentration
-				species.setInitialConcentration(Double.NaN);
-				species.setSubstanceUnits("substance");
-				try {
-					species.setInitialConcentration(concMap.get(species.getId().toString()));
-				} catch (Exception e) {
-					logger.info(species.getId().toString() + ": Species not found.");
+		if (model.isSetListOfSpecies()) {
+			for (Species species : model.getListOfSpecies()) {
+				if (concentration) {
+					// in case of setting initialConcentration
+					species.setInitialConcentration(Double.NaN);
+					species.setSubstanceUnits("substance");
+					try {
+						species.setInitialConcentration(concMap.get(species.getId().toString()));
+					} catch (Exception e) {
+						logger.info(species.getId().toString() + ": Species not found.");
+					}
 				}
-			}
-			else {
-				// in case of setting initialAmount
-				species.setInitialAmount(Double.NaN);
-				species.setSubstanceUnits("substance");
-				try {
-					species.setInitialAmount(concMap.get(species.getId().toString()));
-				} catch (Exception e) {
-					logger.info(species.getId().toString() + ": Species not found.");
+				else {
+					// in case of setting initialAmount
+					species.setInitialAmount(Double.NaN);
+					species.setSubstanceUnits("substance");
+					try {
+						species.setInitialAmount(concMap.get(species.getId().toString()));
+					} catch (Exception e) {
+						logger.info(species.getId().toString() + ": Species not found.");
+					}
 				}
 			}
 		}
-		
 		SBMLWriter w = new SBMLWriter();
 		w.write(doc, modelFile);		
 	}

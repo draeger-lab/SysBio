@@ -93,19 +93,21 @@ public class Layout2GraphML extends SB_2GraphML<Layout> {
 	 */
 	private void initReactionModifiers(Layout layout) {
     SBMLCreateEdgeMode createEdgeMode = (SBMLCreateEdgeMode) this.editMode.getCreateEdgeMode();
-    ListOf<ReactionGlyph> list = layout.getListOfReactionGlyphs();
-    for (ReactionGlyph r : list) {
-      ListOf<SpeciesReferenceGlyph> refList = r.getListOfSpeciesReferenceGlyphs();
-      for (SpeciesReferenceGlyph sRef : refList) {
-        if ((sRef.getSpeciesReferenceRole() != SpeciesReferenceRole.PRODUCT) && (sRef.getSpeciesReferenceRole() != SpeciesReferenceRole.SUBSTRATE)) {
-					Node source = (Node) sRef.getSpeciesGlyphInstance().getUserObject(Constants.GLYPH_NODE_KEY);
-          Node target = (Node) r.getUserObject(Constants.GLYPH_NODE_KEY);
-          if ((source != null) && (target != null)) {
-            createEdgeMode.createEdge(this.simpleGraph, source, target,
-              new GenericEdgeRealizer(), sRef.getSBOTerm());
-          }
-        }
-      }
+    if (layout.isSetListOfReactionGlyphs()) {
+    	for (ReactionGlyph r : layout.getListOfReactionGlyphs()) {
+    		if (r.isSetListOfSpeciesReferencesGlyphs()) {
+    			for (SpeciesReferenceGlyph sRef : r.getListOfSpeciesReferenceGlyphs()) {
+    				if ((sRef.getSpeciesReferenceRole() != SpeciesReferenceRole.PRODUCT) && (sRef.getSpeciesReferenceRole() != SpeciesReferenceRole.SUBSTRATE)) {
+    					Node source = (Node) sRef.getSpeciesGlyphInstance().getUserObject(Constants.GLYPH_NODE_KEY);
+    					Node target = (Node) r.getUserObject(Constants.GLYPH_NODE_KEY);
+    					if ((source != null) && (target != null)) {
+    						createEdgeMode.createEdge(this.simpleGraph, source, target,
+    							new GenericEdgeRealizer(), sRef.getSBOTerm());
+    					}
+    				}
+    			}
+    		}
+    	}
     }
   }
 
@@ -114,13 +116,14 @@ public class Layout2GraphML extends SB_2GraphML<Layout> {
 	 * @param layout
 	 */
 	private void initTextGlyphs(Layout layout) {
-	  ListOf<TextGlyph> list = layout.getListOfTextGlyphs();
-	  for (TextGlyph textGlyph : list) {
-	    SpeciesGlyph s = layout.getSpeciesGlyph(textGlyph.getGraphicalObject());
-	    if (s != null) {
-	      s.putUserObject(Constants.GRAPHOBJECT_TEXTGLYPH_KEY, textGlyph);
-	    }
-	  }
+		if (layout.isSetListOfTextGlyphs()) {
+			for (TextGlyph textGlyph : layout.getListOfTextGlyphs()) {
+				SpeciesGlyph s = layout.getSpeciesGlyph(textGlyph.getGraphicalObject());
+				if (s != null) {
+					s.putUserObject(Constants.GRAPHOBJECT_TEXTGLYPH_KEY, textGlyph);
+				}
+			}
+		}
 	}
 
 	/**
@@ -128,31 +131,33 @@ public class Layout2GraphML extends SB_2GraphML<Layout> {
 	 * @param layout
 	 */
 	private void initReactionGlyphs(Layout layout) {
-	  ListOf<ReactionGlyph> list = layout.getListOfReactionGlyphs();
-	  for (ReactionGlyph r : list) {
-	    
-	    Reaction reaction = (Reaction) r.getReactionInstance();
-	    
-	    Node source = null;
-	    Node target = null;
-	    ListOf<SpeciesReferenceGlyph> refList = r.getListOfSpeciesReferenceGlyphs();
-	    for (SpeciesReferenceGlyph sRef : refList) {
-	      if (sRef.getSpeciesReferenceRole() == SpeciesReferenceRole.SUBSTRATE) {
-	        source = (Node) sRef.getSpeciesGlyphInstance().getUserObject(Constants.GLYPH_NODE_KEY);
-	      }
-	      if (sRef.getSpeciesReferenceRole() == SpeciesReferenceRole.PRODUCT) {
-	        target = (Node) sRef.getSpeciesGlyphInstance().getUserObject(Constants.GLYPH_NODE_KEY);
-	      }
-	    }
-	    SBMLCreateEdgeMode createEdgeMode = (SBMLCreateEdgeMode) this.editMode.getCreateEdgeMode();
-	    Node n = createEdgeMode.createEdgeNode(this.simpleGraph, source, target,
-	      new GenericEdgeRealizer(), reaction.getReversible());	
-	    
-	    if (r.isSetBoundingBox()) {
-	      this.simpleGraph.setLocation(n, r.getBoundingBox().getPosition().getX(), r.getBoundingBox().getPosition().getY());
-	    }
-	    r.putUserObject(Constants.GLYPH_NODE_KEY, n);
-	  }
+		if (layout.isSetListOfReactionGlyphs()) {
+			for (ReactionGlyph r : layout.getListOfReactionGlyphs()) {
+				
+				Reaction reaction = (Reaction) r.getReactionInstance();
+				
+				Node source = null;
+				Node target = null;
+				if (r.isSetListOfSpeciesReferencesGlyphs()) {
+					for (SpeciesReferenceGlyph sRef : r.getListOfSpeciesReferenceGlyphs()) {
+						if (sRef.getSpeciesReferenceRole() == SpeciesReferenceRole.SUBSTRATE) {
+							source = (Node) sRef.getSpeciesGlyphInstance().getUserObject(Constants.GLYPH_NODE_KEY);
+						}
+						if (sRef.getSpeciesReferenceRole() == SpeciesReferenceRole.PRODUCT) {
+							target = (Node) sRef.getSpeciesGlyphInstance().getUserObject(Constants.GLYPH_NODE_KEY);
+						}
+					}
+				}
+				SBMLCreateEdgeMode createEdgeMode = (SBMLCreateEdgeMode) this.editMode.getCreateEdgeMode();
+				Node n = createEdgeMode.createEdgeNode(this.simpleGraph, source, target,
+					new GenericEdgeRealizer(), reaction.getReversible());	
+				
+				if (r.isSetBoundingBox()) {
+					this.simpleGraph.setLocation(n, r.getBoundingBox().getPosition().getX(), r.getBoundingBox().getPosition().getY());
+				}
+				r.putUserObject(Constants.GLYPH_NODE_KEY, n);
+			}
+		}
 	}
 
 	/**
@@ -160,38 +165,39 @@ public class Layout2GraphML extends SB_2GraphML<Layout> {
 	 * @param layout
 	 */
 	private void initSpeciesGlyphs(Layout layout) {
-	  ListOf<SpeciesGlyph> list = layout.getListOfSpeciesGlyphs();
-	  for (SpeciesGlyph glyph : list) {
-
-	    String speciesId = glyph.getSpecies();
-	    Species species = layout.getModel().getSpecies(speciesId);
-	    if (species == null) {
-	      continue;
-	    }
-
-	    String name = "(" + species.getName() + ")";
-	    TextGlyph textGlyph = (TextGlyph) glyph.getUserObject(Constants.GRAPHOBJECT_TEXTGLYPH_KEY);
-	    if (textGlyph != null && textGlyph.isSetNamedSBase()) {
-	      String namedSBase = textGlyph.getNamedSBase();
-	      Species originSpecies = textGlyph.getModel().getSpecies(namedSBase);
-	      if (originSpecies != null && originSpecies.isSetName()) {
-	        name = originSpecies.getName();
-	      }
-	    }
-	    
-	    Node n;
-	    if (glyph.isSetBoundingBox() && glyph.getBoundingBox().isSetPosition()
-	        && glyph.getBoundingBox().isSetDimensions()) {
-	      BoundingBox bb = glyph.getBoundingBox();
-	      Dimensions dimensions = bb.getDimensions();
-	      Point point = bb.getPosition();
-	      n = createNode(speciesId, name, species.getSBOTerm(), point.getX(), point.getY(), dimensions.getWidth(), dimensions.getHeight());
-	    }
-	    else {
-	      n = createNode(speciesId, name, species.getSBOTerm());
-	    }
-	    glyph.putUserObject(Constants.GLYPH_NODE_KEY, n);
-	  }
+		if (layout.isSetListOfSpeciesGlyphs()) {
+			for (SpeciesGlyph glyph : layout.getListOfSpeciesGlyphs()) {
+				
+				String speciesId = glyph.getSpecies();
+				Species species = layout.getModel().getSpecies(speciesId);
+				if (species == null) {
+					continue;
+				}
+				
+				String name = "(" + species.getName() + ")";
+				TextGlyph textGlyph = (TextGlyph) glyph.getUserObject(Constants.GRAPHOBJECT_TEXTGLYPH_KEY);
+				if (textGlyph != null && textGlyph.isSetNamedSBase()) {
+					String namedSBase = textGlyph.getNamedSBase();
+					Species originSpecies = textGlyph.getModel().getSpecies(namedSBase);
+					if (originSpecies != null && originSpecies.isSetName()) {
+						name = originSpecies.getName();
+					}
+				}
+				
+				Node n;
+				if (glyph.isSetBoundingBox() && glyph.getBoundingBox().isSetPosition()
+						&& glyph.getBoundingBox().isSetDimensions()) {
+					BoundingBox bb = glyph.getBoundingBox();
+					Dimensions dimensions = bb.getDimensions();
+					Point point = bb.getPosition();
+					n = createNode(speciesId, name, species.getSBOTerm(), point.getX(), point.getY(), dimensions.getWidth(), dimensions.getHeight());
+				}
+				else {
+					n = createNode(speciesId, name, species.getSBOTerm());
+				}
+				glyph.putUserObject(Constants.GLYPH_NODE_KEY, n);
+			}
+		}
 	}
 
 	/**
@@ -199,35 +205,30 @@ public class Layout2GraphML extends SB_2GraphML<Layout> {
 	 * @param layout
 	 */
 	private void initCompartments(Layout layout) {
-			List<CompartmentGlyph> compartments = layout.getListOfCompartmentGlyphs();
-			if (compartments.size() == 0) {
-			  // found one compartment, the default compartment, do not draw it
-			  return;
+		if (layout.isSetListOfCompartmentGlyphs()) {
+			// TODO
+			// String outmostCompartmentId = getOutmostCompartmentId(compartments);
+			String outmostCompartmentId = "outmost";
+			for (CompartmentGlyph c : layout.getListOfCompartmentGlyphs()) {
+				// TODO order: outmost compartment -> innermost compartment
+				if (c.getId().equals(outmostCompartmentId)) {
+					continue;
+				}
+				Node n;
+				if (c.isSetBoundingBox() && c.getBoundingBox().isSetDimensions()
+						&& c.getBoundingBox().isSetPosition()) {
+					BoundingBox bb = c.getBoundingBox();
+					Dimensions dimensions = bb.getDimensions();
+					Point point = bb.getPosition();
+					n = createNode(c.getId(), c.getName(), c.getSBOTerm(),
+						point.getX(), point.getY(), dimensions.getWidth(), dimensions.getHeight());
+				}
+				else {
+					n = createNode(c.getId(), c.getName(), c.getSBOTerm());
+				}
+				c.putUserObject(Constants.GLYPH_NODE_KEY, n);
 			}
-			else {
-			  // TODO
-			  // String outmostCompartmentId = getOutmostCompartmentId(compartments);
-			  String outmostCompartmentId = "outmost";
-			  for (CompartmentGlyph c : compartments) {
-			    // TODO order: outmost compartment -> innermost compartment
-			    if (c.getId().equals(outmostCompartmentId)) {
-			      continue;
-			    }
-			    Node n;
-			    if (c.isSetBoundingBox() && c.getBoundingBox().isSetDimensions()
-			        && c.getBoundingBox().isSetPosition()) {
-			      BoundingBox bb = c.getBoundingBox();
-			      Dimensions dimensions = bb.getDimensions();
-			      Point point = bb.getPosition();
-			      n = createNode(c.getId(), c.getName(), c.getSBOTerm(),
-			          point.getX(), point.getY(), dimensions.getWidth(), dimensions.getHeight());
-			    }
-			    else {
-			      n = createNode(c.getId(), c.getName(), c.getSBOTerm());
-			    }
-			    c.putUserObject(Constants.GLYPH_NODE_KEY, n);
-			  }
-			}
+		}
 	}
 	
 	

@@ -321,9 +321,11 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			lh.add(new SBasePanel(e.getTimeUnitsInstance(), namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
 			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
 		}
-		for (EventAssignment ea : e.getListOfEventAssignments()) {
-			lh.add(new SBasePanel(ea, namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
-			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
+		if (e.isSetListOfEventAssignments()) {
+			for (EventAssignment ea : e.getListOfEventAssignments()) {
+				lh.add(new SBasePanel(ea, namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
+				lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
+			}
 		}
 	}
 
@@ -607,13 +609,15 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			String columnNames[] = new String[] { bundle.getString("givenName"), bundle.getString("familyName"),
 				bundle.getString("eMail"), bundle.getString("organization") };
 			String rowData[][] = new String[hist.getCreatorCount()][4];
-			int i = 0;
-			for (Creator mc : hist.getListOfCreators()) {
-				rowData[i][0] = mc.getGivenName();
-				rowData[i][1] = mc.getFamilyName();
-				rowData[i][2] = mc.getEmail();
-				rowData[i][3] = mc.getOrganization();
-				i++;
+			if (hist.isSetListOfCreators()) {
+				int i = 0;
+				for (Creator mc : hist.getListOfCreators()) {
+					rowData[i][0] = mc.getGivenName();
+					rowData[i][1] = mc.getFamilyName();
+					rowData[i][2] = mc.getEmail();
+					rowData[i][3] = mc.getOrganization();
+					i++;
+				}
 			}
 			JTable table = new JTable(rowData, columnNames);
 			table.setEnabled(editable);
@@ -638,7 +642,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			if (hist.isSetModifiedDate()) {
 				modification.add(hist.getModifiedDate());
 			}
-			for (i = 0; i < hist.getModifiedDateCount(); i++) {
+			for (int i = 0; i < hist.getModifiedDateCount(); i++) {
 				if (!modification.contains(hist.getModifiedDate(i))) {
 					modification.add(hist.getModifiedDate(i));
 				}
@@ -996,8 +1000,10 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private void addProperties(UnitDefinition ud) {
 		addLabeledComponent(bundle.getString("definition"), unitPreview(ud));
-		for (Unit u : ud.getListOfUnits()) {
-			lh.add(new SBasePanel(u, namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
+		if (ud.isSetListOfUnits()) {
+			for (Unit u : ud.getListOfUnits()) {
+				lh.add(new SBasePanel(u, namesIfAvailable, this.renderer), 1, ++row, 3, 1, 1d, 1d);
+			}
 		}
 	}
 

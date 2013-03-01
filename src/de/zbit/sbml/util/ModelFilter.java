@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.CVTerm.Qualifier;
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
@@ -159,21 +160,23 @@ public class ModelFilter {
       for (Reaction r : transportReactions) {
         boolean reactantsContained = true;
         boolean productsContained = true;
-        
-        for (SpeciesReference sr : r.getListOfReactants()) {
-          Species sp = sr.getSpeciesInstance();
-          if (!speciesToAdd.contains(sp)) {
-            reactantsContained = false;
-            break;
-          }
+        if (r.isSetListOfReactants()) {
+        	for (SpeciesReference sr : r.getListOfReactants()) {
+        		Species sp = sr.getSpeciesInstance();
+        		if (!speciesToAdd.contains(sp)) {
+        			reactantsContained = false;
+        			break;
+        		}
+        	}
         }
-        
-        for (SpeciesReference sr : r.getListOfProducts()) {
-          Species sp = sr.getSpeciesInstance();
-          if (!speciesToAdd.contains(sp)) {
-            productsContained = false;
-            break;
-          }
+        if (r.isSetListOfProducts()) {
+        	for (SpeciesReference sr : r.getListOfProducts()) {
+        		Species sp = sr.getSpeciesInstance();
+        		if (!speciesToAdd.contains(sp)) {
+        			productsContained = false;
+        			break;
+        		}
+        	}
         }
         if (reactantsContained || productsContained) {
           reactionAdded = true;
@@ -223,21 +226,23 @@ public class ModelFilter {
   private static boolean reactionInteresting(Reaction r, Set<String> speciesSet) {
     boolean productContained = false;
     boolean reactantContained = false;
-    
-    for (SpeciesReference sr : r.getListOfReactants()) {
-      String id = sr.getSpecies();
-      if (speciesSet.contains(id)) {
-        reactantContained = true;
-        break;
-      }
+    if (r.isSetListOfReactants()) {
+    	for (SpeciesReference sr : r.getListOfReactants()) {
+    		String id = sr.getSpecies();
+    		if (speciesSet.contains(id)) {
+    			reactantContained = true;
+    			break;
+    		}
+    	}
     }
-    
-    for (SpeciesReference sr : r.getListOfProducts()) {
-      String id = sr.getSpecies();
-      if (speciesSet.contains(id)) {
-        productContained = true;
-        break;
-      }
+    if (r.isSetListOfProducts()) {
+    	for (SpeciesReference sr : r.getListOfProducts()) {
+    		String id = sr.getSpecies();
+    		if (speciesSet.contains(id)) {
+    			productContained = true;
+    			break;
+    		}
+    	}
     }
     if (reactantContained && productContained) {
       return true;
@@ -250,23 +255,24 @@ public class ModelFilter {
     Set<String> speciesSet) {
     boolean productsContained = true;
     boolean reactantsContained = true;
-    
-    for (SpeciesReference sr : r.getListOfReactants()) {
-      String id = sr.getSpecies();
-      if (!speciesSet.contains(id)) {
-        reactantsContained = false;
-        break;
-      }
+    if (r.isSetListOfReactants()) {
+    	for (SpeciesReference sr : r.getListOfReactants()) {
+    		String id = sr.getSpecies();
+    		if (!speciesSet.contains(id)) {
+    			reactantsContained = false;
+    			break;
+    		}
+    	}
     }
-    
-    for (SpeciesReference sr : r.getListOfProducts()) {
-      String id = sr.getSpecies();
-      if (!speciesSet.contains(id)) {
-        productsContained = false;
-        break;
-      }
+    if (r.isSetListOfProducts()) {
+    	for (SpeciesReference sr : r.getListOfProducts()) {
+    		String id = sr.getSpecies();
+    		if (!speciesSet.contains(id)) {
+    			productsContained = false;
+    			break;
+    		}
+    	}
     }
-    
     if (reactantsContained && productsContained) {
       return true;
     } else {
@@ -282,29 +288,34 @@ public class ModelFilter {
     
     //find reactions where all products of r take part
     Set<Reaction> commonInterestingReactions = null;
-    for (SpeciesReference sr : r.getListOfProducts()) {
-      Species sp = sr.getSpeciesInstance();
-      Set<Reaction> interestingReactions = new HashSet<Reaction>();
-      if (speciesToReaction.get(sp) != null) {
-        for (Reaction r2 : speciesToReaction.get(sp)) {
-          if (r2.hasReactant(sp)) {
-            interestingReactions.add(r2);
-          }
-        }
-      }
-      if (commonInterestingReactions == null) {
-        commonInterestingReactions = new HashSet<Reaction>();
-        commonInterestingReactions.addAll(interestingReactions);
-      } else {
-        commonInterestingReactions.retainAll(interestingReactions);
-      }
+    if (r.isSetListOfProducts()) {
+    	for (SpeciesReference sr : r.getListOfProducts()) {
+    		Species sp = sr.getSpeciesInstance();
+    		Set<Reaction> interestingReactions = new HashSet<Reaction>();
+    		if (speciesToReaction.get(sp) != null) {
+    			for (Reaction r2 : speciesToReaction.get(sp)) {
+    				if (r2.hasReactant(sp)) {
+    					interestingReactions.add(r2);
+    				}
+    			}
+    		}
+    		if (commonInterestingReactions == null) {
+    			commonInterestingReactions = new HashSet<Reaction>();
+    			commonInterestingReactions.addAll(interestingReactions);
+    		} else {
+    			commonInterestingReactions.retainAll(interestingReactions);
+    		}
+    	}
     }
-    
     for (Reaction r2 : commonInterestingReactions) {
       if (r2.getSBOTerm() != 185) {
         List<SpeciesReference> list = new LinkedList<SpeciesReference>();
-        list.addAll(r2.getListOfReactants());
-        list.removeAll(r.getListOfProducts());
+        if (r2.isSetListOfReactants()) {
+        	list.addAll(r2.getListOfReactants());
+        }
+        if (r.isSetListOfProducts()) {
+        	list.removeAll(r.getListOfProducts());
+        }
         if (list.size() == 0) {
           Reaction newReaction = combineReactions(r, r2);
           
@@ -339,39 +350,47 @@ public class ModelFilter {
     }
     newReaction.setFast(r.getFast() && r2.getFast());
     newReaction.setReversible(r.getReversible() & r2.getReversible());
-    newReaction.setListOfModifiers(r.getListOfModifiers());
-    newReaction.setListOfReactants(r.getListOfReactants());
-    newReaction.setListOfProducts(r2.getListOfProducts());
+    if (r.isSetListOfModifiers()) {
+    	newReaction.setListOfModifiers(r.getListOfModifiers());
+    }
+    if  (r.isSetListOfReactants()) {
+    	newReaction.setListOfReactants(r.getListOfReactants());
+    }
+    if (r2.isSetListOfProducts()) {
+    	newReaction.setListOfProducts(r2.getListOfProducts());
+    }
     if ((r.isSetSBOTerm() && r2.isSetSBOTerm())
         && (r.getSBOTerm() == r2.getSBOTerm())) {
       newReaction.setSBOTerm(r.getSBOTerm());
     }
     newReaction.setKineticLaw(r.getKineticLaw());
     
-    HashMap<String, Double> leftStoichiometry = new HashMap<String, Double>();
-    HashMap<String, Double> rightStoichiometry = new HashMap<String, Double>();
-    for (SpeciesReference sr : r.getListOfProducts()) {
-      String id = sr.getSpecies();
-      double st = sr.getStoichiometry();
-      Double currentStoichiometry = leftStoichiometry.get(id);
-      if (currentStoichiometry == null) {
-        leftStoichiometry.put(id, st);
-      } else {
-        leftStoichiometry.put(id, st + currentStoichiometry);
-      }
+    Map<String, Double> leftStoichiometry = new HashMap<String, Double>();
+    Map<String, Double> rightStoichiometry = new HashMap<String, Double>();
+    if (r.isSetListOfProducts()) {
+    	for (SpeciesReference sr : r.getListOfProducts()) {
+    		String id = sr.getSpecies();
+    		double st = sr.getStoichiometry();
+    		Double currentStoichiometry = leftStoichiometry.get(id);
+    		if (currentStoichiometry == null) {
+    			leftStoichiometry.put(id, st);
+    		} else {
+    			leftStoichiometry.put(id, st + currentStoichiometry);
+    		}
+    	}
     }
-    for (SpeciesReference sr : r2.getListOfReactants()) {
-      String id = sr.getSpecies();
-      double st = sr.getStoichiometry();
-      Double currentStoichiometry = rightStoichiometry.get(id);
-      if (currentStoichiometry == null) {
-        rightStoichiometry.put(id, st);
-      } else {
-        rightStoichiometry.put(id, st + currentStoichiometry);
-      }
-      
+    if (r2.isSetListOfReactants()) {
+    	for (SpeciesReference sr : r2.getListOfReactants()) {
+    		String id = sr.getSpecies();
+    		double st = sr.getStoichiometry();
+    		Double currentStoichiometry = rightStoichiometry.get(id);
+    		if (currentStoichiometry == null) {
+    			rightStoichiometry.put(id, st);
+    		} else {
+    			rightStoichiometry.put(id, st + currentStoichiometry);
+    		}
+    	}
     }
-    
     boolean ratioSet = false;
     double ratio = -1;
     for (String id : leftStoichiometry.keySet()) {
@@ -381,61 +400,80 @@ public class ModelFilter {
         ratioSet = true;
         ratio = left / right;
       } else {
-        if (left / right != ratio) { return null; }
+        if (left / right != ratio) {
+        	return null;
+        }
       }
     }
-    for (SpeciesReference sr : newReaction.getListOfProducts()) {
-      sr.setStoichiometry(sr.getStoichiometry() * ratio);
+    if (newReaction.isSetListOfProducts()) {
+    	for (SpeciesReference sr : newReaction.getListOfProducts()) {
+    		sr.setStoichiometry(sr.getStoichiometry() * ratio);
+    	}
     }
-    
-    for (CVTerm ct : r.getCVTerms()) {
-      newReaction.addCVTerm(ct);
+    if (r.getCVTermCount() > 0) {
+    	for (CVTerm ct : r.getCVTerms()) {
+    		newReaction.addCVTerm(ct);
+    	}
     }
-    for (CVTerm ct : r2.getCVTerms()) {
-      newReaction.addCVTerm(ct);
+    if (r2.getCVTermCount() > 0) {
+    	for (CVTerm ct : r2.getCVTerms()) {
+    		newReaction.addCVTerm(ct);
+    	}
     }
     return newReaction;
   }
   
+  /**
+   * 
+   * @param speciesToReaction
+   * @param reactionToSpecies
+   * @param doc
+   */
   private static void createMaps(Map<Species, Set<Reaction>> speciesToReaction,
-    Map<Reaction, Set<Species>> reactionToSpecies, SBMLDocument doc) {
-    for (Reaction r : doc.getModel().getListOfReactions()) {
-      Set<Species> species = new HashSet<Species>();
-      
-      for (SpeciesReference sr : r.getListOfReactants()) {
-        Species sp = sr.getSpeciesInstance();
-        species.add(sp);
-        Set<Reaction> reactions = speciesToReaction.get(species);
-        if (reactions == null) {
-          reactions = new HashSet<Reaction>();
-        }
-        reactions.add(r);
-        speciesToReaction.put(sp, reactions);
-      }
-      for (SpeciesReference sr : r.getListOfProducts()) {
-        Species sp = sr.getSpeciesInstance();
-        species.add(sp);
-        Set<Reaction> reactions = speciesToReaction.get(species);
-        if (reactions == null) {
-          reactions = new HashSet<Reaction>();
-        }
-        reactions.add(r);
-        speciesToReaction.put(sp, reactions);
-      }
-      for (ModifierSpeciesReference sr : r.getListOfModifiers()) {
-        Species sp = sr.getSpeciesInstance();
-        species.add(sp);
-        Set<Reaction> reactions = speciesToReaction.get(species);
-        if (reactions == null) {
-          reactions = new HashSet<Reaction>();
-        }
-        reactions.add(r);
-        speciesToReaction.put(sp, reactions);
-      }
-      reactionToSpecies.put(r, species);
-      
-    }
-    
+  	Map<Reaction, Set<Species>> reactionToSpecies, SBMLDocument doc) {
+  	Model model = doc.getModel();
+  	if (model.isSetListOfReactions()) {
+  		for (Reaction r : model.getListOfReactions()) {
+  			Set<Species> species = new HashSet<Species>();
+  			if (r.isSetListOfReactants()) {
+  				for (SpeciesReference sr : r.getListOfReactants()) {
+  					Species sp = sr.getSpeciesInstance();
+  					species.add(sp);
+  					Set<Reaction> reactions = speciesToReaction.get(species);
+  					if (reactions == null) {
+  						reactions = new HashSet<Reaction>();
+  					}
+  					reactions.add(r);
+  					speciesToReaction.put(sp, reactions);
+  				}
+  			}
+  			if (r.isSetListOfProducts()) {
+  				for (SpeciesReference sr : r.getListOfProducts()) {
+  					Species sp = sr.getSpeciesInstance();
+  					species.add(sp);
+  					Set<Reaction> reactions = speciesToReaction.get(species);
+  					if (reactions == null) {
+  						reactions = new HashSet<Reaction>();
+  					}
+  					reactions.add(r);
+  					speciesToReaction.put(sp, reactions);
+  				}
+  			}
+  			if (r.isSetListOfModifiers()) {
+  				for (ModifierSpeciesReference sr : r.getListOfModifiers()) {
+  					Species sp = sr.getSpeciesInstance();
+  					species.add(sp);
+  					Set<Reaction> reactions = speciesToReaction.get(species);
+  					if (reactions == null) {
+  						reactions = new HashSet<Reaction>();
+  					}
+  					reactions.add(r);
+  					speciesToReaction.put(sp, reactions);
+  				}
+  			}
+  			reactionToSpecies.put(r, species);
+  		}
+  	}
   }
   
   private static SBMLDocument createFilteredSBMLDocument(
