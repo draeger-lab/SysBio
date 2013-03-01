@@ -16,6 +16,8 @@
  */
 package de.zbit.text;
 
+import de.zbit.text.TableColumn.Align;
+
 
 /**
  * @author Andreas Dr&auml;ger
@@ -76,6 +78,65 @@ public class LaTeXFormatter {
 
 	public String texttt(String text) {
 		return isUsingTypewriterFont() ? createLaTeXCommand("texttt", text) : text;
+	}
+
+	public String beginLandscape() {
+		return "\\begin{landscape}";
+	}
+
+	public String trademark() {
+		return "\\texttrademark{}";
+	}
+
+	public String link(String url, String label) {
+		return "\\href{" + url + "}{" + label + "}";
+	}
+
+	public String sbml2latex() {
+		return "\\SBMLLaTeX";
+	}
+
+	public String emdash() {
+		return "---";
+	}
+
+	public String numero() {
+		return "\\numero";
+	}
+
+	public String multicolumn(int columnCount, Align align, Object text) {
+		return multicolumn(columnCount, align, text, false, false);
+	}
+
+	public String multicolumn(int columnCount, Align align, Object text, boolean leftBorder,
+		boolean rightBorder) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("\\multicolumn{");
+		sb.append(columnCount);
+		sb.append("}{");
+		if (leftBorder) {
+			sb.append('|');
+		}
+		sb.append(align.toString().charAt(0));
+		if (rightBorder) {
+			sb.append('|');
+		}
+		sb.append("}{");
+		sb.append(text);
+		sb.append('}');
+		return sb.toString();
+	}
+
+	public String labeledItem(String label) {
+		return "\\item[" + label + "] ";
+	}
+
+	public String documentSubject(String subject) {
+		return "\\subject{" + subject + "}";
+	}
+
+	public String quote(String text) {
+		return "``" + text + "\"";
 	}
 	
 }

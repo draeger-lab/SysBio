@@ -1183,7 +1183,7 @@ public class StringUtil {
 	 * @return True if the given character is a vocal and false if it is a
 	 *         consonant.
 	 */
-	public static boolean isVocal(char c) {
+	public static boolean isVowel(char c) {
 		c = Character.toLowerCase(c);
 		return (c == 'a') || (c == 'e') || (c == 'i') || (c == 'o') || (c == 'u');
 	}

@@ -165,7 +165,7 @@ public class SBMLTestsuiteOverview {
 				if (m.getInitialAssignmentCount() > 0) {
 					withInitAssignments.add(file.getParentFile());
 				}
-				if (m.getRuleCount() > 0) {
+				if (m.isSetListOfRules()) {
 					for (Rule r : m.getListOfRules()) {
 						if (r.isAlgebraic()) {
 							withAlgebraicRules.add(file.getParentFile());

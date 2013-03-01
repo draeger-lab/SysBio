@@ -147,37 +147,36 @@ public class SetSBOTerms {
 	 */
 	private void createSBOMapFromAnnotation() throws XMLStreamException {
 		SBO.Term sbo = null;
-		
-		ListOf<Species> spList = this.model.getListOfSpecies();
-		for (Species s : spList) {
-			if (sboMap.get(s.getId()) == null) {
-				sbo = null;
-				if (s.getAnnotationString() != null) {
-					sbo = getSBOfromAnnotation(getAnnotationBlockWithNamespace(s.getAnnotationString()));
+		if (model.isSetListOfSpecies()) {
+			for (Species s : this.model.getListOfSpecies()) {
+				if (sboMap.get(s.getId()) == null) {
+					sbo = null;
+					if (s.getAnnotationString() != null) {
+						sbo = getSBOfromAnnotation(getAnnotationBlockWithNamespace(s.getAnnotationString()));
+					}
+					else {
+						sbo = sboDefaultSpecies;
+						logger.info(s.getId() + ": no CellDesigner annotation block. SBO terms are set to default (material entity)");
+					}
+					sboMap.put(s.getId(), sbo);
 				}
-				else {
-					sbo = sboDefaultSpecies;
-					logger.info(s.getId() + ": no CellDesigner annotation block. SBO terms are set to default (material entity)");
-				}
-				sboMap.put(s.getId(), sbo);
 			}
 		}
-		
-		ListOf<Reaction> rList = this.model.getListOfReactions();
-		for (Reaction r : rList) {
-			if (sboMap.get(r.getId()) == null) {
-				sbo = null;
-				if (r.getAnnotationString() != null) {
-					sbo = getSBOfromAnnotation(getAnnotationBlockWithNamespace(r.getAnnotationString()));
+		if (model.isSetListOfReactions()) {
+			for (Reaction r : model.getListOfReactions()) {
+				if (sboMap.get(r.getId()) == null) {
+					sbo = null;
+					if (r.getAnnotationString() != null) {
+						sbo = getSBOfromAnnotation(getAnnotationBlockWithNamespace(r.getAnnotationString()));
+					}
+					else {
+						sbo = sboDefaultReaction;
+						logger.info(r.getId() + ": no CellDesigner annotation block. SBO terms are set to default (process)");
+					}
+					sboMap.put(r.getId(), sbo);
 				}
-				else {
-					sbo = sboDefaultReaction;
-					logger.info(r.getId() + ": no CellDesigner annotation block. SBO terms are set to default (process)");
-				}
-				sboMap.put(r.getId(), sbo);
 			}
 		}
-		
 	}
 	
 	/**
@@ -334,60 +333,64 @@ public class SetSBOTerms {
 		}
 		
 		// for each compartment
-		ListOf<Compartment> cList = this.model.getListOfCompartments();
-		for (Compartment c : cList) {
-			if (sboMap.get(c.getId()) != null) {
-				c.setSBOTerm(sboMap.get(c.getId()).toString());
-			}
-			else {
-				c.setSBOTerm(sboDefaultCompartment.toString());
+		if (model.isSetListOfCompartments()) {
+			for (Compartment c : model.getListOfCompartments()) {
+				if (sboMap.get(c.getId()) != null) {
+					c.setSBOTerm(sboMap.get(c.getId()).toString());
+				}
+				else {
+					c.setSBOTerm(sboDefaultCompartment.toString());
+				}
 			}
 		}
 		
 		//for each species
-		ListOf<Species> spList = this.model.getListOfSpecies();
-		for (Species s : spList) {
-			if (sboMap.get(s.getId()) != null) {
-				s.setSBOTerm(sboMap.get(s.getId()).toString());
-			}
-			else {
-				s.setSBOTerm(sboDefaultSpecies.toString());
+		if (model.isSetListOfSpecies()) {
+			for (Species s : model.getListOfSpecies()) {
+				if (sboMap.get(s.getId()) != null) {
+					s.setSBOTerm(sboMap.get(s.getId()).toString());
+				}
+				else {
+					s.setSBOTerm(sboDefaultSpecies.toString());
+				}
 			}
 		}
 		
 		// for each reaction
-		ListOf<Reaction> rList = this.model.getListOfReactions();
-		for (Reaction r : rList) {
-			if (sboMap.get(r.getId()) != null) {
-				r.setSBOTerm(sboMap.get(r.getId()).toString());
-			}
-			else {
-				r.setSBOTerm(sboDefaultReaction.toString());
-			}
-
-			// for each reactant/product set SBO.getReactant/SBO.getProduct
-			ListOf<SpeciesReference> srListReac = r.getListOfReactants();
-			for (SpeciesReference sr : srListReac) {
-				sr.setSBOTerm(SBO.getReactant());
-			}
-			ListOf<SpeciesReference> srListProd = r.getListOfProducts();
-			for (SpeciesReference sr : srListProd) {
-				sr.setSBOTerm(SBO.getProduct());
-			}
-			
-			// in case of a modifier
-			ListOf<ModifierSpeciesReference> srModifierList = r.getListOfModifiers();
-			for (ModifierSpeciesReference msr : srModifierList) {
-				SBO.Term sbo = null; 
-				if (r.getAnnotationString() != null) {
-					sbo = getSBOfromAnnotation(getAnnotationBlockWithNamespace(r.getAnnotationString()), true);
+		if (model.isSetListOfReactions()) {
+			for (Reaction r : model.getListOfReactions()) {
+				if (sboMap.get(r.getId()) != null) {
+					r.setSBOTerm(sboMap.get(r.getId()).toString());
 				}
-				if (sbo == null) {
-					sbo = sboDefaultModifier;
+				else {
+					r.setSBOTerm(sboDefaultReaction.toString());
 				}
-				msr.setSBOTerm(sbo.toString());
+				
+				// for each reactant/product set SBO.getReactant/SBO.getProduct
+				if (r.isSetListOfReactants()) {
+					for (SpeciesReference sr : r.getListOfReactants()) {
+						sr.setSBOTerm(SBO.getReactant());
+					}
+				}
+				if (r.isSetListOfProducts()) {
+					for (SpeciesReference sr : r.getListOfProducts()) {
+						sr.setSBOTerm(SBO.getProduct());
+					}
+				}
+				// in case of a modifier
+				if (r.isSetListOfModifiers()) {
+					for (ModifierSpeciesReference msr : r.getListOfModifiers()) {
+						SBO.Term sbo = null; 
+						if (r.getAnnotationString() != null) {
+							sbo = getSBOfromAnnotation(getAnnotationBlockWithNamespace(r.getAnnotationString()), true);
+						}
+						if (sbo == null) {
+							sbo = sboDefaultModifier;
+						}
+						msr.setSBOTerm(sbo.toString());
+					}
+				}
 			}
-			
 		}
 	}
 	

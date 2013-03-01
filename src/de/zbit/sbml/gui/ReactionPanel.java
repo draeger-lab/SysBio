@@ -193,7 +193,7 @@ public class ReactionPanel extends JPanel {
 				y *= 2;
 			}
 			FontMetrics metrics = g.getFontMetrics();
-			String curr = createString(reaction.getListOfReactants(), false, true);
+			String curr = reaction.isSetListOfReactants() ? createString(reaction.getListOfReactants(), false, true) : "\u2205";
 			g.drawString(curr, x, y);
 			x += metrics.getStringBounds(curr, g).getWidth();
 			if (reaction.getModifierCount() > 0) {
@@ -208,7 +208,7 @@ public class ReactionPanel extends JPanel {
 				g.drawString(curr, x, y);
 				x += metrics.getStringBounds(curr, g).getWidth();
 			}
-			curr = createString(reaction.getListOfProducts(), true, false);
+			curr = reaction.isSetListOfProducts() ? createString(reaction.getListOfProducts(), true, false) : "\u2205";
 			g.drawString(curr, x, y);
 			preferredWith = 2 * fontSize
 					+ (int) (x + metrics.getStringBounds(curr, g).getWidth());

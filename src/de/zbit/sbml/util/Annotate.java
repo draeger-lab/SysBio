@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.CVTerm.Type;
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLReader;
@@ -72,6 +73,10 @@ public class Annotate {
    */
   public static void automaticAnnotation(String inputFile, String outputFile) throws XMLStreamException, SBMLException, IOException {
     SBMLDocument doc = (new SBMLReader()).readSBML(inputFile);
+    if (!doc.isSetModel()) {
+    	return;
+    }
+    Model model = doc.getModel();
     
     //KeggAdaptor adap = new KeggAdaptor();
     KeggAdaptor.printEachOutputToScreen = false;
@@ -84,7 +89,9 @@ public class Annotate {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    if (fmanager == null) fmanager = new KeggFunctionManagement();
+    if (fmanager == null) {
+    	fmanager = new KeggFunctionManagement();
+    }
     
     KeggInfoManagement manager = null;
     try {
@@ -96,89 +103,91 @@ public class Annotate {
     if (manager == null) manager = new KeggInfoManagement();
     
     int total = 0, matched = 0, ambigous = 0, notMatched = 0;
-    ProgressBar prog = new ProgressBar(doc.getModel().getListOfSpecies().size());
+    ProgressBar prog = new ProgressBar(model.getSpeciesCount());
     
-    for (Species spec : doc.getModel().getListOfSpecies()) {
-      total++;
-      prog.DisplayBar();
-      boolean foundExactHit = false;
-      
-      String symbol = spec.getName().trim();
-      List<String> symbols = new LinkedList<String>();
-      symbols.add(symbol);
-      symbol = symbol.replaceAll("_", " ").replaceAll("-", " ");
-      symbols.add(symbol);
-      symbol = symbol.replaceAll("\\(.\\)", "").replaceAll("\\(..\\)", "")
-          .replaceAll("\\(gene\\)", "").replaceAll("\\(RNA\\)", "")
-          .replaceAll("\\(p\\)", "").replaceAll("\\(s\\)", "")
-          .replaceAll("\\(r\\)", "").replaceAll("\\(l\\)", "")
-          .replaceAll("\\(n\\)", "").replaceAll("\\(b\\)", "")
-          .replaceAll("\\(PG\\)", "");
-      symbols.add(symbol);
-      String symbol2 = symbol.replaceAll("PP", "-bisphosphate");
-      symbols.add(symbol2);
-      symbol2 = symbol.replaceAll("PP", "diphosphate");
-      symbols.add(symbol2);
-      symbol2 = symbol.replaceAll("P", "-phosphate");
-      symbols.add(symbol2);
-      symbol2 = symbol.replaceAll("Pase", " phosphatase");
-      symbols.add(symbol2);
-      
-      KeggQuery query = null;
-      
-      CustomObject<Object> res = null;
-      String resultingSymbol = null;
-      for (String s : symbols) {
-        //Species is gene or RNA
-        if (spec.getSBOTerm() == 243 || spec.getSBOTerm() == 278) {
-          query = new KeggQuery(KeggQuery.genericFind, "GENES " + s);
-          res = fmanager.getInformation(query);
-        }
-
-        //Species is not a gene and not degraded
-        else if (spec.getSBOTerm() != 291) {
-          query = new KeggQuery(KeggQuery.genericFind, "COMPOUND " + s);
-          res = fmanager.getInformation(query);
-        }
-        
-        if (res != null) {
-          resultingSymbol = s;
-          break;
-        }
-      }
-      
-      if (res != null && res.getObject() != null
-          && res.getObject().toString().length() > 0) {
-        String result = res.getObject().toString();
-        String[] matches = result.split("\n");
-        for (String match : matches) {
-          String[] matchSplit = match.split(" ", 2);
-          if (matchSplit.length < 2) continue;
-          String[] hitSymbols = matchSplit[1].split(";");
-          for (String hitSymbol : hitSymbols) {
-            if (hitSymbol.trim().equalsIgnoreCase(resultingSymbol)) {
-              // Exact hit! ADD Miriam URNs
-              //System.out.println(spec.getId() + " => " + matchSplit[0]);
-              matched++;
-              foundExactHit = true;
-              break;
-            }
-          }
-          if (foundExactHit) {
-            annotate(spec, matchSplit[0], manager);
-            break;
-          }
-        }
-        if (!foundExactHit) {
-          ambigous++;
-          int i = 0, j = 0;
-          annotate(spec, matches[i].split(" ", 2)[j], manager);
-        }
-      } else {
-        notMatched++;
-        System.out.println(spec.getName());
-      }
-      
+    if (model.isSetListOfSpecies()) {
+    	for (Species spec : model.getListOfSpecies()) {
+    		total++;
+    		prog.DisplayBar();
+    		boolean foundExactHit = false;
+    		
+    		String symbol = spec.getName().trim();
+    		List<String> symbols = new LinkedList<String>();
+    		symbols.add(symbol);
+    		symbol = symbol.replaceAll("_", " ").replaceAll("-", " ");
+    		symbols.add(symbol);
+    		symbol = symbol.replaceAll("\\(.\\)", "").replaceAll("\\(..\\)", "")
+    				.replaceAll("\\(gene\\)", "").replaceAll("\\(RNA\\)", "")
+    				.replaceAll("\\(p\\)", "").replaceAll("\\(s\\)", "")
+    				.replaceAll("\\(r\\)", "").replaceAll("\\(l\\)", "")
+    				.replaceAll("\\(n\\)", "").replaceAll("\\(b\\)", "")
+    				.replaceAll("\\(PG\\)", "");
+    		symbols.add(symbol);
+    		String symbol2 = symbol.replaceAll("PP", "-bisphosphate");
+    		symbols.add(symbol2);
+    		symbol2 = symbol.replaceAll("PP", "diphosphate");
+    		symbols.add(symbol2);
+    		symbol2 = symbol.replaceAll("P", "-phosphate");
+    		symbols.add(symbol2);
+    		symbol2 = symbol.replaceAll("Pase", " phosphatase");
+    		symbols.add(symbol2);
+    		
+    		KeggQuery query = null;
+    		
+    		CustomObject<Object> res = null;
+    		String resultingSymbol = null;
+    		for (String s : symbols) {
+    			//Species is gene or RNA
+    			if (spec.getSBOTerm() == 243 || spec.getSBOTerm() == 278) {
+    				query = new KeggQuery(KeggQuery.genericFind, "GENES " + s);
+    				res = fmanager.getInformation(query);
+    			}
+    			
+    			//Species is not a gene and not degraded
+    			else if (spec.getSBOTerm() != 291) {
+    				query = new KeggQuery(KeggQuery.genericFind, "COMPOUND " + s);
+    				res = fmanager.getInformation(query);
+    			}
+    			
+    			if (res != null) {
+    				resultingSymbol = s;
+    				break;
+    			}
+    		}
+    		
+    		if (res != null && res.getObject() != null
+    				&& res.getObject().toString().length() > 0) {
+    			String result = res.getObject().toString();
+    			String[] matches = result.split("\n");
+    			for (String match : matches) {
+    				String[] matchSplit = match.split(" ", 2);
+    				if (matchSplit.length < 2) continue;
+    				String[] hitSymbols = matchSplit[1].split(";");
+    				for (String hitSymbol : hitSymbols) {
+    					if (hitSymbol.trim().equalsIgnoreCase(resultingSymbol)) {
+    						// Exact hit! ADD Miriam URNs
+    						//System.out.println(spec.getId() + " => " + matchSplit[0]);
+    						matched++;
+    						foundExactHit = true;
+    						break;
+    					}
+    				}
+    				if (foundExactHit) {
+    					annotate(spec, matchSplit[0], manager);
+    					break;
+    				}
+    			}
+    			if (!foundExactHit) {
+    				ambigous++;
+    				int i = 0, j = 0;
+    				annotate(spec, matches[i].split(" ", 2)[j], manager);
+    			}
+    		} else {
+    			notMatched++;
+    			System.out.println(spec.getName());
+    		}
+    		
+    	}
     }
     InfoManagement.saveToFilesystem("kgim.dat", manager);
     InfoManagement.saveToFilesystem("kgfc.dat", fmanager);

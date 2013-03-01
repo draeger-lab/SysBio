@@ -23,11 +23,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
@@ -75,19 +75,19 @@ public class CalculateReactionGibbsEnergies {
 		fw.write("id\t[kJ/mol]\n");
 		//get the list of reactions
 		Model m = doc.getModel();
-		ListOf<Reaction> rlist = new ListOf<Reaction>(m.getLevel(),m.getVersion());
-		rlist = m.getListOfReactions();
 
 		//for each reaction get the ListOf reactants and products incl. stoichiometry, 
 		//then calculate the Gibbs energy, 
 		//then write it to the outputfile
-		for (Reaction r : rlist){
-			
-			String[] reactants = this.getListOfReactants(r);
-			String[] products = this.getListOfProducts(r);
-
-			Double gEnergy = calculateGibbsEnergies(reactants, products);	
-			fw.write(r.getId() + "\t" + gEnergy + "\n");
+		if (m.isSetListOfReactions()) {
+			for (Reaction r : m.getListOfReactions()) {
+				
+				String[] reactants = this.getListOfReactants(r);
+				String[] products = this.getListOfProducts(r);
+				
+				Double gEnergy = calculateGibbsEnergies(reactants, products);	
+				fw.write(r.getId() + "\t" + gEnergy + "\n");
+			}
 		}
 		logger.info("output is written to: " + output);
 		this.closeFile(fw);
@@ -99,12 +99,12 @@ public class CalculateReactionGibbsEnergies {
 	 * @param products
 	 * @return
 	 */
-	private Double calculateGibbsEnergies(String[] reactants, String[] products){
+	private Double calculateGibbsEnergies(String[] reactants, String[] products) {
 		Double leftSum = 0.0;
 		Double rightSum = 0.0;
 
 		// example of s: "1.0 \t HC00032_i"
-		for (String s : reactants){
+		for (String s : reactants) {
 			String[] helper = s.split("\t");
 			if (this.gibbsMap.get(helper[1]) != null) {
 				leftSum += (Double.valueOf(helper[0]) * this.gibbsMap.get(helper[1]));
@@ -113,7 +113,7 @@ public class CalculateReactionGibbsEnergies {
 				System.out.println("no value for: " + helper[1]);
 			}
 		}
-		for (String s : products){
+		for (String s : products) {
 			String[] helper = s.split("\t");
 			if (this.gibbsMap.get(helper[1]) != null) {
 				rightSum += (Double.valueOf(helper[0]) * this.gibbsMap.get(helper[1]));
@@ -139,14 +139,14 @@ public class CalculateReactionGibbsEnergies {
 		
 		while ((line = input.readLine()) != null) {
 			String[] help = line.split("[ \t]");
-			if ((colId != 1000000) && (colGibbs != 1000000) && (colId != colGibbs)){
+			if ((colId != 1000000) && (colGibbs != 1000000) && (colId != colGibbs)) {
 				this.gibbsMap.put(help[colId], Double.valueOf(help[colGibbs]));
 			}
 			// must be placed as second, otherwise the first row will tried to put in the @param gibbsMap
-			if (flagHeader){
+			if (flagHeader) {
 				boolean flagID = false;
 				boolean flagkJperMole = false;
-				for (int i=0; i<help.length; i++){
+				for (int i=0; i<help.length; i++) {
 					if (help[i].contains("id")) {
 						colId = i;
 						flagID = true;
@@ -171,10 +171,12 @@ public class CalculateReactionGibbsEnergies {
 	 * @param r
 	 * @return speciesIds
 	 */
-	private String[] getListOfProducts(Reaction r){
+	private String[] getListOfProducts(Reaction r) {
 		String[] speciesIds = new String[0];
-		for (SpeciesReference specRef : r.getListOfProducts()) {
+		if (r.isSetListOfProducts()) {
+			for (SpeciesReference specRef : r.getListOfProducts()) {
 				speciesIds = addEntry(speciesIds, (specRef.getStoichiometry() + "\t" + specRef.getSpeciesInstance().getId()));
+			}
 		}
 		return speciesIds;
 	}
@@ -184,10 +186,12 @@ public class CalculateReactionGibbsEnergies {
 	 * @param r
 	 * @return speciesIds
 	 */
-	private String[] getListOfReactants(Reaction r){
+	private String[] getListOfReactants(Reaction r) {
 		String[] speciesIds = new String[0];
-		for (SpeciesReference specRef : r.getListOfReactants()) {
+		if (r.isSetListOfReactants()) {
+			for (SpeciesReference specRef : r.getListOfReactants()) {
 				speciesIds = addEntry(speciesIds, (specRef.getStoichiometry() + "\t" + specRef.getSpeciesInstance().getId()));
+			}
 		}
 		return speciesIds;
 	}
@@ -198,7 +202,7 @@ public class CalculateReactionGibbsEnergies {
 	 * @param newPart
 	 * @return
 	 */
-	private String[] addEntry(String[] old, String newPart){
+	private String[] addEntry(String[] old, String newPart) {
 		String[] newer = new String[(old.length + 1)];
 		System.arraycopy(old, 0, newer, 0, (old.length));
 		newer[old.length] = newPart;
@@ -241,7 +245,9 @@ public class CalculateReactionGibbsEnergies {
 		File model = new File(args[0]);
 		String gibbsEnergies = args[1];
 		String result = new File(gibbsEnergies).getParent() + "/gibbsEnergyResult";
-		if (args.length == 3){result = args[2];}
+		if (args.length == 3) {
+			result = args[2];
+		}
 		new CalculateReactionGibbsEnergies(model, gibbsEnergies, result);
 	}
 	

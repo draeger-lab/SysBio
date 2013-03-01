@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.CVTerm;
+import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.Reaction;
@@ -33,7 +34,6 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
-import org.sbml.jsbml.CVTerm.Qualifier;
 
 /**
  * @author Stephanie Tscherneck
@@ -60,15 +60,10 @@ public class SBML2GibbsPred {
 	 */
 	public SBML2GibbsPred(SBMLDocument doc, String output) throws IOException {
 		logger.info("reading completed");
-		
 		Model m = doc.getModel();
-
-		ListOf<Reaction> rlist = new ListOf<Reaction>(m.getLevel(),m.getVersion());	
-		rlist = m.getListOfReactions();
-
-		this.writeReactionsInGibbsPredFormat(rlist, output);
-
-		
+		if (m.isSetListOfReactions()) {
+			this.writeReactionsInGibbsPredFormat(m.getListOfReactions(), output);
+		}
 	}
 	
 
@@ -78,15 +73,17 @@ public class SBML2GibbsPred {
 	 * @param outputfile
 	 * @throws IOException
 	 */
-	public void writeReactionsInGibbsPredFormat(ListOf<Reaction> rlist, String outputfile) throws IOException {
+	public void writeReactionsInGibbsPredFormat(List<Reaction> rlist, String outputfile) throws IOException {
 		FileWriter output = new FileWriter(outputfile ,false);
-
-		
 		for (Reaction r : rlist) {
 			output.write(r + "\t");
-			writeReferences(r.getListOfReactants(), output);
+			if (r.isSetListOfReactants()) {
+				writeReferences(r.getListOfReactants(), output);
+			}
 			output.write("=");
-			writeReferences(r.getListOfProducts(), output);
+			if (r.isSetListOfProducts()) {
+				writeReferences(r.getListOfProducts(), output);
+			}
 			output.write("\n");
 
 		}
@@ -101,7 +98,7 @@ public class SBML2GibbsPred {
 	 * @param outputfile
 	 * @throws IOException 
 	 */
-	public void writeReactionsInGibbsPredFormat(ListOf<Reaction> rlist, boolean keggReactionId, String outputfile) throws IOException {
+	public void writeReactionsInGibbsPredFormat(List<Reaction> rlist, boolean keggReactionId, String outputfile) throws IOException {
 		FileWriter output = new FileWriter(outputfile ,false);
 
 		for (Reaction r : rlist) {
@@ -119,9 +116,13 @@ public class SBML2GibbsPred {
 			else {
 				output.write(r + "\t");
 			}
-			writeReferences(r.getListOfReactants(), output);
+			if (r.isSetListOfReactants()) {
+				writeReferences(r.getListOfReactants(), output);
+			}
 			output.write("=");
-			writeReferences(r.getListOfProducts(), output);
+			if (r.isSetListOfProducts()) {
+				writeReferences(r.getListOfProducts(), output);
+			}
 			output.write("\n");
 
 		}

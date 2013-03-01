@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
@@ -30,17 +30,11 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLReader;
-import org.sbml.jsbml.Species;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.Output;
-import org.sbml.jsbml.ext.qual.OutputTransitionEffect;
-import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.QualitativeSpecies;
 import org.sbml.jsbml.ext.qual.Transition;
-
-import y.base.Edge;
-import de.zbit.graph.io.SBML2GraphML;
 
 /**
  * @author Stephanie Tscherneck
@@ -113,7 +107,7 @@ public class GetSubRegulationNetwork {
 		model = doc.getModel();
 		qModel = QualModelBuilding.getQualitativeModel(doc);
 		System.out.println("start to create the map");
-		extractSpecies2transitionMap(qModel.getListOfTransitions());
+		extractSpecies2transitionMap(qModel.isSetListOfTransitions() ? qModel.getListOfTransitions() : null);
 		SBMLDocument subDoc = QualModelBuilding.initializeQualDocument(model.getName(), model.getId(), creator, organisms.split(","));
 		subQualModel = QualModelBuilding.qualModel;
 		maximumDepth = searchDepth;
@@ -181,24 +175,28 @@ public class GetSubRegulationNetwork {
 	 */
 	private String[] addTransitionToSubmodel(Transition transition) {
 		if (subQualModel.getTransition(transition.getId()) == null) { 
-			String[] qsList = new String[transition.getListOfOutputs().size()];
+			String[] qsList = new String[transition.getOutputCount()];
 			int cnt = 0;
-			for (Input i : transition.getListOfInputs()) {
-				if (subQualModel.getQualitativeSpecies(i.getQualitativeSpecies()) == null) {
-					QualitativeSpecies qs = qModel.getQualitativeSpecies(i.getQualitativeSpecies()).clone();
-//					qs.unregister(model);
-					subQualModel.addQualitativeSpecies(qs);
-					qualSpeciesStatistics++;
+			if (transition.isSetListOfInputs()) {
+				for (Input i : transition.getListOfInputs()) {
+					if (subQualModel.getQualitativeSpecies(i.getQualitativeSpecies()) == null) {
+						QualitativeSpecies qs = qModel.getQualitativeSpecies(i.getQualitativeSpecies()).clone();
+						//					qs.unregister(model);
+						subQualModel.addQualitativeSpecies(qs);
+						qualSpeciesStatistics++;
+					}
 				}
 			}
-			for (Output o : transition.getListOfOutputs()) {
-				System.out.println("output: " + o.getQualitativeSpecies());
-				if (subQualModel.getQualitativeSpecies(o.getQualitativeSpecies()) == null) {
-					subQualModel.addQualitativeSpecies(qModel.getQualitativeSpecies(o.getQualitativeSpecies()).clone());
-					qualSpeciesStatistics++;
+			if (transition.isSetListOfOutputs()) {
+				for (Output o : transition.getListOfOutputs()) {
+					System.out.println("output: " + o.getQualitativeSpecies());
+					if (subQualModel.getQualitativeSpecies(o.getQualitativeSpecies()) == null) {
+						subQualModel.addQualitativeSpecies(qModel.getQualitativeSpecies(o.getQualitativeSpecies()).clone());
+						qualSpeciesStatistics++;
+					}
+					qsList[cnt] = o.getQualitativeSpecies();
+					cnt++;
 				}
-				qsList[cnt] = o.getQualitativeSpecies();
-				cnt++;
 			}
 			Transition t = transition.clone();
 			t.unregister(model);
@@ -221,29 +219,31 @@ public class GetSubRegulationNetwork {
 	 * @param transitions
 	 * @return true if species are mapped to the transitions, in which they participate 
 	 */
-	private boolean extractSpecies2transitionMap(ListOf<Transition> transitions) {
-		if ((transitions != null) && (transitions.size() > 0)){
+	private boolean extractSpecies2transitionMap(List<Transition> transitions) {
+		if ((transitions != null) && (transitions.size() > 0)) {
 			for (Transition t : transitions) {
-				for (Input i : (t.getListOfInputs())) {
-					if (i.getQualitativeSpecies() != null) {
-						String helper;
-//						ListOf<Transition> trList;
-						//TODO test extraction
-						if (species2transition.get(i.getQualitativeSpecies()) != null) {
-//							trList = species2transition.get(i.getQualitativeSpecies());
-							helper = species2transition.get(i.getQualitativeSpecies());
+				if (t.isSetListOfInputs()) {
+					for (Input i : t.getListOfInputs()) {
+						if (i.getQualitativeSpecies() != null) {
+							String helper;
+							//						ListOf<Transition> trList;
+							//TODO test extraction
+							if (species2transition.get(i.getQualitativeSpecies()) != null) {
+								//							trList = species2transition.get(i.getQualitativeSpecies());
+								helper = species2transition.get(i.getQualitativeSpecies());
+							}
+							else {
+								//							trList = new ListOf<Transition>(model.getLevel(), model.getVersion());
+								helper = "";
+							}
+							
+							String trList = helper + t.getId() + ";";
+							//						Transition tClone = t.clone();
+							//						tClone.unregister(transitions);
+							//						trList.add(tClone);
+							//						species2transition.put(i.getQualitativeSpecies(), trList);
+							species2transition.put(i.getQualitativeSpecies(), trList);
 						}
-						else {
-//							trList = new ListOf<Transition>(model.getLevel(), model.getVersion());
-							helper = "";
-						}
-						
-						String trList = helper + t.getId() + ";";
-//						Transition tClone = t.clone();
-//						tClone.unregister(transitions);
-//						trList.add(tClone);
-//						species2transition.put(i.getQualitativeSpecies(), trList);
-						species2transition.put(i.getQualitativeSpecies(), trList);
 					}
 				}
 			}

@@ -18,11 +18,13 @@ package de.zbit.sbml.layout.y;
 
 import java.awt.Rectangle;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.ListOf;
@@ -436,13 +438,14 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			
 			logger.fine("PN position: " + position);
 			logger.fine("PN center: " + centerPosition);
-			for (SpeciesReferenceGlyph sRG : reactionGlyph.getListOfSpeciesReferenceGlyphs()) {
-				Point speciesDockingAtPN = calculateReactionGlyphDockingPoint(reactionGlyph, rotationAngle, sRG);
-				// make point relative to center of PN
-				Point relativeDockingAtPN = new Point(speciesDockingAtPN.getX() - centerPosition.getX(),
+			if (reactionGlyph.isSetListOfSpeciesReferencesGlyphs()) {
+				for (SpeciesReferenceGlyph sRG : reactionGlyph.getListOfSpeciesReferenceGlyphs()) {
+					Point speciesDockingAtPN = calculateReactionGlyphDockingPoint(reactionGlyph, rotationAngle, sRG);
+					// make point relative to center of PN
+					Point relativeDockingAtPN = new Point(speciesDockingAtPN.getX() - centerPosition.getX(),
 						speciesDockingAtPN.getY() - centerPosition.getY(), DEFAULT_Z_COORD);
-				sRG.putUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT, relativeDockingAtPN);
-				/*
+					sRG.putUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT, relativeDockingAtPN);
+					/*
 				SpeciesGlyph speciesGlyph = sRG.getSpeciesGlyphInstance();
 				Point middleOfSpecies = calculateCenter(speciesGlyph);
 				BoundingBox sgBoundingBox = speciesGlyph.getBoundingBox();
@@ -474,8 +477,9 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 				sRG.putUserObject(LayoutDirector.SPECIES_RELATIVE_DOCKING_POINT, relativeDockingAtSelf);
 				
 				logger.fine(sRG.getId() + " docks relative at species " + relativeDockingAtSelf.toString());
-				*/
-				logger.fine(sRG.getId() + " docks relative at PN " + relativeDockingAtPN.toString());
+					 */
+					logger.fine(sRG.getId() + " docks relative at PN " + relativeDockingAtPN.toString());
+				}
 			}
 		}
 		
@@ -582,8 +586,9 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			 *  compute the average and the relative substrate position
 			 */
 			SpeciesReferenceRole specRefRole = specRefGlyph.getSpeciesReferenceRole();
-			Point averageSubstratePosition = calculateAverageSpeciesPosition(SpeciesReferenceRole.SUBSTRATE, reactionGlyph.getListOfSpeciesReferenceGlyphs());
-			Point averageProductPosition = calculateAverageSpeciesPosition(SpeciesReferenceRole.PRODUCT, reactionGlyph.getListOfSpeciesReferenceGlyphs());
+			List<SpeciesReferenceGlyph> speciesReferenceGlyphs = reactionGlyph.isSetListOfSpeciesReferencesGlyphs() ? reactionGlyph.getListOfSpeciesReferenceGlyphs() : new ArrayList<SpeciesReferenceGlyph>(0);
+			Point averageSubstratePosition = calculateAverageSpeciesPosition(SpeciesReferenceRole.SUBSTRATE, speciesReferenceGlyphs);
+			Point averageProductPosition = calculateAverageSpeciesPosition(SpeciesReferenceRole.PRODUCT, speciesReferenceGlyphs);
 
 			BoundingBox helpingBB1 = createBoundingBoxWithLevelAndVersion();
 			helpingBB1.setPosition(averageSubstratePosition);

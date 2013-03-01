@@ -351,17 +351,19 @@ public class AnnotationCheck {
 			throws IOException {
 		Hashtable<String, Integer> defect;
 		int noCheckPossible = 0, withDefect = 0;
-		for (Reaction r : model.getListOfReactions()) {
-			defect = checkAtomBalance(r, replacement);
-			if (defect == null){
-				System.out.println("Can't check atom balance in: " + r);
-				noCheckPossible++;
+		if (model.isSetListOfReactions()) {
+			for (Reaction r : model.getListOfReactions()) {
+				defect = checkAtomBalance(r, replacement);
+				if (defect == null){
+					System.out.println("Can't check atom balance in: " + r);
+					noCheckPossible++;
+				}
+				else if (defect.size() > 0) {
+					withDefect++;
+				}
 			}
-			else if (defect.size() > 0)
-				withDefect++;
 		}
-		System.out
-				.printf(
+		System.out.printf(
 						"No check possible for %d reactions.\n%d reactions with defect.\n",
 						noCheckPossible, withDefect);
 	}
@@ -381,8 +383,8 @@ public class AnnotationCheck {
 		Hashtable<String, Integer> atomsLeft;
 		Hashtable<String, Integer> atomsRight;
 		Hashtable<String, Integer> defect;
-		atomsLeft = countAtoms(r.getListOfReactants(), replacement);
-		atomsRight = countAtoms(r.getListOfProducts(), replacement);
+		atomsLeft = countAtoms(r.isSetListOfReactants() ? r.getListOfReactants() : null, replacement);
+		atomsRight = countAtoms(r.isSetListOfProducts() ? r.getListOfProducts() : null, replacement);
 		if ((atomsLeft == null || atomsLeft.size() == 0)
 				|| (atomsRight == null || atomsRight.size() == 0)) {
 			logger.info(String.format(
@@ -447,51 +449,55 @@ public class AnnotationCheck {
 			throws IOException {
 		boolean plus = false;
 		StringBuilder sb = new StringBuilder();
-		for (SpeciesReference specRef : r.getListOfReactants()) {
-			if (plus) {
-				sb.append("+ ");
-			} else {
-				plus = true;
-			}
-			if (specRef.getStoichiometry() != 1) {
-				sb.append(String.format("%s ", StringTools.toString(specRef
+		if (r.isSetListOfReactants()) {
+			for (SpeciesReference specRef : r.getListOfReactants()) {
+				if (plus) {
+					sb.append("+ ");
+				} else {
+					plus = true;
+				}
+				if (specRef.getStoichiometry() != 1) {
+					sb.append(String.format("%s ", StringTools.toString(specRef
 						.getStoichiometry())));
-			}
-			List<String> keggIds = getKEGGids(specRef.getSpeciesInstance());
-			if (keggIds.size() > 0) {
-				String keggID = keggIds.get(0);
-				KEGGcompound compound = kegg.getCompoundForURI(keggID);
-				if (compound == null) {
-					logger.fine(String.format(
+				}
+				List<String> keggIds = getKEGGids(specRef.getSpeciesInstance());
+				if (keggIds.size() > 0) {
+					String keggID = keggIds.get(0);
+					KEGGcompound compound = kegg.getCompoundForURI(keggID);
+					if (compound == null) {
+						logger.fine(String.format(
 							"Couldn't find any compound for %s with id %s.",
 							specRef.getSpecies(), keggID));
+					}
+					String empiricalFormula = compound == null ? specRef
+							.getSpecies() : compound.getFormula();
+							if (empiricalFormula == null) {
+								empiricalFormula = specRef.getSpecies();
+							}
+							sb.append(String.format("%s ", formula ? empiricalFormula
+									: keggID));
+				} else {
+					logger.fine("Couldn't find any KEGG Id");
 				}
-				String empiricalFormula = compound == null ? specRef
-						.getSpecies() : compound.getFormula();
-				if (empiricalFormula == null) {
-					empiricalFormula = specRef.getSpecies();
-				}
-				sb.append(String.format("%s ", formula ? empiricalFormula
-						: keggID));
-			} else {
-				logger.fine("Couldn't find any KEGG Id");
 			}
 		}
 		sb.append(String.format(r.getReversible() ? "<=>" : "->"));
 		plus = false;
-		for (SpeciesReference specRef : r.getListOfProducts()) {
-			if (plus)
-				sb.append(" +");
-			else
-				plus = true;
-			if (specRef.getStoichiometry() != 1)
-				sb.append(String.format(" %s", StringTools.toString(specRef
+		if (r.isSetListOfProducts()) {
+			for (SpeciesReference specRef : r.getListOfProducts()) {
+				if (plus)
+					sb.append(" +");
+				else
+					plus = true;
+				if (specRef.getStoichiometry() != 1)
+					sb.append(String.format(" %s", StringTools.toString(specRef
 						.getStoichiometry())));
-			List<String> keggIds = getKEGGids(specRef.getSpeciesInstance());
-			if (keggIds.size() > 0) {
-				sb.append(String.format(" %s", formula ? kegg
-						.getCompoundForURI(keggIds.get(0)).getFormula()
-						: getKEGGids(specRef.getSpeciesInstance()).get(0)));
+				List<String> keggIds = getKEGGids(specRef.getSpeciesInstance());
+				if (keggIds.size() > 0) {
+					sb.append(String.format(" %s", formula ? kegg
+							.getCompoundForURI(keggIds.get(0)).getFormula()
+							: getKEGGids(specRef.getSpeciesInstance()).get(0)));
+				}
 			}
 		}
 		if (r.getProductCount() == 0) {
@@ -636,6 +642,9 @@ public class AnnotationCheck {
 			ListOf<SpeciesReference> listOfSpecRefs, int replacement)
 			throws IOException {
 		Hashtable<String, Integer> atomCount = new Hashtable<String, Integer>();
+		if ((listOfSpecRefs == null) || (listOfSpecRefs.size() == 0)) {
+			return atomCount;
+		}
 		for (SpeciesReference specRef : listOfSpecRefs) {
 			List<String> keggIDs = getKEGGids(specRef.getSpeciesInstance());
 			if (keggIDs == null) {
@@ -1507,18 +1516,22 @@ public class AnnotationCheck {
 	 * @param m
 	 */
 	public void identifyUnconnectedSpecies(Model m) {
-		for (Species s : m.getListOfSpecies()) {
-			boolean involved = false;
-			for (Reaction r : m.getListOfReactions()) {
-				if (r.involves(s)) {
-					involved = true;
-					break;
+		if (m.isSetListOfSpecies()) {
+			for (Species s : m.getListOfSpecies()) {
+				boolean involved = false;
+				if (m.isSetListOfReactions()) {
+					for (Reaction r : m.getListOfReactions()) {
+						if (r.involves(s)) {
+							involved = true;
+							break;
+						}
+					}
 				}
-			}
-			if (!involved)
-				System.out.printf(
+				if (!involved)
+					System.out.printf(
 						"Species %s is not involved in any reactions.\n", s
-								.getId());
+						.getId());
+			}
 		}
 	}
 
@@ -1530,15 +1543,20 @@ public class AnnotationCheck {
 				boolean identical = r1.getReactantCount() == r2
 						.getReactantCount()
 						&& r1.getProductCount() == r2.getProductCount();
-				if (!identical)
+				if (!identical) {
 					continue;
-				for (SpeciesReference specRef : r1.getListOfReactants()) {
-					identical &= r2.getListOfReactants().contains(
-							specRef.getSpeciesInstance());
 				}
-				for (SpeciesReference specRef : r1.getListOfProducts()) {
-					identical &= r2.getListOfProducts().contains(
+				if (r1.isSetListOfReactants()) {
+					for (SpeciesReference specRef : r1.getListOfReactants()) {
+						identical &= r2.getListOfReactants().contains(
 							specRef.getSpeciesInstance());
+					}
+				}
+				if (r1.isSetListOfProducts()) {
+					for (SpeciesReference specRef : r1.getListOfProducts()) {
+						identical &= r2.getListOfProducts().contains(
+							specRef.getSpeciesInstance());
+					}
 				}
 				if (identical)
 					System.out.printf("Identical reactions:\t%s\t%s\n", r1
@@ -1554,14 +1572,16 @@ public class AnnotationCheck {
 	public void identifyReactionsWithIdenticalKEGGAnnotation(Model m) {
 		int i = 0, j = 0;
 		Hashtable<Integer, Set<String>> reactionMap = new Hashtable<Integer, Set<String>>();
-		for (Reaction r : m.getListOfReactions()) {
-			for (String kegg : r.filterCVTerms(Qualifier.BQB_IS, "kegg")) {
-				Integer id = Integer.parseInt(kegg.substring(kegg
+		if (m.isSetListOfReactions()) {
+			for (Reaction r : m.getListOfReactions()) {
+				for (String kegg : r.filterCVTerms(Qualifier.BQB_IS, "kegg")) {
+					Integer id = Integer.parseInt(kegg.substring(kegg
 						.lastIndexOf(':') + 2));
-				if (!reactionMap.containsKey(id))
-					reactionMap.put(id, new HashSet<String>());
-				Set<String> s = reactionMap.get(id);
-				s.add(r.getId());
+					if (!reactionMap.containsKey(id))
+						reactionMap.put(id, new HashSet<String>());
+					Set<String> s = reactionMap.get(id);
+					s.add(r.getId());
+				}
 			}
 		}
 		for (Integer key : reactionMap.keySet()) {
@@ -1636,12 +1656,18 @@ public class AnnotationCheck {
 	 */
 	private String[] getKEGGIDsOfReactantsAndProducts(Reaction r) {
 		List<String> keggIDs = new LinkedList<String>();
-		for (SpeciesReference specRef : r.getListOfReactants())
-			keggIDs.addAll(getKeggsIDs(specRef.getSpeciesInstance(),
+		if (r.isSetListOfReactants()) {
+			for (SpeciesReference specRef : r.getListOfReactants()) {
+				keggIDs.addAll(getKeggsIDs(specRef.getSpeciesInstance(),
 					Qualifier.BQB_IS));
-		for (SpeciesReference specRef : r.getListOfProducts())
-			keggIDs.addAll(getKeggsIDs(specRef.getSpeciesInstance(),
+			}
+		}
+		if (r.isSetListOfProducts()) {
+			for (SpeciesReference specRef : r.getListOfProducts()) {
+				keggIDs.addAll(getKeggsIDs(specRef.getSpeciesInstance(),
 					Qualifier.BQB_IS));
+			}
+		}
 		return keggIDs.toArray(new String[] {});
 	}
 
@@ -1650,19 +1676,22 @@ public class AnnotationCheck {
 	 * @param m
 	 */
 	public void identifyKEGGReactionIDs(Model m) {
-		for (Reaction r : m.getListOfReactions())
-			if (r.getCVTermCount() == 0)
-				try {
-					CVTerm ct = identifyKEGGids(r);
-					if (ct.isSetBiologicalQualifierType()
-							&& ct.isSetTypeQualifier()
-							&& ct.getResourceCount() > 0) {
-						r.addCVTerm(ct);
-						System.out.printf("%s: %s\n", r.getId(), ct.toString());
+		if (m.isSetListOfReactions()) {
+			for (Reaction r : m.getListOfReactions()) {
+				if (r.getCVTermCount() == 0)
+					try {
+						CVTerm ct = identifyKEGGids(r);
+						if (ct.isSetBiologicalQualifierType()
+								&& ct.isSetTypeQualifier()
+								&& (ct.getResourceCount() > 0)) {
+							r.addCVTerm(ct);
+							System.out.printf("%s: %s\n", r.getId(), ct.toString());
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			}
+		}
 	}
 
 	/**
@@ -1671,32 +1700,34 @@ public class AnnotationCheck {
 	 * @param ids
 	 */
 	public void printCVTermsOf(ListOf<SpeciesReference> listOfSpecRef,
-			boolean ids) {
+		boolean ids) {
 		int i = 0, j;
 		String keggID;
 		final String cpdPrefix = "urn:miriam:kegg.compound:";
-		for (SpeciesReference specRef : listOfSpecRef) {
-			if (i > 0)
-				System.out.print(" + ");
-			if (specRef.getStoichiometry() != 1)
-				System.out.printf(" %f ", specRef.getStoichiometry());
-			if (ids)
-				keggID = specRef.getSpecies();
-			else {
-				keggID = "?";
-				for (CVTerm term : specRef.getSpeciesInstance().getCVTerms()) {
-					for (j = 0; j < term.getResourceCount()
-							&& keggID.equals("?"); j++)
-						if (term.getResourceURI(j).startsWith(cpdPrefix)) {
-							keggID = term.getResourceURI(j).substring(
+		if (listOfSpecRef != null) {
+			for (SpeciesReference specRef : listOfSpecRef) {
+				if (i > 0)
+					System.out.print(" + ");
+				if (specRef.getStoichiometry() != 1)
+					System.out.printf(" %f ", specRef.getStoichiometry());
+				if (ids)
+					keggID = specRef.getSpecies();
+				else {
+					keggID = "?";
+					for (CVTerm term : specRef.getSpeciesInstance().getCVTerms()) {
+						for (j = 0; j < term.getResourceCount()
+								&& keggID.equals("?"); j++)
+							if (term.getResourceURI(j).startsWith(cpdPrefix)) {
+								keggID = term.getResourceURI(j).substring(
 									cpdPrefix.length());
-						}
-					if (keggID.length() > 1)
-						break;
+							}
+						if (keggID.length() > 1)
+							break;
+					}
 				}
+				System.out.printf("%s", keggID);
+				i++;
 			}
-			System.out.printf("%s", keggID);
-			i++;
 		}
 	}
 
@@ -1706,22 +1737,25 @@ public class AnnotationCheck {
 	 */
 	public void printNamesOfReactionsWithoutAnnotation(Model model) {
 		int i = 0;
-		for (Reaction r : model.getListOfReactions()) {
-			if (r.getCVTermCount() == 0 && r.isSetName())
-				System.out.printf("%d.\treaction id: %s\tname: %s\n", (++i), r
+		if (model.isSetListOfReactions()) {
+			for (Reaction r : model.getListOfReactions()) {
+				if ((r.getCVTermCount() == 0) && r.isSetName()) {
+					System.out.printf("%d.\treaction id: %s\tname: %s\n", (++i), r
 						.getId(), r.getName());
+				}
+			}
 		}
 	}
 
 	public void printReactionAnnotation(Reaction r) {
 		System.out.printf("%s:\n", r.getId());
-		printCVTermsOf(r.getListOfReactants(), false);
+		printCVTermsOf(r.isSetListOfReactants() ? r.getListOfReactants() : null, false);
 		System.out.print(r.getReversible() ? " <=> " : " -> ");
-		printCVTermsOf(r.getListOfProducts(), false);
+		printCVTermsOf(r.isSetListOfProducts() ? r.getListOfProducts() : null, false);
 		System.out.print("\n");
-		printCVTermsOf(r.getListOfReactants(), true);
+		printCVTermsOf(r.isSetListOfReactants() ? r.getListOfReactants() : null, true);
 		System.out.print(r.getReversible() ? " <=> " : " -> ");
-		printCVTermsOf(r.getListOfProducts(), true);
+		printCVTermsOf(r.isSetListOfProducts() ? r.getListOfProducts() : null, true);
 		System.out.println();
 	}
 }

@@ -268,12 +268,11 @@ public class CellDesignerAnnotationParser implements Runnable {
 	 * @throws XMLStreamException
 	 */
 	private void readReactionLayout() throws XMLStreamException {
-		
-		ListOf<Reaction> rlist = model.getListOfReactions();
-		for (Reaction r : rlist) {
-			createGlyphsForReaction(r, getAnnotationBlockWithNamespace(r.getAnnotationString()));
+		if (model.isSetListOfReactions()) {
+			for (Reaction r : model.getListOfReactions()) {
+				createGlyphsForReaction(r, getAnnotationBlockWithNamespace(r.getAnnotationString()));
+			}
 		}
-		
 	}
 	
 	/**

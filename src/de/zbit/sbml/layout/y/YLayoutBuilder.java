@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBO;
@@ -630,16 +631,19 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	@Override
 	public ILayoutGraph getProduct() {
 		Map<String, Set<List<Edge>>> reactionId2Edge = new HashMap<String, Set<List<Edge>>>();
-		for (Reaction reaction : layout.getModel().getListOfReactions()) {
-			String reactionId = reaction.getId();
-			Set<List<Edge>> edgeListSet = new HashSet<List<Edge>>();
-			List<NamedSBaseGlyph> reactionGlyphs = (List<NamedSBaseGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
-			if (reactionGlyphs != null) {
-				for (NamedSBaseGlyph reactionGlyph : reactionGlyphs) {
-					edgeListSet.add(new LinkedList<Edge>(reactionGlyphId2edges.get(reactionGlyph.getId())));
+		Model model = layout.getModel();
+		if (model.isSetListOfReactions()) {
+			for (Reaction reaction : model.getListOfReactions()) {
+				String reactionId = reaction.getId();
+				Set<List<Edge>> edgeListSet = new HashSet<List<Edge>>();
+				List<NamedSBaseGlyph> reactionGlyphs = (List<NamedSBaseGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
+				if (reactionGlyphs != null) {
+					for (NamedSBaseGlyph reactionGlyph : reactionGlyphs) {
+						edgeListSet.add(new LinkedList<Edge>(reactionGlyphId2edges.get(reactionGlyph.getId())));
+					}
 				}
+				reactionId2Edge.put(reactionId, edgeListSet);
 			}
-			reactionId2Edge.put(reactionId, edgeListSet);
 		}
 		ILayoutGraph layoutGraph = new LayoutGraph(speciesId2Node,
 				compartmentId2Node,

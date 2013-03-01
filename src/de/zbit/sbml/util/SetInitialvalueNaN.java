@@ -59,14 +59,13 @@ public class SetInitialvalueNaN {
 	 */
 	private void zeroToNaN(SBMLDocument doc, String output) throws SBMLException, FileNotFoundException, XMLStreamException{
 		Model m = doc.getModel();
-		
-		ListOf<Species> speciesList = m.getListOfSpecies();
-		
-		for (Species s : speciesList){
-			if (!s.isSetValue() || (s.getValue() == 0d)){
-				s.setInitialConcentration(Double.NaN);
+		if (m.isSetListOfSpecies()) {
+			for (Species s : m.getListOfSpecies()) {
+				if (!s.isSetValue() || (s.getValue() == 0d)) {
+					s.setInitialConcentration(Double.NaN);
+				}
+				s.setHasOnlySubstanceUnits(false);
 			}
-			s.setHasOnlySubstanceUnits(false);
 		}
 		SBMLWriter w = new SBMLWriter();
 		w.write(doc, output);		

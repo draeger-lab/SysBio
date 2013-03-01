@@ -299,12 +299,12 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    * @return true if a valid {@link #ncbi_tax_id} is set.
    */
   public boolean isSetTaxonomyId() {
-    return ncbi_tax_id!=null && ncbi_tax_id>0;
+    return (ncbi_tax_id != null) && (ncbi_tax_id > 0);
   }
 
   public static List<String> getListOfNames(List<Species> list, int type) {
     List<String> retval = new LinkedList<String>();
-    for (int i=0; i<list.size(); i++) {
+    for (int i = 0; i < list.size(); i++) {
       retval.add(list.get(i).getName(type));
     }
     return retval;
@@ -316,13 +316,13 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    * @param type
    */
   public String getName(int type) {
-    if (type==SCIENTIFIC_NAME) {
+    if (type == SCIENTIFIC_NAME) {
       return getScientificName();
-    } else if (type==COMMON_NAME) {
+    } else if (type == COMMON_NAME) {
       return getCommonName();
-    } else if (type==KEGG_ABBR) {
+    } else if (type == KEGG_ABBR) {
       return keggAbbr;
-    } else if (type==UNIPROT_EXTENSION) {
+    } else if (type == UNIPROT_EXTENSION) {
       return uniprotExtension;
     } else {
       System.err.println("Unknown species name type: " + type);

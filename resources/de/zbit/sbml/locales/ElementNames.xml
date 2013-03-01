@@ -24,6 +24,8 @@
 
   <!-- Attributes -->
   
+  <entry key="id">ID</entry>
+  
   <entry key="areaUnits">Area units</entry>
   <entry key="boundaryCondition">Boundary condition</entry>
   <entry key="charge">Charge</entry>
@@ -92,7 +94,7 @@
   <entry key="listOfEventAssignments">Event assignments</entry>
   <entry key="listOfFunctionDefinitions">Function definitions</entry>
   <entry key="listOfInitialAssignments">Initial assignments</entry>
-  <entry key="listOfLocalParameters">Parameters</entry> <!-- local or not is not relevant to the user. -->
+  <entry key="listOfLocalParameters">Local parameters</entry>
   <entry key="listOfModifiers">Modifiers</entry>
   <entry key="listOfParameters">Parameters</entry>
   <entry key="listOfProducts">Products</entry>
@@ -103,7 +105,7 @@
   <entry key="listOfSpeciesTypes">Species types</entry>
   <entry key="listOfUnitDefinitions">Unit definitions</entry>
   <entry key="listOfUnits">Units</entry>
-  <entry key="localParameter">Parameter</entry> <!-- local or not is not relevant to the user. -->
+  <entry key="localParameter">Local parameter</entry>
   <entry key="model">Model</entry>
   <entry key="modifierSpeciesReference">Modifier species reference</entry>
   <entry key="parameter">Parameter</entry>
