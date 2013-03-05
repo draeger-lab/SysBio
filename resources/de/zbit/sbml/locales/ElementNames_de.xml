@@ -40,6 +40,7 @@
   <entry key="extentUnits">Ausmaßeinheit</entry>
   <entry key="familyName">Familienname</entry>
   <entry key="fast">Schnell</entry>
+  <entry key="formula">Formel</entry>
   <entry key="givenName">Vorname</entry>
   <entry key="hasOnlySubstanceUnits">Hat ausschließlich Substanzeinheiten</entry>
   <entry key="initialAmount">Anfangsmenge</entry>

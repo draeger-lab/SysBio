@@ -1521,7 +1521,7 @@ public class GUITools {
 		
 		// Only if the user specified either no LaF or an invalid one, try to
 		// load an operating system dependent nice LaF.
-		if (def==null || cl==null) {
+		if ((def == null) || (cl == null)) {
 		  try {
 		    UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
 		    String osName = System.getProperty("os.name");

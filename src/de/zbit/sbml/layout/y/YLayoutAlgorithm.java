@@ -407,8 +407,8 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		// position process nodes
 		for (ReactionGlyph reactionGlyph : reactionNodes) {
 			assert glyphNodeMap.get(reactionGlyph.getId()) != null;
-			ReactionNodeRealizer reactionNodeRealizer = (ReactionNodeRealizer)
-				graph2D.getRealizer(glyphNodeMap.get(reactionGlyph.getId()));
+			NodeRealizer realizer = graph2D.getRealizer(glyphNodeMap.get(reactionGlyph.getId()));
+			//ReactionNodeRealizer reactionNodeRealizer = (ReactionNodeRealizer) realizer;
 			
 			double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);
 			reactionGlyph.putUserObject("ROTATION", rotationAngle);
@@ -429,7 +429,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 					"No position given for reaction glyph {0}",
 					reactionGlyph));
 			}
-			reactionNodeRealizer.setLocation(x, y);
+			realizer.setLocation(x, y);
 			
 			BoundingBox rgBoundingBox = reactionGlyph.isSetBoundingBox() ?
 					reactionGlyph.getBoundingBox() : reactionGlyph.createBoundingBox();
