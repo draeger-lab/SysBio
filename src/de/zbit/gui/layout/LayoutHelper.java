@@ -309,7 +309,7 @@ public class LayoutHelper {
 	public void add(String label, Component c) {
 	  ensurePointerIsAtBeginningOfARow();
 		add(label, c, 0, row);
-		atRowBeginning=false;
+		atRowBeginning = false;
 	}
 	
 	/**
@@ -363,7 +363,7 @@ public class LayoutHelper {
 		add(lab, x, y, 1, 1, 0, 0);
 		add(new JPanel(), x + 1, y, 1, 1, 0, 0);
 		add(c, x + 2, y, 1, 1);
-		atRowBeginning=false;
+		atRowBeginning = false;
 		return lab;
 	}
 	

@@ -41,6 +41,7 @@
   <entry key="exponent">Exponent</entry>
   <entry key="extentUnits">Extent units</entry>
   <entry key="familyName">Family name</entry>
+  <entry key="formula">Formula</entry>
   <entry key="fast">Fast</entry>
   <entry key="givenName">Given name</entry>
   <entry key="hasOnlySubstanceUnits">Has only substance units</entry>

@@ -18,7 +18,10 @@ package de.zbit.util.prefs;
 
 import java.io.File;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,7 +201,7 @@ Serializable {
 		
 		// Parse color from string. Alpha is being lost...
 		if (requiredType.equals(java.awt.Color.class)) {
-			if (ret!=null && !ret.getClass().equals(java.awt.Color.class) && // May be already decoded
+			if ((ret != null) && !ret.getClass().equals(java.awt.Color.class) && // May be already decoded
 					ret.toString().startsWith("java.awt.Color[r=")) {
 				String parse = ret.toString();
 				int r = Utils.getNumberFromString(parse.indexOf("r=")+2, parse);
@@ -206,28 +209,20 @@ Serializable {
 				int b = Utils.getNumberFromString(parse.indexOf("b=")+2, parse);
 				return (Type) new java.awt.Color(r,g,b);
 			}
-		}
-		
-		if (requiredType.equals(Character.class)) {
+		} else if (requiredType.equals(Character.class)) {
 			if ((ret == null) || (ret.toString().length() < 1)) {
 				return null;
 			}
 			ret = ((Character) ret.toString().charAt(0));
-		}
-		
-		if (requiredType.equals(File.class)) {
+		} else if (requiredType.equals(File.class)) {
 			ret = new File(ret.toString());
-		}
-		
-		if (requiredType.equals(Class.class) && (ret instanceof String)) {
+		} else if (requiredType.equals(Class.class) && (ret instanceof String)) {
 			try {
 				ret = Class.forName((String) ret);
 			} catch (ClassNotFoundException exc) {
 				logger.finest(exc.getLocalizedMessage());
 			}
-		}
-		
-		if (Enum.class.isAssignableFrom(requiredType)) {
+		} else if (Enum.class.isAssignableFrom(requiredType)) {
 			// Empty strings are never contained in enums
 			if ((ret == null) || (ret.toString().length() < 1)) {
 				return null;
@@ -240,12 +235,20 @@ Serializable {
 				logger.finest(exc.getLocalizedMessage());
 				return null;
 			}
+		} else if (Date.class.isAssignableFrom(requiredType)) {
+			try {
+				ret = DateFormat.getInstance().parse(ret.toString());
+				System.out.println(ret);
+			} catch (ParseException exc) {
+				logger.finest(exc.getLocalizedMessage());
+				return null;
+			}
 		}
 		
 		try {
 			return (Type) ret;
-		} catch (Exception exc) {
-			logger.finest(exc.getLocalizedMessage());
+		} catch (Throwable exc) {
+			logger.fine(exc.getLocalizedMessage());
 			return null;
 		}
 	}

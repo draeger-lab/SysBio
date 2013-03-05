@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -299,19 +300,30 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         initial = Option.parseOrCast(Color.class, defaultValue);
       }
       if (initial == null) {
-				log.warning(String.format("Invalid default value for color %s: %s",
-					defaultValue.getClass(), defaultValue));
+				log.warning(MessageFormat.format(
+					"Invalid default value for color {0}: {0}",
+					defaultValue.getClass().getName(), defaultValue));
         initial = Color.WHITE;
       }
       ColorChooserWithPreview colChooser = new ColorChooserWithPreview(initial);
       component = new JLabeledComponent(optionTitle, true, colChooser);
       
+    } else if (Date.class.isAssignableFrom(clazz)) {
+    	
+    	Date initial = null;
+    	if (defaultValue instanceof Date) {
+    		initial = (Date) defaultValue;
+    	} else if (defaultValue instanceof String) {
+    		initial = Option.parseOrCast(Date.class, defaultValue);
+    	}
+    	// TODO: Date!
+    	
     } else if ((values != null) && (values.length > 0)) {
       component = new JLabeledComponent(optionTitle, true, values);
       ((JLabeledComponent) component).setAcceptOnlyIntegers(false);
       
     } else {
-			log.severe(String.format("Please implement JComponent for %s.", clazz));
+			log.severe(MessageFormat.format("Please implement JComponent for {0}.", clazz.getName()));
     }
     
     // Check if the option could be converted to a JComponent
@@ -422,7 +434,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    */
   public static JComponent createJComponentForOption(Option<?> option, SBProperties probs, EventListener l) {
     // Get default value
-    Object def = (probs != null)? probs.get(option) : option.getDefaultValue();
+    Object def = (probs != null) ? probs.get(option) : option.getDefaultValue();
     if (def != null) {
       try {
         // Try to get the real default value

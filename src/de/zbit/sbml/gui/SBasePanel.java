@@ -374,6 +374,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				laTeXpreview.append(LaTeXCompiler.eqEnd);
 				lh.add(renderer.renderEquation(laTeXpreview.toString()), 1, ++row, 3, 1, 1d, 0d);
 				lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
+			} else {
+				JTextField tf = new JTextField(mc.getMath().toFormula());
+				tf.setEditable(editable);
+				tf.setColumns(25);
+				tf.setCaretPosition(0);
+				lh.add(bundle.getString("formula"), tf, 1, ++row);
 			}
 			if (mc instanceof Assignment) {
 				lh.add(new SBasePanel(((Assignment) mc)
