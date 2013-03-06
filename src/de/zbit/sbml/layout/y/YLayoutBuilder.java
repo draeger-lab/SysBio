@@ -80,6 +80,7 @@ import de.zbit.sbml.layout.OmittedProcessNode;
 import de.zbit.sbml.layout.PerturbingAgent;
 import de.zbit.sbml.layout.ProcessNode;
 import de.zbit.sbml.layout.Production;
+import de.zbit.sbml.layout.ReversibleConsumption;
 import de.zbit.sbml.layout.SBGNArc;
 import de.zbit.sbml.layout.SBGNNode;
 import de.zbit.sbml.layout.SimpleChemical;
@@ -291,7 +292,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	 */
 	@Override
 	public void buildConnectingArc(SpeciesReferenceGlyph srg, ReactionGlyph reactionGlyph, double curveWidth) {
-		logger.fine(String.format("building arc srgId=%s to rgId=%s", srg.getId(), reactionGlyph.getId()));
 		
 		Node processNode = id2node.get(reactionGlyph.getId());
 		SpeciesGlyph speciesGlyph = srg.getSpeciesGlyphInstance();
@@ -300,33 +300,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		assert processNode != null;
 		assert speciesGlyphNode != null;
 		
-		SBGNArc<EdgeRealizer> arc;
-		int sboTerm = -1;
-		SpeciesReferenceRole speciesReferenceRole = null;
-		if (srg.isSetSpeciesReferenceRole() &&
-				srg.getSpeciesReferenceRole() != null) {
-			speciesReferenceRole = srg.getSpeciesReferenceRole();
-			arc = getSBGNArc(speciesReferenceRole);
-			logger.fine("SRG role " + speciesReferenceRole);
-		}
-		else {
-			sboTerm = srg.getSBOTerm();
-			arc = getSBGNArc(sboTerm);
-			logger.fine("SRG sbo term " + sboTerm);
-		}
-		
-		Reaction reaction = (Reaction) reactionGlyph.getReactionInstance();
-		boolean reactionIsReversible = (reaction != null) &&
-			reaction.isSetReversible() && reaction.isReversible();
-		
-		if (reactionIsReversible &&
-				(((sboTerm != -1) && SBO.isChildOf(sboTerm, 394)) ||
-						((speciesReferenceRole != null) &&
-								((speciesReferenceRole == SpeciesReferenceRole.SUBSTRATE) ||
-										(speciesReferenceRole == SpeciesReferenceRole.SIDESUBSTRATE))))) {
-			// consumption in reversible reaction needs an arrow
-			arc = createReversibleConsumption();
-		}
+		SBGNArc<EdgeRealizer> arc = identifyArcType(srg, reactionGlyph);
 
 		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve(), curveWidth);
 		
@@ -743,8 +717,12 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	public Consumption<EdgeRealizer> createConsumption() {
 		return new YConsumption();
 	}
-
-	private SBGNArc<EdgeRealizer> createReversibleConsumption() {
+	
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createReversibleConsumption()
+	 */
+	@Override
+	public ReversibleConsumption<EdgeRealizer> createReversibleConsumption() {
 		return new YReversibleConsumption();
 	}
 
