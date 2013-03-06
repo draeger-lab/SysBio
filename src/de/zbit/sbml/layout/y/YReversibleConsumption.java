@@ -20,7 +20,7 @@ import org.sbml.jsbml.ext.layout.Curve;
 
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import de.zbit.sbml.layout.SBGNArc;
+import de.zbit.sbml.layout.ReversibleConsumption;
 
 /**
  * Consumptions in reversible reactions have to display an arrow. This class
@@ -31,7 +31,7 @@ import de.zbit.sbml.layout.SBGNArc;
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YReversibleConsumption extends YAbstractSBGNArc implements SBGNArc<EdgeRealizer> {
+public class YReversibleConsumption extends YAbstractSBGNArc implements ReversibleConsumption<EdgeRealizer> {
 
 	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
