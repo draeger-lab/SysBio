@@ -18,12 +18,13 @@ package de.zbit.util.prefs;
 
 import java.io.File;
 import java.io.Serializable;
-import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.SortedSet;
@@ -237,8 +238,8 @@ Serializable {
 			}
 		} else if (Date.class.isAssignableFrom(requiredType)) {
 			try {
-				ret = DateFormat.getInstance().parse(ret.toString());
-				System.out.println(ret);
+				SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", Locale.US);
+				ret = df.parse(ret.toString());
 			} catch (ParseException exc) {
 				logger.finest(exc.getLocalizedMessage());
 				return null;
