@@ -60,6 +60,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.JTextComponent;
 
+
 import de.zbit.gui.ColorChooserWithPreview;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.csv.CSVReaderOptionPanel;
@@ -316,7 +317,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     	} else if (defaultValue instanceof String) {
     		initial = Option.parseOrCast(Date.class, defaultValue);
     	}
-    	// TODO: Date!
+    	
+		component = new JDatePanel(initial);
+		
     	
     } else if ((values != null) && (values.length > 0)) {
       component = new JLabeledComponent(optionTitle, true, values);
