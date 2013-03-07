@@ -127,6 +127,12 @@
   <entry key="NOT_AVAILABLE">Not available</entry>
   <entry key="INVALID_COLUMN">Invalid column</entry>
   
+  <!-- JDatePanel -->
+  
+  <entry key="DATE">Date</entry>
+  <entry key="DATE_TOOLTIP">Select a date from the calendar.</entry>
+  <entry key="DATE_FORMAT">dd/MM/yyyy</entry>
+  
   <!-- JHelpBrowser -->
   
   <entry key="ONLINE_HELP">Online Help</entry>

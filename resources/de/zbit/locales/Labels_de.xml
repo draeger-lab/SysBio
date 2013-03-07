@@ -125,6 +125,12 @@
   <entry key="NOT_AVAILABLE">Nicht verfügbar</entry>
   <entry key="INVALID_COLUMN">Ungültige Spalte</entry>
   
+  <!-- JDatePanel -->
+  
+  <entry key="DATE">Datum</entry>
+  <entry key="DATE_TOOLTIP">Wählen Sie einen passenen Termin aus dem Kalender.</entry>
+  <entry key="DATE_FORMAT">dd.MM.yyyy</entry>
+  
   <!-- JHelpBrowser -->
   
   <entry key="ONLINE_HELP">Online-Hilfe</entry>
