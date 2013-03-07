@@ -300,7 +300,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		assert processNode != null;
 		assert speciesGlyphNode != null;
 		
-		SBGNArc<EdgeRealizer> arc = identifyArcType(srg, reactionGlyph);
+		SBGNArc<EdgeRealizer> arc = createArc(srg, reactionGlyph);
 
 		EdgeRealizer edgeRealizer = arc.draw(srg.getCurve(), curveWidth);
 		

@@ -23,15 +23,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.zbit.util.ResourceManager;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 
@@ -42,7 +45,7 @@ import de.zbit.util.prefs.SBPreferences;
 public class JDatePanel extends JPanel implements JComponentForOption, ActionListener{
 
 	/**
-	 * 
+	 * Generated serial version identifier.
 	 */
 	private static final long serialVersionUID = -1776415205536049365L;
 
@@ -87,16 +90,18 @@ public class JDatePanel extends JPanel implements JComponentForOption, ActionLis
 	 * @param initial
 	 */
 	public JDatePanel(Date date) {
+		ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
 		this.selectedDate = date;
 		
 		textFieldCalendar = new JTextField();
-		dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		dateFormat = new SimpleDateFormat(bundle.getString("DATE_FORMAT"));
     	textFieldCalendar.setText(dateFormat.format(date));
 		textFieldCalendar.setEnabled(false);
 		
 		this.changeListeners = new LinkedList<ChangeListener>();
 		
-		buttonCalendar = new JButton("Date");
+		buttonCalendar = new JButton(bundle.getString("DATE"), UIManager.getIcon("ICON_CALENDAR_16"));
+		buttonCalendar.setToolTipText(bundle.getString("DATE_TOOLTIP"));
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.add(textFieldCalendar);
 		this.add(buttonCalendar);
@@ -127,7 +132,7 @@ public class JDatePanel extends JPanel implements JComponentForOption, ActionLis
 	/* (non-Javadoc)
 	 * @see de.zbit.gui.prefs.JComponentForOption#getCurrentValue()
 	 */
-	public Object getCurrentValue() {
+	public Date getCurrentValue() {
 		return selectedDate;
 	}
 
@@ -150,12 +155,11 @@ public class JDatePanel extends JPanel implements JComponentForOption, ActionLis
 			textFieldCalendar.setText(dateFormat.format(dialogCalendar
 					.getSelectedDate()));
 			this.selectedDate = dialogCalendar.getSelectedDate();
-			for(ChangeListener cl: changeListeners) {
+			for (ChangeListener cl: changeListeners) {
 				cl.stateChanged(new ChangeEvent(this));
 			}
 			
 		}
 	}
-	
 	
 }

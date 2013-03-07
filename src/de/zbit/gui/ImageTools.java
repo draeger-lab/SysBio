@@ -368,6 +368,7 @@ public class ImageTools {
         "ICON_ARROW_LEFT_32.png",
         "ICON_ARROW_RIGHT_16.png",
         "ICON_ARROW_RIGHT_32.png",
+        "ICON_CALENDAR_16.png",
         "ICON_DOCUMENT_16.png",
         "ICON_DOCUMENT_32.png",
         "ICON_DOCUMENT_48.png",
