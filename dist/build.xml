@@ -213,6 +213,10 @@
   	
   	<mkdir dir="${doc}"/>
   	<mkdir dir="${doc}/version_${version}"/>
+	<path id="classpath">
+      <fileset dir="${lib}" includes="**.jar, **.zip"/>
+    </path>
+  	<!-- ${lib}/junit-4.3.1.jar:${lib}/jsbml-1.0-a1-with-dependencies.jar:${lib}/jaxrpc.jar:${lib}/axis.jar:${lib}/commons-cli-1.1.jar:${lib}/commons-discovery.jar:${lib}/commons-logging.jar:${lib}/jaxrpc.jar:${lib}/keggapi.jar:${lib}/WSDbfetch.jar:${lib}/wsdl4j.jar:${lib}/quaqua.jar:${lib}/graph/org.sbgn.jar:${lib}/graph/y.jar:${lib}/garuda/garuda-csr.jar:${lib}/garuda/jsonic-1.2.10.jar:${lib}/garuda/log4j-1.2.16.jar -->
 	<javadoc
       sourcepath="${src}:${test}:${resources}:${examples}:${mac_support}"
       destdir="${doc}/version_${version}"
@@ -231,7 +235,7 @@
       use="true"
       stylesheetfile="${doc}/javadoc-style.css" 
       overview="${src}/overview.html"
-      classpath="${lib}/junit-4.3.1.jar:${lib}/jsbml-1.0-a1-with-dependencies.jar:${lib}/jaxrpc.jar:${lib}/axis.jar:${lib}/commons-cli-1.1.jar:${lib}/commons-discovery.jar:${lib}/commons-logging.jar:${lib}/jaxrpc.jar:${lib}/keggapi.jar:${lib}/WSDbfetch.jar:${lib}/wsdl4j.jar:${lib}/quaqua.jar:${lib}/graph/org.sbgn.jar:${lib}/graph/y.jar:${lib}/garuda/garuda-csr.jar:${lib}/garuda/jsonic-1.2.10.jar:${lib}/garuda/log4j-1.2.16.jar"
+      classpathref="classpath"
       version="true">
 		<link href="http://commons.apache.org/io/api-1.4/"/>
 		<link href="http://commons.apache.org/math/api-2.2/"/>
