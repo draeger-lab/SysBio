@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
 
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
-import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
 
@@ -127,10 +127,10 @@ public class YGraphView implements PropertyChangeListener {
 			System.exit(1);
 		}
 		Model model = doc.getModel();
-		ExtendedLayoutModel ext = (ExtendedLayoutModel) model.getExtension(LayoutConstants.getNamespaceURI(doc.getLevel(), doc.getVersion()));
+		LayoutModelPlugin ext = (LayoutModelPlugin) model.getExtension(LayoutConstants.getNamespaceURI(doc.getLevel(), doc.getVersion()));
 		if (ext == null) {
 			new GlyphCreator(model).create();
-			ext = (ExtendedLayoutModel) model.getExtension(LayoutConstants.getNamespaceURI(doc.getLevel(), doc.getVersion()));
+			ext = (LayoutModelPlugin) model.getExtension(LayoutConstants.getNamespaceURI(doc.getLevel(), doc.getVersion()));
 		}
 		int layoutIndex = 0;
 		if (ext.getLayoutCount() > 1) {

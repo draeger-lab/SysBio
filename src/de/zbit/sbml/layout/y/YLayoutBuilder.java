@@ -118,11 +118,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	private List<ProgressListener> progressListeners = new LinkedList<ProgressListener>();
 
 	/**
-	 * Indicates whether graph generation has finished or not.
-	 */
-	private boolean terminated = false;
-
-	/**
 	 * Maps SBML identifiers to yFiles nodes.
 	 */
 	private Map<String, Node> id2node = new HashMap<String, Node>();
@@ -594,7 +589,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		for (TextGlyph textGlyph : labelTextGlyphs) {
 			buildTextGlyphAsLabel(textGlyph);
 		}
-		
 		terminated = true;
 	}
 
@@ -628,14 +622,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 				graph);
 
 		return layoutGraph;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutBuilder#isProductReady()
-	 */
-	@Override
-	public boolean isProductReady() {
-		return terminated;
 	}
 
 	/* (non-Javadoc)
