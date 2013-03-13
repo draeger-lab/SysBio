@@ -28,7 +28,7 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLWriter;
-import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.qual.QualConstant;
@@ -94,7 +94,7 @@ public abstract class QualModelBuilding {
 	    qualModel = new QualitativeModel(model);
 	    model.addExtension(QualConstant.namespaceURI, QualModelBuilding.qualModel);
 		
-	    ExtendedLayoutModel layoutExt = new ExtendedLayoutModel(model);
+	    LayoutModelPlugin layoutExt = new LayoutModelPlugin(model);
 		model.addExtension(LayoutConstants.namespaceURI, layoutExt);
 		layout = layoutExt.createLayout();
 	    

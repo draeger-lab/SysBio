@@ -42,7 +42,7 @@ import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
-import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
@@ -112,7 +112,7 @@ public class CellDesignerAnnotationParser implements Runnable {
 	private void initializeLayout(SBMLDocument doc) {
 		model = doc.getModel();
 		if ((model != null) && (model.getExtension(LayoutConstants.namespaceURI) == null)) {
-			ExtendedLayoutModel layoutExt = new ExtendedLayoutModel(model);
+			LayoutModelPlugin layoutExt = new LayoutModelPlugin(model);
 			model.addExtension(LayoutConstants.namespaceURI, layoutExt);
 			layout = layoutExt.createLayout("l1");
 		}

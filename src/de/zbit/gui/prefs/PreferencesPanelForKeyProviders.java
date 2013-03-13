@@ -17,13 +17,16 @@
 package de.zbit.gui.prefs;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
+import de.zbit.util.prefs.SBProperties;
 
 /**
  * Automatically build an options panel for multiple {@link KeyProvider}s.
@@ -37,6 +40,11 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
    * Generated serial version identifer.
    */
   private static final long serialVersionUID = -921160153764089395L;
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final Logger logger = Logger.getLogger(PreferencesPanelForKeyProviders.class.getName());
   
   /**
    * The KeyProvider, that determines this panel.
@@ -92,8 +100,7 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
     initializePrefPanel();
   }
 
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see de.zbit.gui.prefs.PreferencesPanel#accepts(java.lang.Object)
    */
   public boolean accepts(Object key) {
@@ -112,16 +119,14 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
     return false;
   }
   
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see de.zbit.gui.prefs.PreferencesPanel#getTitle()
    */
   public String getTitle() {
     return title;
   }
   
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see de.zbit.gui.prefs.PreferencesPanel#init()
    */
   @SuppressWarnings("unchecked")
@@ -129,6 +134,31 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
     if ((providers != null) && (providers.size() > 0)) {
       autoBuildPanel((Class<? extends KeyProvider>[]) providers.toArray(new Class[0]));
     }
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.PreferencesPanel#initializePrefPanel()
+   */
+  protected void initializePrefPanel() throws IOException {
+  	String k;
+    properties = new SBProperties(new SBProperties());
+    for (Class<? extends KeyProvider> provider: providers) {
+    	preferences = SBPreferences.getPreferencesFor(provider);
+    	// TODO: In cases that there is an old configuration of preferences in memory it might be necessary to call SBPreferences.getPreferencesFor(myKeyProvider).flush() before all options can be displayed. The reason is that here all keys are taken from the preferences, instead using the actual options from the keyprovider!
+    	for (Object key : preferences.keySetFull()) {
+    		if (accepts(key)) {
+    			// Accept only key from KeyProvider!
+    			// Don't put all keys in properties (also not in preferences) here!
+    			k = key.toString();
+    			properties.put(k, preferences.get(key));
+    			properties.getDefaults().put(k, preferences.getDefault(key));
+    		} else {
+    			log.finer(MessageFormat.format("Rejecting key: {0}", key));
+    		}
+    	}
+    }
+    preferences = null;
+    init();
   }
   
   /* (non-Javadoc)
@@ -146,6 +176,9 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
         	// TODO: this is a very simple check. What if we have a new key-value pair? Null values??
           prefs.put(entry.getKey(), entry.getValue());
           changes = true;
+          logger.finest("Storing key-value pair (" + entry.getKey() + ", " + entry.getValue() + ") for KeyProvider " + provider.getName());
+        } else {
+        	logger.finest("Could not store key-value pair (" + entry.getKey() + ", " + entry.getValue() + ") for KeyProvider " + provider.getName());
         }
       }
       
@@ -155,21 +188,11 @@ public class PreferencesPanelForKeyProviders extends PreferencesPanel {
     }
   }
   
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see de.zbit.gui.prefs.PreferencesPanel#loadPreferences()
    */
   protected SBPreferences loadPreferences() throws IOException {
-    SBPreferences prefs = null;
-    for (Class<? extends KeyProvider> provider: providers) {
-      if (prefs == null) {
-        prefs = SBPreferences.getPreferencesFor(provider);
-      } else {
-        prefs.putAll(SBPreferences.getPreferencesFor(provider));
-      }
-    }
-    return prefs;
+    return null;
   }
 
-  
 }

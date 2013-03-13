@@ -317,7 +317,7 @@ public class FileTools {
    * and in the current directory.
    * 
    * @param filename
-   * @return the executable file if found, or null if not.
+   * @return the executable file if found, or {@code null} if not.
    */
   public static File which(String filename) {
     
@@ -327,7 +327,7 @@ public class FileTools {
        path.split(Pattern.quote(File.pathSeparator));
     
     // Append the current working directory
-    String[] morePaths = new String[paths.length+1];
+    String[] morePaths = new String[paths.length + 1];
     morePaths[0] = System.getProperty("user.dir");
     System.arraycopy(paths, 0, morePaths, 1, paths.length);
     

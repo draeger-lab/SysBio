@@ -1017,7 +1017,9 @@ public class SBPreferences implements Map<Object, Object> {
 		Option<?> option;
 		while (iterator.hasNext()) {
 			option = iterator.next();
-			checkPref(option);
+			if (!checkPref(option)) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -1117,6 +1119,7 @@ public class SBPreferences implements Map<Object, Object> {
 	
 	/**
 	 * @throws BackingStoreException
+	 * @see {@link Preferences#flush()}
 	 */
 	public void flush() throws BackingStoreException {
 		if (checkPrefs()) {
@@ -1548,16 +1551,17 @@ public class SBPreferences implements Map<Object, Object> {
 		String orig;
 		Set<Object> keySet = keySet();
 		for (Map.Entry<? extends Object, ? extends Object> entry : m.entrySet()) {
-			if (!keySet.contains(entry.getKey())) {
-				put(entry.getKey(), entry.getValue());
+			Object key = entry.getKey();
+			if (!keySet.contains(key)) {
+				put(key, entry.getValue());
 			} else {
-				orig = get(entry.getKey());
+				orig = get(key);
 				if (entry.getValue() != null) {
 					if (!orig.equals(entry.getValue().toString())) {
-						put(entry.getKey(), entry.getValue());
+						put(key, entry.getValue());
 					}
 				} else if (orig != null) {
-					remove(entry.getKey());
+					remove(key);
 				}
 			}
 		}

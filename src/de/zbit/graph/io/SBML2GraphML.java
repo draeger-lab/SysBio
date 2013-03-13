@@ -49,7 +49,7 @@ import org.sbml.jsbml.ext.groups.GroupModel;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Dimensions;
-import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.Point;
@@ -247,7 +247,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     	Model model = doc.getModel();
     	SBasePlugin extension = model.getExtension(LayoutConstants.getNamespaceURI(model.getLevel(), model.getVersion()));
     	if (extension != null) {
-    		ExtendedLayoutModel layoutModel = (ExtendedLayoutModel) extension;
+    		LayoutModelPlugin layoutModel = (LayoutModelPlugin) extension;
     		int layoutIndex = 0;
     		if (layoutModel.isSetListOfLayouts()) {
     			Layout layout = layoutModel.getLayout(layoutIndex);
@@ -714,7 +714,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     useLayoutExtension = layoutExtension!=null;
     id2layoutMap = null;
     if (useLayoutExtension) {
-    	ExtendedLayoutModel layoutModel = (ExtendedLayoutModel) layoutExtension;
+    	LayoutModelPlugin layoutModel = (LayoutModelPlugin) layoutExtension;
       if (layoutModel.isSetListOfLayouts()) {
         // TODO: For generic releases, it would be nice to have a JList
         // that let's the user choose the layout.

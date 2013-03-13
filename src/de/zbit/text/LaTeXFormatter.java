@@ -61,10 +61,19 @@ public class LaTeXFormatter {
 		return usingTypewriterFont;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String protectedBlank() {
 		return "~";
 	}
 
+	/**
+	 * 
+	 * @param link
+	 * @return
+	 */
 	public String ref(String link) {
 		return createLaTeXCommand("vref", link);
 	}
@@ -76,38 +85,85 @@ public class LaTeXFormatter {
 		this.usingTypewriterFont = usingTypewriterFont;
 	}
 
+	/**
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public String texttt(String text) {
 		return isUsingTypewriterFont() ? createLaTeXCommand("texttt", text) : text;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String beginLandscape() {
 		return "\\begin{landscape}";
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String trademark() {
 		return "\\texttrademark{}";
 	}
 
+	/**
+	 * 
+	 * @param url
+	 * @param label
+	 * @return
+	 */
 	public String link(String url, String label) {
 		return "\\href{" + url + "}{" + label + "}";
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String sbml2latex() {
 		return "\\SBMLLaTeX";
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String emdash() {
 		return "---";
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String numero() {
 		return "\\numero";
 	}
 
+	/**
+	 * 
+	 * @param columnCount
+	 * @param align
+	 * @param text
+	 * @return
+	 */
 	public String multicolumn(int columnCount, Align align, Object text) {
 		return multicolumn(columnCount, align, text, false, false);
 	}
 
+	/**
+	 * 
+	 * @param columnCount
+	 * @param align
+	 * @param text
+	 * @param leftBorder
+	 * @param rightBorder
+	 * @return
+	 */
 	public String multicolumn(int columnCount, Align align, Object text, boolean leftBorder,
 		boolean rightBorder) {
 		StringBuilder sb = new StringBuilder();
@@ -127,16 +183,84 @@ public class LaTeXFormatter {
 		return sb.toString();
 	}
 
+	/**
+	 * 
+	 * @param label
+	 * @return
+	 */
 	public String labeledItem(String label) {
 		return "\\item[" + label + "] ";
 	}
 
+	/**
+	 * 
+	 * @param subject
+	 * @return
+	 */
 	public String documentSubject(String subject) {
 		return "\\subject{" + subject + "}";
 	}
 
+	/**
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public String quote(String text) {
 		return "``" + text + "\"";
 	}
+
+	/**
+	 * 
+	 * @param title
+	 * @return
+	 */
+	public String caption(String title) {
+		return "\\caption{" + title + "}\n";
+	}
+
+	/**
+	 * 
+	 * @param style
+	 * @return
+	 */
+	public String thisPageStyle(String style) {
+		return "\\thispagestyle{" + style + "}";
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String today() {
+		return "\\today";
+	}
+
+	/**
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public String date(String date) {
+		return "\\date{" + date + "}";
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String appendix() {
+		return "\\appendix";
+	}
+
+	/**
+	 * 
+	 * @param label
+	 * @return
+	 */
+	public String label(String label) {
+		return "\\label{" + label + "}";
+	}
 	
 }
+

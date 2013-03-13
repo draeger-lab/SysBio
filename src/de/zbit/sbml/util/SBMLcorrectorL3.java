@@ -36,7 +36,7 @@ import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
-import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
@@ -88,7 +88,7 @@ public class SBMLcorrectorL3 {
 			}
 			String namespace = LayoutConstants.getNamespaceURI(m.getLevel(), m.getVersion());
 			if (m.getExtension(namespace) != null) {
-				ExtendedLayoutModel layoutPlugin = (ExtendedLayoutModel) m.getExtension(namespace);
+				LayoutModelPlugin layoutPlugin = (LayoutModelPlugin) m.getExtension(namespace);
 				int i = 1;
 				if (layoutPlugin.isSetListOfLayouts()) {
 					for (Layout layout : layoutPlugin.getListOfLayouts()) {

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -391,7 +392,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       } else {
         // Issue a warning. Programmers should watch that each returned
         // JComponent implements the JComponentForOption interface!!!
-				log.warning(String.format("%s IS NO %s!", component.getClass()
+				log.warning(MessageFormat.format("{0} IS NO {1}!", component.getClass()
 						.getName(), JComponentForOption.class.getName()));
       }      
     }
@@ -509,7 +510,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * value will only be stored if the Range check returns true. <br/>
    * If source is NOT an instance of {@link JComponentForOption} this method
    * does NOT perform any Range check. This has to be done before calling this
-   * method. Else, you may end up having invalid properties in the HashSet.
+   * method. Else, you may end up having invalid properties in the {@link Set}.
    * </p>
    * 
    * @param properties
@@ -518,7 +519,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    *        The element whose value has been changed (e.g., in events, this
    *        should be e.getSource()).
    * @param checkRange
-   *        Decides, wether the method should try to perform a range check
+   *        Decides, whether the method should try to perform a range check
    *        before storing the property. If false, the property will be stored
    *        without any further check. This should always be true, when working
    *        with {@link Preferences}.
@@ -695,6 +696,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    */
   protected PreferencesPanel(boolean initPanel) throws IOException {
     super();
+    changeListeners = new LinkedList<ChangeListener>();
+    itemListeners = new LinkedList<ItemListener>();
     /*
      * We have to move this into a separate method, because it calls abstract
      * functions and they may require an initialization first, by extending
@@ -760,7 +763,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       
       // Create swing option based on field type
       JComponent jc = null;
-      if (properties.containsKey(option)) {
+      String key = option.toString();
+      if (properties.containsKey(key) || (key.contains(".") && properties.containsKey(key.substring(key.lastIndexOf('.') + 1)))) {
         // Check if we already have an element for this option
         // Unfortunately is no good choice: this render the
         // "reset defaults" button useless...
@@ -1005,7 +1009,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @return
    */
   public <T> T getProperty(Option<T> option) {
-    return option.parseOrCast(properties.getProperty(option));
+  	String key = option.toString();
+  	if (key.contains(".")) {
+  		return option.parseOrCast(properties.getProperty(key.substring(key.lastIndexOf('.') + 1)));
+  	}
+    return option.parseOrCast(properties.getProperty(key));
   }
   
   /**
@@ -1035,8 +1043,6 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @throws IOException
    */
   protected void initializePrefPanel() throws IOException {
-    changeListeners = new LinkedList<ChangeListener>();
-    itemListeners = new LinkedList<ItemListener>();
     properties = new SBProperties(new SBProperties());
     preferences = loadPreferences();
     if (preferences != null) {
@@ -1047,8 +1053,8 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
           // Accept only key from KeyProvider!
           // Don't put all keys in properties (also not in preferences) here!
           k = key.toString();
-          properties.put(k, preferences.get(k));
-          properties.getDefaults().put(k, preferences.getDefault(k));
+          properties.put(k, preferences.get(key));
+          properties.getDefaults().put(k, preferences.getDefault(key));
         } else {
           log.finer(MessageFormat.format("Rejecting key: {0}", key));
         }
@@ -1173,8 +1179,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    */
   public boolean isUserConfiguration() {
     for (Entry<Object, Object> e : properties.entrySet()) {
-      if (!e.getValue().toString()
-          .equals(preferences.get(e.getKey().toString()))) { 
+      if (!e.getValue().toString().equals(preferences.get(e.getKey().toString()))) { 
         return false; 
       }
     }
