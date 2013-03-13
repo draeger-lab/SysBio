@@ -261,6 +261,23 @@ public class LaTeXFormatter {
 	public String label(String label) {
 		return "\\label{" + label + "}";
 	}
+
+	/**
+	 * 
+	 * @param text
+	 * @return
+	 */
+	public String mathText(String text) {
+		return "\\text{" + text + "}";
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String emptySet() {
+		return "\\emptyset";
+	}
 	
 }
 

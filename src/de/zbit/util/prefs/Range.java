@@ -630,7 +630,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 	 * @param props
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
   public boolean isInRange(Type value, SBProperties props) {
 		if (isSetConstraints()) {
 			if (constraints instanceof GeneralFileFilter) {
@@ -643,7 +643,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
 				}
 				return ((GeneralFileFilter) constraints).accept(file);
 				
-			} else if (constraints instanceof ValuePair<?, ?>) {
+			/*} else if (constraints instanceof ValuePair<?, ?>) {
 	      // XXX: What is this used for, besides the (FINE!) log-message???
 			  Relation relation = (Relation) ((ValuePair<?, ?>) constraints).getA();
         Option<? extends Comparable<Type>> option = (Option<? extends Comparable<Type>>) ((ValuePair<?, ?>) constraints)
@@ -668,7 +668,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
           message += ' ' + relation.getRelationSymbol() + ' ';
           message += value;
           logger.fine(String.format(message, v, option));
-        }
+        }*/
 			}
 		}
     // Special treatment for concrete lists (e.g., for classes).
