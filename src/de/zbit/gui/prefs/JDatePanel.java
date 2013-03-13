@@ -25,8 +25,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -100,11 +102,12 @@ public class JDatePanel extends JPanel implements JComponentForOption, ActionLis
 		
 		this.changeListeners = new LinkedList<ChangeListener>();
 		
-		buttonCalendar = new JButton(bundle.getString("DATE"), UIManager.getIcon("ICON_CALENDAR_16"));
+		buttonCalendar = new JButton("Calendar", UIManager.getIcon("ICON_CALENDAR_16"));
 		buttonCalendar.setToolTipText(bundle.getString("DATE_TOOLTIP"));
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.add(textFieldCalendar);
 		this.add(buttonCalendar);
+		this.setBorder(BorderFactory.createTitledBorder(bundle.getString("DATE")));
 		buttonCalendar.addActionListener(this);
 	}
 
