@@ -7,7 +7,11 @@
 	<!-- =================================================================== -->
 	<!-- Help on usage                                                       -->
 	<!-- =================================================================== -->
-	<target name="usage" depends="init">
+	<target
+	 name="usage"
+	 depends="init"
+	 description="Displays a help message."
+	>
 		<echo message=""/>
 		<echo message=""/>
 		<echo message=" ${appBaseJar} Build file"/>
@@ -19,6 +23,7 @@
 		<echo message="   obfuscate   --> generates obfuscated signed ${appBaseJarWithGraph}.jar file"/>
 		<echo message="   javadoc     --> generates javadoc for the SysBio framework"/>
 		<echo message="   clean       --> cleans up the directory"/>
+		<echo message="   compile     --> deletes all binary files and recompiles the entire project"/>
 		<echo message=""/>
 		<echo message=" See the comments inside the build.xml file for more details."/>
 		<echo message=" -------------------------------------------------------------"/>
@@ -26,38 +31,34 @@
 		<echo message=""/>
 	</target>
 
-  <!-- define some properties that are used throughout the tasks -->
-  <target name="init">
+
+  <target
+  	name="init"
+  	description="Define some properties that are used throughout the tasks"
+  >
   	<echo>
   	  PLESE MAKE SURE ALL PATHS ARE CORRECT AND DECIDE IF YOU WANT
   	  TO USE THE LIB-JARs OR REFERENCED PROJECTS.
   	</echo>
   	<tstamp /> <!-- set ${TODAY} and ${TSTAMP} -->
-  		
-    <!-- the base directory of the SysBio repository -->
-    <property name="base" location=".."/>
   	
-    <!-- the path to the SysBio sources -->
+  	<property name="Name" value="SysBio Library"/>
+  	
+    <!-- Path declarations -->
+    <property name="base" location=".."/>
   	<property name="src" location="${base}/src"/>
+  	<property name="mac_support" location="${base}/src_mac_api"/>
+  	<property name="test" location="${base}/test"/>
+  	<property name="resources" location="${base}/resources"/>
+  	<property name="examples" location="${base}/examples"/>
+  	<property name="lib" location="${base}/lib"/>
+  	<property name="doc" location="${base}/doc/api"/>
+    <property name="classes" location="${base}/bin"/>
+  	<property name="dist" location="${base}/dist"/>
   	
   	<!-- the version of the current release -->
-  	<property name="version" value="1.2"/>
-  	
-  	<!-- path to examples folder -->
-  	<property name="examples" location="${base}/examples"/>
-  	
-  	<!-- path to MacOSX support -->
-  	<property name="mac_support" location="${base}/src_mac_api"/>
-  	
-  	<!-- the path to the SysBio sources -->
-  	<property name="doc" location="${base}/doc/api"/>
-  	
-    <!-- the path to the SysBio binaries -->
-    <property name="classes" location="${base}/bin"/>
+	<property name="build.number" value="${DSTAMP}-${TSTAMP}"/>
     
-    <!-- the path to the SysBio libraries -->
-  	<property name="lib" location="${base}/lib"/>
-
     <!-- the application jar file basenames (without ".jar") -->
   	<!-- without graph package -->
     <property name="appBaseJar" value="SysBio"/>
@@ -82,8 +83,12 @@
   	
   </target>
 
-  <!-- puts the application specific classes into application.jar. -->
-  <target name="jar" depends="init">
+	
+  <target
+  	name="jar"
+  	depends="init, compile"
+  	description="Puts the application-specific classes into application.jar."
+  >
     <delete file="${appJar}"/>
     <jar jarfile="${appJar}">
       <manifest>
@@ -132,9 +137,14 @@
   </target>
 
 
-  <!-- obfuscates y.jar and adjusts application.jar accordingly. -->
-  <!-- Generates the jar files yObf.jar and applicationObf.jar.  -->
-  <target name="obfuscate" depends="jar">
+  <!-- =================================================================== -->
+  <!-- Compile SysBio                                                      -->
+  <!-- =================================================================== -->
+  <target
+  	name="obfuscate"
+  	depends="jar"
+  	description="Obfuscates y.jar and adjusts application.jar accordingly. Generates the jar files yObf.jar and applicationObf.jar."
+  >
     <taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="${yGuardJar}"/>
     <yguard>
     	
@@ -197,8 +207,12 @@
   	<delete file="${appJarRaw}"/>
   </target>
 
-  <!-- Removes all that has been built -->
-  <target name="clean" depends="init">
+	
+  <target
+  	name="clean"
+  	depends="init"
+  	description="Removes all that has been built"
+  >
   	<delete file="${appJarRaw}"/>
   	<delete file="${appJarWithGraph}"/>
     <delete file="${appJar}"/>
@@ -208,23 +222,24 @@
 
   <target
   	name="javadoc"
-  	depends="init"
+  	depends="init, svnrevision"
   	description="Creates Javadoc for the SysBio Framework">
   	
+  	<property name="apidoc" location="${doc}/revision_${repository.revision}"/>
   	<mkdir dir="${doc}"/>
-  	<mkdir dir="${doc}/version_${version}"/>
+  	<mkdir dir="${apidoc}"/>
 	<path id="classpath">
-      <fileset dir="${lib}" includes="**.jar, **.zip"/>
+      <fileset dir="${lib}" includes="**.jar, **/*.jar, **.zip"/>
     </path>
-  	<!-- ${lib}/junit-4.3.1.jar:${lib}/jsbml-1.0-a1-with-dependencies.jar:${lib}/jaxrpc.jar:${lib}/axis.jar:${lib}/commons-cli-1.1.jar:${lib}/commons-discovery.jar:${lib}/commons-logging.jar:${lib}/jaxrpc.jar:${lib}/keggapi.jar:${lib}/WSDbfetch.jar:${lib}/wsdl4j.jar:${lib}/quaqua.jar:${lib}/graph/org.sbgn.jar:${lib}/graph/y.jar:${lib}/garuda/garuda-csr.jar:${lib}/garuda/jsonic-1.2.10.jar:${lib}/garuda/log4j-1.2.16.jar -->
-	<javadoc
+  	
+  	<javadoc
       sourcepath="${src}:${test}:${resources}:${examples}:${mac_support}"
-      destdir="${doc}/version_${version}"
+      destdir="${apidoc}"
       packagenames="de.zbit.*"
       footer="Generated ${TODAY}"
       access="protected"
       author="true"
-      doctitle="SysBio Library ${version}"
+      doctitle="${Name} Revision ${repository.revision}"
       nodeprecated="false"
       nodeprecatedlist="false"
       noindex="false"
@@ -250,24 +265,29 @@
   	
   </target>
 	
-	<target name="svnrevision" depends="init">
-	    <exec executable="svnversion" outputproperty="repository.revision">
-	        <arg line="-c ${base}" />
-	        <redirector>
-	            <outputfilterchain>
-	                <tokenfilter>
-	                    <replaceregex pattern="[0-9]+\:" replace="" />
-	                    <replaceregex pattern="[PM]+" replace="" />
-	                </tokenfilter>
-	            </outputfilterchain>
-	        </redirector>
-	    </exec>
-      <echo message="Current revision is ${repository.revision}" />
-
+  <target
+	name="svnrevision"
+  	depends="init"
+  	description="Determines the current SVN revions number and stores it in a variable."
+  >
+    <exec executable="svnversion" outputproperty="repository.revision">
+	  <arg line="-c ${base}" />
+	  <redirector>
+	    <outputfilterchain>
+	      <tokenfilter>
+	        <replaceregex pattern="[0-9]+\:" replace="" />
+	        <replaceregex pattern="[PM]+" replace="" />
+	      </tokenfilter>
+	    </outputfilterchain>
+	  </redirector>
+	</exec>
+    <echo message="Current revision is ${repository.revision}" />
+  	
+  	<property name="build.name" value="Revision ${repository.revision} ${TODAY} (Build ${build.number})"/>
     <property name="appJarRev" value="${appBaseJar}_r${repository.revision}.jar"/>
     <property name="appJarRevRaw" value="${appBaseJarRaw}_r${repository.revision}.jar"/>
     <property name="appJarRevWithGraph" value="${appBaseJarWithGraph}_r${repository.revision}.jar"/>
-	</target>
+  </target>
 	
 	<target name="jar_revision_number" depends="obfuscate,svnrevision" description="Renames the JAR revision number to its filename">
     <!-- the FINAL obfuscated signed application jar files -->
@@ -282,6 +302,129 @@
     <move failonerror="false" tofile="${appJarRevRaw}" file="${appJarRaw}"/>
     <move failonerror="false" tofile="${appJarRevWithGraph}" file="${appJarWithGraph}"/>
   </target>
-		
+	
+
+  <!-- =================================================================== -->
+  <!-- Compile SysBio                                                      -->
+  <!-- =================================================================== -->
+  <target
+  	name="compile"
+  	depends="init, clean"
+  	description="Compiles the entire SysBio project"
+  >
+  	
+  	<!-- compiler properties -->
+	<property name="compiler" value="modern"/>
+	<property name="debug" value="on"/>
+	<property name="optimize" value="on"/>
+	<property name="deprecation" value="false"/>
+	<property name="depend" value="true"/>
+	<property name="verbose" value="true"/>
+  	
+	<!-- The relative path of the SysBio project -->
+	<path id="classpath">
+      <fileset dir="${lib}" includes="**.jar, **/*.jar, **.zip"/>
+	</path>
+	<path id="sourcepath">
+	  <fileset dir="${src}"/>
+	  <fileset dir="${test}"/>
+	  <fileset dir="${resources}"/>
+	  <fileset dir="${examples}"/>
+    </path>
+  	
+    <delete dir="${classes}"/>
+	<mkdir dir="${classes}"/>
+	<javac srcdir="${src}"
+	  	compiler="${compiler}"
+	  	listfiles="yes"
+	  	debug="${debug}"
+	  	deprecation="${deprecation}"
+		depend="${depend}"
+	  	nowarn="no"
+	  	memoryMaximumSize="512M"
+		destdir="${classes}"
+		verbose="${verbose}"
+		source="1.6"
+		target="1.6"
+		optimize="${optimize}"
+		sourcepathref="sourcepath"
+	  	classpathref="classpath"
+	  />
+	  <!-- <copy todir="${classes}"/> -->
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates a minimal SysBio JAR                                        -->
+  <!-- =================================================================== -->
+  <target
+    name="minimal_sysbio"
+    depends="init, svnrevision, compile"
+    description="Build a minimal version of SysBio for SBML2LaTeX">
+
+    <!-- Delete all previous versions of SysBio JAR files -->
+    <delete verbose="true">
+      <fileset dir="${dist}">
+        <include name="SysBioBase**.jar"/>
+      </fileset>
+    </delete>
+
+    <!-- Pack a minimal JAR file containing only parts required for SBML2LaTeX -->
+    <jar jarfile="${dist}/SysBioBase-r${repository.revision}-b${build.number}.jar">
+      
+      <manifest>
+        <section name="SysBio">
+	      <attribute name="Built-By" value="${user.name}"/>
+          <attribute name="Specification-Title" value="${Name}"/>
+          <attribute name="Specification-Version" value="Revision ${sysbio.revision}"/>
+          <attribute name="Specification-Vendor" value="Center for Bioinformatics Tuebingen (ZBIT)"/>
+       	  <attribute name="Implementation-Title" value="${Name}"/>
+          <attribute name="Implementation-Version" value="${build.name}"/>
+	      <attribute name="Implementation-Vendor" value="University of Tuebingen"/>
+        </section>
+  	  </manifest>
+      <fileset dir="${base}">
+	    <include name="licenses/COPYING.txt"/>
+        <include name="licenses/lib-licenses/*.txt"/>
+        <include name="licenses/lib-licenses/*.html"/>
+        <include name="licenses/AUTHORS.txt"/>
+      </fileset>
+      <fileset dir="${classes}" excludes="**/.svn*, **/package-info.class">
+        <include name="de/zbit/**.class"/>
+        <include name="de/zbit/gui/actioncommand/**.class"/>
+        <include name="de/zbit/gui/layout/**.class"/>
+        <exclude name="de/zbit/gui/layout/SpringUtilities.class"/>
+        <exclude name="de/zbit/gui/layout/VerticalLayout.class"/>
+        <include name="de/zbit/gui/panels/**.class"/>
+        <include name="de/zbit/gui/prefs/**.class"/>
+        <include name="de/zbit/gui/table/**.class"/>
+        <include name="de/zbit/gui/wizard/**.class"/>
+        <include name="de/zbit/gui/**.class"/>
+        <include name="de/zbit/io/**"/>
+        <include name="de/zbit/math/**.class"/>
+        <include name="de/zbit/resources/**.class"/>
+        <include name="de/zbit/sbml/**.class"/>
+        <include name="de/zbit/sbml/gui/*.class"/>
+        <include name="de/zbit/sbml/io/*.class"/>
+        <include name="de/zbit/sbml/layout/*.class"/>
+        <exclude name="de/zbit/sbml/layout/y"/>
+        <include name="de/zbit/text/**.class"/>
+        <include name="de/zbit/util/argparser/**.class"/>
+        <include name="de/zbit/util/logging/**.class"/>
+        <include name="de/zbit/util/objectwrapper/**.class"/>
+        <include name="de/zbit/util/prefs/**.class"/>
+        <include name="de/zbit/util/progressbar/**.class"/>
+        <include name="de/zbit/util/**.class"/>
+      </fileset>
+      <fileset dir="${base}/resources" excludes="**/.svn*, de/zbit/locales/Base*.xml">
+        <include name="de/zbit/gui/img/**.class, UT_*.png"/>
+        <include name="de/zbit/locales/**.xml"/>
+        <include name="de/zbit/sbml/locales/**.xml"/>
+      </fileset>
+      
+      <zipfileset excludes="META-INF/*" src="${lib}/sysbio-osx-support.jar"/>
+      
+    </jar>
+
+  </target>
 	
 </project>
