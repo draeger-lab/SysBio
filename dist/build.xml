@@ -383,9 +383,8 @@
         </section>
   	  </manifest>
       <fileset dir="${base}">
-	    <include name="licenses/COPYING.txt"/>
-        <include name="licenses/lib-licenses/*.txt"/>
-        <include name="licenses/lib-licenses/*.html"/>
+	    <include name="licenses/COPYING_SysBioBase.txt"/>
+        <include name="licenses/lib-licenses/argparser.txt"/>
         <include name="licenses/AUTHORS.txt"/>
       </fileset>
       <fileset dir="${classes}" excludes="**/.svn*, **/package-info.class">
@@ -416,7 +415,6 @@
         <include name="de/zbit/util/**.class"/>
       </fileset>
       <fileset dir="${base}/resources" excludes="**/.svn*, de/zbit/locales/Base*.xml">
-        <include name="de/zbit/gui/img/**.class, UT_*.png"/>
         <include name="de/zbit/locales/**.xml"/>
         <include name="de/zbit/sbml/locales/**.xml"/>
       </fileset>
