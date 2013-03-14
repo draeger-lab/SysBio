@@ -17,23 +17,19 @@
 package de.zbit.gui.prefs;
 
 import java.awt.Dimension;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.PreferenceChangeListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.GUITools;
 import de.zbit.util.Reflect;
@@ -41,7 +37,6 @@ import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
-import de.zbit.util.prefs.SBPreferences;
 
 /**
  * A {@link JPanel} containing a {@link JTabbedPane} with several options for
@@ -53,7 +48,7 @@ import de.zbit.util.prefs.SBPreferences;
  * @date 2009-09-22
  * @version $Rev$
  */
-public class MultiplePreferencesPanel extends PreferencesPanel {
+public class MultiplePreferencesPanel extends AbstractMultiplePreferencesPanel {
 
 	/**
 	 * Load all available {@link PreferencesPanel}s. This array is constructed
@@ -118,8 +113,8 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
          */
 	      classes = Reflect.getAllClassesInPackage(pckName, true, true, PreferencesPanel.class,
 	        System.getProperty("user.dir") + File.separatorChar, true);
-        logger.finer(String.format(
-          "Used reflection to find preferences panels: %s", Arrays
+        logger.finer(MessageFormat.format(
+          "Used reflection to find preferences panels: {0}", Arrays
               .deepToString(classes)));
 	    }
 	    isClassesInitialized = true;
@@ -151,8 +146,10 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
       o = con.newInstance();
     } catch (Exception e1) {
       // Mainly ClassNotFoundException
-      logger.finer(String.format("No predefined preference panel found for %s", pckName));
-      logger.log(Level.FINEST, String.format("%s not found.", panelClass), e1);
+      logger.finer(MessageFormat.format(
+      	"No predefined preference panel found for {0}", pckName));
+      logger.log(Level.FINEST, MessageFormat.format(
+      	"{0} not found.", panelClass), e1);
     }
     
     // If a predefined 'panelClass'-instance exits, load the classes array from it.
@@ -161,7 +158,8 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
         foundPanelClasses = (Class<PreferencesPanel>[]) Reflect.invokeIfContains(o,
           "getPreferencesClasses");
         if (foundPanelClasses != null) {
-          logger.finer(String.format("Found preferences panels in %s", panelClass));
+          logger.finer(MessageFormat.format(
+          	"Found preferences panels in {0}", panelClass));
         }
       } catch (Exception e) {
         e.printStackTrace();
@@ -234,73 +232,7 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
     this.options = kp;
     initializePrefPanel();
   }
-
-  /* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#accepts(java.lang.Object)
-	 */
-	public boolean accepts(Object key) {
-		return false;
-	}
 	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#addChangeListener(javax.swing.event.ChangeListener)
-	 */
-	@Override
-	public void addChangeListener(ChangeListener listener) {
-		for (int i = 0; i < tab.getTabCount(); i++) {
-			getPreferencesPanel(i).addChangeListener(listener);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#addItemListener(java.awt.event.ItemListener)
-	 */
-	@Override
-	public void addItemListener(ItemListener listener) {
-		for (int i = 0; i < tab.getTabCount(); i++) {
-			getPreferencesPanel(i).addItemListener(listener);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.Component#addKeyListener(java.awt.event.KeyListener)
-	 */
-	@Override
-	public void addKeyListener(KeyListener listener) {
-		for (int i = 0; i < tab.getTabCount(); i++) {
-			getPreferencesPanel(i).addKeyListener(listener);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.prefs.PreferencesPanel#addPreferenceChangeListener(java.util.prefs.PreferenceChangeListener)
-	 */
-	@Override
-	public void addPreferenceChangeListener(PreferenceChangeListener listener) {
-		for (int i = 0; i < tab.getTabCount(); i++) {
-		  getPreferencesPanel(i).addPreferenceChangeListener(listener);
-		}
-	}
-
-	/**
-	 * @param index
-	 * @return
-	 */
-	public PreferencesPanel getPreferencesPanel(int index) {
-		return (PreferencesPanel) ((JScrollPane) tab.getComponentAt(index))
-				.getViewport().getComponent(0);
-	}
-
-	/**
-	 * Gives the number of {@link PreferencesPanel}s displayed on this element.
-	 * 
-	 * @return 0 if there is no panel or if this element has not yet been
-	 *         initialized properly.
-	 */
-	public int getPreferencesPanelCount() {
-		return tab == null ? 0 : tab.getTabCount();
-	}
-
 	/**
 	 * @return
 	 */
@@ -312,8 +244,8 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 	 * @see de.zbit.gui.cfg.PreferencesPanel#getTitle()
 	 */
 	public String getTitle() {
-		return ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS)
-				.getString("USER_PREFERENCES");
+		return ResourceManager.getBundle(
+			StringUtil.RESOURCE_LOCATION_FOR_LABELS).getString("USER_PREFERENCES");
 	}
 
 	/* (non-Javadoc)
@@ -367,96 +299,6 @@ public class MultiplePreferencesPanel extends PreferencesPanel {
 		JScrollPane scroll = new JScrollPane(settingsPanel);
 		scroll.setOpaque(true);
 		tab.addTab(settingsPanel.getTitle(), scroll);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#isDefaultConfiguration()
-	 */
-	@Override
-	public boolean isDefaultConfiguration() {
-		for (int i = 0; i < getPreferencesPanelCount(); i++) {
-			if (!getPreferencesPanel(i).isDefaultConfiguration()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#isUserConfiguration()
-	 */
-	@Override
-	public boolean isUserConfiguration() {
-		for (int i = 0; i < getPreferencesPanelCount(); i++) {
-			if (!getPreferencesPanel(i).isUserConfiguration()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#loadPreferences()
-	 */
-	protected SBPreferences loadPreferences() throws IOException {
-		// This class only gathers other preferences panels.
-		// It therefore does not have any own preferences.
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#persist()
-	 */
-	@Override
-	public void persist() throws BackingStoreException {
-		for (int i = 0; i < tab.getTabCount(); i++) {
-			getPreferencesPanel(i).persist();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.prefs.PreferencesPanel#removeChangeListener(javax.swing.event.ChangeListener)
-	 */
-	@Override
-	public boolean removeChangeListener(ChangeListener listener) {
-		boolean removed = false;
-		for (int i = 0; i < tab.getTabCount(); i++) {
-		  removed |= getPreferencesPanel(i).removeChangeListener(listener);
-		}
-		return removed;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.prefs.PreferencesPanel#removeItemListener(java.awt.event.ItemListener)
-	 */
-	@Override
-	public boolean removeItemListener(ItemListener listener) {
-		boolean removed = false;
-		for (int i = 0; i < tab.getTabCount(); i++) {
-		  removed |= getPreferencesPanel(i).removeItemListener(listener);
-		}
-		return removed;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.prefs.PreferencesPanel#removePreferenceChangeLisener(java.util.prefs.PreferenceChangeListener)
-	 */
-	@Override
-	public void removePreferenceChangeLisener(PreferenceChangeListener listener) {
-		for (int i = 0; i < tab.getTabCount(); i++) {
-		  getPreferencesPanel(i).removePreferenceChangeLisener(listener);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#restoreDefaults()
-	 */
-	@Override
-	public void restoreDefaults() {
-		for (int i = 0; i < tab.getTabCount(); i++) {
-			getPreferencesPanel(i).restoreDefaults();
-		}
-		validate();
 	}
 
 	/* (non-Javadoc)
