@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.ListOf;
@@ -614,27 +614,25 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 			// Set the SpeciesGlyph 
 			Point middleOfSpecies = calculateCenter(speciesGlyph);
 			// TODO replace call of deprecated method
-			sgCurvePoint = calculateOldSpeciesGlyphDockingPosition(middleOfSpecies , relativeSpeciesGlyphPosition, speciesGlyph);
+//			sgCurvePoint = calculateOldSpeciesGlyphDockingPosition(middleOfSpecies , relativeSpeciesGlyphPosition, speciesGlyph);
+			sgCurvePoint = calculateSpeciesGlyphDockingPosition(middleOfSpecies, reactionGlyph, specRefRole, speciesGlyph);
 
 			double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);
 
 			rgCurvePoint = calculateReactionGlyphDockingPoint(reactionGlyph, rotationAngle, specRefGlyph);
 
-			if (specRefRole.equals(SpeciesReferenceRole.PRODUCT) || specRefRole.equals(SpeciesReferenceRole.SIDEPRODUCT)) {
-				//curve goes from reaction glyph to species glyph
+			if (specRefRole.equals(SpeciesReferenceRole.PRODUCT) ||
+					specRefRole.equals(SpeciesReferenceRole.SIDEPRODUCT)) {
+				// For products, the curve goes from the reaction glyph to the
+				// species glyph.
 				curveSegment.setStart(rgCurvePoint);
 				curveSegment.setEnd(sgCurvePoint);
 			} else {
-				//curve goes from species glyph to reaction glyph
+				// For all other species, the curve goes from the species glyph
+				// to the reaction glyph.
 				curveSegment.setStart(sgCurvePoint);
 				curveSegment.setEnd(rgCurvePoint);
 			}
-
-//			if (basePoint != null) {
-//				curveSegment.setBasePoint1(basePoint);
-//				curveSegment.setBasePoint2(basePoint);
-//			}
-
 		}
 		curveSegmentsList.add(curveSegment);
 		curve.setListOfCurveSegments(curveSegmentsList);
