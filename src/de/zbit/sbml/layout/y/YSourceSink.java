@@ -23,6 +23,8 @@ import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.sbml.layout.SourceSink;
 
 /**
+ * yFiles implementation of EPN type {@link SourceSink}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

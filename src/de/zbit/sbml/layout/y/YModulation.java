@@ -23,6 +23,8 @@ import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Modulation;
 
 /**
+ * yFiles implementation of arc type {@link Modulation}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

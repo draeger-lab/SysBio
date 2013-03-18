@@ -16,45 +16,42 @@
  */
 package de.zbit.graph.sbgn;
 
+import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 
 import y.view.NodeRealizer;
-import y.view.ShapeNodeRealizer;
 
 
+/**
+ * Realizer for process nodes of type "reaction". Draws the SBGN specified shape
+ * (unfilled rectangle).
+ * 
+ * @author Jakob Matthes
+ * @version $Rev$
+ */
 public class ReactionNodeRealizer extends ProcessNodeRealizer {
+
+	public ReactionNodeRealizer() {
+		super();
+	}
 
 	public ReactionNodeRealizer(NodeRealizer nr) {
 		super(nr);
-		// If the given node realizer is of this type, then apply copy semantics. 
-		if (nr instanceof ReactionNodeRealizer) {
-			ReactionNodeRealizer fnr = (ReactionNodeRealizer) nr;
-			lineWidth = fnr.lineWidth;
-			rotationAngle = fnr.rotationAngle;
-			rotationCenter = fnr.rotationCenter;
-		}
 	}
 
-	/* (non-Javadoc)
-	 * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
-	 */
 	public NodeRealizer createCopy(NodeRealizer nr) {
 		return new ReactionNodeRealizer(nr);
 	}
 
-	/**
-	 * 
-	 */
-	public ReactionNodeRealizer() {
-		super(ShapeNodeRealizer.RECT);
-		setHeight(10);
-		setWidth(getHeight() * 2);
-	}
-
 	@Override
   protected void drawShape(Graphics2D gfx) {
-	  // TODO draw rectangle
-	  
+		double min = Math.min(width, height);
+		double offsetX = (width - min)/2d;
+		double offsetY = (height - min)/2d;
+		
+		gfx.setColor(getLineColor());
+		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
+		gfx.drawRect((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
   }
 
 }

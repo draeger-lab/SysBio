@@ -23,6 +23,8 @@ import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.sbml.layout.Compartment;
 
 /**
+ * yFiles implementation of EPN type {@link Compartment}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

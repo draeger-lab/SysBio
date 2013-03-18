@@ -22,81 +22,64 @@ import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
 
 import y.view.NodeRealizer;
-import de.zbit.graph.sbgn.ReactionNodeRealizer;
-import de.zbit.sbml.layout.ProcessNode;
+import de.zbit.graph.sbgn.DissociationNodeRealizer;
+import de.zbit.graph.sbgn.ProcessNodeRealizer;
+import de.zbit.sbml.layout.DissociationNode;
 
 /**
+ * yFiles implementation of process node of type "dissociation".
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class YProcessNode extends ProcessNode<NodeRealizer> {
+public class YDissociationNode extends DissociationNode<NodeRealizer> {
 
-	/**
-	 * 
-	 */
-	private ReactionNodeRealizer reactionNodeRealizer;
+	protected ProcessNodeRealizer processNodeRealizer;
 
-	/**
-	 * 
-	 */
-	public YProcessNode() {
-		reactionNodeRealizer = new ReactionNodeRealizer();
-	}
+	public YDissociationNode() {
+	  super();
+	  processNodeRealizer = new DissociationNodeRealizer();
+  }
 	
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
-	 */
 	@Override
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth) {
 		return draw(x, y, z, width, height, depth, 0d, null);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.ProcessNode#drawLineSegment(org.sbml.jsbml.ext.layout.LineSegment, double, org.sbml.jsbml.ext.layout.Point)
-	 */
 	@Override
 	public NodeRealizer drawLineSegment(LineSegment lineSegment,
 			double rotationAngle, Point rotationCenter) {
-		// TODO Auto-generated method stub
+		// Drawing of single line segments not supported by yFiles implementation. 
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.ProcessNode#draw(double, double, double, double, double, double, double, org.sbml.jsbml.ext.layout.Point)
-	 */
 	@Override
 	public NodeRealizer draw(double x, double y, double z, double width,
 			double height, double depth, double rotationAngle,
 			Point rotationCenter) {
-		reactionNodeRealizer = (ReactionNodeRealizer) reactionNodeRealizer.createCopy();
-		reactionNodeRealizer.setSize(width, height);
-		reactionNodeRealizer.setLocation(x, y);
+		processNodeRealizer = (DissociationNodeRealizer) processNodeRealizer.createCopy();
+		processNodeRealizer.setSize(width, height);
+		processNodeRealizer.setLocation(x, y);
 		if ((rotationAngle % 180) != 0) {
-			reactionNodeRealizer.setRotationAngle(rotationAngle);
+			processNodeRealizer.setRotationAngle(rotationAngle);
 			if (rotationCenter != null) {
 				java.awt.geom.Point2D.Double point = new Point2D.Double();
 				point.setLocation(rotationCenter.getX(), rotationCenter.getY());
-				reactionNodeRealizer.setRotationCenter(point);
+				processNodeRealizer.setRotationCenter(point);
 			}
 		}
-		return reactionNodeRealizer;
+		return processNodeRealizer;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.ProcessNode#getLineWidth()
-	 */
 	@Override
 	public double getLineWidth() {
-		return reactionNodeRealizer.getLineWidth();
+		return processNodeRealizer.getLineWidth();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.ProcessNode#setLineWidth(double)
-	 */
 	@Override
 	public void setLineWidth(double lineWidth) {
-		reactionNodeRealizer.setLineWidth((float) lineWidth);
+		processNodeRealizer.setLineWidth((float) lineWidth);
 	}
 
 }

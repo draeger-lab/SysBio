@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: AssociationNodeRealizer.java 1223 2013-03-11 14:30:46Z jmatthes $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/graph/sbgn/AssociationNodeRealizer.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -22,37 +22,42 @@ import java.awt.Graphics2D;
 import y.view.NodeRealizer;
 
 /**
- * Realizer for process nodes of type "association". Draws the SBGN specified
- * shape (filled circle).
+ * Realizer for process nodes of type "omitted process". Draws the SBGN
+ * specified shape (rectangle with string "\\").
  * 
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class AssociationNodeRealizer extends ProcessNodeRealizer {
+public class OmittedProcessNodeRealizer extends ProcessNodeRealizer {
+	
+	public static final String OMITTED_PROCESS_STRING = "\\\\";
 
-	public AssociationNodeRealizer() {
+	public OmittedProcessNodeRealizer() {
 		super();
 	}
 
-	public AssociationNodeRealizer(NodeRealizer nr) {
+	public OmittedProcessNodeRealizer(NodeRealizer nr) {
 		super(nr);
 	}
 
 	public NodeRealizer createCopy(NodeRealizer nr) {
-		return new AssociationNodeRealizer(nr);
+		return new OmittedProcessNodeRealizer(nr);
 	}
 
 	@Override
-  protected void drawShape(Graphics2D gfx) {
+	protected void drawShape(Graphics2D gfx) {
 		double min = Math.min(width, height);
 		double offsetX = (width - min)/2d;
 		double offsetY = (height - min)/2d;
-		
+
 		gfx.setColor(getLineColor());
 		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
 		
-		// Draw a filled circle.
-		gfx.fillOval((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
-  }
+		// Draw a rectangle with string "\\".
+		gfx.drawRect((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
+		gfx.drawString(OMITTED_PROCESS_STRING,
+				(float) (offsetX + x),
+				(float) (offsetY + y + .93d * min));
+	}
 
 }

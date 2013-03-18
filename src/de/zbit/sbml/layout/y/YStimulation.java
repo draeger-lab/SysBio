@@ -23,6 +23,8 @@ import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Stimulation;
 
 /**
+ * yFiles implementation of arc type {@link Stimulation}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

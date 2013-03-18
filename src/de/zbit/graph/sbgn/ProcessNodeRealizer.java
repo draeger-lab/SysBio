@@ -16,14 +16,12 @@
  */
 package de.zbit.graph.sbgn;
 
-import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.Set;
 
 import org.sbml.jsbml.util.StringTools;
 
-import de.zbit.math.MathUtils;
 import y.base.Edge;
 import y.base.EdgeCursor;
 import y.base.Node;
@@ -32,10 +30,12 @@ import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import de.zbit.math.MathUtils;
 
 /**
- * Creates a small node that should be used as reaction node
- * to visualize e.g. SBML reactions.
+ * Superclass for all reaction nodes. Subclasses decide which specific shape to
+ * draw.
+ * 
  * @author Clemens Wrzodek
  * @version $Rev$
  */
@@ -65,7 +65,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
 		super(nr);
 		// If the given node realizer is of this type, then apply copy semantics. 
 		if (nr instanceof ProcessNodeRealizer) {
-			ReactionNodeRealizer fnr = (ReactionNodeRealizer) nr;
+			ProcessNodeRealizer fnr = (ProcessNodeRealizer) nr;
 			lineWidth = fnr.lineWidth;
 			rotationAngle = fnr.rotationAngle;
 			rotationCenter = fnr.rotationCenter;
@@ -90,12 +90,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
 
 		rotate(gfx, rotationAngle, rotationCenter);
 
-		// TODO create method each subclass can implement
-		gfx.setColor(getLineColor());
-		//line width
-		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
-		// Draw the reaction node rectangle
-		gfx.drawRect((int) offsetX + x, (int) offsetY + y, (int) min, (int) min);
+		drawShape(gfx);
 
 		int halfHeight = (int) (height/2d);
 
@@ -107,6 +102,11 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
 		rotate(gfx, -rotationAngle, rotationCenter);
 	}
 	
+	/**
+	 * Draw the shape of the process node. Each subclass provides its own shape.
+	 * 
+	 * @param gfx
+	 */
 	protected abstract void drawShape(Graphics2D gfx);
 
 	/**

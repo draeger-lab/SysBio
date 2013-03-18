@@ -57,11 +57,14 @@ import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
+import de.zbit.sbml.layout.LayoutAlgorithm;
 import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.sbml.layout.SimpleLayoutAlgorithm;
 import de.zbit.util.objectwrapper.ValuePairUncomparable;
 
 /**
+ * {@link LayoutAlgorithm} for use with the yFiles implementation. 
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */
@@ -610,6 +613,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 
 			// Set the SpeciesGlyph 
 			Point middleOfSpecies = calculateCenter(speciesGlyph);
+			// TODO replace call of deprecated method
 			sgCurvePoint = calculateOldSpeciesGlyphDockingPosition(middleOfSpecies , relativeSpeciesGlyphPosition, speciesGlyph);
 
 			double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);

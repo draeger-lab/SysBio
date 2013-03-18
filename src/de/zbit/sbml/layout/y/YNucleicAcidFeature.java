@@ -24,6 +24,8 @@ import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
 import de.zbit.sbml.layout.NucleicAcidFeature;
 
 /**
+ * yFiles implementation of EPN type {@link NucleicAcidFeature}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

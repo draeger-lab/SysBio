@@ -26,9 +26,11 @@ import de.zbit.sbml.layout.SBGNArc;
 
 /**
  * Abstract class to represent common features of all SBGN arc classes:
- * - draw(CurveSegment, ...) is not supported
- * - draw(Curve, double lineWidth) uses the arc-specific draw(Curve)
- *   implementations
+ * <ul>
+ * <li>draw(CurveSegment, ...) is not supported</li>
+ * <li>draw(Curve, double lineWidth) uses the arc-specific draw(Curve)
+ * implementations</li>
+ * </ul>
  * 
  * @author Jakob Matthes
  * @version $Rev$

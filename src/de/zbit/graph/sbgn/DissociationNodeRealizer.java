@@ -17,42 +17,58 @@
 package de.zbit.graph.sbgn;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 import y.view.NodeRealizer;
 
 /**
- * Realizer for process nodes of type "association". Draws the SBGN specified
- * shape (filled circle).
+ * Realizer for process nodes of type "dissociation". Draws the SBGN specified
+ * shape (two unfilled circles).
  * 
  * @author Jakob Matthes
  * @version $Rev$
  */
-public class AssociationNodeRealizer extends ProcessNodeRealizer {
-
-	public AssociationNodeRealizer() {
+public class DissociationNodeRealizer extends ProcessNodeRealizer {
+	
+	public DissociationNodeRealizer() {
 		super();
 	}
 
-	public AssociationNodeRealizer(NodeRealizer nr) {
+	public DissociationNodeRealizer(NodeRealizer nr) {
 		super(nr);
 	}
 
 	public NodeRealizer createCopy(NodeRealizer nr) {
-		return new AssociationNodeRealizer(nr);
+		return new DissociationNodeRealizer(nr);
 	}
 
 	@Override
-  protected void drawShape(Graphics2D gfx) {
+	protected void drawShape(Graphics2D gfx) {
 		double min = Math.min(width, height);
 		double offsetX = (width - min)/2d;
 		double offsetY = (height - min)/2d;
-		
+
 		gfx.setColor(getLineColor());
 		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
+
+		// Draw a circle and a smaller circle in the center of the first.
+		gfx.drawOval((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
 		
-		// Draw a filled circle.
-		gfx.fillOval((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
-  }
+		gfx.setColor(Color.RED);
+		gfx.drawRect((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
+		gfx.setColor(getLineColor());
+		
+		double diameter = min * .75d;
+		double diff = min - diameter;
+		int innerX = (int) (offsetX + x  +  diff/2d);
+		int innerY = (int) (offsetY + y  +  diff/2d);
+		gfx.drawOval(innerX, innerY, (int) diameter, (int) diameter);
+		
+		gfx.setColor(Color.RED);
+		gfx.drawRect(innerX, innerY, (int) diameter, (int) diameter);
+		gfx.setColor(getLineColor());
+		
+	}
 
 }

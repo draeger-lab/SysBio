@@ -23,6 +23,8 @@ import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Catalysis;
 
 /**
+ * yFiles implementation of arc type {@link Catalysis}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

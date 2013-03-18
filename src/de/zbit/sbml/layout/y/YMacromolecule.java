@@ -24,6 +24,8 @@ import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
 import de.zbit.sbml.layout.Macromolecule;
 
 /**
+ * yFiles implementation of EPN type {@link Macromolecule}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */
