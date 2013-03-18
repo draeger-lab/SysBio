@@ -24,6 +24,8 @@ import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
 import de.zbit.sbml.layout.SimpleChemical;
 
 /**
+ * yFiles implementation of EPN type {@link SimpleChemical}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

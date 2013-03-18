@@ -83,6 +83,7 @@ import de.zbit.sbml.layout.Production;
 import de.zbit.sbml.layout.ReversibleConsumption;
 import de.zbit.sbml.layout.SBGNArc;
 import de.zbit.sbml.layout.SBGNNode;
+import de.zbit.sbml.layout.SBGNReactionNode;
 import de.zbit.sbml.layout.SimpleChemical;
 import de.zbit.sbml.layout.SourceSink;
 import de.zbit.sbml.layout.Stimulation;
@@ -302,14 +303,13 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		// dock correctly at process node
 		Point relativeDockingAtPN = (Point) srg.getUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT);
 		logger.fine(MessageFormat.format("srg={0} rg={1} dock relative at PN {2}", srg.getId(), reactionGlyph.getId(), relativeDockingAtPN));
-//		relativeDockingAtPN = new Point(0, 0, 0, relativeDockingAtPN.getLevel(), relativeDockingAtPN.getVersion());
 		if (relativeDockingAtPN != null) {
 			double x = relativeDockingAtPN.getX();
 			double y = relativeDockingAtPN.getY();
 			edgeRealizer.setSourcePoint(new YPoint(x, y));
 		}
 		else {
-			logger.warning(MessageFormat.format("No relative docking position at PN given for srg {0}", srg.getId()));
+			logger.fine(MessageFormat.format("Algorithm did not calculate relative docking position at process node for species reference glyph {0}", srg.getId()));
 		}
 		
 		// docking at species works automatically, YFiles points the edge towards the center of the node
@@ -342,6 +342,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	 * @return
 	 */
 	private boolean neccessary(SpeciesReferenceGlyph srg) {
+		// TODO Roles need higher priority
 		if (srg.isSetSBOTerm()) {
 			int sbo = srg.getSBOTerm();
 			if (SBO.isChildOf(sbo, SBO.getProduct())
@@ -356,6 +357,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 			switch (role) {
 				case INHIBITOR: return false;
 				case ACTIVATOR: return false; //TODO not sure
+			default:
+				break;
 			}
 			return true;
 		}
@@ -397,7 +400,15 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 					reactionGlyph));
 		}
 		
-		ProcessNode<NodeRealizer> processNode = createProcessNode();
+		SBGNReactionNode<NodeRealizer> processNode = createProcessNode();
+		if (reactionGlyph.isSetReaction()) {
+			processNode = getSBGNReactionNode(reactionGlyph.getSBOTerm());
+		} else {
+			processNode = getSBGNReactionNode(reactionGlyph.getReactionInstance().getSBOTerm());
+		}
+		
+		assert processNode != null;
+		
 		Point rotationCenter = new Point(x + width / 2d, y + height / 2d, z + depth / 2d);
 		NodeRealizer reactionNodeRealizer = processNode.draw(
 			x, y, z, width, height, depth, rotationAngle, rotationCenter);
@@ -625,14 +636,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	}
 
 	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.LayoutFactory#createProcessNode()
-	 */
-	@Override
-	public ProcessNode<NodeRealizer> createProcessNode() {
-		return new YProcessNode();
-	}
-
-	/* (non-Javadoc)
 	 * @see de.zbit.sbml.layout.LayoutFactory#createMacromolecule()
 	 */
 	@Override
@@ -752,28 +755,44 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		return new YNecessaryStimulation();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createProcessNode()
+	 */
 	@Override
-	public OmittedProcessNode<NodeRealizer> createOmittedProcessNode() {
-		// TODO Auto-generated method stub
-		return null;
+	public ProcessNode<NodeRealizer> createProcessNode() {
+		return new YReactionNode();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createAssociationNode()
+	 */
 	@Override
 	public AssociationNode<NodeRealizer> createAssociationNode() {
-		// TODO Auto-generated method stub
-		return null;
+		return new YAssociationNode();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createDissociationNode()
+	 */
 	@Override
 	public DissociationNode<NodeRealizer> createDissociationNode() {
-		// TODO Auto-generated method stub
-		return null;
+		return new YDissociationNode();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createOmittedProcessNode()
+	 */
+	@Override
+	public OmittedProcessNode<NodeRealizer> createOmittedProcessNode() {
+		return new YOmittedProcessNode();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.sbml.layout.LayoutFactory#createUncertainProcessNode()
+	 */
 	@Override
 	public UncertainProcessNode<NodeRealizer> createUncertainProcessNode() {
-		// TODO Auto-generated method stub
-		return null;
+		return new YUncertainProcessNode();
 	}
 
 }

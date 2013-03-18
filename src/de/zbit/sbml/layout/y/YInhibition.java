@@ -23,6 +23,8 @@ import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Inhibition;
 
 /**
+ * yFiles implementation of arc type {@link Inhibition}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

@@ -23,6 +23,8 @@ import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.ReversibleConsumption;
 
 /**
+ * yFiles implementation of arc type {@link ReversibleConsumption}.
+ * 
  * Consumptions in reversible reactions have to display an arrow. This class
  * represents a consumption in a reversible reaction.
  * 

@@ -28,6 +28,8 @@ import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Production;
 
 /**
+ * yFiles implementation of arc type {@link Production}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

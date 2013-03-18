@@ -24,6 +24,8 @@ import de.zbit.graph.sbgn.CloneMarker;
 import de.zbit.sbml.layout.PerturbingAgent;
 
 /**
+ * yFiles implementation of EPN type {@link YPerturbingAgent}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

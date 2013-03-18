@@ -24,6 +24,8 @@ import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
 import de.zbit.sbml.layout.UnspecifiedNode;
 
 /**
+ * yFiles implementation of EPN type {@link UnspecifiedNode}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

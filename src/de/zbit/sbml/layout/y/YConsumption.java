@@ -22,6 +22,8 @@ import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Consumption;
 
 /**
+ * yFiles implementation of arc type {@link Consumption}.
+ * 
  * @author Jakob Matthes
  * @version $Rev$
  */

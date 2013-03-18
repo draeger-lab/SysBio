@@ -16,10 +16,15 @@
  */
 
 /**
- * @author jmatthes
- * @version $Rev$
+ * <p>This package implements the generic LayoutBuilder and LayoutAlgorithm classes
+ * and all necessary SBGN representations for usage with YFiles.</p>
  * 
- * This package implements the generic LayoutBuilder and LayoutAlgorithm classes
- * for usage with YFiles.
+ * <p>Nodes are implemented using {@link y.view.NodeRealizer}, arcs are implemented
+ * using {@link y.view.EdgeRealizer}.</p>
+ * 
+ * <p>The output type is {@link y.view.Graph2D}.</p>
+ * 
+ * @author Jakob Matthes
+ * @version $Rev$
  */
 package de.zbit.sbml.layout.y;
