@@ -369,8 +369,14 @@
     </delete>
 
     <!-- Pack a minimal JAR file containing only parts required for SBML2LaTeX -->
-    <jar jarfile="${dist}/SysBioBase-r${repository.revision}-b${build.number}.jar">
-      
+    <jar jarfile="${dist}/SysBioBase.jar">
+      <!-- 
+        Note: The file should not contain something like 
+        -r${repository.revision}-b${build.number}
+        because this information can be found in the manifest file anyway.
+        If the JAR is used in a repository, name changes will require changes
+        in the build path of every person who checks out the repostitory... 
+      -->
       <manifest>
         <section name="SysBio">
 	      <attribute name="Built-By" value="${user.name}"/>

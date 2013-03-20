@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.PreferenceChangeListener;
 
-import javax.swing.JScrollPane;
 import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.layout.LayoutHelper;
@@ -160,9 +159,7 @@ public abstract class AbstractMultiplePreferencesPanel extends PreferencesPanel 
 	  			PreferencesPanelForKeyProvider settingsPanel = new PreferencesPanelForKeyProvider(provider);
 					listOfPanels.add(settingsPanel);
 					settingsPanel.setOpaque(true);
-					JScrollPane scroll = new JScrollPane(settingsPanel);
-					scroll.setOpaque(true);
-					layoutHelper.add(scroll);
+					layoutHelper.add(settingsPanel);
 				} catch (IOException exc) {
 					logger.fine(exc.getLocalizedMessage());
 				}

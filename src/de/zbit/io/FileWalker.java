@@ -79,7 +79,11 @@ public class FileWalker {
 				}
 			} else if (filter.accept(source)) {
 				logger.log(Level.FINE, "adding file " + source.getAbsolutePath());
-				inputToOutput.put(source, targetDir.getAbsolutePath() + '/' + source.getName());
+				if (targetDir.isDirectory()) {
+					inputToOutput.put(source, targetDir.getAbsolutePath() + '/' + source.getName());
+				} else {
+					inputToOutput.put(source, targetDir.getAbsolutePath());
+				}
 			}
 		} else {
 			logger.log(Level.FINE, "skipping " + source.getAbsolutePath());

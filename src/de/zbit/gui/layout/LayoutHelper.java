@@ -106,6 +106,7 @@ public class LayoutHelper {
 	 * 
 	 */
 	private int row;
+	private int maxColCount = 1;
 	
 	/**
 	 * Creates a new GridBaglayout and associates this with the given container.
@@ -244,7 +245,10 @@ public class LayoutHelper {
 		double weighty) {
 		add(c, x, row, width, height, weightx, weighty);
 		row++;
-		atRowBeginning=true;
+		atRowBeginning = true;
+		if (width > maxColCount) {
+			maxColCount = width;
+		}
 	}
 	
 	/**
@@ -259,7 +263,10 @@ public class LayoutHelper {
 	  // Note: This method does NOT increase the row!
 		LayoutHelper.addComponent(this.cont, this.gbl, c, x, y, width, height, 0, 0);
 		row = y;
-		atRowBeginning=false;
+		atRowBeginning = false;
+		if (width > maxColCount) {
+			maxColCount = width;
+		}
 	}
 	
 	/**
@@ -277,7 +284,10 @@ public class LayoutHelper {
 	  // Note: This method does NOT increase the row!
 		addComponent(this.cont, this.gbl, c, x, y, width, height, weightx, weighty);
 		row = y;
-		atRowBeginning=false;
+		atRowBeginning = false;
+		if (width > maxColCount) {
+			maxColCount = width;
+		}
 	}
 	
 	/**
@@ -298,7 +308,10 @@ public class LayoutHelper {
 		LayoutHelper.addComponent(this.cont, this.gbl, c, x, y, width, height,
 			weightx, weighty, ipadx, ipady);
 		row = y;
-		atRowBeginning=false;
+		atRowBeginning = false;
+		if (width > maxColCount) {
+			maxColCount = width;
+		}
 	}
 	
 	/**
@@ -504,6 +517,11 @@ public class LayoutHelper {
 	 */
 	public void incrementRowBy(int increment) {
 		row += increment;
+	}
+
+	public int getColumnCount() {
+		// TODO Auto-generated method stub
+		return maxColCount;
 	}
 	
 }

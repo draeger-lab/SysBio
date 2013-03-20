@@ -61,7 +61,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.JTextComponent;
 
-
 import de.zbit.gui.ColorChooserWithPreview;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.csv.CSVReaderOptionPanel;
@@ -857,8 +856,9 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
        * ungrouped options.
        */
       if (OptionGroup.isAnyOptionVisible(ungroupedOptions)) {
-        lh.add(createGroup((Collection<Option>) ungroupedOptions,
-          unprocessedOptions));
+      	Component grp = createGroup((Collection<Option>) ungroupedOptions,
+          unprocessedOptions);
+        lh.add(grp, lh.getColumnCount());
       }
     }
     
