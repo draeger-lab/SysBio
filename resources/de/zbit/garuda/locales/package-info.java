@@ -16,6 +16,8 @@
  */
 
 /**
+ * Localization support for Garuda.
+ * 
  * @author Andreas Dr&auml;ger
  * @version $Rev$
  */
