@@ -53,6 +53,8 @@ public class DissociationNodeRealizer extends ProcessNodeRealizer {
 		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
 
 		// Draw a circle and a smaller circle in the center of the first.
+		// TODO The smaller circle is not positioned correctly, possibly due to
+		// rounding errors/int casting.
 		gfx.drawOval((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
 		
 		gfx.setColor(Color.RED);
