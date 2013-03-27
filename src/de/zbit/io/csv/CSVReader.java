@@ -833,6 +833,13 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
   }
   
   /**
+   * If column headers have been read, this function will return the column
+   * number, that equals any of the given <code>names</code> parameters. 
+   * Case sensitivity is determined via the <code>caseSensitive</code>
+   * parameter.
+   * 
+   * If no headers have been read or if the string does not equal any column,
+   * returns -1
    * 
    * @param caseSensitive
    * @param names
