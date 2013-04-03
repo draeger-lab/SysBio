@@ -525,10 +525,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    */
   public static void setProperty(Map<Object, Object> properties, Object source,
     boolean checkRange) {
+  	log.finest("setProperty: " + source.getClass().toString());
     if (source instanceof Component) {
       Component c = (Component) source;
       String name = c.getName();
-			log.fine("tring to change property of " + name);
+			log.finest("tring to change property of " + name);
       /*
        * Properties is build in initializePrefPanel() -> loadPreferences ->
        * accept(key). If a key is missing in properties, it is very likely that
@@ -1190,6 +1191,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
    */
   public void itemStateChanged(ItemEvent e) {
+  	log.finest("itemStateChanged: " + e.toString());
     setProperty(properties, e.getSource());
     for (ItemListener i : itemListeners) {
       i.itemStateChanged(e);
@@ -1200,6 +1202,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
    */
   public void keyPressed(KeyEvent e) {
+  	log.finest("keyPressed: " + e.toString());
     setProperty(properties, e.getSource());
     for (KeyListener i : getKeyListeners()) {
       i.keyPressed(e);
@@ -1210,6 +1213,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
    */
   public void keyReleased(KeyEvent e) {
+  	log.finest("keyReleased: " + e.toString());
     setProperty(properties, e.getSource());
     for (KeyListener kl : getKeyListeners()) {
       kl.keyReleased(e);
@@ -1220,6 +1224,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
    */
   public void keyTyped(KeyEvent e) {
+  	log.finest("keyTyped: " + e.toString());
     setProperty(properties, e.getSource());
     for (KeyListener kl : getKeyListeners()) {
       kl.keyTyped(e);
@@ -1377,6 +1382,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
    * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
    */
   public void stateChanged(ChangeEvent e) {
+  	log.finest("stateChanged: " + e.toString());
     setProperty(properties, e.getSource());
     for (ChangeListener cl : changeListeners) {
       cl.stateChanged(e);

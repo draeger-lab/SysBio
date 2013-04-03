@@ -2311,12 +2311,11 @@ public class GUITools {
    * @param defaultMessage
    */
   public static void showErrorMessage(Component parent, Throwable exc, String defaultMessage) {
+  	String title = (exc != null) ? exc.getClass().getSimpleName() : "Error";
     if ((exc == null) || (exc.getLocalizedMessage() == null)
         || (exc.getLocalizedMessage().length() == 0)) {
-      
       logger.log(Level.WARNING, defaultMessage, exc);
-      String name = (exc!=null?exc.getClass().getSimpleName():"Error");
-      JOptionPane.showMessageDialog(parent, StringUtil.toHTMLToolTip(defaultMessage), name, JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(parent, StringUtil.toHTMLToolTip(defaultMessage), title, JOptionPane.ERROR_MESSAGE);
     } else {
       showErrorMessage(parent, exc);
     }
