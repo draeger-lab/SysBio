@@ -29,7 +29,6 @@ import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.ListOf;
-import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
@@ -40,7 +39,6 @@ import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.util.TreeNodeRemovedEvent;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
 import org.sbml.jsbml.util.compilers.UnitException;
-import org.sbml.jsbml.util.compilers.UnitsCompiler;
 
 import de.zbit.util.ResourceManager;
 
@@ -441,12 +439,6 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 			if (stringRepresentation == null) {
 				StringBuilder sb = new StringBuilder();
 				ASTNode ast = (ASTNode) node;
-				int level = -1, version = -1;
-				MathContainer mc = ast.getParentSBMLObject();
-				if (mc != null) {
-					level = mc.getLevel();
-					version = mc.getVersion();
-				}
 				if (ast.isName()) {
 					sb.append(ast.getName());
 				} else if (ast.isNumber()) {
@@ -456,7 +448,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 				}
 				sb.append(' ');
 				try {
-					sb.append(UnitDefinition.printUnits(ast.compile(new UnitsCompiler(level, version)).getUnits(), true));
+					sb.append(UnitDefinition.printUnits(ast.deriveUnit(), true));
 				} catch (UnitException exc) {
 					sb.append("invalid");
 					logger.fine(exc.getMessage());

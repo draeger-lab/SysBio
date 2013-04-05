@@ -368,16 +368,26 @@
     description="Build a minimal version of SysBio for SBML2LaTeX"
   >
 
-    <!-- Delete all previous versions of SysBio JAR files -->
+    <!-- Delete all previous versions of SysBio JAR files 
     <delete verbose="true">
       <fileset dir="${dist}">
         <include name="SysBioBase**.jar"/>
       	<include name="zbit**.jar"/>
       </fileset>
-    </delete>
+    </delete>-->
 
     <!-- Pack a minimal JAR file containing only parts required for SBML2LaTeX -->
-    <jar jarfile="${dist}/zbit.jar">
+    <jar
+      compress="true"
+      filesetmanifest="mergewithoutmain"
+      index="true"
+      indexMetaInf="true"
+      jarfile="${dist}/zbit.jar"
+      level="9"
+      manifestencoding="utf-8"
+      strict="warn"
+      update="true"
+    >
       <!-- 
         Note: The file should not contain something like 
         -r${repository.revision}-b${build.number}
@@ -389,7 +399,7 @@
         <section name="SysBio">
 	      <attribute name="Built-By" value="${user.name}"/>
           <attribute name="Specification-Title" value="${Name}"/>
-          <attribute name="Specification-Version" value="Revision ${sysbio.revision}"/>
+          <attribute name="Specification-Version" value="Revision ${repository.revision}"/>
           <attribute name="Specification-Vendor" value="Center for Bioinformatics Tuebingen (ZBIT)"/>
        	  <attribute name="Implementation-Title" value="${Name}"/>
           <attribute name="Implementation-Version" value="${build.name}"/>
