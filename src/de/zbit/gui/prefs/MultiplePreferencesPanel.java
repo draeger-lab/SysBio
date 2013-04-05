@@ -299,6 +299,7 @@ public class MultiplePreferencesPanel extends AbstractMultiplePreferencesPanel {
 		JScrollPane scroll = new JScrollPane(settingsPanel);
 		scroll.setOpaque(true);
 		tab.addTab(settingsPanel.getTitle(), scroll);
+		addPreferencesPanel(settingsPanel);
 	}
 
 	/* (non-Javadoc)

@@ -129,6 +129,7 @@
   
   <!-- JDatePanel -->
   
+  <entry key="CALENDAR">Calendar</entry>
   <entry key="DATE">Date</entry>
   <entry key="DATE_TOOLTIP">Select a date from the calendar.</entry>
   <entry key="DATE_FORMAT">dd/MM/yyyy</entry>
