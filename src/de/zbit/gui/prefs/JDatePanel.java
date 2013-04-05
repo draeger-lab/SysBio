@@ -25,9 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -43,7 +43,7 @@ import de.zbit.util.prefs.SBPreferences;
  * @author Roland Keller
  * @version $Rev$
  */
-public class JDatePanel extends JPanel implements JComponentForOption, ActionListener{
+public class JDatePanel extends JPanel implements JComponentForOption, ActionListener {
 
 	/**
 	 * Generated serial version identifier.
@@ -87,10 +87,17 @@ public class JDatePanel extends JPanel implements JComponentForOption, ActionLis
 	protected List<ChangeListener> changeListeners;
 	
 	/**
+	 * Creates a new panel that contains a titled border, a label describing the
+	 * purpose of this configuration, the currently selected date value, and a
+	 * button through which the user can alter the date in a calendar.
 	 * 
+	 * @param label
+	 *        A brief comment explaining for which purpose the date can be
+	 *        configured here.
 	 * @param initial
+	 *        the initial value for the date to be configured.
 	 */
-	public JDatePanel(Date date) {
+	public JDatePanel(String label, Date date) {
 		ResourceBundle bundle = ResourceManager.getBundle("de.zbit.locales.Labels");
 		this.selectedDate = date;
 		
@@ -101,12 +108,13 @@ public class JDatePanel extends JPanel implements JComponentForOption, ActionLis
 		
 		this.changeListeners = new LinkedList<ChangeListener>();
 		
-		buttonCalendar = new JButton("Calendar", UIManager.getIcon("ICON_CALENDAR_16"));
+		buttonCalendar = new JButton(bundle.getString("CALENDAR"), UIManager.getIcon("ICON_CALENDAR_16"));
 		buttonCalendar.setToolTipText(bundle.getString("DATE_TOOLTIP"));
-		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		this.add(textFieldCalendar);
-		this.add(buttonCalendar);
-		this.setBorder(BorderFactory.createTitledBorder(bundle.getString("DATE")));
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		add(new JLabel(label));
+		add(textFieldCalendar);
+		add(buttonCalendar);
+		// setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("DATE") + ' '));
 		buttonCalendar.addActionListener(this);
 	}
 
@@ -151,16 +159,19 @@ public class JDatePanel extends JPanel implements JComponentForOption, ActionLis
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(buttonCalendar)) {
+			
 			dialogCalendar = new JDialogCalendar(
 					SwingUtilities.getWindowAncestor(this),
 					ModalityType.APPLICATION_MODAL, selectedDate);
-			textFieldCalendar.setText(dateFormat.format(dialogCalendar
-					.getSelectedDate()));
-			this.selectedDate = dialogCalendar.getSelectedDate();
-			for (ChangeListener cl: changeListeners) {
-				cl.stateChanged(new ChangeEvent(this));
+			textFieldCalendar.setText(dateFormat.format(dialogCalendar.getSelectedDate()));
+			Date oldValue = selectedDate;
+			selectedDate = dialogCalendar.getSelectedDate();
+			if (!selectedDate.equals(oldValue)) {
+				ChangeEvent event = new ChangeEvent(this);
+				for (ChangeListener cl: changeListeners) {
+					cl.stateChanged(event);
+				}
 			}
-			
 		}
 	}
 	

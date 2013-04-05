@@ -64,7 +64,7 @@ public abstract class AbstractMultiplePreferencesPanel extends PreferencesPanel 
 	/**
 	 * 
 	 */
-	private List<PreferencesPanelForKeyProvider> listOfPanels = new LinkedList<PreferencesPanelForKeyProvider>();
+	private List<PreferencesPanel> listOfPanels = new LinkedList<PreferencesPanel>();
 
 	/**
 	 * 
@@ -157,7 +157,7 @@ public abstract class AbstractMultiplePreferencesPanel extends PreferencesPanel 
 	  	for (Class<? extends KeyProvider> provider : providers) {
 	  		try {
 	  			PreferencesPanelForKeyProvider settingsPanel = new PreferencesPanelForKeyProvider(provider);
-					listOfPanels.add(settingsPanel);
+					addPreferencesPanel(settingsPanel);
 					settingsPanel.setOpaque(true);
 					layoutHelper.add(settingsPanel);
 				} catch (IOException exc) {
@@ -196,6 +196,15 @@ public abstract class AbstractMultiplePreferencesPanel extends PreferencesPanel 
 		for (int i = 0; i < getPreferencesPanelCount(); i++) {
 			getPreferencesPanel(i).addKeyListener(listener);
 		}
+	}
+	
+  /**
+   * Register the given panel as a sub-component of this composed element.
+   * 
+   * @param settingsPanel
+   */
+	protected void addPreferencesPanel(PreferencesPanel settingsPanel) {
+		listOfPanels.add(settingsPanel);
 	}
 
 	/* (non-Javadoc)

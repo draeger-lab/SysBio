@@ -419,7 +419,7 @@ public class PreferencesDialog extends JDialog implements ActionListener,
     // Preferences panels look stupid if they are smaller
     // than the "Ok","Cancel", etc. button panel!
     allPrefsPanel.setPreferredSize(GUITools.getMaxPreferredSize(foot, allPrefsPanel));
-    
+
 		pack();
 	}
 

@@ -301,6 +301,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         initial = Option.parseOrCast(Color.class, defaultValue);
       }
       if (initial == null) {
+      	// TODO: Localize!
 				log.warning(MessageFormat.format(
 					"Invalid default value for color {0}: {0}",
 					defaultValue.getClass().getName(), defaultValue));
@@ -317,9 +318,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     	} else if (defaultValue instanceof String) {
     		initial = Option.parseOrCast(Date.class, defaultValue);
     	}
-    	
-		component = new JDatePanel(initial);
-		
+    	component = new JDatePanel(optionTitle, initial);
     	
     } else if ((values != null) && (values.length > 0)) {
       component = new JLabeledComponent(optionTitle, true, values);
