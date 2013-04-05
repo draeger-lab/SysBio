@@ -77,7 +77,7 @@ public class SBMLTreeSearchComponent extends JPanel implements PropertyChangeLis
 	
 	public SBMLTreeSearchComponent(SBMLDocument doc) {
 		super();
-		
+		assert doc != null;
 		TreePath path = null;
 		TreeNode[] savedState = null;
 		if (tree != null) {

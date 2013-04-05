@@ -109,6 +109,16 @@ public class LaTeXFormatter {
 	public String trademark() {
 		return "\\texttrademark{}";
 	}
+	
+	/**
+	 * 
+	 * @param color
+	 * @param text
+	 * @return
+	 */
+	public String textcolor(String color, String text) {
+		return "\\textcolor{" + color + "}{" + text + "}";
+	}
 
 	/**
 	 * 
