@@ -123,8 +123,10 @@ public class OpenedFile<T> {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof OpenedFile<?>) {
+	  if (obj != null && obj.getClass() == OpenedFile.class) {
 			OpenedFile<?> other = (OpenedFile<?>) obj;
+			// TODO: is there a reason that only the file, but not the document or
+			//       changed status are compared?     (Florian Mittag)
 			return this.isSetFile() && other.isSetFile() &&
 					this.file.equals(other.file);
 		}
@@ -144,6 +146,15 @@ public class OpenedFile<T> {
 	 */
 	public File getFile() {
 		return file;
+	}
+	
+	@Override
+  public int hashCode() {
+	  int hash = 433;
+	  if( file != null ) {
+	    hash *= file.hashCode();
+	  }
+	  return hash;
 	}
 	
 	/**
