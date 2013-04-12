@@ -112,6 +112,14 @@ public class LaTeXFormatter {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	public String smallSpace() {
+		return "\\;";
+	}
+	
+	/**
+	 * 
 	 * @param color
 	 * @param text
 	 * @return

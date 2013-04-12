@@ -267,6 +267,12 @@
       <link href="http://www.jdom.org/docs/apidocs.1.1/"/>
       <link href="http://www.xom.nu/apidocs/"/>
       <link href="http://docs.yworks.com/yfiles/doc/api/"/>
+  	
+      <tag name="sbml.deprecated" description="Deprecated in SBML since: "/>
+      <tag name="jsbml.note" description="Note"/>
+      <tag name="jsbml.warning"/>
+  	  <tag name="doc.note"  description="Documentation note"/>
+ 
     </javadoc>
 
   </target>
@@ -368,15 +374,7 @@
     description="Build a minimal version of SysBio for SBML2LaTeX"
   >
 
-    <!-- Delete all previous versions of SysBio JAR files 
-    <delete verbose="true">
-      <fileset dir="${dist}">
-        <include name="SysBioBase**.jar"/>
-      	<include name="zbit**.jar"/>
-      </fileset>
-    </delete>-->
-
-    <!-- Pack a minimal JAR file containing only parts required for SBML2LaTeX -->
+    <echo message="Pack a minimal JAR file containing only parts required for SBML2LaTeX"/>
     <jar
       compress="true"
       filesetmanifest="mergewithoutmain"
