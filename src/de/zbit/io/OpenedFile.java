@@ -31,9 +31,9 @@ import java.io.File;
 public class OpenedFile<T> {
 
 	/**
-	 * {@link File} content change event name.
+	 * Event name used to indicate that the document associated to the file in this object has been parsed.
 	 */
-	public static final String FILE_CONTENT_CHANGED_EVENT = "de.zbit.io.OpenedFile.fileContentChangedEvent";
+	public static final String DOCUMENT_SET_EVENT = "de.zbit.io.OpenedFile.documentSetEvent";
 	
 	/**
 	 * {@link File} change event name.
@@ -41,23 +41,15 @@ public class OpenedFile<T> {
 	public static final String FILE_CHANGED_EVENT = "de.zbit.io.OpenedFile.fileChangedEvent";
 	
 	/**
-	 * Event name used to indicate that the document associated to the file in this object has been parsed.
+	 * {@link File} content change event name.
 	 */
-	public static final String DOCUMENT_SET_EVENT = "de.zbit.io.OpenedFile.documentSetEvent";
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "OpenedFile [file=" + file + ", changed=" + changed + ", document=" + document + ']';
-	}
+	public static final String FILE_CONTENT_CHANGED_EVENT = "de.zbit.io.OpenedFile.fileContentChangedEvent";
 
 	/**
 	 * Flag to indicate if the document has been changed.
 	 */
 	boolean changed = false;
-	
+
 	/**
 	 * The content of the {@link File}, i.e., the result of some parsing.
 	 */
@@ -72,14 +64,14 @@ public class OpenedFile<T> {
 	 * Notifies listeners about changes within the document.
 	 */
 	private PropertyChangeSupport propertyChangeSupport;
-
+	
 	/**
 	 * Bean constructor.
 	 */
 	public OpenedFile() {
 		super();
 	}
-	
+
 	/**
 	 * 
 	 * @param original
@@ -99,7 +91,7 @@ public class OpenedFile<T> {
 		this.document = document;
 		this.propertyChangeSupport = new PropertyChangeSupport(this);
 	}
-
+	
 	/**
 	 * 
 	 * @param original
@@ -107,7 +99,7 @@ public class OpenedFile<T> {
 	public OpenedFile(T document) {
 		this(null, document);
 	}
-	
+
 	/**
 	 * 
 	 * @param propertyName
@@ -117,20 +109,40 @@ public class OpenedFile<T> {
 		PropertyChangeListener listener) {
 		propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
-	  if (obj != null && obj.getClass() == OpenedFile.class) {
-			OpenedFile<?> other = (OpenedFile<?>) obj;
-			// TODO: is there a reason that only the file, but not the document or
-			//       changed status are compared?     (Florian Mittag)
-			return this.isSetFile() && other.isSetFile() &&
-					this.file.equals(other.file);
+		if (this == obj) {
+			return true;
 		}
-		return false;
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		OpenedFile<?> other = (OpenedFile<?>) obj;
+		if (changed != other.changed) {
+			return false;
+		}
+		if (document == null) {
+			if (other.document != null) {
+				return false;
+			}
+		} else if (!document.equals(other.document)) {
+			return false;
+		}
+		if (file == null) {
+			if (other.file != null) {
+				return false;
+			}
+		} else if (!file.equals(other.file)) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -139,7 +151,7 @@ public class OpenedFile<T> {
 	public T getDocument() {
 		return document;
 	}
-	
+
 	/**
 	 * 
 	 * @return the {@link File} object.
@@ -147,14 +159,18 @@ public class OpenedFile<T> {
 	public File getFile() {
 		return file;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
-  public int hashCode() {
-	  int hash = 433;
-	  if( file != null ) {
-	    hash *= file.hashCode();
-	  }
-	  return hash;
+	public int hashCode() {
+		final int prime = 31;
+		int hash = 1;
+		hash = prime * hash + (changed ? 1231 : 1237);
+		hash = prime * hash + ((document == null) ? 0 : document.hashCode());
+		hash = prime * hash + ((file == null) ? 0 : file.hashCode());
+		return hash;
 	}
 	
 	/**
@@ -171,14 +187,14 @@ public class OpenedFile<T> {
 	public boolean isSetDocument() {
 		return document != null;
 	}
-
+	
 	/**
 	 * checks if file path is set
 	 */
 	public boolean isSetFile() {
 		return this.file != null;
 	}
-	
+
 	/**
 	 * @param changed the changed to set
 	 */
@@ -187,7 +203,7 @@ public class OpenedFile<T> {
 		this.changed = changed;
 		propertyChangeSupport.firePropertyChange(FILE_CONTENT_CHANGED_EVENT, previous, changed);
 	}
-
+	
 	/**
 	 * 
 	 * @param document
@@ -206,6 +222,14 @@ public class OpenedFile<T> {
 		File oldFile = getFile();
 		this.file = file;
 		propertyChangeSupport.firePropertyChange(FILE_CHANGED_EVENT, oldFile, file);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "OpenedFile [file=" + file + ", changed=" + changed + ", document=" + document + ']';
 	}
 
 	/**
