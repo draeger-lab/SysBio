@@ -368,7 +368,7 @@ public class JTableFilter extends JPanel {
    * @return
    */
   public static String[] getOperators() {
-    // TODO: Schöner wäre ala excep "entspricht", "entspricht nicht",...
+    // TODO: Schöner wäre ala excel "entspricht", "entspricht nicht",...
     // ermöglicht auch "beginnt mit", etc.
     // Änderungen hier unbedingt mit matchOperator() abgleichen!
     return new String[]{"","=", "!=", ">=","<=",">","<"
@@ -417,6 +417,17 @@ public class JTableFilter extends JPanel {
       bothToString = true;
     }
     
+    // Avoid comparisons with NaN's
+    if (val2 instanceof Number) {
+      if (Double.isNaN(((Number)val2).doubleValue())) {
+        return false;
+      }
+    } if (val1 instanceof Number) {
+      if (Double.isNaN(((Number)val1).doubleValue())) {
+        return false;
+      }
+    }
+      
     // If classes are incompatible, make string comparisons.
     if (bothToString) {
       val1=val1.toString();
@@ -438,12 +449,13 @@ public class JTableFilter extends JPanel {
       return (((Comparable) val1).compareTo(val2)<0);
     }
     
-    // Absoluate values coming...
+    // ABSOLUTE VALUES coming...
     if (val1 instanceof Number || val2 instanceof Number) {
       // should always be true
-      val1 = toNumber(val1);
-      val2 = toNumber(val2);
-      if (val1==null || val2==null) {
+      val1 = toAbsoluteNumber(val1);
+      val2 = toAbsoluteNumber(val2);
+      if (val1==null || val2==null || 
+          Double.isNaN(((Number)val1).doubleValue()) || Double.isNaN(((Number)val2).doubleValue()) ) {
         // incompatible data types.
         return false;
       }
@@ -472,10 +484,29 @@ public class JTableFilter extends JPanel {
     }
     
     try {
-      val1 = Math.abs(((Number)val1).doubleValue());
+      val1 = ((Number)val1).doubleValue();
     } catch (Exception e) {
       try {
         val1 = Double.parseDouble(val1.toString());
+      } catch (Exception e2) {
+        //e2.printStackTrace(); //Mostly 'empty string'
+        //return false;
+        val1 = null;
+      }
+    }
+    return val1;
+  }
+  
+  private Object toAbsoluteNumber(Object val1) {
+    if (val1 instanceof Number) {
+      return Math.abs(((Number) val1).doubleValue());
+    }
+    
+    try {
+      val1 = Math.abs(((Number) val1).doubleValue());
+    } catch (Exception e) {
+      try {
+        val1 = Math.abs(Double.parseDouble(val1.toString()));
       } catch (Exception e2) {
         //e2.printStackTrace(); //Mostly 'empty string'
         //return false;
