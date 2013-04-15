@@ -379,69 +379,10 @@ public class ZIPUtils {
         String myTest = deCrypt(new ByteArrayInputStream(out.toByteArray()));
         System.out.println (myTest.substring(0, Math.min(1000, myTest.length())));
         
-      } catch (Exception e) {e.printStackTrace();} 
+      } catch (Exception e) {
+      	e.printStackTrace();
+      } 
     }
-    if (true) return;
-    
-    try {
-      StringBuffer pwms = new StringBuffer();
-      // Encrypt and ZIP Transfac PWMS
-      ////BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/1.merged.BFmoved.arabAnnot"));
-      //BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/1.FINAL+Manuell"));
-      //BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/2+3.arabAnnot"));
-      //BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/minFNScores.txt"));
-      //BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/PLACE/place+adDimere"));
-      
-      //BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/NEU ANNOTIERT/1"));
-      //BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/NEU ANNOTIERT/2+3"));
-      //BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/NEU ANNOTIERT/2+3.BMadded"));
-      BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/NEU ANNOTIERT/NEW_Predictions"));
-      
-      //BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/NEU ANNOTIERT/IUPAC"));
-      //BufferedReader in = new BufferedReader(new FileReader("tmpTestFiles/Matritzen/neu/PUBLIC_matrix.dat.annotated")); // => "data/pwms"
-      //
-      
-      /*      
-      // Decrompress encrypted String ZIPs
-      ByteArrayOutputStream out2 = ZIPunCompressData("data/ORGpwms.zip");
-      FileWriter outt = new FileWriter("C:\\ORGpwms.txt");
-      outt.write(deCrypt(new ByteArrayInputStream(out2.toByteArray())));
-      outt.close();
-      if (true) return;*/
-
-      
-      String line = "";
-      while ((line = in.readLine()) != null) {
-        pwms.append(line + "\n");
-      }
-      
-      
-      //in = new BufferedReader(new FileReader("data/pwms"));
-      /*line = "";
-      StringBuffer test = new StringBuffer();
-      while ((line = in.readLine()) != null) {
-        test.append(line + "\n");
-      }*/
-
-      //ByteArrayInputStream  b = new ByteArrayInputStream(enCrypt(pwms.toString()).toByteArray());
-      //String c = deCrypt(b);
-      //System.out.println(c);
-      //if (true) return;
-      
-      //System.out.println(deCrypt(new FileInputStream("data/pwms")));
-      //if (true) return;
-      
-      String fn = "data/pwmsPred2"; // pwms   pwmsPred   pwmsPlace   minFNs
-      enCrypt(pwms.toString(), new FileOutputStream(fn));
-      ZIPcompress(new String[]{fn}, fn + ".zip", "ModuleMaster\nEncrypted Data", true);
-      new File(fn).delete();
-      
-      // Decrypt test
-      ByteArrayOutputStream out = ZIPunCompressData(fn + ".zip");
-      System.out.println (deCrypt(new ByteArrayInputStream(out.toByteArray())));
-    
-    } catch (Exception e) {e.printStackTrace();}  
-    
   }
   
   /**
