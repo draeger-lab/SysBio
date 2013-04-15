@@ -2585,8 +2585,29 @@ public class GUITools {
    * confirmed every warning. Else, null is returned. 
    */
   public static File showSaveFileChooser(Component parent, String saveDir, FileFilter... filter) {
+    return showSaveFileChooser(parent, saveDir, null, filter);
+  }
+  
+  /**
+   * Shows a {@link JFileChooser} to the user, appends the selected file extension to the
+   * selected file and checks weather the selected file is writable. If the file already
+   * exists, the user will be asked if he wants to overwrite the file. If the file is not
+   * writable, an error message id displayed to the user.
+   * @param parent parent component for makeing a modal dialog. May be null.
+   * @param saveDir initial directory for the {@link JFileChooser}. May be null.
+   * @param initialFileNameProposal this will be used as proposed save-file-name.
+   * @param filter {@link FileFilter} the user may choose from. May be null.
+   * @return a file selected by the user if and only if this file is writable and the user
+   * confirmed every warning. Else, null is returned. 
+   */
+  public static File showSaveFileChooser(Component parent, String saveDir, String initialFileNameProposal, FileFilter... filter) {
     JFileChooser fc = GUITools.createJFileChooser(saveDir, (filter==null || filter.length<1),
       false, JFileChooser.FILES_ONLY, filter);
+    if (initialFileNameProposal!=null) {
+      fc.setSelectedFile(new File(initialFileNameProposal));
+    }
+    
+    // Show the dialog
     if (fc.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION) return null;
     
     // Get selected file and try to prepend extension
