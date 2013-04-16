@@ -137,6 +137,11 @@ public class DatabaseIdentifiers {
      */
     GeneSymbol,
     /**
+     * The IUPAC International Chemical Identifier (InChI)
+     * www.iupac.org/inchi/
+     */
+    InChI,
+    /**
      * The International Protein Index (IPI) provides complete nonredundant data
      * sets representing the human, mouse and rat proteomes, built from the
      * Swiss-Prot, TrEMBL, Ensembl and RefSeq databases.
