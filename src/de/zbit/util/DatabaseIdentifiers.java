@@ -83,6 +83,12 @@ public class DatabaseIdentifiers {
     ChEBI,
     ChemicalAbstracts,
     /**
+     * ChemSpider is a free chemical structure database providing fast text and
+     * structure search access to over 28 million structures from hundreds of data sources.
+     * http://www.chemspider.com/
+     */
+    ChemSpider,
+    /**
      * The DrugBank database is a bioinformatics and chemoinformatics resource
      * that combines detailed drug (i.e. chemical, pharmacological and
      * pharmaceutical) data with comprehensive drug target (i.e. sequence,
@@ -141,6 +147,11 @@ public class DatabaseIdentifiers {
      * www.iupac.org/inchi/
      */
     InChI,
+    /**
+     * The IUPAC International Chemical Identifier as hashed key(InChIKey)
+     * www.iupac.org/inchi/
+     */
+    InChIKey,
     /**
      * The International Protein Index (IPI) provides complete nonredundant data
      * sets representing the human, mouse and rat proteomes, built from the
@@ -226,6 +237,7 @@ public class DatabaseIdentifiers {
      * Initiative. PubChem Substance archives chemical substance records.
      */
     PubChem_substance,
+    PubChem_compound,
     PubMed,
     /**
      * Protein Modification Ontology, The Proteomics Standards Initiative
