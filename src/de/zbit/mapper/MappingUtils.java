@@ -61,11 +61,14 @@ public class MappingUtils {
     Affymetrix(IdentifierClass.Gene),
     Agilent(IdentifierClass.Gene),
     Illumina(IdentifierClass.Gene),
+    HMDB(IdentifierClass.Compound),
     KeggCompound(IdentifierClass.Compound),
     InChI(IdentifierClass.Compound),
+    InChIKey(IdentifierClass.Compound),
     ChEBI(IdentifierClass.Compound),
     CAS(IdentifierClass.Compound),
-    HMDB(IdentifierClass.Compound),
+    ChemSpider(IdentifierClass.Compound),
+    PubChem_compound(IdentifierClass.Compound),
     CompoundSynonym(IdentifierClass.Compound),
     UnknownCompound(IdentifierClass.Compound);
     
@@ -84,7 +87,7 @@ public class MappingUtils {
     }
     
     public IdentifierType[] getCompoundIdentifierTypes(){
-    	return new IdentifierType[]{KeggCompound,InChI,ChEBI,CAS,HMDB,CompoundSynonym,UnknownCompound};
+    	return new IdentifierType[]{HMDB,KeggCompound,InChI,InChIKey,ChEBI,CAS,ChemSpider,PubChem_compound,CompoundSynonym,UnknownCompound};
     }
   }
   
