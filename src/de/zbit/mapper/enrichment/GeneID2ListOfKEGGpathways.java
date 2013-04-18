@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import de.zbit.io.csv.CSVReader;
 import de.zbit.mapper.GeneID2KeggIDMapper;
 import de.zbit.mapper.KeggPathwayID2PathwayName;
+import de.zbit.mapper.MappingUtils.IdentifierClass;
 import de.zbit.util.Species;
 import de.zbit.util.Timer;
 import de.zbit.util.progressbar.AbstractProgressBar;
@@ -83,7 +84,7 @@ public class GeneID2ListOfKEGGpathways extends AbstractEnrichmentMapper<Integer,
     // Build the respective meta-collection
     Timer t = new Timer();
     GeneID2KeggIDMapper map1 = new GeneID2KeggIDMapper(organism_kegg_abbr, progress);
-    KeggID2PathwayMapper map2 = new KeggID2PathwayMapper(organism_kegg_abbr, progress);
+    KeggID2PathwayMapper map2 = new KeggID2PathwayMapper(organism_kegg_abbr, progress, IdentifierClass.Gene);
     
     // Create an internal mapping from GeneID 2 PathwayList (merge map1 and map2).
     Set<Entry<Integer, String>> gene_ids = map1.getMapping().entrySet();

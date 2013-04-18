@@ -89,4 +89,25 @@ public class KeggCompound2CompoundIDMapper extends AbstractMapper<String,Integer
     return string.substring(4);
   }
 
+  /**
+   * This method makes sure that "CPD:C00523", "C00523" or
+   * "c00523" will all be mapped to their desired HMDB target (31).
+   * @param id
+   * @return
+   * @throws Exception 
+   */
+  public Integer mapSavely(String id) throws Exception {
+    if (id==null) return null;
+    
+    // "CPD:C00523" => "C00523"
+    if (id.length()>6) {
+      id = id.substring(id.length()-6);
+    }
+    if (id.charAt(0)=='c') {
+      id = id.toUpperCase();
+    }
+    
+    return map(id);
+  }
+
 }
