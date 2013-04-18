@@ -1,6 +1,6 @@
 /*
- * $Id:  CompoundID2KeggCompoundMapper.java 15:22:17 rosenbaum $
- * $URL: CompoundID2KeggCompoundMapper.java $
+ * $Id:  CompoundID2CommonNameMapper.java 15:22:17 rosenbaum $
+ * $URL: CompoundID2CommonNameMapper.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -24,21 +24,21 @@ import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
- * Maps CompoundID to KEGG Compound IDs.
+ * Maps CompoundID to a common human readable name
 
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class CompoundID2KeggCompoundMapper extends AbstractMapper<Integer,String> {
+public class CompoundID2CommonNameMapper extends AbstractMapper<Integer,String> {
 
   private static final long serialVersionUID = 3761835058241496109L;
-	public static final Logger log = Logger.getLogger(CompoundID2KeggCompoundMapper.class.getName());
+	public static final Logger log = Logger.getLogger(CompoundID2CommonNameMapper.class.getName());
   
-  public CompoundID2KeggCompoundMapper() throws IOException {
+  public CompoundID2CommonNameMapper() throws IOException {
   	this(null);
   }
   
-	public CompoundID2KeggCompoundMapper(AbstractProgressBar progress) throws IOException {
+	public CompoundID2CommonNameMapper(AbstractProgressBar progress) throws IOException {
 	  super(Integer.class, String.class, progress);
 	  init();
   }
@@ -65,7 +65,7 @@ public class CompoundID2KeggCompoundMapper extends AbstractMapper<Integer,String
 	 */
 	@Override
 	public String getMappingName() {
-		return "CompoundID2KeggCompound";
+		return "CompoundID2CommonName";
 	}
 
 	/* (non-Javadoc)
@@ -73,7 +73,7 @@ public class CompoundID2KeggCompoundMapper extends AbstractMapper<Integer,String
 	 */
 	@Override
 	public int getTargetColumn(CSVReader r) {
-		return 2;
+		return 1;
 	}
 
 	/* (non-Javadoc)
