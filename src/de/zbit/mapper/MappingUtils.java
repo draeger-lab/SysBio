@@ -22,11 +22,14 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import de.zbit.mapper.compounds.CAS2CompoundIDMapper;
+import de.zbit.mapper.compounds.ChEBI2CompoundIDMapper;
+import de.zbit.mapper.compounds.ChemSpider2CompoundIDMapper;
 import de.zbit.mapper.compounds.CompoundSynonym2CompoundIDMapper;
 import de.zbit.mapper.compounds.HMDB2CompoundIDMapper;
 import de.zbit.mapper.compounds.InChI2CompoundIDMapper;
 import de.zbit.mapper.compounds.InChIKey2ComoundIDMapper;
 import de.zbit.mapper.compounds.KeggCompound2CompoundIDMapper;
+import de.zbit.mapper.compounds.PubChemCompound2CompoundIDMapper;
 import de.zbit.mapper.probes.ProbeID2GeneIDMapper;
 import de.zbit.mapper.probes.ProbeID2GeneIDMapper.Manufacturer;
 import de.zbit.util.DatabaseIdentifiers;
@@ -267,16 +270,13 @@ public class MappingUtils {
         } else if (sourceIDtype.equals(IdentifierType.InChIKey)) {
           mapper = new InChIKey2ComoundIDMapper(progress);
         } else if (sourceIDtype.equals(IdentifierType.ChEBI)) {
-          // FIXME: ChEBI2CompoundIDMapper is not of type <String>2<Integer>
-          //mapper = new ChEBI2CompoundIDMapper(progress);
+          mapper = new ChEBI2CompoundIDMapper(progress);
         } else if (sourceIDtype.equals(IdentifierType.CAS)) {
           mapper = new CAS2CompoundIDMapper(progress);
         } else if (sourceIDtype.equals(IdentifierType.ChemSpider)) {
-          // FIXME: ChemSpider2CompoundIDMapper is not of type <String>2<Integer>
-          //mapper = new ChemSpider2CompoundIDMapper(progress);
+          mapper = new ChemSpider2CompoundIDMapper(progress);
         } else if (sourceIDtype.equals(IdentifierType.PubChem_compound)) {
-          // FIXME: PubChemCompound2CompoundIDMapper is not of type <String>2<Integer>
-          //mapper = new PubChemCompound2CompoundIDMapper(progress);
+          mapper = new PubChemCompound2CompoundIDMapper(progress);
         } else if (sourceIDtype.equals(IdentifierType.CompoundSynonym)) {
           mapper = new CompoundSynonym2CompoundIDMapper(progress);
         }

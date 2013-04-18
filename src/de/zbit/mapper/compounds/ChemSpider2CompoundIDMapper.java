@@ -29,7 +29,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class ChemSpider2CompoundIDMapper extends AbstractMapper<Integer,Integer> {
+public class ChemSpider2CompoundIDMapper extends AbstractMapper<String,Integer> {
 
   private static final long serialVersionUID = 3761835058241496109L;
 	public static final Logger log = Logger.getLogger(ChemSpider2CompoundIDMapper.class.getName());
@@ -39,7 +39,7 @@ public class ChemSpider2CompoundIDMapper extends AbstractMapper<Integer,Integer>
   }
   
 	public ChemSpider2CompoundIDMapper(AbstractProgressBar progress) throws IOException {
-	  super(Integer.class, Integer.class, progress);
+	  super(String.class, Integer.class, progress);
 	  init();
   }
 
