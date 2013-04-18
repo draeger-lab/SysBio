@@ -30,6 +30,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * secondary accessions and assigns them to their primary accession
  * 
  * @author Lars Rosenbaum
+ * @author Clemens Wrzodek
  * @version $Rev$
  */
 public class HMDB2CompoundIDMapper extends AbstractMapper<String,Integer> {
@@ -79,14 +80,35 @@ public class HMDB2CompoundIDMapper extends AbstractMapper<String,Integer> {
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#getSourceColumn(de.zbit.io.csv.CSVReader)
-	 */
-	@Override
-	public int getSourceColumn(CSVReader r) {
-		return 0;
-	}
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getMultiSourceColumn(de.zbit.io.CSVReader)
+   */
+  @Override
+  public int[] getMultiSourceColumn(CSVReader r) {
+    // From the second(1) to the end of the line [1..n]
+    return new int[]{1, Integer.MAX_VALUE};
+  }
+  
+  
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getSourceColumn(de.zbit.io.CSVReader)
+   */
+  @Override
+  public int getSourceColumn(CSVReader r) {
+    return 1; // Never called if getMultiSourceColumn() is implemented.
+  }
 	
+	 /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#configureReader(de.zbit.io.csv.CSVReader)
+   */
+  @Override
+  protected void configureReader(CSVReader r) {
+    r.setSeparatorChar('\t');
+    r.setContainsHeaders(true);
+    r.setSkipLines(0);
+    r.setAutoDetectContentStart(false);
+  }
+  
 	@Override
 	protected String preProcessTargetID(String string) {
     return string.substring(4);
