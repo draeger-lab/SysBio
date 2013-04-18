@@ -1,6 +1,6 @@
 /*
- * $Id:  InChI2KeggCompoundIDMapper.java 15:22:17 rosenbaum $
- * $URL: InChI2KeggCompoundIDMapper.java $
+ * $Id:  CAS2CompoundIDMapper.java 15:22:17 rosenbaum $
+ * $URL: CAS2CompoundIDMapper.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -24,24 +24,24 @@ import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
- * Maps CAS number to KEGG Compound IDs.
+ * Maps CAS number to Compound IDs.
  * CAS (Chemical Abstracts Service) is a division of the American Chemical
  * Society and is the producer of comprehensive databases of chemical information.
  
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class PubChemCompound2HMDBMapper extends AbstractMapper<Integer,Integer> {
+public class CAS2CompoundIDMapper extends AbstractMapper<String,Integer> {
 
   private static final long serialVersionUID = 3761835058241496109L;
-	public static final Logger log = Logger.getLogger(PubChemCompound2HMDBMapper.class.getName());
+	public static final Logger log = Logger.getLogger(CAS2CompoundIDMapper.class.getName());
   
-  public PubChemCompound2HMDBMapper() throws IOException {
+  public CAS2CompoundIDMapper() throws IOException {
   	this(null);
   }
   
-	public PubChemCompound2HMDBMapper(AbstractProgressBar progress) throws IOException {
-	  super(Integer.class, Integer.class, progress);
+	public CAS2CompoundIDMapper(AbstractProgressBar progress) throws IOException {
+	  super(String.class, Integer.class, progress);
 	  init();
   }
 
@@ -67,7 +67,7 @@ public class PubChemCompound2HMDBMapper extends AbstractMapper<Integer,Integer> 
 	 */
 	@Override
 	public String getMappingName() {
-		return "ChemSpider2HMDB";
+		return "CAS2CompoundID";
 	}
 
 	/* (non-Javadoc)
@@ -83,7 +83,7 @@ public class PubChemCompound2HMDBMapper extends AbstractMapper<Integer,Integer> 
 	 */
 	@Override
 	public int getSourceColumn(CSVReader r) {
-		return 7;
+		return 6;
 	}
 	
 	@Override

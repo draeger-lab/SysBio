@@ -1,6 +1,6 @@
 /*
- * $Id:  InChI2KeggCompoundIDMapper.java 15:22:17 rosenbaum $
- * $URL: InChI2KeggCompoundIDMapper.java $
+ * $Id:  ChemSpider2CompoundIDMapper.java 15:22:17 rosenbaum $
+ * $URL: ChemSpider2CompoundIDMapper.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -24,23 +24,21 @@ import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
- * Maps CAS number to KEGG Compound IDs.
- * CAS (Chemical Abstracts Service) is a division of the American Chemical
- * Society and is the producer of comprehensive databases of chemical information.
- 
+ * Maps a ChemSpider IDs to Compound IDs.
+
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class ChemSpider2HMDBMapper extends AbstractMapper<Integer,Integer> {
+public class ChemSpider2CompoundIDMapper extends AbstractMapper<Integer,Integer> {
 
   private static final long serialVersionUID = 3761835058241496109L;
-	public static final Logger log = Logger.getLogger(ChemSpider2HMDBMapper.class.getName());
+	public static final Logger log = Logger.getLogger(ChemSpider2CompoundIDMapper.class.getName());
   
-  public ChemSpider2HMDBMapper() throws IOException {
+  public ChemSpider2CompoundIDMapper() throws IOException {
   	this(null);
   }
   
-	public ChemSpider2HMDBMapper(AbstractProgressBar progress) throws IOException {
+	public ChemSpider2CompoundIDMapper(AbstractProgressBar progress) throws IOException {
 	  super(Integer.class, Integer.class, progress);
 	  init();
   }
@@ -67,7 +65,7 @@ public class ChemSpider2HMDBMapper extends AbstractMapper<Integer,Integer> {
 	 */
 	@Override
 	public String getMappingName() {
-		return "PubChemCompound2HMDB";
+		return "ChemSpider2CompoundID";
 	}
 
 	/* (non-Javadoc)
@@ -83,7 +81,7 @@ public class ChemSpider2HMDBMapper extends AbstractMapper<Integer,Integer> {
 	 */
 	@Override
 	public int getSourceColumn(CSVReader r) {
-		return 8;
+		return 7;
 	}
 	
 	@Override
