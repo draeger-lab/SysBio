@@ -16,6 +16,7 @@
  */
 package de.zbit.io.csv;
 
+import java.awt.Component;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,8 +25,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.StringTokenizer;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import de.zbit.util.StringUtil;
@@ -486,8 +489,7 @@ public class CSVWriter {
 	private Writer write(String comments, char commentSymbol,
 			Writer writer) throws IOException {
 		// setCommentSymbol(commentSymbol);
-		StringTokenizer st = new StringTokenizer(comments.replace("\r", ""),
-				"\n");
+		StringTokenizer st = new StringTokenizer(comments.replace("\r", ""), "\n");
 		while (st.hasMoreElements()) {
 			writer.append(commentSymbol);
 			writer.append(' ');
@@ -505,8 +507,20 @@ public class CSVWriter {
 	 * @param writer
 	 * @throws IOException
 	 */
-	private void write(TableModel data, char separator, Writer writer)
-			throws IOException {
+  private void write(TableModel data, char separator, Writer writer) throws IOException {
+    write(data,null,separator,writer);
+  }
+  
+	/**
+	 * 
+	 * @param data
+	 * @param useTheseRenderers
+	 * @param separator
+	 * @param writer
+	 * @throws IOException
+	 */
+	private void write(TableModel data, JTable useTheseRenderers, char separator, Writer writer) throws IOException {
+
 	  String lineSep = StringUtil.newLine();
 	  
 		// setSeparator(separator);
@@ -544,8 +558,21 @@ public class CSVWriter {
         if (j > 0) {
           writer.append(separator);
         }
+        
+        // Get cell content
+        value = data.getValueAt(i, j);
+        
+        // Try to preserve rendered texts instead of using the raw value
+        if (useTheseRenderers!=null) {
+          TableCellRenderer renderer = useTheseRenderers.getCellRenderer(i, j);
+          Component comp = renderer.getTableCellRendererComponent(useTheseRenderers, value, false, false, i, j);
+          if (comp instanceof JLabel) {
+            value = ((JLabel) comp).getText();
+          }
+        }
+        
   			// Do not write new line terms here. This breaks the CSV file!
-				writer.append(formatCellValue(data.getValueAt(i, j)));
+				writer.append(formatCellValue(value));
 			}
 			writer.write(lineSep);
 		}
@@ -678,6 +705,8 @@ public class CSVWriter {
    * @throws IOException 
    */
   public void write(JTable table, File file) throws IOException {
-    write (table.getModel(), this.separator, file);
+    //write (table.getModel(), this.separator, file);
+    // Presere rendering
+    write (table.getModel(),table,this.separator,initializeWriter(file));
   }
 }

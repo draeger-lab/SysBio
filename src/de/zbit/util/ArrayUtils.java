@@ -544,4 +544,19 @@ public class ArrayUtils {
     }
   }
 
+  /**
+   * 
+   * @param table
+   * @return
+   */
+  public static Object[][] toArray(Collection<? extends Collection<?>> table) {
+    Object[][] arr = new Object[table.size()][];
+    int i=0;
+    for (Collection<?> c : table) {
+      arr[i++] = c.toArray();
+    }
+    
+    return arr;
+  }
+
 }
