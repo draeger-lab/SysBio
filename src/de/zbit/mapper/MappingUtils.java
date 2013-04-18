@@ -17,8 +17,16 @@
 package de.zbit.mapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import de.zbit.mapper.compounds.CAS2CompoundIDMapper;
+import de.zbit.mapper.compounds.CompoundSynonym2CompoundIDMapper;
+import de.zbit.mapper.compounds.HMDB2CompoundIDMapper;
+import de.zbit.mapper.compounds.InChI2CompoundIDMapper;
+import de.zbit.mapper.compounds.InChIKey2ComoundIDMapper;
+import de.zbit.mapper.compounds.KeggCompound2CompoundIDMapper;
 import de.zbit.mapper.probes.ProbeID2GeneIDMapper;
 import de.zbit.mapper.probes.ProbeID2GeneIDMapper.Manufacturer;
 import de.zbit.util.DatabaseIdentifiers;
@@ -61,6 +69,7 @@ public class MappingUtils {
     Affymetrix(IdentifierClass.Gene),
     Agilent(IdentifierClass.Gene),
     Illumina(IdentifierClass.Gene),
+    
     HMDB(IdentifierClass.Compound),
     KeggCompound(IdentifierClass.Compound),
     InChI(IdentifierClass.Compound),
@@ -82,12 +91,33 @@ public class MappingUtils {
     	return this.identClass;
     }
     
-    public IdentifierType[] getGeneIdentifierTypes(){
-    	return new IdentifierType[]{Unknown,NCBI_GeneID,RefSeq,Ensembl,KeggGenes,UniProt,GeneSymbol,Affymetrix,Agilent,Illumina};
+    /**
+     * @return all available {@link IdentifierClass#Gene} identifiers.
+     */
+    public static IdentifierType[] getGeneIdentifierTypes(){
+      return getAllIdentifers(IdentifierClass.Gene);
     }
     
-    public IdentifierType[] getCompoundIdentifierTypes(){
-    	return new IdentifierType[]{HMDB,KeggCompound,InChI,InChIKey,ChEBI,CAS,ChemSpider,PubChem_compound,CompoundSynonym,UnknownCompound};
+    /**
+     * @return all available {@link IdentifierClass#Compound} identifiers.
+     */
+    public static IdentifierType[] getCompoundIdentifierTypes(){
+      return getAllIdentifers(IdentifierClass.Compound);
+    }
+    
+    /**
+     * Returns all available identifiers with {@link IdentifierClass} {@code clas}.
+     * @param clas
+     * @return
+     */
+    public static IdentifierType[] getAllIdentifers(IdentifierClass clas) {
+      List<IdentifierType> ret = new ArrayList<IdentifierType>();
+      for (IdentifierType v : values()) {
+        if (clas==null || v.getIdentifierClass().equals(clas)) {
+          ret.add(v);
+        }
+      }
+      return ret.toArray(new IdentifierType[0]);
     }
   }
   
@@ -103,11 +133,12 @@ public class MappingUtils {
   
   /**
    * Get a regular expression for each {@link IdentifierType}.
+   * @param clas any {@link IdentifierClass} or {@code null} to get all.
    * @return regular expressions for each {@link IdentifierType} in
    * the same ordering as {@link IdentifierType#values()}.
    */
-  public static String[] getRegularExpressionsForAllIdentifierTypes() {
-    IdentifierType[] values = IdentifierType.values();
+  public static String[] getRegularExpressionsFor(IdentifierClass clas) {
+    IdentifierType[] values = IdentifierType.getAllIdentifers(clas);
     String[] ret = new String[values.length];
     
     for (int i=0; i<values.length; i++) {
@@ -125,6 +156,7 @@ public class MappingUtils {
   public static String getRegularExpressionForIdentifier(IdentifierType identifier) {
     // Use the new class "DatabaseIdentifiers" for this method.
     switch (identifier) {
+      // Gene identifiers
       case NCBI_GeneID:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.EntrezGene, false);
@@ -149,8 +181,44 @@ public class MappingUtils {
         return "A_\\d{2}_[A-Z0-9]{6,8}";
       case Illumina:
         return "ILMN_\\d+";
+        
+      // Compound identifiers
+      case HMDB:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.HMDB, false);
+      case KeggCompound:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.KEGG_Compound, false);
+      case InChI:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.InChI, false);
+      case InChIKey:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.InChIKey, false);
+      case ChEBI:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.ChEBI, false);
+      case CAS:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.CAS, false);
+      case ChemSpider:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.ChemSpider, false);
+      case PubChem_compound:
+        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
+          DatabaseIdentifiers.IdentifierDatabases.PubChem_compound, false);
+        
       default:
-        return null;
+        // Search for an equally named instance in the "DatabaseIdentifiers.IdentifierDatabases" class.
+        DatabaseIdentifiers.IdentifierDatabases dbID = null;
+        try {
+          dbID = DatabaseIdentifiers.IdentifierDatabases.valueOf(identifier.toString());
+        } catch (Exception e) {} // Intentionally ignored.
+        if (dbID!=null) {
+          return DatabaseIdentifiers.getRegularExpressionForIdentifier(dbID, false);
+        } else {
+          return null;
+        }
     }
   }
   
@@ -164,11 +232,11 @@ public class MappingUtils {
    * @throws IOException
    */
   public static AbstractMapper<String, Integer> initialize2GeneIDMapper(IdentifierType sourceIDtype, AbstractProgressBar progress, Species species) throws IOException {
-    log.info("Initializing 2GeneID mapper...");
     // Init mapper based on targetIDtype
     AbstractMapper<String, Integer> mapper = null;
     if (sourceIDtype!=null) {
-    	if(sourceIDtype.getIdentifierClass() == IdentifierClass.Gene){
+    	if(sourceIDtype.getIdentifierClass().equals(IdentifierClass.Gene)) {
+    	  log.info("Initializing 2GeneID mapper...");
 	      if (sourceIDtype.equals(IdentifierType.RefSeq)) {
 	        mapper = new RefSeq2GeneIDMapper(progress, species.getNCBITaxonID());
 	      } else if (sourceIDtype.equals(IdentifierType.Ensembl)) {
@@ -186,7 +254,32 @@ public class MappingUtils {
 	      } else if (sourceIDtype.equals(IdentifierType.Illumina)) {
 	        mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Illumina, species.getCommonName());
 	      }
-    	}else if(sourceIDtype.getIdentifierClass() == IdentifierClass.Compound){
+	      
+	      
+    	} else if(sourceIDtype.getIdentifierClass().equals(IdentifierClass.Compound)) {
+    	  log.info("Initializing 2CompoundID mapper...");
+        if (sourceIDtype.equals(IdentifierType.HMDB)) {
+          mapper = new HMDB2CompoundIDMapper(progress);
+        } else if (sourceIDtype.equals(IdentifierType.KeggCompound)) {
+          mapper = new KeggCompound2CompoundIDMapper(progress);
+        } else if (sourceIDtype.equals(IdentifierType.InChI)) {
+          mapper = new InChI2CompoundIDMapper(progress);
+        } else if (sourceIDtype.equals(IdentifierType.InChIKey)) {
+          mapper = new InChIKey2ComoundIDMapper(progress);
+        } else if (sourceIDtype.equals(IdentifierType.ChEBI)) {
+          // FIXME: ChEBI2CompoundIDMapper is not of type <String>2<Integer>
+          //mapper = new ChEBI2CompoundIDMapper(progress);
+        } else if (sourceIDtype.equals(IdentifierType.CAS)) {
+          mapper = new CAS2CompoundIDMapper(progress);
+        } else if (sourceIDtype.equals(IdentifierType.ChemSpider)) {
+          // FIXME: ChemSpider2CompoundIDMapper is not of type <String>2<Integer>
+          //mapper = new ChemSpider2CompoundIDMapper(progress);
+        } else if (sourceIDtype.equals(IdentifierType.PubChem_compound)) {
+          // FIXME: PubChemCompound2CompoundIDMapper is not of type <String>2<Integer>
+          //mapper = new PubChemCompound2CompoundIDMapper(progress);
+        } else if (sourceIDtype.equals(IdentifierType.CompoundSynonym)) {
+          mapper = new CompoundSynonym2CompoundIDMapper(progress);
+        }
     		
     	}
     }

@@ -657,4 +657,17 @@ public class KeggAdaptor {
     return results;
   }
 
+
+
+  /**
+   * Convert from an external identifier to a KEGG identifier.
+   * @param keggDB "genes" or "compound" 
+   * @param id "chebi:16761" or "ncbi-geneid:1644"
+   * @return Tabbed mapping from original_ID to KEGG_ID.
+   * @throws IOException 
+   */
+  public String convert(String keggDB, String id) throws IOException {
+    return get("conv", keggDB.toLowerCase(), id.toLowerCase());
+  }
+
 }
