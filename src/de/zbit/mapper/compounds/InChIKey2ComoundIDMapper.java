@@ -88,4 +88,10 @@ public class InChIKey2ComoundIDMapper extends AbstractMapper<String,Integer> {
 	protected String preProcessTargetID(String string) {
     return string.substring(4);
   }
+	
+	@Override
+	protected String preProcessSourceID(String string) {
+		//Remove 'InChIKey='
+		return string.substring(9);
+	}
 }
