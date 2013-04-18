@@ -31,7 +31,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class ChEBI2CompoundIDMapper extends AbstractMapper<Integer,Integer> {
+public class ChEBI2CompoundIDMapper extends AbstractMapper<String,Integer> {
 	private static final long serialVersionUID = -465552345234526L;
 
   public static final Logger log = Logger.getLogger(ChEBI2CompoundIDMapper.class.getName());
@@ -41,7 +41,7 @@ public class ChEBI2CompoundIDMapper extends AbstractMapper<Integer,Integer> {
   }
   
 	public ChEBI2CompoundIDMapper(AbstractProgressBar progress) throws IOException {
-	  super(Integer.class, Integer.class, progress);
+	  super(String.class, Integer.class, progress);
 	  init();
   }
 
@@ -91,4 +91,10 @@ public class ChEBI2CompoundIDMapper extends AbstractMapper<Integer,Integer> {
 	protected String preProcessTargetID(String string) {
     return string.substring(4);
   }
+	
+	@Override
+	protected String preProcessSourceID(String string) {
+		//add CHEBI: before integer
+		return "CHEBI:"+string;
+	}
 }
