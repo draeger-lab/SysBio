@@ -410,13 +410,27 @@ public abstract class SB_2GraphML <T> {
     // Change to/ setup the group node
     NodeRealizer nr = setupGroupNode(null);
     simpleGraph.setRealizer(n, nr);
-    simpleGraph.getHierarchyManager().convertToGroupNode(n);
+    getHierarchyManager(simpleGraph).convertToGroupNode(n);
     
     
     addChildren(n, childrenID);
     
     return n;
   }
+
+  /**
+   * @param simpleGraph
+   * @return
+   */
+  protected HierarchyManager getHierarchyManager(Graph2D simpleGraph) {
+    HierarchyManager hm = simpleGraph.getHierarchyManager();
+    if (hm == null) {
+      hm = new HierarchyManager(simpleGraph);
+      simpleGraph.setHierarchyManager(hm);
+    }
+    return hm;
+  }
+
 
   /**
    * 
@@ -457,12 +471,7 @@ public abstract class SB_2GraphML <T> {
       simpleGraph.setSize(n, width2 - x2 + 2 * offset, height2 - y2 + 2 * offset + 11);
       
       // Set hierarchy
-      HierarchyManager hm = simpleGraph.getHierarchyManager();
-      if (hm == null) {
-        hm = new HierarchyManager(simpleGraph);
-        simpleGraph.setHierarchyManager(hm);
-      }
-      hm.setParentNode(nl, n);
+      getHierarchyManager(simpleGraph).setParentNode(nl, n);
       
 //      for (int i = 0; i < nl.size(); i++) {
 //      	Node node = (Node) nl.get(i);

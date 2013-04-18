@@ -237,11 +237,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   	/*
      *  TODO: Add COMPARTMENTS
      */
-    HierarchyManager hm = simpleGraph.getHierarchyManager();
-    if (hm == null) {
-      hm = new HierarchyManager(simpleGraph);
-      simpleGraph.setHierarchyManager(hm);
-    }
+    HierarchyManager hm = getHierarchyManager(simpleGraph);
     Map<String, List<String>> mapOfChildren = new HashMap<String, List<String>>();
     if (doc.isSetModel()) {
     	Model model = doc.getModel();
@@ -361,7 +357,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     	    if (c.isSetOutsideInstance()) {
     	    	Node outside = id2node.get(c.getOutside());
     	    	if (outside != null) {
-        	    simpleGraph.getHierarchyManager().setParentNode(n, outside);
+        	    hm.setParentNode(n, outside);
     	    	}
     	    }
     	    children = mapOfChildren.get(c.getId());
