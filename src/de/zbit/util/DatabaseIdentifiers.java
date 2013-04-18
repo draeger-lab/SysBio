@@ -290,6 +290,8 @@ public class DatabaseIdentifiers {
         return "Gene Ontology";
       } else if (this==PubChem_substance) {
         return "PubChem-substance";
+      } else if (this==PubChem_compound) {
+        return "PubChem-compound";
       } else if (this==UniProt_AC) {
         return "UniProt";
       } else if (this==EC_code) {
@@ -416,6 +418,9 @@ public class DatabaseIdentifiers {
     if (id==null) {
       // Check against each database
       String dbIdentifier2 = dbIdentifier.toLowerCase().replace("_", "").replace("-", "").replace(" ", "");
+      if (dbIdentifier2.contains(":")) {
+        dbIdentifier2 = dbIdentifier2.substring(0, dbIdentifier2.indexOf(':'));
+      }
       for (IdentifierDatabases identifier : IdentifierDatabases.values()) {
         if (identifier.toString().replace("_", "").replace("-", "").replace(" ", "").equalsIgnoreCase(dbIdentifier2)) {
           return identifier;
@@ -436,6 +441,7 @@ public class DatabaseIdentifiers {
       } else if (dbIdentifier2.equalsIgnoreCase("NCBIGeneID") ||
           dbIdentifier2.equalsIgnoreCase("GeneID") ||
           dbIdentifier2.equalsIgnoreCase("LocusLink") ||
+          dbIdentifier2.equalsIgnoreCase("Entrez") ||
           dbIdentifier2.equalsIgnoreCase("LL")) {
         return IdentifierDatabases.EntrezGene;
         
@@ -448,6 +454,14 @@ public class DatabaseIdentifiers {
         
       } else if (dbIdentifier2.equalsIgnoreCase("3DMET")) {
         return IdentifierDatabases.ThreeDMET;
+        
+      } else if (dbIdentifier2.equalsIgnoreCase("CID") ||
+          dbIdentifier2.equalsIgnoreCase("PubChem")) {
+        // WARNING: PubChem: may also refer to the substance identifier!!! 
+        return IdentifierDatabases.PubChem_compound;
+        
+      } else if (dbIdentifier2.equalsIgnoreCase("SID")) {
+        return IdentifierDatabases.PubChem_substance;
 
       } else if (dbIdentifier2.equalsIgnoreCase("Chemical Abstracts Service") ||
           dbIdentifier2.startsWith("CAS ") || dbIdentifier2.equalsIgnoreCase("CASRN")) {
@@ -456,7 +470,8 @@ public class DatabaseIdentifiers {
       } else if (dbIdentifier2.equalsIgnoreCase("PDBCCD")) {
         return IdentifierDatabases.PDBeChem;
 
-      } else if (dbIdentifier2.equalsIgnoreCase("EnzymeConsortium")) {
+      } else if (dbIdentifier2.equalsIgnoreCase("EnzymeConsortium") ||
+          dbIdentifier2.equalsIgnoreCase("EC")) {
         return IdentifierDatabases.EC_code;
         
       } else if (dbIdentifier2.startsWith("reactome")) {
@@ -523,6 +538,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.PDB,                   "[0-9][A-Za-z0-9]{3}");
     regExMap.put(IdentifierDatabases.Panther,               "PTHR\\d{5}");
     regExMap.put(IdentifierDatabases.PubChem_substance,     "\\d+");
+    regExMap.put(IdentifierDatabases.PubChem_compound,      "\\d+");
     regExMap.put(IdentifierDatabases.PubMed,                "\\d+");
     regExMap.put(IdentifierDatabases.PSI_MI,                "MI:\\d{4}");
     regExMap.put(IdentifierDatabases.PSI_MOD,               "MOD:\\d{5}");
@@ -549,7 +565,10 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.GeneSymbol,            "\\w+");
     regExMap.put(IdentifierDatabases.SBO,                   "SBO:\\d{7}");
     regExMap.put(IdentifierDatabases.MI,                    "MI:\\d{4}");
-    regExMap.put(IdentifierDatabases.MOD,                    "MOD:\\d{5}");
+    regExMap.put(IdentifierDatabases.MOD,                   "MOD:\\d{5}");
+    regExMap.put(IdentifierDatabases.ChemSpider,            "\\d+");
+    regExMap.put(IdentifierDatabases.InChI,                 "InChI\\=1S\\/[A-Za-z0-9]+(\\/[cnpqbtmsih][A-Za-z0-9\\-\\+\\(\\)\\,]+)+");
+    regExMap.put(IdentifierDatabases.InChIKey,              "[A-Z]{14}\\-[A-Z]{10}(\\-[A-N])?");
     
     
     
@@ -578,6 +597,7 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.PDB,	                "urn:miriam:pdb:");
     miriamMap.put(IdentifierDatabases.Panther,              "urn:miriam:panther:");
     miriamMap.put(IdentifierDatabases.PubChem_substance,    "urn:miriam:pubchem.substance:");
+    miriamMap.put(IdentifierDatabases.PubChem_compound,     "urn:miriam:pubchem.compound:");
     miriamMap.put(IdentifierDatabases.PubMed,               "urn:miriam:pubmed:");
     miriamMap.put(IdentifierDatabases.PSI_MI,               "urn:miriam:obo.mi:");
     miriamMap.put(IdentifierDatabases.PSI_MOD,              "urn:miriam:obo.psi-mod:");
@@ -602,6 +622,9 @@ public class DatabaseIdentifiers {
     miriamMap.put(IdentifierDatabases.SBO,                  "urn:miriam:biomodels.sbo:");
     miriamMap.put(IdentifierDatabases.MI,                   "urn:miriam:obo.mi:");
     miriamMap.put(IdentifierDatabases.MOD,                  "urn:miriam:obo.psi-mod:");
+    miriamMap.put(IdentifierDatabases.ChemSpider,           "urn:miriam:chemspider:");
+    miriamMap.put(IdentifierDatabases.InChI,                "urn:miriam:inchi:");
+    miriamMap.put(IdentifierDatabases.InChIKey,             "urn:miriam:inchikey:");
     //miriamMap.put(IdentifierDatabases.GeneSymbol,         ); // None available!
     
     
@@ -630,6 +653,7 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.PDB,	                 DatabaseContent.structures);
     describedType.put(IdentifierDatabases.Panther,               DatabaseContent.description);
     describedType.put(IdentifierDatabases.PubChem_substance,     DatabaseContent.structures);
+    describedType.put(IdentifierDatabases.PubChem_compound,      DatabaseContent.small_molecule);
     describedType.put(IdentifierDatabases.PubMed,                DatabaseContent.publication);
     describedType.put(IdentifierDatabases.PSI_MI,                DatabaseContent.annotation); // Actually molecular interaction
     describedType.put(IdentifierDatabases.PSI_MOD,               DatabaseContent.protein);
@@ -655,6 +679,9 @@ public class DatabaseIdentifiers {
     describedType.put(IdentifierDatabases.SBO,                   DatabaseContent.description);
     describedType.put(IdentifierDatabases.MI,                    DatabaseContent.description);
     describedType.put(IdentifierDatabases.MOD,                   DatabaseContent.description);
+    describedType.put(IdentifierDatabases.ChemSpider,            DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.InChI,                 DatabaseContent.small_molecule);
+    describedType.put(IdentifierDatabases.InChIKey,              DatabaseContent.small_molecule);
     
     
     for (IdentifierDatabases db : IdentifierDatabases.values()) {
