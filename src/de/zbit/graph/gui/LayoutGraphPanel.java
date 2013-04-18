@@ -61,8 +61,8 @@ public class LayoutGraphPanel extends JPanel {
 
 
 	/**
-	 * @param layout : the layout to be displayed by this panel
-	 * @param editMode : the editMode to enable lasting graph manipulation
+	 * @param layout the layout to be displayed by this panel
+	 * @param editMode the editMode to enable lasting graph manipulation
 	 */
 	public LayoutGraphPanel(Layout layout, EditMode editMode) {
 		super(new BorderLayout());
@@ -76,6 +76,9 @@ public class LayoutGraphPanel extends JPanel {
 		init();
 	}
 	
+	/**
+	 * 
+	 */
 	public void init() {
 		this.add(graph2DView, BorderLayout.CENTER);
 		this.graph2DView.setOpaque(false);
@@ -117,4 +120,5 @@ public class LayoutGraphPanel extends JPanel {
 	public Graph2DView getGraph2DView() {
 		return graph2DView;
 	}
+
 }
