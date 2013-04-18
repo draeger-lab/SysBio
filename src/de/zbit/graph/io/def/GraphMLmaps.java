@@ -20,8 +20,6 @@
  */
 package de.zbit.graph.io.def;
 
-import de.zbit.kegg.parser.pathway.EntryType;
-
 /**
  * This is a container for GraphML map-references the provide
  * additional information for nodes.
@@ -48,7 +46,7 @@ public interface GraphMLmaps {
   public final static String NODE_GENE_ID = "entrezIds";
   
   /**
-   * Node type ("small molecule", "protein" or any {@link EntryType}.
+   * Node type ("small molecule", "protein" or any {@link de.zbit.kegg.parser.pathway.EntryType}.
    */
   public final static String NODE_TYPE = "type";
   

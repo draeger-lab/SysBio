@@ -36,6 +36,8 @@ import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.QualitativeSpecies;
 import org.sbml.jsbml.ext.qual.Transition;
 
+import de.zbit.sbml.io.QualModelBuilding;
+
 /**
  * @author Stephanie Tscherneck
  * @version $Rev$

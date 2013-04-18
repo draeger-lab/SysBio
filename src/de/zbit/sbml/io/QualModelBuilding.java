@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.sbml.util;
+package de.zbit.sbml.io;
 
 import java.io.FileNotFoundException;
 import java.util.Calendar;

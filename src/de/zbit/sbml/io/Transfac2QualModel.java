@@ -16,7 +16,7 @@
  */
 
 
-package de.zbit.sbml.util;
+package de.zbit.sbml.io;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
