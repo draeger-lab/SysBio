@@ -73,6 +73,7 @@ public class MappingUtils {
     Agilent(IdentifierClass.Gene),
     Illumina(IdentifierClass.Gene),
     
+    CompoundID(IdentifierClass.Compound),
     HMDB(IdentifierClass.Compound),
     KeggCompound(IdentifierClass.Compound),
     InChI(IdentifierClass.Compound),
@@ -81,7 +82,7 @@ public class MappingUtils {
     CAS(IdentifierClass.Compound),
     ChemSpider(IdentifierClass.Compound),
     PubChem_compound(IdentifierClass.Compound),
-    CompoundSynonym(IdentifierClass.Compound),
+    CommonName(IdentifierClass.Compound),
     UnknownCompound(IdentifierClass.Compound);
     
     private IdentifierClass identClass;
@@ -186,6 +187,8 @@ public class MappingUtils {
         return "ILMN_\\d+";
         
       // Compound identifiers
+      case CompoundID:
+      	return "\\d{5}";
       case HMDB:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.HMDB, false);
@@ -277,7 +280,7 @@ public class MappingUtils {
           mapper = new ChemSpider2CompoundIDMapper(progress);
         } else if (sourceIDtype.equals(IdentifierType.PubChem_compound)) {
           mapper = new PubChemCompound2CompoundIDMapper(progress);
-        } else if (sourceIDtype.equals(IdentifierType.CompoundSynonym)) {
+        } else if (sourceIDtype.equals(IdentifierType.CommonName)) {
           mapper = new CompoundSynonym2CompoundIDMapper(progress);
         }
     		
