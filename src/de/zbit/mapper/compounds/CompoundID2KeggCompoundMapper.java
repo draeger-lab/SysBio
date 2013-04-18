@@ -1,6 +1,6 @@
 /*
- * $Id:  InChI2KeggCompoundIDMapper.java 15:22:17 rosenbaum $
- * $URL: InChI2KeggCompoundIDMapper.java $
+ * $Id:  CompoundID2KeggCompoundMapper.java 15:22:17 rosenbaum $
+ * $URL: CompoundID2KeggCompoundMapper.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -24,24 +24,24 @@ import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
- * Maps CAS number to KEGG Compound IDs.
+ * Maps CompoundID to KEGG Compound IDs.
  * CAS (Chemical Abstracts Service) is a division of the American Chemical
  * Society and is the producer of comprehensive databases of chemical information.
  
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class CAS2HMDBMapper extends AbstractMapper<String,Integer> {
+public class CompoundID2KeggCompoundMapper extends AbstractMapper<Integer,String> {
 
   private static final long serialVersionUID = 3761835058241496109L;
-	public static final Logger log = Logger.getLogger(CAS2HMDBMapper.class.getName());
+	public static final Logger log = Logger.getLogger(CompoundID2KeggCompoundMapper.class.getName());
   
-  public CAS2HMDBMapper() throws IOException {
+  public CompoundID2KeggCompoundMapper() throws IOException {
   	this(null);
   }
   
-	public CAS2HMDBMapper(AbstractProgressBar progress) throws IOException {
-	  super(String.class, Integer.class, progress);
+	public CompoundID2KeggCompoundMapper(AbstractProgressBar progress) throws IOException {
+	  super(Integer.class, String.class, progress);
 	  init();
   }
 
@@ -67,7 +67,7 @@ public class CAS2HMDBMapper extends AbstractMapper<String,Integer> {
 	 */
 	@Override
 	public String getMappingName() {
-		return "CAS2HMDB";
+		return "CompoundID2KeggCompound";
 	}
 
 	/* (non-Javadoc)
@@ -75,7 +75,7 @@ public class CAS2HMDBMapper extends AbstractMapper<String,Integer> {
 	 */
 	@Override
 	public int getTargetColumn(CSVReader r) {
-		return 0;
+		return 2;
 	}
 
 	/* (non-Javadoc)
@@ -83,11 +83,11 @@ public class CAS2HMDBMapper extends AbstractMapper<String,Integer> {
 	 */
 	@Override
 	public int getSourceColumn(CSVReader r) {
-		return 6;
+		return 0;
 	}
 	
 	@Override
-	protected String preProcessTargetID(String string) {
+	protected String preProcessSourceID(String string) {
     return string.substring(4);
   }
 

@@ -1,6 +1,6 @@
 /*
- * $Id:  InChI2KeggCompoundIDMapper.java 15:22:17 rosenbaum $
- * $URL: InChI2KeggCompoundIDMapper.java $
+ * $Id: KeggCompound2CompoundIDMapper.java 15:22:17 rosenbaum $
+ * $URL: KeggCompound2CompoundIDMapper.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -24,24 +24,22 @@ import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
- * Maps ChEBI identifiers to KEGG Compound IDs.
- * Chemical Entities of Biological Interest (ChEBI) is a freely available dictionary 
- * of molecular entities focused on 'small' chemical compounds.
- *
+ * Maps KEGG Compound IDs to Compound IDs.
+
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class ChEBI2HMDBMapper extends AbstractMapper<Integer,Integer> {
-	private static final long serialVersionUID = -465552345234526L;
+public class KeggCompound2CompoundIDMapper extends AbstractMapper<String,Integer> {
 
-  public static final Logger log = Logger.getLogger(ChEBI2HMDBMapper.class.getName());
+  private static final long serialVersionUID = 3761835058241496109L;
+	public static final Logger log = Logger.getLogger(KeggCompound2CompoundIDMapper.class.getName());
   
-  public ChEBI2HMDBMapper() throws IOException {
+  public KeggCompound2CompoundIDMapper() throws IOException {
   	this(null);
   }
   
-	public ChEBI2HMDBMapper(AbstractProgressBar progress) throws IOException {
-	  super(Integer.class, Integer.class, progress);
+	public KeggCompound2CompoundIDMapper(AbstractProgressBar progress) throws IOException {
+	  super(String.class, Integer.class, progress);
 	  init();
   }
 
@@ -67,7 +65,7 @@ public class ChEBI2HMDBMapper extends AbstractMapper<Integer,Integer> {
 	 */
 	@Override
 	public String getMappingName() {
-		return "ChEBI2HMDB";
+		return "KeggCompound2CompoundID";
 	}
 
 	/* (non-Javadoc)
@@ -83,12 +81,12 @@ public class ChEBI2HMDBMapper extends AbstractMapper<Integer,Integer> {
 	 */
 	@Override
 	public int getSourceColumn(CSVReader r) {
-		return 5;
+		return 2;
 	}
-	
 	
 	@Override
 	protected String preProcessTargetID(String string) {
     return string.substring(4);
   }
+
 }

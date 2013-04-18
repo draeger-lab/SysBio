@@ -1,6 +1,6 @@
 /*
- * $Id:  InChI2KeggCompoundIDMapper.java 15:22:17 rosenbaum $
- * $URL: InChI2KeggCompoundIDMapper.java $
+ * $Id:  InChI2CompoundIDMapper.java 15:22:17 rosenbaum $
+ * $URL: InChI2CompoundIDMapper.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -24,21 +24,21 @@ import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
- * Maps IUPAC International Chemical Identifier (InChI) to KEGG Compound IDs.
+ * Maps IUPAC International Chemical Identifier (InChI) to Compound IDs.
  *  
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class InChI2HMDBMapper extends AbstractMapper<String,Integer> {
+public class InChI2CompoundIDMapper extends AbstractMapper<String,Integer> {
 	private static final long serialVersionUID = -465552345234526L;
 
-  public static final Logger log = Logger.getLogger(InChI2HMDBMapper.class.getName());
+  public static final Logger log = Logger.getLogger(InChI2CompoundIDMapper.class.getName());
   
-  public InChI2HMDBMapper() throws IOException {
+  public InChI2CompoundIDMapper() throws IOException {
   	this(null);
   }
   
-	public InChI2HMDBMapper(AbstractProgressBar progress) throws IOException {
+	public InChI2CompoundIDMapper(AbstractProgressBar progress) throws IOException {
 	  super(String.class, Integer.class, progress);
 	  init();
   }
@@ -65,7 +65,7 @@ public class InChI2HMDBMapper extends AbstractMapper<String,Integer> {
 	 */
 	@Override
 	public String getMappingName() {
-		return "InChI2HMDB";
+		return "InChI2CompoundID";
 	}
 
 	/* (non-Javadoc)

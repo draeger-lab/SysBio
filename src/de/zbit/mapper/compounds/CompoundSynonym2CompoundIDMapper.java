@@ -1,6 +1,6 @@
 /*
- * $Id:  InChI2KeggCompoundIDMapper.java 15:22:17 rosenbaum $
- * $URL: InChI2KeggCompoundIDMapper.java $
+ * $Id:  CompoundSynonym2CompoundIDMapper.java 15:22:17 rosenbaum $
+ * $URL: CompoundSynonym2CompoundIDMapper.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -24,24 +24,24 @@ import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
- * Maps CAS number to KEGG Compound IDs.
+ * Tries to map compound synonyms and names to Compound IDs.
  * CAS (Chemical Abstracts Service) is a division of the American Chemical
  * Society and is the producer of comprehensive databases of chemical information.
  
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class HMDB2KeggCompoundMapper extends AbstractMapper<Integer,String> {
+public class CompoundSynonym2CompoundIDMapper extends AbstractMapper<String,Integer> {
 
   private static final long serialVersionUID = 3761835058241496109L;
-	public static final Logger log = Logger.getLogger(HMDB2KeggCompoundMapper.class.getName());
+	public static final Logger log = Logger.getLogger(CompoundSynonym2CompoundIDMapper.class.getName());
   
-  public HMDB2KeggCompoundMapper() throws IOException {
+  public CompoundSynonym2CompoundIDMapper() throws IOException {
   	this(null);
   }
   
-	public HMDB2KeggCompoundMapper(AbstractProgressBar progress) throws IOException {
-	  super(Integer.class, String.class, progress);
+	public CompoundSynonym2CompoundIDMapper(AbstractProgressBar progress) throws IOException {
+	  super(String.class, Integer.class, progress);
 	  init();
   }
 
@@ -59,7 +59,7 @@ public class HMDB2KeggCompoundMapper extends AbstractMapper<Integer,String> {
 	 */
 	@Override
 	public String getLocalFile() {
-		return "2013-04-17_HMDB_3_0_Mapping.zip";
+		return "2013-04-17_HMDB_3_0_Mapping_synonyms.zip";
 	}
 
 	/* (non-Javadoc)
@@ -67,7 +67,7 @@ public class HMDB2KeggCompoundMapper extends AbstractMapper<Integer,String> {
 	 */
 	@Override
 	public String getMappingName() {
-		return "HMDB2KeggCompound";
+		return "CompoundSynonym2CompoundID";
 	}
 
 	/* (non-Javadoc)
@@ -75,7 +75,7 @@ public class HMDB2KeggCompoundMapper extends AbstractMapper<Integer,String> {
 	 */
 	@Override
 	public int getTargetColumn(CSVReader r) {
-		return 2;
+		return 0;
 	}
 
 	/* (non-Javadoc)
@@ -87,7 +87,7 @@ public class HMDB2KeggCompoundMapper extends AbstractMapper<Integer,String> {
 	}
 	
 	@Override
-	protected String preProcessSourceID(String string) {
+	protected String preProcessTargetID(String string) {
     return string.substring(4);
   }
 

@@ -1,6 +1,6 @@
 /*
- * $Id:  InChI2KeggCompoundIDMapper.java 15:22:17 rosenbaum $
- * $URL: InChI2KeggCompoundIDMapper.java $
+ * $Id:  HMDB2CompoundIDMapper.java 15:22:17 rosenbaum $
+ * $URL: HMDB2CompoundIDMapper.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -24,23 +24,24 @@ import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
- * Maps CAS number to KEGG Compound IDs.
- * CAS (Chemical Abstracts Service) is a division of the American Chemical
- * Society and is the producer of comprehensive databases of chemical information.
- 
+ * Maps HMDB IDs to Compound IDs.
+ * Compound IDs are HMDB IDS without the 'HMDB' prefix
+ * in addition to removing the prefix, this class resolves
+ * secondary accessions and assigns them to their primary accession
+ * 
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class CompoundSynonym2HMDBMapper extends AbstractMapper<String,Integer> {
+public class HMDB2CompoundIDMapper extends AbstractMapper<String,Integer> {
 
   private static final long serialVersionUID = 3761835058241496109L;
-	public static final Logger log = Logger.getLogger(CompoundSynonym2HMDBMapper.class.getName());
+	public static final Logger log = Logger.getLogger(HMDB2CompoundIDMapper.class.getName());
   
-  public CompoundSynonym2HMDBMapper() throws IOException {
+  public HMDB2CompoundIDMapper() throws IOException {
   	this(null);
   }
   
-	public CompoundSynonym2HMDBMapper(AbstractProgressBar progress) throws IOException {
+	public HMDB2CompoundIDMapper(AbstractProgressBar progress) throws IOException {
 	  super(String.class, Integer.class, progress);
 	  init();
   }
@@ -59,7 +60,7 @@ public class CompoundSynonym2HMDBMapper extends AbstractMapper<String,Integer> {
 	 */
 	@Override
 	public String getLocalFile() {
-		return "2013-04-17_HMDB_3_0_Mapping_synonyms.zip";
+		return "2013-04-17_HMDB_3_0_Mapping_secondary_accessions.zip";
 	}
 
 	/* (non-Javadoc)
@@ -67,7 +68,7 @@ public class CompoundSynonym2HMDBMapper extends AbstractMapper<String,Integer> {
 	 */
 	@Override
 	public String getMappingName() {
-		return "CompoundSynonym2HMDB";
+		return "HMDB2CompoundID";
 	}
 
 	/* (non-Javadoc)
