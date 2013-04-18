@@ -29,6 +29,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * Society and is the producer of comprehensive databases of chemical information.
  
  * @author Lars Rosenbaum
+ * @author Clemens Wrzodek
  * @version $Rev$
  */
 public class CompoundSynonym2CompoundIDMapper extends AbstractMapper<String,Integer> {
@@ -78,17 +79,38 @@ public class CompoundSynonym2CompoundIDMapper extends AbstractMapper<String,Inte
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#getSourceColumn(de.zbit.io.csv.CSVReader)
-	 */
-	@Override
-	public int getSourceColumn(CSVReader r) {
-		return 0;
-	}
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getMultiSourceColumn(de.zbit.io.CSVReader)
+   */
+  @Override
+  public int[] getMultiSourceColumn(CSVReader r) {
+    // From the second(1) to the end of the line [1..n]
+    return new int[]{1, Integer.MAX_VALUE};
+  }
+  
+  
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getSourceColumn(de.zbit.io.CSVReader)
+   */
+  @Override
+  public int getSourceColumn(CSVReader r) {
+    return 1; // Never called if getMultiSourceColumn() is implemented.
+  }
 	
 	@Override
 	protected String preProcessTargetID(String string) {
     return string.substring(4);
+  }
+	
+	 /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#configureReader(de.zbit.io.csv.CSVReader)
+   */
+  @Override
+  protected void configureReader(CSVReader r) {
+    r.setSeparatorChar('\t');
+    r.setContainsHeaders(true);
+    r.setSkipLines(0);
+    r.setAutoDetectContentStart(false);
   }
 
 }
