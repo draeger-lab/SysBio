@@ -29,6 +29,7 @@ import de.zbit.io.csv.CSVReader;
 import de.zbit.mapper.AbstractMapper;
 import de.zbit.mapper.GeneID2KeggIDMapper;
 import de.zbit.mapper.KeggPathwayID2PathwayName;
+import de.zbit.mapper.MappingUtils.IdentifierClass;
 import de.zbit.util.Species;
 import de.zbit.util.logging.LogUtil;
 import de.zbit.util.progressbar.AbstractProgressBar;
@@ -73,6 +74,11 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
   private int sourceCol=-1;
   
   /**
+   * What should be considerer? Genes, compounds or both?
+   */
+  private IdentifierClass dataType=IdentifierClass.Gene;
+  
+  /**
    * @param sourceType
    * @param targetType
    * @throws IOException
@@ -92,9 +98,29 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
   
   public KeggID2PathwayMapper(String speciesKEGGPrefix, AbstractProgressBar progress)
   throws IOException {
+ // By default, init an enrichment mapper that only considers genes and no metabolites.
+    this (speciesKEGGPrefix, progress, IdentifierClass.Gene);
+  }
+  
+  /**
+   * 
+   * @param speciesKEGGPrefix NOT required for compounds only.
+   * @param progress
+   * @param dataType
+   *        specify what to Include. {@link IdentifierClass#Gene} for genes
+   *        only, {@link IdentifierClass#Compound} for compounds only or
+   *        {@code NULL} for both.
+   * @throws IOException
+   */
+  public KeggID2PathwayMapper(String speciesKEGGPrefix, AbstractProgressBar progress, IdentifierClass dataType)
+  throws IOException {
     // This constructor is called from every other!
     super(String.class, (Class<Collection<String>>) ((Collection<String>) new ArrayList<String>()).getClass(), progress);
     this.organism_kegg_abbr = speciesKEGGPrefix;
+    this.dataType = dataType;
+    if (dataType!=null && dataType.equals(IdentifierClass.Compound) && organism_kegg_abbr==null) {
+      organism_kegg_abbr = "hsa"; // Compounds are equal for all organisms. Just use any.
+    }
     init();
   }
   
@@ -196,8 +222,15 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
    */
   @Override
   protected boolean skipLine(String[] line) {
-    // Skip everything thats not a gene (e.g., compounds starting with "CPD:*")
-    if (!line[getSourceColumn(null)].startsWith(organism_kegg_abbr)) return true;
+    if (dataType==null) return false; // Read all data
+    
+    if (dataType.equals(IdentifierClass.Gene)) {
+      // Skip everything thats not a gene (e.g., compounds starting with "CPD:*")
+      if (!line[getSourceColumn(null)].startsWith(organism_kegg_abbr)) return true;
+    } else if (dataType.equals(IdentifierClass.Compound)) {
+      if (!line[getSourceColumn(null)].startsWith("cpd")) return true;
+    }
+    
     return false;
   }
   
