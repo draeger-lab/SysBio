@@ -1561,6 +1561,9 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     int headerMatchesData=0; int headerNOTMatchesData=0;
     for (int col=0; col<headerLine.length; col++) {
       String cell = headerLine[col];
+      if (cell==null || cell.length()<1) {
+        continue; // we should not use lines with empty headers for considerations
+      }
       boolean b = isNumber(cell, false);
       @SuppressWarnings("unused")
       boolean checkedAtLeastOneAttribute=false;
