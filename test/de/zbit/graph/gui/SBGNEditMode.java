@@ -15,7 +15,6 @@
  */
 package de.zbit.graph.gui;
 
-import java.awt.Color;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
@@ -27,10 +26,8 @@ import y.base.GraphEvent;
 import y.base.GraphListener;
 import y.base.Node;
 import y.view.Graph2D;
-import y.view.NodeRealizer;
 import de.zbit.graph.RestrictedEditMode;
 import de.zbit.graph.io.SB_2GraphML;
-import de.zbit.graph.io.def.SBGNVisualizationProperties;
 
 /**
  * @author Andreas Dr&auml;ger
