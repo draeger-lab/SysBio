@@ -166,9 +166,13 @@ public class GarudaSoftwareBackend {
 		this.listOfOutputFileFormats = new LinkedList<FileFormat>();
 		this.listOfInputFileFormats = new LinkedList<FileFormat>();
     this.softwareListener = new GarudaSoftwareListener(this);
-    
     this.iconPath = iconPath;
-    this.provider = ResourceManager.getBundle("de.zbit.locales.Launcher").getString("PROVIDER");
+    
+    ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Launcher");
+    this.provider = MessageFormat.format(
+			resources.getString("PROVIDER"),
+			resources.getString("ORGANIZATION"),
+			resources.getString("INSTITUTE"));
     this.description = description;
     this.listOfCategories = categories;
     this.listOfScreenshots = screenshots;

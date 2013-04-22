@@ -241,7 +241,7 @@
       classpathref="classpath"
       destdir="${apidoc}"
       doctitle="${Name} Revision ${repository.revision}"
-      footer="Generated ${TODAY}"
+      footer="Generated at ${TODAY}&lt;br/&gt;Revision ${repository.revision}"
   	  maxmemory="96m"
       nodeprecated="false"
       nodeprecatedlist="false"
