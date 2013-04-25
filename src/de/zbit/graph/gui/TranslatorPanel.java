@@ -112,7 +112,8 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * Desired output file format
    */
   String outputFormat;
-  
+
+
   /**
    * Boolean flag to remember weather the contained {@link #document}
    * has been saved successfully at least once.
@@ -460,7 +461,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * the default file filter.
    * @return
    */
-  protected abstract List<FileFilter> getOutputFileFilter();
+  public abstract List<FileFilter> getOutputFileFilter();
   
   /**
    * 
@@ -677,6 +678,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     if (additionalData==null) additionalData = new HashMap<String, Object>();
     additionalData.put(key, object);
   }
+  
 
 //  /**
 //   * @return true if this is a GraphML panel (and the {@link #document}

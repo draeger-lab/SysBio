@@ -530,7 +530,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @see de.zbit.kegg.gui.TranslatorPanel#getOutputFileFilter()
    */
   @Override
-  protected List<FileFilter> getOutputFileFilter() {
+  public List<FileFilter> getOutputFileFilter() {
     List<FileFilter> ff = getOutputFileFilterForRealDocument();
     if (ff==null) ff = new LinkedList<FileFilter>();
     if (isAllowedToSaveAsGraphFormats()) {
