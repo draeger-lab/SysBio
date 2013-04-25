@@ -53,7 +53,7 @@
  *     }
  *  }
  * }).start();
- * </pre>
+ * <pre>
  * In the above code, it is assumed that {@code gui} is some instance of a AWT
  * or SWING element. Insert this code in the method
  * {@link de.zbit.Launcher#initGUI(de.zbit.AppConf)} for the launcher of your
