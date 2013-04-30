@@ -103,7 +103,8 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
   }
   
   /**
-   * 
+   * Read KEGG_IDs and map them to pathways. Note: KEGG IDs are always saved WITH PREFIX.
+   * So be sure to add "cpd:" to your compounds and, e.g., "hsa:" to your gene IDs!
    * @param speciesKEGGPrefix NOT required for compounds only.
    * @param progress
    * @param dataType
