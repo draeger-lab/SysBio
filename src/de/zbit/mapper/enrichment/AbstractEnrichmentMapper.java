@@ -136,7 +136,7 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
           try {
             cNew.add(ID2Name.map((TargetType) object));
           } catch (Exception e) {
-            log.log(Level.WARNING, "Could not map " + object.toString() + " to a Enrichment Name.");
+            log.log(Level.WARNING, "Could not map " + object==null?"NULL":object.toString() + " to a Enrichment Name.");
           }
         }
         
