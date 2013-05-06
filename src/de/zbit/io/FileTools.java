@@ -100,6 +100,45 @@ public class FileTools {
     return false;
   }
   
+  public static File createNewFile(String prefix) throws IOException {
+    return createNewFile(prefix, null);
+  }
+
+  /**
+   * Returns a filename with the given prefix and suffix of a file that doesn't
+   * exist, yet.
+   * 
+   * @param prefix the prefix (including path) of the file
+   * @param suffix the suffix of the file, may be <code>null</code>
+   * @return
+   */
+  public static File createNewFile(String prefix, String suffix) throws IOException {
+    boolean created = false;
+    int i = 0;
+    int errorcount = 0;
+    File f = null;
+    while( !created ) {
+      i++;
+      f = new File(prefix + i + suffix);
+      try {
+        if( f.createNewFile() ) {
+          created = true;
+        }
+      }
+      catch (IOException e) {
+        errorcount++;
+        if( errorcount > 10 ) {
+          throw new IOException("Failed to create a new file with prefix '" + prefix + "' after 10 tries.", e);
+        }
+      }
+
+      if( i > 10000 ) {
+        throw new IOException("Failed to find an unused filename with prefix '" + prefix + "' after 10000 tries.");
+      }
+    }
+    return f;
+  }
+
   /**
    * @param name any filename
    * @return file extension of {@code name}
