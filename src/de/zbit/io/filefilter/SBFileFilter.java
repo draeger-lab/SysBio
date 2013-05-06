@@ -1050,6 +1050,7 @@ public class SBFileFilter extends GeneralFileFilter {
    * 
    * @see javax.swing.filechooser.FileFilter#getDescription()
    */
+  @Override
   public String getDescription() {
     return getDescription(false);
   }

@@ -719,6 +719,7 @@ public abstract class Launcher implements Runnable, Serializable {
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+  @Override
   public void run() {
     // Get appConf command-line options
     final AppConf appConf = getAppConf();
@@ -741,6 +742,7 @@ public abstract class Launcher implements Runnable, Serializable {
         /* (non-Javadoc)
          * @see java.lang.Runnable#run()
          */
+        @Override
         public void run() {
           try {
           	// Now we're preparing the GUI mode.
