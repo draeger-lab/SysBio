@@ -87,21 +87,24 @@ public class SBPreferences implements Map<Object, Object> {
 		/* (non-Javadoc)
 		 * @see java.util.Map.Entry#getKey()
 		 */
-		public Object getKey() {
+		@Override
+    public Object getKey() {
 			return key;
 		}
 		
 		/* (non-Javadoc)
 		 * @see java.util.Map.Entry#getValue()
 		 */
-		public Object getValue() {
+		@Override
+    public Object getValue() {
 			return value;
 		}
 		
 		/* (non-Javadoc)
 		 * @see java.util.Map.Entry#setValue(java.lang.Object)
 		 */
-		public Object setValue(Object value) {
+		@Override
+    public Object setValue(Object value) {
 			return this.value = value;
 		}
 
@@ -603,7 +606,6 @@ public class SBPreferences implements Map<Object, Object> {
 		
 		String usage;
 		if (mainClass == null) {
-			// Should never happen...
 			usage = "java [program_name]";
 		} else {
 			usage = generateUsageString(mainClass)
@@ -619,19 +621,18 @@ public class SBPreferences implements Map<Object, Object> {
 	 * class is inside a jar. If yes, {@code java -jar [NAME].jar} is the usage string.
 	 * Else {@code java package.ClassName} is the usage string.
 	 * 
-	 * @param mainClass
-	 *        of your project
+	 * @param mainC the main class of your project
 	 * @return usage String
 	 */
-	public static String generateUsageString(Class<?> mainClass) {
+	public static String generateUsageString(Class<?> mainC) {
 		String synopsis = "java ";
 		
-		String jarName = Reflect.getNameOfJar(mainClass);
+		String jarName = Reflect.getNameOfJar(mainC);
 		if (jarName != null && jarName.length() > 0) {
 			synopsis += "-jar " + jarName;
 		} else {
 			// class.getName() also returns the package prefix.
-			synopsis += mainClass.getName();
+			synopsis += mainC.getName();
 		}
 		
 		return synopsis;
@@ -732,8 +733,8 @@ public class SBPreferences implements Map<Object, Object> {
 					if (exc instanceof IllegalArgumentException) { 
 						throw (IllegalArgumentException) exc; 
 					} else {
-						logger.fine(exc.getLocalizedMessage());
-					}
+            logger.fine(exc.getLocalizedMessage());
+          }
 				}
 			}
 			for (Map.Entry<Object, Object> e : defaults.entrySet()) {
@@ -1063,7 +1064,8 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#clear()
 	 */
-	public void clear() {
+	@Override
+  public void clear() {
 		try {
 			String keys[] = prefs.keys();
 			for (int i = keys.length - 1; 0 <= i; i--) {
@@ -1077,14 +1079,16 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#containsKey(java.lang.Object)
 	 */
-	public boolean containsKey(Object key) { 
+	@Override
+  public boolean containsKey(Object key) { 
 		return keySet().contains(key);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.util.Map#containsValue(java.lang.Object)
 	 */
-	public boolean containsValue(Object value) {
+	@Override
+  public boolean containsValue(Object value) {
 		for (String key : keys()) {
 			if (get(key).equals(value)) { 
 				return true; 
@@ -1109,7 +1113,8 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#entrySet()
 	 */
-	public Set<java.util.Map.Entry<Object, Object>> entrySet() {
+	@Override
+  public Set<java.util.Map.Entry<Object, Object>> entrySet() {
 		Set<Map.Entry<Object, Object>> set = new HashSet<Map.Entry<Object, Object>>();
 		for (String key : keys()) {
 			set.add(new Entry(key, get(key)));
@@ -1130,7 +1135,8 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#get(java.lang.Object)
 	 */
-	public String get(Object key) {
+	@Override
+  public String get(Object key) {
 		return getString(key);
 	}
 	
@@ -1352,7 +1358,8 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#isEmpty()
 	 */
-	public boolean isEmpty() {
+	@Override
+  public boolean isEmpty() {
 		return keys().length == 0;
 	}
 	
@@ -1374,7 +1381,8 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#keySet()
 	 */
-	public Set<Object> keySet() {
+	@Override
+  public Set<Object> keySet() {
 		Set<Object> set = new HashSet<Object>();
 		set.addAll(Arrays.asList(keys()));
 	  // If the complete list of keys incl. default keys is required, use keySetFull! 
@@ -1504,7 +1512,8 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
 	 */
-	public Object put(Object key, Object value) {
+	@Override
+  public Object put(Object key, Object value) {
    	// if value is null, a NullPointerException is thrown later.
 		Object o = get(key);
 		put(key, value != null ? value.toString() : (String) null);
@@ -1542,7 +1551,8 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#putAll(java.util.Map)
 	 */
-	public void putAll(Map<? extends Object, ? extends Object> m) {
+	@Override
+  public void putAll(Map<? extends Object, ? extends Object> m) {
 		/* 
 		 * In order to notify change listeners only when necessary
 		 * there must be a fine-grained check if it is really necessary
@@ -1573,9 +1583,9 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#putAll(java.util.Map)
 	 */
-  public void putAll(SBPreferences prefs) {
-    putAll((Map<?, ?>) prefs);
-    for (Map.Entry<? extends Object, ? extends Object> entry : prefs.defaults.entrySet()) {
+  public void putAll(SBPreferences sbprefs) {
+    putAll((Map<?, ?>) sbprefs);
+    for (Map.Entry<? extends Object, ? extends Object> entry : sbprefs.defaults.entrySet()) {
       defaults.put(entry.getKey(), entry.getValue());
     }
   }
@@ -1586,7 +1596,8 @@ public class SBPreferences implements Map<Object, Object> {
 	 * 
 	 * @param key
 	 */
-	public Object remove(Object key) {
+	@Override
+  public Object remove(Object key) {
 		Object o = get(key);
 		prefs.remove(key.toString());
 		return o;
@@ -1668,8 +1679,8 @@ public class SBPreferences implements Map<Object, Object> {
 	      checkPref(option);
 	    } catch (Exception e) { // Also IllegalArgumentExceptions possible
 	      Object defaultV = option.getDefaultValue();
-	      if (defaultV!=null) {
-	        logger.log(Level.FINE, String.format("Restored default value \"%s\" for %s in %s", (defaultV == null ? "NULL" : defaultV) , option, keyProvider), e);
+	      if (defaultV != null) {
+	        logger.log(Level.FINE, String.format("Restored default value \"%s\" for %s in %s", defaultV, option, keyProvider), e);
 	        put(option, defaultV);
 	      } else {
 	        //logger.log(Level.FINE, String.format("Could NOT restore default value \"%s\" for %s in %s", (defaultV==null?"NULL":defaultV) , option, keyProvider), e);
@@ -1695,8 +1706,8 @@ public class SBPreferences implements Map<Object, Object> {
       option = iterator.next();
       
       Object defaultV = option.getDefaultValue();
-      if (defaultV!=null) {
-        logger.fine(String.format("Restored default value \"%s\" for %s in %s", (defaultV == null ? "NULL" : defaultV) , option, keyProvider));
+      if (defaultV != null) {
+        logger.fine(String.format("Restored default value \"%s\" for %s in %s", defaultV, option, keyProvider));
         put(option, defaultV);
       }
     }
@@ -1705,7 +1716,8 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#size()
 	 */
-	public int size() {
+	@Override
+  public int size() {
 		return keys().length;
 	}
 	
@@ -1789,7 +1801,8 @@ public class SBPreferences implements Map<Object, Object> {
 	/* (non-Javadoc)
 	 * @see java.util.Map#values()
 	 */
-	public Collection<Object> values() {
+	@Override
+  public Collection<Object> values() {
 		Collection<Object> c = new LinkedList<Object>();
 		for (String key : keys()) {
 			c.add(get(key));
