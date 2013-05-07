@@ -65,7 +65,8 @@ public class Reflect {
 		/**
 		 * 
 		 */
-		public int compare(Object o1, Object o2) {
+		@Override
+    public int compare(Object o1, Object o2) {
 			return (o1.toString().compareTo(o2.toString()));
 		}
 	}
@@ -378,26 +379,16 @@ public class Reflect {
 		String path, String pckgname, boolean includeSubs, Class<T> reqSuperCls) {
 		try {
 			// Get a File object for the package
-			File directory = null;
-			String dir = null;
-			try {
-				ClassLoader cld = ClassLoader.getSystemClassLoader();
-				if (cld == null) { 
-					throw new ClassNotFoundException("Can't get class loader."); 
-				}
-				dir = path + "/" + pckgname.replace(".", "/");
-				
-				logger.fine(String.format(".. opening %s", path));
-				
-				directory = new File(dir);
-				
-			} catch (NullPointerException x) {
-				logger.warning(String.format("%s not found in %s.",
-					directory.getPath(), path));
-				logger.warning(String.format("directory %s.",
-					(directory.exists() ? "exists" : "does not exist")));
-				return 0;
+			ClassLoader cld = ClassLoader.getSystemClassLoader();
+			if (cld == null) { 
+				throw new ClassNotFoundException("Can't get class loader."); 
 			}
+			String dir = path + "/" + pckgname.replace(".", "/");
+			
+			logger.fine(String.format(".. opening %s", path));
+			
+			File directory =  new File(dir);
+				
 			if (directory.exists()) {
 				// Get the list of the files contained in the package
 				return getClassesFromDirFltr(set, directory, pckgname, includeSubs, reqSuperCls);
@@ -429,8 +420,8 @@ public class Reflect {
 		boolean isInSubPackage = true;
 		int cntAdded = 0;
 		
-		packageName = packageName.replace('.', '/');
-		logger.fine(String.format("Jar %s looking for %s", jarName, packageName));
+		String newPackageName = packageName.replace('.', '/');
+		logger.fine(String.format("Jar %s looking for %s", jarName, newPackageName));
 		try {
 			JarInputStream jarFile = new JarInputStream(new FileInputStream(jarName));
 			JarEntry jarEntry;
@@ -438,13 +429,13 @@ public class Reflect {
 			while ((jarEntry = jarFile.getNextJarEntry()) != null) {
 				String jarEntryName = jarEntry.getName();
 				// if (TRACE) { logger.info("- " + jarEntry.getName()); }
-				if ((jarEntryName.startsWith(packageName))
+				if ((jarEntryName.startsWith(newPackageName))
 						&& (jarEntryName.endsWith(".class"))) {
 					// subpackages are hit here as well!
 					if (!includeSubs) { // check if the class belongs to a
 						// subpackage
 						int lastDash = jarEntryName.lastIndexOf('/');
-						if (lastDash > packageName.length() + 1) {
+						if (lastDash > newPackageName.length() + 1) {
 							isInSubPackage = true;
 						} else {isInSubPackage = false;}
 					}
@@ -677,7 +668,10 @@ public class Reflect {
 			try {
 				// Decode does the same as the "parseX" methods.
 				return clazz.getMethod("decode", String.class);
-			} catch (Exception e2) {}
+			} catch (Exception e2) {
+			  // TODO: Clean up this code, I have no idea what the original coder
+			  //       intended here
+			}
       return null;
 		}
 	}
@@ -799,8 +793,12 @@ public class Reflect {
 			Method m = getMethod(clazz, methodName, parameterTypes);
 			return m != null;
 		} catch (SecurityException e) {
-		} catch (NoSuchMethodException e) {
-		}
+      // TODO: Clean up this code, I have no idea what the original coder
+      //       intended here
+	  } catch (NoSuchMethodException e) {
+      // TODO: Clean up this code, I have no idea what the original coder
+      //       intended here
+    }
 		return false;
 	}
 
@@ -883,31 +881,14 @@ public class Reflect {
    */
   public static Class<?> getMainClass() {
     Class<?> lastMain = null;
-    
-    // Get last command-line from properties
-    /*
-     * NOTE: This does NOT WORK IN ALL CASES! E.g. in webstart
-     * applications, "com.sun.javaws.Main" is returned.
+
+    /* Get the main class from the stackTrace
+     *
+     * This may not be the nicest solution, but it works in most cases. It WON'T
+     * work when the main-Thread doesn't exist anymore
      */
-//    String command = System.getProperty("sun.java.command");
-//    if (command!=null && command.length()>0) {
-//      // Trim arguments
-//      int pos = command.indexOf(' ');
-//      if (pos>0) command = command.substring(0, pos);
-//      try {
-//        lastMain = Class.forName(command);
-//      } catch (ClassNotFoundException e1) {
-//        lastMain = null;
-//      }
-//    }
-    
-    // Get the main class from the stackTrace
-    /*
-     * This may not be the nicest solution, but WORKS IN ALL CASES! 
-     */
-    if (lastMain==null) {
-      final Throwable t = new Throwable();
-      for (StackTraceElement e : t.getStackTrace()) {
+    for (StackTraceElement[] ste : Thread.getAllStackTraces().values() ) {
+      for (StackTraceElement e : ste) {
         // Search the main class
         if (e.getMethodName().equalsIgnoreCase("main")) {
           // Get it's name
@@ -968,12 +949,14 @@ public class Reflect {
       /* (non-Javadoc)
        * @see java.util.Enumeration#hasMoreElements()
        */
+      @Override
       public boolean hasMoreElements() {
         return clazz.getFields().length>i;
       }
       /* (non-Javadoc)
        * @see java.util.Enumeration#nextElement()
        */
+      @Override
       public String nextElement() {
         try {
           return clazz.getFields()[i++].get(new String()).toString();
@@ -997,10 +980,11 @@ public class Reflect {
   public static String getNameOfJar(Class<?> c) {
     try {
       File moduleFile = new File(c.getProtectionDomain().getCodeSource().getLocation().toURI());
-      if (moduleFile.isFile())
+      if (moduleFile.isFile()) {
         return moduleFile.getName();
-      else
+      } else {
         return "";
+      }
     } catch (Throwable t) {
       // Not important
     }

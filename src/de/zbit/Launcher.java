@@ -175,6 +175,10 @@ public abstract class Launcher implements Runnable, Serializable {
     this.terminateJVMwhenDone = true;
     this.props = new SBProperties();
     LogUtil.initializeLogging(getLogLevel(), getLogPackages());
+    
+    // calling this method ensures that the main class is determined before the
+    // main thread terminates.
+    SBPreferences.generateUsageString();
   }
 
   /**
@@ -402,13 +406,13 @@ public abstract class Launcher implements Runnable, Serializable {
 	 * 
 	 * @param window
 	 *        the parent window that has just been closed.
-	 * @param terminateJVMwhenDone
+	 * @param flagTerminateJVMwhenDone
 	 *        whether or not to terminate the JVM (and making selected options
 	 *        persistent).
 	 * @see #getPersistentOptions()
 	 */
-	public void exit(java.awt.Window window, boolean terminateJVMwhenDone) {
-		if (terminateJVMwhenDone) {
+	public void exit(java.awt.Window window, boolean flagTerminateJVMwhenDone) {
+		if (flagTerminateJVMwhenDone) {
 			/*
 			 * Do not manipulate any preferences here. This must be done in the
 			 * individual program. Otherwise it might happen that changes are
