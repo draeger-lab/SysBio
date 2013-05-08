@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
+import java.awt.Insets;
 import java.awt.MenuItem;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -71,6 +72,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 
 import de.zbit.AppConf;
@@ -195,7 +197,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		/* (non-Javadoc)
 		 * @see de.zbit.gui.ActionCommandWithIcon#getIcon()
 		 */
-		public Icon getIcon() {
+		@Override
+    public Icon getIcon() {
 			switch (this) {
 				case EDIT_PREFERENCES:
 					return UIManager.getIcon("ICON_PREFS_16");
@@ -226,7 +229,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		/* (non-Javadoc)
 		 * @see de.zbit.gui.ActionCommandWithIcon#getName()
 		 */
-		public String getName() {
+		@Override
+    public String getName() {
 			String key = toString();
 			String name = nameProperties.getProperty(key);
 			if (name != null) {
@@ -245,7 +249,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		/* (non-Javadoc)
 		 * @see de.zbit.gui.ActionCommandWithIcon#getToolTip()
 		 */
-		public String getToolTip() {
+		@Override
+    public String getToolTip() {
 			String key = toString();
 			String toolTip = nameProperties.getProperty(key);
 			if (toolTip != null) {
@@ -301,8 +306,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		browser.setPreferredSize(new Dimension(preferedWidth, preferedHeight));
 		if (scroll) { 
 		  return new JScrollPane(browser,
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); 
+			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED); 
 		}
 		browser.setBorder(BorderFactory.createLoweredBevelBorder());
 		return browser;
@@ -528,8 +533,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		JButton button;
 		Object action = null;
 		ResourceBundle resources = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
-		JToolBar toolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
-		toolBar.setOpaque(true);
+		JToolBar newToolBar = new JToolBar(resources.getString("DEFAULT_TOOL_BAR_TITLE"));
+		newToolBar.setOpaque(true);
 		if (isOSX
 				&& (((appConf != null) && (appConf.getInteractiveOptions() != null) && 
 						(appConf.getInteractiveOptions().length > 0)) || 
@@ -539,14 +544,14 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				BaseAction.EDIT_PREFERENCES.getToolTip());
 			button.setOpaque(true);
 			button.setBorderPainted(false);
-			toolBar.add(button);
-			toolBar.add(new JToolBar.Separator());
+			newToolBar.add(button);
+			newToolBar.add(new JToolBar.Separator());
 		}
 		for (int i = 0; i < getJMenuBar().getMenuCount(); i++) {
 			menu = getJMenuBar().getMenu(i);
-			int buttonCount = collectMenuItems(menu, toolBar, isOSX);
+			int buttonCount = collectMenuItems(menu, newToolBar, isOSX);
 			if ((i < getJMenuBar().getMenuCount() - 1) && (buttonCount > 0)) {
-				toolBar.add(new JToolBar.Separator());
+				newToolBar.add(new JToolBar.Separator());
 			}
 		}
 		if (isOSX) {
@@ -555,9 +560,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 				action, BaseAction.HELP_ABOUT.getToolTip());
 			button.setOpaque(true);
 			button.setBorderPainted(false);
-			toolBar.add(button);
+			newToolBar.add(button);
 		}
-		return toolBar;
+		return newToolBar;
 	}
 	
 	/**
@@ -566,7 +571,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * 
 	 * @param menu
 	 *        the current menu.
-	 * @param toolBar
+	 * @param jToolBar
 	 *        the {@link JToolBar} where to add the buttons.
 	 * @param isOSX
 	 *        to save repeatedly performing a check if we are on Mac OS X, this
@@ -574,7 +579,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @return The number of buttons created for this particular menu. This avoids
 	 *         creating separators for empty menus.
 	 */
-	private int collectMenuItems(JMenu menu, JToolBar toolBar, boolean isOSX) {
+	private int collectMenuItems(JMenu menu, JToolBar jToolBar, boolean isOSX) {
 		int buttonCount = 0;
 		JMenuItem item;
 		JButton button;
@@ -583,7 +588,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			item = menu.getItem(j);
 			if (item instanceof JMenu) {
 				// recursive call:
-				buttonCount += collectMenuItems((JMenu) item, toolBar, isOSX);
+				buttonCount += collectMenuItems((JMenu) item, jToolBar, isOSX);
 			}
 			if (item != null) {
 				try {
@@ -607,7 +612,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 						button.setOpaque(true);	
 					}
 					button.setEnabled(item.isEnabled());
-					toolBar.add(button);
+					jToolBar.add(button);
 					buttonCount++;
 				}
 			}
@@ -629,6 +634,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
       	/* (non-Javadoc)
       	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
       	 */
+        @Override
         @SuppressWarnings({ "unchecked" })
         //@Override
         public void actionPerformed(ActionEvent event) {
@@ -728,7 +734,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @return a {@link JMenu} might be {@code null} or empty (zero
 	 *         {@link JMenuItem}s).
 	 */
-	protected JMenu createFileMenu(boolean loadDefaultFileMenuEntries) {
+	@SuppressWarnings("unused")
+  protected JMenu createFileMenu(boolean loadDefaultFileMenuEntries) {
 		boolean macOS = GUITools.isMacOSX();
 		int ctr_down = macOS ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
 		JMenuItem openFile = null, saveFile = null, saveFileAs = null, closeFile = null;
@@ -896,6 +903,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		for (JMenu menu : listOfMenus) {
 			// avoid adding empty menus
 			if ((menu != null) && (menu.getItemCount() > 0)) {
+			  menu.setMargin(new Insets(0, 5, 0, 5));
 				menuBar.add(menu);
 			}
 		}
@@ -904,6 +912,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		JMenu helpMenu = createHelpMenu();
 		if ((helpMenu != null) && (helpMenu.getItemCount() > 0)) {
 			helpMenu.setActionCommand(BaseAction.HELP.toString());
+			helpMenu.setMargin(new Insets(0, 5, 0, 5));
 			try {
 				menuBar.setHelpMenu(helpMenu);
 			} catch (Error exc) {
@@ -947,8 +956,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @return
 	 */
 	public JMenu createViewMenu() {
-		ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
-		JCheckBoxMenuItem showStatusBar = new JCheckBoxMenuItem(bundle.getString("STATUS_BAR"), true);
+		ResourceBundle resourceBundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+		JCheckBoxMenuItem showStatusBar = new JCheckBoxMenuItem(resourceBundle.getString("STATUS_BAR"), true);
 		showStatusBar.addItemListener(new ItemListener() {
 			
 			/* (non-Javadoc)
@@ -968,7 +977,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		});
 		JMenuItem items[] = additionalViewMenuItems();
 		
-		return GUITools.createJMenu(bundle.getString("VIEW"), items, showStatusBar);
+		return GUITools.createJMenu(resourceBundle.getString("VIEW"), items, showStatusBar);
 	}
 
 	/**
@@ -1244,13 +1253,13 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		Icon icon = getIconImage() != null ? new ImageIcon(getIconImage()) : null;
 
 		// Create the status bar
-		StatusBar statusBar = new StatusBar(icon, null);
-		statusBar.registerAsIconListenerFor(this);
+		StatusBar newStatusBar = new StatusBar(icon, null);
+		newStatusBar.registerAsIconListenerFor(this);
 		
 		// Capture and display logging messages.
-		statusBar.displayLogMessagesInStatusBar();
+		newStatusBar.displayLogMessagesInStatusBar();
 		
-		return statusBar;
+		return newStatusBar;
   }
 
 	/**
@@ -1521,14 +1530,15 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			if (file.exists() && file.canRead() && file.canWrite()) {
 				SBPreferences prefs = SBPreferences.getPreferencesFor(getClass());
 				prefs.put(GUIOptions.SAVE_DIR, file.getAbsolutePath());
-				try {
-		          prefs.flush();
-		        } catch (BackingStoreException exc) {
-		          // do NOT show this error, because the user really dosn't know
-		          // how to handle a "The value for SAVE_DIR is out of range [...]"
-		          // message.
-		          logger.finest(exc.getLocalizedMessage());
-		        };
+        try {
+          prefs.flush();
+        }
+        catch (BackingStoreException exc) {
+          // do NOT show this error, because the user really dosn't know
+          // how to handle a "The value for SAVE_DIR is out of range [...]"
+          // message.
+          logger.finest(exc.getLocalizedMessage());
+        }
 			}
 		}
 		GUITools.setEnabled(true, getJMenuBar(), getJToolBar(),
@@ -1794,7 +1804,8 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 			      /* (non-Javadoc)
 			       * @seejava.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			       */
-			    	public void actionPerformed(ActionEvent e) {
+			    	@Override
+            public void actionPerformed(ActionEvent e) {
 			    		openFileAndLogHistory(file);
 			    	}
 			    });
