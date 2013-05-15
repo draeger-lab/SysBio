@@ -96,6 +96,16 @@ public class CompoundSynonym2CompoundIDMapper extends AbstractMapper<String,Inte
   public int getSourceColumn(CSVReader r) {
     return 1; // Never called if getMultiSourceColumn() is implemented.
   }
+  
+  @Override
+  protected String postProcessSourceID(String source) {
+    return source.toLowerCase();
+  }
+  
+  @Override
+	protected String preProcessSourceID(String string) {
+    return string.toLowerCase();
+  }
 	
 	@Override
 	protected String preProcessTargetID(String string) {
