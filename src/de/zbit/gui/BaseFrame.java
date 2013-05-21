@@ -465,9 +465,10 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	}
 	
   /**
-	 * 
-	 * @param fileList
-	 * @param fileHistory
+   * Adds the given files to the file history.
+   * 
+	 * @param fileList    TODO
+	 * @param fileHistory TODO
 	 */
 	protected void addToFileHistory(Collection<File> fileList, JMenu... fileHistory) {
     if (getMaximalFileHistorySize() > 0) {
