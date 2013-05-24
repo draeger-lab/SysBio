@@ -157,10 +157,15 @@ public interface KeyProvider {
 			ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);					
 			List<OptionGroup> groupList = optionGroupList(keyProvider);
 			List<Option> optionList = optionList(keyProvider);
+	    boolean atLeastOneOptionVisible = false;
+	    // if there is at least on group for that KeyProvider
 			if (groupList.size() > 0) {
+	      // for each group
 				for (OptionGroup<?> group : groupList) {
+	        // if this group contains options and is visible
 					if (group.getOptions().size() > 0) {
 						if (group.isAnyOptionVisible()) {
+	            // add a header with the groups name
 							sb.append(createHeadline(headerRank, group.getName()));
 							String tooltip = group.getToolTip();
 							if ((tooltip != null) && (tooltip.trim().length() > 0)) {
@@ -168,7 +173,8 @@ public interface KeyProvider {
 								sb.append(StringUtil.insertLineBreaks(tooltip, 70, "\n      "));
 								sb.append("</p>\n");
 							}
-							writeOptionsToHTMLTable(sb, group.getOptions(), optionList);
+	            // create the options
+							atLeastOneOptionVisible |= writeOptionsToHTMLTable(sb, group.getOptions(), optionList);
 						}
 					}
 				}
@@ -176,7 +182,11 @@ public interface KeyProvider {
 			if (optionList.size() > 0) {
 				if (OptionGroup.isAnyOptionVisible(optionList)) {
 					if (groupList.size() > 0) {
-						sb.append(createHeadline(headerRank, bundle.getString("ADDITIONAL_OPTIONS")));
+					  // If at least one option was displayed, add an "Additional options"
+					  // header. Otherwise, don't add a header at all.
+		        if (atLeastOneOptionVisible) {
+		          sb.append(createHeadline(headerRank, bundle.getString("ADDITIONAL_OPTIONS")));
+		        }
 					}
 					writeOptionsToHTMLTable(sb, optionList, null);
 				}
@@ -647,7 +657,8 @@ public interface KeyProvider {
 				/* (non-Javadoc)
 				 * @see java.util.Iterator#hasNext()
 				 */
-				public boolean hasNext() {
+				@Override
+        public boolean hasNext() {
 					try {
 						return getField(keyProvider, clazz, i + 1) != null;
 					} catch (ArrayIndexOutOfBoundsException exc) {
@@ -658,7 +669,8 @@ public interface KeyProvider {
 				/* (non-Javadoc)
 				 * @see java.util.Iterator#next()
 				 */
-				public T next() {
+				@Override
+        public T next() {
 					Entry<? extends T> entry = getField(keyProvider, clazz, ++i);
 					if (entry == null) {
 						i = keyProvider.getFields().length;
@@ -671,7 +683,8 @@ public interface KeyProvider {
 				/* (non-Javadoc)
 				 * @see java.util.Iterator#remove()
 				 */
-				public void remove() {
+				@Override
+        public void remove() {
 					throw new IllegalAccessError();
 				}
 			};
@@ -757,11 +770,16 @@ public interface KeyProvider {
 		 * @param sb
 		 * @param options
 		 * @param removeFromHere
+		 * @return <code>true</code>, if at least one option is written to the HTML
+		 *         table, <code>false</code> otherwise
 		 */
 		@SuppressWarnings("rawtypes")
-		private static void writeOptionsToHTMLTable(StringBuilder sb,
-			List<?> options, List<Option> removeFromHere) {
-			sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
+		private static boolean writeOptionsToHTMLTable(StringBuilder sb,
+		                                               List<?> options,
+		                                               List<Option> removeFromHere) {
+	    boolean atLeastOneOptionVisible = false;
+		  
+		  sb.append("      <table cellspacing=\"1\" cellpadding=\"1\" border=\"0\">\n");
 			for (Object o : options) {
 				if (!(o instanceof Option<?>)) {
 					continue;
@@ -769,6 +787,7 @@ public interface KeyProvider {
 				Option<?> option = (Option<?>) o;
 				// Hide options that should not be visible, i.e., show only visible options.
 				if (option.isVisible()) {
+				  atLeastOneOptionVisible = true;
 					sb.append("        <tr>\n          ");
 					sb.append("<td colspan=\"2\" class=\"typewriter-highlighted\">");
 					String shortName = option.getShortCmdName();
@@ -869,6 +888,7 @@ public interface KeyProvider {
 				}
 			}
 			sb.append("    </table>\n");
+			return atLeastOneOptionVisible;
 		}
 	}
 	
