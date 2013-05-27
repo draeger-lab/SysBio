@@ -99,12 +99,8 @@ public class CompoundSynonym2CompoundIDMapper extends AbstractMapper<String,Inte
   
   @Override
   protected String postProcessSourceID(String source) {
+    // This is called when reading the input mapping file AND when mapping any string with "map(sourceID)".
     return source.toLowerCase();
-  }
-  
-  @Override
-	protected String preProcessSourceID(String string) {
-    return string.toLowerCase();
   }
 	
 	@Override
