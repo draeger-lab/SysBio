@@ -45,7 +45,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class GeneID2KeggIDMapper extends AbstractMapper<Integer, String> {
+public class GeneID2KeggIDMapper extends AbstractMapper<Integer, String> implements KEGGspeciesAbbreviation {
   private static final long serialVersionUID = -4655963680015519436L;
 
   public static final Logger log = Logger.getLogger(GeneID2KeggIDMapper.class.getName());

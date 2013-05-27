@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import de.zbit.io.csv.CSVReader;
 import de.zbit.mapper.GeneID2KeggIDMapper;
+import de.zbit.mapper.KEGGspeciesAbbreviation;
 import de.zbit.mapper.KeggPathwayID2PathwayName;
 import de.zbit.mapper.MappingUtils.IdentifierClass;
 import de.zbit.util.Species;
@@ -42,7 +43,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * @version $Rev$
  */
 @SuppressWarnings("unchecked")
-public class GeneID2ListOfKEGGpathways extends AbstractEnrichmentMapper<Integer, String>  {
+public class GeneID2ListOfKEGGpathways extends AbstractEnrichmentMapper<Integer, String> implements KEGGspeciesAbbreviation {
   private static final long serialVersionUID = 2584808521199605644L;
   public static final Logger log = Logger.getLogger(GeneID2ListOfKEGGpathways.class.getName());
   
