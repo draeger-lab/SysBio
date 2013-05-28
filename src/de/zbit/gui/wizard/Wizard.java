@@ -300,6 +300,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
 
     if (id == null) {
       close(ERROR_RETURN_CODE);
+      return;
     }
     WizardPanelDescriptor oldPanelDescriptor = wizardModel.getCurrentPanelDescriptor();
     if (oldPanelDescriptor != null) {
@@ -322,6 +323,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
    * @param evt PropertyChangeEvent passed from the model to signal that one of
    *          its properties has changed value.
    */
+  @Override
   public void propertyChange(PropertyChangeEvent evt) {
 
     if (evt.getPropertyName().equals(WizardModel.CURRENT_PANEL_DESCRIPTOR_PROPERTY)) {
@@ -488,7 +490,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     if( enableNext ) {
       setWarningIcon(message != null ? WARNING_ICON : null);
     } else {
-      setWarningIcon(ERROR_ICON);
+      setWarningIcon(message != null ? ERROR_ICON : null);
     }
   }
 
