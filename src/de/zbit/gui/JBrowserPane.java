@@ -49,7 +49,7 @@ public class JBrowserPane extends JEditorPane implements HyperlinkListener {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * A list that loggs all visited pages
+	 * A list that logs all visited pages
 	 */
 	private LinkedList<URL> history;
 	/**
@@ -109,7 +109,8 @@ public class JBrowserPane extends JEditorPane implements HyperlinkListener {
 	 * javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event
 	 * .HyperlinkEvent)
 	 */
-	public void hyperlinkUpdate(HyperlinkEvent event) {
+	@Override
+  public void hyperlinkUpdate(HyperlinkEvent event) {
 		HyperlinkEvent.EventType typ = event.getEventType();
 
 		if (typ == HyperlinkEvent.EventType.ACTIVATED) {
@@ -156,7 +157,7 @@ public class JBrowserPane extends JEditorPane implements HyperlinkListener {
 	/**
 	 * Returns the number of pages visited so far.
 	 * 
-	 * @return
+	 * @return the number of pages visited so far
 	 */
 	public int getNumPagesVisited() {
 		return history.size();
