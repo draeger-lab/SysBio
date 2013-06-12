@@ -87,6 +87,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -165,6 +166,7 @@ public class GUITools {
     
     // Add listeners
     ok.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent arg0) {
         ok.setSelected(true);
         cancel.setSelected(false);
@@ -172,6 +174,7 @@ public class GUITools {
       }      
     });
     cancel.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent arg0) {
         ok.setSelected(false);
         cancel.setSelected(true);
@@ -260,7 +263,10 @@ public class GUITools {
 		boolean showCopyright) {
 		int distanceToBorder = 7;
 		SplashScreen splash = SplashScreen.getSplashScreen();
-		Graphics2D g = (splash == null) ? null : splash.createGraphics();
+		if (splash == null) {
+		  return;
+		}
+		Graphics2D g = splash.createGraphics();
 		if ((g == null) || (!showVersionNumber && !showCopyright)) { 
 			return;
 		}
@@ -1517,7 +1523,9 @@ public class GUITools {
 		Class<?> cl = null;
 		try {
 		  cl = Class.forName(def);
-		} catch (Throwable t) {}
+		} catch (Throwable t) {
+      // intentionally left blank
+		}
 		
 		// Only if the user specified either no LaF or an invalid one, try to
 		// load an operating system dependent nice LaF.
@@ -1910,6 +1918,7 @@ public class GUITools {
    */
   public static void scrollToTop(final JScrollPane scrollPanel) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      @Override
       public void run() { 
         synchronized (scrollPanel) {
           scrollPanel.getVerticalScrollBar().setValue(0);
@@ -2184,6 +2193,7 @@ public class GUITools {
     
     // Close dialog with ESC button.
     jd.getRootPane().registerKeyboardAction(new ActionListener() {
+      @Override
       public synchronized void actionPerformed(ActionEvent e) {
         // deselect the OK button
         if (addOkAndCancel) {
@@ -2195,6 +2205,7 @@ public class GUITools {
     }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     // Close dialog with ENTER button.
     jd.getRootPane().registerKeyboardAction(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         // select the OK button
         if (addOkAndCancel) {
@@ -2207,17 +2218,28 @@ public class GUITools {
     
     // Set close operations
     jd.addWindowListener(new WindowAdapter() {
+      @Override
       public void windowClosing(WindowEvent e) {
         jd.setVisible(false);
       }
     });
     c.addComponentListener(new ComponentListener() {
+      @Override
       public void componentHidden(ComponentEvent e) {
         jd.setVisible(false);
       }
-      public void componentMoved(ComponentEvent e) {}
-      public void componentResized(ComponentEvent e) {}
-      public void componentShown(ComponentEvent e) {}
+      @Override
+      public void componentMoved(ComponentEvent e) {
+        // intentionally left blank
+      }
+      @Override
+      public void componentResized(ComponentEvent e) {
+        // intentionally left blank
+      }
+      @Override
+      public void componentShown(ComponentEvent e) {
+        // intentionally left blank
+      }
     });
     
     // Set size
@@ -2401,8 +2423,8 @@ public class GUITools {
       
       if ((rowCount > 100) || (maxLine > 250)) {
         JScrollPane scroll = new JScrollPane(browser,
-          JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+          ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+          ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         // TODO: Calculate required size using the font size.
         scroll.setMaximumSize(new Dimension(470, 470));
         Dimension prefered = new Dimension(450, 450);
@@ -2470,6 +2492,7 @@ public class GUITools {
       /* (non-Javadoc)
        * @see javax.swing.SwingWorker#doInBackground()
        */
+      @Override
       protected Integer doInBackground() throws Exception {
         return JOptionPane.showConfirmDialog(null, component,
           caption, JOptionPane.OK_CANCEL_OPTION);
@@ -2537,7 +2560,9 @@ public class GUITools {
     while (worker.getState() == SwingWorker.StateValue.PENDING) {
       try {
         Thread.sleep(100);
-      } catch (InterruptedException e) {}
+      } catch (InterruptedException e) {
+        // intentionally left blank
+      }
     }
     
     return area;
