@@ -144,6 +144,8 @@
   <entry key="NEXT_PAGE">Next Page</entry>
   <entry key="SAVE">Save</entry>
   <entry key="SAVE_TOOLTIP">Save the current page as HTML file.</entry>
+  <entry key="OPEN_IN_BROWSER">Open in browser</entry>
+  <entry key="OPEN_IN_BROWSER_TOOLTIP">Open the current page in an external web browser.</entry>
   
   <!-- KeyProvider -->
   
