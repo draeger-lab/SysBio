@@ -394,7 +394,7 @@ public class JHelpBrowser extends JDialog implements ActionListener,
       }
     }
     if (browserPane.equals(editor)) {
-      openInBrowserButton.setEnabled( !browserPane.getPage().getProtocol().startsWith("file") );
+      openInBrowserButton.setEnabled( browserPane.getPage().getProtocol().startsWith("http") );
     } else {
       openInBrowserButton.setEnabled(false);
     }
