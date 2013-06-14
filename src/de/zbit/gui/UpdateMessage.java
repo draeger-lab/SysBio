@@ -113,12 +113,11 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
      * @param icon - Icon that is displayed, along with the update message.
      * May be null, if no icon is desired.
      */
-    public UpdateMessageWindow(String u, String applicationName, Icon icon)
-    throws IOException {
+    public UpdateMessageWindow(String urlString, String applicationName, Icon icon) throws IOException {
       super();
       setBackground(Color.YELLOW);
       setAlwaysOnTop(true);
-      URL url = new URL(u);
+      URL url = new URL(urlString);
 
       JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
       buttonPanel.setBackground(getBackground());
@@ -130,7 +129,6 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
       showHideButton.setName("showReleaseNotes");
       showHideButton.setIcon(UIManager.getIcon("ICON_ARROW_RIGHT"));
       showHideButton.setIconTextGap(5);
-      showHideButton.setBorderPainted(false);
       showHideButton.setBackground(new Color(buttonPanel.getBackground()
           .getRGB()));
       showHideButton.setSize(150, 20);
