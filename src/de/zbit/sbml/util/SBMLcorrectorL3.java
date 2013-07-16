@@ -36,11 +36,11 @@ import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
-import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
+import org.sbml.jsbml.ext.layout.AbstractReferenceGlyph;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
-import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
@@ -342,10 +342,10 @@ public class SBMLcorrectorL3 {
 			for (TextGlyph tg : layout.getListOfTextGlyphs()) {
 				if (tg.isSetOriginOfText() && tg.isSetGraphicalObject() && tg.getOriginOfText().equals(tg.getGraphicalObject())) {
 					GraphicalObject go = tg.getGraphicalObjectInstance();
-					if (go instanceof NamedSBaseGlyph) {
-						NamedSBaseGlyph nsbg = (NamedSBaseGlyph) go;
-						if (nsbg.isSetNamedSBase()) {
-							tg.setOriginOfText(nsbg.getNamedSBase());
+					if (go instanceof AbstractReferenceGlyph) {
+						AbstractReferenceGlyph nsbg = (AbstractReferenceGlyph) go;
+						if (nsbg.isSetReference()) {
+							tg.setOriginOfText(nsbg.getReference());
 						}
 					}
 				}

@@ -23,7 +23,7 @@ import java.util.Set;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Species;
-import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
+import org.sbml.jsbml.ext.layout.AbstractReferenceGlyph;
 
 import y.base.Edge;
 import y.base.Node;
@@ -78,6 +78,6 @@ public interface ILayoutGraph {
 	/**
 	 * @return
 	 */
-	public Map<Node, NamedSBaseGlyph> getNode2glyph();
+	public Map<Node, AbstractReferenceGlyph> getNode2glyph();
 
 }

@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.ListOf;
@@ -36,6 +36,7 @@ import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
+import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.Position;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
@@ -554,7 +555,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 
 		ListOf<CurveSegment> curveSegmentsList = new ListOf<CurveSegment>(layoutLevel, layoutVersion);
 
-		CurveSegment curveSegment = new CurveSegment();
+		LineSegment curveSegment = new LineSegment();
 		curveSegment.setLevel(layoutLevel);
 		curveSegment.setVersion(layoutVersion);
 

@@ -42,10 +42,11 @@ import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
-import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
+import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
@@ -462,7 +463,7 @@ public class CellDesignerAnnotationParser implements Runnable {
 		srg2.setRole(SpeciesReferenceRole.PRODUCT);
 		setBoundingBox(rg, 100.0, 0.0, 10.0, 10.0);
 
-		CurveSegment cs1 = new CurveSegment();
+		LineSegment cs1 = new LineSegment();
 		cs1.setStart(new Point(35.0, 10.0, 0.0));
 		cs1.setEnd(new Point(100.0, 10.0, 0.0));
 		Curve c = new Curve();
@@ -471,7 +472,7 @@ public class CellDesignerAnnotationParser implements Runnable {
 		c.setListOfCurveSegments(csList);
 		srg1.setCurve(c);
 
-		CurveSegment cs2 = new CurveSegment();
+		LineSegment cs2 = new LineSegment();
 		cs2.createStart(110.0, 10.0, 0.0);
 		cs2.createEnd(235.0, 10.0, 0.0);
 		Curve c2 = new Curve();
