@@ -33,6 +33,7 @@ import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
+import org.sbml.jsbml.ext.layout.AbstractReferenceGlyph;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.CubicBezier;
@@ -40,7 +41,7 @@ import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.Layout;
-import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
+import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
@@ -153,7 +154,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 	 * Maps yfiles node to the represented SRG
 	 * TODO merge / replace with id2node map
 	 */
-	private Map<Node, NamedSBaseGlyph> node2glyph = new HashMap<Node, NamedSBaseGlyph>();
+	private Map<Node, AbstractReferenceGlyph> node2glyph = new HashMap<Node, AbstractReferenceGlyph>();
 	
 	/**
 	 * Set to hold all text glyphs which label a specific node.
@@ -574,16 +575,18 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 
 			for (int i = listOfCurveSegments.size()-1; i >= 0; i--) {
 				CurveSegment curveSegment = listOfCurveSegments.get(i);
-
-				Point end = curveSegment.getEnd();
+				LineSegment ls = (LineSegment) curveSegment;
+				
+				Point end = ls.getEnd();
 				edgeRealizer.addPoint(end.getX(), end.getY());
 				if (drawBezier) {
-					Point basePoint2 = curveSegment.getBasePoint2();
+					CubicBezier cb = (CubicBezier) curveSegment;
+					Point basePoint2 = cb.getBasePoint2();
 					edgeRealizer.addPoint(basePoint2.getX(), basePoint2.getY());
-					Point basePoint1 = curveSegment.getBasePoint1();
+					Point basePoint1 = cb.getBasePoint1();
 					edgeRealizer.addPoint(basePoint1.getX(), basePoint1.getY());
 				}
-				Point start = curveSegment.getStart();
+				Point start = ls.getStart();
 				edgeRealizer.addPoint(start.getX(), start.getY());
 			}
 		}
@@ -615,9 +618,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 			for (Reaction reaction : model.getListOfReactions()) {
 				String reactionId = reaction.getId();
 				Set<List<Edge>> edgeListSet = new HashSet<List<Edge>>();
-				List<NamedSBaseGlyph> reactionGlyphs = (List<NamedSBaseGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
+				List<AbstractReferenceGlyph> reactionGlyphs = (List<AbstractReferenceGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
 				if (reactionGlyphs != null) {
-					for (NamedSBaseGlyph reactionGlyph : reactionGlyphs) {
+					for (AbstractReferenceGlyph reactionGlyph : reactionGlyphs) {
 						edgeListSet.add(new LinkedList<Edge>(reactionGlyphId2edges.get(reactionGlyph.getId())));
 					}
 				}

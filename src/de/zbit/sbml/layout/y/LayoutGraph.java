@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sbml.jsbml.ext.layout.NamedSBaseGlyph;
+import org.sbml.jsbml.ext.layout.AbstractReferenceGlyph;
 
 import y.base.Edge;
 import y.base.Node;
@@ -56,7 +56,7 @@ public class LayoutGraph implements ILayoutGraph {
 	 */
 	private Map<String, Set<String>> speciesId2reactions;
 
-	private Map<Node, NamedSBaseGlyph> node2glyph;
+	private Map<Node, AbstractReferenceGlyph> node2glyph;
 
 	private Graph2D graph2D;
 	
@@ -71,7 +71,7 @@ public class LayoutGraph implements ILayoutGraph {
 			Map<String, Set<Node>> reactionId2nodes,
 			Map<String, Set<List<Edge>>> reactionId2edges,
 			Map<String, Set<String>> speciesId2reactions, 
-			Map<Node, NamedSBaseGlyph> node2glyph,
+			Map<Node, AbstractReferenceGlyph> node2glyph,
 			Graph2D graph2d) {
 		this.speciesId2nodes = speciesId2nodes;
 		this.compartmentId2nodes = compartmentId2nodes;
@@ -134,7 +134,7 @@ public class LayoutGraph implements ILayoutGraph {
 	 * @see de.zbit.sbml.layout.y.ILayoutGraph#node2speciesReferenceGlyph()
 	 */
 	@Override
-	public Map<Node, NamedSBaseGlyph> getNode2glyph() {
+	public Map<Node, AbstractReferenceGlyph> getNode2glyph() {
 		return node2glyph;
 	}
 	

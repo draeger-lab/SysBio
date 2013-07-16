@@ -16,10 +16,8 @@
  */
 package de.zbit.graph.io;
 
-import java.util.List;
 import java.util.logging.Logger;
 
-import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.ext.layout.BoundingBox;
@@ -33,11 +31,10 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceRole;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
-import de.zbit.sbml.layout.y.SBMLCreateEdgeMode;
-
 import y.base.Node;
 import y.view.EditMode;
 import y.view.GenericEdgeRealizer;
+import de.zbit.sbml.layout.y.SBMLCreateEdgeMode;
 
 /**
  * Creates yFiles graph information from a JSBML layout and draws it on the graph.
@@ -176,8 +173,8 @@ public class Layout2GraphML extends SB_2GraphML<Layout> {
 				
 				String name = "(" + species.getName() + ")";
 				TextGlyph textGlyph = (TextGlyph) glyph.getUserObject(Constants.GRAPHOBJECT_TEXTGLYPH_KEY);
-				if (textGlyph != null && textGlyph.isSetNamedSBase()) {
-					String namedSBase = textGlyph.getNamedSBase();
+				if ((textGlyph != null) && textGlyph.isSetReference()) {
+					String namedSBase = textGlyph.getReference();
 					Species originSpecies = textGlyph.getModel().getSpecies(namedSBase);
 					if (originSpecies != null && originSpecies.isSetName()) {
 						name = originSpecies.getName();

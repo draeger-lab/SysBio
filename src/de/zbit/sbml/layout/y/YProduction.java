@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
+import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
 
 import y.view.Arrow;
@@ -47,10 +48,11 @@ public class YProduction extends YAbstractSBGNArc implements Production<EdgeReal
 			List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
 			Collections.reverse(listOfCurveSegments);
 			for (CurveSegment curveSegment : listOfCurveSegments) {
-				Point start = curveSegment.getStart().clone();
-				Point end = curveSegment.getEnd();
-				curveSegment.setEnd(start);
-				curveSegment.setStart(end);
+				LineSegment ls = (LineSegment) curveSegment;
+				Point start = ls.getStart().clone();
+				Point end = ls.getEnd();
+				ls.setEnd(start);
+				ls.setStart(end);
 			}
 		}
 		
