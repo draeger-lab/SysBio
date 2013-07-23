@@ -97,7 +97,7 @@ public class Utils {
    * @param path
    */
   public static String ensureSlash(String path) {
-    if (!path.endsWith("\\") && !path.endsWith("/")) {
+    if ((path != null) && (path.length() > 0) && !path.endsWith("\\") && !path.endsWith("/")) {
       if (path.contains("/")) {
       	path += '/';
       } else if (path.contains("\\")) {
