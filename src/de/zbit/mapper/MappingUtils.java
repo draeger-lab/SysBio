@@ -98,14 +98,14 @@ public class MappingUtils {
     /**
      * @return all available {@link IdentifierClass#Gene} identifiers.
      */
-    public static IdentifierType[] getGeneIdentifierTypes(){
+    public static IdentifierType[] getGeneIdentifierTypes() {
       return getAllIdentifers(IdentifierClass.Gene);
     }
     
     /**
      * @return all available {@link IdentifierClass#Compound} identifiers.
      */
-    public static IdentifierType[] getCompoundIdentifierTypes(){
+    public static IdentifierType[] getCompoundIdentifierTypes() {
       return getAllIdentifers(IdentifierClass.Compound);
     }
     

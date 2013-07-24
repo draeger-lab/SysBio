@@ -248,7 +248,7 @@ public class OpenFile {
         if (ret != null) {
           FormatDescription desc2 = FormatIdentification.identify(ret);
           if (desc2 != null) { // Tar.GZ Archives
-            if (desc2.getShortName().equalsIgnoreCase("TAR")){ // Extract GZ completely and return tar stream.
+            if (desc2.getShortName().equalsIgnoreCase("TAR")) { // Extract GZ completely and return tar stream.
               ret.close();
               // ==> Completely decompresses the GZIPPED file in-memory! <==
               ret = ZIPUtils.TARunCompressStream(new ByteArrayInputStream(ZIPUtils.GUnzipData(filename).toByteArray()));

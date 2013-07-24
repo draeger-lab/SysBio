@@ -249,7 +249,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   }
 
   public int compareTo(Object o) {
-    if (o instanceof Species){
+    if (o instanceof Species) {
       return scientificName.toLowerCase().compareTo(((Species)o).scientificName.toLowerCase());
     } else
       return scientificName.toLowerCase().compareTo(o.toString().toLowerCase());
@@ -336,7 +336,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    * @param br UniProtList uniprotSpeciesFile from the UniProt homepage under <a href="http://www.uniprot.org/docs/speclist">http://www.uniprot.org/docs/speclist</a>
    * @return species, if the species is not found it returns null
    */
-  public static Species getSpeciesWithKEGGIDInList(String kegg, BufferedReader br){
+  public static Species getSpeciesWithKEGGIDInList(String kegg, BufferedReader br) {
     List<Species> speciesList = null;
     try {
       speciesList = Species.generateSpeciesDataStructure(br, true);
@@ -347,7 +347,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     
     Species sp = null;
     for (Species species : speciesList) {
-      if(species.getKeggAbbr().equals(kegg.toLowerCase())){
+      if(species.getKeggAbbr().equals(kegg.toLowerCase())) {
         sp = species;
         break;
       }
@@ -363,7 +363,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    * @return species, if the species is not found it returns null
    */
   public static Species getSpeciesWithTaxonomyIDInList(Integer tax, BufferedReader br, 
-      boolean keggNecessary){
+      boolean keggNecessary) {
     List<Species> speciesList = null;
     try {
       speciesList = Species.generateSpeciesDataStructure(br, keggNecessary);
@@ -447,7 +447,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
           if(!uniprot.equals("_")) {                        
             // Add to list here, because the scientific name is required.
             if(!uniprot.isEmpty() && tax!=null && 
-                !scientificName.isEmpty() &&!commonName.isEmpty()){
+                !scientificName.isEmpty() &&!commonName.isEmpty()) {
               Species s = new Species(scientificName, uniprot, commonName, null, tax.intValue());
               allSpec.add(s);
               
@@ -468,10 +468,10 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
           // Start at position 16 are Common-, Scientific Name and Synonyms.
           String help = line.substring(16, line.length());
           String[] split = help.split("=");
-          if (split.length>=2){
+          if (split.length>=2) {
             if(split[0].equals("N") && split[1]!=null && !split[1].isEmpty())
               scientificName = split[1].trim();
-            else if (split[0].equals("C") && split[1]!=null && !split[1].isEmpty()){              
+            else if (split[0].equals("C") && split[1]!=null && !split[1].isEmpty()) {              
               commonName = split[1].trim();
             }
             else if (split[0].equals("S") && split[1]!=null && !split[1].isEmpty())
@@ -491,7 +491,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     try {
       boolean fileExists = new File("kgFct.dat").exists();
       log.config("File kgFct.dat exists: " + fileExists);
-      if (fileExists){
+      if (fileExists) {
         manag = (KeggFunctionManagement) KeggFunctionManagement.loadFromFilesystem("kgFct.dat");
       }
     } catch (Throwable e) {
@@ -502,7 +502,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     KeggQuery q = new KeggQuery(KeggQuery.getOrganisms, null);
     keggOrgs = (Definition[]) manag.getInformation(q).getObject();
     
-    if (keggOrgs!=null){
+    if (keggOrgs!=null) {
       for (Definition definition : keggOrgs) {
         // getDefinition() = e.g "Homo sapiens (human)"
         String scientificName  = definition.getDefinition();
@@ -519,7 +519,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
         // Search all species in allSpec for the current KEGG species.
         String keggAbbr = definition.getEntry_id();
         boolean contained = false;
-        for(int i=0; i<allSpec.size(); i++){
+        for(int i=0; i<allSpec.size(); i++) {
           String scName = allSpec.get(i).getScientificName();
           
           // Search for the current species
@@ -559,10 +559,10 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     int counter = 0;
     List<Species> speciesWithoutKeggAbbr = new SortedArrayList<Species>();
     List<Species> speciesWithKeggAbbr = new SortedArrayList<Species>();
-    if (keggNecessary){      
+    if (keggNecessary) {      
       for (Species species : allSpec) {
         System.out.println(species.getNCBITaxonID());
-        if(species.getKeggAbbr()!=null){
+        if(species.getKeggAbbr()!=null) {
           counter++;
           speciesWithKeggAbbr.add(species);
         }
@@ -583,7 +583,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   }
   
   @Override
-  public int hashCode(){
+  public int hashCode() {
     return scientificName.hashCode();
   }
   

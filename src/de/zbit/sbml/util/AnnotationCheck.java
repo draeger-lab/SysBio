@@ -354,7 +354,7 @@ public class AnnotationCheck {
 		if (model.isSetListOfReactions()) {
 			for (Reaction r : model.getListOfReactions()) {
 				defect = checkAtomBalance(r, replacement);
-				if (defect == null){
+				if (defect == null) {
 					System.out.println("Can't check atom balance in: " + r);
 					noCheckPossible++;
 				}

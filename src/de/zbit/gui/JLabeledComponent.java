@@ -944,7 +944,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     } else {
       if (CSVReader.isNumber(s, true)) {
         setDefaultValue(Integer.parseInt(s));
-      } else if (colChooser instanceof JTextComponent){
+      } else if (colChooser instanceof JTextComponent) {
         ((JTextComponent) colChooser).setText(s);
       }
     }

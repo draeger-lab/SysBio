@@ -162,13 +162,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
 //    // Removes everything that is selected, when the middle mouse button is pressed.
 //    // Useful for manual picture creation (e.g., for papers).
 //    NodeCursor yc = getGraph2D().selectedNodes();
-//    while (yc.ok()){
+//    while (yc.ok()) {
 //      getGraph2D().removeNode(yc.node());
 //      yc.next();
 //    }
 //    
 //    EdgeCursor ec = getGraph2D().selectedEdges();
-//    while (ec.ok()){
+//    while (ec.ok()) {
 //      getGraph2D().removeEdge(ec.edge());
 //      ec.next();
 //    }
@@ -487,8 +487,8 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
         }
       };
       // Make cell values to appear as ToolTip
-      propTable.addMouseMotionListener(new MouseMotionAdapter(){
-        public void mouseMoved(MouseEvent e){
+      propTable.addMouseMotionListener(new MouseMotionAdapter() {
+        public void mouseMoved(MouseEvent e) {
           int row = -1, column=-1;
           try {
             Point p = e.getPoint(); 

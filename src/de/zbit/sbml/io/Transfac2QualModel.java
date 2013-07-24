@@ -431,7 +431,7 @@ public class Transfac2QualModel {
 					String regGeneName = helper[4].toLowerCase(); 	// reg. gene name
 					String bindingFactors = helper[5]; 		// binding factors (T00000)
 					String annotation = helper[6];		// EMBL annotation "AC(first site pos: last site pos)"+
-					if (isModelOrganism(organism)){
+					if (isModelOrganism(organism)) {
 						QualitativeSpecies qsGene = oriGeneAc2qs.get(regGeneId);
 //						if (qsGene == null) {
 //							qsGene = oriGeneName2qualSpecies.get(regGeneName);
@@ -728,7 +728,7 @@ public class Transfac2QualModel {
 				if (qsInt != null) { // do not create a new transition if the interacting tf is not of the model organism
 					int ia = Integer.parseInt(interactingTfs[i].replace("T", ""));
 					if (tf != ia) {
-						if (tf < ia){ // only the first occurrence as interacting species
+						if (tf < ia) { // only the first occurrence as interacting species
 							if (tfId.equals(intId)) {
 
 								Transition t = createTransition(("int" + transitionCnt), SBO.getUnknownTransition());
@@ -839,7 +839,7 @@ public class Transfac2QualModel {
 //			qs.setSBOTerm(sbo);
 //
 //			// fill equal species map
-//			if (SBO.isGene(sbo)){
+//			if (SBO.isGene(sbo)) {
 //				StringBuffer b = equalGenesMap.get(name); // TODO plus type
 //				if (b == null) {b = new StringBuffer(""); }
 //				equalGenesMap.put(name, (b.append(id + ",")));

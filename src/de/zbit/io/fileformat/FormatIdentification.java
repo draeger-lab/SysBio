@@ -192,7 +192,7 @@ public class FormatIdentification {
   public static void main(String[] args) {
     String[] test = new String[]{"C:\\dataset_99.dat", "C:\\pareto1.dat", "C:\\Fpareto1.zip", "C:\\pareto1.txt", "C:\\GSE15239_series_matrix.txt.gz", "c:\\foo.tar.gz", "c:\\foo.tar.bz2"};
     
-    for (String filename: test){
+    for (String filename: test) {
       de.zbit.io.fileformat.FormatDescription desc = FormatIdentification.identify(new File(filename));
       if (desc==null) System.out.println("Unknown");
       else if (desc.getShortName().equalsIgnoreCase("GZ") ) {
@@ -207,7 +207,7 @@ public class FormatIdentification {
     
     }
     
-    for (String filename: test){
+    for (String filename: test) {
       System.out.println("\n"+filename+"\n===================");
       BufferedReader in = OpenFile.openFile(filename);
       try {

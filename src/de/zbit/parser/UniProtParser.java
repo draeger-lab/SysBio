@@ -55,20 +55,20 @@ public class UniProtParser {
    * @param geneblock, containing the whole gene block of the uniprot entry, parsed by  {@link #getGeneBlocks(String[])} 
    * @return the offical gene name of a protein
    */
-  public String getGeneSymbolName(String geneBlock){
+  public String getGeneSymbolName(String geneBlock) {
     String name = "";
     String[] lineSplit = geneBlock.split("\n");
     
     for (String line : lineSplit) {
-      if(line!=null && line.length()>0){
+      if(line!=null && line.length()>0) {
         String[] geneSplit = line.split(";");
         for (String gs : geneSplit) {
           gs = gs.trim();
           String[] split = gs.split("=");
-          if(split.length==2){          
+          if(split.length==2) {          
             String[] entry = split[1].trim().split(",");
 
-            if(split[0].trim().equals("NAME")){
+            if(split[0].trim().equals("NAME")) {
               for (String e : entry) {
                 name = e.trim();
               }
@@ -80,20 +80,20 @@ public class UniProtParser {
     return name;
   }
 
-  public SortedArrayList<String> getGeneSynonyms(String block){
+  public SortedArrayList<String> getGeneSynonyms(String block) {
     SortedArrayList<String> synonyms = new SortedArrayList<String>();
     String[] lineSplit = block.split("\n");
     
     for (String line : lineSplit) {
-      if(line!=null && line.length()>0){
+      if(line!=null && line.length()>0) {
         String[] geneSplit = line.split(";");
         for (String gs : geneSplit) {
           gs = gs.trim();
           String[] split = gs.split("=");
-          if(split.length==2){          
+          if(split.length==2) {          
             String[] entry = split[1].trim().split(",");
 
-            if(split[0].trim().equals("SYNONYMS")){
+            if(split[0].trim().equals("SYNONYMS")) {
               for (String e : entry) {
                 e = e.trim();
                 if(!synonyms.contains(e))
@@ -107,20 +107,20 @@ public class UniProtParser {
     return synonyms;
   }
   
-  public SortedArrayList<String> getGeneOrderedLocusNames(String block){
+  public SortedArrayList<String> getGeneOrderedLocusNames(String block) {
     SortedArrayList<String> orderedLocusNames = new SortedArrayList<String>();
     String[] lineSplit = block.split("\n");
     
     for (String line : lineSplit) {
-      if(line!=null && line.length()>0){
+      if(line!=null && line.length()>0) {
         String[] geneSplit = line.split(";");
         for (String gs : geneSplit) {
           gs = gs.trim();
           String[] split = gs.split("=");
-          if(split.length==2){          
+          if(split.length==2) {          
             String[] entry = split[1].trim().split(",");
 
-            if(split[0].trim().equals("ORDEREDLOCUSNAMES")){
+            if(split[0].trim().equals("ORDEREDLOCUSNAMES")) {
               for (String e : entry) {
                 e = e.trim();
                 if(!orderedLocusNames.contains(e))
@@ -134,20 +134,20 @@ public class UniProtParser {
     return orderedLocusNames;
   }
   
-  public SortedArrayList<String> getGeneOrfNames(String block){
+  public SortedArrayList<String> getGeneOrfNames(String block) {
     SortedArrayList<String> orfNames = new SortedArrayList<String>();
     String[] lineSplit = block.split("\n");
     
     for (String line : lineSplit) {
-      if(line!=null && line.length()>0){
+      if(line!=null && line.length()>0) {
         String[] geneSplit = line.split(";");
         for (String gs : geneSplit) {
           gs = gs.trim();
           String[] split = gs.split("=");
-          if(split.length==2){          
+          if(split.length==2) {          
             String[] entry = split[1].trim().split(",");
 
-            if(split[0].trim().equals("ORFNAMES")){
+            if(split[0].trim().equals("ORFNAMES")) {
               for (String e : entry) {
                 e = e.trim();
                 if(!orfNames.contains(e))
@@ -191,10 +191,10 @@ public class UniProtParser {
       
       String[] splitLines = block.split("\n");  // separates lines
       for (String line : splitLines) {
-        if (line.startsWith("GN   ")){
+        if (line.startsWith("GN   ")) {
           line = line.substring(5,line.length());
           line = line.trim().toUpperCase();
-          if(line.equals("AND")){
+          if(line.equals("AND")) {
             geneBlocks.add(sb.toString());
             sb.setLength(0);
           }
@@ -221,7 +221,7 @@ public class UniProtParser {
 
     String[] results = UniProtFetcher.getInformations(acs);
     
-    if(results!=null){
+    if(results!=null) {
       for (int i=0; i<results.length; i++) {
         String uniProtBlock = results[i];
 
@@ -250,8 +250,8 @@ public class UniProtParser {
 
           /*if (splitLine[0].equals("AC")) {
             String[] splitACLine = splitLine[1].split(";");
-            for(int j=0; j<splitACLine.length; j++){ 
-              if(splitACLine[j].trim().startsWith(acs[i])){
+            for(int j=0; j<splitACLine.length; j++) { 
+              if(splitACLine[j].trim().startsWith(acs[i])) {
                 ids.add(new String[]{acs[i], id});
               }
             }
@@ -287,7 +287,7 @@ public class UniProtParser {
     String result = UniProtFetcher.getInformation(uniProtID);
     String[] split = result.split("\n");
     for (String line : split) {
-      if(line.startsWith("DR   GeneID")){
+      if(line.startsWith("DR   GeneID")) {
         String[] splitID = line.split(";");
         geneID = Integer.parseInt(splitID[1].trim());
       }
@@ -317,7 +317,7 @@ public class UniProtParser {
       
       String[] split = proteinBlock[i].split("\n");
       for (String line : split) {
-        if(line.startsWith("DR   GeneID")){
+        if(line.startsWith("DR   GeneID")) {
           String[] splitID = line.split(";");
           geneIDs[i] = Integer.parseInt(splitID[1].trim());
           continue;

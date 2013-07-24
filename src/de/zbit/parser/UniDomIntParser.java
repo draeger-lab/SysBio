@@ -86,7 +86,7 @@ public class UniDomIntParser {
   double sum_ofAllw; 
 
 
-  public UniDomIntParser(String referenceFile, String interactionFile){
+  public UniDomIntParser(String referenceFile, String interactionFile) {
     init(referenceFile, interactionFile);
   }
 
@@ -142,13 +142,13 @@ public class UniDomIntParser {
     I_ref = new SortedArrayList<ValuePair<String, String>>();
 
     //    BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
-    for(int i=1;i<data.length; i++){
+    for(int i=1;i<data.length; i++) {
       if(!D_ref.contains(data[i][0]))
         D_ref.add(data[i][0]);
       if(!D_ref.contains(data[i][1]))
         D_ref.add(data[i][1]);
       ValuePair<String, String> sb = new ValuePair<String, String>(data[i][0], data[i][1]);
-      if(!I_ref.contains(sb)){
+      if(!I_ref.contains(sb)) {
         I_ref.add(sb);
       }
     }
@@ -172,7 +172,7 @@ public class UniDomIntParser {
 
     SortedArrayList<ValuePair<String, String>> temp = new SortedArrayList<ValuePair<String, String>>();
 
-    for(int i=0;i<data.length; i++){
+    for(int i=0;i<data.length; i++) {
       ValuePair<String, String> sb = new ValuePair<String, String>(data[i][0], data[i][1]);
       if(!temp.contains(sb))
         temp.add(sb);
@@ -180,7 +180,7 @@ public class UniDomIntParser {
         System.out.println("Double occurrence of domain pair " + data[i][0] + " " + data[i][1]);
 
 
-      if(data[i][pos2].equals("1")){
+      if(data[i][pos2].equals("1")) {
         if(!D.contains(data[i][0]))
           D.add(data[i][0]);
 
@@ -188,8 +188,8 @@ public class UniDomIntParser {
           D.add(data[i][1]);
 
 
-        if(data[i][pos1].equals("1")){
-          if(!I.contains(sb)){
+        if(data[i][pos1].equals("1")) {
+          if(!I.contains(sb)) {
             I.add(sb);
           }
           else{
@@ -226,11 +226,11 @@ public class UniDomIntParser {
       for (int j = 0; j < D_ref_D_me.size(); j++) {
         ValuePair<String, String> sb = new ValuePair<String, String>(D_ref_D_me.get(i), D_ref_D_me.get(j));
 
-        if(I_ref.contains(sb)){
+        if(I_ref.contains(sb)) {
           if (!I_ref_me.contains(sb))
             I_ref_me.add(sb);
         }
-        if(I_me.contains(sb)){
+        if(I_me.contains(sb)) {
           if (!I_me_ref.contains(sb))
             I_me_ref.add(sb);
         }
@@ -273,31 +273,31 @@ public class UniDomIntParser {
   private double getreliabilityScore(String domain1, String domain2) {
     ValuePair<String, String> sb = new ValuePair<String, String>(domain1, domain2);
     double sum = 0.0;
-    if(I_me.contains(sb)){
+    if(I_me.contains(sb)) {
       sum+= w_me;
     }
-    if(I_himap.contains(sb)){
+    if(I_himap.contains(sb)) {
       sum+= w_himap;
     }
-    if(I_rcdp.contains(sb)){
+    if(I_rcdp.contains(sb)) {
       sum+= w_rcdp;
     }
-    if(I_dima.contains(sb)){
+    if(I_dima.contains(sb)) {
       sum+= w_dima;
     }
-    if(I_pValue.contains(sb)){
+    if(I_pValue.contains(sb)) {
       sum+= w_pValue;
     }
-    if(I_dpea.contains(sb)){
+    if(I_dpea.contains(sb)) {
       sum+= w_dpea;
     }
-    if(I_rdff.contains(sb)){
+    if(I_rdff.contains(sb)) {
       sum+= w_rdff;
     }
-    if(I_inter.contains(sb)){
+    if(I_inter.contains(sb)) {
       sum+= w_inter;
     }
-    if(I_lp.contains(sb)){
+    if(I_lp.contains(sb)) {
       sum+= w_lp;
     }
     
@@ -315,7 +315,7 @@ public class UniDomIntParser {
     String[][] data = reader.getData();
     try{
       BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileName));
-      for(int i=0;i<data.length; i++){
+      for(int i=0;i<data.length; i++) {
         String domain1 = data[i][0];
         String domain2 = data[i][1];
 
@@ -336,7 +336,7 @@ public class UniDomIntParser {
       }
       bw.close();
     }
-    catch(Exception e){
+    catch(Exception e) {
       System.err.print("Error while writing file: " + outputFileName);
       e.printStackTrace();
     }

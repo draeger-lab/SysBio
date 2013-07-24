@@ -676,7 +676,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * Will read the file, if not already done.
    * @return
    */
-  public String[][] getData(){
+  public String[][] getData() {
     if (data == null) { 
       try {
         readUsingArrayList();
@@ -692,7 +692,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * Will NOT read the file, if not already done.
    * @return
    */
-  public String[][] getDataButDoNotReadIfNotAvailable(){
+  public String[][] getDataButDoNotReadIfNotAvailable() {
     return this.data;
   }
   
@@ -701,7 +701,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * Null else.
    * @return
    */
-  public String[] getHeader(){
+  public String[] getHeader() {
     if (containsHeaders && (headers == null) ||
         !isInitialized) {
       try {
@@ -1745,9 +1745,9 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
   }
   
   
-  private static int countChar(String input, char toCount){
+  private static int countChar(String input, char toCount) {
     int counter = 0;
-    for(char c: input.toCharArray()){
+    for(char c: input.toCharArray()) {
       if(c==toCount) counter++;
     }
     return counter;
@@ -1759,12 +1759,12 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * @param toCount  Character to count
    * @return Occurences of the character in the string text, skipping all occurences in strings.
    */
-  private static int countChar(String input, char toCount, boolean treatMultipleConsecutiveCharsAsOne, boolean IgnoreStrings){
+  private static int countChar(String input, char toCount, boolean treatMultipleConsecutiveCharsAsOne, boolean IgnoreStrings) {
     if (toCount=='\u0001') return countChar(input, whiteSpacePattern, treatMultipleConsecutiveCharsAsOne, IgnoreStrings);
     int counter = 0;
     boolean skip1 = false, skip2 = false;
     char lastC = '\u0000'; // \u0000 = The null character.
-    for(char c: input.toCharArray()){
+    for(char c: input.toCharArray()) {
       if (c=='"' && IgnoreStrings) skip1 = !skip1;
       //if (c=='\'') skip2 = !skip2;//Complicated because of terms like "it's"
       if(c==toCount && !skip1 && !skip2) {
@@ -1785,12 +1785,12 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    * @param treatMultipleConsecutiveCharsAsOne
    * @return
    */
-  private static int countChar(String input, Pattern pat, boolean treatMultipleConsecutiveCharsAsOne, boolean IgnoreStrings){
+  private static int countChar(String input, Pattern pat, boolean treatMultipleConsecutiveCharsAsOne, boolean IgnoreStrings) {
     // Count matches, skip strings.
     int counter=0;
     String newLine = "";
     boolean skip1 = false, skip2 = false;
-    for(char c: input.toCharArray()){
+    for(char c: input.toCharArray()) {
       if (c=='"' && IgnoreStrings) skip1 = !skip1;
       //if (c=='\'') skip2 = !skip2;//Complicated because of terms like "it's"
       
@@ -1887,7 +1887,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     
     StringBuilder currentColumn = new StringBuilder();
     Character lastC='\u0000';
-    for(char c: input.toCharArray()){
+    for(char c: input.toCharArray()) {
       // Look for string indicators (that disable the separator).
       int pos = stringIndicators.indexOf(c);
       if (pos>=0 && skipMatchesInStrings) {
@@ -2024,7 +2024,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     for (int i=0; i< a.length; i++) {
       if (!atLeastOneDigit && Character.isDigit(a[i])) atLeastOneDigit = true;
       
-      if (onlyDigits){
+      if (onlyDigits) {
         if (Character.isDigit(a[i])) continue; else return false;
       } else {
         if (Character.isDigit(a[i])) continue;

@@ -206,7 +206,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
           if (defaultListRenderer == null) {
             defaultListRenderer = (ListCellRenderer) UIManager.get("List.cellRenderer");
           }
-        } catch (Throwable exc){
+        } catch (Throwable exc) {
           logger.warning(exc.getLocalizedMessage());
         }
         if (defaultListRenderer == null) {

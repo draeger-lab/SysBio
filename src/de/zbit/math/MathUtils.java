@@ -50,7 +50,7 @@ public class MathUtils {
    * @return the average of all non-NaN and non-infinite values in the given
    *         array.
    */
-  public static double mean(double... d){
+  public static double mean(double... d) {
     double average = mean1(d);
     if (Double.isNaN(average) || Double.isInfinite(average)) 
         return mean2(d);
@@ -61,7 +61,7 @@ public class MathUtils {
    * Spaltenweise mittelwertberechnung.
    * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
    */
-  public static double[] mean(double[][] d){
+  public static double[] mean(double[][] d) {
     double[] average = mean1(d);
     if (average == null) return null; // Koomt vor wenn er alle sequenzen nicht mappen kann 
     for (int i=0; i<average.length; i++)
@@ -80,7 +80,7 @@ public class MathUtils {
    * @return the average of all non-NaN and non-infinite values in the given
    *         array.
    */
-  private static double mean1(double[] d){ // Schneller
+  private static double mean1(double[] d) { // Schneller
     if (d==null || d.length<1) return Double.NaN;
     double retVal= 0;
     
@@ -100,7 +100,7 @@ public class MathUtils {
    * @param d
    * @return
    */
-  private static double[] mean1(double[][] d){ // Schneller
+  private static double[] mean1(double[][] d) { // Schneller
     if (d.length<1) return new double[0];
     double[] retVal= null;
     
@@ -131,7 +131,7 @@ public class MathUtils {
    * @return the average of all non-NaN and non-infinite values in the given
    *         array.
    */
-  private static double mean2(double[] d){ // Keine to-large-numbers
+  private static double mean2(double[] d) { // Keine to-large-numbers
     if (d.length<1) return Double.NaN;
     double retVal= 0;
   
@@ -154,7 +154,7 @@ public class MathUtils {
    * @param d
    * @return
    */
-  private static double[] mean2(double[][] d){ // Keine to-large-numbers
+  private static double[] mean2(double[][] d) { // Keine to-large-numbers
     if (d.length<1) return new double[0];
     double[] retVal= null;
     ArrayList<Integer> spaltenCounter = new ArrayList<Integer>(); 
@@ -180,7 +180,7 @@ public class MathUtils {
    * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
    */
   @SuppressWarnings("rawtypes")
-  public static double mean(Collection d){
+  public static double mean(Collection d) {
     double average = mean1(d);
     if (Double.isNaN(average) || Double.isInfinite(average)) 
         return mean2(d);
@@ -188,7 +188,7 @@ public class MathUtils {
   }
 
   @SuppressWarnings("rawtypes")
-  private static double mean1(Collection doubles){ // Schneller
+  private static double mean1(Collection doubles) { // Schneller
     if (doubles==null || doubles.size()<1) return Double.NaN;
     double retVal= 0;
     
@@ -212,7 +212,7 @@ public class MathUtils {
   }
 
   @SuppressWarnings("rawtypes")
-  private static double mean2(Collection doubles){ // Keine to-large-numbers
+  private static double mean2(Collection doubles) { // Keine to-large-numbers
     if (doubles==null || doubles.size()<1) return Double.NaN;
     double retVal= 0;
     
@@ -295,7 +295,7 @@ public class MathUtils {
    * @param k
    * @return
    */
-  public static BigInteger binomialCoefficient(int n, int k){
+  public static BigInteger binomialCoefficient(int n, int k) {
     return binomialCoefficient(BigInteger.valueOf(n), BigInteger.valueOf(k));
   }
 
@@ -305,10 +305,10 @@ public class MathUtils {
    * @param k
    * @return
    */
-  public static BigInteger binomialCoefficient(BigInteger n, BigInteger k){
+  public static BigInteger binomialCoefficient(BigInteger n, BigInteger k) {
     
     BigInteger n_minus_k=n.subtract(k);
-    if(n_minus_k.compareTo(k)<0){
+    if(n_minus_k.compareTo(k)<0) {
       BigInteger temp=k;
       k=n_minus_k;
       n_minus_k=temp;
@@ -317,7 +317,7 @@ public class MathUtils {
     BigInteger numerator=BigInteger.ONE;
     BigInteger denominator=BigInteger.ONE;
     
-    for(BigInteger j=BigInteger.ONE; j.compareTo(k)<=0; j=j.add(BigInteger.ONE)){
+    for(BigInteger j=BigInteger.ONE; j.compareTo(k)<=0; j=j.add(BigInteger.ONE)) {
       numerator=numerator.multiply(j.add(n_minus_k));
       denominator=denominator.multiply(j);
       BigInteger gcd=numerator.gcd(denominator);
@@ -337,9 +337,9 @@ public class MathUtils {
    */
   public static double[][] divide (double[][] arr1, double[][] arr2) {
     double[][] ret = new double[arr1.length][];
-    for (int i=0; i<arr1.length; i++){
+    for (int i=0; i<arr1.length; i++) {
       ret[i] = new double [arr1[i].length];
-      for (int j=0; j<arr1[i].length; j++){
+      for (int j=0; j<arr1[i].length; j++) {
         if (arr2[i][j]==0)
           ret[i][j]=Double.NaN;
         else
@@ -358,9 +358,9 @@ public class MathUtils {
    */
   public static double[][] divide (int[][] arr1, int[][] arr2) {
     double[][] ret = new double[arr1.length][];
-    for (int i=0; i<arr1.length; i++){
+    for (int i=0; i<arr1.length; i++) {
       ret[i] = new double [arr1[i].length];
-      for (int j=0; j<arr1[i].length; j++){
+      for (int j=0; j<arr1[i].length; j++) {
         if (arr2[i][j]==0)
           ret[i][j]=0;
         else
@@ -480,7 +480,7 @@ public class MathUtils {
    * @param values
    * @return
    */
-  public static double standardDeviation(double[] values){
+  public static double standardDeviation(double[] values) {
     return Math.sqrt(variance(values));
   }
 
@@ -491,7 +491,7 @@ public class MathUtils {
    * @param mean -  the precomputed mean value
    * @return
    */
-  public static double standardDeviation(double[] values, double mean){
+  public static double standardDeviation(double[] values, double mean) {
     return Math.sqrt(variance(values, mean));
   }
 

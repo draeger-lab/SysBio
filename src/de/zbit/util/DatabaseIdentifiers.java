@@ -431,7 +431,7 @@ public class DatabaseIdentifiers {
       // Many databases have synonyms! Catch them here.
       if (dbIdentifier2.equalsIgnoreCase("UniProtKB") ||
           dbIdentifier2.equalsIgnoreCase("UniProt") ||
-          dbIdentifier2.equalsIgnoreCase("SPACC")){
+          dbIdentifier2.equalsIgnoreCase("SPACC")) {
         return IdentifierDatabases.UniProt_AC;
         
       } else if (dbIdentifier2.equalsIgnoreCase("Taxonomy") ||

@@ -96,7 +96,7 @@ public class RegexpSpeciesReferenceFilter implements Filter {
 				String refId = specRef.getSpecies();
 				String specName = specRef.getSpeciesInstance().getName();
 				String specId = specRef.getSpeciesInstance().getId();
-				if (!caseSensitive){
+				if (!caseSensitive) {
 					regexp = regexp.toLowerCase();
 					refName = refName.toLowerCase();
 					refId = refId.toLowerCase();

@@ -173,7 +173,7 @@ public class KGMLWriter {
       File outFile = new File(fileName);
       try {
         new File(outFile.getParent()).mkdirs();
-      } catch (Throwable t){
+      } catch (Throwable t) {
         // Just ensure that the directory is available.
       }
       StreamResult result = new StreamResult(outFile);
@@ -208,21 +208,21 @@ public class KGMLWriter {
     for (java.util.Map.Entry<String, String> att : attributes.entrySet()) {
          rootElement.setAttribute(att.getKey(), att.getValue());
     }
-    if(writeEntryExtended && keggPW.isSetAdditionalText()){
+    if(writeEntryExtended && keggPW.isSetAdditionalText()) {
       rootElement.setAttribute("additionalText", keggPW.getAdditionalText());
     }
     doc.appendChild(rootElement);
     
     // kegg entries
     ArrayList<Entry>  entries = keggPW.getEntries();
-    if(entries.size()>0){
+    if(entries.size()>0) {
       for (Entry entry : entries) {
         Element newChild = doc.createElement("entry");
         Map<String, String> entryMap = null;
-        if(writeEntryExtended){
+        if(writeEntryExtended) {
           try{
           entryMap = ((EntryExtended)entry).getKGMLAttributes();
-          } catch (ClassCastException e){
+          } catch (ClassCastException e) {
             entryMap = entry.getKGMLAttributes();  
           }
         } else {
@@ -236,7 +236,7 @@ public class KGMLWriter {
           newChild.setAttribute(att.getKey(), att.getValue());
         }
         
-        if (entry.isSetComponent()){
+        if (entry.isSetComponent()) {
           for (int component : entry.getComponents()) {
             Element newChild2 = doc.createElement("component");
             newChild2.setAttribute("id", String.valueOf(component));
@@ -244,7 +244,7 @@ public class KGMLWriter {
           }
         }
         
-        if (entry.isSetGraphics()){
+        if (entry.isSetGraphics()) {
           Element newChild2 = doc.createElement("graphics");
           for (java.util.Map.Entry<String, String> graphic : entry.getGraphics().getKGMLAttributes().entrySet()) {
             newChild2.setAttribute(graphic.getKey(), graphic.getValue());
@@ -258,13 +258,13 @@ public class KGMLWriter {
     
     // kegg relations
     ArrayList<Relation>  relations = keggPW.getRelations();
-    if(relations!=null && relations.size()>0){
+    if(relations!=null && relations.size()>0) {
       for (Relation relation : relations) {
         Element newChild = doc.createElement("relation");
         for (java.util.Map.Entry<String, String> att : relation.getKGMLAttributes().entrySet()) {
           newChild.setAttribute(att.getKey(), att.getValue());
         }
-        if (relation.isSetSubTypes()){
+        if (relation.isSetSubTypes()) {
           for (SubType subtype : relation.getSubtypes()) {
             Element newChild2 = doc.createElement("subtype");
             for (java.util.Map.Entry<String, String> att1 : (subtype.getKGMLAttributes()).entrySet()) {
@@ -280,13 +280,13 @@ public class KGMLWriter {
     
  // kegg reactions
     ArrayList<Reaction>  reactions = keggPW.getReactions();
-    if(reactions.size()>0){
+    if(reactions.size()>0) {
       for (Reaction reaction : reactions) {
         Element newChild = doc.createElement("reaction");
         for (java.util.Map.Entry<String, String> att : (reaction.getKGMLAttributes()).entrySet()) {
           newChild.setAttribute(att.getKey(), att.getValue());
         }
-        if (reaction.isSetProduct()){
+        if (reaction.isSetProduct()) {
           for (ReactionComponent product : reaction.getProducts()) {
             Element newChild2 = doc.createElement("product");
             for (java.util.Map.Entry<String, String> att1 : (product.getKGMLAttributes()).entrySet()) {
@@ -300,7 +300,7 @@ public class KGMLWriter {
             newChild.appendChild(newChild2);              
           }
         }
-        if (reaction.isSetSubstrate()){
+        if (reaction.isSetSubstrate()) {
           for (ReactionComponent substrate : reaction.getSubstrates()) {
             Element newChild2 = doc.createElement("substrate");
             for (java.util.Map.Entry<String, String> att1 : (substrate.getKGMLAttributes()).entrySet()) {

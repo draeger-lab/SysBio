@@ -283,7 +283,7 @@ public class JDropDownButton extends JToggleButton implements Accessible, Action
    * @param millis
    */
   public void deselect(final int millis) {
-    Thread r = new Thread(){
+    Thread r = new Thread() {
       @Override
       public void run() {
         try {

@@ -457,13 +457,13 @@ public class Reaction {
   public Map<String, String> getKGMLAttributes() {
     Map<String, String> attributes = new TreeMap<String, String>();
     
-    if(isSetID()){
+    if(isSetID()) {
       attributes.put("id", id.toString());
     }
-    if(isSetName()){
+    if(isSetName()) {
       attributes.put("name", name);
     }    
-    if(isSetType()){
+    if(isSetType()) {
       attributes.put("type", type.toString());
     }
        
@@ -512,7 +512,7 @@ public class Reaction {
   @Override
   public boolean equals(Object obj) {
     boolean equals = Reaction.class.isAssignableFrom(obj.getClass());
-    if(equals){
+    if(equals) {
       Reaction o = (Reaction)obj;
       equals &= o.isSetID()==this.isSetID();
       if(equals && isSetID()) 

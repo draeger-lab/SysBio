@@ -109,7 +109,7 @@ public class KeggTools {
             r.clearReactants();
             toClone = r.clone();
             r.setName(ko_id);
-          } else if (i>0){
+          } else if (i>0) {
             r = toClone.clone();
             r.setName(ko_id);
             novelReactions.add(r);
@@ -392,7 +392,7 @@ public class KeggTools {
 //    } else {
       for (String ko_id : entry.getName().split(" ")) {
         KeggInfos infos = KeggInfos.get(ko_id, manager);
-        if (infos.queryWasSuccessfull() ){
+        if (infos.queryWasSuccessfull() ) {
           modifier.addAll(infos.getECcodes());
 //            && infos.getDefinition()!=null) {
 //          String def = infos.getDefinition().replace("]", ")");

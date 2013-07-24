@@ -140,7 +140,7 @@ public class SBGNProperties {
 	     * @see java.lang.Enum#toString()
 	     */
 	    @Override
-	    public String toString(){
+	    public String toString() {
 	    	return this.name().replace('_', ' ');
 	    }
 	    
@@ -244,7 +244,7 @@ public class SBGNProperties {
 		 * @see java.lang.Enum#toString()
 		 */
 		 @Override
-		 public String toString(){
+		 public String toString() {
 			 return this.name().replaceAll("_", " ");
 		 }
 		 

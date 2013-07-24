@@ -43,7 +43,7 @@ public class UniProtParserTest {
     
     System.out.println("blocks.length " + blocks.length);
     for (int i = 0; i < blocks.length; i++) {
-      if(i==0){
+      if(i==0) {
         System.out.println("1433B_Mouse:");
       }
       else if (i==1)
@@ -109,7 +109,7 @@ try {
   BufferedReader snpIn = new BufferedReader(new FileReader(System.getenv("UNIDOMINT_FOLDER" + "protein.txt")));
   String line;
   int counter = 0;
-  while((line=snpIn.readLine())!=null){
+  while((line=snpIn.readLine())!=null) {
     counter++;
   }
   snpIn.close();
@@ -118,9 +118,9 @@ try {
   snpIn = new BufferedReader(new FileReader("UNIDOMINT_FOLDER" + "/protein.txt"));
   ipiArray = new String[counter];
   int i=0;
-  while((line=snpIn.readLine())!=null){
+  while((line=snpIn.readLine())!=null) {
     line = line.trim().replace("\"", "").toUpperCase();
-    if(line != null){
+    if(line != null) {
       ipiArray[i] = line;  
       overAllArray[i][0] = line;
       i++;
@@ -128,18 +128,18 @@ try {
   }
   snpIn.close();
 }
-catch(Exception e){
+catch(Exception e) {
   System.err.print("Error while reading protein File");
 }
 
 // fetching upAC
-if(ipiArray != null){
+if(ipiArray != null) {
   IPIParser ipiParser = new IPIParser();
   acList = ipiParser.getUniProtACs(ipiArray);
   int counter = 0;
   if (acList != null) {
     for (int i = 0; i<acList.size(); i++) {
-      if(acList.get(i)[1] != null && !acList2.contains(acList.get(i)[1])){
+      if(acList.get(i)[1] != null && !acList2.contains(acList.get(i)[1])) {
         acList2.add(acList.get(i)[1]);
         overAllArray[i][1] = acList.get(i)[1];
         counter++;
@@ -164,21 +164,21 @@ if(ipiArray != null){
     }
 
     j = 0;
-    if(acArray != null){
+    if(acArray != null) {
       UniProtParser up = new UniProtParser();
       idList = up.getUniProtID(acArray);  
       // write proteins in protein vector
-      for (int i=0; i<idList.size(); i++){
+      for (int i=0; i<idList.size(); i++) {
         String[] entry = idList.get(i);
 
-        if(overAllArray[j][1]!= null && overAllArray[j][1].startsWith(entry[0])){
+        if(overAllArray[j][1]!= null && overAllArray[j][1].startsWith(entry[0])) {
           overAllArray[j][2] = entry[1];
           j++;
         }
         else{
           j++;
-          while(j<counter){
-            if(overAllArray[j][1]!= null && overAllArray[j][1].startsWith(entry[0])){
+          while(j<counter) {
+            if(overAllArray[j][1]!= null && overAllArray[j][1].startsWith(entry[0])) {
               break;
             }
             else

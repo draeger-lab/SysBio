@@ -106,13 +106,13 @@ public class PartialElementsMarkers {
 
     for (NodeCursor nodeCursor = graph.nodes(); nodeCursor.ok(); nodeCursor.next()) {
       Node node = nodeCursor.node();
-      if (isPartialNode.getBool(node)){
+      if (isPartialNode.getBool(node)) {
         return true;
       }
     }
     for (EdgeCursor edgeCursor = graph.edges(); edgeCursor.ok(); edgeCursor.next()) {
       Edge edge = edgeCursor.edge();
-      if (isPartialEdge.getBool(edge)){
+      if (isPartialEdge.getBool(edge)) {
         return true;
       }
     }

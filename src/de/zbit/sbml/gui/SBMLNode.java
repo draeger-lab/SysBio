@@ -202,7 +202,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
 	 * @return
 	 */
 	public boolean containsUserObject(TreeNodeWithChangeSupport obj) {
-		if (getUserObject().equals(obj)){
+		if (getUserObject().equals(obj)) {
 			return true;
 		} else if (isLeaf()) {
 			return false;

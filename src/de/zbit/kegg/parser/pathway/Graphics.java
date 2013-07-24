@@ -76,16 +76,16 @@ public class Graphics {
   /**
    * Should not be public, because isGeneProduct information is important!
    */
-  private Graphics(){
+  private Graphics() {
     super();
   }
   
-  public Graphics(String name){
+  public Graphics(String name) {
     this();
     this.name = name;
   }
   
-//  public Graphics(String name, GraphicsType type){
+//  public Graphics(String name, GraphicsType type) {
 //    this();
 //    this.name = name;
 //    this.type = type;
@@ -344,31 +344,31 @@ public class Graphics {
     Map<String, String> attributes = new LinkedHashMap<String, String>();
     // LinkedHashMap has a stable ordering (fifo).
 
-    if(isSetName()){
+    if(isSetName()) {
       attributes.put("name", name);
     }        
-    if(isSetX()){
+    if(isSetX()) {
       attributes.put("x", String.valueOf(x));
     }
-    if(isSetY()){
+    if(isSetY()) {
       attributes.put("y", String.valueOf(y));
     }
     if(isSetCoords()) {
       attributes.put("coords", StringUtil.implode(coords, ","));
     }
-    if(isSetType()){
+    if(isSetType()) {
       attributes.put("type", type.toString());
     }
-    if(isSetWidth()){
+    if(isSetWidth()) {
       attributes.put("width", String.valueOf(width));
     }
-    if(isSetHeight()){
+    if(isSetHeight()) {
       attributes.put("height", String.valueOf(height));
     }
-    if(isSetFGcolor()){
+    if(isSetFGcolor()) {
       attributes.put("fgcolor", fgcolor);
     }
-    if(isSetBGcolor()){
+    if(isSetBGcolor()) {
       attributes.put("bgcolor", bgcolor);
     }
     
@@ -427,7 +427,7 @@ public class Graphics {
   @Override
   public boolean equals(Object obj) {
     boolean equals = Graphics.class.isAssignableFrom(obj.getClass());
-    if(equals){    
+    if(equals) {    
       Graphics o = (Graphics)obj;
       
       equals &= o.isSetName()==this.isSetName();
@@ -443,7 +443,7 @@ public class Graphics {
         equals &= (o.getY() == this.getY());
       
       equals &= o.isSetCoords() == this.isSetCoords();
-      if(equals && isSetCoords()){
+      if(equals && isSetCoords()) {
         equals &= (o.getCoords().equals(coords));
       }
       

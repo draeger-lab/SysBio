@@ -116,7 +116,7 @@ public final class EscapeChars {
    * <P>Note that JSTL's {@code <c:out>} escapes <em>only the first 
    * five</em> of the above characters.
    */
-  public static final String forHTML(String string){
+  public static final String forHTML(String string) {
     return forHTML(string,false);
   }
   
@@ -126,7 +126,7 @@ public final class EscapeChars {
    * @param skipExistingHTMLencodings
    * @return
    */
-  public static final String forHTML(String string, boolean skipExistingHTMLencodings){
+  public static final String forHTML(String string, boolean skipExistingHTMLencodings) {
     final StringBuilder result = new StringBuilder();
     for (char character : string.toCharArray()) {
       if      (character == '\t')result.append("&#009;");
@@ -282,7 +282,7 @@ public final class EscapeChars {
   * multiple query parameters appear in the URL, since it requires a little 
   * extra work.
   */
-  public static String forHrefAmpersand(String aURL){
+  public static String forHrefAmpersand(String aURL) {
     return aURL.replace("&", "&amp;");
   }
    
@@ -297,12 +297,12 @@ public final class EscapeChars {
    * (it is URL-encoded), and ensuring it is valid HTML (ensuring the 
    * ampersand is escaped).
    */
-   public static String forURL(String aURLFragment){
+   public static String forURL(String aURLFragment) {
      String result = null;
      try {
        result = URLEncoder.encode(aURLFragment, "UTF-8");
      }
-     catch (UnsupportedEncodingException ex){
+     catch (UnsupportedEncodingException ex) {
        throw new RuntimeException("UTF-8 not supported", ex);
      }
      return result;
@@ -326,11 +326,11 @@ public final class EscapeChars {
   *  is good for escaping to produce valid XML, but not for producing safe 
   *  HTML.</span>
   */
-  public static String forXML(String aText){
+  public static String forXML(String aText) {
     final StringBuilder result = new StringBuilder();
     final StringCharacterIterator iterator = new StringCharacterIterator(aText);
     char character =  iterator.current();
-    while (character != CharacterIterator.DONE ){
+    while (character != CharacterIterator.DONE ) {
       if (character == '<') {
         result.append("&lt;");
       }
@@ -360,11 +360,11 @@ public final class EscapeChars {
   * Return <tt>aText</tt> with all <tt>'<'</tt> and <tt>'>'</tt> characters
   * replaced by their escaped equivalents.
   */
-  public static String toDisableTags(String aText){
+  public static String toDisableTags(String aText) {
     final StringBuilder result = new StringBuilder();
     final StringCharacterIterator iterator = new StringCharacterIterator(aText);
     char character =  iterator.current();
-    while (character != CharacterIterator.DONE ){
+    while (character != CharacterIterator.DONE ) {
       if (character == '<') {
         result.append("&lt;");
       }
@@ -399,14 +399,14 @@ public final class EscapeChars {
   *<li>^ and $
   *</ul>
   */
-  public static String forRegex(String aRegexFragment){
+  public static String forRegex(String aRegexFragment) {
     final StringBuilder result = new StringBuilder();
 
     final StringCharacterIterator iterator = 
       new StringCharacterIterator(aRegexFragment)
     ;
     char character =  iterator.current();
-    while (character != CharacterIterator.DONE ){
+    while (character != CharacterIterator.DONE ) {
       /*
       * All literals need to have backslashes doubled.
       */
@@ -482,7 +482,7 @@ public final class EscapeChars {
   * will usually need to escape that text, to ensure special characters 
   * are interpreted literally.
   */
-  public static String forReplacementString(String aInput){
+  public static String forReplacementString(String aInput) {
     return Matcher.quoteReplacement(aInput);
   }
   
@@ -491,7 +491,7 @@ public final class EscapeChars {
   * 
   * <P>Insensitive to case.
   */  
-  public static String forScriptTagsOnly(String aText){
+  public static String forScriptTagsOnly(String aText) {
     String result = null;
     Matcher matcher = SCRIPT.matcher(aText);
     result = matcher.replaceAll("&lt;SCRIPT>");
@@ -502,7 +502,7 @@ public final class EscapeChars {
   
   // PRIVATE //
   
-  private EscapeChars(){
+  private EscapeChars() {
     //empty - prevent construction
   }
   
@@ -518,12 +518,12 @@ public final class EscapeChars {
    * @param aIdx
    * @param aBuilder
    */
-  private static void addCharEntity(Integer aIdx, StringBuilder aBuilder){
+  private static void addCharEntity(Integer aIdx, StringBuilder aBuilder) {
     String padding = "";
-    if( aIdx <= 9 ){
+    if( aIdx <= 9 ) {
        padding = "00";
     }
-    else if( aIdx <= 99 ){
+    else if( aIdx <= 99 ) {
       padding = "0";
     }
     else {

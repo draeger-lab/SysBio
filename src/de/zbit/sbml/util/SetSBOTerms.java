@@ -244,74 +244,74 @@ public class SetSBOTerms {
 //		System.out.println("--> " + cellDesignerLabel);
 		
 		// for species labels
-		if (cellDesignerLabel.equals("SIMPLE_MOLECULE")){
+		if (cellDesignerLabel.equals("SIMPLE_MOLECULE")) {
 			return (SBO.getTerm(SBO.getSimpleMolecule()));
 		}
-		else if (cellDesignerLabel.equals("PROTEIN")){
+		else if (cellDesignerLabel.equals("PROTEIN")) {
 			return (SBO.getTerm(SBO.getProtein()));
 		}
-		else if (cellDesignerLabel.equals("DRUG")){
+		else if (cellDesignerLabel.equals("DRUG")) {
 			return (SBO.getTerm(SBO.getDrug()));
 		}
-		else if (cellDesignerLabel.equals("ION")){
+		else if (cellDesignerLabel.equals("ION")) {
 			return (SBO.getTerm(SBO.getIon()));
 		}
-		else if (cellDesignerLabel.equals("RNA")){ 
+		else if (cellDesignerLabel.equals("RNA")) { 
 			return (SBO.getTerm(SBO.getRNA()));
 		}
-		else if (cellDesignerLabel.equals("GENE")){
+		else if (cellDesignerLabel.equals("GENE")) {
 			return (SBO.getTerm(SBO.getGene()));
 		}
-		else if (cellDesignerLabel.equals("DEGRADED")){
+		else if (cellDesignerLabel.equals("DEGRADED")) {
 			return (SBO.getTerm(SBO.getEmptySet()));
 		}
-		else if (cellDesignerLabel.equals("UNKNOWN")){
+		else if (cellDesignerLabel.equals("UNKNOWN")) {
 			return (SBO.getTerm(SBO.getUnknownMolecule()));
 		}
-		else if (cellDesignerLabel.equals("COMPLEX")){
+		else if (cellDesignerLabel.equals("COMPLEX")) {
 			return (SBO.getTerm(SBO.getComplex()));
 		}
 		//for reaction labels
-		else if (cellDesignerLabel.equals("STATE_TRANSITION")){
+		else if (cellDesignerLabel.equals("STATE_TRANSITION")) {
 			return (SBO.getTerm(SBO.getStateTransition()));
 		}
-		else if (cellDesignerLabel.equals("TRANSPORT")){
+		else if (cellDesignerLabel.equals("TRANSPORT")) {
 			return (SBO.getTerm(SBO.getTransport()));
 		}
-		else if (cellDesignerLabel.equals("KNOWN_TRANSITION_OMITTED")){
+		else if (cellDesignerLabel.equals("KNOWN_TRANSITION_OMITTED")) {
 			return (SBO.getTerm(SBO.getTransitionOmitted()));
 		}
-		else if (cellDesignerLabel.equals("UNKNOWN_TRANSITION")){
+		else if (cellDesignerLabel.equals("UNKNOWN_TRANSITION")) {
 			return (SBO.getTerm(SBO.getUnknownTransition()));
 		}
-		else if (cellDesignerLabel.equals("TRANSCRIPTION")){
+		else if (cellDesignerLabel.equals("TRANSCRIPTION")) {
 			return (SBO.getTerm(SBO.getTranscription()));
 		}
-		else if (cellDesignerLabel.equals("TRANSLATION")){
+		else if (cellDesignerLabel.equals("TRANSLATION")) {
 			return (SBO.getTerm(SBO.getTranslation()));
 		}
 		// for modifier labels
-		else if (cellDesignerLabel.equals("INHIBITION")){
+		else if (cellDesignerLabel.equals("INHIBITION")) {
 			return (SBO.getTerm(SBO.getInhibitor()));
 		}
-		else if (cellDesignerLabel.equals("CATALYSIS")){
+		else if (cellDesignerLabel.equals("CATALYSIS")) {
 			return (SBO.getTerm(SBO.getCatalyticActivator()));
 		}
-		else if (cellDesignerLabel.equals("TRIGGER")){
+		else if (cellDesignerLabel.equals("TRIGGER")) {
 			return (SBO.getTerm(SBO.getTrigger()));
 		}
-		else if (cellDesignerLabel.equals("MODULATION")){
+		else if (cellDesignerLabel.equals("MODULATION")) {
 			// currently, no corresponding sbo Term in JSBML found
 			return null;
 		}
-		else if (cellDesignerLabel.equals("PHYSICAL_STIMULATION")){
+		else if (cellDesignerLabel.equals("PHYSICAL_STIMULATION")) {
 			return (SBO.getTerm(SBO.getStimulator()));
 		}
-		else if (cellDesignerLabel.equals("UNKNOWN_CATALYSIS")){ 
+		else if (cellDesignerLabel.equals("UNKNOWN_CATALYSIS")) { 
 			// currently, no corresponding sbo Term in JSBML found
 			return null;
 		}
-		else if (cellDesignerLabel.equals("UNKNOWN_INHIBITION")){ 
+		else if (cellDesignerLabel.equals("UNKNOWN_INHIBITION")) { 
 			// currently, no corresponding sbo Term in JSBML found
 			return null;
 		}

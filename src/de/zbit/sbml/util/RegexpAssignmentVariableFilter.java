@@ -86,7 +86,7 @@ public class RegexpAssignmentVariableFilter implements Filter {
 				String assId = er.getVariable();
 				String varId = er.getVariableInstance().getId();
 				String varName = er.getVariableInstance().getName();
-				if (!caseSensitive){
+				if (!caseSensitive) {
 					regexp = regexp.toLowerCase();
 					assId = assId.toLowerCase();
 					varId = varId.toLowerCase();

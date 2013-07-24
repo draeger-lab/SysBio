@@ -783,7 +783,7 @@ public class Pathway {
       rcEntry = getEntryForId(rc.getId());
     } 
     
-    if (rcEntry==null && rc.isSetName()){ // no id or invalid id.
+    if (rcEntry==null && rc.isSetName()) { // no id or invalid id.
       Collection<Entry> c = getEntriesForName(rc.getName());
       int size = c==null?0:c.size();
       
@@ -857,7 +857,7 @@ public class Pathway {
     return null;
   }
   
-  public boolean isSetName(){
+  public boolean isSetName() {
     return (name!=null && name.length()>0);
   }
   
@@ -921,22 +921,22 @@ public class Pathway {
   public Map<String, String> getKGMLAttributes() {
     Map<String, String> attributes = new TreeMap<String, String>();
     
-    if(isSetName()){
+    if(isSetName()) {
       attributes.put("name", name);
     }
-    if(isSetOrg()){
+    if(isSetOrg()) {
       attributes.put("org", org);
     }
-    if(isSetNumber()){
+    if(isSetNumber()) {
       attributes.put("number", String.valueOf(number));
     }
-    if(isSetTitle()){
+    if(isSetTitle()) {
       attributes.put("title", title);
     }
-    if(isSetImage()){
+    if(isSetImage()) {
       attributes.put("image", image);
     }
-    if(isSetLink()){
+    if(isSetLink()) {
       attributes.put("link", link);
     }
     
@@ -944,15 +944,15 @@ public class Pathway {
     return attributes;
   }
   
-  public boolean isSetEntries(){
+  public boolean isSetEntries() {
     return entries!=null && entries.size()>0;
   }
   
-  public boolean isSetReactions(){
+  public boolean isSetReactions() {
     return reactions!=null && reactions.size()>0;
   }
   
-  public boolean isSetRelations(){
+  public boolean isSetRelations() {
     return relations!=null && relations.size()>0;
   }
   
@@ -985,7 +985,7 @@ public class Pathway {
   @Override
   public boolean equals(Object obj) {
     boolean equals = Pathway.class.isAssignableFrom(obj.getClass());
-    if(equals){    
+    if(equals) {    
       Pathway o = (Pathway)obj;
       equals &= o.isSetName()==this.isSetName();
       if(equals && isSetName()) 
@@ -1135,7 +1135,7 @@ public class Pathway {
     this.additionalText = additionalText;
   }
   
-  public boolean isSetAdditionalText(){
+  public boolean isSetAdditionalText() {
     if(additionalText!=null && !additionalText.isEmpty())
       return true;
     return false;

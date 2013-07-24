@@ -183,7 +183,7 @@ public class Entry {
    * @param components
    */
   public void addComponents(List<Integer> components) {
-    if (!isSetComponent()){
+    if (!isSetComponent()) {
       this.components = new ArrayList<Integer>();
     }
     this.components.addAll(components);
@@ -330,16 +330,16 @@ public class Entry {
    * adds the {@link Integer} if it is not in the list
    * @param component
    */
-  public void addComponent(Integer component){
+  public void addComponent(Integer component) {
     if (!isSetComponent())
       components = new ArrayList<Integer>();
-    if (!components.contains(component)){
+    if (!components.contains(component)) {
       components.add(component);
     }
   }
   
-  public void addGraphics(Graphics gr){
-    if(!isSetGraphics()){
+  public void addGraphics(Graphics gr) {
+    if(!isSetGraphics()) {
       graph = new LinkedList<Graphics>();
     } 
     if(!graph.contains(gr))
@@ -496,31 +496,31 @@ public class Entry {
     }
   }
 
-  public boolean isSetID(){
+  public boolean isSetID() {
     return id>0;
   }
   
-  public boolean isSetName(){
+  public boolean isSetName() {
     return (name!=null && name.length()>0);
   }
   
-  public boolean isSetType(){
+  public boolean isSetType() {
     return type==null ? false : true;
   }
   
-  public boolean isSetLink(){
+  public boolean isSetLink() {
     return (link!=null && link.length()>0);
   }
   
-  public boolean isSetReaction(){
+  public boolean isSetReaction() {
     return (reaction!=null && reaction.trim().length()>0);
   }
   
-  public boolean isSetComponent(){
+  public boolean isSetComponent() {
     return components!=null && components.size()>0;
   }
   
-  public boolean isSetGraphics(){
+  public boolean isSetGraphics() {
     return graph!=null && graph.size()>0;
   }
   
@@ -557,19 +557,19 @@ public class Entry {
   public Map<String, String> getKGMLAttributes() {
     Map<String, String> attributes = new TreeMap<String, String>();
     
-    if(isSetID()){
+    if(isSetID()) {
       attributes.put("id", String.valueOf(id));
     }
-    if(isSetName()){
+    if(isSetName()) {
       attributes.put("name", name);
     }    
-    if(isSetType()){
+    if(isSetType()) {
       attributes.put("type", type.toString());
     }
-    if(isSetReaction()){
+    if(isSetReaction()) {
       attributes.put("reaction", reaction);
     }  
-    if(isSetLink()){
+    if(isSetLink()) {
       attributes.put("link", link);
     }      
     
@@ -600,7 +600,7 @@ public class Entry {
   public boolean equalsWithoutIDNameReactionComparison(Object obj) {
     boolean equals = true;
     
-    if (Entry.class.isAssignableFrom(obj.getClass())){
+    if (Entry.class.isAssignableFrom(obj.getClass())) {
       Entry o = (Entry)obj;          
       
       equals &= o.isSetType()==this.isSetType();
@@ -626,7 +626,7 @@ public class Entry {
   public boolean equalsWithoutIDReactionComparison(Object obj) {
     boolean equals = true;
     
-    if (Entry.class.isAssignableFrom(obj.getClass())){
+    if (Entry.class.isAssignableFrom(obj.getClass())) {
       Entry o = (Entry)obj;          
       
       equals &= o.isSetName()==this.isSetName();
@@ -657,7 +657,7 @@ public class Entry {
   public boolean equals(Object obj) {
     boolean equals = Entry.class.isAssignableFrom(obj.getClass());
     
-    if (equals){
+    if (equals) {
       Entry o = (Entry)obj;
       equals &= o.isSetID()==this.isSetID();
       if(equals && isSetID()) 

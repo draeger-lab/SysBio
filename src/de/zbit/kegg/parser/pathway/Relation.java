@@ -179,7 +179,7 @@ public class Relation {
    * @param s
    */
   public boolean addSubtype(SubType s) {
-    if(s!=null && (!subtypes.contains(s))){
+    if(s!=null && (!subtypes.contains(s))) {
       subtypes.add(s);
       return true;
     }
@@ -240,20 +240,20 @@ public class Relation {
   public Map<String, String> getKGMLAttributes() {
     Map<String, String> attributes = new TreeMap<String, String>();
     
-    if(isSetEntry1()){
+    if(isSetEntry1()) {
       attributes.put("entry1", String.valueOf(getEntry1()));
     }
-    if(isSetEntry2()){
+    if(isSetEntry2()) {
       attributes.put("entry2", String.valueOf(getEntry2()));
     }
-    if(isSetType()){
+    if(isSetType()) {
       attributes.put("type", type.toString());
     }
     
     return attributes;
   }
 
-  public boolean isSetSubTypes(){
+  public boolean isSetSubTypes() {
     return subtypes!=null && subtypes.size()>0;
   }
   
@@ -287,7 +287,7 @@ public class Relation {
   @Override
   public boolean equals(Object obj) {
     boolean equals = Relation.class.isAssignableFrom(obj.getClass());
-    if(equals){
+    if(equals) {
       Relation o = (Relation)obj;
       equals &= o.isSetEntry1()==this.isSetEntry1();
       if(equals && isSetEntry1()) 

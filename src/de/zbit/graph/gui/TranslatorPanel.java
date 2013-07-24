@@ -285,7 +285,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
         /*
          * MEANS: "REMOVE ME FROM YOUR LISTENERS LIST".
          */
-        if (e.getSource()!=null && translationListener!=null){
+        if (e.getSource()!=null && translationListener!=null) {
           translationListener.remove(e.getSource());
         }
         break;

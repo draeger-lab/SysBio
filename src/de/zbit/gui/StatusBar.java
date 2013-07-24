@@ -308,7 +308,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 //	 * set a limit to the length of log messages
 //	 * @param size	the maximum length of log messages
 //	 */
-//	public void limitLogMessageLength(int width){
+//	public void limitLogMessageLength(int width) {
 //		maxLogSize = width;
 //		limitLogLength = true;
 //		
@@ -317,7 +317,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 //		statusLabel.setMaximumSize(d);
 //	}
 //	
-//	public void unsetLogMessageLimit(){
+//	public void unsetLogMessageLimit() {
 //		limitLogLength = false;
 //		Dimension d = new Dimension(this.getWidth(), statusLabel.getHeight());
 //		statusLabel.setPreferredSize(d);
@@ -399,7 +399,7 @@ public class StatusBar extends JPanel implements ProgressListener {
 		
 		private FontMetrics fontMetrics;
 
-		public LimitLogHandler(FontMetrics fontMetrics){
+		public LimitLogHandler(FontMetrics fontMetrics) {
 			this.fontMetrics = fontMetrics;
 		}
 		
@@ -444,12 +444,12 @@ public class StatusBar extends JPanel implements ProgressListener {
 			String m = message.toString();
 
 			if (!m.equals(statusLabel.getText())) {
-				if(limitLogLength){
+				if(limitLogLength) {
 					String limitedMessage = "";
 					int maxIndex = 0;
-					for(int i = 0; i < m.length(); i++){
+					for(int i = 0; i < m.length(); i++) {
 						limitedMessage += m.charAt(i);
-						if(fontMetrics.stringWidth(limitedMessage) < maxLogSize){
+						if(fontMetrics.stringWidth(limitedMessage) < maxLogSize) {
 							// Set the status label text.
 							maxIndex = i+1;
 						}
