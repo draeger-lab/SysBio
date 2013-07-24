@@ -386,7 +386,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     if (errors) {
       StringBuilder sb = new StringBuilder();
       for (int i=0; i<ret.length; i++) {
-        if (ret[i] ==null){
+        if (ret[i] ==null) {
           if (sb.length()>0) sb.append(", ");
           sb.append('"');
           sb.append(ids[i]==null?null:ids[i]);

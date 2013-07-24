@@ -219,7 +219,7 @@ public class KGMLSelectAndDownload {
 //    
 //    if (metaURL!=null && new File(metaURL).exists() && new File(metaURL).length()>1) {
 //      return metaURL;
-//    } else if (nonMetaURL!=null){
+//    } else if (nonMetaURL!=null) {
 //      nonMetaURL = FileDownload.download(nonMetaURL);
 //      if (new File(nonMetaURL).exists() && new File(nonMetaURL).length()>1) {
 //        return nonMetaURL;
@@ -279,7 +279,7 @@ public class KGMLSelectAndDownload {
     String newUrl = String.format("http://www.genome.jp/kegg-bin/download?entry=%s&format=kgml", pwID);
     try {
       new File(new File(localFile).getParent()).mkdirs();
-    } catch (Exception e){};// consequences will be handeled in the download method
+    } catch (Exception e) {};// consequences will be handeled in the download method
     localFile = FileDownload.download(newUrl, localFile);
     
     if (localFile!=null && new File(localFile).exists() && new File(localFile).length()>1) {

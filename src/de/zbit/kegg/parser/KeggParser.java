@@ -125,7 +125,7 @@ public class KeggParser extends DefaultHandler {
             }
             
             // Remove invalid XML code in older KGML versions
-            if (kgmlVersion<=0.5 && line.contains("&keywords=")){
+            if (kgmlVersion<=0.5 && line.contains("&keywords=")) {
               line = line.replace("&keywords=", "");
             }
             
@@ -133,7 +133,7 @@ public class KeggParser extends DefaultHandler {
             line = "";
           }
         }
-        if (line.length()==0){sb.append(line);}
+        if (line.length()==0) {sb.append(line);}
         
         inS = new InputSource((new StringReader(sb.toString()))); // sb.toString() only klappt nicht ?!?!?
       } catch (IOException e) {e.printStackTrace();}
@@ -147,7 +147,7 @@ public class KeggParser extends DefaultHandler {
       
       // Give a warning if version does not match.
       try {
-        if (kgmlVersion==0){
+        if (kgmlVersion==0) {
           kgmlVersion = getKGMLVersion(document);}
         if (kgmlVersion>0 && kgmlVersion<0.7) {
           System.out.println("WARNING: Your kgml document is rather old.\n"+
@@ -196,7 +196,7 @@ public class KeggParser extends DefaultHandler {
       // e.g. http://www.genome.jp/kegg/xml/KGML_v0.6.1_.dtd
       if (SYSTEMline!=null)
         ret = parseNextDouble(SYSTEMline, SYSTEMline.lastIndexOf('v'),true);
-    } catch (Exception e){
+    } catch (Exception e) {
       e.printStackTrace();
       if (SYSTEMline!=null) {
         System.err.println("Could not parse Pathway version from '" + SYSTEMline + "'.");
@@ -238,7 +238,7 @@ public class KeggParser extends DefaultHandler {
         if (pos>0) s = s.substring(pos);
         ret = parseNextDouble(s, s.indexOf('v'),true);
       }
-    } catch (Exception e){
+    } catch (Exception e) {
       e.printStackTrace();
       if (s!=null) {
         System.err.println("Could not parse Pathway version from '" + s + "'.");

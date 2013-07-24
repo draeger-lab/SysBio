@@ -227,10 +227,10 @@ public class SubType implements Cloneable {
   public Map<String, String> getKGMLAttributes() {
     Map<String, String> attributes = new HashMap<String, String>();
     
-    if(isSetName()){
+    if(isSetName()) {
       attributes.put("name", name);
     }
-    if(isSetValue()){
+    if(isSetValue()) {
       attributes.put("value", value);
     }
     
@@ -269,7 +269,7 @@ public class SubType implements Cloneable {
   @Override
   public boolean equals(Object obj) {
     boolean equals = SubType.class.isAssignableFrom(obj.getClass());
-    if(equals){
+    if(equals) {
       SubType o = (SubType)obj;
       equals &= o.isSetName()==this.isSetName();
       if(equals && isSetName()) 

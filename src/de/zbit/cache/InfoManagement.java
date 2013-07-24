@@ -531,13 +531,13 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         ObjectAndTimestamp<INFOtype> o = rememberedInfos.get(ids[i]);
         if (o!=null) { // Same if-order as above!
           infos[i] = o.getInformation();
-        } else if (unknownIDs.size()>0 && ids[i].equals(filtIDs[infos_i])){
+        } else if (unknownIDs.size()>0 && ids[i].equals(filtIDs[infos_i])) {
           // Newly fetched infos (filteredIDs==0 if all in cache).
           if (newItems!=null && newItems.length<infos_i) {
             // should never happen. (=null => unsuccessfulQueries)
             log.warning("Something went badly wrong. Your fetchMultipleInformations method must return an array of exactly the same size as the input id array!");
             infos[i] = null;
-          } else if (newItems!=null){
+          } else if (newItems!=null) {
             infos[i] = newItems[infos_i];
             if (newItems[infos_i]!=null) addInformation(ids[i], newItems[infos_i]);
           }else{

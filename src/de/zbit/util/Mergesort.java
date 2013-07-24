@@ -31,11 +31,11 @@ public class Mergesort{
    * Quicksort
    */
   
-  public static void qsort(Comparable[] c,int start,int end){
+  public static void qsort(Comparable[] c,int start,int end) {
     if(end <= start) return;
     Comparable comp = c[start];
     int i = start,j = end + 1;
-    for(;;){
+    for(;;) {
       do i++; while(i<end && c[i].compareTo(comp)<0);
       do j--; while(j>start && c[j].compareTo(comp)>0);
       if(j <= i)   break;
@@ -49,11 +49,11 @@ public class Mergesort{
     qsort(c,j+1,end);
   }
   
-  public static void qsort(Comparable[] c){
+  public static void qsort(Comparable[] c) {
     qsort(c,0,c.length-1);
   }
   
-  public static <T extends Comparable> void qsortTabString(Comparable<String>[][] c, int indexToSort, T DataTypeToSort, int start,int end){
+  public static <T extends Comparable> void qsortTabString(Comparable<String>[][] c, int indexToSort, T DataTypeToSort, int start,int end) {
     //String DataType = DataTypeToSort.toLowerCase();
     if(end <= start) return;
     Comparable<T> comp = (T)c[start][indexToSort];
@@ -67,7 +67,7 @@ public class Mergesort{
       comp = Double.parseDouble((String)comp);*/
     
     int i = start,j = end + 1;
-    for(;;){
+    for(;;) {
       /*if (DataType == "string") {
         do i++; while(i<end && (c[i][indexToSort]).compareTo(comp)<=0);
         do j--; while(j>start && (c[j][indexToSort]).compareTo(comp)>=0);
@@ -93,7 +93,7 @@ public class Mergesort{
     qsortTabString(c,indexToSort, DataTypeToSort, j+1,end);
   }
   
-  public static void qsortTabString(Comparable[][] c, int indexToSort, String DataTypeToSort){
+  public static void qsortTabString(Comparable[][] c, int indexToSort, String DataTypeToSort) {
     qsortTabString(c,indexToSort, DataTypeToSort, 0,c.length-1);
   }
   

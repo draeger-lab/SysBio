@@ -92,7 +92,7 @@ public class FileTools {
       String curDir = System.getProperty("user.dir");
       if (!curDir.endsWith(File.separator)) curDir+=File.separator;
       f = new File (curDir+localFile);
-      if (f.exists() && (f.length()>0) && f.canRead() && f.isFile()){
+      if (f.exists() && (f.length()>0) && f.canRead() && f.isFile()) {
         return true;
       }
     }
@@ -319,10 +319,10 @@ public class FileTools {
     BufferedReader br = new BufferedReader(new FileReader(input));
     BufferedWriter bw = new BufferedWriter(new FileWriter(outputFolder + File.separator + filename + 
                                   String.valueOf(fileNo) + fileExtension));
-    while((line=br.readLine())!=null){
+    while((line=br.readLine())!=null) {
       bw.append(line + "\n");
       lineCounter++;
-      if(lineCounter == lineSplit){
+      if(lineCounter == lineSplit) {
         bw.close();
         fileNo++;
         lineCounter = 0;

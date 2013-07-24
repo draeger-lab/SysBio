@@ -230,7 +230,7 @@ public class Utils {
     for (int i=0; i< a.length; i++) {
       if (!atLeastOneDigit && Character.isDigit(a[i])) atLeastOneDigit = true;
       
-      if (onlyDigits){
+      if (onlyDigits) {
         if (Character.isDigit(a[i])) continue; else return false;
       } else {
         if (Character.isDigit(a[i])) continue;

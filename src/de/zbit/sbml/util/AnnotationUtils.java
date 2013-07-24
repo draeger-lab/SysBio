@@ -508,7 +508,7 @@ public class AnnotationUtils {
       if (sbo!=null) {
         element.setSBOTerm(sbo);
       }
-      else if (!element.isSetAnnotation()){
+      else if (!element.isSetAnnotation()) {
         System.out.println(element.getId());
       }
       

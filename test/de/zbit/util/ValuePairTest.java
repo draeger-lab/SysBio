@@ -32,7 +32,7 @@ public class ValuePairTest {
   ValuePair<String, String> r1, r2, r3;
   
   @Before
-  public void setUP(){
+  public void setUP() {
     r1 = new ValuePair<String, String>("path:hsa0010", "YWHAB");
     r2 = new ValuePair<String, String>("path:hsa0020", "YWHAB");
     r3 = new ValuePair<String, String>("path:hsa0010", "YWHAB");
@@ -40,7 +40,7 @@ public class ValuePairTest {
   
   
   @Test
-  public void pwRankingsEqual(){
+  public void pwRankingsEqual() {
     assertEquals(r1.equals(r2), false);
     assertEquals(r1.equals(r3), true);
   }

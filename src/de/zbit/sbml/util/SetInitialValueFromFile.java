@@ -106,13 +106,13 @@ public class SetInitialValueFromFile {
 		BufferedReader input = new BufferedReader(new FileReader(dataFile));
 		while ((line = input.readLine()) != null) {
 			String[] conc = line.split("\t");
-			if (conc.length >= 2){
-				if ((conc[1].trim()).matches("[-+Ee0-9.]+")){
+			if (conc.length >= 2) {
+				if ((conc[1].trim()).matches("[-+Ee0-9.]+")) {
 					Double d = Double.valueOf(conc[1].trim()).doubleValue();
 //					System.out.println(conc[0] + " : " + d);
 					concMap.put(conc[0], d);
 				}
-				else if ((conc[1].trim()).matches("[-+Ee0-9,]+")){
+				else if ((conc[1].trim()).matches("[-+Ee0-9,]+")) {
 					String helper = conc[1].replace(",", ".");
 					Double d = Double.valueOf(helper.trim()).doubleValue();
 					concMap.put(conc[0], d);

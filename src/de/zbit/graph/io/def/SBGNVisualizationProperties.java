@@ -166,13 +166,13 @@ public class SBGNVisualizationProperties {
    * @return the color of the appropriate shape
    */
   public static Color getFillColor(int sboTerm) {
-    if (SBO.isChildOf(sboTerm, SBO.getNonCovalentComplex())){
+    if (SBO.isChildOf(sboTerm, SBO.getNonCovalentComplex())) {
       return new Color(24,116,205);    // DodgerBlue3
-    } else if (SBO.isChildOf(sboTerm, SBO.getGene())){ 
+    } else if (SBO.isChildOf(sboTerm, SBO.getGene())) { 
       return new Color(255,255,0);    // Yellow
-    } else if (SBO.isChildOf(sboTerm, SBO.getMacromolecule())){
+    } else if (SBO.isChildOf(sboTerm, SBO.getMacromolecule())) {
       return new Color(0,205,0);       // Green 3
-    } else if (SBO.isChildOf(sboTerm, SBO.getSimpleMolecule())){
+    } else if (SBO.isChildOf(sboTerm, SBO.getSimpleMolecule())) {
       return new Color(176,226,255);   // LightSkyBlue1
     } else if ((sboTerm == map) || (sboTerm == submap)) {
       return new Color(224,238,238);   // azure2

@@ -195,7 +195,7 @@ public class CellDesignerAnnotationParser implements Runnable {
 					}
 					logger.fine("compartment alias " + actualId);
 				}
-				else if (newCompartmentAlias && streamReader.getLocalName().equals("namePoint")){
+				else if (newCompartmentAlias && streamReader.getLocalName().equals("namePoint")) {
 //					Double x = null;
 //					Double y = null;
 //					for (int i = 0; i < streamReader.getAttributeCount(); i++) {
@@ -334,7 +334,7 @@ public class CellDesignerAnnotationParser implements Runnable {
 							srg = rg.createSpeciesReferenceGlyph((specRefGlyphIDbasis + streamReader.getAttributeValue(i)), streamReader.getAttributeValue(i));
 						}
 						else if (streamReader.getAttributeLocalName(i).equals("type")) {
-							if (srg != null){
+							if (srg != null) {
 								if (streamReader.getAttributeValue(i).equals("INHIBITION")) {
 									srg.setRole(SpeciesReferenceRole.INHIBITOR);							
 								}

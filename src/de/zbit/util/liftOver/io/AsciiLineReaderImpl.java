@@ -97,7 +97,7 @@ public class AsciiLineReaderImpl implements LineReader {
      * @return     A String containing the contents of the line or null if the
      *             end of the stream has been reached
      */
-    public String readLine(final boolean includeTerminators){
+    public String readLine(final boolean includeTerminators) {
         int linePosition = 0;
 
         while (true)
@@ -179,7 +179,7 @@ public class AsciiLineReaderImpl implements LineReader {
      * @return peeked character.
      * @throws java.io.IOException
      */
-    public int peek(){
+    public int peek() {
         // Refill buffer if neccessary
         if (nextChar == nChars)
         {

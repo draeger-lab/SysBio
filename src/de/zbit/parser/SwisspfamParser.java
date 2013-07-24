@@ -75,9 +75,9 @@ public class SwisspfamParser {
       //  >11011_ASFM2      |================================================| P0C9J5.1 286 a.a.
       //  v110             2 __________________         __________________    (87) PF01639.10 Viral family 110  1-111 165-274
 
-      while ((line = br.readLine()) != null){
+      while ((line = br.readLine()) != null) {
         log.fine("line: '" + line + "'");
-        if(line.isEmpty()){log.fine("in erster if");continue;}
+        if(line.isEmpty()) {log.fine("in erster if");continue;}
         if (line.substring(0, 1).equals(">")) {
           // get uniprot id
           start = 0;
@@ -111,12 +111,12 @@ public class SwisspfamParser {
           else
             pfamID = "";
 
-          while(line.indexOf("  ", end+1) > 0){
+          while(line.indexOf("  ", end+1) > 0) {
             end = line.indexOf("  ", end+1);
           }
 
-          if(pfamID.startsWith("PF") || (pfamID.startsWith("PB") && includePBDomains)){            
-            if(includeBPNo){
+          if(pfamID.startsWith("PF") || (pfamID.startsWith("PB") && includePBDomains)) {            
+            if(includeBPNo) {
               List<int[]> number = parseNumbers(end, line);
               for (int[] is : number) {
                 bw.append(protein + "\t");  //protein id
@@ -156,13 +156,13 @@ public class SwisspfamParser {
    * @param out output file
    * @param species uniprot species identifier, i.e. "_HUMAN", or "_MOUSE"
    */
-  public void getSpeciesProtDomFile(String in, String out, String species){
+  public void getSpeciesProtDomFile(String in, String out, String species) {
     log.info("getSpeciesSpecificProtDomFiles");
     try{
       BufferedReader br = new BufferedReader(new FileReader(in));
       BufferedWriter bw = new BufferedWriter(new FileWriter(out));
       String line = "";
-      while((line=br.readLine())!= null){
+      while((line=br.readLine())!= null) {
         String[]split = line.split("\t");
         if(split[0].endsWith(species))
           bw.append(line + "\n");      
@@ -170,7 +170,7 @@ public class SwisspfamParser {
       br.close();
       bw.close();
     }
-    catch(Exception e){
+    catch(Exception e) {
       log.log(Level.SEVERE, "File could not be generated.", e);
     }
   }

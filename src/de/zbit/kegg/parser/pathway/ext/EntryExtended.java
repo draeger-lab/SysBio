@@ -144,27 +144,27 @@ public class EntryExtended extends Entry {
    */
   public EntryExtended(Entry ke) {
     super(ke.getParentPathway(), ke.getId(), ke.getName());
-//    if(ke.getParentPathway()!=null){
+//    if(ke.getParentPathway()!=null) {
 //      this.setParentNode(ke.getParentNode());
 //    }
-//    if(ke.isSetID()){
+//    if(ke.isSetID()) {
 //      this.setId(ke.getId());
 //    }
-//    if(ke.isSetName()){
+//    if(ke.isSetName()) {
 //      this.setName(ke.getName());
 //    }
-    if(ke.isSetType()){
+    if(ke.isSetType()) {
       this.setType(ke.getType());
     }
-    if(ke.isSetLink()){
+    if(ke.isSetLink()) {
       this.setLink(ke.getLink());
     }
-    if(ke.isSetReaction()){
+    if(ke.isSetReaction()) {
       this.setReaction(ke.getReactionString());
     }
   }
 
-  public EntryTypeExtended getGeneType(){
+  public EntryTypeExtended getGeneType() {
     return geneType;
   }
   
@@ -230,7 +230,7 @@ public class EntryExtended extends Entry {
     this.compartment = compartment;
   }
   
-  public boolean isSetCompartment(){
+  public boolean isSetCompartment() {
     return compartment!=null && compartment.length()>0;
   }
 
@@ -253,13 +253,13 @@ public class EntryExtended extends Entry {
     Map<String, String> attributes = super.getKGMLAttributes();
     
     if (includeExtendedAttributes) {
-      if(isSetGeneType()){
+      if(isSetGeneType()) {
         attributes.put("geneType", geneType.toString());
       }    
-      if(isSetCompartment()){
+      if(isSetCompartment()) {
         attributes.put("compartment", compartment);
       }
-      if(isSetDatabaseIdentifiers()){
+      if(isSetDatabaseIdentifiers()) {
         for (java.util.Map.Entry<IdentifierDatabases, Collection<String>> entry : identifiers.entrySet()) {
           for (String value : entry.getValue()) {
             attributes.put(entry.getKey().toString(), value);
@@ -284,7 +284,7 @@ public class EntryExtended extends Entry {
   public boolean equalsWithoutIDReactionComparison(Object obj) {
     boolean equals = super.equalsWithoutIDReactionComparison(obj);
     
-    if(equals && obj.getClass().isAssignableFrom(EntryExtended.class)){    
+    if(equals && obj.getClass().isAssignableFrom(EntryExtended.class)) {    
       EntryExtended o = (EntryExtended)obj;
       equals &= (o.isSetGeneType()==this.isSetGeneType());
       if(equals && isSetGeneType()) 
@@ -297,7 +297,7 @@ public class EntryExtended extends Entry {
   public boolean equalsWithoutIDNameReactionComparison(Object obj) {
     boolean equals = super.equalsWithoutIDNameReactionComparison(obj);
     
-    if (EntryExtended.class.isAssignableFrom(obj.getClass())){
+    if (EntryExtended.class.isAssignableFrom(obj.getClass())) {
       EntryExtended o = (EntryExtended)obj;          
       
       equals &= o.isSetGeneType()==this.isSetGeneType();
@@ -316,7 +316,7 @@ public class EntryExtended extends Entry {
   public boolean equals(Object obj) {
     boolean equals = super.equals(obj);
     
-    if(equals && obj.getClass().isAssignableFrom(EntryExtended.class)){    
+    if(equals && obj.getClass().isAssignableFrom(EntryExtended.class)) {    
       EntryExtended o = (EntryExtended)obj;
       equals &= (o.isSetGeneType()==this.isSetGeneType());
       if(equals && isSetGeneType()) 

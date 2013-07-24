@@ -272,7 +272,7 @@ public class JTableFilter extends JPanel {
             }
           }
         }
-      } else if (c1.equals(regexString)){
+      } else if (c1.equals(regexString)) {
         f1 = Pattern.compile(filter1);
       }
       if (c2.length()>0 && !c2.equals(regexString)) {
@@ -287,7 +287,7 @@ public class JTableFilter extends JPanel {
             }
           }
         }
-      } else if (c2.equals(regexString)){
+      } else if (c2.equals(regexString)) {
         f2 = Pattern.compile(filter2);
       }
     } catch (Exception e) {

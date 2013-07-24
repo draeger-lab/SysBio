@@ -86,7 +86,7 @@ public class GraphTools {
    * 
    * @param graph
    */
-  public GraphTools(Graph2D graph){
+  public GraphTools(Graph2D graph) {
     super();
     this.graph=graph;
     if (this.graph==null) log.warning("Graph is null!");
@@ -227,7 +227,7 @@ public class GraphTools {
         dp2.set(n, SmartOrganicLayouter.GROUP_NODE_MODE_FIX_CONTENTS);
       }
       
-      if (!newNodes.contains(n)){// && hm.getParentNode(n)==null && !hm.isGroupNode(n)) {
+      if (!newNodes.contains(n)) {// && hm.getParentNode(n)==null && !hm.isGroupNode(n)) {
         if (n.degree()<1) { // NEW: only store orphans (and actually separate cliques...) 
           resetLayout.add(n);
         } else {

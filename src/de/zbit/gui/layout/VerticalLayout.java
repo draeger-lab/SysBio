@@ -79,7 +79,7 @@ public class VerticalLayout implements LayoutManager{
    * Constructs an instance of VerticalLayout with a vertical vgap of 5 pixels, horizontal centering and anchored to
    * the top of the display area.
    */
-  public VerticalLayout(){
+  public VerticalLayout() {
     this(5,CENTER,TOP);
   }
   /**
@@ -87,7 +87,7 @@ public class VerticalLayout implements LayoutManager{
    *
    * @param vgap An int value indicating the vertical seperation of the components
    */
-  public VerticalLayout(int vgap){
+  public VerticalLayout(int vgap) {
     this(vgap,CENTER,TOP);
   }
   /**
@@ -96,7 +96,7 @@ public class VerticalLayout implements LayoutManager{
    * @param vgap An int value indicating the vertical seperation of the components
    * @param alignment An int value which is one of {@code RIGHT, LEFT, CENTER, BOTH} for the horizontal alignment.
    */
-  public VerticalLayout(int vgap,int alignment){
+  public VerticalLayout(int vgap,int alignment) {
     this(vgap,alignment,TOP);
   }
   /**
@@ -107,18 +107,18 @@ public class VerticalLayout implements LayoutManager{
    * @param anchor An int value which is one of {@code TOP, BOTTOM, CENTER} indicating where the components are
    * to appear if the display area exceeds the minimum necessary.
    */
-  public VerticalLayout(int vgap,int alignment,int anchor){
+  public VerticalLayout(int vgap,int alignment,int anchor) {
     this.vgap=vgap; this.alignment=alignment; this.anchor=anchor;
   }
   //----------------------------------------------------------------------------
-  private Dimension layoutSize(Container parent,boolean minimum){
+  private Dimension layoutSize(Container parent,boolean minimum) {
     Dimension dim=new Dimension(0,0);
     Dimension d;
-    synchronized(parent.getTreeLock()){
+    synchronized(parent.getTreeLock()) {
       int n=parent.getComponentCount();
-      for(int i=0;i<n;i++){
+      for(int i=0;i<n;i++) {
         Component c=parent.getComponent(i);
-        if(c.isVisible()){
+        if(c.isVisible()) {
           d=minimum ? c.getMinimumSize() : c.getPreferredSize();
           dim.width=Math.max(dim.width,d.width); dim.height+=d.height;
           if(i>0)dim.height+=vgap;
@@ -134,13 +134,13 @@ public class VerticalLayout implements LayoutManager{
   /**
    * Lays out the container.
    */
-  public void layoutContainer(Container parent){
+  public void layoutContainer(Container parent) {
     Insets insets=parent.getInsets();
-    synchronized(parent.getTreeLock()){
+    synchronized(parent.getTreeLock()) {
       int n=parent.getComponentCount();
       Dimension pd=parent.getSize(); int y=0;
       //work out the total size
-      for(int i=0;i<n;i++){
+      for(int i=0;i<n;i++) {
         Component c=parent.getComponent(i);
         Dimension d=c.getPreferredSize();
         y+=d.height+vgap;
@@ -151,9 +151,9 @@ public class VerticalLayout implements LayoutManager{
       else if(anchor==CENTER)y=(pd.height-y)/2;
       else y=pd.height-y-insets.bottom;
       //do layout
-      for(int i=0;i<n;i++){
+      for(int i=0;i<n;i++) {
         Component c=parent.getComponent(i);
-        if(c.isVisible()){
+        if(c.isVisible()) {
           Dimension d=c.getPreferredSize();
           int x=insets.left; int wid=d.width;
           if(alignment==CENTER)x=(pd.width-d.width)/2;
@@ -166,19 +166,19 @@ public class VerticalLayout implements LayoutManager{
     }
   }
   //-----------------------------------------------------------------------------
-  public Dimension minimumLayoutSize(Container parent){return layoutSize(parent,false);}
+  public Dimension minimumLayoutSize(Container parent) {return layoutSize(parent,false);}
   //-----------------------------------------------------------------------------
-  public Dimension preferredLayoutSize(Container parent){return layoutSize(parent,false);}
+  public Dimension preferredLayoutSize(Container parent) {return layoutSize(parent,false);}
   //----------------------------------------------------------------------------
   /**
    * Not used by this class
    */
-  public void addLayoutComponent(String name,Component comp){}
+  public void addLayoutComponent(String name,Component comp) {}
   //-----------------------------------------------------------------------------
   /**
    * Not used by this class
    */
-  public void removeLayoutComponent(Component comp){}
+  public void removeLayoutComponent(Component comp) {}
   //-----------------------------------------------------------------------------
-  public String toString(){return getClass().getName()+"[vgap="+vgap+" align="+alignment+" anchor="+anchor+"]";}
+  public String toString() {return getClass().getName()+"[vgap="+vgap+" align="+alignment+" anchor="+anchor+"]";}
 }

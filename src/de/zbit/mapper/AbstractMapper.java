@@ -204,7 +204,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
     try {
       // Create parent directories
       new File(new File(localFile).getParent()).mkdirs();
-    } catch (Throwable t){};
+    } catch (Throwable t) {};
     String localf = FileDownload.download(getRemoteURL(), localFile);
     localFile = localf;
     if (FileDownload.ProgressBar!=null) {

@@ -60,12 +60,12 @@ public class IPIParser {
     String[] results = IPIManagement.getInformations(ids);
     
     for( int i = 0; i < results.length; i++) {
-      if(results[i]!=null){    
+      if(results[i]!=null) {    
         String[] splitLines = results[i].split("\n");
-        for(int j = 0; j<splitLines.length; j++){
+        for(int j = 0; j<splitLines.length; j++) {
           String line = splitLines[j];
 
-          if(line.startsWith("DR   UniProtKB/Swiss-Prot")){
+          if(line.startsWith("DR   UniProtKB/Swiss-Prot")) {
             
             String[] lineEntries = line.split(";");
             String[] s = new String[]{ids[i].trim(),lineEntries[1].trim()};

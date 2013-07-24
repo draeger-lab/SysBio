@@ -249,10 +249,10 @@ public class ReactionComponent implements Cloneable {
   public Map<String, String> getKGMLAttributes() {
     Map<String, String> attributes = new TreeMap<String, String>();
     
-    if(isSetID()){
+    if(isSetID()) {
       attributes.put("id", id.toString());
     }
-    if(isSetName()){
+    if(isSetName()) {
       attributes.put("name", name);
     }           
     
@@ -274,7 +274,7 @@ public class ReactionComponent implements Cloneable {
   @Override
   public boolean equals(Object obj) {
     boolean equals = ReactionComponent.class.isAssignableFrom(obj.getClass());
-    if(equals){
+    if(equals) {
       ReactionComponent o = (ReactionComponent)obj;
       equals &= o.isSetID()==this.isSetID();
       if(equals && isSetID()) 

@@ -92,7 +92,7 @@ public class RegexpNameFilter implements Filter {
 			if ((nsb.isSetName() || nsb.isSetId()) && (regexp != null)) {
 				String name = nsb.getName();
 				String id = nsb.getId();
-				if (!caseSensitive){
+				if (!caseSensitive) {
 					regexp = regexp.toLowerCase();
 					name = name.toLowerCase();
 					id = id.toLowerCase();

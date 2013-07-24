@@ -1567,7 +1567,7 @@ public class StringUtil {
    */
   public static String replicateCharacter(String ch, int times) {
     StringBuilder retval = new StringBuilder();
-    for (int i=0; i<times;i++){
+    for (int i=0; i<times;i++) {
       retval.append(ch);
     }
     return retval.toString();

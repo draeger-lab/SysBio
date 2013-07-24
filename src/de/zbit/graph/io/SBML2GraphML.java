@@ -150,7 +150,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * Returns mapping from reaction ID to all edges of this reaction.
    * @return
    */
-  public Map<String, LinkedList<Edge>> getId2edge(){
+  public Map<String, LinkedList<Edge>> getId2edge() {
     return id2edge;
   }
   

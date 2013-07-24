@@ -1235,7 +1235,7 @@ public class KeggInfos implements Serializable {
    * @return see above. Result is always trimmed.
    */
   public static String suffix(String s) {
-    if (!s.contains(":")){
+    if (!s.contains(":")) {
       return s.trim();
     }
     return (s.substring(s.indexOf(':') + 1)).trim();
@@ -1253,7 +1253,7 @@ public class KeggInfos implements Serializable {
     if (s==null) return s;
     
     int pos = s.indexOf(':');
-    if (pos>0){
+    if (pos>0) {
       return s.trim();
     } else if (pos==0) {
       return appendPrefix(s.substring(1));
@@ -1295,7 +1295,7 @@ public class KeggInfos implements Serializable {
         if (Pattern.matches("^\\w{2,3}\\d{5}$", s)) {
         // e.g. ("path:hsa00010")
         return "path:" + s;
-      } else if (ECcodes.matcher(s).matches()){
+      } else if (ECcodes.matcher(s).matches()) {
         return "ec:"+s; // Enzyme codes
       } else {
         // genes, impossible without knowing the organism ("^\w+:[\w\d\.-]*$")

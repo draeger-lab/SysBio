@@ -129,11 +129,11 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     public Type getMinimum() {
       if (!excludingLBound) {
         return lBound;
-      } else if (Utils.isInteger(lBound.getClass())){
+      } else if (Utils.isInteger(lBound.getClass())) {
         return (Type) Option.parseOrCast(lBound.getClass(),((Double)lBound)+1);
-      } else if (Float.class.isAssignableFrom(lBound.getClass())){
+      } else if (Float.class.isAssignableFrom(lBound.getClass())) {
         return (Type) Option.parseOrCast(lBound.getClass(),((Float)lBound)+Float.MIN_NORMAL);
-      } else if (Double.class.isAssignableFrom(lBound.getClass())){
+      } else if (Double.class.isAssignableFrom(lBound.getClass())) {
         return (Type) Option.parseOrCast(lBound.getClass(),((Double)lBound)+Double.MIN_NORMAL);
       } else {
         // Fallback...
@@ -148,11 +148,11 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     public Type getMaximum() {
       if (!excludingUBound) {
         return uBound;
-      } else if (Utils.isInteger(uBound.getClass())){
+      } else if (Utils.isInteger(uBound.getClass())) {
         return (Type) Option.parseOrCast(uBound.getClass(),((Double)uBound)-1);
-      } else if (Float.class.isAssignableFrom(uBound.getClass())){
+      } else if (Float.class.isAssignableFrom(uBound.getClass())) {
         return (Type) Option.parseOrCast(uBound.getClass(),((Float)uBound)-Float.MIN_NORMAL);
-      } else if (Double.class.isAssignableFrom(uBound.getClass())){
+      } else if (Double.class.isAssignableFrom(uBound.getClass())) {
         return (Type) Option.parseOrCast(uBound.getClass(),((Double)uBound)-Double.MIN_NORMAL);
       } else {
         // Fallback...

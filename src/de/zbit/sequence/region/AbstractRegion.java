@@ -340,7 +340,7 @@ public abstract class AbstractRegion extends ChromosomalPoint implements Region,
     
 
     // Eventually return closest
-    if (getClosestIfIntersectionIsEmpty && ret.isEmpty()){
+    if (getClosestIfIntersectionIsEmpty && ret.isEmpty()) {
       // If we have to return the closest, we also need to check the
       // next item that starts behind searchFor
       if (nextRegionStartingBehindSearchFor!=null) {

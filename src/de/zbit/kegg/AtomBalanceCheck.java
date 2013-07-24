@@ -284,7 +284,7 @@ public final class AtomBalanceCheck {
    * @return
    */
   public static Map<String, Integer> countAtoms(KeggInfoManagement manager,
-      List<ReactionComponent> listOfSpecRefs, int replacement){
+      List<ReactionComponent> listOfSpecRefs, int replacement) {
     /* TODO: Does this work correctly for (n+1)?
      * Consider, e.g. rn:R04241 "C00002 + C03541(n) + C00025 <=> C00008 + C00009 + C03541(n+1)"!
      * 
