@@ -735,8 +735,7 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 	 * @return a {@link JMenu} might be {@code null} or empty (zero
 	 *         {@link JMenuItem}s).
 	 */
-	@SuppressWarnings("unused")
-  protected JMenu createFileMenu(boolean loadDefaultFileMenuEntries) {
+	protected JMenu createFileMenu(boolean loadDefaultFileMenuEntries) {
 		boolean macOS = GUITools.isMacOSX();
 		int ctr_down = macOS ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
 		JMenuItem openFile = null, saveFile = null, saveFileAs = null, closeFile = null;
@@ -1725,7 +1724,9 @@ public abstract class BaseFrame extends JFrame implements FileHistory,
 		}
 		String message = form.format(
 			new Object[] {Long.valueOf(unreadableFiles.length), Long.valueOf(unreadableFiles.length), fileList});
-		GUITools.showErrorMessage(this, message);
+		// Do not unnecessarily bother people, just log the warning - this is fine.
+		// GUITools.showErrorMessage(this, message);
+		logger.warning(message);
 	}
 	
 	/**
