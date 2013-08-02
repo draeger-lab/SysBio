@@ -315,14 +315,15 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
       int localVers = Integer.parseInt(progToken.nextToken("."));
       int latestVers = Integer.parseInt(latestToken.nextToken("."));
 
-      if (localVers<latestVers) {
+      if (localVers < latestVers) {
         return true;
-      } else if (localVers>latestVers) {
+      } else if (localVers > latestVers) {
         return false;
       }
 
-      if (latestToken.hasMoreElements() && (Integer.parseInt(latestToken.nextToken(".")) > 0)) {
-        return true;
+      if (latestToken.hasMoreElements() && !progToken.hasMoreElements()) {
+        int nextLatestToken = Integer.parseInt(latestToken.nextToken("."));
+        return nextLatestToken > 0;
       }
     }
     return false;
@@ -372,9 +373,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see javax.swing.SwingWorker#doInBackground()
    */
   @Override
@@ -382,9 +381,7 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
     return checkForUpdate();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see javax.swing.SwingWorker#done()
    */
   @Override
@@ -440,4 +437,5 @@ public class UpdateMessage extends SwingWorker<Boolean, Void> {
   public boolean removeWindowListener(WindowListener wl) {
     return this.listOfListeners.remove(wl);
   }
+ 
 }
