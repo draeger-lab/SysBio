@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
@@ -45,6 +46,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.text.html.HTMLDocument;
 import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.Assignment;
@@ -84,6 +86,7 @@ import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.SystemBrowser;
 import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.gui.table.JTableHyperlinkMouseListener;
 import de.zbit.gui.table.renderer.ColoredBooleanRenderer;
 import de.zbit.sbml.io.SBOTermFormatter;
 import de.zbit.sbml.util.SBMLtools;
@@ -620,7 +623,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 				for (Creator mc : hist.getListOfCreators()) {
 					rowData[i][0] = mc.getGivenName();
 					rowData[i][1] = mc.getFamilyName();
-					rowData[i][2] = mc.getEmail();
+					rowData[i][2] = "<html><a href=\"mailto:" + mc.getEmail() + "?subject=" + sbase.toString().replace(' ', '%') + "\">" + mc.getEmail() + "</a></html>";
 					rowData[i][3] = mc.getOrganization();
 					i++;
 				}
@@ -633,6 +636,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 			for (int j = 0; j < table.getModel().getColumnCount(); j++) {
 				table.setDefaultRenderer(table.getModel().getColumnClass(j), new ColoredBooleanRenderer());
 			}
+			table.addMouseListener(new JTableHyperlinkMouseListener());
 			JScrollPane scroll = new JScrollPane(table);
 			Dimension dim = table.getPreferredScrollableViewportSize();
 			scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
@@ -791,6 +795,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		area.setBackground(Color.WHITE);
 		area.setMaximumSize(dimension);
 		area.setCaretPosition(0);
+		setFont(area);
 		return area;
 	}
 
@@ -1103,11 +1108,26 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 * @return
 	 */
 	private JEditorPane unitPreview(UnitDefinition ud) {
-		JEditorPane preview = new JEditorPane("text/html", StringUtil
-				.toHTML(ud != null ? HTMLFormula.toHTML(ud) : ""));
+		JEditorPane preview = new JEditorPane();
+		preview.setContentType("text/html");
+		setFont(preview);
 		preview.setEditable(editable);
 		preview.setBorder(BorderFactory.createLoweredBevelBorder());
+    preview.setText(StringUtil
+      .toHTML(ud != null ? HTMLFormula.toHTML(ud) : ""));
 		return preview;
 	}
+
+	/**
+	 * TODO
+	 * @param editor
+	 */
+  private void setFont(JEditorPane editor) {
+    Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
+    editor.setFont(font);
+    String bodyRule = "body { font-family: " + font.getFamily() + "; " +
+        "font-size: " + font.getSize() + "pt; }";
+    ((HTMLDocument) editor.getDocument()).getStyleSheet().addRule(bodyRule);
+  }
 
 }
