@@ -183,6 +183,14 @@ public class DatabaseIdentifiers {
      */
     LipidBank,
     /**
+     * LIPID Metabolites And Pathways Strategy (LIPID MAPS) is a multi-institutional
+     * effort to identify and quantitate, using a systems biology approach and
+     * sophisticated mass spectrometers, all of the major — and many minor — lipid
+     * species in mammalian cells, as well as to quantitate the changes in these
+     *  species in response to perturbation.
+     */
+    LIPIDMAPS,
+    /**
      * Molecular Interactions Ontology (PSI-MI)
      */
     MI,
@@ -559,6 +567,7 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.PDBeChem,              "\\w{3}");
     regExMap.put(IdentifierDatabases.GlycomeDB,             "\\d+");
     regExMap.put(IdentifierDatabases.LipidBank,             "\\w+\\d+");
+    regExMap.put(IdentifierDatabases.LIPIDMAPS,             "^LM(FA|GL|GP|SP|ST|PR|SL|PK)[0-9]{4}([0-9a-zA-Z]{4,6})?$");
     regExMap.put(IdentifierDatabases.KEGG_Genome,           "(T0\\d+|\\w{3,4})");
     regExMap.put(IdentifierDatabases.KEGG_Metagenome,       "T3\\d+");
     regExMap.put(IdentifierDatabases.HGNC,                  "HGNC:\\d{1,5}");
