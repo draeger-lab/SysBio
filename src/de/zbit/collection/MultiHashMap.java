@@ -50,7 +50,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   @Override
   public int size() {
     int size = 0;
-    for( K key : map.keySet() ) {
+    for (K key : map.keySet()) {
       size += map.get(key).size();
     }
     
@@ -69,13 +69,13 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   @Override
   public boolean put(K key, V value) {
     Collection<V> coll = null;
-    if( !map.containsKey(key) ) {
+    if (!map.containsKey(key)) {
       map.put(key, newCollection());
     }
     
     coll = map.get(key);
     
-    if( coll.contains(value) ) {
+    if (coll.contains(value)) {
       return false;
     }
 
@@ -88,14 +88,14 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   @Override
   public boolean remove(K key, V value) {
     Collection<V> coll = null;
-    if( !map.containsKey(key) ) {
+    if (!map.containsKey(key)) {
       return false;
     }
     
     coll = map.get(key);
-    if( coll.contains(value) ) {
+    if (coll.contains(value)) {
       coll.remove(value);
-      if( coll.isEmpty() ) {
+      if (coll.isEmpty()) {
         map.remove(key);
       }
       return true;
@@ -108,7 +108,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   
   @Override
   public Collection<V> get(K key) {
-    if( !map.containsKey(key) ) {
+    if (!map.containsKey(key)) {
       return null;
     }
     
@@ -123,14 +123,14 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   @Override
   public boolean putAll(K key, Iterable<? extends V> values) {
     Collection<V> coll = null;
-    if( !map.containsKey(key) ) {
+    if (!map.containsKey(key)) {
       map.put(key, newCollection());
     }
     
     coll = map.get(key);
     boolean changed = false;
-    for( V v : values ) {
-      if( !coll.contains(v) ) {
+    for (V v : values) {
+      if (!coll.contains(v)) {
         changed = true;
         coll.add(v);
       }
@@ -144,7 +144,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   @Override
   public boolean putAll(MultiMap<? extends K, ? extends V> multimap) {
     boolean changed = false;
-    for( Entry<? extends K, ? extends V> entry : multimap.entries() ) {
+    for (Entry<? extends K, ? extends V> entry : multimap.entries()) {
       changed |= put(entry.getKey(), entry.getValue());
     }
     return changed;
@@ -154,7 +154,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   
   @Override
   public Collection<V> removeAll(K key) {
-    if( map.containsKey(key) ) {
+    if (map.containsKey(key)) {
       return map.remove(key);
     }
     
@@ -179,7 +179,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   
   @Override
   public boolean containsEntry(K key, V value) {
-    if( map.containsKey(key) ) {
+    if (map.containsKey(key)) {
       return get(key).contains(value);
     }
     return false;
@@ -204,7 +204,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   @Override
   public Collection<V> values() {
     List<V> coll = new ArrayList<V>();
-    for( K key : map.keySet() ) {
+    for (K key : map.keySet()) {
       coll.addAll(map.get(key));
     }
     return coll;
@@ -215,8 +215,8 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
   @Override
   public Collection<Entry<K, V>> entries() {
     Collection<Entry<K, V>> coll = new HashSet<Entry<K,V>>();
-    for( K key : map.keySet() ) {
-      for( V value : map.get(key) ) {
+    for (K key : map.keySet()) {
+      for (V value : map.get(key)) {
         coll.add(new AbstractMap.SimpleEntry<K, V>(key, value));
       }
     }
@@ -236,7 +236,7 @@ public class MultiHashMap<K, V> implements MultiMap<K, V> {
    */
   @Override
   public boolean equals(Object obj) {
-    if( obj.getClass() == MultiHashMap.class ) {
+    if (obj.getClass() == MultiHashMap.class) {
       MultiHashMap<?, ?> mhm = (MultiHashMap<?, ?>)obj;
       return map.equals(mhm.map);
     }

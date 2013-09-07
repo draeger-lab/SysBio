@@ -26,6 +26,7 @@ import javax.swing.tree.TreeNode;
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.MathContainer;
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBO;
@@ -96,8 +97,8 @@ public class SBMLtools {
     // Before SBML l3, exponent, scale and multiplier had default values.
     // => Restore them when upgrading to l3
     if (sbase instanceof Unit) {
-      Unit ud = ((Unit)sbase);
-      if (sbase.getLevel()<3 && level>=3) {
+      Unit ud = ((Unit) sbase);
+      if ((sbase.getLevel() < 3) && (level >= 3)) {
         if (!ud.isSetExponent()) {
           ud.setExponent(1d);
         }
@@ -205,5 +206,86 @@ public class SBMLtools {
 		text = "<html><head></head>" + text + "</html>";
 		return text;
 	}
-  
+	
+
+  /**
+   * Appends "_&lt;number&gt;" to a given String. &lt;number&gt; is being set to the next
+   * free number, so that this sID is unique in this {@link SBMLDocument}. Should
+   * only be called from {@link #nameToSId(String)}.
+   * 
+   * @return
+   */
+  private static String incrementSIdSuffix(String prefix, SBMLDocument doc) {
+    int i = 1;
+    String aktString = prefix + "_" + i;
+    Model model = doc.getModel();
+    while (model.containsUniqueNamedSBase(aktString)) {
+      aktString = prefix + "_" + (++i);
+    }
+    return aktString;
+  }
+
+  /**
+   * Generates a valid SId from a given name. If the name already is a valid
+   * SId, the name is returned. If the SId already exists in this document,
+   * "_&lt;number>" will be appended and the next free number is being assigned.
+   * => See SBML L2V4 document for the Definition of SId. (Page 12/13)
+   * 
+   * @param name
+   * @return SId
+   */
+  public static String nameToSId(String name, SBMLDocument doc) {
+    /*
+     * letter = a-z,A-Z; digit = 0-9; idChar = (letter | digit | _ );
+     * SId = ( letter | _ ) idChar*
+     */
+    String ret;
+    if ((name == null) || (name.trim().length() == 0)) {
+      ret = incrementSIdSuffix("SId", doc);
+    } else {
+      name = name.trim();
+      StringBuilder ret2 = new StringBuilder(name.length()+4);
+      char c = name.charAt(0);
+
+      // Must start with letter or '_'.
+      if (!(isLetter(c) || c == '_')) {
+        ret2.append("SId_");
+      } else {
+        ret2.append(c);
+      }
+
+      // May contain letters, digits or '_'
+      for (int i = 1; i < name.length(); i++) {
+        c = name.charAt(i);
+        if (c == ' ') {
+          c = '_'; // Replace spaces with "_"
+        }
+
+        if (isLetter(c) || Character.isDigit(c) || (c == '_')) {
+          ret2.append(c);
+        } // else: skip invalid characters
+      }
+
+      // Make unique
+      ret = ret2.toString();
+      Model model = doc.getModel();
+      if (model.containsUniqueNamedSBase(ret)) {
+        ret = incrementSIdSuffix(ret, doc);
+      }
+    }
+
+    return ret;
+  }
+
+  /**
+   * Returns true if c is out of A-Z or a-z.
+   * @param c
+   * @return
+   */
+  private static boolean isLetter(char c) {
+    // Unfortunately Character.isLetter also accepts ??, but SBML doesn't.
+    // a-z or A-Z
+    return ((c >= 97) && (c <= 122)) || ((c >= 65) && (c <= 90));
+  }
+
 }

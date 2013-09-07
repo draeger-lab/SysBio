@@ -1,7 +1,7 @@
 <!-- ANT build script for yfiles obfuscation           -->
 <!-- The java based ANT tool is available from         -->
 <!-- http://jakarta.apache.org/ant                     -->
-           	
+
 <project name="SysBio" default="usage" basedir=".">
 	
 	<!-- =================================================================== -->
@@ -40,7 +40,7 @@
   	  PLESE MAKE SURE ALL PATHS ARE CORRECT AND DECIDE IF YOU WANT
   	  TO USE THE LIB-JARs OR REFERENCED PROJECTS.
   	</echo>
-  	<tstamp /> <!-- set ${TODAY} and ${TSTAMP} -->
+  	<tstamp/> <!-- set ${TODAY} and ${TSTAMP} -->
   	
   	<property name="Name" value="SysBio Library"/>
   	
@@ -282,23 +282,20 @@
   	depends="init"
   	description="Determines the current SVN revions number and stores it in a variable."
   >
-    <exec executable="svnversion" outputproperty="repository.revision">
-	  <arg line="-c ${base}" />
-	  <redirector>
-	    <outputfilterchain>
-	      <tokenfilter>
-	        <replaceregex pattern="[0-9]+\:" replace="" />
-	        <replaceregex pattern="[PM]+" replace="" />
-	      </tokenfilter>
-	    </outputfilterchain>
-	  </redirector>
-	</exec>
-    <echo message="Current revision is ${repository.revision}" />
+    <exec executable="svn" outputproperty="svninfo.xml">
+      <arg line="info --xml"/>
+    </exec>
+    <xmlproperty collapseAttributes="true">
+      <propertyresource name="svninfo.xml"/>
+    </xmlproperty>
+	<property name="repository.revision" value="${info.entry.revision}"/>
+    <echo message="Current revision is ${repository.revision}."/>
   	
   	<property name="build.name" value="Revision ${repository.revision} ${TODAY} (Build ${build.number})"/>
     <property name="appJarRev" value="${appBaseJar}_r${repository.revision}.jar"/>
     <property name="appJarRevRaw" value="${appBaseJarRaw}_r${repository.revision}.jar"/>
     <property name="appJarRevWithGraph" value="${appBaseJarWithGraph}_r${repository.revision}.jar"/>
+    
   </target>
 	
 	<target name="jar_revision_number" depends="obfuscate,svnrevision" description="Renames the JAR revision number to its filename">
