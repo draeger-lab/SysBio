@@ -325,6 +325,26 @@ Serializable {
 	private boolean visible = true;
 	
 	/**
+	 * Decide whether the value of this option is allowed to be displayed to users,
+	 * e.g., passwords etc.  
+	 */
+	private boolean secret = false;
+	
+	/**
+	 * @return the secret
+	 */
+	public boolean isSecret() {
+	  return secret;
+	}
+	
+	/**
+	 * @param secret the secret to set
+	 */
+	public void setSecret(boolean secret) {
+	  this.secret = secret;
+	}
+	
+	/**
 	 * 
 	 * @param optionName
 	 * @param requiredType

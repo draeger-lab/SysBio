@@ -49,6 +49,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
@@ -235,6 +236,23 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * @return
    */
   protected static JComponent getColumnChooser(ComboBoxModel model, int defaultValue, boolean required, ActionListener l, boolean acceptOnlyIntegers) {
+    return getColumnChooser(model, defaultValue, required, l, acceptOnlyIntegers, false);
+  }
+  
+  /**
+   * 
+   * @param model
+   * @param defaultValue
+   * @param required
+   * @param l
+   * @param acceptOnlyIntegers
+   * @param secret is it legal do display the value to the user? For instance, password field
+   * @return
+   * @see #getColumnChooser(ComboBoxModel, int, boolean, ActionListener, boolean)
+   */
+  public static JComponent getColumnChooser(ComboBoxModel model,
+    int defaultValue, boolean required, ActionListener l,
+    boolean acceptOnlyIntegers, boolean secret) {
     JComponent ret;
     
     if ((model != null) && (model.getSize() > 0)) {
@@ -260,7 +278,11 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       if (acceptOnlyIntegers) {
         tf =CSVReaderOptionPanel.buildIntegerBox(Integer.toString(defaultValue), l);
       } else {
-        tf = new JTextField(defaultValue);
+        if (secret) {
+          tf = new JPasswordField(defaultValue);
+        } else {
+          tf = new JTextField(defaultValue);
+        }
         tf.setColumns(TEXTFIELD_COLUMNS);
         tf.addActionListener(l);
       }
@@ -416,6 +438,8 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * Use a JTextField instead of JComboBoxes
    */
   protected boolean useJTextField = false;
+
+  private boolean secret = false;
   
   /**
    * Creates a new column chooser which let's the user choose
@@ -470,6 +494,11 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * @param columnHeaders - Column Headers
    */
   public JLabeledComponent(String title, boolean fieldIsRequired, Object[] columnHeaders) {
+    this(title, fieldIsRequired, columnHeaders, false);
+  }
+  
+  public JLabeledComponent(String title, boolean fieldIsRequired,
+    Object[] columnHeaders, boolean secret) {
     super();
     initGUI();
     
@@ -480,8 +509,9 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     setHeaders(columnHeaders);
     
     label.setLabelFor(colChooser);
+    this.secret  = secret;
   }
-  
+
   /**
    * Add any action Listener to the combo box.
    * Be careful: The action listeners are erased when the selector
@@ -831,7 +861,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       if (colChooser != null) {
         remove(colChooser);
       }
-      colChooser = getColumnChooser(useJTextField ? null : model, -1, required, null, acceptOnlyIntegers);
+      colChooser = getColumnChooser(useJTextField ? null : model, -1, required, null, acceptOnlyIntegers, secret);
       
       // Add to layout
       if (getLayout() instanceof GridBagLayout) {

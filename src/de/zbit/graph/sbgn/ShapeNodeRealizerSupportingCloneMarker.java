@@ -126,6 +126,7 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
 					g.setColor(color);
 					g.draw(ellipse);
 				}
+				break;
 			case ROUND_RECT:
 				double x = getX(), y = getY(), width = getWidth(), height = getHeight();
 				RoundRectangle2D rectangle = new RoundRectangle2D.Double(

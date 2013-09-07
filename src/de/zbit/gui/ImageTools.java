@@ -413,7 +413,7 @@ public class ImageTools {
     };
     for (String path : iconPaths) {
       URL u = ImageTools.class.getResource("img/" + path);
-      if (u!=null) {
+      if (u != null) {
         UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(u));
       }
     }

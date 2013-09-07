@@ -395,7 +395,12 @@ public class StatusBar extends JPanel implements ProgressListener {
 	  hideProgress();
 	}
 
-	private class LimitLogHandler extends Handler{
+	/**
+	 * 
+	 * @author Clemens Wrzodek
+	 * @version $Rev$
+	 */
+	private class LimitLogHandler extends Handler {
 		
 		private FontMetrics fontMetrics;
 
@@ -444,12 +449,12 @@ public class StatusBar extends JPanel implements ProgressListener {
 			String m = message.toString();
 
 			if (!m.equals(statusLabel.getText())) {
-				if(limitLogLength) {
+				if (limitLogLength) {
 					String limitedMessage = "";
 					int maxIndex = 0;
-					for(int i = 0; i < m.length(); i++) {
+					for (int i = 0; i < m.length(); i++) {
 						limitedMessage += m.charAt(i);
-						if(fontMetrics.stringWidth(limitedMessage) < maxLogSize) {
+						if (fontMetrics.stringWidth(limitedMessage) < maxLogSize) {
 							// Set the status label text.
 							maxIndex = i+1;
 						}

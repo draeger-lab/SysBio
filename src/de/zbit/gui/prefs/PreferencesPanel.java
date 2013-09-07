@@ -25,6 +25,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -260,7 +261,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
       
     } else if (String.class.isAssignableFrom(clazz)
         || (Enum.class.isAssignableFrom(clazz))) {
-      component = new JLabeledComponent(optionTitle, true, values);
+      component = new JLabeledComponent(optionTitle, true, values, option.isSecret());
       ((JLabeledComponent) component).setAcceptOnlyIntegers(false);
       
     } else if (Number.class.isAssignableFrom(clazz)) {
@@ -292,7 +293,7 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
         }
       }
       
-    } else if (java.awt.Color.class.isAssignableFrom(clazz)) {
+    } else if (Color.class.isAssignableFrom(clazz)) {
       // Create color chooser with defaultValue or white as initial color.
       Color initial = null;
       if (defaultValue instanceof Color) {
@@ -319,6 +320,11 @@ public abstract class PreferencesPanel extends JPanel implements KeyListener,
     		initial = Option.parseOrCast(Date.class, defaultValue);
     	}
     	component = new JDatePanel(optionTitle, initial);
+    
+    } else if (URL.class.isAssignableFrom(clazz)) {
+      
+      component = new JLabeledComponent(optionTitle, true, values);
+      ((JLabeledComponent) component).setAcceptOnlyIntegers(false);
     	
     } else if ((values != null) && (values.length > 0)) {
       component = new JLabeledComponent(optionTitle, true, values);

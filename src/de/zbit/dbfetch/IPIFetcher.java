@@ -139,7 +139,7 @@ public class IPIFetcher extends DBFetcher {
     String[] ids = new String[]{"IPI00114375", "IPI00420349"};
     
     String[] results = ipifetch.getInformations(ids);
-    for( int i = 0; i < ids.length; i++) {
+    for ( int i = 0; i < ids.length; i++) {
       System.out.println("=== ID: " + ids[i] + " ===");
       System.out.println(results[i]);
       System.out.println();
