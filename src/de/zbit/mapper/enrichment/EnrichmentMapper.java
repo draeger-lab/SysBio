@@ -36,17 +36,17 @@ import de.zbit.mapper.Mapper;
 public interface EnrichmentMapper<SourceType, TargetType> extends Mapper<SourceType, Collection<TargetType>> {
   
   /**
-   * Total number of genes, occuring in all enrichment classes
-   * including multiples (genes occuring in multiple
-   * e.g., pathways).
+   * Total number of entities (genes/compounds), occuring in all
+   * enrichment classes including multiples (entities occuring in
+   * multiple e.g., pathways).
    * <p>
    * Use {@link AbstractMapper#size()} to get number of
-   * unique genes, occuring in all pathways.
+   * unique entities, occuring in all pathways.
    * <p>
    * This is mostly equal to the sum of all {@link java.util.Collection#size()}s.
    * @return
    */
-  public int getGenomeSize();
+  public int getSumOfEntitiesInClasses();
   
   /**
    * Return the size of an enrichment class.

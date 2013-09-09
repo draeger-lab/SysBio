@@ -511,6 +511,13 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
   public void initialize() throws IOException {
     if (!isInizialized) init();
   }
-
+  
+  /**
+   * Allow access to templocalfile for subclasses
+   * @return
+   */
+  protected String getTempLocalFile(){
+  	return this.tempLocalFile;
+  }
   
 }

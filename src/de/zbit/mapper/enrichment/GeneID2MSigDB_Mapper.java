@@ -130,7 +130,7 @@ public class GeneID2MSigDB_Mapper extends AbstractEnrichmentMapper<Integer, Stri
     Collection c = mapper.map(5175);
     if (c==null) System.out.println("null");
     else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("NonUnique: " + mapper.getGenomeSize() + " Unique: " + mapper.size());
+    System.out.println("NonUnique: " + mapper.getSumOfEntitiesInClasses() + " Unique: " + mapper.size());
     System.out.println(mapper.getEnrichmentClassSize("BIOCARTA_SRCRPTP_PATHWAY"));
     
     System.out.println("=================");
@@ -138,7 +138,7 @@ public class GeneID2MSigDB_Mapper extends AbstractEnrichmentMapper<Integer, Stri
     c = mapper.map(121021); // ="CSPG4"
     if (c==null) System.out.println("null");
     else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("NonUnique: " + mapper.getGenomeSize() + " Unique: " + mapper.size());
+    System.out.println("NonUnique: " + mapper.getSumOfEntitiesInClasses() + " Unique: " + mapper.size());
     System.out.println(mapper.getEnrichmentClassSize("V$SP1_Q6_01"));
     
   }
@@ -166,7 +166,7 @@ public class GeneID2MSigDB_Mapper extends AbstractEnrichmentMapper<Integer, Stri
    */
   protected boolean skipLine(String[] line) {
     // col 0 = target, 1 = URL, 2-X = genes
-    genesInPathway.put(line[getTargetColumn(null)], line.length-2);
+    entitiesInPathway.put(line[getTargetColumn(null)], line.length-2);
     sumOfCollectionSizes+=line.length-2;
     return super.skipLine(line);
   }

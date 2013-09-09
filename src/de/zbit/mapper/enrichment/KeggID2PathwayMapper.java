@@ -37,7 +37,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * Maps the given KEGG gene id (see {@link GeneID2KeggIDMapper}) to
- * a {@link Collection} of KEGG Pathways, in which this gene occurs.
+ * a {@link Collection} of KEGG Pathways, in which this gene/compound occurs.
  * 
  * <p>XXX: KEGG Pathway FTP is no more available. You'll have to use
  * cached KEGG mapping files for this class to work.
@@ -76,33 +76,28 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
   
   /**
    * What should be considerer? Genes, compounds or both?
+   * A user MUST decide via the constructors. Setting a default might generate errors
    */
-  private IdentifierClass dataType=IdentifierClass.Gene;
+  private IdentifierClass dataType;
   
   /**
    * @param sourceType
    * @param targetType
    * @throws IOException
    */
-  public KeggID2PathwayMapper(String speciesKEGGPrefix)
+  public KeggID2PathwayMapper(String speciesKEGGPrefix, IdentifierClass dataType)
   throws IOException {
-    this(speciesKEGGPrefix, null);
+    this(speciesKEGGPrefix, null, dataType);
   }
   
-  public KeggID2PathwayMapper(Species species) throws IOException {
-    this(species.getKeggAbbr());
+  public KeggID2PathwayMapper(Species species, IdentifierClass dataType) throws IOException {
+    this(species.getKeggAbbr(),dataType);
   }
   
-  public KeggID2PathwayMapper(Species species, AbstractProgressBar progress) throws IOException {
-    this(species.getKeggAbbr(), progress);
+  public KeggID2PathwayMapper(Species species, AbstractProgressBar progress, IdentifierClass dataType) throws IOException {
+    this(species.getKeggAbbr(), progress, dataType);
   }
-  
-  public KeggID2PathwayMapper(String speciesKEGGPrefix, AbstractProgressBar progress)
-  throws IOException {
- // By default, init an enrichment mapper that only considers genes and no metabolites.
-    this (speciesKEGGPrefix, progress, IdentifierClass.Gene);
-  }
-  
+    
   /**
    * Read KEGG_IDs and map them to pathways. Note: KEGG IDs are always saved WITH PREFIX.
    * So be sure to add "cpd:" to your compounds and, e.g., "hsa:" to your gene IDs!
@@ -133,7 +128,7 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
   @SuppressWarnings("rawtypes")
   public static void main(String[] args) throws Exception {
     LogUtil.initializeLogging(Level.FINE);
-    KeggID2PathwayMapper mapper = new KeggID2PathwayMapper("mmu");
+    KeggID2PathwayMapper mapper = new KeggID2PathwayMapper("mmu",IdentifierClass.Gene);
     
     for (int i=0; i<2; i++) {
       Collection c = mapper.map("mmu:11576");
@@ -148,7 +143,7 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
       if (c==null) System.out.println("null");
       else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
       
-      System.out.println("NonUnique: " + mapper.getGenomeSize() + " Unique: " + mapper.size());
+      System.out.println("NonUnique: " + mapper.getSumOfEntitiesInClasses() + " Unique: " + mapper.size());
       System.out.println(mapper.getEnrichmentClassSize("path:mmu04530"));
       System.out.println(mapper.getEnrichmentClassSize("Tight junction"));
       
@@ -245,8 +240,8 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
    * unique genes, occuring in all pathways.
    * @return
    */
-  public int getGenomeSize() {
-    return super.getGenomeSize();
+  public int getSumOfEntitiesInClasses() {
+    return super.getSumOfEntitiesInClasses();
   }
   
   /**
