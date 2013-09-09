@@ -97,7 +97,7 @@ public class GeneID2GO_ID_Mapper extends AbstractEnrichmentMapper<Integer, Strin
       if (c==null) System.out.println("null");
       else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
       
-      System.out.println("NonUnique: " + mapper.getGenomeSize() + " Unique: " + mapper.size());
+      System.out.println("NonUnique: " + mapper.getSumOfEntitiesInClasses() + " Unique: " + mapper.size());
       System.out.println(mapper.getEnrichmentClassSize("GO:0008219"));
       System.out.println(mapper.getEnrichmentClassSize("cell death"));
       

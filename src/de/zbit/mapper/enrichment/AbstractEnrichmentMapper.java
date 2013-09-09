@@ -57,7 +57,7 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
    * Thus, the key is the enrichment-class-id(.toString()) and the Integer is the
    * total number of genes in the enrichment class.
    */
-  public Map<String, Integer> genesInPathway = new HashMap<String, Integer>();
+  public Map<String, Integer> entitiesInPathway = new HashMap<String, Integer>();
   
   /**
    * @param sourceType
@@ -74,8 +74,9 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
   /**
    * We do no postProcessing here, but fill our private variables.
    * 
-   * <p>We count the genome size in {@link #sumOfCollectionSizes}
-   * and the Genes in an Enrichment class {@link #genesInPathway}.
+   * <p>We count the number of entities in {@link #sumOfCollectionSizes}
+   * and the entities in an Enrichment class {@link #genesInPathway}. An
+   * entity might be a geneID or a compoundID
    * 
    * <p>Methods, overriding this method should at any cost make
    * a reference to this super method!
@@ -90,11 +91,11 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
       // Remark: No matter what the targetType originally was,
       // here it is always a string!
       String key = it.next().toString();
-      Integer count = genesInPathway.get(key);
+      Integer count = entitiesInPathway.get(key);
       if (count==null) count = new Integer(0);
       
       
-      genesInPathway.put(key, (++count));
+      entitiesInPathway.put(key, (++count));
       sumOfCollectionSizes++;
     }
     
@@ -106,7 +107,7 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
   /* (non-Javadoc)
    * @see de.zbit.mapper.EnrichmentMapper#getGenomeSize()
    */
-  public int getGenomeSize() {
+  public int getSumOfEntitiesInClasses() {
     return this.sumOfCollectionSizes;
   }
   
@@ -114,7 +115,7 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
    * @see de.zbit.mapper.EnrichmentMapper#getEnrichmentClassSize()
    */
   public int getEnrichmentClassSize(TargetType className) {
-    Integer i = genesInPathway.get(className.toString());
+    Integer i = entitiesInPathway.get(className.toString());
     return i==null?0:i;
   }
   
@@ -146,10 +147,10 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
     }
     
     // Reflect this change also in private map
-    String[] oldKeys = genesInPathway.keySet().toArray(new String[0]);
+    String[] oldKeys = entitiesInPathway.keySet().toArray(new String[0]);
     for (String key : oldKeys) {
       try {
-        genesInPathway.put(ID2Name.map(Option.parseOrCast(ID2Name.getSourceType(), key)), genesInPathway.remove(key));
+        entitiesInPathway.put(ID2Name.map(Option.parseOrCast(ID2Name.getSourceType(), key)), entitiesInPathway.remove(key));
       } catch (Exception e) {
         log.log(Level.WARNING, "Could not reconstrocut enrichment classes and counters", e);
       }

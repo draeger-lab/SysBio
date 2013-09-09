@@ -19,17 +19,14 @@ package de.zbit.mapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
-import de.zbit.mapper.compounds.CAS2CompoundIDMapper;
-import de.zbit.mapper.compounds.ChEBI2CompoundIDMapper;
-import de.zbit.mapper.compounds.ChemSpider2CompoundIDMapper;
-import de.zbit.mapper.compounds.CompoundSynonym2CompoundIDMapper;
-import de.zbit.mapper.compounds.HMDB2CompoundIDMapper;
-import de.zbit.mapper.compounds.InChI2CompoundIDMapper;
-import de.zbit.mapper.compounds.InChIKey2ComoundIDMapper;
-import de.zbit.mapper.compounds.KeggCompound2CompoundIDMapper;
-import de.zbit.mapper.compounds.PubChemCompound2CompoundIDMapper;
+import de.zbit.mapper.compounds.CHEBI2InChIKeyMapper;
+import de.zbit.mapper.compounds.HMDB2InChIKeyMapper;
+import de.zbit.mapper.compounds.KeggCompound2InChIKeyMapper;
+import de.zbit.mapper.compounds.LIPIDMAPS2InChIKeyMapper;
+import de.zbit.mapper.compounds.PC_compound2InChIKeyMapper;
 import de.zbit.mapper.probes.ProbeID2GeneIDMapper;
 import de.zbit.mapper.probes.ProbeID2GeneIDMapper.Manufacturer;
 import de.zbit.util.DatabaseIdentifiers;
@@ -62,7 +59,7 @@ public class MappingUtils {
     // we need a subset of identifiers that are mappable to geneID or compoundID
     // and have an actual 2GeneID implementation here.
   	// (2GeneID implementation also performs the mapping of compounds)
-    Unknown(IdentifierClass.Gene),
+    UnknownGene(IdentifierClass.Gene),
     NCBI_GeneID(IdentifierClass.Gene),
     RefSeq(IdentifierClass.Gene),
     Ensembl(IdentifierClass.Gene),
@@ -73,16 +70,13 @@ public class MappingUtils {
     Agilent(IdentifierClass.Gene),
     Illumina(IdentifierClass.Gene),
     
-    CompoundID(IdentifierClass.Compound),
-    HMDB(IdentifierClass.Compound),
-    KeggCompound(IdentifierClass.Compound),
-    InChI(IdentifierClass.Compound),
     InChIKey(IdentifierClass.Compound),
-    ChEBI(IdentifierClass.Compound),
-    CAS(IdentifierClass.Compound),
-    ChemSpider(IdentifierClass.Compound),
-    PubChem_compound(IdentifierClass.Compound),
-    CommonName(IdentifierClass.Compound),
+    CompoundName(IdentifierClass.Compound),
+    HMDB(IdentifierClass.Compound),
+    LIPIDMAPS(IdentifierClass.Compound),
+    KeggCompound(IdentifierClass.Compound),
+    CHEBI(IdentifierClass.Compound),
+    PC_compound(IdentifierClass.Compound),
     UnknownCompound(IdentifierClass.Compound);
     
     private IdentifierClass identClass;
@@ -187,30 +181,22 @@ public class MappingUtils {
         return "ILMN_\\d+";
         
       // Compound identifiers
-      case CompoundID:
-      	return "\\d{5}";
       case HMDB:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.HMDB, false);
       case KeggCompound:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.KEGG_Compound, false);
-      case InChI:
-        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
-          DatabaseIdentifiers.IdentifierDatabases.InChI, false);
       case InChIKey:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.InChIKey, false);
-      case ChEBI:
+      case CHEBI:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.ChEBI, false);
-      case CAS:
+      case LIPIDMAPS:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
-          DatabaseIdentifiers.IdentifierDatabases.CAS, false);
-      case ChemSpider:
-        return DatabaseIdentifiers.getRegularExpressionForIdentifier(
-          DatabaseIdentifiers.IdentifierDatabases.ChemSpider, false);
-      case PubChem_compound:
+          DatabaseIdentifiers.IdentifierDatabases.LIPIDMAPS, false);
+      case PC_compound:
         return DatabaseIdentifiers.getRegularExpressionForIdentifier(
           DatabaseIdentifiers.IdentifierDatabases.PubChem_compound, false);
         
@@ -239,54 +225,69 @@ public class MappingUtils {
    */
   public static AbstractMapper<String, Integer> initialize2GeneIDMapper(IdentifierType sourceIDtype, AbstractProgressBar progress, Species species) throws IOException {
     // Init mapper based on targetIDtype
-    AbstractMapper<String, Integer> mapper = null;
+  	AbstractMapper<String, Integer> mapper = null;
+  	if (sourceIDtype!=null) {
+  		if(sourceIDtype.getIdentifierClass().equals(IdentifierClass.Gene)) {
+  			log.info("Initializing 2GeneID mapper...");
+  			if (sourceIDtype.equals(IdentifierType.RefSeq)) {
+  				mapper = new RefSeq2GeneIDMapper(progress, species.getNCBITaxonID());
+  			} else if (sourceIDtype.equals(IdentifierType.Ensembl)) {
+  				mapper = new Ensembl2GeneIDMapper(species.getCommonName(), progress);
+  			} else if (sourceIDtype.equals(IdentifierType.GeneSymbol)) {
+  				mapper = new GeneSymbol2GeneIDMapper(species.getCommonName(), progress);
+  			} else if (sourceIDtype.equals(IdentifierType.KeggGenes)) {
+  				mapper = new KeggGenesID2GeneID(species.getKeggAbbr(), progress);
+  			} else if (sourceIDtype.equals(IdentifierType.UniProt)) {
+  				mapper = new UniProt2GeneIDmapper(species, progress);
+  			} else if (sourceIDtype.equals(IdentifierType.Affymetrix)) {
+  				mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Affymetrix, species.getCommonName());
+  			} else if (sourceIDtype.equals(IdentifierType.Agilent)) {
+  				mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Agilent, species.getCommonName());
+  			} else if (sourceIDtype.equals(IdentifierType.Illumina)) {
+  				mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Illumina, species.getCommonName());
+  			}
+  		}
+  	}
+    return mapper;
+  }
+  
+  /**
+   * Initializes an X to InChIKey mapper.
+   * @param sourceIDtype - see {@link IdentifierType}
+   * @param progress - Optional progress bar, used for downloading or reading the mapping flatfile. May be null.
+   * @return
+   * @throws IOException
+   */
+  public static AbstractMapper<String, Set<String>> initialize2InChIKeyMapper(IdentifierType sourceIDtype, AbstractProgressBar progress) throws IOException {
+    // Init mapper based on targetIDtype
+    AbstractMapper<String, Set<String>> mapper = null;
+
+
     if (sourceIDtype!=null) {
-    	if(sourceIDtype.getIdentifierClass().equals(IdentifierClass.Gene)) {
-    	  log.info("Initializing 2GeneID mapper...");
-	      if (sourceIDtype.equals(IdentifierType.RefSeq)) {
-	        mapper = new RefSeq2GeneIDMapper(progress, species.getNCBITaxonID());
-	      } else if (sourceIDtype.equals(IdentifierType.Ensembl)) {
-	        mapper = new Ensembl2GeneIDMapper(species.getCommonName(), progress);
-	      } else if (sourceIDtype.equals(IdentifierType.GeneSymbol)) {
-	        mapper = new GeneSymbol2GeneIDMapper(species.getCommonName(), progress);
-	      } else if (sourceIDtype.equals(IdentifierType.KeggGenes)) {
-	        mapper = new KeggGenesID2GeneID(species.getKeggAbbr(), progress);
-	      } else if (sourceIDtype.equals(IdentifierType.UniProt)) {
-	        mapper = new UniProt2GeneIDmapper(species, progress);
-	      } else if (sourceIDtype.equals(IdentifierType.Affymetrix)) {
-	        mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Affymetrix, species.getCommonName());
-	      } else if (sourceIDtype.equals(IdentifierType.Agilent)) {
-	        mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Agilent, species.getCommonName());
-	      } else if (sourceIDtype.equals(IdentifierType.Illumina)) {
-	        mapper = new ProbeID2GeneIDMapper(progress, Manufacturer.Illumina, species.getCommonName());
-	      }
-	      
-	      
-    	} else if(sourceIDtype.getIdentifierClass().equals(IdentifierClass.Compound)) {
-    	  log.info("Initializing 2CompoundID mapper...");
-        if (sourceIDtype.equals(IdentifierType.HMDB)) {
-          mapper = new HMDB2CompoundIDMapper(progress);
-        } else if (sourceIDtype.equals(IdentifierType.KeggCompound)) {
-          mapper = new KeggCompound2CompoundIDMapper(progress);
-        } else if (sourceIDtype.equals(IdentifierType.InChI)) {
-          mapper = new InChI2CompoundIDMapper(progress);
-        } else if (sourceIDtype.equals(IdentifierType.InChIKey)) {
-          mapper = new InChIKey2ComoundIDMapper(progress);
-        } else if (sourceIDtype.equals(IdentifierType.ChEBI)) {
-          mapper = new ChEBI2CompoundIDMapper(progress);
-        } else if (sourceIDtype.equals(IdentifierType.CAS)) {
-          mapper = new CAS2CompoundIDMapper(progress);
-        } else if (sourceIDtype.equals(IdentifierType.ChemSpider)) {
-          mapper = new ChemSpider2CompoundIDMapper(progress);
-        } else if (sourceIDtype.equals(IdentifierType.PubChem_compound)) {
-          mapper = new PubChemCompound2CompoundIDMapper(progress);
-        } else if (sourceIDtype.equals(IdentifierType.CommonName)) {
-          mapper = new CompoundSynonym2CompoundIDMapper(progress);
-        }
-    		
+    	if(sourceIDtype.getIdentifierClass().equals(IdentifierClass.Compound)) {
+    		log.info("Initializing 2InChIKey mapper...");
+    		//if (sourceIDtype.equals(IdentifierType.CompoundName)) {
+    		//	mapper = new CHEBI2InChIKeyMapper(progress);
+    		//}
+    		if (sourceIDtype.equals(IdentifierType.HMDB)) {
+    			mapper = new HMDB2InChIKeyMapper(progress);
+    		}
+    		if (sourceIDtype.equals(IdentifierType.LIPIDMAPS)) {
+    			mapper = new LIPIDMAPS2InChIKeyMapper(progress);
+    		}
+    		if (sourceIDtype.equals(IdentifierType.KeggCompound)) {
+    			mapper = new KeggCompound2InChIKeyMapper(progress);
+    		}
+    		if (sourceIDtype.equals(IdentifierType.CHEBI)) {
+    			mapper = new CHEBI2InChIKeyMapper(progress);
+    		}
+    		if (sourceIDtype.equals(IdentifierType.PC_compound)) {
+    			mapper = new PC_compound2InChIKeyMapper(progress);
+    		}
     	}
     }
     return mapper;
   }
+  
 
 }
