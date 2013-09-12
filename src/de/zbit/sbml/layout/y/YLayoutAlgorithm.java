@@ -490,6 +490,11 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 		return output;
 	}
 
+	/**
+	 * 
+	 * @param srg
+	 * @param rg
+	 */
 	private void handleEdge(SpeciesReferenceGlyph srg, ReactionGlyph rg) {
 		Node processNode = glyphNodeMap.get(rg.getId());
 		Node speciesGlyphNode = glyphNodeMap.get(srg.getSpeciesGlyph());

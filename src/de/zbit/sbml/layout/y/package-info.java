@@ -16,13 +16,14 @@
  */
 
 /**
- * <p>This package implements the generic LayoutBuilder and LayoutAlgorithm classes
- * and all necessary SBGN representations for usage with YFiles.</p>
- * 
- * <p>Nodes are implemented using {@link y.view.NodeRealizer}, arcs are implemented
- * using {@link y.view.EdgeRealizer}.</p>
- * 
- * <p>The output type is {@link y.view.Graph2D}.</p>
+ * <p>
+ * This package implements the generic LayoutBuilder and LayoutAlgorithm classes
+ * and all necessary SBGN representations for usage with YFiles.
+ * <p>
+ * Nodes are implemented using {@link y.view.NodeRealizer}, arcs are implemented
+ * using {@link y.view.EdgeRealizer}.
+ * <p>
+ * The output type is {@link y.view.Graph2D}.
  * 
  * @author Jakob Matthes
  * @version $Rev$
