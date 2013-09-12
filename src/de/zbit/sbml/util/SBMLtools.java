@@ -19,6 +19,7 @@ package de.zbit.sbml.util;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.swing.tree.TreeNode;
@@ -209,9 +210,9 @@ public class SBMLtools {
 	
 
   /**
-   * Appends "_&lt;number&gt;" to a given String. &lt;number&gt; is being set to the next
-   * free number, so that this sID is unique in this {@link SBMLDocument}. Should
-   * only be called from {@link #nameToSId(String)}.
+   * Appends "_&lt;number&gt;" to a given String. &lt;number&gt; is being set to
+   * the next free number, so that this sID is unique in this
+   * {@link SBMLDocument}. Should only be called from {@link #nameToSId(String)}.
    * 
    * @return
    */
@@ -288,4 +289,23 @@ public class SBMLtools {
     return ((c >= 97) && (c <= 122)) || ((c >= 65) && (c <= 90));
   }
 
+  /**
+   * Generate a valid SBML identifier using UUID.
+   * 
+   * @param model
+   * @return
+   */
+  public static String nextId(Model model) {
+    String idOne;
+    do {
+      idOne = UUID.randomUUID().toString().replace("-", "_");
+      if (Character.isDigit(idOne.charAt(0))) {
+        // Add an underscore at the beginning of the new id only if
+        // necessary.
+        idOne = '_' + idOne;
+      }
+    } while (model.findNamedSBase(idOne) != null);
+    return idOne;
+  }
+  
 }

@@ -213,7 +213,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		id2node.put(compartmentGlyph.getId(), ynode);
 		putInMapSet(compartmentId2Node, compartmentGlyph.getCompartment(), ynode);
 		node2glyph.put(ynode, compartmentGlyph);
-		logger.fine(String.format("building compartment glyph id=%s\n\tbounding box=%s",
+		logger.fine(MessageFormat.format("building compartment glyph id={0}\n\tbounding box={1}",
 				compartmentGlyph.getId(), nodeRealizer.getBoundingBox()));
 	}
 
@@ -249,7 +249,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 //	    nodeRealizer.setFillColor2(fillColor.brighter());
 //	    nodeRealizer.setFillColor(fillColor);
 		
-		logger.fine(String.format("building EPN element id=%s sbo=%d (%s)\n\tbounding box= %s %s",
+		logger.fine(MessageFormat.format("building EPN element id={0} sbo={1} (%s)\n\tbounding box= {2} {3}",
 				speciesGlyph.getId(), speciesGlyph.getSBOTerm(), SBO.convertSBO2Alias(speciesGlyph.getSBOTerm()),
 				speciesGlyph.getBoundingBox().getPosition(), nodeRealizer.getBoundingBox()));
 		
@@ -444,7 +444,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 			height = dimensions.getHeight();
 			
 			text = textGlyph.getText();
-			logger.fine(String.format("building text glyph element id=%s\n\tindependent text text='%s'",
+			logger.fine(MessageFormat.format("building text glyph element id={0}\n\tindependent text text='{1}'",
 					textGlyph.getId(), text));
 
 			Node ynode = graph.createNode();
@@ -459,7 +459,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 			labelTextGlyphs.add(textGlyph);
 		}
 		else {
-			logger.warning(String.format("illegal text glyph id=%s", textGlyph.getId()));
+			logger.warning(MessageFormat.format("illegal text glyph id={0}", textGlyph.getId()));
 		}
 	}
 
@@ -512,7 +512,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 			double glyphX = position.getX();
 			double glyphY = position.getY();
 			
-			logger.fine(String.format("text position is %.2f,%.2f", glyphX, glyphY));
+			logger.fine(MessageFormat.format("text position is {0,number},{1,number}", glyphX, glyphY));
 			
 			Dimensions dimensions = textGlyph.getBoundingBox().getDimensions();
 			double width = dimensions.getWidth();
@@ -621,7 +621,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 				List<AbstractReferenceGlyph> reactionGlyphs = (List<AbstractReferenceGlyph>) reaction.getUserObject(LayoutDirector.LAYOUT_LINK);
 				if (reactionGlyphs != null) {
 					for (AbstractReferenceGlyph reactionGlyph : reactionGlyphs) {
-						edgeListSet.add(new LinkedList<Edge>(reactionGlyphId2edges.get(reactionGlyph.getId())));
+					  String id = reactionGlyph.getId();
+					  Set<Edge> setOfEdges = reactionGlyphId2edges.get(id);
+					  if (setOfEdges != null) {
+					    edgeListSet.add(new LinkedList<Edge>(setOfEdges));
+					  }
 					}
 				}
 				reactionId2Edge.put(reactionId, edgeListSet);

@@ -247,7 +247,7 @@ public class YGraphView implements PropertyChangeListener {
 			// Not really a problem
 		}
 		RestrictedEditMode.addOverviewAndNavigation(view);
-		//view.addViewMode(new RestrictedEditMode());
+		view.addViewMode(new RestrictedEditMode());
 		view.setFitContentOnResize(true);
 		
 		// Create and show window

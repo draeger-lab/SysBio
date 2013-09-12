@@ -105,17 +105,20 @@ import de.zbit.util.StringUtil;
  */
 public class RestrictedEditMode extends EditMode implements Graph2DSelectionListener {
   
+  /**
+   * A {@link Logger} for this class.
+   */
   public static final transient Logger log = Logger.getLogger(RestrictedEditMode.class.getName());
  
   /**
    * A properties table that might be initialized.
    */
-  JTable propTable=null;
+  JTable propTable = null;
   
   /**
    * A panel for the {@link #propTable}.
    */
-  JPanel eastPanel=null;
+  JPanel eastPanel = null;
   
   /**
    * This is used to fire openPathway events on double clicks on
@@ -133,6 +136,9 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    */
   private JComponent parent = null;
   
+  /**
+   * 
+   */
   public RestrictedEditMode() {
     super();
     
@@ -144,13 +150,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     allowEdgeCreation(false);
     allowNodeCreation(false);
     allowMoveLabels(true);
-    
+    allowMoveSelection(true);
     
     /*
      * The Tooltips of nodes, provding descriptions must be shown
      * longer than the system default. Let's show them 15 seconds!
      */
-    if (ToolTipManager.sharedInstance().getDismissDelay()<15000) {
+    if (ToolTipManager.sharedInstance().getDismissDelay() < 15000) {
       ToolTipManager.sharedInstance().setDismissDelay(15000);
     }
   }
@@ -187,13 +193,18 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     this.parent = parent;
   }
   
-  
-  
+  /* (non-Javadoc)
+   * @see y.view.EditMode#createNode(y.view.Graph2D, double, double)
+   */
   @Override
   protected Node createNode(Graph2D graph, double x, double y) {
     // do nothing
     return null;
   }
+  
+  /* (non-Javadoc)
+   * @see y.view.EditMode#createNode(y.view.Graph2D, double, double, y.base.Node)
+   */
   @Override
    protected Node createNode(Graph2D graph, double x, double y, Node parent) {
     // do nothing
@@ -225,6 +236,9 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    */
   public static Thread addDynamicBackgroundImage(final URL imagePath, final Graph2DView pane, final int brighten, final boolean greyscale) {
     Runnable run = new Runnable() {
+      /* (non-Javadoc)
+       * @see java.lang.Runnable#run()
+       */
       public void run() {
         try {
           DefaultBackgroundRenderer renderer = new DefaultBackgroundRenderer(pane);
@@ -264,7 +278,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
   protected String getNodeTip(Node n) {
     // Show a nice ToolTipText for every node.
     GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) n.getGraph().getDataProvider(Graph2Dwriter.mapDescription);
-    if (mapDescriptionMap==null) return super.getNodeTip(n);
+    if (mapDescriptionMap == null) return super.getNodeTip(n);
     
     // Get nodeLabel, description and eventually an image for the ToolTipText
     String nodeLabel = null;
@@ -279,37 +293,44 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       return super.getNodeTip(n);
     }
     if (nm!=null) {
-      for (int i=0; i<nm.length;i++) {
-        if (nm[i]==null) continue;
+      for (int i =0; i<nm.length;i++) {
+        if (nm[i] == null) {
+          continue;
+        }
         Object c = nm[i].get(n);
-        if (c==null || c.toString().length()<1) continue;
+        if ((c == null) || (c.toString().length() < 1)) {
+          continue;
+        }
         String mapDescription = mapDescriptionMap.getV(nm[i]);
-        if (mapDescription==null) continue;
+        if (mapDescription == null) {
+          continue;
+        }
         if (mapDescription.equals(GraphMLmaps.NODE_LABEL)) {
           nodeLabel = "<b>"+c.toString().replace(",", ",<br/>")+"</b><br/>";
         } else if (mapDescription.equals(GraphMLmaps.NODE_DESCRIPTION)) {
           description = "<i>"+c.toString().replace(",", ",<br/>")+"</i><br/>";
         } else if (mapDescription.equals(GraphMLmaps.NODE_KEGG_ID)) {
           for (String s: c.toString().split(",")) {
-            s=s.toUpperCase().trim();
+            s = s.toUpperCase().trim();
             if (s.startsWith("PATH:")) {
-              image+=Pathway.getPathwayPreviewPicture(s);
+              image += Pathway.getPathwayPreviewPicture(s);
             } else if (s.startsWith("CPD:")) {
               // KEGG provides picture for compounds (e.g., "C00118").
-              image+=Pathway.getCompoundPreviewPicture(s);
+              image += Pathway.getCompoundPreviewPicture(s);
             }
           }
           
         } else if (mapDescription.startsWith("[")) {
           // I know, it is a dirty solution, but it allows other applications
           // that use KEGGtranslator to include something into the tooltip.
-          if (additional.length()>0) additional.append("<br/>");
+          if (additional.length() > 0) {
+            additional.append("<br/>");
+          }
           additional.append(String.format(
             "<p><b>%s:</b><br/>%s</p>",
             mapDescription, c.toString().replace("\n", "<br/>")));
-        }
-          
-        }
+        } 
+      }
     }
     
     // Merge the three strings to a single tooltip
@@ -349,7 +370,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       Object url = (GraphTools.getNodeInfoIDs(n, GraphMLmaps.NODE_URL));
       String kgId = GraphTools.getKeggIDs(n);
       // Clicked on a pathway node?
-      if (kgId!=null && kgId.toLowerCase().startsWith("path:")) {
+      if ((kgId != null) && kgId.toLowerCase().startsWith("path:")) {
         // Dirty check if it is the title node via green color of title nodes.
         Object color = (GraphTools.getNodeInfoIDs(n, GraphMLmaps.NODE_COLOR));
         if ((((color != null) && color.equals("#00FF00")) || (aListener == null)) && 
@@ -391,9 +412,6 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
         p.updateDetailPanel(getGraph2D().getHitInfo(x, y, false));
       }
     }
-    
-    
-    
   }
   
   /**
@@ -439,6 +457,10 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     glassPane.add(westPanel, BorderLayout.WEST);
   }
   
+  /**
+   * 
+   * @param view
+   */
   public void addPropertiesTable(Graph2DView view) {
     //get the glass pane
     JPanel glassPane = view.getGlassPane();
@@ -475,27 +497,38 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
   }
   
   /**
-   * Creates a JTable based properties view that displays the details of a selected model element.
+   * Creates a {@link JTable} based properties view that displays the details of
+   * a selected model element.
    */
   private JTable createPropertiesTable() {
-    if (propTable==null) {
+    if (propTable == null) {
       propTable = new JTable() {
         private static final long serialVersionUID = -542498752356126673L;
         // Make cells not editable.
+        /* (non-Javadoc)
+         * @see javax.swing.JTable#isCellEditable(int, int)
+         */
+        @Override
         public boolean isCellEditable(int row, int column) {
           return false;
         }
       };
       // Make cell values to appear as ToolTip
       propTable.addMouseMotionListener(new MouseMotionAdapter() {
+        /* (non-Javadoc)
+         * @see java.awt.event.MouseMotionAdapter#mouseMoved(java.awt.event.MouseEvent)
+         */
+        @Override
         public void mouseMoved(MouseEvent e) {
           int row = -1, column=-1;
           try {
             Point p = e.getPoint(); 
             row = propTable.rowAtPoint(p);
             column = propTable.columnAtPoint(p);
-          } catch (Throwable t) {return;}
-          if (row>=0 && column>=0) {
+          } catch (Throwable t) {
+            return;
+          }
+          if ((row >= 0) && (column >= 0)) {
             propTable.setToolTipText(
               StringUtil.toHTML( EscapeChars.forHTML(String.valueOf(propTable.getValueAt(row,column))) , 120)
             );
@@ -504,6 +537,10 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       });
       propTable.addMouseListener(new MouseAdapter() {
         // Open browser on link double-click
+        /* (non-Javadoc)
+         * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+         */
+        @Override
         public void mouseClicked(MouseEvent e) {
           super.mouseClicked(e);
           if (e.getClickCount() == 2) {
@@ -643,7 +680,9 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     // Get map headings and graph
     Graph2D graph = getGraph2D();
     GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2Dwriter.mapDescription);
-    if (mapDescriptionMap==null) return;
+    if (mapDescriptionMap == null) {
+      return;
+    }
     
     
     // Generate table headings and content
@@ -679,13 +718,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       Edge edge = (Edge) nodeOrEdge;
       
       EdgeMap[] eg = graph.getRegisteredEdgeMaps();
-      if (eg!=null)
-        for (int i=0; i<eg.length;i++) {
+      if (eg != null) {
+        for (int i = 0; i < eg.length; i++) {
           //tm.setValueAt(eg[i].get(edge), (index++), 1);
           Object c = eg[i].get(edge);
-          if (c!=null && c.toString().length()>0) {
+          if ((c != null) && (c.toString().length() > 0)) {
             String mapName = mapDescriptionMap.getV(eg[i]);
-            if (mapName==null || mapName.startsWith("_")) {
+            if ((mapName == null) || mapName.startsWith("_")) {
               // Maps starting with a "_" are marked invisible.
               continue;
             }
@@ -694,7 +733,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
             content.add(c.toString().replace(";", "; "));
           }
         }
-      
+      }
     }
     
     // Apply the new table content
@@ -711,7 +750,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    */
   private static String getNiceCaption(String v) {
     // description, type, description are being first-uppercased.
-    if (v==null) {
+    if (v == null) {
       return null;
     }
     
@@ -723,9 +762,10 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       // in the resources file.
       log.log(Level.FINE, "", e);
     }
-    if (caption!=null) {
+    if (caption != null) {
       return caption;
     }
     return StringUtil.firstLetterUpperCase(v).replace('_', ' ');
   }
+
 }
