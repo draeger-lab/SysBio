@@ -108,7 +108,7 @@ public class InChIKey2ListOfKEGGpathways extends AbstractEnrichmentMapper<String
 
     
     // Grab the additional Enrichment information from map2
-    this.sumOfCollectionSizes = map2.getSumOfEntitiesInClasses();
+    this.sumOfCollectionSizes = map2.getTotalSumOfEntitiesInAllClasses();
     this.entitiesInPathway = map2.entitiesInPathway;
     
     log.config("Parsed " + getMappingName() + " mapping file. Read " + ((getMapping()!=null)?getMapping().size():"0") + " mappings.");

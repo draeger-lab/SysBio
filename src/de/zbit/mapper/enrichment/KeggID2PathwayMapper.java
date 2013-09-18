@@ -143,7 +143,7 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
       if (c==null) System.out.println("null");
       else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
       
-      System.out.println("NonUnique: " + mapper.getSumOfEntitiesInClasses() + " Unique: " + mapper.size());
+      System.out.println("NonUnique: " + mapper.getTotalSumOfEntitiesInAllClasses() + " Unique: " + mapper.size());
       System.out.println(mapper.getEnrichmentClassSize("path:mmu04530"));
       System.out.println(mapper.getEnrichmentClassSize("Tight junction"));
       
@@ -240,8 +240,8 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
    * unique genes, occuring in all pathways.
    * @return
    */
-  public int getSumOfEntitiesInClasses() {
-    return super.getSumOfEntitiesInClasses();
+  public int getTotalSumOfEntitiesInAllClasses() {
+    return super.getTotalSumOfEntitiesInAllClasses();
   }
   
   /**

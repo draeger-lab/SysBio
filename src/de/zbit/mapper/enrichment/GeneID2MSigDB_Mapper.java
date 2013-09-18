@@ -130,7 +130,7 @@ public class GeneID2MSigDB_Mapper extends AbstractEnrichmentMapper<Integer, Stri
     Collection c = mapper.map(5175);
     if (c==null) System.out.println("null");
     else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("NonUnique: " + mapper.getSumOfEntitiesInClasses() + " Unique: " + mapper.size());
+    System.out.println("NonUnique: " + mapper.getTotalSumOfEntitiesInAllClasses() + " Unique: " + mapper.size());
     System.out.println(mapper.getEnrichmentClassSize("BIOCARTA_SRCRPTP_PATHWAY"));
     
     System.out.println("=================");
@@ -138,7 +138,7 @@ public class GeneID2MSigDB_Mapper extends AbstractEnrichmentMapper<Integer, Stri
     c = mapper.map(121021); // ="CSPG4"
     if (c==null) System.out.println("null");
     else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
-    System.out.println("NonUnique: " + mapper.getSumOfEntitiesInClasses() + " Unique: " + mapper.size());
+    System.out.println("NonUnique: " + mapper.getTotalSumOfEntitiesInAllClasses() + " Unique: " + mapper.size());
     System.out.println(mapper.getEnrichmentClassSize("V$SP1_Q6_01"));
     
   }

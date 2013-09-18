@@ -121,7 +121,7 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
       if (c==null) System.out.println("null");
       else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
       
-      System.out.println("NonUnique: " + mapper.getSumOfEntitiesInClasses() + " Unique: " + mapper.size());
+      System.out.println("NonUnique: " + mapper.getTotalSumOfEntitiesInAllClasses() + " Unique: " + mapper.size());
       System.out.println(mapper.getEnrichmentClassSize("path:mmu04530"));
       System.out.println(mapper.getEnrichmentClassSize("Tight junction"));
       
