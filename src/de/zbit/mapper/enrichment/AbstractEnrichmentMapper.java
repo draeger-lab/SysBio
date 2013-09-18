@@ -107,7 +107,7 @@ public abstract class AbstractEnrichmentMapper<SourceType, TargetType> extends A
   /* (non-Javadoc)
    * @see de.zbit.mapper.EnrichmentMapper#getGenomeSize()
    */
-  public int getSumOfEntitiesInClasses() {
+  public int getTotalSumOfEntitiesInAllClasses() {
     return this.sumOfCollectionSizes;
   }
   

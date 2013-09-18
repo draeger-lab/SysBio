@@ -102,7 +102,7 @@ public class GeneID2ListOfKEGGpathways extends AbstractEnrichmentMapper<Integer,
     }
     
     // Grab the additional Enrichment information from map2
-    this.sumOfCollectionSizes = map2.getSumOfEntitiesInClasses();
+    this.sumOfCollectionSizes = map2.getTotalSumOfEntitiesInAllClasses();
     this.entitiesInPathway = map2.entitiesInPathway;
     
     log.config("Parsed " + getMappingName() + " mapping file in " + t.getNiceAndReset()+". Read " + ((getMapping()!=null)?getMapping().size():"0") + " mappings.");

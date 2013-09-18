@@ -46,7 +46,7 @@ public interface EnrichmentMapper<SourceType, TargetType> extends Mapper<SourceT
    * This is mostly equal to the sum of all {@link java.util.Collection#size()}s.
    * @return
    */
-  public int getSumOfEntitiesInClasses();
+  public int getTotalSumOfEntitiesInAllClasses();
   
   /**
    * Return the size of an enrichment class.
