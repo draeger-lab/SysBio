@@ -1,6 +1,6 @@
 /*
- * $Id: KeggCompound2InChIKeyMapper.java 15:22:17 rosenbaum $
- * $URL: KeggCompound2InChIKeyMapper.java $
+ * $Id:  CompoundSynonym2InChIKeyMapper.java 13:23:45 rosenbaum $
+ * $URL: CompoundSynonym2InChIKeyMapper.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -17,29 +17,31 @@
 package de.zbit.mapper.compounds;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import de.zbit.io.csv.CSVReader;
+import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
- * Maps KEGG Compound IDs to InChIKey.
  * @author Lars Rosenbaum
  * @version $Rev$
  */
-public class KeggCompound2InChIKeyMapper extends AbstractMultiEntryMapper<String, String> {
-
-  private static final long serialVersionUID = 3761835058241496109L;
-	public static final Logger log = Logger.getLogger(KeggCompound2InChIKeyMapper.class.getName());
+public class CompoundSynonym2InChIKeyMapper extends AbstractMultiEntryMapper<String, String> {
+  private static final long serialVersionUID = -752885457570068938L;
+  public static final Logger log = Logger.getLogger(CompoundSynonym2InChIKeyMapper.class.getName());
   
-  public KeggCompound2InChIKeyMapper() throws IOException {
+  
+  public CompoundSynonym2InChIKeyMapper() throws IOException {
   	this(null);
   }
   
-	public KeggCompound2InChIKeyMapper(AbstractProgressBar progress) throws IOException {
+	public CompoundSynonym2InChIKeyMapper(AbstractProgressBar progress) throws IOException {
 	  super(String.class, String.class, progress);
 	  init();
   }
+  
 
 	/* (non-Javadoc)
 	 * @see de.zbit.mapper.AbstractMapper#getRemoteURL()
@@ -55,7 +57,7 @@ public class KeggCompound2InChIKeyMapper extends AbstractMultiEntryMapper<String
 	 */
 	@Override
 	public String getLocalFile() {
-		return "2013-09-06_CompoundData.zip";
+		return "2013-09-20_CompoundSynonyms.zip";
 	}
 
 	/* (non-Javadoc)
@@ -63,7 +65,7 @@ public class KeggCompound2InChIKeyMapper extends AbstractMultiEntryMapper<String
 	 */
 	@Override
 	public String getMappingName() {
-		return "KeggCompound2InChIKey";
+		return "CompoundSynonym2InChIKey";
 	}
 
 	/* (non-Javadoc)
@@ -74,49 +76,34 @@ public class KeggCompound2InChIKeyMapper extends AbstractMultiEntryMapper<String
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#getSourceColumn(de.zbit.io.csv.CSVReader)
-	 */
-	@Override
-	public int getSourceColumn(CSVReader r) {
-		return 4;
-	}
-	
   /* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#preProcessSourceID(java.lang.String)
-	 */
+   * @see de.zbit.mapper.AbstractMapper#getMultiSourceColumn(de.zbit.io.CSVReader)
+   */
   @Override
-  protected String preProcessSourceID(String string) {
-  	if(string==null || string.length() == 0) return string;
-
-	  // "CPD:C00523" => "C00523"
-    if (string.length()>6) {
-      string = string.substring(string.length()-6);
-    }
-    if (string.charAt(0)=='c') {
-      string = string.toUpperCase();
-    }
-    return string;
-  }
-
-	/* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#postProcessSourceID(java.lang.Object)
-	 */
-  @Override
-  protected String postProcessSourceID(String source) {
-	  if(source==null || source.equals("")) return null;
-	  
-	  // "CPD:C00523" => "C00523"
-    if (source.length()>6) {
-      source = source.substring(source.length()-6);
-    }
-    if (source.charAt(0)=='c') {
-      source = source.toUpperCase();
-    }
-    
-    return source;
+  public int[] getMultiSourceColumn(CSVReader r) {
+    // From the second(1) to the end of the line [1..n]
+    return new int[]{1, Integer.MAX_VALUE};
   }
   
+  
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getSourceColumn(de.zbit.io.CSVReader)
+   */
+  @Override
+  public int getSourceColumn(CSVReader r) {
+    return -1; // Never called if getMultiSourceColumn() is implemented.
+  }
+  
+  @Override
+  protected String postProcessSourceID(String source) {
+    return source.toLowerCase();
+  }
+  
+  @Override
+	protected String preProcessSourceID(String string) {
+    return string.toLowerCase();
+  }
+	
   /* (non-Javadoc)
 	 * @see de.zbit.mapper.AbstractMapper#preProcessTargetID(java.lang.String)
 	 */
@@ -126,7 +113,18 @@ public class KeggCompound2InChIKeyMapper extends AbstractMultiEntryMapper<String
   	else
   		return string.toUpperCase();
   }
-  
+	
+	 /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#configureReader(de.zbit.io.csv.CSVReader)
+   */
+  @Override
+  protected void configureReader(CSVReader r) {
+    r.setSeparatorChar('\t');
+    r.setContainsHeaders(true);
+    r.setSkipLines(0);
+    r.setAutoDetectContentStart(false);
+  }
+
   /* (non-Javadoc)
 	 * @see de.zbit.mapper.compounds.AbstractMultiSourceEntryMapper#getEntrySeparator()
 	 */
@@ -134,4 +132,5 @@ public class KeggCompound2InChIKeyMapper extends AbstractMultiEntryMapper<String
   public String getEntrySeparator() {
 	  return "\\|\\|";
   }
+
 }
