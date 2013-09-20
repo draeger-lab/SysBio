@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import de.zbit.mapper.compounds.CHEBI2InChIKeyMapper;
+import de.zbit.mapper.compounds.CompoundSynonym2InChIKeyMapper;
 import de.zbit.mapper.compounds.HMDB2InChIKeyMapper;
 import de.zbit.mapper.compounds.KeggCompound2InChIKeyMapper;
 import de.zbit.mapper.compounds.LIPIDMAPS2InChIKeyMapper;
@@ -266,9 +267,9 @@ public class MappingUtils {
     if (sourceIDtype!=null) {
     	if(sourceIDtype.getIdentifierClass().equals(IdentifierClass.Compound)) {
     		log.info("Initializing 2InChIKey mapper...");
-    		//if (sourceIDtype.equals(IdentifierType.CompoundName)) {
-    		//	mapper = new CHEBI2InChIKeyMapper(progress);
-    		//}
+    		if (sourceIDtype.equals(IdentifierType.CompoundName)) {
+    			mapper = new CompoundSynonym2InChIKeyMapper(progress);
+    		}
     		if (sourceIDtype.equals(IdentifierType.HMDB)) {
     			mapper = new HMDB2InChIKeyMapper(progress);
     		}
