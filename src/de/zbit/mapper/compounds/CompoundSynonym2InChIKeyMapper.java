@@ -96,6 +96,9 @@ public class CompoundSynonym2InChIKeyMapper extends AbstractMultiEntryMapper<Str
   
   @Override
   protected String postProcessSourceID(String source) {
+  	
+  	if(source.equals("Heptadecanoic acid"))
+  		System.out.println("Heptadecanoiic");
     return source.toLowerCase();
   }
   

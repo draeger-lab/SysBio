@@ -53,7 +53,7 @@ public class CHEBI2InChIKeyMapper extends AbstractMultiEntryMapper<String, Strin
 	 */
   @Override
   public String getLocalFile() {
-  	return "2013-09-06_CompoundData.zip";
+  	return "2013-09-20_CompoundData.zip";
   }
 
 	/* (non-Javadoc)

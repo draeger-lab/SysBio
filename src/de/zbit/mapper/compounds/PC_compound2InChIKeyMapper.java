@@ -54,7 +54,7 @@ public class PC_compound2InChIKeyMapper extends AbstractMultiEntryMapper<String,
 	 */
   @Override
   public String getLocalFile() {
-	  return "2013-09-06_CompoundData.zip";
+	  return "2013-09-20_CompoundData.zip";
   }
 
 	/* (non-Javadoc)

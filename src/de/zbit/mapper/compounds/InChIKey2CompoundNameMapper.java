@@ -55,7 +55,7 @@ public class InChIKey2CompoundNameMapper extends AbstractMapper<String, String> 
 	 */
   @Override
   public String getLocalFile() {
-	  return "2013-09-06_CompoundData.zip";
+	  return "2013-09-20_CompoundData.zip";
   }
 
 	/* (non-Javadoc)
