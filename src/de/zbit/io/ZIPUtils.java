@@ -125,12 +125,21 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static BufferedReader BZ2unCompressReader(String INfilename) throws IOException {
+    InputStream in = BZ2unCompressStream(INfilename);
+    
+    if(in!=null)    
+    	return new BufferedReader( new InputStreamReader(in));
+    else
+    	return null;
+  }
+  
+  public static InputStream BZ2unCompressStream(String INfilename) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi == null) {
     	return null;
     }
     
-    return new BufferedReader( new InputStreamReader( new CBZip2InputStream(new CheckedInputStream(fi,new CRC32()))));
+    return new CBZip2InputStream(new CheckedInputStream(fi,new CRC32()));
   }
   
   /**
@@ -299,13 +308,38 @@ public class ZIPUtils {
     return GUnzipReader(fi);
   }
   
+  /**
+   * 
+   * @param fi
+   * @return
+   * @throws IOException
+   */
   public static BufferedReader GUnzipReader(InputStream fi) throws IOException {
-    if (fi==null) return null;
-    
-    //new GZIPInputStream(fi).
-    //new ZipInputStream(fi).
-    
+
     return new BufferedReader( new InputStreamReader( new GZIPInputStream(fi)));
+  }
+  
+  /**
+   * 
+   * @param fi
+   * @return
+   * @throws IOException
+   */
+  public static InputStream GUnzipStream(InputStream fi) throws IOException {
+  	if (fi==null) return null;
+    
+  	return new GZIPInputStream(fi);
+  }
+  
+  /**
+   * 
+   * @param INfilename
+   * @return
+   * @throws IOException
+   */
+  public static InputStream GUnzipStream(String INfilename) throws IOException{
+  	InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
+    return GUnzipStream(fi);
   }
   
   /**
@@ -446,24 +480,53 @@ public class ZIPUtils {
   }
   
   /**
-   * 
+   * Returns input stream for streaming the content of the first file in the tar
    * @param in
    * @return
    * @throws IOException
    */
-  public static BufferedReader TARunCompressReader(InputStream in) throws IOException { //ByteArrayInputStream
-    CheckedInputStream csumi = new CheckedInputStream(in,new CRC32());
+  public static InputStream TARunCompressStream(InputStream in) throws IOException {
+  	CheckedInputStream csumi = new CheckedInputStream(in,new CRC32());
     TarInputStream in2 = new TarInputStream(new BufferedInputStream(csumi));
     
     TarEntry ze;
     while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\")));
     
     if (ze!=null)
-      return new BufferedReader(new InputStreamReader(in2)); // Liefert NUR DIE ERSTE DATEI!
+      return in2; // Liefert NUR DIE ERSTE DATEI!
     else {
       in2.close();
       return null;
     }
+  }
+  
+  /**
+   * 
+   * @param INfilename
+   * @return
+   * @throws IOException
+   */
+  public static InputStream TARunCompressStream(String INfilename) throws IOException {
+  	InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
+    if (fi==null) return null;
+    
+    return TARunCompressStream(fi);
+  }
+
+  
+  /**
+   * Returns an input reader for reading the content of the first file in the tar
+   * @param in
+   * @return
+   * @throws IOException
+   */
+  public static BufferedReader TARunCompressReader(InputStream in) throws IOException { //ByteArrayInputStream
+    InputStream in2 = TARunCompressStream(in);
+    
+    if(in2!=null)
+    	return new BufferedReader(new InputStreamReader(in2));
+    else
+    	return null;
   }
   
   /**
@@ -784,13 +847,27 @@ public class ZIPUtils {
   }
   
   /**
-   * 
+   * Return a Reader for reading the content of a zip file
    * @param INfilename
    * @return
    * @throws IOException
    */
   public static BufferedReader ZIPunCompressReader(String INfilename) throws IOException {
-    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
+    InputStream in = ZIPunCompressStream(INfilename);
+    if(in!=null)
+    	return new BufferedReader(new InputStreamReader(in));
+    else
+    	return null;
+  }
+  
+  /**
+   * Returns an input stream for streaming the content of a zip file
+   * @param INfilename
+   * @return
+   * @throws IOException
+   */
+  public static InputStream ZIPunCompressStream(String INfilename) throws IOException{
+  	InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return null;
     
     CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
@@ -800,7 +877,7 @@ public class ZIPUtils {
     ZipEntry ze;
     while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\")));
     if (ze!=null)
-      return new BufferedReader(new InputStreamReader(in2));
+      return in2;
     else {
       in2.close();
       return null;

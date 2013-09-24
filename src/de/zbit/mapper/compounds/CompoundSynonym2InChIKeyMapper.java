@@ -21,7 +21,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import de.zbit.io.csv.CSVReader;
-import de.zbit.mapper.AbstractMapper;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
@@ -96,9 +95,6 @@ public class CompoundSynonym2InChIKeyMapper extends AbstractMultiEntryMapper<Str
   
   @Override
   protected String postProcessSourceID(String source) {
-  	
-  	if(source.equals("Heptadecanoic acid"))
-  		System.out.println("Heptadecanoiic");
     return source.toLowerCase();
   }
   
