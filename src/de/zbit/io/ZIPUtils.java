@@ -124,7 +124,7 @@ public class ZIPUtils {
    * @return
    * @throws IOException
    */
-  public static BufferedReader BZ2unCompressStream(String INfilename) throws IOException {
+  public static BufferedReader BZ2unCompressReader(String INfilename) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi == null) {
     	return null;
@@ -276,7 +276,7 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static ByteArrayOutputStream GUnzipData(String infile) throws IOException {
-    BufferedReader in2 = GUnzipStream(infile);
+    BufferedReader in2 = GUnzipReader(infile);
     if (in2==null) return null;
     
     int s;
@@ -294,12 +294,12 @@ public class ZIPUtils {
    * @return
    * @throws IOException
    */
-  public static BufferedReader GUnzipStream(String INfilename) throws IOException {
+  public static BufferedReader GUnzipReader(String INfilename) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    return GUnzipStream(fi);
+    return GUnzipReader(fi);
   }
   
-  public static BufferedReader GUnzipStream(InputStream fi) throws IOException {
+  public static BufferedReader GUnzipReader(InputStream fi) throws IOException {
     if (fi==null) return null;
     
     //new GZIPInputStream(fi).
@@ -451,7 +451,7 @@ public class ZIPUtils {
    * @return
    * @throws IOException
    */
-  public static BufferedReader TARunCompressStream(InputStream in) throws IOException { //ByteArrayInputStream
+  public static BufferedReader TARunCompressReader(InputStream in) throws IOException { //ByteArrayInputStream
     CheckedInputStream csumi = new CheckedInputStream(in,new CRC32());
     TarInputStream in2 = new TarInputStream(new BufferedInputStream(csumi));
     
@@ -472,11 +472,11 @@ public class ZIPUtils {
    * @return
    * @throws IOException
    */
-  public static BufferedReader TARunCompressStream(String INfilename) throws IOException {
+  public static BufferedReader TARunCompressReader(String INfilename) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return null;
     
-    return TARunCompressStream(fi);
+    return TARunCompressReader(fi);
   }
   
   /**
@@ -789,7 +789,7 @@ public class ZIPUtils {
    * @return
    * @throws IOException
    */
-  public static BufferedReader ZIPunCompressStream(String INfilename) throws IOException {
+  public static BufferedReader ZIPunCompressReader(String INfilename) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi==null) return null;
     
@@ -810,7 +810,7 @@ public class ZIPUtils {
   /**
    * Returns the file size of ZIP-compressed single files.
    * @param INfilename
-   * @return Uncompressed file size of the file, that {@link #ZIPunCompressStream(String)} is deflating.
+   * @return Uncompressed file size of the file, that {@link #ZIPunCompressReader(String)} is deflating.
    * @throws IOException
    */
   public static long getUncompressedSizeOf_ZIPunCompressStream(String INfilename) throws IOException {
