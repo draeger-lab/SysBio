@@ -114,6 +114,17 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
    * @return
    */
   public abstract String getLocalFile();
+  
+  /**
+   * This may be overwritten instead of {@link #getLocalFile()}
+   * to read encrypted files. This method will be preferred if it
+   * does not return null;
+   * @return
+   */
+  public String getEncryptedLocalFile(){
+  	return null;
+  }
+  
   /**
    * This may be overwritten instead of {@link #getLocalFile()}.
    * This method is preferred if it does not return null.
@@ -167,6 +178,11 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
           if (FileTools.checkInputResource(localFile, this.getClass())) return true;
         }
       }
+    }
+    
+    // Check encrypted single file
+    if (FileTools.checkInputResource(getEncryptedLocalFile(), this.getClass())) {
+      return true;
     }
     
     // Check single file
@@ -229,9 +245,12 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
       throw new IOException("Could not download or read required resources.");
     }
     
+    boolean useEncryptedFile = getEncryptedLocalFile()!=null;
+    String storedLocalFile = useEncryptedFile?getEncryptedLocalFile():getLocalFile();
+        
     // Parse all files.
     Timer t = new Timer();
-    String[] localFiles = ArrayUtils.merge(getLocalFiles(), getLocalFile(), tempLocalFile);
+    String[] localFiles = ArrayUtils.merge(getLocalFiles(), storedLocalFile, tempLocalFile);
     for (String localFile: localFiles) {
       if (!FileTools.checkInputResource(localFile, this.getClass())) {
         log.config("Skipping " + getMappingName() + " mapping file " + (localFile==null?"null":localFile));
@@ -242,6 +261,7 @@ public abstract class AbstractMapper<SourceType, TargetType> implements Serializ
       r.setUseParentPackageForOpeningFiles(this.getClass());
       r.setDisplayProgress(progress!=null);
       r.setProgressBar(progress);
+      r.setIsEncrypted(useEncryptedFile);
       configureReader(r);
       int[] multiSourceColumn = getMultiSourceColumn(r);
       if (multiSourceColumn==null || multiSourceColumn.length<1)
