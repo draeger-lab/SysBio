@@ -143,6 +143,15 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
   public String getLocalFile() {
     return  "res/" + FileTools.getFilename(getRemoteURL());
   }
+  
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getEncryptedLocalFile()
+   */
+  @Override
+  public String getEncryptedLocalFile() {
+  	return getLocalFile()+".dat";
+  }
 
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#getMappingName()

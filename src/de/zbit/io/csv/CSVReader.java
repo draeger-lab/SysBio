@@ -236,6 +236,10 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    */
   private boolean displayProgress = false;
   /**
+   * File is encrypted and has to be decrypted before reading
+   */
+  private boolean isEncrypted = false;
+  /**
    * 
    */
   private transient FileReadProgress progress = null;
@@ -434,6 +438,16 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
   }
   
   /**
+   * Set a flag if the file to be read is encrypted and has to be decrypted for
+   * reading. This can be used to obfuscate files that should not be obviously readable.
+   * However: The decryption/enryption is in NO WAY secure.
+   * @param isEncrypted
+   */
+  public void setIsEncrypted(boolean isEncrypted) {
+  	this.isEncrypted = isEncrypted;
+  }
+  
+  /**
    * @return the filename currently opened with this CSVReader instance.
    */
   public String getFilename() {
@@ -578,6 +592,15 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    */
   public boolean isAutoDetectSeparatorChar() {
     return (separatorChar=='\u0000');
+  }
+  
+  /**
+   * @return true - if the file to be read is encrypted and has to be encrypted before
+   * reading with csv reader
+   * false - otherwise (default)
+   */
+  public boolean isFileEncrypted() {
+  	return isEncrypted;
   }
   
   /**
@@ -913,7 +936,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     BufferedReader in;
     if (useOpenFileMethod) {
       // Use the OpenFile Method to automatically extract ZIP archives and such.
-      in = OpenFile.openFile(filename, useParentPackageForOpeningFiles);
+      in = OpenFile.openFile(filename, useParentPackageForOpeningFiles,isEncrypted);
     } else {
       in = new BufferedReader(new FileReader(filename));
     }
@@ -971,9 +994,10 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     int max=0; // If file had less then "threshold" consistent lines in total; Take the max.
     int j = -1 + this.skipLines;
     String firstConsistentLineStringOfMax=null;
-    while (in.ready() && max<=threshold && j<(cancelAfterXLines+skipLines)) { //  && separatorChar=='\u0000'
+    
+    String line;
+    while ((line = in.readLine()) != null && max<=threshold && j<(cancelAfterXLines+skipLines)) { //  && separatorChar=='\u0000'
       j++;
-      String line = in.readLine();
       if (trimLinesAfterReading && line!=null) line = line.trim();
       if (line.length()<1 && autoDetectContentStart) continue;
       char firstChar = line.length()>0?line.charAt(0):'\u0000';
@@ -1304,14 +1328,14 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     preamble = new StringBuffer();
     this.currentOpenFile = getAndResetInputReader(filename, preamble);
     int j = -1 + skipLines;
-    while (currentOpenFile.ready()) {
+    String line = null;
+    while ((line = currentOpenFile.readLine())!=null) {
       j++;
       if ((j == firstConsistentLine) && !containsHeaders || ( j > firstConsistentLine) && containsHeaders) {
         // We reached the first data line (don't read it!).
         break;
       }
       
-      String line = currentOpenFile.readLine();
       if (displayProgress && (progress != null)) {
       	progress.progress(line);
       }
@@ -1356,15 +1380,17 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
       open(); //throw new Exception("No file is currently opened.");
       if (currentOpenFile==null) return null; // Open() threw exception.
     }
-    if (!currentOpenFile.ready()) {
-      close();
-      return null;
-    }
+    //Lars: we should not use .ready() as it only garantues that the next
+    //readline will not block. even if it returns false readline() can return
+    //a non null value
+    //if (!currentOpenFile.ready()) {
+    //  close();
+    //  return null;
+    //}
     
     // Read next line, draw progress, split into columns
     String line=null;
-    while(currentOpenFile.ready()) {
-      line = currentOpenFile.readLine();
+    while((line = currentOpenFile.readLine())!=null) {
       if (displayProgress && progress!=null) progress.progress(line);
       if (trimLinesAfterReading) line = line.trim();
       if (line.length()==0 && skipEmptyLines) {
@@ -1374,7 +1400,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
         break; // the usual case
       }
     }
-    if (line==null) { // Equal to !currentOpenFile.ready()
+    if (line==null) { // Equal to !currentOpenFile.ready(), Lars: NO .ready() can be false while read() returns a non null value
       close();
       return null;
     }
@@ -1432,10 +1458,9 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
       // Finally... get the data, NOT Using the global variable
       BufferedReader currentOpenFile = getAndResetInputReader(filename);
       int j=-1+skipLines;
-      while (currentOpenFile.ready()) {
+      String line = null;
+      while ((line = currentOpenFile.readLine())!=null) {
         j++;
-        
-        String line = currentOpenFile.readLine();
         if (trimLinesAfterReading) line = line.trim();
         if (j==firstConsistentLine) {
           headerLine = getSplits(line);
@@ -1681,9 +1706,9 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     int j=-1+skipLines;
     int numDataLines = 0;
     long totalFileLength=0;
-    while (in.ready()) {
+    String line = null;
+    while ((line = in.readLine())!=null) {
       j++;
-      String line = in.readLine();
       if (trimLinesAfterReading) line = line.trim();
       totalFileLength += line.length()+1; // +1 for \n
       //line = line.trim();

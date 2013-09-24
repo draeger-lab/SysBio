@@ -16,6 +16,7 @@
  */
 package de.zbit.io.fileformat;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -63,7 +64,25 @@ public class FormatIdentification {
   }
   
   /**
-   * Liest soviele bytes aus dem stream, wie f�r identifikation n�tig, identifiziert und resettet den Stream wieder.
+   * Liest benoetigte bytes aus stream und resetted stream nach identifikation
+   * @param ret
+   * @return
+   * @throws IOException
+   */
+  public static FormatDescription identify(BufferedInputStream ret) throws IOException {
+    if (ret.markSupported()) ret.mark(minBufferSize+2);
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    int s; int bytesRead=0;
+    while ((s = ret.read()) != -1 && bytesRead<(minBufferSize+1)) {
+      out.write(s);
+      bytesRead++;
+    }
+    if (ret.markSupported()) ret.reset();
+    return identify(out.toByteArray());
+  }
+  
+  /**
+   * Liest soviele bytes aus dem Reader, wie f�r identifikation n�tig, identifiziert und resettet den Stream wieder.
    */
   public static FormatDescription identify(BufferedReader ret) throws IOException {
     if (ret.markSupported()) ret.mark(minBufferSize+2);
@@ -76,6 +95,7 @@ public class FormatIdentification {
     if (ret.markSupported()) ret.reset();
     return identify(out.toByteArray());
   }
+  
   public static FormatDescription identify(byte[] data) {
     if (data == null || data.length < 1) {
       //System.out.println("Too less data for identification.");

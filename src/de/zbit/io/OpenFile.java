@@ -16,6 +16,7 @@
  */
 package de.zbit.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -185,7 +186,18 @@ public class OpenFile {
    * @return
    */
   public static BufferedReader openFile(String filename, Class<?> searchInputRelativeToResource) {
-    BufferedReader ret = null;
+  	InputStream in = openFileStream(filename, searchInputRelativeToResource,false);
+  	BufferedReader ret = null;
+  	
+  	if(in!=null)
+  		ret = new BufferedReader(new InputStreamReader(in));
+  		
+  	if ((ret == null) && verbose) {
+    	logger.warning(MessageFormat.format(warningsBundle.getString("ERROR_OPENING_FILE"), filename));
+    }
+  	
+  	return ret; 
+  	/*BufferedReader ret = null;
     
     // Ensure consistent behavious with other methods in this class
     if (searchInputRelativeToResource == null) {
@@ -284,7 +296,148 @@ public class OpenFile {
     	logger.warning(MessageFormat.format(warningsBundle.getString("ERROR_OPENING_FILE"), filename));
     }
     
-    return ret;
+    return ret;*/
+  }
+  
+  /**
+   * see {@link #openFile(String, Class)} but with option to decrypt file
+   * @param filename
+   * @param searchInputRelativeToResource
+   * @param encrypted
+   * @return
+   */
+  public static BufferedReader openFile(String filename, Class<?> searchInputRelativeToResource, boolean encrypted) {
+  	InputStream in = openFileStream(filename, searchInputRelativeToResource,encrypted);
+  	BufferedReader ret = null;
+  	
+  	if(in!=null)
+  		ret = new BufferedReader(new InputStreamReader(in));
+  		
+  	if ((ret == null) && verbose) {
+    	logger.warning(MessageFormat.format(warningsBundle.getString("ERROR_OPENING_FILE"), filename));
+    }
+  	
+  	return ret; 
+  }
+  
+  /**
+   * see {@link #openFile(String)} but returns stream instead of reader
+   * @param filename
+   * @param searchInputRelativeToResource
+   * @param encrypted
+   * @return
+   */
+  public static InputStream openFileStream(String filename, Class<?> searchInputRelativeToResource, boolean encrypted){
+  	InputStream ret = null;
+
+  	// Ensure consistent behavious with other methods in this class
+  	if (searchInputRelativeToResource == null) {
+  		searchInputRelativeToResource = Reflect.getParentClass();
+  	}
+
+  	// Trivial checks
+  	if ((filename == null) || (filename.trim().length() == 0)) {
+  		return ret;
+  	}
+  	filename = filename.trim();
+
+  	// Try to download file if it's an URL
+  	if ((filename.length() > 5) && filename.substring(0, 5).equalsIgnoreCase("http:")) {
+  		filename = doDownload(filename);
+  	} else if ((filename.length() > 4) && filename.substring(0, 4).equalsIgnoreCase("ftp:")) {
+  		filename = doDownload(filename);
+  	}
+
+  	// Identify format...
+  	InputStream myStream = null;
+  	try {
+  		myStream = searchFileAndGetInputStream(filename, searchInputRelativeToResource);
+  	} catch (IOException e1) {
+  		e1.printStackTrace();
+  	}
+  	FormatDescription desc = null;
+  	desc = fetchDescription(myStream);
+
+  	// 2nd try. Bugfixing accidently added slashes (not so seldomly...)
+  	if ((desc == null) && (myStream == null)) {
+  		// remove accidently added double slashes. Do NOT do this before checking if it's an URL
+  		// May lead to problems on non http urls (jar urls e.g. "jar:http://xyz.de/my.jar!/com/...")
+  		String filename2 = filename.replace(File.separator+File.separator, File.separator).replace("//", "/");
+  		try {
+  			myStream = searchFileAndGetInputStream(filename2, searchInputRelativeToResource);
+  		} catch (IOException e) {
+  			e.printStackTrace();
+  		}
+  		desc = fetchDescription(myStream);
+  		if (myStream != null) { // take fixed file name
+  			filename = filename2;
+  		}
+  	}
+  	// myStream is not required anymore
+  	try {
+  		if (myStream != null) {
+  			myStream.close();
+  		}
+  	} catch (IOException e1) {}
+  	//System.out.println(filename + " => " + (desc==null?"null":desc.getShortName()));
+
+
+  	//...  and return Input Stream
+  	try {
+  		ZIPUtils.parentClass=searchInputRelativeToResource;
+  		if ((desc != null) && desc.getShortName().equalsIgnoreCase("GZ") || (desc == null) && filename.toLowerCase().trim().endsWith(".gz")) {
+  			// Gzipped files do sadly not always contain the "magic bytes". That's why also the extension is considered if desc=null.
+  			ret = new BufferedInputStream(ZIPUtils.GUnzipStream(searchFileAndGetInputStream(filename, searchInputRelativeToResource)));
+  			if (ret != null) {
+  				FormatDescription desc2 = FormatIdentification.identify((BufferedInputStream)ret);
+  				if (desc2 != null) { // Tar.GZ Archives
+  					if (desc2.getShortName().equalsIgnoreCase("TAR")) { // Extract GZ completely and return tar stream.
+  						ret.close();
+  						// ==> Completely decompresses the GZIPPED file in-memory! <==
+  						ret = ZIPUtils.TARunCompressStream(new ByteArrayInputStream(ZIPUtils.GUnzipData(filename).toByteArray()));
+  					}
+  				}
+  			}
+  		} else if ((desc != null) && desc.getShortName().equalsIgnoreCase("ZIP")) {
+  			ret = ZIPUtils.ZIPunCompressStream(filename);
+  		} else if ((desc != null) && desc.getShortName().equalsIgnoreCase("BZ2")) {
+  			ret = new BufferedInputStream(ZIPUtils.BZ2unCompressStream(filename));
+  			FormatDescription desc2 = FormatIdentification.identify( (BufferedInputStream)ret );
+  			if (desc2 != null) { // Tar.BZ Archives
+  				if (desc2.getShortName().equalsIgnoreCase("TAR")) {
+  					ret.close();
+  					ret = ZIPUtils.TARunCompressStream(new ByteArrayInputStream(ZIPUtils.BZ2unCompressData(filename).toByteArray()));
+  				}
+  			}
+  		} else if ((desc != null) && desc.getShortName().equalsIgnoreCase("TAR")) {
+  			ret = ZIPUtils.TARunCompressStream(filename);
+  		}
+  		
+  		// Native text file OR ret is not ready if file wasn't really a zip file.
+  		if (ret == null ) {
+  			
+  			// we could add , "UTF-8" here
+  			if (myStream != null) {
+  				ret = searchFileAndGetInputStream(filename, searchInputRelativeToResource);
+  			}
+  		}
+  	} catch (Exception exc) {
+  		exc.printStackTrace();
+  	}
+  	if ((ret == null) && verbose) {
+  		logger.warning(MessageFormat.format(warningsBundle.getString("ERROR_OPENING_FILE"), filename));
+  	}
+  	
+  	if(encrypted && ret != null)
+  		ret = ZIPUtils.deCryptInputStream(ret);
+  	
+  	int a = Integer.MIN_VALUE;
+  	try{
+  		ret.read();
+  		a = ret.available();
+  	}catch(IOException e){}
+  	
+  	return ret;
   }
 
 

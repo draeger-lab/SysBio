@@ -165,6 +165,15 @@ public class KeggID2PathwayMapper extends AbstractEnrichmentMapper<String, Strin
   public String getLocalFile() {
     return  "res/" + FileTools.getFilename(getRemoteURL());
   }
+  
+  /*
+   * (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getEncryptedLocalFile()
+   */
+  @Override
+  public String getEncryptedLocalFile() {
+  	return getLocalFile()+".dat";
+  }
 
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#getMappingName()
