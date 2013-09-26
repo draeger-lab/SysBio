@@ -186,7 +186,7 @@ public class OpenFile {
    * @return
    */
   public static BufferedReader openFile(String filename, Class<?> searchInputRelativeToResource) {
-  	InputStream in = openFileStream(filename, searchInputRelativeToResource,false);
+  	/*InputStream in = openFileStream(filename, searchInputRelativeToResource,false);
   	BufferedReader ret = null;
   	
   	if(in!=null)
@@ -196,8 +196,8 @@ public class OpenFile {
     	logger.warning(MessageFormat.format(warningsBundle.getString("ERROR_OPENING_FILE"), filename));
     }
   	
-  	return ret; 
-  	/*BufferedReader ret = null;
+  	return ret; */
+  	BufferedReader ret = null;
     
     // Ensure consistent behavious with other methods in this class
     if (searchInputRelativeToResource == null) {
@@ -296,7 +296,7 @@ public class OpenFile {
     	logger.warning(MessageFormat.format(warningsBundle.getString("ERROR_OPENING_FILE"), filename));
     }
     
-    return ret;*/
+    return ret;
   }
   
   /**
@@ -307,6 +307,10 @@ public class OpenFile {
    * @return
    */
   public static BufferedReader openFile(String filename, Class<?> searchInputRelativeToResource, boolean encrypted) {
+  	//for safety: ensure old behavior
+  	if(!encrypted)
+  		return openFile(filename,searchInputRelativeToResource);
+  	
   	InputStream in = openFileStream(filename, searchInputRelativeToResource,encrypted);
   	BufferedReader ret = null;
   	
@@ -430,12 +434,6 @@ public class OpenFile {
   	
   	if(encrypted && ret != null)
   		ret = ZIPUtils.deCryptInputStream(ret);
-  	
-  	int a = Integer.MIN_VALUE;
-  	try{
-  		ret.read();
-  		a = ret.available();
-  	}catch(IOException e){}
   	
   	return ret;
   }
