@@ -1327,7 +1327,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     // Finally... get the data
     preamble = new StringBuffer();
     this.currentOpenFile = getAndResetInputReader(filename, preamble);
-    int j = -1 + skipLines;
+    int j = skipLines;
     String line = null;
     while ((line = currentOpenFile.readLine())!=null) {
       j++;
