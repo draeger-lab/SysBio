@@ -91,8 +91,9 @@ public class SBMLtools {
    * @param sbase
    * @param level
    * @param version
+   * @return
    */
-  public static final void setLevelAndVersion(SBase sbase, int level, int version) {
+  public static final SBase setLevelAndVersion(SBase sbase, int level, int version) {
     
     // Some hard-coded default stuff:
     // Before SBML l3, exponent, scale and multiplier had default values.
@@ -123,6 +124,7 @@ public class SBMLtools {
         setLevelAndVersion((SBase) child, level, version);
       }
     }
+    return sbase;
   }
 
   /**
@@ -244,31 +246,8 @@ public class SBMLtools {
     if ((name == null) || (name.trim().length() == 0)) {
       ret = incrementSIdSuffix("SId", doc);
     } else {
-      name = name.trim();
-      StringBuilder ret2 = new StringBuilder(name.length()+4);
-      char c = name.charAt(0);
-
-      // Must start with letter or '_'.
-      if (!(isLetter(c) || c == '_')) {
-        ret2.append("SId_");
-      } else {
-        ret2.append(c);
-      }
-
-      // May contain letters, digits or '_'
-      for (int i = 1; i < name.length(); i++) {
-        c = name.charAt(i);
-        if (c == ' ') {
-          c = '_'; // Replace spaces with "_"
-        }
-
-        if (isLetter(c) || Character.isDigit(c) || (c == '_')) {
-          ret2.append(c);
-        } // else: skip invalid characters
-      }
-
       // Make unique
-      ret = ret2.toString();
+      ret = toSId(name);
       Model model = doc.getModel();
       if (model.containsUniqueNamedSBase(ret)) {
         ret = incrementSIdSuffix(ret, doc);
@@ -276,6 +255,39 @@ public class SBMLtools {
     }
 
     return ret;
+  }
+
+  /**
+   * 
+   * @param name
+   * @return
+   */
+  public static String toSId(String name) {
+    name = name.trim();
+    StringBuilder id = new StringBuilder(name.length() + 4);
+    char c = name.charAt(0);
+
+    // Must start with letter or '_'.
+    if (!(isLetter(c) || c == '_')) {
+      id.append("_");
+    }
+
+    // May contain letters, digits or '_'
+    for (int i = 0; i < name.length(); i++) {
+      c = name.charAt(i);
+      if (c == ' ') {
+        c = '_'; // Replace spaces with "_"
+      }
+
+      if (isLetter(c) || Character.isDigit(c) || (c == '_')) {
+        id.append(c);
+      } else if ((c == '-') || (c == '(') || (c == ')')) {
+        if (i < name.length() - 1) {
+          id.append('_');
+        }
+      } // else: skip other invalid characters
+    }
+    return id.toString();
   }
 
   /**
