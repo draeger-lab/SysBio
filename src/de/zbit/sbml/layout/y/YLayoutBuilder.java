@@ -403,9 +403,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
 		
 		SBGNReactionNode<NodeRealizer> processNode = createProcessNode();
 		if (reactionGlyph.isSetReaction()) {
-			processNode = getSBGNReactionNode(reactionGlyph.getSBOTerm());
+		  processNode = getSBGNReactionNode(reactionGlyph.getReactionInstance().getSBOTerm());
 		} else {
-			processNode = getSBGNReactionNode(reactionGlyph.getReactionInstance().getSBOTerm());
+		  processNode = getSBGNReactionNode(reactionGlyph.getSBOTerm());
 		}
 		
 		assert processNode != null;
