@@ -1329,24 +1329,27 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     this.currentOpenFile = getAndResetInputReader(filename, preamble);
     int j = skipLines;
     String line = null;
-    while ((line = currentOpenFile.readLine())!=null) {
-      j++;
-      if ((j == firstConsistentLine) && !containsHeaders || ( j > firstConsistentLine) && containsHeaders) {
-        // We reached the first data line (don't read it!).
-        break;
-      }
-      
-      if (displayProgress && (progress != null)) {
-      	progress.progress(line);
-      }
-      if (trimLinesAfterReading) {
-      	line = line.trim();
-      }
-      if (!(containsHeaders && (j == firstConsistentLine))) {
-        // Else, this line is the header.
-        preamble.append(line + '\n');
-      }
-    }
+	if (!((j == firstConsistentLine) && !containsHeaders)) {
+		while ((line = currentOpenFile.readLine()) != null) {
+			j++;
+			if ((j == firstConsistentLine) && !containsHeaders
+					|| (j > firstConsistentLine) && containsHeaders) {
+				// We reached the first data line (don't read it!).
+				break;
+			}
+
+			if (displayProgress && (progress != null)) {
+				progress.progress(line);
+			}
+			if (trimLinesAfterReading) {
+				line = line.trim();
+			}
+			if (!(containsHeaders && (j == firstConsistentLine))) {
+				// Else, this line is the header.
+				preamble.append(line + '\n');
+			}
+		}
+	}
     
   }
   
