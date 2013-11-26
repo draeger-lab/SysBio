@@ -130,6 +130,10 @@ public class SBasePanel extends JPanel implements EquationComponent {
 	 */
 	private static final long serialVersionUID = -4969096536922920641L;
 
+  private static final double SPINNER_MIN_VALUE = -1E9d;
+
+  private static final double SPINNER_MAX_VALUE = 1E9d;
+
 	private boolean editable;
 
 	private LaTeXCompiler latex;
@@ -905,8 +909,8 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		} else {
 			lh.add(new JLabel(bundle.getString("stoichiometry")), 1, ++row, 1, 1, 0d, 0d);
 			JSpinner spinner = new JSpinner(new SpinnerNumberModel(specRef
-					.getStoichiometry(), specRef.getStoichiometry() - 1000,
-					specRef.getStoichiometry() + 1000, .1d));
+					.getStoichiometry(), specRef.getStoichiometry() + SPINNER_MIN_VALUE,
+					specRef.getStoichiometry() + SPINNER_MAX_VALUE, .1d));
 			spinner.setEnabled(editable);
 			lh.add(spinner, 3, row, 1, 1, 1d, 0d);
 			lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
@@ -974,12 +978,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
 		if ((unit.getLevel() == 1)
 				|| ((unit.getLevel() == 2) && (unit.getVersion() == 1))) {
 			JSpinner sOffset = new JSpinner(new SpinnerNumberModel(unit
-					.getOffset(), -1000, 1000, 1));
+					.getOffset(), SPINNER_MIN_VALUE, SPINNER_MAX_VALUE, 1));
 			sOffset.setEnabled(editable);
 			addLabeledComponent(bundle.getString("offset"), sOffset);
 		}
-		JSpinner sScale = new JSpinner(new SpinnerNumberModel(unit.getScale(),
-				-1000, 1000, 1));
+		JSpinner sScale = new JSpinner(new SpinnerNumberModel(
+		  unit.getScale(), SPINNER_MIN_VALUE, SPINNER_MAX_VALUE, 1));
 		sScale.setEnabled(editable);
 		addLabeledComponent(bundle.getString("scale"), sScale);
 		double exponent = unit.getExponent();

@@ -76,15 +76,18 @@ public class SBMLtools {
 	 * @param nsb
 	 * @return a {@link String} describing the given element.
 	 */
-	public static String getName(NamedSBase nsb) {
-		if (nsb.isSetName()) {
-			return nsb.getName();
-		}
-		if (nsb.isSetId()) {
-			return nsb.getId();
-		}
-		return nsb.getElementName();
-	}
+  public static String getName(NamedSBase nsb) {
+    if (nsb == null) {
+      return "";
+    }
+    if (nsb.isSetName()) {
+      return nsb.getName();
+    }
+    if (nsb.isSetId()) {
+      return nsb.getId();
+    }
+    return nsb.getElementName();
+  }
   
   /**
    * 
@@ -93,7 +96,7 @@ public class SBMLtools {
    * @param version
    * @return
    */
-  public static final SBase setLevelAndVersion(SBase sbase, int level, int version) {
+  public static final <T extends SBase> T setLevelAndVersion(T sbase, int level, int version) {
     
     // Some hard-coded default stuff:
     // Before SBML l3, exponent, scale and multiplier had default values.
