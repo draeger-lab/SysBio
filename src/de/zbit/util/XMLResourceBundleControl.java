@@ -38,7 +38,7 @@ import java.util.Set;
  * 
  * Example usage:
  * <pre>
- * ResourceBundle resource = ResourceManager.getBundle("de.zbit.locales.Labels");
+ * ResourceBundle resource = ResourceManager.getBundle("my.package.locales.Labels");
    String myString = resource.getString("MY_KEY");
  * </pre>
  * 
