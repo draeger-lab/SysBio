@@ -46,12 +46,13 @@ import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.groups.Group;
 import org.sbml.jsbml.ext.groups.GroupModel;
+import org.sbml.jsbml.ext.groups.GroupsConstants;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Dimensions;
-import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
@@ -61,7 +62,6 @@ import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
-import org.sbml.jsbml.xml.parsers.GroupsParser;
 
 import y.base.Edge;
 import y.base.Node;
@@ -127,7 +127,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   /**
    * The namespace URI of the layout extension.
    */
-  private final static String groupNamespace = GroupsParser.namespaceURI;
+  private final static String groupNamespace = GroupsConstants.namespaceURI;
   
   /**
    * map from reaction id to corresponding edge in graph
@@ -629,7 +629,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
           int size = group.isSetListOfMembers() ? group.getMemberCount() : 0;
           String[] groupMembers = new String[size];
           for (int i = 0; i < size; i++) {
-            groupMembers[i] = ((Group) s).getMember(i).getSymbol();
+            groupMembers[i] = ((Group) s).getMember(i).getIdRef();
           }
           n = createGroupNode(s.getId(), s.getName(), sboTerm, x, y, w, h, groupMembers);
           
