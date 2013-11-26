@@ -21,13 +21,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 /**
  * A {@link ResourceManager} avoids loading instances of {@link ResourceBundle}
  * multiple times by keeping these in a {@link Map} data structure. As
  * {@link ResourceBundle}s are a kind of unmodifiable {@link Map}-like data
  * structures, these do not have to be loaded again and again (in contrast to,
- * e.g., {@link SBPreferences}).
+ * e.g., {@link Preferences}).
  * 
  * @author Andreas Dr&auml;ger
  * @date 2011-01-05
