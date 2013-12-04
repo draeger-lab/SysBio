@@ -118,7 +118,7 @@
           <zipfileset excludes="META-INF/*" src="${lib}/sysbio-osx-support.jar"/>
           
           <!-- These libraries are required by just some classes (decide yourself if you want them) -->
-          <zipfileset excludes="META-INF/*.SF" src="${lib}/Java5/saaj.jar"/>
+          <!--<zipfileset excludes="META-INF/*.SF" src="${lib}/Java5/saaj.jar"/>-->
           <zipfileset excludes="META-INF/*.SF" src="${lib}/WSDbfetch.jar"/>
     </jar>
     
@@ -207,7 +207,9 @@
   	<delete file="${appJarRaw}"/>
   </target>
 
-	
+  <!-- =================================================================== -->
+  <!-- Cleans everything                                                   -->
+  <!-- =================================================================== -->
   <target
   	name="clean"
   	depends="init"
@@ -343,22 +345,23 @@
   	
     <delete dir="${classes}"/>
 	<mkdir dir="${classes}"/>
-	<javac srcdir="${src}"
+	<javac
+	  	classpathref="classpath"
 	  	compiler="${compiler}"
-	  	listfiles="yes"
 	  	debug="${debug}"
 	  	deprecation="${deprecation}"
-		depend="${depend}"
-	  	nowarn="no"
-	  	memoryMaximumSize="512M"
 		destdir="${classes}"
-		verbose="${verbose}"
-		source="1.6"
-		target="1.6"
+	  	listfiles="yes"
+	  	memoryMaximumSize="512M"
+	  	nowarn="no"
 		optimize="${optimize}"
+		source="1.6"
+		srcdir="${src}"
 		sourcepathref="sourcepath"
-	  	classpathref="classpath"
+		target="1.6"
+		verbose="${verbose}"
 	  />
+  	<!-- 		depend="${depend}" -->
 	  <!-- <copy todir="${classes}"/> -->
   </target>
 
@@ -439,6 +442,55 @@
       </fileset>
       
       <zipfileset excludes="META-INF/*" src="${lib}/sysbio-osx-support.jar"/>
+      
+    </jar>
+
+  </target>
+  
+  <!-- =================================================================== -->
+  <!-- Creates a JAR only for localization                                 -->
+  <!-- =================================================================== -->
+  <target
+    name="SysBio_for_localization"
+    depends="init, svnrevision, compile"
+    description="Build a minimal version of SysBio only for localization"
+  >
+
+    <echo message="Pack a minimal JAR file containing only parts required for localization"/>
+    <jar
+      compress="true"
+      filesetmanifest="mergewithoutmain"
+      index="true"
+      indexMetaInf="true"
+      jarfile="${dist}/localization.jar"
+      level="9"
+      manifestencoding="utf-8"
+      strict="warn"
+      update="true"
+    >
+      <manifest>
+        <section name="SysBio">
+	      <attribute name="Built-By" value="${user.name}"/>
+          <attribute name="Specification-Title" value="${Name}"/>
+          <attribute name="Specification-Version" value="Revision ${repository.revision}"/>
+          <attribute name="Specification-Vendor" value="Center for Bioinformatics Tuebingen (ZBIT)"/>
+       	  <attribute name="Implementation-Title" value="${Name}"/>
+          <attribute name="Implementation-Version" value="${build.name}"/>
+	      <attribute name="Implementation-Vendor" value="University of Tuebingen"/>
+        </section>
+  	  </manifest>
+      <fileset dir="${base}">
+	    <include name="licenses/COPYING_SysBioBase.txt"/>
+        <include name="licenses/AUTHORS.txt"/>
+      </fileset>
+      <fileset dir="${classes}" excludes="**/.svn*, **/package-info.class">
+        <include name="de/zbit/util/XMLResourceBundleControl.class"/>
+        <include name="de/zbit/util/ResourceManager.class"/>
+      </fileset>
+      <fileset dir="${src}">
+        <include name="de/zbit/util/XMLResourceBundleControl.java"/>
+        <include name="de/zbit/util/ResourceManager.java"/>
+      </fileset>
       
     </jar>
 

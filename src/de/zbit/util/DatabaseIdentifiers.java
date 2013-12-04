@@ -185,7 +185,7 @@ public class DatabaseIdentifiers {
     /**
      * LIPID Metabolites And Pathways Strategy (LIPID MAPS) is a multi-institutional
      * effort to identify and quantitate, using a systems biology approach and
-     * sophisticated mass spectrometers, all of the major — and many minor — lipid
+     * sophisticated mass spectrometers, all of the major ? and many minor ? lipid
      * species in mammalian cells, as well as to quantitate the changes in these
      *  species in response to perturbation.
      */
