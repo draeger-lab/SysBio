@@ -37,7 +37,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.groups.GroupsConstants;
-import org.sbml.jsbml.ext.groups.GroupModel;
+import org.sbml.jsbml.ext.groups.GroupsModelPlugin;
 import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 
@@ -250,7 +250,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
         
         // Try to get actual SBML-element
         String sbmlID = null;
-        if (converter!=null && converter.getGraphElement2SBid()!=null) {
+        if ((converter != null) && (converter.getGraphElement2SBid() != null)) {
           sbmlID = converter.getGraphElement2SBid().get(nodeOrEdge);
         }
         SBase base = null;
@@ -258,8 +258,8 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
           
           // First, try group (shared with core and qualitative modeling)
           SBasePlugin gm = document.getModel().getExtension(GroupsConstants.namespaceURI);
-          if ((gm != null) && gm instanceof GroupModel) {
-            base = ((GroupModel) gm).getGroup(sbmlID);
+          if ((gm != null) && (gm instanceof GroupsModelPlugin)) {
+            base = ((GroupsModelPlugin) gm).getGroup(sbmlID);
           }
           
           if (base == null) {

@@ -45,8 +45,8 @@ import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.groups.Group;
-import org.sbml.jsbml.ext.groups.GroupModel;
 import org.sbml.jsbml.ext.groups.GroupsConstants;
+import org.sbml.jsbml.ext.groups.GroupsModelPlugin;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
 import org.sbml.jsbml.ext.layout.Dimensions;
@@ -775,7 +775,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     SBasePlugin groupExtension = document.getModel().getExtension(groupNamespace);
     boolean useGroupExtension = groupExtension!=null;
     if (useGroupExtension) {
-    	GroupModel groupModel = (GroupModel) groupExtension;
+    	GroupsModelPlugin groupModel = (GroupsModelPlugin) groupExtension;
       if (groupModel.isSetListOfGroups()) {
         ListOf<Group> groups = groupModel.getListOfGroups();
         

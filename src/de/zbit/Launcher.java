@@ -659,21 +659,21 @@ public abstract class Launcher implements Runnable, Serializable {
     
     // Do not make all, but some defined subset of them persistent
     List<Class<? extends KeyProvider>> persist = getPersistentOptions();
-    if (persist!=null) {
+    if (persist != null) {
       for (Class<? extends KeyProvider> kp : persist) {
         SBPreferences toflush = new SBPreferences(kp);
         Iterator<Option> it = KeyProvider.Tools.optionIterator(kp);
-        while (it!=null && it.hasNext()) {
+        while ((it != null) && it.hasNext()) {
           Option<?> o = it.next();
           if (props.containsKey(o.toString())) {
             toflush.put(o, o.getValue(props));
           }
         }
-        if (toflush.size()>0) {
+        if (toflush.size() > 0) {
           try {
             toflush.flush();
-          } catch (Exception e) {
-            logger.log(Level.WARNING, e.getLocalizedMessage(), e);
+          } catch (Exception exc) {
+            logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
           }
         }
       }
