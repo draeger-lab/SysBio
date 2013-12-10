@@ -166,6 +166,11 @@ public abstract class AbstractMultiEntryMapper<SourceType,TargetType> extends Ab
       	
         for(String targetString: entry){
         	
+        	//Catch empty target Strings
+        	if(targetString.isEmpty()){
+        		continue;
+        	}
+        	
         	TargetType target;
           if (Collection.class.isAssignableFrom(innerTargetType)) {
             // Mapping from x to a collection.
@@ -185,6 +190,10 @@ public abstract class AbstractMultiEntryMapper<SourceType,TargetType> extends Ab
         	targetSet.add(target);
 	
         }
+        
+        //no targets so there is nothing to add to the mapping
+        if(targetSet.isEmpty())
+        	continue;
 	        
         // Optional method that allow customization.
         targetSet = postProcessTargetID(targetSet);

@@ -104,7 +104,7 @@ public class KeggCompound2InChIKeyMapper extends AbstractMultiEntryMapper<String
 	 */
   @Override
   protected String postProcessSourceID(String source) {
-	  if(source==null || source.equals("")) return null;
+	  if(source==null || source.isEmpty()) return null;
 	  
 	  // "CPD:C00523" => "C00523"
     if (source.length()>6) {

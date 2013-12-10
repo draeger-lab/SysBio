@@ -17,6 +17,8 @@
 package de.zbit.mapper.compounds;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import de.zbit.io.csv.CSVReader;
@@ -78,6 +80,19 @@ public class CHEBI2InChIKeyMapper extends AbstractMultiEntryMapper<String, Strin
   @Override
   public int getSourceColumn(CSVReader r) {
 	  return 5;
+  }
+  
+  /* (non-Javadoc)
+	 * @see de.zbit.mapper.AbstractMapper#postProcessSourceID(java.lang.Object)
+	 */
+  @Override
+  protected String postProcessSourceID(String source) {
+	  if(source==null || source.isEmpty()) return null;
+	  String s = source.toUpperCase();
+		if(!source.startsWith("CHEBI:"))
+			return "CHEBI:".concat(s);
+		else
+			return s;
   }
   
   /* (non-Javadoc)

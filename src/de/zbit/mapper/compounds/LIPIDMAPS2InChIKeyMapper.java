@@ -81,6 +81,15 @@ public class LIPIDMAPS2InChIKeyMapper extends AbstractMultiEntryMapper<String,St
   }
   
   /* (non-Javadoc)
+	 * @see de.zbit.mapper.AbstractMapper#postProcessSourceID(java.lang.Object)
+	 */
+  @Override
+  protected String postProcessSourceID(String source) {
+	  if(source==null || source.isEmpty()) return null;
+	  return source;
+  }
+  
+  /* (non-Javadoc)
 	 * @see de.zbit.mapper.AbstractMapper#preProcessTargetID(java.lang.String)
 	 */
   @Override
