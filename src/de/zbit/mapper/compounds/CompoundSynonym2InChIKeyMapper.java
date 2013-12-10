@@ -95,6 +95,7 @@ public class CompoundSynonym2InChIKeyMapper extends AbstractMultiEntryMapper<Str
   
   @Override
   protected String postProcessSourceID(String source) {
+  	if(source==null || source.isEmpty()) return null;
     return source.toLowerCase();
   }
   

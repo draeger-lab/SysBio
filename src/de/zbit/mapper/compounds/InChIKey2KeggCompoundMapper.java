@@ -82,6 +82,15 @@ public class InChIKey2KeggCompoundMapper extends AbstractMultiEntryMapper<String
   }
   
   /* (non-Javadoc)
+	 * @see de.zbit.mapper.AbstractMapper#postProcessSourceID(java.lang.Object)
+	 */
+  @Override
+  protected String postProcessSourceID(String source) {
+	  if(source==null || source.isEmpty()) return null;
+	  return source.toUpperCase();
+  }
+  
+  /* (non-Javadoc)
 	 * @see de.zbit.mapper.AbstractMapper#preProcessSourceID(java.lang.String)
 	 */
   @Override
