@@ -203,7 +203,7 @@ public class Annotate {
   }
   
   public static void annotate(Species spec, String ko_id,
-    KeggInfoManagement manager) {
+    KeggInfoManagement manager) throws XMLStreamException {
     //KeggInfos infos = new KeggInfos(ko_id, manager);
     
     CVTerm cvtKGID = new CVTerm();
