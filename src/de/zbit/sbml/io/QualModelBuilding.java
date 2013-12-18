@@ -28,10 +28,10 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLWriter;
-import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
-import org.sbml.jsbml.ext.qual.QualConstant;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
+import org.sbml.jsbml.ext.qual.QualConstants;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 
 import de.zbit.util.DatabaseIdentifierTools;
@@ -64,12 +64,13 @@ public abstract class QualModelBuilding {
 	 * @param taxon
 	 * @param organism
 	 * @return
+	 * @throws XMLStreamException 
 	 */
-	public static SBMLDocument initializeQualDocument(String modelName, String modelID, String creator, String[] organisms) {
+	public static SBMLDocument initializeQualDocument(String modelName, String modelID, String creator, String[] organisms) throws XMLStreamException {
 	    initTaxonomyMap();
 	    
 	    SBMLDocument doc = new SBMLDocument(3, 1);
-	    doc.addNamespace(QualConstant.shortLabel, "xmlns", QualConstant.namespaceURI);
+	    doc.addNamespace(QualConstants.shortLabel, "xmlns", QualConstants.namespaceURI);
 		
 	    model = doc.createModel(modelID);
 	    model.setMetaId("meta_" + modelID);
@@ -92,7 +93,7 @@ public abstract class QualModelBuilding {
 	    }
 	    
 	    qualModel = new QualitativeModel(model);
-	    model.addExtension(QualConstant.namespaceURI, QualModelBuilding.qualModel);
+	    model.addExtension(QualConstants.namespaceURI, QualModelBuilding.qualModel);
 		
 	    LayoutModelPlugin layoutExt = new LayoutModelPlugin(model);
 		model.addExtension(LayoutConstants.namespaceURI, layoutExt);
@@ -136,7 +137,7 @@ public abstract class QualModelBuilding {
 		if (doc != null) {
 			Model m = doc.getModel();
 			if (m != null) {
-				QualitativeModel qModel = (QualitativeModel)m.getExtension(QualConstant.namespaceURI);
+				QualitativeModel qModel = (QualitativeModel)m.getExtension(QualConstants.namespaceURI);
 				if (qModel != null) {
 					return qModel;
 				}
