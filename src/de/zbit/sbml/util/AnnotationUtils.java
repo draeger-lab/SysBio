@@ -365,7 +365,7 @@ public class AnnotationUtils {
   }
   
   private static void annotateSpecies(Species s, String annotation,
-    KeggInfoManagement manager) {
+    KeggInfoManagement manager) throws XMLStreamException {
     if ((annotation.startsWith("P")) || (annotation.startsWith("Q"))
         || (annotation.startsWith("O"))) {
       s.addCVTerm(new CVTerm(CVTerm.Type.BIOLOGICAL_QUALIFIER,

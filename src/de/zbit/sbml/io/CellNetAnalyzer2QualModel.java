@@ -61,8 +61,9 @@ public class CellNetAnalyzer2QualModel {
 	 * @return
 	 * @throws IOException
 	 * @throws ParseException
+	 * @throws XMLStreamException 
 	 */
-	public static SBMLDocument createQualitativeModel(String modelName, String modelID, String creator, String speciesFile, String reactionFile, String taxon, String organism) throws IOException, ParseException {
+	public static SBMLDocument createQualitativeModel(String modelName, String modelID, String creator, String speciesFile, String reactionFile, String taxon, String organism) throws IOException, ParseException, XMLStreamException {
 		String[] org = organism.split(",");
 		SBMLDocument sbmlDoc = QualModelBuilding.initializeQualDocument(modelName, modelID, creator, org);
 	  

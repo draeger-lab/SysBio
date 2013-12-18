@@ -412,8 +412,9 @@ public class Transfac2QualModel {
 	 * @param bindingSites
 	 * @param header
 	 * @throws IOException
+	 * @throws XMLStreamException 
 	 */
-	private void readBindingSites(String bindingSites, boolean header) throws IOException {
+	private void readBindingSites(String bindingSites, boolean header) throws IOException, XMLStreamException {
 		String line;
 
 		BufferedReader input = new BufferedReader(new FileReader(bindingSites));
