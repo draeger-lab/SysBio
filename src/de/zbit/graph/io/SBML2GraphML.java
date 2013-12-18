@@ -58,7 +58,7 @@ import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.Output;
-import org.sbml.jsbml.ext.qual.QualConstant;
+import org.sbml.jsbml.ext.qual.QualConstants;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
@@ -119,7 +119,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   /**
    * The namespace URI of the qual extension.
    */
-  private final static String qualNamespace = QualConstant.namespaceURI;
+  private final static String qualNamespace = QualConstants.namespaceURI;
   /**
    * The namespace URI of the layout extension.
    */

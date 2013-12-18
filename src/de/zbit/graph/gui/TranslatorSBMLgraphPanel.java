@@ -38,7 +38,7 @@ import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.groups.GroupsConstants;
 import org.sbml.jsbml.ext.groups.GroupsModelPlugin;
-import org.sbml.jsbml.ext.qual.QualConstant;
+import org.sbml.jsbml.ext.qual.QualConstants;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 
 import y.view.Graph2D;
@@ -271,7 +271,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
               }
             } else {
               // Try qualitative (qual) model
-              SBasePlugin qm = document.getModel().getExtension(QualConstant.namespaceURI);
+              SBasePlugin qm = document.getModel().getExtension(QualConstants.namespaceURI);
               if (qm!=null && qm instanceof QualitativeModel) {
                 QualitativeModel q = (QualitativeModel) qm;
                 base = q.getQualitativeSpecies(sbmlID);
