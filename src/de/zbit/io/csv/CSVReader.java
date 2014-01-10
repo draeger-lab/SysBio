@@ -1049,10 +1049,16 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     
     // Fill the headers variable
     if (this.containsHeaders && firstConsistentLineStringOfMax!=null) {
-      headers=getSplits(firstConsistentLineStringOfMax);
+      headers = getSplits(firstConsistentLineStringOfMax);
       // Headers do often start with a comment symbol.
-      if (headers!=null && headers.length>0 && headers[0].length()>0)
-        if (CommentIndicators.contains(headers[0].charAt(0))) headers[0] = headers[0].substring(1); 
+      if (headers != null && headers.length > 0 && headers[0].length() > 0) {
+        if (CommentIndicators.contains(headers[0].charAt(0))) {
+          headers[0] = headers[0].substring(1); 
+        }
+      }
+      if( removeStringIndiciatorsAtCellStartEnd ) {
+        headers = removeStringIndicators(headers);
+      }
     } else {
       headers=null;
     }
