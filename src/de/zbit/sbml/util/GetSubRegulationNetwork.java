@@ -1,10 +1,10 @@
 /*
- * $Id:  GetNeighboringNodes.java 10:56:18 tscherneck $
- * $URL: GetNeighboringNodes.java $
+ * $Id:  GetSubRegulationNetwork.java 10:56:18 tscherneck $
+ * $URL: GetSubRegulationNetwork.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2014 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
