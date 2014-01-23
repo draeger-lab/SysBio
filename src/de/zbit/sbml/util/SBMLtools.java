@@ -48,8 +48,8 @@ import de.zbit.util.ResourceManager;
  * @version $Rev$
  * @since 1.1
  */
-public class SBMLtools {
-
+public class SBMLtools extends org.sbml.jsbml.util.SBMLtools {
+  
   /**
    * A {@link Logger} for this class.
    */
@@ -70,12 +70,12 @@ public class SBMLtools {
   }
   
   /**
-	 * Returns a name associated to this given {@link NamedSBase}. It first tries
-	 * the name, then the id, finally, the element's name.
-	 * 
-	 * @param nsb
-	 * @return a {@link String} describing the given element.
-	 */
+   * Returns a name associated to this given {@link NamedSBase}. It first tries
+   * the name, then the id, finally, the element's name.
+   * 
+   * @param nsb
+   * @return a {@link String} describing the given element.
+   */
   public static String getName(NamedSBase nsb) {
     if (nsb == null) {
       return "";
@@ -92,47 +92,6 @@ public class SBMLtools {
   /**
    * 
    * @param sbase
-   * @param level
-   * @param version
-   * @return
-   */
-  public static final <T extends SBase> T setLevelAndVersion(T sbase, int level, int version) {
-    
-    // Some hard-coded default stuff:
-    // Before SBML l3, exponent, scale and multiplier had default values.
-    // => Restore them when upgrading to l3
-    if (sbase instanceof Unit) {
-      Unit ud = ((Unit) sbase);
-      if ((sbase.getLevel() < 3) && (level >= 3)) {
-        if (!ud.isSetExponent()) {
-          ud.setExponent(1d);
-        }
-        if (!ud.isSetScale()) {
-          ud.setScale(0);
-        }
-        if (!ud.isSetMultiplier()) {
-          ud.setMultiplier(1d);
-        }
-      }
-    }
-    
-    // Set level and version
-    sbase.setVersion(version);
-    sbase.setLevel(level);
-    
-    // Recurse to children
-    for (int i = 0; i<sbase.getChildCount(); i++) {
-      TreeNode child = sbase.getChildAt(i);
-      if (child instanceof SBase) {
-        setLevelAndVersion((SBase) child, level, version);
-      }
-    }
-    return sbase;
-  }
-
-  /**
-   * 
-   * @param sbase
    * @param term
    */
   public static final void setSBOTerm(SBase sbase, int term) {
@@ -140,10 +99,10 @@ public class SBMLtools {
       Integer.valueOf(2))) {
       sbase.setSBOTerm(term);
     } else {
-    	ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.Messages");
+      ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.Messages");
       logger.warning(MessageFormat.format(
-          bundle.getString("COULD_NOT_SET_SBO_TERM"), 
-          SBO.sboNumberString(term), sbase.getElementName(), sbase.getLevel(), sbase.getVersion()));
+        bundle.getString("COULD_NOT_SET_SBO_TERM"),
+        SBO.sboNumberString(term), sbase.getElementName(), sbase.getLevel(), sbase.getVersion()));
     }
   }
   
@@ -153,7 +112,7 @@ public class SBMLtools {
    * @param unit
    */
   public static final void setUnits(ASTNode node, UnitDefinition unit) {
-  	setUnits(node, unit.getId());
+    setUnits(node, unit.getId());
   }
   
   /**
@@ -162,58 +121,58 @@ public class SBMLtools {
    * @param unit
    */
   public static final void setUnits(ASTNode node, Unit.Kind unit) {
-  	setUnits(node, unit.toString().toLowerCase());
+    setUnits(node, unit.toString().toLowerCase());
   }
-
+  
   /**
    * 
    * @param node
    * @param unit
    */
-	public static final void setUnits(ASTNode node, String unit) {
-		MathContainer container = node.getParentSBMLObject();
-		if ((container != null) && (container.getLevel() > 2)) {
-			node.setUnits(unit);
-		}
-	}
-
-	/**
-	 * 
-	 * @param sbase
-	 * @param doc 
-	 */
-	public static void updateAnnotation(SBase sbase, SBMLDocument doc) {
-		if (sbase.isSetMetaId()) {
-			sbase.setMetaId(doc.nextMetaId());
-		}
-		for (int i = 0; i < sbase.getChildCount(); i++) {
-			TreeNode child = sbase.getChildAt(i);
-			if (child instanceof SBase) {
-				updateAnnotation((SBase) child, doc);
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param sbase
-	 * @return
-	 */
-	public static String createHTMLfromNotes(SBase sbase) {
-		String text = sbase.getNotesString();
-		if (text.startsWith("<notes") && text.endsWith("notes>")) {
-			text = text.substring(sbase.getNotesString().indexOf('>') + 1,
-					sbase.getNotesString().lastIndexOf('/') - 1);
-		}
-		text = text.trim().replace("/>", ">");
-		if (!text.startsWith("<body") && !text.endsWith("</body>")) {
-			text = "<body>" + text + "</body>";
-		}
-		text = "<html><head></head>" + text + "</html>";
-		return text;
-	}
-	
-
+  public static final void setUnits(ASTNode node, String unit) {
+    MathContainer container = node.getParentSBMLObject();
+    if ((container != null) && (container.getLevel() > 2)) {
+      node.setUnits(unit);
+    }
+  }
+  
+  /**
+   * 
+   * @param sbase
+   * @param doc
+   */
+  public static void updateAnnotation(SBase sbase, SBMLDocument doc) {
+    if (sbase.isSetMetaId()) {
+      sbase.setMetaId(doc.nextMetaId());
+    }
+    for (int i = 0; i < sbase.getChildCount(); i++) {
+      TreeNode child = sbase.getChildAt(i);
+      if (child instanceof SBase) {
+        updateAnnotation((SBase) child, doc);
+      }
+    }
+  }
+  
+  /**
+   * 
+   * @param sbase
+   * @return
+   */
+  public static String createHTMLfromNotes(SBase sbase) {
+    String text = toXML(sbase.getNotes());
+    if (text.startsWith("<notes") && text.endsWith("notes>")) {
+      text = text.substring(toXML(sbase.getNotes()).indexOf('>') + 1,
+        toXML(sbase.getNotes()).lastIndexOf('/') - 1);
+    }
+    text = text.trim().replace("/>", ">");
+    if (!text.startsWith("<body") && !text.endsWith("</body>")) {
+      text = "<body>" + text + "</body>";
+    }
+    text = "<html><head></head>" + text + "</html>";
+    return text;
+  }
+  
+  
   /**
    * Appends "_&lt;number&gt;" to a given String. &lt;number&gt; is being set to
    * the next free number, so that this sID is unique in this
@@ -230,7 +189,7 @@ public class SBMLtools {
     }
     return aktString;
   }
-
+  
   /**
    * Generates a valid SId from a given name. If the name already is a valid
    * SId, the name is returned. If the SId already exists in this document,
@@ -256,10 +215,10 @@ public class SBMLtools {
         ret = incrementSIdSuffix(ret, doc);
       }
     }
-
+    
     return ret;
   }
-
+  
   /**
    * 
    * @param name
@@ -269,19 +228,19 @@ public class SBMLtools {
     name = name.trim();
     StringBuilder id = new StringBuilder(name.length() + 4);
     char c = name.charAt(0);
-
+    
     // Must start with letter or '_'.
     if (!(isLetter(c) || c == '_')) {
       id.append("_");
     }
-
+    
     // May contain letters, digits or '_'
     for (int i = 0; i < name.length(); i++) {
       c = name.charAt(i);
       if (c == ' ') {
         c = '_'; // Replace spaces with "_"
       }
-
+      
       if (isLetter(c) || Character.isDigit(c) || (c == '_')) {
         id.append(c);
       } else if ((c == '-') || (c == '(') || (c == ')')) {
@@ -292,7 +251,7 @@ public class SBMLtools {
     }
     return id.toString();
   }
-
+  
   /**
    * Returns true if c is out of A-Z or a-z.
    * @param c
@@ -303,7 +262,7 @@ public class SBMLtools {
     // a-z or A-Z
     return ((c >= 97) && (c <= 122)) || ((c >= 65) && (c <= 90));
   }
-
+  
   /**
    * Generate a valid SBML identifier using UUID.
    * 

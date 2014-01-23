@@ -16,6 +16,7 @@
 package de.zbit.sbml.util;
 
 import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.util.SBMLtools;
 
 /**
  * @author Andreas Dr&auml;ger
@@ -24,30 +25,30 @@ import org.sbml.jsbml.SBase;
  * @version $Rev$
  */
 public class HTMLtools {
-
-	/**
-	 * 
-	 * @param sbase
-	 * @return
-	 */
-	public static String createTooltip(SBase sbase) {
-		return sbase.isSetNotes() ? toTooltip(sbase.getNotesString()) : null;
-	}
-	
-	/**
-	 * 
-	 * @param notesString
-	 * @return
-	 */
-	public static String toTooltip(String notesString) {
-		int firstIndex = notesString.indexOf("<html");
-		int secondIndex = notesString.indexOf("</notes");
-		if ((firstIndex > 0) && (secondIndex > 0)) {
-			String ns = notesString.substring(firstIndex, secondIndex).trim();
-			ns = ns.replace(" xmlns=\"http://www.w3.org/1999/xhtml\"", "");
-			return ns;
-		}
-		return null;
-	}
-	
+  
+  /**
+   * 
+   * @param sbase
+   * @return
+   */
+  public static String createTooltip(SBase sbase) {
+    return sbase.isSetNotes() ? toTooltip(SBMLtools.toXML(sbase.getNotes())) : null;
+  }
+  
+  /**
+   * 
+   * @param notesString
+   * @return
+   */
+  public static String toTooltip(String notesString) {
+    int firstIndex = notesString.indexOf("<html");
+    int secondIndex = notesString.indexOf("</notes");
+    if ((firstIndex > 0) && (secondIndex > 0)) {
+      String ns = notesString.substring(firstIndex, secondIndex).trim();
+      ns = ns.replace(" xmlns=\"http://www.w3.org/1999/xhtml\"", "");
+      return ns;
+    }
+    return null;
+  }
+  
 }

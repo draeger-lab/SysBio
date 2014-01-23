@@ -54,6 +54,8 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceRole;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
+import de.zbit.sbml.util.SBMLtools;
+
 
 /**
  * @author Stephanie Tscherneck
@@ -511,7 +513,9 @@ public class CellDesignerAnnotationParser implements Runnable {
   @Override
   public void run() {
     if ((sbmlDocument != null) && (sbmlDocument.isSetModel())) {
-      String annotation = getAnnotationBlockWithNamespace(sbmlDocument.getModel().getAnnotation().getNonRDFannotation().toXMLString());
+      String annotation = getAnnotationBlockWithNamespace(
+        SBMLtools.toXML(
+          sbmlDocument.getModel().getAnnotation().getNonRDFannotation()));
       try {
         readCDLayout(new BufferedReader(new StringReader(annotation)));
         readReactionLayout();
