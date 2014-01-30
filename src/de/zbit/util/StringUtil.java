@@ -1107,7 +1107,7 @@ public class StringUtil {
    * @param lineBreak
    * @param lineBreakSymbol
    * @param padString TODO
-   * @param breakBeforeLineBreak if false, breaks after a line is longer than
+   * @param breakBeforeLineBreak if {@code false}, breaks after a line is longer than
    * {@code lineBreak} characters. If true, ensures that no line is longer
    * than {@code lineBreak} characters, i.e., breaks before that number
    * of chars.
@@ -1156,7 +1156,7 @@ public class StringUtil {
   }
 
   /**
-   * For simplicity this method returns false if the char is in any operating system
+   * For simplicity this method returns {@code false} if the char is in any operating system
    * invalid.
    * @param c
    * @return true if and only if this character can be used in a file name.

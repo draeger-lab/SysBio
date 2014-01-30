@@ -31,6 +31,8 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
+import com.sun.org.apache.xpath.internal.operations.Quo;
+
 import de.zbit.util.StringUtil;
 import de.zbit.util.progressbar.AbstractProgressBar;
 
@@ -185,6 +187,13 @@ public class CSVWriter {
 	private char commentSymbol;
 	
 	/**
+   * Whether quoting of values should be allowed to preserve separator chars
+   */
+  private boolean allowQuoting;
+	
+  protected final static String QUOTE = "\"";
+  
+	/**
 	 * Allows to display progress information.
 	 */
 	private AbstractProgressBar progress = null;
@@ -196,6 +205,7 @@ public class CSVWriter {
 	public CSVWriter() {
 		separator = '\t';
 		commentSymbol = '#';
+		allowQuoting = false;
 	}
 	
 	/**
@@ -309,6 +319,10 @@ public class CSVWriter {
 	public char getSeparator() {
 		return separator;
 	}
+	
+	public boolean getAllowQuoting() {
+	  return allowQuoting;
+	}
 
 	/**
 	 * @param commentSymbol
@@ -326,6 +340,13 @@ public class CSVWriter {
 		this.separator = separator;
 	}
 
+	/**
+	 * @param allowQuoting
+	 */
+	public void setAllowQuoting(boolean allowQuoting) {
+	  this.allowQuoting = allowQuoting;
+	}
+	
 	/**
 	 * 
 	 * @param data
@@ -523,10 +544,11 @@ public class CSVWriter {
 
 	  String lineSep = StringUtil.newLine();
 	  
-		// setSeparator(separator);
 		int i, j;
 		Object value;
 
+		// check if there is a header line to be written, i.e. if there is at least
+		// one column name that is non-empty
 		boolean allHeadEntriesNullOrEmpty = true;
 		String name;
 		for (i = 0; i < data.getColumnCount() && allHeadEntriesNullOrEmpty; i++) {
@@ -535,7 +557,8 @@ public class CSVWriter {
 				allHeadEntriesNullOrEmpty = false;
 			}
 		}
-
+		
+		// if a header has to be written
 		if (!allHeadEntriesNullOrEmpty) {
 			i = 0;
 			// write table head
@@ -551,9 +574,9 @@ public class CSVWriter {
 		}
 
 		// write table body
-		if (progress!=null) progress.setNumberOfTotalCalls(data.getRowCount());
+		if (progress != null) progress.setNumberOfTotalCalls(data.getRowCount());
 		for (i = 0; i < data.getRowCount(); i++) {
-		  if (progress!=null) progress.DisplayBar();
+		  if (progress != null) progress.DisplayBar();
 			for (j = 0; j < data.getColumnCount(); j++) {
         if (j > 0) {
           writer.append(separator);
@@ -563,7 +586,7 @@ public class CSVWriter {
         value = data.getValueAt(i, j);
         
         // Try to preserve rendered texts instead of using the raw value
-        if (useTheseRenderers!=null) {
+        if (useTheseRenderers != null) {
           TableCellRenderer renderer = useTheseRenderers.getCellRenderer(i, j);
           Component comp = renderer.getTableCellRendererComponent(useTheseRenderers, value, false, false, i, j);
           if (comp instanceof JLabel) {
@@ -576,7 +599,7 @@ public class CSVWriter {
 			}
 			writer.write(lineSep);
 		}
-		if (progress!=null) progress.finished();
+		if (progress != null) progress.finished();
 		writer.close();
 	}
 
@@ -586,9 +609,22 @@ public class CSVWriter {
    */
   protected String formatCellValue(Object value) {
     // NULL is equal to an empty string, in this case
-    if (value == null) return "";
-    // Avoid writing new lines or column separators (breaks file format).
-    else return value.toString().replace('\n', ' ').replace(separator, ' ');
+    if (value == null) {
+      return "";
+    } else {
+      // Avoid writing new lines (breaks file format).
+      String s = value.toString().replace('\n', ' ');
+      // if the value contains the separator char, it needs to be quoted
+      if (s.indexOf(separator) >= 0) {
+        if (allowQuoting) {
+          // mask all quotes in the value by doubling them (not escaping)
+          s = QUOTE + s.replace(QUOTE, QUOTE + QUOTE) + QUOTE;
+        } else {
+          s = s.replace(separator, ' '); 
+        }
+      }
+      return s;
+    }
   }
 
 	/**
