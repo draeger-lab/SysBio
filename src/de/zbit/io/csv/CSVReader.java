@@ -1902,7 +1902,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
   
   /**
    * Split the given String at the given separator.
-   * Remark: intances of separator, in stringIndicators are ignored, but the
+   * Remark: intances of separator in stringIndicators are ignored, but the
    * indicators are NOT REMOVED!
    * @param input - String to split
    * @param separator - separator char
