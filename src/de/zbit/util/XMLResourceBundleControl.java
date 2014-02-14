@@ -48,121 +48,123 @@ import java.util.Set;
  * @since 1.0
  */
 public class XMLResourceBundleControl extends Control {
-	
-	/**
-	 * An adapter class that wraps a {@link Properties} class and provides its
-	 * functionality as a {@link ResourceBundle}.
-	 * 
-	 * Usually, this will simply return the elements for a given key as it would
-	 * be in an instance of {@link Properties}. The only difference is the support
-	 * for {@link String} arrays: If a returned element is surrounded with square
-	 * brackets ({@code '['} and {@code ']'}), these brackets are
-	 * removed from the string and the separator char {@code ';'} is used to
-	 * split the given {@link String} into an array of {@link String}s.
-	 * 
-	 * @author Andreas Dr&auml;ger
-	 * @date 2011-01-04
-	 */
-	private static class XMLResourceBundle extends ResourceBundle {
-		
-		/**
-		 * The wrapped element.
-		 */
-		private Properties properties;
-		
-		/**
-		 * 
-		 * @param stream
-		 * @throws IOException
-		 */
-		public XMLResourceBundle(InputStream stream) throws IOException,
-			InvalidPropertiesFormatException {
-			Properties defaults = new Properties();
-			defaults.loadFromXML(stream);
-			properties = new Properties(defaults);
-		}
-		
-		/* (non-Javadoc)
-		 * @see java.util.ResourceBundle#getKeys()
-		 */
-		public Enumeration<String> getKeys() {
-			Set<String> key = properties.stringPropertyNames();
-			return Collections.enumeration(key);
-		}
-		
-		/* (non-Javadoc)
-		 * @see java.util.ResourceBundle#handleGetObject(java.lang.String)
-		 */
-		protected Object handleGetObject(String key) {
-			String element = properties.getProperty(key);
-			if ((element != null) && (element.length() > 0)
-					&& (element.charAt(0) == '[')
-					&& (element.charAt(element.length() - 1) == ']')) {
-				return element.substring(1, element.length() - 1).split(";");
-			}
-			return element;
-		}
-		
-		/* (non-Javadoc)
-		 * @see java.lang.Object#toString()
-		 */
-		@Override
-		public String toString() {
-			return properties.toString();
-		} 
-		
-	}
-	
-	/**
-	 * The extension for XML files.
-	 */
-	public static final String XML = "xml";
-	
-	/* (non-Javadoc)
-	 * @see java.util.ResourceBundle.Control#getFormats(java.lang.String)
-	 */
-	@Override
-	public List<String> getFormats(String baseName) {
-		return Arrays.asList(XML);
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.util.ResourceBundle.Control#newBundle(java.lang.String, java.util.Locale, java.lang.String, java.lang.ClassLoader, boolean)
-	 */
-	@Override
-	public ResourceBundle newBundle(String baseName, Locale locale,
-		String format, ClassLoader loader, boolean reload)
-				throws IllegalAccessException, InstantiationException, IOException {
-		if ((baseName == null) || (locale == null) || (format == null)
-				|| (loader == null)) { 
-			throw new NullPointerException(); 
-		}
-		ResourceBundle bundle = null;
-		
-		if (format.equalsIgnoreCase(XML)) {
-			// 1. Localize resource file
-			String bundleName = toBundleName(baseName, locale);
-			String resName = toResourceName(bundleName, format);
-			URL url = loader.getResource(resName);
-			
-			// 2. Create Stream to the resource file
-			if (url != null) {
-				URLConnection connection = url.openConnection();
-				if (connection != null) {
-					if (reload) {
-						connection.setUseCaches(false);
-					}
-					InputStream stream = connection.getInputStream();
-					if (stream != null) {
-						// 3. Create ResourceBundle object
-						bundle = new XMLResourceBundle(stream);
-						stream.close();
-					}
-				}
-			}
-		}
-		// 4. Return the bundle.
-		return bundle;
-	}
-	
+  
+  /**
+   * An adapter class that wraps a {@link Properties} class and provides its
+   * functionality as a {@link ResourceBundle}.
+   * 
+   * Usually, this will simply return the elements for a given key as it would
+   * be in an instance of {@link Properties}. The only difference is the support
+   * for {@link String} arrays: If a returned element is surrounded with square
+   * brackets ({@code '['} and {@code ']'}), these brackets are
+   * removed from the string and the separator char {@code ';'} is used to
+   * split the given {@link String} into an array of {@link String}s.
+   * 
+   * @author Andreas Dr&auml;ger
+   * @date 2011-01-04
+   */
+  private static class XMLResourceBundle extends ResourceBundle {
+    
+    /**
+     * The wrapped element.
+     */
+    private Properties properties;
+    
+    /**
+     * 
+     * @param stream
+     * @throws IOException
+     */
+    public XMLResourceBundle(InputStream stream) throws IOException,
+    InvalidPropertiesFormatException {
+      Properties defaults = new Properties();
+      defaults.loadFromXML(stream);
+      properties = new Properties(defaults);
+    }
+    
+    /* (non-Javadoc)
+     * @see java.util.ResourceBundle#getKeys()
+     */
+    @Override
+    public Enumeration<String> getKeys() {
+      Set<String> key = properties.stringPropertyNames();
+      return Collections.enumeration(key);
+    }
+    
+    /* (non-Javadoc)
+     * @see java.util.ResourceBundle#handleGetObject(java.lang.String)
+     */
+    @Override
+    protected Object handleGetObject(String key) {
+      String element = properties.getProperty(key);
+      if ((element != null) && (element.length() > 0)
+          && (element.charAt(0) == '[')
+          && (element.charAt(element.length() - 1) == ']')) {
+        return element.substring(1, element.length() - 1).split(";");
+      }
+      return element;
+    }
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+      return properties.toString();
+    }
+    
+  }
+  
+  /**
+   * The extension for XML files.
+   */
+  public static final String XML = "xml";
+  
+  /* (non-Javadoc)
+   * @see java.util.ResourceBundle.Control#getFormats(java.lang.String)
+   */
+  @Override
+  public List<String> getFormats(String baseName) {
+    return Arrays.asList(XML);
+  }
+  
+  /* (non-Javadoc)
+   * @see java.util.ResourceBundle.Control#newBundle(java.lang.String, java.util.Locale, java.lang.String, java.lang.ClassLoader, boolean)
+   */
+  @Override
+  public ResourceBundle newBundle(String baseName, Locale locale,
+    String format, ClassLoader loader, boolean reload)
+        throws IllegalAccessException, InstantiationException, IOException {
+    if ((baseName == null) || (locale == null) || (format == null)
+        || (loader == null)) {
+      throw new NullPointerException();
+    }
+    ResourceBundle bundle = null;
+    
+    if (format.equalsIgnoreCase(XML)) {
+      // 1. Localize resource file
+      String bundleName = toBundleName(baseName, locale);
+      String resName = toResourceName(bundleName, format);
+      URL url = loader.getResource(resName);
+      
+      // 2. Create Stream to the resource file
+      if (url != null) {
+        URLConnection connection = url.openConnection();
+        if (connection != null) {
+          if (reload) {
+            connection.setUseCaches(false);
+          }
+          InputStream stream = connection.getInputStream();
+          if (stream != null) {
+            // 3. Create ResourceBundle object
+            bundle = new XMLResourceBundle(stream);
+            stream.close();
+          }
+        }
+      }
+    }
+    // 4. Return the bundle.
+    return bundle;
+  }
+  
 }

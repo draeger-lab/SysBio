@@ -31,17 +31,17 @@ import de.zbit.util.prefs.Option;
  * @version $Rev$
  */
 public interface GarudaOptions extends KeyProvider {
-	
-	/**
-	 * Localization support
-	 */
-	public static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels");
-	
-	/**
-	 * Decides whether or not the current application should attempt to connect to
-	 * the Garuda Core.
-	 */
-	public static final Option<Boolean> CONNECT_TO_GARUDA = new Option<Boolean>(
-		"CONNECT_TO_GARUDA", Boolean.class, bundle, Boolean.TRUE);
-	
+  
+  /**
+   * Localization support
+   */
+  public static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels");
+  
+  /**
+   * Decides whether or not the current application should attempt to connect to
+   * the Garuda Core.
+   */
+  public static final Option<Boolean> CONNECT_TO_GARUDA = new Option<Boolean>(
+      "CONNECT_TO_GARUDA", Boolean.class, bundle, Boolean.TRUE);
+  
 }

@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.SBO;
+import de.zbit.util.ResourceManager;
 
 import y.base.DataMap;
 import y.base.Edge;
@@ -51,7 +52,6 @@ import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.graph.sbgn.ComplexGroupNode;
 import de.zbit.graph.sbgn.ComplexNode;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
-import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
