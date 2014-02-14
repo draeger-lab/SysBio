@@ -280,12 +280,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
    */
   private void addProperties(Compartment c) {
     if (c.isSetCompartmentType() || editable) {
-      JTextField tf = new JTextField(c.getCompartmentTypeInstance().toString());
+      JTextField tf = new JTextField(c.isSetCompartmentType() ? c.getCompartmentTypeInstance().toString() : "");
       tf.setEditable(editable);
       addLabeledComponent(bundle.getString("compartmentType"), tf);
     }
     if (c.isSetOutside() || editable) {
-      JTextField tf = new JTextField(c.getOutsideInstance().toString());
+      JTextField tf = new JTextField(c.isSetOutside() ? c.getOutsideInstance().toString() : "");
       tf.setEditable(editable);
       addLabeledComponent(bundle.getString("outside"), tf);
     }

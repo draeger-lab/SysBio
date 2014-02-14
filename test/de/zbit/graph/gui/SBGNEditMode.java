@@ -36,72 +36,68 @@ import de.zbit.graph.io.SB_2GraphML;
  * @version $Rev$
  */
 public class SBGNEditMode<T> extends RestrictedEditMode implements GraphListener {
-	
-	private int count = 0;
-	private SB_2GraphML<T> converter;
-	
-	/**
-	 * 
-	 */
-	public SBGNEditMode(SB_2GraphML<T> converter) {
-		super();
-		this.converter = converter;
-		allowNodeCreation(true);
-		setCreateEdgeMode(new CreateReactionEdgeMode());
-    allowEdgeCreation(true); 
-	}
-	
-	
-	
-	/* (non-Javadoc)
-	 * @see y.view.EditMode#mousePressedRight(double, double)
-	 */
-	@Override
-	public void mousePressedRight(double x, double y) {
-//		super.mousePressedRight(x, y);
-		
-		String name = JOptionPane.showInputDialog("Enter name:", "s" + ++count);
-		if ((name != null) && (name.length() > 0) && !name.equalsIgnoreCase("undefined")) {
-			Graph2D graph = getGraph2D();
-//			graph.addGraphListener(this);
-//			NodeRealizer nr = SBGNVisualizationProperties.getNodeRealizer(SBO.getSimpleMolecule());
-//			Node n = graph.createNode();
-//			nr = nr.createCopy();
-//			nr.setCenter(x, y);
-//			nr.setWidth(46);
-//			nr.setHeight(17);
-//			nr.setLabelText(name);
-//			nr.setFillColor(Color.GREEN);
-//			graph.setRealizer(n, nr);
-			Node n = converter.createNode("s" + count, name, SBO.getSimpleMolecule(), x, y);
-			
-			graph.updateViews();
-			if (!name.equals("s" + count)) {
-				count--;
-			}
-		} else {
-			count--;
-		}
-	}
-
-
-	/**
-	 * @param listener
-	 * @param parent
-	 */
-	public SBGNEditMode(ActionListener listener, JComponent parent) {
-		super(listener, parent);
-	}
-
-
-
-	/* (non-Javadoc)
-	 * @see y.base.GraphListener#onGraphEvent(y.base.GraphEvent)
-	 */
-	public void onGraphEvent(GraphEvent evt) {
-		if (evt.getType() == GraphEvent.NODE_CREATION) {
-			System.out.println(evt.getData() + "\t" + evt.getSource() + "\t" + evt.getGraph());
-		}
-	}
-	
+  
+  private int count = 0;
+  private SB_2GraphML<T> converter;
+  
+  /**
+   * 
+   */
+  public SBGNEditMode(SB_2GraphML<T> converter) {
+    super();
+    this.converter = converter;
+    allowNodeCreation(true);
+    setCreateEdgeMode(new CreateReactionEdgeMode());
+    allowEdgeCreation(true);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.EditMode#mousePressedRight(double, double)
+   */
+  @Override
+  public void mousePressedRight(double x, double y) {
+    //		super.mousePressedRight(x, y);
+    
+    String name = JOptionPane.showInputDialog("Enter name:", "s" + ++count);
+    if ((name != null) && (name.length() > 0) && !name.equalsIgnoreCase("undefined")) {
+      Graph2D graph = getGraph2D();
+      //			graph.addGraphListener(this);
+      //			NodeRealizer nr = SBGNVisualizationProperties.getNodeRealizer(SBO.getSimpleMolecule());
+      //			Node n = graph.createNode();
+      //			nr = nr.createCopy();
+      //			nr.setCenter(x, y);
+      //			nr.setWidth(46);
+      //			nr.setHeight(17);
+      //			nr.setLabelText(name);
+      //			nr.setFillColor(Color.GREEN);
+      //			graph.setRealizer(n, nr);
+      Node n = converter.createNode("s" + count, name, SBO.getSimpleMolecule(), x, y);
+      
+      graph.updateViews();
+      if (!name.equals("s" + count)) {
+        count--;
+      }
+    } else {
+      count--;
+    }
+  }
+  
+  /**
+   * @param listener
+   * @param parent
+   */
+  public SBGNEditMode(ActionListener listener, JComponent parent) {
+    super(listener, parent);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.base.GraphListener#onGraphEvent(y.base.GraphEvent)
+   */
+  @Override
+  public void onGraphEvent(GraphEvent evt) {
+    if (evt.getType() == GraphEvent.NODE_CREATION) {
+      System.out.println(evt.getData() + "\t" + evt.getSource() + "\t" + evt.getGraph());
+    }
+  }
+  
 }
