@@ -243,7 +243,7 @@ public class SBFileFilter extends GeneralFileFilter {
         case BioPAX_FILES_L2:
           extensions.add("bp2");
         case BioPAX_FILES_L3:
-          if (!this.equals(BioPAX_FILES_L2)) {
+          if (!equals(BioPAX_FILES_L2)) {
             extensions.add("bp3");
           }
         case OWL_FILES:
@@ -289,15 +289,15 @@ public class SBFileFilter extends GeneralFileFilter {
       if (this == KGML_FILES) {
         return Pattern.compile("<!DOCTYPE[\\p{ASCII}]*KGML[\\p{ASCII}]*>", Pattern.MULTILINE & Pattern.DOTALL);
       }
-      if (this.toString().startsWith(SBML_FILES.toString())) {
+      if (toString().startsWith(SBML_FILES.toString())) {
         String anyChar = "[\\s\\w\\p{ASCII}]*";
         String whiteSpace = "[\\s]+";
         String number = "[1-9]+[0-9]*";
         String level = number, version = number;
         String sbmlDef = "<sbml%s%s((level=\"%s\"%s%sversion=\"%s\")|(version=\"%s\"%s%slevel=\"%s\"))%s>";
         if (this != SBML_FILES) {
-          level = this.toString().substring(12, 13);
-          version = this.toString().substring(14);
+          level = toString().substring(12, 13);
+          version = toString().substring(14);
         }
         return Pattern.compile(String.format(sbmlDef, whiteSpace,
           anyChar, level, whiteSpace, anyChar, version, version, whiteSpace,
@@ -305,11 +305,11 @@ public class SBFileFilter extends GeneralFileFilter {
           & Pattern.DOTALL);
       }
       
-      if (this.toString().startsWith(BioPAX_FILES.toString())) {
+      if (toString().startsWith(BioPAX_FILES.toString())) {
         // Parse a level from file filter string
         Pattern levelPattern = Pattern.compile("BioPAX_FILES_L(\\d)+");
         int level = 0;
-        Matcher m = levelPattern.matcher(this.toString());
+        Matcher m = levelPattern.matcher(toString());
         if (m.find()) {
           level = Integer.parseInt(m.group(1));
         }
@@ -359,8 +359,8 @@ public class SBFileFilter extends GeneralFileFilter {
     Pattern pattern = type.getLinePattern();
     boolean retVal = pattern == null;
     if (!retVal) {
-    	boolean oldVerbose = OpenFile.isVerbose();
-    	OpenFile.setVerbose(false);
+      boolean oldVerbose = OpenFile.isVerbose();
+      OpenFile.setVerbose(false);
       BufferedReader br = OpenFile.openFile(file.getAbsolutePath());
       Matcher matcher;
       try {
@@ -380,7 +380,7 @@ public class SBFileFilter extends GeneralFileFilter {
       } finally {
         try {
           if (br != null) {
-          	br.close();
+            br.close();
           }
         } catch (IOException e) {
           return false;
@@ -465,7 +465,7 @@ public class SBFileFilter extends GeneralFileFilter {
   }
   
   /**
-   * @return 
+   * @return
    */
   public static final FileFilter createHTMLFileFilter() {
     return new SBFileFilter(FileType.HTML_FILES);
@@ -538,7 +538,7 @@ public class SBFileFilter extends GeneralFileFilter {
   }
   
   /**
-   * @return A filter for SBML files
+   * @return A filter for SIF files
    */
   public static final SBFileFilter createSIFFileFilter() {
     return new SBFileFilter(FileType.SIF_FILES);
@@ -870,10 +870,10 @@ public class SBFileFilter extends GeneralFileFilter {
    */
   public SBFileFilter(FileType type) {
     this.type = type;
-    if (type == FileType.UNDEFINED) { 
+    if (type == FileType.UNDEFINED) {
       throw new IllegalArgumentException(
         ResourceManager.getBundle("de.zbit.locales.Warnings").getString(
-        "FILE_TYPE_MUST_NOT_BE_UNDEFINED")); 
+            "FILE_TYPE_MUST_NOT_BE_UNDEFINED"));
     }
   }
   
@@ -885,7 +885,7 @@ public class SBFileFilter extends GeneralFileFilter {
    */
   public SBFileFilter(GeneralFileFilter filter) {
     this.filter = filter;
-    this.type = FileType.UNDEFINED;
+    type = FileType.UNDEFINED;
   }
   
   /* (non-Javadoc)
@@ -901,8 +901,8 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     Set<String> extensions = type.getFileExtensions();
     return f.isDirectory()
-    || (((extensions == null) || extensions.isEmpty() || extensions.contains(getExtension(f))) 
-    		&& (!f.exists() || (checkFileHead(f, type))));
+        || (((extensions == null) || extensions.isEmpty() || extensions.contains(getExtension(f)))
+            && (!f.exists() || (checkFileHead(f, type))));
   }
   
   /**
@@ -1029,9 +1029,9 @@ public class SBFileFilter extends GeneralFileFilter {
    * @return Can be two empty {@link List}s
    */
   public ValuePairUncomparable<List<File>, List<File>> separate(File... files) {
-    if ((files == null) || (files.length == 0)) { 
+    if ((files == null) || (files.length == 0)) {
       return new ValuePairUncomparable<List<File>, List<File>>(
-          new ArrayList<File>(0), new ArrayList<File>(0)); 
+          new ArrayList<File>(0), new ArrayList<File>(0));
     }
     ValuePairUncomparable<List<File>, List<File>> separation = new ValuePairUncomparable<List<File>, List<File>>(
         new ArrayList<File>(files.length), new ArrayList<File>(files.length));
@@ -1127,15 +1127,15 @@ public class SBFileFilter extends GeneralFileFilter {
     if (obj.getClass().equals(getClass())) {
       SBFileFilter sbff = (SBFileFilter)obj;
       boolean equal = true;
-      if( this.filter == null ) {
+      if( filter == null ) {
         equal &= (sbff.filter == null);
       } else {
-        equal &= this.filter.equals(sbff.filter);
+        equal &= filter.equals(sbff.filter);
       }
-      if( this.type == null ) {
+      if( type == null ) {
         equal &= (sbff.type == null);
       } else {
-        equal &= this.type.equals(sbff.type);
+        equal &= type.equals(sbff.type);
       }
       return equal;
     }
@@ -1173,6 +1173,6 @@ public class SBFileFilter extends GeneralFileFilter {
   @Override
   public String toString() {
     return getDescription();
-  }	
+  }
   
 }

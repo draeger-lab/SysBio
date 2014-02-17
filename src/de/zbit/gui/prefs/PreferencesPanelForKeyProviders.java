@@ -19,7 +19,7 @@ package de.zbit.gui.prefs;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.Set;
 
 import de.zbit.util.prefs.KeyProvider;
 
@@ -52,7 +52,7 @@ public class PreferencesPanelForKeyProviders extends AbstractMultiplePreferences
    * @throws IOException
    */
   public PreferencesPanelForKeyProviders(List<Class<? extends KeyProvider>> provider) throws IOException {
-    this(null, provider);
+    this(null, provider, null);
   }
   
   /**
@@ -62,23 +62,24 @@ public class PreferencesPanelForKeyProviders extends AbstractMultiplePreferences
    * @throws IOException
    */
   public PreferencesPanelForKeyProviders(String title, Class<? extends KeyProvider>... provider) throws IOException {
-    this(title, Arrays.asList(provider));
+    this(title, Arrays.asList(provider), null);
   }
   
   /**
    * 
    * @param title
    * @param provider
+   * @param ignore
    * @throws IOException
    */
-  public PreferencesPanelForKeyProviders(String title, List<Class<? extends KeyProvider>> provider) throws IOException {
-    super(false); // calls init, before provider is set => many null-pointer-exceptions.
-    this.providers = provider;
+  public PreferencesPanelForKeyProviders(String title, List<Class<? extends KeyProvider>> provider, Set<String> ignore) throws IOException {
+    super(false, ignore); // calls init, before provider is set => many null-pointer-exceptions.
+    providers = provider;
     if (title == null) {
       title = KeyProvider.Tools.createTitle(providers.get(0));
     }
     this.title = title;
     initializePrefPanel();
   }
-
+  
 }

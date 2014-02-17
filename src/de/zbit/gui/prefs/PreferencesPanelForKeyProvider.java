@@ -17,6 +17,7 @@
 package de.zbit.gui.prefs;
 
 import java.io.IOException;
+import java.util.Set;
 
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
@@ -29,17 +30,17 @@ import de.zbit.util.prefs.SBPreferences;
  * @since 1.0
  */
 public class PreferencesPanelForKeyProvider extends PreferencesPanel {
-	
-	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = -3293205475880841303L;
-	
-	/**
-	 * The KeyProvider, that determines this panel.
-	 */
-	protected Class<? extends KeyProvider> provider;
-	
+  
+  /**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = -3293205475880841303L;
+  
+  /**
+   * The KeyProvider, that determines this panel.
+   */
+  protected Class<? extends KeyProvider> provider;
+  
   /**
    * Title of this panel. Will be used as tab-title.
    */
@@ -59,53 +60,79 @@ public class PreferencesPanelForKeyProvider extends PreferencesPanel {
    * @throws IOException
    */
   public PreferencesPanelForKeyProvider(String title, Class<? extends KeyProvider> provider) throws IOException {
+    this(title, provider, null);
+  }
+  
+  /**
+   * 
+   * @param provider
+   * @param ignore
+   * @throws IOException
+   */
+  public PreferencesPanelForKeyProvider(Class<? extends KeyProvider> provider, Set<String> ignore) throws IOException {
+    this(null, provider, ignore);
+  }
+  
+  /**
+   * 
+   * @param title
+   * @param provider
+   * @param ignore
+   * @throws IOException
+   */
+  public PreferencesPanelForKeyProvider(String title, Class<? extends KeyProvider> provider, Set<String> ignore) throws IOException {
     super(false); // calls init, before provider is set => many null-pointer-exceptions.
     if (title == null) {
-    	title = KeyProvider.Tools.createTitle(provider);
+      title = KeyProvider.Tools.createTitle(provider);
     }
     this.title = title;
     this.provider = provider;
+    ignoreOptions = ignore;
     initializePrefPanel();
   }
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.prefs.PreferencesPanel#accepts(java.lang.Object)
-	 */
-	public boolean accepts(Object key) {
-		//return preferences.keySetFull().contains(key);
-	  // Preferences keyset contains all options from the package.
-	  // Better read fields of actual key-provider. These are the
-	  // Keys we want to have in the properties!!
-	  try {
-      return (provider.getField(key.toString()) != null);
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.PreferencesPanel#accepts(java.lang.Object)
+   */
+  @Override
+  public boolean accepts(Object key) {
+    //return preferences.keySetFull().contains(key);
+    // Preferences keyset contains all options from the package.
+    // Better read fields of actual key-provider. These are the
+    // Keys we want to have in the properties!!
+    try {
+      return (((ignoreOptions == null)) || !ignoreOptions.contains(key)) && (provider.getField(key.toString()) != null);
     } catch (SecurityException e) {
       return false;
     } catch (NoSuchFieldException e) {
       return false;
     }
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.prefs.PreferencesPanel#getTitle()
-	 */
-	public String getTitle() {
-		return title;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.prefs.PreferencesPanel#init()
-	 */
-	public void init() {
-		if (provider != null) {
-			autoBuildPanel();
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.prefs.PreferencesPanel#loadPreferences()
-	 */
-	protected SBPreferences loadPreferences() throws IOException {
-		return provider == null ? null : SBPreferences.getPreferencesFor(provider);
-	}
-	
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.PreferencesPanel#getTitle()
+   */
+  @Override
+  public String getTitle() {
+    return title;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.PreferencesPanel#init()
+   */
+  @Override
+  public void init() {
+    if (provider != null) {
+      autoBuildPanel();
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.prefs.PreferencesPanel#loadPreferences()
+   */
+  @Override
+  protected SBPreferences loadPreferences() throws IOException {
+    return provider == null ? null : SBPreferences.getPreferencesFor(provider);
+  }
+  
 }
