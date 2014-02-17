@@ -415,6 +415,7 @@
         <include name="de/zbit/gui/layout/**.class"/>
         <exclude name="de/zbit/gui/layout/SpringUtilities.class"/>
         <exclude name="de/zbit/gui/layout/VerticalLayout.class"/>
+      	<include name="de/zbit/locales/**.class"/>
         <include name="de/zbit/gui/panels/**.class"/>
         <include name="de/zbit/gui/prefs/**.class"/>
         <include name="de/zbit/gui/table/**.class"/>
