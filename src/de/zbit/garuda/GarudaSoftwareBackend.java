@@ -18,7 +18,6 @@ package de.zbit.garuda;
 
 import java.awt.Component;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -28,15 +27,14 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import jp.sbi.garuda.client.backend.BackendAlreadyInitializedException;
+import jp.sbi.garuda.client.backend.BackendNotInitializedException;
+import jp.sbi.garuda.client.backend.GarudaClientBackend;
+import jp.sbi.garuda.client.backend.listeners.GarudaBackendPropertyChangeSupport;
 import jp.sbi.garuda.platform.commons.FileFormat;
 import jp.sbi.garuda.platform.commons.Gadget;
 import jp.sbi.garuda.platform.commons.exception.NetworkException;
 import jp.sbi.garuda.platform.commons.net.GarudaConnectionNotInitializedException;
-import jp.sbi.garuda.platform.event.PlatformEvent;
-import jp.sbi.garuda.platform.event.PlatformEventListener;
-import jp.sbi.garuda.platform.event.PlatformEventManager;
-import jp.sbi.garuda.platform.event.PlatformEventType;
-import jp.sbi.garuda.platform.gadget.CoreClientAPI;
 import de.zbit.UserInterface;
 import de.zbit.gui.GUITools;
 import de.zbit.io.FileTools;
@@ -52,21 +50,13 @@ import de.zbit.util.ResourceManager;
  */
 public class GarudaSoftwareBackend {
   
-  public static final String LOAD_FILE_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.loadFilePropertyChangeId";
-  public static final String CONNECTION_NOT_INITIALIZED_ID = "de.zbit.garuda.GarudaSoftwareBackend.connectionNotInitialized";
-  public static final String CONNECTION_TERMINATED_ID = "de.zbit.garuda.GarudaSoftwareBackend.connectionTerminated";
-  public static final String GOT_ERRORS_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.gotErrors";
-  public static final String GOT_SOFTWARES_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.gotSoftwares";
-  public static final String LOAD_GADGET_PROPERTY_CHANGE_ID = "de.zbit.garuda.GarudaSoftwareBackend.loadGadget";
-  public static final String SOFTWARE_DEREGISTRATION_ERROR_ID = "de.zbit.garuda.GarudaSoftwareBackend.softwareDeregistrationError";
-  public static final String SOFTWARE_REGISTRATION_ERROR_ID = "de.zbit.garuda.GarudaSoftwareBackend.softwareRegistrationError";
   public static final String GARUDA_ACTIVATED = "de.zbit.garuda.GarudaSoftwareBackend.garudaActivated";
-  
-  public static final String SOFTWARE_DEREGISTERED_ERROR = "Protocol Error: SoftwareNotRegistered";
   public static final String SOFTWARE_REGISTERED_ERROR = "Protocol Error: SoftwareRegistered";
   
-  private static final int GARUDA_CORE_PORT = 9000;
-  private static final int GARUDA_CORE_TIMEOUT = 1000;
+  /**
+   * The actual backend.
+   */
+  private GarudaClientBackend backend;
   
   /**
    * A {@link Logger} for this class.
@@ -81,15 +71,6 @@ public class GarudaSoftwareBackend {
   /**
    * 
    */
-  private boolean initialized;
-  
-  /**
-   * 
-   */
-  private List<Gadget> listOfCompatibleSoftware;
-  /**
-   * 
-   */
   private List<FileFormat> listOfOutputFileFormats, listOfInputFileFormats;
   
   /**
@@ -100,16 +81,11 @@ public class GarudaSoftwareBackend {
   /**
    * 
    */
-  private PropertyChangeSupport pcs;
+  private GarudaBackendPropertyChangeSupport pcs;
   /**
    * 
    */
-  private Gadget sourceGadget;
-  
-  /**
-   * 
-   */
-  private GarudaSoftwareListener softwareListener;
+  private Gadget gadget;
   
   /**
    * 
@@ -156,16 +132,14 @@ public class GarudaSoftwareBackend {
     String description, List<String> categories, List<String> screenshots) {
     super();
     
-    sourceGadget = new Gadget();
-    sourceGadget.setUUID(uid);
-    sourceGadget.setName(parent.getApplicationName());
+    gadget = new Gadget();
+    gadget.setUUID(uid);
+    gadget.setName(parent.getApplicationName());
     
-    listOfCompatibleSoftware = null;
     this.parent = parent;
-    pcs = new PropertyChangeSupport(parent);
+    pcs = new GarudaBackendPropertyChangeSupport(this.parent);
     listOfOutputFileFormats = new LinkedList<FileFormat>();
     listOfInputFileFormats = new LinkedList<FileFormat>();
-    softwareListener = new GarudaSoftwareListener(this);
     this.iconPath = iconPath;
     
     ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Launcher");
@@ -177,8 +151,8 @@ public class GarudaSoftwareBackend {
     listOfCategories = categories;
     listOfScreenshots = screenshots;
     
-    addPropertyChangeListenerForAllProperties(softwareListener);
-    addPropertyChangeListenerForAllProperties(this.parent);
+    //addPropertyChangeListener(softwareListener);
+    addPropertyChangeListener(this.parent);
   }
   
   /**
@@ -223,47 +197,6 @@ public class GarudaSoftwareBackend {
     pcs.addPropertyChangeListener(pcl);
   }
   
-  /**
-   * 
-   * @param propertyName
-   * @param pcl
-   */
-  public void addPropertyChangeListener(String propertyName,
-    PropertyChangeListener pcl) {
-    pcs.addPropertyChangeListener(propertyName, pcl);
-  }
-  
-  /**
-   * 
-   * @param listener
-   */
-  private void addPropertyChangeListenerForAllProperties(PropertyChangeListener listener) {
-    addPropertyChangeListener(LOAD_FILE_PROPERTY_CHANGE_ID, listener);
-    addPropertyChangeListener(LOAD_GADGET_PROPERTY_CHANGE_ID, listener);
-    addPropertyChangeListener(GOT_SOFTWARES_PROPERTY_CHANGE_ID, listener);
-    addPropertyChangeListener(GOT_ERRORS_PROPERTY_CHANGE_ID, listener);
-    addPropertyChangeListener(CONNECTION_TERMINATED_ID, listener);
-    addPropertyChangeListener(CONNECTION_NOT_INITIALIZED_ID, listener);
-    addPropertyChangeListener(SOFTWARE_REGISTRATION_ERROR_ID, listener);
-    addPropertyChangeListener(SOFTWARE_DEREGISTRATION_ERROR_ID, listener);
-    addPropertyChangeListener(GARUDA_ACTIVATED, listener);
-  }
-  
-  /**
-   * 
-   * @throws NetworkException
-   * @throws BackendNotInitializedException
-   * @throws GarudaConnectionNotInitializedException
-   */
-  public void deregisterSoftwareFromGaruda() throws NetworkException,
-  BackendNotInitializedException, GarudaConnectionNotInitializedException {
-    if (!initialized) {
-      throw new BackendNotInitializedException();
-    }
-    CoreClientAPI.getInstance().deregisterGadget();
-    logger.fine(bundle.getString("SOFTWARE_DEREGISTERED"));
-  }
-  
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
@@ -279,9 +212,6 @@ public class GarudaSoftwareBackend {
       return false;
     }
     GarudaSoftwareBackend other = (GarudaSoftwareBackend) obj;
-    if (initialized != other.initialized) {
-      return false;
-    }
     if (listOfInputFileFormats == null) {
       if (other.listOfInputFileFormats != null) {
         return false;
@@ -303,18 +233,11 @@ public class GarudaSoftwareBackend {
     } else if (!parent.equals(other.parent)) {
       return false;
     }
-    if (sourceGadget == null) {
-      if (other.sourceGadget != null) {
+    if (gadget == null) {
+      if (other.gadget != null) {
         return false;
       }
-    } else if (!sourceGadget.equals(other.sourceGadget)) {
-      return false;
-    }
-    if (softwareListener == null) {
-      if (other.softwareListener != null) {
-        return false;
-      }
-    } else if (!softwareListener.equals(other.softwareListener)) {
+    } else if (!gadget.equals(other.gadget)) {
       return false;
     }
     return true;
@@ -325,8 +248,8 @@ public class GarudaSoftwareBackend {
    * @param propertyName
    * @param newValue
    */
-  public void firePropertyChange(String propertyName, Object newValue) {
-    firePropertyChange(propertyName, null, newValue);
+  public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+    pcs.firePropertyChange(propertyName, oldValue, newValue);
   }
   
   /**
@@ -335,16 +258,15 @@ public class GarudaSoftwareBackend {
    * @param oldValue
    * @param newValue
    */
-  public void firePropertyChange(String propertyName, Object oldValue,
-    Object newValue) {
-    pcs.firePropertyChange(propertyName, oldValue, newValue);
+  public void firePropertyChange(String propertyName, Object newValue) {
+    firePropertyChange(propertyName, null, newValue);
   }
   
   /**
    * @return the listOfCompatibleSoftware
    */
-  public List<Gadget> getListOfCompatibleSoftware() {
-    return listOfCompatibleSoftware;
+  public List<Gadget> getCompatibleGadgetList() {
+    return backend.getCompatibleGadgetList();
   }
   
   /**
@@ -362,12 +284,10 @@ public class GarudaSoftwareBackend {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (initialized ? 1231 : 1237);
     result = prime * result + ((listOfInputFileFormats == null) ? 0 : listOfInputFileFormats .hashCode());
     result = prime * result + ((listOfOutputFileFormats == null) ? 0 : listOfOutputFileFormats .hashCode());
     result = prime * result + ((parent == null) ? 0 : parent.hashCode());
-    result = prime * result + ((sourceGadget == null) ? 0 : sourceGadget.hashCode());
-    result = prime * result + ((softwareListener == null) ? 0 : softwareListener.hashCode());
+    result = prime * result + ((gadget == null) ? 0 : gadget.hashCode());
     return result;
   }
   
@@ -376,92 +296,30 @@ public class GarudaSoftwareBackend {
    * @throws NetworkException
    * @throws GarudaConnectionNotInitializedException
    */
+  @SuppressWarnings("deprecation")
   public void init() throws NetworkException, GarudaConnectionNotInitializedException {
-    if (softwareListener == null) {
-      throw new IllegalStateException(bundle.getString("GARUDA_LISTENER_NOT_INITIALIZED"));
-    }
-    
-    CoreClientAPI api = CoreClientAPI.getInstance();
-    
-    api.initialize(
-      sourceGadget.getUUID(),
-      parent.getApplicationName(),
-      iconPath,
-      softwareListener,
-      GARUDA_CORE_PORT,
-      GARUDA_CORE_TIMEOUT);
+    backend = new GarudaClientBackend(gadget.getUUID(), gadget.getName(),
+      iconPath, listOfOutputFileFormats, listOfInputFileFormats,
+      listOfCategories, provider, description, listOfScreenshots);
     logger.fine(bundle.getString("GARUDA_CORE_INITIALIZED"));
-    
-    api.start();
-    
-    logger.fine(bundle.getString("GARUDA_CORE_STARTED"));
-    
-    PlatformEventManager.getInstance().addListener(new PlatformEventListener() {
-      /* (non-Javadoc)
-       * @see jp.sbi.garuda.platform.event.PlatformEventListener#accept(jp.sbi.garuda.platform.event.PlatformEventType)
-       */
-      @Override
-      public boolean accept(PlatformEventType type) {
-        return type == PlatformEventType.COMMAND_ERROR;
+    try {
+      backend.initialize();
+      if (backend.isInitialized()) {
+        backend.addGarudaChangeListener(new GarudaSoftwareListener(this));
+        firePropertyChange(GARUDA_ACTIVATED, this);
       }
-      
-      /* (non-Javadoc)
-       * @see jp.sbi.garuda.platform.event.PlatformEventListener#fire(jp.sbi.garuda.platform.event.PlatformEvent)
-       */
-      @Override
-      public void fire(PlatformEvent event) {
-        String message = event.getMessage();
-        logger.warning(message);
-        if (!initialized) {
-          firePropertyChange(CONNECTION_NOT_INITIALIZED_ID, null);
-        } else {
-          if (initialized) {
-            if (SOFTWARE_REGISTERED_ERROR.equals(message)) {
-              firePropertyChange(SOFTWARE_REGISTRATION_ERROR_ID, message);
-            } else if (SOFTWARE_DEREGISTERED_ERROR.equals(message)) {
-              firePropertyChange(SOFTWARE_DEREGISTRATION_ERROR_ID, message);
-            } else {
-              firePropertyChange(CONNECTION_TERMINATED_ID, null);
-            }
-          }
-        }
-      }
-    });
-    
-    PlatformEventManager.getInstance().addListener(new PlatformEventListener() {
-      /* (non-Javadoc)
-       * @see jp.sbi.garuda.platform.event.PlatformEventListener#accept(jp.sbi.garuda.platform.event.PlatformEventType)
-       */
-      @Override
-      public boolean accept(PlatformEventType type) {
-        return type == PlatformEventType.PROTOCOL_ERROR;
-      }
-      
-      /* (non-Javadoc)
-       * @see jp.sbi.garuda.platform.event.PlatformEventListener#fire(jp.sbi.garuda.platform.event.PlatformEvent)
-       */
-      @Override
-      public void fire(PlatformEvent event) {
-        String message = event.getMessage();
-        if (initialized) {
-          firePropertyChange(GOT_ERRORS_PROPERTY_CHANGE_ID, message);
-        }
-        logger.warning(message);
-      }
-    });
-    
-    api.activateGadget();
-    logger.fine(bundle.getString("GARUDA_CORE_SOFTWARE_ACTIVATED"));
-    firePropertyChange(GARUDA_ACTIVATED, this);
-    
-    initialized = true;
+    } catch (GarudaConnectionNotInitializedException exc) {
+      firePropertyChange(GarudaClientBackend.CONNECTION_NOT_INITIALIZED_ID, null);
+    } catch (BackendAlreadyInitializedException exc) {
+      firePropertyChange(SOFTWARE_REGISTERED_ERROR, null);
+    }
   }
   
   /**
    * @return the initialized
    */
   public boolean isInitialized() {
-    return initialized;
+    return backend.isInitialized();
   }
   
   /**
@@ -478,10 +336,11 @@ public class GarudaSoftwareBackend {
    * @throws NetworkException
    * @throws BackendNotInitializedException
    * @throws GarudaConnectionNotInitializedException
+   * @throws BackendNotInitializedException
    */
   public void registedSoftwareToGaruda() throws NetworkException,
-  BackendNotInitializedException, GarudaConnectionNotInitializedException {
-    if (!initialized) {
+  BackendNotInitializedException, GarudaConnectionNotInitializedException, BackendNotInitializedException {
+    if (!backend.isInitialized()) {
       throw new BackendNotInitializedException();
     }
     File parentFolder = new File(System.getProperty("user.dir"));
@@ -491,17 +350,12 @@ public class GarudaSoftwareBackend {
     //using the command to launch a jar file.
     //      String filePath = "javaw -jar " + parentFolder.getAbsolutePath().toString()  +  "/NewTestSoftwareA.jar";
     
-    String filePath = GarudaSoftwareBackend.class.getProtectionDomain()
-        .getCodeSource().getLocation().getPath();
+    String filePath = GarudaSoftwareBackend.class.getProtectionDomain().getCodeSource().getLocation().getPath();
     
     try {
       filePath = URLDecoder.decode(filePath, "UTF-8");
     } catch (UnsupportedEncodingException exc) {
-      if (parent instanceof Component) {
-        GUITools.showErrorMessage((Component) parent, exc);
-      } else {
-        exc.printStackTrace();
-      }
+      showErrorMessage(exc);
     }
     
     filePath = filePath.substring(1);
@@ -511,30 +365,25 @@ public class GarudaSoftwareBackend {
     String os_name = System.getProperty("os.name").toLowerCase();
     
     if (os_name.indexOf("mac") >= 0) {
-      filePath = "open \"" + filePath;
+      filePath = "open \"" + filePath + "\"";
     } else if (os_name.contains("windows")) {
-      filePath = "cmd /c start jre\\bin\\javaw.exe -jar \"" + filePath + "\"";
+      filePath = "cmd /c start javaw.exe -jar \"" + filePath + "\"";
     } else {
       filePath = "java -jar " + filePath;
     }
-    
-    //List of the file outputs from this software
-    //...
-    
-    //The register call for this software to the Core.
-    
-    CoreClientAPI api = CoreClientAPI.getInstance();
-    api.registerGadget(
-      filePath,
-      iconPath,
-      listOfInputFileFormats,
-      listOfOutputFileFormats,
-      listOfCategories,
-      provider,
-      description,
-      listOfScreenshots);
-    
+    backend.registerGadgetToGaruda(filePath);
     logger.fine(MessageFormat.format(bundle.getString("REGISTERED_SOFTWARE_TO_CORE"), parentFolder.getAbsolutePath()));
+  }
+  
+  /**
+   * @param exc
+   */
+  private void showErrorMessage(Throwable exc) {
+    if (parent instanceof Component) {
+      GUITools.showErrorMessage((Component) parent, exc);
+    } else {
+      exc.printStackTrace();
+    }
   }
   
   /**
@@ -547,26 +396,15 @@ public class GarudaSoftwareBackend {
   
   /**
    * 
-   * @param propertyName
-   * @param pcl
-   */
-  public void removePropertyChangeListener(String propertyName, PropertyChangeListener pcl) {
-    pcs.removePropertyChangeListener(propertyName, pcl);
-  }
-  
-  /**
-   * 
    * @param selectedFile
    * @throws NetworkException
    * @throws IllegalStateException
    * @throws GarudaConnectionNotInitializedException
    */
-  public void requestForLoadableSoftwares(File selectedFile, String fileType) throws NetworkException,
+  public void requestForLoadableGadgets(File selectedFile, String fileType) throws NetworkException,
   IllegalStateException, GarudaConnectionNotInitializedException {
     if (selectedFile != null) {
-      CoreClientAPI.getInstance().doGetLoadableGadgets(
-        selectedFile.getName().substring(selectedFile.getName().indexOf('.') + 1),
-        fileType);
+      backend.requestForLoadableGadgets(fileType, selectedFile);
       logger.fine(MessageFormat.format(bundle.getString("REQUESTED_COMPATIBLE_SOFTWARE"), selectedFile));
     } else {
       throw new IllegalStateException(bundle.getString("NO_FILE_SELECTED"));
@@ -586,29 +424,19 @@ public class GarudaSoftwareBackend {
     if ((selectedFile == null) || !selectedFile.exists()) {
       throw new IllegalStateException(MessageFormat.format(bundle.getString("FILE_DOES_NOT_EXIST"), selectedFile));
     }
-    if ((listOfCompatibleSoftware == null)
-        || listOfCompatibleSoftware.isEmpty()
-        || (listOfCompatibleSoftware.get(indexOfSoftware) == null)) {
+    List<Gadget> listOfCompatibleGadgets = backend.getCompatibleGadgetList();
+    if ((listOfCompatibleGadgets == null)
+        || listOfCompatibleGadgets.isEmpty()
+        || (listOfCompatibleGadgets.get(indexOfSoftware) == null)) {
       throw new IllegalStateException(MessageFormat.format(
         bundle.getString("NO_COMPATIBLE_SOFTWARE_FOUND"),
         FileTools.getExtension(selectedFile.getName())));
     }
-    CoreClientAPI.getInstance().loadFileOntoGadget(
-      listOfCompatibleSoftware.get(indexOfSoftware), sourceGadget,
-      selectedFile.getAbsolutePath());
+    backend.sentFileToGadget(backend.getCompatibleGadgetList().get(indexOfSoftware), selectedFile);
     logger.fine(MessageFormat.format(
       bundle.getString("FILE_LOADING_REQUEST"),
       selectedFile.getAbsolutePath(),
-      listOfCompatibleSoftware.get(indexOfSoftware).getName()));
-  }
-  
-  /**
-   * 
-   * @param softwareList
-   */
-  public void setListOfCompatibleSoftware(List<Gadget> softwareList) {
-    listOfCompatibleSoftware = softwareList;
-    firePropertyChange(GOT_SOFTWARES_PROPERTY_CHANGE_ID, softwareList);
+      listOfCompatibleGadgets.get(indexOfSoftware).getName()));
   }
   
   /* (non-Javadoc)
@@ -619,9 +447,9 @@ public class GarudaSoftwareBackend {
     StringBuilder builder = new StringBuilder();
     builder.append(getClass().getSimpleName());
     builder.append(" [softwareID=");
-    builder.append(sourceGadget.getUUID());
+    builder.append(gadget.getUUID());
     builder.append(", initialized=");
-    builder.append(initialized);
+    builder.append((backend != null) && backend.isInitialized() ? "true" : "faslse");
     builder.append(", listOfInputFileFormats=");
     builder.append(listOfInputFileFormats);
     builder.append(", listOfOutputFileFormats=");

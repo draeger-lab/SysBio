@@ -47,39 +47,39 @@ import de.zbit.util.ResourceManager;
  * @version $Rev$
  */
 public enum GarudaActions implements ActionCommandWithIcon {
-	
-	/**
-	 * Sents the current file to a compatible software in the Garuda platform.
-	 */
-	SENT_TO_GARUDA;
-	
-	/**
-	 * Localization support.
-	 */
-	private static final transient ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels"); 
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.actioncommand.ActionCommand#getName()
-	 */
-	@Override
-	public String getName() {
-		return bundle.getString(name());
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.actioncommand.ActionCommand#getToolTip()
-	 */
-	@Override
-	public String getToolTip() {
-		return bundle.getString(name() + "_TOOLTIP");
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.actioncommand.ActionCommandWithIcon#getIcon()
-	 */
-	@Override
-	public Icon getIcon() {
-		return UIManager.getIcon("ICON_GARUDA_16");
-	}
-	
+  
+  /**
+   * Sents the current file to a compatible software in the Garuda platform.
+   */
+  SENT_TO_GARUDA;
+  
+  /**
+   * Localization support.
+   */
+  private static final transient ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels");
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.actioncommand.ActionCommand#getName()
+   */
+  @Override
+  public String getName() {
+    return bundle.getString(name());
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.actioncommand.ActionCommand#getToolTip()
+   */
+  @Override
+  public String getToolTip() {
+    return bundle.getString(name() + "_TOOLTIP");
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.actioncommand.ActionCommandWithIcon#getIcon()
+   */
+  @Override
+  public Icon getIcon() {
+    return UIManager.getIcon("ICON_GARUDA_16");
+  }
+  
 }
