@@ -29,6 +29,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
+import jp.sbi.garuda.client.backend.GarudaClientBackend;
 import jp.sbi.garuda.platform.commons.Gadget;
 import jp.sbi.garuda.platform.commons.exception.NetworkException;
 import jp.sbi.garuda.platform.commons.net.GarudaConnectionNotInitializedException;
@@ -46,112 +47,113 @@ import de.zbit.util.ResourceManager;
  * @since 1.1
  */
 public class GarudaFileSender extends SwingWorker<Void, Gadget> {
-	
-	/**
-	 * Localization support.
-	 */
-	private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels");
-	
-	/**
-	 * The GUI component acting as the parent for {@link JOptionPane}s to be
-	 * opened by this class.
-	 */
-	private Component parent;
-	/**
-	 * The back-end to communicate with the Garuda Core.
-	 */
-	private GarudaSoftwareBackend garudaBackend;
-	/**
-	 * The file for which compatible software is to be searched.
-	 */
-	private File file;
-
-	/**
-	 * The type of accepted files that the filtering of the list will be depended
-	 * upon.
-	 */
-	private String fileType;
-
-	/**
-	 * Initializes this file sender.
-	 * 
-	 * @param parent
-	 *        The GUI component acting as the parent for {@link JOptionPane}s to
-	 *        be opened by this class.
-	 * @param garudaBackend
-	 *        The backend to communicate with the Garuda Core.
-	 * @param file
-	 *        The file for which compatible software is to be searched.
-	 */
-	public GarudaFileSender(Component parent, GarudaSoftwareBackend garudaBackend, File file, String fileType) {
-		super();
-		this.parent = parent;
-		this.garudaBackend = garudaBackend;
-		this.file = file;
-		this.fileType = fileType;
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.SwingWorker#doInBackground()
-	 */
-	@Override
-	protected Void doInBackground() throws Exception {
-		garudaBackend.addPropertyChangeListener(GarudaSoftwareBackend.GOT_SOFTWARES_PROPERTY_CHANGE_ID, new PropertyChangeListener() {
-			
-			/* (non-Javadoc)
-			 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-			 */
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (evt.getPropertyName().equals(GarudaSoftwareBackend.GOT_SOFTWARES_PROPERTY_CHANGE_ID)) {
-					// Avoid calls at later time points
-					garudaBackend.removePropertyChangeListener(GarudaSoftwareBackend.GOT_SOFTWARES_PROPERTY_CHANGE_ID, this);
-					
-					@SuppressWarnings("unchecked")
-					List<Gadget> listOfCompatibleSoftare = (List<Gadget>) evt.getNewValue();
-					publish(listOfCompatibleSoftare.toArray(new Gadget[] {}));
-				}
-			}
-
-		});
-		garudaBackend.requestForLoadableSoftwares(file, fileType);
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.SwingWorker#process(java.util.List)
-	 */
-	@Override
-	protected void process(List<Gadget> listOfCompatibleSoftare) {
-		if (listOfCompatibleSoftare.isEmpty()) {
-			JOptionPane.showMessageDialog(parent, MessageFormat.format(
-				bundle.getString("NO_COMPATIBLE_SOFTWARE_FOUND"),
-				FileTools.getExtension(file.getName())));
-		} else {
-			String softwareNames[] = new String[listOfCompatibleSoftare.size()];
-			int i = 0;
-			for (Gadget software : listOfCompatibleSoftare) {
-				softwareNames[i++] = software.getName();
-			}
-			JComboBox compatibleSoftwaresComboBox = new JComboBox(softwareNames);
-			compatibleSoftwaresComboBox.setPreferredSize(new Dimension(150, 20));
-			compatibleSoftwaresComboBox.setToolTipText(bundle.getString("SOFTWARE_LIST"));
-
-			if (JOptionPane.showConfirmDialog(parent, compatibleSoftwaresComboBox,
-				bundle.getString("SELECT_SOFTWARE"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-				if ((garudaBackend != null) && (compatibleSoftwaresComboBox.getSelectedIndex() != -1)) {
-					try {
-						garudaBackend.sentFileToSoftware(file, compatibleSoftwaresComboBox.getSelectedIndex()) ;
-					} catch (IllegalStateException exc) {
-						GUITools.showErrorMessage(parent, exc);
-					} catch (NetworkException exc) {
-						GUITools.showErrorMessage(parent, exc);
-					} catch (GarudaConnectionNotInitializedException exc) {
-						GUITools.showErrorMessage(parent, exc);
-					}
-				}
-			}
-		}
-	}
-	
+  
+  /**
+   * Localization support.
+   */
+  private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels");
+  
+  /**
+   * The GUI component acting as the parent for {@link JOptionPane}s to be
+   * opened by this class.
+   */
+  private Component parent;
+  /**
+   * The back-end to communicate with the Garuda Core.
+   */
+  private GarudaSoftwareBackend garudaBackend;
+  /**
+   * The file for which compatible software is to be searched.
+   */
+  private File file;
+  
+  /**
+   * The type of accepted files that the filtering of the list will be depended
+   * upon.
+   */
+  private String fileType;
+  
+  /**
+   * Initializes this file sender.
+   * 
+   * @param parent
+   *        The GUI component acting as the parent for {@link JOptionPane}s to
+   *        be opened by this class.
+   * @param garudaBackend
+   *        The backend to communicate with the Garuda Core.
+   * @param file
+   *        The file for which compatible software is to be searched.
+   */
+  public GarudaFileSender(Component parent, GarudaSoftwareBackend garudaBackend, File file, String fileType) {
+    super();
+    this.parent = parent;
+    this.garudaBackend = garudaBackend;
+    this.file = file;
+    this.fileType = fileType;
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.SwingWorker#doInBackground()
+   */
+  @Override
+  protected Void doInBackground() throws Exception {
+    garudaBackend.addPropertyChangeListener(new PropertyChangeListener() {
+      
+      /* (non-Javadoc)
+       * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+       */
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        System.out.println(evt);
+        if (evt.getPropertyName().equals(GarudaClientBackend.GOT_GADGETS_PROPERTY_CHANGE_ID)) {
+          // Avoid calls at later time points
+          garudaBackend.removePropertyChangeListener(this);
+          
+          @SuppressWarnings("unchecked")
+          List<Gadget> listOfCompatibleSoftare = (List<Gadget>) evt.getNewValue();
+          publish(listOfCompatibleSoftare.toArray(new Gadget[] {}));
+        }
+      }
+      
+    });
+    garudaBackend.requestForLoadableGadgets(file, fileType);
+    return null;
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.SwingWorker#process(java.util.List)
+   */
+  @Override
+  protected void process(List<Gadget> listOfCompatibleSoftare) {
+    if (listOfCompatibleSoftare.isEmpty()) {
+      JOptionPane.showMessageDialog(parent, MessageFormat.format(
+        bundle.getString("NO_COMPATIBLE_SOFTWARE_FOUND"),
+        FileTools.getExtension(file.getName())));
+    } else {
+      String softwareNames[] = new String[listOfCompatibleSoftare.size()];
+      int i = 0;
+      for (Gadget software : listOfCompatibleSoftare) {
+        softwareNames[i++] = software.getName();
+      }
+      JComboBox compatibleSoftwaresComboBox = new JComboBox(softwareNames);
+      compatibleSoftwaresComboBox.setPreferredSize(new Dimension(150, 20));
+      compatibleSoftwaresComboBox.setToolTipText(bundle.getString("SOFTWARE_LIST"));
+      
+      if (JOptionPane.showConfirmDialog(parent, compatibleSoftwaresComboBox,
+        bundle.getString("SELECT_SOFTWARE"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        if ((garudaBackend != null) && (compatibleSoftwaresComboBox.getSelectedIndex() != -1)) {
+          try {
+            garudaBackend.sentFileToSoftware(file, compatibleSoftwaresComboBox.getSelectedIndex()) ;
+          } catch (IllegalStateException exc) {
+            GUITools.showErrorMessage(parent, exc);
+          } catch (NetworkException exc) {
+            GUITools.showErrorMessage(parent, exc);
+          } catch (GarudaConnectionNotInitializedException exc) {
+            GUITools.showErrorMessage(parent, exc);
+          }
+        }
+      }
+    }
+  }
+  
 }
