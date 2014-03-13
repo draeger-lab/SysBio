@@ -24,6 +24,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -52,6 +53,11 @@ public class GarudaFileSender extends SwingWorker<Void, Gadget> {
    * Localization support.
    */
   private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.garuda.locales.Labels");
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final Logger logger = Logger.getLogger(GarudaFileSender.class.getName());
   
   /**
    * The GUI component acting as the parent for {@link JOptionPane}s to be
@@ -104,7 +110,7 @@ public class GarudaFileSender extends SwingWorker<Void, Gadget> {
        */
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println(evt);
+        logger.fine(evt.toString());
         if (evt.getPropertyName().equals(GarudaClientBackend.GOT_GADGETS_PROPERTY_CHANGE_ID)) {
           // Avoid calls at later time points
           garudaBackend.removePropertyChangeListener(this);

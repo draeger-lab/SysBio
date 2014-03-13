@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -31,7 +30,8 @@ import jp.sbi.garuda.client.backend.BackendAlreadyInitializedException;
 import jp.sbi.garuda.client.backend.BackendNotInitializedException;
 import jp.sbi.garuda.client.backend.GarudaClientBackend;
 import jp.sbi.garuda.client.backend.listeners.GarudaBackendPropertyChangeSupport;
-import jp.sbi.garuda.platform.commons.FileFormat;
+import jp.sbi.garuda.client.backend.ui.GarudaControlPanelFactory;
+import jp.sbi.garuda.client.backend.ui.GarudaGlassPanel;
 import jp.sbi.garuda.platform.commons.Gadget;
 import jp.sbi.garuda.platform.commons.exception.NetworkException;
 import jp.sbi.garuda.platform.commons.net.GarudaConnectionNotInitializedException;
@@ -71,11 +71,6 @@ public class GarudaSoftwareBackend {
   /**
    * 
    */
-  private List<FileFormat> listOfOutputFileFormats, listOfInputFileFormats;
-  
-  /**
-   * 
-   */
   private UserInterface parent;
   
   /**
@@ -88,48 +83,14 @@ public class GarudaSoftwareBackend {
   private Gadget gadget;
   
   /**
-   * 
-   */
-  private String iconPath;
-  
-  /**
-   * 
-   */
-  private List<String> listOfCategories;
-  
-  /**
-   * The name of the provider of this gadget.
-   */
-  private String provider;
-  
-  /**
-   * A short description of this gadget.
-   */
-  private String description;
-  
-  /**
-   * A list of paths to screenshots of this gadget.
-   */
-  private List<String> listOfScreenshots;
-  
-  /**
    * Creates a connection to the Garuda core.
    * 
    * @param uid
    *        a unique identifier for your gadget
    * @param parent
    *        the user interface of the gadget
-   * @param iconPath
-   *        an icon of size 128x128 for the Garuda dash-board
-   * @param description
-   *        a few sentences describing the program
-   * @param categories
-   *        a list of Strings giving the categories for the gadget
-   * @param screenshots
-   *        a list of example images of the gadget
    */
-  public GarudaSoftwareBackend(String uid, UserInterface parent, String iconPath,
-    String description, List<String> categories, List<String> screenshots) {
+  public GarudaSoftwareBackend(String uid, UserInterface parent) {
     super();
     
     gadget = new Gadget();
@@ -138,55 +99,8 @@ public class GarudaSoftwareBackend {
     
     this.parent = parent;
     pcs = new GarudaBackendPropertyChangeSupport(this.parent);
-    listOfOutputFileFormats = new LinkedList<FileFormat>();
-    listOfInputFileFormats = new LinkedList<FileFormat>();
-    this.iconPath = iconPath;
     
-    ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Launcher");
-    provider = MessageFormat.format(
-      resources.getString("PROVIDER"),
-      resources.getString("ORGANIZATION"),
-      resources.getString("INSTITUTE"));
-    this.description = description;
-    listOfCategories = categories;
-    listOfScreenshots = screenshots;
-    
-    //addPropertyChangeListener(softwareListener);
     addPropertyChangeListener(this.parent);
-  }
-  
-  /**
-   * 
-   * @param ff
-   */
-  public void addInputFileFormat(FileFormat ff) {
-    listOfInputFileFormats.add(ff);
-  }
-  
-  /**
-   * 
-   * @param fileExtension
-   * @param fileFormat
-   */
-  public void addInputFileFormat(String fileExtension, String fileFormat) {
-    addInputFileFormat(new FileFormat(fileExtension, fileFormat));
-  }
-  
-  /**
-   * 
-   * @param ff
-   */
-  public void addOutputFileFormat(FileFormat ff) {
-    listOfOutputFileFormats.add(ff);
-  }
-  
-  /**
-   * 
-   * @param fileExtension
-   * @param fileFormat
-   */
-  public void addOutputFileFormat(String fileExtension, String fileFormat) {
-    addOutputFileFormat(new FileFormat(fileExtension, fileFormat));
   }
   
   /**
@@ -212,20 +126,6 @@ public class GarudaSoftwareBackend {
       return false;
     }
     GarudaSoftwareBackend other = (GarudaSoftwareBackend) obj;
-    if (listOfInputFileFormats == null) {
-      if (other.listOfInputFileFormats != null) {
-        return false;
-      }
-    } else if (!listOfInputFileFormats.equals(other.listOfInputFileFormats)) {
-      return false;
-    }
-    if (listOfOutputFileFormats == null) {
-      if (other.listOfOutputFileFormats != null) {
-        return false;
-      }
-    } else if (!listOfOutputFileFormats.equals(other.listOfOutputFileFormats)) {
-      return false;
-    }
     if (parent == null) {
       if (other.parent != null) {
         return false;
@@ -284,8 +184,6 @@ public class GarudaSoftwareBackend {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((listOfInputFileFormats == null) ? 0 : listOfInputFileFormats .hashCode());
-    result = prime * result + ((listOfOutputFileFormats == null) ? 0 : listOfOutputFileFormats .hashCode());
     result = prime * result + ((parent == null) ? 0 : parent.hashCode());
     result = prime * result + ((gadget == null) ? 0 : gadget.hashCode());
     return result;
@@ -296,23 +194,53 @@ public class GarudaSoftwareBackend {
    * @throws NetworkException
    * @throws GarudaConnectionNotInitializedException
    */
-  @SuppressWarnings("deprecation")
+  //@SuppressWarnings("deprecation")
   public void init() throws NetworkException, GarudaConnectionNotInitializedException {
-    backend = new GarudaClientBackend(gadget.getUUID(), gadget.getName(),
+    backend = new GarudaClientBackend(gadget.getUUID(), gadget.getName()); /*,
       iconPath, listOfOutputFileFormats, listOfInputFileFormats,
-      listOfCategories, provider, description, listOfScreenshots);
+      listOfCategories, provider, description, listOfScreenshots);*/
+    backend.addGarudaChangeListener(new GarudaSoftwareListener(this));
     logger.fine(bundle.getString("GARUDA_CORE_INITIALIZED"));
     try {
       backend.initialize();
-      if (backend.isInitialized()) {
-        backend.addGarudaChangeListener(new GarudaSoftwareListener(this));
-        firePropertyChange(GARUDA_ACTIVATED, this);
-      }
+      backend.setForceCloseOnDisconnect(false);
+      backend.setShowHelpOnStart(false);
     } catch (GarudaConnectionNotInitializedException exc) {
       firePropertyChange(GarudaClientBackend.CONNECTION_NOT_INITIALIZED_ID, null);
     } catch (BackendAlreadyInitializedException exc) {
       firePropertyChange(SOFTWARE_REGISTERED_ERROR, null);
     }
+  }
+  
+  /**
+   * 
+   */
+  public void setGlassPane() {
+    if (parent instanceof java.awt.Component) {
+      java.awt.Component component = (java.awt.Component) parent;
+      if (component instanceof javax.swing.JFrame) {
+        backend.setParentFrame((javax.swing.JFrame) component);
+      }
+      try {
+        GarudaGlassPanel glassPane = (GarudaGlassPanel) GarudaControlPanelFactory.getGarudaGlassPanel(backend);
+        if (component instanceof javax.swing.JComponent) {
+          ((javax.swing.JComponent) component).getRootPane().setGlassPane(glassPane);
+        } else if (component instanceof javax.swing.JFrame) {
+          ((javax.swing.JFrame) component).setGlassPane(glassPane);
+        }
+        glassPane.setKeyboardListeners();
+      } catch (NoClassDefFoundError exc) {
+        logger.fine(exc.getMessage());
+      }
+    }
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public boolean isSetGlassPane() {
+    return getGlassPane() != null;
   }
   
   /**
@@ -450,12 +378,19 @@ public class GarudaSoftwareBackend {
     builder.append(gadget.getUUID());
     builder.append(", initialized=");
     builder.append((backend != null) && backend.isInitialized() ? "true" : "faslse");
-    builder.append(", listOfInputFileFormats=");
-    builder.append(listOfInputFileFormats);
-    builder.append(", listOfOutputFileFormats=");
-    builder.append(listOfOutputFileFormats);
     builder.append(']');
     return builder.toString();
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public java.awt.Component getGlassPane() {
+    if (parent instanceof javax.swing.JComponent) {
+      return ((javax.swing.JComponent) parent).getRootPane().getGlassPane();
+    }
+    return null;
   }
   
 }

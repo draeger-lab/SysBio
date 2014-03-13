@@ -1,5 +1,5 @@
 /*
- * $Id$ 
+ * $Id$
  * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
@@ -21,9 +21,13 @@
  * software. It basically allows Garuda-enabled tools to receive and sent files
  * from/to other Garuda-enabled tools.
  * <p>
+ * In order to make Garuda gadgets run, you have to edit the gadget_confic.xml
+ * file that you can find in the dist folder of SysBio. Your gadget
+ * configuration must be very specific for what your program does.
+ * <p>
  * Here follows a minimal example of how to use it to Garuda-enable any
  * software. When initializing your graphical user interface, which must be
- * derived from {@link de.zbit.UserInterface}, just insert the following piece 
+ * derived from {@link de.zbit.UserInterface}, just insert the following piece
  * of code:
  * <pre>
  * new Thread(new Runnable() {
@@ -32,20 +36,9 @@
  *       GarudaSoftwareBackend garudaBackend = new GarudaSoftwareBackend(
  *         uuid,                // a unique identifier for your gadget
  *         (UserInterface) gui, // the user interface of the gadget
- *         icon,                // an icon of size 128x128 for the Garuda dash-board
- *         description,         // a few sentences describing the program
- *         keywords,            // a list of Strings giving the categories for the gadget
- *         screenshots          // a list of example images of the gadget
  *       );
- *       garudaBackend.addInputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
- *       // ... as many additional input file formats as supported
- *       garudaBackend.addOutputFileFormat(&quot;xml&quot;, &quot;SBML&quot;);
- *       // ... as many additional output file formats as supported
  *       garudaBackend.init();
- *       garudaBackend.registedSoftwareToGaruda();
  *     } catch (NetworkException exc) {
- *       GUITools.showErrorMessage(gui, exc);
- *     } catch (BackendNotInitializedException exc) {
  *       GUITools.showErrorMessage(gui, exc);
  *     } catch (Throwable exc) {
  *       String message = exc.getLocalizedMessage();
@@ -82,7 +75,7 @@
  * However, before you can react to action events coming from the Garuda Core,
  * you'll have to register the {@link de.zbit.garuda.GarudaSoftwareBackend} in
  * your application: As any instance of {@link de.zbit.UserInterface}, also your
- * one must extend {@link java.beans.PropertyChangeListener}. In order to 
+ * one must extend {@link java.beans.PropertyChangeListener}. In order to
  * successfully enable Garuda in your application, do the following in your gui:
  * <pre>
  * public void propertyChange(PropertyChangeEvent evt) {
@@ -100,7 +93,7 @@
  * In this method, the instance of the
  * {@link de.zbit.garuda.GarudaSoftwareBackend}
  * can be stored in the GUI as a controller for Garuda.
- * It is also important to enable or disable the action 
+ * It is also important to enable or disable the action
  * {@link de.zbit.garuda.GarudaActions#SENT_TO_GARUDA} when files are
  * opened or closed that could be sent to Garuda gadgets.
  * <p>
