@@ -28,53 +28,57 @@
   <!-- GarudaActions -->
   
   <entry key="SENT_TO_GARUDA">Sent current file to Garuda</entry>
-  <entry key="SENT_TO_GARUDA_TOOLTIP">Sents the current file to a compatible software in the Garuda platform.</entry>
+  <entry key="SENT_TO_GARUDA_TOOLTIP">Sents the current file to a compatible gadget in the Garuda platform.</entry>
   
   <!-- GarudaFileSender -->
   
   <entry key="NO_COMPATIBLE_SOFTWARE_FOUND">No compatible software could be found for files of type "{0}".</entry>
-  <entry key="SOFTWARE_LIST">Software List</entry>
-  <entry key="SELECT_SOFTWARE">Select Garuda Software</entry>
+  <entry key="SOFTWARE_LIST">Gadget List</entry>
+  <entry key="SELECT_SOFTWARE">Select a Garuda Gadget</entry>
   
   <!-- GarudaOptions -->
   
   <entry key="GarudaOptions">Garuda options</entry>
-  <entry key="GarudaOptions_TOOLTIP">Settings for the communication with a Garuda Core and hence access to other Garuda-enabled tools.</entry>
+  <entry key="GarudaOptions_TOOLTIP">Settings for the communication with a Garuda Core and hence access to other Garuda gadgets.</entry>
   <entry key="CONNECT_TO_GARUDA">Connect to Garuda</entry>
   <entry key="CONNECT_TO_GARUDA_TOOLTIP">Decides whether or not the current application should attempt to connect to the Garuda Core.</entry>
   
   <!-- GarudaSoftwareBackend -->
   
   <entry key="FILE_DOES_NOT_EXIST">File {0} to sent does not exist.</entry>
-  <entry key="FILE_LOADING_REQUEST">Request to load file {0} into software {1}</entry>
+  <entry key="FILE_LOADING_REQUEST">Request to load file {0} into gadget {1}</entry>
   <entry key="NO_FILE_SELECTED">No File selected</entry>
-  <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Request to get the compatible softwares list to sent file {0}</entry>
-  <entry key="PATH_FOR_SOFTWARE">path for this software is: {0}</entry>
+  <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Request to get the compatible gadgets list to sent file {0}</entry>
+  <entry key="PATH_FOR_SOFTWARE">path for this gadget is: {0}</entry>
   
   <!-- // Obsolete: -->
-  <entry key="REGISTERED_SOFTWARE_TO_CORE">registered software to Garuda Core {0}</entry>
-  <entry key="GARUDA_CORE_SOFTWARE_ACTIVATED">Garuda Core Client initialized and software activated</entry>
+  <entry key="REGISTERED_SOFTWARE_TO_CORE">registered gadget to Garuda Core {0}</entry>
+  <entry key="GARUDA_CORE_SOFTWARE_ACTIVATED">Garuda Core Client initialized and gadget activated</entry>
   <entry key="GARUDA_CORE_STARTED">Garuda Core Client initialized and started</entry>
   <entry key="GARUDA_CORE_INITIALIZED">Garuda Core Client initialized</entry>
   <entry key="GARUDA_LISTENER_NOT_INITIALIZED">Garuda listener not initialized.</entry>
-  <entry key="SOFTWARE_DEREGISTERED">Software deregistered from the Garuda Core.</entry> 
+  <entry key="SOFTWARE_DEREGISTERED">Gadget deregistered from the Garuda Core.</entry> 
   <!-- -->
   
   <!-- GarudaSoftwareListener -->
   
   <entry key="COULD_NOT_ESTABLISH_CONNECTION">Could not establish connection to Garuda Core.</entry>
+  <entry key="GADGET_CONNECTION_ESTABLISHED_ID">Gadget connection to Garuda established.</entry>
+  <entry key="GADGET_REGISTRERED_ID">Gadget registered.</entry>
   <entry key="LOADED_GADGET">Loaded Gadget {0}</entry>
   <entry key="LOADED_FILE">Loaded File {0}</entry>
   <entry key="LOST_CONNECTION_TO_CORE">Lost connection to Garuda Core.</entry>
-  <entry key="RECEIVED_NEW_SOFTWARE_LIST">Got new software list</entry>
-  <entry key="RECEIVED_COMPATIBLE_SOFTWARE_LIST">Received compatible software list: {0}</entry>
+  <entry key="RECEIVED_NEW_SOFTWARE_LIST">Got new gadget list</entry>
+  <entry key="RECEIVED_COMPATIBLE_SOFTWARE_LIST">Received compatible gadget list: {0}</entry>
   <entry key="RECEIVED_GADGET_REQUEST">Received load gadget request: {0}</entry>
-  <entry key="SOFTWARE_ALREADY_REGISTERED">Software already registered.</entry>
-  <entry key="SOFTWARE_STILL_NOT_REGISTERED">Software still not registered.</entry>
+  <entry key="SENT_DATA_RECEIVED_RESPONSE">Gadget {0} received file.</entry>
+  <entry key="SENT_DATA_RECEIVED_RESPONSE_ERROR">An error occurred while Gadget {0} received file.</entry>
+  <entry key="SOFTWARE_ALREADY_REGISTERED">Gadget already registered.</entry>
+  <entry key="SOFTWARE_STILL_NOT_REGISTERED">Gadget still not registered.</entry>
   
   <!-- User interface -->
   
   <entry key="GARUDA">Garuda</entry>
-  <entry key="GARUDA_TOOLTIP">Interaction with other Garuda-enabled tools</entry>
+  <entry key="GARUDA_TOOLTIP">Interaction with other Garuda gadgets</entry>
   
 </properties>

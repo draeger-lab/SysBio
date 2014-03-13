@@ -21,18 +21,16 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.swing.SwingUtilities;
+
 import jp.sbi.garuda.client.backend.GarudaClientBackend;
 import jp.sbi.garuda.client.backend.listeners.GarudaBackendPropertyChangeEvent;
+import jp.sbi.garuda.client.backend.ui.GarudaGlassPanel;
 import jp.sbi.garuda.platform.commons.Gadget;
-import jp.sbi.garuda.platform.commons.protocol.ProtocolResults;
-import jp.sbi.garuda.platform.commons.protocol.c2g.LoadDataRequest;
-import jp.sbi.garuda.platform.commons.protocol.c2g.LoadGadgetRequest;
-import jp.sbi.garuda.platform.commons.protocol.g2c.GetCompatibleGadgetListResponse;
-import jp.sbi.garuda.platform.gadget.handler.GadgetRequestListener;
-import jp.sbi.garuda.platform.gadget.handler.GadgetResponseListener;
 import de.zbit.UserInterface;
 import de.zbit.gui.GUITools;
 import de.zbit.util.ResourceManager;
@@ -45,7 +43,7 @@ import de.zbit.util.ResourceManager;
  * @since 1.1
  * @version $Rev$
  */
-public class GarudaSoftwareListener implements PropertyChangeListener, GadgetRequestListener, GadgetResponseListener {
+public class GarudaSoftwareListener implements PropertyChangeListener {
   
   /**
    * Localization support.
@@ -71,122 +69,150 @@ public class GarudaSoftwareListener implements PropertyChangeListener, GadgetReq
   }
   
   /* (non-Javadoc)
-   * @see jp.sbi.garuda.platform.gadget.handler.GadgetResponseListener#getCompatibleGadgetList(jp.sbi.garuda.platform.commons.protocol.s2c.GetCompatibleGadgetListResponse)
-   */
-  @Override
-  public void getCompatibleGadgetList(GetCompatibleGadgetListResponse response) {
-    logger.fine(MessageFormat.format(bundle.getString("RECEIVED_COMPATIBLE_SOFTWARE_LIST"), response.toString()));
-    backend.firePropertyChange(GarudaClientBackend.GOT_GADGETS_PROPERTY_CHANGE_ID, response.body.gadgets);
-  }
-  
-  /* (non-Javadoc)
-   * @see jp.sbi.garuda.platform.gadget.handler.GadgetRequestListener#loadData(jp.sbi.garuda.platform.commons.protocol.c2s.LoadDataRequest)
-   */
-  @Override
-  public String loadData(LoadDataRequest request) {
-    backend.openFile(new File(request.body.data));
-    return ProtocolResults.SUCCESS;
-  }
-  
-  /* (non-Javadoc)
-   * @see jp.sbi.garuda.platform.gadget.handler.GadgetRequestListener#loadGadget(jp.sbi.garuda.platform.commons.protocol.c2g.LoadGadgetRequest)
-   */
-  @Override
-  public String loadGadget(LoadGadgetRequest request) {
-    logger.fine(MessageFormat.format("RECEIVED_GADGET_REQUEST", request.toString()));
-    backend.firePropertyChange(GarudaClientBackend.LOAD_GADGET_PROPERTY_CHANGE_ID, request.body.loadableGadgetName);
-    return ProtocolResults.SUCCESS;
-  }
-  
-  /* (non-Javadoc)
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
     String name = evt.getPropertyName();
     
-    if (name.equals(GarudaClientBackend.LOAD_GADGET_PROPERTY_CHANGE_ID)) {
-      // I just received a message from a gadget
-      logger.info(MessageFormat.format(bundle.getString("LOADED_GADGET"), evt.getNewValue()));
-    } else if (name.equals(GarudaClientBackend.CONNECTION_TERMINATED_ID)) {
-      logger.info(bundle.getString("LOST_CONNECTION_TO_CORE"));
-    } else if (name.equals(GarudaClientBackend.CONNECTION_NOT_INITIALIZED_ID)) {
-      logger.info(bundle.getString("COULD_NOT_ESTABLISH_CONNECTION"));
-    } else if (name.equals(GarudaClientBackend.GADGET_REGISTRATION_ERROR_ID)) {
-      logger.info(bundle.getString("SOFTWARE_ALREADY_REGISTERED"));
-    } else if (name.equals(GarudaClientBackend.GOT_GADGETS_PROPERTY_CHANGE_ID)) {
-      if (backend.getCompatibleGadgetList() != null) {
-        logger.info(bundle.getString("RECEIVED_NEW_SOFTWARE_LIST"));
-        //        backend.removePropertyChangeListener(this);
-        backend.firePropertyChange(GarudaClientBackend.GOT_GADGETS_PROPERTY_CHANGE_ID, backend.getCompatibleGadgetList());
-        //        backend.addPropertyChangeListener(this);
-      }
-    }
-    
     if (evt instanceof GarudaBackendPropertyChangeEvent) {
       
       GarudaBackendPropertyChangeEvent garudaPropertyEvt = (GarudaBackendPropertyChangeEvent) evt;
       
-      if (name.equals(GarudaClientBackend.LOAD_DATA_PROPERTY_CHANGE_ID)) {
-        logger.info("Loaded File \"" + garudaPropertyEvt.getSecondProperty().toString() + "\" from " + ((Gadget) garudaPropertyEvt.getFirstProperty()).getName());
-        backend.openFile(new File(evt.getNewValue().toString()));
+      if (name.equals(GarudaClientBackend.GOT_ERRORS_PROPERTY_CHANGE_ID)) {
+        UserInterface parent = backend.getParent();
+        String message = toMessage(garudaPropertyEvt);
+        if (parent instanceof Component) {
+          GUITools.showErrorMessage((Component) parent, message);
+        } else {
+          logger.warning(message);
+        }
+        logger.warning("An error occured");
+      } else if (name.equals(GarudaClientBackend.LOAD_DATA_PROPERTY_CHANGE_ID)) {
+        final String filePath =  garudaPropertyEvt.getSecondProperty().toString();
+        
+        logger.info(MessageFormat.format(bundle.getString("LOADED_FILE"), garudaPropertyEvt.getSecondProperty().toString()));
+        logger.fine(((Gadget) garudaPropertyEvt.getFirstProperty()).getName());
+        SwingUtilities.invokeLater(new Runnable() {
+          /* (non-Javadoc)
+           * @see java.lang.Runnable#run()
+           */
+          @Override
+          public void run() {
+            backend.openFile(new File(filePath));
+          }
+        });
       } else if (name.equals(GarudaClientBackend.LOAD_GADGET_PROPERTY_CHANGE_ID)) {
+        // I just received a message from a gadget
         Gadget loadableGadget = (Gadget) garudaPropertyEvt.getFirstProperty();
-        logger.info("Loaded Gadget \"" + loadableGadget.getName() + "\"");
+        logger.info(MessageFormat.format(bundle.getString("LOADED_GADGET"), loadableGadget.getName()));
         String launchPath = garudaPropertyEvt.getSecondProperty().toString();
-        logger.info("I just received a message from a gadget:\t" + launchPath);
-        //CoreClientAPI.getInstance().sentLoadGadgetResponseToCore(true, loadableGadget);
-      } else if (name.equals(
-        GarudaClientBackend.CONNECTION_TERMINATED_ID)) {
-        logger.info("Lost Connection with Core.");
-        //      backend.stopBackend();
-      } else if (name.equals(
-        GarudaClientBackend.CONNECTION_NOT_INITIALIZED_ID)) {
-        //      JOptionPane.showMessageDialog(NewTestSoftwareGUI.this, "Could not establish connection to Core.", "No Connection.", JOptionPane.ERROR_MESSAGE);
-        //      backend.stopBackend();
-        //      enableGarudaUIElements (false);
-        backend = null;
-        logger.info("Could not establish connection to Core.");
-      } else if (name.equals(
-        GarudaClientBackend.GADGET_REGISTRATION_ERROR_ID)) {
-        logger.info("Software already registered.");
-      } else if (name.equals(
-        GarudaClientBackend.GADGET_DEREGISTRATION_ERROR_ID)) {
-        logger.info("Software already not registered.");
-      } else if (name.equals(
-        GarudaClientBackend.GADGET_CONNECTION_ESTABLISHED_ID)) {
-        logger.info("Software connected.");
-      } else if (name.equals(
-        GarudaClientBackend.GADGET_REGISTRERED_ID)) {
-        logger.info("Software Registered.");
-      } else if (name.equals(
-        GarudaClientBackend.GADGET_DEREGISTRERED_ID)) {
-        logger.info("Software Reregistered.");
-      } else if (name.equals(
-        GarudaClientBackend.SENT_DATA_RECEIVED_RESPONSE)) {
-        logger.info(garudaPropertyEvt.getFirstProperty().toString() + " received sent file .");
+        logger.fine(MessageFormat.format(bundle.getString("PATH_FOR_SOFTWARE"), launchPath));
+        firePropertyChange(GarudaClientBackend.LOAD_GADGET_PROPERTY_CHANGE_ID, loadableGadget.getName());
+      } else if (name.equals(GarudaClientBackend.CONNECTION_TERMINATED_ID)) {
+        SwingUtilities.invokeLater(new Runnable() {
+          /* (non-Javadoc)
+           * @see java.lang.Runnable#run()
+           */
+          @Override
+          public void run() {
+            Object obj = backend.getGlassPane();
+            if ((obj != null) && (obj instanceof GarudaGlassPanel)) {
+              ((GarudaGlassPanel) obj).showPanel(null);
+            }
+          }
+        });
+        logger.info(bundle.getString("LOST_CONNECTION_TO_CORE"));
+      } else if (name.equals(GarudaClientBackend.CONNECTION_NOT_INITIALIZED_ID)) {
+        logger.info(bundle.getString("COULD_NOT_ESTABLISH_CONNECTION"));
+      } else if (name.equals(GarudaClientBackend.GADGET_REGISTRATION_ERROR_ID)) {
+        logger.info(bundle.getString("SOFTWARE_ALREADY_REGISTERED"));
+      } else if (name.equals(GarudaClientBackend.GADGET_CONNECTION_ESTABLISHED_ID)) {
+        logger.info(bundle.getString("GADGET_CONNECTION_ESTABLISHED_ID"));
+        firePropertyChange(GarudaSoftwareBackend.GARUDA_ACTIVATED, backend);
+      } else if (name.equals(GarudaClientBackend.GADGET_REGISTRERED_ID)) {
+        logger.info(bundle.getString("GADGET_REGISTRERED_ID"));
+      } else if (name.equals(GarudaClientBackend.SENT_DATA_RECEIVED_RESPONSE)) {
+        logger.info(MessageFormat.format(bundle.getString("SENT_DATA_RECEIVED_RESPONSE"), garudaPropertyEvt.getFirstProperty().toString()));
       } else if (name.equals(GarudaClientBackend.SENT_DATA_RECEIVED_RESPONSE_ERROR)) {
-        logger.info(garudaPropertyEvt.getFirstProperty().toString() + " received sent file .");
+        logger.info(MessageFormat.format(bundle.getString("SENT_DATA_RECEIVED_RESPONSE_ERROR"), garudaPropertyEvt.getFirstProperty().toString()));
       } else if (name.equals(GarudaClientBackend.GOT_GADGETS_PROPERTY_CHANGE_ID)) {
+        logger.info(bundle.getString("RECEIVED_NEW_SOFTWARE_LIST"));
         if (backend.getCompatibleGadgetList() != null) {
-          logger.info("Got software List");
+          final List<Gadget> listOfGadgets = backend.getCompatibleGadgetList();
+          logger.fine(MessageFormat.format(bundle.getString("RECEIVED_COMPATIBLE_SOFTWARE_LIST"), createGadgetListString(listOfGadgets)));
+          SwingUtilities.invokeLater(new Runnable() {
+            /* (non-Javadoc)
+             * @see java.lang.Runnable#run()
+             */
+            @Override
+            public void run() {
+              if (!backend.isSetGlassPane()) {
+                backend.setGlassPane();
+              }
+              Object glassPane = backend.getGlassPane();
+              if ((glassPane != null) && (glassPane instanceof GarudaGlassPanel)) {
+                ((GarudaGlassPanel) glassPane).showPanel(listOfGadgets);
+              }
+            }
+          });
+          firePropertyChange(GarudaClientBackend.GOT_GADGETS_PROPERTY_CHANGE_ID, listOfGadgets);
         }
       }
     }
     
   }
   
-  /* (non-Javadoc)
-   * @see jp.sbi.garuda.platform.commons.protocol.ProtocolListener#protocolError(java.lang.String)
+  /**
+   * 
+   * @param propertyName
    */
-  @Override
-  public void protocolError(String message) {
-    UserInterface parent = backend.getParent();
-    if (parent instanceof Component) {
-      GUITools.showErrorMessage((Component) parent, message);
-    } else {
-      logger.warning(message);
+  private void firePropertyChange(final String propertyName, final Object newValue) {
+    SwingUtilities.invokeLater(new Runnable() {
+      /* (non-Javadoc)
+       * @see java.lang.Runnable#run()
+       */
+      @Override
+      public void run() {
+        backend.firePropertyChange(propertyName, newValue);
+      }
+    });
+  }
+  
+  /**
+   * 
+   * @param listOfGadgets
+   * @return
+   */
+  private String createGadgetListString(List<Gadget> listOfGadgets) {
+    StringBuilder list = new StringBuilder();
+    list.append('[');
+    if (listOfGadgets != null) {
+      for (int i = 0; i < listOfGadgets.size(); i++) {
+        Gadget g = listOfGadgets.get(i);
+        list.append(g.getName());
+        if (i < listOfGadgets.size() - 1) {
+          list.append(", ");
+        }
+      }
     }
+    list.append(']');
+    return list.toString();
+  }
+  
+  /**
+   * 
+   * @param garudaPropertyEvt
+   * @return
+   */
+  private String toMessage(GarudaBackendPropertyChangeEvent garudaPropertyEvt) {
+    String message = "";
+    if (garudaPropertyEvt.getFirstProperty() != null) {
+      message = garudaPropertyEvt.toString();
+    } else if (garudaPropertyEvt.getSecondProperty() != null) {
+      message = garudaPropertyEvt.toString();
+    }
+    return message;
   }
   
 }

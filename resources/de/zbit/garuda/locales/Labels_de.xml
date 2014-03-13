@@ -28,20 +28,24 @@
   <!-- GarudaSoftwareListener -->
   
   <entry key="COULD_NOT_ESTABLISH_CONNECTION">Es konnte keine Verbindung zum Garuda-Kern hergestellt werden.</entry>
+  <entry key="GADGET_CONNECTION_ESTABLISHED_ID">Gadget-Verbindung zu Garuda hergestellt.</entry>
+  <entry key="GADGET_REGISTRERED_ID">Gadget registriert.</entry>
   <entry key="LOADED_GADGET">Gadget {0} geladen</entry>
   <entry key="LOADED_FILE">Datei {0} geladen</entry>
   <entry key="LOST_CONNECTION_TO_CORE">Verbindung zum Garuda-Kern verloren.</entry>
-  <entry key="RECEIVED_NEW_SOFTWARE_LIST">Neue Software-Liste erhalten</entry>
-  <entry key="RECEIVED_COMPATIBLE_SOFTWARE_LIST">Neue Liste kompatibler Software erhalten: {0}</entry>
+  <entry key="RECEIVED_NEW_SOFTWARE_LIST">Neue Gadget-Liste erhalten</entry>
+  <entry key="RECEIVED_COMPATIBLE_SOFTWARE_LIST">Neue Liste kompatibler Gadgets erhalten: {0}</entry>
   <entry key="RECEIVED_GADGET_REQUEST">Gadget-Anfrage erhalten: {0}</entry>
-  <entry key="SOFTWARE_ALREADY_REGISTERED">Software bereits registriert.</entry>
-  <entry key="SOFTWARE_STILL_NOT_REGISTERED">Software immer noch nicht registriert.</entry>
+  <entry key="SENT_DATA_RECEIVED_RESPONSE">Gadget {0} hat die Datei erhalten.</entry>
+  <entry key="SENT_DATA_RECEIVED_RESPONSE_ERROR">Beim Versenden der Datei an Gadget {0} ist ein Fehler aufgetreten.</entry>
+  <entry key="SOFTWARE_ALREADY_REGISTERED">Gadget bereits registriert.</entry>
+  <entry key="SOFTWARE_STILL_NOT_REGISTERED">Gadget immer noch nicht registriert.</entry>
   
   <!-- GarudaFileSender -->
   
-  <entry key="NO_COMPATIBLE_SOFTWARE_FOUND">Es konnte keine kompatible Software für Dateien des Typs "{0}" gefunden werden.</entry>
-  <entry key="SOFTWARE_LIST">Software Liste</entry>
-  <entry key="SELECT_SOFTWARE">Wählen Sie eine Garuda-Software</entry>
+  <entry key="NO_COMPATIBLE_SOFTWARE_FOUND">Es konnte keine kompatible Gadget für Dateien des Typs "{0}" gefunden werden.</entry>
+  <entry key="SOFTWARE_LIST">Gadget-Liste</entry>
+  <entry key="SELECT_SOFTWARE">Wählen Sie ein Garuda-Gadget</entry>
   
   <!-- GarudaOptions -->
   
@@ -53,18 +57,18 @@
   <!-- GarudaSoftwareBackend -->
   
   <entry key="FILE_DOES_NOT_EXIST">Datei {0} zum Senden existiert nicht.</entry>
-  <entry key="FILE_LOADING_REQUEST">Anfrage, um Datei {0} in Software {1} zu laden</entry>
+  <entry key="FILE_LOADING_REQUEST">Anfrage, um Datei {0} in Gadget {1} zu laden</entry>
   <entry key="NO_FILE_SELECTED">Keine Datei ausgewählt</entry>
-  <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Anfrage nach der liste kompatibler Software, um Datei {0} zu senden</entry>
-  <entry key="PATH_FOR_SOFTWARE">Der Pfad dieser Software lautet: {0}</entry>
+  <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Anfrage nach der liste kompatibler Gadget, um Datei {0} zu senden</entry>
+  <entry key="PATH_FOR_SOFTWARE">Der Pfad dieser Gadget lautet: {0}</entry>
   
   <!-- // Obsolete: -->
-  <entry key="REGISTERED_SOFTWARE_TO_CORE">Registrierte Software für Garuda-Kern {0}</entry>
-  <entry key="GARUDA_CORE_SOFTWARE_ACTIVATED">Garuda-Kern-Klient wurde initialisiert und Software aktiviert.</entry>
+  <entry key="REGISTERED_SOFTWARE_TO_CORE">Registrierte Gadget für Garuda-Kern {0}</entry>
+  <entry key="GARUDA_CORE_SOFTWARE_ACTIVATED">Garuda-Kern-Klient wurde initialisiert und Gadget aktiviert.</entry>
   <entry key="GARUDA_CORE_STARTED">Garuda-Kern-Klient initialisiert und gestartet</entry>
   <entry key="GARUDA_CORE_INITIALIZED">Garuda-Kern-Klient wurde initialisiert</entry>
   <entry key="GARUDA_LISTENER_NOT_INITIALIZED">Garuda-Lauscher nicht initialisiert.</entry>
-  <entry key="SOFTWARE_DEREGISTERED">Software abgemeldet vom Garuda-Kern.</entry> 
+  <entry key="SOFTWARE_DEREGISTERED">Gadget abgemeldet vom Garuda-Kern.</entry> 
   <!-- -->
   
   <!-- User interface -->
@@ -72,6 +76,6 @@
   <entry key="GARUDA">Garuda</entry>
   <entry key="GARUDA_TOOLTIP">Zugriff auf weitere Garuda-fähige Programme</entry>
   <entry key="SENT_TO_GARUDA">Sende die aktuelle Datei zu Garuda</entry>
-  <entry key="SENT_TO_GARUDA_TOOLTIP">Sendet die aktuelle Datei zu einer kompatiblen Software in der Garuda-Plattform.</entry>
+  <entry key="SENT_TO_GARUDA_TOOLTIP">Sendet die aktuelle Datei zu einem kompatiblen Gadget in der Garuda-Plattform.</entry>
   
 </properties>
