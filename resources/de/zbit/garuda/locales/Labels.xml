@@ -50,12 +50,12 @@
   <entry key="NO_FILE_SELECTED">No File selected</entry>
   <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Request to get the compatible gadgets list to sent file {0}</entry>
   <entry key="PATH_FOR_SOFTWARE">path for this gadget is: {0}</entry>
+  <entry key="TRYING_TO_INITIALIZE_GARUDA_CORE">Trying to connect client to Garuda Core...</entry>
   
   <!-- // Obsolete: -->
   <entry key="REGISTERED_SOFTWARE_TO_CORE">registered gadget to Garuda Core {0}</entry>
   <entry key="GARUDA_CORE_SOFTWARE_ACTIVATED">Garuda Core Client initialized and gadget activated</entry>
   <entry key="GARUDA_CORE_STARTED">Garuda Core Client initialized and started</entry>
-  <entry key="GARUDA_CORE_INITIALIZED">Garuda Core Client initialized</entry>
   <entry key="GARUDA_LISTENER_NOT_INITIALIZED">Garuda listener not initialized.</entry>
   <entry key="SOFTWARE_DEREGISTERED">Gadget deregistered from the Garuda Core.</entry> 
   <!-- -->
