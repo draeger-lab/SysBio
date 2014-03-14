@@ -200,7 +200,7 @@ public class GarudaSoftwareBackend {
       iconPath, listOfOutputFileFormats, listOfInputFileFormats,
       listOfCategories, provider, description, listOfScreenshots);*/
     backend.addGarudaChangeListener(new GarudaSoftwareListener(this));
-    logger.fine(bundle.getString("GARUDA_CORE_INITIALIZED"));
+    logger.fine(bundle.getString("TRYING_TO_INITIALIZE_GARUDA_CORE"));
     try {
       backend.initialize();
       backend.setForceCloseOnDisconnect(false);

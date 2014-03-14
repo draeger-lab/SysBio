@@ -61,12 +61,12 @@
   <entry key="NO_FILE_SELECTED">Keine Datei ausgewählt</entry>
   <entry key="REQUESTED_COMPATIBLE_SOFTWARE">Anfrage nach der liste kompatibler Gadget, um Datei {0} zu senden</entry>
   <entry key="PATH_FOR_SOFTWARE">Der Pfad dieser Gadget lautet: {0}</entry>
+  <entry key="TRYING_TO_INITIALIZE_GARUDA_CORE">Versuche, den Clienten mit dem Garuda Core zu verbinden...</entry>
   
   <!-- // Obsolete: -->
   <entry key="REGISTERED_SOFTWARE_TO_CORE">Registrierte Gadget für Garuda-Kern {0}</entry>
   <entry key="GARUDA_CORE_SOFTWARE_ACTIVATED">Garuda-Kern-Klient wurde initialisiert und Gadget aktiviert.</entry>
   <entry key="GARUDA_CORE_STARTED">Garuda-Kern-Klient initialisiert und gestartet</entry>
-  <entry key="GARUDA_CORE_INITIALIZED">Garuda-Kern-Klient wurde initialisiert</entry>
   <entry key="GARUDA_LISTENER_NOT_INITIALIZED">Garuda-Lauscher nicht initialisiert.</entry>
   <entry key="SOFTWARE_DEREGISTERED">Gadget abgemeldet vom Garuda-Kern.</entry> 
   <!-- -->
