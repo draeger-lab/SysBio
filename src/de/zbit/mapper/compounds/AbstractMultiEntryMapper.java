@@ -1,6 +1,6 @@
 /*
- * $Id:  AbstractMultiEntryMapper.java 10:42:32 rosenbaum $
- * $URL: AbstractMultiEntryMapper.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

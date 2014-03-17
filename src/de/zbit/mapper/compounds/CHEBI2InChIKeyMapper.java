@@ -1,6 +1,6 @@
 /*
- * $Id:  CHEBI2InChIKeyMapper.java 12:16:03 rosenbaum $
- * $URL: CHEBI2InChIKeyMapper.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

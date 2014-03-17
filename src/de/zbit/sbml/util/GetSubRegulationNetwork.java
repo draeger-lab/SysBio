@@ -1,6 +1,6 @@
 /*
- * $Id:  GetSubRegulationNetwork.java 10:56:18 tscherneck $
- * $URL: GetSubRegulationNetwork.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

@@ -1,6 +1,6 @@
 /*
- * $Id:  PC_Compound2InChIKeyMapper.java 14:13:39 rosenbaum $
- * $URL: PC_Compound2InChIKeyMapper.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
