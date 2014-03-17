@@ -1,6 +1,6 @@
 /*
- * $Id:  CompoundSynonym2InChIKeyMapper.java 13:23:45 rosenbaum $
- * $URL: CompoundSynonym2InChIKeyMapper.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

@@ -1,6 +1,6 @@
 /*
- * $Id:  HMDB2InChIKeyMapper.java 13:19:24 rosenbaum $
- * $URL: HMDB2InChIKeyMapper.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

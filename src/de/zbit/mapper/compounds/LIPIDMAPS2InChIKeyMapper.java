@@ -1,6 +1,6 @@
 /*
- * $Id:  LIPIDMAPS2InChIKeyMapping.java 13:49:52 rosenbaum $
- * $URL: LIPIDMAPS2InChIKeyMapping.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

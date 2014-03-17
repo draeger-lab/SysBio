@@ -1,6 +1,6 @@
 /*
- * $Id: AssociationNodeRealizer.java 1223 2013-03-11 14:30:46Z jmatthes $
- * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/graph/sbgn/AssociationNodeRealizer.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *

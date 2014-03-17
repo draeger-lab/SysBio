@@ -1,6 +1,6 @@
 /*
- * $Id: KeggCompound2InChIKeyMapper.java 15:22:17 rosenbaum $
- * $URL: KeggCompound2InChIKeyMapper.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
