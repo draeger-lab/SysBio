@@ -170,6 +170,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
    */
   public SBasePanel(SBase sbase, boolean namesIfAvailable, EquationRenderer renderer) {
     super(true);
+    setOpaque(false);
     this.namesIfAvailable = namesIfAvailable;
     this.renderer = renderer;
     GridBagLayout gbl = new GridBagLayout();
@@ -238,7 +239,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
         addProperties((Variable) sbase);
       }
     }
-    GUITools.setOpaqueForAllElements(this, true);
+    GUITools.setOpaqueForAllElements(this, false);
   }
   
   /**
@@ -256,7 +257,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
    */
   private JPanel createJPanel(LayoutManager layout) {
     JPanel p = new JPanel(layout, true);
-    p.setOpaque(true);
+    p.setOpaque(false);
     return p;
   }
   
@@ -314,6 +315,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
   private void addProperties(Event e) {
     JCheckBox check = new JCheckBox(bundle.getString("useValuesFromTriggerTime"), e.getUseValuesFromTriggerTime());
     check.setEnabled(editable);
+    check.setOpaque(false);
     lh.add(check, 1, ++row, 3, 1, 0d, 0d);
     lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
     if (e.isSetTrigger()) {
@@ -343,6 +345,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     JList l = new JList(list.toArray(new SBase[] {}));
     l.setCellRenderer(new SBMLlistCellRenderer());
     l.setBorder(BorderFactory.createLoweredBevelBorder());
+    l.setOpaque(false);
     lh.add(new JScrollPane(l), 1, ++row, 3, 1, 1d, 1d);
   }
   
@@ -379,14 +382,18 @@ public class SBasePanel extends JPanel implements EquationComponent {
           //exc.printStackTrace();
         }
         laTeXpreview.append(LaTeXCompiler.eqEnd);
-        lh.add(renderer.renderEquation(laTeXpreview.toString().replace("dcases", "cases")), 1, ++row, 3, 1, 1d, 0d);
+        JComponent component = renderer.renderEquation(laTeXpreview.toString().replace("dcases", "cases"));
+        component.setOpaque(false);
+        lh.add(component, 1, ++row, 3, 1, 1d, 0d);
         lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
       } else {
         JTextField tf = new JTextField(mc.getMath().toFormula());
         tf.setEditable(editable);
         tf.setColumns(25);
         tf.setCaretPosition(0);
-        lh.add(bundle.getString("formula"), tf, 1, ++row);
+        tf.setBorder(BorderFactory.createLoweredBevelBorder());
+        addLabeledComponent(bundle.getString("formula"), tf);
+        //lh.add(bundle.getString("formula"), tf, 1, ++row);
       }
       if (mc instanceof Assignment) {
         lh.add(new SBasePanel(((Assignment) mc)
@@ -404,8 +411,15 @@ public class SBasePanel extends JPanel implements EquationComponent {
     Component jlabel = null;
     if (label instanceof String) {
       jlabel = new JLabel(label.toString().endsWith(": ") ? label.toString() : label + ": ");
+      ((JLabel) jlabel).setOpaque(false);
     } else if (label instanceof Component) {
       jlabel = (Component) label;
+      if (jlabel instanceof JComponent) {
+        ((JComponent) jlabel).setOpaque(false);
+      }
+    }
+    if (component instanceof JComponent) {
+      ((JComponent) component).setOpaque(false);
     }
     lh.add(jlabel, 1, ++row, 1, 1, 0d, 0d);
     lh.add(component, 3, row, 1, 1, 1, 0d);
@@ -473,6 +487,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     Dimension dim = table.getPreferredScrollableViewportSize();
     scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
       (int) dim.getHeight() + 18));
+    scroll.setOpaque(false);
     lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
     lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
   }
@@ -487,6 +502,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     tf.setEditable(editable);
     tf.setColumns(25);
     tf.setCaretPosition(0);
+    tf.setOpaque(false);
     return tf;
   }
   
@@ -544,10 +560,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
   private void addProperties(Reaction reaction) throws XMLStreamException {
     JCheckBox check = new JCheckBox(bundle.getString("reversible"), reaction.getReversible());
     check.setEnabled(editable);
+    check.setOpaque(false);
     lh.add(check, 1, ++row, 3, 1, 0d, 0d);
     lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
     check = new JCheckBox(bundle.getString("fast"), reaction.getFast());
     check.setEnabled(editable);
+    check.setOpaque(false);
     lh.add(check, 1, ++row, 3, 1, 0d, 0d);
     lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
     
@@ -585,6 +603,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
         .getRowCount() + 1)
         * table.getRowHeight()));
     table.setEnabled(editable);
+    table.setOpaque(false);
     for (int i = 0; i < table.getModel().getColumnCount(); i++) {
       table.setDefaultRenderer(table.getModel().getColumnClass(i), new ColoredBooleanRenderer());
     }
@@ -592,6 +611,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     Dimension dim = table.getPreferredScrollableViewportSize();
     scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
       (int) dim.getHeight() + 18));
+    scroll.setOpaque(false);
     lh.add(scroll, 1, ++row, 3, 1, 0d, 0d);
     lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
     JPanel rEqPanel = createJPanel(new BorderLayout());
@@ -600,6 +620,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     JScrollPane s = new JScrollPane(reactionPanel);
     s.setBorder(BorderFactory.createLoweredBevelBorder());
     s.setPreferredSize(new Dimension(preferedWidth, 50));
+    s.setOpaque(false);
     rEqPanel.add(s, BorderLayout.CENTER);
     rEqPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("reactionEquation") + ' '));
     lh.add(rEqPanel, 1, ++row, 3, 1, 1d, 0d);
@@ -641,15 +662,18 @@ public class SBasePanel extends JPanel implements EquationComponent {
         table.setDefaultRenderer(table.getModel().getColumnClass(j), new ColoredBooleanRenderer());
       }
       table.addMouseListener(new JTableHyperlinkMouseListener());
+      table.setOpaque(false);
       JScrollPane scroll = new JScrollPane(table);
       Dimension dim = table.getPreferredScrollableViewportSize();
       scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
         (int) dim.getHeight() + 18));
+      scroll.setOpaque(false);
       lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
       lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
       if (hist.isSetCreatedDate()) {
         JTextField tf = new JTextField(hist.getCreatedDate().toString());
         tf.setEditable(editable);
+        tf.setOpaque(false);
         addLabeledComponent(bundle.getString("dateOfCreation"), tf);
       }
       Vector<Date> modification = new Vector<Date>();
@@ -667,6 +691,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
         JScrollPane scroll2 = new JScrollPane(l);
         scroll2.setPreferredSize(new Dimension(preferedWidth,
           modification.size() * 20));
+        scroll2.setOpaque(false);
         scroll2.setBorder(BorderFactory.createLoweredBevelBorder());
         addLabeledComponent(bundle.getString("dateOfModification"), scroll2);
       }
@@ -674,6 +699,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     if (sbase.isSetNotes() || editable) {
       JEditorPane notesArea = createHTMLPane(SBMLtools.createHTMLfromNotes(sbase));
       JScrollPane editorScrollPane = new JScrollPane(notesArea);
+      editorScrollPane.setOpaque(false);
       editorScrollPane.setViewportBorder(BorderFactory.createLoweredBevelBorder());
       //scroll.setMaximumSize(notesArea.getMaximumSize());
       // We NEED to set a PreferredSize on the scroll. Else, Long description strings
@@ -684,7 +710,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
       JPanel notesPanel = createJPanel(new BorderLayout());
       notesPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("notes") + ' '));
-      notesPanel.setOpaque(true);
+      notesPanel.setOpaque(false);
       notesPanel.add(editorScrollPane, BorderLayout.CENTER);
       lh.add(notesPanel, 1, ++row, 3, 1, 1d, 0d);
       lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
@@ -736,12 +762,14 @@ public class SBasePanel extends JPanel implements EquationComponent {
       }
       sb.append("</body></html>");
       JEditorPane l = createHTMLPane(sb.toString());
+      l.setOpaque(false);
       JScrollPane editorScrollPane = new JScrollPane(l);
       editorScrollPane.setPreferredSize(new Dimension(250, 145));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
       editorScrollPane.setViewportBorder(BorderFactory.createLoweredBevelBorder());
+      editorScrollPane.setOpaque(false);
       JPanel miriamPanel = createJPanel(new BorderLayout());
-      miriamPanel.setOpaque(true);
+      miriamPanel.setOpaque(false);
       miriamPanel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("MIRIAM") + ' '));
       miriamPanel.add(editorScrollPane, BorderLayout.CENTER);
       lh.add(miriamPanel, 1, ++row, 3, 1, 1d, 0d);
@@ -760,7 +788,10 @@ public class SBasePanel extends JPanel implements EquationComponent {
       nameField.setCaretPosition(0);
       nameField.setLineWrap(true);
       nameField.setWrapStyleWord(true);
-      helper.add(new JScrollPane(nameField), 3, innerRow, 1, 1, 1d, 0d);
+      nameField.setOpaque(false);
+      JScrollPane scroll = new JScrollPane(nameField);
+      scroll.setOpaque(false);
+      helper.add(scroll, 3, innerRow, 1, 1, 1d, 0d);
       helper.add(createJPanel(), 1, innerRow, 1, 1, .1d, 0d);
       helper.add(createJPanel(), 0, ++innerRow, 6, 1, 1d, 0d);
       
@@ -770,13 +801,16 @@ public class SBasePanel extends JPanel implements EquationComponent {
       sboTermField.setLineWrap(true);
       sboTermField.setWrapStyleWord(true);
       sboTermField.setEditable(editable);
+      sboTermField.setOpaque(false);
       try {
         sboTermField.setText(SBOTermFormatter.getShortDefinition(term));
       } catch (Exception exc) {
         // NoSuchElementException if ontology file is outdated
         logger.log(Level.WARNING, bundleWarnings.getString("COULD_NOT_GET_SBO_IDENTIFIER"), exc);
       }
-      helper.add(new JScrollPane(sboTermField), 3, innerRow, 1, 1, 1d, 0d);
+      JScrollPane scroll1 =  new JScrollPane(sboTermField);
+      scroll1.setOpaque(false);
+      helper.add(scroll1, 3, innerRow, 1, 1, 1d, 0d);
       helper.add(createJPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
       
       lh.add(helper.getContainer(), 1, ++row, 3, 1, 0d, 0d);
@@ -799,6 +833,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     area.setBackground(Color.WHITE);
     area.setMaximumSize(dimension);
     area.setCaretPosition(0);
+    area.setOpaque(false);
     setFont(area);
     return area;
   }
@@ -835,6 +870,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
       JComboBox combo = new JComboBox(idsOrNames);
       combo.setSelectedIndex(index);
       combo.setEnabled(editable);
+      combo.setOpaque(false);
       lh.add(new JLabel(bundle.getString("species")), 1, ++row, 1, 1, 0d, 0d);
       lh.add(combo, 3, row, 1, 1, 1d, 0d);
       lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
@@ -857,10 +893,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
     if (species.isSetSpeciesType()) {
       JTextField tf = new JTextField(species.getSpeciesTypeInstance().toString());
       tf.setEditable(editable);
+      tf.setOpaque(false);
       addLabeledComponent(bundle.getString("speciesType"), tf);
     }
     JTextField tf = new JTextField(species.getCompartmentInstance().toString());
     tf.setEditable(editable);
+    tf.setOpaque(false);
     addLabeledComponent(bundle.getString("compartment"), tf);
     if (species.isSetSpeciesType() || editable) {
       tf = new JTextField(species.getSpeciesTypeInstance().toString());
@@ -873,10 +911,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
     addProperties((Symbol) species);
     JCheckBox check = new JCheckBox(bundle.getString("boundaryCondition"), species.getBoundaryCondition());
     check.setEnabled(editable);
+    check.setOpaque(false);
     lh.add(check, 1, ++row, 3, 1, 0d, 0d);
     lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
     check = new JCheckBox(bundle.getString("hasOnlySubstanceUnits"), species.getHasOnlySubstanceUnits());
     check.setEnabled(editable);
+    check.setOpaque(false);
     lh.add(check, 1, ++row, 3, 1, 0d, 0d);
     lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
   }
@@ -912,6 +952,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
         .getStoichiometry(), specRef.getStoichiometry() + SPINNER_MIN_VALUE,
         specRef.getStoichiometry() + SPINNER_MAX_VALUE, .1d));
       spinner.setEnabled(editable);
+      spinner.setOpaque(false);
       lh.add(spinner, 3, row, 1, 1, 1d, 0d);
       lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
     }
@@ -1009,6 +1050,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     }
     unitSelection.setEditable(editable);
     unitSelection.setEnabled(editable);
+    unitSelection.setOpaque(false);
     return unitSelection;
   }
   
@@ -1031,6 +1073,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
   private void addProperties(Variable v) {
     JCheckBox check = new JCheckBox(bundle.getString("constant"), v.isConstant());
     check.setEnabled(editable);
+    check.setOpaque(false);
     lh.add(check, 1, ++row, 3, 1, 0d, 0d);
     lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
   }
@@ -1121,6 +1164,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     preview.setBorder(BorderFactory.createLoweredBevelBorder());
     preview.setText(StringUtil
       .toHTML(ud != null ? HTMLFormula.toHTML(ud) : ""));
+    preview.setOpaque(false);
     return preview;
   }
   
