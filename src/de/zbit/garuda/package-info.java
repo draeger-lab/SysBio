@@ -41,8 +41,7 @@
  *     } catch (NetworkException exc) {
  *       GUITools.showErrorMessage(gui, exc);
  *     } catch (Throwable exc) {
- *       String message = exc.getLocalizedMessage();
- *       logger.log(Level.FINE, message != null ? message : exc.getMessage(), exc);
+ *       logger.log(Level.FINE, Utils.getMessage(exc), exc);
  *     }
  *  }
  * }).start();

@@ -15,6 +15,8 @@
  */
 package de.zbit.sbml.gui;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
@@ -36,53 +38,54 @@ import de.zbit.sbml.util.ListOfCallableSBases;
  * @version $Rev$
  */
 public class UnitDerivationWorker extends SwingWorker<UnitDefinition[], Void> {
-	
-	/**
-	 * A {@link Logger} for this class.
-	 */
-	private static final transient Logger logger = Logger.getLogger(UnitDerivationWorker.class.getName());
-	
-	/**
-	 * 
-	 */
-	private Model model;
-
-	/**
-	 * 
-	 */
-	public UnitDerivationWorker(Model model) {
-		this.model = model;
-	}
-	
-	/* (non-Javadoc)
-	 * @see javax.swing.SwingWorker#doInBackground()
-	 */
-	protected UnitDefinition[] doInBackground() throws Exception {
-		List<CallableSBase> listOfCallableSBases = new ListOfCallableSBases(model);
-		UnitDefinition result[] = new UnitDefinition[listOfCallableSBases.size()];
-		for (int i = 0; i < result.length; i++) {
-			try {
-				result[i] = listOfCallableSBases.get(i).getDerivedUnitDefinition();
-			} catch (Exception exc) {
-				result[i] = null;
-				logger.warning(exc.getLocalizedMessage());
-			}
-		}
-		return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.SwingWorker#done()
-	 */
-	@Override
-	protected void done() {
-		try {
-			firePropertyChange("done", null, get());
-		} catch (InterruptedException exc) {
-			logger.warning(exc.getLocalizedMessage());
-		} catch (ExecutionException exc) {
-			logger.warning(exc.getLocalizedMessage());
-		}
-	}
-	
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(UnitDerivationWorker.class.getName());
+  
+  /**
+   * 
+   */
+  private Model model;
+  
+  /**
+   * 
+   */
+  public UnitDerivationWorker(Model model) {
+    this.model = model;
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.SwingWorker#doInBackground()
+   */
+  @Override
+  protected UnitDefinition[] doInBackground() throws Exception {
+    List<CallableSBase> listOfCallableSBases = new ListOfCallableSBases(model);
+    UnitDefinition result[] = new UnitDefinition[listOfCallableSBases.size()];
+    for (int i = 0; i < result.length; i++) {
+      try {
+        result[i] = listOfCallableSBases.get(i).getDerivedUnitDefinition();
+      } catch (Exception exc) {
+        result[i] = null;
+        logger.warning(getMessage(exc));
+      }
+    }
+    return result;
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.SwingWorker#done()
+   */
+  @Override
+  protected void done() {
+    try {
+      firePropertyChange("done", null, get());
+    } catch (InterruptedException exc) {
+      logger.warning(getMessage(exc));
+    } catch (ExecutionException exc) {
+      logger.warning(getMessage(exc));
+    }
+  }
+  
 }

@@ -16,6 +16,8 @@
  */
 package de.zbit.gui.prefs;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.io.IOException;
@@ -176,7 +178,7 @@ public abstract class AbstractMultiplePreferencesPanel extends PreferencesPanel 
           settingsPanel.setOpaque(true);
           layoutHelper.add(settingsPanel);
         } catch (IOException exc) {
-          logger.fine(exc.getLocalizedMessage());
+          logger.fine(getMessage(exc));
         }
       }
     }

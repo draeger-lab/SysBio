@@ -16,6 +16,8 @@
  */
 package de.zbit.gui;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -137,7 +139,7 @@ public class FileDropHandler extends TransferHandler {
             URL url = new URL(stringList.get(i));
             fileList.add(new File(url.getFile()));
           } catch (MalformedURLException exc) {
-            logger.fine(exc.getLocalizedMessage());
+            logger.fine(getMessage(exc));
           }
         }
         if ((fileList.size() == 0) && (stringList.size() > 0)) {
@@ -146,7 +148,7 @@ public class FileDropHandler extends TransferHandler {
       } else {
         data = t.getTransferData(DataFlavor.javaFileListFlavor);
         /* data of type javaFileListFlavor is a list of files */
-        fileList = (List<File>) data; 
+        fileList = (List<File>) data;
       }
       
       // Fire single action per drag and drop.

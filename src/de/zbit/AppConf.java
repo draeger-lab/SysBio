@@ -16,6 +16,8 @@
  */
 package de.zbit;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -55,7 +57,7 @@ public class AppConf implements Cloneable, Serializable {
    * Generated serial version identifier.
    */
   private static final long serialVersionUID = -2339428729026820588L;
-
+  
   /**
    * The name of a program.
    */
@@ -103,32 +105,32 @@ public class AppConf implements Cloneable, Serializable {
   public AppConf(AppConf pc) {
     super();
     if (pc.getApplicationName() != null) {
-      this.applicationName = new String(pc.getApplicationName());
+      applicationName = new String(pc.getApplicationName());
     }
     if (pc.getCmdArgs() != null) {
-      this.cmdArgs = pc.getCmdArgs().clone();
+      cmdArgs = pc.getCmdArgs().clone();
     }
     if (pc.getCmdOptions() != null) {
-      this.cmdOptions = pc.getCmdOptions().clone();
+      cmdOptions = pc.getCmdOptions().clone();
     }
     if (pc.getInteractiveOptions() != null) {
-      this.interactiveOptions = pc.getInteractiveOptions().clone();
+      interactiveOptions = pc.getInteractiveOptions().clone();
     }
     try {
       if (pc.getLicenceFile() != null) {
-        this.licenceFile = new URL(pc.getLicenceFile().toString());
+        licenceFile = new URL(pc.getLicenceFile().toString());
       }
       if (pc.getOnlineUpdate() != null) {
-        this.onlineUpdate = new URL(pc.getOnlineUpdate().toString());
+        onlineUpdate = new URL(pc.getOnlineUpdate().toString());
       }
     } catch (MalformedURLException e) {
       // can never happen...
     }
     if (pc.getVersionNumber() != null) {
-      this.versionNumber = new String(pc.getVersionNumber());
+      versionNumber = new String(pc.getVersionNumber());
     }
-    this.yearOfRelease = pc.getYearOfRelease();
-    this.yearOfProjectStart = pc.getYearOfProjectStart();
+    yearOfRelease = pc.getYearOfRelease();
+    yearOfProjectStart = pc.getYearOfProjectStart();
   }
   
   /**
@@ -152,7 +154,7 @@ public class AppConf implements Cloneable, Serializable {
     this.interactiveOptions = interactiveOptions;
     this.onlineUpdate = onlineUpdate;
   }
-
+  
   /**
    * 
    * @param applicationName
@@ -172,9 +174,9 @@ public class AppConf implements Cloneable, Serializable {
     this.yearOfProjectStart = yearOfProjectStart;
     this.cmdOptions = cmdOptions;
     this.cmdArgs = cmdArgs;
-    this.licenceFile = licenseFile;
+    licenceFile = licenseFile;
   }
-
+  
   /**
    * 
    * @param applicationName
@@ -197,11 +199,11 @@ public class AppConf implements Cloneable, Serializable {
     this(applicationName, versionNumber, yearOfProgramRelease, yearOfProjectStart,
       (Class<? extends KeyProvider>[]) (commandLineOptions != null ? commandLineOptions
           .toArray(new Class<?>[0]) : null),
-      commandLineArgs,
-      (Class<? extends KeyProvider>[]) (interactiveOptions != null ? interactiveOptions
-          .toArray(new Class<?>[0]) : null), urLlicenseFile, urlOnlineUpdate);
+          commandLineArgs,
+          (Class<? extends KeyProvider>[]) (interactiveOptions != null ? interactiveOptions
+              .toArray(new Class<?>[0]) : null), urLlicenseFile, urlOnlineUpdate);
   }
-
+  
   /* (non-Javadoc)
    * @see java.lang.Object#clone()
    */
@@ -209,7 +211,7 @@ public class AppConf implements Cloneable, Serializable {
   protected Object clone() throws CloneNotSupportedException {
     return new AppConf(this);
   }
-
+  
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
@@ -218,42 +220,42 @@ public class AppConf implements Cloneable, Serializable {
     return obj.getClass().equals(getClass())
         && toMap().equals(((AppConf) obj).toMap());
   }
-
+  
   /**
    * @return the applicationName
    */
   public String getApplicationName() {
     return applicationName;
   }
-
+  
   /**
    * @return the cmdArgs
    */
   public SBProperties getCmdArgs() {
     return cmdArgs;
   }
-
+  
   /**
    * @return the cmdOptions
    */
   public Class<? extends KeyProvider>[] getCmdOptions() {
     return cmdOptions;
   }
-
+  
   /**
    * @return the interactiveOptions
    */
   public Class<? extends KeyProvider>[] getInteractiveOptions() {
     return interactiveOptions;
   }
-
+  
   /**
    * @return the licenceFile
    */
   public URL getLicenceFile() {
     return licenceFile;
   }
-
+  
   /**
    * @return the onlineUpdate
    */
@@ -267,7 +269,7 @@ public class AppConf implements Cloneable, Serializable {
   public String getVersionNumber() {
     return versionNumber;
   }
-
+  
   /**
    * @return the year when the project started
    */
@@ -281,7 +283,7 @@ public class AppConf implements Cloneable, Serializable {
   public short getYearOfRelease() {
     return yearOfRelease;
   }
-
+  
   /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
@@ -300,37 +302,37 @@ public class AppConf implements Cloneable, Serializable {
     hashCode += prime * Short.valueOf(yearOfProjectStart).hashCode();
     return hashCode;
   }
-
-	/**
-	 * If command line arguments are stored in this object, this method makes all
-	 * those {@link Option}-value pairs belonging to the
-	 * {@link #interactiveOptions} persistent in corresponding
-	 * {@link SBPreferences}.
-	 * 
-	 * @throws BackingStoreException
-	 */
-	@SuppressWarnings("rawtypes")
-	public void persistCmdArgs(Class<? extends KeyProvider>... keyProvider) throws BackingStoreException {
-		if (keyProvider == null) {
-			return;
-		}
-		SBProperties props = getCmdArgs();
-		if (props.size() > 0) {
-			for (Class<? extends KeyProvider> provider : keyProvider) {
-				SBPreferences prefs = SBPreferences.getPreferencesFor(provider);
-				Iterator<Option> options = KeyProvider.Tools.optionIterator(provider);
-				Option<?> option;
-				while (options.hasNext()) {
-					option = options.next();
-					if (props.containsKey(option)) {
-						prefs.put(option, props.get(option));
-					}
-				}
-				prefs.flush();
-			}
-		}
-	}
-
+  
+  /**
+   * If command line arguments are stored in this object, this method makes all
+   * those {@link Option}-value pairs belonging to the
+   * {@link #interactiveOptions} persistent in corresponding
+   * {@link SBPreferences}.
+   * 
+   * @throws BackingStoreException
+   */
+  @SuppressWarnings("rawtypes")
+  public void persistCmdArgs(Class<? extends KeyProvider>... keyProvider) throws BackingStoreException {
+    if (keyProvider == null) {
+      return;
+    }
+    SBProperties props = getCmdArgs();
+    if (props.size() > 0) {
+      for (Class<? extends KeyProvider> provider : keyProvider) {
+        SBPreferences prefs = SBPreferences.getPreferencesFor(provider);
+        Iterator<Option> options = KeyProvider.Tools.optionIterator(provider);
+        Option<?> option;
+        while (options.hasNext()) {
+          option = options.next();
+          if (props.containsKey(option)) {
+            prefs.put(option, props.get(option));
+          }
+        }
+        prefs.flush();
+      }
+    }
+  }
+  
   /**
    * Creates and returns a {@link Map} representation of all fields in this
    * {@link AppConf}.
@@ -344,16 +346,16 @@ public class AppConf implements Cloneable, Serializable {
         try {
           map.put(StringUtil.createKeyFromField(f.getName()), f.get(this));
         } catch (IllegalArgumentException exc) {
-          logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+          logger.log(Level.FINE, getMessage(exc), exc);
         } catch (IllegalAccessException exc) {
-          logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+          logger.log(Level.FINE, getMessage(exc), exc);
         }
       }
     }
     return map;
   }
-
-	/* (non-Javadoc)
+  
+  /* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
   @Override

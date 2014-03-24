@@ -15,6 +15,8 @@
  */
 package de.zbit.sbml.gui;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.Component;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
@@ -156,7 +158,7 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
       return doc;
     } catch (Throwable exc) {
       logger.info(MessageFormat.format(bundle.getString("CANCELING_AT_TIME"), timer.getAndReset(false)));
-      logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+      logger.log(Level.FINE, getMessage(exc), exc);
       throw new XMLStreamException(exc);
     }
   }
@@ -174,9 +176,11 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
       }
       firePropertyChange(SBML_READING_SUCCESSFULLY_DONE, null, openedFile);
     } catch (InterruptedException exc) {
-      GUITools.showErrorMessage(parent, exc.getLocalizedMessage());
+      exc.printStackTrace();
+      GUITools.showErrorMessage(parent, getMessage(exc));
     } catch (ExecutionException exc) {
-      GUITools.showErrorMessage(parent, exc.getLocalizedMessage());
+      exc.printStackTrace();
+      GUITools.showErrorMessage(parent, getMessage(exc));
     }
   }
   

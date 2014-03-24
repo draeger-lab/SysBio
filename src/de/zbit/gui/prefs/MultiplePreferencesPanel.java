@@ -16,6 +16,8 @@
  */
 package de.zbit.gui.prefs;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
@@ -49,80 +51,80 @@ import de.zbit.util.prefs.Option;
  * @version $Rev$
  */
 public class MultiplePreferencesPanel extends AbstractMultiplePreferencesPanel {
-
-	/**
-	 * Load all available {@link PreferencesPanel}s. This array is constructed
-	 * by querying the current project and the calling project as well.
-	 * 
-	 * <p>Access this array by using {@link #getClasses()}!</p>
-	 */
-	private static Class<PreferencesPanel>[] classes = null;
-	
-	/**
-	 * Determines, if the {@link #classes} array has been initialized.
-	 * (Remark: the array may be initialized but still be null!).
-	 */
-	private static boolean isClassesInitialized = false;
-	
-	/**
-	 * A {@link Logger} for this class.
-	 */
-	private static final transient Logger logger = Logger.getLogger(MultiplePreferencesPanel.class.getName());
-
-	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = 3189416350182046246L;
-	
-	/**
-	 * @return the classes
-	 */
+  
+  /**
+   * Load all available {@link PreferencesPanel}s. This array is constructed
+   * by querying the current project and the calling project as well.
+   * 
+   * <p>Access this array by using {@link #getClasses()}!</p>
+   */
+  private static Class<PreferencesPanel>[] classes = null;
+  
+  /**
+   * Determines, if the {@link #classes} array has been initialized.
+   * (Remark: the array may be initialized but still be null!).
+   */
+  private static boolean isClassesInitialized = false;
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(MultiplePreferencesPanel.class.getName());
+  
+  /**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = 3189416350182046246L;
+  
+  /**
+   * @return the classes
+   */
   public static Class<PreferencesPanel>[] getClasses() {
-	  /* Moved the classes initialization to this method. Else, it causes projects using
-	   * SysBio to have a ~5sec delay, even when they do not use this Class!!
-	   */
-	  if (!isClassesInitialized) {
-	    
-	    /**
-	     * It is now possible to predefine the classes, instead of using reflections.
-	     * Example:<pre>
-	     * package de.zbit.gui.prefs;
+    /* Moved the classes initialization to this method. Else, it causes projects using
+     * SysBio to have a ~5sec delay, even when they do not use this Class!!
+     */
+    if (!isClassesInitialized) {
+      
+      /**
+       * It is now possible to predefine the classes, instead of using reflections.
+       * Example:<pre>
+       * package de.zbit.gui.prefs;
        * public class PreferencePanels {
        *   public static Class<?>[] getPreferencesClasses() {
        *     return new Class<?>[]{
        *         de.zbit.gui.prefs.GeneralOptionPanel.class,
-       *         de.zbit.gui.prefs.LaTeXPrefPanel.class, 
-       *         de.zbit.gui.prefs.MultiplePreferencesPanel.class, 
-       *         de.zbit.gui.prefs.PreferencesPanelForKeyProvider.class, 
+       *         de.zbit.gui.prefs.LaTeXPrefPanel.class,
+       *         de.zbit.gui.prefs.MultiplePreferencesPanel.class,
+       *         de.zbit.gui.prefs.PreferencesPanelForKeyProvider.class,
        *         de.zbit.gui.prefs.TranslatorPanelOptionPanel.class
        *     };
-       *   }   
+       *   }
        * }
        * </pre>
-	     */
-	    
-	    // Try to get some predefined classes
-	    classes = getPredefinedPanels();
-	    
-	    // Fallback on reflection
-	    if (classes == null) {
-	      String pckName = MultiplePreferencesPanel.class.getPackage().getName();
+       */
+      
+      // Try to get some predefined classes
+      classes = getPredefinedPanels();
+      
+      // Fallback on reflection
+      if (classes == null) {
+        String pckName = MultiplePreferencesPanel.class.getPackage().getName();
         /*
          * Remark: user.dir might cause problems when using web start programs;
          * it might become something like C:\Programs\Mozilla Firefox.
          */
-	      classes = Reflect.getAllClassesInPackage(pckName, true, true, PreferencesPanel.class,
-	        System.getProperty("user.dir") + File.separatorChar, true);
+        classes = Reflect.getAllClassesInPackage(pckName, true, true, PreferencesPanel.class,
+          System.getProperty("user.dir") + File.separatorChar, true);
         logger.finer(MessageFormat.format(
           "Used reflection to find preferences panels: {0}", Arrays
-              .deepToString(classes)));
-	    }
-	    isClassesInitialized = true;
-	  }
-	  
-		return classes;
-	}
-
+          .deepToString(classes)));
+      }
+      isClassesInitialized = true;
+    }
+    
+    return classes;
+  }
+  
   /**
    * Loads a class in the same package as this class, called "PreferencePanels".
    * Looks if it exists and contains some predefined {@link PreferencesPanel}s
@@ -147,19 +149,19 @@ public class MultiplePreferencesPanel extends AbstractMultiplePreferencesPanel {
     } catch (Exception e1) {
       // Mainly ClassNotFoundException
       logger.finer(MessageFormat.format(
-      	"No predefined preference panel found for {0}", pckName));
+        "No predefined preference panel found for {0}", pckName));
       logger.log(Level.FINEST, MessageFormat.format(
-      	"{0} not found.", panelClass), e1);
+        "{0} not found.", panelClass), e1);
     }
     
     // If a predefined 'panelClass'-instance exits, load the classes array from it.
     if (o != null) {
       try {
         foundPanelClasses = (Class<PreferencesPanel>[]) Reflect.invokeIfContains(o,
-          "getPreferencesClasses");
+            "getPreferencesClasses");
         if (foundPanelClasses != null) {
           logger.finer(MessageFormat.format(
-          	"Found preferences panels in {0}", panelClass));
+            "Found preferences panels in {0}", panelClass));
         }
       } catch (Exception e) {
         e.printStackTrace();
@@ -168,164 +170,166 @@ public class MultiplePreferencesPanel extends AbstractMultiplePreferencesPanel {
     
     return foundPanelClasses;
   }
-
-	/**
-	 * Counts how many tabs can be created inside of this
-	 * {@link MultiplePreferencesPanel} due to the number of
-	 * {@link PreferencesPanel} classes found in this package.
-	 * 
-	 * @return The number of tabs that will be automatically created and added to
-	 *         this {@link MultiplePreferencesPanel} when initializing.
-	 */
-	public static int getPossibleTabCount() {
-		int tabCount = 0;
-		for (int i = 0; i < getClasses().length; i++) {
-			if (!getClasses()[i].equals(MultiplePreferencesPanel.class)) {
-				try {
-					Class<PreferencesPanel> c = getClasses()[i];
-					for (Constructor<?> constructor : c.getConstructors()) {
-						if (constructor.getParameterTypes().length == 0) {
-							tabCount++;
-							break;
-						}
-					}
-				} catch (Exception exc) {
-					logger.finer(exc.getLocalizedMessage());
-				}
-			}
-		}
-		return tabCount;
-	};
-
-	/**
-	 * With this {@link List} it is possible to let this
-	 * {@link MultiplePreferencesPanel} show only
-	 * {@link PreferencesPanelForKeyProvider}s defined by the given {@link Option}
-	 * s.
-	 */
-	private Class<? extends KeyProvider>[] options;
-
-	/**
-	 * Needed to structure this {@link PreferencesPanel}.
-	 */
-	private JTabbedPane tab;
-
-	/**
-	 * @param properties
-	 * @param defaultProperties
-	 * @throws IOException
-	 */
-	public MultiplePreferencesPanel() throws IOException {
-		super();
-		setOpaque(true);
-	}
-
+  
+  /**
+   * Counts how many tabs can be created inside of this
+   * {@link MultiplePreferencesPanel} due to the number of
+   * {@link PreferencesPanel} classes found in this package.
+   * 
+   * @return The number of tabs that will be automatically created and added to
+   *         this {@link MultiplePreferencesPanel} when initializing.
+   */
+  public static int getPossibleTabCount() {
+    int tabCount = 0;
+    for (int i = 0; i < getClasses().length; i++) {
+      if (!getClasses()[i].equals(MultiplePreferencesPanel.class)) {
+        try {
+          Class<PreferencesPanel> c = getClasses()[i];
+          for (Constructor<?> constructor : c.getConstructors()) {
+            if (constructor.getParameterTypes().length == 0) {
+              tabCount++;
+              break;
+            }
+          }
+        } catch (Exception exc) {
+          logger.finer(getMessage(exc));
+        }
+      }
+    }
+    return tabCount;
+  };
+  
+  /**
+   * With this {@link List} it is possible to let this
+   * {@link MultiplePreferencesPanel} show only
+   * {@link PreferencesPanelForKeyProvider}s defined by the given {@link Option}
+   * s.
+   */
+  private Class<? extends KeyProvider>[] options;
+  
+  /**
+   * Needed to structure this {@link PreferencesPanel}.
+   */
+  private JTabbedPane tab;
+  
+  /**
+   * @param properties
+   * @param defaultProperties
+   * @throws IOException
+   */
+  public MultiplePreferencesPanel() throws IOException {
+    super();
+    setOpaque(true);
+  }
+  
   /**
    * 
    * @param kp
    * @throws IOException
    */
   public MultiplePreferencesPanel(Class<? extends KeyProvider>... kp)
-    throws IOException {
+      throws IOException {
     super(false);
     setOpaque(true);
-    this.options = kp;
+    options = kp;
     initializePrefPanel();
   }
-	
-	/**
-	 * @return
-	 */
-	public int getSelectedIndex() {
-		return tab.getSelectedIndex();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#getTitle()
-	 */
-	public String getTitle() {
-		return ResourceManager.getBundle(
-			StringUtil.RESOURCE_LOCATION_FOR_LABELS).getString("USER_PREFERENCES");
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.cfg.PreferencesPanel#init()
-	 */
-	public void init() {
-		tab = new JTabbedPane();
-		tab.setOpaque(true);
-		
-		/* Initializes all preferences-tabs according to the following priority:
+  
+  /**
+   * @return
+   */
+  public int getSelectedIndex() {
+    return tab.getSelectedIndex();
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.cfg.PreferencesPanel#getTitle()
+   */
+  @Override
+  public String getTitle() {
+    return ResourceManager.getBundle(
+      StringUtil.RESOURCE_LOCATION_FOR_LABELS).getString("USER_PREFERENCES");
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.gui.cfg.PreferencesPanel#init()
+   */
+  @Override
+  public void init() {
+    tab = new JTabbedPane();
+    tab.setOpaque(true);
+    
+    /* Initializes all preferences-tabs according to the following priority:
      * 1. explicitly predefined in a class called de.zbit.gui.prefs.PreferencePanels
      * 2. given as "options"
      * 3. with reflection
-		 */
-		if ((options != null) && (getPredefinedPanels() == null)) {
-			for (Class<? extends KeyProvider> provider : options) {
-				try {
-					addTab(new PreferencesPanelForKeyProvider(provider));
-				} catch (IOException exc) {
-					GUITools.showErrorMessage(this, exc);
-				}
-			}
-		} else {
-			for (int i = 0; i < getClasses().length; i++) {
-				if (!getClasses()[i].equals(getClass())) {
-					try {
-						Class<PreferencesPanel> c = getClasses()[i];
-						Constructor<PreferencesPanel> con = c.getConstructor();
-						if (c != null) {
-							addTab(con.newInstance());
-						}
-					} catch (NoSuchMethodException exc) {
-						logger.finest(exc.getLocalizedMessage());
-					} catch (Exception exc) {
-						GUITools.showErrorMessage(this, exc);
-					}
-				}
-			}
-		}
-		add(tab);
-		addItemListener(this);
-	}
-	
-	/**
-	 * Helper method.
-	 * 
-	 * @param settingsPanel
-	 */
-	private void addTab(PreferencesPanel settingsPanel) {
-		settingsPanel.setOpaque(true);
-		JScrollPane scroll = new JScrollPane(settingsPanel);
-		scroll.setOpaque(true);
-		tab.addTab(settingsPanel.getTitle(), scroll);
-		addPreferencesPanel(settingsPanel);
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.JComponent#setPreferredSize(java.awt.Dimension)
-	 */
-	@Override
-	public void setPreferredSize(Dimension preferredSize) {
-	  super.setPreferredSize(preferredSize);
+     */
+    if ((options != null) && (getPredefinedPanels() == null)) {
+      for (Class<? extends KeyProvider> provider : options) {
+        try {
+          addTab(new PreferencesPanelForKeyProvider(provider));
+        } catch (IOException exc) {
+          GUITools.showErrorMessage(this, exc);
+        }
+      }
+    } else {
+      for (int i = 0; i < getClasses().length; i++) {
+        if (!getClasses()[i].equals(getClass())) {
+          try {
+            Class<PreferencesPanel> c = getClasses()[i];
+            Constructor<PreferencesPanel> con = c.getConstructor();
+            if (c != null) {
+              addTab(con.newInstance());
+            }
+          } catch (NoSuchMethodException exc) {
+            logger.finest(getMessage(exc));
+          } catch (Exception exc) {
+            GUITools.showErrorMessage(this, exc);
+          }
+        }
+      }
+    }
+    add(tab);
+    addItemListener(this);
+  }
+  
+  /**
+   * Helper method.
+   * 
+   * @param settingsPanel
+   */
+  private void addTab(PreferencesPanel settingsPanel) {
+    settingsPanel.setOpaque(true);
+    JScrollPane scroll = new JScrollPane(settingsPanel);
+    scroll.setOpaque(true);
+    tab.addTab(settingsPanel.getTitle(), scroll);
+    addPreferencesPanel(settingsPanel);
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.JComponent#setPreferredSize(java.awt.Dimension)
+   */
+  @Override
+  public void setPreferredSize(Dimension preferredSize) {
+    super.setPreferredSize(preferredSize);
     // Make tab at least as big as this panel.
-	  if (tab != null) {
-	    Dimension p1 = tab.getPreferredSize();
-	    Dimension p2 = preferredSize;
-	    p1.width = Math.max(p1.width, p2.width);
-	    p1.height = Math.max(p1.height, p2.height);
-	    tab.setPreferredSize(p1);
-	  }
-	}
-
-	/**
-	 * Sets the selected {@link PreferencesPanel} to the given index.
-	 * 
-	 * @param tab
-	 *            The index of the {@link PreferencesPanel} to be selected.
-	 */
-	public void setSelectedIndex(int tab) {
-		this.tab.setSelectedIndex(tab);
-	}
-	
+    if (tab != null) {
+      Dimension p1 = tab.getPreferredSize();
+      Dimension p2 = preferredSize;
+      p1.width = Math.max(p1.width, p2.width);
+      p1.height = Math.max(p1.height, p2.height);
+      tab.setPreferredSize(p1);
+    }
+  }
+  
+  /**
+   * Sets the selected {@link PreferencesPanel} to the given index.
+   * 
+   * @param tab
+   *            The index of the {@link PreferencesPanel} to be selected.
+   */
+  public void setSelectedIndex(int tab) {
+    this.tab.setSelectedIndex(tab);
+  }
+  
 }
