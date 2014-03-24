@@ -145,7 +145,7 @@ public class CSVReaderOptionPanel extends JPanel {
     original = org;
     
     if (initGUI) {
-    	initGUI();
+      initGUI();
     }
   }
   public CSVReaderOptionPanel(String inFile) throws IOException {
@@ -198,12 +198,12 @@ public class CSVReaderOptionPanel extends JPanel {
    * The default font to use for the Titles in the Borders
    * @param defaultTitleFont
    */
-	public void setDefaultTitleFont(Font defaultTitleFont) {
-		this.defaultTitleFont = defaultTitleFont;
-		setBorder(currentOptions, getCSVOptionsString());
-		setBorder(currentPreview, ResourceManager.getBundle(
-			"de.zbit.locales.Labels").getString("FILE_PREVIEW"));
-	}
+  public void setDefaultTitleFont(Font defaultTitleFont) {
+    this.defaultTitleFont = defaultTitleFont;
+    setBorder(currentOptions, getCSVOptionsString());
+    setBorder(currentPreview, ResourceManager.getBundle(
+        "de.zbit.locales.Labels").getString("FILE_PREVIEW"));
+  }
   
   /**
    * See {@link #setDefaultPreviewFont(Font)}
@@ -229,14 +229,20 @@ public class CSVReaderOptionPanel extends JPanel {
    */
   public void setShowButtons(boolean showButtons) {
     boolean rebuild = false;
-    if (this.showButtons != showButtons) rebuild = true;
+    if (this.showButtons != showButtons) {
+      rebuild = true;
+    }
     
     this.showButtons = showButtons;
     
     if (rebuild) {
-      if (currentButtons!=null) remove(currentButtons);
+      if (currentButtons!=null) {
+        remove(currentButtons);
+      }
       if (showButtons) {
-        if (currentButtons==null) currentButtons = buildButtons();
+        if (currentButtons==null) {
+          currentButtons = buildButtons();
+        }
         add(currentButtons, BorderLayout.SOUTH);
       }
     }
@@ -259,14 +265,14 @@ public class CSVReaderOptionPanel extends JPanel {
    * Has the OK-button been pressed or not. If false,
    * either cancel has been pressed or the dialog has
    * been closed.
-   * @return 
+   * @return
    */
   public boolean isOkPressed() {
     return (buttonPressed == JOptionPane.OK_OPTION);
   }
   
   /**
-   * @return the button pressed on this dialog as given by 
+   * @return the button pressed on this dialog as given by
    * JOptionPane. -1 if it has just been closed,
    * JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION else.
    */
@@ -283,7 +289,7 @@ public class CSVReaderOptionPanel extends JPanel {
     try {
       r.open();
     } catch (IOException e) {
-    	e.printStackTrace();
+      e.printStackTrace();
     }
     return r;
   }
@@ -291,7 +297,7 @@ public class CSVReaderOptionPanel extends JPanel {
   /**
    * Builds the whole panel.
    * This function is called automatically in the constructor.
-   * @throws IOException 
+   * @throws IOException
    */
   protected void initGUI() throws IOException{
     resetPanel();
@@ -302,12 +308,12 @@ public class CSVReaderOptionPanel extends JPanel {
     
     // Add borders
     if (!(currentOptions instanceof ExpandablePanel)) {
-		  setBorder(currentOptions, getCSVOptionsString());
+      setBorder(currentOptions, getCSVOptionsString());
     }
-		setBorder(currentPreview, getFilePreviewCaption());
+    setBorder(currentPreview, getFilePreviewCaption());
     
     // Create Panel
-    this.setLayout(new BorderLayout());
+    setLayout(new BorderLayout());
     add(currentOptions, BorderLayout.NORTH);
     add(currentPreview, BorderLayout.CENTER);
     
@@ -324,7 +330,7 @@ public class CSVReaderOptionPanel extends JPanel {
    */
   protected static String getCSVOptionsString() {
     return ResourceManager.getBundle(
-			"de.zbit.locales.Labels").getString("CSV_OPTIONS");
+        "de.zbit.locales.Labels").getString("CSV_OPTIONS");
   }
   
   /**
@@ -332,7 +338,7 @@ public class CSVReaderOptionPanel extends JPanel {
    */
   protected String getFilePreviewCaption() {
     return ResourceManager.getBundle(
-    "de.zbit.locales.Labels").getString("FILE_PREVIEW");
+        "de.zbit.locales.Labels").getString("FILE_PREVIEW");
   }
   /**
    * Build a panel with cancel and ok buttons.
@@ -342,48 +348,53 @@ public class CSVReaderOptionPanel extends JPanel {
    */
   public JPanel buildButtons() {
     JPanel southPanel = new JPanel(new BorderLayout());
-
+    
     // Ok Button
     FlowLayout fr = new FlowLayout();
     fr.setAlignment(FlowLayout.RIGHT);
     JPanel se = new JPanel(fr);
     String text = GUITools.getOkButtonText();
     JButton ok = new JButton(text);
-    if (this.defaultFont != null) {
-    	ok.setFont(defaultFont);
+    ok.setName("ok");
+    if (defaultFont != null) {
+      ok.setFont(defaultFont);
     }
     ok.setSelected(true);
     se.add(ok);
     southPanel.add(se, BorderLayout.EAST);
-
+    
     // Cancel Button
     FlowLayout fl = new FlowLayout();
     fl.setAlignment(FlowLayout.LEFT);
     JPanel sw = new JPanel(fl);
     text = GUITools.getCancelButtonText();
     JButton cancel = new JButton(text);
-    if (this.defaultFont!=null) cancel.setFont(defaultFont);
+    if (defaultFont!=null) {
+      cancel.setFont(defaultFont);
+    }
     sw.add(cancel);
     southPanel.add(sw, BorderLayout.WEST);
     
     // Set common size
     ok.setPreferredSize(cancel.getPreferredSize()); // new Dimension(75,25)
-//    cancel.setPreferredSize(new Dimension(75,25));
+    //    cancel.setPreferredSize(new Dimension(75,25));
     
     // Add listeners
     ok.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent arg0) {
         if (isSelectionValid()) {
           buttonPressed = JOptionPane.OK_OPTION;
           setVisible(false);
         }
-      }  
+      }
     });
     cancel.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent arg0) {
         buttonPressed = JOptionPane.CANCEL_OPTION;
         setVisible(false);
-      }      
+      }
     });
     
     return southPanel;
@@ -396,11 +407,13 @@ public class CSVReaderOptionPanel extends JPanel {
    */
   protected boolean isSelectionValid() {
     return true;
-  }    
+  }
   
   private void setBorder(JComponent c, String title) {
     TitledBorder tb2 = new TitledBorder(title);
-    if (defaultTitleFont!=null) tb2.setTitleFont(defaultTitleFont);
+    if (defaultTitleFont!=null) {
+      tb2.setTitleFont(defaultTitleFont);
+    }
     c.setBorder(tb2);
   }
   
@@ -409,7 +422,7 @@ public class CSVReaderOptionPanel extends JPanel {
    * @throws IOException
    */
   private void init() throws IOException {
-    this.setPreferredSize(getDefaultPreferredSize());
+    setPreferredSize(getDefaultPreferredSize());
     
     // Open the file and read the first data line.
     if (r.getDataButDoNotReadIfNotAvailable()==null) {
@@ -432,14 +445,17 @@ public class CSVReaderOptionPanel extends JPanel {
     // Do NOT change the names. They are used in the buildPreviewPanel function.
     
     // Contains headers
-		final JCheckBox head = new JCheckBox(ResourceManager.getBundle(
-			"de.zbit.locales.Labels").getString("FILE_CONTAINS_HEADERS"));
-    if (defaultFont!=null) head.setFont(defaultFont);
-		head.setToolTipText(ResourceManager.getBundle("de.zbit.locales.Labels")
-				.getString("INDICATE_IF_COLUMN_DESCRIPTIONS_ARE_GIVEN"));
+    final JCheckBox head = new JCheckBox(ResourceManager.getBundle(
+        "de.zbit.locales.Labels").getString("FILE_CONTAINS_HEADERS"));
+    if (defaultFont!=null) {
+      head.setFont(defaultFont);
+    }
+    head.setToolTipText(ResourceManager.getBundle("de.zbit.locales.Labels")
+      .getString("INDICATE_IF_COLUMN_DESCRIPTIONS_ARE_GIVEN"));
     head.setSelected(r.getContainsHeaders());
     head.setName(FIELD_CONTAINS_HEADERS);
     head.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent arg0) {
         r.setContainsHeaders(head.isSelected());
         queueRefreshPreviewPanel(0);
@@ -448,9 +464,11 @@ public class CSVReaderOptionPanel extends JPanel {
     addComponent(currentPanel, head, 0, 0, 2, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
     
     // Separator char
-		JLabel d0 = new JLabel(ResourceManager.getBundle("de.zbit.locales.Labels")
-				.getString("SEPARATOR_CHAR"));
-    if (defaultFont!=null) d0.setFont(defaultFont);
+    JLabel d0 = new JLabel(ResourceManager.getBundle("de.zbit.locales.Labels")
+      .getString("SEPARATOR_CHAR"));
+    if (defaultFont!=null) {
+      d0.setFont(defaultFont);
+    }
     final JComboBox sep = buildSeparatorCharChooser();
     sep.setName(FIELD_SEPARATOR_CHAR);
     d0.setLabelFor(sep);
@@ -458,14 +476,17 @@ public class CSVReaderOptionPanel extends JPanel {
     addComponent(currentPanel, sep, 1, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
     // Separator Char END
     
-
+    
     // Treat multi as one
     final JCheckBox mult = new JCheckBox(ResourceManager.getBundle("de.zbit.locales.Labels").getString("TREAT_CONSECUTIVE_SEPARATORS_AS_ONE"));
-    if (defaultFont!=null) mult.setFont(defaultFont);
+    if (defaultFont!=null) {
+      mult.setFont(defaultFont);
+    }
     mult.setToolTipText(ResourceManager.getBundle("de.zbit.locales.Labels").getString("TREAT_CONSECUTIVE_SEPARATORS_AS_ONE_TOOLTIP"));
     mult.setSelected(r.getTreatMultipleConsecutiveSeparatorsAsOne());
     mult.setName(FIELD_TREAT_MULTI_AS_ONE);
     mult.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent arg0) {
         r.setTreatMultipleConsecutiveSeparatorsAsOne(mult.isSelected());
         queueRefreshPreviewPanel(0);
@@ -477,11 +498,14 @@ public class CSVReaderOptionPanel extends JPanel {
     // Skip lines (=> set via Skip)
     String contentStartTT = ResourceManager.getBundle("de.zbit.locales.Labels").getString("SKIP_THIS_NUMBER_OF_LEADING_LINES");
     JLabel d1 = new JLabel(ResourceManager.getBundle("de.zbit.locales.Labels").getString("SKIP_LINES"));
-    if (defaultFont!=null) d1.setFont(defaultFont);
+    if (defaultFont!=null) {
+      d1.setFont(defaultFont);
+    }
     d1.setToolTipText(contentStartTT);
     
     final ActionListener skipLinesAction = new ActionListener() {
       public int lastQueuedSkip = r.getContentStartLine();
+      @Override
       public void actionPerformed(ActionEvent e) {
         String s = e.getActionCommand().trim();
         if (s==null || s.length()<1) {
@@ -499,7 +523,9 @@ public class CSVReaderOptionPanel extends JPanel {
     };
     
     JTextField tf = buildIntegerBox(Integer.toString(r.getContentStartLine()), skipLinesAction);
-    if (defaultFont!=null) tf.setFont(defaultFont);
+    if (defaultFont!=null) {
+      tf.setFont(defaultFont);
+    }
     tf.setToolTipText(contentStartTT);
     tf.setName(FIELD_TO_SKIP);
     d1.setLabelFor(tf);
@@ -518,7 +544,7 @@ public class CSVReaderOptionPanel extends JPanel {
     // The ordering and subject of the first four elements is important and
     // should not be touched (Auto, RegexWS,Space,Tab).
     char c = r.getSeparatorChar();
-    if (c!='\u0000' && c!='\u0001' && c!=' ' && c!='\t' && 
+    if (c!='\u0000' && c!='\u0001' && c!=' ' && c!='\t' &&
         !arrayContains(seperators, Character.toString(c))) {
       
       String[] temp  = new String[seperators.length+1];
@@ -529,7 +555,9 @@ public class CSVReaderOptionPanel extends JPanel {
     
     final DefaultComboBoxModel m = new DefaultComboBoxModel(seperators);
     final JComboBox sep = new JComboBox(m);
-    if (defaultFont!=null) sep.setFont(defaultFont);
+    if (defaultFont!=null) {
+      sep.setFont(defaultFont);
+    }
     sep.setEditable(true);
     sep.setToolTipText(ResourceManager.getBundle("de.zbit.locales.Labels").getString("SEPARATOR_CHAR_TOOLTIP"));
     
@@ -539,10 +567,13 @@ public class CSVReaderOptionPanel extends JPanel {
     // Define action to perform
     final ActionListener seperatorAction = new ActionListener() {
       private char lastQueuedChar = r.getSeparatorChar();
+      @Override
       public void actionPerformed(ActionEvent e) {
         
         String s = ((JTextComponent)sep.getEditor().getEditorComponent()).getText();
-        if (s.length()<1) return;
+        if (s.length()<1) {
+          return;
+        }
         separatorAutoDetect = false;
         if (s.equalsIgnoreCase(m.getElementAt(0).toString())) {
           r.setSeparatorChar('\u0000');
@@ -554,7 +585,9 @@ public class CSVReaderOptionPanel extends JPanel {
         } else if (s.equalsIgnoreCase(m.getElementAt(3).toString())) {
           r.setSeparatorChar('\t');
         } else {
-          if (s.length()>1) return;
+          if (s.length()>1) {
+            return;
+          }
           r.setSeparatorChar(s.charAt(0));
         }
         
@@ -593,44 +626,56 @@ public class CSVReaderOptionPanel extends JPanel {
     
     // Create a new document with maximum size of 1
     // This will really disable all texts with length>1 in the box => no "[Tab]" selection, etc.
-//    editorcomp.setDocument(new PlainDocument() {
-//      private static final long serialVersionUID = 1L;
-//      private int limit=1;
-//      public void insertString (int offset, String str, AttributeSet attr) throws BadLocationException {
-//        if (str == null) return;
-//        
-//        if ((getLength() + str.length()) <= limit) {
-//          super.insertString(offset, str, attr);
-//        }
-//      }
-//    });
+    //    editorcomp.setDocument(new PlainDocument() {
+    //      private static final long serialVersionUID = 1L;
+    //      private int limit=1;
+    //      public void insertString (int offset, String str, AttributeSet attr) throws BadLocationException {
+    //        if (str == null) return;
+    //
+    //        if ((getLength() + str.length()) <= limit) {
+    //          super.insertString(offset, str, attr);
+    //        }
+    //      }
+    //    });
     
     
     // Ensure that the text field length is always 1
     editorcomp.addKeyListener(new KeyListener() {
       public boolean isValid(char keyChar) {
         String selText=editorcomp.getSelectedText();
-        if (selText==null) selText="";
+        if (selText==null) {
+          selText="";
+        }
         // Accept backspace or delete or everything if length < 1
-        if ((keyChar == 8 )  || (keyChar == 127) || // BS, Entf 
+        if ((keyChar == 8 )  || (keyChar == 127) || // BS, Entf
             Character.getType(keyChar) == Character.UNASSIGNED || // left or right and such
             selText.equals(editorcomp.getText()) || // text is selected
-            editorcomp.getText().length()<1) //all
+            editorcomp.getText().length()<1) {
           return true;
+        }
         return false;
       }
+      @Override
       public void keyPressed(KeyEvent e) {
-        if (!isValid(e.getKeyChar())) e.consume();
+        if (!isValid(e.getKeyChar())) {
+          e.consume();
+        }
       }
+      @Override
       public void keyReleased(KeyEvent e) {
-        if (!isValid(e.getKeyChar())) e.consume();
+        if (!isValid(e.getKeyChar())) {
+          e.consume();
+        }
         // Fire an action event to change the separator accordingly.
         if (fireOnKeyRelease!=null) {
           fireOnKeyRelease.actionPerformed(new ActionEvent(editorcomp,ActionEvent.ACTION_PERFORMED, "textBoxChanged"));
         }
       }
+      @Override
       public void keyTyped(KeyEvent e) {
-        if (!isValid(e.getKeyChar())) e.consume();
+        if (!isValid(e.getKeyChar())) {
+          e.consume();
+        }
       }
     });
     
@@ -658,8 +703,11 @@ public class CSVReaderOptionPanel extends JPanel {
       sep.setSelectedIndex(3);
     } else {
       int id = arrayIndexOf(seperators, Character.toString(c));
-      if (id>=0) sep.setSelectedIndex(id);
-      else sep.setSelectedItem(Character.toString(c));
+      if (id>=0) {
+        sep.setSelectedIndex(id);
+      } else {
+        sep.setSelectedItem(Character.toString(c));
+      }
     }
     separatorAutoDetect = backupAutoDetec;
   }
@@ -683,7 +731,9 @@ public class CSVReaderOptionPanel extends JPanel {
    * @return
    */
   public static JTextField buildIntegerBox(String defaultValue, final ActionListener ac) {
-    if (defaultValue==null) defaultValue="";
+    if (defaultValue==null) {
+      defaultValue="";
+    }
     final JTextField tf = new JTextField(defaultValue);
     
     // Ensure that only numbers come in this box
@@ -699,27 +749,38 @@ public class CSVReaderOptionPanel extends JPanel {
           } else {
             t = t.substring(0, tf.getCaretPosition())+ keyChar + t.substring(tf.getCaretPosition(), t.length());
           }
-          if (t.equals("-") || CSVReader.isIntegerNumber(t)) validNumber=true;
+          if (t.equals("-") || CSVReader.isIntegerNumber(t)) {
+            validNumber=true;
+          }
         }
         
         // Accept backspace or delete or everything if length < 1
         if ((keyChar == 8 )  || (keyChar == 127) ||
             Character.getType(keyChar) == Character.UNASSIGNED || // left or right and such
-            validNumber)
+            validNumber) {
           return true;
+        }
         return false;
       }
+      @Override
       public void keyPressed(KeyEvent e) {
-        if (!isValid(e.getKeyChar())) e.consume();
+        if (!isValid(e.getKeyChar())) {
+          e.consume();
+        }
       }
+      @Override
       public void keyReleased(KeyEvent e) {
-        if (!isValid(e.getKeyChar())) e.consume();
-        // Fire an action event to change the separator accordingly.
-        else if (ac!=null)
+        if (!isValid(e.getKeyChar())) {
+          e.consume();
+        } else if (ac!=null) {
           ac.actionPerformed(new ActionEvent(tf,ActionEvent.ACTION_PERFORMED, tf.getText()));
+        }
       }
+      @Override
       public void keyTyped(KeyEvent e) {
-        if (!isValid(e.getKeyChar())) e.consume();
+        if (!isValid(e.getKeyChar())) {
+          e.consume();
+        }
       }
     });
     return tf;
@@ -732,10 +793,10 @@ public class CSVReaderOptionPanel extends JPanel {
    * 
    * @param numDataLines - number of data lines to display.
    * @return JScrollPane with the preview table.
-   * @throws IOException 
+   * @throws IOException
    */
   public JComponent buildPreview(int numDataLines) throws IOException {
-
+    
     // Get Preview content and number of columns
     String[][] previewContent = getSampleData(numDataLines);
     int maxColCount = 0;
@@ -746,39 +807,47 @@ public class CSVReaderOptionPanel extends JPanel {
     // Set the header
     // For correct sizing, at least a space is required in each header column.
     String[] header=null;
-    if (r.getContainsHeaders()) header = r.getHeader();
+    if (r.getContainsHeaders()) {
+      header = r.getHeader();
+    }
     String[] newHeader=header;
     newHeader = new String[maxColCount];
-		if (header != null) {
-			System.arraycopy(header, 0, newHeader, 0, Math.min(newHeader.length,header.length));
-		}
-		String column = ResourceManager.getBundle("de.zbit.locales.Labels").getString("COLUMN");
-		for (int i = 0; i < newHeader.length; i++) {
-			if (!r.getContainsHeaders())
-				newHeader[i] = column + (i + 1);
-			else if (newHeader[i] == null || newHeader[i].length() < 1)
-				newHeader[i] = " ";
-		}
+    if (header != null) {
+      System.arraycopy(header, 0, newHeader, 0, Math.min(newHeader.length,header.length));
+    }
+    String column = ResourceManager.getBundle("de.zbit.locales.Labels").getString("COLUMN");
+    for (int i = 0; i < newHeader.length; i++) {
+      if (!r.getContainsHeaders()) {
+        newHeader[i] = column + (i + 1);
+      } else if (newHeader[i] == null || newHeader[i].length() < 1) {
+        newHeader[i] = " ";
+      }
+    }
     
     // Build the table
-		final JTable table = buildPreviewTable(previewContent, newHeader);
-		
+    final JTable table = buildPreviewTable(previewContent, newHeader);
+    
     // Put all on a scroll  pane
     final JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     
     // When resizing, try to optimize table size.
     final int numberOfcols = newHeader.length;
     final int defaultWidth;
-    if (table.getColumnModel().getColumnCount()>0) 
+    if (table.getColumnModel().getColumnCount()>0) {
       defaultWidth = table.getColumnModel().getColumn(0).getWidth();
-    else
+    } else {
       defaultWidth = 75;
+    }
     
     scrollPane.addComponentListener(new ComponentListener() {
+      @Override
       public void componentHidden(ComponentEvent e) {}
+      @Override
       public void componentMoved(ComponentEvent e) {}
+      @Override
       public void componentShown(ComponentEvent e) {}
       
+      @Override
       public void componentResized(ComponentEvent e) {
         if (numberOfcols<5 && scrollPane.getWidth()>numberOfcols*defaultWidth) {
           table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -800,7 +869,9 @@ public class CSVReaderOptionPanel extends JPanel {
     final JTable table = new JTable(data, header);
     table.setPreferredScrollableViewportSize(new Dimension(500, 100));
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    if (defaultPreviewFont!=null) table.setFont(defaultPreviewFont);
+    if (defaultPreviewFont!=null) {
+      table.setFont(defaultPreviewFont);
+    }
     
     // Make cells not editable
     table.setEnabled(false);
@@ -819,7 +890,9 @@ public class CSVReaderOptionPanel extends JPanel {
   private String[][] getSampleData(int numDataLines) throws IOException {
     // If the user has not definitely set a separator, allow
     // to change the current selection, based on best-guess.
-    if (separatorAutoDetect) r.setSeparatorChar('\u0000');
+    if (separatorAutoDetect) {
+      r.setSeparatorChar('\u0000');
+    }
     
     // Get Data
     ArrayList<String[]> firstLines = new ArrayList<String[]>(numDataLines);
@@ -831,7 +904,9 @@ public class CSVReaderOptionPanel extends JPanel {
     while((line=r.getNextLine())!=null) {
       firstLines.add(line);
       maxColCount = Math.max(maxColCount, line.length);
-      if ((++i)==numDataLines) break;
+      if ((++i)==numDataLines) {
+        break;
+      }
     }
     r.close();
     // ---
@@ -850,15 +925,25 @@ public class CSVReaderOptionPanel extends JPanel {
     if (currentOptions!=null) {
       for (i=0; i<currentOptions.getComponentCount(); i++) {
         Component c = currentOptions.getComponent(i);
-        if (c==null || c.getName()==null) continue;
+        if (c==null || c.getName()==null) {
+          continue;
+        }
         if (c.getName().equals(FIELD_CONTAINS_HEADERS)) {
-          if (c instanceof JCheckBox) ((JCheckBox)c).setSelected(r.getContainsHeaders());
+          if (c instanceof JCheckBox) {
+            ((JCheckBox)c).setSelected(r.getContainsHeaders());
+          }
         } else if (c.getName().equals(FIELD_SEPARATOR_CHAR)) {
-          if (c instanceof JComboBox) setCurrentSeparator(r.getSeparatorChar(), ((JComboBox)c));
+          if (c instanceof JComboBox) {
+            setCurrentSeparator(r.getSeparatorChar(), ((JComboBox)c));
+          }
         } else if (c.getName().equals(FIELD_TREAT_MULTI_AS_ONE)) {
-          if (c instanceof JCheckBox) ((JCheckBox)c).setSelected(r.getTreatMultipleConsecutiveSeparatorsAsOne());
+          if (c instanceof JCheckBox) {
+            ((JCheckBox)c).setSelected(r.getTreatMultipleConsecutiveSeparatorsAsOne());
+          }
         } else if (c.getName().equals(FIELD_TO_SKIP)) {
-          if (c instanceof JTextComponent) ((JTextComponent)c).setText(Integer.toString(Math.max(0, r.getContentStartLine())));
+          if (c instanceof JTextComponent) {
+            ((JTextComponent)c).setText(Integer.toString(Math.max(0, r.getContentStartLine())));
+          }
         }
       }
     }
@@ -872,10 +957,13 @@ public class CSVReaderOptionPanel extends JPanel {
    * @param refreshInMiliseconds - time to wait until refresh.
    */
   private void queueRefreshPreviewPanel(final int refreshInMiliseconds) {
-    if (waitingForRefresh!=null) waitingForRefresh.interrupt();
+    if (waitingForRefresh!=null) {
+      waitingForRefresh.interrupt();
+    }
     
     // Queue the refresh.
     waitingForRefresh = new Thread() {
+      @Override
       public void run() {
         try {
           Thread.sleep(refreshInMiliseconds);
@@ -887,14 +975,16 @@ public class CSVReaderOptionPanel extends JPanel {
       }
     };
     waitingForRefresh.start();
-          
+    
   }
   
   /**
    * Recreates the preview panel and replaces the old one.
    */
   public void refreshPreviewPanel() {
-    if (currentPreview!=null) remove(currentPreview);
+    if (currentPreview!=null) {
+      remove(currentPreview);
+    }
     try {
       currentPreview = buildPreview(numDataLinesForPreview);
     } catch (Exception e) {
@@ -907,7 +997,7 @@ public class CSVReaderOptionPanel extends JPanel {
     validate();
     repaint();
   }
-
+  
   /**
    * Recreates the option panel and replaces the old one.
    */
@@ -917,7 +1007,7 @@ public class CSVReaderOptionPanel extends JPanel {
       setBorder(newOptions, getCSVOptionsString());
       GUITools.replaceComponent(currentOptions, newOptions);
       currentOptions = newOptions;
-    
+      
       validate();
       repaint();
     }
@@ -934,15 +1024,19 @@ public class CSVReaderOptionPanel extends JPanel {
   
   
   private static boolean arrayContains(String[] arr, String element) {
-    if (arrayIndexOf(arr, element)>=0) return true;
+    if (arrayIndexOf(arr, element)>=0) {
+      return true;
+    }
     return false;
   }
   
   
   private static int arrayIndexOf(String[] arr, String element) {
-    for (int i=0; i<arr.length; i++)
-      if (arr[i].equalsIgnoreCase(element))
+    for (int i=0; i<arr.length; i++) {
+      if (arr[i].equalsIgnoreCase(element)) {
         return i;
+      }
+    }
     return -1;
   }
   
@@ -952,7 +1046,7 @@ public class CSVReaderOptionPanel extends JPanel {
    * Removes all objects from this panel.
    */
   public void resetPanel() {
-    this.removeAll();
+    removeAll();
   }
   
   /**
@@ -975,9 +1069,9 @@ public class CSVReaderOptionPanel extends JPanel {
    * Helper Method for GridBagConstrains.
    */
   private static void addComponent(Container container, Component component, int gridx, int gridy,
-      int gridwidth, int gridheight, int anchor, int fill) {
+    int gridwidth, int gridheight, int anchor, int fill) {
     GridBagConstraints gbc = new GridBagConstraints(gridx, gridy, gridwidth, gridheight, 1.0, 1.0,
-        anchor, fill, insets, 0, 0);
+      anchor, fill, insets, 0, 0);
     container.add(component, gbc);
   }
   
@@ -1003,7 +1097,7 @@ public class CSVReaderOptionPanel extends JPanel {
    * @throws IOException - if input file is not readable or invalid.
    */
   public static CSVReader showDialog(Container parent, String inFile, String title) throws IOException {
-	    return showDialog(parent, new CSVReader(inFile), title);
+    return showDialog(parent, new CSVReader(inFile), title);
   }
   
   /**
@@ -1019,7 +1113,7 @@ public class CSVReaderOptionPanel extends JPanel {
   
   /**
    * Show a dialog to choose the main CSVReader options.
-   * @param parent - the parent to which this dialog is modal. 
+   * @param parent - the parent to which this dialog is modal.
    * @param r - the current CSV Reader
    * @param title - title for this dialog
    * @return copy of original (cancel button pressed) or modified (ok) reader.
@@ -1027,7 +1121,7 @@ public class CSVReaderOptionPanel extends JPanel {
    * @throws IOException - if input file is not readable or invalid.
    */
   public static CSVReader showDialog(Component parent, CSVReader r, String title) throws IOException {
-
+    
     // Initialize the dialog
     final JDialog jd;
     if (parent!=null && parent instanceof Frame) {
@@ -1035,53 +1129,60 @@ public class CSVReaderOptionPanel extends JPanel {
     } else if (parent!=null && parent instanceof Dialog) {
       jd = new JDialog((Dialog)parent, title, true);
     } else {
-    	jd = new JDialog();
-    	jd.setTitle(title);
-    	jd.setModal(true);
+      jd = new JDialog();
+      jd.setTitle(title);
+      jd.setModal(true);
     }
     
     // Initialize the panel
     final CSVReaderOptionPanel c = new CSVReaderOptionPanel(r);
     jd.add(c);
     // Close dialog with ESC button.
-		jd.getRootPane().registerKeyboardAction(new ActionListener() {
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
-			public void actionPerformed(ActionEvent e) {
-				c.buttonPressed = JOptionPane.CANCEL_OPTION;
-				jd.dispose();
-			}
-		}, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
-  	// Close dialog with ENTER button.
-		jd.getRootPane().registerKeyboardAction(new ActionListener() {
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
-			public void actionPerformed(ActionEvent e) {
-			  if (c.isSelectionValid()) {
-				  c.buttonPressed = JOptionPane.OK_OPTION;
-				  jd.dispose();
-			  }
-			}
-		}, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
-		
-		// Set close operations
-		jd.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				jd.setVisible(false);
-			}
-		});
+    jd.getRootPane().registerKeyboardAction(new ActionListener() {
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+       */
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        c.buttonPressed = JOptionPane.CANCEL_OPTION;
+        jd.dispose();
+      }
+    }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+    JComponent.WHEN_IN_FOCUSED_WINDOW);
+    // Close dialog with ENTER button.
+    jd.getRootPane().registerKeyboardAction(new ActionListener() {
+      /*
+       * (non-Javadoc)
+       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+       */
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (c.isSelectionValid()) {
+          c.buttonPressed = JOptionPane.OK_OPTION;
+          jd.dispose();
+        }
+      }
+    }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+    JComponent.WHEN_IN_FOCUSED_WINDOW);
+    
+    // Set close operations
+    jd.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent e) {
+        jd.setVisible(false);
+      }
+    });
     c.addComponentListener(new ComponentListener() {
+      @Override
       public void componentHidden(ComponentEvent e) {
         jd.setVisible(false);
       }
+      @Override
       public void componentMoved(ComponentEvent e) {}
+      @Override
       public void componentResized(ComponentEvent e) {}
+      @Override
       public void componentShown(ComponentEvent e) {}
     });
     
