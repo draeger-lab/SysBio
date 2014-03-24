@@ -16,6 +16,9 @@
  */
 package de.zbit.gui;
 
+import static de.zbit.gui.UpdateMessage.compareVersionNumbers;
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -124,23 +127,23 @@ public class GUITools {
    */
   private static final Logger logger = Logger.getLogger(GUITools.class.getName());
   
-	/**
-	 * Build a panel with cancel and ok buttons. When any button is pressed, it
-	 * will trigger setVisible(false).
-	 * <p>
-	 * You can check if ok has been pressed with
-	 * 
-	 * <pre>
-	 * ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).isSelected()
-	 * </pre>
-	 * 
-	 * @param parentDialog
-	 *        the dialog to close (hide) with ok and cancel.
-	 * @return
-	 */
+  /**
+   * Build a panel with cancel and ok buttons. When any button is pressed, it
+   * will trigger setVisible(false).
+   * <p>
+   * You can check if ok has been pressed with
+   * 
+   * <pre>
+   * ((JButton) ((JPanel) buttonPanel.getComponent(0)).getComponent(0)).isSelected()
+   * </pre>
+   * 
+   * @param parentDialog
+   *        the dialog to close (hide) with ok and cancel.
+   * @return
+   */
   public static JPanel buildOkCancelButtons(final Component parentDialog) {
     JPanel southPanel = new JPanel(new BorderLayout());
-
+    
     // Ok Button
     FlowLayout fr = new FlowLayout();
     fr.setAlignment(FlowLayout.RIGHT);
@@ -150,7 +153,7 @@ public class GUITools {
     //if (this.defaultFont!=null) ok.setFont(defaultFont);
     se.add(ok);
     southPanel.add(se, BorderLayout.EAST);
-
+    
     // Cancel Button
     FlowLayout fl = new FlowLayout();
     fl.setAlignment(FlowLayout.LEFT);
@@ -170,16 +173,20 @@ public class GUITools {
       public void actionPerformed(ActionEvent arg0) {
         ok.setSelected(true);
         cancel.setSelected(false);
-        if (parentDialog!=null) parentDialog.setVisible(false);
-      }      
+        if (parentDialog!=null) {
+          parentDialog.setVisible(false);
+        }
+      }
     });
     cancel.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
         ok.setSelected(false);
         cancel.setSelected(true);
-        if (parentDialog!=null) parentDialog.setVisible(false);
-      }      
+        if (parentDialog!=null) {
+          parentDialog.setVisible(false);
+        }
+      }
     });
     
     return southPanel;
@@ -206,9 +213,9 @@ public class GUITools {
       }
     }
     for (Component component : components) {
-    	if (component != null) {
-    		component.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
-    	}
+      if (component != null) {
+        component.setPreferredSize(new Dimension((int) maxWidth, (int) maxHeight));
+      }
     }
   }
   
@@ -219,7 +226,7 @@ public class GUITools {
   public static void processOnSwingEventThread(Runnable todo) {
     processOnSwingEventThread(todo, false);
   }
-
+  
   /**
    * 
    * @param todo
@@ -229,7 +236,7 @@ public class GUITools {
     if (todo == null) {
       throw new IllegalArgumentException("Runnable == null");
     }
-
+    
     if (wait) {
       if (SwingUtilities.isEventDispatchThread()) {
         todo.run();
@@ -258,48 +265,48 @@ public class GUITools {
    * @param showVersionNumber
    * @param showCopyright
    */
-	public static void configureSplashScreen(String versionNumber,
-		int yearOfProjectStart, int yearOfRelease, boolean showVersionNumber,
-		boolean showCopyright) {
-		int distanceToBorder = 7;
-		SplashScreen splash = SplashScreen.getSplashScreen();
-		if (splash == null) {
-		  return;
-		}
-		Graphics2D g = splash.createGraphics();
-		if ((g == null) || (!showVersionNumber && !showCopyright)) { 
-			return;
-		}
-		ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Launcher");
-		
-		// Decrease font size and set color
-		g.setFont(g.getFont().deriveFont((g.getFont().getSize() * 0.8f)));
-		g.setColor(ColorPalette.CAMINE_RED);
-		
-		Rectangle b = splash.getBounds();
-		FontMetrics m = g.getFontMetrics();
-		
-		// Show version number in lower right corner
-		if (showVersionNumber) {
-			Rectangle2D stringBounds = m.getStringBounds(versionNumber, g);
-			g.drawString("v" + versionNumber,
-				(int) (b.getWidth() - stringBounds.getWidth() - 1 - distanceToBorder),
-				(int) (b.getHeight() - distanceToBorder));
-		}
-		
-		// Show copyright in lower left corner
-		if (showCopyright) {
-			String cMessage = resources.getString("COPYRIGHT_HOLDER");
-			cMessage = MessageFormat.format(cMessage,
-				yearOfProjectStart,
-				yearOfRelease,
-				resources.getString("ORGANIZATION"));
-			g.drawString(cMessage, distanceToBorder,
-				(int) (b.getHeight() - distanceToBorder));
-		}
-		
-		splash.update();
-	}
+  public static void configureSplashScreen(String versionNumber,
+    int yearOfProjectStart, int yearOfRelease, boolean showVersionNumber,
+    boolean showCopyright) {
+    int distanceToBorder = 7;
+    SplashScreen splash = SplashScreen.getSplashScreen();
+    if (splash == null) {
+      return;
+    }
+    Graphics2D g = splash.createGraphics();
+    if ((g == null) || (!showVersionNumber && !showCopyright)) {
+      return;
+    }
+    ResourceBundle resources = ResourceManager.getBundle("de.zbit.locales.Launcher");
+    
+    // Decrease font size and set color
+    g.setFont(g.getFont().deriveFont((g.getFont().getSize() * 0.8f)));
+    g.setColor(ColorPalette.CAMINE_RED);
+    
+    Rectangle b = splash.getBounds();
+    FontMetrics m = g.getFontMetrics();
+    
+    // Show version number in lower right corner
+    if (showVersionNumber) {
+      Rectangle2D stringBounds = m.getStringBounds(versionNumber, g);
+      g.drawString("v" + versionNumber,
+        (int) (b.getWidth() - stringBounds.getWidth() - 1 - distanceToBorder),
+        (int) (b.getHeight() - distanceToBorder));
+    }
+    
+    // Show copyright in lower left corner
+    if (showCopyright) {
+      String cMessage = resources.getString("COPYRIGHT_HOLDER");
+      cMessage = MessageFormat.format(cMessage,
+        yearOfProjectStart,
+        yearOfRelease,
+        resources.getString("ORGANIZATION"));
+      g.drawString(cMessage, distanceToBorder,
+        (int) (b.getHeight() - distanceToBorder));
+    }
+    
+    splash.update();
+  }
   
   /**
    * Checks whether the first container contains the second one.
@@ -310,14 +317,15 @@ public class GUITools {
    */
   public static boolean contains(Component c, Component insight) {
     boolean contains = c.equals(insight);
-    if ((c instanceof Container) && !contains)
+    if ((c instanceof Container) && !contains) {
       for (Component c1 : ((Container) c).getComponents()) {
         if (c1.equals(insight)) {
           return true;
         } else {
-        	contains |= contains(c1, insight);
+          contains |= contains(c1, insight);
         }
       }
+    }
     return contains;
   }
   
@@ -328,17 +336,17 @@ public class GUITools {
    * @return
    */
   @SuppressWarnings("unchecked")
-	public static <T extends Component> List<T> find(Container c, Class<T> clazz) {
-  	List<T> list = new LinkedList<T>();
-  	if (c.getClass().isAssignableFrom(clazz)) {
-  		list.add((T) c);
-  	}
-  	for (Component c1 : c.getComponents()) {
-  		if (c1 instanceof Container) {
-  			list.addAll(find((Container) c1, clazz));
-  		}
-  	}
-  	return list;
+  public static <T extends Component> List<T> find(Container c, Class<T> clazz) {
+    List<T> list = new LinkedList<T>();
+    if (c.getClass().isAssignableFrom(clazz)) {
+      list.add((T) c);
+    }
+    for (Component c1 : c.getComponents()) {
+      if (c1 instanceof Container) {
+        list.addAll(find((Container) c1, clazz));
+      }
+    }
+    return list;
   }
   
   /**
@@ -398,42 +406,42 @@ public class GUITools {
     }
     return group;
   }
-	
-	/**
-	 * Creates a new {@link JButton} with action listeners that invoke a specific
-	 * method.
-	 * 
-	 * @param listener
-	 *        the ActionListener to be added
-	 * @param command
-	 *        the action command for this button, i.e., the item in the menu. This
-	 *        will be converted to a {@link String} using the {@link
-	 *        String.#toString()} method.
-	 * @return A new {@link JButton} with the given features.
-	 */
-	public static JButton createJButton(ActionListener listener,
-		ActionCommand command) {
-		return createJButton(listener, command, null);
-	}
-	
-	/**
-	 * Creates a new {@link JButton} with action listeners that invoke a specific
-	 * method.
-	 * 
-	 * @param listener
-	 *        the ActionListener to be added
-	 * @param command
-	 *        the action command for this button, i.e., the item in the menu. This
-	 *        will be converted to a {@link String} using the {@link
-	 *        String.#toString()} method.
-	 * @param icon
-	 *        the icon of the JButton (can be null)
-	 * @return A new {@link JButton} with the given features.
-	 */
-	public static JButton createJButton(ActionListener listener,
-		ActionCommand command, Icon icon) {
-		return createJButton(listener, command, icon, null);
-	}
+  
+  /**
+   * Creates a new {@link JButton} with action listeners that invoke a specific
+   * method.
+   * 
+   * @param listener
+   *        the ActionListener to be added
+   * @param command
+   *        the action command for this button, i.e., the item in the menu. This
+   *        will be converted to a {@link String} using the {@link
+   *        String.#toString()} method.
+   * @return A new {@link JButton} with the given features.
+   */
+  public static JButton createJButton(ActionListener listener,
+    ActionCommand command) {
+    return createJButton(listener, command, null);
+  }
+  
+  /**
+   * Creates a new {@link JButton} with action listeners that invoke a specific
+   * method.
+   * 
+   * @param listener
+   *        the ActionListener to be added
+   * @param command
+   *        the action command for this button, i.e., the item in the menu. This
+   *        will be converted to a {@link String} using the {@link
+   *        String.#toString()} method.
+   * @param icon
+   *        the icon of the JButton (can be null)
+   * @return A new {@link JButton} with the given features.
+   */
+  public static JButton createJButton(ActionListener listener,
+    ActionCommand command, Icon icon) {
+    return createJButton(listener, command, icon, null);
+  }
   
   /**
    * Creates a {@link JButton}.
@@ -499,66 +507,66 @@ public class GUITools {
   }
   
   /**
-	 * More convenient method to create a {@link JCheckBox} for a {@link Boolean}
-	 * {@link Option}.
-	 * 
-	 * @param option
-	 * @param selected
-	 * @param listener
-	 * @return
-	 * @see #createJCheckBox(String, boolean, Object, String, ItemListener...)
-	 */
-	public static JCheckBox createJCheckBox(Option<Boolean> option,
-		boolean selected, ItemListener... listener) {
-		return createJCheckBox(option.getName(), option.toString(), selected,
-			option, option.getToolTip(), listener);
-	}
+   * More convenient method to create a {@link JCheckBox} for a {@link Boolean}
+   * {@link Option}.
+   * 
+   * @param option
+   * @param selected
+   * @param listener
+   * @return
+   * @see #createJCheckBox(String, boolean, Object, String, ItemListener...)
+   */
+  public static JCheckBox createJCheckBox(Option<Boolean> option,
+    boolean selected, ItemListener... listener) {
+    return createJCheckBox(option.getName(), option.toString(), selected,
+      option, option.getToolTip(), listener);
+  }
   
-	/**
-	 * More convenient method to create a {@link JCheckBox} for a {@link Boolean}
-	 * {@link Option}.
-	 * 
-	 * @param option
-	 * @param prefs
-	 * @param listener
-	 * @return
-	 * @see #createJCheckBox(Option, boolean, ItemListener...)
-	 */
-	public static JCheckBox createJCheckBox(Option<Boolean> option,
-		SBPreferences prefs, ItemListener... listener) {
-		return createJCheckBox(option, prefs.getBoolean(option), listener);
-	}
-	
-	/**
-  	 * Creates and returns a JCheckBox with all the given properties.
-	 * 
-	 * @param label
-	 * @param name
-	 *        The name for the component to be identifiable by the
-	 *        {@link ItemListener}. {@code null} allowed.
-	 * @param selected
-	 * @param command
-	 * @param toolTip
-	 * @param listener
-	 * @return
-	 */
-	public static JCheckBox createJCheckBox(String label, String name, boolean selected,
-		Object command, String toolTip, ItemListener... listener) {
-		JCheckBox chkbx = new JCheckBox(label, selected);
-		chkbx.setActionCommand(command.toString());
-		if (listener.length > 0) {
-			for (ItemListener l : listener) {
-				chkbx.addItemListener(l);
-			}
-		}
-		if (name != null) {
-			chkbx.setName(name);
-		}
-		chkbx.setToolTipText(StringUtil.toHTML(toolTip, StringUtil.TOOLTIP_LINE_LENGTH));
-		return chkbx;
-	}
+  /**
+   * More convenient method to create a {@link JCheckBox} for a {@link Boolean}
+   * {@link Option}.
+   * 
+   * @param option
+   * @param prefs
+   * @param listener
+   * @return
+   * @see #createJCheckBox(Option, boolean, ItemListener...)
+   */
+  public static JCheckBox createJCheckBox(Option<Boolean> option,
+    SBPreferences prefs, ItemListener... listener) {
+    return createJCheckBox(option, prefs.getBoolean(option), listener);
+  }
   
-	/**
+  /**
+   * Creates and returns a JCheckBox with all the given properties.
+   * 
+   * @param label
+   * @param name
+   *        The name for the component to be identifiable by the
+   *        {@link ItemListener}. {@code null} allowed.
+   * @param selected
+   * @param command
+   * @param toolTip
+   * @param listener
+   * @return
+   */
+  public static JCheckBox createJCheckBox(String label, String name, boolean selected,
+    Object command, String toolTip, ItemListener... listener) {
+    JCheckBox chkbx = new JCheckBox(label, selected);
+    chkbx.setActionCommand(command.toString());
+    if (listener.length > 0) {
+      for (ItemListener l : listener) {
+        chkbx.addItemListener(l);
+      }
+    }
+    if (name != null) {
+      chkbx.setName(name);
+    }
+    chkbx.setToolTipText(StringUtil.toHTML(toolTip, StringUtil.TOOLTIP_LINE_LENGTH));
+    return chkbx;
+  }
+  
+  /**
    * 
    * @param command
    * @param selected
@@ -566,82 +574,82 @@ public class GUITools {
    * @param listeners
    * @return
    */
-	public static JCheckBoxMenuItem createJCheckBoxMenuItem(
-		ActionCommand command, boolean selected, boolean enabled,
-		ItemListener... listeners) {
-		JCheckBoxMenuItem item = new JCheckBoxMenuItem(command.getName(), selected);
-		item.setEnabled(enabled);
-		item.setToolTipText(command.getToolTip());
-		item.setActionCommand(command.toString());
-		for (ItemListener listener : listeners) {
-			item.addItemListener(listener);
-		}
-		return item;
-	}
-	
-	/**
-	 * Creates a {@link JComboBox} with the given properties.
-	 * 
-	 * @param items
-	 * @param renderer
-	 *        {@code null} allowed.
-	 * @param enabled
-	 * @param name
-	 *        {@code null} allowed.
-	 * @param tooltip
-	 *        {@code null} allowed.
-	 * @param selectedIndex
-	 * @param listeners
-	 *        {@code null} allowed.
-	 * @return
-	 */
-	public static JComboBox createJComboBox(Object[] items,
-		ListCellRenderer renderer, boolean enabled, String name, String tooltip,
-		int selectedIndex, ItemListener... listeners) {
-		JComboBox box = new JComboBox(items);
-		if (renderer != null) {
-			box.setRenderer(renderer);
-		}
-		box.setEnabled(enabled);
-		if ((name != null) && (name.length() > 0)) {
-			box.setName(name);
-		}
-		if ((tooltip != null) && (tooltip.length() > 0)) {
-			box.setToolTipText(StringUtil.toHTML(tooltip, StringUtil.TOOLTIP_LINE_LENGTH));
-		}
-		if ((-1 < selectedIndex) && (items != null)
-				&& (selectedIndex < items.length)) {
-			box.setSelectedIndex(selectedIndex);
-		}
-		if (listeners != null) {
-			for (ItemListener listener : listeners) {
-				box.addItemListener(listener);
-			}
-		}
-		return box;
-	}
-	
-	/**
-	 * Creates a {@link JComboBox} with the given properties.
-	 * 
-	 * @param items
-	 * @param renderer
-	 *        {@code null} allowed.
-	 * @param enabled
-	 * @param name
-	 *        {@code null} allowed.
-	 * @param tooltip
-	 *        {@code null} allowed.
-	 * @param listeners
-	 *        {@code null} allowed.
-	 * @return
-	 */
-	public static JComboBox createJComboBox(Object[] items,
-		ListCellRenderer renderer, boolean enabled, String name, String tooltip,
-		ItemListener... listeners) {
-		return createJComboBox(items, renderer, enabled, name, tooltip, 0,
-			listeners);
-	}
+  public static JCheckBoxMenuItem createJCheckBoxMenuItem(
+    ActionCommand command, boolean selected, boolean enabled,
+    ItemListener... listeners) {
+    JCheckBoxMenuItem item = new JCheckBoxMenuItem(command.getName(), selected);
+    item.setEnabled(enabled);
+    item.setToolTipText(command.getToolTip());
+    item.setActionCommand(command.toString());
+    for (ItemListener listener : listeners) {
+      item.addItemListener(listener);
+    }
+    return item;
+  }
+  
+  /**
+   * Creates a {@link JComboBox} with the given properties.
+   * 
+   * @param items
+   * @param renderer
+   *        {@code null} allowed.
+   * @param enabled
+   * @param name
+   *        {@code null} allowed.
+   * @param tooltip
+   *        {@code null} allowed.
+   * @param selectedIndex
+   * @param listeners
+   *        {@code null} allowed.
+   * @return
+   */
+  public static JComboBox createJComboBox(Object[] items,
+    ListCellRenderer renderer, boolean enabled, String name, String tooltip,
+    int selectedIndex, ItemListener... listeners) {
+    JComboBox box = new JComboBox(items);
+    if (renderer != null) {
+      box.setRenderer(renderer);
+    }
+    box.setEnabled(enabled);
+    if ((name != null) && (name.length() > 0)) {
+      box.setName(name);
+    }
+    if ((tooltip != null) && (tooltip.length() > 0)) {
+      box.setToolTipText(StringUtil.toHTML(tooltip, StringUtil.TOOLTIP_LINE_LENGTH));
+    }
+    if ((-1 < selectedIndex) && (items != null)
+        && (selectedIndex < items.length)) {
+      box.setSelectedIndex(selectedIndex);
+    }
+    if (listeners != null) {
+      for (ItemListener listener : listeners) {
+        box.addItemListener(listener);
+      }
+    }
+    return box;
+  }
+  
+  /**
+   * Creates a {@link JComboBox} with the given properties.
+   * 
+   * @param items
+   * @param renderer
+   *        {@code null} allowed.
+   * @param enabled
+   * @param name
+   *        {@code null} allowed.
+   * @param tooltip
+   *        {@code null} allowed.
+   * @param listeners
+   *        {@code null} allowed.
+   * @return
+   */
+  public static JComboBox createJComboBox(Object[] items,
+    ListCellRenderer renderer, boolean enabled, String name, String tooltip,
+    ItemListener... listeners) {
+    return createJComboBox(items, renderer, enabled, name, tooltip, 0,
+      listeners);
+  }
   
   /**
    * Creates a new {@link JDropDownButton} using the entries from the given
@@ -680,8 +688,8 @@ public class GUITools {
       tooltip = description[1];
     }
     if (tooltip != null) {
-			button.setToolTipText(StringUtil.toHTML(tooltip,
-				StringUtil.TOOLTIP_LINE_LENGTH));
+      button.setToolTipText(StringUtil.toHTML(tooltip,
+        StringUtil.TOOLTIP_LINE_LENGTH));
     }
     button.setName(name);
     button.setActionCommand(name);
@@ -721,9 +729,9 @@ public class GUITools {
     JFileChooser chooser = createJFileChooser(dir, allFilesAcceptable,
       multiSelectionAllowed, mode);
     if (filter != null) {
-			for (int i = filter.length; i > 0; i--) {
-				chooser.addChoosableFileFilter(filter[i - 1]);
-			}
+      for (int i = filter.length; i > 0; i--) {
+        chooser.addChoosableFileFilter(filter[i - 1]);
+      }
       if (filter.length > 0) {
         chooser.setFileFilter(filter[0]);
       }
@@ -750,9 +758,9 @@ public class GUITools {
     }
     catch( MissingResourceException e ) {
       logger.log(Level.WARNING,
-          "Couldn't find localized string for label '" + labelLocalizationKey
-          + "'. Please report this bug.",
-          e);
+        "Couldn't find localized string for label '" + labelLocalizationKey
+        + "'. Please report this bug.",
+        e);
       text = labelLocalizationKey;
     }
     
@@ -789,9 +797,9 @@ public class GUITools {
     JMenu menu = new JMenu(text);
     menu.setMnemonic(mnemonic);
     for (Object item : menuItems) {
-    	if (item == null) {
-    		continue;
-    	} else if (item instanceof JMenuItem) {
+      if (item == null) {
+        continue;
+      } else if (item instanceof JMenuItem) {
         menu.add((JMenuItem) item);
       } else if (item instanceof JSeparator) {
         menu.add((JSeparator) item);
@@ -828,15 +836,15 @@ public class GUITools {
   public static JMenu createJMenu(String text, String tooltip, Object... menuItems) {
     JMenu menu = createJMenu(text, menuItems);
     if ((tooltip != null) && (tooltip.length() > 0) && (!tooltip.equals(text))) {
-    	if (isMacOSX()) {
-    		menu.setToolTipText(tooltip);
-    	} else {
+      if (isMacOSX()) {
+        menu.setToolTipText(tooltip);
+      } else {
         menu.setToolTipText(StringUtil.toHTML(tooltip, StringUtil.TOOLTIP_LINE_LENGTH));
-    	}
+      }
     }
     return menu;
   }
-
+  
   /**
    * Creates an entry for the menu bar.
    * 
@@ -846,7 +854,7 @@ public class GUITools {
    */
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command) {
-  	return createJMenuItem(listener, command, true);
+    return createJMenuItem(listener, command, true);
   }
   
   /**
@@ -858,7 +866,7 @@ public class GUITools {
    */
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, boolean enabled) {
-  	Icon icon = (command instanceof ActionCommandWithIcon) ? ((ActionCommandWithIcon) command).getIcon() : null;
+    Icon icon = (command instanceof ActionCommandWithIcon) ? ((ActionCommandWithIcon) command).getIcon() : null;
     return createJMenuItem(listener, command, icon, enabled);
   }
   
@@ -934,12 +942,12 @@ public class GUITools {
    */
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, Icon icon, KeyStroke keyStroke) {
-  	return createJMenuItem(listener, command, icon, keyStroke, true);
+    return createJMenuItem(listener, command, icon, keyStroke, true);
   }
   
   public static JMenuItem createJMenuItem(ActionListener listener,
     ActionCommand command, Icon icon, KeyStroke keyStroke, boolean enabled) {
-  	return createJMenuItem(listener, command, icon, keyStroke, null, enabled);
+    return createJMenuItem(listener, command, icon, keyStroke, null, enabled);
   }
   
   /**
@@ -982,55 +990,55 @@ public class GUITools {
    * @param mnemonic
    * @param type may also be {@link JCheckBoxMenuItem} or other derivates
    * of {@link JMenuItem}.
-   * @param enabled 
+   * @param enabled
    * @return
    */
-	public static JMenuItem createJMenuItem(ActionListener listener,
-		ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic,
-		Class<? extends JMenuItem> type, boolean enabled) {
-		if (type == null) {
-			type = JMenuItem.class;
-		}
-		JMenuItem item;
-		try {
-			item = type.newInstance();
-		} catch (Exception e) {
-			logger.log(Level.WARNING, "Cannot instantiate class.", e);
-			item = new JMenuItem();
-		}
-		
-		if (ks != null) {
-			item.setAccelerator(ks);
-		}
-		if (listener != null) {
-			item.addActionListener(listener);
-		}
-		if (mnemonic != null) {
-			item.setMnemonic(Character.getNumericValue(mnemonic.charValue()));
-		}
-		if (command != null) {
-			item.setText(command.getName());
-			String toolTip = command.getToolTip();
-			if (toolTip != null) {
-				if (isMacOSX()) {
-					item.setToolTipText(toolTip);
-				} else {
-					item.setToolTipText(StringUtil.toHTML(toolTip, StringUtil.TOOLTIP_LINE_LENGTH));
-				}
-			}
-			item.setActionCommand(command.toString());
-			item.setName(command.toString());
-		}
-		if (icon != null) {
-			item.setIcon(icon);
-		} else if (command instanceof ActionCommandWithIcon) {
-			item.setIcon(((ActionCommandWithIcon) command).getIcon());
-		}
-		
-		item.setEnabled(enabled);
-		
-		return item;
-	}
+  public static JMenuItem createJMenuItem(ActionListener listener,
+    ActionCommand command, Icon icon, KeyStroke ks, Character mnemonic,
+    Class<? extends JMenuItem> type, boolean enabled) {
+    if (type == null) {
+      type = JMenuItem.class;
+    }
+    JMenuItem item;
+    try {
+      item = type.newInstance();
+    } catch (Exception e) {
+      logger.log(Level.WARNING, "Cannot instantiate class.", e);
+      item = new JMenuItem();
+    }
+    
+    if (ks != null) {
+      item.setAccelerator(ks);
+    }
+    if (listener != null) {
+      item.addActionListener(listener);
+    }
+    if (mnemonic != null) {
+      item.setMnemonic(Character.getNumericValue(mnemonic.charValue()));
+    }
+    if (command != null) {
+      item.setText(command.getName());
+      String toolTip = command.getToolTip();
+      if (toolTip != null) {
+        if (isMacOSX()) {
+          item.setToolTipText(toolTip);
+        } else {
+          item.setToolTipText(StringUtil.toHTML(toolTip, StringUtil.TOOLTIP_LINE_LENGTH));
+        }
+      }
+      item.setActionCommand(command.toString());
+      item.setName(command.toString());
+    }
+    if (icon != null) {
+      item.setIcon(icon);
+    } else if (command instanceof ActionCommandWithIcon) {
+      item.setIcon(((ActionCommandWithIcon) command).getIcon());
+    }
+    
+    item.setEnabled(enabled);
+    
+    return item;
+  }
   
   
   /**
@@ -1052,75 +1060,75 @@ public class GUITools {
    * @param enabled
    * @return
    */
-	public static JMenuItem createJMenuItem(ActionListener listener,
-		ActionCommandWithIcon command, char mnemonic, boolean enabled) {
-		return createJMenuItem(listener, command, (Icon) null, mnemonic, enabled);
-	}
-	
-	/**
-	 * 
-	 * @param listener
-	 * @param command
-	 * @param ks
-	 * @param mnemonic
-	 * @param enabled
-	 * @return
-	 */
-	public static JMenuItem createJMenuItem(ActionListener listener,
-		ActionCommandWithIcon command, KeyStroke ks, char mnemonic, boolean enabled) {
-		return createJMenuItem(listener, command, command.getIcon(), ks, mnemonic,
-			enabled);
-	}
+  public static JMenuItem createJMenuItem(ActionListener listener,
+    ActionCommandWithIcon command, char mnemonic, boolean enabled) {
+    return createJMenuItem(listener, command, (Icon) null, mnemonic, enabled);
+  }
   
   /**
-	 * Creates a {@link JSpinner} with the given properties.
-	 * 
-	 * @param model
-	 * @param name
-	 *        {@code null} allowed.
-	 * @param tooltip
-	 *        {@code null} allowed.
-	 * @param enabled
-	 * @param cl
-	 *        {@code null} allowed.
-	 * @return
-	 */
-	public static JSpinner createJSpinner(SpinnerModel model, String name,
-		String tooltip, boolean enabled, ChangeListener... cl) {
-		JSpinner spinner = new JSpinner(model);
-		if ((name != null) && (name.length() > 0)) {
-			spinner.setName(name);
-		}
-		if ((tooltip != null) && (tooltip.length() > 0)) {
-			spinner.setToolTipText(StringUtil.toHTML(tooltip, StringUtil.TOOLTIP_LINE_LENGTH));
-		}
-		spinner.setEnabled(enabled);
-		if (cl != null) {
-			for (ChangeListener c : cl) {
-				spinner.addChangeListener(c);
-			}
-		}
-		return spinner;
-	}
+   * 
+   * @param listener
+   * @param command
+   * @param ks
+   * @param mnemonic
+   * @param enabled
+   * @return
+   */
+  public static JMenuItem createJMenuItem(ActionListener listener,
+    ActionCommandWithIcon command, KeyStroke ks, char mnemonic, boolean enabled) {
+    return createJMenuItem(listener, command, command.getIcon(), ks, mnemonic,
+      enabled);
+  }
   
   /**
-	 * Creates an enabled {@link JSpinner} with the given properties.
-	 * 
-	 * @param model
-	 * @param name
-	 * @param tooltip
-	 * @param listener
-	 * @return
-	 * @see #createJSpinner(SpinnerModel, String, String, boolean,
-	 *      ChangeListener...)
-	 */
-	public static JSpinner createJSpinner(SpinnerModel model, String name,
-		String tooltip, ChangeListener... listener) {
-		return createJSpinner(model, name, tooltip, true, listener);
-	}
+   * Creates a {@link JSpinner} with the given properties.
+   * 
+   * @param model
+   * @param name
+   *        {@code null} allowed.
+   * @param tooltip
+   *        {@code null} allowed.
+   * @param enabled
+   * @param cl
+   *        {@code null} allowed.
+   * @return
+   */
+  public static JSpinner createJSpinner(SpinnerModel model, String name,
+    String tooltip, boolean enabled, ChangeListener... cl) {
+    JSpinner spinner = new JSpinner(model);
+    if ((name != null) && (name.length() > 0)) {
+      spinner.setName(name);
+    }
+    if ((tooltip != null) && (tooltip.length() > 0)) {
+      spinner.setToolTipText(StringUtil.toHTML(tooltip, StringUtil.TOOLTIP_LINE_LENGTH));
+    }
+    spinner.setEnabled(enabled);
+    if (cl != null) {
+      for (ChangeListener c : cl) {
+        spinner.addChangeListener(c);
+      }
+    }
+    return spinner;
+  }
   
   /**
-   * Create a panel for a component and adds a title to it. 
+   * Creates an enabled {@link JSpinner} with the given properties.
+   * 
+   * @param model
+   * @param name
+   * @param tooltip
+   * @param listener
+   * @return
+   * @see #createJSpinner(SpinnerModel, String, String, boolean,
+   *      ChangeListener...)
+   */
+  public static JSpinner createJSpinner(SpinnerModel model, String name,
+    String tooltip, ChangeListener... listener) {
+    return createJSpinner(model, name, tooltip, true, listener);
+  }
+  
+  /**
+   * Create a panel for a component and adds a title to it.
    */
   public static JComponent createTitledPanel(JComponent content, String title) {
     /*JPanel panel = new JPanel();
@@ -1191,12 +1199,12 @@ public class GUITools {
   public static synchronized boolean enableOkButtonIfAllComponentsReady(Container c) {
     return enableOkButtonIfAllComponentsReady(c, false);
   }
-	
-	/**
+  
+  /**
    * Simply checks if all elements on "c" are enabled and if yes, the given "okButton" will
    * be enabled. Else, the current state stays untouched.
    * 
-   * In opposite to {@link #enableOkButtonIfAllComponentsReady(Component)}, this function 
+   * In opposite to {@link #enableOkButtonIfAllComponentsReady(Component)}, this function
    * uses the given okButton.
    * @param c
    * @param okButton
@@ -1242,50 +1250,50 @@ public class GUITools {
   
   
   /**
-	 * 
-	 * @param menu
-	 * @param action
-	 * @return
-	 * @see #find(Container, ActionCommand)
-	 */
-	public static JMenuItem find(JMenu menu, Object action) {
-		JMenuItem item;
-		for (int i = 0; i < menu.getItemCount(); i++) {
-			item = menu.getItem(i);
-			if ((item.getActionCommand() != null)
-					&& item.getActionCommand().equals(action.toString())) {
-				return item;
-			} else if (item instanceof JMenu) {
-				JMenuItem subItem = find((JMenu) item, action);
-				if (subItem != null) {
-					return subItem;
-				}
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * 
-	 * @param menuBar
-	 * @param command
-	 * @return
-	 */
-	public static JMenuItem find(JMenuBar menuBar, Object command) {
-		JMenu menu;
-		JMenuItem item;
-		for (int i = 0; i < menuBar.getMenuCount(); i++) {
-			menu = menuBar.getMenu(i);
-			if (menu.getActionCommand().equals(command)) {
-				return menu;
-			}
-			item = find(menu, command);
-			if (item != null) {
-				return item;
-			}
-		}
-		return null;
-	}
+   * 
+   * @param menu
+   * @param action
+   * @return
+   * @see #find(Container, ActionCommand)
+   */
+  public static JMenuItem find(JMenu menu, Object action) {
+    JMenuItem item;
+    for (int i = 0; i < menu.getItemCount(); i++) {
+      item = menu.getItem(i);
+      if ((item.getActionCommand() != null)
+          && item.getActionCommand().equals(action.toString())) {
+        return item;
+      } else if (item instanceof JMenu) {
+        JMenuItem subItem = find((JMenu) item, action);
+        if (subItem != null) {
+          return subItem;
+        }
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * 
+   * @param menuBar
+   * @param command
+   * @return
+   */
+  public static JMenuItem find(JMenuBar menuBar, Object command) {
+    JMenu menu;
+    JMenuItem item;
+    for (int i = 0; i < menuBar.getMenuCount(); i++) {
+      menu = menuBar.getMenu(i);
+      if (menu.getActionCommand().equals(command)) {
+        return menu;
+      }
+      item = find(menu, command);
+      if (item != null) {
+        return item;
+      }
+    }
+    return null;
+  }
   
   /**
    * Tries to get the lokalized cancel Button Message, as it occurs
@@ -1296,16 +1304,18 @@ public class GUITools {
     
     // First, get it from the UI Manager
     Object cancel = UIManager.get("OptionPane.cancelButtonText");
-    if (cancel!=null) return cancel.toString();
+    if (cancel!=null) {
+      return cancel.toString();
+    }
     
     // Second, try to get it from the internal resources
     ResourceBundle resource = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
     cancel = resource == null ? null: resource.getString("CANCEL");
     if (cancel != null) {
       if (cancel.toString().contains(";")) {
-      	return cancel.toString().split(";")[0];
+        return cancel.toString().split(";")[0];
       } else {
-      	return cancel.toString();
+        return cancel.toString();
       }
     }
     
@@ -1335,23 +1345,23 @@ public class GUITools {
     for (int i = 0; i < menuBar.getMenuCount(); i++) {
       menu = menuBar.getMenu(i);
       if ((menu.getActionCommand() != null)
-          && (menu.getActionCommand().equals(command.toString()))) { 
-      	return menu; 
+          && (menu.getActionCommand().equals(command.toString()))) {
+        return menu;
       }
       for (int j = 0; j < menu.getItemCount(); j++) {
         item = menu.getItem(j);
-				if (item != null) {
-					if ((item.getActionCommand() != null)
-							&& (item.getActionCommand().equals(command.toString()))) { 
-						return item; 
-					}
-					if (item instanceof JMenu) {
-						item = find((JMenu) item, command);
-						if (item != null) {
-							return item;
-						}
-					}
-				}
+        if (item != null) {
+          if ((item.getActionCommand() != null)
+              && (item.getActionCommand().equals(command.toString()))) {
+            return item;
+          }
+          if (item instanceof JMenu) {
+            item = find((JMenu) item, command);
+            if (item != null) {
+              return item;
+            }
+          }
+        }
       }
     }
     return null;
@@ -1374,34 +1384,6 @@ public class GUITools {
   }
   
   /**
-   * Return a best suited string to describe this {@link Throwable}.
-   * Prefers in this order: <ol><li>LocalizedMessage
-   * <li>LocalizedMessage of the Cause
-   * <li>message<li>toString()<li>NULL</ol>
-   * @param exc
-   * @return
-   */
-  private static String getMessage(Throwable exc) {
-    if (exc == null) {
-    	return "NULL";
-    }
-    String msg = exc.getLocalizedMessage();
-    if ((msg == null) && (exc.getCause() != null)) {
-      msg = exc.getCause().getLocalizedMessage();
-    }
-    if (msg == null) {
-    	msg = exc.getMessage();
-    }
-    if (msg == null) {
-    	msg = exc.toString(); // Axis Faults have all messages null
-    }
-    if (msg == null) {
-    	msg = "NULL";
-    }
-    return msg;
-  }
-  
-  /**
    * 
    * @param c
    * @param inspectWholeWindow
@@ -1412,10 +1394,10 @@ public class GUITools {
     // Search for parent window
     Container oldC = c;
     if (inspectWholeWindow) {
-    	c = getParentWindow(c);
+      c = getParentWindow(c);
     }
     if (c == null) {
-    	c = oldC;
+      c = oldC;
     }
     
     // Search for ok button and enable.
@@ -1435,16 +1417,18 @@ public class GUITools {
     
     // First, get it from the UI Manager
     Object ok = UIManager.get("OptionPane.okButtonText");
-    if (ok!=null) return ok.toString();
+    if (ok!=null) {
+      return ok.toString();
+    }
     
     // Second, try to get it from the internal resources
     ResourceBundle resource = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
     ok = resource == null ? null : resource.getString("OK");
     if (ok != null) {
       if (ok.toString().contains(";")) {
-      	return ok.toString().split(";")[0];
+        return ok.toString().split(";")[0];
       } else {
-      	return ok.toString();
+        return ok.toString();
       }
     }
     
@@ -1497,9 +1481,9 @@ public class GUITools {
       // intentionally left blank
     }
   }
-
-
-	/**
+  
+  
+  /**
    * @param g
    * @param incrementBy
    * @return
@@ -1513,97 +1497,97 @@ public class GUITools {
    */
   public static void initLaF() {
     ImageTools.initImages();
-  	
-		// 15 s for tooltips to be displayed
-		ToolTipManager.sharedInstance().setDismissDelay(15000);
-		
-		// The user may have specified a custom LaF on the command line
-		// with "-Dswing.defaultlaf=XXX".
-		String def = System.getProperty("swing.defaultlaf");
-		Class<?> cl = null;
-		try {
-		  cl = Class.forName(def);
-		} catch (Throwable t) {
+    
+    // 15 s for tooltips to be displayed
+    ToolTipManager.sharedInstance().setDismissDelay(15000);
+    
+    // The user may have specified a custom LaF on the command line
+    // with "-Dswing.defaultlaf=XXX".
+    String def = System.getProperty("swing.defaultlaf");
+    Class<?> cl = null;
+    try {
+      cl = Class.forName(def);
+    } catch (Throwable t) {
       // intentionally left blank
-		}
-		
-		// Only if the user specified either no LaF or an invalid one, try to
-		// load an operating system dependent nice LaF.
-		if ((def == null) || (cl == null)) {
-		  try {
-		    UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
-		    String osName = System.getProperty("os.name");
-		    if (osName.equals("Linux") || osName.equals("FreeBSD")) {
-		      UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-		      // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-		    } else if (isMacOSX()) {
-		      String osVersion = System.getProperty("os.version");
-		      if (osVersion.startsWith("10.4") || osVersion.startsWith("10.5") || osVersion.startsWith("10.6")) {
-		        UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
-		      } else {
-		        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());	
-		      }
-		    } else if (osName.contains("Windows")) {
-		      UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		    } else {
-		      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		    }
-		  } catch (Throwable e) {
-		    try {
-		      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		    } catch (Throwable e1) {
-		      // If Nimbus is not available, you can set the GUI to another look
-		      // and feel.
-		      // Native look and feel for Windows, MacOS X. GTK look and
-		      // feel for Linux, FreeBSD
-		      try {
-		        for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-		          if ("Nimbus".equals(info.getName())) {
-		            UIManager.setLookAndFeel(info.getClassName());
-		            break;
-		          }
-		        }
-		      } catch (Throwable exc) {
-		        showErrorMessage(null, exc.getLocalizedMessage());
-		      }
-		    }
-		  }
-		}
+    }
+    
+    // Only if the user specified either no LaF or an invalid one, try to
+    // load an operating system dependent nice LaF.
+    if ((def == null) || (cl == null)) {
+      try {
+        UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
+        String osName = System.getProperty("os.name");
+        if (osName.equals("Linux") || osName.equals("FreeBSD")) {
+          UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+          // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+        } else if (isMacOSX()) {
+          String osVersion = System.getProperty("os.version");
+          if (compareVersionNumbers("10.4", osVersion)) {
+            UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+          } else {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+          }
+        } else if (osName.contains("Windows")) {
+          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        } else {
+          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+      } catch (Throwable e) {
+        try {
+          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Throwable e1) {
+          // If Nimbus is not available, you can set the GUI to another look
+          // and feel.
+          // Native look and feel for Windows, MacOS X. GTK look and
+          // feel for Linux, FreeBSD
+          try {
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+              if ("Nimbus".equals(info.getName())) {
+                UIManager.setLookAndFeel(info.getClassName());
+                break;
+              }
+            }
+          } catch (Throwable exc) {
+            showErrorMessage(null, getMessage(exc));
+          }
+        }
+      }
+    }
   }
   
   /**
-	 * Initializes the look and feel. This method is only useful when the calling
-	 * class contains the main method of your program and is also derived from this
-	 * class ({@link GUITools}). The preferred way to set up your application would
-	 * be to let it extend {@link Launcher}.
-	 * 
-	 * @param title
-	 *        the title to be displayed in the xDock in case of MacOS. Note that
-	 *        this title can only be displayed if this method belongs to the class
-	 *        that has the main method (or is in a super class of it), i.e., in
-	 *        order to make use of this method in a proper way, you have to extend
-	 *        this {@link GUITools} and to put the main method into your derived
-	 *        class. From this main method you then have to call this method.
-	 *        Otherwise, this title will not have any effect. An easier way to set
-	 *        the xDock properties for your application would be to use the
-	 *        {@link Launcher} class that already correctly sets all properties
-	 *        for you.
-	 */
+   * Initializes the look and feel. This method is only useful when the calling
+   * class contains the main method of your program and is also derived from this
+   * class ({@link GUITools}). The preferred way to set up your application would
+   * be to let it extend {@link Launcher}.
+   * 
+   * @param title
+   *        the title to be displayed in the xDock in case of MacOS. Note that
+   *        this title can only be displayed if this method belongs to the class
+   *        that has the main method (or is in a super class of it), i.e., in
+   *        order to make use of this method in a proper way, you have to extend
+   *        this {@link GUITools} and to put the main method into your derived
+   *        class. From this main method you then have to call this method.
+   *        Otherwise, this title will not have any effect. An easier way to set
+   *        the xDock properties for your application would be to use the
+   *        {@link Launcher} class that already correctly sets all properties
+   *        for you.
+   */
   public static void initLaF(String title) {
-		if (isMacOSX()) {
-			Properties p = System.getProperties();
-			// also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
-			p.setProperty("apple.awt.graphics.EnableQ2DX", "true");
-			p.setProperty("apple.laf.useScreenMenuBar", "true");
-			p.setProperty("com.apple.macos.smallTabs", "true");
-			p.setProperty("com.apple.macos.useScreenMenuBar", "true");
-			if ((title != null) && (title.length() > 0)) {
-				p.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
-			}
-			p.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
-			p.setProperty("com.apple.mrj.application.live-resize", "true");
-		}
-		initLaF();
+    if (isMacOSX()) {
+      Properties p = System.getProperties();
+      // also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
+      p.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+      p.setProperty("apple.laf.useScreenMenuBar", "true");
+      p.setProperty("com.apple.macos.smallTabs", "true");
+      p.setProperty("com.apple.macos.useScreenMenuBar", "true");
+      if ((title != null) && (title.length() > 0)) {
+        p.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
+      }
+      p.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
+      p.setProperty("com.apple.mrj.application.live-resize", "true");
+    }
+    initLaF();
   }
   
   /**
@@ -1617,11 +1601,17 @@ public class GUITools {
     for (int i = 0; i < c.getComponentCount(); i++) {
       inside = c.getComponent(i);
       enabled &= inside.isEnabled();
-      if (!enabled) return false; // shortcut.
+      if (!enabled)
+      {
+        return false; // shortcut.
+      }
       if (inside instanceof Container) {
         enabled&=isEnabled((Container) inside);
       }
-      if (!enabled) return false; // shortcut.
+      if (!enabled)
+      {
+        return false; // shortcut.
+      }
     }
     return enabled;
   }
@@ -1631,9 +1621,9 @@ public class GUITools {
    * @return
    */
   public static boolean isMacOSX() {
-		return (System.getProperty("mrj.version") != null)
-				|| (System.getProperty("os.name").toLowerCase().indexOf("mac") != -1);
-	}
+    return (System.getProperty("mrj.version") != null)
+        || (System.getProperty("os.name").toLowerCase().indexOf("mac") != -1);
+  }
   
   /**
    * Create an open file dialog that let's the user
@@ -1649,7 +1639,9 @@ public class GUITools {
     String dialogTitle, boolean acceptURLs) {
     JFileChooser chooser = createJFileChooser(null, true,
       false, JFileChooser.FILES_ONLY, (FileFilter)null);
-    if (dialogTitle!=null) chooser.setDialogTitle(dialogTitle);
+    if (dialogTitle!=null) {
+      chooser.setDialogTitle(dialogTitle);
+    }
     if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
       File f = chooser.getSelectedFile();
       String fString = f.getPath();
@@ -1723,7 +1715,7 @@ public class GUITools {
     boolean allFilesAcceptable, int mode, FileFilter... filter) {
     File files[] = openFileDialog(parent, dir, false, allFilesAcceptable, mode, filter);
     if ((files != null) && (files.length == 1)) {
-    	return files[0];
+      return files[0];
     }
     return null;
   }
@@ -1747,7 +1739,7 @@ public class GUITools {
    */
   public static int overwriteExistingFileDialog(Component parent, File out) {
     ResourceBundle resource = ResourceManager
-    .getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+        .getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
     return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(String
       .format(resource.getString("OVERRIDE_EXISTING_FILE_QUESTION"),
         StringUtil.changeFirstLetterCase(resource
@@ -1879,7 +1871,7 @@ public class GUITools {
     JFileChooser fc = createJFileChooser(dir, allFilesAcceptable,
       multiSelectionAllowed, mode, filter);
     if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
-    	// FIXME: This only checks one file. If multiselection is allowed, multiple files may be returned!
+      // FIXME: This only checks one file. If multiselection is allowed, multiple files may be returned!
       File f = fc.getSelectedFile();
       if (f.exists()) {
         if (checkFile && !f.canWrite()) {
@@ -1919,7 +1911,7 @@ public class GUITools {
   public static void scrollToTop(final JScrollPane scrollPanel) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void run() { 
+      public void run() {
         synchronized (scrollPanel) {
           scrollPanel.getVerticalScrollBar().setValue(0);
           scrollPanel.getHorizontalScrollBar().setValue(0);
@@ -1962,7 +1954,9 @@ public class GUITools {
       // Recurse further.
       if (c instanceof Container) {
         Component c2 = searchFor((Container)c, searchFor, methodName, retVal);
-        if (c2!=null) return c2;
+        if (c2!=null) {
+          return c2;
+        }
       }
     }
     return null;
@@ -1976,13 +1970,14 @@ public class GUITools {
     c.setBackground(color);
     Component children[] = c.getComponents();
     for (int i = 0; i < children.length; i++) {
-      if (children[i] instanceof Container)
+      if (children[i] instanceof Container) {
         setAllBackground((Container) children[i], color);
+      }
       children[i].setBackground(color);
     }
   }
-
-
+  
+  
   /**
    * @param c
    * @param enabled
@@ -2011,10 +2006,12 @@ public class GUITools {
       inside = c.getComponent(i);
       if (inside instanceof Container) {
         setEnabled(state, (Container) inside, command);
-      } // Don't do "else if" here. JButtons are containers AND buttons itself! 
+      } // Don't do "else if" here. JButtons are containers AND buttons itself!
       if (inside instanceof AbstractButton) {
         String com = ((AbstractButton) inside).getActionCommand();
-        if (com==null) continue;
+        if (com==null) {
+          continue;
+        }
         for (Object cmd: command) {
           if (com.toString().equals(cmd.toString())) {
             inside.setEnabled(state);
@@ -2065,7 +2062,7 @@ public class GUITools {
               }
             }
             if (containsCommand) {
-            	m.setEnabled(state);
+              m.setEnabled(state);
             }
           }
           if ((item != null) && (item.getActionCommand() != null)
@@ -2076,19 +2073,19 @@ public class GUITools {
       }
     }
     if (toolbar != null) {
-    	for (i = 0; i < toolbar.getComponentCount(); i++) {
-    		Object o = toolbar.getComponent(i);
-    		if (o instanceof JButton) {
-    			JButton b = (JButton) o;
-    			if (setOfCommands.contains(b.getActionCommand())) {
-    				b.setEnabled(state);
-    				// if (b.getIcon() != null
-    				// && b.getIcon() instanceof CloseIcon)
-    				// ((CloseIcon) b.getIcon())
-    				// .setColor(state ? Color.BLACK : Color.GRAY);
-    			}
-    		}
-    	}
+      for (i = 0; i < toolbar.getComponentCount(); i++) {
+        Object o = toolbar.getComponent(i);
+        if (o instanceof JButton) {
+          JButton b = (JButton) o;
+          if (setOfCommands.contains(b.getActionCommand())) {
+            b.setEnabled(state);
+            // if (b.getIcon() != null
+            // && b.getIcon() instanceof CloseIcon)
+            // ((CloseIcon) b.getIcon())
+            // .setColor(state ? Color.BLACK : Color.GRAY);
+          }
+        }
+      }
     }
   }
   
@@ -2141,7 +2138,9 @@ public class GUITools {
    * @param val - false means transparent, true means object has a background.
    */
   public static void setOpaqueForAllElements(JComponent p, boolean val) {
-    if (p instanceof JTextField || p instanceof JTextArea) return;
+    if (p instanceof JTextField || p instanceof JTextArea) {
+      return;
+    }
     p.setOpaque(val);
     
     for (Component c: p.getComponents()) {
@@ -2158,13 +2157,13 @@ public class GUITools {
    * @param c the panel to display
    * @param title a title that should be used for the window
    * @param addOkAndCancel if true, will add additional OK and CANCEL buttons
-   * at the bottom of the dialog 
+   * at the bottom of the dialog
    * @return if ok has been pressed. More formarlly: either {@link JOptionPane#OK_OPTION} or
    * {@link JOptionPane#CANCEL_OPTION} or -2 if unknown (external closing, e.g., by your own
    * ok button).
    */
   public static int showAsDialog(Component parent, JPanel c, String title, final boolean addOkAndCancel) {
-
+    
     // Initialize the dialog
     final JDialog jd;
     if (parent!=null && parent instanceof Frame) {
@@ -2183,13 +2182,15 @@ public class GUITools {
     final JPanel okAndCancel;
     if (addOkAndCancel) {
       okAndCancel = buildOkCancelButtons(jd);
-    } else { 
+    } else {
       okAndCancel = null;
     }
     
     // Initialize the panel
     jd.add(c, BorderLayout.CENTER);
-    if (addOkAndCancel) jd.add(okAndCancel, BorderLayout.SOUTH);
+    if (addOkAndCancel) {
+      jd.add(okAndCancel, BorderLayout.SOUTH);
+    }
     
     // Close dialog with ESC button.
     jd.getRootPane().registerKeyboardAction(new ActionListener() {
@@ -2305,10 +2306,10 @@ public class GUITools {
     String msg = getMessage(exc);
     
     if (logger != null) {
-    	logger.log(Level.WARNING, msg, exc);
+      logger.log(Level.WARNING, msg, exc);
     }
     ValuePair<String, Integer> messagePair = StringUtil
-    .insertLineBreaksAndCount(msg, StringUtil.TOOLTIP_LINE_LENGTH, "\n", null);
+        .insertLineBreaksAndCount(msg, StringUtil.TOOLTIP_LINE_LENGTH, "\n", null);
     Object message;
     if (messagePair.getB().intValue() > 30) {
       JEditorPane pane = new JEditorPane("text/html", messagePair.getA());
@@ -2318,10 +2319,10 @@ public class GUITools {
     } else {
       message = messagePair.getA();
     }
-		Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause()
-				.getClass() : exc.getClass();
-		JOptionPane.showMessageDialog(parent, message,
-			clazz != null ? clazz.getSimpleName() : "Error", JOptionPane.ERROR_MESSAGE);
+    Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause()
+        .getClass() : exc.getClass();
+        JOptionPane.showMessageDialog(parent, message,
+          clazz != null ? clazz.getSimpleName() : "Error", JOptionPane.ERROR_MESSAGE);
   }
   
   /**
@@ -2333,9 +2334,8 @@ public class GUITools {
    * @param defaultMessage
    */
   public static void showErrorMessage(Component parent, Throwable exc, String defaultMessage) {
-  	String title = (exc != null) ? exc.getClass().getSimpleName() : "Error";
-    if ((exc == null) || (exc.getLocalizedMessage() == null)
-        || (exc.getLocalizedMessage().length() == 0)) {
+    String title = (exc != null) ? exc.getClass().getSimpleName() : "Error";
+    if (getMessage(exc).equals("NULL")) {
       logger.log(Level.WARNING, defaultMessage, exc);
       JOptionPane.showMessageDialog(parent, StringUtil.toHTMLToolTip(defaultMessage), title, JOptionPane.ERROR_MESSAGE);
     } else {
@@ -2343,27 +2343,27 @@ public class GUITools {
     }
   }
   
-
+  
   /**
-	 * Shows a dialog that displays the given {@link listIndex} of {@link Object}s
-	 * together with a label and a title.
-	 * 
-	 * @param parent
-	 * @param label
-	 *        A description what the purpose of the given {@link List} of
-	 *        {@link File}s is.
-	 * @param title
-	 * @param things
-	 */
-	public static void showListMessage(Component parent, String label,
-		String title, List<?> things) {
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(new JLabel(StringUtil.toHTML(label, StringUtil.TOOLTIP_LINE_LENGTH)),
-			BorderLayout.NORTH);
-		panel.add(new JScrollPane(new JList(things.toArray())));
-		JOptionPane.showMessageDialog(parent, panel, title,
-			JOptionPane.WARNING_MESSAGE);
-	}
+   * Shows a dialog that displays the given {@link listIndex} of {@link Object}s
+   * together with a label and a title.
+   * 
+   * @param parent
+   * @param label
+   *        A description what the purpose of the given {@link List} of
+   *        {@link File}s is.
+   * @param title
+   * @param things
+   */
+  public static void showListMessage(Component parent, String label,
+    String title, List<?> things) {
+    JPanel panel = new JPanel(new BorderLayout());
+    panel.add(new JLabel(StringUtil.toHTML(label, StringUtil.TOOLTIP_LINE_LENGTH)),
+      BorderLayout.NORTH);
+    panel.add(new JScrollPane(new JList(things.toArray())));
+    JOptionPane.showMessageDialog(parent, panel, title,
+      JOptionPane.WARNING_MESSAGE);
+  }
   
   
   
@@ -2392,8 +2392,8 @@ public class GUITools {
   public static void showMessage(URL path, String title, Component owner) {
     showMessage(path, title, owner, null);
   }
-
-
+  
+  
   /**
    * @param path
    * @param title
@@ -2420,7 +2420,6 @@ public class GUITools {
         }
         rowCount++;
       }
-      
       if ((rowCount > 100) || (maxLine > 250)) {
         JScrollPane scroll = new JScrollPane(browser,
           ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -2435,19 +2434,20 @@ public class GUITools {
         JOptionPane.showMessageDialog(owner, browser, title,
           JOptionPane.INFORMATION_MESSAGE, icon);
       }
+      br.close();
     } catch (IOException exc) {
       showErrorMessage(owner, exc);
     }
   }
-
+  
   /**
    * 
    * @param parent
    * @param file
    */
   public static void showNowReadingAccessWarning(Component parent, File file) {
-		ResourceBundle resource = ResourceManager
-				.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+    ResourceBundle resource = ResourceManager
+        .getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
     JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
       resource.getString("NO_READ_ACCESS_MESSAGE"), resource.getString(file
         .isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
@@ -2461,8 +2461,8 @@ public class GUITools {
    * @param file
    */
   public static void showNowWritingAccessWarning(Component parent, File file) {
-		ResourceBundle resource = ResourceManager
-				.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+    ResourceBundle resource = ResourceManager
+        .getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
     JOptionPane.showMessageDialog(parent, StringUtil.toHTML(String.format(
       resource.getString("NO_WRITE_ACCESS_MESSAGE"), resource.getString(file
         .isFile() ? "THE_FILE" : "THE_DIRECTORY"), file.getAbsolutePath()),
@@ -2523,12 +2523,12 @@ public class GUITools {
       try {
         Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
       } catch (InterruptedException exc) {
-        logger.finest(exc.getLocalizedMessage());
+        logger.finest(getMessage(exc));
       }
     }
   }
-
-	/**
+  
+  /**
    * Shows the output of a process inside a textarea.
    * Autoscrolls as the process genereates output and
    * automatically disables the ok-button as long as
@@ -2567,8 +2567,8 @@ public class GUITools {
     
     return area;
   }
-
-	/**
+  
+  /**
    * Show a Question Dialog
    * @param parent may be null
    * @param message question to display
@@ -2577,13 +2577,13 @@ public class GUITools {
    * @return an integer indicating the option selected by the user (e.g. {@link JOptionPane#YES_OPTION})
    */
   public static int showQuestionMessage(Component parent, String message, String title, int optionType) {
-    return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(message, StringUtil.TOOLTIP_LINE_LENGTH), 
+    return JOptionPane.showConfirmDialog(parent, StringUtil.toHTML(message, StringUtil.TOOLTIP_LINE_LENGTH),
       title, optionType, JOptionPane.QUESTION_MESSAGE);
   }
   
-
-
-	/**
+  
+  
+  /**
    * Show a Question Dialog
    * @param parent may be null
    * @param message question to display
@@ -2597,7 +2597,7 @@ public class GUITools {
       StringUtil.TOOLTIP_LINE_LENGTH), title, JOptionPane.DEFAULT_OPTION,
       JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
   }
-
+  
   /**
    * Shows a {@link JFileChooser} to the user, appends the selected file extension to the
    * selected file and checks weather the selected file is writable. If the file already
@@ -2607,7 +2607,7 @@ public class GUITools {
    * @param saveDir initial directory for the {@link JFileChooser}. May be null.
    * @param filter {@link FileFilter} the user may choose from. May be null.
    * @return a file selected by the user if and only if this file is writable and the user
-   * confirmed every warning. Else, null is returned. 
+   * confirmed every warning. Else, null is returned.
    */
   public static File showSaveFileChooser(Component parent, String saveDir, FileFilter... filter) {
     return showSaveFileChooser(parent, saveDir, null, filter);
@@ -2623,7 +2623,7 @@ public class GUITools {
    * @param initialFileNameProposal this will be used as proposed save-file-name.
    * @param filter {@link FileFilter} the user may choose from. May be null.
    * @return a file selected by the user if and only if this file is writable and the user
-   * confirmed every warning. Else, null is returned. 
+   * confirmed every warning. Else, null is returned.
    */
   public static File showSaveFileChooser(Component parent, String saveDir, String initialFileNameProposal, FileFilter... filter) {
     JFileChooser fc = GUITools.createJFileChooser(saveDir, (filter==null || filter.length<1),
@@ -2633,7 +2633,9 @@ public class GUITools {
     }
     
     // Show the dialog
-    if (fc.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION) return null;
+    if (fc.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION) {
+      return null;
+    }
     
     // Get selected file and try to prepend extension
     File f = fc.getSelectedFile();
@@ -2653,11 +2655,13 @@ public class GUITools {
     
     // Check if file exists and is writable
     boolean fileExists = f.exists();
-    if (!fileExists) try {
-      f.createNewFile();
-    } catch (IOException e) {
-      GUITools.showErrorMessage(parent, e);
-      return null;
+    if (!fileExists) {
+      try {
+        f.createNewFile();
+      } catch (IOException e) {
+        GUITools.showErrorMessage(parent, e);
+        return null;
+      }
     }
     if (!f.canWrite() || f.isDirectory()) {
       GUITools.showNowWritingAccessWarning(parent, f);
@@ -2667,28 +2671,28 @@ public class GUITools {
     }
     return null;
   }
-
+  
   /**
-	 * Swaps the {@link KeyStroke} associated with the {@link JMenuItem}s that
-	 * have the given actions, but only if both items can be found and are hence
-	 * not null.
-	 * 
-	 * @param jMenuBar
-	 * @param action1
-	 * @param action2
-	 */
-	public static void swapAccelerator(JMenuBar jMenuBar, Object action1,
-		Object action2) {
-		JMenuItem item1 = GUITools.getJMenuItem(jMenuBar, action1);
-		JMenuItem item2 = GUITools.getJMenuItem(jMenuBar, action2);
-		
-		if ((item1 != null) && (item2 != null)) {
-			KeyStroke ks1 = item1.getAccelerator();
-			KeyStroke ks2 = item2.getAccelerator();
-			item1.setAccelerator(ks2);
-			item2.setAccelerator(ks1);
-		}
-		jMenuBar.updateUI();
-	}
-
+   * Swaps the {@link KeyStroke} associated with the {@link JMenuItem}s that
+   * have the given actions, but only if both items can be found and are hence
+   * not null.
+   * 
+   * @param jMenuBar
+   * @param action1
+   * @param action2
+   */
+  public static void swapAccelerator(JMenuBar jMenuBar, Object action1,
+    Object action2) {
+    JMenuItem item1 = GUITools.getJMenuItem(jMenuBar, action1);
+    JMenuItem item2 = GUITools.getJMenuItem(jMenuBar, action2);
+    
+    if ((item1 != null) && (item2 != null)) {
+      KeyStroke ks1 = item1.getAccelerator();
+      KeyStroke ks2 = item2.getAccelerator();
+      item1.setAccelerator(ks2);
+      item2.setAccelerator(ks1);
+    }
+    jMenuBar.updateUI();
+  }
+  
 }

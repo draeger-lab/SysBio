@@ -16,6 +16,8 @@
  */
 package de.zbit.gui;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -81,7 +83,7 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  */
 public class JLabeledComponent extends JPanel implements JComponentForOption, ItemSelectable {
-	
+  
   /**
    * 
    */
@@ -125,7 +127,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     GridBagConstraints gbc = new GridBagConstraints(gridx, gridy, gridwidth, gridheight, 1.0, 1.0,
       anchor, fill, insets, 0, 0);
     container.add(component, gbc);
-  }  
+  }
   /**
    * 
    * @param lh
@@ -160,7 +162,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * @param <T>
    * @param option
    * @param initialValue might be {@code null}.
-   * @return 
+   * @return
    */
   @SuppressWarnings({ "rawtypes" })
   public static <T extends Number> JSpinner buildJSpinner(Option<T> option, T initialValue) {
@@ -170,9 +172,15 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     T maximum = option.isSetRangeSpecification() ? option.getRange().getMaximum() : null;
     
     // Get an initial value (required parameter)
-    if (initialValue == null) initialValue = option.getDefaultValue();
-    if (initialValue == null) initialValue = (minimum != null) ? minimum : maximum;
-    if (initialValue == null) initialValue = option.parseOrCast("0");
+    if (initialValue == null) {
+      initialValue = option.getDefaultValue();
+    }
+    if (initialValue == null) {
+      initialValue = (minimum != null) ? minimum : maximum;
+    }
+    if (initialValue == null) {
+      initialValue = option.parseOrCast("0");
+    }
     
     // Get the step size (required parameter)
     T stepSize = null;
@@ -187,7 +195,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
         }
         stepSize = option.parseOrCast(d);
       } catch (Throwable exc) {
-    	logger.finest(exc.getLocalizedMessage());
+        logger.finest(getMessage(exc));
       }
     }
     if ((stepSize == null) || (stepSize.doubleValue() == 0d)) {
@@ -209,11 +217,11 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       JSpinner.NumberEditor editor = (JSpinner.NumberEditor) spinner.getEditor();
       DecimalFormat format = editor.getFormat();
       format.setMaximumFractionDigits(TEXTFIELD_COLUMNS - 2);
-      editor.getTextField().setHorizontalAlignment(SwingConstants.RIGHT);      
+      editor.getTextField().setHorizontalAlignment(SwingConstants.RIGHT);
     }
     
     if (option.isSetDescription()) {
-    	spinner.setToolTipText(option.getDescription());
+      spinner.setToolTipText(option.getDescription());
     }
     
     return spinner;
@@ -305,7 +313,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     }
     return -1;
   }
-
+  
   /**
    * Set the static string to use in optional combo boxes if no
    * column has been selected.
@@ -349,7 +357,9 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     final JPanel c = new JPanel(new VerticalLayout());
     for (int i=0; i<fields.length; i++) {
       JLabeledComponent l = new JLabeledComponent(fields[i],true, suggestions[i]);
-      if (!fixedSuggestions) l.setEditHeaderAllowed(true);
+      if (!fixedSuggestions) {
+        l.setEditHeaderAllowed(true);
+      }
       // Make a flexible layout
       l.setLayout(new FlowLayout());
       l.setPreferredSize(null);
@@ -362,8 +372,9 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     
     // OK Pressed?
     boolean okPressed = (button==JOptionPane.OK_OPTION);
-    if (!okPressed) return null;
-    else {
+    if (!okPressed) {
+      return null;
+    } else {
       String[] ret = new String[fields.length];
       for (int i=0; i<fields.length; i++) {
         ret[i] = ((JLabeledComponent)c.getComponent(i)).getSelectedItem().toString();
@@ -438,7 +449,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * Use a JTextField instead of JComboBoxes
    */
   protected boolean useJTextField = false;
-
+  
   private boolean secret = false;
   
   /**
@@ -505,13 +516,13 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     setTitle(title);
     setName(title);
     // setHeaders handles this variable.. so set it directly.
-    this.required = fieldIsRequired;
+    required = fieldIsRequired;
     setHeaders(columnHeaders);
     
     label.setLabelFor(colChooser);
     this.secret  = secret;
   }
-
+  
   /**
    * Add any action Listener to the combo box.
    * Be careful: The action listeners are erased when the selector
@@ -543,6 +554,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * 
    * @param il
    */
+  @Override
   public synchronized void addItemListener(ItemListener il) {
     JComponent comp = getColumnChooser();
     if (comp instanceof JComboBox) {
@@ -616,6 +628,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   /* (non-Javadoc)
    * @see de.zbit.gui.prefs.JComponentForOption#getCurrentValue()
    */
+  @Override
   public Object getCurrentValue() {
     return getSelectedItem();
   }
@@ -649,7 +662,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * @return
    */
   public JLabel getLabel() {
-    return this.label;
+    return label;
   }
   
   /*
@@ -664,6 +677,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   /* (non-Javadoc)
    * @see de.zbit.gui.prefs.JComponentForOption#getOption()
    */
+  @Override
   public Option<?> getOption() {
     return option;
   }
@@ -684,7 +698,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       return ((JSpinner) colChooser).getValue();
     } else {
       logger.severe(String.format(
-        "Please implement getSelectedItem() for %s in JLabeledComponent.", 
+        "Please implement getSelectedItem() for %s in JLabeledComponent.",
         colChooser.getClass().toString()));
       return null;
     }
@@ -693,6 +707,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   /* (non-Javadoc)
    * @see java.awt.ItemSelectable#getSelectedObjects()
    */
+  @Override
   public Object[] getSelectedObjects() {
     return ArrayUtils.toArray(getSelectedItem());
   }
@@ -723,7 +738,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       if (CSVReader.isNumber(s, true)) {
         return Integer.parseInt(s);
       } else {
-    	return -1;
+        return -1;
       }
     } else {
       return -1; // Unknown
@@ -734,12 +749,12 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * 
    */
   protected void initGUI() {
-    this.setPreferredSize(new Dimension(400, 25));
+    setPreferredSize(new Dimension(400, 25));
     //layout = new GridBagLayout();
     GridLayout layout = new GridLayout(1,3,10,2);
-    this.setLayout(layout);
+    setLayout(layout);
   }
-    
+  
   /**
    * @return acceptOnlyIntegers
    */
@@ -752,12 +767,13 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * this class will add a NoOptionChoosen String at the start of the box.
    */
   public boolean isRequired() {
-    return this.required;
+    return required;
   }
-    
+  
   /* (non-Javadoc)
    * @see de.zbit.gui.prefs.JComponentForOption#isSetOption()
    */
+  @Override
   public boolean isSetOption() {
     return option!=null;
   }
@@ -768,12 +784,20 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   protected void layoutElements() {
     LayoutManager l = getLayout();
     
-    if (label!=null) l.removeLayoutComponent(label);
-    if (colChooser!=null) l.removeLayoutComponent(colChooser);
+    if (label!=null) {
+      l.removeLayoutComponent(label);
+    }
+    if (colChooser!=null) {
+      l.removeLayoutComponent(colChooser);
+    }
     if (l instanceof BorderLayout) {
       BorderLayout c = (BorderLayout) l;
-      if (label!=null) c.addLayoutComponent(label, BorderLayout.WEST);
-      if (colChooser!=null) c.addLayoutComponent(colChooser, BorderLayout.CENTER);
+      if (label!=null) {
+        c.addLayoutComponent(label, BorderLayout.WEST);
+      }
+      if (colChooser!=null) {
+        c.addLayoutComponent(colChooser, BorderLayout.CENTER);
+      }
       
     } else if (l instanceof GridBagLayout) {
       GridBagLayout c = (GridBagLayout) l;
@@ -791,8 +815,12 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       }
       
     } else {
-      if (label!=null) l.addLayoutComponent("Titel", label);
-      if (colChooser!=null) l.addLayoutComponent("ColChooser", colChooser);
+      if (label!=null) {
+        l.addLayoutComponent("Titel", label);
+      }
+      if (colChooser!=null) {
+        l.addLayoutComponent("ColChooser", colChooser);
+      }
     }
   }
   
@@ -823,8 +851,8 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    */
   protected void refreshLabel() {
     // Create it
-    if (this.label==null) {
-      label = new JLabel(this.titel);
+    if (label==null) {
+      label = new JLabel(titel);
       if (getLayout() instanceof GridBagLayout) {
         addComponent(this, label, 0, 0, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
       } else if (getLayout() instanceof BorderLayout) {
@@ -870,12 +898,12 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
         add(colChooser, BorderLayout.CENTER);
       } else {
         add(colChooser); // e.g. GridLayout
-      } 
+      }
     }
     
     // Set Properties
     if (colChooser instanceof JComboBox) {
-      ((JComboBox) colChooser).setEditable(this.editHeaderAlllowed);
+      ((JComboBox) colChooser).setEditable(editHeaderAlllowed);
     }
     colChooser.setToolTipText(getToolTipText());
     
@@ -898,6 +926,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   /* (non-Javadoc)
    * @see java.awt.ItemSelectable#removeItemListener(java.awt.event.ItemListener)
    */
+  @Override
   public void removeItemListener(ItemListener l) {
     JComponent comp = getColumnChooser();
     if (comp instanceof JComboBox) {
@@ -906,7 +935,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       // otherwise not possible!
       Reflect.invokeIfContains(colChooser, "removeItemListener", ItemListener.class, l);
     }
-  }  
+  }
   
   /**
    * This should always be true. Just if you want to use this
@@ -932,16 +961,24 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    */
   public void setDefaultValue(int i) {
     if (!sortHeaders) {
-      if (!required) i+=1;
-      if (i<0) i=0;
-      if (model!=null && i>=model.getSize()) i = model.getSize()-1;
+      if (!required) {
+        i+=1;
+      }
+      if (i<0) {
+        i=0;
+      }
+      if (model!=null && i>=model.getSize()) {
+        i = model.getSize()-1;
+      }
       
       if (model!=null && i<model.getSize()) {
         model.setSelectedItem(model.getElementAt(i));
       }
     } else {
       // Search for position of the given item.
-      if (i<0 || i>=headers.length) return;
+      if (i<0 || i>=headers.length) {
+        return;
+      }
       for (int j=0; j<model.getSize(); j++) {
         if (model.getElementAt(j).equals(headers[i])) {
           i=j;
@@ -985,7 +1022,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * and customized by the user!
    */
   public void setEditHeaderAllowed(boolean b) {
-    this.editHeaderAlllowed=b;
+    editHeaderAlllowed=b;
     if (colChooser instanceof JComboBox) {
       ((JComboBox) colChooser).setEditable(b);
     } else {
@@ -999,8 +1036,12 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   @Override
   public void setEnabled(boolean enabled) {
     super.setEnabled(enabled);
-    if (label!=null) label.setEnabled(enabled);
-    if (colChooser!=null) colChooser.setEnabled(enabled);
+    if (label!=null) {
+      label.setEnabled(enabled);
+    }
+    if (colChooser!=null) {
+      colChooser.setEnabled(enabled);
+    }
   }
   
   /**
@@ -1049,7 +1090,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
     maxSize = Math.max(numberOfColumns, maxSize);
     newHeader = new Object[maxSize];
     if (header != null) {
-      System.arraycopy(header, 0, newHeader, 0, header.length);	
+      System.arraycopy(header, 0, newHeader, 0, header.length);
     }
     String column = bundle.getString("COLUMN");
     for (int i = 0; i < newHeader.length; i++) {
@@ -1074,7 +1115,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * choose that column.
    * Try to set multiple columns at once, because calling this class
    * will also lead to refreshing and repainting the column chooser.
-   * @param columnNumber - from 0 to n. 
+   * @param columnNumber - from 0 to n.
    * @param visible - true or false. Default: true (visible).
    */
   public void setHeaderVisible(int columnNumber, boolean visible) {
@@ -1087,7 +1128,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * choose that column.
    * Try to set multiple columns at once, because calling this class
    * will also lead to refreshing and repainting the column chooser.
-   * @param columnNumbers - from 0 to n. 
+   * @param columnNumbers - from 0 to n.
    * @param visible - true or false. Default: true (visible).
    */
   public void setHeaderVisible(int[] columnNumbers, boolean visible) {
@@ -1133,12 +1174,15 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   @Override
   public void setName(String name) {
     super.setName(name);
-    if (colChooser != null) colChooser.setName(name);
+    if (colChooser != null) {
+      colChooser.setName(name);
+    }
   }
   
   /* (non-Javadoc)
    * @see de.zbit.gui.prefs.JComponentForOption#setOption(de.zbit.util.prefs.Option)
    */
+  @Override
   public void setOption(Option<?> option) {
     this.option=option;
   }
@@ -1150,7 +1194,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   public void setRequired(boolean required) {
     if (this.required != required) {
       this.required = required;
-      model = buildComboBoxModel(this.headers);
+      model = buildComboBoxModel(headers);
       refreshSelector();
       validateRepaint();
     }
@@ -1197,7 +1241,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
       ((JTextComponent) colChooser).setText(Integer.toString(i));
     } else {
       logger.warning(String.format(
-        "Cannot set selected integer value on %s", 
+        "Cannot set selected integer value on %s",
         colChooser.getClass().toString()));
     }
   }
@@ -1208,11 +1252,11 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * in the same ordering as they appear in the file.
    */
   public void setSortHeaders(boolean sort) {
-    if (sort!=this.sortHeaders) {
+    if (sort!=sortHeaders) {
       // Keep the selection
       Object item = getSelectedItem();
       
-      this.sortHeaders = sort;
+      sortHeaders = sort;
       refreshAndRepaint();
       
       // Restore selection.
@@ -1225,7 +1269,7 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * @param title
    */
   public void setTitle(String title) {
-    this.titel = title;
+    titel = title;
     refreshLabel();
     validateRepaint();
   }
@@ -1238,7 +1282,9 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
   @Override
   public void setToolTipText(String s) {
     super.setToolTipText(s);
-    if (colChooser!=null) colChooser.setToolTipText(s);
+    if (colChooser!=null) {
+      colChooser.setToolTipText(s);
+    }
   }
   
   /**
@@ -1248,11 +1294,11 @@ public class JLabeledComponent extends JPanel implements JComponentForOption, It
    * @param useTextField
    */
   public void setUseJTextField(boolean useTextField) {
-    this.useJTextField = useTextField;
+    useJTextField = useTextField;
     refreshSelector();
     validateRepaint();
   }
-
+  
   /**
    * 
    */

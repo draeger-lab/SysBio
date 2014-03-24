@@ -66,14 +66,50 @@ import de.zbit.sequence.DNAsequenceUtils;
 public class Utils {
   
   /**
+   * Tries to return a best suited {@link String} to describe this {@link Throwable}.
+   * Prefers in this order:
+   * <ol>
+   * <li>LocalizedMessage
+   * <li>LocalizedMessage of the Cause
+   * <li>message
+   * <li>{@code toString()}
+   * <li>{@code NULL}
+   * </ol>
+   * 
+   * @param exc
+   * @return
+   */
+  public static String getMessage(Throwable exc) {
+    if (exc == null) {
+      return "NULL";
+    }
+    String msg = exc.getLocalizedMessage();
+    if ((msg == null) && (exc.getCause() != null)) {
+      msg = exc.getCause().getLocalizedMessage();
+    }
+    if (msg == null) {
+      msg = exc.getMessage();
+    }
+    if (msg == null) {
+      msg = exc.toString(); // Axis Faults have all messages null
+    }
+    if (msg == null) {
+      msg = "NULL";
+    }
+    return msg;
+  }
+  
+  /**
    * Returns the double value of any {@link Number}.
    * @param o
    */
   public static double getDoubleValue(Object o) {
     double d;
-    if (o instanceof Number || Number.class.isAssignableFrom(o.getClass()) )
+    if ((o instanceof Number) || Number.class.isAssignableFrom(o.getClass())) {
       d = ((Number)o).doubleValue();
-    else d = Double.parseDouble(o.toString());
+    } else {
+      d = Double.parseDouble(o.toString());
+    }
     return d;
   }
   
@@ -87,7 +123,7 @@ public class Utils {
     String s = Double.toString(Math.floor(d));
     int ep = s.indexOf('.');
     if (ep < 1) {
-    	ep = s.length();
+      ep = s.length();
     }
     return s.substring(0, ep);
   }
@@ -99,11 +135,11 @@ public class Utils {
   public static String ensureSlash(String path) {
     if ((path != null) && (path.length() > 0) && !path.endsWith("\\") && !path.endsWith("/")) {
       if (path.contains("/")) {
-      	path += '/';
+        path += '/';
       } else if (path.contains("\\")) {
-      	path += '\\';
+        path += '\\';
       } else {
-      	path += '/';
+        path += '/';
       }
     }
     return path;
@@ -119,11 +155,14 @@ public class Utils {
    */
   public static int getNumberFromString(int startAtPos, String toParse) {
     int i = startAtPos;
-    if (i<0 || i>=toParse.length()) return -1;
+    if (i<0 || i>=toParse.length()) {
+      return -1;
+    }
     
     String ret = "";
-    while (i<toParse.length() && Character.isDigit(toParse.charAt(i)))
+    while (i<toParse.length() && Character.isDigit(toParse.charAt(i))) {
       ret += toParse.charAt(i++);
+    }
     
     return Integer.parseInt(ret);
   }
@@ -148,11 +187,14 @@ public class Utils {
    */
   public static String getNumberFromStringRevAsString(int startAtPos, String toParse) {
     int i = startAtPos;
-    if (i<=0 || i>toParse.length()) return "-1";
+    if (i<=0 || i>toParse.length()) {
+      return "-1";
+    }
     
     StringBuffer ret = new StringBuffer();
-    while (i>0 && Character.isDigit(toParse.charAt(i-1)))
+    while (i>0 && Character.isDigit(toParse.charAt(i-1))) {
       ret.append( toParse.charAt(--i) );
+    }
     
     return ret.length()>0?ret.reverse().toString():"-1";
   }
@@ -167,7 +209,7 @@ public class Utils {
   
   /**
    * Given the miliseconds elapsed, returns a formatted time string up to a max deph of 3.
-   * e.g. "16h 4m 4s" or "2d 16h 4m" or "4s 126dms" 
+   * e.g. "16h 4m 4s" or "2d 16h 4m" or "4s 126dms"
    * @param miliseconds
    * @return
    */
@@ -224,22 +266,35 @@ public class Utils {
   
   /** Nicht ganz korrekt da auch 4.345,2.1 als nummer erkannt wird, aber das reicht mir so. **/
   public static boolean isNumber(String s, boolean onlyDigits) {
-    if (s==null || s.trim().length()==0) return false;
+    if (s==null || s.trim().length()==0) {
+      return false;
+    }
     char[] a = s.trim().toCharArray();
     boolean atLeastOneDigit=false;
     for (int i=0; i< a.length; i++) {
-      if (!atLeastOneDigit && Character.isDigit(a[i])) atLeastOneDigit = true;
+      if (!atLeastOneDigit && Character.isDigit(a[i])) {
+        atLeastOneDigit = true;
+      }
       
       if (onlyDigits) {
-        if (Character.isDigit(a[i])) continue; else return false;
+        if (Character.isDigit(a[i])) {
+          continue;
+        } else {
+          return false;
+        }
       } else {
-        if (Character.isDigit(a[i])) continue;
-        else if (i==0 && a[i]=='-') continue;
-        else if (a[i]=='.' || a[i]==',') continue;
-        else if (a[i]=='E' || a[i]=='e') {
+        if (Character.isDigit(a[i])) {
+          continue;
+        } else if (i==0 && a[i]=='-') {
+          continue;
+        } else if (a[i]=='.' || a[i]==',') {
+          continue;
+        } else if (a[i]=='E' || a[i]=='e') {
           if (i+1< a.length) {
             // Detect strings like "2.8E+01" or "2.8E-01"
-            if (a[i+1]=='+' || a[i+1]=='-') i+=1;
+            if (a[i+1]=='+' || a[i+1]=='-') {
+              i+=1;
+            }
           }
           continue;
         }
@@ -247,11 +302,14 @@ public class Utils {
         return false;
       }
     }
-    if (!atLeastOneDigit) return false; // Only "-" or "..." is no number.
+    if (!atLeastOneDigit)
+    {
+      return false; // Only "-" or "..." is no number.
+    }
     return true;
   }
   
-
+  
   /**
    * Returns the memory, that is currently allocated by the JVM in bytes.
    * Divide it by /1024.0/1024.0 the get the amount in MB.
@@ -286,8 +344,12 @@ public class Utils {
     for (double v: arr) {
       if (Double.isInfinite(v)) {inf++; continue;}
       if (Double.isNaN(v)) {nan++; continue;}
-      if (v<min) min=v;
-      if (v>max) max=v;
+      if (v<min) {
+        min=v;
+      }
+      if (v>max) {
+        max=v;
+      }
     }
     System.out.println("Min: " + min + "\t Max:" + max + "\t Infinity:" + inf + "\t NaN:" + nan);
   }
@@ -299,10 +361,14 @@ public class Utils {
    * @return
    */
   public static <T> boolean allElementsAreNull(T[] arr) {
-    if (arr == null) return true;
+    if (arr == null) {
+      return true;
+    }
     
     for (T e: arr) {
-      if (e!=null) return false;
+      if (e!=null) {
+        return false;
+      }
     }
     
     return true;
@@ -317,16 +383,24 @@ public class Utils {
     boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
     
     String sysDir = System.getProperty("os.home");
-    if (sysDir==null) sysDir = "";
+    if (sysDir==null) {
+      sysDir = "";
+    }
     sysDir = sysDir.trim();
-    if (sysDir==null || sysDir.length()==0 && isWindows) sysDir = System.getenv("WinDir").trim();
-    if (sysDir.length()!=0 && !sysDir.endsWith("/") && !sysDir.endsWith("\\"))
+    if (sysDir==null || sysDir.length()==0 && isWindows) {
+      sysDir = System.getenv("WinDir").trim();
+    }
+    if (sysDir.length()!=0 && !sysDir.endsWith("/") && !sysDir.endsWith("\\")) {
       sysDir+=File.separator;
-    if (isWindows&&sysDir.length()!=0) sysDir += "system32\\";
+    }
+    if (isWindows&&sysDir.length()!=0) {
+      sysDir += "system32\\";
+    }
     
     Runtime run = Runtime.getRuntime();
-    if (isWindows) sysDir += "shutdown.exe"; // -s -c "TimeLogger shutdown command." (-f)
-    else {
+    if (isWindows) {
+      sysDir += "shutdown.exe"; // -s -c "TimeLogger shutdown command." (-f)
+    } else {
       // Unter linux mit "which" Rscript suchen
       try {
         Process pr = run.exec("which shutdown");
@@ -337,11 +411,13 @@ public class Utils {
         InputStreamReader r = new InputStreamReader(pr.getInputStream());
         BufferedReader in = new BufferedReader(r);
         String line = in.readLine(); // eine reicht
-        if (!line.toLowerCase().contains("no shutdown") && !line.contains(":"))
+        if (!line.toLowerCase().contains("no shutdown") && !line.contains(":")) {
           sysDir = line;
+        }
       } catch(Exception e) {}
-      if (sysDir.length()!=0 && !sysDir.endsWith("/") && !sysDir.endsWith("\\"))
+      if (sysDir.length()!=0 && !sysDir.endsWith("/") && !sysDir.endsWith("\\")) {
         sysDir+=File.separator;
+      }
       sysDir += "shutdown";
     }
     
@@ -351,8 +427,12 @@ public class Utils {
       String command = sysDir.substring(sysDir.lastIndexOf(File.separator)+1);
       
       String[] commandToRun;
-      if (isWindows) commandToRun = new String[] {command, "-s", "-c", "\"TimeLogger shutdown command.\""}; // -f
-      else commandToRun = new String[] {command, "-h", "now"}; // Linux
+      if (isWindows) {
+        commandToRun = new String[] {command, "-s", "-c", "\"TimeLogger shutdown command.\""}; // -f
+      }
+      else {
+        commandToRun = new String[] {command, "-h", "now"}; // Linux
+      }
       
       try { // Try to execute in input dir.
         //Process pr = run.exec(cmd, null, new File(inputFolder));
@@ -388,16 +468,26 @@ public class Utils {
    * @return
    */
   public static boolean isInteger(Class<?> clazz) {
-  	if (!(Number.class.isAssignableFrom(clazz))) return false;
-  	if (clazz.equals(AtomicInteger.class)) return true;
-  	else if (clazz.equals(AtomicLong.class)) return true;
-  	else if (clazz.equals(BigInteger.class)) return true;
-  	else if (clazz.equals(Byte.class)) return true;
-  	else if (clazz.equals(Integer.class)) return true;
-  	else if (clazz.equals(Long.class)) return true;
-  	else if (clazz.equals(Short.class)) return true;
-  	
-  	return false;
+    if (!(Number.class.isAssignableFrom(clazz))) {
+      return false;
+    }
+    if (clazz.equals(AtomicInteger.class)) {
+      return true;
+    } else if (clazz.equals(AtomicLong.class)) {
+      return true;
+    } else if (clazz.equals(BigInteger.class)) {
+      return true;
+    } else if (clazz.equals(Byte.class)) {
+      return true;
+    } else if (clazz.equals(Integer.class)) {
+      return true;
+    } else if (clazz.equals(Long.class)) {
+      return true;
+    } else if (clazz.equals(Short.class)) {
+      return true;
+    }
+    
+    return false;
   }
   
   /**
@@ -408,7 +498,7 @@ public class Utils {
    * The behavior of such an invocation is undefined.
    * 
    * For any two arrays a and b such that Arrays.deepEquals(a, b), it is also the case that
-   * Arrays.deepCompareTo(a) == Arrays.deepCompareTo(b). 
+   * Arrays.deepCompareTo(a) == Arrays.deepCompareTo(b).
    * 
    * @param arr1 - the first array to comapre to the second one.
    * @param arr2 - the second array to compare to the first one.
@@ -417,32 +507,42 @@ public class Utils {
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static int deepCompareTo(Object[] arr1, Object[] arr2) {
-    if (arr1==null && arr2==null) return 0;
-    if (arr1==null) return -1;
-    if (arr2==null) return 1;
+    if (arr1==null && arr2==null) {
+      return 0;
+    }
+    if (arr1==null) {
+      return -1;
+    }
+    if (arr2==null) {
+      return 1;
+    }
     
     int min = Math.min(arr1.length, arr2.length);
     for (int i=0; i<min; i++) {
       int ret=0;
       
       // Look if the current object is smaller, greater or eqal
-      if (arr1[i]==null && arr2[i]==null) ret =0;
-      else if (arr1[i]==null) ret = -1;
-      else if (arr2[i]==null) ret = 1;
-      
-      else if (arr1[i].getClass().isArray() && arr2[i].getClass().isArray()) {
+      if (arr1[i]==null && arr2[i]==null) {
+        ret =0;
+      } else if (arr1[i]==null) {
+        ret = -1;
+      } else if (arr2[i]==null) {
+        ret = 1;
+      } else if (arr1[i].getClass().isArray() && arr2[i].getClass().isArray()) {
         // Deep array comparison
         ret = deepCompareTo((Object[])arr1[i], (Object[])arr2[i]);
         
       } else if (arr1[i] instanceof Comparable && arr2[i] instanceof Comparable) {
         // Comparables
-        ret = ((Comparable)arr1[i]).compareTo(((Comparable)arr2[i]));
+        ret = ((Comparable)arr1[i]).compareTo((arr2[i]));
         
       } else if (arr1[i] instanceof Number && arr2[i] instanceof Number ) {
         // Numbers
         double diff = (((Number)arr2[i]).doubleValue()-((Number)arr1[i]).doubleValue());
         ret = (int) diff;
-        if (ret==0 && !((Number)arr2[i]).equals((Number)arr1[i])) ret = diff<0?-1:1;
+        if (ret==0 && !((Number)arr2[i]).equals(arr1[i])) {
+          ret = diff<0?-1:1;
+        }
         
       } else {
         // String based comparison
@@ -451,7 +551,9 @@ public class Utils {
       }
       
       // Evaluate results
-      if (ret!=0) return ret;
+      if (ret!=0) {
+        return ret;
+      }
       
       
     }
@@ -459,14 +561,14 @@ public class Utils {
     // They are equal.
     return 0;
   }
-
+  
   /**
    * This function creates a new file / overwrites an existing one (without warning) and puts
    * the given content into the file. The required directory structure to write the file
    * will be created.
    * @param filename File path and name.
    * @param content content to write to file.
-   * @throws IOException 
+   * @throws IOException
    */
   public static void writeFile(String filename, String content) throws IOException {
     // Create directory
@@ -528,7 +630,7 @@ public class Utils {
     }
     return ret;
   }
-
+  
   /**
    * Parses a String that contains multiple numbers (only digits) and returns
    * an array of all those numbers.
@@ -554,10 +656,17 @@ public class Utils {
     boolean jumpToNextNumber = true;
     for (int i=0; i<cArr.length; i++) {
       if (jumpToNextNumber) {
-        if (leftOfEachNumber!=null) i = stringWithMultipleNumbers.indexOf(leftOfEachNumber,i);
-        if (i<0) break;
-        else i+=leftOfEachNumber!=null?leftOfEachNumber.length():0;
-        if (i>=cArr.length) break;
+        if (leftOfEachNumber!=null) {
+          i = stringWithMultipleNumbers.indexOf(leftOfEachNumber,i);
+        }
+        if (i<0) {
+          break;
+        } else {
+          i+=leftOfEachNumber!=null?leftOfEachNumber.length():0;
+        }
+        if (i>=cArr.length) {
+          break;
+        }
       }
       
       char c = cArr[i];
@@ -570,7 +679,9 @@ public class Utils {
         String num = curNum.toString();
         curNum = new StringBuffer();
         if (rightOfEachNumber!=null) {
-          if (i+rightOfEachNumber.length()>cArr.length) break;
+          if (i+rightOfEachNumber.length()>cArr.length) {
+            break;
+          }
           if (!new String(cArr, i, rightOfEachNumber.length()).equals(rightOfEachNumber)) {
             continue;
           }
@@ -585,7 +696,7 @@ public class Utils {
     
     return ret;
   }
-
+  
   /**
    * Performs the nasty comparison of two integers, for usage in CompareTo methods.
    * Performs Nullpointer checks, before performing the actual comparison and
@@ -620,11 +731,14 @@ public class Utils {
    * @param arr
    * @param s
    * @param ignoreCase
-   * @return 
+   * @return
    */
   public static String returnString(String[] arr, String s, boolean ignoreCase) {
-    for (int i=0; i<arr.length; i++)
-      if ((!ignoreCase && arr[i].equals(s)) || (ignoreCase && arr[i].equalsIgnoreCase(s))) return arr[i];
+    for (int i=0; i<arr.length; i++) {
+      if ((!ignoreCase && arr[i].equals(s)) || (ignoreCase && arr[i].equalsIgnoreCase(s))) {
+        return arr[i];
+      }
+    }
     return null;
   }
   
@@ -646,7 +760,7 @@ public class Utils {
   
   /**
    * Converts an {@link Iterable} to a {@link List} with the
-   * most effective available method. 
+   * most effective available method.
    * @param <T>
    * @param it
    * @return
@@ -670,7 +784,7 @@ public class Utils {
     
     return l;
   }
-
+  
   /**
    * Add a key value pair to a {@link HashMap} of {@link Collection}s of values!
    * <pre>Map&lt;K, Collection&lt;V>></pre>

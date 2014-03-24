@@ -16,6 +16,8 @@
  */
 package de.zbit.gui.actioncommand;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.Component;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -51,7 +53,7 @@ import de.zbit.util.prefs.KeyProvider;
  * @version $Rev$
  */
 public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
-    TableCellRenderer, Serializable {
+TableCellRenderer, Serializable {
   
   /**
    * Generated serial version identifier.
@@ -104,6 +106,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
   /* (non-Javadoc)
    * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
    */
+  @Override
   public Component getTableCellRendererComponent(JTable table, Object value,
     boolean isSelected, boolean hasFocus, int row, int column) {
     
@@ -153,15 +156,15 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
     try {
       iconMethod = Reflect.getMethod(c, "setIcon", Icon.class);
     } catch (Exception exc) {
-      logger.finest(exc.getLocalizedMessage());
+      logger.finest(getMessage(exc));
     }
     if (iconMethod!=null) {
       try {
         iconMethod.invoke(c, icon);
       } catch (Exception exc) {
-        logger.finest(exc.getLocalizedMessage());
+        logger.finest(getMessage(exc));
       }
-    } 
+    }
     
     return c;
   }
@@ -169,6 +172,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
   /* (non-Javadoc)
    * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
    */
+  @Override
   public Component getListCellRendererComponent(JList list, Object value,
     int index, boolean isSelected, boolean cellHasFocus) {
     
@@ -207,7 +211,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
             defaultListRenderer = (ListCellRenderer) UIManager.get("List.cellRenderer");
           }
         } catch (Throwable exc) {
-          logger.warning(exc.getLocalizedMessage());
+          logger.warning(getMessage(exc));
         }
         if (defaultListRenderer == null) {
           defaultListRenderer = new DefaultListCellRenderer();
@@ -217,7 +221,7 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
       
       c = defaultListRenderer.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);
     }
-        
+    
     // Set ToolTip
     if ((toolTip != null) && (toolTip.length() > 0) && (c instanceof JComponent)) {
       if (showAsHTML) {
@@ -236,17 +240,17 @@ public class ActionCommandRenderer extends JLabel implements ListCellRenderer,
     try {
       iconMethod = Reflect.getMethod(c, "setIcon", Icon.class);
     } catch (Exception exc) {
-      logger.finest(exc.getLocalizedMessage());
+      logger.finest(getMessage(exc));
     }
     if (iconMethod != null) {
       try {
         iconMethod.invoke(c, icon);
       } catch (Exception exc) {
-        logger.finest(exc.getLocalizedMessage());
+        logger.finest(getMessage(exc));
       }
-    } 
+    }
     
     return c;
-  }  
-
+  }
+  
 }

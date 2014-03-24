@@ -16,6 +16,8 @@
  */
 package de.zbit.util.prefs;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -518,7 +520,7 @@ public class SBPreferences implements Map<Object, Object> {
                 // Just ignore...
                 // TODO: Then catch and ignore only this specific error, but still
                 // print other errors
-                logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+                logger.log(Level.FINE, getMessage(exc), exc);
               }
             }
           }
@@ -543,7 +545,7 @@ public class SBPreferences implements Map<Object, Object> {
             // Just ignore...
             // TODO: Then catch and ignore only this specific error, but still
             // print other errors
-            logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+            logger.log(Level.FINE, getMessage(exc), exc);
           }
           
         }
@@ -738,7 +740,7 @@ public class SBPreferences implements Map<Object, Object> {
           if (exc instanceof IllegalArgumentException) {
             throw (IllegalArgumentException) exc;
           } else {
-            logger.fine(exc.getLocalizedMessage());
+            logger.fine(getMessage(exc));
           }
         }
       }

@@ -28,73 +28,81 @@ import de.zbit.util.Utils;
  * @version $Rev$
  */
 public class NativeLibraryLoader {
-	
-	/**
-	 * The only instance of this class!
-	 */
-	private static NativeLibraryLoader loader = new NativeLibraryLoader();
-	
-	/**
-	 * 
-	 * @param tmpDir
-	 * @throws IOException 
-	 */
-	public static final void deleteTempLibFile(String tmpDir) throws IOException {
-		File libFile = loader.createLibFile(tmpDir);
-		if (libFile.exists()) {
-			libFile.delete();
-			loader.libFile = null;
-		}
-	}
-	
-	/**
-	 * @throws IOException 
-	 * 
-	 */
-	public static final void loadMacOSLibrary(String tmpDir) throws IOException {
-		File libFile = loader.createLibFile(tmpDir);
-		if (libFile.canWrite()) {
-		  FileTools.copyStream(NativeLibraryLoader.class.getResourceAsStream(libFile.getName()), libFile);
-			libFile.deleteOnExit();
-			System.load(libFile.getAbsolutePath());
-			System.loadLibrary(libFile.getName());
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	private File libFile;
-
-	/**
-	 * 
-	 */
-	private NativeLibraryLoader() {
-		super();
-	}
-
-	/**
-	 * 
-	 * @param tmpDir
-	 * @return
-	 * @throws IOException 
-	 */
-	private final File createLibFile(String tmpDir) throws IOException {
-		if (libFile != null) {
-			return libFile;
-		}
-		String osArch = System.getProperty("os.arch").toString();
-		String suffix = "jnilib";
-		String libFileName = "libquaqua";
-		if (osArch.startsWith("x86") || osArch.endsWith("64")) {
-			libFileName += "64";
-		}
-		libFileName += '.' + suffix;
-		libFile = new File(Utils.ensureSlash(tmpDir) + libFileName);
-		if (!libFile.exists()) {
-			libFile.createNewFile();
-		}
-		return libFile;
-	}
-	
+  
+  /**
+   * The only instance of this class!
+   */
+  private static NativeLibraryLoader loader = new NativeLibraryLoader();
+  
+  /**
+   * 
+   * @param tmpDir
+   * @throws IOException
+   */
+  public static final void deleteTempLibFile(String tmpDir) throws IOException {
+    File libFiles[] = loader.createLibFile(tmpDir);
+    for (File libFile : libFiles) {
+      if (libFile.exists()) {
+        libFile.delete();
+        loader.libFile = null;
+      }
+    }
+  }
+  
+  /**
+   * @throws IOException
+   * 
+   */
+  public static final void loadMacOSLibrary(String tmpDir) throws IOException {
+    File libFiles[] = loader.createLibFile(tmpDir);
+    for (File libFile : libFiles) {
+      if (libFile.canWrite()) {
+        FileTools.copyStream(NativeLibraryLoader.class.getResourceAsStream(libFile.getName()), libFile);
+        libFile.deleteOnExit();
+        System.load(libFile.getAbsolutePath());
+        System.loadLibrary(libFile.getName());
+      }
+    }
+  }
+  
+  /**
+   * 
+   */
+  private File[] libFile;
+  
+  /**
+   * 
+   */
+  private NativeLibraryLoader() {
+    super();
+  }
+  
+  /**
+   * 
+   * @param tmpDir
+   * @return
+   * @throws IOException
+   */
+  private final File[] createLibFile(String tmpDir) throws IOException {
+    if (libFile != null) {
+      return libFile;
+    }
+    String osArch = System.getProperty("os.arch").toString();
+    String libFileName = "libquaqua";
+    if (osArch.startsWith("x86") || osArch.endsWith("64")) {
+      libFileName += "64";
+      libFile = new File[2];
+      libFile[1] = new File(Utils.ensureSlash(tmpDir) + libFileName + ".dylib");
+    }
+    String suffix = "jnilib";
+    libFileName += '.' + suffix;
+    libFile[0] = new File(Utils.ensureSlash(tmpDir) + libFileName);
+    for (File file : libFile) {
+      if (!file.exists()) {
+        file.createNewFile();
+      }
+    }
+    return libFile;
+  }
+  
 }

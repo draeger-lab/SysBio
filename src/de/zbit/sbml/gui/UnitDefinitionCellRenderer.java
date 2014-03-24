@@ -15,6 +15,8 @@
  */
 package de.zbit.sbml.gui;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.Color;
 import java.util.logging.Logger;
 
@@ -39,82 +41,84 @@ import de.zbit.util.StringUtil;
  * @version $Rev$
  */
 public class UnitDefinitionCellRenderer extends JLabel implements
-		TableCellRenderer, TreeCellRenderer {
-	
-	/**
-	 * A {@link Logger} for this class.
-	 */
-	private static final transient Logger logger = Logger.getLogger(UnitDefinitionCellRenderer.class.getName());
-
-	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = 3139960961236803377L;
-	
-	/**
-	 * 
-	 */
-	public UnitDefinitionCellRenderer() {
-		super();
-		setOpaque(true);
-	}
-	
-	/**
-	 * 
-	 * @param value
-	 * @param selected
-	 * @param foreground
-	 * @param background
-	 */
-	private void init(Object value, boolean selected, Color foreground, Color background) {
-		setForeground(foreground);
-		setBackground(background);
-		try {
-			UnitDefinition ud = (UnitDefinition) value;
-			setText(StringUtil.toHTML(HTMLFormula.toHTML(ud)));
-			setToolTipText(ud.isSetName() ? ud.getName() : null);
-		} catch (Exception exc) {
-			setText("N/A");
-			setToolTipText(null);
-			if (value != null && !value.equals("")) {
-				logger.warning(exc.getLocalizedMessage());
-			}
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
-	 */
-	public JLabel getTableCellRendererComponent(JTable table, Object value,
-		boolean isSelected, boolean hasFocus, int row, int column) {
-		Color foreground;
-		Color background;
-		if (isSelected) {
+TableCellRenderer, TreeCellRenderer {
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(UnitDefinitionCellRenderer.class.getName());
+  
+  /**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = 3139960961236803377L;
+  
+  /**
+   * 
+   */
+  public UnitDefinitionCellRenderer() {
+    super();
+    setOpaque(true);
+  }
+  
+  /**
+   * 
+   * @param value
+   * @param selected
+   * @param foreground
+   * @param background
+   */
+  private void init(Object value, boolean selected, Color foreground, Color background) {
+    setForeground(foreground);
+    setBackground(background);
+    try {
+      UnitDefinition ud = (UnitDefinition) value;
+      setText(StringUtil.toHTML(HTMLFormula.toHTML(ud)));
+      setToolTipText(ud.isSetName() ? ud.getName() : null);
+    } catch (Exception exc) {
+      setText("N/A");
+      setToolTipText(null);
+      if ((value != null) && !value.equals("")) {
+        logger.warning(getMessage(exc));
+      }
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+   */
+  @Override
+  public JLabel getTableCellRendererComponent(JTable table, Object value,
+    boolean isSelected, boolean hasFocus, int row, int column) {
+    Color foreground;
+    Color background;
+    if (isSelected) {
       foreground = table.getSelectionForeground();
       background = table.getSelectionBackground();
     } else {
       foreground = table.getForeground();
       background = table.getBackground();
     }
-		foreground = Color.BLACK;
-		if (row % 2 == 0) {
-			background = ColorPalette.lightBlue;
-		} else if (!isSelected) {
-  		background = Color.WHITE;
-  	}
-		init(value, isSelected, foreground, background);
-		return this;
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.tree.TreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
-	 */
-	public JLabel getTreeCellRendererComponent(JTree tree, Object value,
-		boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-		Color foreground = tree.getForeground();
-		Color background = tree.getBackground();
-		init(value, selected, foreground, background);
-		return this;
-	}
-	
+    foreground = Color.BLACK;
+    if (row % 2 == 0) {
+      background = ColorPalette.lightBlue;
+    } else if (!isSelected) {
+      background = Color.WHITE;
+    }
+    init(value, isSelected, foreground, background);
+    return this;
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.tree.TreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+   */
+  @Override
+  public JLabel getTreeCellRendererComponent(JTree tree, Object value,
+    boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+    Color foreground = tree.getForeground();
+    Color background = tree.getBackground();
+    init(value, selected, foreground, background);
+    return this;
+  }
+  
 }

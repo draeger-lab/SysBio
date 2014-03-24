@@ -16,6 +16,8 @@
  */
 package de.zbit;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.beans.EventHandler;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -319,7 +321,7 @@ public abstract class Launcher implements Runnable, Serializable {
           de.zbit.gui.mac.NativeLibraryLoader.loadMacOSLibrary(tmpDirName);
         } catch (Throwable exc) {
           // Ignore this problem.
-          logger.fine(exc.getLocalizedMessage());
+          logger.fine(getMessage(exc));
         }
       }
       // Use the systems proxy settings to establish connections
@@ -343,7 +345,7 @@ public abstract class Launcher implements Runnable, Serializable {
        *   <all-permissions/>
        * </security>
        */
-      logger.warning(exc.getLocalizedMessage());
+      logger.warning(getMessage(exc));
     }
   }
   
@@ -669,7 +671,7 @@ public abstract class Launcher implements Runnable, Serializable {
           try {
             toflush.flush();
           } catch (Exception exc) {
-            logger.log(Level.WARNING, exc.getLocalizedMessage(), exc);
+            logger.log(Level.WARNING, getMessage(exc), exc);
           }
         }
       }

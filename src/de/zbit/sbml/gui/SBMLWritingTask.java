@@ -16,6 +16,8 @@
  */
 package de.zbit.sbml.gui;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.Component;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
@@ -43,7 +45,7 @@ public class SBMLWritingTask extends SwingWorker<File, Void> {
   private Component parent;
   private OpenedFile<SBMLDocument> sbmlFile;
   private BufferedOutputStream outputStream;
-
+  
   /**
    * 
    * @param sbmlFile
@@ -55,7 +57,7 @@ public class SBMLWritingTask extends SwingWorker<File, Void> {
     super();
     this.parent = parent;
     this.sbmlFile = sbmlFile;
-    this.outputStream = new BufferedOutputStream(new FileOutputStream(sbmlFile.getFile()));
+    outputStream = new BufferedOutputStream(new FileOutputStream(sbmlFile.getFile()));
     if ((changeListeners != null) && (changeListeners.length > 0)) {
       for (PropertyChangeListener listener : changeListeners) {
         addPropertyChangeListener(listener);
@@ -73,7 +75,7 @@ public class SBMLWritingTask extends SwingWorker<File, Void> {
     outputStream.close();
     return sbmlFile.getFile();
   }
-
+  
   /* (non-Javadoc)
    * @see javax.swing.SwingWorker#done()
    */
@@ -82,9 +84,9 @@ public class SBMLWritingTask extends SwingWorker<File, Void> {
     try {
       firePropertyChange(SBML_WRITING_SUCCESSFULLY_DONE, null, get());
     } catch (InterruptedException exc) {
-      GUITools.showErrorMessage(parent, exc.getLocalizedMessage());
+      GUITools.showErrorMessage(parent, getMessage(exc));
     } catch (ExecutionException exc) {
-      GUITools.showErrorMessage(parent, exc.getLocalizedMessage());
+      GUITools.showErrorMessage(parent, getMessage(exc));
     }
   }
   
