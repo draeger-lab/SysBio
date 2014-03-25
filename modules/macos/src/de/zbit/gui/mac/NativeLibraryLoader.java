@@ -55,13 +55,25 @@ public class NativeLibraryLoader {
    */
   public static final void loadMacOSLibrary(String tmpDir) throws IOException {
     File libFiles[] = loader.createLibFile(tmpDir);
+    Throwable t = null;
     for (File libFile : libFiles) {
       if (libFile.canWrite()) {
         FileTools.copyStream(NativeLibraryLoader.class.getResourceAsStream(libFile.getName()), libFile);
         libFile.deleteOnExit();
-        System.load(libFile.getAbsolutePath());
-        System.loadLibrary(libFile.getName());
+        try {
+          System.load(libFile.getAbsolutePath());
+          System.loadLibrary(libFile.getName());
+        } catch (Throwable exc) {
+          if (t == null) {
+            t = exc;
+          } else {
+            t.initCause(exc);
+          }
+        }
       }
+    }
+    if (t != null) {
+      throw (RuntimeException) t;
     }
   }
   
