@@ -103,7 +103,7 @@ public class PathwaySelector extends JPanel implements PWSel {
     this(manag,lh,(String)null);
   }
   
-  /** 
+  /**
    * @param manag cache to use
    * @param lh LayoutHelper to use
    * @param fixedOrganismKeggAbbr if not null, will preselect an organism and deactivate the organism selector
@@ -119,18 +119,22 @@ public class PathwaySelector extends JPanel implements PWSel {
    * @param manag
    * @param lh
    * @param organisms only show these organisms
-   * @throws Exception 
+   * @throws Exception
    */
   public PathwaySelector(KeggFunctionManagement manag, LayoutHelper lh, List<Species> organisms) throws Exception {
     super();
     lh = init(manag, lh);
     initGui(lh, null, organisms);
   }
-
+  
   
   public LayoutHelper init(KeggFunctionManagement manag, LayoutHelper lh) {
-    if (manag==null) manag = new KeggFunctionManagement();
-    if (lh==null) lh = new LayoutHelper(this);
+    if (manag == null) {
+      manag = new KeggFunctionManagement();
+    }
+    if (lh==null) {
+      lh = new LayoutHelper(this);
+    }
     this.manag = manag;
     return lh;
   }
@@ -160,7 +164,7 @@ public class PathwaySelector extends JPanel implements PWSel {
     t.start();
   }
   
-
+  
   /**
    * Searches on the given container for an ok button and
    * controls this button.
@@ -168,13 +172,13 @@ public class PathwaySelector extends JPanel implements PWSel {
    */
   public void autoActivateOkButton(Container c) {
     AbstractButton okButton = GUITools.getOKButton(c, false);
-    if (okButton==null) {
+    if (okButton == null) {
       // Search whole window
       okButton = GUITools.getOKButton(c, true);
     }
     
     // Control this button
-    if (okButton!=null) {
+    if (okButton != null) {
       autoActivateOkButton(okButton);
     }
   }
@@ -182,7 +186,7 @@ public class PathwaySelector extends JPanel implements PWSel {
   /**
    * @param lh
    * @param fixedOrganismKeggAbbr if not null, will preselect an organism and deactivate the organism selector
-   * @throws Exception 
+   * @throws Exception
    */
   private void initGui(LayoutHelper lh, final String fixedOrganismKeggAbbr, List<Species> onlyShowThese) throws Exception {
     // Create organism selector
@@ -236,7 +240,10 @@ public class PathwaySelector extends JPanel implements PWSel {
       @SuppressWarnings("unchecked")
       @Override
       protected void done() {
-        if (Thread.currentThread().isInterrupted()) return; // don't continue
+        if (Thread.currentThread().isInterrupted())
+        {
+          return; // don't continue
+        }
         HashMap<String, String> orgs=null;
         try {
           orgs = (HashMap<String, String>) get();
@@ -282,15 +289,16 @@ public class PathwaySelector extends JPanel implements PWSel {
     lh.add("Select pathway", pathwaySelector, true);
     worker.execute();
   }
-
+  
   /**
    * Set the enabled attribute of an ok-button to true
    * or false.
    * @param state
    */
   private void changeOkButtonState(boolean state) {
-    if (okButton!=null) okButton.setEnabled(state);
-    else {
+    if (okButton!=null) {
+      okButton.setEnabled(state);
+    } else {
       if (state) {
         GUITools.enableOkButton(this);
       } else {
@@ -298,7 +306,7 @@ public class PathwaySelector extends JPanel implements PWSel {
       }
     }
   }
-
+  
   /**
    * @return all reference kegg pathways (multi-organism).
    * @throws IOException
@@ -347,11 +355,13 @@ public class PathwaySelector extends JPanel implements PWSel {
           // "path:map04614" => "04614"
           String idNum = pathways[i].getEntry_id();
           int pos = idNum.indexOf("map");
-          if (pos>=0) idNum = idNum.substring(pos+3).trim();
+          if (pos>=0) {
+            idNum = idNum.substring(pos+3).trim();
+          }
           
           //pathwayMap.put(idNum, pathways[i].getDefinition().replace(" - Reference pathway", ""));
-//          int trimPos = pathways[i].getDefinition().lastIndexOf('-');
-//          pathwayMap.put(idNum, pathways[i].getDefinition().substring(0, trimPos<0? pathways[i].getDefinition().length():trimPos).trim());
+          //          int trimPos = pathways[i].getDefinition().lastIndexOf('-');
+          //          pathwayMap.put(idNum, pathways[i].getDefinition().substring(0, trimPos<0? pathways[i].getDefinition().length():trimPos).trim());
           pathwayMap.put(idNum, pathways[i].getDefinition());
         }
         return pathwayMap;
@@ -365,7 +375,7 @@ public class PathwaySelector extends JPanel implements PWSel {
   
   /**
    * @return all kegg pathways (multi-organism).
-   * @throws IOException 
+   * @throws IOException
    */
   /*
    * Methods to get pathway lists before 2011-07-01
@@ -423,7 +433,7 @@ public class PathwaySelector extends JPanel implements PWSel {
     } catch (IOException t) {} // Not that important. Just a cache.
     return pwlist;
   }
-  */
+   */
   
   
   /**
@@ -437,7 +447,7 @@ public class PathwaySelector extends JPanel implements PWSel {
     try {
       PathwaySelector selector = createPathwaySelectorPanel(new LayoutHelper(p));
       if (JOptionPane.showConfirmDialog(null, p, "Test",
-        JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {        
+        JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
         System.out.println(selector.getSelectedPathway());
         System.out.println(selector.getSelectedPathwayID());
         System.out.println(selector.getOrganismSelector().getSelectedOrganism());
@@ -467,18 +477,26 @@ public class PathwaySelector extends JPanel implements PWSel {
     // Get the KEY of the selected pathway
     String selID = null;
     String selItem = pathwaySelector.getSelectedItem().toString();
-    if (pathwayMap==null || pathwayMap.entrySet()==null) return null;
-    for (Map.Entry<String,String> e: pathwayMap.entrySet()) {
-      if (e.getValue().equals(selItem)) selID = e.getKey();
+    if (pathwayMap==null || pathwayMap.entrySet()==null) {
+      return null;
     }
-    if (selID==null) return null;
+    for (Map.Entry<String,String> e: pathwayMap.entrySet()) {
+      if (e.getValue().equals(selItem)) {
+        selID = e.getKey();
+      }
+    }
+    if (selID==null) {
+      return null;
+    }
     
     // Convert e.g. "path:hsa05410" to 05410.
     selID = StringUtil.removeAllNonDigits(selID);
     
     // Prepend the organism
     String abv = getOrganismSelector().getSelectedOrganismAbbreviation();
-    if (abv==null) abv = "ko";
+    if (abv==null) {
+      abv = "ko";
+    }
     
     return abv + selID;
   }
@@ -497,7 +515,7 @@ public class PathwaySelector extends JPanel implements PWSel {
   /**
    * Creates a new {@link #PathwaySelector} without any cache.
    * @return {@link #PathwaySelector}
-   * @throws Exception 
+   * @throws Exception
    */
   public static PWSel createPathwaySelectorPanel() throws Exception {
     PWSel ret = new PathwaySelector();
@@ -509,7 +527,7 @@ public class PathwaySelector extends JPanel implements PWSel {
    * Creates a new {@link #PathwaySelector} without any cache.
    * @param layoutHelper
    * @return {@link #PathwaySelector}
-   * @throws Exception 
+   * @throws Exception
    */
   public static PathwaySelector createPathwaySelectorPanel(LayoutHelper layoutHelper) throws Exception {
     PathwaySelector ret = new PathwaySelector(layoutHelper);
@@ -524,7 +542,7 @@ public class PathwaySelector extends JPanel implements PWSel {
     
     return ret;
   }
-
+  
   
   
 }

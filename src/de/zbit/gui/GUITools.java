@@ -44,6 +44,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -2482,20 +2484,26 @@ public class GUITools {
    * displayed, use other threads for computation. Do not go the opposite
    * way!</b>
    * 
-   * @param component
-   * @param caption
+   * @param message
+   * @param title
    * @param okAction optional, action to be performed after dialog confirmation.
    * @param cancelAction optional, action to be performed after dialog cancellation.
+   * @param the listener to be notified when the actions are executed.
    */
-  public static void showOkCancelDialogInNewThread(final Component component, final String caption, final Runnable okAction, final Runnable cancelAction) {
-    SwingWorker<Integer, Void> worker = new SwingWorker<Integer, Void>() {
+  public static void showOkCancelDialogInNewThread(Component message, String title, final Runnable okAction, final Runnable cancelAction, final PropertyChangeListener listener) {
+    final int retVal = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.OK_CANCEL_OPTION);
+    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
       /* (non-Javadoc)
        * @see javax.swing.SwingWorker#doInBackground()
        */
       @Override
-      protected Integer doInBackground() throws Exception {
-        return JOptionPane.showConfirmDialog(null, component,
-          caption, JOptionPane.OK_CANCEL_OPTION);
+      protected Void doInBackground() throws Exception {
+        if ((retVal == JOptionPane.OK_OPTION) && (okAction != null)) {
+          okAction.run();
+        } else if ((retVal == JOptionPane.CANCEL_OPTION) && (cancelAction != null)) {
+          cancelAction.run();
+        }
+        return null;
       }
       
       /* (non-Javadoc)
@@ -2503,14 +2511,9 @@ public class GUITools {
        */
       @Override
       protected void done() {
-        super.done();
         try {
-          Integer retVal = get();
-          if ((retVal == JOptionPane.OK_OPTION) && (okAction != null)) {
-            okAction.run();
-          } else if ((retVal == JOptionPane.CANCEL_OPTION) && (cancelAction != null)) {
-            cancelAction.run();
-          }
+          super.done();
+          listener.propertyChange(new PropertyChangeEvent(this, "dialog.done", null, get()));
         } catch (Exception exc) {
           GUITools.showErrorMessage(null, exc);
         }
@@ -2518,14 +2521,14 @@ public class GUITools {
     };
     worker.execute();
     
-    // Wait until the dialog is painted, before continuing
-    while (worker.getState() == SwingWorker.StateValue.PENDING) {
-      try {
-        Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
-      } catch (InterruptedException exc) {
-        logger.finest(getMessage(exc));
-      }
-    }
+    //    // Wait until the dialog is painted, before continuing
+    //    while (worker.getState() == SwingWorker.StateValue.PENDING) {
+    //      try {
+    //        Thread.sleep(100); // do no decrease this value, JOptionPane takes longer to paint
+    //      } catch (InterruptedException exc) {
+    //        logger.finest(getMessage(exc));
+    //      }
+    //    }
   }
   
   /**

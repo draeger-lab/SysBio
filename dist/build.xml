@@ -351,6 +351,7 @@
 	  	debug="${debug}"
 	  	deprecation="${deprecation}"
 		destdir="${classes}"
+		fork="true"
 	  	listfiles="yes"
 	  	memoryMaximumSize="512M"
 	  	nowarn="no"
@@ -394,7 +395,9 @@
         in the build path of every person who checks out the repostitory... 
       -->
       <manifest>
-        <section name="SysBio">
+      	<attribute name="Built-By"               value="${user.name}"/>
+      	<attribute name="Built-Date"             value="${TODAY}"/>
+        <section name="${Name}">
 	      <attribute name="Built-By" value="${user.name}"/>
           <attribute name="Specification-Title" value="${Name}"/>
           <attribute name="Specification-Version" value="Revision ${repository.revision}"/>
@@ -425,9 +428,9 @@
         <include name="de/zbit/math/**.class"/>
         <include name="de/zbit/resources/**.class"/>
         <include name="de/zbit/sbml/**.class"/>
-        <include name="de/zbit/sbml/gui/*.class"/>
-        <include name="de/zbit/sbml/io/*.class"/>
-        <include name="de/zbit/sbml/layout/*.class"/>
+        <include name="de/zbit/sbml/gui/**.class"/>
+        <include name="de/zbit/sbml/io/**.class"/>
+        <include name="de/zbit/sbml/layout/**.class"/>
         <exclude name="de/zbit/sbml/layout/y"/>
         <include name="de/zbit/text/**.class"/>
         <include name="de/zbit/util/argparser/**.class"/>
