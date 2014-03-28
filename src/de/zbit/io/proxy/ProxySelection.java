@@ -74,7 +74,7 @@ public interface ProxySelection extends KeyProvider {
     public void initializeProxyServer() {
       SBPreferences prefs = SBPreferences.getPreferencesFor(ProxySelection.class);
       String host = prefs.get(PROXY_HOST);
-      if (host!=null && host.trim().length()>0) {
+      if ((host != null) && (host.trim().length() > 0)) {
         int answer = GUITools.showQuestionMessage(null, String.format(
           "Previously stored settings for a proxy server have been detected ('%s').\nDo you want to use this proxy?", host),
           "Proxy server", JOptionPane.YES_NO_OPTION);
@@ -110,13 +110,13 @@ public interface ProxySelection extends KeyProvider {
       String user = prefs.get(PROXY_USERNAME);
       String pass = prefs.get(PROXY_PASSWORD);
       
-      for (int i=0; i<4; i++) {
-        String settingName="";
-        String settingValue="";
-        if (i==0) {
+      for (int i = 0; i < 4; i++) {
+        String settingName = "";
+        String settingValue = "";
+        if (i == 0) {
           settingName = "Host";
           settingValue = host;
-          if (host==null || host.trim().length()<1) {
+          if ((host == null) || (host.trim().length() < 1)) {
             System.setProperty("proxySet", "false");
             System.setProperty("http.proxySet", "false");
           } else {
@@ -128,11 +128,11 @@ public interface ProxySelection extends KeyProvider {
           settingValue = port;
         } else if (i==2) {
           settingName = "User";
-          settingValue = user;          
+          settingValue = user;
           
         } else if (i==3) {
           settingName = "Password";
-          settingValue = pass;          
+          settingValue = pass;
         }
         
         if (settingValue.trim().length()<1) {
@@ -141,39 +141,39 @@ public interface ProxySelection extends KeyProvider {
         
         // Set the values for http, https, ftp and socks
         if (settingValue!=null) {
-          System.setProperty("proxy"+settingName, settingValue);
-          System.setProperty("http.proxy"+settingName, settingValue);
-          System.setProperty("https.proxy"+settingName, settingValue);
-          System.setProperty("ftp.proxy"+settingName, settingValue);
-          System.setProperty("ftp.prox"+settingName, settingValue);
-          System.setProperty("socks.proxy"+settingName, settingValue);
-          System.setProperty("socksProxy"+settingName, settingValue);
+          System.setProperty("proxy" + settingName, settingValue);
+          System.setProperty("http.proxy" + settingName, settingValue);
+          System.setProperty("https.proxy" + settingName, settingValue);
+          System.setProperty("ftp.proxy" + settingName, settingValue);
+          System.setProperty("ftp.prox" + settingName, settingValue);
+          System.setProperty("socks.proxy" + settingName, settingValue);
+          System.setProperty("socksProxy" + settingName, settingValue);
         } else {
-          System.clearProperty("proxy"+settingName);
-          System.clearProperty("http.proxy"+settingName);
-          System.clearProperty("https.proxy"+settingName);
-          System.clearProperty("ftp.proxy"+settingName);
-          System.clearProperty("ftp.prox"+settingName);
-          System.clearProperty("socks.proxy"+settingName);
-          System.clearProperty("socksProxy"+settingName);
+          System.clearProperty("proxy" + settingName);
+          System.clearProperty("http.proxy" + settingName);
+          System.clearProperty("https.proxy" + settingName);
+          System.clearProperty("ftp.proxy" + settingName);
+          System.clearProperty("ftp.prox" + settingName);
+          System.clearProperty("socks.proxy" + settingName);
+          System.clearProperty("socksProxy" + settingName);
         }
       }
     }
   }
-
-  public static final Option<String> PROXY_HOST = new Option<String>("PROXY_HOST", 
+  
+  public static final Option<String> PROXY_HOST = new Option<String>("PROXY_HOST",
       String.class, "Please specify your proxy server (e.g., webcache.mydomain.com).", System.getProperty("http.proxyHost"));
   
   // Integer will generate a (in this case inappropriate) decimal format (8,080) instaead of 8080
-//  public static final Option<Integer> PROXY_PORT = new Option<Integer>("PROXY_PORT", 
-//      Integer.class, "Please specify your proxy port (often 80 or 8080).", 8080);
-  public static final Option<String> PROXY_PORT = new Option<String>("PROXY_PORT", 
+  //  public static final Option<Integer> PROXY_PORT = new Option<Integer>("PROXY_PORT",
+  //      Integer.class, "Please specify your proxy port (often 80 or 8080).", 8080);
+  public static final Option<String> PROXY_PORT = new Option<String>("PROXY_PORT",
       String.class, "Please specify your proxy port (often 80 or 8080).", System.getProperty("http.proxyPort"));
   
-  public static final Option<String> PROXY_USERNAME = new Option<String>("PROXY_USERNAME", 
+  public static final Option<String> PROXY_USERNAME = new Option<String>("PROXY_USERNAME",
       String.class, "OPTIONAL: Please specify the username for your proxy server.", System.getProperty("http.proxyUser"));
   
-  public static final Option<String> PROXY_PASSWORD = new Option<String>("PROXY_PASSWORD", 
+  public static final Option<String> PROXY_PASSWORD = new Option<String>("PROXY_PASSWORD",
       String.class, "OPTIONAL: Please specify the password for your proxy server.", System.getProperty("http.proxyPassword"));
   
 }
