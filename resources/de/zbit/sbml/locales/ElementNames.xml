@@ -126,6 +126,7 @@
 
   <!-- FBC -->
 
+  <entry key="chemicalFormula">Chemical formula</entry>
   <entry key="fluxBound">Flux bound</entry>
   <entry key="fluxObjective">Flux objective</entry>
   <entry key="listOfFluxBounds">Flux bounds</entry>

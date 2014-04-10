@@ -80,6 +80,8 @@ import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.Unit.Kind;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
+import org.sbml.jsbml.ext.fbc.FBCConstants;
+import org.sbml.jsbml.ext.fbc.FBCSpeciesPlugin;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
@@ -391,8 +393,16 @@ public class SBasePanel extends JPanel implements EquationComponent {
       }
       if (mc instanceof Assignment) {
         lh.add(new SBasePanel(((Assignment) mc)
-          .getVariableInstance(), namesIfAvailable, renderer), 1, ++row, 3, 1, 1d, 1d);
+          .getVariableInstance(), namesIfAvailable, renderer), 1, ++row, 3, 1, 1d, 0d);
       }
+      //      if (mc instanceof KineticLaw) {
+      //        KineticLaw kl = (KineticLaw) mc;
+      //        if (kl.isSetListOfLocalParameters()) {
+      //          for (LocalParameter lp : kl.getListOfLocalParameters()) {
+      //            lh.add(new SBasePanel(lp, namesIfAvailable, renderer), 1, ++row, 3, 1, 1d, 0d);
+      //          }
+      //        }
+      //      }
     }
   }
   
@@ -484,7 +494,16 @@ public class SBasePanel extends JPanel implements EquationComponent {
    * @return
    */
   private JTextField createNameField(NamedSBase nsb) {
-    JTextField tf = new JTextField(nsb.isSetName() ? nsb.getName() : nsb.getId());
+    return createTextField(nsb.isSetName() ? nsb.getName() : nsb.getId());
+  }
+  
+  /**
+   * 
+   * @param content
+   * @return
+   */
+  private JTextField createTextField(String content) {
+    JTextField tf = new JTextField(content);
     tf.setEditable(editable);
     tf.setColumns(25);
     tf.setCaretPosition(0);
@@ -535,7 +554,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
    * @param q
    */
   private void addProperties(QuantityWithUnit q) {
-    addLabeledComponent(q instanceof Species ? bundle.getString("substanceUnit")	: bundle.getString("unit"), unitPreview(q.getUnitsInstance()));
+    addLabeledComponent(q instanceof Species ? bundle.getString("substanceUnit") : bundle.getString("unit"), unitPreview(q.getDerivedUnitDefinition()));
   }
   
   /**
@@ -868,7 +887,17 @@ public class SBasePanel extends JPanel implements EquationComponent {
       tf.setEditable(editable);
       addLabeledComponent(bundle.getString("speciesType"), tf);
     }
-    JSpinner spinCharge = new JSpinner(new SpinnerNumberModel(species.getCharge(), -10, 10, 1));
+    int charge = species.getCharge();
+    if (species.getPlugin(FBCConstants.getNamespaceURI(species.getLevel(), species.getVersion())) != null) {
+      FBCSpeciesPlugin fbcSpecies = (FBCSpeciesPlugin) species.getPlugin(FBCConstants.getNamespaceURI(species.getLevel(), species.getVersion()));
+      if (fbcSpecies.isSetCharge()) {
+        charge = fbcSpecies.getCharge();
+      }
+      if (fbcSpecies.isSetChemicalFormula()) {
+        addLabeledComponent(bundle.getString("chemicalFormula"), createTextField(fbcSpecies.getChemicalFormula()));
+      }
+    }
+    JSpinner spinCharge = new JSpinner(new SpinnerNumberModel(charge, -10, 10, 1));
     spinCharge.setEnabled(editable);
     addLabeledComponent(bundle.getString("charge"), spinCharge);
     addProperties((Symbol) species);
@@ -1020,7 +1049,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     addLabeledComponent(bundle.getString("definition"), unitPreview(ud));
     if (ud.isSetListOfUnits()) {
       for (Unit u : ud.getListOfUnits()) {
-        lh.add(new SBasePanel(u, namesIfAvailable, renderer), 1, ++row, 3, 1, 1d, 1d);
+        lh.add(new SBasePanel(u, namesIfAvailable, renderer), 1, ++row, 3, 1, 1d, 0d);
       }
     }
   }

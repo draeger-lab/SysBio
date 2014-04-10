@@ -129,6 +129,7 @@
 
   <!-- FBC -->
 
+  <entry key="chemicalFormula">Chemische Formel</entry>
   <entry key="fluxBound">Flussbeschränkung</entry>
   <entry key="fluxObjective">Flussziel</entry>
   <entry key="listOfFluxBounds">Flussbeschränkungen</entry>
