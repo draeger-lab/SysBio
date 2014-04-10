@@ -208,9 +208,9 @@ public class GarudaSoftwareListener implements PropertyChangeListener {
   private String toMessage(GarudaBackendPropertyChangeEvent garudaPropertyEvt) {
     String message = "";
     if (garudaPropertyEvt.getFirstProperty() != null) {
-      message = garudaPropertyEvt.toString();
+      message = garudaPropertyEvt.getFirstProperty().toString();
     } else if (garudaPropertyEvt.getSecondProperty() != null) {
-      message = garudaPropertyEvt.toString();
+      message = garudaPropertyEvt.getSecondProperty().toString();
     }
     return message;
   }
