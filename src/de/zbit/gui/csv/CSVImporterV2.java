@@ -78,8 +78,8 @@ import de.zbit.util.StringUtil;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListener {
   
+public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListener {
   /**
    * Generated serial version identifier.
    */
@@ -113,7 +113,8 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
    */
   private Integer[] exColSelections = null;
   
-  /**
+
+	/**
    * This array holds the selected type for the column in the indices.
    */
   private Integer[] exColTypeSelections = null;
@@ -205,6 +206,7 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     this(reader);
     init(expectedColumns);
   }
+ 
   
   /**
    * 
@@ -345,6 +347,34 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
   public List<ExpectedColumn> getExpectedColumns() {
     return exCols;
   }
+  
+  /**
+   * @param exCols list of {@link ExpectedColumn}s.
+   */
+  public void setExpectedColumns(List<ExpectedColumn> exCols) {
+    this.exCols = exCols;
+  }
+  
+  /**
+   * @return current list of {@link ExpectedColumn}s.
+   */
+  public Integer[] getExColTypeSelections() {
+		return exColTypeSelections;
+	}
+
+  /**
+   * @param array of selected types for the {@link ExpectedColumn}s.
+   */
+	public void setExColTypeSelections(Integer[] exColTypeSelections) {
+		this.exColTypeSelections = exColTypeSelections;
+	}
+  
+  /**
+   * @return current array of selected types for the {@link ExpectedColumn}s.
+   */
+  public Integer[] getExColSelections() {
+  	return exColSelections;
+  }
 
   /**
    * @return true if any ExpectedColumn from {@link #exCols}
@@ -416,8 +446,9 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
     
     return table;
   }
-  
-  /**
+ 
+
+	/**
    * @param data
    * @return
    */
@@ -807,5 +838,4 @@ public class CSVImporterV2 extends CSVReaderOptionPanel implements ActionListene
       }
     }
   }
-
 }
