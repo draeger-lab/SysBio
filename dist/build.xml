@@ -113,6 +113,7 @@
           <zipfileset excludes="META-INF/*.SF" src="${lib}/jaxrpc.jar"/>
           <zipfileset excludes="META-INF/*.SF" src="${lib}/wsdl4j.jar"/>
           <zipfileset excludes="META-INF/*.SF" src="${lib}/axis.jar"/>
+          <zipfileset excludes="META-INF/*.SF" src="${lib}/argparser.jar"/>
           <zipfileset excludes="META-INF/*" src="${lib}/commons-cli-1.1.jar"/>
           <zipfileset excludes="META-INF/*" src="${lib}/quaqua.jar"/>
           <zipfileset excludes="META-INF/*" src="${lib}/sysbio-osx-support.jar"/>
