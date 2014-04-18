@@ -43,12 +43,13 @@ import java.util.prefs.NodeChangeListener;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
+import org.argparser.ArgHolder;
+import org.argparser.ArgParser;
+
 import de.zbit.io.filefilter.GeneralFileFilter;
 import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
-import de.zbit.util.argparser.ArgHolder;
-import de.zbit.util.argparser.ArgParser;
 
 /**
  * This class is a wrapper for {@link Preferences}, which provides a lot of
