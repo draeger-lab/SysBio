@@ -114,8 +114,9 @@ public class FormatDescription implements Comparable<FormatDescription> {
     }
   }
   
+  @Override
   public int compareTo(FormatDescription obj) {
-    FormatDescription desc = (FormatDescription) obj;
+    FormatDescription desc = obj;
     int relation = getGroup().compareTo(desc.getGroup());
     if (relation != 0) {
       return relation;
@@ -144,8 +145,8 @@ public class FormatDescription implements Comparable<FormatDescription> {
   }
   
   public String getMimeType(int index) {
-    if (mimeTypes != null && index >= 0 && index < mimeTypes.size()) {
-      return (String) mimeTypes.get(index);
+    if ((mimeTypes != null) && (index >= 0) && (index < mimeTypes.size())) {
+      return mimeTypes.get(index).toString();
     } else {
       return null;
     }
@@ -288,5 +289,5 @@ public class FormatDescription implements Comparable<FormatDescription> {
     sb.append(PRIMARY_SEPARATOR);
     return sb.toString();
   }
-
+  
 }
