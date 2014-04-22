@@ -129,10 +129,11 @@
     <jar jarfile="${appJarRaw}">
     	<!-- SysBio Classes -->
         <fileset dir="${classes}">
-    	    <include name="de/zbit/graph/**/*"/>
-    	  </fileset>
+    	  <include name="de/zbit/graph/**/*"/>
+    	</fileset>
         <zipfileset excludes="META-INF/*" src="${lib}/graph/y.jar"/>
-    	  <zipfileset excludes="META-INF/*" src="${lib}/graph/org.sbgn.jar"/>
+    	<zipfileset excludes="META-INF/*" src="${lib}/graph/org.sbgn.jar"/>
+		<zipfileset excludes="META-INF/*" src="${lib}/argparser.jar"/>
         <zipfileset src="${appJar}"/>
     </jar>
   </target>
@@ -301,16 +302,20 @@
     
   </target>
 	
-	<target name="jar_revision_number" depends="obfuscate,svnrevision" description="Renames the JAR revision number to its filename">
+  <target
+    name="jar_revision_number"
+    depends="obfuscate,svnrevision"
+    description="Renames the JAR revision number to its filename"
+  >
     <!-- the FINAL obfuscated signed application jar files -->
 
-		<!--
-		<delete file="${appJarRev}"/>
+	<!--
+	<delete file="${appJarRev}"/>
     <delete file="${appJarRevRaw}"/>
     <delete file="${appJarRevWithGraph}"/>
     -->
     	
-		<move failonerror="false" tofile="${appJarRev}" file="${appJar}"/>
+    <move failonerror="false" tofile="${appJarRev}" file="${appJar}"/>
     <move failonerror="false" tofile="${appJarRevRaw}" file="${appJarRaw}"/>
     <move failonerror="false" tofile="${appJarRevWithGraph}" file="${appJarWithGraph}"/>
   </target>
@@ -447,6 +452,7 @@
       </fileset>
       
       <zipfileset excludes="META-INF/*" src="${lib}/sysbio-osx-support.jar"/>
+      <zipfileset excludes="META-INF/*" src="${lib}/argparser.jar"/>
       
     </jar>
 
