@@ -352,22 +352,24 @@
     <delete dir="${classes}"/>
 	<mkdir dir="${classes}"/>
 	<javac
-	  	classpathref="classpath"
-	  	compiler="${compiler}"
-	  	debug="${debug}"
-	  	deprecation="${deprecation}"
-		destdir="${classes}"
-		fork="true"
-	  	listfiles="yes"
-	  	memoryMaximumSize="512M"
-	  	nowarn="no"
-		optimize="${optimize}"
-		source="1.6"
-		srcdir="${src}"
-		sourcepathref="sourcepath"
-		target="1.6"
-		verbose="${verbose}"
-	  />
+    classpathref="classpath"
+    compiler="${compiler}"
+    debug="${debug}"
+    deprecation="${deprecation}"
+    destdir="${classes}"
+    fork="true"
+    listfiles="yes"
+    memoryMaximumSize="512M"
+    nowarn="no"
+    optimize="${optimize}"
+    source="1.6"
+    srcdir="${src}"
+    sourcepathref="sourcepath"
+    target="1.6"
+    verbose="${verbose}"
+  >
+    <compilerarg value="-XDignore.symbol.file" />
+  </javac>
   	<!-- 		depend="${depend}" -->
 	  <!-- <copy todir="${classes}"/> -->
   </target>
