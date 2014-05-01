@@ -2321,10 +2321,9 @@ public class GUITools {
     } else {
       message = messagePair.getA();
     }
-    Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause()
-        .getClass() : exc.getClass();
-        JOptionPane.showMessageDialog(parent, message,
-          clazz != null ? clazz.getSimpleName() : "Error", JOptionPane.ERROR_MESSAGE);
+    Class<? extends Throwable> clazz = exc.getCause() != null ? exc.getCause().getClass() : exc.getClass();
+    JOptionPane.showMessageDialog(parent, message, clazz != null ? clazz.getSimpleName() : "Error", JOptionPane.ERROR_MESSAGE);
+    exc.printStackTrace();
   }
   
   /**
