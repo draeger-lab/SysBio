@@ -57,7 +57,7 @@
   <entry key="CSV_FILE_SELECTION">CSV file selection</entry>
   <entry key="CSV_FILE_SELECTION_TOOLTIP">Select the character-separated file to be opened.</entry>
   <entry key="CSV_FILE_CHARACTERS">CSV file characters</entry>
-  <entry key="CSV_FILE_CHARACTERS_TOOLTIP">Define the special chracters in CSV files that separate values or that quote strings of characters.</entry>
+  <entry key="CSV_FILE_CHARACTERS_TOOLTIP">Define the special characters in CSV files that separate values or that quote strings of characters.</entry>
   
   <!-- CSVReaderColumnChooser -->
   

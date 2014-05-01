@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<!-- 
+ * $I$
+ * $URL$
+ *********************************************************************** 
+ * This file is part of the SysBio API library.
+ * 
+ * Copyright (C) 2009-2014 by the University of Tuebingen, Germany.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation. A copy of the license agreement is provided in the file
+ * named "LICENSE.txt" included with this software distribution and also
+ * available online as http://www.gnu.org/licenses/lgpl-3.0-standalone.html.
+ ***********************************************************************
+ *
+ * Version: $Rev$
+-->
+<properties>
+  <comment>
+  This configuration describes the labels of buttons and menu items or 
+  some important user messages in SBMLsqueezer-related graphical user interfaces.
+  Although the preferred way would be to have separate key-value pairs for
+  actual labels and their corresponding tooltips, you may want to use just 
+  one key-value pair, in which the tooltip is located after the separator 
+  ";". Otherwise, please use the suffix "_TOOLTIP" to indicate a tooltip 
+  for some label.
+  
+  Please see the JavaDoc for MessageFormatter and Formatter. 
+  </comment>
+  
+  <entry key="SBML_IN_FILE">SBML input file</entry>
+  <entry key="SBML_IN_FILE_TOOLTIP">Specifies the SBML input file.</entry>
+  
+  <entry key="NEED_TO_LAYOUT">Need to layout</entry>
+  <entry key="NEED_TO_LAYOUT_TOOLTIP">This option decides if the nodes of a graph or network need to be laid out.</entry>
+  
+</properties>
