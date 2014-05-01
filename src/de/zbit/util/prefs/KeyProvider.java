@@ -260,7 +260,7 @@ public interface KeyProvider {
               
               // display all options in an description environment
               sb.append("\\begin{description}\n");
-              //writeOptionsToHTMLTable(sb, group.getOptions(), optionList); // TODO: LaTeX method
+              writeOptionsToLaTeXItems(sb, group.getOptions(), optionList); // TODO: LaTeX method
               sb.append("\\end{description}\n");
             }
           }
@@ -272,7 +272,7 @@ public interface KeyProvider {
             sb.append(String.format("%s{%s}\n", getLaTeXSection(headerRank+1), bundle.getString("ADDITIONAL_OPTIONS")));
           }
           sb.append("\\begin{description}\n");
-          //writeOptionsToHTMLTable(sb, optionList, null);  // TODO: LaTeX method
+          writeOptionsToLaTeXItems(sb, optionList, null);  // TODO: LaTeX method
           sb.append("\\end{description}\n");
         }
       }
@@ -770,12 +770,136 @@ public interface KeyProvider {
     }
     
     /**
+     * TODO: Quick and dirty solution: Just a copy of the HTML function!!! That's
+     * terrible! We need a formatter instance and just one method that actually
+     * creates the text. The formatter knows what to do when writing LaTeX or HTML...
      * 
      * @param sb
      * @param options
      * @param removeFromHere
-     * @return <code>true</code>, if at least one option is written to the HTML
-     *         table, <code>false</code> otherwise
+     * @return {@code true}, if at least one option is written to the HTML
+     *         table, {@code false} otherwise
+     */
+    @SuppressWarnings("rawtypes")
+    private static boolean writeOptionsToLaTeXItems(StringBuilder sb,
+      List<?> options,
+      List<Option> removeFromHere) {
+      boolean atLeastOneOptionVisible = false;
+      
+      for (Object o : options) {
+        if (!(o instanceof Option<?>)) {
+          continue;
+        }
+        Option<?> option = (Option<?>) o;
+        // Hide options that should not be visible, i.e., show only visible options.
+        if (option.isVisible()) {
+          atLeastOneOptionVisible = true;
+          sb.append("\\item[");
+          String shortName = option.getShortCmdName();
+          String requiredType = String.format("<%s>", option.getRequiredType().getSimpleName());
+          /*
+           * Special treatment of boolean arguments whose presents only is
+           * already sufficient to switch some feature on.
+           */
+          boolean switchOnOnlyOption = option.getRequiredType().equals(
+            Boolean.class)
+            && !(Boolean.parseBoolean(option.getDefaultValue().toString()) || option
+                .isSetRangeSpecification());
+          if (shortName != null) {
+            sb.append(shortName);
+            if (!switchOnOnlyOption) {
+              sb.append(requiredType);
+            }
+            sb.append(", ");
+          }
+          sb.append(option.toCommandLineOptionKey());
+          if (!switchOnOnlyOption) {
+            sb.append("[ |=]");
+            sb.append(requiredType);
+          }
+          sb.append("] ");
+          sb.append(StringUtil.insertLineBreaks(option.getToolTip(),
+            StringUtil.TOOLTIP_LINE_LENGTH, "\n          "));
+          Range<?> range = option.getRange();
+          ResourceBundle bundle = ResourceManager
+              .getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
+          if (range != null) {
+            List<?> list = range.getAllAcceptableValues();
+            String value;
+            int lineLength = 0;
+            if ((list != null) && (list.size() > 0)) {
+              sb.append("\n          ");
+              sb.append(bundle.getString("ALL_POSSIBLE_VALUES_FOR_TYPE"));
+              sb.append(" \\texttt{");
+              sb.append(requiredType);
+              sb.append("} ");
+              sb.append(bundle.getString("ARE"));
+              sb.append(":\n          ");
+              Object element;
+              for (int i = 0; i < list.size(); i++) {
+                if ((i > 0) && (list.size() > 2)) {
+                  sb.append(',');
+                  if (lineLength > StringUtil.TOOLTIP_LINE_LENGTH) {
+                    sb.append("\n          ");
+                    lineLength = 0;
+                  } else {
+                    sb.append(' ');
+                  }
+                }
+                if (i == list.size() - 1) {
+                  sb.append(' ');
+                  sb.append(bundle.getString("AND"));
+                  sb.append(' ');
+                }
+                element = list.get(i);
+                if (element instanceof Class<?>) {
+                  value = ((Class<?>) element).getName();
+                } else {
+                  value = element.toString();
+                }
+                sb.append("\\texttt{");
+                sb.append(value);
+                sb.append("}");
+                lineLength += value.length() + 30;
+              }
+              sb.append('.');
+            } else if ((range.getRangeSpecString() != null)
+                && !range.isSetConstraints()) {
+              sb.append("\n          ");
+              sb.append(String.format(
+                bundle.getString("ARGS_MUST_FIT_INTO_RANGE"),
+                range.getRangeSpecString()));
+            }
+          }
+          Object defaultValue = option.getDefaultValue();
+          if (defaultValue != null) {
+            sb.append("\n          ");
+            sb.append(bundle.getString("DEFAULT_VALUE"));
+            sb.append(": \\texttt{");
+            if (defaultValue instanceof Class<?>) {
+              sb.append(((Class<?>) defaultValue).getSimpleName());
+            } else {
+              sb.append(defaultValue);
+            }
+            sb.append("}");
+          }
+          sb.append("\n\n");
+        }
+        if (removeFromHere != null) {
+          removeFromHere.remove(option);
+        }
+      }
+      sb.append("\n");
+      return atLeastOneOptionVisible;
+    }
+    
+    /**
+     * 
+     * @param sb
+     * @param options
+     * @param removeFromHere
+     * @return {@code true}, if at least one option is written to the HTML
+     *         table, {@code false} otherwise
      */
     @SuppressWarnings("rawtypes")
     private static boolean writeOptionsToHTMLTable(StringBuilder sb,

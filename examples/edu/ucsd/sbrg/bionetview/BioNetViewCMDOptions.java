@@ -14,21 +14,32 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.sbml.layout.y;
+package edu.ucsd.sbrg.bionetview;
 
+import java.io.File;
+import java.util.ResourceBundle;
+
+import de.zbit.util.ResourceManager;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 
 /**
- * @author Alex Thomas
+ * Options for the command line that are not usable in the graphical user
+ * interface.
+ * 
  * @author Andreas Dr&auml;ger
  * @version $Rev$
  */
-public interface YGraphOptions extends KeyProvider {
+public interface BioNetViewCMDOptions extends KeyProvider {
   
   /**
-   * This option decides if the nodes of a graph or network need to be laid out.
+   * Localization support.
    */
-  public static final Option<Boolean> NEED_TO_LAYOUT = new Option<Boolean>("NEED_TO_LAYOUT", Boolean.class, "This option decides if the nodes of a graph or network need to be laid out.");
+  public static ResourceBundle bundle = ResourceManager.getBundle(YGraphOptions.class.getPackage().getName() + ".Messages");
+  
+  /**
+   * Specifies the SBML input file.
+   */
+  public static final Option<File> SBML_IN_FILE = new Option<File>("SBML_IN_FILE", File.class, bundle, null);
   
 }
