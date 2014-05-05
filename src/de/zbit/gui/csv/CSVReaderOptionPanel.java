@@ -1022,6 +1022,15 @@ public class CSVReaderOptionPanel extends JPanel {
     return currentOptions;
   }
   
+  /**
+   * Use this method with caution, as it returns unchecked internal
+   * data structures!
+   * @return the current preview panel.
+   */
+  public JComponent getPreviewPanel() {
+    return currentPreview;
+  }
+  
   
   private static boolean arrayContains(String[] arr, String element) {
     if (arrayIndexOf(arr, element)>=0) {
