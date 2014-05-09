@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
@@ -35,6 +36,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.SBMLWriter;
+import org.sbml.jsbml.ext.layout.AbstractReferenceGlyph;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
@@ -49,7 +51,6 @@ import y.layout.organic.SmartOrganicLayouter;
 import y.view.DefaultGraph2DRenderer;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
-import y.view.Graph2DLayoutExecutor;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
 import y.view.NodeLabel;
@@ -206,18 +207,40 @@ public class YGraphView implements PropertyChangeListener {
         new LayoutDirector<ILayoutGraph>(doc, new YLayoutBuilder(), new YLayoutAlgorithm());
     director.setLayoutIndex(layoutIndex);
     director.run();
+    //    ILayoutGraph hello = director.getProduct();
+    //    hello.getNode2glyph();
     product = director.getProduct().getGraph2D();
 
     SmartOrganicLayouter sol = new SmartOrganicLayouter();
     sol.setCompactness(.2);
 
-    new Graph2DLayoutExecutor(Graph2DLayoutExecutor.BUFFERED).doLayout(product, sol);
+    //    new Graph2DLayoutExecutor(Graph2DLayoutExecutor.BUFFERED).doLayout(product, sol);
+    updateSBMLDocument(director);
     // experimental or debug features
-    //    writeModifiedModel(System.getProperty("user.dir")+"/out.xml");
+    writeModifiedModel(System.getProperty("user.dir")+"/out.xml");
     writeSVGImage(out);
     //dumpGraph();
 
     displayGraph2DView();
+  }
+
+  private void updateSBMLDocument(LayoutDirector<ILayoutGraph> director) {
+    LayoutGraph layoutProduct = (LayoutGraph) director.getProduct();
+    Graph2D graph = product;
+
+    Map<Node, AbstractReferenceGlyph> node2glyph = layoutProduct.getNode2glyph();
+
+    for (Map.Entry<Node, AbstractReferenceGlyph> entry : node2glyph.entrySet()) {
+      Node key = entry.getKey();
+      AbstractReferenceGlyph value = entry.getValue();
+
+      value.getBoundingBox().getPosition().setX(graph.getX(key));
+      value.getBoundingBox().getPosition().setY(graph.getY(key));
+      value.getBoundingBox().getDimensions().setWidth(graph.getWidth(key));
+      value.getBoundingBox().getDimensions().setHeight(graph.getHeight(key));
+
+    }
+
   }
 
   /**
