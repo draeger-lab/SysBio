@@ -30,28 +30,42 @@ import y.view.NodeRealizer;
  * @version $Rev$
  */
 public class ReactionNodeRealizer extends ProcessNodeRealizer {
-
-	public ReactionNodeRealizer() {
-		super();
-	}
-
-	public ReactionNodeRealizer(NodeRealizer nr) {
-		super(nr);
-	}
-
-	public NodeRealizer createCopy(NodeRealizer nr) {
-		return new ReactionNodeRealizer(nr);
-	}
-
-	@Override
-  protected void drawShape(Graphics2D gfx) {
-		double min = Math.min(width, height);
-		double offsetX = (width - min)/2d;
-		double offsetY = (height - min)/2d;
-		
-		gfx.setColor(getLineColor());
-		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
-		gfx.drawRect((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
+  
+  /**
+   * 
+   */
+  public ReactionNodeRealizer() {
+    super();
   }
-
+  
+  /**
+   * 
+   * @param nr
+   */
+  public ReactionNodeRealizer(NodeRealizer nr) {
+    super(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
+  @Override
+  public NodeRealizer createCopy(NodeRealizer nr) {
+    return new ReactionNodeRealizer(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.sbgn.ProcessNodeRealizer#drawShape(java.awt.Graphics2D)
+   */
+  @Override
+  protected void drawShape(Graphics2D gfx) {
+    double min = Math.min(width, height);
+    double offsetX = (width - min)/2d;
+    double offsetY = (height - min)/2d;
+    
+    gfx.setColor(getLineColor());
+    gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
+    gfx.drawRect((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
+  }
+  
 }

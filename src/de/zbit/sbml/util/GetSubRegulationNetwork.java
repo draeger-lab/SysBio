@@ -201,7 +201,6 @@ public class GetSubRegulationNetwork {
         }
       }
       Transition t = transition.clone();
-      t.unregister(model);
       subQualModel.addTransition(t);
       transitionStatistics++;
       return qsList;

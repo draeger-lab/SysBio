@@ -33,74 +33,74 @@ import de.zbit.sbml.layout.ProcessNode;
  * @version $Rev$
  */
 public class YReactionNode extends ProcessNode<NodeRealizer> {
-
+  
   /**
    * 
    */
-	private ProcessNodeRealizer processNodeRealizer;
-	
-	/**
-	 * 
-	 */
-	public YReactionNode() {
-	  super();
-	  processNodeRealizer = new ReactionNodeRealizer();
+  private ProcessNodeRealizer processNodeRealizer;
+  
+  /**
+   * 
+   */
+  public YReactionNode() {
+    super();
+    processNodeRealizer = new ReactionNodeRealizer();
   }
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
-	 */
-	@Override
-	public NodeRealizer draw(double x, double y, double z, double width,
-			double height, double depth) {
-		return draw(x, y, z, width, height, depth, 0d, null);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.ProcessNode#drawLineSegment(org.sbml.jsbml.ext.layout.LineSegment, double, org.sbml.jsbml.ext.layout.Point)
-	 */
-	@Override
-	public NodeRealizer drawLineSegment(LineSegment lineSegment,
-			double rotationAngle, Point rotationCenter) {
-		// Drawing of single line segments not supported by yFiles implementation. 
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.ProcessNode#draw(double, double, double, double, double, double, double, org.sbml.jsbml.ext.layout.Point)
-	 */
-	@Override
-	public NodeRealizer draw(double x, double y, double z, double width,
-			double height, double depth, double rotationAngle,
-			Point rotationCenter) {
-		processNodeRealizer = (ReactionNodeRealizer) processNodeRealizer.createCopy();
-		processNodeRealizer.setSize(width, height);
-		processNodeRealizer.setLocation(x, y);
-		if ((rotationAngle % 180) != 0) {
-			processNodeRealizer.setRotationAngle(rotationAngle);
-			if (rotationCenter != null) {
-				Point2D.Double point = new Point2D.Double();
-				point.setLocation(rotationCenter.getX(), rotationCenter.getY());
-				processNodeRealizer.setRotationCenter(point);
-			}
-		}
-		return processNodeRealizer;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.ProcessNode#getLineWidth()
-	 */
-	@Override
-	public double getLineWidth() {
-		return processNodeRealizer.getLineWidth();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.ProcessNode#setLineWidth(double)
-	 */
-	@Override
-	public void setLineWidth(double lineWidth) {
-		processNodeRealizer.setLineWidth((float) lineWidth);
-	}
-
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
+   */
+  @Override
+  public NodeRealizer draw(double x, double y, double z, double width,
+    double height, double depth) {
+    return draw(x, y, z, width, height, depth, 0d, null);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.ProcessNode#drawLineSegment(org.sbml.jsbml.ext.layout.LineSegment, double, org.sbml.jsbml.ext.layout.Point)
+   */
+  @Override
+  public NodeRealizer drawLineSegment(LineSegment lineSegment,
+    double rotationAngle, Point rotationCenter) {
+    // Drawing of single line segments not supported by yFiles implementation.
+    return null;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.ProcessNode#draw(double, double, double, double, double, double, double, org.sbml.jsbml.ext.layout.Point)
+   */
+  @Override
+  public NodeRealizer draw(double x, double y, double z, double width,
+    double height, double depth, double rotationAngle,
+    Point rotationCenter) {
+    processNodeRealizer = (ReactionNodeRealizer) processNodeRealizer.createCopy();
+    processNodeRealizer.setSize(width, height);
+    processNodeRealizer.setLocation(x, y);
+    if ((rotationAngle % 180) != 0) {
+      processNodeRealizer.setRotationAngle(rotationAngle);
+      if (rotationCenter != null) {
+        Point2D.Double point = new Point2D.Double();
+        point.setLocation(rotationCenter.getX(), rotationCenter.getY());
+        processNodeRealizer.setRotationCenter(point);
+      }
+    }
+    return processNodeRealizer;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.ProcessNode#getLineWidth()
+   */
+  @Override
+  public double getLineWidth() {
+    return processNodeRealizer.getLineWidth();
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.ProcessNode#setLineWidth(double)
+   */
+  @Override
+  public void setLineWidth(double lineWidth) {
+    processNodeRealizer.setLineWidth((float) lineWidth);
+  }
+  
 }
