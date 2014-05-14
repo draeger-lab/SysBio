@@ -98,74 +98,74 @@ import de.zbit.util.progressbar.ProgressListener;
  * @version $Rev$
  */
 public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeRealizer, EdgeRealizer> {
-
+  
   /**
    * curve segment type cubic bezier
    */
   private static final String CURVESEGMENT_CUBICBEZIER = "CubicBezier";
-
+  
   /**
    * A {@link Logger} for this class.
    */
   private static Logger logger = Logger.getLogger(YLayoutBuilder.class.toString());
-
+  
   /**
    * A YFiles Graph2D is the product of this builder.
    */
   private Graph2D graph;
-
+  
   /**
    * List keeping track of ProgressListeners.
    */
   private List<ProgressListener> progressListeners = new LinkedList<ProgressListener>();
-
+  
   /**
    * Maps SBML identifiers to yFiles nodes.
    */
   private Map<String, Node> id2node = new HashMap<String, Node>();
-
+  
   /**
    * Map species id to all yfiles nodes.
    */
   private Map<String, Set<Node>> speciesId2Node = new HashMap<String, Set<Node>>();
-
+  
   /**
    * Map compartment id to all yfiles nodes.
    */
   private Map<String, Set<Node>> compartmentId2Node = new HashMap<String, Set<Node>>();
-
+  
   /**
    * Map reaction id to all yfiles process nodes.
    */
   private Map<String, Set<Node>> reactionId2Node = new HashMap<String, Set<Node>>();
-
+  
   /**
    * Map reaction glyph id to set of adjoining edges.
    */
   private Map<String, Set<Edge>> reactionGlyphId2edges = new HashMap<String, Set<Edge>>();
-
+  
   /**
    * Map a species id to the set of reactions the species is involved in.
    * For each species only the reactions where species is necessary are listed.
    */
   private Map<String, Set<String>> speciesId2reactions = new HashMap<String, Set<String>>();
-
+  
   /**
    * Maps yfiles node to the represented SRG
    * TODO merge / replace with id2node map
    */
   private Map<Node, AbstractReferenceGlyph> node2glyph = new HashMap<Node, AbstractReferenceGlyph>();
-
+  
   /**
    * Set to hold all text glyphs which label a specific node.
    */
   Set<TextGlyph> labelTextGlyphs;
-
+  
   /**
    * The SBML layout object.
    */
   private Layout layout;
-
+  
   /**
    * Method to initialize the graph2d structure.
    * 
@@ -184,7 +184,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     labelTextGlyphs = new HashSet<TextGlyph>();
     // TODO for all p in progressListeners: progress.setNumberOfTotalCalls(xyz);
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutBuilder#addProgressListener(de.zbit.util.progressbar.AbstractProgressBar)
    */
@@ -192,7 +192,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public void addProgressListener(AbstractProgressBar progress) {
     progressListeners.add(progress);
   }
-
+  
   /**
    * Method to add the compartment glyph representation to the graph.
    * @see de.zbit.sbml.layout.LayoutBuilder#buildCompartment(org.sbml.jsbml.ext.layout.CompartmentGlyph)
@@ -200,13 +200,13 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   @Override
   public void buildCompartment(CompartmentGlyph compartmentGlyph) {
     SBGNNode<NodeRealizer> node = getSBGNNode(SBO.getCompartment());
-
+    
     BoundingBox boundingBox = compartmentGlyph.getBoundingBox();
     Point point = boundingBox.getPosition();
     Dimensions dimension = boundingBox.getDimensions();
     double x = point.getX(), y = point.getY(), z = point.getZ();
     double width = dimension.getWidth(), height = dimension.getHeight(), depth = dimension.getDepth();
-
+    
     ShapeNodeRealizer nodeRealizer = (ShapeNodeRealizer) node.draw(x, y, z, width, height, depth);
     Node ynode = graph.createNode();
     graph.setRealizer(ynode, nodeRealizer);
@@ -216,7 +216,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     logger.fine(MessageFormat.format("building compartment glyph id={0}\n\tbounding box={1}",
       compartmentGlyph.getId(), nodeRealizer.getBoundingBox()));
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutBuilder#buildEntityPoolNode(org.sbml.jsbml.ext.layout.SpeciesGlyph, boolean)
    */
@@ -224,11 +224,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public void buildEntityPoolNode(SpeciesGlyph speciesGlyph,
     boolean cloneMarker) {
     SBGNNode<NodeRealizer> node = getSBGNNode(speciesGlyph.getSBOTerm());
-
+    
     if (cloneMarker) {
       node.setCloneMarker();
     }
-
+    
     BoundingBox boundingBox = speciesGlyph.getBoundingBox();
     Point point = boundingBox.getPosition();
     Dimensions dimension = boundingBox.getDimensions();
@@ -239,20 +239,20 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     width = dimension.getWidth();
     height = dimension.getHeight();
     depth = dimension.getDepth();
-
+    
     ShapeNodeRealizer nodeRealizer = (ShapeNodeRealizer) node.draw(x, y, z, width, height, depth);
-
+    
     //		nodeRealizer.setDropShadowColor(new Color(0, 0, 0, 64));
     //	    nodeRealizer.setDropShadowOffsetX((byte) 3);
     //	    nodeRealizer.setDropShadowOffsetY((byte) 3);
     //	    Color fillColor = nodeRealizer.getFillColor();
     //	    nodeRealizer.setFillColor2(fillColor.brighter());
     //	    nodeRealizer.setFillColor(fillColor);
-
+    
     logger.fine(MessageFormat.format("building EPN element id={0} sbo={1} (%s)\n\tbounding box= {2} {3}",
       speciesGlyph.getId(), speciesGlyph.getSBOTerm(), SBO.convertSBO2Alias(speciesGlyph.getSBOTerm()),
       speciesGlyph.getBoundingBox().getPosition(), nodeRealizer.getBoundingBox()));
-
+    
     Node ynode = graph.createNode();
     if (speciesGlyph.isSetSpecies()) {
       Node compartmentYNode = id2node.get(((Species) speciesGlyph.getSpeciesInstance()).getCompartment());
@@ -265,7 +265,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     putInMapSet(speciesId2Node, speciesGlyph.getSpecies(), ynode);
     node2glyph.put(ynode, speciesGlyph);
   }
-
+  
   /**
    * @param <T>
    * @param speciesId2Node2
@@ -283,24 +283,24 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       hashSet.add(object);
     }
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutBuilder#buildConnectingArc(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph, org.sbml.jsbml.ext.layout.ReactionGlyph)
    */
   @Override
   public void buildConnectingArc(SpeciesReferenceGlyph srg, ReactionGlyph reactionGlyph, double curveWidth) {
-
+    
     Node processNode = id2node.get(reactionGlyph.getId());
     SpeciesGlyph speciesGlyph = srg.getSpeciesGlyphInstance();
     String speciesId = speciesGlyph.getSpecies();
     Node speciesGlyphNode = id2node.get(srg.getSpeciesGlyph());
     assert processNode != null;
     assert speciesGlyphNode != null;
-
+    
     SBGNArc<EdgeRealizer> arc = createArc(srg, reactionGlyph);
-
+    
     EdgeRealizer edgeRealizer = arc.draw(srg.getCurve(), curveWidth);
-
+    
     // dock correctly at process node
     Point relativeDockingAtPN = (Point) srg.getUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT);
     logger.fine(MessageFormat.format("srg={0} rg={1} dock relative at PN {2}", srg.getId(), reactionGlyph.getId(), relativeDockingAtPN));
@@ -312,9 +312,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     else {
       logger.fine(MessageFormat.format("Algorithm did not calculate relative docking position at process node for species reference glyph {0}", srg.getId()));
     }
-
+    
     // docking at species works automatically, YFiles points the edge towards the center of the node
-
+    
     // display stoichiometry labels
     if (srg.isSetSpeciesReference()) {
       SimpleSpeciesReference speciesReference = (SimpleSpeciesReference) srg.getSpeciesReferenceInstance();
@@ -327,7 +327,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
         }
       }
     }
-
+    
     Edge edge = graph.createEdge(processNode, speciesGlyphNode, edgeRealizer);
     putInMapSet(reactionGlyphId2edges, reactionGlyph.getId(), edge);
     if (neccessary(srg)) {
@@ -335,7 +335,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     }
     node2glyph.put(processNode, reactionGlyph);
   }
-
+  
   /**
    * checks if given {@link SpeciesReferenceGlyph} is necessary for
    * the reaction to take place
@@ -356,23 +356,23 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     else {
       SpeciesReferenceRole role = srg.getSpeciesReferenceRole();
       switch (role) {
-      case INHIBITOR: return false;
-      case ACTIVATOR: return false; //TODO not sure
-      default:
-        break;
+        case INHIBITOR: return false;
+        case ACTIVATOR: return false; //TODO not sure
+        default:
+          break;
       }
       return true;
     }
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutBuilder#buildCubicBezier(org.sbml.jsbml.ext.layout.CubicBezier)
    */
   @Override
   public void buildCubicBezier(CubicBezier cubicBezier, double lineWidth) {
-    // partial edge drawing is not supported
+    // TODO partial edge drawing is not supported
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutBuilder#buildProcessNode(org.sbml.jsbml.ext.layout.ReactionGlyph, double)
    */
@@ -400,36 +400,36 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
         "No dimension given for reaction glyph {0} - using default values",
         reactionGlyph));
     }
-
+    
     SBGNReactionNode<NodeRealizer> processNode = createProcessNode();
     if (reactionGlyph.isSetReaction()) {
       processNode = getSBGNReactionNode(reactionGlyph.getReactionInstance().getSBOTerm());
     } else {
       processNode = getSBGNReactionNode(reactionGlyph.getSBOTerm());
     }
-
+    
     assert processNode != null;
-
+    
     Point rotationCenter = new Point(x + width / 2d, y + height / 2d, z + depth / 2d);
     NodeRealizer reactionNodeRealizer = processNode.draw(
       x, y, z, width, height, depth, rotationAngle, rotationCenter);
     logger.fine(MessageFormat.format("Process node position: {0} rotationAngle: {1} rotationCenter: {2}",
       point, rotationAngle, rotationCenter));
-
+    
     Node processYNode = graph.createNode(reactionNodeRealizer);
     id2node.put(reactionGlyph.getId(), processYNode);
     putInMapSet(reactionId2Node, reactionGlyph.getReaction(), processYNode);
     logger.fine(MessageFormat.format("building PN id={0} bounding box={1} {2}",
       reactionGlyph.getId(), reactionGlyph.getBoundingBox().getPosition(), reactionNodeRealizer.getBoundingBox()));
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutBuilder#buildTextGlyph(org.sbml.jsbml.ext.layout.TextGlyph)
    */
   @Override
   public void buildTextGlyph(TextGlyph textGlyph) {
     String text = "";
-
+    
     if (textGlyph.isSetText() &&
         !textGlyph.isSetGraphicalObject() &&
         !textGlyph.isSetOriginOfText()) {
@@ -442,11 +442,11 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       y = point.getY();
       width = dimensions.getWidth();
       height = dimensions.getHeight();
-
+      
       text = textGlyph.getText();
       logger.fine(MessageFormat.format("building text glyph element id={0}\n\tindependent text text='{1}'",
         textGlyph.getId(), text));
-
+      
       Node ynode = graph.createNode();
       IndependentTextRealizer textRealizer =
           new IndependentTextRealizer(x, y, width, height,text);
@@ -462,7 +462,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       logger.warning(MessageFormat.format("illegal text glyph id={0}", textGlyph.getId()));
     }
   }
-
+  
   /**
    * Realizes a text glyph as a label of an already existing node.
    * @param textGlyph
@@ -479,7 +479,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       return;
     }
     NodeRealizer originRealizer = graph.getRealizer(origin);
-
+    
     String text = null;
     if (textGlyph.isSetText()) {
       text = textGlyph.getText();
@@ -496,7 +496,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
         logger.warning(MessageFormat.format("No such element defined {0}", textGlyph.getOriginOfText()));
       }
     }
-
+    
     if (textGlyph.isSetBoundingBox() &&
         textGlyph.getBoundingBox().isSetPosition() &&
         textGlyph.getBoundingBox().isSetDimensions() &&
@@ -510,18 +510,18 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       nodeLabel.setLabelModel(new FreeNodeLabelModel());
       nodeLabel.setFontSize(fontSize);
       originRealizer.setLabel(nodeLabel);
-
+      
       // text glyph position
       Point position = textGlyph.getBoundingBox().getPosition();
       double glyphX = position.getX();
       double glyphY = position.getY();
-
+      
       logger.fine(MessageFormat.format("text position is {0,number},{1,number}", glyphX, glyphY));
-
+      
       Dimensions dimensions = textGlyph.getBoundingBox().getDimensions();
       double width = dimensions.getWidth();
       double height = dimensions.getHeight();
-
+      
       OrientedRectangle orientedRectangle =
           new OrientedRectangle(glyphX, glyphY + height, width, height, 0f, -1f);
       logger.fine("oriented rectangle is " + orientedRectangle.toString());
@@ -552,20 +552,20 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       }
     }
   }
-
+  
   /**
    * @param curve
    * @return
    */
   public static EdgeRealizer createEdgeRealizerFromCurve(Curve curve) {
     EdgeRealizer edgeRealizer = new GenericEdgeRealizer();
-
+    
     // Note: if multiple curve segments (beziers) are specified, the resulting
     // representation will not be standard compliant.
-
+    
     if ((curve != null) && curve.isSetListOfCurveSegments()) {
       List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
-
+      
       // if all curve segments are beziers, use BezierEdgeRealizer, else use PolyLineEdgeRealizer
       boolean drawBezier = true;
       for (CurveSegment curveSegment : listOfCurveSegments) {
@@ -574,13 +574,13 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
           break;
         }
       }
-
+      
       edgeRealizer = drawBezier ? new BezierEdgeRealizer() : new PolyLineEdgeRealizer();
-
+      
       for (int i = listOfCurveSegments.size()-1; i >= 0; i--) {
         CurveSegment curveSegment = listOfCurveSegments.get(i);
         LineSegment ls = (LineSegment) curveSegment;
-
+        
         Point end = ls.getEnd();
         edgeRealizer.addPoint(end.getX(), end.getY());
         if (drawBezier) {
@@ -594,10 +594,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
         edgeRealizer.addPoint(start.getX(), start.getY());
       }
     }
-
+    
     return edgeRealizer;
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutBuilder#builderEnd()
    */
@@ -609,7 +609,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     }
     terminated = true;
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutBuilder#getProduct()
    */
@@ -642,10 +642,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       speciesId2reactions,
       node2glyph,
       graph);
-
+    
     return layoutGraph;
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createMacromolecule()
    */
@@ -653,7 +653,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public Macromolecule<NodeRealizer> createMacromolecule() {
     return new YMacromolecule();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createSourceSink()
    */
@@ -661,7 +661,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public SourceSink<NodeRealizer> createSourceSink() {
     return new YSourceSink();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createUnspecifiedNode()
    */
@@ -669,7 +669,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public UnspecifiedNode<NodeRealizer> createUnspecifiedNode() {
     return new YUnspecifiedNode();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createSimpleChemical()
    */
@@ -677,7 +677,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public SimpleChemical<NodeRealizer> createSimpleChemical() {
     return new YSimpleChemical();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createNucleicAcidFeature()
    */
@@ -685,7 +685,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public NucleicAcidFeature<NodeRealizer> createNucleicAcidFeature() {
     return new YNucleicAcidFeature();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createPerturbingAgent()
    */
@@ -693,7 +693,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public PerturbingAgent<NodeRealizer> createPerturbingAgent() {
     return new YPerturbingAgent();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createCompartment()
    */
@@ -701,7 +701,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public Compartment<NodeRealizer> createCompartment() {
     return new YCompartment();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createProduction()
    */
@@ -709,7 +709,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public Production<EdgeRealizer> createProduction() {
     return new YProduction();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createConsumption()
    */
@@ -717,7 +717,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public Consumption<EdgeRealizer> createConsumption() {
     return new YConsumption();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createReversibleConsumption()
    */
@@ -725,7 +725,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public ReversibleConsumption<EdgeRealizer> createReversibleConsumption() {
     return new YReversibleConsumption();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createCatalysis()
    */
@@ -733,7 +733,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public Catalysis<EdgeRealizer> createCatalysis() {
     return new YCatalysis();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createInhibition()
    */
@@ -741,7 +741,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public Inhibition<EdgeRealizer> createInhibition() {
     return new YInhibition();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createModulation()
    */
@@ -749,7 +749,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public Modulation<EdgeRealizer> createModulation() {
     return new YModulation();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createStimulation()
    */
@@ -757,7 +757,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public Stimulation<EdgeRealizer> createStimulation() {
     return new YStimulation();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createNecessaryStimulation()
    */
@@ -765,7 +765,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public NecessaryStimulation<EdgeRealizer> createNecessaryStimulation() {
     return new YNecessaryStimulation();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createProcessNode()
    */
@@ -773,7 +773,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public ProcessNode<NodeRealizer> createProcessNode() {
     return new YReactionNode();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createAssociationNode()
    */
@@ -781,7 +781,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public AssociationNode<NodeRealizer> createAssociationNode() {
     return new YAssociationNode();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createDissociationNode()
    */
@@ -789,7 +789,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public DissociationNode<NodeRealizer> createDissociationNode() {
     return new YDissociationNode();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createOmittedProcessNode()
    */
@@ -797,7 +797,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public OmittedProcessNode<NodeRealizer> createOmittedProcessNode() {
     return new YOmittedProcessNode();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutFactory#createUncertainProcessNode()
    */
@@ -805,5 +805,5 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
   public UncertainProcessNode<NodeRealizer> createUncertainProcessNode() {
     return new YUncertainProcessNode();
   }
-
+  
 }
