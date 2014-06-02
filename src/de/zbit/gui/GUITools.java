@@ -2512,7 +2512,8 @@ public class GUITools {
       protected void done() {
         try {
           super.done();
-          listener.propertyChange(new PropertyChangeEvent(this, "dialog.done", null, get()));
+          if(listener != null)
+          	listener.propertyChange(new PropertyChangeEvent(this, "dialog.done", null, get()));
         } catch (Exception exc) {
           GUITools.showErrorMessage(null, exc);
         }
