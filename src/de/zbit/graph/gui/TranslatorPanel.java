@@ -106,7 +106,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   /**
    * KGML formatted input file
    */
-  File inputFile;
+  protected File inputFile;
   
   /**
    * Desired output file format
@@ -135,7 +135,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   /**
    * We need to remember the translator for saving the file later on.
    */
-  private KEGGtranslator<?> translator = null;
+  protected KEGGtranslator<?> translator = null;
   
   /**
    * Allows the programmer to store any additional data along with this panel.
@@ -169,7 +169,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * @param translatedDocument
    * @throws Exception 
    */
-  protected TranslatorPanel(final File inputFile, final String outputFormat, ActionListener translationResult, DocumentType translatedDocument) {
+  public TranslatorPanel(final File inputFile, final String outputFormat, ActionListener translationResult, DocumentType translatedDocument) {
     super();
     setLayout(new BorderLayout());
     setOpaque(false);
@@ -207,6 +207,8 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     this.translationListener.add(downloadORTranslateWorker);
     downloadORTranslateWorker.execute();
   }
+  
+  
   
   /* (non-Javadoc)
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
@@ -297,7 +299,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   
   
   
-  private void showTemporaryLoadingPanel(String pwName, String organism) {
+  protected void showTemporaryLoadingPanel(String pwName, String organism) {
     if (pwName==null) {
       pwName = "model";
     }
@@ -402,7 +404,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * @param parent - may be null. Else: all elements will be placed on this container
    * @return - the ProgressBar of the container.
    */
-  private static AbstractProgressBar generateLoadingPanel(Container parent, String loadingText) {
+  protected static AbstractProgressBar generateLoadingPanel(Container parent, String loadingText) {
     Dimension panelSize = new Dimension(400, 75);
     
     // Create the panel
