@@ -91,12 +91,12 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   /**
    * The current graph layer
    */
-  Graph2D graphLayer;
+  protected Graph2D graphLayer;
   
   /**
    * The current pane on which the {@link #graphLayer} is visualized.
    */
-  Graph2DView pane;
+  protected Graph2DView pane;
   
   /**
    * @return the pane
@@ -416,7 +416,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @return {@code true} if all nodes in the graph
    * have the same center X coordinate.
    */
-  private static boolean allNodesAtSamePosition(Graph2D graph) {
+  protected static boolean allNodesAtSamePosition(Graph2D graph) {
     double centerX = Double.NaN;
     boolean isAllOnCenterX = true;
     double X = Double.NaN;
