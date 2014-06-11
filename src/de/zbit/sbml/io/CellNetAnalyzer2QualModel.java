@@ -29,16 +29,14 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLWriter;
 import org.sbml.jsbml.ext.layout.BoundingBox;
-import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
-import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.InputTransitionEffect;
 import org.sbml.jsbml.ext.qual.OutputTransitionEffect;
-import org.sbml.jsbml.ext.qual.QualitativeModel;
+import org.sbml.jsbml.ext.qual.QualModelPlugin;
 import org.sbml.jsbml.ext.qual.QualitativeSpecies;
 import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
@@ -68,7 +66,7 @@ public class CellNetAnalyzer2QualModel {
 		SBMLDocument sbmlDoc = QualModelBuilding.initializeQualDocument(modelName, modelID, creator, org);
 	  
 		Model model = QualModelBuilding.model;
-	    QualitativeModel qModel = QualModelBuilding.qualModel;
+	    QualModelPlugin qModel = QualModelBuilding.qualModel;
 		Layout layout = QualModelBuilding.layout;
 		
 		//add species
@@ -126,7 +124,7 @@ public class CellNetAnalyzer2QualModel {
 	 * @param current
 	 * @return
 	 */
-	public static void determineInputs(QualitativeModel model, ASTNode node, Transition t) {
+	public static void determineInputs(QualModelPlugin model, ASTNode node, Transition t) {
 		if(node.getType().equals(ASTNode.Type.PLUS)) {
 			node.setType(ASTNode.Type.LOGICAL_AND);
 		}
