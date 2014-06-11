@@ -32,19 +32,19 @@ import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.qual.QualConstants;
-import org.sbml.jsbml.ext.qual.QualitativeModel;
+import org.sbml.jsbml.ext.qual.QualModelPlugin;
 
 import de.zbit.util.DatabaseIdentifierTools;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 import de.zbit.util.EscapeChars;
 
 /**
- * @author Roland Keller, Stephanie Tscherneck
+ * @author Roland Keller, Stephanie Hoffmann
  * @version $Rev$
  */
 public abstract class QualModelBuilding {
 
-	public static QualitativeModel qualModel;
+	public static QualModelPlugin qualModel;
 	public static Layout layout;
 	public static Model model;
 	
@@ -70,7 +70,7 @@ public abstract class QualModelBuilding {
 	    initTaxonomyMap();
 	    
 	    SBMLDocument doc = new SBMLDocument(3, 1);
-	    doc.addNamespace(QualConstants.shortLabel, "xmlns", QualConstants.namespaceURI);
+	    doc.addDeclaredNamespace("xmlns" + ':' + QualConstants.shortLabel, QualConstants.namespaceURI);
 		
 	    model = doc.createModel(modelID);
 	    model.setMetaId("meta_" + modelID);
@@ -92,7 +92,7 @@ public abstract class QualModelBuilding {
 	    	model.getHistory().addModifiedDate(Calendar.getInstance().getTime());
 	    }
 	    
-	    qualModel = new QualitativeModel(model);
+	    qualModel = new QualModelPlugin(model);
 	    model.addExtension(QualConstants.namespaceURI, QualModelBuilding.qualModel);
 		
 	    LayoutModelPlugin layoutExt = new LayoutModelPlugin(model);
@@ -133,11 +133,11 @@ public abstract class QualModelBuilding {
 	 * @param {@link SBMLDocument}
 	 * @return {@link QualitativeModel} if existing
 	 */
-	public static QualitativeModel getQualitativeModel(SBMLDocument doc) {
+	public static QualModelPlugin getQualitativeModel(SBMLDocument doc) {
 		if (doc != null) {
 			Model m = doc.getModel();
 			if (m != null) {
-				QualitativeModel qModel = (QualitativeModel)m.getExtension(QualConstants.namespaceURI);
+				QualModelPlugin qModel = (QualModelPlugin)m.getExtension(QualConstants.namespaceURI);
 				if (qModel != null) {
 					return qModel;
 				}
@@ -154,7 +154,7 @@ public abstract class QualModelBuilding {
 	 * @throws FileNotFoundException
 	 * @throws XMLStreamException
 	 */
-	public static void writeSBMlDocument(SBMLDocument doc, String outputFile) throws SBMLException, FileNotFoundException, XMLStreamException {
+	public static void writeSBMLDocument(SBMLDocument doc, String outputFile) throws SBMLException, FileNotFoundException, XMLStreamException {
 		SBMLWriter.write(doc, outputFile, "Sysbio-Project", "1");
 	}
 
