@@ -23,8 +23,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
-import org.sbml.jsbml.util.XMLResourceBundleControl;
-
 /**
  * A {@link ResourceManager} avoids loading instances of {@link ResourceBundle}
  * multiple times by keeping these in a {@link Map} data structure. As
