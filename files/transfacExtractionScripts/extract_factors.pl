@@ -14,17 +14,17 @@ $superfamily = "none";
 $organism = "";
 $annotation = "";
 
-if (length(@ARGV) < 3) {
-	print "usage: perl extract_factors.pl [factor.dat] [bindingFactor-file] [organism-file]\n";
+if (length(@ARGV) < 1) {
+	print "usage: perl extract_factors.pl [factor.dat] [bindingFactor-file]\n";
 }
-
-
+else {
+print "computing\n";
 open(IN, "<$ARGV[0]");
 open(OUT, ">$ARGV[1]");
-open(ORG, ">$ARGV[2]");
+#open(ORG, ">$ARGV[2]");
 
-print OUT "TF_AC\tTF_name\torganism\tTF_type\tbindingsites\tencoding_gene_ac\tencoding_gene_name\tcomplexes\tinteracting_factors\tprecurser\tsuperfamily\tbindingsite_annotation\n";
-print ORG "TF_AC\tTFname\torganism\n";
+print OUT "TF_AC\tTF_name\torganism\tTF_type\tbindingsites\tencoding_gene_ac\tencoding_gene_name\tcomplexes\tinteracting_factors\tprecurser\tsuperfamily\tTF_annotation\n";
+#print ORG "TF_AC\tTFname\tTF_type\torganism\n";
 
 while (<IN>){
 	if (/\/\//) { #new entry
@@ -49,15 +49,15 @@ while (<IN>){
 			if (length($annotation) < 5) {
 				$annotation = "none";
 			}
-
+			if (length($organism) < 2) {
+				$organism = "none";
+			}
+	
+#			print ORG "$ac\t$name\t$type\t$organism\n";
 			print OUT "$ac\t$name\t$organism\t$type\t$bindingsites\t$geneAC\t$geneName\t$complexes\t$interaction\t$precurser\t$superfamily\t$annotation\n";
 		}
 
-		if (length($organism) < 2) {
-			$organism = "none";
-		}
-	
-		print ORG "$ac\t$name\t$organism\n";
+
 
 
 		#reset
@@ -74,11 +74,12 @@ while (<IN>){
 		$superfamily = "none";
 		$organism = "";
 		$annotation = "";
+		$dr = "";
 
-		print "\n"; 
+#		print "\n"; 
 	}
 	elsif (/^AC  (T\d{5})/) {
-		print "$1\t";
+#		print "$1\t";
 		$ac = $1;
 	}
 	elsif (/^FA  (.*)/) {
@@ -86,7 +87,7 @@ while (<IN>){
 	}
 	elsif (/^OS  ([A-Za-z\(\) ]+),.+$/) {
 		$organism = $1;
-		print $organism;
+#		print $organism;
 	}
 	elsif (/^TY  (\w+)./) {
 		$type = $1;
@@ -114,14 +115,16 @@ while (<IN>){
 	elsif (/^HP  (T\d{5});.+/) {
 		$superfamily = $1;
 	}
-	elsif (/^DR  ([A-Za-z0-9: ]+);.+/) {
+	elsif (/^DR  ([.A-Za-z0-9: ]+)\.$/) {
 		$dr = $1;
+print $ac." ".$dr."\n";
 		$annotation .= $dr.";";
 	}
 
+}
 }
 
 
 close(IN);
 close(OUT);
-close(ORG);
+#close(ORG);
