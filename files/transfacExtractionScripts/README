@@ -4,10 +4,11 @@ factor.dat und site.dat are files from the Transfac database, which can be downl
 
 usage of the perl-scripts: 
 
-perl extract_factors.pl [factor.dat] [bindingFactor-file] [organism-file]
+perl extract_factors.pl [factor.dat] [bindingFactor-file]
 perl extract_sites.pl [site.dat] [bindingSites-file]
 perl extract_genes.pl [gene.data] [genesAnnotation-file]
 
 
-All transcriptionfactors will be extracted and can then be used to translate the data in a qualitative model.
-The class Transfac2Qualmodel.java requires these four output files and furthermore the organisms which are allowed to include in the model, e.g.: "human,Mammalia".
+All transcription factors will be extracted and can then be used to translate the data in a qualitative model.
+The class Transfac2Qualmodel.java requires these 3 output files.
+Further the class requires the organisms which are allowed to be included in the model, e.g.: "human,Mammalia".
