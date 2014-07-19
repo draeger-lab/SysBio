@@ -82,6 +82,10 @@ import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
 import org.sbml.jsbml.ext.fbc.FBCConstants;
 import org.sbml.jsbml.ext.fbc.FBCSpeciesPlugin;
+import org.sbml.jsbml.ext.layout.CubicBezier;
+import org.sbml.jsbml.ext.layout.Dimensions;
+import org.sbml.jsbml.ext.layout.LineSegment;
+import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
@@ -239,8 +243,98 @@ public class SBasePanel extends JPanel implements EquationComponent {
       if (sbase instanceof Variable) {
         addProperties((Variable) sbase);
       }
+      if (sbase instanceof LineSegment) {
+        addProperties((LineSegment) sbase);
+      }
+      if (sbase instanceof Point) {
+        addProperties((Point) sbase);
+      }
+      if (sbase instanceof Dimensions) {
+        addProperties((Dimensions) sbase);
+      }
     }
     //GUITools.setOpaqueForAllElements(this, false);
+  }
+  
+  /**
+   * 
+   * @param dim
+   */
+  private void addProperties(Dimensions dim) {
+    if (dim.isSetWidth()) {
+      JSpinner spinner = new JSpinner(new SpinnerNumberModel(dim.getWidth(), SPINNER_MIN_VALUE, SPINNER_MAX_VALUE, 1d));
+      spinner.setEnabled(editable);
+      addLabeledComponent(bundle.getString("width"), spinner);
+    }
+    if (dim.isSetHeight()) {
+      JSpinner spinner = new JSpinner(new SpinnerNumberModel(dim.getHeight(), SPINNER_MIN_VALUE, SPINNER_MAX_VALUE, 1d));
+      spinner.setEnabled(editable);
+      addLabeledComponent(bundle.getString("height"), spinner);
+    }
+    if (dim.isSetDepth()) {
+      JSpinner spinner = new JSpinner(new SpinnerNumberModel(dim.getDepth(), SPINNER_MIN_VALUE, SPINNER_MAX_VALUE, 1d));
+      spinner.setEnabled(editable);
+      addLabeledComponent(bundle.getString("depth"), spinner);
+    }
+  }
+  
+  /**
+   * 
+   * @param point
+   */
+  private void addProperties(Point point) {
+    if (point.isSetX()) {
+      JSpinner spinner = new JSpinner(new SpinnerNumberModel(point.getX(), SPINNER_MIN_VALUE, SPINNER_MAX_VALUE, 1d));
+      spinner.setEnabled(editable);
+      addLabeledComponent(bundle.getString("x"), spinner);
+    }
+    if (point.isSetY()) {
+      JSpinner spinner = new JSpinner(new SpinnerNumberModel(point.getY(), SPINNER_MIN_VALUE, SPINNER_MAX_VALUE, 1d));
+      spinner.setEnabled(editable);
+      addLabeledComponent(bundle.getString("y"), spinner);
+    }
+    if (point.isSetZ()) {
+      JSpinner spinner = new JSpinner(new SpinnerNumberModel(point.getZ(), SPINNER_MIN_VALUE, SPINNER_MAX_VALUE, 1d));
+      spinner.setEnabled(editable);
+      addLabeledComponent(bundle.getString("z"), spinner);
+    }
+  }
+  
+  /**
+   * 
+   * @param ls
+   */
+  private void addProperties(LineSegment ls) {
+    if (ls.isSetStart()) {
+      SBasePanel panel = new SBasePanel(ls.getStart(), namesIfAvailable);
+      panel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("start") + ' '));
+      lh.add(panel);
+    }
+    if (ls.isSetEnd()) {
+      SBasePanel panel = new SBasePanel(ls.getEnd(), namesIfAvailable);
+      panel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("end") + ' '));
+      lh.add(panel);
+    }
+    if (ls instanceof CubicBezier) {
+      addProperties((CubicBezier) ls);
+    }
+  }
+  
+  /**
+   * 
+   * @param cb
+   */
+  private void addProperties(CubicBezier cb) {
+    if (cb.isSetBasePoint1()) {
+      SBasePanel panel = new SBasePanel(cb.getStart(), namesIfAvailable);
+      panel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("basePoint1") + ' '));
+      lh.add(panel);
+    }
+    if (cb.isSetBasePoint2()) {
+      SBasePanel panel = new SBasePanel(cb.getStart(), namesIfAvailable);
+      panel.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("basePoint2") + ' '));
+      lh.add(panel);
+    }
   }
   
   /**
@@ -303,7 +397,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
    */
   private void addProperties(Constraint c) {
     if (c.isSetMessage() || editable) {
-      JTextField tf = new JTextField(SBMLtools.toXML(c.getMessage()));
+      JTextField tf = new JTextField(org.sbml.jsbml.util.SBMLtools.toXML(c.getMessage()));
       tf.setEditable(editable);
       addLabeledComponent(bundle.getString("message"), tf);
     }

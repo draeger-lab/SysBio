@@ -153,8 +153,10 @@
   <entry key="cubicBezier">Cubic bezier</entry>
   <entry key="curve">Curve</entry>
   <entry key="curveSegment">Curve segment</entry>
+  <entry key="depth">Depth</entry>
   <entry key="dimensions">Dimensions</entry>
   <entry key="end">End</entry>
+  <entry key="height">Height</entry>
   <entry key="layout">Layout</entry>  
   <entry key="listOfCompartmentGlyphs">Compartment glyphs</entry>
   <entry key="listOfCurveSegments">Curve segments</entry>
@@ -169,6 +171,10 @@
   <entry key="speciesReferenceGlyph">Species reference glyph</entry>
   <entry key="start">Start</entry>
   <entry key="textGlyph">Text glyph</entry>
+  <entry key="width">Width</entry>
+  <entry key="x">x-coordinate</entry>
+  <entry key="y">y-coordinate</entry>
+  <entry key="z">z-coordinate</entry>
   
   <!-- Qual -->
   
