@@ -156,8 +156,10 @@
   <entry key="cubicBezier">Kubische Bézierkurve</entry>
   <entry key="curve">Kurve</entry>
   <entry key="curveSegment">Kurvensegment</entry>
+  <entry key="depth">Tiefe</entry>
   <entry key="dimensions">Dimensionen</entry>
   <entry key="end">Ende</entry>
+  <entry key="height">Höhe</entry>
   <entry key="layout">Layout</entry>  
   <entry key="listOfCompartmentGlyphs">Kompartimentglyphen</entry>
   <entry key="listOfCurveSegments">Kurvensegmente</entry>
@@ -172,6 +174,10 @@
   <entry key="speciesReferenceGlyph">Speziesverweisglyphen</entry>
   <entry key="start">Start</entry>
   <entry key="textGlyph">Textglyphe</entry>
+  <entry key="width">Breite</entry>
+  <entry key="x">Abzissenwert</entry>
+  <entry key="y">Ordinatenwert</entry>
+  <entry key="z">Tiefenwert</entry>
 
   <!-- Qual -->
   
