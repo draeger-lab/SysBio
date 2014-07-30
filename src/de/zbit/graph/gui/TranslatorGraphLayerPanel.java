@@ -29,8 +29,10 @@ import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import y.base.Node;
@@ -109,7 +111,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * This allows extending classes to build a panel with detailed
    * information that is shown on node-selection.
    */
-  private JScrollPane detailPanel=null;
+  protected JScrollPane detailPanel=null;
   
   /**
    * Thread that updates the detail panel.
@@ -462,6 +464,15 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
       detailPanelUpdater.interrupt();
     }
     
+    // If there was a vertical scroll bar, save their position
+    final JScrollBar bar = detailPanel.getVerticalScrollBar();
+		final int pos;
+		if(bar != null) {
+			pos = bar.getValue();
+		} else {
+			pos = -1;
+		}
+			
     // Set temporary progress bar
     JProgressBar prog = new JProgressBar();
     prog.setIndeterminate(true);
@@ -479,7 +490,23 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
             detailPanel.getViewport().getView().equals(p)) {
           detailPanel.setViewportView(null);
         }
+        
+        
         detailPanel.validate();
+
+        // restore the old vertical scroll bar position if there was a bar
+        if(bar != null && pos > 0) {
+        	SwingUtilities.invokeLater(new Runnable() {	
+        		@Override
+        		public void run() {
+        			JScrollBar newBar = detailPanel.getVerticalScrollBar();
+        			if(bar != null && pos > 0) {
+        				newBar.setValue(pos);
+        			}					
+        		}
+        	});
+        }
+        
         detailPanel.repaint();
       }
     };
