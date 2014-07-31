@@ -111,6 +111,10 @@ public class SBFileFilter extends GeneralFileFilter {
      */
     JPEG_FILES,
     /**
+     * For the JSON file format (JavaScript Object Notation).
+     */
+    JSON_FILES,
+    /**
      * KEGG Markup Language files.
      */
     KGML_FILES,
@@ -231,9 +235,13 @@ public class SBFileFilter extends GeneralFileFilter {
           return extensions;
         case HTML_FILES:
           extensions.add("htm");
+          extensions.add("html");
           break;
         case JPEG_FILES:
           extensions.add("jpg");
+          break;
+        case JSON_FILES:
+          extensions.add("json");
           break;
         case KGML_FILES:
           extensions.add("xml");
@@ -493,6 +501,13 @@ public class SBFileFilter extends GeneralFileFilter {
    */
   public static SBFileFilter createJPEGFileFilter() {
     return new SBFileFilter(FileType.JPEG_FILES);
+  }
+  
+  /**
+   * @return A filter for JavaScript Object Notation (JSON) files.
+   */
+  public static GeneralFileFilter createJSONFileFilter() {
+    return new SBFileFilter(FileType.JSON_FILES);
   }
   
   /**
@@ -1074,8 +1089,7 @@ public class SBFileFilter extends GeneralFileFilter {
     StringBuilder sb = new StringBuilder();
     try {
       sb.append(bundle.getString(type.toString()));
-    }
-    catch( MissingResourceException e ) {
+    } catch(MissingResourceException e) {
       log.warning("No label found for this file type " + type.toString());
     }
     if (extensions.iterator().hasNext()) {
