@@ -665,7 +665,7 @@ Serializable {
     this.description = description;
     this.range = range;
     this.shortCmdName = shortCmdName;
-    if (requiredType.isAssignableFrom(Class.class)) {
+    if (requiredType.isAssignableFrom(Class.class) && (defaultValue != null)) {
       this.defaultValue = (Type) ((Class<Type>) defaultValue).getName();
     } else {
       this.defaultValue = defaultValue;
@@ -1437,6 +1437,18 @@ Serializable {
     Option<E> dependency, Range<E> condition) {
     this(optionName, requiredType, description, defaultValue, displayName);
     addDependency(dependency, condition);
+  }
+  
+  /**
+   * 
+   * @param optionName
+   * @param requiredType
+   * @param bundle
+   * @param range
+   */
+  public Option(String optionName, Class<Type> requiredType, ResourceBundle bundle,
+    Range<Type> range) {
+    this(optionName, requiredType, bundle, range, (Type) null);
   }
   
   /**
