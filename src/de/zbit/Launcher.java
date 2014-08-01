@@ -349,22 +349,6 @@ public abstract class Launcher implements Runnable, Serializable {
     }
   }
   
-  /**
-   * Optional method that returns a citation for the implementing application.
-   * 
-   * @param HTMLstyle
-   *        if {@code true}, a HTML style citation should be returned
-   *        (using HTML-special chars and formatting).
-   * @return complete citation string.
-   */
-  public String getCitation(boolean HTMLstyle) {
-    // Is implemented, because this method should be OPTIONAL.
-    // Example for a return in HTML-style could be:
-    // "KEGGtranslator: visualizing and converting the KEGG PATHWAY database to various formats. Wrzodek C, Dr&#228;ger A, Zell A.<i>Bioinformatics</i>. 2011, <b>27</b>:2314-2315"
-    // Please do not use HTML-names (such as "&auml;") but rather unicode encodings (as "&#228;").
-    return null;
-  }
-  
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
@@ -446,6 +430,22 @@ public abstract class Launcher implements Runnable, Serializable {
   }
   
   /**
+   * Optional method that returns a citation for the implementing application.
+   * 
+   * @param HTMLstyle
+   *        if {@code true}, a HTML style citation should be returned
+   *        (using HTML-special chars and formatting).
+   * @return complete citation string.
+   */
+  public String getCitation(boolean HTMLstyle) {
+    // Is implemented, because this method should be OPTIONAL.
+    // Example for a return in HTML-style could be:
+    // "KEGGtranslator: visualizing and converting the KEGG PATHWAY database to various formats. Wrzodek C, Dr&#228;ger A, Zell A.<i>Bioinformatics</i>. 2011, <b>27</b>:2314-2315"
+    // Please do not use HTML-names (such as "&auml;") but rather unicode encodings (as "&#228;").
+    return null;
+  }
+  
+  /**
    * This method provides information about the {@link Option} containing
    * {@link KeyProvider} {@link Class} objects that are allowable command line
    * options for this program.
@@ -464,6 +464,26 @@ public abstract class Launcher implements Runnable, Serializable {
    */
   public SBProperties getCommandLineArgs() {
     return props;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public String getCopyrightYears() {
+    String key = getYearWhenProjectWasStarted() < getYearOfProgramRelease() ? "COPYRIGHT_YEARS" : "COPYRIGHT_YEAR";
+    return MessageFormat.format(
+      resources.getString(key),
+      getYearWhenProjectWasStarted(),
+      getYearOfProgramRelease());
+  }
+  
+  /**
+   * @return The name of the institute within the organization that vendors this
+   *         application.
+   */
+  public String getInstitute() {
+    return resources.getString("INSTITUTE");
   }
   
   /**
@@ -500,6 +520,13 @@ public abstract class Launcher implements Runnable, Serializable {
   }
   
   /**
+   * @return The name of the organization that vendors this application.
+   */
+  public String getOrganization() {
+    return resources.getString("ORGANIZATION");
+  }
+  
+  /**
    * This is a list of options, given on the command-line (i.e. should also
    * be contained in {@link #getCmdLineOptions()}), that are made persistent.
    * @return
@@ -507,6 +534,17 @@ public abstract class Launcher implements Runnable, Serializable {
   public List<Class<? extends KeyProvider>> getPersistentOptions() {
     // Per definition, interactive options should be made persistent!
     return getInteractiveOptions();
+  }
+  
+  /**
+   * @return The name of the provider, i.e., the vendor of this application.
+   *         Typically, this name will consist of the name of the organization
+   *         and the institute.
+   * @see #getOrganization()
+   * @see #getInstitute()
+   */
+  public String getProvider() {
+    return resources.getString("PROVIDER");
   }
   
   /**
@@ -697,12 +735,11 @@ public abstract class Launcher implements Runnable, Serializable {
         getAppName(), getVersionNumber()),
         MessageFormat.format(
           resources.getString("COPYRIGHT_HOLDER"),
-          getYearWhenProjectWasStarted(),
-          getYearOfProgramRelease(),
+          getCopyrightYears(),
           MessageFormat.format(
-            resources.getString("PROVIDER"),
-            resources.getString("ORGANIZATION"),
-            resources.getString("INSTITUTE"))
+            getProvider(),
+            getOrganization(),
+            getInstitute())
             )
         )
         );
