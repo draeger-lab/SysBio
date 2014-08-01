@@ -35,7 +35,7 @@
 {1}</entry>
   <entry key="ORGANIZATION">Universität Tübingen</entry>
   <entry key="INSTITUTE">Zentrum für Bioinformatik Tübingen (ZBIT)</entry>
-  <entry key="COPYRIGHT_HOLDER">Copyright © {0,number,#}-{1,number,#} {2}</entry>
+  <entry key="COPYRIGHT_HOLDER">Copyright © {0} {1}</entry>
   <entry key="COPYRIGHT_MESSAGE">
 {0}
 {1}.
@@ -44,6 +44,8 @@ GEWÄHRLEISTUNG UND HAFTUNG kostenlos zur Verfügung
 gestellt. Dies ist freie Software, die Sie gern unter
 bestimmten Bedingungen weiterverbreiten dürfen.
 </entry>
+  <entry key="COPYRIGHT_YEAR">{0,number,#}</entry>
+  <entry key="COPYRIGHT_YEARS">{0,number,#}-{1,number,#}</entry>
   <entry key="LINK_TO_LICENSE_FILE">Siehe {0}.</entry>
   
   
