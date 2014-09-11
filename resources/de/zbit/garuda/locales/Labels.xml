@@ -27,8 +27,8 @@
   
   <!-- GarudaActions -->
   
-  <entry key="SENT_TO_GARUDA">Sent current file to Garuda</entry>
-  <entry key="SENT_TO_GARUDA_TOOLTIP">Sents the current file to a compatible gadget in the Garuda platform.</entry>
+  <entry key="SENT_TO_GARUDA">Send current file to Garuda</entry>
+  <entry key="SENT_TO_GARUDA_TOOLTIP">Sends the current file to a compatible gadget in the Garuda platform.</entry>
   
   <!-- GarudaFileSender -->
   
