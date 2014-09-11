@@ -82,6 +82,7 @@ import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
 import org.sbml.jsbml.ext.fbc.FBCConstants;
 import org.sbml.jsbml.ext.fbc.FBCSpeciesPlugin;
+import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CubicBezier;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.LineSegment;
@@ -252,8 +253,24 @@ public class SBasePanel extends JPanel implements EquationComponent {
       if (sbase instanceof Dimensions) {
         addProperties((Dimensions) sbase);
       }
+      if (sbase instanceof BoundingBox) {
+        addProperties((BoundingBox) sbase);
+      }
     }
     //GUITools.setOpaqueForAllElements(this, false);
+  }
+  
+  private void addProperties(BoundingBox bbox) {
+    if (bbox.isSetPosition()) {
+      SBasePanel p = new SBasePanel(bbox.getPosition());
+      p.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("position") + ' '));
+      lh.add(p);
+    }
+    if (bbox.isSetDimensions()) {
+      SBasePanel p = new SBasePanel(bbox.getDimensions());
+      p.setBorder(BorderFactory.createTitledBorder(' ' + bundle.getString("dimensions") + ' '));
+      lh.add(p);
+    }
   }
   
   /**
