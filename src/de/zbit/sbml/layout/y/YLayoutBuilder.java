@@ -566,29 +566,38 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     if ((curve != null) && curve.isSetListOfCurveSegments()) {
       List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
       
-      // if all curve segments are beziers, use BezierEdgeRealizer, else use PolyLineEdgeRealizer
-      boolean drawBezier = true;
+      // if at least one curve segment is a bezier, use BezierEdgeRealizer, else use PolyLineEdgeRealizer
+      boolean drawBezier = false;
       for (CurveSegment curveSegment : listOfCurveSegments) {
-        drawBezier = drawBezier && curveSegment.isSetType() && curveSegment.getType().equals(CURVESEGMENT_CUBICBEZIER);
-        if (!drawBezier) {
+        //        drawBezier = drawBezier && curveSegment.isSetType() && curveSegment.getType().equals(CURVESEGMENT_CUBICBEZIER);
+        //        if (!drawBezier) {
+        //          break;
+        //        }
+        if (curveSegment instanceof CubicBezier) {
+          drawBezier = true;
           break;
         }
       }
       
       edgeRealizer = drawBezier ? new BezierEdgeRealizer() : new PolyLineEdgeRealizer();
       
-      for (int i = listOfCurveSegments.size()-1; i >= 0; i--) {
+      for (int i = listOfCurveSegments.size() - 1; i >= 0; i--) {
         CurveSegment curveSegment = listOfCurveSegments.get(i);
         LineSegment ls = (LineSegment) curveSegment;
         
         Point end = ls.getEnd();
         edgeRealizer.addPoint(end.getX(), end.getY());
-        if (drawBezier) {
+        if (drawBezier && (curveSegment instanceof CubicBezier)) {
           CubicBezier cb = (CubicBezier) curveSegment;
-          Point basePoint2 = cb.getBasePoint2();
-          edgeRealizer.addPoint(basePoint2.getX(), basePoint2.getY());
-          Point basePoint1 = cb.getBasePoint1();
-          edgeRealizer.addPoint(basePoint1.getX(), basePoint1.getY());
+          BezierEdgeRealizer ber = (BezierEdgeRealizer) edgeRealizer;
+          if (cb.isSetBasePoint2()) {
+            Point basePoint2 = cb.getBasePoint2();
+            ber.appendBend(basePoint2.getX(), basePoint2.getY());
+          }
+          if (cb.isSetBasePoint1()) {
+            Point basePoint1 = cb.getBasePoint1();
+            ber.appendBend(basePoint1.getX(), basePoint1.getY());
+          }
         }
         Point start = ls.getStart();
         edgeRealizer.addPoint(start.getX(), start.getY());
