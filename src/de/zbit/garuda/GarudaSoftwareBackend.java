@@ -94,7 +94,7 @@ public class GarudaSoftwareBackend {
     super();
     
     gadget = new Gadget();
-    gadget.setUUID(uid);
+    gadget.setID(uid);
     gadget.setName(parent.getApplicationName());
     
     this.parent = parent;
@@ -196,7 +196,7 @@ public class GarudaSoftwareBackend {
    */
   //@SuppressWarnings("deprecation")
   public void init() throws NetworkException, GarudaConnectionNotInitializedException {
-    backend = new GarudaClientBackend(gadget.getUUID(), gadget.getName()); /*,
+    backend = new GarudaClientBackend(gadget.getID(), gadget.getName()); /*,
       iconPath, listOfOutputFileFormats, listOfInputFileFormats,
       listOfCategories, provider, description, listOfScreenshots);*/
     backend.addGarudaChangeListener(new GarudaSoftwareListener(this));
@@ -375,7 +375,7 @@ public class GarudaSoftwareBackend {
     StringBuilder builder = new StringBuilder();
     builder.append(getClass().getSimpleName());
     builder.append(" [softwareID=");
-    builder.append(gadget.getUUID());
+    builder.append(gadget.getID());
     builder.append(", initialized=");
     builder.append((backend != null) && backend.isInitialized() ? "true" : "faslse");
     builder.append(']');
