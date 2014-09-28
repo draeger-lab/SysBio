@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -349,6 +350,20 @@ public abstract class Launcher implements Runnable, Serializable {
     }
   }
   
+  /**
+   * 
+   * @param uuid
+   * @param ui
+   * @param cmdargs
+   */
+  protected void connectToGaruda(String uuid, UserInterface ui, SBProperties cmdargs) {
+    if (getCmdLineOptions().contains(de.zbit.garuda.GarudaOptions.class)
+        && (!cmdargs.containsKey(de.zbit.garuda.GarudaOptions.CONNECT_TO_GARUDA) ||
+            cmdargs.getBoolean(de.zbit.garuda.GarudaOptions.CONNECT_TO_GARUDA))) {
+      new Thread(new de.zbit.garuda.GarudaConnector(uuid, ui)).start();
+    }
+  }
+  
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
@@ -479,6 +494,19 @@ public abstract class Launcher implements Runnable, Serializable {
   }
   
   /**
+   * Returns a unique identifier for the software based on class and package
+   * name of the instance of {@link Launcher}. You may want to override this
+   * method if your software should connect to Garuda. However, the returned
+   * {@link String} is a constant property of the launcher class and can
+   * therefore also be used as is.
+   * 
+   * @return
+   */
+  public String getId() {
+    return UUID.nameUUIDFromBytes(getClass().getName().getBytes()).toString();
+  }
+  
+  /**
    * @return The name of the institute within the organization that vendors this
    *         application.
    */
@@ -599,6 +627,11 @@ public abstract class Launcher implements Runnable, Serializable {
   public void guiMode(AppConf appConf) {
     java.awt.Window ui = initGUI(appConf);
     if (ui != null) {
+      
+      String uuid = getId();
+      if ((uuid != null) && (isGarudaEnabled()) && (ui instanceof UserInterface)) {
+        connectToGaruda(uuid, (UserInterface) ui, appConf.getCmdArgs());
+      }
       if (terminateJVMwhenDone) {
         ui.addWindowListener(EventHandler.create(
           java.awt.event.WindowListener.class, this, "exit", "window",
@@ -649,6 +682,14 @@ public abstract class Launcher implements Runnable, Serializable {
    *         such mode is supported.
    */
   public abstract java.awt.Window initGUI(AppConf appConf);
+  
+  /**
+   * Override and return {@code true} if your software is Garuda-enabled.
+   * @return
+   */
+  public boolean isGarudaEnabled() {
+    return false;
+  }
   
   /**
    * @return the terminateJVMwhenDone
