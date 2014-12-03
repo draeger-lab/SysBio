@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+
 import jp.sbi.garuda.client.backend.BackendAlreadyInitializedException;
 import jp.sbi.garuda.client.backend.BackendNotInitializedException;
 import jp.sbi.garuda.client.backend.GarudaClientBackend;
@@ -91,8 +93,6 @@ public class GarudaSoftwareBackend {
    *        the user interface of the gadget
    */
   public GarudaSoftwareBackend(String uid, UserInterface parent) {
-    super();
-    
     gadget = new Gadget();
     gadget.setID(uid);
     gadget.setName(parent.getApplicationName());
@@ -155,7 +155,6 @@ public class GarudaSoftwareBackend {
   /**
    * 
    * @param propertyName
-   * @param oldValue
    * @param newValue
    */
   public void firePropertyChange(String propertyName, Object newValue) {
@@ -194,11 +193,15 @@ public class GarudaSoftwareBackend {
    * @throws NetworkException
    * @throws GarudaConnectionNotInitializedException
    */
-  //@SuppressWarnings("deprecation")
   public void init() throws NetworkException, GarudaConnectionNotInitializedException {
     backend = new GarudaClientBackend(gadget.getID(), gadget.getName()); /*,
       iconPath, listOfOutputFileFormats, listOfInputFileFormats,
       listOfCategories, provider, description, listOfScreenshots);*/
+    UserInterface ui = getParent();
+    if (ui instanceof JFrame) {
+      backend.setParentFrame((JFrame) ui);
+    }
+    backend.setForceCloseOnDisconnect(true);
     backend.addGarudaChangeListener(new GarudaSoftwareListener(this));
     logger.fine(bundle.getString("TRYING_TO_INITIALIZE_GARUDA_CORE"));
     try {

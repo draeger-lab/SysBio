@@ -26,7 +26,6 @@ import java.security.AccessControlException;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -533,7 +532,7 @@ public abstract class Launcher implements Runnable, Serializable {
    * @return By default, this method returns {@link Level#INFO}. If something
    *         different is desired, this method should be overridden in an
    *         implementing class.
-   * @see {@link de.zbit.gui.GUIOptions#LOG_LEVEL} allows to overwrite this
+   * @see de.zbit.gui.GUIOptions#LOG_LEVEL allows to overwrite this
    *      value from the command-line.
    */
   public Level getLogLevel() {
