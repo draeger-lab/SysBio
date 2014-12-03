@@ -293,7 +293,7 @@ GUIOptions, UserInterface {
    *        the width dimension of the {@link JBrowserPane}.
    * @param preferedHeight
    *        the height dimension of the {@link JBrowserPane}.
-   * @param scorll
+   * @param scroll
    *        whether or not to embed the created {@link JBrowserPane} in a
    *        {@link JScrollPane}.
    * @return Either an instance of {@link JBrowserPane} that displays the HTML
@@ -360,7 +360,7 @@ GUIOptions, UserInterface {
    * Creates a new {@link BaseFrame} with the given
    * {@link GraphicsConfiguration}.
    * 
-   * @param title
+   * @param appConf
    * @param gc
    */
   public BaseFrame(AppConf appConf, GraphicsConfiguration gc) {
@@ -1090,7 +1090,7 @@ GUIOptions, UserInterface {
    * Override this message to change the texts of some or all {@link JMenuItem}s
    * including their tool tips and also of {@link JButton}s and so on. The
    * location given here must be a path that includes the package name, for
-   * instance {@link de.zbit.locales.MyTexts}, where the file extension
+   * instance {@code de.zbit.locales.MyTexts}, where the file extension
    * {@code xml} is omitted, but the resource file is required to be an XML
    * file in the format defined for {@link Properties}. The naming convention
    * for the resource file says that it should contain a suffix consisting of

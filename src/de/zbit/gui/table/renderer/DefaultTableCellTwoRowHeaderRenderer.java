@@ -54,7 +54,7 @@ public class DefaultTableCellTwoRowHeaderRenderer extends DefaultTableCellHeader
     super();
     this.boldBorders = boldBorders;
   }
-
+  
   /* (non-Javadoc)
    * @see sun.swing.table.DefaultTableCellHeaderRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
    */
@@ -75,14 +75,14 @@ public class DefaultTableCellTwoRowHeaderRenderer extends DefaultTableCellHeader
       
       // Eventually create a bold border
       // XXX: Offset possible when "#" col is shown.
-//      if (boldBorders!=null && boldBorders.contains(column)) {
-//        Border b = new MatteBorder(1, 2, 1, 1, secondLabel.getForeground());
-//        firstLabel.setBorder(b);
-//        secondLabel.setBorder(b);
-//      } else {
-//        System.out.println(column + " ::: " + boldBorders);
-//      }
-        
+      //      if (boldBorders!=null && boldBorders.contains(column)) {
+      //        Border b = new MatteBorder(1, 2, 1, 1, secondLabel.getForeground());
+      //        firstLabel.setBorder(b);
+      //        secondLabel.setBorder(b);
+      //      } else {
+      //        System.out.println(column + " ::: " + boldBorders);
+      //      }
+      
       JPanel p = new JPanel(new GridLayout(2, 1));
       p.add(firstLabel);
       p.add(secondLabel);
@@ -101,7 +101,7 @@ public class DefaultTableCellTwoRowHeaderRenderer extends DefaultTableCellHeader
      * because it get's out of sync with the content upon resize (java bug).
      * HOWEVER, we cannot simply set a preferred height from outside
      * this method. Thus, return a modified preferred height here.
-     * BECAUASE: we MUST change the height in order ot make two lines
+     * BECAUASE: we MUST change the height in order to make two lines
      * visible here.
      */
     Dimension pref = super.getPreferredSize();

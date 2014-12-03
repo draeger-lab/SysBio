@@ -39,7 +39,7 @@ import de.zbit.io.FileTools;
 import de.zbit.util.ResourceManager;
 
 /**
- * Requests compatible {@link Software} from the Garuda Core in the background
+ * Requests compatible {@link Gadget} from the Garuda Core in the background
  * and opens a dialog to ask the user where to sent a file if this has been
  * successful.
  * 
