@@ -201,13 +201,12 @@ public class GarudaSoftwareBackend {
     if (ui instanceof JFrame) {
       backend.setParentFrame((JFrame) ui);
     }
-    backend.setForceCloseOnDisconnect(true);
-    backend.addGarudaChangeListener(new GarudaSoftwareListener(this));
     logger.fine(bundle.getString("TRYING_TO_INITIALIZE_GARUDA_CORE"));
+    backend.setForceCloseOnDisconnect(true);
+    backend.setShowHelpOnStart(false);
+    backend.addGarudaChangeListener(new GarudaSoftwareListener(this));
     try {
       backend.initialize();
-      backend.setForceCloseOnDisconnect(false);
-      backend.setShowHelpOnStart(false);
     } catch (GarudaConnectionNotInitializedException exc) {
       firePropertyChange(GarudaClientBackend.CONNECTION_NOT_INITIALIZED_ID, null);
     } catch (BackendAlreadyInitializedException exc) {
