@@ -87,6 +87,7 @@ import org.sbml.jsbml.ext.layout.CubicBezier;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
+import org.sbml.jsbml.ontology.Term;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
@@ -882,7 +883,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
       LayoutHelper helper = new LayoutHelper(sboPanel);
       
       int columns = 35, innerRow = -1;
-      SBO.Term term = SBO.getTerm(sbase.getSBOTerm());
+      Term term = SBO.getTerm(sbase.getSBOTerm());
       helper.add(new JLabel(bundle.getString("name")), 0, ++innerRow, 1, 1, 0d, 0d);
       JTextArea nameField = new JTextArea(term.getName(), 2, columns);
       nameField.setEditable(editable);

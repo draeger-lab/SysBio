@@ -16,7 +16,6 @@
 package de.zbit.sbml.util;
 
 import java.util.AbstractList;
-import java.util.List;
 
 import org.sbml.jsbml.CallableSBase;
 import org.sbml.jsbml.Model;
@@ -30,22 +29,23 @@ import org.sbml.jsbml.Model;
  * @version $Rev$
  */
 public class ListOfCallableSBases extends AbstractList<CallableSBase> {
-
-	private Model model;
-
-	/**
-	 * 
-	 * @param model
-	 */
-	public ListOfCallableSBases(Model model) {
-		this.model = model;
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.util.AbstractList#get(int)
-	 */
-	public CallableSBase get(int index) {
-		if (index < model.getCompartmentCount()) {
+  
+  private Model model;
+  
+  /**
+   * 
+   * @param model
+   */
+  public ListOfCallableSBases(Model model) {
+    this.model = model;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.util.AbstractList#get(int)
+   */
+  @Override
+  public CallableSBase get(int index) {
+    if (index < model.getCompartmentCount()) {
       return model.getCompartment(index);
     }
     index -= model.getCompartmentCount();
@@ -58,13 +58,14 @@ public class ListOfCallableSBases extends AbstractList<CallableSBase> {
     }
     index -= model.getParameterCount();
     return model.getReaction(index);
-	}
-
-	/* (non-Javadoc)
-	 * @see java.util.AbstractCollection#size()
-	 */
-	public int size() {
-		return model.getSymbolCount() + model.getReactionCount();
-	}
-	
+  }
+  
+  /* (non-Javadoc)
+   * @see java.util.AbstractCollection#size()
+   */
+  @Override
+  public int size() {
+    return model.getSymbolCount() + model.getReactionCount();
+  }
+  
 }
