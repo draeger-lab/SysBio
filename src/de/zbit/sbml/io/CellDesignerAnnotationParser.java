@@ -56,7 +56,6 @@ import org.sbml.jsbml.ext.layout.TextGlyph;
 
 import de.zbit.sbml.util.SBMLtools;
 
-
 /**
  * @author Stephanie Tscherneck
  * @version $Rev$
