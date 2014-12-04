@@ -21,9 +21,7 @@ import java.awt.Component;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
-import javax.swing.ListCellRenderer;
 
-import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
@@ -39,46 +37,46 @@ import de.zbit.gui.ColorPalette;
  * @version $Rev$
  */
 public class SBMLlistCellRenderer extends DefaultListCellRenderer {
-	
-	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = 77458008315378864L;
-
-	/**
-	 * 
-	 */
-	public SBMLlistCellRenderer() {
-		super();
-	}
-	
-	/* (non-Javadoc)
-	 * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
-	 */
-	@Override
-	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		boolean textSet = false;
-		if (value instanceof SimpleSpeciesReference) {
-			SimpleSpeciesReference specRef = (SimpleSpeciesReference) value;
+  
+  /**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = 77458008315378864L;
+  
+  /**
+   * 
+   */
+  public SBMLlistCellRenderer() {
+    super();
+  }
+  
+  /* (non-Javadoc)
+   * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
+   */
+  @Override
+  public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+    boolean textSet = false;
+    if (value instanceof SimpleSpeciesReference) {
+      SimpleSpeciesReference specRef = (SimpleSpeciesReference) value;
       if (specRef.isSetSpeciesInstance()) {
-      	Species species = specRef.getSpeciesInstance();
-      	if (species.isSetName()) {
-      		setText(species.getName());
-      		textSet = true;
-      	} else if (species.isSetId()) {
-      		setText(species.getId());
-      		textSet = true;
-      	}
+        Species species = specRef.getSpeciesInstance();
+        if (species.isSetName()) {
+          setText(species.getName());
+          textSet = true;
+        } else if (species.isSetId()) {
+          setText(species.getId());
+          textSet = true;
+        }
       }
-		}
-		if (!textSet && (value instanceof NamedSBase)) {
-			NamedSBase nsb = (NamedSBase) value;
-			setText(nsb.isSetName() ? nsb.getName() : nsb.getId());
-		}
-		Color bg[] = new Color[] {ColorPalette.lightBlue, Color.WHITE}; 
-		setBackground(bg[index % bg.length]);
-		return this;
-	}
-	
+    }
+    if (!textSet && (value instanceof NamedSBase)) {
+      NamedSBase nsb = (NamedSBase) value;
+      setText(nsb.isSetName() ? nsb.getName() : nsb.getId());
+    }
+    Color bg[] = new Color[] {ColorPalette.lightBlue, Color.WHITE};
+    setBackground(bg[index % bg.length]);
+    return this;
+  }
+  
 }

@@ -16,7 +16,7 @@
  */
 package de.zbit.sbml.io;
 
-import org.sbml.jsbml.SBO.Term;
+import org.sbml.jsbml.ontology.Term;
 import org.sbml.jsbml.util.StringTools;
 
 /**
@@ -25,7 +25,7 @@ import org.sbml.jsbml.util.StringTools;
  * @version $Rev$
  */
 public class SBOTermFormatter {
-
+  
   /**
    * @param term
    * @return
@@ -49,5 +49,5 @@ public class SBOTermFormatter {
     }
     return StringTools.firstLetterUpperCase(definition.trim());
   }
-
+  
 }

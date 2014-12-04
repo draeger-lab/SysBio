@@ -27,7 +27,6 @@ import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
@@ -37,8 +36,6 @@ import org.sbml.jsbml.ext.qual.Output;
 import org.sbml.jsbml.ext.qual.QualModelPlugin;
 import org.sbml.jsbml.ext.qual.QualitativeSpecies;
 import org.sbml.jsbml.ext.qual.Transition;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 import de.zbit.sbml.io.QualModelBuilding;
 
@@ -65,7 +62,7 @@ public class GetSubRegulationNetwork {
   /**
    * contains the corresponding count of regulating transitions
    */
-  private Map<String, Integer> species2edgeWeight = new HashMap<String, Integer>(); 
+  private Map<String, Integer> species2edgeWeight = new HashMap<String, Integer>();
   
   /**
    *  contains all regulated genes
@@ -137,26 +134,26 @@ public class GetSubRegulationNetwork {
     
     System.out.println("\nregulatedGenes: cntRegulationTransition");
     for (String speciesId : regulatedGenes) {
-    	System.out.println(subQualModel.getQualitativeSpecies(speciesId).getName() + ": " 
-    			+ species2edgeWeight.get(speciesId)
-    			+ " --> "
-    			+ subQualModel.getQualitativeSpecies(speciesId).getCVTerms()
-    			);
+      System.out.println(subQualModel.getQualitativeSpecies(speciesId).getName() + ": "
+          + species2edgeWeight.get(speciesId)
+          + " --> "
+          + subQualModel.getQualitativeSpecies(speciesId).getCVTerms()
+          );
     }
     
     System.out.println();
     System.out.println(regulated + " regulated species");
     System.out.println(speciesAlreadyThere + " species are already there");
-	System.out.println();
-	System.out.println("qualSpecies: " + qualSpeciesStatistics);
-	System.out.println("Transitions: " + transitionStatistics);
-	System.out.println("-------------------------------");
-	System.out.println("encoding: " + encoding);
-	System.out.println("regulation: " + regulation);
-	System.out.println("interaction: " + interaction);
-	System.out.println("complexing: " + complexing);
-	System.out.println("super family: " + superFamily);
-	
+    System.out.println();
+    System.out.println("qualSpecies: " + qualSpeciesStatistics);
+    System.out.println("Transitions: " + transitionStatistics);
+    System.out.println("-------------------------------");
+    System.out.println("encoding: " + encoding);
+    System.out.println("regulation: " + regulation);
+    System.out.println("interaction: " + interaction);
+    System.out.println("complexing: " + complexing);
+    System.out.println("super family: " + superFamily);
+    
     
     //		SBML2GraphML s2g = new SBML2GraphML(true);
     //		s2g.createGraph(doc);
@@ -194,23 +191,23 @@ public class GetSubRegulationNetwork {
           
           //			if (trIds != null && trIds.length > 0) {
           for (int j = 0; j < trIds.length; j++) {
-        	  String currentId = trIds[j];
-//            System.out.print(trIds[j] + " ");
-//        	  System.out.print(depthIsImportant(trIds[j]));
-            if (depthIsImportant(currentId)) {depth++;} 
-//      	  System.out.println(" " + depth);
+            String currentId = trIds[j];
+            //            System.out.print(trIds[j] + " ");
+            //        	  System.out.print(depthIsImportant(trIds[j]));
+            if (depthIsImportant(currentId)) {depth++;}
+            //      	  System.out.println(" " + depth);
             String[] qsList = addTransitionToSubmodel(qModel.getTransition(trIds[j]), (depth-1));
             if (qsList != null) {
-            	// recursive call of the method
+              // recursive call of the method
               transferTransitions(qsList, depth);
-              if (depthIsImportant(trIds[j])) {depth--;} 
+              if (depthIsImportant(trIds[j])) {depth--;}
             }
           }
         }
       }
       //			}
     } else {
-//    	System.out.println("depth > max");
+      //    	System.out.println("depth > max");
     }
     
   }
@@ -219,89 +216,91 @@ public class GetSubRegulationNetwork {
    * which kind of transitions should be penalized
    */
   private boolean depthIsImportant(String transitionID) {
-	  return (transitionID.startsWith("reg")); // || transitionID.startsWith("cx"));
+    return (transitionID.startsWith("reg")); // || transitionID.startsWith("cx"));
   }
-
-/**
+  
+  /**
    * add the transition and corresponding Species to the submodel as long as they are not already included
    * @param transition
    */
   private String[] addTransitionToSubmodel(Transition transition, int currentDepth) {
-	  if (subQualModel.getTransition(transition.getId()) == null) {
-		  String[] qsList = new String[transition.getOutputCount()];
-		  int cnt = 0;
-		  if (transition.isSetListOfInputs()) {
-			  for (Input i : transition.getListOfInputs()) {
-				  if (subQualModel.getQualitativeSpecies(i.getQualitativeSpecies()) == null) {
-					  QualitativeSpecies qs = qModel.getQualitativeSpecies(i.getQualitativeSpecies()).clone();
-					  //					qs.unregister(model);
-					  subQualModel.addQualitativeSpecies(qs);
-					  qualSpeciesStatistics++;
-				  }
-			  }
-		  }
-		  if (transition.isSetListOfOutputs()) {
-			  for (Output o : transition.getListOfOutputs()) {
-				  if (subQualModel.getQualitativeSpecies(o.getQualitativeSpecies()) == null) {
-					  if (transition.getId().startsWith("reg")) {
-						  System.out.println(currentDepth + ":" + qModel.getQualitativeSpecies(o.getQualitativeSpecies()).getName() + "=" + o.getQualitativeSpecies());
-						  regulatedGenes.add(o.getQualitativeSpecies());
-						  regulated++;
-						  species2edgeWeight.put(o.getQualitativeSpecies(), 1);
-					  }
-					  subQualModel.addQualitativeSpecies(qModel.getQualitativeSpecies(o.getQualitativeSpecies()).clone());
-					  qualSpeciesStatistics++;
-					  qsList[cnt] = o.getQualitativeSpecies();
-					  cnt++;
-				  }
-				  else {
-					  if (transition.getId().startsWith("reg")) {
-//						  System.out.println(currentDepth + ":" + qModel.getQualitativeSpecies(o.getQualitativeSpecies()).getName() + "=" + o.getQualitativeSpecies());
-						  species2edgeWeight.put(o.getQualitativeSpecies(), (species2edgeWeight.get(o.getQualitativeSpecies()) + 1));
-					  }
-					speciesAlreadyThere++;
-				}
-			  }
-		  }
-		  if (subQualModel.getTransition(transition.getId()) == null) {
-			  Transition t = transition.clone();
-			  subQualModel.addTransition(t);
-			  transitionStatistics++;
-			  makeStatistics(t);
-			  return qsList;
-		  }
-		  else return null;
-	  }
-	  else return null;
+    if (subQualModel.getTransition(transition.getId()) == null) {
+      String[] qsList = new String[transition.getOutputCount()];
+      int cnt = 0;
+      if (transition.isSetListOfInputs()) {
+        for (Input i : transition.getListOfInputs()) {
+          if (subQualModel.getQualitativeSpecies(i.getQualitativeSpecies()) == null) {
+            QualitativeSpecies qs = qModel.getQualitativeSpecies(i.getQualitativeSpecies()).clone();
+            //					qs.unregister(model);
+            subQualModel.addQualitativeSpecies(qs);
+            qualSpeciesStatistics++;
+          }
+        }
+      }
+      if (transition.isSetListOfOutputs()) {
+        for (Output o : transition.getListOfOutputs()) {
+          if (subQualModel.getQualitativeSpecies(o.getQualitativeSpecies()) == null) {
+            if (transition.getId().startsWith("reg")) {
+              System.out.println(currentDepth + ":" + qModel.getQualitativeSpecies(o.getQualitativeSpecies()).getName() + "=" + o.getQualitativeSpecies());
+              regulatedGenes.add(o.getQualitativeSpecies());
+              regulated++;
+              species2edgeWeight.put(o.getQualitativeSpecies(), 1);
+            }
+            subQualModel.addQualitativeSpecies(qModel.getQualitativeSpecies(o.getQualitativeSpecies()).clone());
+            qualSpeciesStatistics++;
+            qsList[cnt] = o.getQualitativeSpecies();
+            cnt++;
+          }
+          else {
+            if (transition.getId().startsWith("reg")) {
+              //						  System.out.println(currentDepth + ":" + qModel.getQualitativeSpecies(o.getQualitativeSpecies()).getName() + "=" + o.getQualitativeSpecies());
+              species2edgeWeight.put(o.getQualitativeSpecies(), (species2edgeWeight.get(o.getQualitativeSpecies()) + 1));
+            }
+            speciesAlreadyThere++;
+          }
+        }
+      }
+      if (subQualModel.getTransition(transition.getId()) == null) {
+        Transition t = transition.clone();
+        subQualModel.addTransition(t);
+        transitionStatistics++;
+        makeStatistics(t);
+        return qsList;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
   
   /*
    * counts the type of transitions for statistics
    */
   private void makeStatistics(Transition t) {
-	  if (t.getId().startsWith("tr")) {
-		  encoding++; 
-//		  System.out.println("tr");
-	  } else if (t.getId().startsWith("reg")) {
-		  regulation++; 
-//		  System.out.println("reg");
-	  } else if (t.getId().startsWith("int")) {
-		  interaction++; 
-//		  System.out.println("int");
-	  } else if (t.getId().startsWith("cx")) {
-		  complexing++; 
-//		  System.out.println("cx");
-	  } else if (t.getId().startsWith("sf")) {
-		  superFamily++; 
-//		  System.out.println("sf");
-	  } else {
-		  System.out.println("unknown start of transition id" + t.getId());
-	  }
-	  
-
+    if (t.getId().startsWith("tr")) {
+      encoding++;
+      //		  System.out.println("tr");
+    } else if (t.getId().startsWith("reg")) {
+      regulation++;
+      //		  System.out.println("reg");
+    } else if (t.getId().startsWith("int")) {
+      interaction++;
+      //		  System.out.println("int");
+    } else if (t.getId().startsWith("cx")) {
+      complexing++;
+      //		  System.out.println("cx");
+    } else if (t.getId().startsWith("sf")) {
+      superFamily++;
+      //		  System.out.println("sf");
+    } else {
+      System.out.println("unknown start of transition id" + t.getId());
+    }
+    
+    
   }
-
-private String[] getSpeciesIdsFromName(String string) {
+  
+  private String[] getSpeciesIdsFromName(String string) {
     return null;
     // TODO über equal transitions den rest
   }
@@ -361,7 +360,7 @@ private String[] getSpeciesIdsFromName(String string) {
     }
     else {
       System.out.println("usage: " +
-      	  "[Model.xml] " +
+          "[Model.xml] " +
           "[search strings comma separated] " +
           "[creator] " +
           "[commaseparated allowed organisms (e.g., human,Mammalia)] " +
