@@ -371,7 +371,20 @@ public class ArrayUtils {
     return d;
   }
 
+  
+  /**
+   * Sums each value in an array.
+   * @param arr
+   * @return
+   */
+  public static double sum(double[] arr) {
+    double d = 0;
+    for (double i: arr)
+      d+=i;
+    return d;
+  }
 
+  
   /**
    * Reverse the input array. I.e., the first item will be the last and so on.
    * @param hits
