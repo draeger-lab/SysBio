@@ -996,6 +996,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
     String firstConsistentLineStringOfMax=null;
     
     String line;
+    boolean isHeaderOneColumnShorter = false; // is the header one column shorter than the other lines?
     while ((line = in.readLine()) != null && max<=threshold && j<(cancelAfterXLines+skipLines)) { //  && separatorChar=='\u0000'
       j++;
       if (trimLinesAfterReading && line!=null) line = line.trim();
@@ -1015,8 +1016,14 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
         int aktCounts=0;
         aktCounts = countChar(line, curSepChar, treatMultipleConsecutiveSeparatorsAsOne, true);
         
+        // Decide if the header is one column shorter than the other columns
+        // It's assumed, that this decision is made only once per possible sepChar.
+        if (counts[i]==aktCounts-1 && !isHeaderOneColumnShorter)
+          isHeaderOneColumnShorter = true;
         // If number of columns is consistent, increment counter. If not, reset.
-        if (counts[i]==aktCounts && aktCounts>0 && !CommentIndicators.contains(firstChar)) {
+        // Number of columns is also consistens, if there if there is a difference of one to the
+        // first seen line (because the header could be one column shorter if the first column name is missing)
+        if ((counts[i]==aktCounts || counts[i]==aktCounts-1) && aktCounts>0 && !CommentIndicators.contains(firstChar)) {
           consistentCounts[i]++;
         } else {
           // Headers are allowed to start with a comment indicator.
@@ -1037,6 +1044,10 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
           } else if (firstConsistentLineStringOfMax==null) {
             firstConsistentLineStringOfMax=firstConsistentLineString[i];
             firstConsistentLine = firstConsistentLines[i];
+          }
+          // If the header is one column shorter, insert a space followed by a seperator char
+          if (isHeaderOneColumnShorter) {
+            firstConsistentLineStringOfMax = " " + separatorChar + firstConsistentLineStringOfMax;
           }
           max = consistentCounts[i];
           
@@ -1489,7 +1500,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
         System.arraycopy(dataLine, 0, dataLineShort, 0, j-firstConsistentLine-1);
         dataLine = dataLineShort;
       }
-      
+
       return containsHeaders(headerLine, dataLine);
     } catch (Exception e) {
       logger.fine(e.getLocalizedMessage());
