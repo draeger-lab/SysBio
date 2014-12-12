@@ -22,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -65,7 +64,7 @@ import de.zbit.io.tar.TarInputStream;
  * @since 1.0
  */
 public class ZIPUtils {
-
+  
   /**
    * Allows for unpacking of archives into a specific path.
    */
@@ -98,7 +97,9 @@ public class ZIPUtils {
   public static ByteArrayOutputStream BZ2unCompressData(String INfilename) throws IOException {
     // Now decompress archive
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    if (fi==null) return null;
+    if (fi==null) {
+      return null;
+    }
     
     
     /*CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
@@ -114,12 +115,13 @@ public class ZIPUtils {
     BufferedReader in2 = new BufferedReader( new InputStreamReader( new CBZip2InputStream(fi)));
     int s;
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    while ((s = in2.read()) != -1)
+    while ((s = in2.read()) != -1) {
       out.write(s);
+    }
     //out.close();
     in2.close();
     return out;
-
+    
   }
   
   /**
@@ -131,16 +133,17 @@ public class ZIPUtils {
   public static BufferedReader BZ2unCompressReader(String INfilename) throws IOException {
     InputStream in = BZ2unCompressStream(INfilename);
     
-    if(in!=null)    
-    	return new BufferedReader( new InputStreamReader(in));
-    else
-    	return null;
+    if(in!=null) {
+      return new BufferedReader( new InputStreamReader(in));
+    } else {
+      return null;
+    }
   }
   
   public static InputStream BZ2unCompressStream(String INfilename) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     if (fi == null) {
-    	return null;
+      return null;
     }
     
     return new CBZip2InputStream(new CheckedInputStream(fi,new CRC32()));
@@ -155,7 +158,7 @@ public class ZIPUtils {
     OutputStream out = deCryptStream(in);
     return (out==null)?"":out.toString();
   }
-
+  
   /**
    * 
    * @param in
@@ -170,7 +173,7 @@ public class ZIPUtils {
       DESedeKeySpec keyspec = new DESedeKeySpec(desKeyData);
       SecretKeyFactory keyfactory = SecretKeyFactory.getInstance("DESede");
       SecretKey key = keyfactory.generateSecret(keyspec);
-
+      
       Cipher dcipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
       dcipher.init(Cipher.DECRYPT_MODE, key);
       
@@ -182,8 +185,9 @@ public class ZIPUtils {
       //  out.write(buf, 0, numRead);
       //}
       int x;
-      while ((x = in.read()) != -1)
+      while ((x = in.read()) != -1) {
         out.write(x);
+      }
       out.flush();
       out.close();
       
@@ -193,35 +197,35 @@ public class ZIPUtils {
   }
   
   public static InputStream deCryptInputStream(InputStream in) {
-  	CipherInputStream cis = null;
+    CipherInputStream cis = null;
     try {
       DESedeKeySpec keyspec = new DESedeKeySpec(desKeyData);
       SecretKeyFactory keyfactory = SecretKeyFactory.getInstance("DESede");
       SecretKey key = keyfactory.generateSecret(keyspec);
-
+      
       Cipher dcipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
       dcipher.init(Cipher.DECRYPT_MODE, key);
       
       cis = new CipherInputStream(in, dcipher);
-
+      
     } catch (Exception e) {e.printStackTrace();}
     
     return cis;
   }
   
   public static OutputStream enCryptOutputStream(OutputStream out) {
-  	CipherOutputStream cos = null;
+    CipherOutputStream cos = null;
     //AlgorithmParameterSpec paramSpec = new IvParameterSpec(desKeyData);
     try {
       DESedeKeySpec keyspec = new DESedeKeySpec(desKeyData);
       SecretKeyFactory keyfactory = SecretKeyFactory.getInstance("DESede");
       SecretKey key = keyfactory.generateSecret(keyspec);
-
+      
       Cipher ecipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
       ecipher.init(Cipher.ENCRYPT_MODE, key);
-
+      
       cos = new CipherOutputStream(out, ecipher);
-   
+      
     } catch (Exception e) {e.printStackTrace();}
     return cos;
   }
@@ -241,14 +245,14 @@ public class ZIPUtils {
    * @return
    */
   public static OutputStream enCrypt(InputStream in, OutputStream out2) {
-
-  	OutputStream out = out2;
+    
+    OutputStream out = out2;
     //AlgorithmParameterSpec paramSpec = new IvParameterSpec(desKeyData);
     try {
       DESedeKeySpec keyspec = new DESedeKeySpec(desKeyData);
       SecretKeyFactory keyfactory = SecretKeyFactory.getInstance("DESede");
       SecretKey key = keyfactory.generateSecret(keyspec);
-
+      
       Cipher ecipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
       ecipher.init(Cipher.ENCRYPT_MODE, key);
       
@@ -299,16 +303,19 @@ public class ZIPUtils {
    */
   public static String GUnzip(String infile) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(infile, parentClass);
-    if (fi==null) return null;
+    if (fi==null) {
+      return null;
+    }
     
     //Asuumes your file ends with ".gz" - returns outFilename
     String outFilename = infile.substring(0, infile.length()-3);
     BufferedReader in2 = new BufferedReader( new InputStreamReader(
-        new GZIPInputStream(fi)));
+      new GZIPInputStream(fi)));
     int s;
     BufferedWriter out = new BufferedWriter(new FileWriter(outFilename));
-    while ((s = in2.read()) != -1)
+    while ((s = in2.read()) != -1) {
       out.write(s);
+    }
     out.close();
     in2.close();
     return outFilename;
@@ -322,12 +329,15 @@ public class ZIPUtils {
    */
   public static ByteArrayOutputStream GUnzipData(String infile) throws IOException {
     BufferedReader in2 = GUnzipReader(infile);
-    if (in2==null) return null;
+    if (in2==null) {
+      return null;
+    }
     
     int s;
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    while ((s = in2.read()) != -1)
+    while ((s = in2.read()) != -1) {
       out.write(s);
+    }
     //out.close();
     in2.close();
     return out;
@@ -351,7 +361,7 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static BufferedReader GUnzipReader(InputStream fi) throws IOException {
-
+    
     return new BufferedReader( new InputStreamReader( new GZIPInputStream(fi)));
   }
   
@@ -362,9 +372,11 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static InputStream GUnzipStream(InputStream fi) throws IOException {
-  	if (fi==null) return null;
+    if (fi==null) {
+      return null;
+    }
     
-  	return new GZIPInputStream(fi);
+    return new GZIPInputStream(fi);
   }
   
   /**
@@ -374,7 +386,7 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static InputStream GUnzipStream(String INfilename) throws IOException{
-  	InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
     return GUnzipStream(fi);
   }
   
@@ -389,16 +401,19 @@ public class ZIPUtils {
     BufferedReader in = new BufferedReader(new FileReader("inputfile.txt"));
     BufferedOutputStream out = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream("out.gz")));
     int c;
-    while ((c = in.read()) != -1) out.write(c);
+    while ((c = in.read()) != -1) {
+      out.write(c);
+    }
     in.close();
     out.close();
     
     // now decompress our new file
     BufferedReader in2 = new BufferedReader( new InputStreamReader(
-        new GZIPInputStream(new FileInputStream("out.gz"))));
+      new GZIPInputStream(new FileInputStream("out.gz"))));
     String s;
-    while ((s = in2.readLine()) != null)
+    while ((s = in2.readLine()) != null) {
       System.out.println(s);
+    }
   }
   
   /**
@@ -410,8 +425,9 @@ public class ZIPUtils {
     StringBuffer ret = new StringBuffer();
     try {
       int x;
-      while ((x = in.read()) != -1)
+      while ((x = in.read()) != -1) {
         ret.append(x);
+      }
     } catch (Exception e) {e.printStackTrace();}
     return ret;
   }
@@ -421,7 +437,7 @@ public class ZIPUtils {
    * @param args
    */
   public static void main(String[] args) {
-    /*String a = "Dies ist ein\nTest String.\tbb\raa�%!\"%\\";
+    /*String a = "Dies ist ein\nTest String.\tbb\raa%!\"%\\";
     System.out.println ("1"+a+"\n");
     ByteArrayInputStream  b = new ByteArrayInputStream(enCrypt(a).toByteArray());
     System.out.println ("2"+b.toString()+"\n");
@@ -430,11 +446,13 @@ public class ZIPUtils {
     if (true) return;*/
     
     // Nicht wundern! Ist nicht die schnellste Funktion...
-    String myDir = "Z:\\workspace\\dipl\\tmpTestFiles\\Matritzen\\neu\\NEU ANNOTIERT\\allerneuste/"; // mit "/" abschlie�end!
+    String myDir = "Z:\\workspace\\dipl\\tmpTestFiles\\Matritzen\\neu\\NEU ANNOTIERT\\allerneuste/"; // mit "/" abschliessend!
     String[] files = new File(myDir).list();
- // XXX: PWMANNOTATIONS.JAVA DANACH AUF DIE GEMERGTEN PWMS AUSF�HREN!!!, AN ARAB_ANNOT DENKEN!
+    // XXX: PWMANNOTATIONS.JAVA DANACH AUF DIE GEMERGTEN PWMS AUSFUEHREN!!!, AN ARAB_ANNOT DENKEN!
     for (String file: files) {
-      if (!file.endsWith(".arabAnnot2")) continue;
+      if (!file.endsWith(".arabAnnot2")) {
+        continue;
+      }
       try {
         System.out.println("Encrypting " + file + "...");
         String fn = myDir + file + ".tmp";
@@ -450,8 +468,8 @@ public class ZIPUtils {
         System.out.println (myTest.substring(0, Math.min(1000, myTest.length())));
         
       } catch (Exception e) {
-      	e.printStackTrace();
-      } 
+        e.printStackTrace();
+      }
     }
   }
   
@@ -462,7 +480,9 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static ByteArrayOutputStream TARunCompressData(ByteArrayInputStream in) throws IOException {
-    if (in==null) return null;
+    if (in==null) {
+      return null;
+    }
     
     CheckedInputStream csumi = new CheckedInputStream(in,new CRC32());
     TarInputStream in2 = new TarInputStream(new BufferedInputStream(csumi));
@@ -470,14 +490,19 @@ public class ZIPUtils {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     TarEntry ze;
     
-    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\")));
+    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\"))) {
+      ;
+    }
     //while ((ze = in2.getNextEntry()) != null) {
-      //System.out.println(ze);
-      int x;
-      while ((x = in2.read()) != -1)
-        out.write(x);
-      if (in2.getNextEntry()!=null) System.out.println("TAR stream contains multiple files. Just taking the first file (" + ze.getName() + ").");
-      //break; // Read only the first file
+    //System.out.println(ze);
+    int x;
+    while ((x = in2.read()) != -1) {
+      out.write(x);
+    }
+    if (in2.getNextEntry()!=null) {
+      System.out.println("TAR stream contains multiple files. Just taking the first file (" + ze.getName() + ").");
+    }
+    //break; // Read only the first file
     //}
     in2.close();
     return out;
@@ -492,7 +517,9 @@ public class ZIPUtils {
   public static ByteArrayOutputStream TARunCompressData(String INfilename) throws IOException {
     // Now decompress archive
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    if (fi==null) return null;
+    if (fi==null) {
+      return null;
+    }
     
     
     CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
@@ -502,14 +529,19 @@ public class ZIPUtils {
     TarEntry ze;
     
     // Jump to first file, which is not a folder
-    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\")));
+    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\"))) {
+      ;
+    }
     //while ((ze = in2.getNextEntry()) != null) {
-      //System.out.println(ze);
-      int x;
-      while ((x = in2.read()) != -1)
-        out.write(x);
-      if (in2.getNextEntry()!=null) System.out.println("TAR Archive '" + INfilename + "' contains multiple files. Just taking the first file (" + ze.getName() + ").");
-      //break; // Read only the first file
+    //System.out.println(ze);
+    int x;
+    while ((x = in2.read()) != -1) {
+      out.write(x);
+    }
+    if (in2.getNextEntry()!=null) {
+      System.out.println("TAR Archive '" + INfilename + "' contains multiple files. Just taking the first file (" + ze.getName() + ").");
+    }
+    //break; // Read only the first file
     //}
     in2.close();
     return out;
@@ -522,15 +554,17 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static InputStream TARunCompressStream(InputStream in) throws IOException {
-  	CheckedInputStream csumi = new CheckedInputStream(in,new CRC32());
+    CheckedInputStream csumi = new CheckedInputStream(in,new CRC32());
     TarInputStream in2 = new TarInputStream(new BufferedInputStream(csumi));
     
     TarEntry ze;
-    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\")));
+    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\"))) {
+      ;
+    }
     
-    if (ze!=null)
+    if (ze!=null) {
       return in2; // Liefert NUR DIE ERSTE DATEI!
-    else {
+    } else {
       in2.close();
       return null;
     }
@@ -543,12 +577,14 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static InputStream TARunCompressStream(String INfilename) throws IOException {
-  	InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    if (fi==null) return null;
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
+    if (fi==null) {
+      return null;
+    }
     
     return TARunCompressStream(fi);
   }
-
+  
   
   /**
    * Returns an input reader for reading the content of the first file in the tar
@@ -559,10 +595,11 @@ public class ZIPUtils {
   public static BufferedReader TARunCompressReader(InputStream in) throws IOException { //ByteArrayInputStream
     InputStream in2 = TARunCompressStream(in);
     
-    if(in2!=null)
-    	return new BufferedReader(new InputStreamReader(in2));
-    else
-    	return null;
+    if(in2!=null) {
+      return new BufferedReader(new InputStreamReader(in2));
+    } else {
+      return null;
+    }
   }
   
   /**
@@ -573,7 +610,9 @@ public class ZIPUtils {
    */
   public static BufferedReader TARunCompressReader(String INfilename) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    if (fi==null) return null;
+    if (fi==null) {
+      return null;
+    }
     
     return TARunCompressReader(fi);
   }
@@ -612,19 +651,23 @@ public class ZIPUtils {
     FileOutputStream f = new FileOutputStream(outFilename);
     CheckedOutputStream csum = new CheckedOutputStream(f, new CRC32());
     ZipOutputStream out = new ZipOutputStream(
-        new BufferedOutputStream(csum));
+      new BufferedOutputStream(csum));
     out.setComment(Comment); //Custom Archive comment
     out.setLevel(9); //0-9. 9 ist Maximum!
     
     // now adding files -- any number with putNextEntry() method
     for (int i=0; i< INfilenames.length; i++) {
       String nameInZip = INfilenames[i];
-      if (ignorePath) nameInZip = new File(INfilenames[i]).getName();
+      if (ignorePath) {
+        nameInZip = new File(INfilenames[i]).getName();
+      }
       //BufferedReader in = new BufferedReader( new FileReader(INfilenames[i])); //<= funzt nur bei ASCII codes.
       InputStream in = OpenFile.searchFileAndGetInputStream(INfilenames[i], parentClass);
       out.putNextEntry(new ZipEntry(nameInZip));
       int c;
-      while ((c = in.read()) != -1) out.write(c);
+      while ((c = in.read()) != -1) {
+        out.write(c);
+      }
       in.close();
     }
     out.close();
@@ -643,22 +686,22 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static void ZIPcompressData(Object INData[], String desiredFilename, String outFilename, String Comment) throws IOException {
-    try  {  
+    try  {
       // ZIP
-      FileOutputStream f = new FileOutputStream (outFilename) ;             
-      ZipOutputStream zout = new ZipOutputStream (new BufferedOutputStream(f)); 
+      FileOutputStream f = new FileOutputStream (outFilename) ;
+      ZipOutputStream zout = new ZipOutputStream (new BufferedOutputStream(f));
       zout.setComment(Comment); //Custom Archive comment
       zout.setLevel(9); //0-9. 9 ist Maximum!
-
+      
       zout.putNextEntry(new ZipEntry(desiredFilename));
       ObjectOutputStream aout = new ObjectOutputStream (zout) ;
       for (int i=0; i<INData.length; i++) {
-        aout.writeObject (INData[i]) ;            
+        aout.writeObject (INData[i]) ;
       }
       
-      zout.close () ;             
-    }  
-    catch  (Exception e) {e.printStackTrace();}  
+      zout.close () ;
+    }
+    catch  (Exception e) {e.printStackTrace();}
   }
   
   /**
@@ -719,12 +762,16 @@ public class ZIPUtils {
       e.printStackTrace();
       throw new IOException(e.getMessage());
     }
-    if (inFile==null) return false;
+    if (inFile==null) {
+      return false;
+    }
     
     // Look, if desired file in Zip exists
     ZipFile zipfile = new ZipFile(inFile);
     ZipEntry entry = zipfile.getEntry(fileInZip);
-    if (entry==null) return false;
+    if (entry==null) {
+      return false;
+    }
     
     // Extract file
     BufferedInputStream is = new BufferedInputStream(zipfile.getInputStream(entry));
@@ -773,8 +820,12 @@ public class ZIPUtils {
       
       ZipEntry ze;
       while ((ze = in2.getNextEntry()) != null) {
-        if (!silentMode) System.out.println("Extracting file "+ze);
-        if (!silentMode && ze.getComment()!=null && ze.getComment().length()!=0) System.out.println("Comment: " + ze.getComment());
+        if (!silentMode) {
+          System.out.println("Extracting file "+ze);
+        }
+        if (!silentMode && ze.getComment()!=null && ze.getComment().length()!=0) {
+          System.out.println("Comment: " + ze.getComment());
+        }
         
         // Eventually create directories
         if (ze.getName().endsWith("/") || ze.getName().endsWith("\\")) {
@@ -789,10 +840,12 @@ public class ZIPUtils {
           if (ze.getSize()>=0 && ze.getSize()==new File(prefixOfOutFile+ze.getName()).length()) {
             continue;
           } else {
-            if (!silentMode) System.out.println("Overwriting '" + ze.getName() + "', because file length differs.");
+            if (!silentMode) {
+              System.out.println("Overwriting '" + ze.getName() + "', because file length differs.");
+            }
           }
         }
-
+        
         // Create output streams
         FileOutputStream fos = new FileOutputStream(prefixOfOutFile+ze.getName());
         BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER);
@@ -832,7 +885,9 @@ public class ZIPUtils {
   public static ByteArrayOutputStream ZIPunCompressData(String INfilename) throws IOException {
     // Now decompress archive
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    if (fi==null) return null;
+    if (fi==null) {
+      return null;
+    }
     
     CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
     ZipInputStream in2 = new ZipInputStream(new BufferedInputStream(csumi));
@@ -840,12 +895,17 @@ public class ZIPUtils {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     ZipEntry ze;
     while ((ze = in2.getNextEntry()) != null) {
-      if (ze.getName().endsWith("/") || ze.getName().endsWith("\\")) continue;
+      if (ze.getName().endsWith("/") || ze.getName().endsWith("\\")) {
+        continue;
+      }
       int x;
-      while ((x = in2.read()) != -1)
+      while ((x = in2.read()) != -1) {
         out.write(x);
+      }
       
-      if (in2.getNextEntry()!=null) System.out.println("ZIP Archive '" + INfilename + "' contains multiple files. Just taking the first file (" + ze.getName() + ").");
+      if (in2.getNextEntry()!=null) {
+        System.out.println("ZIP Archive '" + INfilename + "' contains multiple files. Just taking the first file (" + ze.getName() + ").");
+      }
       break;
     }
     in2.close();
@@ -861,7 +921,9 @@ public class ZIPUtils {
    */
   public static String ZIPunCompressData(String INfilename, String fileInZip) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    if (fi==null) return "";
+    if (fi==null) {
+      return "";
+    }
     
     // Now decompress archive
     CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
@@ -871,11 +933,14 @@ public class ZIPUtils {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     ZipEntry ze;
     while ((ze = in2.getNextEntry()) != null) {
-      if (!ze.getName().toLowerCase().trim().equals(fileInZip)) continue;
+      if (!ze.getName().toLowerCase().trim().equals(fileInZip)) {
+        continue;
+      }
       
       int x;
-      while ((x = in2.read()) != -1)
+      while ((x = in2.read()) != -1) {
         out.write(x);
+      }
       break;
     }
     in2.close();
@@ -890,10 +955,11 @@ public class ZIPUtils {
    */
   public static BufferedReader ZIPunCompressReader(String INfilename) throws IOException {
     InputStream in = ZIPunCompressStream(INfilename);
-    if(in!=null)
-    	return new BufferedReader(new InputStreamReader(in));
-    else
-    	return null;
+    if(in!=null) {
+      return new BufferedReader(new InputStreamReader(in));
+    } else {
+      return null;
+    }
   }
   
   /**
@@ -903,18 +969,22 @@ public class ZIPUtils {
    * @throws IOException
    */
   public static InputStream ZIPunCompressStream(String INfilename) throws IOException{
-  	InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    if (fi==null) return null;
+    InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
+    if (fi==null) {
+      return null;
+    }
     
     CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
-    ZipInputStream in2 = new ZipInputStream(new BufferedInputStream(csumi));    
+    ZipInputStream in2 = new ZipInputStream(new BufferedInputStream(csumi));
     //if ((in2.getNextEntry()) != null) { // Liefert NUR DIE ERSTE DATEI!
     
     ZipEntry ze;
-    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\")));
-    if (ze!=null)
+    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\"))) {
+      ;
+    }
+    if (ze!=null) {
       return in2;
-    else {
+    } else {
       in2.close();
       return null;
     }
@@ -928,14 +998,18 @@ public class ZIPUtils {
    */
   public static long getUncompressedSizeOf_ZIPunCompressStream(String INfilename) throws IOException {
     InputStream fi = OpenFile.searchFileAndGetInputStream(INfilename, parentClass);
-    if (fi==null) return -1;
+    if (fi==null) {
+      return -1;
+    }
     
     CheckedInputStream csumi = new CheckedInputStream(fi,new CRC32());
-    ZipInputStream in2 = new ZipInputStream(new BufferedInputStream(csumi));    
+    ZipInputStream in2 = new ZipInputStream(new BufferedInputStream(csumi));
     //if ((in2.getNextEntry()) != null) { // Liefert NUR DIE ERSTE DATEI!
     
     ZipEntry ze;
-    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\")));
+    while ((ze = in2.getNextEntry()) != null && (ze.getName().endsWith("/") || ze.getName().endsWith("\\"))) {
+      ;
+    }
     if (ze!=null) {
       in2.close();
       return ze.getSize();

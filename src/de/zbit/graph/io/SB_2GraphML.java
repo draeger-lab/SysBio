@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2010-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -29,11 +29,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.SBO;
-import de.zbit.util.ResourceManager;
 
 import y.base.DataMap;
-import y.base.Edge;
-import y.base.EdgeCursor;
 import y.base.Node;
 import y.base.NodeList;
 import y.base.NodeMap;
@@ -52,6 +49,7 @@ import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.graph.sbgn.ComplexGroupNode;
 import de.zbit.graph.sbgn.ComplexNode;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
+import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 
 /**
@@ -209,7 +207,7 @@ public abstract class SB_2GraphML <T> {
     
     moveComplexNodesToBackground();
     
-    // Fix ReactionNode nodes (determines 90° rotatable node orientation)
+    // Fix ReactionNode nodes (determines 90&deg; rotatable node orientation)
     /* TODO: These reaction nodes are not nice and
      * require still massive improvements!
      */
@@ -306,7 +304,7 @@ public abstract class SB_2GraphML <T> {
       sboTerm = SBO.getSimpleMolecule();
       // TODO: Localize
       log.warning(MessageFormat.format(
-        bundle.getString("USING_DEFAULT_SBO_TERM"), 
+        bundle.getString("USING_DEFAULT_SBO_TERM"),
         SBO.getTerm(sboTerm).getName(), label));
     }
     
@@ -349,7 +347,7 @@ public abstract class SB_2GraphML <T> {
       // Make a square (w=h)
       double min;
       if (unlayoutedNodes.contains(n)) {
-        min = 8; // KEGG compounds always have w and h of 8 by default.  
+        min = 8; // KEGG compounds always have w and h of 8 by default.
       } else {
         min = Math.min(width, height);
       }
@@ -372,7 +370,7 @@ public abstract class SB_2GraphML <T> {
    */
   public static NodeRealizer setupGroupNode(NodeLabel nl) {
     GroupNodeRealizer nr = new ComplexGroupNode();
-    ((GroupNodeRealizer) nr).setGroupClosed(false);
+    nr.setGroupClosed(false);
     //    nr.setTransparent(true);
     
     // Eliminate the expanding/ collapsing icons
@@ -385,7 +383,7 @@ public abstract class SB_2GraphML <T> {
     //    nl.setBackgroundColor(new Color((float)0.8,(float)0.8,(float)0.8,(float)0.5));
     //    nl.setFontSize(10);
     //    nl.setAutoSizePolicy(NodeLabel.AUTOSIZE_NODE_WIDTH);
-    //    
+    //
     //    nr.setLabel(nl);
     
     return nr;
@@ -417,7 +415,7 @@ public abstract class SB_2GraphML <T> {
     
     return n;
   }
-
+  
   /**
    * @param simpleGraph
    * @return
@@ -430,19 +428,19 @@ public abstract class SB_2GraphML <T> {
     }
     return hm;
   }
-
-
+  
+  
   /**
    * 
    * @param n
    * @param childrenID
    */
-	protected void addChildren(Node n, String... childrenID) {
-		if (childrenID == null) {
-			return;
-		}
-		
-	// Add children
+  protected void addChildren(Node n, String... childrenID) {
+    if (childrenID == null) {
+      return;
+    }
+    
+    // Add children
     //////////////////////////////////////
     NodeList nl = new NodeList();
     double x2 = Double.MAX_VALUE,y2=Double.MAX_VALUE, width2 = 0, height2 = 0;
@@ -473,21 +471,21 @@ public abstract class SB_2GraphML <T> {
       // Set hierarchy
       getHierarchyManager(simpleGraph).setParentNode(nl, n);
       
-//      for (int i = 0; i < nl.size(); i++) {
-//      	Node node = (Node) nl.get(i);
-//      	EdgeCursor ec = node.edges();
-//      	for (int j = 0; j < ec.size(); j++, ec.next()) {
-//      		Edge edge = ec.edge();
-//      		if ((hm.getParentNode(edge.source()) == n) || (hm.getParentNode(edge.target()) == n)) {
-//      			hm.convertToInterEdge(edge, edge.source(), edge.target());
-//      		}
-//      	}
-//      }
+      //      for (int i = 0; i < nl.size(); i++) {
+      //      	Node node = (Node) nl.get(i);
+      //      	EdgeCursor ec = node.edges();
+      //      	for (int j = 0; j < ec.size(); j++, ec.next()) {
+      //      		Edge edge = ec.edge();
+      //      		if ((hm.getParentNode(edge.source()) == n) || (hm.getParentNode(edge.target()) == n)) {
+      //      			hm.convertToInterEdge(edge, edge.source(), edge.target());
+      //      		}
+      //      	}
+      //      }
       
       // Reposition group node to fit content (2nd time is necessary. Maybe yFiles bug...)
       simpleGraph.setLocation(n, x2 - offset, y2 - offset - 14);
       simpleGraph.setSize(n, width2 - x2 + 2 * offset, height2 - y2 + 2 * offset + 11);
     }
-	}
-
+  }
+  
 }
