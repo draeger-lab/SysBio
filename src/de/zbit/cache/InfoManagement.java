@@ -117,8 +117,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   public int getNumberOfCachedIDs() {
     int sum = 0;
-    if (rememberedInfos!=null) sum+=rememberedInfos.size();
-    if (unsuccessfulQueries!=null) sum+=unsuccessfulQueries.size();
+    if (rememberedInfos!=null) {
+      sum+=rememberedInfos.size();
+    }
+    if (unsuccessfulQueries!=null) {
+      sum+=unsuccessfulQueries.size();
+    }
     return sum;
   }
   
@@ -135,7 +139,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   public int getCacheSize() {
     return maxListSize;
   }
-
+  
   /**
    * Set a new cache size. This is the maximum number of ids to
    * store infos for. The number of unsuccessful queries (ids
@@ -201,14 +205,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   private void addInformation(IDtype id, ObjectAndTimestamp<INFOtype> info) {
     // Ensure constant max list capacity. Remove least frequently used item.
     if (isCacheFull()) {
-      freeCache(Math.max(10, (int)(((double)maxListSize)*0.1)));
+      freeCache(Math.max(10, (int)((maxListSize)*0.1)));
     }
     synchronized (rememberedInfos) {
       rememberedInfos.put(id, info);
     }
     cacheChangedSinceLastLoading=true;
   }
-
+  
   /**
    * @return true if and only if rememberedInfos.size() is at least maxListSize.
    */
@@ -263,7 +267,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   }
   
   /**
-   * Removes one element from the cache. 
+   * Removes one element from the cache.
    * @param id
    * @return true, if the element has been found and removed. False instead.
    */
@@ -279,11 +283,13 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       }
     }
     
-    if (found) cacheChangedSinceLastLoading=true;
+    if (found) {
+      cacheChangedSinceLastLoading=true;
+    }
     
     return found;
   }
- 
+  
   /**
    * This function should NEVER be called from any other class. It fetches the information from an
    * online or hard disc source and does not use the remembered information in memory.
@@ -307,8 +313,11 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * @param id
    * @return INFOtype if info could be retrieved successfully, null instead.
    */
-  private INFOtype fetchInformationWrapper(IDtype id) {    
-    if (unsuccessfulQueries.contains(id)) return null; // Don't have to try it again.
+  private INFOtype fetchInformationWrapper(IDtype id) {
+    if (unsuccessfulQueries.contains(id))
+    {
+      return null; // Don't have to try it again.
+    }
     INFOtype ret=null;
     int retried=0;
     while (ret==null) {
@@ -341,14 +350,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     
     return ret;
   }
-
+  
   /**
    * @param id
    * @param e
    */
   private void markAsUnretrievable(IDtype id, UnsuccessfulRetrieveException e) {
-    log.log(Level.FINE, "Unsuccessful retrieval, marking " + 
-      (id ==null?"null": id.toString()) + " as unretrievable", e);
+    log.log(Level.FINE, "Unsuccessful retrieval, marking " +
+        (id ==null?"null": id.toString()) + " as unretrievable", e);
     synchronized (unsuccessfulQueries) {
       unsuccessfulQueries.add(id);
     }
@@ -360,7 +369,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * Please SEE {@link fetchInformation} for more annotations!
    * Return INFOtype for each id in ids. Use exactly the same index in both arrays.
    * If you return null, all queries for all ids do not return results (unsuccessfull retrieve).
-   * If you set certain elements in the array to null, only the id at this index was not successfully queried. 
+   * If you set certain elements in the array to null, only the id at this index was not successfully queried.
    * @param ids - MAY CONTAIN null or empty IDS, may also be a list of size 0 !!!!!
    * @return
    * @throws TimeoutException - if and only if the timeout is for ALL object.
@@ -387,13 +396,15 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * and TimeoutException exceptions. It will update the unsuccessfulQueries() collection and
    * return the resulting infos.
    * @param ids
-   * @param progress 
+   * @param progress
    * @return
    */
   private INFOtype[] fetchMultipleInformationWrapper(IDtype[] ids, AbstractProgressBar progress) {
     // you should already have checked for "unsuccessfulQueries" when using this function.
     INFOtype[] ret = null;
-    if (ids==null) return ret;
+    if (ids==null) {
+      return ret;
+    }
     
     int retried=0;
     while (ret==null) {
@@ -424,7 +435,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
           example = (ids[0]==null?"null":ids[0].toString());
         }
         log.log(Level.FINE, "Unsuccessful retrieval, marking ALL IDs as unretrievable"+
-          (example!=null?" (e.g., '" +example+"')": ""), e);
+            (example!=null?" (e.g., '" +example+"')": ""), e);
         synchronized (unsuccessfulQueries) {
           unsuccessfulQueries.addAll(Arrays.asList(ids));
         }
@@ -452,11 +463,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   public INFOtype getInformation(IDtype id) {
     ObjectAndTimestamp<INFOtype> o = rememberedInfos.get(id);
-    if (o!=null) return o.getInformation();
-    else {
+    if (o!=null) {
+      return o.getInformation();
+    } else {
       // Retrieve object and store it.
       INFOtype info = fetchInformationWrapper(id);
-      if (info!=null) addInformation(id, info);
+      if (info!=null) {
+        addInformation(id, info);
+      }
       return info;
     }
   }
@@ -465,7 +479,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   /**
    * Retrieve multiple informations. This will used the cached information, if available. Else,
    * it will call the fetchMultipleInformation method and build a cache on the answer. The
-   * returned results use the same indices as the given ids. 
+   * returned results use the same indices as the given ids.
    * @param ids - ids to query.
    * @return INFOtype - array of same size, with same ordering as ids.
    */
@@ -476,25 +490,31 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   /**
    * Retrieve multiple informations. This will used the cached information, if available. Else,
    * it will call the fetchMultipleInformation method and build a cache on the answer. The
-   * returned results use the same indices as the given ids. 
+   * returned results use the same indices as the given ids.
    * @param ids ids to query.
    * @param progress optional aditional progress bar (might be null)
    * @return INFOtype array of same size, with same ordering as ids.
    */
   @SuppressWarnings("unchecked")
   public INFOtype[] getInformations(IDtype[] ids, AbstractProgressBar progress) {
-    if (ids==null) return null;
+    if (ids==null) {
+      return null;
+    }
     List<IDtype> unknownIDs = new ArrayList<IDtype>();
     
     // Look if at least one of the ids is in the cache
     INFOtype anyCachedInfo=null;
     for (IDtype id: ids) {
-      if (id==null) continue;
+      if (id==null) {
+        continue;
+      }
       ObjectAndTimestamp<INFOtype> o = rememberedInfos.get(id);
       if (o==null && !unsuccessfulQueries.contains(id)) { // Same if-order as below!
         unknownIDs.add(id);
       } else {
-        if (anyCachedInfo==null) anyCachedInfo=o.getInformation(false);
+        if (anyCachedInfo==null) {
+          anyCachedInfo=o.getInformation(false);
+        }
       }
     }
     
@@ -503,8 +523,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       
       // Retain all elements that have to be fetched
       IDtype[] filtIDs = (IDtype[]) createNewArray(ids,unknownIDs.size());
-      for (int i=0; i<unknownIDs.size(); i++)
+      for (int i=0; i<unknownIDs.size(); i++) {
         Array.set(filtIDs, i, unknownIDs.get(i));
+      }
       
       INFOtype[] newItems=null;
       if (unknownIDs.size()>0) {
@@ -514,12 +535,12 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         
         // Free enough cache for them
         if (isCacheFull()) {
-          freeCache(Math.max(Math.max(10, unknownIDs.size()), (int)(((double)maxListSize)*0.1)));
+          freeCache(Math.max(Math.max(10, unknownIDs.size()), (int)((maxListSize)*0.1)));
         }
       }
       
       // Big Problem: Java does not permit creating an generic array
-      //INFOtype[] infos = new INFOtype[ids.length]; // Not permitted... workaround: 
+      //INFOtype[] infos = new INFOtype[ids.length]; // Not permitted... workaround:
       //INFOtype[] infosTemp = (INFOtype[]) Array.newInstance(ret.getClass(), ids.length);
       //INFOtype[] infosTemp = Arrays.copyOf(ret, ids.length); // Create a new Reference to an existing array, WITH NEW SIZE
       //INFOtype[] infos = infosTemp.clone(); // After creating new reference with correct size, create new array.
@@ -539,7 +560,9 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
             infos[i] = null;
           } else if (newItems!=null) {
             infos[i] = newItems[infos_i];
-            if (newItems[infos_i]!=null) addInformation(ids[i], newItems[infos_i]);
+            if (newItems[infos_i]!=null) {
+              addInformation(ids[i], newItems[infos_i]);
+            }
           }else{
             infos[i] = null;
           }
@@ -554,9 +577,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     } else {
       // No id is cached.
       INFOtype[] infos = fetchMultipleInformationWrapper(ids, progress);
-      if (infos==null) return null;
-      for (int i=0; i<infos.length; i++)
-        if (infos[i]!=null && ids[i]!=null) addInformation(ids[i], infos[i]);
+      if (infos==null) {
+        return null;
+      }
+      for (int i=0; i<infos.length; i++) {
+        if (infos[i]!=null && ids[i]!=null) {
+          addInformation(ids[i], infos[i]);
+        }
+      }
       return infos;
     }
   }
@@ -584,13 +612,17 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    */
   @SuppressWarnings("unchecked")
   public void precacheIDs(IDtype[] ids, AbstractProgressBar progress) {
-    if (ids==null || ids.length<1) return;
+    if (ids==null || ids.length<1) {
+      return;
+    }
     List<IDtype> unknownIDs = new ArrayList<IDtype>();
     
     // Look if at least one of the ids is in the cache
     boolean containsAtLeastOneID=false;
     for (IDtype id: ids) {
-      if (id==null) continue;
+      if (id==null) {
+        continue;
+      }
       ObjectAndTimestamp<INFOtype> o = rememberedInfos.get(id);
       if (o==null && !unsuccessfulQueries.contains(id)) { // Same if-order as below!
         unknownIDs.add(id);
@@ -598,7 +630,10 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
         containsAtLeastOneID = true;
       }
     }
-    if (unknownIDs.size()<1) return; // All ids are known.
+    if (unknownIDs.size()<1)
+    {
+      return; // All ids are known.
+    }
     
     INFOtype[] infos;
     IDtype[] filtIDs = ids;
@@ -608,28 +643,35 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
       // Big Problem: Java does not permit creating an generic array
       // IDtype[] filtIDs = new IDtype[filteredIDs.size()]; // Not permitted... workaround:
       //IDtype[] filtIDs = (IDtype[]) Array.newInstance(ids.getClass(), filteredIDs.size()); // <= funzt auch nicht.
-      // Funzt nur in Java 1.6 (nächste zwei zeilen):
+      // Funzt nur in Java 1.6 (naechste zwei zeilen):
       //IDtype[] temp = Arrays.copyOf(ids, filteredIDs.size()); // Create a new Reference to an existing array, WITH NEW SIZE
       //IDtype[] filtIDs = temp.clone(); // After creating new reference with correct size, create new array.
       filtIDs = (IDtype[]) createNewArray(ids,unknownIDs.size());
       
-      for (int i=0; i<filtIDs.length; i++)
+      for (int i=0; i<filtIDs.length; i++) {
         Array.set(filtIDs, i, unknownIDs.get(i));
+      }
     } // Else, all ids are unknown.
-    if (filtIDs.length<1) return;
+    if (filtIDs.length<1) {
+      return;
+    }
     
     // Query unknown ids
     infos = fetchMultipleInformationWrapper(filtIDs, progress);
-    if (infos==null) return;
+    if (infos==null) {
+      return;
+    }
     
     // Free enough cache for them
     if (isCacheFull()) {
-      freeCache(Math.max(Math.max(10, infos.length), (int)(((double)maxListSize)*0.1)));
+      freeCache(Math.max(Math.max(10, infos.length), (int)((maxListSize)*0.1)));
     }
     
     // Add retrieved infos
     for (int i=0; i<infos.length; i++) {
-      if (infos[i]!=null && filtIDs[i]!=null) addInformation(filtIDs[i], infos[i]);
+      if (infos[i]!=null && filtIDs[i]!=null) {
+        addInformation(filtIDs[i], infos[i]);
+      }
     }
   }
   
@@ -637,7 +679,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * Load an instance of the cache (InfoManagement) from the filesystem.
    * @param file
    * @return loaded InfoManagement instance.
-   * @throws IOException 
+   * @throws IOException
    */
   public static InfoManagement<?, ?> loadFromFilesystem(File file) throws IOException {
     InfoManagement<?, ?> m = (InfoManagement<?, ?>)SerializableTools.loadObjectAutoDetectZIP(file);
@@ -649,7 +691,7 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * reasons only).
    * @param in
    * @return loaded InfoManagement instance.
-   * @throws IOException 
+   * @throws IOException
    */
   public static InfoManagement<?, ?> loadFromFilesystem(InputStream in) throws IOException {
     InfoManagement<?, ?> m = (InfoManagement<?, ?>)SerializableTools.loadObjectAutoDetectZIP(in);
@@ -659,13 +701,13 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
    * Load an instance of the cache (InfoManagement) from the filesystem.
    * @param filepath
    * @return loaded InfoManagement instance.
-   * @throws IOException 
+   * @throws IOException
    */
   public static InfoManagement<?, ?> loadFromFilesystem(String filepath) throws IOException {
     InfoManagement<?, ?> m = (InfoManagement<?, ?>)SerializableTools.loadObjectAutoDetectZIP(filepath);
     return m;
   }
-
+  
   /**
    * Save the given instance of the cache (InfoManagement) as serialized object.
    * @param filepath
@@ -692,14 +734,16 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
   @SuppressWarnings("unused")
   private static Object resizeArray(Object oldArray, int newSize) {
     int oldSize = 0;
-    if (oldArray.getClass().isArray())
+    if (oldArray.getClass().isArray()) {
       oldSize = java.lang.reflect.Array.getLength(oldArray);
+    }
     
     Object newArray = createNewArray(oldArray, newSize);
     
     int preserveLength = Math.min(oldSize, newSize);
-    if (preserveLength > 0)
+    if (preserveLength > 0) {
       System.arraycopy(oldArray, 0, newArray, 0, preserveLength);
+    }
     return newArray;
   }
   
@@ -722,12 +766,14 @@ public abstract class InfoManagement<IDtype extends Comparable<?> & Serializable
     }
     
     // If oldArray was in fact no array, then elementType==null here.
-    if (elementType==null) elementType = type.getClass();
+    if (elementType==null) {
+      elementType = type.getClass();
+    }
     Object newArray = java.lang.reflect.Array.newInstance(elementType, size);
     
     return newArray;
   }
-
+  
   
   /**
    * You may implement this Method to make your class serializable.

@@ -70,29 +70,37 @@ public class FormatIdentification {
    * @throws IOException
    */
   public static FormatDescription identify(BufferedInputStream ret) throws IOException {
-    if (ret.markSupported()) ret.mark(minBufferSize+2);
+    if (ret.markSupported()) {
+      ret.mark(minBufferSize+2);
+    }
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     int s; int bytesRead=0;
     while ((s = ret.read()) != -1 && bytesRead<(minBufferSize+1)) {
       out.write(s);
       bytesRead++;
     }
-    if (ret.markSupported()) ret.reset();
+    if (ret.markSupported()) {
+      ret.reset();
+    }
     return identify(out.toByteArray());
   }
   
   /**
-   * Liest soviele bytes aus dem Reader, wie f�r identifikation n�tig, identifiziert und resettet den Stream wieder.
+   * Liest soviele bytes aus dem Reader, wie f&uuml;r identifikation n&ouml;tig, identifiziert und resettet den Stream wieder.
    */
   public static FormatDescription identify(BufferedReader ret) throws IOException {
-    if (ret.markSupported()) ret.mark(minBufferSize+2);
+    if (ret.markSupported()) {
+      ret.mark(minBufferSize+2);
+    }
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     int s; int bytesRead=0;
     while ((s = ret.read()) != -1 && bytesRead<(minBufferSize+1)) {
       out.write(s);
       bytesRead++;
     }
-    if (ret.markSupported()) ret.reset();
+    if (ret.markSupported()) {
+      ret.reset();
+    }
     return identify(out.toByteArray());
   }
   
@@ -103,7 +111,7 @@ public class FormatIdentification {
     }
     Iterator<FormatDescription> iter = descriptions.iterator();
     while (iter.hasNext()) {
-      FormatDescription desc = (FormatDescription) iter.next();
+      FormatDescription desc = iter.next();
       if (desc.matches(data)) {
         return desc;
       }
@@ -134,7 +142,9 @@ public class FormatIdentification {
       return null;
     } finally {
       try {
-        if (in != null) in.close();
+        if (in != null) {
+          in.close();
+        }
       } catch (IOException ioe) {}
     }
     
@@ -168,7 +178,7 @@ public class FormatIdentification {
           in.close();
         }
       } catch (IOException ioe) {
-        // 
+        //
       }
     }*/
     return identify(data);
@@ -181,19 +191,20 @@ public class FormatIdentification {
     minBufferSize = 1;
     try {
       InputStream input = null;
-      if (new File(INfilename).exists()) // Load from Filesystem
+      if (new File(INfilename).exists()) {
         input = new FileInputStream(INfilename);
-      else if (FormatIdentification.class.getClassLoader().getResource(INfilename) != null) // Load from same jar
+      } else if (FormatIdentification.class.getClassLoader().getResource(INfilename) != null) {
         input = FormatIdentification.class.getClassLoader().getResource(INfilename).openStream();
-      else if (FormatIdentification.class.getClassLoader().getResource(new File(INfilename).getName() ) != null) // Load from same jar
+      } else if (FormatIdentification.class.getClassLoader().getResource(new File(INfilename).getName() ) != null) {
         input = FormatIdentification.class.getClassLoader().getResource(new File(INfilename).getName()).openStream();
+      }
       
       if (input == null) {
         System.err.println("WARNING: Could not load format identification magic byte file.");
         return;
       }
       FormatDescriptionReader in = new FormatDescriptionReader(
-          new InputStreamReader(input));
+        new InputStreamReader(input));
       FormatDescription desc;
       while ((desc = in.read()) != null) {
         byte[] magic = desc.getMagicBytes();
@@ -214,17 +225,18 @@ public class FormatIdentification {
     
     for (String filename: test) {
       de.zbit.io.fileformat.FormatDescription desc = FormatIdentification.identify(new File(filename));
-      if (desc==null) System.out.println("Unknown");
-      else if (desc.getShortName().equalsIgnoreCase("GZ") ) {
+      if (desc==null) {
+        System.out.println("Unknown");
+      } else if (desc.getShortName().equalsIgnoreCase("GZ") ) {
         System.out.println("GZ");
       } else if (desc.getShortName().equalsIgnoreCase("ZIP") ) {
         System.out.println("ZIP");
-    } else if (desc.getShortName().equalsIgnoreCase("BZ2") ) {
-      System.out.println("BZ2");
-    } else if (desc.getShortName().equalsIgnoreCase("TAR") ) {
-      System.out.println("TAR");
-    }
-    
+      } else if (desc.getShortName().equalsIgnoreCase("BZ2") ) {
+        System.out.println("BZ2");
+      } else if (desc.getShortName().equalsIgnoreCase("TAR") ) {
+        System.out.println("TAR");
+      }
+      
     }
     
     for (String filename: test) {
@@ -232,14 +244,15 @@ public class FormatIdentification {
       BufferedReader in = OpenFile.openFile(filename);
       try {
         int i=0;
-        while (in.ready() && (i++)<10)
+        while (in.ready() && (i++)<10) {
           System.out.println(in.readLine());
+        }
       } catch (IOException e) {
         e.printStackTrace();
       }
     }
     
   }
-
+  
   
 }

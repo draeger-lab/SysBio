@@ -33,12 +33,12 @@ import de.zbit.util.progressbar.ProgressBar;
  * A mapper to map from rs-dbSNP identifier (see http://www.ncbi.nlm.nih.gov/projects/SNP/)
  * to an NCBI Gene ID (Entrez).
  * @author Clemens Wrzodek
- * @author Finja Büchel
+ * @author Finja B&uuml;chel
  * @version $Rev$
  */
 public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
   private static final long serialVersionUID = 8644671525392250381L;
-
+  
   public static final Logger log = Logger.getLogger(SNPid2GeneIDmapper.class.getName());
   
   /**
@@ -64,7 +64,7 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
   
   
   
-
+  
   /**
    * Inintializes the mapper from dbSNP to Gene ids. Downloads and reads the mapping
    * file automatically as required. This constructor is not recommended as it
@@ -120,7 +120,9 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
       primaryDownloadURL = String.format("http://cogsys.cs.uni-tuebingen.de/software/InCroMAP/downloads/mappings/%s.SNP2GeneID.gz", ncbi_tax_id);
       tryThisDownloadURL = primaryDownloadURL;
     }
-    if (initImmediately) init();
+    if (initImmediately) {
+      init();
+    }
   }
   
   /**
@@ -135,10 +137,10 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
   
   /**
    * @param args
-   * @throws Exception 
+   * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-//    generateInputFileForSpecies(9606, 10090, 10116);
+    //    generateInputFileForSpecies(9606, 10090, 10116);
   }
   
   /**
@@ -147,7 +149,7 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
    * species only.
    * @param taxonomiesOfInterest NCBI Taxonomy id to generate a mapping
    * file for.
-   * @throws Exception 
+   * @throws Exception
    */
   @SuppressWarnings("unchecked")
   public static void generateInputFileForSpecies(Integer... taxonomiesOfInterest) throws Exception {
@@ -155,24 +157,24 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
     //Integer[] taxonomiesOfInterest = new Integer[]{9606, 10090, 10116};
     
     // Read all snps to read for every given organism
-//    System.out.println("Reading taxonomy Mapping...");
-//    CSVReader r = new CSVReader("C:/Users/wrzodek/Downloads/snp_taxonomy.gz");
-//    String[] line;
-//    Set<Integer>[] snpsToRead = new HashSet[taxonomiesOfInterest.length];
-//    for (int i=0; i<taxonomiesOfInterest.length; i++) snpsToRead[i] = new HashSet<Integer>();
-//    while ((line=r.getNextLine())!=null) {
-//      try { //RS 2 TaxID mapping
-//        Integer taxId = Integer.parseInt(line[1]);
-//        for (int i=0; i<taxonomiesOfInterest.length; i++) {
-//          if (taxId.equals(taxonomiesOfInterest[i])) {
-//            snpsToRead[i].add(Integer.parseInt(line[0]));
-//          }
-//        }
-//      } catch (Throwable t) {t.printStackTrace();}
-//    }
-//    for (int i=0; i<snpsToRead.length; i++) {
-//      System.out.println(taxonomiesOfInterest[i] + ": " + snpsToRead[i].size() + " SNPs");
-//    }
+    //    System.out.println("Reading taxonomy Mapping...");
+    //    CSVReader r = new CSVReader("C:/Users/wrzodek/Downloads/snp_taxonomy.gz");
+    //    String[] line;
+    //    Set<Integer>[] snpsToRead = new HashSet[taxonomiesOfInterest.length];
+    //    for (int i=0; i<taxonomiesOfInterest.length; i++) snpsToRead[i] = new HashSet<Integer>();
+    //    while ((line=r.getNextLine())!=null) {
+    //      try { //RS 2 TaxID mapping
+    //        Integer taxId = Integer.parseInt(line[1]);
+    //        for (int i=0; i<taxonomiesOfInterest.length; i++) {
+    //          if (taxId.equals(taxonomiesOfInterest[i])) {
+    //            snpsToRead[i].add(Integer.parseInt(line[0]));
+    //          }
+    //        }
+    //      } catch (Throwable t) {t.printStackTrace();}
+    //    }
+    //    for (int i=0; i<snpsToRead.length; i++) {
+    //      System.out.println(taxonomiesOfInterest[i] + ": " + snpsToRead[i].size() + " SNPs");
+    //    }
     /*
      * REQUIRED INPUT FILES CAN BE DOWNLOADED FROM
      * - Entrez Gene FTP Server: ftp://ftp.ncbi.nih.gov/gene/DATA/
@@ -183,7 +185,9 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
     CSVReader r = new CSVReader("C:/Users/wrzodek/Downloads/gene_info.gz");
     String[] line;
     Set<Integer>[] genesToRead = new HashSet[taxonomiesOfInterest.length];
-    for (int i=0; i<taxonomiesOfInterest.length; i++) genesToRead[i] = new HashSet<Integer>();
+    for (int i=0; i<taxonomiesOfInterest.length; i++) {
+      genesToRead[i] = new HashSet<Integer>();
+    }
     while ((line=r.getNextLine())!=null) {
       try { //Tax 2 GeneID mapping
         Integer taxId = Integer.parseInt(line[0]);
@@ -212,18 +216,18 @@ public class SNPid2GeneIDmapper extends AbstractMapper<Integer, Integer> {
     r = new CSVReader(mapper.getLocalFile());
     while ((line=r.getNextLine())!=null) {
       try { //RS 2 GenID mapping
-//        Integer rsId = Integer.parseInt(line[0]);
-//        for (int i=0; i<snpsToRead.length; i++) {
-//          if (snpsToRead[i].contains(rsId)) {
-//            fw[i].write(String.format("%s\t%s\n", rsId, Integer.parseInt(line[1])).getBytes());
-//          }
-//        }
-      Integer geneId = Integer.parseInt(line[1]);
-      for (int i=0; i<genesToRead.length; i++) {
-        if (genesToRead[i].contains(geneId)) {
-          fw[i].write(String.format("%s\t%s\n", Integer.parseInt(line[0]), geneId).getBytes());
+        //        Integer rsId = Integer.parseInt(line[0]);
+        //        for (int i=0; i<snpsToRead.length; i++) {
+        //          if (snpsToRead[i].contains(rsId)) {
+        //            fw[i].write(String.format("%s\t%s\n", rsId, Integer.parseInt(line[1])).getBytes());
+        //          }
+        //        }
+        Integer geneId = Integer.parseInt(line[1]);
+        for (int i=0; i<genesToRead.length; i++) {
+          if (genesToRead[i].contains(geneId)) {
+            fw[i].write(String.format("%s\t%s\n", Integer.parseInt(line[0]), geneId).getBytes());
+          }
         }
-      }
       } catch (Throwable t) {t.printStackTrace();}
     }
     
