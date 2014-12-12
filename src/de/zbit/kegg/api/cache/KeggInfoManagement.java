@@ -55,19 +55,19 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    * If this flag ist set to true, this class does NOT retrieve any Information, but uses stored information.
    */
   public static boolean offlineMode = false;
-      
+  
   /**
    * 
    */
   public KeggInfoManagement () {
     super();
-    this.adap = new KeggAdaptor();
+    adap = new KeggAdaptor();
   }
   
   public KeggInfoManagement (int maxListSize) {
     this (maxListSize, new KeggAdaptor());
   }
-    
+  
   /**
    * 
    * @param maxListSize
@@ -82,24 +82,35 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    * (non-Javadoc)
    * @see de.zbit.util.InfoManagement#cleanupUnserializableObject()
    */
-  @Override  
+  @Override
   protected void cleanupUnserializableObject() {
     adap = null;
   }
-
+  
   /*
    * (non-Javadoc)
    * @see de.zbit.util.InfoManagement#fetchInformation(java.lang.Comparable)
    */
   @Override
   protected KeggInfos fetchInformation(String id) throws TimeoutException, UnsuccessfulRetrieveException {
-    if (offlineMode) throw new TimeoutException(); // do not cache as "Unsuccessful" and retry next time.
-    if (id.toLowerCase().startsWith("unknown")) return null;
+    if (offlineMode)
+    {
+      throw new TimeoutException(); // do not cache as "Unsuccessful" and retry next time.
+    }
+    if (id.toLowerCase().startsWith("unknown")) {
+      return null;
+    }
     hasChanged=true;
     
-    if (adap==null) adap = getKeggAdaptor(); // create new one
+    if (adap==null)
+    {
+      adap = getKeggAdaptor(); // create new one
+    }
     String ret = adap.getWithReturnInformation(id);
-    if (ret==null || ret.trim().length()==0) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember this one.
+    if (ret==null || ret.trim().length()==0)
+    {
+      throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember this one.
+    }
     
     if (id.startsWith("br:")) {
       // KEGG Brite unfortunately returns HTML-code
@@ -110,7 +121,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     KeggInfos realRet = new KeggInfos(id, ret);
     
     
-    return  realRet;// Successfull and "with data" ;-) 
+    return  realRet;// Successfull and "with data" ;-)
   }
   
   /**
@@ -121,7 +132,9 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    */
   private String transformBRITEOutputToNormal(String ret) {
     int ePos = ret.indexOf("ENTRY");
-    if (ePos<0) return ret;
+    if (ePos<0) {
+      return ret;
+    }
     int start = ret.lastIndexOf("<!---",ePos);
     int end = ret.indexOf("--->",ePos);
     if (start>=0 && end>start) {
@@ -130,7 +143,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     }
     return ret.trim();
   }
-
+  
   /*
    * (non-Javadoc)
    * @see de.zbit.util.InfoManagement#fetchMultipleInformations(IDtype[])
@@ -188,13 +201,13 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       // ---
     } else {
       //APIinfos = new String[ids.length];
-
+      
       // Instead of requesting all objects at once, splitts Queries to 100 max and concatenates the results... that's it.
       int j=0;
       while (j<ids.length) {
         String[] subArr = new String[Math.min(atATime, ids.length-j)];
         System.arraycopy(ids, j, subArr, 0, subArr.length);
-
+        
         String[] ret;
         try {
           ret = fetchMultipleInformationsUpTo100AtATime(subArr);
@@ -210,25 +223,28 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
         }
         ret = removeUnnecessaryInfos(ret);
         //System.arraycopy(ret, 0, APIinfos, j, ret.length);
-
+        
         // Multi-threaded string parsing
         parseAPI(subArr, ret, realRet, APIstringParser, j, progress);
-        // ---        
-
+        // ---
+        
         j+=subArr.length;
       }
     }
     
     APIstringParser.awaitTermination();
-    if (progress!=null) progress.finished();
-    // For Debugging
-    //for (int i=0; i<ids.length; i++) {
-    //  System.out.println(ids[i] + ": '" + realRet[i].substring(0, 50).replace("\n", "|").replaceAll(" +", " ")+"'");
-    //}
+    if (progress!=null)
+    {
+      progress.finished();
+      // For Debugging
+      //for (int i=0; i<ids.length; i++) {
+      //  System.out.println(ids[i] + ": '" + realRet[i].substring(0, 50).replace("\n", "|").replaceAll(" +", " ")+"'");
+      //}
+    }
     
     return realRet;
   }
-
+  
   /**
    * Parse the return string from the KEGG API to the internal {@link KeggInfos}
    * data structure.
@@ -260,6 +276,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
            * (non-Javadoc)
            * @see java.lang.Runnable#run()
            */
+          @Override
           public void run() {
             if (apiInfos==null || apiInfos.length()<1) {
               realRet[final_i+realRetOffset] = null;
@@ -277,7 +294,7 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       }
     }
   }
-
+  
   /**
    * Do not call this class by yourself.
    * It's just a helper method for {@link fetchMultipleInformations}
@@ -287,9 +304,16 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    * @throws UnsuccessfulRetrieveException
    */
   private String[] fetchMultipleInformationsUpTo100AtATime(String[] ids) throws TimeoutException, UnsuccessfulRetrieveException {
-    if (offlineMode) throw new TimeoutException(); // do not cache as "Unsuccessful" and retry next time.
-    if (ids == null) return null;
-    if (ids.length<1) return new String[0];
+    if (offlineMode)
+    {
+      throw new TimeoutException(); // do not cache as "Unsuccessful" and retry next time.
+    }
+    if (ids == null) {
+      return null;
+    }
+    if (ids.length<1) {
+      return new String[0];
+    }
     hasChanged=true;
     
     // Check if we have at least one valid kegg id!
@@ -300,11 +324,20 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
         break;
       }
     }
-    if (allUnknown) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember all.
+    if (allUnknown)
+    {
+      throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember all.
+    }
     
-    if (adap==null) adap = getKeggAdaptor(); // create new one
+    if (adap==null)
+    {
+      adap = getKeggAdaptor(); // create new one
+    }
     String q = adap.getWithReturnInformation(concatenateKeggIDs(ids));
-    if (q==null || q.trim().length()==0) throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember all.
+    if (q==null || q.trim().length()==0)
+    {
+      throw new UnsuccessfulRetrieveException(); // Will cause the InfoManagement class to remember all.
+    }
     
     String[] splitt = q.split("///");
     
@@ -315,7 +348,9 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     boolean errors = false;
     for (int i=0; i<splitt.length; i++) {
       // Trim and check trivial cases
-      if (splitt[i]==null) continue;
+      if (splitt[i]==null) {
+        continue;
+      }
       splitt[i] = splitt[i].trim();
       if  (splitt[i].length()<=0) {splitt[i]=null; continue;}
       
@@ -357,16 +392,19 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       while (idIndex<ids.length) {
         idIndex = i+numMissing;
         if (idIndex>= ids.length) {
-          // z.B. Query (gn:)"HSA" liefert eine Entry ID "T01001" zur�ck. Das findet man nicht so einfach. Deshalb komplett durchlaufen lassen
+          // z.B. Query (gn:)"HSA" liefert eine Entry ID "T01001" zurueck. Das findet man nicht so einfach. Deshalb komplett durchlaufen lassen
           // und spaeter noch mal unschaerfer suchen.
           numMissing = minNumMissing;
           idIndex = i+numMissing;
-          if (takeNotSoSureHits) break; // ... should never happen.
+          if (takeNotSoSureHits)
+          {
+            break; // ... should never happen.
+          }
           takeNotSoSureHits = true;
         }
         aktQueryID = (ids[idIndex].contains(":")? ids[idIndex].substring(ids[idIndex].indexOf(':')+1):ids[idIndex]).trim().toUpperCase();
-        if (aktQueryID.equalsIgnoreCase(aktEntryID) 
-            || ("EC " + aktQueryID).equalsIgnoreCase(aktEntryID) // Enzyme werden ohne "EC " gequeried, kommen aber MIT zurueck... 
+        if (aktQueryID.equalsIgnoreCase(aktEntryID)
+            || ("EC " + aktQueryID).equalsIgnoreCase(aktEntryID) // Enzyme werden ohne "EC " gequeried, kommen aber MIT zurueck...
             || (takeNotSoSureHits && StringUtil.isWord(splitt[i].toUpperCase(), aktQueryID))) { // Siehe obiges Beispiel.
           ret[idIndex] = splitt[i]; // Aufpassen. Hier nur i, da index von splitt und id2 hier gleich!
           found = true;
@@ -387,7 +425,9 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       StringBuilder sb = new StringBuilder();
       for (int i=0; i<ret.length; i++) {
         if (ret[i] ==null) {
-          if (sb.length()>0) sb.append(", ");
+          if (sb.length()>0) {
+            sb.append(", ");
+          }
           sb.append('"');
           sb.append(ids[i]==null?null:ids[i]);
           sb.append('"');
@@ -396,15 +436,17 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
       System.err.println("The following ids could not get fetched from KEGG: " + sb.toString());
     }
     
-    return ret; // Successfull and "with data" ;-) 
+    return ret; // Successfull and "with data" ;-)
   }
-
+  
   /**
    * 
    * @return
    */
   public KeggAdaptor getKeggAdaptor() {
-    if (adap==null) adap = new KeggAdaptor();
+    if (adap==null) {
+      adap = new KeggAdaptor();
+    }
     return adap;
   }
   
@@ -431,7 +473,7 @@ CLASS       Metabolism; [...]
      */
     return ret;
   }
-
+  
   /**
    * This function allows you to extend this class and overwrite this function.
    * Then you can remove all information from the KeggString which you don't need.
@@ -440,12 +482,15 @@ CLASS       Metabolism; [...]
    * @return
    */
   private String[] removeUnnecessaryInfos(String[] realRet) {
-    if (realRet==null) return realRet;
-    for (int i=0; i<realRet.length; i++)
+    if (realRet==null) {
+      return realRet;
+    }
+    for (int i=0; i<realRet.length; i++) {
       realRet[i] = removeUnnecessaryInfos(realRet[i]);
+    }
     return realRet;
   }
-
+  
   /*
    * (non-Javadoc)
    * @see de.zbit.util.InfoManagement#restoreUnserializableObject()

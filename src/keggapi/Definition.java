@@ -135,9 +135,9 @@ public class Definition  implements java.io.Serializable {
     return _hashCode;
   }
   
-  // メタデータ型 / [en]-(Type metadata)
+  // [en]-(Type metadata)
   private static org.apache.axis.description.TypeDesc typeDesc =
-  new org.apache.axis.description.TypeDesc(Definition.class, true);
+      new org.apache.axis.description.TypeDesc(Definition.class, true);
   
   static {
     typeDesc.setXmlType(new javax.xml.namespace.QName("SOAP/KEGG", "Definition"));
@@ -156,7 +156,7 @@ public class Definition  implements java.io.Serializable {
   }
   
   /**
-   * メタデータオブジェクトの型を返却 / [en]-(Return type metadata object)
+   * [en]-(Return type metadata object)
    */
   public static org.apache.axis.description.TypeDesc getTypeDesc() {
     return typeDesc;

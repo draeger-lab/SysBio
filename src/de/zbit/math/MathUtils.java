@@ -35,12 +35,12 @@ import de.zbit.util.Utils;
  * @version $Rev$
  */
 public class MathUtils {
-
+  
   /**
    * The natural logarithm of 2.
    */
   final static double ln2 = Math.log(2);
-
+  
   /**
    * Returns the average of all non-NaN and non-infinite values in the given
    * array. Internally, it first tries to use the faster implementation and if
@@ -52,24 +52,30 @@ public class MathUtils {
    */
   public static double mean(double... d) {
     double average = mean1(d);
-    if (Double.isNaN(average) || Double.isInfinite(average)) 
-        return mean2(d);
+    if (Double.isNaN(average) || Double.isInfinite(average)) {
+      return mean2(d);
+    }
     return average;
   }
-
+  
   /**
    * Spaltenweise mittelwertberechnung.
    * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
    */
   public static double[] mean(double[][] d) {
     double[] average = mean1(d);
-    if (average == null) return null; // Koomt vor wenn er alle sequenzen nicht mappen kann 
-    for (int i=0; i<average.length; i++)
-      if (Double.isNaN(average[i]) || average[i]==Double.POSITIVE_INFINITY || average[i]==Double.NEGATIVE_INFINITY)
+    if (average == null)
+    {
+      return null; // Koomt vor wenn er alle sequenzen nicht mappen kann
+    }
+    for (int i=0; i<average.length; i++) {
+      if (Double.isNaN(average[i]) || average[i]==Double.POSITIVE_INFINITY || average[i]==Double.NEGATIVE_INFINITY) {
         return mean2(d);
+      }
+    }
     return average;
   }
-
+  
   /**
    * Returns the average of all non-NaN and non-infinite values in the given
    * array. This implementation first sums up all values and then divides by the
@@ -81,46 +87,64 @@ public class MathUtils {
    *         array.
    */
   private static double mean1(double[] d) { // Schneller
-    if (d==null || d.length<1) return Double.NaN;
+    if (d==null || d.length<1) {
+      return Double.NaN;
+    }
     double retVal= 0;
     
     int countNonNAN=0;
     for (int i=0; i<d.length; i++) {
-      if (Double.isNaN(d[i]) || Double.isInfinite(d[i])) continue;
+      if (Double.isNaN(d[i]) || Double.isInfinite(d[i])) {
+        continue;
+      }
       countNonNAN++;
       retVal+=d[i];
     }
     
-    if (countNonNAN<=0) return Double.NaN;
+    if (countNonNAN<=0) {
+      return Double.NaN;
+    }
     return (retVal/countNonNAN);
   }
-
+  
   /**
    * 
    * @param d
    * @return
    */
   private static double[] mean1(double[][] d) { // Schneller
-    if (d.length<1) return new double[0];
+    if (d.length<1) {
+      return new double[0];
+    }
     double[] retVal= null;
     
     int countNonNull = 0;
     for (int i=0; i<d.length; i++) {
-      if (d[i] == null) continue; // kommt vor wenn er sequenz i nicht mappen kann
+      if (d[i] == null)
+      {
+        continue; // kommt vor wenn er sequenz i nicht mappen kann
+      }
       countNonNull++;
-      if (retVal==null) retVal = new double[d[i].length];
-      for (int j=0; j<d[i].length; j++)
+      if (retVal==null) {
+        retVal = new double[d[i].length];
+      }
+      for (int j=0; j<d[i].length; j++) {
         retVal[j]+=d[i][j];
+      }
     }
-  
-    if (retVal==null) return null; // Koomt vor wenn er alle sequenzen nicht mappen kann
-    for (int i=0; i<retVal.length; i++)
+    
+    if (retVal==null)
+    {
+      return null; // Koomt vor wenn er alle sequenzen nicht mappen kann
+    }
+    for (int i=0; i<retVal.length; i++) {
       retVal[i] /= countNonNull;
+    }
     
     
     return retVal;
   }
-
+  
   /**
    * Returns the average of all non-NaN and non-infinite values in the given
    * array. This implementation performs an iterative calculation of the mean,
@@ -132,12 +156,16 @@ public class MathUtils {
    *         array.
    */
   private static double mean2(double[] d) { // Keine to-large-numbers
-    if (d.length<1) return Double.NaN;
+    if (d.length<1) {
+      return Double.NaN;
+    }
     double retVal= 0;
-  
+    
     int countNonNAN=0;
     for (int i=0; i<d.length; i++) {
-      if (Double.isNaN(d[i]) || Double.isInfinite(d[i])) continue;
+      if (Double.isNaN(d[i]) || Double.isInfinite(d[i])) {
+        continue;
+      }
       countNonNAN++;
       
       // retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
@@ -145,36 +173,53 @@ public class MathUtils {
     }
     
     // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
-    if (countNonNAN<=0) return Double.NaN;
+    if (countNonNAN<=0) {
+      return Double.NaN;
+    }
     return retVal;
   }
-
+  
   /**
    * 
    * @param d
    * @return
    */
   private static double[] mean2(double[][] d) { // Keine to-large-numbers
-    if (d.length<1) return new double[0];
+    if (d.length<1) {
+      return new double[0];
+    }
     double[] retVal= null;
-    ArrayList<Integer> spaltenCounter = new ArrayList<Integer>(); 
+    ArrayList<Integer> spaltenCounter = new ArrayList<Integer>();
     for (int i=0; i<d.length; i++) {
-      if (d[i] == null) continue; // kommt vor wenn er sequenz i nicht mappen kann
-      if (retVal==null) retVal = new double[d[i].length];
+      if (d[i] == null)
+      {
+        continue; // kommt vor wenn er sequenz i nicht mappen kann
+      }
+      if (retVal==null) {
+        retVal = new double[d[i].length];
+      }
       for (int j=0; j<d[i].length; j++) {
-        if (spaltenCounter.size()<=j) spaltenCounter.add(0);
-        if (Double.isNaN(d[i][j])) continue; // Deshalb auch der Spaltencounter: Skip NaN eintr�ge.
+        if (spaltenCounter.size()<=j) {
+          spaltenCounter.add(0);
+        }
+        if (Double.isNaN(d[i][j]))
+        {
+          continue; // Deshalb auch der Spaltencounter: Skip NaN eintraege.
+        }
         //retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
         retVal[j]=retVal[j] * spaltenCounter.get(j)/(spaltenCounter.get(j)+1) + d[i][j] * 1/(spaltenCounter.get(j)+1);
         spaltenCounter.set(j,spaltenCounter.get(j)+1);
       }
     }
     // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
-    for (int i=0; i<spaltenCounter.size(); i++)
-      if (spaltenCounter.get(i)==0) retVal[i] = Double.NaN;
+    for (int i=0; i<spaltenCounter.size(); i++) {
+      if (spaltenCounter.get(i)==0) {
+        retVal[i] = Double.NaN;
+      }
+    }
     return retVal;
   }
-
+  
   /**
    * Mittelwertberechnung.
    * Versuchts erst schneller und nimmt sonst den langsameren, aber sicheren Algorithmus.
@@ -182,14 +227,17 @@ public class MathUtils {
   @SuppressWarnings("rawtypes")
   public static double mean(Collection d) {
     double average = mean1(d);
-    if (Double.isNaN(average) || Double.isInfinite(average)) 
-        return mean2(d);
+    if (Double.isNaN(average) || Double.isInfinite(average)) {
+      return mean2(d);
+    }
     return average;
   }
-
+  
   @SuppressWarnings("rawtypes")
   private static double mean1(Collection doubles) { // Schneller
-    if (doubles==null || doubles.size()<1) return Double.NaN;
+    if (doubles==null || doubles.size()<1) {
+      return Double.NaN;
+    }
     double retVal= 0;
     
     int countNonNAN=0;
@@ -200,20 +248,26 @@ public class MathUtils {
         Object o = it.next();
         d = Utils.getDoubleValue(o);
         
-        if (Double.isNaN(d) || Double.isInfinite(d)) continue;
+        if (Double.isNaN(d) || Double.isInfinite(d)) {
+          continue;
+        }
         countNonNAN++;
-        retVal+=d;        
+        retVal+=d;
         
       } catch (Throwable t) {t.printStackTrace();}
     }
     
-    if (countNonNAN<=0) return Double.NaN;
+    if (countNonNAN<=0) {
+      return Double.NaN;
+    }
     return (retVal/countNonNAN);
   }
-
+  
   @SuppressWarnings("rawtypes")
   private static double mean2(Collection doubles) { // Keine to-large-numbers
-    if (doubles==null || doubles.size()<1) return Double.NaN;
+    if (doubles==null || doubles.size()<1) {
+      return Double.NaN;
+    }
     double retVal= 0;
     
     int countNonNAN=0;
@@ -224,7 +278,9 @@ public class MathUtils {
         Object o = it.next();
         d = Utils.getDoubleValue(o);
         
-        if (Double.isNaN(d) || Double.isInfinite(d)) continue;
+        if (Double.isNaN(d) || Double.isInfinite(d)) {
+          continue;
+        }
         countNonNAN++;
         
         // retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
@@ -234,10 +290,12 @@ public class MathUtils {
     }
     
     // Wenn irgendwo nur NaNs waren, das auch so wiedergeben
-    if (countNonNAN<=0) return Double.NaN;
+    if (countNonNAN<=0) {
+      return Double.NaN;
+    }
     return retVal;
   }
-
+  
   /**
    * Empirical Correlation Coefficient computes the correlation coefficient
    * between y (lables) and x (predictions)
@@ -269,10 +327,10 @@ public class MathUtils {
     
     return numerator / (denominator_x * denominator_y);
   }
-
+  
   /**
-   * Binomial distribution (German: Binomialverteilung oder "n über m").
-   * O(n²) implementation for small values. So better use it with a cache...
+   * Binomial distribution (German: Binomialverteilung oder "n &uuml;ber m").
+   * O(n&sup2;) implementation for small values. So better use it with a cache...
    * @param n
    * @param m
    * @return
@@ -288,7 +346,7 @@ public class MathUtils {
     }
     return b[m];
   }
-
+  
   /**
    * binomialCoefficient that also can calculate bigger values, using a {@link BigInteger}.
    * @param n
@@ -298,7 +356,7 @@ public class MathUtils {
   public static BigInteger binomialCoefficient(int n, int k) {
     return binomialCoefficient(BigInteger.valueOf(n), BigInteger.valueOf(k));
   }
-
+  
   /**
    * binomialCoefficient that also can calculate bigger values, using a {@link BigInteger}.
    * @param n
@@ -327,9 +385,9 @@ public class MathUtils {
     
     return numerator;
   }
-
+  
   /**
-   * Divide each element in the first array by the 
+   * Divide each element in the first array by the
    * corresponding element in the second array (same indicies).
    * @param arr1
    * @param arr2
@@ -340,17 +398,18 @@ public class MathUtils {
     for (int i=0; i<arr1.length; i++) {
       ret[i] = new double [arr1[i].length];
       for (int j=0; j<arr1[i].length; j++) {
-        if (arr2[i][j]==0)
+        if (arr2[i][j]==0) {
           ret[i][j]=Double.NaN;
-        else
+        } else {
           ret[i][j] = arr1[i][j]/arr2[i][j];
+        }
       }
     }
     return ret;
   }
-
+  
   /**
-   * Divide each element in the first array by the 
+   * Divide each element in the first array by the
    * corresponding element in the second array (same indicies).
    * @param arr1
    * @param arr2
@@ -361,15 +420,16 @@ public class MathUtils {
     for (int i=0; i<arr1.length; i++) {
       ret[i] = new double [arr1[i].length];
       for (int j=0; j<arr1[i].length; j++) {
-        if (arr2[i][j]==0)
+        if (arr2[i][j]==0) {
           ret[i][j]=0;
-        else
+        } else {
           ret[i][j] = (double)arr1[i][j]/arr2[i][j];
+        }
       }
     }
     return ret;
   }
-
+  
   /**
    * Calculates the median of the given values.
    * The input array is MODIFIED (sorted).
@@ -386,7 +446,9 @@ public class MathUtils {
    * @return median
    */
   public static double median(double[] values) {
-    if (values.length<1) return Double.NaN;
+    if (values.length<1) {
+      return Double.NaN;
+    }
     Arrays.sort(values);
     
     if (values.length%2!=0) {
@@ -396,7 +458,7 @@ public class MathUtils {
       return (values[upper-1]+(values[upper]-values[upper-1])/2);
     }
   }
-
+  
   /**
    * Calculates the median of the given values.
    * The input list is <b>MODIFIED (sorted)</b>.
@@ -409,7 +471,9 @@ public class MathUtils {
   
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public static double median(List values) {
-    if (values.size()<1) return Double.NaN;
+    if (values.size()<1) {
+      return Double.NaN;
+    }
     Collections.sort(values);
     
     Object median;
@@ -425,7 +489,7 @@ public class MathUtils {
     }
     
   }
-
+  
   /**
    * Returns the value at relative (percentage) index {@code quantilke}
    * in the sorted list {@code values}.
@@ -436,8 +500,12 @@ public class MathUtils {
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static double quantile(List values, int quantile, boolean listIsAlreadySorted) {
-    if (values.size()<1) return Double.NaN;
-    if (!listIsAlreadySorted) Collections.sort(values);
+    if (values.size()<1) {
+      return Double.NaN;
+    }
+    if (!listIsAlreadySorted) {
+      Collections.sort(values);
+    }
     double valIndex = values.size()/100*quantile;
     double valFloor = Math.floor(valIndex);
     // (5 / 100) * 50 = 2.5 => Bei ungrade abrunden
@@ -456,7 +524,7 @@ public class MathUtils {
     }
     
   }
-
+  
   /**
    * Converts the collection to a list and returns the median.
    * @param values
@@ -470,10 +538,10 @@ public class MathUtils {
     } else {
       ArrayList list = new ArrayList(values.size());
       list.addAll(values);
-      return median ((List)list);
+      return median (list);
     }
   }
-
+  
   /**
    * Returns the standard deviation of the given double values.
    * The Standard deviation is the square root of the variance.
@@ -483,7 +551,7 @@ public class MathUtils {
   public static double standardDeviation(double[] values) {
     return Math.sqrt(variance(values));
   }
-
+  
   /**
    * Returns the standard deviation of the given double values.
    * The Standard deviation is the square root of the variance.
@@ -494,7 +562,7 @@ public class MathUtils {
   public static double standardDeviation(double[] values, double mean) {
     return Math.sqrt(variance(values, mean));
   }
-
+  
   /**
    * Calculates and returns the variance of the given list of double values
    * 
@@ -505,7 +573,7 @@ public class MathUtils {
     double mean = mean(d);
     return variance(d, mean);
   }
-
+  
   /**
    * Calculates and returns the variance of the given list of double values.
    * This version of the method also takes the precalculated mean of the values
@@ -518,7 +586,7 @@ public class MathUtils {
   public static double variance(double[] d, double mean) {
     return variance(d, mean, 2);
   }
-
+  
   /**
    * Calculates and returns the variance of the given list of double values.
    * This version of the method also takes the precalculated mean of the values
@@ -532,14 +600,16 @@ public class MathUtils {
    */
   public static double variance(double[] d, double mean, double power) {
     double sum = 0.0;
-    if( d.length <= 1 ) return sum;
+    if( d.length <= 1 ) {
+      return sum;
+    }
     
     for (int i = 0; i < d.length; i++) {
       sum += Math.pow(d[i] - mean, power);
     }
     return sum / (d.length - 1);
   }
-
+  
   /**
    * Linear normalize the given value to a distribution from 0 to 1.
    * @see #normalize(double, double, double, double, double)
@@ -551,7 +621,7 @@ public class MathUtils {
   public static double normalize(double value, double minValue, double maxValue) {
     return normalize(value, minValue, maxValue, 0, 1);
   }
-
+  
   /**
    * Linear normalize the given value to a new distribution.
    * @param value value to normalize
@@ -576,7 +646,7 @@ public class MathUtils {
     
     return v;
   }
-
+  
   /**
    * The hypergeometric distribution, calculated as<br/>
    * <img src="http://upload.wikimedia.org/math/7/e/c/7ecd507bdc33dc636fdae2000d9b31fb.png"/>
@@ -595,7 +665,7 @@ public class MathUtils {
     BigDecimal nenner  = new BigDecimal(binomialCoefficient(N,n));
     return (zaehler.divide(nenner, 20, RoundingMode.HALF_UP)).doubleValue();
   }
-
+  
   /**
    * Calculates a pValue for an enrichment significance (e.g., gene set enrichments
    * in pathways).
@@ -616,48 +686,60 @@ public class MathUtils {
     
     return 1-p;
   }
-
+  
   /**
    * @param values any iterable number collection.
    * @return minimum value in {@code values} or {@link Double#NaN}
    * if {@code values} is {@code null} or contains no numbers.
    */
   public static <T extends Number> double min(Iterable<T> values) {
-    if (values == null) return Double.NaN;
+    if (values == null) {
+      return Double.NaN;
+    }
     Iterator<T> it = values.iterator();
-    if (!it.hasNext()) return Double.NaN;
+    if (!it.hasNext()) {
+      return Double.NaN;
+    }
     double min = it.next().doubleValue();
     while (it.hasNext()) {
       min = Math.min(min, it.next().doubleValue());
     }
     return min;
   }
-
+  
   /**
    * @param values any iterable number collection.
    * @return maximum value in {@code values} or {@link Double#NaN}
    * if {@code values} is {@code null} or contains no numbers.
    */
   public static <T extends Number> double max(Iterable<T> values) {
-    if (values == null) return Double.NaN;
+    if (values == null) {
+      return Double.NaN;
+    }
     Iterator<T> it = values.iterator();
-    if (!it.hasNext()) return Double.NaN;
+    if (!it.hasNext()) {
+      return Double.NaN;
+    }
     double max = it.next().doubleValue();
     while (it.hasNext()) {
       max = Math.max(max, it.next().doubleValue());
     }
     return max;
   }
-
+  
   /**
    * @param <T>
    * @param values
    * @return value with maximum distance to zero.
    */
   public static <T extends Number> double maxDistanceToZero(Iterable<T> values) {
-    if (values == null) return Double.NaN;
+    if (values == null) {
+      return Double.NaN;
+    }
     Iterator<T> it = values.iterator();
-    if (!it.hasNext()) return Double.NaN;
+    if (!it.hasNext()) {
+      return Double.NaN;
+    }
     
     double maxVal = it.next().doubleValue();
     double max = Math.abs(maxVal);
@@ -671,15 +753,15 @@ public class MathUtils {
     }
     return maxVal;
   }
-
+  
   public static double log2(double val) {
     return Math.log(val)/ln2;
   }
-
+  
   public static <T extends Number> double log2(T val) {
     return Math.log(val.doubleValue())/ln2;
   }
-
+  
   /**
    * 
    * @param zahl
@@ -690,7 +772,7 @@ public class MathUtils {
     double d = Math.pow(10, stellen);
     return Math.round( zahl * ((long)d) ) / d;
   }
-
+  
   /**
    * Returns a weighted mean of two values.
    * @param old_m
@@ -702,7 +784,7 @@ public class MathUtils {
   public static double weightedMean(double val, double weight, double val2, double weight2) {
     return (val*weight/(weight2+weight)) +  (val2 * weight2/(weight2+weight));
   }
-
+  
   /**
    * Creates a string that summarizes the given collection by
    * returning min, max, median and mean.
@@ -715,9 +797,9 @@ public class MathUtils {
     // Could be realized much more efficient by sorting and getting values manually.
     // All called methods consinder the whole, unsorted collection!
     return(String.format("Min:%s, Mean:%s, Median:%s, Max:%s",
-      min(values), mean(values), median(values), max(values) )); 
+      min(values), mean(values), median(values), max(values) ));
   }
-
+  
   /**
    * Creates a string that summarizes the given collection by
    * returning min, max, median and mean.
@@ -732,7 +814,7 @@ public class MathUtils {
     // All called methods consinder the whole, unsorted collection!
     return(String.format("Min:%s, Mean:%s, Median:%s, Max:%s",
       round(min(values), roundToDigits), round(mean(values), roundToDigits),
-      round(median(values), roundToDigits), round(max(values),roundToDigits) )); 
+      round(median(values), roundToDigits), round(max(values),roundToDigits) ));
   }
   
 }

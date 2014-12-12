@@ -81,7 +81,7 @@ public class ProgressBar extends AbstractProgressBar {
   public boolean isPrintInOneLine() {
     return (!useSimpleStyle || printInOneLine);
   }
-
+  
   /**
    * Only necessary for non-ANSII ({@link #useSimpleStyle}=true) ouputs.
    * Disables displaying the ETR and additionalText!
@@ -91,10 +91,11 @@ public class ProgressBar extends AbstractProgressBar {
   public void setPrintInOneLine(boolean printInOneLine) {
     this.printInOneLine = printInOneLine;
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.util.aProgressBar#drawProgressBar(int, double, java.lang.String)
    */
+  @Override
   protected synchronized void drawProgressBar(int percent, double miliSecondsRemaining, String additionalText) {
     String percString = percent + "%";
     
@@ -103,16 +104,21 @@ public class ProgressBar extends AbstractProgressBar {
     if (getEstimateTime() && miliSecondsRemaining>=0) {
       ETA = "ETR: " + Utils.getTimeString((long) miliSecondsRemaining);
     }
-
-    // Simples File-out oder Eclipse-Output-Window tool. Windows Console unterstützt leider auch kein ANSI.
+    
+    // Simples File-out oder Eclipse-Output-Window tool. Windows Console unterstuetzt leider auch kein ANSI.
     if (useSimpleStyle) {
       if (percent!=lastPercentage) {
         if (!printInOneLine) {
           System.out.println(percString + ' ' + ETA + (additionalText!=null && (additionalText.length()>0)? " " + additionalText:"") );
         } else {
-          if (percent%10==0) System.out.print(percString);
-          else if (percent%2==0) System.out.print('.');
-          if (percent==100) System.out.print('\n');
+          if (percent%10==0) {
+            System.out.print(percString);
+          } else if (percent%2==0) {
+            System.out.print('.');
+          }
+          if (percent==100) {
+            System.out.print('\n');
+          }
         }
         lastPercentage=percent;
       }
@@ -127,18 +133,23 @@ public class ProgressBar extends AbstractProgressBar {
       int additionalSpace = 2 + ((ETA!=null&&ETA.length()>0)?(ETA.length()+1):0);
       additionalSpace+= ((additionalText!=null&&additionalText.length()>0)?(additionalText.length()+1):0);
       int totalStringWidth = kMax + additionalSpace;
-      if (totalStringWidth>=consoleWidth) kMax = consoleWidth-additionalSpace-1;
+      if (totalStringWidth>=consoleWidth) {
+        kMax = consoleWidth-additionalSpace-1;
+      }
       kMax = Math.max(kMax, 4); // At least four chars for "100%" are required.
     }
     
     // Nice-and cool looking ANSI ProgressBar ;-)
     String anim= "|/-\\";
     StringBuilder sb = new StringBuilder();
-    int x = (int) Math.round((double)percent / (100.0/(double)kMax)); // Number of blocks to visualize percentage
+    int x = (int) Math.round(percent / (100.0/kMax)); // Number of blocks to visualize percentage
     sb.append("\r\033[K"); // <= clear line, Go to beginning
     sb.append("\033[107m"); // Bright white bg color
     for (int k = 0; k < kMax; k++) {
-      if (x==k) sb.append("\033[100m"); // grey like bg color
+      if (x==k)
+      {
+        sb.append("\033[100m"); // grey like bg color
+      }
       
       /*
       // % Zahl ist immer am "Farbschwellwert" (klebt am rechten bankenrand)
@@ -146,7 +157,7 @@ public class ProgressBar extends AbstractProgressBar {
         if (x<=k && k<x+percString.length()) sb.append("\033[93m"+percString.charAt(k-x)); // yellow
         else sb.append(" ");
       } else {
-        if (k<x && (x-percString.length())<=k) sb.append("\033[34m"+percString.charAt(1-(x-percString.length()-k+1))); // blue 
+        if (k<x && (x-percString.length())<=k) sb.append("\033[34m"+percString.charAt(1-(x-percString.length()-k+1))); // blue
         else sb.append(" ");
       }*/
       
@@ -155,11 +166,20 @@ public class ProgressBar extends AbstractProgressBar {
       int pEnd = kMax/2+percString.length()/2;
       if (k>=pStart && k<=pEnd) {
         char c = ' ';
-        if (k-pStart<percString.length()) c = percString.charAt(k-pStart);
-        if (x<=k) sb.append("\033[93m"+c); // Foreground colors depend on
-        if (x> k) sb.append("\033[34m"+c); // bg color
-      } else
+        if (k-pStart<percString.length()) {
+          c = percString.charAt(k-pStart);
+        }
+        if (x<=k)
+        {
+          sb.append("\033[93m"+c); // Foreground colors depend on
+        }
+        if (x> k)
+        {
+          sb.append("\033[34m"+c); // bg color
+        }
+      } else {
         sb.append(" ");
+      }
       
     }
     
@@ -170,10 +190,14 @@ public class ProgressBar extends AbstractProgressBar {
     sb.append(" \033[93m" + anim.charAt((int) (getCallNumber() % anim.length()))  + "\033[1m");
     
     // ETA
-    if (ETA.length()>0) sb.append(' ' + ETA);
+    if (ETA.length()>0) {
+      sb.append(' ' + ETA);
+    }
     
     // Additional Text
-    if (additionalText!=null && additionalText.length()>0) sb.append(' ' + additionalText);
+    if (additionalText!=null && additionalText.length()>0) {
+      sb.append(' ' + additionalText);
+    }
     
     // Reset colors and stuff.
     sb.append("\033[0m");
@@ -206,9 +230,13 @@ public class ProgressBar extends AbstractProgressBar {
     return useSimpleStyle;
   }
   
+  @Override
   public void finished_impl() {
-    if (!useSimpleStyle) System.out.println();
-    else if (printInOneLine && lastPercentage!=100) System.out.print('\n');
+    if (!useSimpleStyle) {
+      System.out.println();
+    } else if (printInOneLine && lastPercentage!=100) {
+      System.out.print('\n');
+    }
     lastPercentage=100;
   }
   

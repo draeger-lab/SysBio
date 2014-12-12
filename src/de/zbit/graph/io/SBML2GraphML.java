@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2010-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -172,11 +172,12 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   /* (non-Javadoc)
    * @see de.zbit.kegg.io.SB_2GraphML#createNodesAndEdges(java.lang.Object)
    */
+  @Override
   protected void createNodesAndEdges(SBMLDocument document) {
     
     // Check if we have anything to visualize
     if ((document == null) || !document.isSetModel()) {
-    	return;
+      return;
     }
     
     Model model = document.getModel();
@@ -187,7 +188,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       if (qm!=null && qm instanceof QualitativeModel) {
         QualitativeModel q = (QualitativeModel) qm;
         if (!q.isSetListOfQualitativeSpecies()) {
-        	return;
+          return;
         }
         species = q.getListOfQualitativeSpecies();
       } else {
@@ -195,9 +196,9 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         return;
       }
     } else if (model.isSetListOfSpecies()) {
-    	species = model.getListOfSpecies();
+      species = model.getListOfSpecies();
     } else {
-    	species = new ArrayList<Species>(0);
+      species = new ArrayList<Species>(0);
     }
     
     // Eventually get the layout extension
@@ -216,9 +217,9 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
        */
       QualitativeModel qm = (QualitativeModel) model.getExtension(qualNamespace);
       if (qm.isSetListOfTransitions()) {
-      	for (Transition t : qm.getListOfTransitions()) {
-      		createRelation(t);
-      	}
+        for (Transition t : qm.getListOfTransitions()) {
+          createRelation(t);
+        }
       }
     } else {
       /*
@@ -234,149 +235,149 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   
   
   private void createCompartments(SBMLDocument doc) {
-  	/*
+    /*
      *  TODO: Add COMPARTMENTS
      */
     HierarchyManager hm = getHierarchyManager(simpleGraph);
     Map<String, List<String>> mapOfChildren = new HashMap<String, List<String>>();
     if (doc.isSetModel()) {
-    	Model model = doc.getModel();
-    	SBasePlugin extension = model.getExtension(LayoutConstants.getNamespaceURI(model.getLevel(), model.getVersion()));
-    	if (extension != null) {
-    		LayoutModelPlugin layoutModel = (LayoutModelPlugin) extension;
-    		int layoutIndex = 0;
-    		if (layoutModel.isSetListOfLayouts()) {
-    			Layout layout = layoutModel.getLayout(layoutIndex);
-    			for (int i = 0; i < layout.getCompartmentGlyphCount(); i++) {
-    				CompartmentGlyph cg = layout.getCompartmentGlyph(i);
-    				NamedSBase nsb = cg.getNamedSBaseInstance();
-    				if (nsb != null) {
-    					nsb.putUserObject("GLYPH", cg);
-    				}
-    			}
-    		}
-    	}
-    	// Find children
-    	List<String> children;
-    	if (model.isSetListOfSpecies()) {
-    		for (Species s : model.getListOfSpecies()) {
-    			Compartment c = s.getCompartmentInstance();
-    			if ((c != null) && s.isSetId()) {
-    				addChild(c.getId(), s.getId(), mapOfChildren);
-    			}
-    		}
-    	}
-    	if (model.isSetListOfReactions()) {
-    		for (Reaction r : model.getListOfReactions()) {
-    			Compartment c = r.getCompartmentInstance();
-    			if (c != null) {
-    				if (r.isSetId()) {
-    					addChild(c.getId(), r.getId(), mapOfChildren);
-    				}
-    			} else {
-    				Set<Compartment> compartments = new HashSet<Compartment>();
-    				if (r.isSetListOfReactants()) {
-    					compartments.addAll(findCompartments(r.getListOfReactants()));
-    				}
-    				if (r.isSetListOfModifiers()) {
-    					compartments.addAll(findCompartments(r.getListOfModifiers()));
-    				}
-    				if (r.isSetListOfProducts()) {
-    					compartments.addAll(findCompartments(r.getListOfProducts()));
-    				}
-    				if (compartments.size() == 1) {
-    					addChild(compartments.iterator().next().getId(), r.getId(), mapOfChildren);
-    				}
-    			}
-    		}
-    	}
-    	// Sort compartments from outside to inside
-    	LinkedList<Compartment> compList = new LinkedList<Compartment>();
-    	LinkedList<Compartment> temp = new LinkedList<Compartment>();
-    	if (model.isSetListOfCompartments()) {
-    		temp.addAll(model.getListOfCompartments());
-    	}
-    	while (temp.size() > 0) {
-    		Iterator<Compartment> it = temp.iterator();
-    		while (it.hasNext()) {
-    			Compartment curr = it.next();
-    			if (!curr.isSetOutside()) {
-    				compList.addFirst(curr);
-    				it.remove();
-    			} else {
-						Compartment outside = curr.getOutsideInstance();
-						if (outside == null) {
-							compList.add(curr);
-							it.remove();
-						} else {
-							int pi = compList.indexOf(outside);
-							if (pi >= 0) { // contains
-								compList.addLast(curr);
-								it.remove();
-							} else if (!temp.contains(outside)) {
-								compList.add(curr);
-								it.remove();
-							}
-						}
-    			}
-    		}
-    	}
-    	temp = null;
-    	
-    	for (int i = 0; i < compList.size(); i++) {
-    		Compartment c = compList.get(i);
-    		String id = c.getId();
-    		double x = Double.NaN, y = Double.NaN, w = 25d, h = 25d;
-    		if (c.containsUserObjectKey("GLYPH") || c.isSetOutside()) {
-    			if (c.containsUserObjectKey("GLYPH")) {
-    				CompartmentGlyph cg = (CompartmentGlyph) c.getUserObject("GLYPH");
-    				if (cg.isSetBoundingBox()) {
-    					BoundingBox bb = cg.getBoundingBox();
-    					if (bb.isSetPosition()) {
-    						Point p = bb.getPosition();
-    						x = p.getX();
-    						y = p.getY();
-    					}
-    					if (bb.isSetDimensions()) {
-    						Dimensions d = bb.getDimensions();
-    						w = d.getWidth();
-    						h = d.getHeight();
-    					}
-    				}
-    				id = cg.getId();
-    			} else {
-    				id = c.getId();
-    			}
-    			Node n = createNode(id, c.isSetName() ? c.getName() : c.getId(), SBO.getCompartment(), x, y, w, h);
-    			CompartmentRealizer nr = new CompartmentRealizer();
-    			nr.setFillColor(null);
-    			nr.setInterFillColor(SBGNVisualizationProperties.getFillColor(SBO.getCompartment()));
-    			nr.setLineColor(SBGNVisualizationProperties.getLineColor(SBO.getCompartment()));
-    			simpleGraph.setRealizer(n, nr);
-    	    hm.convertToGroupNode(n);
-    	    if (c.isSetOutsideInstance()) {
-    	    	Node outside = id2node.get(c.getOutside());
-    	    	if (outside != null) {
-        	    hm.setParentNode(n, outside);
-    	    	}
-    	    }
-    	    children = mapOfChildren.get(c.getId());
-    	    if ((children != null) && (children.size() > 0)) {
-    	    	addChildren(n, children.toArray(new String[] {}));
-    	    }
-    		}
-    	}
+      Model model = doc.getModel();
+      SBasePlugin extension = model.getExtension(LayoutConstants.getNamespaceURI(model.getLevel(), model.getVersion()));
+      if (extension != null) {
+        LayoutModelPlugin layoutModel = (LayoutModelPlugin) extension;
+        int layoutIndex = 0;
+        if (layoutModel.isSetListOfLayouts()) {
+          Layout layout = layoutModel.getLayout(layoutIndex);
+          for (int i = 0; i < layout.getCompartmentGlyphCount(); i++) {
+            CompartmentGlyph cg = layout.getCompartmentGlyph(i);
+            NamedSBase nsb = cg.getNamedSBaseInstance();
+            if (nsb != null) {
+              nsb.putUserObject("GLYPH", cg);
+            }
+          }
+        }
+      }
+      // Find children
+      List<String> children;
+      if (model.isSetListOfSpecies()) {
+        for (Species s : model.getListOfSpecies()) {
+          Compartment c = s.getCompartmentInstance();
+          if ((c != null) && s.isSetId()) {
+            addChild(c.getId(), s.getId(), mapOfChildren);
+          }
+        }
+      }
+      if (model.isSetListOfReactions()) {
+        for (Reaction r : model.getListOfReactions()) {
+          Compartment c = r.getCompartmentInstance();
+          if (c != null) {
+            if (r.isSetId()) {
+              addChild(c.getId(), r.getId(), mapOfChildren);
+            }
+          } else {
+            Set<Compartment> compartments = new HashSet<Compartment>();
+            if (r.isSetListOfReactants()) {
+              compartments.addAll(findCompartments(r.getListOfReactants()));
+            }
+            if (r.isSetListOfModifiers()) {
+              compartments.addAll(findCompartments(r.getListOfModifiers()));
+            }
+            if (r.isSetListOfProducts()) {
+              compartments.addAll(findCompartments(r.getListOfProducts()));
+            }
+            if (compartments.size() == 1) {
+              addChild(compartments.iterator().next().getId(), r.getId(), mapOfChildren);
+            }
+          }
+        }
+      }
+      // Sort compartments from outside to inside
+      LinkedList<Compartment> compList = new LinkedList<Compartment>();
+      LinkedList<Compartment> temp = new LinkedList<Compartment>();
+      if (model.isSetListOfCompartments()) {
+        temp.addAll(model.getListOfCompartments());
+      }
+      while (temp.size() > 0) {
+        Iterator<Compartment> it = temp.iterator();
+        while (it.hasNext()) {
+          Compartment curr = it.next();
+          if (!curr.isSetOutside()) {
+            compList.addFirst(curr);
+            it.remove();
+          } else {
+            Compartment outside = curr.getOutsideInstance();
+            if (outside == null) {
+              compList.add(curr);
+              it.remove();
+            } else {
+              int pi = compList.indexOf(outside);
+              if (pi >= 0) { // contains
+                compList.addLast(curr);
+                it.remove();
+              } else if (!temp.contains(outside)) {
+                compList.add(curr);
+                it.remove();
+              }
+            }
+          }
+        }
+      }
+      temp = null;
+      
+      for (int i = 0; i < compList.size(); i++) {
+        Compartment c = compList.get(i);
+        String id = c.getId();
+        double x = Double.NaN, y = Double.NaN, w = 25d, h = 25d;
+        if (c.containsUserObjectKey("GLYPH") || c.isSetOutside()) {
+          if (c.containsUserObjectKey("GLYPH")) {
+            CompartmentGlyph cg = (CompartmentGlyph) c.getUserObject("GLYPH");
+            if (cg.isSetBoundingBox()) {
+              BoundingBox bb = cg.getBoundingBox();
+              if (bb.isSetPosition()) {
+                Point p = bb.getPosition();
+                x = p.getX();
+                y = p.getY();
+              }
+              if (bb.isSetDimensions()) {
+                Dimensions d = bb.getDimensions();
+                w = d.getWidth();
+                h = d.getHeight();
+              }
+            }
+            id = cg.getId();
+          } else {
+            id = c.getId();
+          }
+          Node n = createNode(id, c.isSetName() ? c.getName() : c.getId(), SBO.getCompartment(), x, y, w, h);
+          CompartmentRealizer nr = new CompartmentRealizer();
+          nr.setFillColor(null);
+          nr.setInterFillColor(SBGNVisualizationProperties.getFillColor(SBO.getCompartment()));
+          nr.setLineColor(SBGNVisualizationProperties.getLineColor(SBO.getCompartment()));
+          simpleGraph.setRealizer(n, nr);
+          hm.convertToGroupNode(n);
+          if (c.isSetOutsideInstance()) {
+            Node outside = id2node.get(c.getOutside());
+            if (outside != null) {
+              hm.setParentNode(n, outside);
+            }
+          }
+          children = mapOfChildren.get(c.getId());
+          if ((children != null) && (children.size() > 0)) {
+            addChildren(n, children.toArray(new String[] {}));
+          }
+        }
+      }
     }
-	}
-
-	/**
-   * Fix ReactionNode nodes (determines 90° rotatable node orientation).
+  }
+  
+  /**
+   * Fix ReactionNode nodes (determines 90&deg; rotatable node orientation).
    * @param reaction2node
    */
   @Override
   public void improveReactionNodeLayout() {
     if (reaction2node == null) {
-    	return; // QUAL-Model
+      return; // QUAL-Model
     }
     for (Map.Entry<Reaction,ReactionNodeRealizer> en : reaction2node.entrySet()) {
       Set<Node> reactants = new HashSet<Node>();
@@ -384,21 +385,21 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       Set<Node> modifier = new HashSet<Node>();
       Reaction reaction = en.getKey();
       if (reaction.isSetListOfReactants()) {
-      	for (SimpleSpeciesReference sr : reaction.getListOfReactants()) {
-      		reactants.add((Node) id2node.get(sr.getSpecies()));
-      	}
+        for (SimpleSpeciesReference sr : reaction.getListOfReactants()) {
+          reactants.add(id2node.get(sr.getSpecies()));
+        }
       }
       if (reaction.isSetListOfProducts()) {
-      	for (SimpleSpeciesReference sr : reaction.getListOfProducts()) {
-      		products.add((Node) id2node.get(sr.getSpecies()));
-      	}
+        for (SimpleSpeciesReference sr : reaction.getListOfProducts()) {
+          products.add(id2node.get(sr.getSpecies()));
+        }
       }
       if (reaction.isSetListOfModifiers()) {
-      	for (SimpleSpeciesReference sr : reaction.getListOfModifiers()) {
-      		modifier.add((Node) id2node.get(sr.getSpecies()));
-      	}
+        for (SimpleSpeciesReference sr : reaction.getListOfModifiers()) {
+          modifier.add(id2node.get(sr.getSpecies()));
+        }
       }
-      en.getValue().fixLayout(reactants, products, modifier);      
+      en.getValue().fixLayout(reactants, products, modifier);
     }
   }
   
@@ -420,127 +421,127 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     
     Model model = document.getModel();
     if (model.isSetListOfReactions()) {
-    	for (Reaction r : model.getListOfReactions()) {
-    		// List all edges corresponding to the same Reaction
-    		LinkedList<Edge> listOfEdges = new LinkedList<Edge>();
-    		
-    		if (r.isSetListOfReactants() && r.isSetListOfProducts()) {
-    			
-    			// Create the reaction node
-    			NodeRealizer nr = new ReactionNodeRealizer();
-    			reaction2node .put(r, (ReactionNodeRealizer) nr);
-    			Node rNode = simpleGraph.createNode(nr);
-    			GraphElement2SBid.put(rNode, r.getId());
-    			id2node.put(r.getId(), rNode);
-    			
-    			// Get information from the layout extension
-    			double x = Double.NaN;
-    			double y = Double.NaN;
-    			if (useLayoutExtension) {
-    				// reactions can not have mutliple glyphs... take first!
-    				Collection<BoundingBox> layout = id2layoutMap.get(r.getId());
-    				BoundingBox g = (layout != null) && (layout.size() > 0) ? layout.iterator().next() : null;
-    				if (g != null) {
-    					if (g.isSetDimensions()) {
-    						nr.setWidth(g.getDimensions().getWidth());
-    						nr.setHeight(g.getDimensions().getHeight());
-    					}
-    					if (g.isSetPosition()) {
-    						// Ignore 0|0 positions. They're due to default values
-    						if ((g.getPosition().getX() != 0d) || (g.getPosition().getY() != 0d)) {
-    							x = g.getPosition().getX();
-    							y = g.getPosition().getY();
-    						}
-    					}
-    				}
-    			}
-    			
-    			List<SpeciesReference> reactants = r.isSetListOfReactants() ? r.getListOfReactants() : new ArrayList<SpeciesReference>(0);
-    			List<SpeciesReference> products = r.isSetListOfProducts() ? r.getListOfProducts() : new ArrayList<SpeciesReference>(0);
-    			List<ModifierSpeciesReference> modifiers = r.isSetListOfModifiers() ? r.getListOfModifiers() : new ArrayList<ModifierSpeciesReference>(0);
-    			
-    			// Adding them to the to-be-layouted list will lead to position
-    			// them as freely as possible by yFiles, which is WRONG for these
-    			// nodes. Actually, they should always be between products and
-    			// substrate... needing special layouting!
-    			//unlayoutedNodes.add(rNode);
-    			if (Double.isNaN(x) || Double.isNaN(y)) {
-    				ValuePair<Double, Double> xy = calculateMeanCoords(reactants, products, id2node, simpleGraph);
-    				x = (xy.getA());
-    				y = (xy.getB());
-    			}
-    			nr.setCenterX(x);
-    			nr.setCenterY(y);
-    			
-    			// TODO: Add stoichiometry to edges (docked to corresponding node):
-    			// subtrate on substrate node
-    			// product on product node
-    			
-    			// Add edges to the reaction node
-    			for (SpeciesReference sr : reactants) {
-    				Node source = id2node.get(sr.getSpecies());
-    				if (source!=null) {
-    					Edge e = simpleGraph.createEdge(source, rNode);
-    					GraphElement2SBid.put(e, r.getId());
-    					listOfEdges.add(e);
-    					EdgeRealizer er = simpleGraph.getRealizer(e);
-    					if (r.isReversible()) {
-    						er.setSourceArrow(Arrow.STANDARD);
-    					} else {
-    						er.setSourceArrow(Arrow.NONE);
-    					}
-    					er.setArrow(Arrow.NONE);
-    					
-    					
-    				}
-    			}
-    			
-    			for (SpeciesReference sr : products) {
-    				Node target = id2node.get(sr.getSpecies());
-    				if (target!=null) {
-    					Edge e = simpleGraph.createEdge(rNode, target);
-    					GraphElement2SBid.put(e, r.getId());
-    					listOfEdges.add(e);
-    					EdgeRealizer er = simpleGraph.getRealizer(e);
-    					er.setArrow(Arrow.STANDARD);
-    					er.setSourceArrow(Arrow.NONE);
-    				}
-    			}
-    			
-    			for (ModifierSpeciesReference sr : modifiers) {
-    				Node source = id2node.get(sr.getSpecies());
-    				if (source!=null) {
-    					if (splitEnzymesToOnlyOccurOnceInAnyReaction) {
-    						// Split enzymes to have a nicer visualization. 
-    						if (usedEnzymes.contains(source)) {
-    							Node oldSource = source;
-    							source = oldSource.createCopy(simpleGraph);
-    							NodeRealizer realizer = simpleGraph.getRealizer(source);
-    							if (realizer instanceof CloneMarker) {
-    								((CloneMarker) realizer).setNodeIsCloned(true);
-    								((CloneMarker) simpleGraph.getRealizer(oldSource)).setNodeIsCloned(true);
-    							} else {
-    								log.warning("Can not setup clone marker on " + realizer.getClass().getSimpleName());
-    							}
-    							unlayoutedNodes.add(source);
-    							GraphElement2SBid.put(source, sr.getSpecies());
-    						}
-    					}
-    					Edge e = simpleGraph.createEdge(source, rNode);
-    					GraphElement2SBid.put(e, r.getId());
-    					listOfEdges.add(e);
-    					EdgeRealizer er = simpleGraph.getRealizer(e);
-    					er.setArrow(Arrow.TRANSPARENT_CIRCLE);
-    					er.setLineType(LineType.LINE_1);
-    					er.setSourceArrow(Arrow.NONE);
-    					usedEnzymes.add(source);
-    				}
-    			}
-    			
-    		}
-    		
-    		id2edge.put(r.getId(), listOfEdges);
-    	}
+      for (Reaction r : model.getListOfReactions()) {
+        // List all edges corresponding to the same Reaction
+        LinkedList<Edge> listOfEdges = new LinkedList<Edge>();
+        
+        if (r.isSetListOfReactants() && r.isSetListOfProducts()) {
+          
+          // Create the reaction node
+          NodeRealizer nr = new ReactionNodeRealizer();
+          reaction2node .put(r, (ReactionNodeRealizer) nr);
+          Node rNode = simpleGraph.createNode(nr);
+          GraphElement2SBid.put(rNode, r.getId());
+          id2node.put(r.getId(), rNode);
+          
+          // Get information from the layout extension
+          double x = Double.NaN;
+          double y = Double.NaN;
+          if (useLayoutExtension) {
+            // reactions can not have mutliple glyphs... take first!
+            Collection<BoundingBox> layout = id2layoutMap.get(r.getId());
+            BoundingBox g = (layout != null) && (layout.size() > 0) ? layout.iterator().next() : null;
+            if (g != null) {
+              if (g.isSetDimensions()) {
+                nr.setWidth(g.getDimensions().getWidth());
+                nr.setHeight(g.getDimensions().getHeight());
+              }
+              if (g.isSetPosition()) {
+                // Ignore 0|0 positions. They're due to default values
+                if ((g.getPosition().getX() != 0d) || (g.getPosition().getY() != 0d)) {
+                  x = g.getPosition().getX();
+                  y = g.getPosition().getY();
+                }
+              }
+            }
+          }
+          
+          List<SpeciesReference> reactants = r.isSetListOfReactants() ? r.getListOfReactants() : new ArrayList<SpeciesReference>(0);
+          List<SpeciesReference> products = r.isSetListOfProducts() ? r.getListOfProducts() : new ArrayList<SpeciesReference>(0);
+          List<ModifierSpeciesReference> modifiers = r.isSetListOfModifiers() ? r.getListOfModifiers() : new ArrayList<ModifierSpeciesReference>(0);
+          
+          // Adding them to the to-be-layouted list will lead to position
+          // them as freely as possible by yFiles, which is WRONG for these
+          // nodes. Actually, they should always be between products and
+          // substrate... needing special layouting!
+          //unlayoutedNodes.add(rNode);
+          if (Double.isNaN(x) || Double.isNaN(y)) {
+            ValuePair<Double, Double> xy = calculateMeanCoords(reactants, products, id2node, simpleGraph);
+            x = (xy.getA());
+            y = (xy.getB());
+          }
+          nr.setCenterX(x);
+          nr.setCenterY(y);
+          
+          // TODO: Add stoichiometry to edges (docked to corresponding node):
+          // subtrate on substrate node
+          // product on product node
+          
+          // Add edges to the reaction node
+          for (SpeciesReference sr : reactants) {
+            Node source = id2node.get(sr.getSpecies());
+            if (source!=null) {
+              Edge e = simpleGraph.createEdge(source, rNode);
+              GraphElement2SBid.put(e, r.getId());
+              listOfEdges.add(e);
+              EdgeRealizer er = simpleGraph.getRealizer(e);
+              if (r.isReversible()) {
+                er.setSourceArrow(Arrow.STANDARD);
+              } else {
+                er.setSourceArrow(Arrow.NONE);
+              }
+              er.setArrow(Arrow.NONE);
+              
+              
+            }
+          }
+          
+          for (SpeciesReference sr : products) {
+            Node target = id2node.get(sr.getSpecies());
+            if (target!=null) {
+              Edge e = simpleGraph.createEdge(rNode, target);
+              GraphElement2SBid.put(e, r.getId());
+              listOfEdges.add(e);
+              EdgeRealizer er = simpleGraph.getRealizer(e);
+              er.setArrow(Arrow.STANDARD);
+              er.setSourceArrow(Arrow.NONE);
+            }
+          }
+          
+          for (ModifierSpeciesReference sr : modifiers) {
+            Node source = id2node.get(sr.getSpecies());
+            if (source!=null) {
+              if (splitEnzymesToOnlyOccurOnceInAnyReaction) {
+                // Split enzymes to have a nicer visualization.
+                if (usedEnzymes.contains(source)) {
+                  Node oldSource = source;
+                  source = oldSource.createCopy(simpleGraph);
+                  NodeRealizer realizer = simpleGraph.getRealizer(source);
+                  if (realizer instanceof CloneMarker) {
+                    ((CloneMarker) realizer).setNodeIsCloned(true);
+                    ((CloneMarker) simpleGraph.getRealizer(oldSource)).setNodeIsCloned(true);
+                  } else {
+                    log.warning("Can not setup clone marker on " + realizer.getClass().getSimpleName());
+                  }
+                  unlayoutedNodes.add(source);
+                  GraphElement2SBid.put(source, sr.getSpecies());
+                }
+              }
+              Edge e = simpleGraph.createEdge(source, rNode);
+              GraphElement2SBid.put(e, r.getId());
+              listOfEdges.add(e);
+              EdgeRealizer er = simpleGraph.getRealizer(e);
+              er.setArrow(Arrow.TRANSPARENT_CIRCLE);
+              er.setLineType(LineType.LINE_1);
+              er.setSourceArrow(Arrow.NONE);
+              usedEnzymes.add(source);
+            }
+          }
+          
+        }
+        
+        id2edge.put(r.getId(), listOfEdges);
+      }
     }
     return reaction2node;
   }
@@ -625,7 +626,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         Node n;
         if ((s instanceof Group) && ((Group) s).isSetListOfMembers()) {
           // Create a group node (SBML-groups extension)
-        	Group group = (Group) s;
+          Group group = (Group) s;
           int size = group.isSetListOfMembers() ? group.getMemberCount() : 0;
           String[] groupMembers = new String[size];
           for (int i = 0; i < size; i++) {
@@ -655,38 +656,38 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * @return
    */
   private Set<Compartment> findCompartments(ListOf<? extends SimpleSpeciesReference> listOfReactionParticipants) {
-  	Set<Compartment> setOfComp = new HashSet<Compartment>();
-		for (int i = 0; i < listOfReactionParticipants.size(); i++) {
-			SimpleSpeciesReference ref = listOfReactionParticipants.get(i);
-			Species s = ref.getSpeciesInstance();
-			if (s != null) {
-				Compartment curr = s.getCompartmentInstance();
-				if (curr != null) {
-					setOfComp.add(curr);
-				}
-			}
-		}
-		return setOfComp;
-	}
-
-	/**
+    Set<Compartment> setOfComp = new HashSet<Compartment>();
+    for (int i = 0; i < listOfReactionParticipants.size(); i++) {
+      SimpleSpeciesReference ref = listOfReactionParticipants.get(i);
+      Species s = ref.getSpeciesInstance();
+      if (s != null) {
+        Compartment curr = s.getCompartmentInstance();
+        if (curr != null) {
+          setOfComp.add(curr);
+        }
+      }
+    }
+    return setOfComp;
+  }
+  
+  /**
    * 
    * @param compartmentID
    * @param elementID
    * @param mapOfChildren
    */
   private void addChild(String compartmentID, String elementID, Map<String, List<String>> mapOfChildren) {
-  	List<String> children = mapOfChildren.get(compartmentID);
-		if (children == null) {
-			children = new ArrayList<String>();
-			children.add(elementID);
-			mapOfChildren.put(compartmentID, children);
-		} else {
-			children.add(elementID);
-		}
-	}
-
-	/**
+    List<String> children = mapOfChildren.get(compartmentID);
+    if (children == null) {
+      children = new ArrayList<String>();
+      children.add(elementID);
+      mapOfChildren.put(compartmentID, children);
+    } else {
+      children.add(elementID);
+    }
+  }
+  
+  /**
    * Parses the layout information from the given {@code document}.
    * This will set the {@link #useLayoutExtension} and
    * {@link #id2layoutMap} variables.
@@ -705,19 +706,19 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * the correct layout.
    */
   private void parseLayoutInformation(SBMLDocument document, List<? extends AbstractNamedSBase> species) {
-  	Model model = document.getModel();
+    Model model = document.getModel();
     SBasePlugin layoutExtension = model.getExtension(layoutNamespace);
     useLayoutExtension = layoutExtension!=null;
     id2layoutMap = null;
     if (useLayoutExtension) {
-    	LayoutModelPlugin layoutModel = (LayoutModelPlugin) layoutExtension;
+      LayoutModelPlugin layoutModel = (LayoutModelPlugin) layoutExtension;
       if (layoutModel.isSetListOfLayouts()) {
         // TODO: For generic releases, it would be nice to have a JList
         // that let's the user choose the layout.
         
         // In many applications (KEGGtranslator, SBVC, etc.) there is one layout
         // for core and one for qual => identify the required one.
-      	ListOf<Layout> layouts = layoutModel.getListOfLayouts();
+        ListOf<Layout> layouts = layoutModel.getListOfLayouts();
         Layout l = layouts.iterator().next(); // First one
         for (int i = 0; i < layouts.size(); i++) {
           Layout toTest = layoutModel.getLayout(i);
@@ -726,7 +727,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             if ((species != null) && speciesListContainsID(species, anyID)) {
               // we have a corresponding layout
               l = toTest;
-              break;              
+              break;
             }
             if (!showQualModel && model.getSpecies(anyID) != null) {
               // we have a core layout
@@ -742,18 +743,18 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         // Parse layout and establish internal maps
         id2layoutMap = new HashMap<String, Collection<BoundingBox>>();
         if (l.isSetListOfSpeciesGlyphs()) {
-        	for (SpeciesGlyph sg: l.getListOfSpeciesGlyphs()) {
-        		if (sg.isSetBoundingBox()) {
-        			Utils.addToMapOfSets(id2layoutMap, sg.getSpecies(), sg.getBoundingBox());
-        		}
-        	}
+          for (SpeciesGlyph sg: l.getListOfSpeciesGlyphs()) {
+            if (sg.isSetBoundingBox()) {
+              Utils.addToMapOfSets(id2layoutMap, sg.getSpecies(), sg.getBoundingBox());
+            }
+          }
         }
         if (l.isSetListOfReactionGlyphs()) {
-        	for (ReactionGlyph sg: l.getListOfReactionGlyphs()) {
-        		if (sg.isSetBoundingBox()) {
-        			Utils.addToMapOfSets(id2layoutMap, sg.getReaction(), sg.getBoundingBox());
-        		}
-        	}
+          for (ReactionGlyph sg: l.getListOfReactionGlyphs()) {
+            if (sg.isSetBoundingBox()) {
+              Utils.addToMapOfSets(id2layoutMap, sg.getReaction(), sg.getBoundingBox());
+            }
+          }
         }
         useLayoutExtension = id2layoutMap.size()>0;
       } else {
@@ -769,13 +770,13 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * @param document
    * @param species list of all species to draw. This helps identifying
    * the correct layout.
-   * @return 
+   * @return
    */
   private List<? extends AbstractNamedSBase> parseGroupInformation(SBMLDocument document, List<? extends AbstractNamedSBase> species) {
     SBasePlugin groupExtension = document.getModel().getExtension(groupNamespace);
     boolean useGroupExtension = groupExtension!=null;
     if (useGroupExtension) {
-    	GroupsModelPlugin groupModel = (GroupsModelPlugin) groupExtension;
+      GroupsModelPlugin groupModel = (GroupsModelPlugin) groupExtension;
       if (groupModel.isSetListOfGroups()) {
         ListOf<Group> groups = groupModel.getListOfGroups();
         
@@ -824,34 +825,34 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     }
     
     if (t.isSetListOfInputs()) {
-    	for (Input i: t.getListOfInputs()) {
-    		if (t.isSetListOfOutputs()) {
-    			for (Output o: t.getListOfOutputs()) {
-    				
-    				// You should use a predefined map here, since the source
-    				// or target could also be a group!
-    				Node source = id2node.get(i.getQualitativeSpecies());
-    				Node target = id2node.get(o.getQualitativeSpecies());
-    				if ((source == null) || (target == null)) {
-    					continue;
-    				}
-    				
-    				Edge e = simpleGraph.createEdge(source, target);
-    				GraphElement2SBid.put(e, t.getId());
-    				
-    				if (i.isSetSign()) {
-    					if (i.getSign().equals(Sign.positive)) {
-    						simpleGraph.getRealizer(e).setArrow(Arrow.STANDARD);
-    					} else if (i.getSign().equals(Sign.negative)) {
-    						simpleGraph.getRealizer(e).setArrow(Arrow.T_SHAPE);
-    					} else if (i.getSign().equals(Sign.dual)) {
-    						// Diamond is used in SBGN-PD as "modulation".
-    						simpleGraph.getRealizer(e).setArrow(Arrow.DIAMOND);
-    					}
-    				}
-    			}
-    		}
-    	}
+      for (Input i: t.getListOfInputs()) {
+        if (t.isSetListOfOutputs()) {
+          for (Output o: t.getListOfOutputs()) {
+            
+            // You should use a predefined map here, since the source
+            // or target could also be a group!
+            Node source = id2node.get(i.getQualitativeSpecies());
+            Node target = id2node.get(o.getQualitativeSpecies());
+            if ((source == null) || (target == null)) {
+              continue;
+            }
+            
+            Edge e = simpleGraph.createEdge(source, target);
+            GraphElement2SBid.put(e, t.getId());
+            
+            if (i.isSetSign()) {
+              if (i.getSign().equals(Sign.positive)) {
+                simpleGraph.getRealizer(e).setArrow(Arrow.STANDARD);
+              } else if (i.getSign().equals(Sign.negative)) {
+                simpleGraph.getRealizer(e).setArrow(Arrow.T_SHAPE);
+              } else if (i.getSign().equals(Sign.dual)) {
+                // Diamond is used in SBGN-PD as "modulation".
+                simpleGraph.getRealizer(e).setArrow(Arrow.DIAMOND);
+              }
+            }
+          }
+        }
+      }
     }
   }
   
@@ -871,7 +872,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * First, calculates the mean of all x/y coordinates of all
    * products and substrates separately. Then, calculates
    * the mean of those means. The result should be X/Y
-   * coordinates that are perfectly between the given 
+   * coordinates that are perfectly between the given
    * products and substrates.
    * @param <T>
    * @param listOfSubstrates
@@ -920,8 +921,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   
   
   /**
-   * Create a list of species (by identifier) that 
-   * show an enzymatic activity. 
+   * Create a list of species (by identifier) that
+   * show an enzymatic activity.
    * @param document
    * @return List of species identifiers that are in the
    * list list of {@link ModifierSpeciesReference}s.

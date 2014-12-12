@@ -25,16 +25,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
-import de.zbit.util.DatabaseIdentifiers;
-import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
 
 
@@ -78,28 +74,28 @@ public final class AtomBalanceCheck {
       this.atomsRight = atomsRight;
       this.defects = defects;
     }
-
+    
     /**
      * @return the reaction
      */
     public Reaction getReaction() {
       return r;
     }
-
+    
     /**
      * @return the atomsLeft
      */
     public Map<String, Integer> getAtomsLeft() {
       return atomsLeft;
     }
-
+    
     /**
      * @return the atomsRight
      */
     public Map<String, Integer> getAtomsRight() {
       return atomsRight;
     }
-
+    
     /**
      * @return the defects
      */
@@ -124,7 +120,9 @@ public final class AtomBalanceCheck {
      */
     public String getResultsAsHTMLtable() {
       Collection<String> atoms = getAtoms();
-      if (atoms.size()<1) return "";
+      if (atoms.size()<1) {
+        return "";
+      }
       StringBuilder sb = new StringBuilder("<table style=\"border:1px solid black;\"><tr align=\"right\"><th>&#160;</th>");
       
       // All atoms
@@ -151,7 +149,7 @@ public final class AtomBalanceCheck {
       sb.append("</table>");
       return sb.toString();
     }
-
+    
     /**
      * @param sb
      * @param rowName
@@ -170,7 +168,7 @@ public final class AtomBalanceCheck {
       }
       sb.append("</tr>");
     }
-
+    
     /**
      * @return {@code true} if this equation is not balanced, i.e.
      * has some missing atoms.
@@ -181,7 +179,7 @@ public final class AtomBalanceCheck {
     
     
   }
-
+  
   
   /**
    * Check atom balances of all reactions in a pathway.
@@ -195,8 +193,8 @@ public final class AtomBalanceCheck {
     int replacement) {
     
     /* TODO:
-     * Option in KEGGtranslator für "correct minor deficiencies"
-     * (einzelne atome wie H+ selbstständig ergänzen).
+     * Option in KEGGtranslator fuer "correct minor deficiencies"
+     * (einzelne atome wie H+ selbststaendig ergaenzen).
      * -  Dann aber unbedingt note in reaction dass und was korigiert wurde
      * 
      */
@@ -228,7 +226,7 @@ public final class AtomBalanceCheck {
    *         defects.
    */
   public static AtomCheckResult checkAtomBalance(KeggInfoManagement manager, Reaction r,
-      int replacement) {
+    int replacement) {
     Map<String, Integer> atomsLeft;
     Map<String, Integer> atomsRight;
     Map<String, Integer> defect;
@@ -263,11 +261,11 @@ public final class AtomBalanceCheck {
     }
     
     if (defect.size() > 0) {
-//      System.out.println(String.format("Detected incorrect atom balance in reaction %s:", r.getName()));
-//      System.out.println(String.format(
-//          "%s\natoms left:  %s\natoms right:  %s\ndefect:  %s\n",
-//          r.getEquation(), atomsLeft.toString(), atomsRight
-//              .toString(), defect.toString()));
+      //      System.out.println(String.format("Detected incorrect atom balance in reaction %s:", r.getName()));
+      //      System.out.println(String.format(
+      //          "%s\natoms left:  %s\natoms right:  %s\ndefect:  %s\n",
+      //          r.getEquation(), atomsLeft.toString(), atomsRight
+      //              .toString(), defect.toString()));
       log.log(level, String.format("incorrect atom balance in reaction %s: %s", r.getName(), defect.toString()) );
     }
     
@@ -284,7 +282,7 @@ public final class AtomBalanceCheck {
    * @return
    */
   public static Map<String, Integer> countAtoms(KeggInfoManagement manager,
-      List<ReactionComponent> listOfSpecRefs, int replacement) {
+    List<ReactionComponent> listOfSpecRefs, int replacement) {
     /* TODO: Does this work correctly for (n+1)?
      * Consider, e.g. rn:R04241 "C00002 + C03541(n) + C00025 <=> C00008 + C00009 + C03541(n+1)"!
      * 
@@ -293,7 +291,7 @@ public final class AtomBalanceCheck {
     for (ReactionComponent component : listOfSpecRefs) {
       KeggInfos infos = KeggInfos.get(KeggInfos.appendPrefix(component.getName()), manager);
       
-
+      
       if (infos == null || !infos.queryWasSuccessfull()) {
         atomCount.clear();
         break;
@@ -332,7 +330,7 @@ public final class AtomBalanceCheck {
    * @return
    */
   public static Map<String, Integer> countAtoms(double stoichiometry,
-      String formula, int replacement) {
+    String formula, int replacement) {
     Map<String, Integer> atomCount = new TreeMap<String, Integer>();
     StringBuilder name = new StringBuilder(), number = new StringBuilder();
     StringBuilder newFormula = new StringBuilder();
@@ -341,18 +339,20 @@ public final class AtomBalanceCheck {
     for (int i = 0; i < formula.length(); i++) {
       char c = formula.charAt(i);
       if (Character.isLetterOrDigit(c)) {
-        if (brackets)
+        if (brackets) {
           name.append(c);
-        else {
+        } else {
           if (digitAfter) {
             if (Character.isUpperCase(c)) {
-              if (number.length() == 0)
+              if (number.length() == 0) {
                 number.append(1);
+              }
               Map<String, Integer> inlay = countAtoms(1,
-                  name.toString(), replacement);
+                name.toString(), replacement);
               for (String key : inlay.keySet()) {
-                if (!atomCount.containsKey(key))
+                if (!atomCount.containsKey(key)) {
                   atomCount.put(key, Integer.valueOf(0));
+                }
                 int mult = number.toString().contains("n") ? replacement
                     : Integer.parseInt(number.toString());
                 int val = (int) (stoichiometry
@@ -380,18 +380,20 @@ public final class AtomBalanceCheck {
         digitAfter = true;
       }
     }
-    for (char c : newFormula.toString().toCharArray())
+    for (char c : newFormula.toString().toCharArray()) {
       if (Character.isLetterOrDigit(c)) {
         if (Character.isUpperCase(c)) {
           if (name.length() > 0) {
-            if (number.length() == 0)
+            if (number.length() == 0) {
               number.append(1);
+            }
             if (digitAfter) {
               Map<String, Integer> inlay = countAtoms(1,
-                  name.toString(), replacement);
+                name.toString(), replacement);
               for (String key : inlay.keySet()) {
-                if (!atomCount.containsKey(key))
+                if (!atomCount.containsKey(key)) {
                   atomCount.put(key, Integer.valueOf(0));
+                }
                 int mult = number.toString().contains("n") ? replacement
                     : Integer.parseInt(number.toString());
                 int val = (int) (stoichiometry
@@ -401,11 +403,11 @@ public final class AtomBalanceCheck {
               digitAfter = false;
             } else {
               String key = name.toString();
-              if (atomCount.containsKey(key))
+              if (atomCount.containsKey(key)) {
                 atomCount.put(key, (int) (atomCount.get(key)
                     .intValue() + stoichiometry
                     * Integer.parseInt(number.toString())));
-              else {
+              } else {
                 int num = number.toString().contains("n") ? num = replacement
                     : Integer.parseInt(number.toString());
                 atomCount.put(key, (int) (stoichiometry * num));
@@ -420,15 +422,17 @@ public final class AtomBalanceCheck {
           name.append(c);
         }
       }
+    }
     if (name.length() > 0) {
       String key = name.toString();
-      if (number.length() == 0)
+      if (number.length() == 0) {
         number.append(1);
-      if (atomCount.containsKey(key))
+      }
+      if (atomCount.containsKey(key)) {
         atomCount.put(key, atomCount.get(key).intValue()
-            + (int) (stoichiometry * Integer.parseInt(number
-                .toString())));
-      else {
+          + (int) (stoichiometry * Integer.parseInt(number
+            .toString())));
+      } else {
         int num = number.toString().contains("n") ? num = replacement
             : Integer.parseInt(number.toString());
         atomCount.put(key, (int) (stoichiometry * num));

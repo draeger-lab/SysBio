@@ -52,7 +52,7 @@ import de.zbit.util.prefs.Option;
  */
 public class JTableFilter extends JPanel {
   private static final long serialVersionUID = 6976706059419605006L;
-
+  
   /** Bundle to get localized Strings. **/
   protected static ResourceBundle bundle = ResourceManager.getBundle(StringUtil.RESOURCE_LOCATION_FOR_LABELS);
   
@@ -70,7 +70,7 @@ public class JTableFilter extends JPanel {
    * A thread that counts the number of selected objects.
    */
   private Thread counter = null;
-
+  
   JLabel description;
   
   JComboBox header1;
@@ -114,9 +114,9 @@ public class JTableFilter extends JPanel {
     lh.add(header1, operator1, text1);
     
     and = new JRadioButton(
-        StringUtil.changeFirstLetterCase(bundle.getString("AND"), true, true));
+      StringUtil.changeFirstLetterCase(bundle.getString("AND"), true, true));
     or = new JRadioButton(
-        StringUtil.changeFirstLetterCase(bundle.getString("OR"), true, true));
+      StringUtil.changeFirstLetterCase(bundle.getString("OR"), true, true));
     andNot = new JRadioButton(StringUtil.changeFirstLetterCase(
       String.format("%s %s", bundle.getString("AND"), bundle.getString("NOT")), true, true));
     ButtonGroup group = new ButtonGroup();
@@ -137,10 +137,11 @@ public class JTableFilter extends JPanel {
     
     // Add listeners to refresh the preview
     ItemListener il = new ItemListener() {
-    /*
-     * 	(non-Javadoc)
-     * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
-     */
+      /*
+       * 	(non-Javadoc)
+       * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+       */
+      @Override
       public void itemStateChanged(ItemEvent e) {
         queueCounter();
       }
@@ -150,13 +151,15 @@ public class JTableFilter extends JPanel {
        * (non-Javadoc)
        * @see javax.swing.event.DocumentListener#removeUpdate(javax.swing.event.DocumentEvent)
        */
+      @Override
       public void removeUpdate(DocumentEvent e) {
-        queueCounter(); 
+        queueCounter();
       }
       /*
        * (non-Javadoc)
        * @see javax.swing.event.DocumentListener#insertUpdate(javax.swing.event.DocumentEvent)
        */
+      @Override
       public void insertUpdate(DocumentEvent e) {
         queueCounter();
       }
@@ -164,6 +167,7 @@ public class JTableFilter extends JPanel {
        * (non-Javadoc)
        * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
        */
+      @Override
       public void changedUpdate(DocumentEvent e) {
         queueCounter();
       }
@@ -210,21 +214,27 @@ public class JTableFilter extends JPanel {
   private void queueCounter() {
     // Do we have to recalculate ?
     int id = currentStateIdentifier();
-    if (preview.getName().equals(Integer.toString(id))) return;
+    if (preview.getName().equals(Integer.toString(id))) {
+      return;
+    }
     preview.setName(Integer.toString(id));
     
     // Are we already recalculating?
-    if (counter!=null) counter.interrupt();
+    if (counter!=null) {
+      counter.interrupt();
+    }
     
     // Queue the refresh.
     counter = new Thread() {
-    	/* (non-Javadoc)
-    	 * @see java.lang.Thread#run()
-    	 */
-    	@Override
+      /* (non-Javadoc)
+       * @see java.lang.Thread#run()
+       */
+      @Override
       public void run() {
         int hits = getSelectedRowCount();
-        if (Thread.currentThread().isInterrupted()) return;
+        if (Thread.currentThread().isInterrupted()) {
+          return;
+        }
         preview.setText(String.format("%s objects in current filter group.", hits));
       }
     };
@@ -245,7 +255,7 @@ public class JTableFilter extends JPanel {
   
   public List<Integer> getSelectedRows() {
     LinkedList<Integer> ret = new LinkedList<Integer>();
-
+    
     // Get selected values
     String c1 = operator1.getSelectedItem().toString();
     String c2 = operator2.getSelectedItem().toString();
@@ -255,7 +265,7 @@ public class JTableFilter extends JPanel {
     String filter2 = text2.getText();
     boolean or = this.or.isSelected();
     boolean andNot = this.andNot.isSelected();
-
+    
     // Prepare filter, parse if numeric.
     Object f1=filter1;
     Object f2=filter2;
@@ -302,11 +312,13 @@ public class JTableFilter extends JPanel {
       col1 = col2;
       c2="";
     }
-
+    
     // Match all rows and store matcheds rows in list.
     for (int i=0; i<table.getRowCount(); i++) {
-      if (Thread.currentThread().isInterrupted()) return null;
-
+      if (Thread.currentThread().isInterrupted()) {
+        return null;
+      }
+      
       
       if (!c1.equals("")) { // Any operator selected
         Object val = table.getValueAt(i, col1);
@@ -314,7 +326,7 @@ public class JTableFilter extends JPanel {
         // Some columns contain rows in the order "N/A", "0.1, "0.2",...
         // then, initially f1 is a String, because the first row ("N/A")
         // is a string. Hence, eventually cast to Number later on.
-        if (val!=null && !Number.class.isAssignableFrom(f1.getClass()) && 
+        if (val!=null && !Number.class.isAssignableFrom(f1.getClass()) &&
             Number.class.isAssignableFrom(val.getClass())) {
           f1=Option.parseOrCast(val.getClass(), f1);
         }
@@ -339,13 +351,15 @@ public class JTableFilter extends JPanel {
           // Some columns contain rows in the order "N/A", "0.1, "0.2",...
           // then, initially f1 is a String, because the first row ("N/A")
           // is a string. Hence, eventually cast to Number later on.
-          if (val2!=null && !Number.class.isAssignableFrom(f2.getClass()) && 
+          if (val2!=null && !Number.class.isAssignableFrom(f2.getClass()) &&
               Number.class.isAssignableFrom(val2.getClass())) {
             f2=Option.parseOrCast(val2.getClass(), f2);
           }
           
           secondConditionOk = matchOperator(c2, val2, f2);
-          if (andNot) secondConditionOk = !secondConditionOk;
+          if (andNot) {
+            secondConditionOk = !secondConditionOk;
+          }
         }
         if (secondConditionOk) {
           // either nothing selected or really ok.
@@ -360,7 +374,7 @@ public class JTableFilter extends JPanel {
     
     return ret;
   }
-
+  
   /**
    * Currently:
    * "","=", "!=", ">=","<=",">","<"
@@ -368,9 +382,9 @@ public class JTableFilter extends JPanel {
    * @return
    */
   public static String[] getOperators() {
-    // TODO: Schöner wäre ala excel "entspricht", "entspricht nicht",...
-    // ermöglicht auch "beginnt mit", etc.
-    // Änderungen hier unbedingt mit matchOperator() abgleichen!
+    // TODO: Schoener waere ala excel "entspricht", "entspricht nicht",...
+    // ermoeglicht auch "beginnt mit", etc.
+    // Aenderungen hier unbedingt mit matchOperator() abgleichen!
     return new String[]{"","=", "!=", ">=","<=",">","<"
         , "|>=|","|<=|","|>|","|<|", regexString};
   }
@@ -427,14 +441,14 @@ public class JTableFilter extends JPanel {
         return false;
       }
     }
-      
+    
     // If classes are incompatible, make string comparisons.
     if (bothToString) {
       val1=val1.toString();
       val2=val2.toString();
     }
     
-
+    
     if (operator.equals("=")) {
       return (((Comparable) val1).compareTo(val2)==0);
     } else if (operator.equals("!=")) {
@@ -454,13 +468,13 @@ public class JTableFilter extends JPanel {
       // should always be true
       val1 = toAbsoluteNumber(val1);
       val2 = toAbsoluteNumber(val2);
-      if (val1==null || val2==null || 
+      if (val1==null || val2==null ||
           Double.isNaN(((Number)val1).doubleValue()) || Double.isNaN(((Number)val2).doubleValue()) ) {
         // incompatible data types.
         return false;
       }
     }
-
+    
     if (operator.equals("|>=|")) {
       return (((Comparable) val1).compareTo(val2)>=0);
     } else if (operator.equals("|<=|")) {
@@ -470,10 +484,10 @@ public class JTableFilter extends JPanel {
     } else if (operator.equals("|<|")) {
       return (((Comparable) val1).compareTo(val2)<0);
     }
-
+    
     return false;
   }
-
+  
   /**
    * @param val1
    * @return
@@ -515,7 +529,7 @@ public class JTableFilter extends JPanel {
     }
     return val1;
   }
-
+  
   /**
    * Returns the headers of the table as array. If the table
    * has no headers, a list of Strings "Column X" will be
@@ -538,7 +552,9 @@ public class JTableFilter extends JPanel {
       Object[] ret = new Object[max];
       for (int i=0;i<max; i++) {
         Object s = null;
-        if (i<m.getColumnCount()) s = m.getColumn(i).getHeaderValue();
+        if (i<m.getColumnCount()) {
+          s = m.getColumn(i).getHeaderValue();
+        }
         if (s!=null && s.toString().length()>0) {
           ret[i]=s;
         } else {
@@ -559,8 +575,10 @@ public class JTableFilter extends JPanel {
     return showDialog(parent, c, title);
   }
   public static JTableFilter showDialog(Component parent, final JTableFilter c, String title) {
-    if (title==null) title = UIManager.getString("OptionPane.titleText");
-
+    if (title==null) {
+      title = UIManager.getString("OptionPane.titleText");
+    }
+    
     boolean allOk = false;
     int ret=JOptionPane.OK_OPTION;
     while(!allOk) {
@@ -609,7 +627,7 @@ public class JTableFilter extends JPanel {
   public void setInitialSelection(String col1Header, String condition1, String filter1, int conjunction, String col2Header, String condition2, String filter2) {
     header1.setSelectedItem(col1Header);
     operator1.setSelectedItem(condition1);
-    text1.setText(filter1);    
+    text1.setText(filter1);
     
     and.setSelected(conjunction<=0);
     or.setSelected(conjunction==1);
@@ -649,7 +667,7 @@ public class JTableFilter extends JPanel {
     
     return true;
   }
-
+  
   public static void main(String[] args) {
     Object[][] row = new Object[][]{
         {-1,"Hallo"},
@@ -668,5 +686,5 @@ public class JTableFilter extends JPanel {
     showDialog(null, demo);
   }
   
-
+  
 }

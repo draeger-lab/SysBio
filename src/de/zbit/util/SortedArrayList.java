@@ -19,7 +19,6 @@ package de.zbit.util;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,7 +29,7 @@ import java.util.List;
  *
  * Haelt eine ArrayList stets sortiert. Nutzt Quicksort und BinarySearch.
  * Kann mit ArrayList<Array> (z.B. ArrayList<String[]>) umgehen und sortiert diese dann nach gegebenen index im inneren Array (default 0).
- * Beispiel: ArrayList<String[]> - Elemente: String[a,z]; String[b,a] ; String[c,h] in der Reihenfolge.  
+ * Beispiel: ArrayList<String[]> - Elemente: String[a,z]; String[b,a] ; String[c,h] in der Reihenfolge.
  *
  * @param <T>
  * @version $Rev$
@@ -51,16 +50,17 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
       mid = (low + high)/2;
       
       
-      if (((Comparable)a.get(mid)).compareTo(x) < 0 )
+      if (((Comparable)a.get(mid)).compareTo(x) < 0 ) {
         low = mid + 1;
-      else if (((Comparable)a.get(mid)).compareTo(x) > 0 )
+      } else if (((Comparable)a.get(mid)).compareTo(x) > 0 ) {
         high = mid - 1;
-      else
+      } else {
         return mid;
+      }
     }
     
-    // Hier nicht -1 statt 0 oder pauschal -1 für not found zurückgeben, da dieser
-    // Wer auch für das Insert benutzt wird.
+    // Hier nicht -1 statt 0 oder pauschal -1 fuer not found zurueckgeben, da dieser
+    // Wer auch fuer das Insert benutzt wird.
     return -Math.abs(mid);     // NOT_FOUND = -1
   }
   /**
@@ -73,7 +73,10 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private static <K> int compare(SortedArrayList<K> a, Object x, int index) {
-    if (index>=a.size()) return -1; // ...eigentlich error thowen besser.
+    if (index>=a.size())
+    {
+      return -1; // ...eigentlich error thowen besser.
+    }
     return (((Comparable)a.get(index)).compareTo(x));
   }
   
@@ -85,26 +88,28 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     SortedArrayList<String[]> sal = new SortedArrayList<String[]>();
     
     String[] a = new String[12];
-    for (int i=0; i<a.length; i++)
+    for (int i=0; i<a.length; i++) {
       a[i] = "";
-    sal.add(new String[]{"Z", "0"}); a[0] = "Z"; 
-    sal.add(new String[]{"z", "1"}); a[1] = "z"; 
-    sal.add(new String[]{"j", "2"}); a[2] = "j"; 
-    sal.add(new String[]{"a", "3"}); a[3] = "a"; 
-    sal.add(new String[]{"k", "4"}); a[4] = "k"; 
+    }
+    sal.add(new String[]{"Z", "0"}); a[0] = "Z";
+    sal.add(new String[]{"z", "1"}); a[1] = "z";
+    sal.add(new String[]{"j", "2"}); a[2] = "j";
+    sal.add(new String[]{"a", "3"}); a[3] = "a";
+    sal.add(new String[]{"k", "4"}); a[4] = "k";
     sal.add(new String[]{"3", "5"}); a[5] = "3";
-    sal.add(new String[]{"Zz", "6"}); a[6] = "Zz"; 
+    sal.add(new String[]{"Zz", "6"}); a[6] = "Zz";
     sal.add(new String[]{"fjd", "7"}); a[7] = "fjd";
-    sal.add(new String[]{"&", "8"}); a[8] = "&"; 
-    sal.add(new String[]{"o", "9"}); a[9] = "o"; 
+    sal.add(new String[]{"&", "8"}); a[8] = "&";
+    sal.add(new String[]{"o", "9"}); a[9] = "o";
     sal.add(new String[]{"f", "10"}); a[10] = "f";
-    sal.add(new String[]{"n", "11"}); a[11] = "n"; 
+    sal.add(new String[]{"n", "11"}); a[11] = "n";
     
-    sal.put(new String[]{"o", "10"}); 
+    sal.put(new String[]{"o", "10"});
     
     Arrays.sort(a);
-    for (int i=0; i<sal.size(); i++)
-      System.out.print(((String[])sal.get(i))[1] + ((String[])sal.get(i))[0] + "-" + a[i] +  "\t");
+    for (int i=0; i<sal.size(); i++) {
+      System.out.print(sal.get(i)[1] + sal.get(i)[0] + "-" + a[i] +  "\t");
+    }
     
     System.out.println();
     System.out.println(sal.indexOf(new String[]{"fjd", "7"}));
@@ -121,26 +126,28 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     SortedArrayList<String> sal2 = new SortedArrayList<String>();
     
     String[] a2 = new String[12];
-    for (int i=0; i<a2.length; i++)
+    for (int i=0; i<a2.length; i++) {
       a2[i] = "";
-    sal2.add("Z"); a2[0] = "Z"; 
-    sal2.add("z"); a2[1] = "z"; 
-    sal2.add("j"); a2[2] = "j"; 
-    sal2.add("a2"); a2[3] = "a2"; 
-    sal2.add("k"); a2[4] = "k"; 
+    }
+    sal2.add("Z"); a2[0] = "Z";
+    sal2.add("z"); a2[1] = "z";
+    sal2.add("j"); a2[2] = "j";
+    sal2.add("a2"); a2[3] = "a2";
+    sal2.add("k"); a2[4] = "k";
     sal2.add("3"); a2[5] = "3";
-    sal2.add("Zz"); a2[6] = "Zz"; 
+    sal2.add("Zz"); a2[6] = "Zz";
     sal2.add("fjd"); a2[7] = "fjd";
-    sal2.add("&"); a2[8] = "&"; 
-    sal2.add("o"); a2[9] = "o"; 
+    sal2.add("&"); a2[8] = "&";
+    sal2.add("o"); a2[9] = "o";
     sal2.add("f"); a2[10] = "f";
     sal2.add("n"); a2[11] = "n"; Arrays.sort(a2);
     
     System.out.println("Putting already contained element: "+sal2.put("f"));
     
     
-    for (int i=0; i<sal2.size(); i++)
+    for (int i=0; i<sal2.size(); i++) {
       System.out.print(sal2.get(i) + "-" + a2[i] +  "\t");
+    }
     
     System.out.println("\n" + sal2.indexOf("fjd") + sal2.contains("fjd"));
     System.out.println(sal2.indexOf("&") + "" + sal2.contains("&"));
@@ -193,27 +200,37 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private int getInsertPosition(T s) {
-    if (size()<=0) return 0;
+    if (size()<=0) {
+      return 0;
+    }
     int pos = 0;
     if (s.getClass().isArray()) {
       pos = Math.abs(binarySearchTabString(this, indexToSearch, s));
-      if (((Comparable)Array.get(this.get(pos), indexToSearch)).compareTo(Array.get(s, indexToSearch))>0) {
-        while(pos > -1 && ((Comparable)Array.get(this.get(pos), indexToSearch)).compareTo(Array.get(s, indexToSearch))>0)
+      if (((Comparable)Array.get(get(pos), indexToSearch)).compareTo(Array.get(s, indexToSearch))>0) {
+        while(pos > -1 && ((Comparable)Array.get(get(pos), indexToSearch)).compareTo(Array.get(s, indexToSearch))>0) {
           pos--;
-        if (pos<this.size()) pos = pos+1;
-      } else if (((Comparable)Array.get(this.get(pos), indexToSearch)).compareTo(Array.get(s, indexToSearch))<0) {
-        while(pos >=0 && pos<this.size() && ((Comparable)Array.get(this.get(pos), indexToSearch)).compareTo(Array.get(s, indexToSearch))<0)
+        }
+        if (pos<size()) {
+          pos = pos+1;
+        }
+      } else if (((Comparable)Array.get(get(pos), indexToSearch)).compareTo(Array.get(s, indexToSearch))<0) {
+        while(pos >=0 && pos<size() && ((Comparable)Array.get(get(pos), indexToSearch)).compareTo(Array.get(s, indexToSearch))<0) {
           pos++;
+        }
       }
     } else {
       pos = Math.abs(binarySearch(this, s));
-      if (((Comparable)this.get(pos)).compareTo(s)>0) {
-        while(pos > -1 && ((Comparable)this.get(pos)).compareTo(s)>0)
+      if (((Comparable)get(pos)).compareTo(s)>0) {
+        while(pos > -1 && ((Comparable)get(pos)).compareTo(s)>0) {
           pos--;
-        if (pos<this.size()) pos = pos+1;
-      } else if (((Comparable)this.get(pos)).compareTo(s)<0) {
-        while(pos >=0 && pos<this.size() && ((Comparable)this.get(pos)).compareTo(s)<0)
+        }
+        if (pos<size()) {
+          pos = pos+1;
+        }
+      } else if (((Comparable)get(pos)).compareTo(s)<0) {
+        while(pos >=0 && pos<size() && ((Comparable)get(pos)).compareTo(s)<0) {
           pos++;
+        }
       }
     }
     return pos;
@@ -248,7 +265,9 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     int pos = getInsertPosition(s);
     
     // Check if not already contained
-    if (pos<size() && equals(get(pos), s)) return false;
+    if (pos<size() && equals(get(pos), s)) {
+      return false;
+    }
     
     super.add(pos, s);
     indexOfLastAddedItem = pos;
@@ -270,7 +289,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
         return true;
       }
     } else {
-      if (((Comparable)element1).compareTo((Comparable)element2)==0) {
+      if (((Comparable)element1).compareTo(element2)==0) {
         return true;
       }
     }
@@ -295,8 +314,9 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    */
   public boolean addAll(Iterator<? extends T> it) {
     boolean hasChanged=false;
-    while(it.hasNext())
+    while(it.hasNext()) {
       hasChanged = this.add(it.next());
+    }
     
     return hasChanged;
   }
@@ -343,12 +363,13 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     while(low <= high) {
       mid = (low + high)/2;
       
-      if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(x) < 0 )
+      if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(x) < 0 ) {
         low = mid + 1;
-      else if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(x) > 0 )
+      } else if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(x) > 0 ) {
         high = mid - 1;
-      else
+      } else {
         return mid;
+      }
     }
     return -Math.abs(mid);     // NOT_FOUND = -1
   }
@@ -371,12 +392,13 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     while(low <= high) {
       mid = (low + high)/2;
       
-      if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(Array.get(x, indexToSearch)) < 0 )
+      if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(Array.get(x, indexToSearch)) < 0 ) {
         low = mid + 1;
-      else if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(Array.get(x, indexToSearch)) > 0 )
+      } else if(((Comparable)Array.get(a.get(mid), indexToSearch)).compareTo(Array.get(x, indexToSearch)) > 0 ) {
         high = mid - 1;
-      else
+      } else {
         return mid;
+      }
     }
     return -Math.abs(mid);     // NOT_FOUND = -1
   }
@@ -387,10 +409,16 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    */
   @Override
   public boolean contains(Object o) {
-    if (this.size()==0) return false;
+    if (size()==0) {
+      return false;
+    }
     
     int pos = this.indexOf(o);
-    if (pos>=0) return true; else return false;
+    if (pos>=0) {
+      return true;
+    } else {
+      return false;
+    }
   }
   
   /**
@@ -410,21 +438,28 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   public int indexOf(Object o) {
     // TODO: Return FIRST, not any indexOf item to be
     // Conform with super.indexOf().
-    if (this.size()==0) return -1;
+    if (size()==0) {
+      return -1;
+    }
     T s  = get(0);
     int pos = -1;
     
     if (s.getClass().isArray()) {
       if (!o.getClass().isArray()) {
         pos = binarySearchNonArrayItemInTabString(this, indexToSearch, o);
-        if (pos==0 && !Array.get(this.get(0), indexToSearch).equals(o)) return -1;
+        if (pos==0 && !Array.get(get(0), indexToSearch).equals(o)) {
+          return -1;
+        }
       } else {
         pos = binarySearchTabString(this, indexToSearch, o);
-        if (pos==0 && !Array.get(this.get(0), indexToSearch).equals(Array.get(o, indexToSearch))) return -1;
+        if (pos==0 && !Array.get(get(0), indexToSearch).equals(Array.get(o, indexToSearch))) {
+          return -1;
+        }
       }
     } else {
-      if (!o.getClass().isArray())
+      if (!o.getClass().isArray()) {
         pos = binarySearch(this, o);
+      }
       if (pos==0 && compare(this, o, 0)!=0) {
         return -1; //((T)o).equals(this.get(0)) && !((T)o).equals(this.get(0).toString())) return -1;
       }
@@ -449,15 +484,23 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
    * @return
    */
   public boolean isContained (String s) {
-    if (this.size()<=0) return false;
+    if (size()<=0) {
+      return false;
+    }
     
     T s2 = get(0);
     if (s2.getClass().isArray()) {
-      for (int i=0; i<this.size(); i++)
-        if (s.contains(Array.get(get(i),indexToSearch).toString())) return true;
+      for (int i=0; i<size(); i++) {
+        if (s.contains(Array.get(get(i),indexToSearch).toString())) {
+          return true;
+        }
+      }
     } else {
-      for (int i=0; i<this.size(); i++)
-        if (s.contains(get(i).toString())) return true;
+      for (int i=0; i<size(); i++) {
+        if (s.contains(get(i).toString())) {
+          return true;
+        }
+      }
     }
     
     return false;
@@ -467,7 +510,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
   /**
    * 
    * @param indexToSearch
-   * @throws Exception 
+   * @throws Exception
    */
   public void setArrayIndexToSort(int indexToSearch) throws Exception {
     if (size()>1) {
@@ -476,6 +519,7 @@ public class SortedArrayList<T> extends java.util.ArrayList<T>{
     this.indexToSearch = indexToSearch;
   }
   
+  @Override
   public void add(int index, T element) {
     System.err.println("Add with specific index not allowed in " + getClass().getSimpleName());
     add(element);

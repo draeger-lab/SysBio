@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2010-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -37,7 +37,6 @@ import y.base.Node;
 import y.view.Arrow;
 import y.view.EdgeRealizer;
 import y.view.GenericEdgeRealizer;
-import y.view.Graph2D;
 import de.zbit.graph.io.def.SBGNProperties;
 import de.zbit.graph.io.def.SBGNProperties.ArcType;
 import de.zbit.graph.io.def.SBGNProperties.GlyphType;
@@ -73,7 +72,9 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
     reaction2node = new HashMap<Glyph, ReactionNodeRealizer>();
     
     // Check if we have anything to visualize
-    if (document==null || document.getMap()==null) return;
+    if (document==null || document.getMap()==null) {
+      return;
+    }
     
     // Add all glyphs to the graph
     addGlyphsToGraph(document);
@@ -83,7 +84,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
     
     return;
   }
-
+  
   /**
    * @param document
    */
@@ -93,7 +94,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
       Node source = null, target = null;
       if (a.getSource()!=null) {
         if (a.getSource() instanceof Glyph) {
-          source = (Node) id2node.get(((Glyph)a.getSource()).getId());
+          source = id2node.get(((Glyph)a.getSource()).getId());
         } else if (a.getSource() instanceof Port) {
           source = id2node.get(((Port) a.getSource()).getId());
         }
@@ -107,7 +108,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
       
       if (a.getTarget()!=null) {
         if (a.getTarget() instanceof Glyph) {
-          target = (Node) id2node.get(((Glyph)a.getTarget()).getId());
+          target = id2node.get(((Glyph)a.getTarget()).getId());
         } else if (a.getTarget() instanceof Port) {
           target = id2node.get(((Port) a.getTarget()).getId());
         }
@@ -120,7 +121,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
       if (simpleGraph.containsEdge(source, target)) {
         log.fine("Skippind duplicate arc-edge.");
         continue;
-      } 
+      }
       
       // TODO: Also consider the arc's glyph (i.e. special reaction nodes, etc)
       
@@ -161,7 +162,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
         sboTerm = gType.getSBOterm();
       }
       
-
+      
       // Initialize default layout variables
       double x=Double.NaN;
       double y=Double.NaN;
@@ -212,12 +213,14 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
   }
   
   /**
-   * Fix ReactionNode nodes (determines 90° rotatable node orientation).
+   * Fix ReactionNode nodes (determines 90&deg; rotatable node orientation).
    * @param reaction2node
    */
   @Override
   public void improveReactionNodeLayout() {
-    if (reaction2node==null) return;
+    if (reaction2node==null) {
+      return;
+    }
     for (Map.Entry<Glyph,ReactionNodeRealizer> en : reaction2node.entrySet()) {
       // TODO Iterate through all ARCS, inspect source and target and classify into:
       Set<Node> reactants = new HashSet<Node>();
@@ -227,7 +230,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
       en.getValue().fixLayout(reactants, products, modifier);
     }
   }
-
+  
   /**
    * @param number
    * @return
@@ -236,7 +239,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
     // Also ignore 0|0 positions. They're due to default values
     return !Double.isNaN(number) && number!=0f;
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.kegg.io.SB_2GraphML#isAnyLayoutInformationAvailable()
    */

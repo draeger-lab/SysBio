@@ -302,7 +302,7 @@ public class GetSubRegulationNetwork {
   
   private String[] getSpeciesIdsFromName(String string) {
     return null;
-    // TODO über equal transitions den rest
+    // TODO ueber equal transitions den rest
   }
   
   /**
