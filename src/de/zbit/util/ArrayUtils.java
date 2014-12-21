@@ -16,6 +16,7 @@
  */
 package de.zbit.util;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -381,6 +382,22 @@ public class ArrayUtils {
     double d = 0;
     for (double i: arr)
       d+=i;
+    
+    return d;
+  }
+  
+  
+  /**
+   * Sums each value in an array.
+   * @param arr
+   * @return
+   */
+  public static BigDecimal sum(BigDecimal[] arr) {
+    BigDecimal d = BigDecimal.ZERO;
+    
+    for (BigDecimal i: arr)
+      d = d.add(i);
+    
     return d;
   }
 
