@@ -1101,6 +1101,15 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
         }
       }
     }
+    
+    // Closing an input stream not fully read causes a BadPaddingException since Java7u72
+    // See: https://bugs.openjdk.java.net/browse/JDK-8064546?page=com.atlassian.jira.plugin.system.issuetabpanels:all-tabpanel
+    while (in.read() >= 0)
+    {
+        while (in.ready())
+           in.skip(1);
+    }
+    
     in.close();
     
     // Fill the headers variable
@@ -1518,6 +1527,14 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
   @Override
   public void close() throws IOException {
     if (currentOpenFile!=null) {
+    	
+      // Closing an input stream not fully read causes a BadPaddingException since Java7u72
+      // See: https://bugs.openjdk.java.net/browse/JDK-8064546?page=com.atlassian.jira.plugin.system.issuetabpanels:all-tabpanel
+      while (currentOpenFile.read() >= 0) {
+    	while (currentOpenFile.ready())
+	      currentOpenFile.skip(1);
+      }
+      
       currentOpenFile.close();
       currentOpenFile=null;
       if (displayProgress && progress!=null) {
