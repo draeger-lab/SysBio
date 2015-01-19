@@ -89,6 +89,41 @@ public class ArrayUtils {
   }
   
   /**
+   * If there exists at least one element in arr such that arr[i].equals(s),
+   * A array of i (the indeces) is returned. If ther is no occurence of s in arr,
+   * a empty array is returned.
+   * @param <T>
+   * @param arr
+   * @param s
+   * @return
+   */
+  public static <T> int[] indecesOf(T[] arr, T s) {
+    if (arr==null) return null;
+    int[] indices = new int[arr.length];
+    int curPos = 0;
+    for (int i=0; i<arr.length; i++) {
+      if (s==null) {
+        // Also detect indexOf null
+        if (arr[i]==null) {
+          indices[curPos] = i;
+          curPos++;
+        }
+        else continue;
+      }
+      if (arr[i]==null) continue;
+      if (arr[i].equals(s)) {
+    	indices[curPos] = i;
+    	curPos++;
+      }
+    }
+    int[] res = new int[curPos];
+    for(int i=0; i<curPos; i++) {
+    	res[i] = indices[i];
+    }
+    return res;
+  }
+  
+  /**
    * If there exists one element in arr such that arr[i].equalsIgnoreCase(s),
    * i (the index) is returned.
    * @param <T>
