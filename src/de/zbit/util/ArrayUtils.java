@@ -97,12 +97,12 @@ public class ArrayUtils {
    * @param s
    * @return
    */
-  public static <T> int[] indecesOf(T[] arr, T s) {
-    if (arr==null) return null;
+  public static <T> int[] indicesOf(T[] arr, T s) {
+    if (arr == null) return null;
     int[] indices = new int[arr.length];
     int curPos = 0;
     for (int i=0; i<arr.length; i++) {
-      if (s==null) {
+      if (s == null) {
         // Also detect indexOf null
         if (arr[i]==null) {
           indices[curPos] = i;
@@ -110,14 +110,14 @@ public class ArrayUtils {
         }
         else continue;
       }
-      if (arr[i]==null) continue;
+      if (arr[i] == null) continue;
       if (arr[i].equals(s)) {
     	indices[curPos] = i;
     	curPos++;
       }
     }
     int[] res = new int[curPos];
-    for(int i=0; i<curPos; i++) {
+    for (int i = 0; i<curPos; i++) {
     	res[i] = indices[i];
     }
     return res;
@@ -132,14 +132,14 @@ public class ArrayUtils {
    * @return
    */
   public static int indexOfIgnoreCase(String[] arr, String s) {
-    if (arr==null) return -1;
-    for (int i=0; i<arr.length; i++) {
-      if (s==null) {
+    if (arr == null) return -1;
+    for (int i = 0; i<arr.length; i++) {
+      if (s == null) {
         // Also detect indexOf null
-        if (arr[i]==null) return i;
+        if (arr[i] == null) return i;
         else continue;
       }
-      if (arr[i]==null) continue;
+      if (arr[i] == null) continue;
       if (arr[i].equalsIgnoreCase(s)) return i;
     }
     return -1;

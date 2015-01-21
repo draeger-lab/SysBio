@@ -175,6 +175,10 @@ public class SBFileFilter extends GeneralFileFilter {
      */
     SBML_FILES_L2V4,
     /**
+     * To be selected if SBML files (XML files) of Level 2 Version 5 can be chosen.
+     */
+    SBML_FILES_L2V5,
+    /**
      * To be selected if SBML files (XML files) of Level 3 Version 1 can be chosen.
      */
     SBML_FILES_L3V1,
@@ -271,6 +275,7 @@ public class SBFileFilter extends GeneralFileFilter {
         case SBML_FILES_L2V2:
         case SBML_FILES_L2V3:
         case SBML_FILES_L2V4:
+        case SBML_FILES_L2V5:
         case SBML_FILES_L3V1:
           extensions.add("xml");
           break;
@@ -644,6 +649,13 @@ public class SBFileFilter extends GeneralFileFilter {
   }
   
   /**
+   * @return A filter for SBML files in level 2 version 4
+   */
+  public static final SBFileFilter createSBMLFileFilterL2V5() {
+    return new SBFileFilter(FileType.SBML_FILES_L2V5);
+  }
+  
+  /**
    * @return A filter for SBML files in level 3 version 1
    */
   public static final SBFileFilter createSBMLFileFilterL3V1() {
@@ -658,7 +670,8 @@ public class SBFileFilter extends GeneralFileFilter {
     FileType types[] = { FileType.SBML_FILES, FileType.SBML_FILES_L1V1,
         FileType.SBML_FILES_L1V2, FileType.SBML_FILES_L2V1,
         FileType.SBML_FILES_L2V2, FileType.SBML_FILES_L2V3,
-        FileType.SBML_FILES_L2V4, FileType.SBML_FILES_L3V1 };
+        FileType.SBML_FILES_L2V4, FileType.SBML_FILES_L2V5,
+        FileType.SBML_FILES_L3V1 };
     SBFileFilter filters[] = new SBFileFilter[types.length];
     int i = 0;
     for (FileType type : types) {

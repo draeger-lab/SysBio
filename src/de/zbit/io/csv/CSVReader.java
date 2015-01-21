@@ -1526,7 +1526,7 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
    */
   @Override
   public void close() throws IOException {
-    if (currentOpenFile!=null) {
+    if (currentOpenFile != null) {
     	
       // Closing an input stream not fully read causes a BadPaddingException since Java7u72
       // See: https://bugs.openjdk.java.net/browse/JDK-8064546?page=com.atlassian.jira.plugin.system.issuetabpanels:all-tabpanel
@@ -1536,10 +1536,10 @@ public class CSVReader implements Cloneable, Closeable, Serializable {
       }
       
       currentOpenFile.close();
-      currentOpenFile=null;
-      if (displayProgress && progress!=null) {
+      currentOpenFile = null;
+      if (displayProgress && (progress != null)) {
         progress.finished();
-        progress=null; // Might not be serializable.
+        progress = null; // Might not be serializable.
       }
     }
   }
