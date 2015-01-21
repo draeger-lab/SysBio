@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2015 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -50,7 +50,7 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
   
   /**
    * The URL where the file should be downloaded, if it is not available.
-   * @return 
+   * @return
    */
   private final static String getDownloadURL(String kegg_abbr) {
     // Col 0 = KG_Gene, Col 1 = KG_Pathway
@@ -60,7 +60,7 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
     // Col 0 = KG_Pathway, Col 1 = KG_Gene
     return String.format("ftp://ftp.genome.jp/pub/kegg/pathway/organisms/%s/%s.list", kegg_abbr,kegg_abbr);
   }
-
+  
   /**
    * This is required. (e.g. "mmu" for mouse, or "hsa" for human).
    * @see Species#getKeggAbbr()
@@ -78,7 +78,7 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
    * @throws IOException
    */
   public KeggPathway2KEGGGeneIDs(String speciesKEGGPrefix)
-  throws IOException {
+      throws IOException {
     this(speciesKEGGPrefix, null);
   }
   
@@ -91,17 +91,17 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
   }
   
   public KeggPathway2KEGGGeneIDs(String speciesKEGGPrefix, AbstractProgressBar progress)
-  throws IOException {
+      throws IOException {
     // This constructor is called from every other!
     super(String.class, (Class<Collection<String>>) ((Collection<String>) new ArrayList<String>()).getClass(), progress);
-    this.organism_kegg_abbr = speciesKEGGPrefix;
+    organism_kegg_abbr = speciesKEGGPrefix;
     init();
   }
-
+  
   
   /**
    * TESTS ONLY!
-   * @throws Exception 
+   * @throws Exception
    */
   @SuppressWarnings("rawtypes")
   public static void main(String[] args) throws Exception {
@@ -110,28 +110,40 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
     
     for (int i=0; i<2; i++) {
       Collection c = mapper.map("mmu:11576");
-      if (c==null) System.out.println("null");
-      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      if (c==null) {
+        System.out.println("null");
+      } else {
+        System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      }
       System.out.println("=================");
       c = mapper.map("mmu:77579"); // 3 PWs
-      if (c==null) System.out.println("null");
-      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      if (c==null) {
+        System.out.println("null");
+      } else {
+        System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      }
       System.out.println("=================");
       c = mapper.map("mmu:16334");
-      if (c==null) System.out.println("null");
-      else System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      if (c==null) {
+        System.out.println("null");
+      } else {
+        System.out.println(Arrays.deepToString(c.toArray(new String[0])));
+      }
       
       System.out.println("NonUnique: " + mapper.getTotalSumOfEntitiesInAllClasses() + " Unique: " + mapper.size());
       System.out.println(mapper.getEnrichmentClassSize("path:mmu04530"));
       System.out.println(mapper.getEnrichmentClassSize("Tight junction"));
       
-      if (i==0)mapper.convertPathwayIDsToPathwayNames();
+      if (i==0) {
+        mapper.convertPathwayIDsToPathwayNames();
+      }
     }
   }
   
   /**
    * @return the KEGG abbreviation for the current species.
    */
+  @Override
   public String getSpeciesKEGGabbreviation() {
     return organism_kegg_abbr;
   }
@@ -150,9 +162,9 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
    */
   @Override
   public String getEncryptedLocalFile() {
-  	return getLocalFile()+".dat";
+    return getLocalFile()+".dat";
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#getMappingName()
    */
@@ -160,15 +172,15 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
   public String getMappingName() {
     return "KEGGPathway2KEGGGeneIDs";
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#getRemoteURL()
    */
   @Override
   public String getRemoteURL() {
-    return getDownloadURL(this.organism_kegg_abbr);
+    return getDownloadURL(organism_kegg_abbr);
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#getSourceColumn(de.zbit.io.CSVReader)
    */
@@ -181,7 +193,7 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
       return 0;
     }
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#getTargetColumn(de.zbit.io.CSVReader)
    */
@@ -207,7 +219,9 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
   @Override
   protected boolean skipLine(String[] line) {
     // Skip everything thats not a gene (e.g., compounds starting with "CPD:*")
-    if (!line[getTargetColumn(null)].startsWith(organism_kegg_abbr)) return true;
+    if (!line[getTargetColumn(null)].startsWith(organism_kegg_abbr)) {
+      return true;
+    }
     return false;
   }
   
@@ -215,7 +229,7 @@ public class KeggPathway2KEGGGeneIDs extends AbstractEnrichmentMapper<String, St
    * Uses the {@link KeggPathwayID2PathwayName} mapper to map all IDs in
    * this mapping to the pathway name (e.g., "Tight junction" instead
    * of "path:mmu04530").
-   * @throws IOException 
+   * @throws IOException
    */
   public void convertPathwayIDsToPathwayNames() throws IOException {
     KeggPathwayID2PathwayName mapper = new KeggPathwayID2PathwayName();

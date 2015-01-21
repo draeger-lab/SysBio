@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2012 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2015 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -36,22 +36,24 @@ import de.zbit.sbml.layout.SBGNArc;
  * @version $Rev$
  */
 public abstract class YAbstractSBGNArc implements SBGNArc<EdgeRealizer> {
-	
-	private static Logger logger = Logger.getLogger(YAbstractSBGNArc.class.getName());
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
-	 */
-	public EdgeRealizer draw(CurveSegment curveSegment, double lineWidth) {
-		logger.warning("Implementation does not support separate drawing of single curve segments!");
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve, double)
-	 */
-	public EdgeRealizer draw(Curve curve, double lineWidth) {
-		EdgeRealizer edgeRealizer = draw(curve);
-		return RealizerTools.setLineWidth(edgeRealizer, lineWidth);
-	}
+  
+  private static Logger logger = Logger.getLogger(YAbstractSBGNArc.class.getName());
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)
+   */
+  @Override
+  public EdgeRealizer draw(CurveSegment curveSegment, double lineWidth) {
+    logger.warning("Implementation does not support separate drawing of single curve segments!");
+    return null;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve, double)
+   */
+  @Override
+  public EdgeRealizer draw(Curve curve, double lineWidth) {
+    EdgeRealizer edgeRealizer = draw(curve);
+    return RealizerTools.setLineWidth(edgeRealizer, lineWidth);
+  }
 }
