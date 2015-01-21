@@ -1,6 +1,18 @@
-/**
+/*
+ * $Id$
+ * $URL$
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
  *
- * @author Clemens Wrzodek
+ * Copyright (C) 2009-2015 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
  */
 package de.zbit.io;
 
@@ -54,7 +66,9 @@ public class CSVReaderDemonstration {
     System.out.println("ContentStart: " + r.getContentStartLine());
     
     String sep = Character.toString(r.getSeparatorChar());
-    if (r.getSeparatorChar()=='\u0001') sep = "[AnyWhitespaceChar]";
+    if (r.getSeparatorChar()=='\u0001') {
+      sep = "[AnyWhitespaceChar]";
+    }
     System.out.println("Separator: '" + sep + "'");
     System.out.println("TreatMultiAsOne: " + r.getTreatMultipleConsecutiveSeparatorsAsOne());
     
@@ -69,8 +83,9 @@ public class CSVReaderDemonstration {
     System.out.println("Headers: " + r.getContainsHeaders());
     if (r.getContainsHeaders()) {
       System.out.println("\nHeaders:");
-      for (String s : r.getHeader())
+      for (String s : r.getHeader()) {
         System.out.print(s + " | ");
+      }
       System.out.println();
     }
     
@@ -81,13 +96,14 @@ public class CSVReaderDemonstration {
     try {
       while (((line=r.getNextLine())!=null) && i<5) {
         
-        for (String s : line)
+        for (String s : line) {
           System.out.print(s + " | ");
+        }
         System.out.println();
         i++;
       }
     } catch (IOException e) {e.printStackTrace();}
-
+    
   }
   
   public static void showOptionsPanel(CSVReader r) {
