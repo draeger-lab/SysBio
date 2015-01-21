@@ -1,5 +1,18 @@
-/**
- * 
+/*
+ * $Id$
+ * $URL$
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2009-2015 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
  */
 package de.zbit.util;
 
@@ -10,7 +23,6 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +54,7 @@ import de.zbit.util.progressbar.ProgressBar;
  * 
  * @author Finja B&uml;chel
  * @author Clemens Wrzodek
+ * @version $Rev$
  */
 public class Species implements Serializable, Comparable<Object>, CSVwriteable, ActionCommand {
   private static final long serialVersionUID = 5900817226349012280L;
@@ -67,7 +80,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    * http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy
    * tax_id -- the id of node associated with this name
    */
-  Integer ncbi_tax_id=null;  
+  Integer ncbi_tax_id=null;
   
   /**
    * 
@@ -106,7 +119,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     this.commonName = commonName;
     addSynonym(synonym);
   }
-
+  
   /**
    * @param scientificName2
    */
@@ -114,7 +127,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     super();
     this.scientificName = scientificName;
   }
-
+  
   /**
    * @param scientific
    * @param uniprot
@@ -124,9 +137,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    */
   public Species(String scientificName, String uniprotExtension, String commonName, List<String> synonyms, Integer ncbi_taxon_id) {
     this(scientificName, uniprotExtension, commonName, synonyms);
-    this.ncbi_tax_id = ncbi_taxon_id;
+    ncbi_tax_id = ncbi_taxon_id;
   }
-
+  
   /**
    * 
    * @param scientificName
@@ -138,9 +151,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public Species(String scientificName, String uniprotExtension, String commonName, String keggAbbr, int ncbi_taxon_id) {
     this(scientificName, uniprotExtension, commonName, null);
     this.keggAbbr = keggAbbr;
-    this.ncbi_tax_id = ncbi_taxon_id;
+    ncbi_tax_id = ncbi_taxon_id;
   }
-
+  
   /**
    * 
    * @param synonym
@@ -148,7 +161,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    */
   public boolean addSynonym(String synonym) {
     if (synonym!=null && (synonym.trim().length())>0) {
-      if (this.synonyms==null) synonyms = new LinkedList<String>();
+      if (synonyms==null) {
+        synonyms = new LinkedList<String>();
+      }
       if (!synonyms.contains(synonym)) {
         return synonyms.add(synonym);
       }
@@ -157,11 +172,11 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   }
   
   public List<String> getSynonyms() {
-    return this.synonyms;
+    return synonyms;
   }
-
-
-
+  
+  
+  
   /**
    * @return the kegg abbreviation
    */
@@ -175,25 +190,25 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public Integer getNCBITaxonID() {
     return ncbi_tax_id;
   }
-
-
-
+  
+  
+  
   /**
    * @param shortName the shortName to set
    */
   public void setShortName(String keggAbbr) {
     this.keggAbbr = keggAbbr;
   }
-
-
-
+  
+  
+  
   /**
    * @return the scientificName
    */
   public String getScientificName() {
     return scientificName;
   }
-
+  
   /**
    * @param scientificName the scientificName to set
    */
@@ -207,14 +222,14 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public String getUniprotExtension() {
     return uniprotExtension;
   }
-
+  
   /**
    * @param uniprotExtension the uniprotExtension to set
    */
   public void setUniprotExtension(String uniprotExtension) {
     this.uniprotExtension = uniprotExtension;
   }
-
+  
   /**
    * @return the commonName
    */
@@ -231,8 +246,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    */
   public String getEnsemblName() {
     int pos = scientificName.indexOf(' ');
-    if (pos<0) return scientificName;
-    else {
+    if (pos<0) {
+      return scientificName;
+    } else {
       String ret = scientificName.charAt(0) + scientificName.substring(pos+1).trim();
       if (ret.contains(" ")) {
         ret = ret.substring(0, ret.indexOf(' '));
@@ -240,19 +256,21 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
       return ret;
     }
   }
-
+  
   /**
    * @param commonName the commonName to set
    */
   public void setCommonName(String commonName) {
     this.commonName = commonName;
   }
-
+  
+  @Override
   public int compareTo(Object o) {
     if (o instanceof Species) {
       return scientificName.toLowerCase().compareTo(((Species)o).scientificName.toLowerCase());
-    } else
+    } else {
       return scientificName.toLowerCase().compareTo(o.toString().toLowerCase());
+    }
   }
   
   /* (non-Javadoc)
@@ -260,7 +278,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    */
   @Override
   public Object clone() throws CloneNotSupportedException {
-    Species newSpecies = new Species(this.scientificName);
+    Species newSpecies = new Species(scientificName);
     
     newSpecies.keggAbbr = keggAbbr;
     newSpecies.uniprotExtension = uniprotExtension;
@@ -271,10 +289,11 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     if (synonyms==null) {
       newSpecies.synonyms = null;
     } else {
-      for (String sym: synonyms)
+      for (String sym: synonyms) {
         newSpecies.addSynonym(sym);
+      }
     }
-
+    
     return newSpecies;
   }
   
@@ -283,12 +302,13 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     if (o instanceof Species) {
       if (((Species) o).isSetTaxonomyId() && isSetTaxonomyId()) {
         // most precise is tax id.
-        return ((Species) o).ncbi_tax_id.equals(ncbi_tax_id); 
+        return ((Species) o).ncbi_tax_id.equals(ncbi_tax_id);
       }
-      if (((Species) o).scientificName.toLowerCase().equals(scientificName.toLowerCase()))
+      if (((Species) o).scientificName.toLowerCase().equals(scientificName.toLowerCase())) {
         return true;
-      else
+      } else {
         return false;
+      }
     }
     else {
       return false;
@@ -301,7 +321,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public boolean isSetTaxonomyId() {
     return (ncbi_tax_id != null) && (ncbi_tax_id > 0);
   }
-
+  
   public static List<String> getListOfNames(List<Species> list, int type) {
     List<String> retval = new LinkedList<String>();
     for (int i = 0; i < list.size(); i++) {
@@ -309,7 +329,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     }
     return retval;
   }
-
+  
   /**
    * @param list
    * @param biopaxRDFid
@@ -331,7 +351,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   }
   
   /**
-   *   
+   * 
    * @param kegg identifier, i.e. "hsa"
    * @param br UniProtList uniprotSpeciesFile from the UniProt homepage under <a href="http://www.uniprot.org/docs/speclist">http://www.uniprot.org/docs/speclist</a>
    * @return species, if the species is not found it returns null
@@ -357,28 +377,28 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   }
   
   /**
-   *   
+   * 
    * @param kegg identifier, i.e. "hsa"
    * @param br UniProtList uniprotSpeciesFile from the UniProt homepage under <a href="http://www.uniprot.org/docs/speclist">http://www.uniprot.org/docs/speclist</a>
    * @return species, if the species is not found it returns null
    */
-  public static Species getSpeciesWithTaxonomyIDInList(Integer tax, BufferedReader br, 
-      boolean keggNecessary) {
+  public static Species getSpeciesWithTaxonomyIDInList(Integer tax, BufferedReader br,
+    boolean keggNecessary) {
     List<Species> speciesList = null;
     try {
       speciesList = Species.generateSpeciesDataStructure(br, keggNecessary);
     } catch (IOException e) {
       System.err.printf("Error while generating species list", e);
       System.exit(0);
-    }   
-            
+    }
+    
     return Species.search(speciesList, tax.toString(), NCBI_TAX_ID);
   }
   
   /**
    * 
-   * @return a list with the species 
-   *  
+   * @return a list with the species
+   * 
    */
   public static List<Species> generateSpeciesDataStructure() throws IOException {
     BufferedReader in = new BufferedReader(new InputStreamReader(Resource.class.getResourceAsStream("speclist.txt")));
@@ -389,8 +409,8 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   /**
    * 
    * @param uniprotSpeciesFile
-   * @return a list with the species 
-   *  
+   * @return a list with the species
+   * 
    *  catches the IOException
    */
   public static List<Species> generateSpeciesDataStructureExcToSto(BufferedReader uniprotSpeciesFile) {
@@ -410,7 +430,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    * @throws IOException
    */
   public static List<Species> generateSpeciesDataStructure(BufferedReader in,
-      boolean keggNecessary) throws IOException {
+    boolean keggNecessary) throws IOException {
     List<Species> allSpec = new SortedArrayList<Species>();
     
     
@@ -424,8 +444,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
       List<String> syns = new ArrayList<String>();
       
       while ((line=in.readLine())!=null) {
-        if (line.trim().length()<1) continue;
-        else if (startReading) {          
+        if (line.trim().length()<1) {
+          continue;
+        } else if (startReading) {
           if (line.contains("====================================")) {
             startReading=false;
             break; // done reading.
@@ -444,9 +465,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
           
           // Create the current species object, if a new entry starts here.
           uniprot = "_" + line.substring(0,6).trim();
-          if(!uniprot.equals("_")) {                        
+          if(!uniprot.equals("_")) {
             // Add to list here, because the scientific name is required.
-            if(!uniprot.isEmpty() && tax!=null && 
+            if(!uniprot.isEmpty() && tax!=null &&
                 !scientificName.isEmpty() &&!commonName.isEmpty()) {
               Species s = new Species(scientificName, uniprot, commonName, null, tax.intValue());
               allSpec.add(s);
@@ -458,7 +479,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
               syns = new ArrayList<String>();
             }
           }
-
+          
           // Taxon ID is always in line with uniprot species name
           String taxon_id = line.substring(7, 14).trim();
           if (taxon_id.length()>0) {
@@ -469,14 +490,15 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
           String help = line.substring(16, line.length());
           String[] split = help.split("=");
           if (split.length>=2) {
-            if(split[0].equals("N") && split[1]!=null && !split[1].isEmpty())
+            if(split[0].equals("N") && split[1]!=null && !split[1].isEmpty()) {
               scientificName = split[1].trim();
-            else if (split[0].equals("C") && split[1]!=null && !split[1].isEmpty()) {              
+            } else if (split[0].equals("C") && split[1]!=null && !split[1].isEmpty()) {
               commonName = split[1].trim();
             }
-            else if (split[0].equals("S") && split[1]!=null && !split[1].isEmpty())
-              syns.add(split[1].trim());  
-          }           
+            else if (split[0].equals("S") && split[1]!=null && !split[1].isEmpty()) {
+              syns.add(split[1].trim());
+            }
+          }
         } else if (line.contains("____________________________________")) {
           startReading = true;
         }
@@ -484,9 +506,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
       in.close();
     }
     
-   
+    
     //KeggQuery.getOrganisms
-    KeggFunctionManagement manag = null;      
+    KeggFunctionManagement manag = null;
     Definition[] keggOrgs = null;
     try {
       boolean fileExists = new File("kgFct.dat").exists();
@@ -497,7 +519,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     } catch (Throwable e) {
       log.log(Level.WARNING, "Error reading kgFct.dat", e);
     }
-    if (manag==null) manag = new KeggFunctionManagement();
+    if (manag==null) {
+      manag = new KeggFunctionManagement();
+    }
     
     KeggQuery q = new KeggQuery(KeggQuery.getOrganisms, null);
     keggOrgs = (Definition[]) manag.getInformation(q).getObject();
@@ -510,7 +534,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
         int pos = scientificName.indexOf("(");
         if(pos>-1) {
           int pos2 = scientificName.indexOf(")",pos);
-          if (pos2<0) pos2=scientificName.length();
+          if (pos2<0) {
+            pos2=scientificName.length();
+          }
           commonName = scientificName.substring(pos+1, pos2);
           
           scientificName = scientificName.substring(0,pos).trim();
@@ -531,23 +557,25 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
           if(scName.startsWith(scientificName)) {
             if (allSpec.get(i).getKeggAbbr()==null || allSpec.get(i).getKeggAbbr().length()<1) {
               /*
-               * Sometimes leads to wrong annotations! E.g. 
-               * [1] zmo - Zymomonas mobilis _ZYMMO    542 
-               * [2] zmo - Zymomonas mobilis subsp. mobilis (strain NCIB 11163)  _ZYMMN    622759  
+               * Sometimes leads to wrong annotations! E.g.
+               * [1] zmo - Zymomonas mobilis _ZYMMO    542
+               * [2] zmo - Zymomonas mobilis subsp. mobilis (strain NCIB 11163)  _ZYMMN    622759
                * [3] zmn - Zymomonas mobilis subsp. mobilis NCIMB 11163
-               * 2 & 3 are equal. Thus, the KeggAbbr. should be zmn not zmo!        
+               * 2 & 3 are equal. Thus, the KeggAbbr. should be zmn not zmo!
                */
               allSpec.get(i).setShortName(keggAbbr);
               contained=true;
             }
-          }          
+          }
         }
         
         
         // Add not contained species.
         if (!contained) {
           String uniprot_ext = null;
-          if (commonName!=null && commonName.trim().length()>0) uniprot_ext = '_'+commonName.trim().toUpperCase().replace(" ", "");
+          if (commonName!=null && commonName.trim().length()>0) {
+            uniprot_ext = '_'+commonName.trim().toUpperCase().replace(" ", "");
+          }
           Species new_spec = new Species(keggAbbr, scientificName, uniprot_ext, commonName, null);
           allSpec.add(new_spec);
         }
@@ -559,7 +587,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     int counter = 0;
     List<Species> speciesWithoutKeggAbbr = new SortedArrayList<Species>();
     List<Species> speciesWithKeggAbbr = new SortedArrayList<Species>();
-    if (keggNecessary) {      
+    if (keggNecessary) {
       for (Species species : allSpec) {
         System.out.println(species.getNCBITaxonID());
         if(species.getKeggAbbr()!=null) {
@@ -567,15 +595,17 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
           speciesWithKeggAbbr.add(species);
         }
         else{
-          if (species.getNCBITaxonID().equals((Integer)6706))System.out.println("FUCK");
+          if (species.getNCBITaxonID().equals(6706)) {
+            System.out.println("FUCK");
+          }
           speciesWithoutKeggAbbr.add(species);
         }
-      }  
+      }
     } else {
       speciesWithKeggAbbr = allSpec;
     }
     
-     if (manag.isCacheChangedSinceLastLoading()) {
+    if (manag.isCacheChangedSinceLastLoading()) {
       InfoManagement.saveToFilesystem("kgFct.dat", manag);
     }
     
@@ -591,7 +621,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public String toString() {
     return "[Species: " + scientificName + ']';
   }
-
+  
   /**
    * Searches for a specific species in a list of species.
    * @param all
@@ -601,19 +631,23 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    * @return
    */
   public static Species search(List<Species> all, String species, int nameTypeToSearch) {
-    if (all==null || species==null) return null;
+    if (all==null || species==null) {
+      return null;
+    }
     for (Species s: all) {
-      if (s.matchesIdentifier(species, nameTypeToSearch)) return s;
+      if (s.matchesIdentifier(species, nameTypeToSearch)) {
+        return s;
+      }
     }
     return null;
   }
-
+  
   /**
    * Searches for a specific species and retrieves a complete list
    * of species from KEGG.
    * @param species
    * @return
-   * @throws IOException 
+   * @throws IOException
    */
   public static Species search(String species) throws IOException {
     return search(Species.generateSpeciesDataStructure(), species, -1);
@@ -631,7 +665,7 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public static Species get(String identifier, int nameTypeToSearch) throws IOException {
     return search(Species.generateSpeciesDataStructure(), identifier, nameTypeToSearch);
   }
-
+  
   /**
    * Checks all identifiers and returns true if one of them
    * equals (ignore case) the 'species' string.
@@ -668,17 +702,29 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
       }
       
       if (nameTypeToSearch==UNIPROT_EXTENSION || nameTypeToSearch==-1) {
-        if (getUniprotExtension()!=null && getUniprotExtension().equalsIgnoreCase(species)) return true;
+        if (getUniprotExtension()!=null && getUniprotExtension().equalsIgnoreCase(species)) {
+          return true;
+        }
       }
       // TODO: Implement checks for nameTypeToSearch for other name types.
       
-      if (getScientificName()!=null && getScientificName().equalsIgnoreCase(species)) return true;
-      if (getCommonName()!=null && getCommonName().equalsIgnoreCase(species)) return true;
-      if (getEnsemblName()!=null && getEnsemblName().equalsIgnoreCase(species)) return true;
-      if (getKeggAbbr()!=null && getKeggAbbr().equalsIgnoreCase(species)) return true;
+      if (getScientificName()!=null && getScientificName().equalsIgnoreCase(species)) {
+        return true;
+      }
+      if (getCommonName()!=null && getCommonName().equalsIgnoreCase(species)) {
+        return true;
+      }
+      if (getEnsemblName()!=null && getEnsemblName().equalsIgnoreCase(species)) {
+        return true;
+      }
+      if (getKeggAbbr()!=null && getKeggAbbr().equalsIgnoreCase(species)) {
+        return true;
+      }
       if (getSynonyms()!=null) {
         for (String s1: getSynonyms()) {
-          if (s1!=null && s1.equalsIgnoreCase(species)) return true;
+          if (s1!=null && s1.equalsIgnoreCase(species)) {
+            return true;
+          }
         }
       }
     }
@@ -691,10 +737,10 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
    * @param namesDMPfile -
    * Download "taxdmp.zip" from "ftp://ftp.ncbi.nih.gov/pub/taxonomy/"
    * and extract "names.dmp". This is the required filepath.
-   * @throws IOException 
+   * @throws IOException
    */
   public static void addNCBItaxonomyIdentifier(List<Species> all, String namesDMPfile) throws IOException {
-    System.out.println("Reading NCBI Taxonomy file...");    
+    System.out.println("Reading NCBI Taxonomy file...");
     HashMap<String, Integer> taxFile = new HashMap<String, Integer>(10000);
     
     // Fast but memory intensive method. Could be rewritten to slow but memory efficient.
@@ -718,7 +764,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
       Species spec = unmatched.get(i);
       
       Integer r = taxFile.get(spec.getScientificName().toUpperCase());
-      if (r==null && spec.getCommonName()!=null) r = taxFile.get(spec.getCommonName().toUpperCase());
+      if (r==null && spec.getCommonName()!=null) {
+        r = taxFile.get(spec.getCommonName().toUpperCase());
+      }
       if (r!=null) {
         spec.ncbi_tax_id = r;
         unmatched.remove(i);
@@ -739,9 +787,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
           unmatched.remove(i);
           i--;
           System.out.println("XAnnotate " + spec.ncbi_tax_id  + " => " + spec + " Remaining: " + unmatched.size());
-        }        
+        }
       }
-
+      
     }
     
     System.out.println("DONE.");
@@ -755,12 +803,13 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     //Utils.saveGZippedObject(speciesCacheFile, all);
     
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.io.CSVwriteable#fromCSV(java.lang.String[], int, int)
    */
+  @Override
   public void fromCSV(String[] elements, int elementNumber, int CSVversionNumber)
-    throws CorruptInputStreamException {
+      throws CorruptInputStreamException {
     
     keggAbbr = elements[0];
     scientificName = elements[1].trim();
@@ -773,17 +822,19 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
     }
     
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.io.CSVwriteable#getCSVOutputVersionNumber()
    */
+  @Override
   public int getCSVOutputVersionNumber() {
     return 0;
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.io.CSVwriteable#toCSV(int)
    */
+  @Override
   public String toCSV(int elementNumber) {
     if (elementNumber==0) {
       StringBuffer csv = new StringBuffer();
@@ -797,7 +848,9 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
         csv.append(ArrayUtils.implode(synonyms.toArray(new String[0]), "|"));
       }
       return csv.toString();
-    } else return null;
+    } else {
+      return null;
+    }
   }
   
   private static void appendCSVString(StringBuffer csv, Object toAppend) {
@@ -831,30 +884,32 @@ public class Species implements Serializable, Comparable<Object>, CSVwriteable, 
   public static Object loadFromCSV(String file) throws IOException {
     return CSVwriteableIO.read(new Species(null), file);
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.gui.ActionCommand#getName()
    */
+  @Override
   public String getName() {
     // For a better readability in options and such
     return getScientificName();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.gui.ActionCommand#getToolTip()
    */
+  @Override
   public String getToolTip() {
     // no tooltip.
     return null;
   }
-
+  
   /**
    * @return
    */
   public boolean isSetScientificName() {
     return scientificName!=null && scientificName.length()>0;
   }
-
+  
   /**
    * @return
    */
