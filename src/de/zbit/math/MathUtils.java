@@ -451,11 +451,11 @@ public class MathUtils {
     }
     Arrays.sort(values);
     
-    if (values.length%2!=0) {
+    if (values.length %2 !=0) {
       return values[values.length/2];
     } else {
       int upper = (int) Math.ceil(values.length/2);
-      return (values[upper-1]+(values[upper]-values[upper-1])/2);
+      return (values[upper - 1] + (values[upper] - values[upper - 1])/2);
     }
   }
   

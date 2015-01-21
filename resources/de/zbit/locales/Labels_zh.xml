@@ -158,6 +158,7 @@
   <entry key="SBML_FILES_L2V2">SBML文件 Level 2 Version 2</entry>
   <entry key="SBML_FILES_L2V3">SBML文件 Level 2 Version 3</entry>
   <entry key="SBML_FILES_L2V4">SBML文件 Level 2 Version 4</entry>
+  <entry key="SBML_FILES_L2V5">SBML文件 Level 2 Version 5</entry>
   <entry key="SBML_FILES_L3V1">SBML文件 Level 3 Version 1</entry>
   <entry key="SVG_FILES">SVG文件</entry>
   <entry key="TeX_FILES">TeX文件</entry>
