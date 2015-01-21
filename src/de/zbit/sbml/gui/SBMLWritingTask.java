@@ -44,7 +44,6 @@ public class SBMLWritingTask extends SwingWorker<File, Void> {
   
   private Component parent;
   private OpenedFile<SBMLDocument> sbmlFile;
-  private BufferedOutputStream outputStream;
   
   /**
    * 
@@ -57,7 +56,6 @@ public class SBMLWritingTask extends SwingWorker<File, Void> {
     super();
     this.parent = parent;
     this.sbmlFile = sbmlFile;
-    outputStream = new BufferedOutputStream(new FileOutputStream(sbmlFile.getFile()));
     if ((changeListeners != null) && (changeListeners.length > 0)) {
       for (PropertyChangeListener listener : changeListeners) {
         addPropertyChangeListener(listener);
@@ -70,6 +68,7 @@ public class SBMLWritingTask extends SwingWorker<File, Void> {
    */
   @Override
   protected File doInBackground() throws Exception {
+    BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(sbmlFile.getFile()));
     SBMLWriter.write(sbmlFile.getDocument(), outputStream,
       System.getProperty("app.name"), System.getProperty("app.version"));
     outputStream.close();
@@ -89,7 +88,5 @@ public class SBMLWritingTask extends SwingWorker<File, Void> {
       GUITools.showErrorMessage(parent, getMessage(exc));
     }
   }
-  
-  
   
 }

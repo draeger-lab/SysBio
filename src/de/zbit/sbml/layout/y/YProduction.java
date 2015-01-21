@@ -19,6 +19,7 @@ package de.zbit.sbml.layout.y;
 import java.util.Collections;
 import java.util.List;
 
+import org.sbml.jsbml.ext.layout.CubicBezier;
 import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.LineSegment;
@@ -35,30 +36,37 @@ import de.zbit.sbml.layout.Production;
  * @version $Rev$
  */
 public class YProduction extends YAbstractSBGNArc implements Production<EdgeRealizer> {
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
-	 */
-	@Override
-	public EdgeRealizer draw(Curve curve) {
-		// Reverse order of curve segments an of start and end points because
-		// curves are always specified in the direction of the reaction
-		// (from substrate process node, from process node to product).
-		if ((curve != null) && curve.isSetListOfCurveSegments()) {
-			List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
-			Collections.reverse(listOfCurveSegments);
-			for (CurveSegment curveSegment : listOfCurveSegments) {
-				LineSegment ls = (LineSegment) curveSegment;
-				Point start = ls.getStart().clone();
-				Point end = ls.getEnd();
-				ls.setEnd(start);
-				ls.setStart(end);
-			}
-		}
-		
-		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
-		edgeRealizer.setTargetArrow(Arrow.DELTA);
-		return edgeRealizer;
-	}
-
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
+   */
+  @Override
+  public EdgeRealizer draw(Curve curve) {
+    // Reverse order of curve segments and of start and end points because
+    // curves are always specified in the direction of the reaction
+    // (from substrate process node, from process node to product).
+    if ((curve != null) && curve.isSetListOfCurveSegments()) {
+      List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
+      Collections.reverse(listOfCurveSegments);
+      for (CurveSegment curveSegment : listOfCurveSegments) {
+        LineSegment ls = (LineSegment) curveSegment;
+        if (ls instanceof CubicBezier) {
+          CubicBezier bezier = (CubicBezier) ls;
+          if (bezier.isSetBasePoint1() && bezier.isSetBasePoint2()) {
+            Point point = bezier.removeBasePoint1();
+            bezier.setBasePoint1(bezier.removeBasePoint2());
+            bezier.setBasePoint2(point);
+          }
+        }
+        Point end = ls.removeEnd();
+        ls.setEnd(ls.removeStart());
+        ls.setStart(end);
+      }
+    }
+    
+    EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
+    edgeRealizer.setTargetArrow(Arrow.DELTA);
+    return edgeRealizer;
+  }
+  
 }
