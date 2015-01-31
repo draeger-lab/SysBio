@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -51,9 +51,10 @@ import de.zbit.graph.GraphTools;
 import de.zbit.graph.RestrictedEditMode;
 import de.zbit.graph.gui.options.GraphBackgroundImageProvider;
 import de.zbit.graph.gui.options.TranslatorPanelOptions;
+import de.zbit.graph.io.Graph2DExporter;
 import de.zbit.graph.io.Graph2Dwriteable;
+import de.zbit.graph.io.Graph2Dwriteable.WriteableFileExtensions;
 import de.zbit.graph.io.Graph2Dwriter;
-import de.zbit.graph.io.Graph2Dwriter.writeableFileExtensions;
 import de.zbit.gui.GUITools;
 import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.NotifyingWorker;
@@ -133,7 +134,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     LinkedList<SBFileFilter> ff = new LinkedList<SBFileFilter>();
     ff.add(SBFileFilter.createGraphMLFileFilter());
     ff.add(SBFileFilter.createGMLFileFilter());
-    ff.add(SBFileFilter.createJPEGFileFilter());        
+    ff.add(SBFileFilter.createJPEGFileFilter());
     ff.add(SBFileFilter.createGIFFileFilter());
     ff.add(SBFileFilter.createYGFFileFilter());
     ff.add(SBFileFilter.createTGFFileFilter());
@@ -175,7 +176,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   //    ActionListener translationResult) {
   //    super(pathwayID, outputFormat, translationResult);
   //  }
-  //  
+  //
   //  /**
   //   * Initiates a download and translation of the given pathway.
   //   * @param pathwayID
@@ -193,7 +194,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @param outputFormat
    * @param translationResult
    * @param translatedDocument
- * @param showDetailedPanel 
+   * @param showDetailedPanel
    * @throws Exception
    */
   protected TranslatorGraphLayerPanel(final File inputFile,
@@ -211,9 +212,9 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @param translatedDocument
    */
   protected TranslatorGraphLayerPanel(final File inputFile,
-		    final String outputFormat, ActionListener translationResult,
-		    DocumentType translatedDocument) {
-	  this(inputFile, outputFormat, translationResult, translatedDocument, true);
+    final String outputFormat, ActionListener translationResult,
+    DocumentType translatedDocument) {
+    this(inputFile, outputFormat, translationResult, translatedDocument, true);
   }
   
   /**
@@ -222,7 +223,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @param outputFormat
    * @param translationResult
    */
-  public TranslatorGraphLayerPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
+  public TranslatorGraphLayerPanel(NotifyingWorker<?> downloadORTranslateWorker,
     final String outputFormat, ActionListener translationResult) {
     super(downloadORTranslateWorker, outputFormat, translationResult);
     this.showDetailedPanel = true;
@@ -234,7 +235,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @param outputFormat
    * @param translationResult
    */
-  public TranslatorGraphLayerPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
+  public TranslatorGraphLayerPanel(NotifyingWorker<?> downloadORTranslateWorker,
     File inputFile, String outputFormat, ActionListener translationResult) {
     super(downloadORTranslateWorker, inputFile, outputFormat, translationResult);
     this.showDetailedPanel = true;
@@ -282,7 +283,9 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     
     // Also enable the yFiles views
     try {
-      if (graphLayer!=null) GraphTools.enableViews(graphLayer,enabled);
+      if (graphLayer!=null) {
+        GraphTools.enableViews(graphLayer,enabled);
+      }
     } catch (Throwable e) {}
   }
   
@@ -292,7 +295,9 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   @Override
   public void repaint() {
     super.repaint();
-    if (!isReady()) return;
+    if (!isReady()) {
+      return;
+    }
     
     // Update graph
     // updateViews() does not update, but clear the visualization
@@ -402,7 +407,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   
   
   /**
-   * Method might be implemented by extending classes to do 
+   * Method might be implemented by extending classes to do
    * some post-processing after the graph has been layouted
    * completely.
    * @param graphLayer
@@ -410,8 +415,8 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   private void finalize(Graph2D graphLayer) {
     // Intentionally left blank
   }
-
-
+  
+  
   /**
    * Check if all nodes lay at the same X position.
    * @param graph
@@ -466,13 +471,13 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     
     // If there was a vertical scroll bar, save their position
     final JScrollBar bar = detailPanel.getVerticalScrollBar();
-		final int pos;
-		if(bar != null) {
-			pos = bar.getValue();
-		} else {
-			pos = -1;
-		}
-			
+    final int pos;
+    if(bar != null) {
+      pos = bar.getValue();
+    } else {
+      pos = -1;
+    }
+    
     // Set temporary progress bar
     JProgressBar prog = new JProgressBar();
     prog.setIndeterminate(true);
@@ -482,9 +487,12 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     
     // Update panel
     Runnable buildDetailPanel = new Runnable() {
+      @Override
       public void run() {
         updateDetailPanel(detailPanel, hitInfo);
-        if (Thread.currentThread().isInterrupted()) return;
+        if (Thread.currentThread().isInterrupted()) {
+          return;
+        }
         // If it did not change, simply remove the temporaray progress bar
         if (detailPanel.getViewport().getView()!=null &&
             detailPanel.getViewport().getView().equals(p)) {
@@ -493,18 +501,18 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
         
         
         detailPanel.validate();
-
+        
         // restore the old vertical scroll bar position if there was a bar
         if(bar != null && pos > 0) {
-        	SwingUtilities.invokeLater(new Runnable() {	
-        		@Override
-        		public void run() {
-        			JScrollBar newBar = detailPanel.getVerticalScrollBar();
-        			if(bar != null && pos > 0) {
-        				newBar.setValue(pos);
-        			}					
-        		}
-        	});
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              JScrollBar newBar = detailPanel.getVerticalScrollBar();
+              if(bar != null && pos > 0) {
+                newBar.setValue(pos);
+              }
+            }
+          });
         }
         
         detailPanel.repaint();
@@ -559,7 +567,9 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   @Override
   public List<FileFilter> getOutputFileFilter() {
     List<FileFilter> ff = getOutputFileFilterForRealDocument();
-    if (ff==null) ff = new LinkedList<FileFilter>();
+    if (ff==null) {
+      ff = new LinkedList<FileFilter>();
+    }
     if (isAllowedToSaveAsGraphFormats()) {
       ff.addAll(getGraphMLfilefilter());
     }
@@ -593,7 +603,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     boolean isGraphFormat = false;
     if (isAllowedToSaveAsGraphFormats()) {
       try {
-        isGraphFormat = Graph2Dwriter.writeableFileExtensions.valueOf(format.toLowerCase().trim())!=null;
+        isGraphFormat = Graph2DExporter.WriteableFileExtensions.valueOf(format.toLowerCase().trim())!=null;
       } catch (Exception e) {
         isGraphFormat = false;
       }
@@ -601,18 +611,18 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     
     // Write graph formatted file
     if (isGraphFormat) {
-      writeableFileExtensions f = null;
+      WriteableFileExtensions f = null;
       try {
-        f = Graph2Dwriter.writeableFileExtensions.valueOf(format);
+        f = Graph2Dwriteable.WriteableFileExtensions.valueOf(format);
       } catch (Exception e) {
-        f=null;
+        f = null;
       }
       
       // Get writer
       Graph2Dwriteable trans2;
       if (getTranslator() instanceof Graph2Dwriteable) {
         trans2 = (Graph2Dwriteable) getTranslator();
-      } else if (f!=null) {
+      } else if (f != null) {
         trans2 = new Graph2Dwriter(f, getTranslator());
       } else {
         trans2 = new Graph2Dwriter(new JPGIOHandler(), getTranslator());
@@ -620,10 +630,10 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
       
       // Eventually setup background
       if (isSetBackgroundImageProvider() && (trans2 instanceof Graph2Dwriter)) {
-        ((Graph2Dwriter) trans2).setBackgroundImageProvider(getBackgroundImageProvider());
+        ((Graph2DExporter) trans2).setBackgroundImageProvider(getBackgroundImageProvider());
       }
-        
-      return ((Graph2Dwriteable)trans2).writeToFile(graphLayer, file.getPath(), format);
+      
+      return trans2.writeToFile(graphLayer, file.getPath(), format);
       
     } else {
       

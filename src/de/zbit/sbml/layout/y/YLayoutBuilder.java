@@ -317,13 +317,18 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     
     // display stoichiometry labels
     if (srg.isSetSpeciesReference()) {
-      SimpleSpeciesReference speciesReference = (SimpleSpeciesReference) srg.getSpeciesReferenceInstance();
-      if (speciesReference instanceof SpeciesReference) {
-        SpeciesReference specRef = (SpeciesReference) speciesReference;
-        if (specRef.isSetStoichiometry() && (specRef.getStoichiometry() != 1)) {
-          String value = StringTools.toString(specRef.getStoichiometry());
-          EdgeLabel edgeLabel = new StoichiometryLabel(value);
-          edgeRealizer.addLabel(edgeLabel);
+      NamedSBase nsb = srg.getSpeciesReferenceInstance();
+      if (!(nsb instanceof SimpleSpeciesReference)) {
+        logger.warning(MessageFormat.format("Expecting simple species reference, but found {0} in {1}.", nsb.getElementName(), srg));
+      } else {
+        SimpleSpeciesReference speciesReference = (SimpleSpeciesReference) nsb;
+        if (speciesReference instanceof SpeciesReference) {
+          SpeciesReference specRef = (SpeciesReference) speciesReference;
+          if (specRef.isSetStoichiometry() && (specRef.getStoichiometry() != 1)) {
+            String value = StringTools.toString(specRef.getStoichiometry());
+            EdgeLabel edgeLabel = new StoichiometryLabel(value);
+            edgeRealizer.addLabel(edgeLabel);
+          }
         }
       }
     }

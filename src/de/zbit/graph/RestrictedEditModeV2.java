@@ -72,7 +72,7 @@ import y.view.NavigationComponent;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.Overview;
-import de.zbit.graph.io.Graph2Dwriter;
+import de.zbit.graph.io.Graph2DExporter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.gui.GUITools;
@@ -196,7 +196,7 @@ public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionLi
   @Override
   protected String getNodeTip(Node n) {
     // Show a nice ToolTipText for every node.
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) n.getGraph().getDataProvider(Graph2Dwriter.mapDescription);
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) n.getGraph().getDataProvider(Graph2DExporter.mapDescription);
     if (mapDescriptionMap==null) return super.getNodeTip(n);
     
     // Get nodeLabel, description and eventually an image for the ToolTipText
@@ -469,7 +469,7 @@ public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionLi
   private void updatePropertiesTable(Object nodeOrEdge) {
     // Get map headings and graph
     Graph2D graph = getGraph2D();
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2Dwriter.mapDescription);
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2DExporter.mapDescription);
     if (mapDescriptionMap==null) return;
     
     

@@ -28,10 +28,26 @@ public interface Graph2Dwriteable {
   
   
   /**
+   * An enum of writeable output formats (identified by file extension).
+   * <p>All lowercased!
+   * @author Clemens Wrzodek
+   */
+  public static enum WriteableFileExtensions {
+    gif,
+    graphml,
+    gml,
+    ygf,
+    tgf,
+    jpg,
+    jpeg,
+    svg;
+  }
+  
+  /**
    * @param document
    * @param path
    * @param format output file extension, e.g., "gif", "graphml", "gml", "jpg",...
-   * @throws Exception 
+   * @throws Exception
    * @return {@code true} if everything went fine.
    */
   public boolean writeToFile(Graph2D graph, String outFile, String format) throws Exception;

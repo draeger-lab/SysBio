@@ -57,6 +57,7 @@ import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import yext.svg.io.SVGIOHandler;
 import de.zbit.graph.RestrictedEditMode;
+import de.zbit.graph.io.Graph2Dwriteable;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.gui.GUITools;
 import de.zbit.io.OpenedFile;
@@ -329,7 +330,7 @@ public class YGraphView implements PropertyChangeListener {
         iterator.hasNext() ? iterator.next() : null;
         
         if (imageWriter != null) {
-          Graph2Dwriter graph2Dwriter =
+          Graph2Dwriteable graph2Dwriter =
               new Graph2Dwriter(new ImageIoOutputHandler(imageWriter));
           graph2Dwriter.writeToFile(product, outFile);
           logger.info(MessageFormat.format("Image written to ''{0}''.", outFile));

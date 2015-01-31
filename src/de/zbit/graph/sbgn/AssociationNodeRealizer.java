@@ -29,30 +29,44 @@ import y.view.NodeRealizer;
  * @version $Rev$
  */
 public class AssociationNodeRealizer extends ProcessNodeRealizer {
-
-	public AssociationNodeRealizer() {
-		super();
-	}
-
-	public AssociationNodeRealizer(NodeRealizer nr) {
-		super(nr);
-	}
-
-	public NodeRealizer createCopy(NodeRealizer nr) {
-		return new AssociationNodeRealizer(nr);
-	}
-
-	@Override
-  protected void drawShape(Graphics2D gfx) {
-		double min = Math.min(width, height);
-		double offsetX = (width - min)/2d;
-		double offsetY = (height - min)/2d;
-		
-		gfx.setColor(getLineColor());
-		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
-		
-		// Draw a filled circle.
-		gfx.fillOval((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
+  
+  /**
+   * 
+   */
+  public AssociationNodeRealizer() {
+    super();
   }
-
+  
+  /**
+   * 
+   * @param nr
+   */
+  public AssociationNodeRealizer(NodeRealizer nr) {
+    super(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
+  @Override
+  public NodeRealizer createCopy(NodeRealizer nr) {
+    return new AssociationNodeRealizer(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.sbgn.ProcessNodeRealizer#drawShape(java.awt.Graphics2D)
+   */
+  @Override
+  protected void drawShape(Graphics2D gfx) {
+    double min = Math.min(width, height);
+    double offsetX = (width - min)/2d;
+    double offsetY = (height - min)/2d;
+    
+    gfx.setColor(getLineColor());
+    gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
+    
+    // Draw a filled circle.
+    gfx.fillOval((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
+  }
+  
 }
