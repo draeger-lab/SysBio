@@ -96,8 +96,9 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     
     // Draw the small reaction lines on both sides, where substrates
     // and products should dock.
-    gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
-    gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
+    // TODO: Deal with Whiskers!!!
+    //gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
+    //gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
     
     rotate(gfx, -rotationAngle, rotationCenter);
   }

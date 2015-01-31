@@ -29,38 +29,52 @@ import y.view.NodeRealizer;
  * @version $Rev$
  */
 public class UncertainProcessNodeRealizer extends ProcessNodeRealizer {
-	
-	public static final String UNCERTAIN_PROCESS_STRING = "?";
-	
-	public UncertainProcessNodeRealizer() {
-		super();
-	}
-
-	public UncertainProcessNodeRealizer(NodeRealizer nr) {
-		super(nr);
-	}
-
-	public NodeRealizer createCopy(NodeRealizer nr) {
-		return new UncertainProcessNodeRealizer(nr);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.graph.sbgn.ProcessNodeRealizer#drawShape(java.awt.Graphics2D)
-	 */
-	@Override
-	protected void drawShape(Graphics2D gfx) {
-		double min = Math.min(width, height);
-		double offsetX = (width - min)/2d;
-		double offsetY = (height - min)/2d;
-
-		gfx.setColor(getLineColor());
-		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
-		
-		// Draw a rectangle with string "?".
-		gfx.drawRect((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
-		gfx.drawString(UNCERTAIN_PROCESS_STRING,
-				(float) (offsetX + x + .2d * min),
-				(float) (offsetY + y + .93d * min));
-	}
-
+  
+  /**
+   * 
+   */
+  public static final String UNCERTAIN_PROCESS_STRING = "?";
+  
+  /**
+   * 
+   */
+  public UncertainProcessNodeRealizer() {
+    super();
+  }
+  
+  /**
+   * 
+   * @param nr
+   */
+  public UncertainProcessNodeRealizer(NodeRealizer nr) {
+    super(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
+  @Override
+  public NodeRealizer createCopy(NodeRealizer nr) {
+    return new UncertainProcessNodeRealizer(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.sbgn.ProcessNodeRealizer#drawShape(java.awt.Graphics2D)
+   */
+  @Override
+  protected void drawShape(Graphics2D gfx) {
+    double min = Math.min(width, height);
+    double offsetX = (width - min)/2d;
+    double offsetY = (height - min)/2d;
+    
+    gfx.setColor(getLineColor());
+    gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
+    
+    // Draw a rectangle with string "?".
+    gfx.drawRect((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
+    gfx.drawString(UNCERTAIN_PROCESS_STRING,
+      (float) (offsetX + x + .2d * min),
+      (float) (offsetY + y + .93d * min));
+  }
+  
 }

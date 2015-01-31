@@ -18,7 +18,7 @@ package de.zbit.util;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.SwingWorker;
@@ -34,24 +34,39 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public abstract class NotifyingWorker <T, V> extends SwingWorker<T, V> implements ActionListener {
-
-  /**
-   * 
-   */
-  AbstractProgressBar progress = null;
+public abstract class NotifyingWorker<T> extends SwingWorker<T, ActionEvent> implements ActionListener {
   
   /**
    * 
    */
-  List<ActionListener> listeners = null;
+  private List<ActionListener> listeners = null;
   
   /**
    * 
-   * @param progress
    */
-  public void setProgressBar(AbstractProgressBar progress) {
-    this.progress = progress;
+  private AbstractProgressBar progress = null;
+  
+  /* (non-Javadoc)
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    if (evt.getActionCommand() != null) {
+      if (evt.getActionCommand().equals(TranslatorPanel.COMMAND_NEW_PROGRESSBAR)) {
+        setProgressBar((AbstractProgressBar) evt.getSource());
+      }
+    }
+  }
+  
+  /**
+   * 
+   * @param listener
+   */
+  public void addActionListener(ActionListener listener) {
+    if (listeners == null) {
+      listeners = new LinkedList<ActionListener>();
+    }
+    listeners.add(listener);
   }
   
   /**
@@ -62,37 +77,26 @@ public abstract class NotifyingWorker <T, V> extends SwingWorker<T, V> implement
     return progress;
   }
   
-  /**
-   * 
-   * @param listener
+  /* (non-Javadoc)
+   * @see javax.swing.SwingWorker#process(java.util.List)
    */
-  public void addActionListener(ActionListener listener) {
-    if (listeners == null) {
-      listeners = new ArrayList<ActionListener>();
+  @Override
+  protected void process(List<ActionEvent> chunks) {
+    if (listeners != null) {
+      for (ActionEvent actionEvent : chunks) {
+        for (ActionListener listener : listeners) {
+          listener.actionPerformed(actionEvent);
+        }
+      }
     }
-    listeners.add(listener);
   }
   
   /**
-   * @param actionEvent
+   * 
+   * @param progress
    */
-  protected void fireActionEvent(ActionEvent actionEvent) {
-    if (listeners!=null) {
-      for (ActionListener listener : listeners) {
-        listener.actionPerformed(actionEvent);
-      }
-    }
+  public void setProgressBar(AbstractProgressBar progress) {
+    this.progress = progress;
   }
-
-  /* (non-Javadoc)
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-   */
-  public void actionPerformed(ActionEvent e) {
-    if (e.getActionCommand()!=null) {
-      if (e.getActionCommand().equals(TranslatorPanel.COMMAND_NEW_PROGRESSBAR)) {
-        setProgressBar((AbstractProgressBar) e.getSource());
-      }
-    }
-  }
-
+  
 }
