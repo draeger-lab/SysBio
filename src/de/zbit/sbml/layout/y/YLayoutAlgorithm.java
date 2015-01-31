@@ -52,12 +52,11 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.GraphTools;
-import de.zbit.graph.io.Graph2Dwriter;
+import de.zbit.graph.io.Graph2DExporter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
-import de.zbit.sbml.layout.LayoutAlgorithm;
 import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.sbml.layout.SimpleLayoutAlgorithm;
 import de.zbit.util.objectwrapper.ValuePairUncomparable;
@@ -149,8 +148,8 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     
     graph2D = new Graph2D();
     GenericDataMap<DataMap, String> mapDescriptionMap =
-        new GenericDataMap<DataMap, String>(Graph2Dwriter.mapDescription);
-    graph2D.addDataProvider(Graph2Dwriter.mapDescription, mapDescriptionMap);
+        new GenericDataMap<DataMap, String>(Graph2DExporter.mapDescription);
+    graph2D.addDataProvider(Graph2DExporter.mapDescription, mapDescriptionMap);
     
     HierarchyManager hm = graph2D.getHierarchyManager();
     if (hm == null) {
@@ -205,11 +204,19 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     BoundingBox boundingBox = glyph.getBoundingBox();
     Dimensions dimensions = boundingBox.getDimensions();
     Point position = boundingBox.getPosition();
-    int x, y, width, height;
-    x = (int) position.getX();
-    y = (int) position.getY();
-    width = (int) dimensions.getWidth();
-    height = (int) dimensions.getHeight();
+    int x = 0, y = 0, width = 0, height = 0;
+    if (position != null) {
+      x = (int) position.getX();
+      y = (int) position.getY();
+    } else {
+      logger.warning(MessageFormat.format("Position of {0} is undefined. Setting it to origin (0, 0).", glyph));
+    }
+    if (dimensions != null) {
+      width = (int) dimensions.getWidth();
+      height = (int) dimensions.getHeight();
+    } else {
+      logger.warning(MessageFormat.format("Dimensions of {0} are undefined. Setting it to zero.", glyph));
+    }
     
     // Graph2D structure
     NodeRealizer nodeRealizer = (glyph instanceof CompartmentGlyph) ?

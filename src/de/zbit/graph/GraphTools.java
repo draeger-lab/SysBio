@@ -56,7 +56,7 @@ import y.view.View;
 import y.view.hierarchy.GroupLayoutConfigurator;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
-import de.zbit.graph.io.Graph2Dwriter;
+import de.zbit.graph.io.Graph2DExporter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.graph.sbgn.CompartmentRealizer;
@@ -102,7 +102,7 @@ public class GraphTools {
       descriptor2Map = null;
       return;
     }
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2Dwriter.mapDescription);
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2DExporter.mapDescription);
     descriptor2Map = mapDescriptionMap.createReverseMap();
   }
   
@@ -597,7 +597,7 @@ public class GraphTools {
   @SuppressWarnings("unchecked")
   public void addMap(String descriptor, DataMap map) {
     // Add info about map also to descriptors.
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2Dwriter.mapDescription);
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2DExporter.mapDescription);
     mapDescriptionMap.set(map, descriptor);
     descriptor2Map.put(descriptor, map);
   }
@@ -614,7 +614,7 @@ public class GraphTools {
     Graph graph = n.getGraph();
     
     // Get the NodeMap from kegg 2 node.
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2Dwriter.mapDescription);
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2DExporter.mapDescription);
     NodeMap nodeMap = null;
     if (mapDescriptionMap==null) return null;
     for (int i=0; i<graph.getRegisteredNodeMaps().length; i++) {

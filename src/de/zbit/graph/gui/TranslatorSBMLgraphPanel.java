@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -104,7 +104,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   //  public TranslatorSBMLgraphPanel(String pathwayID, String outputFormat, ActionListener translationResult) {
   //    super(pathwayID, outputFormat, translationResult);
   //  }
-  //  
+  //
   //  /**
   //   * Initiates a download and translation of the given pathway.
   //   * @param pathwayID pathway identifier (e.g., "mmu00010")
@@ -113,7 +113,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
   //  public TranslatorSBMLgraphPanel(String pathwayID, ActionListener translationResult) {
   //    this(pathwayID, "SBML", translationResult);
   //  }
-  //  
+  //
   //  public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document) {
   //    this(inputFile, outputFormat, translationResult, document, false);
   //  }
@@ -139,7 +139,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * @param showQualModel
    */
   public TranslatorSBMLgraphPanel(File inputFile, String outputFormat, ActionListener translationResult, SBMLDocument document, boolean showQualModel) {
-	  this(inputFile, outputFormat, translationResult, document, showQualModel, true);
+    this(inputFile, outputFormat, translationResult, document, showQualModel, true);
   }
   
   /**
@@ -148,7 +148,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * @param showQualModel
    */
   public TranslatorSBMLgraphPanel (SBMLDocument document, boolean showQualModel) {
-	  this(document, showQualModel, true);
+    this(document, showQualModel, true);
   }
   
   /**
@@ -157,7 +157,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * @param outputFormat
    * @param translationResult
    */
-  public TranslatorSBMLgraphPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
+  public TranslatorSBMLgraphPanel(NotifyingWorker<?> downloadORTranslateWorker,
     final String outputFormat, ActionListener translationResult) {
     super(downloadORTranslateWorker, outputFormat, translationResult);
     // NOTE: the showDetailPanel variable is not explicitly set here!
@@ -169,7 +169,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * @param outputFormat
    * @param translationResult
    */
-  public TranslatorSBMLgraphPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
+  public TranslatorSBMLgraphPanel(NotifyingWorker<?> downloadORTranslateWorker,
     File inputFile, String outputFormat, ActionListener translationResult) {
     super(downloadORTranslateWorker, inputFile, outputFormat, translationResult);
     // NOTE: the showDetailPanel variable is not explicitly set here!
@@ -182,10 +182,10 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * @param showDetailPanel
    */
   public TranslatorSBMLgraphPanel(SBMLDocument document, boolean showQualModel, boolean showDetailPanel) {
-	  this((File) null, "SBML", null, document, showQualModel, showDetailPanel);
+    this((File) null, "SBML", null, document, showQualModel, showDetailPanel);
   }
-
-/* (non-Javadoc)
+  
+  /* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#createGraphFromDocument(java.lang.Object)
    */
   @Override
@@ -221,7 +221,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    */
   @Override
   protected boolean writeRealDocumentToFileUnchecked(File file, String format)
-  throws Exception {
+      throws Exception {
     //    if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file) || format.equals("tex") || format.equals("pdf")) {
     // TODO: How to include SBML2LaTeX?
     //      TranslatorSBMLPanel.writeLaTeXReport(file, document);
@@ -239,14 +239,16 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     
     if (clickedObjects==null || !clickedObjects.hasHits()) {
       synchronized (detailPanel) {
-        ((JScrollPane) detailPanel).setViewportView(null);
+        detailPanel.setViewportView(null);
       }
     } else {
       Set<Object> hits = GraphTools.getHitEdgesAndNodes(clickedObjects, true);
       JPanel p = new JPanel(); // Gridlayout makes always same height...
       LayoutHelper lh = new LayoutHelper(p);
       for (Object nodeOrEdge: hits) {
-        if (Thread.currentThread().isInterrupted()) return;
+        if (Thread.currentThread().isInterrupted()) {
+          return;
+        }
         
         // Try to get actual SBML-element
         String sbmlID = null;
@@ -296,17 +298,19 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       }
       
       // Add final panel
-      if (Thread.currentThread().isInterrupted()) return;
+      if (Thread.currentThread().isInterrupted()) {
+        return;
+      }
       if (p.getComponentCount() > 0) {
         synchronized (detailPanel) {
-          ((JScrollPane) detailPanel).setViewportView(p);
+          detailPanel.setViewportView(p);
           
           // Scroll to top.
           GUITools.scrollToTop(detailPanel);
         }
       } else {
         synchronized (detailPanel) {
-          ((JScrollPane) detailPanel).setViewportView(null);
+          detailPanel.setViewportView(null);
         }
       }
     }

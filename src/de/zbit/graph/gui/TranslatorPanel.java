@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -85,11 +85,11 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   private static final long serialVersionUID = 6030311193210321410L;
   public static final transient Logger log = Logger.getLogger(TranslatorPanel.class.getName());
   
-//  /**
-//   * This is the path where the background-logo will be loaded from. This must be
-//   * relative to the current path (of this class)!
-//   */
-//  public static String logoResourcePath = "img/Logo2.png";
+  //  /**
+  //   * This is the path where the background-logo will be loaded from. This must be
+  //   * relative to the current path (of this class)!
+  //   */
+  //  public static String logoResourcePath = "img/Logo2.png";
   
   /**
    * This ActionCommand is fired to all listeners, whenever a pathway has been translated
@@ -112,8 +112,8 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * Desired output file format
    */
   String outputFormat;
-
-
+  
+  
   /**
    * Boolean flag to remember weather the contained {@link #document}
    * has been saved successfully at least once.
@@ -142,23 +142,23 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    */
   Map<String, Object> additionalData=null;
   
-//  /**
-//   * Create a new translator-panel and initiates the translation.
-//   * @param inputFile
-//   * @param outputFormat
-//   * @param translationResult
-//   */
-//  public TranslatorPanel(final File inputFile, final String outputFormat, ActionListener translationResult) {
-//    super();
-//    setLayout(new BorderLayout());
-//    setOpaque(false);
-//    this.inputFile = inputFile;
-//    this.outputFormat = outputFormat;
-//    this.translationListener = translationResult;
-//    
-//    translate();
-//  }
-//  
+  //  /**
+  //   * Create a new translator-panel and initiates the translation.
+  //   * @param inputFile
+  //   * @param outputFormat
+  //   * @param translationResult
+  //   */
+  //  public TranslatorPanel(final File inputFile, final String outputFormat, ActionListener translationResult) {
+  //    super();
+  //    setLayout(new BorderLayout());
+  //    setOpaque(false);
+  //    this.inputFile = inputFile;
+  //    this.outputFormat = outputFormat;
+  //    this.translationListener = translationResult;
+  //
+  //    translate();
+  //  }
+  //
   
   /**
    * Use this constructor if the document has already been translated.
@@ -167,7 +167,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * @param outputFormat
    * @param translationResult
    * @param translatedDocument
-   * @throws Exception 
+   * @throws Exception
    */
   public TranslatorPanel(final File inputFile, final String outputFormat, ActionListener translationResult, DocumentType translatedDocument) {
     super();
@@ -187,7 +187,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * @param outputFormat
    * @param translationResult
    */
-  public TranslatorPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
+  public TranslatorPanel(NotifyingWorker<?> downloadORTranslateWorker,
     final String outputFormat, ActionListener translationResult) {
     this(downloadORTranslateWorker, null, outputFormat, translationResult);
   }
@@ -198,7 +198,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * @param outputFormat
    * @param translationResult
    */
-  public TranslatorPanel(NotifyingWorker<?, ?> downloadORTranslateWorker, 
+  public TranslatorPanel(NotifyingWorker<?> downloadORTranslateWorker,
     File inputFile, String outputFormat, ActionListener translationResult) {
     this(inputFile, outputFormat, translationResult, null);
     
@@ -213,6 +213,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   /* (non-Javadoc)
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
+  @Override
   @SuppressWarnings("unchecked")
   public synchronized void actionPerformed(ActionEvent e) {
     switch(e.getID()) {
@@ -239,7 +240,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
         } else {
           log.warning("Pathway download failed.");
           // Remove the tab
-          this.getParent().remove(this);
+          getParent().remove(this);
         }
         break;
         
@@ -307,7 +308,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     removeAll();
     setLayout(new BorderLayout()); // LayoutHelper creates a GridBaglayout, reset it to default.
     final AbstractProgressBar pb = generateLoadingPanel(this, "Downloading '" + pwName + "'" +
-      (organism!=null&&organism.length()>0? " for '"+organism+"'...":"..."));
+        (organism!=null&&organism.length()>0? " for '"+organism+"'...":"..."));
     FileDownload.ProgressBar = pb;
     repaint();
   }
@@ -347,15 +348,19 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    */
   public void hideTemporaryLoadingBar() {
     setEnabled(true);
-    if (!(getLayout() instanceof BorderLayout)) return;
+    if (!(getLayout() instanceof BorderLayout)) {
+      return;
+    }
     Component c = ((BorderLayout)getLayout()).getLayoutComponent(BorderLayout.SOUTH);
-    if (c==null) return;
+    if (c==null) {
+      return;
+    }
     remove(c);
   }
   
   /**
    * Create and place all {@link Component}s on this panel,
-   * based on the current {@link #document}. 
+   * based on the current {@link #document}.
    */
   protected abstract void createTabContent() throws Exception;
   
@@ -370,7 +375,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       }
     }
   }
-
+  
   /**
    * Returns a string representation of the contained pathway.
    * @return
@@ -426,7 +431,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     panel.add(prog);//, BorderLayout.CENTER);
     
     if (panel instanceof JComponent) {
-      GUITools.setOpaqueForAllElements((JComponent) panel, false);
+      GUITools.setOpaqueForAllElements(panel, false);
     }
     
     if (parent!=null) {
@@ -465,12 +470,11 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    */
   public abstract List<FileFilter> getOutputFileFilter();
   
-  /**
-   * 
-   * @return
-   */
+  @Override
   public File saveToFile() {
-    if (!isReady()) return null;
+    if (!isReady()) {
+      return null;
+    }
     
     // Create list of available output file filters
     List<FileFilter> ff = getOutputFileFilter();
@@ -500,20 +504,22 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       }
     }
     
-    // Do not add an extension here! It is added automatically later on.  
+    // Do not add an extension here! It is added automatically later on.
     
     
     File saveDir = GUIOptions.SAVE_DIR.getValue(SBPreferences.getPreferencesFor(GUIOptions.class));
     
     // We also need to know the selected file filter!
     //File file = GUITools.saveFileDialog(this, TranslatorUI.saveDir, false, false, true,
-      //JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
+    //JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
     JFileChooser fc = GUITools.createJFileChooser(saveDir.getAbsolutePath(), false,
       false, JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
     if (outFileSuggestion!=null && outFileSuggestion.length()>0) {
       fc.setSelectedFile(new File(outFileSuggestion));
     }
-    if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return null;
+    if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+      return null;
+    }
     
     // Check file
     File f = fc.getSelectedFile();
@@ -526,19 +532,21 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     
     // Check if file exists and is writable
     boolean showOverride = f.exists();
-    if (!f.exists()) try {
-      f.createNewFile();
-    } catch (IOException e) {
-      GUITools.showErrorMessage(this, e);
-      return null;
+    if (!f.exists()) {
+      try {
+        f.createNewFile();
+      } catch (IOException e) {
+        GUITools.showErrorMessage(this, e);
+        return null;
+      }
     }
-		if (!f.canWrite() || f.isDirectory()) {
-			GUITools.showNowWritingAccessWarning(this, f);
+    if (!f.canWrite() || f.isDirectory()) {
+      GUITools.showNowWritingAccessWarning(this, f);
     } else if (!showOverride || (showOverride && GUITools.overwriteExistingFile(this, f))) {
       // This is the usual case
-    	return saveToFile(f, extension);
-		}
-		return null;
+      return saveToFile(f, extension);
+    }
+    return null;
   }
   
   /**
@@ -574,7 +582,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
         success = false;
       }
     }
-    success&=(file.exists()&& (file.length()>0));
+    success &= (file.exists() && (file.length() > 0));
     
     // Report success or failure.
     if (success) {
@@ -604,8 +612,8 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   public boolean isSaved() {
     return (!isReady() || documentHasBeenSaved);
   }
-
-
+  
+  
   /**
    * Enabled and disables item in the menu bar, based on the content of this panel.
    * @param menuBar
@@ -627,12 +635,13 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   /**
    * @see #updateButtons(JMenuBar)
    */
+  @Override
   public void updateButtons(JMenuBar menuBar, JToolBar... toolbar) {
     updateButtons(menuBar);
     // Toolbar must not be changed!
   }
   
-
+  
   /**
    * @return
    */
@@ -659,7 +668,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   public boolean isReady() {
     return document!=null;
   }
-
+  
   /**
    * @see #setData(Object)
    * @param key key under which the object has been stored
@@ -667,35 +676,39 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * the given {@code key}.
    */
   public Object getData(String key) {
-    if (additionalData==null) return null;
+    if (additionalData==null) {
+      return null;
+    }
     return additionalData.get(key);
   }
-
+  
   /**
    * Allows the programmer to store any additional data along with this panel.
    * @param key a key for the object to store
    * @param object the object to set
    */
   public void setData(String key, Object object) {
-    if (additionalData==null) additionalData = new HashMap<String, Object>();
+    if (additionalData==null) {
+      additionalData = new HashMap<String, Object>();
+    }
     additionalData.put(key, object);
   }
   
-
-//  /**
-//   * @return true if this is a GraphML panel (and the {@link #document}
-//   * is a Graph2D object).
-//   */
-//  public boolean isGraphML() {
-//    return (this instanceof TranslatorGraphPanel);
-//  }
-//  
-//  /**
-//   * @return true if this is a SBML panel (and the {@link #document}
-//   * is a SBMLDocument object).
-//   */
-//  public boolean isSBML() {
-//    return (this instanceof TranslatorSBMLPanel);
-//  }
+  
+  //  /**
+  //   * @return true if this is a GraphML panel (and the {@link #document}
+  //   * is a Graph2D object).
+  //   */
+  //  public boolean isGraphML() {
+  //    return (this instanceof TranslatorGraphPanel);
+  //  }
+  //
+  //  /**
+  //   * @return true if this is a SBML panel (and the {@link #document}
+  //   * is a SBMLDocument object).
+  //   */
+  //  public boolean isSBML() {
+  //    return (this instanceof TranslatorSBMLPanel);
+  //  }
   
 }

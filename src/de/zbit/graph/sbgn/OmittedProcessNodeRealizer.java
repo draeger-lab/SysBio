@@ -29,35 +29,49 @@ import y.view.NodeRealizer;
  * @version $Rev$
  */
 public class OmittedProcessNodeRealizer extends ProcessNodeRealizer {
-	
-	public static final String OMITTED_PROCESS_STRING = "\\\\";
-
-	public OmittedProcessNodeRealizer() {
-		super();
-	}
-
-	public OmittedProcessNodeRealizer(NodeRealizer nr) {
-		super(nr);
-	}
-
-	public NodeRealizer createCopy(NodeRealizer nr) {
-		return new OmittedProcessNodeRealizer(nr);
-	}
-
-	@Override
-	protected void drawShape(Graphics2D gfx) {
-		double min = Math.min(width, height);
-		double offsetX = (width - min)/2d;
-		double offsetY = (height - min)/2d;
-
-		gfx.setColor(getLineColor());
-		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
-		
-		// Draw a rectangle with string "\\".
-		gfx.drawRect((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
-		gfx.drawString(OMITTED_PROCESS_STRING,
-				(float) (offsetX + x),
-				(float) (offsetY + y + .93d * min));
-	}
-
+  
+  public static final String OMITTED_PROCESS_STRING = "\\\\";
+  
+  /**
+   * 
+   */
+  public OmittedProcessNodeRealizer() {
+    super();
+  }
+  
+  /**
+   * 
+   * @param nr
+   */
+  public OmittedProcessNodeRealizer(NodeRealizer nr) {
+    super(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
+  @Override
+  public NodeRealizer createCopy(NodeRealizer nr) {
+    return new OmittedProcessNodeRealizer(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.sbgn.ProcessNodeRealizer#drawShape(java.awt.Graphics2D)
+   */
+  @Override
+  protected void drawShape(Graphics2D gfx) {
+    double min = Math.min(width, height);
+    double offsetX = (width - min)/2d;
+    double offsetY = (height - min)/2d;
+    
+    gfx.setColor(getLineColor());
+    gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
+    
+    // Draw a rectangle with string "\\".
+    gfx.drawRect((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
+    gfx.drawString(OMITTED_PROCESS_STRING,
+      (float) (offsetX + x),
+      (float) (offsetY + y + .93d * min));
+  }
+  
 }
