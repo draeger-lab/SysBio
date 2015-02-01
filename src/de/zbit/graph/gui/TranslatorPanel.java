@@ -95,13 +95,13 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * This ActionCommand is fired to all listeners, whenever a pathway has been translated
    * succesfully.
    */
-  public final static String COMMAND_TRANSLATION_DONE="TRANSLATION_DONE";
+  public final static String COMMAND_TRANSLATION_DONE = "TRANSLATION_DONE";
   /**
    * This ActionCommand is fired to all listeners, whenever a temporary progress bar
    * is displayed. The {@link AbstractProgressBar} itself is given as source of the
    * {@link ActionEvent}.
    */
-  public final static String COMMAND_NEW_PROGRESSBAR="NEW_PROGRESSBAR";
+  public final static String COMMAND_NEW_PROGRESSBAR = "NEW_PROGRESSBAR";
   
   /**
    * KGML formatted input file
@@ -231,7 +231,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
          * The downloaded File should be given as ActionCommend
          */
         String downloadedFile = e.getActionCommand();
-        if (downloadedFile!=null) {
+        if (downloadedFile != null) {
           log.info("Pathway download successful.");
           this.inputFile = new File(downloadedFile);
           removeAll();
@@ -250,8 +250,8 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
          * The KEGGTranslator MUST BE the source.
          * Any loading string can OPTIONALLY be in the ActionCommand.
          */
-        generateLoadingPanel(this, e.getActionCommand()==null?"Reconstructing pathway with online information from KEGG...":e.getActionCommand());
-        if (e.getSource()!=null && e.getSource() instanceof KEGGtranslator) {
+        generateLoadingPanel(this, e.getActionCommand() == null ? "Reconstructing pathway with online information from KEGG..." : e.getActionCommand());
+        if ((e.getSource() != null) && (e.getSource() instanceof KEGGtranslator)) {
           translator = (KEGGtranslator<?>) e.getSource();
         }
         break;
@@ -288,7 +288,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
         /*
          * MEANS: "REMOVE ME FROM YOUR LISTENERS LIST".
          */
-        if (e.getSource()!=null && translationListener!=null) {
+        if ((e.getSource() != null) && (translationListener != null)) {
           translationListener.remove(e.getSource());
         }
         break;
@@ -299,16 +299,20 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   }
   
   
-  
+  /**
+   * 
+   * @param pwName
+   * @param organism
+   */
   protected void showTemporaryLoadingPanel(String pwName, String organism) {
-    if (pwName==null) {
+    if (pwName == null) {
       pwName = "model";
     }
     // Show progress-bar
     removeAll();
     setLayout(new BorderLayout()); // LayoutHelper creates a GridBaglayout, reset it to default.
     final AbstractProgressBar pb = generateLoadingPanel(this, "Downloading '" + pwName + "'" +
-        (organism!=null&&organism.length()>0? " for '"+organism+"'...":"..."));
+        ((organism != null) && (organism.length() > 0) ? " for '" + organism + "'...":"..."));
     FileDownload.ProgressBar = pb;
     repaint();
   }
@@ -352,7 +356,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       return;
     }
     Component c = ((BorderLayout)getLayout()).getLayoutComponent(BorderLayout.SOUTH);
-    if (c==null) {
+    if (c == null) {
       return;
     }
     remove(c);
@@ -418,7 +422,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     panel.setOpaque(false);
     
     // Create the label and progressBar
-    loadingText = (loadingText!=null && loadingText.length()>0)?loadingText:"Please wait...";
+    loadingText = ((loadingText != null) && loadingText.length() > 0) ? loadingText : "Please wait...";
     JLabel jl = new JLabel(loadingText);
     log.info(loadingText);
     //Font font = new java.awt.Font("Tahoma", Font.PLAIN, 12);
@@ -676,7 +680,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * the given {@code key}.
    */
   public Object getData(String key) {
-    if (additionalData==null) {
+    if (additionalData == null) {
       return null;
     }
     return additionalData.get(key);
@@ -688,7 +692,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * @param object the object to set
    */
   public void setData(String key, Object object) {
-    if (additionalData==null) {
+    if (additionalData == null) {
       additionalData = new HashMap<String, Object>();
     }
     additionalData.put(key, object);

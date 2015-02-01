@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
 import y.base.DataMap;
 import y.base.Edge;
 import y.base.EdgeCursor;
-import y.base.EdgeMap;
 import y.base.Graph;
 import y.base.Node;
 import y.base.NodeCursor;
@@ -80,7 +79,7 @@ public class GraphTools {
    * {@link KEGG2yGraph#mapDescription}.
    * <p>In other words, returns directly the map for, e.g. "entrezIds"
    */
-  protected Map<String, DataMap> descriptor2Map=null;
+  protected Map<String, DataMap> descriptor2Map = null;
   
   /**
    * 
@@ -88,8 +87,10 @@ public class GraphTools {
    */
   public GraphTools(Graph2D graph) {
     super();
-    this.graph=graph;
-    if (this.graph==null) log.warning("Graph is null!");
+    this.graph = graph;
+    if (this.graph == null) {
+      log.warning("Graph is null!");
+    }
     init();
   }
   
@@ -108,21 +109,23 @@ public class GraphTools {
   
   /**
    * There is an optional extension available for yFiles
-   * that allows to write graphs as SVG files. 
+   * that allows to write graphs as SVG files.
    * @return {@code true} if the extension is available.
    */
   @SuppressWarnings("unchecked")
   public static boolean isSVGextensionInstalled() {
     try {
-      Class<? extends IOHandler> svg = (Class<? extends IOHandler>) Class.forName("yext.svg.io.SVGIOHandler");    
-      if (svg!=null) return true;
+      Class<? extends IOHandler> svg = (Class<? extends IOHandler>) Class.forName("yext.svg.io.SVGIOHandler");
+      if (svg!=null) {
+        return true;
+      }
     } catch (Throwable e) {
       // Extension not installed
     }
-
+    
     return false;
   }
-
+  
   /**
    * Update the enabled state of all registered views
    * to the given value.
@@ -135,13 +138,13 @@ public class GraphTools {
     while (yc.ok()) {
       if (yc.current() instanceof Graph2DView) {
         ((Graph2DView)yc.current()).setEnabled(state);
-      } else if (yc.current() instanceof View) { 
+      } else if (yc.current() instanceof View) {
         ((View)yc.current()).getComponent().setEnabled(state);
       }
       yc.next();
     }
   }
-
+  
   /**
    * Layout the graph with the given layout.
    * @param layouterClass
@@ -161,7 +164,7 @@ public class GraphTools {
       log.log(Level.WARNING, "Could not create graph layouter.", e);
       return;
     }
-
+    
     // Change a few properties to make the result nicer
     if (layouter instanceof SmartOrganicLayouter) {
       SmartOrganicLayouter la = ((SmartOrganicLayouter) layouter);
@@ -174,11 +177,11 @@ public class GraphTools {
     if (layouter instanceof OrthogonalEdgeRouter) {
       ((OrthogonalEdgeRouter)layouter).setConsiderNodeLabelsEnabled(true);
     }
-//    layouter.setSmartComponentLayoutEnabled(true);
-//    layouter.setNodeOverlapsAllowed(false);
-//    layouter.setConsiderNodeLabelsEnabled(true);
-//    layouter.setCompactness(0.7d);
-//    layouter.setNodeSizeAware(true);
+    //    layouter.setSmartComponentLayoutEnabled(true);
+    //    layouter.setNodeOverlapsAllowed(false);
+    //    layouter.setConsiderNodeLabelsEnabled(true);
+    //    layouter.setCompactness(0.7d);
+    //    layouter.setNodeSizeAware(true);
     
     // Layouts raise an exception if nodes have 0 width or height
     // => Ensure minimum node size
@@ -198,7 +201,7 @@ public class GraphTools {
     glc.restoreAll();
   }
   
-
+  
   /**
    * Layout the freshly added nodes.
    * @param newNodes nodes to layout
@@ -208,7 +211,7 @@ public class GraphTools {
   }
   public void layoutNodeSubset(Set<Node> newNodes, boolean strict) {
     if ((newNodes == null) || (newNodes.size() < 1)) {
-    	return;
+      return;
     }
     graph.unselectAll();
     
@@ -222,13 +225,13 @@ public class GraphTools {
       dp.setBool(n, newNodes.contains(n));
       // Do never layout contents of any group node except for compartment nodes.
       if (hm!=null && hm.isGroupNode(n) &&
-    		  (!(graph.getRealizer(n) instanceof CompartmentRealizer))) {
+          (!(graph.getRealizer(n) instanceof CompartmentRealizer))) {
         ((GroupNodeRealizer)graph.getRealizer(n)).updateAutoSizeBounds();
         dp2.set(n, SmartOrganicLayouter.GROUP_NODE_MODE_FIX_CONTENTS);
       }
       
       if (!newNodes.contains(n)) {// && hm.getParentNode(n)==null && !hm.isGroupNode(n)) {
-        if (n.degree()<1) { // NEW: only store orphans (and actually separate cliques...) 
+        if (n.degree()<1) { // NEW: only store orphans (and actually separate cliques...)
           resetLayout.add(n);
         } else {
           otherNodes.add(n);
@@ -249,7 +252,7 @@ public class GraphTools {
     // If SmartComponentLayoutEnabled is true, all new nodes will
     // simply be put one above the other. If false, they are layouted
     // nicely, BUT orphans are being moved, too :-(
-//    layouter.setSmartComponentLayoutEnabled(true);
+    //    layouter.setSmartComponentLayoutEnabled(true);
     layouter.setSmartComponentLayoutEnabled(strict);
     layouter.setCompactness(0.7d);
     layouter.setMinimalNodeDistance(15);
@@ -265,8 +268,8 @@ public class GraphTools {
       ((CanonicMultiStageLayouter) layouter).prependStage(new MinNodeSizeStage(layouter, 48, 17));
     }
     
-//    OrganicLayouter layouter = new OrganicLayouter();
-//    layouter.setSphereOfAction(OrganicLayouter.ONLY_SELECTION);
+    //    OrganicLayouter layouter = new OrganicLayouter();
+    //    layouter.setSphereOfAction(OrganicLayouter.ONLY_SELECTION);
     
     try {
       Graph2DLayoutExecutor l = new Graph2DLayoutExecutor();
@@ -281,7 +284,9 @@ public class GraphTools {
       try {
         for (Node n:newNodes) {
           NodeRealizer nr = n!=null?graph.getRealizer(n):null;
-          if (nr==null) continue;
+          if (nr==null) {
+            continue;
+          }
           EdgeCursor cursor = n.edges();
           if (cursor.ok()) {
             //cursor.toLast();
@@ -299,13 +304,15 @@ public class GraphTools {
     // If we layout only a subset of nodes, the layout still moves
     // all other nodes by a constant offset! Undo this transformation
     DataMap nodeMap = descriptor2Map.get(GraphMLmaps.NODE_POSITION);
-    if (nodeMap!=null && otherNodes!=null && otherNodes.size()>0) {    
+    if (nodeMap!=null && otherNodes!=null && otherNodes.size()>0) {
       String splitBy = Pattern.quote("|");
       int anyOldX = 0, anyOldY = 0;
       int anyNewX = 0, anyNewY = 0;
       for (Node n: otherNodes) { // Breaks after the first node is found
         Object pos = nodeMap.get(n);
-        if (pos==null) continue;
+        if (pos==null) {
+          continue;
+        }
         // pos is always X|Y
         String[] XY = pos.toString().split(splitBy);
         NodeRealizer nr = graph.getRealizer(n);
@@ -335,7 +342,7 @@ public class GraphTools {
     for (Node n:newNodes) {
       String orgPos = newPositionString.get(n);
       if (orgPos!=null) {
-        this.setInfo(n, GraphMLmaps.NODE_POSITION, orgPos);
+        setInfo(n, GraphMLmaps.NODE_POSITION, orgPos);
       }
       // Paint above other nodes.
       graph.moveToLast(n);
@@ -394,8 +401,8 @@ public class GraphTools {
     }
   }
   
-
-
+  
+  
   /**
    * Returns the actual objects that are contained in {@code clickedObjects}.
    * @param clickedObjects
@@ -458,7 +465,10 @@ public class GraphTools {
   public void setInfo(Object node_or_edge, String descriptor, Object value) {
     // Get the NodeMap for the descriptor.
     DataMap nodeMap = getMap(descriptor);
-    if (nodeMap==null && value==null) return; // all ok. Unset in a non-existing map.
+    if (nodeMap==null && value==null)
+    {
+      return; // all ok. Unset in a non-existing map.
+    }
     
     if (nodeMap==null) {
       // Create non-existing map automatically
@@ -470,7 +480,7 @@ public class GraphTools {
     nodeMap.set(node_or_edge, value);
   }
   
-
+  
   /**
    * Resets the layout to the information stored in the nodes. Usually
    * this is the layout as given directly by kegg. Only affects X and Y
@@ -497,10 +507,14 @@ public class GraphTools {
     
     String splitBy = Pattern.quote("|");
     for (Node n: nodesToReset) {
-    	// keep compartment layout
-    	if (graph.getRealizer(n) instanceof CompartmentRealizer) continue;
+      // keep compartment layout
+      if (graph.getRealizer(n) instanceof CompartmentRealizer) {
+        continue;
+      }
       Object pos = nodeMap.get(n);
-      if (pos==null) continue;
+      if (pos==null) {
+        continue;
+      }
       // pos is always X|Y
       String[] XY = pos.toString().split(splitBy);
       NodeRealizer nr = graph.getRealizer(n);
@@ -510,14 +524,16 @@ public class GraphTools {
     }
   }
   
-
+  
   /**
    * @param nr
    * @return
    */
   private String calculateNodeOriginalPosition(Node n) {
     NodeRealizer nr = n!=null?graph.getRealizer(n):null;
-    if (nr==null) return null;
+    if (nr==null) {
+      return null;
+    }
     
     // Look for adjacent node with known position
     Node n2 = null;
@@ -525,14 +541,16 @@ public class GraphTools {
     int dividerPos = -1;
     for ( NodeCursor nc = n.neighbors(); nc.ok(); nc.next() ) {
       n2 = (Node)nc.current();
-      Object p = this.getInfo(n2, GraphMLmaps.NODE_POSITION);
+      Object p = getInfo(n2, GraphMLmaps.NODE_POSITION);
       if (p!=null && (dividerPos = p.toString().indexOf("|"))>0) {
         n2Pos = p.toString();
         break;
       }
     }
     // For Orphans, simply return current position...
-    if (n2Pos==null) return (int) nr.getX() + "|" + (int) nr.getY();
+    if (n2Pos==null) {
+      return (int) nr.getX() + "|" + (int) nr.getY();
+    }
     
     // Calculate relative coordinates
     // Keeps the distance to neighbors with previously fixed coordinates!
@@ -547,7 +565,7 @@ public class GraphTools {
     return (xOther-diffX) + "|" + (yOther-diffY);
   }
   
-
+  
   /**
    * @param descriptor e.g., "keggIds" or "entrezIds".
    * <p>See {@link GraphMLmaps} for a complete list.
@@ -586,7 +604,7 @@ public class GraphTools {
     return map;
   }
   
-
+  
   /**
    * Registers a map WITHIN THESE TOOLS and linked to the {@link GenericDataMap}
    * {@code mapDescriptionMap}. Does not touch the graph itself!
@@ -601,8 +619,8 @@ public class GraphTools {
     mapDescriptionMap.set(map, descriptor);
     descriptor2Map.put(descriptor, map);
   }
-
-
+  
+  
   /**
    * @param n a node
    * @param descriptor e.g., "keggIds" or "entrezIds". See {@link GraphMLmaps} for a complete list.
@@ -610,13 +628,17 @@ public class GraphTools {
    */
   @SuppressWarnings("unchecked")
   public static String getNodeInfoIDs(Node n, String descriptor) {
-    if (n==null || n.getGraph()==null) return null;
+    if (n==null || n.getGraph()==null) {
+      return null;
+    }
     Graph graph = n.getGraph();
     
     // Get the NodeMap from kegg 2 node.
     GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2DExporter.mapDescription);
     NodeMap nodeMap = null;
-    if (mapDescriptionMap==null) return null;
+    if (mapDescriptionMap==null) {
+      return null;
+    }
     for (int i=0; i<graph.getRegisteredNodeMaps().length; i++) {
       NodeMap nm = graph.getRegisteredNodeMaps()[i];
       String t = mapDescriptionMap.getV(nm);
@@ -635,7 +657,7 @@ public class GraphTools {
     return id!=null?id.toString():null;
   }
   
-
+  
   /**
    * @param n
    * @return kegg ids, separated by a "," for the given node.
