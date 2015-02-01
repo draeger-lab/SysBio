@@ -43,7 +43,7 @@
   
   <!-- GarudaFileSender -->
   
-  <entry key="NO_COMPATIBLE_SOFTWARE_FOUND">Es konnte keine kompatible Gadget für Dateien des Typs "{0}" gefunden werden.</entry>
+  <entry key="NO_COMPATIBLE_SOFTWARE_FOUND">Es konnten keine kompatiblen Gadgets für Dateien des Typs "{0}" gefunden werden.</entry>
   <entry key="SOFTWARE_LIST">Gadget-Liste</entry>
   <entry key="SELECT_SOFTWARE">Wählen Sie ein Garuda-Gadget</entry>
   

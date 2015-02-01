@@ -70,6 +70,7 @@ public class GarudaConnector implements Runnable {
       }
     } catch (Throwable exc) {
       logger.fine(getMessage(exc));
+      exc.printStackTrace();
     }
   }
   

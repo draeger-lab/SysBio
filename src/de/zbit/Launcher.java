@@ -759,7 +759,7 @@ public abstract class Launcher implements Runnable, Serializable {
   }
   
   /**
-   * Displays a copyright notice using the System.out.
+   * Displays a copyright notice using the {@link System#out}.
    */
   public void printCopyrightMessage() {
     StringBuilder message = new StringBuilder();

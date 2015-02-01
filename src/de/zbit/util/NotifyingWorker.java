@@ -84,6 +84,7 @@ public abstract class NotifyingWorker<T> extends SwingWorker<T, ActionEvent> imp
   protected void process(List<ActionEvent> chunks) {
     if (listeners != null) {
       for (ActionEvent actionEvent : chunks) {
+        actionPerformed(actionEvent);
         for (ActionListener listener : listeners) {
           listener.actionPerformed(actionEvent);
         }
