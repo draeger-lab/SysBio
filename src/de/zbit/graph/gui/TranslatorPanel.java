@@ -82,7 +82,15 @@ import de.zbit.util.progressbar.gui.ProgressBarSwing;
  * @version $Rev$
  */
 public abstract class TranslatorPanel <DocumentType> extends JPanel implements BaseFrameTab, ActionListener {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = 6030311193210321410L;
+  
+  /**
+   * A {@link Logger} for this class.
+   */
   public static final transient Logger log = Logger.getLogger(TranslatorPanel.class.getName());
   
   //  /**
@@ -374,8 +382,8 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * @param actionEvent
    */
   protected void fireActionEvent(ActionEvent actionEvent) {
-    if (translationListener!=null) {
-      for (ActionListener listener: translationListener) {
+    if (translationListener != null) {
+      for (ActionListener listener : translationListener) {
         listener.actionPerformed(actionEvent);
       }
     }
@@ -439,7 +447,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       GUITools.setOpaqueForAllElements(panel, false);
     }
     
-    if (parent!=null) {
+    if (parent != null) {
       parent.add(panel);
     } else {
       // Display the panel in an jFrame
@@ -459,9 +467,9 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     // Inform others of this action
     ActionEvent newBar = new ActionEvent(pb, JOptionPane.DEFAULT_OPTION, COMMAND_NEW_PROGRESSBAR);
     if (parent instanceof TranslatorPanel<?>) {
-      ((TranslatorPanel<?>)parent).fireActionEvent(newBar);
+      ((TranslatorPanel<?>) parent).fireActionEvent(newBar);
     } else if (parent instanceof ActionListener) {
-      ((ActionListener)parent).actionPerformed(newBar);
+      ((ActionListener) parent).actionPerformed(newBar);
     }
     
     return pb;
@@ -475,6 +483,9 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    */
   public abstract List<FileFilter> getOutputFileFilter();
   
+  /* (non-Javadoc)
+   * @see de.zbit.gui.BaseFrameTab#saveToFile()
+   */
   @Override
   public File saveToFile() {
     if (!isReady()) {

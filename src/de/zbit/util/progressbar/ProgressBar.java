@@ -29,6 +29,10 @@ import de.zbit.util.Utils;
  * @since 1.0
  */
 public class ProgressBar extends AbstractProgressBar {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = 2073719565121276629L;
   
   private static boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"))?true:false;
@@ -100,7 +104,7 @@ public class ProgressBar extends AbstractProgressBar {
     String percString = percent + "%";
     
     // Calculate time remaining
-    String ETA="";
+    String ETA = "";
     if (getEstimateTime() && miliSecondsRemaining>=0) {
       ETA = "ETR: " + Utils.getTimeString((long) miliSecondsRemaining);
     }
@@ -109,18 +113,18 @@ public class ProgressBar extends AbstractProgressBar {
     if (useSimpleStyle) {
       if (percent!=lastPercentage) {
         if (!printInOneLine) {
-          System.out.println(percString + ' ' + ETA + (additionalText!=null && (additionalText.length()>0)? " " + additionalText:"") );
+          System.out.println(percString + ' ' + ETA + ((additionalText != null) && (additionalText.length() > 0)? " " + additionalText:"") );
         } else {
-          if (percent%10==0) {
+          if (percent % 10 == 0) {
             System.out.print(percString);
-          } else if (percent%2==0) {
+          } else if (percent % 2 == 0) {
             System.out.print('.');
           }
-          if (percent==100) {
+          if (percent == 100) {
             System.out.print('\n');
           }
         }
-        lastPercentage=percent;
+        lastPercentage = percent;
       }
       return;
     }
@@ -128,7 +132,7 @@ public class ProgressBar extends AbstractProgressBar {
     
     // Adjust bar width to fit in line.
     int kMax = 50; // = ProgressBar width
-    if (consoleWidth>0) {
+    if (consoleWidth > 0) {
       // [BarWidth]+ 2(for animation) + (ETA+1) + (additionalText+1)
       int additionalSpace = 2 + ((ETA!=null&&ETA.length()>0)?(ETA.length()+1):0);
       additionalSpace+= ((additionalText!=null&&additionalText.length()>0)?(additionalText.length()+1):0);
@@ -164,18 +168,18 @@ public class ProgressBar extends AbstractProgressBar {
       // %-Value centered to 50% of available width
       int pStart = kMax/2-percString.length()/2;
       int pEnd = kMax/2+percString.length()/2;
-      if (k>=pStart && k<=pEnd) {
+      if ((k >= pStart) && (k <= pEnd)) {
         char c = ' ';
         if (k-pStart<percString.length()) {
-          c = percString.charAt(k-pStart);
+          c = percString.charAt(k - pStart);
         }
         if (x<=k)
         {
-          sb.append("\033[93m"+c); // Foreground colors depend on
+          sb.append("\033[93m" + c); // Foreground colors depend on
         }
         if (x> k)
         {
-          sb.append("\033[34m"+c); // bg color
+          sb.append("\033[34m" + c); // bg color
         }
       } else {
         sb.append(" ");
@@ -190,12 +194,12 @@ public class ProgressBar extends AbstractProgressBar {
     sb.append(" \033[93m" + anim.charAt((int) (getCallNumber() % anim.length()))  + "\033[1m");
     
     // ETA
-    if (ETA.length()>0) {
+    if (ETA.length() > 0) {
       sb.append(' ' + ETA);
     }
     
     // Additional Text
-    if (additionalText!=null && additionalText.length()>0) {
+    if ((additionalText != null) && (additionalText.length() > 0)) {
       sb.append(' ' + additionalText);
     }
     
@@ -209,7 +213,9 @@ public class ProgressBar extends AbstractProgressBar {
       //System.console().writer().print(sb.toString()); // Not supported in Java 1.5!
       //System.console().flush();
       System.out.print(sb.toString());
-    } catch (Exception e) {e.printStackTrace();}
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     
     return; // sb.toString();
   }
@@ -230,14 +236,17 @@ public class ProgressBar extends AbstractProgressBar {
     return useSimpleStyle;
   }
   
+  /* (non-Javadoc)
+   * @see de.zbit.util.progressbar.AbstractProgressBar#finished_impl()
+   */
   @Override
   public void finished_impl() {
     if (!useSimpleStyle) {
       System.out.println();
-    } else if (printInOneLine && lastPercentage!=100) {
+    } else if (printInOneLine && (lastPercentage != 100)) {
       System.out.print('\n');
     }
-    lastPercentage=100;
+    lastPercentage = 100;
   }
   
 }
