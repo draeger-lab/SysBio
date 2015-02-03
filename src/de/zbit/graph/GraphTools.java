@@ -61,12 +61,17 @@ import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.graph.sbgn.CompartmentRealizer;
 
 /**
- * Various tools for {@link Graph2D} and also for
- * ineractions with {@link GraphMLmaps}.
+ * Various tools for {@link Graph2D} and also for interactions with
+ * {@link GraphMLmaps}.
+ * 
  * @author Clemens Wrzodek
  * @version $Rev$
  */
 public class GraphTools {
+  
+  /**
+   * A {@link Logger} for this class.
+   */
   public static final transient Logger log = Logger.getLogger(GraphTools.class.getName());
   
   /**
@@ -209,6 +214,12 @@ public class GraphTools {
   public void layoutNodeSubset(Set<Node> newNodes) {
     layoutNodeSubset(newNodes, false);
   }
+  
+  /**
+   * 
+   * @param newNodes
+   * @param strict
+   */
   public void layoutNodeSubset(Set<Node> newNodes, boolean strict) {
     if ((newNodes == null) || (newNodes.size() < 1)) {
       return;
@@ -647,7 +658,7 @@ public class GraphTools {
         break;
       }
     }
-    if (nodeMap==null) {
+    if (nodeMap == null) {
       log.severe(String.format("Could not find Node to %s mapping.", (descriptor==null?"null":descriptor)));
       return null;
     }

@@ -55,14 +55,14 @@ import de.zbit.util.StringUtil;
 /**
  * This is an abstract superclass for various systems biology formats to create
  * yFiles graph structure. All methods that create yFiles graph structures from
- * Systems Bilogy formats (such as SBML, SBGN, etc.) should extend this class!
+ * Systems Biology formats (such as SBML, SBGN, etc.) should extend this class!
  * 
  * <p>This generic superclass should NOT use ANY SBML or SBGN, etc. classes.
  * Only generic java classes and yFiles should be imported.
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public abstract class SB_2GraphML <T> {
+public abstract class SB_2GraphML<T> {
   
   /**
    * A {@link Logger} for this class.
@@ -248,7 +248,7 @@ public abstract class SB_2GraphML <T> {
   }
   
   /**
-   * Shoudl return {@code true} if and only if any layout information
+   * Should return {@code true} if and only if any layout information
    * of at least one node was available, during the translation (should one
    * be called AFTER a document is translated).
    * @return

@@ -40,11 +40,42 @@ import java.util.Set;
  * }
  * </pre>
  * 
- * @author Clemens Wrzodek 
+ * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
 public abstract class AbstractProgressBar implements Serializable, ProgressListener {
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(getClass().getSimpleName());
+    builder.append(" [totalCalls=");
+    builder.append(totalCalls);
+    builder.append(", estimateTime=");
+    builder.append(estimateTime);
+    builder.append(", callNr=");
+    builder.append(callNr);
+    builder.append(", lastPercentage=");
+    builder.append(lastPercentage);
+    builder.append(", measureTime=");
+    builder.append(measureTime);
+    builder.append(", numMeasurements=");
+    builder.append(numMeasurements);
+    builder.append(", lastCallTime=");
+    builder.append(lastCallTime);
+    builder.append(", callNumbersInSyncWithTimeMeasurements=");
+    builder.append(callNumbersInSyncWithTimeMeasurements);
+    builder.append("]");
+    return builder.toString();
+  }
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = 6447054832080673569L;
   
   /*
@@ -94,7 +125,7 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
    * @return
    */
   public long getNumberOfTotalCalls() {
-    return this.totalCalls;
+    return totalCalls;
   }
   
   /**
@@ -103,7 +134,10 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
    */
   public void setEstimateTime(boolean estimateTime) {
     this.estimateTime = estimateTime;
-    if (estimateTime) lastCallTime = 0;//System.currentTimeMillis();
+    if (estimateTime)
+    {
+      lastCallTime = 0;//System.currentTimeMillis();
+    }
   }
   
   /**
@@ -140,7 +174,7 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
   /**
    * If using the time estimate counter, this function will return the
    * System.currentTimeMillis() time of the last DisplayBar call.
-   * @return 
+   * @return
    */
   public long getLastCallTime() {
     return lastCallTime;
@@ -160,13 +194,14 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
    * Call this function, to set the counter one step further to totalCalls.
    * Paints automatically the progress bar and adds an @param additionalText.
    * 
-   * This function should be called exactly as often as defined in the constructor. 
+   * This function should be called exactly as often as defined in the constructor.
    * It will draw or update a previously drawn progressBar.
    * @param additionalText - Any additional text (e.g. "Best item found so far XYZ")
    */
   public synchronized void DisplayBar(String additionalText) {
     DisplayBar(additionalText, false);
   }
+  
   /**
    * See {@link #DisplayBar(String)}.
    * @param omitTimeCount - If true, increases call number, but does not include this call
@@ -176,19 +211,19 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
     callNr++;
     
     // Calculate percentage
-    int perc = Math.min((int)(((double)callNr/(double)totalCalls)*100.0), 100);
+    int perc = Math.min((int)((((double) callNr)/((double) totalCalls)) * 100d), 100);
     
     // Calculate time remaining
     double miliSecsRemaining = -1;
     if (estimateTime && !omitTimeCount) {
       // Increment
-      if (lastCallTime>0) {
+      if (lastCallTime > 0) {
         measureTime += System.currentTimeMillis() - lastCallTime;
         numMeasurements++;
       }
       
       // Calculate
-      if (numMeasurements>0) {
+      if (numMeasurements > 0) {
         double ScansRemaining = (totalCalls - (callNr+1)); // /(double)MLIBSVMSettings.runs;
         if (callNumbersInSyncWithTimeMeasurements) {
           miliSecsRemaining = ScansRemaining * ((measureTime/(double)numMeasurements)) ;
@@ -202,7 +237,7 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
     }
     
     // Inform listeners
-    if (perc!=lastPercentage) {
+    if (perc != lastPercentage) {
       fireListeners(perc, miliSecsRemaining, additionalText);
     }
     
@@ -210,21 +245,23 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
     drawProgressBar(perc, miliSecsRemaining, additionalText);
     
     // Remember current percentage
-    if (perc!=lastPercentage) {
+    if (perc != lastPercentage) {
       lastPercentage = perc;
     }
     
     // Eventually, call the finishing method.
-    if (callNr == totalCalls) finished();
+    if (callNr == totalCalls) {
+      finished();
+    }
   }
   
-
+  
   /**
    * This method is called automatically, when all calculations are finished (callNr=TotalCalls).
    * Please implement it SYNCHRONIZED. Only call it manually, when you finish before reaching 100%.
    */
   protected abstract void finished_impl();
-
+  
   /**
    * This method is called automatically, when all calculations are finished (callNr=TotalCalls).
    * Please implement it SYNCHRONIZED. Only call it manually, when you finish before reaching 100%.
@@ -242,7 +279,7 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
    * @param additionalText - If available, additional text to display. , If NOT available, null.
    */
   protected abstract void drawProgressBar(int percent, double miliSecondsRemaining, String additionalText);
-
+  
   /**
    * @param callNr
    */
@@ -259,16 +296,16 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
   public void incrementCallNumber(int amount) {
     setCallNr(getCallNumber() + amount);
   }
-
+  
   /**
    * @param statusBar
    */
   public void addProgressListener(ProgressListener listener) {
     if (listener.equals(this)) {
-    	return;
+      return;
     }
     if (listeners == null) {
-    	listeners = new HashSet<ProgressListener>();
+      listeners = new HashSet<ProgressListener>();
     }
     listeners.add(listener);
   }
@@ -278,16 +315,17 @@ public abstract class AbstractProgressBar implements Serializable, ProgressListe
    */
   private void fireListeners(int percent, double miliSecondsRemaining, String additionalText) {
     if ((listeners == null) || (listeners.size() < 1)) {
-    	return;
+      return;
     }
     for (ProgressListener listener : listeners) {
       listener.percentageChanged(percent, miliSecondsRemaining, additionalText);
     }
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.util.ProgressListener#percentageChanged(int, double, java.lang.String)
    */
+  @Override
   public void percentageChanged(int percent, double miliSecondsRemaining, String additionalText) {
     drawProgressBar(percent, miliSecondsRemaining, additionalText);
   }

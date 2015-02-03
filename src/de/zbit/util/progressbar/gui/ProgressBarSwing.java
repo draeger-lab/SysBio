@@ -32,12 +32,15 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * @since 1.0
  */
 public class ProgressBarSwing extends AbstractProgressBar {
-	
-	/**
-	 * Generated serial version identifier
-	 */
+  
+  /**
+   * Generated serial version identifier
+   */
   private static final long serialVersionUID = 2754375775367568812L;
   
+  /**
+   * 
+   */
   private static final String REMAINING_TIME = ResourceManager.getBundle("de.zbit.locales.Labels").getString("REMAINING_TIME");
   
   /**
@@ -70,10 +73,10 @@ public class ProgressBarSwing extends AbstractProgressBar {
    * 
    * @param progressBar
    */
-  public void setProgressBar(JProgressBar progressBar) {
+  public synchronized void setProgressBar(JProgressBar progressBar) {
     this.progressBar = progressBar;
     if (progressBar != null) {
-    	initProgressBar();
+      initProgressBar();
     }
   }
   
@@ -81,22 +84,28 @@ public class ProgressBarSwing extends AbstractProgressBar {
    * ProgressBar
    *=====================================*/
   
+  /**
+   * 
+   */
   public void initProgressBar() {
     // initializes Progress bar
     if ((progressBar != null) && (progressBar instanceof JProgressBar)) {
-      ((JProgressBar) progressBar).setMaximum(100);
-      ((JProgressBar) progressBar).setMinimum(0);
-      ((JProgressBar) progressBar).setValue(0);
-      ((JProgressBar) progressBar).setStringPainted(true);
+      JProgressBar jprogressbar = progressBar;
+      jprogressbar.setMaximum(100);
+      jprogressbar.setMinimum(0);
+      jprogressbar.setValue(0);
+      jprogressbar.setStringPainted(true);
     }
   }
   
   /* (non-Javadoc)
    * @see de.zbit.util.AbstractProgressBar#drawProgressBar(int, double, java.lang.String)
    */
-  public void drawProgressBar(int percent, double miliSecondsRemaining, String additionalText) {
+  @Override
+  public void drawProgressBar(final int percent, final double miliSecondsRemaining, final String additionalText) {
     if (progressBar instanceof JProgressBar) {
-      ((JProgressBar) progressBar).setValue(percent);
+      JProgressBar jprogressbar = progressBar;
+      jprogressbar.setValue(percent);
       
       String s = percent + " %";
       if (miliSecondsRemaining > 0) {
@@ -106,16 +115,17 @@ public class ProgressBarSwing extends AbstractProgressBar {
         s += " - " + additionalText;
       }
       
-      ((JProgressBar) progressBar).setString(s);
+      jprogressbar.setString(s);
     }
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.util.AbstractProgressBar#finished_impl()
    */
+  @Override
   public void finished_impl() {
     // Set Progressbar to 100%
     drawProgressBar(100, 0, "");
   }
-
+  
 }

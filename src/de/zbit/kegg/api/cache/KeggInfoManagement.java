@@ -180,12 +180,12 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
     // If we parse to many string in parallel, we get
     // out of memory errors! => Limit to maximal 50!
     ThreadManager APIstringParser = new ThreadManager();
-    if (ids.length<=atATime) {
+    if (ids.length <= atATime) {
       try {
         APIinfos = fetchMultipleInformationsUpTo100AtATime(ids);
       } catch (UnsuccessfulRetrieveException e) {
         // Do NOT pipie it through! else, everything is marked as unretrievable
-        APIinfos=null;
+        APIinfos = null;
       }
       
       // Jump progress bar to 50%
@@ -257,33 +257,32 @@ public class KeggInfoManagement extends InfoManagement<String, KeggInfos> implem
    */
   private void parseAPI(final String[] ids, String[] APIinfos,
     final KeggInfos[] realRet, ThreadManager APIstringParser, final int realRetOffset, final AbstractProgressBar progress) {
-    if (APIinfos==null) {
+    if (APIinfos == null) {
       // None was succesfull!
-      for (int i=0; i<ids.length; i++) {
-        realRet[i+realRetOffset] = null;
+      for (int i = 0; i < ids.length; i++) {
+        realRet[i + realRetOffset] = null;
       }
-      if (progress!=null) {
+      if (progress != null) {
         synchronized (progress) {
           progress.incrementCallNumber(ids.length);
         }
       }
     } else {
-      for (int i=0; i<APIinfos.length; i++) {
+      for (int i = 0; i < APIinfos.length; i++) {
         final int final_i = i;
         final String apiInfos = APIinfos[final_i];
         Runnable parser = new Runnable() {
-          /*
-           * (non-Javadoc)
+          /* (non-Javadoc)
            * @see java.lang.Runnable#run()
            */
           @Override
           public void run() {
-            if (apiInfos==null || apiInfos.length()<1) {
-              realRet[final_i+realRetOffset] = null;
+            if ((apiInfos == null) || (apiInfos.length() < 1)) {
+              realRet[final_i + realRetOffset] = null;
             } else {
-              realRet[final_i+realRetOffset] = new KeggInfos(ids[final_i], apiInfos);
+              realRet[final_i + realRetOffset] = new KeggInfos(ids[final_i], apiInfos);
             }
-            if (progress!=null) {
+            if (progress != null) {
               synchronized (progress) {
                 progress.DisplayBar();
               }
