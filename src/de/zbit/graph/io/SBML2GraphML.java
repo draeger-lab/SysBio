@@ -59,7 +59,7 @@ import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.Output;
 import org.sbml.jsbml.ext.qual.QualConstants;
-import org.sbml.jsbml.ext.qual.QualitativeModel;
+import org.sbml.jsbml.ext.qual.QualModelPlugin;
 import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
 
@@ -185,8 +185,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     List<? extends AbstractNamedSBase> species;
     if (showQualModel) {
       SBasePlugin qm = model.getExtension(qualNamespace);
-      if (qm!=null && qm instanceof QualitativeModel) {
-        QualitativeModel q = (QualitativeModel) qm;
+      if ((qm != null) && (qm instanceof QualModelPlugin)) {
+        QualModelPlugin q = (QualModelPlugin) qm;
         if (!q.isSetListOfQualitativeSpecies()) {
           return;
         }
@@ -215,7 +215,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       /*
        * RELATIONS
        */
-      QualitativeModel qm = (QualitativeModel) model.getExtension(qualNamespace);
+      QualModelPlugin qm = (QualModelPlugin) model.getExtension(qualNamespace);
       if (qm.isSetListOfTransitions()) {
         for (Transition t : qm.getListOfTransitions()) {
           createRelation(t);
@@ -429,7 +429,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
           
           // Create the reaction node
           NodeRealizer nr = new ReactionNodeRealizer();
-          reaction2node .put(r, (ReactionNodeRealizer) nr);
+          reaction2node.put(r, (ReactionNodeRealizer) nr);
           Node rNode = simpleGraph.createNode(nr);
           GraphElement2SBid.put(rNode, r.getId());
           id2node.put(r.getId(), rNode);
@@ -480,7 +480,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
           // Add edges to the reaction node
           for (SpeciesReference sr : reactants) {
             Node source = id2node.get(sr.getSpecies());
-            if (source!=null) {
+            if (source != null) {
               Edge e = simpleGraph.createEdge(source, rNode);
               GraphElement2SBid.put(e, r.getId());
               listOfEdges.add(e);
@@ -491,14 +491,12 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
                 er.setSourceArrow(Arrow.NONE);
               }
               er.setArrow(Arrow.NONE);
-              
-              
             }
           }
           
           for (SpeciesReference sr : products) {
             Node target = id2node.get(sr.getSpecies());
-            if (target!=null) {
+            if (target != null) {
               Edge e = simpleGraph.createEdge(rNode, target);
               GraphElement2SBid.put(e, r.getId());
               listOfEdges.add(e);

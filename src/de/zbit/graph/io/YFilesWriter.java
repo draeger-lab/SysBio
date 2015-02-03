@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -33,7 +33,7 @@ import java.util.Map;
 
 /**
  * This class creates an {@link OutputStream} that can be used with
- * the yFiles Java library. It ensures that KEGGtranslator name 
+ * the yFiles Java library. It ensures that KEGGtranslator name
  * ({@link KEGGtranslator#APPLICATION_NAME}) and version
  * number ({@link KEGGtranslator#VERSION_NUMBER}) is written to each
  * file, which allows for easier debugging of written graph files.
@@ -50,70 +50,77 @@ import java.util.Map;
  * @version $Rev$
  */
 public class YFilesWriter extends OutputStream implements Closeable {
-	private Map<String, String> toReplace;
-	
-	private OutputStream realOut;
-	
-	private StringBuffer current;
-	
-	/**
-	 * 
-	 * @param out
-	 */
-	public YFilesWriter(OutputStream out) {
-		toReplace = new HashMap<String, String>();
-		// IMPORTANT NOTE: this MUST BE case sensitive, because
-		// Replacing occurences of yfiles will create incompatible
-		// files!
-		/*
+  private Map<String, String> toReplace;
+  
+  private OutputStream realOut;
+  
+  private StringBuffer current;
+  
+  /**
+   * 
+   * @param out
+   */
+  public YFilesWriter(OutputStream out) {
+    toReplace = new HashMap<String, String>();
+    // IMPORTANT NOTE: this MUST BE case sensitive, because
+    // Replacing occurences of yfiles will create incompatible
+    // files!
+    /*
      * Replaces <ul>
      * <li>yFiles with {@link KEGGtranslator#APPLICATION_NAME}</li>
      * <li>yFiles version number with {@link KEGGtranslator#VERSION_NUMBER}</li>
      * </ul>
      * such that no notes of yFiles are being written to the file.
-		 */
-		toReplace.put("yFiles", System.getProperty("app.name"));
-		toReplace.put("ySVG", System.getProperty("app.name"));
-		// It is TOO RISKY to replace "2.8" by another number (collision with node positions, etc.)
-		//toReplace.put(y.util.YVersion.currentVersionString(), Translator.VERSION_NUMBER);
-		toReplace.put(String.format("for Java %s-->", y.util.YVersion.currentVersionString()), 
-		              String.format("for Java %s-->", System.getProperty("app.version")));
-		
-		
-		realOut = out;
-		
-		current = new StringBuffer();
-	}
-
-	
-	/* (non-Javadoc)
-	 * @see java.io.OutputStream#write(int)
-	 */
-	@Override
-	public void write(int b) throws IOException {
-		current.append((char)b);
-		
-		if (b=='\n') {
-			internalFlush();
-		}
-	}
-
-
-	private void internalFlush() throws IOException {
-		// Replace everything
-		String toWrite = current.toString();
-		for (String key : toReplace.keySet()) {
-			toWrite = toWrite.replace(key, toReplace.get(key));
-		}
-		
-		// Write things and clear the current buffer.
-		realOut.write(toWrite.getBytes());
-		current = new StringBuffer();
-	}
-	
-	public void close() throws IOException {
-		internalFlush();
-		realOut.close();
-	}
-	
+     */
+    toReplace.put("yFiles", System.getProperty("app.name"));
+    toReplace.put("ySVG", System.getProperty("app.name"));
+    // It is TOO RISKY to replace "2.8" by another number (collision with node positions, etc.)
+    //toReplace.put(y.util.YVersion.currentVersionString(), Translator.VERSION_NUMBER);
+    toReplace.put(String.format("for Java %s-->", y.util.YVersion.currentVersionString()),
+      String.format("for Java %s-->", System.getProperty("app.version")));
+    
+    
+    realOut = out;
+    
+    current = new StringBuffer();
+  }
+  
+  
+  /* (non-Javadoc)
+   * @see java.io.OutputStream#write(int)
+   */
+  @Override
+  public void write(int b) throws IOException {
+    current.append((char)b);
+    
+    if (b=='\n') {
+      internalFlush();
+    }
+  }
+  
+  /**
+   * 
+   * @throws IOException
+   */
+  private void internalFlush() throws IOException {
+    // Replace everything
+    String toWrite = current.toString();
+    for (String key : toReplace.keySet()) {
+      toWrite = toWrite.replace(key, toReplace.get(key));
+    }
+    
+    // Write things and clear the current buffer.
+    realOut.write(toWrite.getBytes());
+    current = new StringBuffer();
+  }
+  
+  /* (non-Javadoc)
+   * @see java.io.OutputStream#close()
+   */
+  @Override
+  public void close() throws IOException {
+    internalFlush();
+    realOut.close();
+  }
+  
 }
