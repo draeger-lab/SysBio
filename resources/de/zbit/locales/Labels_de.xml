@@ -19,8 +19,8 @@
     Version: $Rev$  
   
     This configuration provides locale-dependent names for labels in
-	a (graphical) user interface. The separator ";" can be used to
-	separate actual labels from associated tool tips.
+    a (graphical) user interface. The separator ";" can be used to
+    separate actual labels from associated tool tips.
   </comment>
   
   <!-- BaseFrame -->
@@ -140,7 +140,7 @@
   <entry key="LAST_PAGE">Verherige Seite</entry>
   <entry key="NEXT">Nächste</entry>
   <entry key="NEXT_PAGE">Nächste Seite</entry>
-  //<entry key="SAVE">Speichern</entry>
+  <entry key="SAVE">Speichern</entry>
   <entry key="SAVE_TOOLTIP">Speichert die aktuelle Seite als HTML-Datei.</entry>
   <entry key="OPEN_IN_BROWSER">In Browser öffnen</entry>
   <entry key="OPEN_IN_BROWSER_TOOLTIP">Öffnet die aktuelle Seite in einem externen Webbrowser.</entry>

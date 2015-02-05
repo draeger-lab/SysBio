@@ -603,7 +603,7 @@ public class SBPreferences implements Map<Object, Object> {
    * @return usage String (also called synopsis).
    */
   public static String generateUsageString() {
-    if (mainClass==null) {
+    if (mainClass == null) {
       mainClass = Reflect.getMainClass();
     }
     
