@@ -88,7 +88,6 @@ import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
@@ -102,7 +101,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
-import de.zbit.Launcher;
 import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.gui.actioncommand.ActionCommandWithIcon;
 import de.zbit.io.OpenFile;
@@ -268,7 +266,7 @@ public class GUITools {
    * @param showCopyright
    */
   public static void configureSplashScreen(String versionNumber,
-    int yearOfProjectStart, int yearOfRelease, boolean showVersionNumber,
+    short yearOfProjectStart, short yearOfRelease, boolean showVersionNumber,
     boolean showCopyright) {
     int distanceToBorder = 7;
     SplashScreen splash = SplashScreen.getSplashScreen();
@@ -300,9 +298,10 @@ public class GUITools {
     if (showCopyright) {
       String cMessage = resources.getString("COPYRIGHT_HOLDER");
       cMessage = MessageFormat.format(cMessage,
-        yearOfProjectStart,
-        yearOfRelease,
-        resources.getString("ORGANIZATION"));
+        MessageFormat.format(resources.getString("COPYRIGHT_YEARS"),
+          yearOfProjectStart,
+          yearOfRelease),
+          resources.getString("ORGANIZATION"));
       g.drawString(cMessage, distanceToBorder,
         (int) (b.getHeight() - distanceToBorder));
     }
@@ -2512,8 +2511,9 @@ public class GUITools {
       protected void done() {
         try {
           super.done();
-          if(listener != null)
-          	listener.propertyChange(new PropertyChangeEvent(this, "dialog.done", null, get()));
+          if(listener != null) {
+            listener.propertyChange(new PropertyChangeEvent(this, "dialog.done", null, get()));
+          }
         } catch (Exception exc) {
           GUITools.showErrorMessage(null, exc);
         }
