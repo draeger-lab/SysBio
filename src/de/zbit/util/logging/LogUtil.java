@@ -24,8 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-
-
 /**
  * Class with helper functions regarding logging.
  * 
@@ -45,7 +43,7 @@ public class LogUtil {
    * Remember packages from last {@link #initializeLogging(String...)} call
    */
   private static String packages_to_log[];
-
+  
   /**
    * Keep references to configured Loggers so the garbage collector does not delete them
    */
@@ -58,7 +56,7 @@ public class LogUtil {
    */
   public static void addHandler(Handler h, String... packages ) {
     Logger.getLogger(basePackage).addHandler(h);
-
+    
     // additional packages to handle
     if (packages != null) {
       for (String s : packages) {
@@ -75,7 +73,7 @@ public class LogUtil {
   public static void changeLogLevel(Level logLevel) {
     changeLogLevel(logLevel, false);
   }
-
+  
   /**
    * Change the log level of the given packages.
    * @param logLevel
@@ -84,7 +82,7 @@ public class LogUtil {
   public static void changeLogLevel(Level logLevel, String... packages) {
     changeLogLevel(logLevel, false, packages);
   }
-
+  
   /**
    * Change the log level of the base package (de.zbit) and all packages for
    * those logging has been initialized with
@@ -126,14 +124,14 @@ public class LogUtil {
       }
     }
   }
-
+  
   
   /**
    * 
    * @return
    */
   public static Level getCurrentLogLevel() {
-  	return Logger.getLogger("").getHandlers()[0].getLevel();
+    return Logger.getLogger("").getHandlers()[0].getLevel();
   }
   
   /**
@@ -182,7 +180,7 @@ public class LogUtil {
    */
   public static void removeHandler(Handler h, String... packages ) {
     Logger.getLogger(basePackage).removeHandler(h);
-
+    
     // additional packages to handle
     if (packages != null) {
       for (String s : packages) {
@@ -191,12 +189,15 @@ public class LogUtil {
     }
   }
   
+  /**
+   * 
+   */
   public static void printLogLevels() {
     LogManager lm = LogManager.getLogManager();
     
-    for( String name : Collections.list(lm.getLoggerNames()) ) {
+    for (String name : Collections.list(lm.getLoggerNames())) {
       Level l = lm.getLogger(name).getLevel();
-      if( l != null ) {
+      if (l != null) {
         System.out.println(name + " = " + l);
       }
     }

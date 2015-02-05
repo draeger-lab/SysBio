@@ -44,8 +44,8 @@ GEWÄHRLEISTUNG UND HAFTUNG kostenlos zur Verfügung
 gestellt. Dies ist freie Software, die Sie gern unter
 bestimmten Bedingungen weiterverbreiten dürfen.
 </entry>
-  <entry key="COPYRIGHT_YEAR">{0,number,#}</entry>
-  <entry key="COPYRIGHT_YEARS">{0,number,#}-{1,number,#}</entry>
+  <entry key="COPYRIGHT_YEAR">{0,number,####}</entry>
+  <entry key="COPYRIGHT_YEARS">{0,number,####}-{1,number,####}</entry>
   <entry key="LINK_TO_LICENSE_FILE">Siehe {0}.</entry>
   
   
