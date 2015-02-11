@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2015 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2014 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -35,30 +35,30 @@ import de.zbit.math.MathUtils;
 /**
  * Superclass for all reaction nodes. Subclasses decide which specific shape to
  * draw.
- * 
+ *
  * @author Clemens Wrzodek
  * @version $Rev$
  */
 public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
-  
+
   /**
    * line width of reaction node
    */
   protected float lineWidth;
   protected double rotationAngle;
   protected java.awt.geom.Point2D.Double rotationCenter;
-  
+
   /**
-   * 
+   *
    */
   public ProcessNodeRealizer() {
     super(ShapeNodeRealizer.RECT);
     setHeight(10);
     setWidth(getHeight() * 2);
   }
-  
+
   /**
-   * 
+   *
    * @param nr
    */
   public ProcessNodeRealizer(NodeRealizer nr) {
@@ -71,11 +71,11 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
       rotationCenter = fnr.rotationCenter;
     }
   }
-  
+
   public ProcessNodeRealizer(byte shape) {
     super(shape);
   }
-  
+
   /* (non-Javadoc)
    * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
    */
@@ -87,29 +87,29 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     double min = Math.min(width, height);
     double offsetX = (width - min)/2d;
     double offsetY = (height - min)/2d;
-    
-    rotate(gfx, rotationAngle, rotationCenter);
-    
+
+    //    rotate(gfx, rotationAngle, rotationCenter);
+
     drawShape(gfx);
-    
+
     int halfHeight = (int) (height/2d);
-    
+
     // Draw the small reaction lines on both sides, where substrates
     // and products should dock.
     // TODO: Deal with Whiskers!!!
     //gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
     //gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
-    
-    rotate(gfx, -rotationAngle, rotationCenter);
+
+    //    rotate(gfx, -rotationAngle, rotationCenter);
   }
-  
+
   /**
    * Draw the shape of the process node. Each subclass provides its own shape.
-   * 
+   *
    * @param gfx
    */
   protected abstract void drawShape(Graphics2D gfx);
-  
+
   /**
    * Configures the orientation of this node and the docking point
    * for all adjacent edges to match the given parameters.
@@ -119,7 +119,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
   public void fixLayout(Set<Node> reactants, Set<Node> products, Set<Node> modifier) {
     Node no = getNode();
     Graph2D graph = (Graph2D) no.getGraph();
-    
+
     // Determine location of adjacent nodes
     Integer[] cases = new Integer[4];
     double[] meanDiff = new double[2];
@@ -129,18 +129,18 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     //	    int reactantsAbove=1;
     //	    int productsLeft=2;
     //	    int productsAbove=3;
-    
+
     for (EdgeCursor ec = no.edges(); ec.ok(); ec.next()) {
       Edge v = ec.edge();
       Node other = v.opposite(no);
       NodeRealizer nr = graph.getRealizer(other);
-      
+
       double distanceX = Math.abs(getCenterX() - nr.getCenterX());
       double distanceY = Math.abs(getCenterY() - nr.getCenterY());
       if (reactants.contains(other)) {
         meanDiff[0]+= distanceX;
         meanDiff[1]+= distanceY;
-        
+
         // Count cases, but require at least 5 pixels difference
         if (distanceX>5 && nr.getCenterX()<getCenterX()) {
           cases[0]++;
@@ -151,7 +151,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
       } else if (products.contains(other)) {
         meanDiff[0]+= distanceX;
         meanDiff[1]+= distanceY;
-        
+
         // Count cases, but require at least 5 pixels difference
         if (distanceX>5 && nr.getCenterX()<getCenterX()) {
           cases[2]++;
@@ -161,7 +161,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
         }
       }
     }
-    
+
     // Determine orientation of this node
     double max = MathUtils.max(Arrays.asList(cases));
     boolean horizontal = isHorizontal();
@@ -187,7 +187,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     } else if (cases[3] == max && horizontal) {
       rotateNode();
     }
-    
+
     // Dock all edges to the correct side
     if (isHorizontal()) {
       if (cases[0]>cases[2]) {
@@ -209,17 +209,17 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
       }
     }
     // TODO: reaction modifiers dock on square
-    
+
   }
-  
+
   /**
-   * 
+   *
    * @return
    */
   public float getLineWidth() {
     return lineWidth;
   }
-  
+
   /**
    * True if the node is painted in a horizontal layout.
    * Use {@link #rotateNode()} to change the rotation.
@@ -227,7 +227,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
   public boolean isHorizontal() {
     return getWidth() >= getHeight();
   }
-  
+
   /**
    * @param adjacentNodes
    * @param dockToPoint
@@ -236,13 +236,13 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     YPoint dockToPoint) {
     Node no = getNode();
     Graph2D graph = (Graph2D) no.getGraph();
-    
+
     for (EdgeCursor ec = no.edges(); ec.ok(); ec.next()) {
       Edge v = ec.edge();
       Node other = v.opposite(no);
       EdgeRealizer er = graph.getRealizer(v);
       boolean isSource = v.source().equals(no);
-      
+
       if (adjacentNodes.contains(other)) {
         if (isSource) {
           er.setSourcePoint(dockToPoint);
@@ -252,7 +252,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
       }
     }
   }
-  
+
   /* (non-Javadoc)
    * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
    */
@@ -260,7 +260,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
   protected void paintFilledShape(Graphics2D gfx) {
     // Do NOT fill it.
   }
-  
+
   /* (non-Javadoc)
    * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
    */
@@ -271,9 +271,9 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     //				new Point((int) Math.round(getX()), (int) Math.round(getY())),
     //				new Dimension((int) Math.round(getWidth()), (int) Math.round(getHeight()))));
   }
-  
+
   /**
-   * 
+   *
    * @param gfx
    * @param rotationAngle
    * @param rotationCenter
@@ -287,7 +287,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
       }
     }
   }
-  
+
   /**
    * Rotates the node by 90&deg;.
    */
@@ -296,7 +296,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     setWidth(height);
     setHeight(width);
   }
-  
+
   /**
    * @param adjacentNodes
    */
@@ -304,7 +304,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     YPoint dockToPoint = new YPoint(getWidth()/2*-1,0);
     letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
   }
-  
+
   /**
    * @param adjacentNodes
    */
@@ -312,7 +312,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     YPoint dockToPoint = new YPoint(0,getHeight()/2);
     letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
   }
-  
+
   /**
    * @param adjacentNodes
    */
@@ -320,7 +320,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     YPoint dockToPoint = new YPoint(getWidth()/2,0);
     letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
   }
-  
+
   /**
    * @param adjacentNodes
    */
@@ -328,33 +328,33 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     YPoint dockToPoint = new YPoint(0,getHeight()/2*-1);
     letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
   }
-  
+
   /**
    * sets line width of {@link ReactionNodeRealizer}. If not set, line
    * width will be 1.
-   * 
+   *
    * @param lineWidth
    */
   public void setLineWidth(float lineWidth) {
     this.lineWidth = lineWidth;
   }
-  
+
   /**
-   * 
+   *
    * @param rotationAngle
    */
   public void setRotationAngle(double rotationAngle) {
     this.rotationAngle = rotationAngle;
   }
-  
+
   /**
-   * 
+   *
    * @param rotationCenter
    */
   public void setRotationCenter(java.awt.geom.Point2D.Double rotationCenter) {
     this.rotationCenter = rotationCenter;
   }
-  
+
   /* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
@@ -370,6 +370,6 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
       ", fill=", getFillColor(), ", line=", getLineColor(),
         "]").toString();
   }
-  
-  
+
+
 }

@@ -50,7 +50,7 @@ import de.zbit.util.objectwrapper.ValuePairUncomparable;
  * @since 1.0
  */
 public class SBFileFilter extends GeneralFileFilter {
-  
+
   /**
    * 
    * @author Andreas Dr&auml;ger
@@ -78,6 +78,10 @@ public class SBFileFilter extends GeneralFileFilter {
      * To be selected if CSV files (comma/character separated files) can be chosen.
      */
     CSV_FILES,
+    /**
+     * To be selected for CDT (clustered data table) files.
+     */
+    CDT_FILES,
     /**
      * True if this filter accepts directories only (no files).
      */
@@ -226,7 +230,7 @@ public class SBFileFilter extends GeneralFileFilter {
      * True if this filter accepts YGF (Y Graph Format) files.
      */
     YGF_FILES;
-    
+
     /**
      * 
      * @return
@@ -235,57 +239,57 @@ public class SBFileFilter extends GeneralFileFilter {
       Set<String> extensions = new TreeSet<String>();
       String string = toString();
       switch (this) {
-        case DIRECTORIES_ONLY:
-          return extensions;
-        case HTML_FILES:
-          extensions.add("htm");
-          extensions.add("html");
-          break;
-        case JPEG_FILES:
-          extensions.add("jpg");
-          break;
-        case JSON_FILES:
-          extensions.add("json");
-          break;
-        case KGML_FILES:
-          extensions.add("xml");
-          return extensions;
-          // ---- please keep the following order
-        case BioPAX_FILES:
-        case BioPAX_FILES_L2:
-          extensions.add("bp2");
-        case BioPAX_FILES_L3:
-          if (!equals(BioPAX_FILES_L2)) {
-            extensions.add("bp3");
-          }
-        case OWL_FILES:
-          extensions.add("owl");
-          extensions.add("xml");
-          return extensions;
-          // ----
-        case PLINK_GENOTYPE_FILES:
-          extensions.add("ped");
-          extensions.add("bed");
-          return extensions;
-        case SBGN_FILES:
-        case SBML_FILES:
-        case SBML_FILES_L1V1:
-        case SBML_FILES_L1V2:
-        case SBML_FILES_L2V1:
-        case SBML_FILES_L2V2:
-        case SBML_FILES_L2V3:
-        case SBML_FILES_L2V4:
-        case SBML_FILES_L2V5:
-        case SBML_FILES_L3V1:
-          extensions.add("xml");
-          break;
-        case TEXT_FILES:
-          extensions.add("txt");
-          return extensions;
-        case TSV_FILES:
-          return extensions;
-        default:
-          break;
+      case DIRECTORIES_ONLY:
+        return extensions;
+      case HTML_FILES:
+        extensions.add("htm");
+        extensions.add("html");
+        break;
+      case JPEG_FILES:
+        extensions.add("jpg");
+        break;
+      case JSON_FILES:
+        extensions.add("json");
+        break;
+      case KGML_FILES:
+        extensions.add("xml");
+        return extensions;
+        // ---- please keep the following order
+      case BioPAX_FILES:
+      case BioPAX_FILES_L2:
+        extensions.add("bp2");
+      case BioPAX_FILES_L3:
+        if (!equals(BioPAX_FILES_L2)) {
+          extensions.add("bp3");
+        }
+      case OWL_FILES:
+        extensions.add("owl");
+        extensions.add("xml");
+        return extensions;
+        // ----
+      case PLINK_GENOTYPE_FILES:
+        extensions.add("ped");
+        extensions.add("bed");
+        return extensions;
+      case SBGN_FILES:
+      case SBML_FILES:
+      case SBML_FILES_L1V1:
+      case SBML_FILES_L1V2:
+      case SBML_FILES_L2V1:
+      case SBML_FILES_L2V2:
+      case SBML_FILES_L2V3:
+      case SBML_FILES_L2V4:
+      case SBML_FILES_L2V5:
+      case SBML_FILES_L3V1:
+        extensions.add("xml");
+        break;
+      case TEXT_FILES:
+        extensions.add("txt");
+        return extensions;
+      case TSV_FILES:
+        return extensions;
+      default:
+        break;
       }
       if (string.contains("_")) {
         extensions.add(toString().substring(0, toString().indexOf("_"))
@@ -293,7 +297,7 @@ public class SBFileFilter extends GeneralFileFilter {
       }
       return extensions;
     }
-    
+
     /**
      * @return a pattern for one of the top-most lines to be matched in order to
      *         accept a file of the given type.
@@ -317,7 +321,7 @@ public class SBFileFilter extends GeneralFileFilter {
           anyChar, level, anyChar), Pattern.MULTILINE
           & Pattern.DOTALL);
       }
-      
+
       if (toString().startsWith(BioPAX_FILES.toString())) {
         // Parse a level from file filter string
         Pattern levelPattern = Pattern.compile("BioPAX_FILES_L(\\d)+");
@@ -326,15 +330,15 @@ public class SBFileFilter extends GeneralFileFilter {
         if (m.find()) {
           level = Integer.parseInt(m.group(1));
         }
-        
+
         return Pattern.compile("biopax-level" + (level <= 0 ? "\\d" : level) + ".owl");
       }
       return null;
     }
   }
-  
+
   public static final Logger log = Logger.getLogger(SBFileFilter.class.getName());
-  
+
   /**
    * The maximal number of characters to check for characteristic identifier in
    * files. If the first {@link #MAX_CHARACTERS_TO_PARSE} do not contain a defined
@@ -342,7 +346,7 @@ public class SBFileFilter extends GeneralFileFilter {
    * file of this type.
    */
   private static final int MAX_CHARACTERS_TO_PARSE = 512;
-  
+
   /**
    * 
    * @param file
@@ -355,7 +359,7 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return file.getName().toLowerCase().endsWith(extension.toLowerCase());
   }
-  
+
   /**
    * This method opens the given file and parses the first
    * {@link #MAX_CHARACTERS_TO_PARSE} characters. If a line pattern for the given expected
@@ -403,56 +407,56 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return retVal;
   }
-  
+
   /**
    * @return The {@link FileFilter} for all files.
    */
   public final static GeneralFileFilter createAllFileFilter() {
     return new SBAcceptAllFileFilter();
   }
-  
+
   /**
    * @return A filter for association files
    */
   public static SBFileFilter createASSOCFileFilter() {
     return new SBFileFilter(FileType.ASSOC_FILES);
   }
-  
+
   /**
    * @return A filter for bed files
    */
   public static SBFileFilter createBEDFileFilter() {
     return new SBFileFilter(FileType.BED_FILES);
   }
-  
+
   /**
    * @return A filter for bim files
    */
   public static SBFileFilter createBIMFileFilter() {
     return new SBFileFilter(FileType.BIM_FILES);
   }
-  
+
   /**
    * @return A filter for CSV files
    */
   public static SBFileFilter createCSVFileFilter() {
     return new SBFileFilter(FileType.CSV_FILES);
   }
-  
+
   /**
    * @return A filter for directories only.
    */
   public static SBFileFilter createDirectoryFilter() {
     return new SBFileFilter(FileType.DIRECTORIES_ONLY);
   }
-  
+
   /**
    * @return A filter for fam files
    */
   public static SBFileFilter createFAMFileFilter() {
     return new SBFileFilter(FileType.FAM_FILES);
   }
-  
+
   /**
    * 
    * @return
@@ -460,7 +464,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static final SBFileFilter createGIFFileFilter() {
     return new SBFileFilter(FileType.GIF_FILES);
   }
-  
+
   /**
    * 
    * @return
@@ -468,7 +472,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static final SBFileFilter createGMLFileFilter() {
     return new SBFileFilter(FileType.GML_FILES);
   }
-  
+
   /**
    * 
    * @return
@@ -476,21 +480,21 @@ public class SBFileFilter extends GeneralFileFilter {
   public static final SBFileFilter createGraphMLFileFilter() {
     return new SBFileFilter(FileType.GRAPHML_FILES);
   }
-  
+
   /**
    * @return
    */
   public static final FileFilter createHTMLFileFilter() {
     return new SBFileFilter(FileType.HTML_FILES);
   }
-  
+
   /**
    * @return A filter for hwe files
    */
   public static SBFileFilter createHWEFileFilter() {
     return new SBFileFilter(FileType.HWE_FILES);
   }
-  
+
   /**
    * @return Filter for any kind of image file supported by this class.
    */
@@ -500,178 +504,178 @@ public class SBFileFilter extends GeneralFileFilter {
       bundle.getString("IMAGE_FILES")), SBFileFilter.createJPEGFileFilter(),
       SBFileFilter.createPNGFileFilter(), SBFileFilter.createGIFFileFilter());
   }
-  
+
   /**
    * @return A filter for joint picture expert group files.
    */
   public static SBFileFilter createJPEGFileFilter() {
     return new SBFileFilter(FileType.JPEG_FILES);
   }
-  
+
   /**
    * @return A filter for JavaScript Object Notation (JSON) files.
    */
   public static GeneralFileFilter createJSONFileFilter() {
     return new SBFileFilter(FileType.JSON_FILES);
   }
-  
+
   /**
    * @return A filter for KGML files (KEGG Markup Language).
    */
   public static final SBFileFilter createKGMLFileFilter() {
     return new SBFileFilter(FileType.KGML_FILES);
   }
-  
+
   /**
    * @return Filter for map files
    */
   public static SBFileFilter createMAPFileFilter() {
     return new SBFileFilter(FileType.MAP_FILES);
   }
-  
+
   /**
    * @return Filter for owl files
    */
   public static SBFileFilter createOWLFileFilter() {
     return new SBFileFilter(FileType.OWL_FILES);
   }
-  
+
   /**
    * @return A filter for SBML files
    */
   public static final SBFileFilter createBioPAXFileFilter() {
     return new SBFileFilter(FileType.BioPAX_FILES);
   }
-  
+
   /**
    * @return Filter for owl files
    */
   public static SBFileFilter createBioPAXFileFilterL2() {
     return new SBFileFilter(FileType.BioPAX_FILES_L2);
   }
-  
+
   /**
    * @return Filter for owl files
    */
   public static SBFileFilter createBioPAXFileFilterL3() {
     return new SBFileFilter(FileType.BioPAX_FILES_L3);
   }
-  
+
   /**
    * @return A filter for SIF files
    */
   public static final SBFileFilter createSIFFileFilter() {
     return new SBFileFilter(FileType.SIF_FILES);
   }
-  
+
   /**
    * @return A filter for PDF files.
    */
   public static final SBFileFilter createPDFFileFilter() {
     return new SBFileFilter(FileType.PDF_FILES);
   }
-  
+
   /**
    * @return A filter for ped files
    */
   public static SBFileFilter createPEDFileFilter() {
     return new SBFileFilter(FileType.PED_FILES);
   }
-  
+
   /**
    * @return A filter for PLINK genotype files
    */
   public static SBFileFilter createPlinkGenotypeFileFilter() {
     return new SBFileFilter(FileType.PLINK_GENOTYPE_FILES);
   }
-  
+
   /**
    * @return A filter for portable network graphic files.
    */
   public static SBFileFilter createPNGFileFilter() {
     return new SBFileFilter(FileType.PNG_FILES);
   }
-  
+
   /**
    * @return A filter for SBGN files
    */
   public static final SBFileFilter createSBGNFileFilter() {
     return new SBFileFilter(FileType.SBGN_FILES);
   }
-  
+
   /**
    * @return A filter for SBML files
    */
   public static final SBFileFilter createSBMLFileFilter() {
     return new SBFileFilter(FileType.SBML_FILES);
   }
-  
+
   /**
    * @return A filter for SBML files in level 1 version 1
    */
   public static final SBFileFilter createSBMLFileFilterL1V1() {
     return new SBFileFilter(FileType.SBML_FILES_L1V1);
   }
-  
+
   /**
    * @return A filter for SBML files in level 1 version 2
    */
   public static final SBFileFilter createSBMLFileFilterL1V2() {
     return new SBFileFilter(FileType.SBML_FILES_L1V2);
   }
-  
+
   /**
    * @return A filter for SBML files in level 2 version 1
    */
   public static final SBFileFilter createSBMLFileFilterL2V1() {
     return new SBFileFilter(FileType.SBML_FILES_L2V1);
   }
-  
+
   /**
    * @return A filter for SBML files in level 2 version 2
    */
   public static final SBFileFilter createSBMLFileFilterL2V2() {
     return new SBFileFilter(FileType.SBML_FILES_L2V2);
   }
-  
+
   /**
    * @return A filter for SBML files in level 2 version 3
    */
   public static final SBFileFilter createSBMLFileFilterL2V3() {
     return new SBFileFilter(FileType.SBML_FILES_L2V3);
   }
-  
+
   /**
    * @return A filter for SBML files in level 2 version 4
    */
   public static final SBFileFilter createSBMLFileFilterL2V4() {
     return new SBFileFilter(FileType.SBML_FILES_L2V4);
   }
-  
+
   /**
    * @return A filter for SBML files in level 2 version 4
    */
   public static final SBFileFilter createSBMLFileFilterL2V5() {
     return new SBFileFilter(FileType.SBML_FILES_L2V5);
   }
-  
+
   /**
    * @return A filter for SBML files in level 3 version 1
    */
   public static final SBFileFilter createSBMLFileFilterL3V1() {
     return new SBFileFilter(FileType.SBML_FILES_L3V1);
   }
-  
+
   /**
    * 
    * @return
    */
   public static final SBFileFilter[] createSBMLFileFilterList() {
     FileType types[] = { FileType.SBML_FILES, FileType.SBML_FILES_L1V1,
-        FileType.SBML_FILES_L1V2, FileType.SBML_FILES_L2V1,
-        FileType.SBML_FILES_L2V2, FileType.SBML_FILES_L2V3,
-        FileType.SBML_FILES_L2V4, FileType.SBML_FILES_L2V5,
-        FileType.SBML_FILES_L3V1 };
+      FileType.SBML_FILES_L1V2, FileType.SBML_FILES_L2V1,
+      FileType.SBML_FILES_L2V2, FileType.SBML_FILES_L2V3,
+      FileType.SBML_FILES_L2V4, FileType.SBML_FILES_L2V5,
+      FileType.SBML_FILES_L3V1 };
     SBFileFilter filters[] = new SBFileFilter[types.length];
     int i = 0;
     for (FileType type : types) {
@@ -679,28 +683,32 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return filters;
   }
-  
+
+  public static final SBFileFilter createCDTFileFilterList() {
+    return new SBFileFilter(FileType.CDT_FILES);
+  }
+
   /**
    * @return A filter for SVG files (Scalable Vector Graphics)
    */
   public static SBFileFilter createSVGFileFilter() {
     return new SBFileFilter(FileType.SVG_FILES);
   }
-  
+
   /**
    * @return A filter for TeX files
    */
   public static final SBFileFilter createTeXFileFilter() {
     return new SBFileFilter(FileType.TeX_FILES);
   }
-  
+
   /**
    * @return A filter for Text files.
    */
   public static final SBFileFilter createTextFileFilter() {
     return new SBFileFilter(FileType.TEXT_FILES);
   }
-  
+
   /**
    * 
    * @return
@@ -708,14 +716,14 @@ public class SBFileFilter extends GeneralFileFilter {
   public static final SBFileFilter createTGFFileFilter() {
     return new SBFileFilter(FileType.TGF_FILES);
   }
-  
+
   /**
    * @return A filter for TSV files (tab separated text files)
    */
   public static SBFileFilter createTSVFileFilter() {
     return new SBFileFilter(FileType.TSV_FILES);
   }
-  
+
   /**
    * 
    * @return
@@ -723,7 +731,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static final SBFileFilter createYGFFileFilter() {
     return new SBFileFilter(FileType.YGF_FILES);
   }
-  
+
   /**
    * 
    * @param file
@@ -732,7 +740,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static String getExtension(File file) {
     return getExtension(file.getName());
   }
-  
+
   /**
    * @param name
    * @return
@@ -740,7 +748,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static String getExtension(String name) {
     return FileTools.getExtension(name);
   }
-  
+
   /**
    * 
    * @param file
@@ -750,7 +758,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean hasFileType(File file, FileType type) {
     return hasFileType(file, type, false);
   }
-  
+
   /**
    * 
    * @param file
@@ -765,7 +773,7 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return type.getFileExtensions().contains(extension);
   }
-  
+
   /**
    * 
    * @param file
@@ -774,7 +782,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean isCSVFile(File file) {
     return hasFileType(file, FileType.CSV_FILES);
   }
-  
+
   /**
    * @param file
    * @return
@@ -782,7 +790,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean isHTMLFile(File file) {
     return hasFileType(file, FileType.HTML_FILES);
   }
-  
+
   /**
    * 
    * @param file
@@ -791,7 +799,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean isJPEGFile(File file) {
     return hasFileType(file, FileType.JPEG_FILES);
   }
-  
+
   /**
    * Checks a) if the file endswith XML and b) if the doctype is KGML.
    * @param file
@@ -804,7 +812,7 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return false;
   }
-  
+
   /**
    * Returns true if the given file is an OWL file.
    * 
@@ -814,7 +822,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean isOWLFile(File file) {
     return hasFileType(file, FileType.OWL_FILES);
   }
-  
+
   /**
    * @param f
    * @return
@@ -822,7 +830,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean isPDFFile(File file) {
     return hasFileType(file, FileType.PDF_FILES);
   }
-  
+
   /**
    * Returns true if the given file is a portable network graphics file.
    * 
@@ -832,7 +840,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean isPNGFile(File file) {
     return hasFileType(file, FileType.PNG_FILES);
   }
-  
+
   /**
    * Returns true if the given file is a SBGN file.
    * 
@@ -842,7 +850,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean isSBGNFile(File file) {
     return hasFileType(file, FileType.SBGN_FILES);
   }
-  
+
   /**
    * Returns true if the given file is an SBML file.
    * 
@@ -856,7 +864,7 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return false;
   }
-  
+
   /**
    * Returns true if the given file is a TeX file.
    * 
@@ -866,7 +874,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean isTeXFile(File file) {
     return hasFileType(file, FileType.TeX_FILES);
   }
-  
+
   /**
    * Returns true if the given file is a text file.
    * 
@@ -876,19 +884,19 @@ public class SBFileFilter extends GeneralFileFilter {
   public static boolean isTextFile(File file) {
     return hasFileType(file, FileType.TEXT_FILES);
   }
-  
+
   /**
    * Allows users to initialize this {@link GeneralFileFilter} with another
    * {@link FileFilter}. In this way, the {@link SBFileFilter} can work as
    * an adapter/wrapper.
    */
   private GeneralFileFilter filter;
-  
+
   /**
    * Allowable file type.
    */
   private FileType type;
-  
+
   /**
    * Constructs a file filter that accepts or not accepts the following files
    * (defined by the given parameters).
@@ -904,7 +912,7 @@ public class SBFileFilter extends GeneralFileFilter {
             "FILE_TYPE_MUST_NOT_BE_UNDEFINED"));
     }
   }
-  
+
   /**
    * A constructor that allows using this {@link SBFileFilter} as a wrapper
    * for another {@link GeneralFileFilter}.
@@ -915,7 +923,7 @@ public class SBFileFilter extends GeneralFileFilter {
     this.filter = filter;
     type = FileType.UNDEFINED;
   }
-  
+
   /* (non-Javadoc)
    * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
    */
@@ -932,7 +940,7 @@ public class SBFileFilter extends GeneralFileFilter {
         || (((extensions == null) || extensions.isEmpty() || extensions.contains(getExtension(f)))
             && (!f.exists() || (checkFileHead(f, type))));
   }
-  
+
   /**
    * 
    * @return
@@ -940,7 +948,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsCSVFiles() {
     return type == FileType.CSV_FILES;
   }
-  
+
   /**
    * 
    * @return
@@ -948,7 +956,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsJPEGFiles() {
     return type == FileType.JPEG_FILES;
   }
-  
+
   /**
    * 
    * @return
@@ -956,7 +964,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsOWLFiles() {
     return type == FileType.OWL_FILES;
   }
-  
+
   /**
    * 
    * @return
@@ -964,7 +972,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsPNGFiles() {
     return type == FileType.PNG_FILES;
   }
-  
+
   /**
    * 
    * @return true if this file filter accepts SBGN files.
@@ -972,7 +980,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsSBGNFiles() {
     return type == FileType.SBGN_FILES;
   }
-  
+
   /**
    * Returns true if this file filter accepts SBML files.
    * 
@@ -981,7 +989,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsSBMLFiles() {
     return type == FileType.SBML_FILES;
   }
-  
+
   /**
    * Returns true if this file filter accepts SBML files.
    * 
@@ -990,7 +998,15 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsBioPAXFiles() {
     return type == FileType.BioPAX_FILES;
   }
-  
+
+  /**
+   * 
+   * @return
+   */
+  public boolean acceptsCDTFiles() {
+    return type == FileType.CDT_FILES;
+  }
+
   /**
    * 
    * @return
@@ -998,7 +1014,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsSVGFiles() {
     return type == FileType.SVG_FILES;
   }
-  
+
   /**
    * 
    * @return
@@ -1006,7 +1022,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsTeXFiles() {
     return type == FileType.TeX_FILES;
   }
-  
+
   /**
    * 
    * @return
@@ -1014,7 +1030,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsTextFiles() {
     return type == FileType.TEXT_FILES;
   }
-  
+
   /**
    * 
    * @return
@@ -1022,7 +1038,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean acceptsTSVFiles() {
     return type == FileType.TSV_FILES;
   }
-  
+
   /*
    * (non-Javadoc)
    * @see de.zbit.io.GeneralFileFilter#clone()
@@ -1034,7 +1050,7 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return new SBFileFilter(type);
   }
-  
+
   /**
    * Filters the given files for those acceptable by this
    * {@link java.io.FileFilter}.
@@ -1046,7 +1062,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public List<File> filter(File... files) {
     return separate(files).getA();
   }
-  
+
   /**
    * Sorts the given {@link File} objects into two {@link List}s:
    * <ol>
@@ -1072,7 +1088,7 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return separation;
   }
-  
+
   /*
    * (non-Javadoc)
    * 
@@ -1082,7 +1098,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public String getDescription() {
     return getDescription(false);
   }
-  
+
   /**
    * 
    * @param inTheMiddleOfASentence
@@ -1122,7 +1138,7 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return sb.toString();
   }
-  
+
   /**
    * @see {@link #getExtensions()}
    * @return the first file extension of all acceptable extensions.
@@ -1134,14 +1150,14 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return null;
   }
-  
+
   /**
    * @return all acceptable file extensions.
    */
   public Set<String> getExtensions() {
     return type.getFileExtensions();
   }
-  
+
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
@@ -1169,7 +1185,7 @@ public class SBFileFilter extends GeneralFileFilter {
     // otherwise false
     return false;
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.io.GeneralFileFilter#hashCode()
    */
@@ -1185,7 +1201,7 @@ public class SBFileFilter extends GeneralFileFilter {
     }
     return hashCode;
   }
-  
+
   /**
    * 
    * @return
@@ -1193,7 +1209,7 @@ public class SBFileFilter extends GeneralFileFilter {
   public boolean isSetFileType() {
     return type != null;
   }
-  
+
   /* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
@@ -1201,5 +1217,5 @@ public class SBFileFilter extends GeneralFileFilter {
   public String toString() {
     return getDescription();
   }
-  
+
 }

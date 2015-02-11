@@ -68,98 +68,98 @@ import de.zbit.util.objectwrapper.ValuePairUncomparable;
  * @version $Rev$
  */
 public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
-  
+
   /**
    * Default value for z-coordinates and depth as YFiles works in two
    * dimensional space but SBML allows three dimensional specifications.
    */
   private static final double DEFAULT_Z_COORD = 0.0d;
   private static final double DEFAULT_DEPTH = 0.0d;
-  
+
   /**
    * Logger instance for informational output.
    */
   private static Logger logger = Logger.getLogger(YLayoutAlgorithm.class.toString());
-  
+
   /**
    * 
    */
   private Set<ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>> setOfUnlayoutedEdges;
-  
+
   /**
    * 
    */
   private Set<ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>> setOfLayoutedEdges;
-  
+
   /**
    * 
    */
   private Map<String, Node> compartmentGlyphMap;
-  
+
   /**
    * Mapping of YFiles nodes to glyphs, containing only nodes/glyphs which
    * need to be layouted.
    */
   private Map<Node,GraphicalObject> nodeIncompleteGlyphMap;
-  
+
   /**
    * Mapping of glyph id to the corresponding YFiles node.
    */
   private Map<String,Node> glyphNodeMap;
-  
+
   /**
    * Output of the algorithm, i.e. the autolayouted previously unlayouted
    * glyphs of the input.
    */
   private Set<GraphicalObject> output;
-  
+
   /**
    * Set to hold all reaction glyphs which need positioning.
    */
   private Set<ReactionGlyph> reactionNodes;
-  
+
   /**
    * Graph2D structure neccessary for using layout algorithms provided by
    * YFiles.
    */
   private Graph2D graph2D;
-  
+
   /**
    * GraphTools instance to handle partial layouting.
    */
   private GraphTools graphTools;
-  
+
   /**
    * LayoutAlgorithm constructor.
    */
   public YLayoutAlgorithm() {
     super();
-    
+
     setOfUnlayoutedEdges =
         new HashSet<ValuePairUncomparable<SpeciesReferenceGlyph,ReactionGlyph>>();
     setOfLayoutedEdges =
         new HashSet<ValuePairUncomparable<SpeciesReferenceGlyph,ReactionGlyph>>();
-    
+
     nodeIncompleteGlyphMap = new HashMap<Node, GraphicalObject>();
     glyphNodeMap = new HashMap<String, Node>();
     reactionNodes = new HashSet<ReactionGlyph>();
     compartmentGlyphMap = new HashMap<String, Node>();
     output = new HashSet<GraphicalObject>();
-    
+
     graph2D = new Graph2D();
     GenericDataMap<DataMap, String> mapDescriptionMap =
         new GenericDataMap<DataMap, String>(Graph2DExporter.mapDescription);
     graph2D.addDataProvider(Graph2DExporter.mapDescription, mapDescriptionMap);
-    
+
     HierarchyManager hm = graph2D.getHierarchyManager();
     if (hm == null) {
       hm = new HierarchyManager(graph2D);
       graph2D.setHierarchyManager(hm);
     }
-    
+
     graphTools = new GraphTools(graph2D);
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#addLayoutedEdge(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph, org.sbml.jsbml.ext.layout.ReactionGlyph)
    */
@@ -171,7 +171,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     setOfLayoutedEdges.add(pair);
     addLayoutedGlyph(rg);
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#addUnlayoutedEdge(org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph, org.sbml.jsbml.ext.layout.ReactionGlyph)
    */
@@ -183,16 +183,16 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     setOfUnlayoutedEdges.add(pair);
     addUnlayoutedGlyph(rg);
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#addLayoutedGlyph(org.sbml.jsbml.ext.layout.GraphicalObject)
    */
   @Override
   public void addLayoutedGlyph(GraphicalObject glyph) {
     logger.fine("add layouted glyph id=" + glyph.getId());
-    
+
     correctDimensions(glyph);
-    
+
     // text glyphs (non-indepentend) without bounding box are considered
     // layouted (positioning in center of graphical object)
     if ((glyph instanceof TextGlyph) &&
@@ -200,7 +200,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
         !glyph.isSetBoundingBox()) {
       return;
     }
-    
+
     BoundingBox boundingBox = glyph.getBoundingBox();
     Dimensions dimensions = boundingBox.getDimensions();
     Point position = boundingBox.getPosition();
@@ -217,33 +217,33 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     } else {
       logger.warning(MessageFormat.format("Dimensions of {0} are undefined. Setting it to zero.", glyph));
     }
-    
+
     // Graph2D structure
     NodeRealizer nodeRealizer = (glyph instanceof CompartmentGlyph) ?
-        new CompartmentRealizer() : new ShapeNodeRealizer();
-        nodeRealizer.setSize(width, height);
-        nodeRealizer.setLocation(x, y);
-        Node node = graph2D.createNode(nodeRealizer);
-        
-        logger.fine(String.format("%d,%d %dx%d", x, y, width, height));
-        
-        handleHierarchy(glyph, node);
-        
-        // GraphTools helper
-        graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
-        graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
-        
-        setOfLayoutedGlyphs.add(glyph);
-        glyphNodeMap.put(glyph.getId(), node);
+      new CompartmentRealizer() : new ShapeNodeRealizer();
+      nodeRealizer.setSize(width, height);
+      nodeRealizer.setLocation(x, y);
+      Node node = graph2D.createNode(nodeRealizer);
+
+      logger.fine(String.format("%d,%d %dx%d", x, y, width, height));
+
+      handleHierarchy(glyph, node);
+
+      // GraphTools helper
+      graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
+      graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+
+      setOfLayoutedGlyphs.add(glyph);
+      glyphNodeMap.put(glyph.getId(), node);
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#addUnlayoutedGlyph(org.sbml.jsbml.ext.layout.GraphicalObject)
    */
   @Override
   public void addUnlayoutedGlyph(GraphicalObject glyph) {
     logger.fine("add unlayouted glyph id=" + glyph.getId());
-    
+
     // text glyphs (non-indepentend) without bounding box are considered
     // layouted (positioning in center of graphical object)
     if ((glyph instanceof TextGlyph) &&
@@ -256,45 +256,45 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
         ) {
       return;
     }
-    
+
     NodeRealizer nodeRealizer;
     Node node;
     if (!(glyph instanceof ReactionGlyph)) {
       nodeRealizer = (glyph instanceof CompartmentGlyph) ?
-          new CompartmentRealizer() : new ShapeNodeRealizer();
-          node = graph2D.createNode(nodeRealizer);
-          
-          // partially layouted: position only
-          if (LayoutDirector.glyphHasPosition(glyph)) {
-            BoundingBox boundingBox = glyph.getBoundingBox();
-            Point position = boundingBox.getPosition();
-            int x, y;
-            x = (int) position.getX();
-            y = (int) position.getY();
-            nodeRealizer.setLocation(x, y);
-            graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
-          }
-          // partially layouted: dimensions only
-          if (LayoutDirector.glyphHasDimensions(glyph)) {
-            BoundingBox boundingBox = glyph.getBoundingBox();
-            Dimensions dimensions = boundingBox.getDimensions();
-            int width, height;
-            width = (int) dimensions.getWidth();
-            height = (int) dimensions.getHeight();
-            nodeRealizer.setSize(width, height);
-            graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
-          }
-          
-          
-          setOfUnlayoutedGlyphs.add(glyph);
-          nodeIncompleteGlyphMap.put(node, glyph);
+        new CompartmentRealizer() : new ShapeNodeRealizer();
+        node = graph2D.createNode(nodeRealizer);
+
+        // partially layouted: position only
+        if (LayoutDirector.glyphHasPosition(glyph)) {
+          BoundingBox boundingBox = glyph.getBoundingBox();
+          Point position = boundingBox.getPosition();
+          int x, y;
+          x = (int) position.getX();
+          y = (int) position.getY();
+          nodeRealizer.setLocation(x, y);
+          graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
+        }
+        // partially layouted: dimensions only
+        if (LayoutDirector.glyphHasDimensions(glyph)) {
+          BoundingBox boundingBox = glyph.getBoundingBox();
+          Dimensions dimensions = boundingBox.getDimensions();
+          int width, height;
+          width = (int) dimensions.getWidth();
+          height = (int) dimensions.getHeight();
+          nodeRealizer.setSize(width, height);
+          graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+        }
+
+
+        setOfUnlayoutedGlyphs.add(glyph);
+        nodeIncompleteGlyphMap.put(node, glyph);
     }
-    
+
     else {
       // glyph is ReactionGlyph
       nodeRealizer = new ReactionNodeRealizer();
       node = graph2D.createNode(nodeRealizer);
-      
+
       if (!LayoutDirector.glyphHasDimensions(glyph)) {
         Dimensions dimensions = createReactionGlyphDimension((ReactionGlyph) glyph);
         int width, height;
@@ -311,12 +311,12 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
       }
       reactionNodes.add((ReactionGlyph) glyph);
     }
-    
+
     glyphNodeMap.put(glyph.getId(), node);
-    
+
     handleHierarchy(glyph, node);
   }
-  
+
   /**
    * @param glyph
    * @param node
@@ -368,7 +368,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
       }
     }
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#getAutolayoutedGlyphs()
    */
@@ -379,7 +379,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     for (Entry<Node,GraphicalObject> entry : nodeIncompleteGlyphMap.entrySet()) {
       setOfUnlayoutedNodes.add(entry.getKey());
     }
-    
+
     // (1) create all edges
     for (ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph> pair : setOfLayoutedEdges) {
       SpeciesReferenceGlyph speciesReferenceGlyph = pair.getA();
@@ -391,45 +391,45 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
       ReactionGlyph reactionGlyph = pair.getB();
       handleEdge(speciesReferenceGlyph, reactionGlyph);
     }
-    
+
     // (2) autolayout of node subset using GraphTools
     graphTools.layoutNodeSubset(setOfUnlayoutedNodes);
-    
+
     // (3) copy realizer information to glyph bounding box
     for (Entry<Node,GraphicalObject> entry : nodeIncompleteGlyphMap.entrySet()) {
       Node node = entry.getKey();
       NodeRealizer nodeRealizer = graph2D.getRealizer(node);
       GraphicalObject glyph = entry.getValue();
-      
+
       // get or create bounding box for glyphs
       BoundingBox boundingBox = glyph.isSetBoundingBox() ?
-          glyph.getBoundingBox() : glyph.createBoundingBox();
-          
-          // copy position
-          if (!LayoutDirector.glyphHasPosition(glyph)) {
-            logger.info("completing glyph position id=" + glyph.getId());
-            boundingBox.createPosition(nodeRealizer.getX(),
-              nodeRealizer.getY(),
-              DEFAULT_Z_COORD);
-          }
-          
-          // copy dimensions
-          if (!LayoutDirector.glyphHasDimensions(glyph)) {
-            logger.info("completing glyph dimensions id=" + glyph.getId());
-            boundingBox.createDimensions(nodeRealizer.getWidth(),
-              nodeRealizer.getHeight(),
-              DEFAULT_DEPTH);
-          }
-          
-          output.add(glyph);
+        glyph.getBoundingBox() : glyph.createBoundingBox();
+
+        // copy position
+        if (!LayoutDirector.glyphHasPosition(glyph)) {
+          logger.info("completing glyph position id=" + glyph.getId());
+          boundingBox.createPosition(nodeRealizer.getX(),
+            nodeRealizer.getY(),
+            DEFAULT_Z_COORD);
+        }
+
+        // copy dimensions
+        if (!LayoutDirector.glyphHasDimensions(glyph)) {
+          logger.info("completing glyph dimensions id=" + glyph.getId());
+          boundingBox.createDimensions(nodeRealizer.getWidth(),
+            nodeRealizer.getHeight(),
+            DEFAULT_DEPTH);
+        }
+
+        output.add(glyph);
     }
-    
+
     // position process nodes
     for (ReactionGlyph reactionGlyph : reactionNodes) {
       assert glyphNodeMap.get(reactionGlyph.getId()) != null;
       NodeRealizer realizer = graph2D.getRealizer(glyphNodeMap.get(reactionGlyph.getId()));
       //ReactionNodeRealizer reactionNodeRealizer = (ReactionNodeRealizer) realizer;
-      
+
       double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);
       reactionGlyph.putUserObject("ROTATION", rotationAngle);
       Point position;
@@ -439,7 +439,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
       else {
         position = createReactionGlyphPositionNew(reactionGlyph);
       }
-      
+
       double x = 0d, y = 0d;
       if (position != null) {
         x = position.getX();
@@ -450,22 +450,22 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
           reactionGlyph));
       }
       realizer.setLocation(x, y);
-      
+
       BoundingBox rgBoundingBox = reactionGlyph.isSetBoundingBox() ?
-          reactionGlyph.getBoundingBox() : reactionGlyph.createBoundingBox();
-          rgBoundingBox.setPosition(position);
-          Point centerPosition = calculateCenter(reactionGlyph);
-          
-          logger.fine("PN position: " + position);
-          logger.fine("PN center: " + centerPosition);
-          if (reactionGlyph.isSetListOfSpeciesReferencesGlyphs()) {
-            for (SpeciesReferenceGlyph sRG : reactionGlyph.getListOfSpeciesReferenceGlyphs()) {
-              Point speciesDockingAtPN = calculateReactionGlyphDockingPoint(reactionGlyph, rotationAngle, sRG);
-              // make point relative to center of PN
-              Point relativeDockingAtPN = new Point(speciesDockingAtPN.getX() - centerPosition.getX(),
-                speciesDockingAtPN.getY() - centerPosition.getY(), DEFAULT_Z_COORD);
-              sRG.putUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT, relativeDockingAtPN);
-              /*
+        reactionGlyph.getBoundingBox() : reactionGlyph.createBoundingBox();
+        rgBoundingBox.setPosition(position);
+        Point centerPosition = calculateCenter(reactionGlyph);
+
+        logger.fine("PN position: " + position);
+        logger.fine("PN center: " + centerPosition);
+        if (reactionGlyph.isSetListOfSpeciesReferencesGlyphs()) {
+          for (SpeciesReferenceGlyph sRG : reactionGlyph.getListOfSpeciesReferenceGlyphs()) {
+            Point speciesDockingAtPN = calculateReactionGlyphDockingPoint(reactionGlyph, rotationAngle, sRG);
+            // make point relative to center of PN
+            Point relativeDockingAtPN = new Point(speciesDockingAtPN.getX() - centerPosition.getX(),
+              speciesDockingAtPN.getY() - centerPosition.getY(), DEFAULT_Z_COORD);
+            sRG.putUserObject(LayoutDirector.PN_RELATIVE_DOCKING_POINT, relativeDockingAtPN);
+            /*
 				SpeciesGlyph speciesGlyph = sRG.getSpeciesGlyphInstance();
 				Point middleOfSpecies = calculateCenter(speciesGlyph);
 				BoundingBox sgBoundingBox = speciesGlyph.getBoundingBox();
@@ -497,15 +497,15 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
 				sRG.putUserObject(LayoutDirector.SPECIES_RELATIVE_DOCKING_POINT, relativeDockingAtSelf);
 
 				logger.fine(sRG.getId() + " docks relative at species " + relativeDockingAtSelf.toString());
-               */
-              logger.fine(sRG.getId() + " docks relative at PN " + relativeDockingAtPN.toString());
-            }
+             */
+            logger.fine(sRG.getId() + " docks relative at PN " + relativeDockingAtPN.toString());
           }
+        }
     }
-    
+
     return output;
   }
-  
+
   /**
    * 
    * @param srg
@@ -518,13 +518,13 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     assert processNode != null;
     assert speciesGlyphNode != null;
     assert graph2D != null;
-    
+
     // create edge
     Edge edge = graph2D.createEdge(processNode, speciesGlyphNode);
-    
+
     output.add(rg);
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#createGlyphBoundingBox(org.sbml.jsbml.ext.layout.NamedSBaseGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
    */
@@ -545,9 +545,9 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     }
     return null;
   }
-  
+
   // -------------------------------------------------------------------------
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#createLayoutDimension()
    */
@@ -561,7 +561,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     logger.fine(dimensions.toString());
     return dimensions;
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#createCurve(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
    */
@@ -570,20 +570,20 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     Curve curve = new Curve();
     int layoutLevel = layout.getLevel();
     int layoutVersion = layout.getVersion();
-    
+
     curve.setLevel(layoutLevel);
     curve.setVersion(layoutVersion);
-    
+
     ListOf<CurveSegment> curveSegmentsList = new ListOf<CurveSegment>(layoutLevel, layoutVersion);
-    
+
     LineSegment curveSegment = new LineSegment();
     curveSegment.setLevel(layoutLevel);
     curveSegment.setVersion(layoutVersion);
-    
+
     if (specRefGlyph.isSetSpeciesGlyph()) {
-      
+
       SpeciesGlyph speciesGlyph = specRefGlyph.getSpeciesGlyphInstance();
-      
+
       BoundingBox sgBoundingBox = speciesGlyph.getBoundingBox();
       //			Point sgPosition = sgBoundingBox.getPosition();
       //			double sgX = sgPosition.getX();
@@ -598,15 +598,15 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
       //			double rgY = rgPosition.getY();
       //			Dimensions rgDimension = rgBoundingBox.getDimensions();
       //			double rgWidth = rgDimension.getWidth();
-      
+
       // curve point at reaction glyph
       Point rgCurvePoint = new Point(layoutLevel, layoutVersion);
-      
+
       // curve point at species glyph
       Point sgCurvePoint = new Point(layoutLevel, layoutVersion);
-      
+
       //			Point basePoint = null;
-      
+
       /*
        *  compute the average and the relative substrate position
        */
@@ -614,16 +614,16 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
       List<SpeciesReferenceGlyph> speciesReferenceGlyphs = reactionGlyph.isSetListOfSpeciesReferencesGlyphs() ? reactionGlyph.getListOfSpeciesReferenceGlyphs() : new ArrayList<SpeciesReferenceGlyph>(0);
       Point averageSubstratePosition = calculateAverageSpeciesPosition(SpeciesReferenceRole.SUBSTRATE, speciesReferenceGlyphs);
       Point averageProductPosition = calculateAverageSpeciesPosition(SpeciesReferenceRole.PRODUCT, speciesReferenceGlyphs);
-      
+
       BoundingBox helpingBB1 = createBoundingBoxWithLevelAndVersion();
       helpingBB1.setPosition(averageSubstratePosition);
       helpingBB1.createDimensions(0, 0, 0);
       BoundingBox helpingBB2 = createBoundingBoxWithLevelAndVersion();
       helpingBB2.setPosition(averageProductPosition);
       helpingBB2.createDimensions(0, 0, 0);
-      
+
       //			RelativePosition relativeSubstratePosition = getRelativePosition(helpingBB2, helpingBB1);
-      
+
       RelativePosition relativeSpeciesGlyphPosition = null;
       if (specRefRole.equals(SpeciesReferenceRole.PRODUCT)) {
         relativeSpeciesGlyphPosition = getRelativePosition(averageSubstratePosition, averageProductPosition);
@@ -632,17 +632,17 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
       } else {
         relativeSpeciesGlyphPosition = getRelativePosition(rgBoundingBox.getPosition(), sgBoundingBox.getPosition());
       }
-      
+
       // Set the SpeciesGlyph
       Point middleOfSpecies = calculateCenter(speciesGlyph);
       // TODO replace call of deprecated method
       //			sgCurvePoint = calculateOldSpeciesGlyphDockingPosition(middleOfSpecies , relativeSpeciesGlyphPosition, speciesGlyph);
       sgCurvePoint = calculateSpeciesGlyphDockingPosition(middleOfSpecies, reactionGlyph, specRefRole, speciesGlyph);
-      
+
       double rotationAngle = calculateReactionGlyphRotationAngle(reactionGlyph);
-      
+
       rgCurvePoint = calculateReactionGlyphDockingPoint(reactionGlyph, rotationAngle, specRefGlyph);
-      
+
       if (specRefRole.equals(SpeciesReferenceRole.PRODUCT) ||
           specRefRole.equals(SpeciesReferenceRole.SIDEPRODUCT)) {
         // For products, the curve goes from the reaction glyph to the
@@ -658,10 +658,10 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     }
     curveSegmentsList.add(curveSegment);
     curve.setListOfCurveSegments(curveSegmentsList);
-    
+
     return curve;
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#createCompartmentGlyphDimension(org.sbml.jsbml.ext.layout.CompartmentGlyph)
    */
@@ -671,7 +671,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     // TODO Auto-generated method stub
     return null;
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#createReactionGlyphDimension(org.sbml.jsbml.ext.layout.ReactionGlyph)
    */
@@ -679,7 +679,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
   public Dimensions createReactionGlyphDimension(ReactionGlyph reactionGlyph) {
     return new Dimensions(20, 10, 0, level, version);
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesReferenceGlyphDimension(org.sbml.jsbml.ext.layout.ReactionGlyph, org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph)
    */
@@ -690,7 +690,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     // TODO Auto-generated method stub
     return null;
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#createTextGlyphDimension(org.sbml.jsbml.ext.layout.TextGlyph)
    */
@@ -699,7 +699,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     // TODO Auto-generated method stub
     return null;
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#createCompartmentGlyphPosition(org.sbml.jsbml.ext.layout.CompartmentGlyph)
    */
@@ -709,7 +709,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
     // TODO Auto-generated method stub
     return null;
   }
-  
+
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.LayoutAlgorithm#createSpeciesGlyphDimension()
    */
@@ -717,5 +717,5 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
   public Dimensions createSpeciesGlyphDimension() {
     return new Dimensions(100d, 100d, 0d, level, version);
   }
-  
+
 }
