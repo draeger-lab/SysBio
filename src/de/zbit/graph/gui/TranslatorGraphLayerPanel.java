@@ -68,8 +68,9 @@ import de.zbit.util.prefs.SBPreferences;
  * 
  * @author Clemens Wrzodek
  * @version $Rev$
+ * @param <DocumentType>
  */
-public abstract class TranslatorGraphLayerPanel <DocumentType> extends TranslatorPanel<DocumentType> {
+public abstract class TranslatorGraphLayerPanel<DocumentType> extends TranslatorPanel<DocumentType> {
   
   /**
    * Generated serial version identifier.
@@ -651,7 +652,5 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @throws Exception
    */
   protected abstract boolean writeRealDocumentToFileUnchecked(File file, String format) throws Exception;
-  
-  
   
 }

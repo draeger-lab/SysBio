@@ -190,7 +190,7 @@
               	<exclude name="de.zbit.graph.gui.**.*"/>
                 <exclude name="de.zbit.graph.io.**.*"/>
               	<exclude name="de.zbit.graph.sbgn.**.*"/>
-              	
+              	<exclude name="de.zbit.sbml.layout.y.*"/>
 
                <!-- Obfuscate the included y.jar -->
                <exclude name="y.**.*"/>
