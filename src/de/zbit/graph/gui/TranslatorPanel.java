@@ -80,8 +80,9 @@ import de.zbit.util.progressbar.gui.ProgressBarSwing;
  * @author Clemens Wrzodek
  * @since 1.0
  * @version $Rev$
+ * @param <DocumentType>
  */
-public abstract class TranslatorPanel <DocumentType> extends JPanel implements BaseFrameTab, ActionListener {
+public abstract class TranslatorPanel<DocumentType> extends JPanel implements BaseFrameTab, ActionListener {
   
   /**
    * Generated serial version identifier.

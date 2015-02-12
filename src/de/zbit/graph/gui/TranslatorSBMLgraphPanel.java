@@ -61,6 +61,10 @@ import de.zbit.util.NotifyingWorker;
  * @version $Rev$
  */
 public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocument> {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = 2361032893527709646L;
   
   /**
