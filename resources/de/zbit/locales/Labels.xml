@@ -193,6 +193,7 @@
   <entry key="BED_FILES">Binary PLINK genotype files</entry>
   <entry key="BIM_FILES">BIM files</entry>
   <entry key="CSV_FILES">Comma separated files</entry>
+  <entry key="CDT_FILES">Clustered Data Table</entry>
   <entry key="DIRECTORIES_ONLY">Directories only</entry>
   <entry key="FAM_FILES">FAM files</entry>
   <entry key="GIF_FILES">Graphics Interchange Format files</entry>
