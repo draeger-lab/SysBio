@@ -57,13 +57,14 @@ import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
+import de.zbit.sbml.layout.LayoutAlgorithm;
 import de.zbit.sbml.layout.LayoutDirector;
 import de.zbit.sbml.layout.SimpleLayoutAlgorithm;
 import de.zbit.util.objectwrapper.ValuePairUncomparable;
 
 /**
  * {@link LayoutAlgorithm} for use with the yFiles implementation.
- * 
+ *
  * @author Jakob Matthes
  * @version $Rev$
  */
@@ -82,17 +83,17 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
   private static Logger logger = Logger.getLogger(YLayoutAlgorithm.class.toString());
 
   /**
-   * 
+   *
    */
   private Set<ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>> setOfUnlayoutedEdges;
 
   /**
-   * 
+   *
    */
   private Set<ValuePairUncomparable<SpeciesReferenceGlyph, ReactionGlyph>> setOfLayoutedEdges;
 
   /**
-   * 
+   *
    */
   private Map<String, Node> compartmentGlyphMap;
 
@@ -507,7 +508,7 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
   }
 
   /**
-   * 
+   *
    * @param srg
    * @param rg
    */
@@ -677,7 +678,11 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
    */
   @Override
   public Dimensions createReactionGlyphDimension(ReactionGlyph reactionGlyph) {
-    return new Dimensions(20, 10, 0, level, version);
+    if ((reactionGlyph.isSetUserObjects()) && (reactionGlyph.getUserObject(LayoutDirector.NO_WHISKERS)!=null)) {
+      return new Dimensions(10, 10, 0, level, version);
+    } else {
+      return new Dimensions(20, 10, 0, level, version);
+    }
   }
 
   /* (non-Javadoc)
