@@ -97,8 +97,8 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     // Draw the small reaction lines on both sides, where substrates
     // and products should dock.
     // TODO: Deal with Whiskers!!!
-    gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
-    gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
+    //        gfx.drawLine((0 + x) - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
+    //        gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
 
     //    rotate(gfx, -rotationAngle, rotationCenter);
   }
@@ -142,10 +142,10 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
         meanDiff[1]+= distanceY;
 
         // Count cases, but require at least 5 pixels difference
-        if (distanceX>5 && nr.getCenterX()<getCenterX()) {
+        if ((distanceX>5) && (nr.getCenterX()<getCenterX())) {
           cases[0]++;
         }
-        if (distanceY>5 && nr.getCenterY()<getCenterY()) {
+        if ((distanceY>5) && (nr.getCenterY()<getCenterY())) {
           cases[1]++;
         }
       } else if (products.contains(other)) {
@@ -153,10 +153,10 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
         meanDiff[1]+= distanceY;
 
         // Count cases, but require at least 5 pixels difference
-        if (distanceX>5 && nr.getCenterX()<getCenterX()) {
+        if ((distanceX>5) && (nr.getCenterX()<getCenterX())) {
           cases[2]++;
         }
-        if (distanceY>5 && nr.getCenterY()<getCenterY()) {
+        if ((distanceY>5) && (nr.getCenterY()<getCenterY())) {
           cases[3]++;
         }
       }
@@ -165,8 +165,8 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     // Determine orientation of this node
     double max = MathUtils.max(Arrays.asList(cases));
     boolean horizontal = isHorizontal();
-    if (cases[0] == max && cases[1] == max ||
-        cases[2] == max && cases[3] == max) {
+    if (((cases[0] == max) && (cases[1] == max)) ||
+        ((cases[2] == max) && (cases[3] == max))) {
       // If same number is above and left, let the distance decide the orientation.
       if (meanDiff[0]>meanDiff[1]) { // X-Distance larger
         if (!horizontal) {
@@ -178,13 +178,13 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
         }
       }
     }
-    else if (cases[0] == max && !horizontal) {
+    else if ((cases[0] == max) && !horizontal) {
       rotateNode();
-    } else if (cases[1] == max && horizontal) {
+    } else if ((cases[1] == max) && horizontal) {
       rotateNode();
-    } else if (cases[2] == max && !horizontal) {
+    } else if ((cases[2] == max) && !horizontal) {
       rotateNode();
-    } else if (cases[3] == max && horizontal) {
+    } else if ((cases[3] == max) && horizontal) {
       rotateNode();
     }
 
@@ -279,7 +279,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
    * @param rotationCenter
    */
   protected void rotate(Graphics2D gfx, double rotationAngle, java.awt.geom.Point2D.Double rotationCenter) {
-    if (rotationAngle % 180 != 0) {
+    if ((rotationAngle % 180) != 0) {
       if (rotationCenter != null) {
         gfx.rotate(Math.toRadians(rotationAngle), rotationCenter.getX(), rotationCenter.getY());
       } else {
@@ -301,7 +301,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
    * @param adjacentNodes
    */
   private void setEdgesToDockOnLeftSideOfNode(Set<Node> adjacentNodes) {
-    YPoint dockToPoint = new YPoint(getWidth()/2*-1,0);
+    YPoint dockToPoint = new YPoint((getWidth()/2)*-1,0);
     letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
   }
 
@@ -325,7 +325,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
    * @param adjacentNodes
    */
   private void setEdgesToDockOnUpperSideOfNode(Set<Node> adjacentNodes) {
-    YPoint dockToPoint = new YPoint(0,getHeight()/2*-1);
+    YPoint dockToPoint = new YPoint(0,(getHeight()/2)*-1);
     letAllEdgesDockToThisPointOnThisNode(adjacentNodes, dockToPoint);
   }
 

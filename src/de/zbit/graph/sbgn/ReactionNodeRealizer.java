@@ -18,7 +18,6 @@ package de.zbit.graph.sbgn;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 
@@ -28,21 +27,30 @@ import y.view.NodeRealizer;
 /**
  * Realizer for process nodes of type "reaction". Draws the SBGN specified shape
  * (unfilled rectangle).
- * 
+ *
  * @author Jakob Matthes
  * @version $Rev$
  */
 public class ReactionNodeRealizer extends ProcessNodeRealizer {
 
+  private Boolean whiskers = true;
   /**
-   * 
+   *
    */
   public ReactionNodeRealizer() {
     super();
   }
 
   /**
-   * 
+   *
+   */
+  public ReactionNodeRealizer(boolean whiskers) {
+    super();
+    this.whiskers = whiskers;
+  }
+
+  /**
+   *
    * @param nr
    */
   public ReactionNodeRealizer(NodeRealizer nr) {
@@ -75,19 +83,26 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
 
     int halfHeight = (int) (height/2d);
 
+
     Rectangle2D.Double rect2d = new Rectangle2D.Double((offsetX + x), (offsetY + y), min, min);
-    //    Rectangle2D.Double l1 = new Rectangle2D.Double(0 + x - extendBesidesBorder, halfHeight + y, offsetX, lineWidth > 0 ? lineWidth : 1);
-    //    Rectangle2D.Double l2 = new Rectangle2D.Double((offsetX + min) + x, halfHeight + y, offsetX, lineWidth > 0 ? lineWidth : 1);
+
 
     Area rxnShape = new Area(rect2d);
     //    Area rxnShape = new Area(l1);
     //    rxnShape.add(new Area(rect2d));
     //    rxnShape.add(new Area(l2));
 
-    AffineTransform affineTransform = new AffineTransform();
-    //    affineTransform.rotate(Math.toRadians(rotationAngle), rect2d.getCenterX(), rect2d.getCenterY());
+    //    AffineTransform affineTransform = new AffineTransform();
+    //    //    affineTransform.rotate(Math.toRadians(rotationAngle), rect2d.getCenterX(), rect2d.getCenterY());
+    //
+    //    rxnShape.transform(affineTransform);
 
-    rxnShape.transform(affineTransform);
+    if (whiskers) {
+      gfx.drawLine((0 + x) - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
+      gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
+    }
+
+
     gfx.draw(rxnShape);
 
 
@@ -110,5 +125,54 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
 
 
   }
+
+
+
+  /**
+   * Returns the value of whiskers
+   *
+   * @return the value of whiskers
+   */
+  public Boolean getWhiskers() {
+    if (isSetWhiskers()) {
+      return whiskers;
+    }
+    // This is necessary if we cannot return null here.
+    return null;
+  }
+
+
+  /**
+   * Returns whether whiskers is set
+   *
+   * @return whether whiskers is set
+   */
+  public boolean isSetWhiskers() {
+    return this.whiskers != null;
+  }
+
+
+  /**
+   * Sets the value of whiskers
+   */
+  public void setWhiskers(Boolean whiskers) {
+    this.whiskers = whiskers;
+  }
+
+
+  /**
+   * Unsets the variable whiskers
+   *
+   * @return {@code true}, if whiskers was set before,
+   *         otherwise {@code false}
+   */
+  public boolean unsetWhiskers() {
+    if (isSetWhiskers()) {
+      this.whiskers = null;
+      return true;
+    }
+    return false;
+  }
+
 
 }
