@@ -47,6 +47,7 @@
   <entry key="initialConcentration">Anfangskonzentration</entry>
   <entry key="kind">Art</entry>
   <entry key="lengthUnits">Längeneinheit</entry>
+  <entry key="level">Level</entry>
   <entry key="listOfCreators">Modellersteller</entry>
   <entry key="message">Meldung</entry>
   <entry key="multiplier">Multiplikator</entry>
@@ -70,6 +71,7 @@
   <entry key="timeUnits">Zeiteinheit</entry>
   <entry key="usesValuesFromTriggerTime">Benutzt Werte von der Auslöserzeit</entry>
   <entry key="value">Wert</entry>
+  <entry key="version">Version</entry>
   <entry key="volumeUnits">Volumeneinheit</entry>
  
   <!-- Core SBML -->
@@ -114,6 +116,7 @@
   <entry key="rateRule">Ratenregel</entry>
   <entry key="reaction">Reaktion</entry>
   <entry key="rule">Regel</entry>
+  <entry key="sbml">SBML-Dokument</entry>
   <entry key="specie">Spezies</entry>
   <entry key="specieReference">Speziesverweis</entry>
   <entry key="species">Spezies</entry>
@@ -132,8 +135,10 @@
   <entry key="chemicalFormula">Chemische Formel</entry>
   <entry key="fluxBound">Flussbeschränkung</entry>
   <entry key="fluxObjective">Flussziel</entry>
+  <entry key="geneProduct">Genprodukt</entry>
   <entry key="listOfFluxBounds">Flussbeschränkungen</entry>
   <entry key="listOfFluxObjectives">Flussziele</entry>
+  <entry key="listOfGeneProducts">Genprodukte</entry>
   <entry key="listOfObjectives">Ziele</entry>
   <entry key="objective">Ziel</entry>
   

@@ -19,6 +19,7 @@ package de.zbit;
 import static de.zbit.util.Utils.getMessage;
 
 import java.beans.EventHandler;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,11 +29,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.util.ResourceManager;
 import de.zbit.util.logging.LogUtil;
+import de.zbit.util.logging.OneLineFormatter;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
@@ -808,6 +811,20 @@ public abstract class Launcher implements Runnable, Serializable {
     if (logLevel != null) {
       LogUtil.changeLogLevel(Level.parse(logLevel.toUpperCase()));
     }
+    // Optionally add a log file where information can be stored.
+    String logFile = appConf.getCmdArgs().get(de.zbit.gui.GUIOptions.LOG_FILE);
+    if (logFile != null) {
+      try {
+        FileHandler fileHandler = new FileHandler(logFile);
+        fileHandler.setFormatter(new OneLineFormatter(false, false, false));
+        LogUtil.addHandler(fileHandler, getLogPackages());
+      } catch (SecurityException exc) {
+        exc.printStackTrace();
+      } catch (IOException exc) {
+        exc.printStackTrace();
+      }
+    }
+    
     
     /*
      * Give the opportunity to load certain libraries or perform

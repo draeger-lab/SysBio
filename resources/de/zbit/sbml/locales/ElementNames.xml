@@ -49,6 +49,7 @@
   <entry key="initialConcentration">Initial concentration</entry>
   <entry key="kind">Kind</entry>
   <entry key="lengthUnits">Length units</entry>
+  <entry key="level">Level</entry>
   <entry key="listOfCreators">Creators</entry>
   <entry key="message">Message</entry>
   <entry key="multiplier">Multiplier</entry>
@@ -72,6 +73,7 @@
   <entry key="timeUnits">Time units</entry>
   <entry key="usesValuesFromTriggerTime">Uses values from trigger time</entry>
   <entry key="value">Value</entry>
+  <entry key="version">Version</entry>
   <entry key="volumeUnits">Volume units</entry>
   
   <!-- Core SBML -->
@@ -114,6 +116,7 @@
   <entry key="rateRule">Rate rule</entry>
   <entry key="reaction">Reaction</entry>
   <entry key="rule">Rule</entry>
+  <entry key="sbml">SBML document</entry>
   <entry key="specie">Species</entry>
   <entry key="specieReference">Species reference</entry>
   <entry key="species">Species</entry>
@@ -129,8 +132,10 @@
   <entry key="chemicalFormula">Chemical formula</entry>
   <entry key="fluxBound">Flux bound</entry>
   <entry key="fluxObjective">Flux objective</entry>
+  <entry key="geneProduct">Gene product</entry>
   <entry key="listOfFluxBounds">Flux bounds</entry>
   <entry key="listOfFluxObjectives">Flux objectives</entry>
+  <entry key="listOfGeneProducts">Gene products</entry>
   <entry key="listOfObjectives">Objectives</entry>
   <entry key="objective">Objective</entry>
   
