@@ -146,7 +146,7 @@ public class LogUtil {
    * Initializes logging using the Java logger and sets the given log level for
    * all classes that are in sub-packages of de.zbit.
    * 
-   * @param loglevel the desired log level
+   * @param logLevel the desired log level
    * @param packages list of packages for which the logger should be initialized
    *                 additionally
    */

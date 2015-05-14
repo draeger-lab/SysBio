@@ -59,6 +59,10 @@ public class CSVReaderDemonstration {
     
   }
   
+  /**
+   * 
+   * @param r
+   */
   public static void demoOutput(CSVReader r) {
     System.out.println("=============================\n" + r.getFilename());
     System.out.println("Headers: " + r.getContainsHeaders());
@@ -106,6 +110,10 @@ public class CSVReaderDemonstration {
     
   }
   
+  /**
+   * 
+   * @param r
+   */
   public static void showOptionsPanel(CSVReader r) {
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

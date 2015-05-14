@@ -19,12 +19,10 @@ package de.zbit.gui;
 import java.awt.Frame;
 import java.io.File;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 
 import de.zbit.io.filefilter.SBFileFilter;
-import de.zbit.util.Reflect;
 import de.zbit.util.ResourceManager;
-import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.logging.LogOptions;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.OptionGroup;
 import de.zbit.util.prefs.Range;
@@ -39,7 +37,7 @@ import de.zbit.util.prefs.Range;
  * @version $Rev$
  * @since 1.0
  */
-public interface GUIOptions extends KeyProvider {
+public interface GUIOptions extends LogOptions {
   
   /**
    * The collection of labels, i.e., descriptions for all options.
@@ -114,15 +112,5 @@ public interface GUIOptions extends KeyProvider {
    */
   public static final Option<Integer> WINDOW_STATE = new Option<Integer>("WINDOW_STATE",
       Integer.class, "State of the window (maximized, minimized, etc).",Frame.NORMAL, false);
-  
-  /**
-   * This allows to change the Log-{@link Level}. It it intended to not allow
-   * levels ALL or OFF (giving bounds of -/+ Intenger maxvalues is not
-   * reasonable for the range).
-   */
-  public static final Option<String> LOG_LEVEL = new Option<String>(
-      "LOG_LEVEL", String.class, "Change the log-level of this application. This option will influence how fine-grained error and other log messages will be that you receive while executing this program.",
-      new Range<String>(String.class, Reflect.getStaticFinalVariablesAsEnumeration(Level.class)),
-      Level.INFO.getName());
   
 }

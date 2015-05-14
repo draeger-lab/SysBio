@@ -22,7 +22,7 @@ import de.zbit.io.FileTools;
 
 /**
  * Sevaral tools, regarding the console.
- * Before using any other tool, you should check wether the output
+ * Before using any other tool, you should check whether the output
  * stream is actually a console. Please do this with {@link #isTTY()}.
  * 
  * @author Clemens Wrzodek
@@ -49,12 +49,14 @@ public class ConsoleTools {
       String v = System.getProperty("java.version");
       if (v!=null && v.length()>2) {
         /*
-         * Use simply style for java version <1.6, because it's not 
+         * Use simply style for java version <1.6, because it's not
          * possible to determine if output goes into file or not
          * (System.console not available in JDK 1.5).
          */
         double d = Double.parseDouble(v.substring(0, 3));
-        if (d<1.6) return false;
+        if (d < 1.6) {
+          return false;
+        }
       }
       
       return isTTY_Java16only.isTty();
@@ -84,15 +86,18 @@ public class ConsoleTools {
      * tput and stty gives default values, whereas the environment variable doesn't exist.
      */
     String variable = System.getenv("COLUMNS");
-    if (variable!=null && Utils.isNumber(variable, true))
+    if (variable!=null && Utils.isNumber(variable, true)) {
       return Integer.parseInt(System.getenv("COLUMNS"));
+    }
     
     File tput = FileTools.which("tput");
     if (tput!=null && tput.exists()) {
       String ret = ProcessExecutioner.executeProcess(tput.getPath(), "cols");
       if (ret!=null) {
         ret = ret.trim();
-        if (Utils.isNumber(ret, true)) cols = Integer.parseInt(ret);
+        if (Utils.isNumber(ret, true)) {
+          cols = Integer.parseInt(ret);
+        }
       }
     }
     
