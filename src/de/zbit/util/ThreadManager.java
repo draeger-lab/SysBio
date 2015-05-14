@@ -16,14 +16,16 @@
  */
 package de.zbit.util;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
- * This class is a helper for parallizing your calculations.
+ * This class is a helper for parallelizing your calculations.
  * You can simply submit all calculations to be done in parallel
  * and wait until they are ready.
  * 
@@ -35,28 +37,34 @@ import java.util.concurrent.TimeUnit;
  *    Runnable r = ... // Any runnable.
  *    m.addToPool(r);
  *  }
- *  
+ * 
  *  // Wait until all calculations finished or interrupted.
  *  m.awaitTermination();
- *  
- *  // You can work with the results here. 
+ * 
+ *  // You can work with the results here.
  * </pre></p>
  * @author Clemens Wrzodek
  * @version $Rev$
  * @since 1.0
  */
 public class ThreadManager {
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(ThreadManager.class.getName());
+  
   /**
    * The actual ThreadPoolExecutor that is used for
    * queue management and executing the runnables.
    */
   private ThreadPoolExecutor pool;
-
+  
   /**
    * Total number of queued threads. This is crucial to get
    * {@link #awaitTermination()} to work!
    */
-  private int queuedThreads=0;
+  private int queuedThreads = 0;
   
   /**
    * This is the queue, used by {@link #pool}. Do never manually
@@ -69,9 +77,7 @@ public class ThreadManager {
    * Number of actual or / and virtual processors in the current machine.
    * ( = Runtime.getRuntime().availableProcessors() ).
    */
-  public final static int NUMBER_OF_PROCESSORS=Runtime.getRuntime().availableProcessors();
-  
-  
+  public final static int NUMBER_OF_PROCESSORS = Runtime.getRuntime().availableProcessors();
   
   /**
    * Initializes a new ThreadManager with ideal settings(
@@ -79,7 +85,7 @@ public class ThreadManager {
    * is left for GUI operations and other stuff.
    */
   public ThreadManager() {
-    this(Math.max(NUMBER_OF_PROCESSORS-1, 1));
+    this(Math.max(NUMBER_OF_PROCESSORS - 1, 1));
   }
   
   /**
@@ -88,9 +94,9 @@ public class ThreadManager {
    */
   public ThreadManager(int numberOfSlots) {
     super();
-    queue = new LinkedBlockingQueue <Runnable>();
+    queue = new LinkedBlockingQueue<Runnable>();
     pool = new ThreadPoolExecutor(numberOfSlots, numberOfSlots, 0L,
-        TimeUnit.MILLISECONDS, queue);
+      TimeUnit.MILLISECONDS, queue);
   }
   
   /**
@@ -121,14 +127,14 @@ public class ThreadManager {
     pool.setCorePoolSize(slots);
     pool.setMaximumPoolSize(slots);
   }
-
+  
   /**
    * Returns the approximate total number of tasks that
    * have been scheduled for execution. Because the states
    * of tasks and threads may change dynamically during computation,
    * the returned value is only an approximation, but one that does
    * not ever decrease across successive calls.
-   *  
+   * 
    * @return the number of tasks currently queued. This includes
    * also all terminated tasks!
    */
@@ -145,7 +151,7 @@ public class ThreadManager {
   public int getNumberOfActiveTasks() {
     return pool.getActiveCount();
   }
-
+  
   /**
    * Returns the approximate number of threads that are waiting in the queue for
    * execution.
@@ -155,29 +161,29 @@ public class ThreadManager {
   public int getNumberOfWaitingTasks() {
     return pool.getQueue().size();
   }
-
-//  /**
-//   * WARNING: this object is the core of this class.
-//   * Modifications might have a huge impact or even
-//   * break this class!
-//   * <p>Especially the local variable {@link #queuedThreads}
-//   * might not change if you use the {@link ThreadPoolExecutor}
-//   * directly!
-//   * @return the ThreadPoolExecutor that is used for the
-//   * internal queue management and execution of runnables.
-//   */
-//  public ThreadPoolExecutor getThreadPoolExecutor() {
-//    return pool;
-//  }
+  
+  //  /**
+  //   * WARNING: this object is the core of this class.
+  //   * Modifications might have a huge impact or even
+  //   * break this class!
+  //   * <p>Especially the local variable {@link #queuedThreads}
+  //   * might not change if you use the {@link ThreadPoolExecutor}
+  //   * directly!
+  //   * @return the ThreadPoolExecutor that is used for the
+  //   * internal queue management and execution of runnables.
+  //   */
+  //  public ThreadPoolExecutor getThreadPoolExecutor() {
+  //    return pool;
+  //  }
   
   /**
    * Blocks until all tasks have completed execution, or
    * completed execution after a shutdown request, or
    * the timeout occurs, or the current thread is
-   * interrupted, whichever happens first. 
+   * interrupted, whichever happens first.
    * 
    * This will also terminate all idle threads as soon
-   * as all runnables are ready.
+   * as all {@link Runnable}s are ready.
    */
   public void awaitTermination() {
     long sleepTime = 0;
@@ -196,11 +202,12 @@ public class ThreadManager {
       
       if (Thread.currentThread().isInterrupted()) {
         pool.shutdownNow();
-        break;        
+        break;
       }
       
-      if (sleepTime<1000) sleepTime += 10; // Sleep a second at max.
-      //else System.out.println(pool.getTaskCount());
+      if (sleepTime < 1000) {
+        sleepTime += 10; // Sleep a second at max.
+      }//else logger.fine(pool.getTaskCount());
     }
     
     
@@ -242,7 +249,10 @@ public class ThreadManager {
         break;
       }
       
-      if (sleepTime<1000) sleepTime += 10; // Sleep a second at max.
+      if (sleepTime<1000)
+      {
+        sleepTime += 10; // Sleep a second at max.
+      }
     }
   }
   
@@ -261,7 +271,7 @@ public class ThreadManager {
    * processing of waiting tasks, and returns a list of the
    * tasks that were awaiting execution.
    * This is the same as shutdownNow().
-   * @return list of tasks that never commenced execution 
+   * @return list of tasks that never commenced execution
    */
   public List<Runnable> interrupt() {
     return pool.shutdownNow();
@@ -287,8 +297,8 @@ public class ThreadManager {
      */
     return queuedThreads==pool.getCompletedTaskCount() && queue.size()<1 && pool.getActiveCount()<1;
     
-//    return !((queuedThreads != pool.getCompletedTaskCount()) &&
-//    (pool.getActiveCount()>0) && !pool.isTerminated());
+    //    return !((queuedThreads != pool.getCompletedTaskCount()) &&
+    //    (pool.getActiveCount()>0) && !pool.isTerminated());
   }
   
   /**
@@ -305,7 +315,7 @@ public class ThreadManager {
   
   /**
    * Just for samples and demos.
-   * @throws InterruptedException 
+   * @throws InterruptedException
    */
   public static void main(String[] args) throws InterruptedException {
     // The lock object is used for synchronizing the different tasks.
@@ -316,77 +326,93 @@ public class ThreadManager {
     // slots that are used for parallel execution.
     int numberOfSlots = Math.max((ThreadManager.NUMBER_OF_PROCESSORS-1),2);
     ThreadManager m = new ThreadManager(numberOfSlots);
-    System.out.println("Initialized a new thread manager with " + 
-        m.getNumberOfSlots() + " slots to execute in parallel.");
+    logger.info(MessageFormat.format(
+      "Initialized a new thread manager with {0,number,integer} slots to execute in parallel.",
+      m.getNumberOfSlots()));
     
     // Add a few jobs to execute
     for (int i=0; i<(numberOfSlots*5); i++) {
       Runnable r = getNextDemoJob(i, lock);
       m.addToPool(r);
     }
-
+    
     synchronized (lock) {
-      System.out.println("Currently " + m.getPoolSize() + 
-      " jobs in ThreadManager. Now awaiting termination.");
+      logger.info(MessageFormat.format(
+        "Currently {0,number,integer} jobs in ThreadManager. Now awaiting termination.",
+        m.getPoolSize()));
     }
-
-    while( !m.isAllDone() ) {
+    
+    while(!m.isAllDone()) {
       Thread.sleep(1000);
       synchronized (lock) {
-        System.out.println("Poolsize=" + m.getPoolSize() + " - active=" + m.getNumberOfActiveTasks() + " - waiting=" + m.getNumberOfWaitingTasks() + " - free slots? = " + m.isFreeSlot());
-        if( m.getNumberOfWaitingTasks() <= 5 ) {
+        logger.info(MessageFormat.format(
+          "Poolsize={0,number,integer} - active={1,number,integer} - waiting={2,number,integer} - free slots? = {3,number,integer}",
+          m.getPoolSize(), m.getNumberOfActiveTasks(), m.getNumberOfWaitingTasks(), m.isFreeSlot()));
+        if (m.getNumberOfWaitingTasks() <= 5) {
           m.setNumberOfSlots(1);
         }
       }
     }
-
+    
     synchronized (lock) {
-      System.out.println("Poolsize=" + m.getPoolSize() + " - active=" + m.getNumberOfActiveTasks() + " - waiting=" + m.getNumberOfWaitingTasks() + " - free slots? = " + m.isFreeSlot());
+      logger.info(MessageFormat.format(
+        "Poolsize={0,number,integer} - active={1,number,integer} - waiting={2,number,integer} - free slots? = {3,number,integer}",
+        m.getPoolSize(), m.getNumberOfActiveTasks(), m.getNumberOfWaitingTasks(), m.isFreeSlot()));
       if( m.getNumberOfWaitingTasks() <= 5 ) {
         m.setNumberOfSlots(2);
       }
     }
-
+    
     for (int i=0; i<(numberOfSlots*5); i++) {
       Runnable r = getNextDemoJob(i, lock);
       m.addToPool(r);
     }
-
-    while( !m.isAllDone() ) {
+    
+    while(!m.isAllDone()) {
       Thread.sleep(1000);
       synchronized (lock) {
-        System.out.println("Poolsize=" + m.getPoolSize() + " - active=" + m.getNumberOfActiveTasks() + " - waiting=" + m.getNumberOfWaitingTasks() + " - free slots? = " + m.isFreeSlot());
-        if( m.getNumberOfWaitingTasks() <= 5 ) {
+        logger.info(MessageFormat.format(
+          "Poolsize={0,number,integer} - active={1,number,integer} - waiting={2,number,integer} - free slots? = {3,number,integer}",
+          m.getPoolSize(), m.getNumberOfActiveTasks(), m.getNumberOfWaitingTasks(), m.isFreeSlot()));
+        if (m.getNumberOfWaitingTasks() <= 5) {
           m.setNumberOfSlots(2);
         }
       }
     }
-
+    
     // Wait until all calculations finished or interrupted.
     m.awaitTermination();
     
     // No need for synchronization here.
-    System.out.println("All done.");
+    logger.info("All done.");
   }
   
+  /**
+   * 
+   * @param x
+   * @param lock
+   * @return
+   */
   private static Runnable getNextDemoJob(final int x, final Object lock) {
     return new Runnable() {
+      /* (non-Javadoc)
+       * @see java.lang.Runnable#run()
+       */
+      @Override
       public void run() {
         try {
           Thread.sleep(3000);
         } catch (InterruptedException e) {
-          System.out.println(x + " has been interupted.");
+          logger.warning(MessageFormat.format("{0,number,integer} has been interupted.", x));
         }
         synchronized(lock) {
           // Using the same lock object for all threads will
           // block threads from accessing this part of the
           // core asynchronously.
-          System.out.println("Number " + x + " slept long enough.");
+          logger.info(MessageFormat.format("Number {0,number,integer} slept long enough.", x));
         }
-      }      
+      }
     };
   }
-  
-  
   
 }

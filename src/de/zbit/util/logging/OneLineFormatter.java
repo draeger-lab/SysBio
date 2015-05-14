@@ -22,6 +22,7 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 
 /**
@@ -33,54 +34,159 @@ import java.util.logging.LogRecord;
  * @since 1.0
  */
 public class OneLineFormatter extends Formatter {
-
-    Date dat = new Date();
-    private final static String format = "{0,date} {0,time}";
-    private MessageFormat formatter;
-
-    private Object args[] = new Object[1];
-
-    // Line separator string.  This is the value of the line.separator
-    // property at the moment that the SimpleFormatter was created.
-    private String lineSeparator = System.getProperty("line.separator");
-
-    public synchronized String format(LogRecord record) {
-        StringBuffer sb = new StringBuffer();
-        // Minimize memory allocations here.
-        dat.setTime(record.getMillis());
-        args[0] = dat;
-        StringBuffer text = new StringBuffer();
-        if (formatter == null) {
-            formatter = new MessageFormat(format);
-        }
-        formatter.format(args, text, null);
-        sb.append(text);
-        sb.append(" ");
-        if (record.getSourceClassName() != null) {
-            sb.append(record.getSourceClassName());
-        } else {
-            sb.append(record.getLoggerName());
-        }
-        if (record.getSourceMethodName() != null) {
-            sb.append(" ");
-            sb.append(record.getSourceMethodName());
-        }
-        sb.append(" --- ");
-        String message = formatMessage(record);
-        sb.append(record.getLevel().getLocalizedName());
-        sb.append(": ");
-        sb.append(message);
-        sb.append(lineSeparator);
-        if (record.getThrown() != null) {
-            try {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                record.getThrown().printStackTrace(pw);
-                pw.close();
-                sb.append(sw.toString());
-            } catch (Exception ex) {
-            }
-        }
-        return sb.toString();
+  
+  /**
+   * 
+   */
+  private final static String format = "{0,date} {0,time}";
+  
+  /**
+   * 
+   */
+  private Object args[] = new Object[1];
+  
+  /**
+   * 
+   */
+  Date dat = new Date();
+  
+  /**
+   * 
+   */
+  private boolean displayClassName;
+  
+  /**
+   * 
+   */
+  private boolean displayMethodName;
+  
+  /**
+   * 
+   */
+  private boolean displayTime;
+  
+  /**
+   * 
+   */
+  private MessageFormat formatter;
+  
+  /**
+   * Line separator string. This is the value of the line.separator property at
+   * the moment that the {@link SimpleFormatter} was created.
+   */
+  private String lineSeparator = System.getProperty("line.separator");
+  
+  /**
+   * 
+   */
+  public OneLineFormatter() {
+    this(true, true, true);
+  }
+  
+  /**
+   * @param displayTime
+   * @param displayClassName
+   * @param displayMethodName
+   */
+  public OneLineFormatter(boolean displayTime, boolean displayClassName,
+    boolean displayMethodName) {
+    super();
+    this.displayTime = displayTime;
+    this.displayClassName = displayClassName;
+    this.displayMethodName = displayMethodName;
+  }
+  
+  /**
+   * 
+   */
+  @Override
+  public synchronized String format(LogRecord record) {
+    StringBuffer sb = new StringBuffer();
+    if (displayTime) {
+      // Minimize memory allocations here.
+      dat.setTime(record.getMillis());
+      args[0] = dat;
+      StringBuffer text = new StringBuffer();
+      if (formatter == null) {
+        formatter = new MessageFormat(format);
+      }
+      formatter.format(args, text, null);
+      sb.append(text);
+      sb.append(" ");
     }
+    if (displayClassName) {
+      if (record.getSourceClassName() != null) {
+        sb.append(record.getSourceClassName());
+      } else {
+        sb.append(record.getLoggerName());
+      }
+      if (displayMethodName) {
+        if (record.getSourceMethodName() != null) {
+          sb.append(" ");
+          sb.append(record.getSourceMethodName());
+        }
+      }
+    }
+    if (sb.length() > 0) {
+      sb.append(" --- ");
+    }
+    String message = formatMessage(record);
+    sb.append(record.getLevel().getLocalizedName());
+    sb.append(": ");
+    sb.append(message);
+    sb.append(lineSeparator);
+    if (record.getThrown() != null) {
+      try {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        record.getThrown().printStackTrace(pw);
+        pw.close();
+        sb.append(sw.toString());
+      } catch (Exception ex) {
+      }
+    }
+    return sb.toString();
+  }
+  
+  /**
+   * @return the displayClassName
+   */
+  public boolean isDisplayClassName() {
+    return displayClassName;
+  }
+  
+  /**
+   * @return the displayMethodName
+   */
+  public boolean isDisplayMethodName() {
+    return displayMethodName;
+  }
+  
+  /**
+   * @return the displayTime
+   */
+  public boolean isDisplayTime() {
+    return displayTime;
+  }
+  
+  /**
+   * @param displayClassName the displayClassName to set
+   */
+  public void setDisplayClassName(boolean displayClassName) {
+    this.displayClassName = displayClassName;
+  }
+  
+  /**
+   * @param displayMethodName the displayMethodName to set
+   */
+  public void setDisplayMethodName(boolean displayMethodName) {
+    this.displayMethodName = displayMethodName;
+  }
+  
+  /**
+   * @param displayTime the displayTime to set
+   */
+  public void setDisplayTime(boolean displayTime) {
+    this.displayTime = displayTime;
+  }
 }

@@ -27,6 +27,7 @@ import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -67,6 +68,7 @@ import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.QuantityWithUnit;
 import org.sbml.jsbml.Reaction;
+import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SBase;
@@ -100,6 +102,7 @@ import de.zbit.sbml.io.SBOTermFormatter;
 import de.zbit.sbml.util.SBMLtools;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
+import de.zbit.util.Utils;
 
 /**
  * A specialized {@link JPanel} that displays all available properties of a
@@ -205,6 +208,8 @@ public class SBasePanel extends JPanel implements EquationComponent {
         // for (SBase s : list) {
         // lh.add(new SBasePanel(s, settings));
         // }
+      } else if (sbase instanceof SBMLDocument) {
+        addProperties((SBMLDocument) sbase);
       } else if (sbase instanceof Model) {
         addProperties((Model) sbase);
       } else if (sbase instanceof UnitDefinition) {
@@ -261,6 +266,37 @@ public class SBasePanel extends JPanel implements EquationComponent {
     //GUITools.setOpaqueForAllElements(this, false);
   }
   
+  /**
+   * 
+   * @param doc
+   */
+  private void addProperties(SBMLDocument doc) {
+    if (doc.isSetLevel()) {
+      addLabeledComponent(bundle.getString("level"), createJSpinner(doc.getLevel(), 1, 100, 1));
+    }
+    if (doc.isSetVersion()) {
+      addLabeledComponent(bundle.getString("version"), createJSpinner(doc.getVersion(), 1, 100, 1));
+    }
+  }
+  
+  /**
+   * 
+   * @param value
+   * @param min
+   * @param max
+   * @param stepSize
+   * @return
+   */
+  public JSpinner createJSpinner(int value, int min, int max, int stepSize) {
+    JSpinner spinner = new JSpinner(new SpinnerNumberModel(value, min, max, stepSize));
+    spinner.setEnabled(editable);
+    return spinner;
+  }
+  
+  /**
+   * 
+   * @param bbox
+   */
   private void addProperties(BoundingBox bbox) {
     if (bbox.isSetPosition()) {
       SBasePanel p = new SBasePanel(bbox.getPosition());
@@ -883,32 +919,36 @@ public class SBasePanel extends JPanel implements EquationComponent {
       LayoutHelper helper = new LayoutHelper(sboPanel);
       
       int columns = 35, innerRow = -1;
-      Term term = SBO.getTerm(sbase.getSBOTerm());
-      helper.add(new JLabel(bundle.getString("name")), 0, ++innerRow, 1, 1, 0d, 0d);
-      JTextArea nameField = new JTextArea(term.getName(), 2, columns);
-      nameField.setEditable(editable);
-      nameField.setCaretPosition(0);
-      nameField.setLineWrap(true);
-      nameField.setWrapStyleWord(true);
-      JScrollPane scroll = new JScrollPane(nameField);
-      helper.add(scroll, 3, innerRow, 1, 1, 1d, 0d);
-      helper.add(createJPanel(), 1, innerRow, 1, 1, .1d, 0d);
-      helper.add(createJPanel(), 0, ++innerRow, 6, 1, 1d, 0d);
-      
-      helper.add(new JLabel(bundle.getString("definition")), 0, ++innerRow, 1, 1, 0d, 0d);
-      JTextArea sboTermField = new JTextArea(5, columns);
-      sboTermField.setCaretPosition(0);
-      sboTermField.setLineWrap(true);
-      sboTermField.setWrapStyleWord(true);
-      sboTermField.setEditable(editable);
       try {
-        sboTermField.setText(SBOTermFormatter.getShortDefinition(term));
-      } catch (Exception exc) {
-        // NoSuchElementException if ontology file is outdated
-        logger.log(Level.WARNING, bundleWarnings.getString("COULD_NOT_GET_SBO_IDENTIFIER"), exc);
+        Term term = SBO.getTerm(sbase.getSBOTerm());
+        helper.add(new JLabel(bundle.getString("name")), 0, ++innerRow, 1, 1, 0d, 0d);
+        JTextArea nameField = new JTextArea(term.getName(), 2, columns);
+        nameField.setEditable(editable);
+        nameField.setCaretPosition(0);
+        nameField.setLineWrap(true);
+        nameField.setWrapStyleWord(true);
+        JScrollPane scroll = new JScrollPane(nameField);
+        helper.add(scroll, 3, innerRow, 1, 1, 1d, 0d);
+        helper.add(createJPanel(), 1, innerRow, 1, 1, .1d, 0d);
+        helper.add(createJPanel(), 0, ++innerRow, 6, 1, 1d, 0d);
+        
+        helper.add(new JLabel(bundle.getString("definition")), 0, ++innerRow, 1, 1, 0d, 0d);
+        JTextArea sboTermField = new JTextArea(5, columns);
+        sboTermField.setCaretPosition(0);
+        sboTermField.setLineWrap(true);
+        sboTermField.setWrapStyleWord(true);
+        sboTermField.setEditable(editable);
+        try {
+          sboTermField.setText(SBOTermFormatter.getShortDefinition(term));
+        } catch (Exception exc) {
+          // NoSuchElementException if ontology file is outdated
+          logger.log(Level.WARNING, bundleWarnings.getString("COULD_NOT_GET_SBO_IDENTIFIER"), exc);
+        }
+        JScrollPane scroll1 =  new JScrollPane(sboTermField);
+        helper.add(scroll1, 3, innerRow, 1, 1, 1d, 0d);
+      } catch (NoSuchElementException exc) {
+        logger.warning(Utils.getMessage(exc));
       }
-      JScrollPane scroll1 =  new JScrollPane(sboTermField);
-      helper.add(scroll1, 3, innerRow, 1, 1, 1d, 0d);
       helper.add(createJPanel(), 1, ++innerRow, 5, 1, 0d, 0d);
       
       lh.add(helper.getContainer(), 1, ++row, 3, 1, 0d, 0d);

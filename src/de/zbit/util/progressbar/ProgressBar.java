@@ -21,8 +21,8 @@ import de.zbit.util.Utils;
 
 
 /**
- * Draws a nice graphical ASCII/ANSI Prograss bar on the console.
- * Auto detects if output is piped to a file or virtual console (e.g. Eclipse Output window) and
+ * Draws a nice graphical ASCII/ANSI Progress bar on the console.
+ * Auto detects if output is piped to a file or virtual console (e.g., Eclipse Output window) and
  * simply outputs percentages in this case.
  * @author Clemens Wrzodek
  * @version $Rev$
