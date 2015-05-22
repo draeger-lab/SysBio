@@ -830,6 +830,15 @@ public class SBFileFilter extends GeneralFileFilter {
   }
   
   /**
+   * 
+   * @param file
+   * @return
+   */
+  public static boolean isJSONFile(File file) {
+    return hasFileType(file, FileType.JSON_FILES);
+  }
+  
+  /**
    * Checks a) if the file endswith XML and b) if the doctype is KGML.
    * @param file
    * @return true if and only if the file is a KGML formatted file.
