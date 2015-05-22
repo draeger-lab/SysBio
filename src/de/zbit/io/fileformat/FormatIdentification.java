@@ -29,6 +29,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.zbit.io.OpenFile;
 
@@ -50,8 +51,20 @@ import de.zbit.io.OpenFile;
  * @since 1.0
  */
 public class FormatIdentification {
+  
+  /**
+   * 
+   */
   private static List<FormatDescription> descriptions;
+  /**
+   * 
+   */
   private static int minBufferSize;
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(FormatIdentification.class.getName());
   
   static {
     init();
@@ -74,8 +87,8 @@ public class FormatIdentification {
       ret.mark(minBufferSize+2);
     }
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    int s; int bytesRead=0;
-    while ((s = ret.read()) != -1 && bytesRead<(minBufferSize+1)) {
+    int s; int bytesRead = 0;
+    while (((s = ret.read()) != -1) && (bytesRead < (minBufferSize+1))) {
       out.write(s);
       bytesRead++;
     }
@@ -87,6 +100,9 @@ public class FormatIdentification {
   
   /**
    * Liest soviele bytes aus dem Reader, wie f&uuml;r identifikation n&ouml;tig, identifiziert und resettet den Stream wieder.
+   * @param ret
+   * @return
+   * @throws IOException
    */
   public static FormatDescription identify(BufferedReader ret) throws IOException {
     if (ret.markSupported()) {
@@ -104,6 +120,10 @@ public class FormatIdentification {
     return identify(out.toByteArray());
   }
   
+  /**
+   * @param data
+   * @return
+   */
   public static FormatDescription identify(byte[] data) {
     if (data == null || data.length < 1) {
       //System.out.println("Too less data for identification.");
@@ -119,6 +139,11 @@ public class FormatIdentification {
     return null;
   }
   
+  /**
+   * 
+   * @param file
+   * @return
+   */
   public static FormatDescription identify(File file) {
     if (!file.isFile()) {
       //System.out.println("File " + file.getName() + " is no file.");
@@ -151,6 +176,11 @@ public class FormatIdentification {
     return identify(data);
   }
   
+  /**
+   * 
+   * @param inn
+   * @return
+   */
   public static FormatDescription identify(ByteArrayInputStream inn) {
     long size = inn.available();
     int numBytes;
@@ -184,6 +214,9 @@ public class FormatIdentification {
     return identify(data);
   }
   
+  /**
+   * 
+   */
   private static void init() {
     //String INfilename = "data/formats.txt";
     String INfilename = "de/zbit/io/formats.txt";
@@ -200,7 +233,7 @@ public class FormatIdentification {
       }
       
       if (input == null) {
-        System.err.println("WARNING: Could not load format identification magic byte file.");
+        logger.warning("Could not load format identification magic byte file.");
         return;
       }
       FormatDescriptionReader in = new FormatDescriptionReader(
@@ -220,6 +253,10 @@ public class FormatIdentification {
     }
   }
   
+  /**
+   * 
+   * @param args
+   */
   public static void main(String[] args) {
     String[] test = new String[]{"C:\\dataset_99.dat", "C:\\pareto1.dat", "C:\\Fpareto1.zip", "C:\\pareto1.txt", "C:\\GSE15239_series_matrix.txt.gz", "c:\\foo.tar.gz", "c:\\foo.tar.bz2"};
     
