@@ -189,4 +189,5 @@ public class OneLineFormatter extends Formatter {
   public void setDisplayTime(boolean displayTime) {
     this.displayTime = displayTime;
   }
+  
 }
