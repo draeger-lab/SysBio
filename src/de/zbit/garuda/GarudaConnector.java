@@ -21,7 +21,6 @@ import static de.zbit.util.Utils.getMessage;
 import java.awt.Component;
 import java.util.logging.Logger;
 
-import jp.sbi.garuda.platform.commons.exception.NetworkException;
 import de.zbit.UserInterface;
 import de.zbit.gui.GUITools;
 
@@ -62,15 +61,12 @@ public class GarudaConnector implements Runnable {
     try {
       GarudaSoftwareBackend garudaBackend = new GarudaSoftwareBackend(id, ui);
       garudaBackend.init();
-    } catch (NetworkException exc) {
+    } catch (Throwable exc) {
       if (ui instanceof Component) {
         GUITools.showErrorMessage((Component) ui, exc);
       } else {
         logger.warning(getMessage(exc));
       }
-    } catch (Throwable exc) {
-      logger.fine(getMessage(exc));
-      exc.printStackTrace();
     }
   }
   

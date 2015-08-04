@@ -417,6 +417,59 @@ public class ZIPUtils {
   }
   
   /**
+   * @param inputPath
+   * @param targetPath
+   * @throws IOException
+   */
+  public static void GZip(String inputPath, String targetPath) throws IOException {
+    IOException exc1 = null;
+    FileOutputStream fileOutputStream = null;
+    GZIPOutputStream gzipOuputStream = null;
+    FileInputStream fileInput = null;
+    try {
+      fileOutputStream = new FileOutputStream(targetPath);
+      gzipOuputStream = new GZIPOutputStream(fileOutputStream);
+      fileInput = new FileInputStream(inputPath);
+      
+      int bytesRead;
+      
+      byte[] buffer = new byte[1024];
+      while ((bytesRead = fileInput.read(buffer)) > 0) {
+        gzipOuputStream.write(buffer, 0, bytesRead);
+      }
+      
+      fileInput.close();
+      gzipOuputStream.finish();
+      gzipOuputStream.close();
+    } catch (IOException exc) {
+      /*
+       * Catching this exception makes sure that we have still the chance to
+       * close the streams. Otherwise they will stay opened although the
+       * execution of this method is over.
+       */
+      exc1 = exc;
+    } finally {
+      try {
+        try {
+          fileInput.close();
+        } finally {
+          gzipOuputStream.close();
+        }
+      } catch (IOException exc2) {
+        // Ok, we lost. No chance to really close these streams. Heavy error.
+        if (exc1 != null) {
+          exc2.initCause(exc1);
+        }
+        throw exc2;
+      } finally {
+        if (exc1 != null) {
+          throw exc1;
+        }
+      }
+    }
+  }
+  
+  /**
    * 
    * @param in
    * @return

@@ -190,10 +190,8 @@ public class GarudaSoftwareBackend {
   
   /**
    * 
-   * @throws NetworkException
-   * @throws GarudaConnectionNotInitializedException
    */
-  public void init() throws NetworkException, GarudaConnectionNotInitializedException {
+  public void init() {
     backend = new GarudaClientBackend(gadget.getID(), gadget.getName()); /*,
       iconPath, listOfOutputFileFormats, listOfInputFileFormats,
       listOfCategories, provider, description, listOfScreenshots);*/
