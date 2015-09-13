@@ -76,6 +76,47 @@
   <entry key="version">Version</entry>
   <entry key="volumeUnits">Volume units</entry>
   
+  <!-- Units -->
+  
+  <entry key="AMPERE">Ampere</entry>
+  <entry key="AVOGADRO">Avogadro's number</entry>
+  <entry key="BECQUEREL">Bequerel</entry>
+  <entry key="CANDELA">Candela</entry>
+  <entry key="CELSIUS">Celsius</entry>
+  <entry key="COULOMB">Coulomb</entry>
+  <entry key="DIMENSIONLESS">Dimensionless</entry>
+  <entry key="FARAD">Farad</entry>
+  <entry key="GRAM">Gram</entry>
+  <entry key="GRAY">Gray</entry>
+  <entry key="HENRY">Henry</entry>
+  <entry key="HERTZ">Hertz</entry>
+  <entry key="INVALID">Invalid</entry>
+  <entry key="ITEM">Item</entry>
+  <entry key="JOULE">Joule</entry>
+  <entry key="KATAL">Katal</entry>
+  <entry key="KELVIN">Kelvin</entry>
+  <entry key="KILOGRAM">Kilogram</entry>
+  <entry key="LITER">Liter</entry>
+  <entry key="LITRE">Litre</entry>
+  <entry key="LUMEN">Lumen</entry>
+  <entry key="LUX">Lux</entry>
+  <entry key="METER">Meter</entry>
+  <entry key="METRE">Metre</entry>
+  <entry key="MOLE">Mole</entry>
+  <entry key="NEWTON">Newton</entry>
+  <entry key="OHM">Ohm</entry>
+  <entry key="PASCAL">Pascal</entry>
+  <entry key="RADIAN">Radian</entry>
+  <entry key="SECOND">Second</entry>
+  <entry key="SIEMENS">Simens</entry>
+  <entry key="SIEVERT">Sievert</entry>
+  <entry key="STERADIAN">Steradian</entry>
+  <entry key="TESLA">Tesla</entry>
+  <entry key="VOLT">Volt</entry>
+  <entry key="WATT">Watt</entry>
+  <entry key="WEBER">Weber</entry>
+  
+  
   <!-- Core SBML -->
   
   <entry key="algebraicRule">Algebraic rule</entry>
@@ -127,6 +168,17 @@
   <entry key="unit">Unit</entry>
   <entry key="unitDefinition">Unit definition</entry>
 
+  <!-- Arrays -->
+  
+  <entry key="dimension">Dimension</entry>
+  <entry key="index">Index</entry>
+
+  <!-- Comp -->
+  
+  <!-- Distrib -->
+  
+  <!-- Dyn -->
+  
   <!-- FBC -->
 
   <entry key="chemicalFormula">Chemical formula</entry>
@@ -144,9 +196,11 @@
   <entry key="classification">Classification</entry>
   <entry key="collection">Collection</entry>
   <entry key="group">Group</entry>
+  <entry key="group.kind">Kind</entry>
   <entry key="listOfGroups">Groups</entry>
   <entry key="listOfMembers">Members</entry>
   <entry key="member">Member</entry>
+  <entry key="member.ref">Referenced element</entry>
   <entry key="partonomy">Partonomy</entry>
   
   <!-- Layout -->
@@ -155,7 +209,7 @@
   <entry key="basePoint2">Base point 2</entry>
   <entry key="boundingBox">Bounding box</entry>
   <entry key="compartmentGlyph">Compartment glyph</entry>
-  <entry key="cubicBezier">Cubic bezier</entry>
+  <entry key="cubicBezier">Cubic Bézier curve</entry>
   <entry key="curve">Curve</entry>
   <entry key="curveSegment">Curve segment</entry>
   <entry key="depth">Depth</entry>
@@ -181,6 +235,8 @@
   <entry key="y">y-coordinate</entry>
   <entry key="z">z-coordinate</entry>
   
+  <!-- Multi -->
+  
   <!-- Qual -->
   
   <entry key="assignmentLevel">Assignment level</entry>
@@ -202,4 +258,10 @@
   <entry key="sign">Sign</entry>
   <entry key="transition">Transition</entry>
 
+  <!-- Render -->
+  
+  <!-- Req -->
+  
+  <!-- Spatial -->
+  
 </properties>

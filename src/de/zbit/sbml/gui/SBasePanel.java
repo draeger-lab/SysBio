@@ -25,8 +25,11 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.MissingResourceException;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.Vector;
@@ -46,6 +49,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.html.HTMLDocument;
 import javax.xml.stream.XMLStreamException;
@@ -84,6 +88,8 @@ import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
 import org.sbml.jsbml.ext.fbc.FBCConstants;
 import org.sbml.jsbml.ext.fbc.FBCSpeciesPlugin;
+import org.sbml.jsbml.ext.groups.Group;
+import org.sbml.jsbml.ext.groups.Member;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CubicBezier;
 import org.sbml.jsbml.ext.layout.Dimensions;
@@ -252,18 +258,49 @@ public class SBasePanel extends JPanel implements EquationComponent {
       }
       if (sbase instanceof LineSegment) {
         addProperties((LineSegment) sbase);
-      }
-      if (sbase instanceof Point) {
+      } else if (sbase instanceof Point) {
         addProperties((Point) sbase);
-      }
-      if (sbase instanceof Dimensions) {
+      } else if (sbase instanceof Dimensions) {
         addProperties((Dimensions) sbase);
-      }
-      if (sbase instanceof BoundingBox) {
+      } else if (sbase instanceof BoundingBox) {
         addProperties((BoundingBox) sbase);
+      } else if (sbase instanceof Group) {
+        addProperties((Group) sbase);
+      } else if (sbase instanceof Member) {
+        addProperties((Member) sbase);
       }
     }
     //GUITools.setOpaqueForAllElements(this, false);
+  }
+  
+  /**
+   * 
+   * @param member
+   */
+  private void addProperties(Member member) {
+    SBase sbase = null;
+    if (member.isSetIdRef()) {
+      Model model = member.getModel();
+      sbase = model.findNamedSBase(member.getIdRef());
+    } else if (member.isSetMetaIdRef()) {
+      SBMLDocument doc = member.getSBMLDocument();
+      sbase = doc.findSBase(member.getMetaIdRef());
+    }
+    if (sbase != null) {
+      SBasePanel panel = new SBasePanel(sbase);
+      panel.setBorder(BorderFactory.createTitledBorder(" " + bundle.getString("member.ref") + " "));
+      lh.add(panel, 1, ++row, 5, 1, 0d, 0d);
+    }
+  }
+  
+  /**
+   * 
+   * @param group
+   */
+  private void addProperties(Group group) {
+    if (group.isSetKind()) {
+      addLabeledComponent(bundle.getString("group.kind"), enumComboBox(Arrays.asList(Group.Kind.values()), group.getKind()));
+    }
   }
   
   /**
@@ -1182,16 +1219,65 @@ public class SBasePanel extends JPanel implements EquationComponent {
    * @return
    */
   private JComboBox unitKindComboBox(Kind kind) {
-    JComboBox unitSelection = new JComboBox();
-    for (Unit.Kind unitKind : Unit.Kind.values()) {
-      unitSelection.addItem(unitKind);
-      if (unitKind.equals(kind)) {
-        unitSelection.setSelectedItem(unitKind);
+    return enumComboBox(Arrays.asList(Unit.Kind.values()), kind);
+  }
+  
+  /**
+   * 
+   * @param listOfEnum
+   * @param item
+   * @return
+   */
+  private <E extends Enum<E>> JComboBox enumComboBox(List<E> listOfEnum, E item) {
+    JComboBox box = new JComboBox();
+    for (E e : listOfEnum) {
+      box.addItem(e);
+      if (e.equals(item)) {
+        box.setSelectedItem(e);
       }
     }
-    unitSelection.setEditable(editable);
-    unitSelection.setEnabled(editable);
-    return unitSelection;
+    box.setEditable(editable);
+    box.setEnabled(editable);
+    box.setRenderer(new ListTextRenderer(box.getRenderer()));
+    return box;
+  }
+  
+  /**
+   * 
+   * @author Andreas Dr&auml;ger
+   * @version $Rev$
+   */
+  private class ListTextRenderer implements ListCellRenderer {
+    
+    /**
+     * 
+     */
+    private ListCellRenderer originalRenderer;
+    
+    /**
+     * 
+     * @param originalRenderer
+     */
+    public ListTextRenderer(ListCellRenderer originalRenderer) {
+      this.originalRenderer = originalRenderer;
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
+     */
+    @Override
+    public Component getListCellRendererComponent(JList list,
+      Object value, int index, boolean isSelected,
+      boolean cellHasFocus) {
+      String text = null;
+      try {
+        text = bundle.getString(value.toString());
+      } catch (MissingResourceException exc) {
+      }
+      return originalRenderer.getListCellRendererComponent(list,
+        text == null ? value.toString() : text, index, isSelected, cellHasFocus);
+    }
+    
   }
   
   /**

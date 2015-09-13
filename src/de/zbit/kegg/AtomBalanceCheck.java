@@ -232,8 +232,8 @@ public final class AtomBalanceCheck {
     Map<String, Integer> defect;
     atomsLeft = countAtoms(manager, r.getSubstrates(), replacement);
     atomsRight = countAtoms(manager, r.getProducts(), replacement);
-    if ((atomsLeft == null || atomsLeft.size() == 0)
-        || (atomsRight == null || atomsRight.size() == 0)) {
+    if (((atomsLeft == null) || (atomsLeft.size() == 0))
+        || ((atomsRight == null) || (atomsRight.size() == 0))) {
       log.log(level, String.format("Couldn't check atom balance of reaction %s.", r.getName()));
       return null;
     }
@@ -275,6 +275,7 @@ public final class AtomBalanceCheck {
   
   /**
    * 
+   * @param manager
    * @param listOfSpecRefs
    * @param replacement
    *            number to be used as a replacement if "n" occurs in an
@@ -292,7 +293,7 @@ public final class AtomBalanceCheck {
       KeggInfos infos = KeggInfos.get(KeggInfos.appendPrefix(component.getName()), manager);
       
       
-      if (infos == null || !infos.queryWasSuccessfull()) {
+      if ((infos == null) || !infos.queryWasSuccessfull()) {
         atomCount.clear();
         break;
       }
@@ -301,9 +302,9 @@ public final class AtomBalanceCheck {
       // => Look if we have synonym identifers for KEGG compound and refetch
       String formula = infos.getFormulaDirectOrFromSynonym(manager);
       if (formula != null) {
-        double st = component.getStoichiometry()==null?1d:component.getStoichiometry().doubleValue();
+        double st = component.getStoichiometry() == null ? 1d : component.getStoichiometry().doubleValue();
         // TODO: consider better replacement.
-        Map<String, Integer> count = countAtoms(st,formula, replacement);
+        Map<String, Integer> count = countAtoms(st, formula, replacement);
         for (String key : count.keySet()) {
           if (!atomCount.containsKey(key)) {
             atomCount.put(key, Integer.valueOf(0));

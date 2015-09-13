@@ -202,6 +202,7 @@
   <entry key="JPEG_FILES">Joint-Photographic-Experts-Group-Dateien</entry>
   <entry key="JSON_FILES">JavaScript-Objekt-Notation-Dateien</entry>
   <entry key="KGML_FILES">KGML-Dateien</entry>
+  <entry key="LOG_FILE">Log-Datei</entry>
   <entry key="MAP_FILES">MAP Dateien</entry>
   <entry key="PDF_FILES">Portable Dokumentformat-Dateien</entry>
   <entry key="PED_FILES">Klartext PLINK Genotype Dateien</entry>
