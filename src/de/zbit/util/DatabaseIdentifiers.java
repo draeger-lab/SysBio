@@ -16,6 +16,7 @@
  */
 package de.zbit.util;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -46,7 +47,7 @@ public class DatabaseIdentifiers {
    * to the corresponding miriam URN.
    */
   private static Map<IdentifierDatabases, String> miriamMap = new HashMap<IdentifierDatabases, String>();
-
+  
   /**
    * This map is used to describe the content of each database.
    * See {@link DatabaseContent}.
@@ -77,7 +78,7 @@ public class DatabaseIdentifiers {
      */
     CAS,
     /**
-     * Chemical Entities of Biological Interest (ChEBI) is a freely available dictionary 
+     * Chemical Entities of Biological Interest (ChEBI) is a freely available dictionary
      * of molecular entities focused on 'small' chemical compounds.
      */
     ChEBI,
@@ -97,8 +98,8 @@ public class DatabaseIdentifiers {
     DrugBank,
     EC_code,
     /**
-     * Evidence Code Ontology, Evidence codes can be used to specify the type of supporting 
-     * evidence for a piece of knowledge. This allows inference of a 'level of support' between 
+     * Evidence Code Ontology, Evidence codes can be used to specify the type of supporting
+     * evidence for a piece of knowledge. This allows inference of a 'level of support' between
      * an entity and an annotation made to an entity.
      */
     ECO,
@@ -109,7 +110,7 @@ public class DatabaseIdentifiers {
     Ensembl,
     EntrezGene,
     /**
-     * FlyBase is the database of the Drosophila Genome Projects and 
+     * FlyBase is the database of the Drosophila Genome Projects and
      * of associated literature.
      */
     FlyBase,
@@ -118,7 +119,7 @@ public class DatabaseIdentifiers {
      * consists of a joint effort to collect and disseminate databases
      * containing DNA and RNA sequences.
      */
-    GenBank, 
+    GenBank,
     GeneOntology,
     /**
      * GlycomeDB is the result of a systematic data integration effort, and
@@ -132,14 +133,14 @@ public class DatabaseIdentifiers {
      * found in the human body.It contains or links 1) chemical 2) clinical and
      * 3) molecular biology/biochemistry data.
      */
-
+    
     HMDB,
     /**
      * Human genome nomenclature (ID format: HGNC:\d{1,5}).
      */
     HGNC,
     /**
-     * Actually not a real database identifier... 
+     * Actually not a real database identifier...
      */
     GeneSymbol,
     /**
@@ -167,7 +168,7 @@ public class DatabaseIdentifiers {
      * which they are derived.
      */
     iRefWeb,
-    KEGG_Genes, 
+    KEGG_Genes,
     KEGG_Compound,
     KEGG_Glycan,
     KEGG_Reaction,
@@ -175,7 +176,7 @@ public class DatabaseIdentifiers {
     KEGG_Pathway,
     KEGG_Orthology,
     KEGG_Genome,
-    KEGG_Metagenome,    
+    KEGG_Metagenome,
     /**
      * LipidBank is an open, publicly free database of natural lipids including
      * fatty acids, glycerolipids, sphingolipids, steroids, and various
@@ -204,13 +205,13 @@ public class DatabaseIdentifiers {
     miRBase,
     NCBI_Taxonomy,
     /**
-     * The Protein database is a collection of sequences from several sources, 
-     * including translations from annotated coding regions in GenBank, RefSeq 
+     * The Protein database is a collection of sequences from several sources,
+     * including translations from annotated coding regions in GenBank, RefSeq
      * and TPA, as well as records from SwissProt, PIR, PRF, and PDB.
-     * Restrictions: This restriction is associated to data collections which 
-     * are an aggregated set of different types of data. For example, they could 
-     * allow identification of protein, DNA and RNA within the same collection. 
-     * One should therefore not expect each record within data collections with 
+     * Restrictions: This restriction is associated to data collections which
+     * are an aggregated set of different types of data. For example, they could
+     * allow identification of protein, DNA and RNA within the same collection.
+     * One should therefore not expect each record within data collections with
      * this restriction to refer to directly comparable entities.
      */
     NCBI_Protein,
@@ -228,7 +229,7 @@ public class DatabaseIdentifiers {
      */
     Panther,
     /**
-     * 	The Protein Data Bank is the single worldwide archive of structural data 
+     * 	The Protein Data Bank is the single worldwide archive of structural data
      *  of biological macromolecules.
      */
     PDB,
@@ -277,13 +278,13 @@ public class DatabaseIdentifiers {
      */
     ThreeDMET,
     /**
-     * A UniGene entry is a set of transcript sequences that appear to come 
-     * from the same transcription locus (gene or expressed pseudogene), 
-     * together with information on protein similarities, gene expression, 
+     * A UniGene entry is a set of transcript sequences that appear to come
+     * from the same transcription locus (gene or expressed pseudogene),
+     * together with information on protein similarities, gene expression,
      * cDNA clone reagents, and genomic location.
-     * Restrictions: The way this data collection is distributed prevents 
-     * linking to one specific entity. For example, access may require users 
-     * authentication or the data might be distributed as a whole set and 
+     * Restrictions: The way this data collection is distributed prevents
+     * linking to one specific entity. For example, access may require users
+     * authentication or the data might be distributed as a whole set and
      * not individually.
      */
     UniGene,
@@ -318,7 +319,7 @@ public class DatabaseIdentifiers {
         s = StringUtil.replaceIgnoreCase(s, "Three", Integer.toString(3));
         s = StringUtil.replaceIgnoreCase(s, "Two", Integer.toString(2));
         s = StringUtil.replaceIgnoreCase(s, "One", Integer.toString(1));
-      
+        
         return s;
       }
     }
@@ -453,8 +454,8 @@ public class DatabaseIdentifiers {
           dbIdentifier2.equalsIgnoreCase("LL")) {
         return IdentifierDatabases.EntrezGene;
         
-      } else if (dbIdentifier2.equalsIgnoreCase("GO") || 
-          dbIdentifier2.equalsIgnoreCase("Gene Ontology")) {        
+      } else if (dbIdentifier2.equalsIgnoreCase("GO") ||
+          dbIdentifier2.equalsIgnoreCase("Gene Ontology")) {
         return IdentifierDatabases.GeneOntology;
         
       } else if (dbIdentifier2.equalsIgnoreCase("INSDC")) {
@@ -465,19 +466,19 @@ public class DatabaseIdentifiers {
         
       } else if (dbIdentifier2.equalsIgnoreCase("CID") ||
           dbIdentifier2.equalsIgnoreCase("PubChem")) {
-        // WARNING: PubChem: may also refer to the substance identifier!!! 
+        // WARNING: PubChem: may also refer to the substance identifier!!!
         return IdentifierDatabases.PubChem_compound;
         
       } else if (dbIdentifier2.equalsIgnoreCase("SID")) {
         return IdentifierDatabases.PubChem_substance;
-
+        
       } else if (dbIdentifier2.equalsIgnoreCase("Chemical Abstracts Service") ||
           dbIdentifier2.startsWith("CAS ") || dbIdentifier2.equalsIgnoreCase("CASRN")) {
         return IdentifierDatabases.CAS;
         
       } else if (dbIdentifier2.equalsIgnoreCase("PDBCCD")) {
         return IdentifierDatabases.PDBeChem;
-
+        
       } else if (dbIdentifier2.equalsIgnoreCase("EnzymeConsortium") ||
           dbIdentifier2.equalsIgnoreCase("EC")) {
         return IdentifierDatabases.EC_code;
@@ -499,7 +500,7 @@ public class DatabaseIdentifiers {
         
       } else if (dbIdentifier2.equalsIgnoreCase("Symbol")) {
         return IdentifierDatabases.GeneSymbol;
-
+        
       }
       
       // Check the official names list
@@ -533,8 +534,8 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.Ensembl,               "ENS[A-Z]*[FPTG]\\d{11}");
     regExMap.put(IdentifierDatabases.ECO,                   "ECO:\\d{7}");
     regExMap.put(IdentifierDatabases.EntrezGene,            "\\d+");
-    regExMap.put(IdentifierDatabases.EC_code,  
-    "\\d+\\.-\\.-\\.-|\\d+\\.\\d+\\.-\\.-|\\d+\\.\\d+\\.\\d+\\.-|\\d+\\.\\d+\\.\\d+\\.(n)?\\d+");
+    regExMap.put(IdentifierDatabases.EC_code,
+        "\\d+\\.-\\.-\\.-|\\d+\\.\\d+\\.-\\.-|\\d+\\.\\d+\\.\\d+\\.-|\\d+\\.\\d+\\.\\d+\\.(n)?\\d+");
     regExMap.put(IdentifierDatabases.GenBank,               "\\w+(\\_)?\\d+(\\.\\d+)?");
     regExMap.put(IdentifierDatabases.GeneOntology,          "GO:\\d{7}");
     regExMap.put(IdentifierDatabases.KEGG_Glycan,           "G\\d{5}");
@@ -551,11 +552,11 @@ public class DatabaseIdentifiers {
     regExMap.put(IdentifierDatabases.PSI_MI,                "MI:\\d{4}");
     regExMap.put(IdentifierDatabases.PSI_MOD,               "MOD:\\d{5}");
     regExMap.put(IdentifierDatabases.Reactome,              "REACT_\\d+(\\.\\d+)?");
-    regExMap.put(IdentifierDatabases.RefSeq,                
-    "(NC|AC|NG|NT|NW|NZ|NM|NR|XM|XR|NP|AP|XP|ZP)_\\d+");
-    regExMap.put(IdentifierDatabases.UniProt_AC, 
-    "([A-N,R-Z][0-9][A-Z][A-Z, 0-9][A-Z, 0-9][0-9])|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])");
-    regExMap.put(IdentifierDatabases.IPI,                   "IPI\\d{8}");    
+    regExMap.put(IdentifierDatabases.RefSeq,
+        "(NC|AC|NG|NT|NW|NZ|NM|NR|XM|XR|NP|AP|XP|ZP)_\\d+");
+    regExMap.put(IdentifierDatabases.UniProt_AC,
+        "([A-N,R-Z][0-9][A-Z][A-Z, 0-9][A-Z, 0-9][0-9])|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])");
+    regExMap.put(IdentifierDatabases.IPI,                   "IPI\\d{8}");
     regExMap.put(IdentifierDatabases.KEGG_Reaction,         "R\\d{5}");
     regExMap.put(IdentifierDatabases.KEGG_Drug,             "D\\d{5}");
     regExMap.put(IdentifierDatabases.KEGG_Pathway,          "[a-zA-Z]{2,4}\\d{5}");
@@ -581,7 +582,7 @@ public class DatabaseIdentifiers {
     
     
     
-    /* 
+    /*
      * Initialize the {@link #miriamMap}.
      */
     miriamMap.put(IdentifierDatabases.CAS,                  "urn:miriam:cas:");
@@ -637,7 +638,7 @@ public class DatabaseIdentifiers {
     //miriamMap.put(IdentifierDatabases.GeneSymbol,         ); // None available!
     
     
-    /* 
+    /*
      * Initialize the {@link #describedType} map.
      */
     describedType.put(IdentifierDatabases.CAS,                   DatabaseContent.small_molecule);
@@ -710,7 +711,7 @@ public class DatabaseIdentifiers {
    */
   public static String getRegularExpressionForIdentifier(IdentifierDatabases identifier, boolean contains) {
     String regEx = regExMap.get(identifier);
-    if (regEx!=null) {
+    if (regEx != null) {
       if (!contains) {
         // Create a "IS" identifier
         regEx = String.format("^%s$", regEx);
@@ -754,7 +755,9 @@ public class DatabaseIdentifiers {
   public static String getMiriamURN(IdentifierDatabases db, String identifier) {
     if (!checkID(db, identifier)) {
       identifier = getFormattedID(db, identifier);
-      if (identifier==null) return null;
+      if (identifier == null) {
+        return null;
+      }
       if (!DatabaseIdentifiers.checkID(db, identifier)) {
         log.warning("Skipping invalid database entry " + identifier);
         return null;
@@ -785,13 +788,17 @@ public class DatabaseIdentifiers {
    */
   public static String getMiriamURI(IdentifierDatabases db, String identifier) {
     String urn = getMiriamURN(db, identifier);
-    if (urn==null) return null;
+    if (urn == null) {
+      return null;
+    }
     
     // Make the conversion to URI
     Matcher m = Pattern.compile("urn:miriam:(.+?):(.+)").matcher(urn);
-    if (!m.find()) return null;
-    // As a side-note: In contrast to the URNs, URIs are allowed to contain a ':'. 
-    return String.format("http://identifiers.org/%s/%s", m.group(1), m.group(2).replace("%3A", ":").replace("%3a", ":"));
+    if (!m.find()) {
+      return null;
+    }
+    // As a side-note: In contrast to the URNs, URIs are allowed to contain a ':'.
+    return String.format("http://identifiers.org/%s/%s", m.group(1), m.group(2).replaceAll("%3[Aa]", ":"));
   }
   
   /**
@@ -812,7 +819,7 @@ public class DatabaseIdentifiers {
    * expression of the {@code database}.
    */
   public static boolean checkID(IdentifierDatabases database, String id) {
-    if (id==null) {
+    if (id == null) {
       return false;
     }
     
@@ -820,7 +827,7 @@ public class DatabaseIdentifiers {
     String regEx = getRegularExpressionForIdentifier(database, false);
     if (regEx == null) {
       // unknown => in doubt, return true.
-      log.warning(String.format("Missing regular expression for database '%s'.", database));
+      log.warning(MessageFormat.format("Missing regular expression for database ''{0}''.", database));
       return true;
     }
     
@@ -860,7 +867,7 @@ public class DatabaseIdentifiers {
     /* Many identifiers end with a number that must have n digits.
      * We can try to prepend zeros to fix issues here.
      * Example: regex is "^ECO:\\d{7}$" and id is "253" => will create "0000253"
-    */
+     */
     if (Utils.isNumber(id, true)) {
       Matcher m = Pattern.compile(".*?\\\\d\\{(\\d+)\\}[$]$").matcher(regEx);
       if (m.matches()) {

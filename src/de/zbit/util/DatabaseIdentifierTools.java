@@ -17,6 +17,7 @@
 package de.zbit.util;
 
 import java.lang.reflect.Array;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -28,6 +29,7 @@ import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.CVTerm.Qualifier;
 
 import de.zbit.kegg.parser.pathway.Entry;
+import de.zbit.sbml.util.AnnotationUtils;
 import de.zbit.util.DatabaseIdentifiers.DatabaseContent;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
@@ -46,7 +48,7 @@ public class DatabaseIdentifierTools {
   
   /**
    * 
-   * @param ids either a {@link String} (for single identifiers) or an Array of Strings 
+   * @param ids either a {@link String} (for single identifiers) or an Array of Strings
    * or any {@link Iterable} instance of strings, for multiple identifiers per
    * database.
    * @param myCVterm
@@ -55,27 +57,28 @@ public class DatabaseIdentifierTools {
   @SuppressWarnings("rawtypes")
   private static void appendAllIds(Object ids, CVTerm myCVterm, IdentifierDatabases db) {
     // check if we have a single identifier
-    if (ids==null) return;
-    
-    else if (ids instanceof String) {
+    if (ids == null) {
+      return;
+    } else if (ids instanceof String) {
       String urn = DatabaseIdentifiers.getMiriamURN(db, ids.toString().trim());
-      if (urn!=null && !myCVterm.getResources().contains(urn)) {
-        myCVterm.addResource(urn);
+      if ((urn != null) && !myCVterm.getResources().contains(urn)) {
+        myCVterm.addResource(AnnotationUtils.convertURN2URI(urn));
       }
       
     } else if (ids instanceof Iterable) {
-      Iterator it = ((Iterable)ids).iterator();
+      Iterator it = ((Iterable) ids).iterator();
       while (it.hasNext()) {
         appendAllIds(it.next(), myCVterm, db);
       }
-     
+      
     } else if (ids.getClass().isArray()) {
-      for (int i=0; i < Array.getLength(ids); i++) {
+      for (int i = 0; i < Array.getLength(ids); i++) {
         appendAllIds(Array.get(ids, i), myCVterm, db);
       }
-        
+      
     } else {
-      log.warning("Can not add an identifier of type " + ids.getClass().getSimpleName());
+      log.warning(MessageFormat.format("Can not add an identifier of type {0}.",
+        ids.getClass().getSimpleName()));
     }
   }
   
@@ -106,7 +109,9 @@ public class DatabaseIdentifierTools {
    */
   public static List<CVTerm> getCVTerms(Map<DatabaseIdentifiers.IdentifierDatabases, ?> ids, String pointOfView) {
     List<CVTerm> ret = new ArrayList<CVTerm>();
-    if (ids==null) return ret;
+    if (ids == null) {
+      return ret;
+    }
     
     for (IdentifierDatabases db: ids.keySet()) {
       Object id = ids.get(db);
@@ -121,8 +126,8 @@ public class DatabaseIdentifierTools {
     
     return ret;
   }
-
-
+  
+  
   /**
    * Get a CV Term.
    * @param db
@@ -132,10 +137,10 @@ public class DatabaseIdentifierTools {
    * @return
    */
   public static CVTerm getCVTerm(IdentifierDatabases db, String pointOfView, Object id) {
-    if (pointOfView==null||pointOfView.length()<1) {
+    if ((pointOfView == null) || (pointOfView.length() < 1)) {
       pointOfView = "protein"; // Default point of view
     }
-
+    
     // Create actual term and set properties
     CVTerm mycv = new CVTerm();
     mycv.setQualifierType(CVTerm.Type.BIOLOGICAL_QUALIFIER);
@@ -145,7 +150,7 @@ public class DatabaseIdentifierTools {
     appendAllIds(id, mycv, db);
     
     // Set BQB to IS or Has_Version
-    if (mycv.getResourceCount() > 1 && 
+    if ((mycv.getResourceCount() > 1) &&
         mycv.getBiologicalQualifierType().equals(CVTerm.Qualifier.BQB_IS)) {
       // Multiple proteins in one node
       mycv.setBiologicalQualifierType(CVTerm.Qualifier.BQB_HAS_VERSION);
@@ -161,17 +166,17 @@ public class DatabaseIdentifierTools {
    */
   @SuppressWarnings("rawtypes")
   private static String getFirstString(Object ids) {
-    if (ids==null) return null;
-    
-    else if (ids instanceof String) {
+    if (ids == null) {
+      return null;
+    } else if (ids instanceof String) {
       return ids.toString();
       
     } else if (ids.getClass().isArray()) {
-      ids = Arrays.asList((Object[])ids);
+      ids = Arrays.asList((Object[]) ids);
       return getFirstString(ids);
       
     } else if (ids instanceof Iterable) {
-      Iterator it = ((Iterable)ids).iterator();
+      Iterator it = ((Iterable) ids).iterator();
       while (it.hasNext()) {
         return it.next().toString();
       }
@@ -179,8 +184,8 @@ public class DatabaseIdentifierTools {
     
     return ids.toString();
   }
-
-
+  
+  
   /**
    * Get a biological {@link Qualifier} describing the interaction of a
    * database identifier and the described object.
@@ -207,7 +212,9 @@ public class DatabaseIdentifierTools {
     identifier = identifier.toUpperCase().trim();
     // Get database content
     DatabaseContent c = DatabaseIdentifiers.getDatabaseType(db);
-    if (c==null) return Qualifier.BQB_UNKNOWN;
+    if (c==null) {
+      return Qualifier.BQB_UNKNOWN;
+    }
     
     // Catch all 1:1 (gene-gene, protein-protein, etc.) cases
     try {
@@ -240,7 +247,7 @@ public class DatabaseIdentifierTools {
         // EC-Code is just a functional annotation of an enzyme.
         return Qualifier.BQB_HAS_PROPERTY;
       case gene:
-        if (pointOfView.equalsIgnoreCase("rna") || 
+        if (pointOfView.equalsIgnoreCase("rna") ||
             pointOfView.equalsIgnoreCase("ortholog") ||
             pointOfView.replaceAll("\\s_", "").equalsIgnoreCase("protein")) {
           return Qualifier.BQB_IS_ENCODED_BY;
@@ -260,7 +267,7 @@ public class DatabaseIdentifierTools {
         if ((identifier.startsWith("ENSG") && pointOfView.equalsIgnoreCase("protein"))) {
           return Qualifier.BQB_IS_ENCODED_BY;
         }
-        if (( (identifier.startsWith("ENSG") || identifier.startsWith("ENST")) 
+        if (( (identifier.startsWith("ENSG") || identifier.startsWith("ENST"))
             && pointOfView.equalsIgnoreCase("protein"))) {
           return Qualifier.BQB_ENCODES;
         }
@@ -278,13 +285,13 @@ public class DatabaseIdentifierTools {
       case publication:
         return Qualifier.BQB_IS_DESCRIBED_BY;
       case reaction:
-        return Qualifier.BQB_OCCURS_IN; 
+        return Qualifier.BQB_OCCURS_IN;
       case sequences:
         break;
       case structures:
         return Qualifier.BQB_HAS_PROPERTY;
       case small_molecule:
-        if (pointOfView.equalsIgnoreCase("compound") || 
+        if (pointOfView.equalsIgnoreCase("compound") ||
             pointOfView.replaceAll("\\s_", "").equalsIgnoreCase("smallmolecule")) {
           return Qualifier.BQB_IS;
         }
@@ -295,8 +302,8 @@ public class DatabaseIdentifierTools {
     
     return Qualifier.BQB_UNKNOWN;
   }
-
-
+  
+  
   /**
    * Get the KEGG database from a KEGG identifier.
    * @param keggID
@@ -304,18 +311,20 @@ public class DatabaseIdentifierTools {
    */
   public static IdentifierDatabases getKEGGdbFromID(String keggID) {
     for (IdentifierDatabases db : DatabaseIdentifiers.IdentifierDatabases.values()) {
-      if (db==IdentifierDatabases.KEGG_Genes) continue;
+      if (db == IdentifierDatabases.KEGG_Genes) {
+        continue;
+      }
       if (db.toString().toLowerCase().startsWith("kegg")) {
-        if (DatabaseIdentifiers.getFormattedID(db, keggID)!=null) {
+        if (DatabaseIdentifiers.getFormattedID(db, keggID) != null) {
           return db;
         }
       }
     }
     
-    if (DatabaseIdentifiers.getFormattedID(IdentifierDatabases.KEGG_Genes, keggID)!=null) {
+    if (DatabaseIdentifiers.getFormattedID(IdentifierDatabases.KEGG_Genes, keggID) != null) {
       return IdentifierDatabases.KEGG_Genes;
     }
-
+    
     return null;
   }
   

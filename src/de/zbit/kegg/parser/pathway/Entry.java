@@ -36,7 +36,7 @@ import de.zbit.kegg.parser.pathway.ext.EntryTypeExtended;
 import de.zbit.util.StringUtil;
 
 /**
- * Corresponding to the Kegg Entry class (see 
+ * Corresponding to the KEGG Entry class (see
  * <a href="http://www.genome.jp/kegg/xml/docs/">KeggAPI</a>)
  * @author Clemens Wrzodek
  * @author Finja B&uuml;chel
@@ -162,12 +162,12 @@ public class Entry {
   public Entry(Pathway parentPathway, int id, String name) {
     this(parentPathway, id,name,Entry.getEntryTypeForKeggId(name));
   }
-
+  
   public Entry(Pathway keggPW, int keggEntryID, String keggname, EntryType eType, Graphics graphics) {
     this(keggPW, keggEntryID, keggname, eType);
     addGraphics(graphics);
   }
-
+  
   /**
    * If it is a group node, this list contains the ids of all children.
    * @return
@@ -177,7 +177,7 @@ public class Entry {
     return components==null?Collections.unmodifiableList(new ArrayList<Integer>()):components;
   }
   
-
+  
   /**
    * adds a list of components to the entry
    * @param components
@@ -221,7 +221,7 @@ public class Entry {
   public Graphics getGraphics() {
     return hasGraphics()?graph.get(0):null;
   }
-
+  
   /**
    * 
    * @return
@@ -229,7 +229,7 @@ public class Entry {
   public int getId() {
     return id;
   }
-
+  
   /**
    * 
    * @return
@@ -237,7 +237,7 @@ public class Entry {
   public String getLink() {
     return link;
   }
-
+  
   /**
    * 
    * @return
@@ -245,7 +245,7 @@ public class Entry {
   public String getName() {
     return name;
   }
-
+  
   /**
    * Returns the reaction directly annotated in this entry
    * in the KGML file.
@@ -266,10 +266,12 @@ public class Entry {
    * @return
    */
   public String[] getReactions() {
-    if (!hasReaction()) return new String[0];
+    if (!hasReaction()) {
+      return new String[0];
+    }
     return reaction.contains(" ")?reaction.split(" "): new String[]{reaction};
   }
-
+  
   /**
    * 
    * @return
@@ -277,7 +279,7 @@ public class Entry {
   public EntryType getType() {
     return type;
   }
-
+  
   /**
    * 
    * @return
@@ -294,25 +296,33 @@ public class Entry {
   public boolean hasReaction() {
     return isSetReaction();
   }
-
+  
   /**
    * 
    * @param nl
    */
   private void parseSubNodes(NodeList nl) {
-    if (nl==null) return;
+    if (nl==null) {
+      return;
+    }
     
     for (int i=0; i<nl.getLength(); i++) {
       Node node = nl.item(i);
-      if (node==null) return;
+      if (node==null) {
+        return;
+      }
       String name = node.getNodeName().trim();
       
       NamedNodeMap att = node.getAttributes();
       if (name.equalsIgnoreCase("component")) { // 0 .. *
-        if (components==null) components = new ArrayList<Integer>();
+        if (components==null) {
+          components = new ArrayList<Integer>();
+        }
         components.add(KeggParser.getNodeValueInt(att, "id"));
       } else if(name.equals("graphics")) { // 0 .. 1 unfortunately, kegg itself does not stick to 0..1
-        if (graph==null) graph = new LinkedList<Graphics>();
+        if (graph==null) {
+          graph = new LinkedList<Graphics>();
+        }
         Graphics g = new Graphics(KeggParser.getNodeValue(att, "name"), KeggParser.getNodeValueInt(att, "x"), KeggParser.getNodeValueInt(att, "y"), GraphicsType.valueOf(KeggParser.getNodeValue(att, "type")), KeggParser.getNodeValueInt(att, "width"), KeggParser.getNodeValueInt(att, "height"), KeggParser.getNodeValue(att, "fgcolor"), KeggParser.getNodeValue(att, "bgcolor"), (type==EntryType.gene) || (type==EntryType.genes));
         String coords = KeggParser.getNodeValue(att, "coords");
         if (coords!=null && coords.contains(",")) {
@@ -331,8 +341,9 @@ public class Entry {
    * @param component
    */
   public void addComponent(Integer component) {
-    if (!isSetComponent())
+    if (!isSetComponent()) {
       components = new ArrayList<Integer>();
+    }
     if (!components.contains(component)) {
       components.add(component);
     }
@@ -341,11 +352,12 @@ public class Entry {
   public void addGraphics(Graphics gr) {
     if(!isSetGraphics()) {
       graph = new LinkedList<Graphics>();
-    } 
-    if(!graph.contains(gr))
+    }
+    if(!graph.contains(gr)) {
       graph.add(gr);
+    }
   }
-
+  
   /**
    * 
    * @param custom
@@ -353,7 +365,7 @@ public class Entry {
   public void setCustom(Object custom) {
     this.custom = custom;
   }
-
+  
   /**
    * 
    * @param id
@@ -362,7 +374,7 @@ public class Entry {
     parentPathway.idChange(this, id);
     this.id = id;
   }
-
+  
   /**
    * 
    * @param link
@@ -370,7 +382,7 @@ public class Entry {
   public void setLink(String link) {
     this.link = link;
   }
-
+  
   /**
    * <b>IT IS STRONGLY SUGGESTED TO USE {@link Pathway#changeNameOfEntry(Entry, String)}
    * IF THE ENTRY ALREADY HAS BEEN PARSED WITH A DIFFERENT NAME!</b>
@@ -390,7 +402,7 @@ public class Entry {
     this.name = name;
     parentPathway.putEntryInNameMap(this);
   }
-
+  
   /**
    * Mark this {@link Entry} as an ENZYME for the given reaction.
    * Do not use it to associate a product or substrate to a reaction.
@@ -406,7 +418,7 @@ public class Entry {
    * @param components
    */
   public void setComponents(List<Integer> components) {
-    this.components = components;   
+    this.components = components;
   }
   /**
    * 
@@ -423,7 +435,7 @@ public class Entry {
       }
     }
   }
-
+  
   /**
    * 
    * @param type
@@ -431,7 +443,7 @@ public class Entry {
   public void setType(EntryType type) {
     this.type = type;
   }
-
+  
   /**
    * If there exists a group node, with this node/entry as component,
    * then this function is the reference, back to the group node.
@@ -443,7 +455,7 @@ public class Entry {
     }
     return parent;
   }
-
+  
   /**
    * See {@link #getParentNode()}
    */
@@ -451,6 +463,7 @@ public class Entry {
     this.parent = parent;
   }
   
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append('[');
@@ -466,7 +479,7 @@ public class Entry {
     
     return sb.toString();
   }
-
+  
   /**
    * Tryis to infere the EntryType from the id's prefix.
    * @param kgId
@@ -495,7 +508,7 @@ public class Entry {
       return EntryType.other;
     }
   }
-
+  
   public boolean isSetID() {
     return id>0;
   }
@@ -531,10 +544,10 @@ public class Entry {
   public boolean hasMultipleGraphics() {
     return hasGraphics() && graph.size()>1;
   }
-
+  
   /**
    * @return if {@link #hasMultipleGraphics()}, returns
-   * all {@link Graphics} objects other than {@link #getGraphics()}. 
+   * all {@link Graphics} objects other than {@link #getGraphics()}.
    */
   public List<Graphics> getMoreGraphics() {
     // Same as graph, but without the first element.
@@ -549,7 +562,7 @@ public class Entry {
       }
     };
   }
-
+  
   /**
    * 
    * @return all the necessary XML attributes of this class
@@ -562,37 +575,44 @@ public class Entry {
     }
     if(isSetName()) {
       attributes.put("name", name);
-    }    
+    }
     if(isSetType()) {
       attributes.put("type", type.toString());
     }
     if(isSetReaction()) {
       attributes.put("reaction", reaction);
-    }  
+    }
     if(isSetLink()) {
       attributes.put("link", link);
-    }      
+    }
     
     return attributes;
   }
-
+  
   @Override
   public int hashCode() {
     int hash = 13;
-    if(isSetID())
+    if(isSetID()) {
       hash *= id;
-    if(isSetName())
+    }
+    if(isSetName()) {
       hash *= name.hashCode();
-    if(isSetType())
+    }
+    if(isSetType()) {
       hash *= type.hashCode();
-    if(isSetLink())
+    }
+    if(isSetLink()) {
       hash *= link.hashCode();
-    if(isSetReaction())
+    }
+    if(isSetReaction()) {
       hash *= reaction.hashCode();
-    if(isSetComponent())
+    }
+    if(isSetComponent()) {
       hash *= components.hashCode();
-    if(isSetGraphics())
+    }
+    if(isSetGraphics()) {
       hash *= graph.hashCode();
+    }
     
     return hash;
   }
@@ -601,53 +621,62 @@ public class Entry {
     boolean equals = true;
     
     if (Entry.class.isAssignableFrom(obj.getClass())) {
-      Entry o = (Entry)obj;          
+      Entry o = (Entry)obj;
       
-      equals &= o.isSetType()==this.isSetType();
-      if(equals && isSetType()) 
-        equals &= (o.getType().equals(this.getType()));
+      equals &= o.isSetType()==isSetType();
+      if(equals && isSetType()) {
+        equals &= (o.getType().equals(getType()));
+      }
       
-      equals &= o.isSetLink()==this.isSetLink();
-      if(equals && isSetLink()) 
-        equals &= (o.getLink().equals(this.getLink()));
+      equals &= o.isSetLink()==isSetLink();
+      if(equals && isSetLink()) {
+        equals &= (o.getLink().equals(getLink()));
+      }
       
-      equals &= o.isSetComponent()==this.isSetComponent();
-      if(equals && isSetComponent()) 
-        equals &= (o.getComponents().equals(this.getComponents()));
+      equals &= o.isSetComponent()==isSetComponent();
+      if(equals && isSetComponent()) {
+        equals &= (o.getComponents().equals(getComponents()));
+      }
       
-      equals &= o.isSetGraphics()==this.isSetGraphics();
-      if(equals && isSetGraphics()) 
-        equals &= (o.getGraphics().equals(this.getGraphics()));
+      equals &= o.isSetGraphics()==isSetGraphics();
+      if(equals && isSetGraphics()) {
+        equals &= (o.getGraphics().equals(getGraphics()));
+      }
       
     }
     return equals;
   }
-
+  
   public boolean equalsWithoutIDReactionComparison(Object obj) {
     boolean equals = true;
     
     if (Entry.class.isAssignableFrom(obj.getClass())) {
-      Entry o = (Entry)obj;          
+      Entry o = (Entry)obj;
       
-      equals &= o.isSetName()==this.isSetName();
-      if(equals && isSetName()) 
-        equals &= (o.getName().equals(this.getName()));
+      equals &= o.isSetName()==isSetName();
+      if(equals && isSetName()) {
+        equals &= (o.getName().equals(getName()));
+      }
       
-      equals &= o.isSetType()==this.isSetType();
-      if(equals && isSetType()) 
-        equals &= (o.getType().equals(this.getType()));
+      equals &= o.isSetType()==isSetType();
+      if(equals && isSetType()) {
+        equals &= (o.getType().equals(getType()));
+      }
       
-      equals &= o.isSetLink()==this.isSetLink();
-      if(equals && isSetLink()) 
-        equals &= (o.getLink().equals(this.getLink()));
+      equals &= o.isSetLink()==isSetLink();
+      if(equals && isSetLink()) {
+        equals &= (o.getLink().equals(getLink()));
+      }
       
-      equals &= o.isSetComponent()==this.isSetComponent();
-      if(equals && isSetComponent()) 
-        equals &= (o.getComponents().equals(this.getComponents()));
+      equals &= o.isSetComponent()==isSetComponent();
+      if(equals && isSetComponent()) {
+        equals &= (o.getComponents().equals(getComponents()));
+      }
       
-      equals &= o.isSetGraphics()==this.isSetGraphics();
-      if(equals && isSetGraphics()) 
-        equals &= (o.getGraphics().equals(this.getGraphics()));
+      equals &= o.isSetGraphics()==isSetGraphics();
+      if(equals && isSetGraphics()) {
+        equals &= (o.getGraphics().equals(getGraphics()));
+      }
       
     }
     return equals;
@@ -659,33 +688,40 @@ public class Entry {
     
     if (equals) {
       Entry o = (Entry)obj;
-      equals &= o.isSetID()==this.isSetID();
-      if(equals && isSetID()) 
-        equals &= (o.getId() == this.getId());
+      equals &= o.isSetID()==isSetID();
+      if(equals && isSetID()) {
+        equals &= (o.getId() == getId());
+      }
       
-      equals &= o.isSetName()==this.isSetName();
-      if(equals && isSetName()) 
-        equals &= (o.getName().equals(this.getName()));
+      equals &= o.isSetName()==isSetName();
+      if(equals && isSetName()) {
+        equals &= (o.getName().equals(getName()));
+      }
       
-      equals &= o.isSetType()==this.isSetType();
-      if(equals && isSetType()) 
-        equals &= (o.getType().equals(this.getType()));
+      equals &= o.isSetType()==isSetType();
+      if(equals && isSetType()) {
+        equals &= (o.getType().equals(getType()));
+      }
       
-      equals &= o.isSetLink()==this.isSetLink();
-      if(equals && isSetLink()) 
-        equals &= (o.getLink().equals(this.getLink()));
+      equals &= o.isSetLink()==isSetLink();
+      if(equals && isSetLink()) {
+        equals &= (o.getLink().equals(getLink()));
+      }
       
-      equals &= o.isSetReaction()==this.isSetReaction();
-      if(equals && isSetReaction()) 
-        equals &= (o.getReactionString().equals(this.getReactionString()));
+      equals &= o.isSetReaction()==isSetReaction();
+      if(equals && isSetReaction()) {
+        equals &= (o.getReactionString().equals(getReactionString()));
+      }
       
-      equals &= o.isSetComponent()==this.isSetComponent();
-      if(equals && isSetComponent()) 
-        equals &= (o.getComponents().equals(this.getComponents()));
+      equals &= o.isSetComponent()==isSetComponent();
+      if(equals && isSetComponent()) {
+        equals &= (o.getComponents().equals(getComponents()));
+      }
       
-      equals &= o.isSetGraphics()==this.isSetGraphics();
-      if(equals && isSetGraphics()) 
-        equals &= (o.getGraphics().equals(this.getGraphics()));
+      equals &= o.isSetGraphics()==isSetGraphics();
+      if(equals && isSetGraphics()) {
+        equals &= (o.getGraphics().equals(getGraphics()));
+      }
       
     }
     return equals;
@@ -693,7 +729,7 @@ public class Entry {
   
   /**
    * To be honest, the {@link EntryType} and {@link EntryTypeExtended}
-   * is a mess. Thus, this method checks them (return values of 
+   * is a mess. Thus, this method checks them (return values of
    * {@link #getType()} and {@link EntryExtended#getGeneType()}) and
    * returns a real string what this entity really is.
    * @return one of "gene", "protein", "dna", "rna", "small_molecule",
@@ -735,8 +771,8 @@ public class Entry {
           return "pathway";
         case ortholog:
           return "ortholog";
-//        case other:          
-//        case reaction:
+          //        case other:
+          //        case reaction:
       }
     }
     return null;

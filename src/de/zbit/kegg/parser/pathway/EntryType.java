@@ -17,7 +17,7 @@
 package de.zbit.kegg.parser.pathway;
 
 /**
- * Corresponding to the possible Kegg Entry-Types (see
+ * Corresponding to the possible KEGG Entry-Types (see
  * {@link http://www.genome.jp/kegg/xml/docs})
  * 
  * "The type attribute specifies the type of this entry.
