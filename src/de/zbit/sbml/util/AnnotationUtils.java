@@ -57,13 +57,28 @@ import de.zbit.util.progressbar.ProgressBar;
  */
 public class AnnotationUtils {
   
+  /**
+   * 
+   * @param miriamURN
+   * @return
+   */
+  public static String convertURN2URI(String miriamURN) {
+    if ((miriamURN != null) && miriamURN.startsWith("urn:miriam:")) {
+      try {
+        return "http://identifiers.org/" + miriamURN.substring(11).replaceFirst(":", "/").replaceAll("%3[Aa]", ":");
+      } catch (Throwable t) {
+      }
+    }
+    return null;
+  }
+  
   public static void addAnnotations(String inputFile, String outputFile,
     String annotationFile, int col, int altCol) throws XMLStreamException,
     SBMLException, IOException {
     //format of annotationFile should be as followed:
-	//first row is expected as header
-	//second and following: species/reaction id \t kegg id as C00000, EC:1.1.1.1, R00000
-	  
+    //first row is expected as header
+    //second and following: species/reaction id \t kegg id as C00000, EC:1.1.1.1, R00000
+    
     SBMLDocument doc = (new SBMLReader()).readSBML(inputFile);
     
     BufferedReader reader = new BufferedReader(new FileReader(annotationFile));
@@ -117,22 +132,22 @@ public class AnnotationUtils {
     KeggInfoManagement manager = loadInfoManager();
     Model model = doc.getModel();
     Object[] elements = new Object[model.getSpeciesCount()
-        + model.getReactionCount()
-        + model.getCompartmentCount()];
+                                   + model.getReactionCount()
+                                   + model.getCompartmentCount()];
     if (model.isSetListOfSpecies()) {
-    	System.arraycopy(model.getListOfSpecies().toArray(), 0, elements,
-    		0, model.getSpeciesCount());
+      System.arraycopy(model.getListOfSpecies().toArray(), 0, elements,
+        0, model.getSpeciesCount());
     }
     if (model.isSetListOfReactions()) {
-    	System.arraycopy(model.getListOfReactions().toArray(), 0,
-    		elements, model.getSpeciesCount(), model
-    		.getReactionCount());
+      System.arraycopy(model.getListOfReactions().toArray(), 0,
+        elements, model.getSpeciesCount(), model
+        .getReactionCount());
     }
     if (model.isSetListOfCompartments()) {
-    	System.arraycopy(model.getListOfCompartments().toArray(), 0,
-    		elements, model.getReactionCount()
-    		+ model.getSpeciesCount(), model
-    		.getCompartmentCount());
+      System.arraycopy(model.getListOfCompartments().toArray(), 0,
+        elements, model.getReactionCount()
+        + model.getSpeciesCount(), model
+        .getCompartmentCount());
     }
     int total = 0, matched = 0, notMatched = 0;
     ProgressBar prog = new ProgressBar(elements.length);
@@ -207,21 +222,22 @@ public class AnnotationUtils {
             }
           }
           if (annotation.startsWith("R")) {
-            element
-                .addCVTerm(new CVTerm(CVTerm.Type.BIOLOGICAL_QUALIFIER,
-                  CVTerm.Qualifier.BQB_IS, "urn:miriam:kegg.reaction:"
-                      + annotation));
+            element.addCVTerm(new CVTerm(CVTerm.Type.BIOLOGICAL_QUALIFIER,
+              CVTerm.Qualifier.BQB_IS,
+              convertURN2URI("urn:miriam:kegg.reaction:" + annotation)));
           } else if (annotation.startsWith("EC")) {
             for (String ann : annotation.split(" ")) {
               element.addCVTerm(new CVTerm(CVTerm.Type.BIOLOGICAL_QUALIFIER,
-                CVTerm.Qualifier.BQB_IS, "urn:miriam:ec-code:" + ann));
+                CVTerm.Qualifier.BQB_IS,
+                convertURN2URI("urn:miriam:ec-code:" + ann)));
             }
             
           }
         } else if (element instanceof Compartment) {
           if (annotation.startsWith("GO")) {
             element.addCVTerm(new CVTerm(CVTerm.Type.BIOLOGICAL_QUALIFIER,
-              CVTerm.Qualifier.BQB_IS, "urn:miriam:obo.go:" + annotation));
+              CVTerm.Qualifier.BQB_IS,
+              convertURN2URI("urn:miriam:obo.go:" + annotation)));
           }
         }
       }
@@ -239,7 +255,7 @@ public class AnnotationUtils {
     // report
     System.out.println("Annotation results:");
     System.out.println("Total: " + total + " Matched: " + matched
-        + " Unmatched: " + notMatched);
+      + " Unmatched: " + notMatched);
     
     SBMLWriter w = new SBMLWriter();
     w.write(doc, outputFile);
@@ -310,55 +326,55 @@ public class AnnotationUtils {
         e.printStackTrace();
       }
     }
-    //add modifiers 
+    //add modifiers
     Model model = doc.getModel();
     if (model.isSetListOfReactions()) {
-    	for (Object o : model.getListOfReactions()) {
-    		Reaction r = (Reaction) o;
-    		for (int i = 0; i != r.getAnnotation().getCVTermCount(); i++) {
-    			for (String ann : r.getAnnotation().getCVTerm(i)
-    					.filterResources("urn:miriam:ec-code:")) {
-    				String annotation = ann.replaceFirst("urn:miriam:ec-code:", "");
-    				if (modifiers.get(annotation) != null) {
-    					for (String modifierID : modifiers.get(annotation)) {
-    						Species modifier = model.getSpecies(modifierID);
-    						if (modifier == null) {
-    							modifier = model.createSpecies(modifierID);
-    							Compartment c = r.getCompartmentInstance();
-    							if (c == null) {
-    								if (r.getReactantCount() > 0) {
-    									Species s = r.getReactant(0).getSpeciesInstance();
-    									if (s != null) {
-    										c = s.getCompartmentInstance();
-    									}
-    								}
-    							}
-    							if (c == null) {
-    								if (r.getProductCount() > 0) {
-    									Species s = r.getProduct(0).getSpeciesInstance();
-    									if (s != null) {
-    										c = s.getCompartmentInstance();
-    									}
-    								}
-    							}
-    							if (c != null) {
-    								modifier.setCompartment(c);
-    							}
-    							modifier.setName(modifierID);
-    							modifier.setMetaId(modifier.getId());
-    							//TODO SBOTerms
-    							if (annotationMap.get(modifierID) != null) {
-    								for (String a : annotationMap.get(modifierID)) {
-    									annotateSpecies(modifier, a, loadInfoManager());
-    								}
-    							}
-    						}
-    						r.addModifier(new ModifierSpeciesReference(modifier));
-    					}
-    				}
-    			}
-    		}
-    	}
+      for (Object o : model.getListOfReactions()) {
+        Reaction r = (Reaction) o;
+        for (int i = 0; i != r.getAnnotation().getCVTermCount(); i++) {
+          for (String ann : r.getAnnotation().getCVTerm(i)
+              .filterResources("urn:miriam:ec-code:")) {
+            String annotation = ann.replaceFirst("urn:miriam:ec-code:", "");
+            if (modifiers.get(annotation) != null) {
+              for (String modifierID : modifiers.get(annotation)) {
+                Species modifier = model.getSpecies(modifierID);
+                if (modifier == null) {
+                  modifier = model.createSpecies(modifierID);
+                  Compartment c = r.getCompartmentInstance();
+                  if (c == null) {
+                    if (r.getReactantCount() > 0) {
+                      Species s = r.getReactant(0).getSpeciesInstance();
+                      if (s != null) {
+                        c = s.getCompartmentInstance();
+                      }
+                    }
+                  }
+                  if (c == null) {
+                    if (r.getProductCount() > 0) {
+                      Species s = r.getProduct(0).getSpeciesInstance();
+                      if (s != null) {
+                        c = s.getCompartmentInstance();
+                      }
+                    }
+                  }
+                  if (c != null) {
+                    modifier.setCompartment(c);
+                  }
+                  modifier.setName(modifierID);
+                  modifier.setMetaId(modifier.getId());
+                  //TODO SBOTerms
+                  if (annotationMap.get(modifierID) != null) {
+                    for (String a : annotationMap.get(modifierID)) {
+                      annotateSpecies(modifier, a, loadInfoManager());
+                    }
+                  }
+                }
+                r.addModifier(new ModifierSpeciesReference(modifier));
+              }
+            }
+          }
+        }
+      }
     }
     SBMLWriter w = new SBMLWriter();
     w.write(doc, outputFile);
@@ -369,7 +385,7 @@ public class AnnotationUtils {
     if ((annotation.startsWith("P")) || (annotation.startsWith("Q"))
         || (annotation.startsWith("O"))) {
       s.addCVTerm(new CVTerm(CVTerm.Type.BIOLOGICAL_QUALIFIER,
-        CVTerm.Qualifier.BQB_IS, "urn:miriam:uniprot:" + annotation));
+        CVTerm.Qualifier.BQB_IS, convertURN2URI("urn:miriam:uniprot:" + annotation)));
     } else {
       Annotate.annotate(s, annotation, manager);
     }
@@ -383,18 +399,20 @@ public class AnnotationUtils {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    if (manager == null) manager = new KeggInfoManagement();
+    if (manager == null) {
+      manager = new KeggInfoManagement();
+    }
     return manager;
   }
   
   public static void main(String[] args) throws XMLStreamException,
-    SBMLException, IOException {
+  SBMLException, IOException {
     
     /*String file1="files/Modell_Hofmann.xml";
     String file2="files/annotations_HepatoNet.txt";
     addAnnotations(file1,file1,file2,-1,-1);
-    */
-  
+     */
+    
     /*
     String file1 = "files/CAR_PXR_2_4.xml";
     String file2 = "files/HepatoNet1.xml";
@@ -426,7 +444,7 @@ public class AnnotationUtils {
     //add modifiers
     addModifiers(file4, file4, modifierFile, annotationFile4);
     
-    //extend other model 
+    //extend other model
     SBMLFileExtension.extendModel(file1, file3);
     
     //annotate other model
@@ -437,7 +455,7 @@ public class AnnotationUtils {
     
     //compartments
     addAnnotations(file3, file3, annotationFile5, -1, -1);
-    */
+     */
     
     
     //addSBOTerms("files/Modell_Hofmann.xml","files/Modell_Hofmann.xml","files/Hofmann_SBO.txt",1);
@@ -480,23 +498,23 @@ public class AnnotationUtils {
     
     Model model = doc.getModel();
     Object[] elements = new Object[model.getSpeciesCount()
-        + model.getReactionCount()
-        + model.getCompartmentCount()];
+                                   + model.getReactionCount()
+                                   + model.getCompartmentCount()];
     if (model.isSetListOfSpecies()) {
-    	System.arraycopy(model.getListOfSpecies().toArray(), 0, elements,
-    		0, model.getSpeciesCount());
+      System.arraycopy(model.getListOfSpecies().toArray(), 0, elements,
+        0, model.getSpeciesCount());
     }
     if (model.isSetListOfReactions()) {
-    	System.arraycopy(model.getListOfReactions().toArray(), 0,
-    		elements, model.getSpeciesCount(), model
-    		.getReactionCount());
+      System.arraycopy(model.getListOfReactions().toArray(), 0,
+        elements, model.getSpeciesCount(), model
+        .getReactionCount());
     }
     if (model.isSetListOfCompartments()) {
-    	System
-    	.arraycopy(model.getListOfCompartments().toArray(), 0,
-    		elements, model.getReactionCount()
-    		+ model.getSpeciesCount(), model
-    		.getCompartmentCount());
+      System
+      .arraycopy(model.getListOfCompartments().toArray(), 0,
+        elements, model.getReactionCount()
+        + model.getSpeciesCount(), model
+        .getCompartmentCount());
     }
     
     for (Object el : elements) {

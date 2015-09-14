@@ -26,26 +26,28 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLWriter;
 import org.sbml.jsbml.Species;
 
+import de.zbit.sbml.util.AnnotationUtils;
+
 /**
  * 
  * @author draeger
  *
  */
 public class SBMLAnnotationTest {
-
-	/**
-	 * 
-	 * @param args
-	 * @throws SBMLException
-	 * @throws XMLStreamException
-	 */
-	public static void main(String args[]) throws SBMLException, XMLStreamException {
-		SBMLDocument doc = new SBMLDocument(3, 1);
-		Model m = doc.createModel("m1");
-		Compartment c = m.createCompartment("c1");
-		Species s = m.createSpecies("s1", c);
-		s.addCVTerm(new CVTerm(CVTerm.Qualifier.BQB_IS, "urn:miriam:obo.chebi:CHEBI:15377"));
-		SBMLWriter.write(doc, System.out, ' ', (short) 2);
-	}
-	
+  
+  /**
+   * 
+   * @param args
+   * @throws SBMLException
+   * @throws XMLStreamException
+   */
+  public static void main(String args[]) throws SBMLException, XMLStreamException {
+    SBMLDocument doc = new SBMLDocument(3, 1);
+    Model m = doc.createModel("m1");
+    Compartment c = m.createCompartment("c1");
+    Species s = m.createSpecies("s1", c);
+    s.addCVTerm(new CVTerm(CVTerm.Qualifier.BQB_IS, AnnotationUtils.convertURN2URI("urn:miriam:obo.chebi:CHEBI:15377")));
+    SBMLWriter.write(doc, System.out, ' ', (short) 2);
+  }
+  
 }

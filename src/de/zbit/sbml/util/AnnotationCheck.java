@@ -290,7 +290,7 @@ public class AnnotationCheck {
         }
         if (compounds.size() == 0) {
           String urn = "urn:miriam:kegg.reaction:" + id.split(":")[1];
-          cv.addResource(urn);
+          cv.addResource(AnnotationUtils.convertURN2URI(urn));
         }
       }
     }
@@ -351,7 +351,7 @@ public class AnnotationCheck {
         cv.setBiologicalQualifierType(CVTerm.Qualifier.BQB_IS);
         String urn = "urn:miriam:kegg.compound:";
         urn += name.contains(":") ? name.split(":")[1] : name;
-        cv.addResource(urn);
+        cv.addResource(AnnotationUtils.convertURN2URI(urn));
       }
     }
     return cv;
