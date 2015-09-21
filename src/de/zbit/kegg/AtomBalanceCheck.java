@@ -16,6 +16,7 @@
  */
 package de.zbit.kegg;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,13 +27,17 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sbml.jsbml.ListOf;
+import org.sbml.jsbml.Model;
+import org.sbml.jsbml.Species;
+import org.sbml.jsbml.SpeciesReference;
+import org.sbml.jsbml.ext.fbc.FBCSpeciesPlugin;
+
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
-
-
 
 /**
  * Static class to check atom balances of KEGG reactions.
@@ -41,7 +46,11 @@ import de.zbit.kegg.parser.pathway.ReactionComponent;
  * @version $Rev$
  */
 public final class AtomBalanceCheck {
-  private static final transient Logger log = Logger.getLogger(AtomBalanceCheck.class.getName());
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(AtomBalanceCheck.class.getName());
   
   /**
    * A defined level to output the results of the atom balance check
@@ -50,12 +59,20 @@ public final class AtomBalanceCheck {
   public static Level level = Level.FINE;
   
   /**
+   * 
+   * @param logLevel
+   */
+  public static void setLogLevel(Level logLevel) {
+    level = logLevel;
+  }
+  
+  /**
    * A class used to improve return values of contained methods
    * @author Clemens Wrzodek
    * @version $Rev$
    */
-  public static final class AtomCheckResult {
-    final Reaction r;
+  public static final class AtomCheckResult<R> {
+    final R r;
     final Map<String, Integer> atomsLeft;
     final Map<String, Integer> atomsRight;
     final Map<String, Integer> defects;
@@ -66,7 +83,7 @@ public final class AtomBalanceCheck {
      * @param atomsRight
      * @param defects
      */
-    public AtomCheckResult(Reaction r, Map<String, Integer> atomsLeft,
+    public AtomCheckResult(R r, Map<String, Integer> atomsLeft,
       Map<String, Integer> atomsRight, Map<String, Integer> defects) {
       super();
       this.r = r;
@@ -78,7 +95,7 @@ public final class AtomBalanceCheck {
     /**
      * @return the reaction
      */
-    public Reaction getReaction() {
+    public R getReaction() {
       return r;
     }
     
@@ -120,29 +137,29 @@ public final class AtomBalanceCheck {
      */
     public String getResultsAsHTMLtable() {
       Collection<String> atoms = getAtoms();
-      if (atoms.size()<1) {
+      if (atoms.size() < 1) {
         return "";
       }
       StringBuilder sb = new StringBuilder("<table style=\"border:1px solid black;\"><tr align=\"right\"><th>&#160;</th>");
       
       // All atoms
-      for (String atom: atoms) {
+      for (String atom : atoms) {
         sb.append(String.format("<th>%s</th>", atom));
       }
       sb.append("</tr>");
       
       // Substrates
-      if (atomsLeft.size()>1) {
+      if (atomsLeft.size() > 1) {
         addHTMLtableRow(sb, "Substrate side", atoms, atomsLeft);
       }
       
       // Products
-      if (atomsRight.size()>1) {
+      if (atomsRight.size() > 1) {
         addHTMLtableRow(sb, "Product side", atoms, atomsRight);
       }
       
       // Defects
-      if (defects.size()!=0) {
+      if (defects.size() != 0) {
         addHTMLtableRow(sb, "Defects", atoms, defects);
       }
       
@@ -160,7 +177,7 @@ public final class AtomBalanceCheck {
       sb.append(String.format("<tr align=\"right\"><th align=\"left\">%s</th>", rowName));
       for (String atom: atoms) {
         Integer value = atomList.get(atom);
-        if (value==null || value==0) {
+        if ((value == null) || (value == 0)) {
           sb.append("<td>&#160;</td>");
         } else {
           sb.append(String.format("<td>%s</td>", value));
@@ -174,9 +191,8 @@ public final class AtomBalanceCheck {
      * has some missing atoms.
      */
     public boolean hasDefects() {
-      return defects!=null && defects.size()!=0;
+      return (defects != null) && (defects.size() != 0);
     }
-    
     
   }
   
@@ -200,10 +216,10 @@ public final class AtomBalanceCheck {
      */
     
     
-    if (p.getReactions()!=null) {
+    if (p.getReactions() != null) {
       List<AtomCheckResult> ret = new ArrayList<AtomCheckResult>(p.getReactions().size());
       
-      for (Reaction r: p.getReactions()) {
+      for (Reaction r : p.getReactions()) {
         ret.add(checkAtomBalance(manager, r, replacement));
       }
       
@@ -214,10 +230,9 @@ public final class AtomBalanceCheck {
   }
   
   
-  
   /**
    * Check atom balance of reaction r
-   * @param manager a cache to fetch eqations, formulas, etc. from
+   * @param manager a cache to fetch reactions, formulas, etc. from
    * @param r
    * @param replacement
    *            number to be used as a replacement of "n" in empirical
@@ -225,18 +240,31 @@ public final class AtomBalanceCheck {
    * @return null if no check is possible. Otherwise an hash with the Atom
    *         defects.
    */
-  public static AtomCheckResult checkAtomBalance(KeggInfoManagement manager, Reaction r,
+  public static AtomCheckResult<Reaction> checkAtomBalance(KeggInfoManagement manager, Reaction r,
     int replacement) {
-    Map<String, Integer> atomsLeft;
-    Map<String, Integer> atomsRight;
-    Map<String, Integer> defect;
-    atomsLeft = countAtoms(manager, r.getSubstrates(), replacement);
-    atomsRight = countAtoms(manager, r.getProducts(), replacement);
+    Map<String, Integer> atomsLeft = countAtoms(manager, r.getSubstrates(), replacement);
+    Map<String, Integer> atomsRight = countAtoms(manager, r.getProducts(), replacement);
     if (((atomsLeft == null) || (atomsLeft.size() == 0))
         || ((atomsRight == null) || (atomsRight.size() == 0))) {
-      log.log(level, String.format("Couldn't check atom balance of reaction %s.", r.getName()));
+      logger.log(level, MessageFormat.format("Couldn't check atom balance of reaction {0}.", r.getName()));
       return null;
     }
+    Map<String, Integer> defect = calculateDefect(r.getName(), atomsLeft, atomsRight);
+    
+    return new AtomCheckResult<Reaction>(r, atomsLeft, atomsRight, defect);
+  }
+  
+  
+  /**
+   * 
+   * @param reactionIdentifier
+   * @param atomsLeft
+   * @param atomsRight
+   * @return
+   */
+  private static Map<String, Integer> calculateDefect(String reactionIdentifier,
+    Map<String, Integer> atomsLeft, Map<String, Integer> atomsRight) {
+    Map<String, Integer> defect;
     defect = new TreeMap<String, Integer>();
     for (String key : atomsLeft.keySet()) {
       if (!atomsRight.containsKey(key)) {
@@ -266,11 +294,27 @@ public final class AtomBalanceCheck {
       //          "%s\natoms left:  %s\natoms right:  %s\ndefect:  %s\n",
       //          r.getEquation(), atomsLeft.toString(), atomsRight
       //              .toString(), defect.toString()));
-      log.log(level, String.format("incorrect atom balance in reaction %s: %s", r.getName(), defect.toString()) );
+      logger.log(level, MessageFormat.format("Detected incorrect atom balance in reaction ''{0}'': {1}", reactionIdentifier, defect.toString()));
     }
-    
-    
-    return new AtomCheckResult(r, atomsLeft, atomsRight, defect);
+    return defect;
+  }
+  
+  /**
+   * 
+   * @param r
+   * @param replacement
+   * @return
+   */
+  public static AtomCheckResult<org.sbml.jsbml.Reaction> checkAtomBalance(org.sbml.jsbml.Reaction r, int replacement) {
+    Map<String, Integer> atomsLeft = countAtoms(r.getListOfReactants(), replacement);
+    Map<String, Integer> atomsRight = countAtoms(r.getListOfProducts(), replacement);
+    if (((atomsLeft == null) || (atomsLeft.size() == 0))
+        || ((atomsRight == null) || (atomsRight.size() == 0))) {
+      logger.log(level, MessageFormat.format("Couldn't check atom balance of reaction {0}.", r.getId()));
+      return null;
+    }
+    Map<String, Integer> defect = calculateDefect(r.getName(), atomsLeft, atomsRight);
+    return new AtomCheckResult<org.sbml.jsbml.Reaction>(r, atomsLeft, atomsRight, defect);
   }
   
   /**
@@ -302,15 +346,7 @@ public final class AtomBalanceCheck {
       // => Look if we have synonym identifers for KEGG compound and refetch
       String formula = infos.getFormulaDirectOrFromSynonym(manager);
       if (formula != null) {
-        double st = component.getStoichiometry() == null ? 1d : component.getStoichiometry().doubleValue();
-        // TODO: consider better replacement.
-        Map<String, Integer> count = countAtoms(st, formula, replacement);
-        for (String key : count.keySet()) {
-          if (!atomCount.containsKey(key)) {
-            atomCount.put(key, Integer.valueOf(0));
-          }
-          atomCount.put(key, Integer.valueOf(atomCount.get(key).intValue() + count.get(key).intValue()));
-        }
+        countAtoms(replacement, atomCount, component.getStoichiometry() == null ? 1d : component.getStoichiometry().doubleValue(), formula);
       } else {
         atomCount.clear();
         break;
@@ -319,6 +355,55 @@ public final class AtomBalanceCheck {
     }
     // if (atomCount.containsKey("R"))
     // atomCount.clear();
+    return atomCount;
+  }
+  
+  
+  /**
+   * 
+   * @param replacement
+   * @param atomCount
+   * @param stoichiometricCoefficient
+   * @param formula
+   */
+  private static void countAtoms(int replacement,
+    Map<String, Integer> atomCount, double stoichiometricCoefficient, String formula) {
+    // TODO: consider better replacement.
+    Map<String, Integer> count = countAtoms(stoichiometricCoefficient, formula, replacement);
+    for (String key : count.keySet()) {
+      if (!atomCount.containsKey(key)) {
+        atomCount.put(key, Integer.valueOf(0));
+      }
+      atomCount.put(key, Integer.valueOf(atomCount.get(key).intValue() + count.get(key).intValue()));
+    }
+  }
+  
+  /**
+   * 
+   * @param listOfSpeciesReferences
+   * @param replacement
+   * @return
+   */
+  public static Map<String, Integer> countAtoms(ListOf<SpeciesReference> listOfSpeciesReferences, int replacement) {
+    Model model = listOfSpeciesReferences.getModel();
+    Map<String, Integer> atomCount = new TreeMap<String, Integer>();
+    for (SpeciesReference specRef : listOfSpeciesReferences) {
+      Species species = model.getSpecies(specRef.getSpecies());
+      if (species != null) {
+        // getExtension does not create the extension (in contrast to getPlugin).
+        FBCSpeciesPlugin specPlug = (FBCSpeciesPlugin) species.getExtension("fbc");
+        if ((specPlug != null) && (specPlug.isSetChemicalFormula()) && !Double.isNaN(specRef.getStoichiometry())) {
+          countAtoms(replacement, atomCount, specRef.getStoichiometry(), specPlug.getChemicalFormula().trim());
+        } else {
+          atomCount.clear();
+          break;
+        }
+      } else {
+        logger.severe(MessageFormat.format("No species set for speciesReference ''{0}''.", specRef.getId()));
+        atomCount.clear();
+        break;
+      }
+    }
     return atomCount;
   }
   
