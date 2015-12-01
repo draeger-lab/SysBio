@@ -81,17 +81,17 @@ import de.zbit.util.objectwrapper.ValuePairUncomparable;
  */
 public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
 Serializable {
-
+  
   /**
    * A {@link Logger} for this class.
    */
   private static final transient Logger logger = Logger.getLogger(Option.class.getName());
-
+  
   /**
    * Generated serial version identifier.
    */
   private static final long serialVersionUID = 1799289265354101320L;
-
+  
   /**
    * Just a convenient wrapper method for {@link Range#Range(Class, List)}.
    * 
@@ -107,7 +107,7 @@ Serializable {
     return new Range<Type>((Class<Type>) acceptedObjects.get(0).getClass(),
         acceptedObjects);
   }
-
+  
   /**
    * Just a convenient wrapper method for {@link Range#Range(Class, List)}.
    * 
@@ -118,9 +118,7 @@ Serializable {
   public static <Type> Range<Type> buildRange(Type... acceptedObjects) {
     return buildRange(Arrays.asList(acceptedObjects));
   }
-
-
-
+  
   /**
    * This method is special for options of type {@link Class}. It allows to
    * get the real class from the {@link #range}, by comparing the
@@ -139,7 +137,7 @@ Serializable {
     // Please DO NOT add a TYPE PARAMETER to class. Option<Class<?>> can not be
     // initialized with a valid range. Thus, adding a type parameter (even a T or
     // a "?" to this method, renders it useless for many Option<Class>'es!!!
-
+    
     // For absolute class strings (e.g., "class de.zbit.io.mRNAReader").
     try {
       if (simpleName.startsWith("class ")) {
@@ -149,7 +147,7 @@ Serializable {
     } catch (ClassNotFoundException exc) {
       logger.finest(getMessage(exc));
     }
-
+    
     // For simple-name class strings (e.g., "mRNAReader").
     if ((option != null) && (option.getRange() != null)) {
       // Really take the simple name!
@@ -157,7 +155,7 @@ Serializable {
       if (pos >= 0) {
         simpleName = simpleName.substring(pos + 1, simpleName.length());
       }
-
+      
       // Search simple name in current range
       List<Class> listOfClasses = option.getRange().getAllAcceptableValues();
       if (listOfClasses != null) {
@@ -168,10 +166,10 @@ Serializable {
         }
       }
     }
-
+    
     return null;
   }
-
+  
   /**
    * Convert 'ret' to {@link #requiredType} by parsing it (e.g.
    * Integer.parseInt), or casting it to the desired type.
@@ -189,7 +187,7 @@ Serializable {
     if (requiredType.isAssignableFrom(ret.getClass())) {
       return requiredType.cast(ret);
     }
-
+    
     if (Reflect.containsParser(requiredType)) {
       try {
         ret = Reflect.invokeParser(requiredType, ret);
@@ -202,7 +200,7 @@ Serializable {
         logger.finest(getMessage(exc));
       }
     }
-
+    
     // Parse color from string. Alpha is being lost...
     if (requiredType.equals(java.awt.Color.class)) {
       if ((ret != null) && !ret.getClass().equals(java.awt.Color.class) && // May be already decoded
@@ -248,7 +246,7 @@ Serializable {
         return null;
       }
     }
-
+    
     try {
       return (Type) ret;
     } catch (Throwable exc) {
@@ -256,8 +254,7 @@ Serializable {
       return null;
     }
   }
-
-
+  
   /**
    * This group allows to create a group of buttons. This does only
    * make sense with {@link Boolean} options. All options on this
@@ -265,7 +262,7 @@ Serializable {
    * when translated into a JComponent.
    */
   private ButtonGroup buttonGroup = null;
-
+  
   /**
    * The default value for this option. May be null, if it is going to be read
    * from the XML-file later.
@@ -277,76 +274,76 @@ Serializable {
    * the condition, this Option is enabled (e.g., in GUIs).
    */
   private Map<Option<?>, SortedSet<Range<?>>> dependencies = null;
-
+  
   /**
    * A short description what the purpose of this option is.
    */
   private String description;
-
+  
   /**
    * A short human-readable representation of the purpose of this {@link Option}
    * . This {@link String} is intended to be displayed in help texts and
    * graphical user interfaces.
    */
   private String displayName;
-
+  
   /**
    * Gives the number of leading '-' symbols when converting this {@link Option}
    * instance's name into a command line key.
    */
   private final short numLeadingMinus;
-
+  
   /**
    * The name of this option.
    */
   private final String optionName;
-
+  
   /**
    * An optional range specification string to limit the allowable values when
    * using this {@link Option} on the command line.
    */
   private final Range<Type> range;
-
+  
   /**
    * The data type that is expected as an associated value in a key-value pair
    * of this {@link Option}'s name and a value. For instance, Boolean, Integer,
    * String etc.
    */
   private final Class<Type> requiredType;
-
+  
   /**
    * A shorter name for the command line, for instance, in addition to --file
    * one might want the option -f.
    */
   private final String shortCmdName;
-
+  
   /**
    * Allows to set a visibility for this option. If this is false,
    * the option should be hidden from every GUI, command-line,
    * help, etc.
    */
   private boolean visible = true;
-
+  
   /**
    * Decide whether the value of this option is allowed to be displayed to users,
    * e.g., passwords etc.
    */
   private boolean secret = false;
-
+  
   /**
    * @return the secret
    */
   public boolean isSecret() {
     return secret;
   }
-
+  
   /**
    * @param secret the secret to set
    */
   public void setSecret(boolean secret) {
     this.secret = secret;
   }
-
+  
   /**
    * 
    * @param optionName
@@ -373,7 +370,7 @@ Serializable {
     this(optionName, requiredType, bundle, range, defaultValue,
       (ValuePairUncomparable) null);
   }
-
+  
   /**
    * 
    * @param <E>
@@ -414,7 +411,7 @@ Serializable {
       }
     }
   }
-
+  
   /**
    * load the display name and description ("_TOOLTIP" or the string after ";")
    * 
@@ -432,7 +429,7 @@ Serializable {
       this.description = names[1];
     }
   }
-
+  
   /**
    * 
    * @param optionName
@@ -456,7 +453,7 @@ Serializable {
     ResourceBundle bundle, Type defaultValue) {
     this(optionName, requiredType, bundle, null, defaultValue);
   }
-
+  
   /**
    * 
    * @param <E>
@@ -471,7 +468,7 @@ Serializable {
     ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
     this(optionName, requiredType, bundle, null, defaultValue, dependencies);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -494,7 +491,7 @@ Serializable {
   public Option(String optionName, Class<Type> requiredType, String description) {
     this(optionName, requiredType, description, null, (Type) null);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -521,7 +518,7 @@ Serializable {
     String description, Range<Type> range) {
     this(optionName, requiredType, description, range, (short) 2);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -540,19 +537,20 @@ Serializable {
    *        to specify the purpose of this {@link Option}, i.e., how it helps
    *        the user to influence the program without explaining details of how
    *        to enter this {@link Option}.
-   * @param Range
+   * @param range
    *        - see {@link Range#Range(Class, String)} or
    *        {@link #buildRange(Class, String)}.
    * @param numLeadingMinus
    *        the number of leading '-' symbols of the command-line argument
    *        corresponding to this option.
    */
+  @SuppressWarnings("unchecked")
   public Option(String optionName, Class<Type> requiredType,
     String description, Range<Type> range, short numLeadingMinus) {
     this(optionName, requiredType, description, range, numLeadingMinus, null,
       (Type) null);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -577,13 +575,14 @@ Serializable {
    * @param numLeadingMinus
    * @param shortCmdName
    */
+  @SuppressWarnings("unchecked")
   public Option(String optionName, Class<Type> requiredType,
     String description, Range<Type> range, short numLeadingMinus,
     String shortCmdName) {
     this(optionName, requiredType, description, range, numLeadingMinus, shortCmdName,
       (Type) null);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -602,7 +601,7 @@ Serializable {
    *        to specify the purpose of this {@link Option}, i.e., how it helps
    *        the user to influence the program without explaining details of how
    *        to enter this {@link Option}.
-   * @param Range
+   * @param range
    *        see {@link Range#Range(Class, String)} or
    *        {@link #buildRange(Class, String)}.
    * @param numLeadingMinus
@@ -610,14 +609,16 @@ Serializable {
    * @param defaultValue
    *        The value for this {@link Option} to be used in case that there is
    *        no user-defined value at the moment.
+   * @param dependencies
    */
-  public Option(String optionName, Class<Type> requiredType,
+  public <E> Option(String optionName, Class<Type> requiredType,
     String description, Range<Type> range, short numLeadingMinus,
-    String shortCmdName, Type defaultValue) {
+    String shortCmdName, Type defaultValue,
+    ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
     this(optionName, requiredType, description, range, numLeadingMinus,
-      shortCmdName, defaultValue, null);
+      shortCmdName, defaultValue, (String) null, dependencies);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -636,7 +637,7 @@ Serializable {
    *        to specify the purpose of this {@link Option}, i.e., how it helps
    *        the user to influence the program without explaining details of how
    *        to enter this {@link Option}.
-   * @param Range
+   * @param range
    *        see {@link Range#Range(Class, String)} or
    *        {@link #buildRange(Class, String)}.
    * @param numLeadingMinus
@@ -644,23 +645,27 @@ Serializable {
    * @param defaultValue
    *        The value for this {@link Option} to be used in case that there is
    *        no user-defined value at the moment.
+   * @param displayName
+   * @param dependencies
    */
   @SuppressWarnings("unchecked")
-  public Option(String optionName, Class<Type> requiredType,
+  public <E> Option(String optionName, Class<Type> requiredType,
     String description, Range<Type> range, short numLeadingMinus,
-    String shortCmdName, Type defaultValue, String displayName) {
+    String shortCmdName, Type defaultValue, String displayName,
+    ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
+    
     super();
-
+    
     // Ensure that the option name contains no white spaces.
     this.optionName = optionName.replaceAll("\\s", "_");
-
+    
     // If declaring for Enums, always set a Range that accepts only
     // values from this Enum !
     if ((range == null) && Enum.class.isAssignableFrom(requiredType)) {
       range = new Range<Type>(requiredType,
           Range.toRangeString((Class<? extends Enum<?>>) requiredType));
     }
-
+    
     this.requiredType = requiredType;
     this.description = description;
     this.range = range;
@@ -677,8 +682,14 @@ Serializable {
     }
     this.numLeadingMinus = numLeadingMinus;
     this.displayName = displayName;
+    
+    if (dependencies != null) {
+      for (ValuePairUncomparable<Option<E>, Range<E>> dependency : dependencies) {
+        addDependency(dependency.getA(), dependency.getB());
+      }
+    }
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -707,13 +718,13 @@ Serializable {
    *        The value for this {@link Option} to be used in case that there is
    *        no user-defined value at the moment.
    */
-  public Option(String optionName, Class<Type> requiredType,
+  public <E> Option(String optionName, Class<Type> requiredType,
     String description, Range<Type> range, short numLeadingMinus,
-    Type defaultValue) {
+    Type defaultValue, ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
     this(optionName, requiredType, description, range, numLeadingMinus, null,
-      defaultValue);
+      defaultValue, dependencies);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -742,13 +753,14 @@ Serializable {
    *        interfaces in order to give a brief description of this
    *        {@link Option}.
    */
+  @SuppressWarnings("unchecked")
   public Option(String optionName, Class<Type> requiredType,
     String description, Range<Type> range, short numLeadingMinus,
     Type defaultValue, String displayName) {
     this(optionName, requiredType, description, range, numLeadingMinus, null,
       defaultValue, displayName);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -778,6 +790,7 @@ Serializable {
    *        interfaces in order to give a brief description of this
    *        {@link Option}.
    */
+  @SuppressWarnings("unchecked")
   public Option(String optionName, Class<Type> requiredType,
     ResourceBundle bundle, Range<Type> range, short numLeadingMinus,
     Type defaultValue) {
@@ -785,7 +798,7 @@ Serializable {
       defaultValue, bundle.getString(optionName));
     loadDisplayNameAndDescription(optionName, bundle);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -804,18 +817,21 @@ Serializable {
    *        to specify the purpose of this {@link Option}, i.e., how it helps
    *        the user to influence the program without explaining details of how
    *        to enter this {@link Option}.
-   * @param Range
+   * @param range
    *        see {@link Range#Range(Class, String)} or
    *        {@link #buildRange(Class, String)}.
    * @param defaultValue
    *        The value for this {@link Option} to be used in case that there is
    *        no user-defined value at the moment.
+   * @param dependencies
    */
-  public Option(String optionName, Class<Type> requiredType,
-    String description, Range<Type> range, Type defaultValue) {
-    this(optionName, requiredType, description, range, (short) 2, defaultValue);
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Range<Type> range, Type defaultValue,
+    ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
+    this(optionName, requiredType, description, range, (short) 2, defaultValue,
+      dependencies);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -843,13 +859,14 @@ Serializable {
    * @param visibility
    *        allows to hide this option from auto-generated
    */
+  @SuppressWarnings("unchecked")
   public Option(String optionName, Class<Type> requiredType,
     String description, Range<Type> range, Type defaultValue,
     boolean visibility) {
     this(optionName, requiredType, description, range, (short) 2, defaultValue);
     setVisible(visibility);
   }
-
+  
   /**
    * 
    * @param <E>
@@ -866,7 +883,7 @@ Serializable {
     this(optionName, requiredType, description, range, defaultValue, null,
       dependencies);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type. This
    * constructor adds a dependency to the created option. The given
@@ -896,12 +913,13 @@ Serializable {
    * @param dependency
    * @param condition
    */
+  @SuppressWarnings("unchecked")
   public <E> Option(String optionName, Class<Type> requiredType,
     String description, Range<Type> range, Type defaultValue, Option<E> dependency, Range<E> condition) {
     this(optionName, requiredType, description, range, defaultValue);
     addDependency(dependency, condition);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -934,7 +952,7 @@ Serializable {
     this(optionName, requiredType, description, range, (short) 2, defaultValue,
       displayName);
   }
-
+  
   /**
    * 
    * @param <E>
@@ -953,7 +971,7 @@ Serializable {
       displayName);
     this.dependencies = dependencies;
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -990,7 +1008,7 @@ Serializable {
       displayName);
     addDependency(dependency, condition);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -1017,7 +1035,7 @@ Serializable {
     this(optionName, requiredType, description, null, numLeadingMinus,
       shortCmdName);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -1042,13 +1060,14 @@ Serializable {
    *        The value for this {@link Option} to be used in case that there is
    *        no user-defined value at the moment.
    */
+  @SuppressWarnings("unchecked")
   public Option(String optionName, Class<Type> requiredType,
     String description, short numLeadingMinus, String shortCmdName,
     Type defaultValue) {
     this(optionName, requiredType, description, null, numLeadingMinus,
       shortCmdName, defaultValue);
   }
-
+  
   /**
    * Same as {@link #Option(String, Class, String, short, String, Object))}, but with a
    * default visibility attribute.
@@ -1067,8 +1086,7 @@ Serializable {
       shortCmdName, defaultValue);
     setVisible(visibility);
   }
-
-
+  
   /**
    * 
    * @param <E>
@@ -1089,7 +1107,7 @@ Serializable {
       defaultValue);
     addDependency(dependency, condition);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -1112,11 +1130,12 @@ Serializable {
    *        The value for this {@link Option} to be used in case that there is
    *        no user-defined value at the moment.
    */
-  public Option(String optionName, Class<Type> requiredType,
-    String description, Type defaultValue) {
-    this(optionName, requiredType, description, null, defaultValue);
+  public <E> Option(String optionName, Class<Type> requiredType,
+    String description, Type defaultValue,
+    ValuePairUncomparable<Option<E>, Range<E>>... dependencies) {
+    this(optionName, requiredType, description, null, defaultValue, dependencies);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -1146,11 +1165,11 @@ Serializable {
     String description, Type defaultValue, boolean visibility) {
     this(optionName, requiredType, description, defaultValue, null, visibility);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type. This
    * constructor adds all given dependencies to the created option. This is
-   * especially usefull for setting the dependencies of this option to the same
+   * especially useful for setting the dependencies of this option to the same
    * dependencies as other options.
    * 
    * @see #getDependencies()
@@ -1181,7 +1200,7 @@ Serializable {
     this(optionName, requiredType, description, defaultValue, null,
       dependencies);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type. This
    * constructor adds a dependency to the created option. The given
@@ -1216,7 +1235,7 @@ Serializable {
     this(optionName, requiredType, description, defaultValue, (String) null,
       dependency, condition);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -1247,7 +1266,7 @@ Serializable {
     String description, Type defaultValue, String displayName) {
     this(optionName, requiredType, description, null, defaultValue, displayName);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -1282,7 +1301,7 @@ Serializable {
     this(optionName, requiredType, description, null, defaultValue, displayName);
     setVisible(visibility);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -1319,7 +1338,7 @@ Serializable {
     this(optionName, requiredType, description, null, defaultValue, displayName);
     setButtonGroup(group);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type.
    * 
@@ -1361,7 +1380,7 @@ Serializable {
     setButtonGroup(group);
     setVisible(visibility);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type. This
    * constructor adds all given dependencies to the created option. This is
@@ -1399,7 +1418,7 @@ Serializable {
     this(optionName, requiredType, description, null, defaultValue,
       displayName, dependencies);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type. This
    * constructor adds a dependency to the created option. The given
@@ -1438,7 +1457,7 @@ Serializable {
     this(optionName, requiredType, description, defaultValue, displayName);
     addDependency(dependency, condition);
   }
-
+  
   /**
    * Creates a new {@link Option}, that accepts an input of the given Type. This
    * constructor adds a dependency to the created option. The given
@@ -1477,7 +1496,7 @@ Serializable {
     this(optionName, requiredType, bundle, defaultValue);
     addDependency(dependency, condition);
   }
-
+  
   /**
    * 
    * @param optionName
@@ -1511,7 +1530,7 @@ Serializable {
     addDependency(option, new Range<E>((Class<E>)condition.getClass(),
         Arrays.asList(condition)));
   }
-
+  
   /**
    * 
    * @param <E>
@@ -1527,7 +1546,7 @@ Serializable {
     }
     dependencies.get(option).add(condition);
   }
-
+  
   /**
    * Does nearly the same as {@link Range#castAndCheckIsInRange(Object)}, but
    * has some enhancements, e.g., when using Class as type.
@@ -1546,7 +1565,7 @@ Serializable {
     }
     return range.isInRange(value2, props);
   }
-
+  
   /**
    * Cast or parse {@code value} to {@code Type}
    * and check with the given range constraints.
@@ -1574,7 +1593,7 @@ Serializable {
       return false;
     }
   }
-
+  
   /* (non-Javadoc)
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
@@ -1582,7 +1601,7 @@ Serializable {
   public int compareTo(Option<Type> option) {
     return toString().compareTo(option.toString());
   }
-
+  
   /**
    * Creates and returns a new argument holder for the required type of this
    * {@link Option}.
@@ -1608,7 +1627,7 @@ Serializable {
       return new ArgHolder<String>(String.class);
     }
   }
-
+  
   /**
    * Creates and returns a new argument holder for the required type of this
    * {@link Option} with the given object as default value.
@@ -1641,7 +1660,7 @@ Serializable {
       return new ArgHolder<String>(value);
     }
   }
-
+  
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
@@ -1649,7 +1668,7 @@ Serializable {
   public boolean equals(Object o) {
     return o.toString().equals(toString());
   }
-
+  
   /**
    * @see StringUtil#formatOptionName(String)
    * @return
@@ -1657,7 +1676,7 @@ Serializable {
   public String formatOptionName() {
     return StringUtil.formatOptionName(getOptionName());
   }
-
+  
   /**
    * @see #setButtonGroup(ButtonGroup)
    * @return the buttonGroup
@@ -1665,7 +1684,7 @@ Serializable {
   public ButtonGroup getButtonGroup() {
     return buttonGroup;
   }
-
+  
   /**
    * The default value for this option. If it is null, the cfg packet tries to
    * read it from an config.xml.
@@ -1677,7 +1696,7 @@ Serializable {
   public Type getDefaultValue() {
     return defaultValue;
   }
-
+  
   /**
    * Remark: Please be careful with this method, as it
    * returns a raw internal data structure.
@@ -1689,7 +1708,7 @@ Serializable {
     }
     return dependencies;
   }
-
+  
   /**
    * Returns a description for this {@link Option}. If the {@link Range} of this
    * {@link Option} is a {@link File} with a {@link GeneralFileFilter}
@@ -1711,14 +1730,14 @@ Serializable {
       } else {
         desc = gf.getDescription();
       }
-
+      
       return StringUtil.concat(description," ",
         ResourceManager.getBundle("de.zbit.locales.Labels").getString(
             "ACCEPTS")," ", desc, ".").toString();
     }
     return description;
   }
-
+  
   /**
    * Returns the display name of this {@link Option}.
    * 
@@ -1728,7 +1747,7 @@ Serializable {
   public final String getDisplayName() {
     return displayName;
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.gui.ActionCommand#getName()
    */
@@ -1736,28 +1755,28 @@ Serializable {
   public String getName() {
     return isSetDisplayName() ? getDisplayName() : getOptionName();
   }
-
+  
   /**
    * @return the numLeadingMinus
    */
   public short getNumLeadingMinus() {
     return numLeadingMinus;
   }
-
+  
   /**
    * @return this {@link Option}'s name
    */
   public String getOptionName() {
     return optionName;
   }
-
+  
   /**
    * @return the range, or null if no range is set.
    */
   public Range<Type> getRange() {
     return range;
   }
-
+  
   /**
    * Returns the Range specification String for the {@link #range}. More
    * specific: {@link Range#getRangeSpecString()} is returned.
@@ -1767,21 +1786,21 @@ Serializable {
   public String getRangeSpecification() {
     return range == null ? null : range.getRangeSpecString();
   }
-
+  
   /**
    * @return the type
    */
   public Class<Type> getRequiredType() {
     return requiredType;
   }
-
+  
   /**
    * @return the shortCmdName
    */
   public String getShortCmdName() {
     return shortCmdName;
   }
-
+  
   /**
    * A {@link String} to be parsed by an {@link ArgParser} to specify the
    * command line option corresponding to this {@link Option}. If a short
@@ -1862,7 +1881,7 @@ Serializable {
     sb.append(getDescription());
     return sb.toString();
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.gui.ActionCommand#getToolTip()
    */
@@ -1870,7 +1889,7 @@ Serializable {
   public String getToolTip() {
     return getDescription();
   }
-
+  
   /**
    * Returns the value for this {@link Option}, which must be contained in the
    * given {@link SBPreferences}.
@@ -1881,10 +1900,10 @@ Serializable {
   public Type getValue(SBPreferences parentPreferences) {
     // Returns a string.
     Object ret = parentPreferences.get(this.toString());
-
+    
     return parseOrCast(requiredType, ret);
   }
-
+  
   /**
    * Returns the value for this {@link Option}, which must be contained in the
    * given {@link SBProperties}.
@@ -1895,10 +1914,10 @@ Serializable {
   public Type getValue(SBProperties parentProperties) {
     // Returns a string.
     Object ret = parentProperties.getProperty(this.toString());
-
+    
     return parseOrCast(requiredType, ret);
   }
-
+  
   /**
    * @return true if and only if this Option depends
    * on other options.
@@ -1906,7 +1925,7 @@ Serializable {
   public boolean hasDependencies() {
     return (dependencies!=null && dependencies.size()>0);
   }
-
+  
   /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
@@ -1914,8 +1933,7 @@ Serializable {
   public int hashCode() {
     return getOptionName().hashCode();
   }
-
-
+  
   /**
    * 
    * @return
@@ -1923,14 +1941,14 @@ Serializable {
   public boolean isSetDefault() {
     return defaultValue != null;
   }
-
+  
   /**
    * @return
    */
   public final boolean isSetDescription() {
     return description != null;
   }
-
+  
   /**
    * Checks if a display name for this option has been set.
    * 
@@ -1940,42 +1958,42 @@ Serializable {
   public final boolean isSetDisplayName() {
     return displayName != null;
   }
-
+  
   /**
    * @return
    */
   public boolean isSetRangeSpecification() {
     return (range != null) && (range.getRangeSpecString() != null);
   }
-
+  
   /**
    * @return
    */
   public final boolean isSetRequiredType() {
     return requiredType != null;
   }
-
+  
   /**
    * 
    */
   public final boolean isSetShortCmdName() {
     return shortCmdName != null;
   }
-
+  
   /**
    * @return true if this options should be visible to the user
    */
   public boolean isVisible() {
     return visible;
   }
-
+  
   /**
    * @return
    */
   public final boolean optionName() {
     return optionName != null;
   }
-
+  
   /**
    * 
    * @param ret
@@ -1990,7 +2008,7 @@ Serializable {
     }
     return parseOrCast(requiredType, ret);
   }
-
+  
   /**
    * Remove an option from the list of dependencies.
    * @param <E>
@@ -2002,7 +2020,7 @@ Serializable {
     }
     dependencies.remove(option);
   }
-
+  
   /**
    * @param group
    *        allows to create a group of buttons. This does only make sense with
@@ -2013,7 +2031,7 @@ Serializable {
   public void setButtonGroup(ButtonGroup group) {
     this.buttonGroup = group;
   }
-
+  
   /**
    * Change the default value for this option. Actually, you should do this only
    * once right at the start of your main class. This possibility has just been
@@ -2025,7 +2043,7 @@ Serializable {
   public void setDefaultValue(Type def) {
     this.defaultValue=def;
   }
-
+  
   /**
    * Sets the display name of this {@link Option}.
    * 
@@ -2035,7 +2053,7 @@ Serializable {
   public final void setDisplayName(String displayName) {
     this.displayName = displayName;
   }
-
+  
   /**
    * @param visible allows to change the desired visibility for
    * this option.
@@ -2044,7 +2062,7 @@ Serializable {
   public void setVisible(boolean visible) {
     this.visible = visible;
   }
-
+  
   /**
    * This creates a command-line argument name from this {@link Option}'s name
    * by adding {@link #numLeadingMinus} '-' symbols, converting the name to
@@ -2060,7 +2078,7 @@ Serializable {
     sb.append(optionName.toLowerCase().replace('_', '-'));
     return sb.toString();
   }
-
+  
   /**
    * Returns the {@link #optionName}.
    */
@@ -2068,4 +2086,5 @@ Serializable {
   public String toString() {
     return optionName;
   }
+  
 }
