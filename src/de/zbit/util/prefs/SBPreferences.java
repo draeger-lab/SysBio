@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +37,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -173,6 +175,28 @@ public class SBPreferences implements Map<Object, Object> {
     }
     parser.matchAllArgs(args);
     putAll(props, options);
+    // check dependencies
+    for (Option<?> o : options.keySet()) {
+      if (o.hasDependencies()) {
+        Map<Option<?>, SortedSet<Range<?>>> dependsOn = o.getDependencies();
+        for (Option cur : dependsOn.keySet()) {
+          boolean conflictFree = false;
+          for (Range condition : dependsOn.get(cur)) {
+            Object value = cur.getValue(props);
+            if (condition.isInRange(value)) {
+              conflictFree = true;
+              break;
+            }
+          }
+          if (!conflictFree) {
+            logger.warning(MessageFormat.format("Option {0} conflicts with the value {1} of option {2}.", o, cur, cur.getValue(props)));
+            logger.warning(MessageFormat.format("Rejecting option {0}={1}.", o, o.getValue(props)));
+            props.remove(o);
+            break;
+          }
+        }
+      }
+    }
     return props;
   }
   
