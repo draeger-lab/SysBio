@@ -35,7 +35,15 @@ import sun.swing.table.DefaultTableCellHeaderRenderer;
  * @version $Rev$
  */
 public class DefaultTableCellTwoRowHeaderRenderer extends DefaultTableCellHeaderRenderer {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = 4654088278313349629L;
+  
+  /**
+   * A {@link Logger} for this class.
+   */
   public static final transient Logger log = Logger.getLogger(DefaultTableCellTwoRowHeaderRenderer.class.getName());
   
   /**
@@ -43,6 +51,9 @@ public class DefaultTableCellTwoRowHeaderRenderer extends DefaultTableCellHeader
    */
   Set<Integer> boldBorders;
   
+  /**
+   * 
+   */
   public DefaultTableCellTwoRowHeaderRenderer() {
     this(null);
   }
