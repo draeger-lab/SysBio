@@ -206,6 +206,7 @@
   <entry key="KGML_FILES">KGML files</entry>
   <entry key="LOG_FILE">Log file</entry>
   <entry key="MAP_FILES">MAP files</entry>
+  <entry key="MAT_FILES">MAT files (*.mat)</entry>
   <entry key="PDF_FILES">Portable Document Format files</entry>
   <entry key="PED_FILES">Plain text PLINK genotype files</entry>
   <entry key="PLINK_GENOTYPE_FILES">PLINK genotype files</entry>

@@ -352,24 +352,28 @@
     <delete dir="${classes}"/>
 	<mkdir dir="${classes}"/>
 	<javac
-    classpathref="classpath"
-    compiler="${compiler}"
-    debug="${debug}"
-    deprecation="${deprecation}"
-    destdir="${classes}"
-    fork="true"
-    listfiles="yes"
-    memoryMaximumSize="512M"
-    nowarn="no"
-    optimize="${optimize}"
-    source="1.6"
-    srcdir="${src}"
-    sourcepathref="sourcepath"
-    target="1.6"
-    verbose="${verbose}"
-  >
-    <compilerarg value="-XDignore.symbol.file" />
-  </javac>
+      classpathref="classpath"
+      compiler="${compiler}"
+      debug="${debug}"
+      deprecation="${deprecation}"
+      destdir="${classes}"
+      fork="true"
+      listfiles="yes"
+      memoryMaximumSize="512M"
+      nowarn="no"
+      optimize="${optimize}"
+      source="1.6"
+      srcdir="${src}"
+      sourcepathref="sourcepath"
+      target="1.6"
+      verbose="${verbose}"
+    >
+      <!-- 
+        Force javac to link agains rt.jar! Works also in MAVEN with fork = true!
+        See http://stackoverflow.com/questions/4065401/using-internal-sun-classes-with-javac
+      -->
+      <compilerarg value="-XDignore.symbol.file" />
+    </javac>
   	<!-- 		depend="${depend}" -->
 	  <!-- <copy todir="${classes}"/> -->
   </target>
