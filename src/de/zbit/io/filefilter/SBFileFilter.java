@@ -143,6 +143,10 @@ public class SBFileFilter extends GeneralFileFilter {
      */
     MAP_FILES,
     /**
+     * Binary MATLAB data object files.
+     */
+    MAT_FILES,
+    /**
      * A file filter for Web-Ontology-Language (OWL files).
      */
     OWL_FILES,
@@ -256,14 +260,9 @@ public class SBFileFilter extends GeneralFileFilter {
         case JPEG_FILES:
           extensions.add("jpg");
           break;
-        case JSON_FILES:
-          extensions.add("json");
-          break;
         case KGML_FILES:
           extensions.add("xml");
           return extensions;
-        case LOG_FILE:
-          extensions.add("log");
           // ---- please keep the following order
         case BioPAX_FILES:
         case BioPAX_FILES_L2:
@@ -297,14 +296,12 @@ public class SBFileFilter extends GeneralFileFilter {
         case TEXT_FILES:
           extensions.add("txt");
           return extensions;
-        case TSV_FILES:
-          return extensions;
         default:
           break;
       }
       if (string.contains("_")) {
-        extensions.add(toString().substring(0, toString().indexOf("_"))
-          .toLowerCase());
+        String ext = toString();
+        extensions.add(ext.substring(0, ext.indexOf("_")).toLowerCase());
       }
       return extensions;
     }
@@ -471,6 +468,10 @@ public class SBFileFilter extends GeneralFileFilter {
     return new SBFileFilter(FileType.BioPAX_FILES_L3);
   }
   
+  /**
+   * 
+   * @return
+   */
   public static final SBFileFilter createCDTFileFilterList() {
     return new SBFileFilter(FileType.CDT_FILES);
   }
@@ -578,6 +579,14 @@ public class SBFileFilter extends GeneralFileFilter {
    */
   public static SBFileFilter createMAPFileFilter() {
     return new SBFileFilter(FileType.MAP_FILES);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public static SBFileFilter createMATFileFilter() {
+    return new SBFileFilter(FileType.MAT_FILES);
   }
   
   /**
