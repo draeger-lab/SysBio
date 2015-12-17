@@ -25,6 +25,60 @@
 	separate actual labels from associated tool tips.
   </comment>
   
+  <!-- DrawingOptions -->
+  
+  <entry key="DrawingOptions">Drawing options</entry>
+  <entry key="DrawingOptions_TOOLTIP">Define the appearance of SBGN elements</entry>
+  <entry key="COMPARTMENT_FILL_COLOR">Compartment fill color</entry>
+  <entry key="COMPARTMENT_FILL_COLOR_TOOLTIP">This option is only available if you decide that compartments should be filled.</entry>
+  <entry key="COMPARTMENT_FILLED">Fill compartment glyphs</entry>
+  <entry key="COMPARTMENT_FILLED_TOOLTIP">Decide if inner part of compartment glyphs should be filled, or if only the outside should be drawn.</entry>
+  <entry key="COMPARTMENT_GLYPH">Compartment glyphs</entry>
+  <entry key="COMPARTMENT_GLYPH_TOOLTIP">Define color and appearance of compartment glyphs.</entry>
+  <entry key="COMPARTMENT_LINE_COLOR">Compartment line color</entry>
+  <entry key="COMPARTMENT_LINE_COLOR_TOOLTIP">Defaults to dark yellow.</entry>
+  <entry key="COMPARTMENT_LINE_WIDTH">Compartment line width</entry>
+  <entry key="COMPARTMENT_LINE_WIDTH_TOOLTIP">The sickness of the lines surrounding compartment glyphs.</entry>
+  <entry key="NONCOVALENT_COMPLEX_FILL_COLOR">Noncovalent complex fill color</entry>
+  <entry key="NONCOVALENT_COMPLEX_FILL_COLOR_TOOLTIP">Defaults to dodger blue 3.</entry>
+  <entry key="GENE_FILL_COLOR">Gene fill color</entry>
+  <entry key="GENE_FILL_COLOR_TOOLTIP">Defaults to yellow.</entry>
+  <entry key="MACROMOLECULE_FILL_COLOR">Macromolecule fill color</entry>
+  <entry key="MACROMOLECULE_FILL_COLOR_TOOLTIP">Defaults to green 3.</entry>
+  <entry key="SIMPLE_MOLECULE_FILL_COLOR">Simple molecule fill color</entry>
+  <entry key="SIMPLE_MOLECULE_FILL_COLOR_TOOLTIP">Defaults to light sky blue 1.</entry>
+  <entry key="MAP_FILL_COLOR">Map and submap fill color</entry>
+  <entry key="MAP_FILL_COLOR_TOOLTIP">Defaults to azure 2.</entry>
+  <entry key="EMPTY_SET_FILL_COLOR">Empty set fill color</entry>
+  <entry key="EMPTY_SET_FILL_COLOR_TOOLTIP">Defaults to pink.</entry>
+  <entry key="PERTURBING_AGENT_FILL_COLOR">Perturbing agent fill color</entry>
+  <entry key="PERTURBING_AGENT_FILL_COLOR_TOOLTIP">Defaults to drug pink.</entry>
+  <entry key="DEFAULT_FILL_COLOR">Default fill color</entry>
+  <entry key="DEFAULT_FILL_COLOR_TOOLTIP">Defaults to light green.</entry>
+  <entry key="DEFAULT_LINE_COLOR">Default line color</entry>
+  <entry key="DEFAULT_LINE_COLOR_TOOLTIP">Defaults to black.</entry>
+  <entry key="FONT">Font</entry>
+  <entry key="FONT_TOOLTIP">Settings for the display of text.</entry>
+  <entry key="FONT_FAMILY">Font family</entry>
+  <entry key="FONT_FAMILY_TOOLTIP">Defaults to Arial.</entry>
+  <entry key="FONT_SIZE">Font size</entry>
+  <entry key="FONT_SIZE_TOOLTIP">Defaults to 12.</entry>
+  <entry key="FONT_STYLE">Font style</entry>
+  <entry key="FONT_STYLE_TOOLTIP">Define which fonts and colors to use for text labels and when these should be shown.</entry>
+  <entry key="FONT_COLOR">Font color</entry>
+  <entry key="FONT_COLOR_TOOLTIP">Defaults to black.</entry>
+  <entry key="GLYPH_LINE_WIDTH">Glyph line width</entry>
+  <entry key="GLYPH_LINE_WIDTH_TOOLTIP">Defaults to 2 px.</entry>
+  <entry key="EDGE_LINE_WIDTH">Edge line width</entry>
+  <entry key="EDGE_LINE_WIDTH_TOOLTIP">Defaults to 2 px.</entry>
+  <entry key="PAINT_SLOPPY_TEXT">Paint text in sloppy mode</entry>
+  <entry key="PAINT_SLOPPY_TEXT_TOOLTIP">Decide if in sloppy representations text should be drawn. By default, text will be omitted in sloppy drawings (highly zoomed out).</entry>
+  <entry key="GLYPH_PREFS">Glyph options</entry>
+  <entry key="GLYPH_PREFS_TOOLTIP">Define drawing properties of graphical elements other than compartments.</entry>
+  <entry key="REACTION_PREFS">Reaction options</entry>
+  <entry key="REACTION_PREFS_TOOLTIP">Define how reactions should be drawn.</entry>
+  
+  
   <!-- RestrictedEditMode (Property table on the upper right) -->
   
   <entry key="nodeLabel">All names</entry>

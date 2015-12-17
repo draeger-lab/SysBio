@@ -14,13 +14,36 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.sbml.layout;
+package de.zbit.svg;
+
+import org.w3c.dom.NodeList;
 
 /**
- * @author Jakob Matthes
+ * @author Andreas Dr&auml;ger
  * @version $Rev$
  * @param <T>
  */
-public abstract class PerturbingAgent<T> extends AbstractSBGNNodeWithCloneMarker<T> {
+public interface SVGHandler<T> {
+  
+  /**
+   * 
+   * @param element
+   * @param elements
+   */
+  void handle(Element element, NodeList elements);
+  
+  /**
+   * 
+   * @return
+   */
+  T getResult();
+  
+  /**
+   * 
+   * @param width
+   * @param height
+   * @param vBox
+   */
+  void init(double width, double height, double[] vBox);
   
 }

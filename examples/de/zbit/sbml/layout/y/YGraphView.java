@@ -97,7 +97,7 @@ public class YGraphView implements PropertyChangeListener {
   
   private static String out;
   
-  private static Logger logger = Logger.getLogger(YGraphView.class.getName());
+  private static final transient Logger logger = Logger.getLogger(YGraphView.class.getName());
   
   /**
    * @param args

@@ -170,13 +170,13 @@ public class StringUtil {
    * that is contained in {@code parentString}, or -1.
    */
   public static int containsAny(String[] strings, String parentString) {
-    if (strings==null) {
+    if (strings == null) {
       return -1;
     }
-    for (int i=0; i<strings.length; i++) {
-      if (parentString==null) {
+    for (int i = 0; i < strings.length; i++) {
+      if (parentString == null) {
         // Also detect indexOf null
-        if (strings[i]==null) {
+        if (strings[i] == null) {
           return i;
         } else {
           continue;

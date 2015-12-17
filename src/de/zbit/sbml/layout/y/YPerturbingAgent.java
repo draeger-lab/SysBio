@@ -41,7 +41,7 @@ public class YPerturbingAgent extends PerturbingAgent<NodeRealizer> {
 			SBGNVisualizationProperties.getNodeRealizer(SBO.getPertubingAgent()).createCopy();
 
 		if (nodeRealizer instanceof CloneMarker) {
-			((CloneMarker) nodeRealizer).setNodeIsCloned(isSetCloneMarker());
+			((CloneMarker) nodeRealizer).setNodeIsCloned(hasCloneMarker());
 		}
 		nodeRealizer.setSize(width, height);
 		nodeRealizer.setLocation(x, y);

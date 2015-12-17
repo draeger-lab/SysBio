@@ -39,6 +39,10 @@ import de.zbit.util.StringUtil;
  * @version $Rev$
  */
 public class ColorChooserWithPreview extends JLabel {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = -3229159450765766302L;
   
   /**
@@ -47,11 +51,17 @@ public class ColorChooserWithPreview extends JLabel {
    */
   private List<ChangeListener> changeListeners;
   
-  
+  /**
+   * 
+   */
   public ColorChooserWithPreview() {
     this(Color.WHITE);
   }
   
+  /**
+   * 
+   * @param initialColor
+   */
   public ColorChooserWithPreview(Color initialColor) {
     super();
     changeListeners = new LinkedList<ChangeListener>();
@@ -80,7 +90,7 @@ public class ColorChooserWithPreview extends JLabel {
   public void setOpaque(boolean isOpaque) {
     // Ignore!
   }
-
+  
   /**
    * 
    */
@@ -90,26 +100,31 @@ public class ColorChooserWithPreview extends JLabel {
        * (non-Javadoc)
        * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
        */
+      @Override
       public void mouseReleased(MouseEvent e) {}
       /*
        * (non-Javadoc)
        * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
        */
+      @Override
       public void mousePressed(MouseEvent e) {}
       /*
        * (non-Javadoc)
        * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
        */
+      @Override
       public void mouseExited(MouseEvent e) {}
       /*
        * (non-Javadoc)
        * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
        */
+      @Override
       public void mouseEntered(MouseEvent e) {}
       /*
        * (non-Javadoc)
        * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
        */
+      @Override
       public void mouseClicked(MouseEvent e) {
         showJColorChooser();
         //e.consume();
@@ -121,6 +136,7 @@ public class ColorChooserWithPreview extends JLabel {
        * (non-Javadoc)
        * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
        */
+      @Override
       public void keyTyped(KeyEvent e) {
         // Enter/ Confirm keys
         if (e.getKeyChar()=='\n' || e.getKeyCode()==13 || e.getKeyCode()==10 || e.getKeyCode()==16777296) { // letztes = Keypad Enter
@@ -135,29 +151,41 @@ public class ColorChooserWithPreview extends JLabel {
        * (non-Javadoc)
        * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
        */
+      @Override
       public void keyReleased(KeyEvent e) {}
       
       /*
        * (non-Javadoc)
        * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
        */
+      @Override
       public void keyPressed(KeyEvent e) {}
     });
   }
   
-  
+  /**
+   * 
+   * @param listener
+   */
   public void addChangeListener(ChangeListener listener) {
     changeListeners.add(listener);
   }
-
+  
+  /**
+   * 
+   * @return
+   */
   public Color showJColorChooser() {
     String title = getToolTipText();
-    if (title==null || title.length()<1)
+    if (title==null || title.length()<1) {
       title = getName();
-    if (title==null || title.length()<1)
+    }
+    if (title==null || title.length()<1) {
       title = getText();
-    if (title==null || title.length()<1)
+    }
+    if (title==null || title.length()<1) {
       title = "Please choose a color.";
+    }
     title = StringUtil.removeXML(title);
     
     Color col = JColorChooser.showDialog(this, title, getBackground());
@@ -170,7 +198,7 @@ public class ColorChooserWithPreview extends JLabel {
     }
     return col;
   }
-
+  
   /**
    * @return
    */

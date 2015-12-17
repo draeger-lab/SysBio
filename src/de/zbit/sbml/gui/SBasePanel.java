@@ -93,6 +93,7 @@ import org.sbml.jsbml.ext.groups.Member;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CubicBezier;
 import org.sbml.jsbml.ext.layout.Dimensions;
+import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ontology.Term;
@@ -255,6 +256,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
       }
       if (sbase instanceof Variable) {
         addProperties((Variable) sbase);
+      }
+      if (sbase instanceof GraphicalObject) {
+        GraphicalObject go = (GraphicalObject) sbase;
+        if (go.isSetBoundingBox()) {
+          lh.add(new SBasePanel(go.getBoundingBox()), 1, ++row, 3, 1, 0d, 0d );
+        }
       }
       if (sbase instanceof LineSegment) {
         addProperties((LineSegment) sbase);

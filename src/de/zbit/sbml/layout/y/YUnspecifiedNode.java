@@ -42,7 +42,7 @@ public class YUnspecifiedNode extends UnspecifiedNode<NodeRealizer> {
 		ShapeNodeRealizerSupportingCloneMarker shapeNodeRealizer =
 			new ShapeNodeRealizerSupportingCloneMarker(nodeRealizer);
 		
-		shapeNodeRealizer.setNodeIsCloned(isSetCloneMarker());
+		shapeNodeRealizer.setNodeIsCloned(hasCloneMarker());
 		shapeNodeRealizer.setSize(width, height);
 		shapeNodeRealizer.setLocation(x, y);
 		
