@@ -122,7 +122,7 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  * @since 1.0
  */
-public class FileSelector extends JPanel implements ActionListener, JComponentForOption{
+public class FileSelector extends JPanel implements ActionListener, JComponentForOption {
   
   /**
    * 
@@ -200,8 +200,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
     }
   }
   
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see java.awt.Component#addKeyListener(java.awt.event.KeyListener)
    */
   @Override
@@ -210,8 +209,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
     textField.addKeyListener(l);
   }
   
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see java.awt.Component#setName(java.lang.String)
    */
   @Override
@@ -931,7 +929,7 @@ public class FileSelector extends JPanel implements ActionListener, JComponentFo
    */
   @Override
   public void setOption(Option<?> option) {
-    this.option=option;
+    this.option = option;
   }
   
   /* (non-Javadoc)

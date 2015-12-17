@@ -37,7 +37,7 @@ import de.zbit.sbml.layout.SBGNArc;
  */
 public abstract class YAbstractSBGNArc implements SBGNArc<EdgeRealizer> {
   
-  private static Logger logger = Logger.getLogger(YAbstractSBGNArc.class.getName());
+  private static final transient Logger logger = Logger.getLogger(YAbstractSBGNArc.class.getName());
   
   /* (non-Javadoc)
    * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.CurveSegment, double)

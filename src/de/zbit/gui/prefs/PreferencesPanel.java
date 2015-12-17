@@ -18,6 +18,7 @@ package de.zbit.gui.prefs;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Panel;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -63,6 +64,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.JTextComponent;
 
 import de.zbit.gui.ColorChooserWithPreview;
+import de.zbit.gui.JFontChooserPanel;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.csv.CSVReaderOptionPanel;
 import de.zbit.gui.layout.LayoutHelper;
@@ -87,7 +89,7 @@ import de.zbit.util.prefs.SBProperties;
  * interest here. All key-value pairs that are not required by this class are
  * removed from the current {@link Properties} element before initialization.
  * The {@link #init()} method creates the layout of this {@link Panel}. You may
- * consider to override the method {@link #initConstantFields(Properties)} to
+ * consider to override the method {@link #initializePrefPanel()} to
  * extract other key-value pairs than those that are directly needed for
  * manipulation. The {@link #getProperties()} method may also be overridden in
  * case that not all {@link Properties} can be updated while this object is
@@ -304,12 +306,29 @@ ItemListener, ChangeListener {
       if (initial == null) {
         // TODO: Localize!
         log.warning(MessageFormat.format(
-          "Invalid default value for color {0}: {0}",
+          "Invalid default value for color {0}: {1}",
           defaultValue.getClass().getName(), defaultValue));
         initial = Color.WHITE;
       }
       ColorChooserWithPreview colChooser = new ColorChooserWithPreview(initial);
       component = new JLabeledComponent(optionTitle, true, colChooser);
+      
+    } else if (Font.class.isAssignableFrom(clazz)) {
+      Font initial = null;
+      if (defaultValue instanceof Font) {
+        initial = (Font) defaultValue;
+      } else if (defaultValue instanceof String) {
+        initial = Option.parseOrCast(Font.class, defaultValue);
+      }
+      if (initial == null) {
+        // TODO: Localize!
+        log.warning(MessageFormat.format(
+          "Invalid default value for font {0}: {1}",
+          defaultValue.getClass().getName(), defaultValue));
+        initial = new Font("Arial", Font.PLAIN, 12);
+      }
+      JFontChooserPanel fontChooser = new JFontChooserPanel(initial);
+      component = new JLabeledComponent(optionTitle, true, fontChooser);
       
     } else if (Date.class.isAssignableFrom(clazz)) {
       
@@ -546,14 +565,16 @@ ItemListener, ChangeListener {
           value = Boolean.toString(((AbstractButton) c).isSelected());
         } else if (c instanceof JColorChooser) {
           value = ((JColorChooser) c).getColor().toString();
+        } else if (c instanceof JFontChooserPanel) {
+          value = ((JFontChooserPanel) c).getSelectedFont().toString();
         } else if (c instanceof ColorChooserWithPreview) {
           value = ((ColorChooserWithPreview) c).getColor().toString();
         } else if (c instanceof JComboBox) {
-          value = ((JComboBox) c).getSelectedItem().toString();
+          value = ((JComboBox<?>) c).getSelectedItem().toString();
         } else if (c instanceof JFileChooser) {
           value = ((JFileChooser) c).getSelectedFile().getAbsolutePath();
         } else if (c instanceof JList) {
-          value = ((JList) c).getSelectedValue().toString();
+          value = ((JList<?>) c).getSelectedValue().toString();
         } else if (c instanceof JSlider) {
           value = Integer.toString(((JSlider) c).getValue());
         } else if (c instanceof JSpinner) {

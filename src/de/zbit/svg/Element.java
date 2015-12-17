@@ -14,17 +14,73 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.sbml.layout;
+package de.zbit.svg;
 
 /**
- * interface all the different graphical representations for macromolecule nodes
- * have to implement
- * 
  * @author Andreas Dr&auml;ger
- * @since 1.0
  * @version $Rev$
- * @param <T>
  */
-public abstract class Macromolecule<T> extends AbstractSBGNNodeWithCloneMarker<T> {
+public enum Element {
+  /**
+   * 
+   */
+  CIRCLE("circle"),
+  /**
+   * 
+   */
+  ELLIPSE("ellipse"),
+  /**
+   * 
+   */
+  GROUP("g"),
+  /**
+   * 
+   */
+  IMAGE("image"),
+  /**
+   * 
+   */
+  LINE("line"),
+  /**
+   * 
+   */
+  PATH("path"),
+  /**
+   * 
+   */
+  POLYGON("polygon"),
+  /**
+   * 
+   */
+  POLYLINE("polyline"),
+  /**
+   * 
+   */
+  RECT("rect"),
+  /**
+   * 
+   */
+  TEXT("text");
+  
+  /**
+   * 
+   */
+  private String elementName;
+  
+  /**
+   * 
+   * @param elementName the XML element name
+   */
+  private Element(String elementName) {
+    this.elementName = elementName;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Enum#toString()
+   */
+  @Override
+  public String toString() {
+    return elementName;
+  }
   
 }

@@ -48,8 +48,11 @@ import de.zbit.util.logging.LogUtil;
  */
 public class SBMLTestsuiteOverview {
 	
-	private static Logger logger = Logger.getLogger(SBMLTestsuiteOverview.class.getName());
+	private static final transient Logger logger = Logger.getLogger(SBMLTestsuiteOverview.class.getName());
 	
+	/**
+	 * 
+	 */
 	private SortedSet<File> withFuncDef, withUnitDef, withCompType, withSpecType,
 			withCompart, withSpecies, withParameters, withLocalParam,
 			withInitAssignments, withRules, withConstraints, withReactions,

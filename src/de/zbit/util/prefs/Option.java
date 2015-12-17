@@ -77,6 +77,7 @@ import de.zbit.util.objectwrapper.ValuePairUncomparable;
  * @author Clemens Wrzodek
  * @date 2010-10-24
  * @version $Rev$
+ * @param <Type> the type of the value for this option.
  * @since 1.0
  */
 public class Option<Type> implements ActionCommand, Comparable<Option<Type>>,
@@ -120,15 +121,19 @@ Serializable {
   }
   
   /**
-   * This method is special for options of type {@link Class}. It allows to
-   * get the real class from the {@link #range}, by comparing the
+   * This method is special for options of type {@link Class}. It allows to get
+   * the real class from the {@link #range}, by comparing the
    * {@link Class#getSimpleName()} with the given simple name.
-   * <p>Since {@link JLabeledComponent}s and command-line arguments are string
-   * based, this method is the easiest was to get to the class, represented
-   * by a string.
-   * @param option an option of type {@link Class}, with a restricted {@link #range}.
-   * @param simpleName the {@link Class#getSimpleName()} of the class to
-   * return from the {@link #range}
+   * <p>
+   * Since {@link JLabeledComponent}s and command-line arguments are
+   * {@link String}-based, this method is the easiest was to get to the class,
+   * represented by a string.
+   * 
+   * @param option
+   *        an option of type {@link Class}, with a restricted {@link #range}.
+   * @param simpleName
+   *        the {@link Class#getSimpleName()} of the class to return from the
+   *        {@link #range}
    * @return the class for the given simpleName
    */
   @SuppressWarnings("rawtypes")
@@ -188,7 +193,7 @@ Serializable {
       return requiredType.cast(ret);
     }
     
-    if (Reflect.containsParser(requiredType)) {
+    if (!requiredType.equals(java.awt.Font.class) && Reflect.containsParser(requiredType)) {
       try {
         ret = Reflect.invokeParser(requiredType, ret);
       } catch (Throwable exc) {
@@ -210,6 +215,16 @@ Serializable {
         int g = Utils.getNumberFromString(parse.indexOf("g=")+2, parse);
         int b = Utils.getNumberFromString(parse.indexOf("b=")+2, parse);
         return (Type) new java.awt.Color(r,g,b);
+      }
+    } else if (requiredType.equals(java.awt.Font.class)) {
+      if ((ret != null) && !ret.getClass().equals(java.awt.Font.class)
+          && ret.toString().startsWith("java.awt.Font[family=")) {
+        String parse[] = ret.toString().split("=");
+        String name = parse[2].substring(0, parse[2].indexOf(','));
+        String styles[] = {"plain", "bold", "italic", "bolditalic"};
+        int style = StringUtil.indexOf(parse[3].substring(0, parse[3].indexOf(',')), styles);
+        int size = Integer.parseInt(parse[4].substring(0, parse[4].length() - 1));
+        return (Type) new java.awt.Font(name, style, size);
       }
     } else if (requiredType.equals(Character.class)) {
       if ((ret == null) || (ret.toString().length() < 1)) {

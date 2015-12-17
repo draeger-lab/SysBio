@@ -14,13 +14,30 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.sbml.layout;
+package de.zbit.svg;
 
 /**
- * @author Jakob Matthes
+ * @author Andreas Dr&auml;ger
  * @version $Rev$
- * @param <T>
  */
-public abstract class PerturbingAgent<T> extends AbstractSBGNNodeWithCloneMarker<T> {
+public class MetaPostComment {
+  
+  private String text;
+  
+  /**
+   * 
+   * @param text
+   */
+  public MetaPostComment(String text) {
+    this.text = text;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "% " + text;
+  }
   
 }

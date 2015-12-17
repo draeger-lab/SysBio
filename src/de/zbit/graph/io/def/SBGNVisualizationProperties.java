@@ -17,7 +17,7 @@
  * this software distribution and also available online as
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
- */ 
+ */
 package de.zbit.graph.io.def;
 
 import java.awt.Color;
@@ -34,11 +34,14 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import de.zbit.graph.sbgn.CompartmentRealizer;
 import de.zbit.graph.sbgn.ComplexNode;
+import de.zbit.graph.sbgn.DrawingOptions;
 import de.zbit.graph.sbgn.EmptySetNode;
 import de.zbit.graph.sbgn.NucleicAcidFeatureNode;
 import de.zbit.graph.sbgn.PerturbingAgentNode;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
+import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * This class stores the sbo terms and the corresponding NodeRealizer classes to
@@ -49,8 +52,16 @@ import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
  * @version $Rev$
  */
 public class SBGNVisualizationProperties {
-
-  public static final Logger log = Logger.getLogger(SBGNVisualizationProperties.class.getName());
+  
+  /**
+   * User preferences.
+   */
+  private static final transient SBPreferences prefs = SBPreferences.getPreferencesFor(DrawingOptions.class);
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  public static final transient Logger log = Logger.getLogger(SBGNVisualizationProperties.class.getName());
   
   /**
    * contains all available shapes
@@ -66,7 +77,7 @@ public class SBGNVisualizationProperties {
    * Other SBO terms that should be visualized in the same manner as {@link SBO#getMacromolecule()}.
    */
   private static final int[] macromolecule_synonyms = new int[]{248, 249, 246, 251, 252, 250};
-
+  
   /**
    * Other SBO terms that should be visualized in the same manner as {@link SBO#getSimpleMolecule()}s.
    * 327 = non-macromolecular ion
@@ -74,16 +85,31 @@ public class SBGNVisualizationProperties {
    */
   private static final int[] simpleChemical_synonyms = new int[]{327, 328};
   
+  /**
+   * 
+   */
   public static final int materialEntityOfUnspecifiedNature = 285;
   
   /**
    * References to complete maps, e.g., to other pathways.
    */
   public static final int map = 552;
+  /**
+   * 
+   */
   public static final int submap = 395;
   
+  /**
+   * 
+   */
   public static final int process = 375;
+  /**
+   * 
+   */
   public static final int omittedProcess = 397;
+  /**
+   * 
+   */
   public static final int uncertainProcess = 396;
   
   /**
@@ -93,12 +119,11 @@ public class SBGNVisualizationProperties {
    * specification differs!
    */
   private static final int[] nonCovalentComplex_synonyms = new int[] {
-  	//macromolecular complex-branch
-  	296, 420, 543, 297,
-  	// Multimere branch
-  	286, 418, 419, 420, 421
+    //macromolecular complex-branch
+    296, 420, 543, 297,
+    // Multimere branch
+    286, 418, 419, 420, 421
   };
-  
   
   /**
    * Static constructor to fill our static maps.
@@ -106,17 +131,20 @@ public class SBGNVisualizationProperties {
   static {
     init();
   }
-
+  
+  /**
+   * 
+   */
   private static void init() {
     /*
      * NOTE: These are all SBO terms from the SBO:0000240 - "material entity" branch.
-     * See http://www.ebi.ac.uk/sbo/main/tree.do?open=240 
+     * See http://www.ebi.ac.uk/sbo/main/tree.do?open=240
      */
     sbo2shape = new HashMap<Integer, NodeRealizer>();
-   
+    
     sbo2shape.put(SBO.getMacromolecule(), getEnzymeRelizerRaw()); // macromolecule - enzyme
     // Sub-branches in the macromolecule-SBO-tree
-       
+    
     for (int sbo:macromolecule_synonyms) {
       sbo2shape.put(sbo, sbo2shape.get(SBO.getMacromolecule()));
     }
@@ -163,27 +191,45 @@ public class SBGNVisualizationProperties {
   }
   
   /**
+   * @param sboTerm
    * @return the color of the appropriate shape
    */
   public static Color getFillColor(int sboTerm) {
     if (SBO.isChildOf(sboTerm, SBO.getNonCovalentComplex())) {
-      return new Color(24,116,205);    // DodgerBlue3
-    } else if (SBO.isChildOf(sboTerm, SBO.getGene())) { 
-      return new Color(255,255,0);    // Yellow
+      // DodgerBlue3
+      return Option.parseOrCast(Color.class,
+        prefs.get(DrawingOptions.NONCOVALENT_COMPLEX_FILL_COLOR));
+    } else if (SBO.isChildOf(sboTerm, SBO.getGene())) {
+      // Yellow
+      return Option.parseOrCast(Color.class,
+        prefs.get(DrawingOptions.GENE_FILL_COLOR));
     } else if (SBO.isChildOf(sboTerm, SBO.getMacromolecule())) {
-      return new Color(0,205,0);       // Green 3
+      // Green 3
+      return Option.parseOrCast(Color.class,
+        prefs.get(DrawingOptions.MACROMOLECULE_FILL_COLOR));
     } else if (SBO.isChildOf(sboTerm, SBO.getSimpleMolecule())) {
-      return new Color(176,226,255);   // LightSkyBlue1
+      // LightSkyBlue1
+      return Option.parseOrCast(Color.class,
+        prefs.get(DrawingOptions.SIMPLE_MOLECULE_FILL_COLOR));
     } else if ((sboTerm == map) || (sboTerm == submap)) {
-      return new Color(224,238,238);   // azure2
+      // azure2
+      return new Color(224,238,238);
     } else if (SBO.isChildOf(sboTerm, SBO.getEmptySet())) {
-    	return new Color(255, 204, 204); // Pink
+      // Pink
+      return Option.parseOrCast(Color.class,
+        prefs.get(DrawingOptions.EMPTY_SET_FILL_COLOR));
     } else if (SBO.isChildOf(sboTerm, SBO.getCompartment())) {
-    	return new Color(243, 243, 191);
+      // Some kind of yellowish
+      return Option.parseOrCast(Color.class,
+        prefs.get(DrawingOptions.COMPARTMENT_FILL_COLOR));
     } else if (SBO.isChildOf(sboTerm, SBO.getPertubingAgent())) {
-    	return new Color(255, 0, 255); // Drug pink
+      // Drug pink
+      return Option.parseOrCast(Color.class,
+        prefs.get(DrawingOptions.PERTURBING_AGENT_FILL_COLOR));
     } else {
-      return new Color(144,238,144);   // LightGreen
+      // LightGreen
+      return Option.parseOrCast(Color.class,
+        prefs.get(DrawingOptions.DEFAULT_FILL_COLOR));
     }
   }
   
@@ -193,20 +239,22 @@ public class SBGNVisualizationProperties {
    * @return
    */
   public static Color getLineColor(int sboTerm) {
-  	if (SBO.isChildOf(sboTerm, SBO.getCompartment())) {
-  		// dark yellow
-  		return new Color(204, 204, 0);
-  	}
-  	return Color.BLACK;
+    SBPreferences prefs = SBPreferences.getPreferencesFor(DrawingOptions.class);
+    if (SBO.isChildOf(sboTerm, SBO.getCompartment())) {
+      return Option.parseOrCast(Color.class,
+        prefs.get(DrawingOptions.COMPARTMENT_LINE_COLOR));
+    }
+    return Option.parseOrCast(Color.class,
+      prefs.get(DrawingOptions.DEFAULT_FILL_COLOR));
   }
-
-	/**
-	 * 
-	 * @param sboTerm
-	 * @return the adequate {@link ShapeNodeRealizer}, if for this sboterm no
-	 *         {@link ShapeNodeRealizer} is available it return the
-	 *         {@link #defaultShape}
-	 */
+  
+  /**
+   * 
+   * @param sboTerm
+   * @return the adequate {@link ShapeNodeRealizer}, if for this sboterm no
+   *         {@link ShapeNodeRealizer} is available it return the
+   *         {@link #defaultShape}
+   */
   public static NodeRealizer getNodeRealizer(int sboTerm) {
     if (sbo2shape == null) {
       init();
@@ -214,29 +262,30 @@ public class SBGNVisualizationProperties {
     NodeRealizer ret = sbo2shape.get(sboTerm);
     if (ret == null) {
       ret = defaultShape;
-			log.warning(MessageFormat.format(
-				"sboTerm: {0,number,integer} couldn't be assigned to a shape, default shape is used",
-				sboTerm));
+      log.warning(MessageFormat.format(
+        "SBO term: {0,number,integer} could not be assigned to a shape, default shape is used.",
+        sboTerm));
     }
     
     // Set a common color
     ret.setFillColor(getFillColor(sboTerm));
-    ret.setLineColor(SBGNVisualizationProperties.getLineColor(sboTerm));
+    ret.setLineColor(getLineColor(sboTerm));
     
     return ret;
   }
-
+  
   /**
-   * Most graphics suites (e.g., yFiles) don't distinct an elipse
+   * Most graphics suites (e.g., yFiles) don't distinct an ellipse
    * and a circle, but SBGN does. If this returns true, a node
-   * realizer, even if it is an eliptical realizer, should have
+   * realizer, even if it is an elliptical realizer, should have
    * the same with and height (resulting in a circle).
+   * 
    * @param sboTerm
    * @return
    */
   public static boolean isCircleShape(int sboTerm) {
-		return SBO.isChildOf(sboTerm, SBO.getSimpleMolecule())
-				|| SBO.isChildOf(sboTerm, SBO.getEmptySet());
+    return SBO.isChildOf(sboTerm, SBO.getSimpleMolecule())
+        || SBO.isChildOf(sboTerm, SBO.getEmptySet());
   }
   
   /**
@@ -247,5 +296,4 @@ public class SBGNVisualizationProperties {
     return new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ROUND_RECT);
   }
   
-
 }

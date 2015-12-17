@@ -132,6 +132,16 @@
   <entry key="DATE_TOOLTIP">Wählen Sie einen passenen Termin aus dem Kalender.</entry>
   <entry key="DATE_FORMAT">dd.MM.yyyy</entry>
   
+    <!-- JFontChooserPanel -->
+  
+  <entry key="BUTTON_BOLD_FONT">F</entry>
+  <entry key="BUTTON_BOLD_FONT_TOOLTIP">Fettdruck</entry>
+  <entry key="BUTTON_ITALIC_FONT">K</entry>
+  <entry key="BUTTON_ITALIC_FONT_TOOLTIP">Kursiv</entry>
+  <entry key="NAME">Name</entry>
+  <entry key="STYLE">Stil</entry>
+  <entry key="SIZE">Größe</entry>
+  
   <!-- JHelpBrowser -->
   
   <entry key="ONLINE_HELP">Online-Hilfe</entry>

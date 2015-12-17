@@ -43,7 +43,7 @@ public class YSimpleChemical extends SimpleChemical<NodeRealizer> {
 		ShapeNodeRealizerSupportingCloneMarker shapeNodeRealizer =
 			new ShapeNodeRealizerSupportingCloneMarker(nodeRealizer);
 		
-		shapeNodeRealizer.setNodeIsCloned(isSetCloneMarker());
+		shapeNodeRealizer.setNodeIsCloned(hasCloneMarker());
 		shapeNodeRealizer.setSize(width, height);
 		shapeNodeRealizer.setLocation(x, y);
 		
