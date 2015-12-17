@@ -20,6 +20,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -72,6 +73,31 @@ public class LayoutHelper {
   public static void addComponent(Container cont, GridBagLayout gbl,
     Component c, int x, int y, int width, int height, double weightx,
     double weighty, int ipadx, int ipady) {
+    addComponent(cont, gbl, c, x, y, width, height, weightx, weighty, ipadx,
+      ipady, 0, 0, 0, 0);
+  }
+  
+  /**
+   * 
+   * @param cont
+   * @param gbl
+   * @param c
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   * @param weightx
+   * @param weighty
+   * @param ipadx
+   * @param ipady
+   * @param top
+   * @param bottom
+   * @param left
+   * @param right
+   */
+  public static void addComponent(Container cont, GridBagLayout gbl,
+    Component c, int x, int y, int width, int height, double weightx,
+    double weighty, int ipadx, int ipady, int top, int bottom, int left, int right) {
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.fill = GridBagConstraints.BOTH;
     gbc.gridx = x;
@@ -82,6 +108,7 @@ public class LayoutHelper {
     gbc.weighty = weighty;
     gbc.ipadx = ipadx;
     gbc.ipady = ipady;
+    gbc.insets = new Insets(top, left, bottom, right);
     gbl.setConstraints(c, gbc);
     cont.add(c);
   }
@@ -308,9 +335,30 @@ public class LayoutHelper {
    */
   public void add(Component c, int x, int y, int width, int height,
     double weightx, double weighty, int ipadx, int ipady) {
+    add(c, x, y, width, height, weightx, weighty, ipadx, ipady, 0, 0, 0, 0);
+  }
+  
+  /**
+   * 
+   * @param c
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   * @param weightx
+   * @param weighty
+   * @param ipadx
+   * @param ipady
+   * @param top
+   * @param bottom
+   * @param left
+   * @param right
+   */
+  public void add(Component c, int x, int y, int width, int height,
+    double weightx, double weighty, int ipadx, int ipady, int top, int bottom, int left, int right) {
     // Note: This method does NOT increase the row!
     LayoutHelper.addComponent(cont, gbl, c, x, y, width, height,
-      weightx, weighty, ipadx, ipady);
+      weightx, weighty, ipadx, ipady, top, bottom, left, right);
     row = y;
     atRowBeginning = false;
     if (width > maxColCount) {

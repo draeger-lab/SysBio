@@ -1041,7 +1041,7 @@ public class SBPreferences implements Map<Object, Object> {
    * thrown, this method returns true to indicate that all key-value pairs are
    * valid.
    * 
-   * @returns true if all key-value pairs are valid.
+   * @return true if all key-value pairs are valid.
    * @throws BackingStoreException
    */
   @SuppressWarnings("rawtypes")

@@ -350,8 +350,8 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
           }
           Node n = createNode(id, c.isSetName() ? c.getName() : c.getId(), SBO.getCompartment(), x, y, w, h);
           CompartmentRealizer nr = new CompartmentRealizer();
-          nr.setFillColor(null);
-          nr.setInterFillColor(SBGNVisualizationProperties.getFillColor(SBO.getCompartment()));
+          nr.setFillColor(SBGNVisualizationProperties.getFillColor(SBO.getCompartment()));
+          nr.setInterFillColor(null);
           nr.setLineColor(SBGNVisualizationProperties.getLineColor(SBO.getCompartment()));
           simpleGraph.setRealizer(n, nr);
           hm.convertToGroupNode(n);

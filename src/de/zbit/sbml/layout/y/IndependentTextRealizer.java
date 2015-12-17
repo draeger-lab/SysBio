@@ -16,12 +16,15 @@
  */
 package de.zbit.sbml.layout.y;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
 
 import org.sbml.jsbml.util.StringTools;
 
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import de.zbit.graph.sbgn.DrawingOptions;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * A {@link NodeRealizer} to display independent text (i.e. text which is not a
@@ -31,70 +34,83 @@ import y.view.ShapeNodeRealizer;
  * @version $Rev$
  */
 public class IndependentTextRealizer extends ShapeNodeRealizer {
-	
-	private String text;
-
-	/**
-	 * copy constructor
-	 */
-	public IndependentTextRealizer(NodeRealizer nr) {
-		super(nr);
-		if (nr instanceof IndependentTextRealizer) {
-			IndependentTextRealizer textNr = (IndependentTextRealizer) nr;
-			text = textNr.text;
-		}
-	}
-
-	/**
-	 * @param x
-	 * @param y
-	 * @param width
-	 * @param height
-	 * @param text
-	 */
-	public IndependentTextRealizer(double x, double y, double width,
-			double height, String text) {
-		this.text = text;
-		setLabelText(text);
-		setSize(width, height);
-		setLocation(x, y);
-	}
-
-	/* (non-Javadoc)
-	 * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
-	 */
-	@Override
-	protected void paintFilledShape(Graphics2D gfx) {
-		// Do not fill it.
-	}
-
-	/* (non-Javadoc)
-	 * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
-	 */
-	@Override
-	protected void paintShapeBorder(Graphics2D gfx) {
-		// Do not paint a border.
-	}
-	
-	/* (non-Javadoc)
-	 * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
-	 */
-	@Override
-	public void paintSloppy(Graphics2D gfx) {
-		// No sloppy representation.
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return StringTools.concat(getClass().getSimpleName(),
-				" [x=", x,
-				", y=", y,
-				", width=", width,
-				", height=", height,
-				", text=", text,
-		"]").toString();
-	}
+  
+  /**
+   * copy constructor
+   * @param nr
+   */
+  public IndependentTextRealizer(NodeRealizer nr) {
+    super(nr);
+    if (nr instanceof IndependentTextRealizer) {
+      IndependentTextRealizer textNr = (IndependentTextRealizer) nr;
+      setLabelText(textNr.getLabelText());
+    }
+  }
+  
+  /**
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   * @param text
+   */
+  public IndependentTextRealizer(double x, double y, double width,
+    double height, String text) {
+    setLabelText(text);
+    setSize(width, height);
+    setLocation(x, y);
+    setLabelText(text);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
+   */
+  @Override
+  protected void paintFilledShape(Graphics2D gfx) {
+    // Do not fill it.
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
+   */
+  @Override
+  protected void paintShapeBorder(Graphics2D gfx) {
+    // Do not paint a border.
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
+   */
+  @Override
+  public void paintSloppy(Graphics2D gfx) {
+    // No sloppy representation unless users want it.
+    if (SBPreferences.getPreferencesFor(DrawingOptions.class).getBoolean(
+      DrawingOptions.PAINT_SLOPPY_TEXT)) {
+      gfx.setFont(getLabel().getFont());
+      gfx.setColor(getLineColor());
+      gfx.drawString(getLabelText(), (int) getX(), (int) getY());
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return StringTools.concat(getClass().getSimpleName(),
+      " [x=", x,
+      ", y=", y,
+      ", width=", width,
+      ", height=", height,
+      ", text=", getLabelText(),
+        "]").toString();
+  }
+  
+  /**
+   * 
+   * @param font
+   */
+  public void setFont(Font font) {
+    getLabel().setFont(font);
+  }
 }

@@ -33,53 +33,74 @@ import de.zbit.sbml.layout.UncertainProcessNode;
  * @version $Rev$
  */
 public class YUncertainProcessNode extends UncertainProcessNode<NodeRealizer> {
-
-	protected ProcessNodeRealizer processNodeRealizer;
-
-	public YUncertainProcessNode() {
-	  super();
-	  processNodeRealizer = new UncertainProcessNodeRealizer();
+  
+  /**
+   * 
+   */
+  protected ProcessNodeRealizer processNodeRealizer;
+  
+  /**
+   * 
+   */
+  public YUncertainProcessNode() {
+    super();
+    processNodeRealizer = new UncertainProcessNodeRealizer();
   }
-	
-	@Override
-	public NodeRealizer draw(double x, double y, double z, double width,
-			double height, double depth) {
-		return draw(x, y, z, width, height, depth, 0d, null);
-	}
-
-	@Override
-	public NodeRealizer drawLineSegment(LineSegment lineSegment,
-			double rotationAngle, Point rotationCenter) {
-		// Drawing of single line segments not supported by yFiles implementation. 
-		return null;
-	}
-
-	@Override
-	public NodeRealizer draw(double x, double y, double z, double width,
-			double height, double depth, double rotationAngle,
-			Point rotationCenter) {
-		processNodeRealizer = (ProcessNodeRealizer) processNodeRealizer.createCopy();
-		processNodeRealizer.setSize(width, height);
-		processNodeRealizer.setLocation(x, y);
-		if ((rotationAngle % 180) != 0) {
-			processNodeRealizer.setRotationAngle(rotationAngle);
-			if (rotationCenter != null) {
-				java.awt.geom.Point2D.Double point = new Point2D.Double();
-				point.setLocation(rotationCenter.getX(), rotationCenter.getY());
-				processNodeRealizer.setRotationCenter(point);
-			}
-		}
-		return processNodeRealizer;
-	}
-
-	@Override
-	public double getLineWidth() {
-		return processNodeRealizer.getLineWidth();
-	}
-
-	@Override
-	public void setLineWidth(double lineWidth) {
-		processNodeRealizer.setLineWidth((float) lineWidth);
-	}
-
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.UncertainProcessNode#draw(double, double, double, double, double, double)
+   */
+  @Override
+  public NodeRealizer draw(double x, double y, double z, double width,
+    double height, double depth) {
+    return draw(x, y, z, width, height, depth, 0d, null);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.UncertainProcessNode#drawLineSegment(org.sbml.jsbml.ext.layout.LineSegment, double, org.sbml.jsbml.ext.layout.Point)
+   */
+  @Override
+  public NodeRealizer drawLineSegment(LineSegment lineSegment,
+    double rotationAngle, Point rotationCenter) {
+    // Drawing of single line segments not supported by yFiles implementation.
+    return null;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.UncertainProcessNode#draw(double, double, double, double, double, double, double, org.sbml.jsbml.ext.layout.Point)
+   */
+  @Override
+  public NodeRealizer draw(double x, double y, double z, double width,
+    double height, double depth, double rotationAngle,
+    Point rotationCenter) {
+    processNodeRealizer = (ProcessNodeRealizer) processNodeRealizer.createCopy();
+    processNodeRealizer.setSize(width, height);
+    processNodeRealizer.setLocation(x, y);
+    if ((rotationAngle % 180) != 0) {
+      processNodeRealizer.setRotationAngle(rotationAngle);
+      if (rotationCenter != null) {
+        java.awt.geom.Point2D.Double point = new Point2D.Double();
+        point.setLocation(rotationCenter.getX(), rotationCenter.getY());
+        processNodeRealizer.setRotationCenter(point);
+      }
+    }
+    return processNodeRealizer;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.UncertainProcessNode#getLineWidth()
+   */
+  @Override
+  public double getLineWidth() {
+    return processNodeRealizer.getLineWidth();
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.UncertainProcessNode#setLineWidth(double)
+   */
+  @Override
+  public void setLineWidth(double lineWidth) {
+    processNodeRealizer.setLineWidth((float) lineWidth);
+  }
+  
 }

@@ -20,6 +20,8 @@ import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
 import java.io.Serializable;
 
+import de.zbit.util.prefs.SBPreferences;
+
 /**
  * @author Andreas Dr&auml;ger
  * @date 09:02:38
@@ -27,58 +29,63 @@ import java.io.Serializable;
  * @version $Rev$
  */
 public class CompartmentShape extends Area implements Serializable {
-
-	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = -8601663070857468444L;
-	
-	/**
-	 * 
-	 */
-	private RoundRectangle2D.Double outer, inner;
-
-	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @param w
-	 * @param h
-	 */
-	public CompartmentShape(double x, double y, double w, double h) {
-		super();
-		double minThickness = 6d;
-		double thickness = Math.min(minThickness, ((x + w) * (y + h)) / minThickness);
-		//double arcWfac = 1.5, arcHfac = 4.5d;
-		double arcWfac = 2.5d, arcHfac = .3d;
-		int arc = computeArc(w, h);
-		outer = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
-		add(new Area(outer));
-		x = x + thickness;
-		y = y + thickness;
-		w = w - 2d * thickness;
-		h = h - 2d * thickness;
-		arc = computeArc(w, h);
-		inner = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
-		subtract(new Area(inner));
-	}
-	
-	/**
-	 * 
-	 * @param w
-	 * @param h
-	 * @return
-	 */
-	public int computeArc(double w, double h) {
-		return (int) (Math.min(w, h) / 5d);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public RoundRectangle2D getInnerArea() {
-		return inner;
-	}
-
+  
+  /**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = -8601663070857468444L;
+  
+  /**
+   * 
+   */
+  private RoundRectangle2D.Double outer;
+  /**
+   * 
+   */
+  private RoundRectangle2D.Double inner;
+  
+  /**
+   * 
+   * @param x
+   * @param y
+   * @param w
+   * @param h
+   */
+  public CompartmentShape(double x, double y, double w, double h) {
+    super();
+    SBPreferences prefs = SBPreferences.getPreferencesFor(DrawingOptions.class);
+    double minThickness = prefs.getDouble(DrawingOptions.COMPARTMENT_LINE_WIDTH);
+    double thickness = Math.min(minThickness, ((x + w) * (y + h)) / minThickness);
+    //double arcWfac = 1.5, arcHfac = 4.5d;
+    double arcWfac = 2.5d, arcHfac = .3d;
+    int arc = computeArc(w, h);
+    outer = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
+    add(new Area(outer));
+    x = x + thickness;
+    y = y + thickness;
+    w = w - 2d * thickness;
+    h = h - 2d * thickness;
+    arc = computeArc(w, h);
+    inner = new RoundRectangle2D.Double(x, y, w, h, arcWfac * arc, arcHfac * arc);
+    subtract(new Area(inner));
+  }
+  
+  /**
+   * 
+   * @param w
+   * @param h
+   * @return
+   */
+  public int computeArc(double w, double h) {
+    return (int) (Math.min(w, h) / 5d);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public RoundRectangle2D getInnerArea() {
+    return inner;
+  }
+  
 }
