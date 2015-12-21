@@ -16,6 +16,9 @@
  */
 package de.zbit.svg;
 
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
+
 import org.apache.batik.anim.dom.SVGOMPathElement;
 import org.apache.batik.dom.AbstractElement;
 import org.sbml.jsbml.Compartment;
@@ -39,6 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGGElement;
 
+import de.zbit.sbml.layout.Tools;
 import de.zbit.sbml.util.SBMLtools;
 
 /**
@@ -147,8 +151,6 @@ public class SBMLLayoutHandler implements SVGHandler<SBMLDocument> {
                 String attribute = ((AbstractElement) g.getParentNode()).getAttribute("id");
                 if (attribute.length() > 0) {
                   String parts[] = value.split(" ");
-                  double x = Double.parseDouble(parts[0].substring(1));
-                  double y = Double.parseDouble(parts[1]);
                   String sid = SBMLtools.toSId(attribute);
                   Model model = builder.getModel();
                   Compartment compartment = model.getCompartment("default");
@@ -167,17 +169,17 @@ public class SBMLLayoutHandler implements SVGHandler<SBMLDocument> {
                     } else {
                       rg = (ReactionGlyph) model.findNamedSBase(sid + "_rglyph");
                     }
-                    Curve c = rg.isSetCurve() ? rg.getCurve() : rg.createCurve();
-                    parsePath(parts, xOffset, yOffset, c);
+                    parsePath(parts, xOffset, yOffset, rg.isSetCurve() ? rg.getCurve() : rg.createCurve());
                   } else {
                     if (!model.containsSpecies(sid)) {
                       builder.buildSpecies(sid, attribute, compartment, true, false, false, 0d, UnitDefinition.SUBSTANCE);
                     }
                     String id = incrementSIdSuffix(sid + "_sglyph");
                     SpeciesGlyph sg = layout.createSpeciesGlyph(id, sid);
-                    double width = 50d;
-                    double height = 50d;
-                    sg.createBoundingBox(width, height, 1d, x - xOffset - width, y - yOffset - height/2d, z);
+                    Path2D path2D = Tools.toGeneralPath(parsePath(parts, xOffset, yOffset, new Curve()));
+                    Rectangle2D bb = path2D.getBounds2D();
+                    // offset is not need here, because it is already taken into account when creating the path:
+                    sg.createBoundingBox(bb.getWidth(), bb.getHeight(), 1d, bb.getX(), bb.getY(), z);
                   }
                 }
               }
@@ -199,8 +201,9 @@ public class SBMLLayoutHandler implements SVGHandler<SBMLDocument> {
    * @param xOffset
    * @param yOffset
    * @param c
+   * @return
    */
-  public void parsePath(String[] parts, double xOffset, double yOffset, Curve c) {
+  public Curve parsePath(String[] parts, double xOffset, double yOffset, Curve c) {
     int part = 0;
     double x, y;
     Point p = null, pathStart = null;
@@ -253,6 +256,7 @@ public class SBMLLayoutHandler implements SVGHandler<SBMLDocument> {
       }
       part++;
     }
+    return c;
   }
   
   /**

@@ -27,7 +27,7 @@ import de.zbit.sbml.layout.SBGNArc;
 /**
  * Abstract class to represent common features of all SBGN arc classes:
  * <ul>
- * <li>draw(CurveSegment, ...) is not supported</li>
+ * <li>draw(CurveSegment, ...) </li> <!-- is not supported -->
  * <li>draw(Curve, double lineWidth) uses the arc-specific draw(Curve)
  * implementations</li>
  * </ul>
@@ -37,6 +37,9 @@ import de.zbit.sbml.layout.SBGNArc;
  */
 public abstract class YAbstractSBGNArc implements SBGNArc<EdgeRealizer> {
   
+  /**
+   * A {@link Logger} for this class.
+   */
   private static final transient Logger logger = Logger.getLogger(YAbstractSBGNArc.class.getName());
   
   /* (non-Javadoc)
@@ -44,8 +47,9 @@ public abstract class YAbstractSBGNArc implements SBGNArc<EdgeRealizer> {
    */
   @Override
   public EdgeRealizer draw(CurveSegment curveSegment, double lineWidth) {
-    logger.warning("Implementation does not support separate drawing of single curve segments!");
-    return null;
+    //logger.warning("Implementation does not support separate drawing of single curve segments!");
+    EdgeRealizer edgeRealizer = YLayoutBuilder.drawCurveSegment(curveSegment);
+    return RealizerTools.setLineWidth(edgeRealizer, lineWidth);
   }
   
   /* (non-Javadoc)
@@ -56,4 +60,5 @@ public abstract class YAbstractSBGNArc implements SBGNArc<EdgeRealizer> {
     EdgeRealizer edgeRealizer = draw(curve);
     return RealizerTools.setLineWidth(edgeRealizer, lineWidth);
   }
+  
 }
