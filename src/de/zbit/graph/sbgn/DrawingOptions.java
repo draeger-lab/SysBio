@@ -148,14 +148,14 @@ public interface DrawingOptions extends KeyProvider {
    */
   public static final Option<Double> GLYPH_LINE_WIDTH = new Option<Double>(
       "GLYPH_LINE_WIDTH", Double.class, bundle, new Range<Double>(Double.class,
-          "{[0, 1024]}"), Double.valueOf(2d));
+          "{[0, 1024]}"), Double.valueOf(1d));
   
   /**
    * Defaults to 2 px.
    */
   public static final Option<Double> EDGE_LINE_WIDTH = new Option<Double>(
       "EDGE_LINE_WIDTH", Double.class, bundle, new Range<Double>(Double.class,
-          "{[0, 1024]}"), Double.valueOf(2d));
+          "{[0, 1024]}"), Double.valueOf(1d));
   
   /**
    * Define color and appearance of compartment glyphs.

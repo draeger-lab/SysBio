@@ -36,6 +36,11 @@ public class CompartmentShape extends Area implements Serializable {
   private static final long serialVersionUID = -8601663070857468444L;
   
   /**
+   * User preferences
+   */
+  private static final transient SBPreferences prefs = SBPreferences.getPreferencesFor(DrawingOptions.class);
+  
+  /**
    * 
    */
   private RoundRectangle2D.Double outer;
@@ -53,7 +58,6 @@ public class CompartmentShape extends Area implements Serializable {
    */
   public CompartmentShape(double x, double y, double w, double h) {
     super();
-    SBPreferences prefs = SBPreferences.getPreferencesFor(DrawingOptions.class);
     double minThickness = prefs.getDouble(DrawingOptions.COMPARTMENT_LINE_WIDTH);
     double thickness = Math.min(minThickness, ((x + w) * (y + h)) / minThickness);
     //double arcWfac = 1.5, arcHfac = 4.5d;

@@ -396,28 +396,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
    */
   @Override
   public void buildProcessNode(ReactionGlyph reactionGlyph, double rotationAngle, double curveWidth) {
-    BoundingBox boundingBox = reactionGlyph.getBoundingBox();
-    Point point = boundingBox.getPosition();
-    Dimensions dimension = boundingBox.getDimensions();
-    double x = 0d, y = 0d, z = 0d, width = 1d, height = 1d, depth = 1d;
-    if (point != null) {
-      x = point.getX();
-      y = point.getY();
-      z = point.getZ();
-    } else {
-      logger.warning(MessageFormat.format(
-        "No position given for reaction glyph {0} - using default values",
-        reactionGlyph));
-    }
-    if (dimension != null) {
-      width = dimension.getWidth();
-      height = dimension.getHeight();
-      depth = dimension.getDepth();
-    } else {
-      logger.warning(MessageFormat.format(
-        "No dimension given for reaction glyph {0} - using default values",
-        reactionGlyph));
-    }
+    NodeRealizer processNodeRealizer;
     
     SBGNProcessNode<NodeRealizer> processNode; // = createProcessNode();
     if (reactionGlyph.isSetReaction()) {
@@ -425,23 +404,55 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     } else {
       processNode = getSBGNReactionNode(reactionGlyph.getSBOTerm());
     }
-    
     assert processNode != null;
     
-    Point rotationCenter = new Point(x + (width / 2d), y + (height / 2d), z + (depth / 2d));
-    ReactionNodeRealizer reactionNodeRealizer = (ReactionNodeRealizer) processNode.draw(
-      x, y, z, width, height, depth, rotationAngle, rotationCenter);
-    if ((reactionGlyph.isSetUserObjects()) && (reactionGlyph.getUserObject(LayoutDirector.NO_WHISKERS)!=null)) {
-      reactionNodeRealizer.setWhiskers(false);
-    }
-    logger.fine(MessageFormat.format("Process node position: {0} rotationAngle: {1} rotationCenter: {2}",
-      point, rotationAngle, rotationCenter));
+    processNode.setLineWidth(prefs.getDouble(DrawingOptions.GLYPH_LINE_WIDTH));
     
-    Node processYNode = graph.createNode(reactionNodeRealizer);
+    if (reactionGlyph.isSetCurve()) {
+      processNodeRealizer = processNode.draw(reactionGlyph.getCurve(), 0d, null);
+      
+    } else {
+      BoundingBox boundingBox = reactionGlyph.getBoundingBox();
+      Point point = boundingBox.getPosition();
+      Dimensions dimension = boundingBox.getDimensions();
+      double x = 0d, y = 0d, z = 0d, width = 1d, height = 1d, depth = 1d;
+      if (point != null) {
+        x = point.getX();
+        y = point.getY();
+        z = point.getZ();
+      } else {
+        logger.warning(MessageFormat.format(
+          "No position given for reaction glyph {0} - using default values",
+          reactionGlyph));
+      }
+      if (dimension != null) {
+        width = dimension.getWidth();
+        height = dimension.getHeight();
+        depth = dimension.getDepth();
+      } else {
+        logger.warning(MessageFormat.format(
+          "No dimension given for reaction glyph {0} - using default values",
+          reactionGlyph));
+      }
+      
+      Point rotationCenter = new Point(x + (width / 2d), y + (height / 2d), z + (depth / 2d));
+      logger.fine(MessageFormat.format("Process node position: {0} rotationAngle: {1} rotationCenter: {2}",
+        point, rotationAngle, rotationCenter));
+      
+      processNodeRealizer = processNode.draw(
+        x, y, z, width, height, depth, rotationAngle, rotationCenter);
+    }
+    
+    if ((processNodeRealizer instanceof ReactionNodeRealizer)
+        && (reactionGlyph.isSetUserObjects())
+        && (reactionGlyph.getUserObject(LayoutDirector.NO_WHISKERS) != null)) {
+      ((ReactionNodeRealizer) processNodeRealizer).setWhiskers(false);
+      logger.fine(MessageFormat.format("building PN id={0} bounding box={1} {2}",
+        reactionGlyph.getId(), reactionGlyph.getBoundingBox().getPosition(), processNodeRealizer.getBoundingBox()));
+    }
+    Node processYNode = graph.createNode(processNodeRealizer);
     id2node.put(reactionGlyph.getId(), processYNode);
     putInMapSet(reactionId2Node, reactionGlyph.getReaction(), processYNode);
-    logger.fine(MessageFormat.format("building PN id={0} bounding box={1} {2}",
-      reactionGlyph.getId(), reactionGlyph.getBoundingBox().getPosition(), reactionNodeRealizer.getBoundingBox()));
   }
   
   /* (non-Javadoc)
@@ -604,7 +615,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     if ((curve != null) && curve.isSetListOfCurveSegments()) {
       List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
       
-      // if at least one curve segment is a bezier, use BezierEdgeRealizer, else use PolyLineEdgeRealizer
+      // if at least one curve segment is a Beziér, use BezierEdgeRealizer, else use PolyLineEdgeRealizer
       boolean drawBezier = false;
       for (CurveSegment curveSegment : listOfCurveSegments) {
         //        drawBezier = drawBezier && curveSegment.isSetType() && curveSegment.getType().equals(CURVESEGMENT_CUBICBEZIER);
@@ -621,26 +632,47 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       
       for (int i = listOfCurveSegments.size() - 1; i >= 0; i--) {
         CurveSegment curveSegment = listOfCurveSegments.get(i);
-        LineSegment ls = (LineSegment) curveSegment;
-        
-        Point end = ls.getEnd();
-        edgeRealizer.addPoint(end.getX(), end.getY());
-        if (drawBezier && (curveSegment instanceof CubicBezier)) {
-          CubicBezier cb = (CubicBezier) curveSegment;
-          BezierEdgeRealizer ber = (BezierEdgeRealizer) edgeRealizer;
-          if (cb.isSetBasePoint2()) {
-            Point basePoint2 = cb.getBasePoint2();
-            ber.appendBend(basePoint2.getX(), basePoint2.getY());
-          }
-          if (cb.isSetBasePoint1()) {
-            Point basePoint1 = cb.getBasePoint1();
-            ber.appendBend(basePoint1.getX(), basePoint1.getY());
-          }
-        }
-        Point start = ls.getStart();
-        edgeRealizer.addPoint(start.getX(), start.getY());
+        drawCurveSegment(edgeRealizer, curveSegment);
       }
     }
+    
+    return edgeRealizer;
+  }
+  
+  /**
+   * 
+   * @param curveSegment
+   * @return
+   */
+  public static EdgeRealizer drawCurveSegment(CurveSegment curveSegment) {
+    return drawCurveSegment(curveSegment instanceof CubicBezier ? new BezierEdgeRealizer() : new PolyLineEdgeRealizer(), curveSegment);
+  }
+  
+  /**
+   * @param edgeRealizer
+   * @param drawBezier
+   * @param curveSegment
+   * @return
+   */
+  private static EdgeRealizer drawCurveSegment(EdgeRealizer edgeRealizer, CurveSegment curveSegment) {
+    LineSegment ls = (LineSegment) curveSegment;
+    
+    Point end = ls.getEnd();
+    edgeRealizer.addPoint(end.getX(), end.getY());
+    if ((edgeRealizer instanceof BezierEdgeRealizer) && (curveSegment instanceof CubicBezier)) {
+      CubicBezier cb = (CubicBezier) curveSegment;
+      BezierEdgeRealizer ber = (BezierEdgeRealizer) edgeRealizer;
+      if (cb.isSetBasePoint2()) {
+        Point basePoint2 = cb.getBasePoint2();
+        ber.appendBend(basePoint2.getX(), basePoint2.getY());
+      }
+      if (cb.isSetBasePoint1()) {
+        Point basePoint1 = cb.getBasePoint1();
+        ber.appendBend(basePoint1.getX(), basePoint1.getY());
+      }
+    }
+    Point start = ls.getStart();
+    edgeRealizer.addPoint(start.getX(), start.getY());
     
     return edgeRealizer;
   }
@@ -818,7 +850,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
    */
   @Override
   public ProcessNode<NodeRealizer> createProcessNode() {
-    return new YReactionNode();
+    return new YProcessNode();
   }
   
   /* (non-Javadoc)
