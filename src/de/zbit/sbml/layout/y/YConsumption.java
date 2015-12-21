@@ -44,6 +44,8 @@ public class YConsumption extends YAbstractSBGNArc implements Consumption<EdgeRe
     // Reverse order of curve segments an of start and end points because
     // curves are always specified in the direction of the reaction
     // (from substrate process node, from process node to product).
+    curve = curve.clone();
+    curve.removeAllTreeNodeChangeListeners(true);
     if ((curve != null) && curve.isSetListOfCurveSegments()) {
       List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
       Collections.reverse(listOfCurveSegments);
