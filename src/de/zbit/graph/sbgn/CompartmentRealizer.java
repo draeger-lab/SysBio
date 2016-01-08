@@ -97,7 +97,7 @@ public class CompartmentRealizer extends GroupNodeRealizer {
    */
   @Override
   public CompartmentRealizer createCopy(NodeRealizer nr) {
-    return new CompartmentRealizer(this);
+    return new CompartmentRealizer(nr);
   }
   
   /* (non-Javadoc)

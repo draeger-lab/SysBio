@@ -16,8 +16,10 @@
  */
 package de.zbit.sbml.layout.y;
 
+import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Map;
 
 import org.sbml.jsbml.ext.layout.Curve;
@@ -26,15 +28,13 @@ import org.sbml.jsbml.ext.layout.Point;
 
 import y.view.GeneralPathNodePainter;
 import y.view.GenericNodeRealizer;
+import y.view.LineType;
 import y.view.NodeRealizer;
-import y.view.ShadowNodePainter;
-import y.view.SimpleUserDataHandler;
-import de.zbit.graph.sbgn.ArbitraryShapeNodeRealizer;
 import de.zbit.graph.sbgn.ProcessNodeRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.AbstractSBGNProcessNode;
+import de.zbit.sbml.layout.Geometry;
 import de.zbit.sbml.layout.ProcessNode;
-import de.zbit.sbml.layout.Tools;
 
 /**
  * yFiles implementation of process node of type "reaction".
@@ -82,25 +82,34 @@ implements ProcessNode<NodeRealizer> {
   @Override
   public NodeRealizer draw(Curve curve, double rotationAngle,
     Point rotationCenter) {
-    GenericNodeRealizer nr = new GenericNodeRealizer();
-    String configName = "General Path";
+    
+    //    NodeRealizer nr = new ArbitraryShapeNodeRealizer(Geometry.toGeneralPath(curve));
+    
     // Get the factory to register custom styles/configurations.
+    
+    GeneralPath path = Geometry.toGeneralPath(curve);
+    
+    GeneralPath gp = Geometry.normalize(path);
+    
     GenericNodeRealizer.Factory factory = GenericNodeRealizer.getFactory();
-    
+    String configName = "General Path";
     Map<Class<?>, Object> implementationsMap = factory.createDefaultConfigurationMap();
-    GeneralPath gp = Tools.toGeneralPath(curve);
     GeneralPathNodePainter painter = new GeneralPathNodePainter(gp);
-    implementationsMap.put(GenericNodeRealizer.Painter.class, new ShadowNodePainter(painter));
+    implementationsMap.put(GenericNodeRealizer.Painter.class, painter); //new ShadowNodePainter(
     implementationsMap.put(GenericNodeRealizer.ContainsTest.class, painter);
-    // User-defined data objects that implement both the Cloneable and Serializable
-    // interfaces are taken care of (when serializing/deserializing the realizer).
-    implementationsMap.put(GenericNodeRealizer.UserDataHandler.class,
-      new SimpleUserDataHandler(SimpleUserDataHandler.REFERENCE_ON_FAILURE));
-    
     factory.addConfiguration(configName, implementationsMap);
-    factory.configure(nr, configName);
     
-    return new ArbitraryShapeNodeRealizer(Tools.toGeneralPath(curve));
+    //factory.configure(nr, configName);
+    GenericNodeRealizer nr = new GenericNodeRealizer(configName);
+    
+    Rectangle2D bb = path.getBounds2D();
+    nr.setFrame(bb.getX(), bb.getY(), bb.getWidth(), bb.getHeight());
+    nr.setLineType(LineType.LINE_2);
+    nr.setLineColor(Color.BLACK);
+    //    nr.setFillColor(Color.BLUE);
+    //    nr.setFillColor2(Color.BLACK);
+    
+    return nr;
   }
   
   /* (non-Javadoc)

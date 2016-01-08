@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGGElement;
 
-import de.zbit.sbml.layout.Tools;
+import de.zbit.sbml.layout.Geometry;
 import de.zbit.sbml.util.SBMLtools;
 
 /**
@@ -176,7 +176,7 @@ public class SBMLLayoutHandler implements SVGHandler<SBMLDocument> {
                     }
                     String id = incrementSIdSuffix(sid + "_sglyph");
                     SpeciesGlyph sg = layout.createSpeciesGlyph(id, sid);
-                    Path2D path2D = Tools.toGeneralPath(parsePath(parts, xOffset, yOffset, new Curve()));
+                    Path2D path2D = Geometry.toGeneralPath(parsePath(parts, xOffset, yOffset, new Curve()));
                     Rectangle2D bb = path2D.getBounds2D();
                     // offset is not need here, because it is already taken into account when creating the path:
                     sg.createBoundingBox(bb.getWidth(), bb.getHeight(), 1d, bb.getX(), bb.getY(), z);

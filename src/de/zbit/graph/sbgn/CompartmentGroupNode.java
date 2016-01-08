@@ -29,7 +29,7 @@ import y.view.hierarchy.GroupNodeRealizer;
  * @version $Rev$
  */
 public class CompartmentGroupNode extends GroupNodeRealizer {
-
+  
   /**
    * 
    */
@@ -38,7 +38,7 @@ public class CompartmentGroupNode extends GroupNodeRealizer {
     
     initDefaults();
   }
-
+  
   /**
    * 
    */
@@ -62,10 +62,10 @@ public class CompartmentGroupNode extends GroupNodeRealizer {
    */
   public CompartmentGroupNode(NodeRealizer nr) {
     super(nr);
-    // If the given node realizer is of this type, then apply copy semantics. 
+    // If the given node realizer is of this type, then apply copy semantics.
     if (nr instanceof CompartmentGroupNode) {
       CompartmentGroupNode fnr = (CompartmentGroupNode) nr;
-      // Copy the values of custom attributes (there are none). 
+      // Copy the values of custom attributes (there are none).
     }
   }
   
@@ -74,11 +74,10 @@ public class CompartmentGroupNode extends GroupNodeRealizer {
    */
   @Override
   public NodeRealizer createCopy(NodeRealizer nr) {
-    CompartmentGroupNode cgr = new CompartmentGroupNode(nr);
-    return cgr;
+    return new CompartmentGroupNode(nr);
   }
   
-
+  
   /* (non-Javadoc)
    * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
    */
@@ -93,7 +92,7 @@ public class CompartmentGroupNode extends GroupNodeRealizer {
    */
   @Override
   protected void paintFilledShape(Graphics2D gfx) {
-   if (getFillColor()!=null) {
+    if (getFillColor()!=null) {
       gfx.setColor(getFillColor());
       gfx.fill(createPolygon());
     }
@@ -142,10 +141,10 @@ public class CompartmentGroupNode extends GroupNodeRealizer {
     path.quadTo(x, y + h, x, y + h - arc); // curve to 7
     path.lineTo(x, y + arc); // line to 8
     path.quadTo(x, y, x + arc, y); // curve to 1
-
+    
     path.closePath(); // should have no effect.
-
-    return path;  
+    
+    return path;
   }
   
   /**
