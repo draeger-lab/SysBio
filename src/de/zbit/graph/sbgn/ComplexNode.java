@@ -17,7 +17,7 @@
  * this software distribution and also available online as
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
- */ 
+ */
 package de.zbit.graph.sbgn;
 
 import java.awt.Graphics2D;
@@ -38,11 +38,11 @@ import y.view.ShapeNodeRealizer;
 public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker {
   
   /**
-   * Is this node a cloned node? (I.e. another
+   * Is this node a cloned node? (For example, another
    * instance must exist in the same graph).
    */
   private boolean isClonedNode = false;
-
+  
   /**
    * 
    */
@@ -56,10 +56,10 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
    */
   public ComplexNode(NodeRealizer nr) {
     super(nr);
-    // If the given node realizer is of this type, then apply copy semantics. 
+    // If the given node realizer is of this type, then apply copy semantics.
     if (nr instanceof ComplexNode) {
       ComplexNode fnr = (ComplexNode) nr;
-      // Copy the values of custom attributes (there are none). 
+      // Copy the values of custom attributes (there are none).
     }
     if (nr instanceof CloneMarker) {
       setNodeIsCloned(((CloneMarker) nr).isNodeCloned());
@@ -77,13 +77,15 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
   /* (non-Javadoc)
    * @see de.zbit.graph.CloneMarker#setNodeIsCloned(boolean)
    */
+  @Override
   public void setNodeIsCloned(boolean b) {
     isClonedNode = b;
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.graph.CloneMarker#isNodeCloned()
    */
+  @Override
   public boolean isNodeCloned() {
     return isClonedNode;
   }
@@ -102,7 +104,7 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
    */
   @Override
   protected void paintFilledShape(Graphics2D gfx) {
-   if (!isTransparent() && (getFillColor() != null)) {
+    if (!isTransparent() && (getFillColor() != null)) {
       gfx.setColor(getFillColor());
       gfx.fill(createPolygon());
       
@@ -138,7 +140,7 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
    */
   public static Polygon createPolygon(double x, double y, double w, double h) {
     int arc = (int) (Math.min(w, h)/5);
-    Polygon nodeshape = new Polygon(); 
+    Polygon nodeshape = new Polygon();
     nodeshape.addPoint((int)  x+arc,       (int) y);                   // 1
     nodeshape.addPoint((int) (x+w)-arc,    (int) y);                   // 2
     nodeshape.addPoint((int) (x+w),        (int) y+arc);               // 3
@@ -149,7 +151,7 @@ public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker 
     nodeshape.addPoint((int)  x,           (int) (y+arc));             // 8
     nodeshape.addPoint((int)  x+arc,       (int) (y));                 // 1
     
-    return nodeshape;    
+    return nodeshape;
   }
-
+  
 }

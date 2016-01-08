@@ -13,7 +13,7 @@
  * this software distribution and also available online as
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
- */ 
+ */
 package de.zbit.graph.sbgn;
 
 import java.awt.Color;
@@ -33,104 +33,108 @@ import y.view.ShapeNodeRealizer;
  * @version $Rev$
  */
 public class EmptySetNode extends ShapeNodeRealizerSupportingCloneMarker {
-	
-	/**
-	 * 
-	 */
-	public EmptySetNode() {
-		super(ShapeNodeRealizer.ELLIPSE);
-	}
-
-	/**
-	 * 
-	 * @param nr
-	 */
-	public EmptySetNode(NodeRealizer nr) {
-		super(nr);
-		// If the given node realizer is of this type, then apply copy
-		// semantics.
-		if (nr instanceof EmptySetNode) {
-//			EmptyNode enr = (EmptyNode) nr;
-			// Copy the values of custom attributes (there are none).
-		}
-		if (nr instanceof CloneMarker) {
-			setNodeIsCloned(((CloneMarker) nr).isNodeCloned());
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
-	 */
-	@Override
-	public EmptySetNode createCopy(NodeRealizer nr) {
-		return new EmptySetNode(nr);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker#createCopy()
-	 */
-	@Override
-	public EmptySetNode createCopy() {
-		return new EmptySetNode(this);
-	}
-
-	/* (non-Javadoc)
-	 * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
-	 */
-	@Override
-	protected void paintShapeBorder(Graphics2D gfx) {
-		gfx.setColor(getLineColor());
-		setWidth(getHeight());
-		super.paintShapeBorder(gfx);
-	}
-
-	/* (non-Javadoc)
-	 * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
-	 */
-	@Override
-	protected void paintFilledShape(Graphics2D gfx) {
-		Color fillColor = getFillColor();
-		if (!isTransparent() && (fillColor != null)) {
-			double diameter = Math.max(getWidth(), getHeight());
-			setWidth(diameter);
-			setHeight(diameter);
-			
-			// Create a filled circle
-			gfx.setColor(fillColor);
-			super.paintFilledShape(gfx);
-			CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this,
-				new Ellipse2D.Double(getX(), getY(), getWidth(), getHeight()));
-			
-			// Diagonal element:
-			gfx.setColor(getLineColor());
-			gfx.draw(createDiagonal());
-		}
-	}
-
-	private Shape createDiagonal() {
-		double x = getX(), y = getY(), width = getWidth(), height = getHeight();
-		double diameter = Math.max(width, height);
-		GeneralPath path = new GeneralPath();
-		path.moveTo(x, y + diameter);
-		path.lineTo(x + diameter, y);
-		path.closePath();
-		return path;
-	}
-
-	/* (non-Javadoc)
-	 * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
-	 */
-	@Override
-	public void paintSloppy(Graphics2D g) {
-		double diameter = Math.max(getWidth(), getHeight());
-		Color fillColor = Color.BLUE;
-		if (!isTransparent() && (fillColor != null)) {
-			g.setColor(getFillColor());
-			g.fill(new Ellipse2D.Double(getX(), getY(), diameter, diameter));
-		}
-		g.setColor(getLineColor());
-		g.draw(new Ellipse2D.Double(getX(), getY(), diameter, diameter));
-		//g.draw(createDiagonal());
-	}
-	
+  
+  /**
+   * 
+   */
+  public EmptySetNode() {
+    super(ShapeNodeRealizer.ELLIPSE);
+  }
+  
+  /**
+   * 
+   * @param nr
+   */
+  public EmptySetNode(NodeRealizer nr) {
+    super(nr);
+    // If the given node realizer is of this type, then apply copy
+    // semantics.
+    if (nr instanceof EmptySetNode) {
+      //			EmptyNode enr = (EmptyNode) nr;
+      // Copy the values of custom attributes (there are none).
+    }
+    if (nr instanceof CloneMarker) {
+      setNodeIsCloned(((CloneMarker) nr).isNodeCloned());
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
+  @Override
+  public EmptySetNode createCopy(NodeRealizer nr) {
+    return new EmptySetNode(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker#createCopy()
+   */
+  @Override
+  public EmptySetNode createCopy() {
+    return new EmptySetNode(this);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
+   */
+  @Override
+  protected void paintShapeBorder(Graphics2D gfx) {
+    gfx.setColor(getLineColor());
+    setWidth(getHeight());
+    super.paintShapeBorder(gfx);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
+   */
+  @Override
+  protected void paintFilledShape(Graphics2D gfx) {
+    Color fillColor = getFillColor();
+    if (!isTransparent() && (fillColor != null)) {
+      double diameter = Math.max(getWidth(), getHeight());
+      setWidth(diameter);
+      setHeight(diameter);
+      
+      // Create a filled circle
+      gfx.setColor(fillColor);
+      super.paintFilledShape(gfx);
+      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this,
+        new Ellipse2D.Double(getX(), getY(), getWidth(), getHeight()));
+      
+      // Diagonal element:
+      gfx.setColor(getLineColor());
+      gfx.draw(createDiagonal());
+    }
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  private Shape createDiagonal() {
+    double x = getX(), y = getY(), width = getWidth(), height = getHeight();
+    double diameter = Math.max(width, height);
+    GeneralPath path = new GeneralPath();
+    path.moveTo(x, y + diameter);
+    path.lineTo(x + diameter, y);
+    path.closePath();
+    return path;
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
+   */
+  @Override
+  public void paintSloppy(Graphics2D g) {
+    double diameter = Math.max(getWidth(), getHeight());
+    Color fillColor = Color.BLUE;
+    if (!isTransparent() && (fillColor != null)) {
+      g.setColor(getFillColor());
+      g.fill(new Ellipse2D.Double(getX(), getY(), diameter, diameter));
+    }
+    g.setColor(getLineColor());
+    g.draw(new Ellipse2D.Double(getX(), getY(), diameter, diameter));
+    //g.draw(createDiagonal());
+  }
+  
 }
