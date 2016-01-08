@@ -21,15 +21,15 @@ import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 
-import y.view.GenericNodeRealizer;
 import y.view.NodeRealizer;
+import y.view.ShapeNodeRealizer;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
  * @author Andreas Dr&auml;ger
  * @version $Rev$
  */
-public class ArbitraryShapeNodeRealizer extends GenericNodeRealizer {
+public class ArbitraryShapeNodeRealizer extends ShapeNodeRealizer {
   
   /**
    * 
@@ -53,6 +53,11 @@ public class ArbitraryShapeNodeRealizer extends GenericNodeRealizer {
   public ArbitraryShapeNodeRealizer(Path2D path) {
     super();
     this.path = path;
+    Rectangle2D bb = this.path.getBounds();
+    setX(bb.getX());
+    setY(bb.getY());
+    setWidth(bb.getWidth());
+    setHeight(bb.getHeight());
     setTransparent(false);
     setVisible(true);
   }
@@ -66,6 +71,14 @@ public class ArbitraryShapeNodeRealizer extends GenericNodeRealizer {
     if (realizer instanceof ArbitraryShapeNodeRealizer) {
       path = (Path2D) ((ArbitraryShapeNodeRealizer) realizer).getPath().clone();
     }
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.NodeRealizer#createCopy()
+   */
+  @Override
+  public NodeRealizer createCopy() {
+    return new ArbitraryShapeNodeRealizer(this);
   }
   
   /**
@@ -88,13 +101,27 @@ public class ArbitraryShapeNodeRealizer extends GenericNodeRealizer {
    * @see y.view.GenericNodeRealizer#paint(java.awt.Graphics2D)
    */
   @Override
-  public void paint(Graphics2D g) {
-    g.setStroke(new BasicStroke((float)
-      getLineWidth(),
-      BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-    g.setColor(getLineColor());
-    g.setBackground(getLineColor());
-    g.draw(path);
+  public void paintFilledShape(Graphics2D g) {
+    //super.paintFilledShape(g);
+    g.setColor(getFillColor());
+    g.fill(path);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.NodeRealizer#paint(java.awt.Graphics2D)
+   */
+  @Override
+  public void paint(Graphics2D gfx) {
+    paintNode(gfx);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#paintNode(java.awt.Graphics2D)
+   */
+  @Override
+  protected void paintNode(Graphics2D gfx) {
+    // TODO Auto-generated method stub
+    super.paintNode(gfx);
   }
   
   /* (non-Javadoc)
@@ -102,16 +129,21 @@ public class ArbitraryShapeNodeRealizer extends GenericNodeRealizer {
    */
   @Override
   public void paintSloppy(Graphics2D g) {
-    paint(g);
+    paintNode(g);
   }
   
   /* (non-Javadoc)
-   * @see y.view.GenericNodeRealizer#paintNode(java.awt.Graphics2D)
+   * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
    */
   @Override
-  public void paintNode(Graphics2D g) {
-    paint(g);
-    super.paintNode(g);
+  protected void paintShapeBorder(Graphics2D gfx) {
+    super.paintShapeBorder(gfx);
+    gfx.setStroke(new BasicStroke((float)
+      getLineWidth(),
+      BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    gfx.setColor(getLineColor());
+    gfx.setBackground(getLineColor());
+    gfx.draw(path);
   }
   
   /* (non-Javadoc)
@@ -119,7 +151,8 @@ public class ArbitraryShapeNodeRealizer extends GenericNodeRealizer {
    */
   @Override
   public Rectangle2D.Double getBoundingBox() {
-    return (java.awt.geom.Rectangle2D.Double) path.getBounds2D();
+    Rectangle2D r = path.getBounds();
+    return new Rectangle2D.Double(r.getX(), r.getY(), r.getWidth(), r.getHeight());
   }
   
   /**
@@ -134,6 +167,21 @@ public class ArbitraryShapeNodeRealizer extends GenericNodeRealizer {
    */
   public void setLineWidth(double lineWidth) {
     this.lineWidth = lineWidth;
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(getClass().getSimpleName());
+    builder.append(" [lineWidth=");
+    builder.append(lineWidth);
+    builder.append(", path=");
+    builder.append(path);
+    builder.append("]");
+    return builder.toString();
   }
   
 }

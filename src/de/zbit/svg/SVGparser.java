@@ -68,7 +68,7 @@ public class SVGparser<T> implements Runnable {
       SVGparser<SBMLDocument> converter = new SVGparser<SBMLDocument>(uri.toString());
       converter.setSVGMHandler(new SBMLLayoutHandler());
       converter.run();
-      File file = new File(System.getProperty("user.home") + "/layout.xml");
+      File file = new File(args[1]);
       System.out.println("writing to file " + file.getAbsolutePath());
       TidySBMLWriter.write(converter.getSVGHandler().getResult(), file, ' ', (short) 2);
       SBMLDocument doc = converter.getSVGHandler().getResult();
@@ -186,10 +186,24 @@ public class SVGparser<T> implements Runnable {
     for (int i = 0; i < vBox.length; i++) {
       vBox[i] = Double.parseDouble(viewBox[i]);
     }
-    handler.init(Double.parseDouble(svgRoot.getAttribute("width")), Double.parseDouble(svgRoot.getAttribute("height")), vBox);
+    String width = stripUnit(svgRoot.getAttribute("width"));
+    String heigth = stripUnit(svgRoot.getAttribute("height"));
+    handler.init(Double.parseDouble(width), Double.parseDouble(heigth), vBox);
     for (Element element : Element.values()) {
       handler.handle(element, getElements(element));
     }
+  }
+  
+  /**
+   * 
+   * @param attribute
+   * @return
+   */
+  private String stripUnit(String attribute) {
+    if (attribute.endsWith("px")) {
+      attribute = attribute.substring(0, attribute.length() - 2);
+    }
+    return attribute;
   }
   
   /**

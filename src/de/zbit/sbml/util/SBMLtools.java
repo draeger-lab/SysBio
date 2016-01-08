@@ -70,6 +70,25 @@ public class SBMLtools extends org.sbml.jsbml.util.SBMLtools {
   }
   
   /**
+   * 
+   * @param sbase
+   * @return
+   */
+  public static String createHTMLfromNotes(SBase sbase) {
+    String text = toXML(sbase.getNotes());
+    if (text.startsWith("<notes") && text.endsWith("notes>")) {
+      text = text.substring(toXML(sbase.getNotes()).indexOf('>') + 1,
+        toXML(sbase.getNotes()).lastIndexOf('/') - 1);
+    }
+    text = text.trim().replace("/>", ">");
+    if (!text.startsWith("<body") && !text.endsWith("</body>")) {
+      text = "<body>" + text + "</body>";
+    }
+    text = "<html><head></head>" + text + "</html>";
+    return text;
+  }
+  
+  /**
    * Returns a name associated to this given {@link NamedSBase}. It first tries
    * the name, then the id, finally, the element's name.
    * 
@@ -90,90 +109,6 @@ public class SBMLtools extends org.sbml.jsbml.util.SBMLtools {
   }
   
   /**
-   * 
-   * @param sbase
-   * @param term
-   */
-  public static final void setSBOTerm(SBase sbase, int term) {
-    if (-1 < sbase.getLevelAndVersion().compareTo(Integer.valueOf(2),
-      Integer.valueOf(2))) {
-      sbase.setSBOTerm(term);
-    } else {
-      ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.Messages");
-      logger.warning(MessageFormat.format(
-        bundle.getString("COULD_NOT_SET_SBO_TERM"),
-        SBO.sboNumberString(term), sbase.getElementName(), sbase.getLevel(), sbase.getVersion()));
-    }
-  }
-  
-  /**
-   * 
-   * @param node
-   * @param unit
-   */
-  public static final void setUnits(ASTNode node, UnitDefinition unit) {
-    setUnits(node, unit.getId());
-  }
-  
-  /**
-   * 
-   * @param node
-   * @param unit
-   */
-  public static final void setUnits(ASTNode node, Unit.Kind unit) {
-    setUnits(node, unit.toString().toLowerCase());
-  }
-  
-  /**
-   * 
-   * @param node
-   * @param unit
-   */
-  public static final void setUnits(ASTNode node, String unit) {
-    MathContainer container = node.getParentSBMLObject();
-    if ((container != null) && (container.getLevel() > 2)) {
-      node.setUnits(unit);
-    }
-  }
-  
-  /**
-   * 
-   * @param sbase
-   * @param doc
-   */
-  public static void updateAnnotation(SBase sbase, SBMLDocument doc) {
-    if (sbase.isSetMetaId()) {
-      sbase.setMetaId(doc.nextMetaId());
-    }
-    for (int i = 0; i < sbase.getChildCount(); i++) {
-      TreeNode child = sbase.getChildAt(i);
-      if (child instanceof SBase) {
-        updateAnnotation((SBase) child, doc);
-      }
-    }
-  }
-  
-  /**
-   * 
-   * @param sbase
-   * @return
-   */
-  public static String createHTMLfromNotes(SBase sbase) {
-    String text = toXML(sbase.getNotes());
-    if (text.startsWith("<notes") && text.endsWith("notes>")) {
-      text = text.substring(toXML(sbase.getNotes()).indexOf('>') + 1,
-        toXML(sbase.getNotes()).lastIndexOf('/') - 1);
-    }
-    text = text.trim().replace("/>", ">");
-    if (!text.startsWith("<body") && !text.endsWith("</body>")) {
-      text = "<body>" + text + "</body>";
-    }
-    text = "<html><head></head>" + text + "</html>";
-    return text;
-  }
-  
-  
-  /**
    * Appends "_&lt;number&gt;" to a given String. &lt;number&gt; is being set to
    * the next free number, so that this sID is unique in this
    * {@link SBMLDocument}. Should only be called from {@link #nameToSId(String)}.
@@ -188,6 +123,16 @@ public class SBMLtools extends org.sbml.jsbml.util.SBMLtools {
       aktString = prefix + "_" + (++i);
     }
     return aktString;
+  }
+  
+  /**
+   * @param c
+   * @return {@code true} if c is out of A-Z or a-z
+   */
+  public static boolean isLetter(char c) {
+    // Unfortunately Character.isLetter also accepts ??, but SBML doesn't.
+    // a-z or A-Z
+    return ((c >= 97) && (c <= 122)) || ((c >= 65) && (c <= 90));
   }
   
   /**
@@ -220,6 +165,86 @@ public class SBMLtools extends org.sbml.jsbml.util.SBMLtools {
   }
   
   /**
+   * Generate a valid SBML identifier using UUID.
+   * 
+   * @param model
+   * @return
+   */
+  public static String nextId(Model model) {
+    String idOne;
+    do {
+      idOne = UUID.randomUUID().toString().replace("-", "_");
+      if (Character.isDigit(idOne.charAt(0))) {
+        // Add an underscore at the beginning of the new id only if
+        // necessary.
+        idOne = '_' + idOne;
+      }
+    } while (model.findNamedSBase(idOne) != null);
+    return idOne;
+  }
+  
+  /**
+   * 
+   * @param sbase
+   * @param term
+   */
+  public static final void setSBOTerm(SBase sbase, int term) {
+    if (-1 < sbase.getLevelAndVersion().compareTo(Integer.valueOf(2),
+      Integer.valueOf(2))) {
+      sbase.setSBOTerm(term);
+    } else {
+      ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.Messages");
+      logger.warning(MessageFormat.format(
+        bundle.getString("COULD_NOT_SET_SBO_TERM"),
+        SBO.sboNumberString(term), sbase.getElementName(), sbase.getLevel(), sbase.getVersion()));
+    }
+  }
+  
+  
+  /**
+   * 
+   * @param node
+   * @param unit
+   */
+  public static final void setUnits(ASTNode node, String unit) {
+    MathContainer container = node.getParentSBMLObject();
+    if ((container != null) && (container.getLevel() > 2)) {
+      node.setUnits(unit);
+    }
+  }
+  
+  /**
+   * 
+   * @param node
+   * @param unit
+   */
+  public static final void setUnits(ASTNode node, Unit.Kind unit) {
+    setUnits(node, unit.toString().toLowerCase());
+  }
+  
+  /**
+   * 
+   * @param node
+   * @param unit
+   */
+  public static final void setUnits(ASTNode node, UnitDefinition unit) {
+    setUnits(node, unit.getId());
+  }
+  
+  /**
+   * 
+   * @param notes
+   * @return
+   */
+  public static String toNotesString(String notes) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("<body xmlns=\"http://www.w3.org/1999/xhtml\">\n");
+    sb.append(notes);
+    sb.append("\n</body>");
+    return sb.toString();
+  }
+  
+  /**
    * 
    * @param name
    * @return
@@ -240,7 +265,6 @@ public class SBMLtools extends org.sbml.jsbml.util.SBMLtools {
       if (c == ' ') {
         c = '_'; // Replace spaces with "_"
       }
-      
       if (isLetter(c) || Character.isDigit(c) || (c == '_')) {
         id.append(c);
       } else if ((c == '-') || (c == '(') || (c == ')')) {
@@ -253,33 +277,20 @@ public class SBMLtools extends org.sbml.jsbml.util.SBMLtools {
   }
   
   /**
-   * Returns true if c is out of A-Z or a-z.
-   * @param c
-   * @return
-   */
-  private static boolean isLetter(char c) {
-    // Unfortunately Character.isLetter also accepts ??, but SBML doesn't.
-    // a-z or A-Z
-    return ((c >= 97) && (c <= 122)) || ((c >= 65) && (c <= 90));
-  }
-  
-  /**
-   * Generate a valid SBML identifier using UUID.
    * 
-   * @param model
-   * @return
+   * @param sbase
+   * @param doc
    */
-  public static String nextId(Model model) {
-    String idOne;
-    do {
-      idOne = UUID.randomUUID().toString().replace("-", "_");
-      if (Character.isDigit(idOne.charAt(0))) {
-        // Add an underscore at the beginning of the new id only if
-        // necessary.
-        idOne = '_' + idOne;
+  public static void updateAnnotation(SBase sbase, SBMLDocument doc) {
+    if (sbase.isSetMetaId()) {
+      sbase.setMetaId(doc.nextMetaId());
+    }
+    for (int i = 0; i < sbase.getChildCount(); i++) {
+      TreeNode child = sbase.getChildAt(i);
+      if (child instanceof SBase) {
+        updateAnnotation((SBase) child, doc);
       }
-    } while (model.findNamedSBase(idOne) != null);
-    return idOne;
+    }
   }
   
 }
