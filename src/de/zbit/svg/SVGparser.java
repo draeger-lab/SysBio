@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2015 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2016 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,11 +16,8 @@
  */
 package de.zbit.svg;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 
-import javax.swing.JFrame;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
@@ -31,17 +28,8 @@ import org.apache.batik.bridge.GVTBuilder;
 import org.apache.batik.bridge.UserAgent;
 import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.util.XMLResourceDescriptor;
-import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
-import org.sbml.jsbml.TidySBMLWriter;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-
-import de.zbit.graph.sbgn.DrawingOptions;
-import de.zbit.gui.prefs.PreferencesDialog;
-import de.zbit.io.OpenedFile;
-import de.zbit.sbml.gui.SBMLModelSplitPane;
-import de.zbit.sbml.layout.y.YGraphView;
 
 /**
  * @author Andreas Dr&auml;ger
@@ -63,38 +51,38 @@ public class SVGparser<T> implements Runnable {
    */
   @SuppressWarnings("unchecked")
   public static void main(String args[]) throws IOException, SBMLException, XMLStreamException {
-    if (PreferencesDialog.showPreferencesDialog(DrawingOptions.class)) {
-      URI uri = new File(args[0]).toURI();
-      SVGparser<SBMLDocument> converter = new SVGparser<SBMLDocument>(uri.toString());
-      converter.setSVGMHandler(new SBMLLayoutHandler());
-      converter.run();
-      File file = new File(args[1]);
-      System.out.println("writing to file " + file.getAbsolutePath());
-      TidySBMLWriter.write(converter.getSVGHandler().getResult(), file, ' ', (short) 2);
-      SBMLDocument doc = converter.getSVGHandler().getResult();
-      JFrame f = new JFrame();
-      f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      //f.setLocationRelativeTo(null);
-      f.getContentPane().add(new SBMLModelSplitPane(new OpenedFile<SBMLDocument>(doc), true));
-      f.pack();
-      f.setVisible(true);
-      new YGraphView(doc);
-    }
+    //    if (PreferencesDialog.showPreferencesDialog(DrawingOptions.class)) {
+    //      URI uri = new File(args[0]).toURI();
+    //      SVGparser<SBMLDocument> converter = new SVGparser<SBMLDocument>(uri.toString());
+    //      converter.setSVGMHandler(new SBMLLayoutHandler());
+    //      converter.run();
+    //      File file = new File(args[1]);
+    //      System.out.println("writing to file " + file.getAbsolutePath());
+    //      TidySBMLWriter.write(converter.getSVGHandler().getResult(), file, ' ', (short) 2);
+    //      SBMLDocument doc = converter.getSVGHandler().getResult();
+    //      JFrame f = new JFrame();
+    //      f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    //      //f.setLocationRelativeTo(null);
+    //      f.getContentPane().add(new SBMLModelSplitPane(new OpenedFile<SBMLDocument>(doc), true));
+    //      f.pack();
+    //      f.setVisible(true);
+    //      new YGraphView(doc);
+    //    }
   }
   
-  /**
-   * 
-   * @return
-   */
-  private SVGHandler<T> getSVGHandler() {
-    return handler;
-  }
-  
-  /**
-   * 
-   */
-  private SVGHandler<T> handler;
-  
+  //  /**
+  //   *
+  //   * @return
+  //   */
+  //  private SVGHandler<T> getSVGHandler() {
+  //    return handler;
+  //  }
+  //
+  //  /**
+  //   *
+  //   */
+  //  private SVGHandler<T> handler;
+  //
   /**
    * 
    */
@@ -134,9 +122,9 @@ public class SVGparser<T> implements Runnable {
    * @param element the name of an element type
    * @return The list of "path" elements in the SVG document.
    */
-  private NodeList getElements(Element element) {
-    return getSVGDocumentRoot().getElementsByTagName(element.toString());
-  }
+  //  private NodeList getElements(Element element) {
+  //    return getSVGDocumentRoot().getElementsByTagName(element.toString());
+  //  }
   
   /**
    * Returns the SVG document parsed upon instantiating this class.
@@ -188,10 +176,10 @@ public class SVGparser<T> implements Runnable {
     }
     String width = stripUnit(svgRoot.getAttribute("width"));
     String heigth = stripUnit(svgRoot.getAttribute("height"));
-    handler.init(Double.parseDouble(width), Double.parseDouble(heigth), vBox);
-    for (Element element : Element.values()) {
-      handler.handle(element, getElements(element));
-    }
+    //    handler.init(Double.parseDouble(width), Double.parseDouble(heigth), vBox);
+    //    for (Element element : Element.values()) {
+    //      handler.handle(element, getElements(element));
+    //    }
   }
   
   /**
@@ -224,8 +212,8 @@ public class SVGparser<T> implements Runnable {
    * 
    * @param svgHandler
    */
-  public void setSVGMHandler(SVGHandler<T> svgHandler) {
-    handler = svgHandler;
-  }
+  //  public void setSVGMHandler(SVGHandler<T> svgHandler) {
+  //    handler = svgHandler;
+  //  }
   
 }
