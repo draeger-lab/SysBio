@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
- * Copyright (C) 2009-2015 by the University of Tuebingen, Germany.
+ * Copyright (C) 2009-2016 by the University of Tuebingen, Germany.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -44,7 +44,7 @@ import de.zbit.util.prefs.SBProperties;
 /**
  * A basic implementation of an application launcher. If launching a program
  * using an implementation of this class, the {@link System} will contain the
- * following new {@link Properties} in order to make these accessible within
+ * following new {@link java.util.Properties} in order to make these accessible within
  * other objects, too:
  * <table>
  * <tr>
@@ -61,7 +61,7 @@ import de.zbit.util.prefs.SBProperties;
  * </tr>
  * </table>
  * If the user operates on Mac OS X, all necessary {@link System}
- * {@link Properties} specific to this environment will also be set. This might
+ * {@link java.util.Properties} specific to this environment will also be set. This might
  * make using {@code -Xdock:name="Some title" -Xdock:icon=path/to/icon} on
  * command line unnecessary.
  * <p>
@@ -816,6 +816,7 @@ public abstract class Launcher implements Runnable, Serializable {
     String logFile = appConf.getCmdArgs().get(de.zbit.gui.GUIOptions.LOG_FILE);
     if (logFile != null) {
       try {
+        (new java.io.File(logFile)).createNewFile();
         FileHandler fileHandler = new FileHandler(logFile);
         fileHandler.setFormatter(new OneLineFormatter(false, false, false));
         LogUtil.addHandler(fileHandler, getLogPackages());
