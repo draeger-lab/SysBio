@@ -74,6 +74,7 @@ public class XMLResourceBundleControl extends Control {
      * 
      * @param stream
      * @throws IOException
+     * @throws InvalidPropertiesFormatException
      */
     public XMLResourceBundle(InputStream stream) throws IOException,
     InvalidPropertiesFormatException {
