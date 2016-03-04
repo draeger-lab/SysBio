@@ -60,7 +60,9 @@ public class LogUtil {
     // additional packages to handle
     if (packages != null) {
       for (String s : packages) {
-        Logger.getLogger(s).addHandler(h);
+        if (!s.equals(basePackage)) {
+          Logger.getLogger(s).addHandler(h);
+        }
       }
     }
   }

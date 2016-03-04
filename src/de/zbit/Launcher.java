@@ -819,6 +819,7 @@ public abstract class Launcher implements Runnable, Serializable {
         (new java.io.File(logFile)).createNewFile();
         FileHandler fileHandler = new FileHandler(logFile);
         fileHandler.setFormatter(new OneLineFormatter(false, false, false));
+        fileHandler.setLevel(LogUtil.getCurrentLogLevel());
         LogUtil.addHandler(fileHandler, getLogPackages());
       } catch (SecurityException exc) {
         exc.printStackTrace();
