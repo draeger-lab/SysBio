@@ -36,6 +36,7 @@ public interface LogOptions extends KeyProvider {
    * levels ALL or OFF (giving bounds of -/+ Integer max values is not
    * reasonable for the range).
    */
+  @SuppressWarnings("unchecked")
   public static final Option<String> LOG_LEVEL = new Option<String>(
       "LOG_LEVEL", String.class, "Change the log-level of this application. This option will influence how fine-grained error and other log messages will be that you receive while executing this program.",
       new Range<String>(String.class, Reflect.getStaticFinalVariablesAsEnumeration(Level.class)),
@@ -45,6 +46,7 @@ public interface LogOptions extends KeyProvider {
    * This option allows you to specify a log file to which all information of
    * the program will be written.
    */
+  @SuppressWarnings("unchecked")
   public static final Option<File> LOG_FILE = new Option<File>(
       "LOG_FILE", File.class, "This option allows you to specify a log file to which all information of the program will be written.",
       new Range<File>(File.class, SBFileFilter.createLogFileFilter()), null);
