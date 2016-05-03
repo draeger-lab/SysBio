@@ -189,8 +189,12 @@ public class SBPreferences implements Map<Object, Object> {
             }
           }
           if (!conflictFree) {
-            logger.warning(MessageFormat.format("Option {0} conflicts with the value {1} of option {2}.", o, cur, cur.getValue(props)));
-            logger.warning(MessageFormat.format("Rejecting option {0}={1}.", o, o.getValue(props)));
+            logger.warning(MessageFormat.format(
+              "Option {0} conflicts with the value {1} of option {2}.",
+              o, cur, cur.getValue(props)));
+            logger.warning(MessageFormat.format(
+              "Rejecting option {0}={1}.",
+              o, o.getValue(props)));
             props.remove(o);
             break;
           }
