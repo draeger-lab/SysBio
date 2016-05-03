@@ -807,11 +807,6 @@ public abstract class Launcher implements Runnable, Serializable {
     // Get appConf command-line options
     final AppConf appConf = getAppConf();
     
-    // Eventually change the log-level
-    String logLevel = appConf.getCmdArgs().get(de.zbit.gui.GUIOptions.LOG_LEVEL);
-    if (logLevel != null) {
-      LogUtil.changeLogLevel(Level.parse(logLevel.toUpperCase()));
-    }
     // Optionally add a log file where information can be stored.
     String logFile = appConf.getCmdArgs().get(de.zbit.gui.GUIOptions.LOG_FILE);
     if (logFile != null) {
@@ -819,7 +814,6 @@ public abstract class Launcher implements Runnable, Serializable {
         (new java.io.File(logFile)).createNewFile();
         FileHandler fileHandler = new FileHandler(logFile);
         fileHandler.setFormatter(new OneLineFormatter(false, false, false));
-        fileHandler.setLevel(LogUtil.getCurrentLogLevel());
         LogUtil.addHandler(fileHandler, getLogPackages());
       } catch (SecurityException exc) {
         exc.printStackTrace();
@@ -827,7 +821,15 @@ public abstract class Launcher implements Runnable, Serializable {
         exc.printStackTrace();
       }
     }
-    
+    // Change the log-level if needed
+    String logLevel = appConf.getCmdArgs().get(de.zbit.gui.GUIOptions.LOG_LEVEL);
+    Level level = getLogLevel();
+    if (logLevel != null) {
+      level = Level.parse(logLevel.toUpperCase());
+    }
+    if ((level != getLogLevel()) || (logFile != null)) {
+      LogUtil.changeLogLevel(level, getLogPackages());
+    }
     
     /*
      * Give the opportunity to load certain libraries or perform
