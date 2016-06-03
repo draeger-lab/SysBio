@@ -510,7 +510,7 @@ public class DatabaseIdentifiers {
         }
       }
       
-      log.warning(String.format("Could not get database identifier for '%s'.", dbIdentifier));
+      log.warning(MessageFormat.format("Could not get database identifier for ''{0}''.", dbIdentifier));
     }
     return id;
   }

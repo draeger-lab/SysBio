@@ -57,33 +57,33 @@ import de.zbit.util.StringUtil;
  * @version $Rev$
  */
 public class KGMLWriter {
-
+  
   /**
    * indent for the xml entries
    */
   static String indent = "4";
-
+  
   public static final Logger log = Logger.getLogger(KGMLWriter.class.getName());
-
-
+  
+  
   /**
    * If the fileName is not set it will be set automatically to the pathway
    * name. The file will be saved in the current folder.
    * 
    * @param keggPW
-   * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended}, 
+   * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended},
    * otherwise the basic KGML is written with normal {@link Entry}
-   * @throws XMLStreamException 
-   * @throws FileNotFoundException 
+   * @throws XMLStreamException
+   * @throws FileNotFoundException
    */
   public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW, boolean writeEntryExtended)  {
     if (keggPW!=null && keggPW.getEntries().size() > 0) {
       String fileName = createFileName(keggPW);
-
+      
       writeKGML(keggPW, fileName, writeEntryExtended);
     }
   }
-
+  
   /**
    * Uses the keggPW title to create a fileName
    * 
@@ -93,8 +93,8 @@ public class KGMLWriter {
   public static String createFileName(de.zbit.kegg.parser.pathway.Pathway keggPW) {
     String fileName = keggPW.getTitle() + ".xml";
     fileName = fileName.replace(" ", "_");
-
-    if (fileName == null) {
+    
+    if ((fileName == null) || (fileName.length() == 4)) {
       fileName = keggPW.getName();
       if (fileName == null) {
         fileName = Integer.toString(keggPW.hashCode());
@@ -103,7 +103,7 @@ public class KGMLWriter {
     if (!fileName.toLowerCase().endsWith(".xml")) {
       fileName += ".xml";
     }
-
+    
     fileName = StringUtil.removeAllNonFileSystemCharacters(fileName);
     return fileName;
   }
@@ -112,33 +112,36 @@ public class KGMLWriter {
    * if the fileName is not set it will be set automatically to the pathway
    * name. The file will be saved in the current folder
    * 
-   * @param keggPW 
-   * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended}, 
+   * @param keggPW
+   * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended},
    * otherwise the basic KGML is written with normal {@link Entry}
    * @param fileName
    */
-  public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW, String fileName, 
-      boolean writeEntryExtended) {
+  public static void writeKGML(de.zbit.kegg.parser.pathway.Pathway keggPW, String fileName,
+    boolean writeEntryExtended) {
     ArrayList<de.zbit.kegg.parser.pathway.Entry> entries = keggPW.getEntries();
-
+    
     if (entries.size() > 0) {
       int counter = 0;
       int counterMacro = 0;
       int counterMaps = 0;
-
+      
       for (de.zbit.kegg.parser.pathway.Entry entry : entries) {
-        if (entry.getType().equals(EntryType.group))
+        if (entry.getType().equals(EntryType.group)) {
           counter++;
-        if (entry.getType().equals(EntryType.map))
+        }
+        if (entry.getType().equals(EntryType.map)) {
           counterMaps++;
-        if (entry.getType().equals(EntryType.compound))
+        }
+        if (entry.getType().equals(EntryType.compound)) {
           counterMacro++;
+        }
       }
       log.info("Entries.size(): " + entries.size() + " - " + counter + " are groups, " + " "
           + counterMacro + " are marcromolecules, " + " " + counterMaps + " are maps.");
       log.info("Reactions.size(): " + keggPW.getReactions().size());
       log.info("Relations.size(): " + keggPW.getRelations().size());
-
+      
       
       Document doc = null;
       try {
@@ -150,7 +153,7 @@ public class KGMLWriter {
     }
   }
   
-
+  
   /**
    * writes a {@link Document} to an xml file
    * 
@@ -160,15 +163,15 @@ public class KGMLWriter {
    * @throws XMLStreamException
    */
   public static void writeKGMLFileFromDoc(Document doc, String fileName) {
-    try {    
+    try {
       // write the content into xml file
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       Transformer transformer = transformerFactory.newTransformer();
-
+      
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", indent);
       transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "http://www.genome.jp/kegg/xml/KGML_v0.7.1_.dtd");
-      DOMSource source = new DOMSource(doc);      
+      DOMSource source = new DOMSource(doc);
       
       File outFile = new File(fileName);
       try {
@@ -177,22 +180,22 @@ public class KGMLWriter {
         // Just ensure that the directory is available.
       }
       StreamResult result = new StreamResult(outFile);
-
+      
       // Output to console for testing
       // StreamResult result = new StreamResult(System.out);
       transformer.transform(source, result);
-
+      
       log.info("File '" + fileName + "' saved!");
-
+      
     } catch (TransformerException tfe) {
       tfe.printStackTrace();
     }
   }
-
+  
   /**
    * 
    * @param keggPW
-   * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended}, 
+   * @param writeEntryExtended if is set true the extended KGML is written for {@link EntryExtended},
    * otherwise the basic KGML is written with normal {@link Entry}
    * @return
    * @throws ParserConfigurationException
@@ -206,7 +209,7 @@ public class KGMLWriter {
     Element rootElement = doc.createElement("pathway");
     Map<String, String> attributes = keggPW.getKGMLAttributes();
     for (java.util.Map.Entry<String, String> att : attributes.entrySet()) {
-         rootElement.setAttribute(att.getKey(), att.getValue());
+      rootElement.setAttribute(att.getKey(), att.getValue());
     }
     if(writeEntryExtended && keggPW.isSetAdditionalText()) {
       rootElement.setAttribute("additionalText", keggPW.getAdditionalText());
@@ -221,15 +224,15 @@ public class KGMLWriter {
         Map<String, String> entryMap = null;
         if(writeEntryExtended) {
           try{
-          entryMap = ((EntryExtended)entry).getKGMLAttributes();
+            entryMap = ((EntryExtended)entry).getKGMLAttributes();
           } catch (ClassCastException e) {
-            entryMap = entry.getKGMLAttributes();  
+            entryMap = entry.getKGMLAttributes();
           }
         } else {
           if (entry instanceof EntryExtended) {
             entryMap = ((EntryExtended) entry).getKGMLAttributes(false);
           } else {
-            entryMap = ((Entry)entry).getKGMLAttributes();
+            entryMap = entry.getKGMLAttributes();
           }
         }
         for (java.util.Map.Entry<String, String> att : entryMap.entrySet()) {
@@ -240,7 +243,7 @@ public class KGMLWriter {
           for (int component : entry.getComponents()) {
             Element newChild2 = doc.createElement("component");
             newChild2.setAttribute("id", String.valueOf(component));
-            newChild.appendChild(newChild2);              
+            newChild.appendChild(newChild2);
           }
         }
         
@@ -248,13 +251,13 @@ public class KGMLWriter {
           Element newChild2 = doc.createElement("graphics");
           for (java.util.Map.Entry<String, String> graphic : entry.getGraphics().getKGMLAttributes().entrySet()) {
             newChild2.setAttribute(graphic.getKey(), graphic.getValue());
-          } 
+          }
           newChild.appendChild(newChild2);
         }
         
         rootElement.appendChild(newChild);
       }
-    }    
+    }
     
     // kegg relations
     ArrayList<Relation>  relations = keggPW.getRelations();
@@ -268,17 +271,17 @@ public class KGMLWriter {
           for (SubType subtype : relation.getSubtypes()) {
             Element newChild2 = doc.createElement("subtype");
             for (java.util.Map.Entry<String, String> att1 : (subtype.getKGMLAttributes()).entrySet()) {
-              newChild2.setAttribute(att1.getKey(), att1.getValue());  
-            }              
-            newChild.appendChild(newChild2);              
+              newChild2.setAttribute(att1.getKey(), att1.getValue());
+            }
+            newChild.appendChild(newChild2);
           }
         }
-
+        
         rootElement.appendChild(newChild);
       }
     }
     
- // kegg reactions
+    // kegg reactions
     ArrayList<Reaction>  reactions = keggPW.getReactions();
     if(reactions.size()>0) {
       for (Reaction reaction : reactions) {
@@ -290,28 +293,28 @@ public class KGMLWriter {
           for (ReactionComponent product : reaction.getProducts()) {
             Element newChild2 = doc.createElement("product");
             for (java.util.Map.Entry<String, String> att1 : (product.getKGMLAttributes()).entrySet()) {
-              newChild2.setAttribute(att1.getKey(), att1.getValue());  
+              newChild2.setAttribute(att1.getKey(), att1.getValue());
               if (product.isSetAlt()) {
                 Element newChild3 = doc.createElement("alt");
                 newChild3.setAttribute("name", product.getAlt().getName());
                 newChild2.appendChild(newChild3);
               }
-            }              
-            newChild.appendChild(newChild2);              
+            }
+            newChild.appendChild(newChild2);
           }
         }
         if (reaction.isSetSubstrate()) {
           for (ReactionComponent substrate : reaction.getSubstrates()) {
             Element newChild2 = doc.createElement("substrate");
             for (java.util.Map.Entry<String, String> att1 : (substrate.getKGMLAttributes()).entrySet()) {
-              newChild2.setAttribute(att1.getKey(), att1.getValue());  
+              newChild2.setAttribute(att1.getKey(), att1.getValue());
               if (substrate.isSetAlt()) {
                 Element newChild3 = doc.createElement("alt");
                 newChild3.setAttribute("name", substrate.getAlt().getName());
                 newChild2.appendChild(newChild3);
               }
-            }              
-            newChild.appendChild(newChild2);              
+            }
+            newChild.appendChild(newChild2);
           }
         }
         rootElement.appendChild(newChild);
@@ -321,5 +324,5 @@ public class KGMLWriter {
     
     return doc;
   }
-
+  
 }
