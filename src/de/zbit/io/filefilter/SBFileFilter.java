@@ -330,6 +330,14 @@ public class SBFileFilter extends GeneralFileFilter {
           & Pattern.DOTALL);
       }
       
+      if (this == SBGN_FILES) {
+        String sbgnDef = "<sbgn%s%sxmlns=\"http://sbgn.org/libsbgn/%s.%s\"%s%s>";
+        String anyChar = "[\\s\\w\\p{ASCII}]*";
+        String whiteSpace = "[\\s]+";
+        String number = "[1-9]+[0-9]*";
+        return Pattern.compile(String.format(sbgnDef, whiteSpace, anyChar, number, number, whiteSpace, anyChar));
+      }
+      
       if (toString().startsWith(BioPAX_FILES.toString())) {
         // Parse a level from file filter string
         Pattern levelPattern = Pattern.compile("BioPAX_FILES_L(\\d)+");
@@ -899,7 +907,8 @@ public class SBFileFilter extends GeneralFileFilter {
    * @return
    */
   public static boolean isSBGNFile(File file) {
-    return hasFileType(file, FileType.SBGN_FILES);
+    FileType type = FileType.SBGN_FILES;
+    return hasFileType(file, type) && checkFileHead(file, type);
   }
   
   /**
@@ -910,10 +919,7 @@ public class SBFileFilter extends GeneralFileFilter {
    */
   public static boolean isSBMLFile(File file) {
     FileType type = FileType.SBML_FILES;
-    if (hasFileType(file, type)) {
-      return checkFileHead(file, type);
-    }
-    return false;
+    return hasFileType(file, type) && checkFileHead(file, type);
   }
   
   /**

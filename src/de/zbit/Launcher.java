@@ -122,7 +122,7 @@ public abstract class Launcher implements Runnable, Serializable {
   /**
    * Stores given command-line options as key-value pairs.
    */
-  private SBProperties props;
+  protected SBProperties props;
   
   /**
    * Switch to decide if {@link System#exit(int)} should be called when the
@@ -777,14 +777,14 @@ public abstract class Launcher implements Runnable, Serializable {
       MessageFormat.format(
         resources.getString("PROGRAM_NAME_AND_VERSION"),
         getAppName(), getVersionNumber()),
+      MessageFormat.format(
+        resources.getString("COPYRIGHT_HOLDER"),
+        getCopyrightYears(),
         MessageFormat.format(
-          resources.getString("COPYRIGHT_HOLDER"),
-          getCopyrightYears(),
-          MessageFormat.format(
-            getProvider(),
-            getOrganization(),
-            getInstitute())
-            )
+          getProvider(),
+          getOrganization(),
+          getInstitute())
+          )
         )
         );
     URL licenseFile = null;
