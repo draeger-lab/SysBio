@@ -321,8 +321,9 @@ public class SBFileFilter extends GeneralFileFilter {
         String level = number, version = number;
         String sbmlDef = "<sbml%s%s((level[\\s]*=[\\s]*[\"']%s[\"']%s%sversion[\\s]*=[\\s]*[\"']%s[\"'])|(version[\\s]*=[\\s]*[\"']%s[\"']%s%slevel[\\s]*=[\\s]*[\"']%s[\"']))%s>";
         if (this != SBML_FILES) {
-          level = toString().substring(12, 13);
-          version = toString().substring(14);
+          String name = toString();
+          level = name.substring(SBML_FILES.toString().length() + 2, name.indexOf('V'));
+          version = name.substring(name.indexOf('V') + 1);
         }
         return Pattern.compile(String.format(sbmlDef, whiteSpace,
           anyChar, level, whiteSpace, anyChar, version, version, whiteSpace,
@@ -331,11 +332,12 @@ public class SBFileFilter extends GeneralFileFilter {
       }
       
       if (this == SBGN_FILES) {
-        String sbgnDef = "<sbgn%s%sxmlns=\"http://sbgn.org/libsbgn/%s.%s\"%s%s>";
+        String sbgnDef = "<sbgn%s%sxmlns[\\s]*=[\\s]*[\"']http[s]?://sbgn.org/libsbgn/%s\\.%s[/]?[\"'][\\s]*%s>";
         String anyChar = "[\\s\\w\\p{ASCII}]*";
         String whiteSpace = "[\\s]+";
-        String number = "[1-9]+[0-9]*";
-        return Pattern.compile(String.format(sbgnDef, whiteSpace, anyChar, number, number, whiteSpace, anyChar));
+        String number = "[0-9]+[0-9]*";
+        
+        return Pattern.compile(String.format(sbgnDef, whiteSpace, anyChar, number, number, anyChar));
       }
       
       if (toString().startsWith(BioPAX_FILES.toString())) {
