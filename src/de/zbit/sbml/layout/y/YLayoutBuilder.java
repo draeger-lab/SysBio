@@ -53,21 +53,6 @@ import org.sbml.jsbml.ext.layout.SpeciesReferenceRole;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 import org.sbml.jsbml.util.StringTools;
 
-import y.base.Edge;
-import y.base.Node;
-import y.geom.OrientedRectangle;
-import y.geom.YPoint;
-import y.layout.FreeNodeLabelModel;
-import y.view.BezierEdgeRealizer;
-import y.view.EdgeLabel;
-import y.view.EdgeRealizer;
-import y.view.GenericEdgeRealizer;
-import y.view.Graph2D;
-import y.view.NodeLabel;
-import y.view.NodeRealizer;
-import y.view.PolyLineEdgeRealizer;
-import y.view.ShapeNodeRealizer;
-import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.sbgn.DrawingOptions;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
@@ -100,6 +85,21 @@ import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.progressbar.AbstractProgressBar;
 import de.zbit.util.progressbar.ProgressListener;
+import y.base.Edge;
+import y.base.Node;
+import y.geom.OrientedRectangle;
+import y.geom.YPoint;
+import y.layout.FreeNodeLabelModel;
+import y.view.BezierEdgeRealizer;
+import y.view.EdgeLabel;
+import y.view.EdgeRealizer;
+import y.view.GenericEdgeRealizer;
+import y.view.Graph2D;
+import y.view.NodeLabel;
+import y.view.NodeRealizer;
+import y.view.PolyLineEdgeRealizer;
+import y.view.ShapeNodeRealizer;
+import y.view.hierarchy.HierarchyManager;
 
 /**
  * @author Jakob Matthes
@@ -331,16 +331,24 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     // display stoichiometry labels
     if (srg.isSetSpeciesReference()) {
       NamedSBase nsb = srg.getSpeciesReferenceInstance();
-      if (!(nsb instanceof SimpleSpeciesReference)) {
-        logger.warning(MessageFormat.format("Expecting simple species reference, but found {0} in {1}.", nsb.getElementName(), srg));
+      if (nsb == null) {
+        logger.fine(MessageFormat.format(
+          "Encountered undefined identifier ''{0}'' in speciesReferenceGlyph ''{1}''.",
+          srg.getSpeciesReference(), srg.getId()));
       } else {
-        SimpleSpeciesReference speciesReference = (SimpleSpeciesReference) nsb;
-        if (speciesReference instanceof SpeciesReference) {
-          SpeciesReference specRef = (SpeciesReference) speciesReference;
-          if (specRef.isSetStoichiometry() && (specRef.getStoichiometry() != 1)) {
-            String value = StringTools.toString(specRef.getStoichiometry());
-            EdgeLabel edgeLabel = new StoichiometryLabel(value);
-            edgeRealizer.addLabel(edgeLabel);
+        if (!(nsb instanceof SimpleSpeciesReference)) {
+          logger.warning(MessageFormat.format(
+            "Expecting simple species reference, but found {0} in {1}.",
+            nsb.getElementName(), srg));
+        } else {
+          SimpleSpeciesReference speciesReference = (SimpleSpeciesReference) nsb;
+          if (speciesReference instanceof SpeciesReference) {
+            SpeciesReference specRef = (SpeciesReference) speciesReference;
+            if (specRef.isSetStoichiometry() && (specRef.getStoichiometry() != 1)) {
+              String value = StringTools.toString(specRef.getStoichiometry());
+              EdgeLabel edgeLabel = new StoichiometryLabel(value);
+              edgeRealizer.addLabel(edgeLabel);
+            }
           }
         }
       }
@@ -517,18 +525,28 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     String text = null;
     if (textGlyph.isSetText()) {
       text = textGlyph.getText();
-      logger.fine(MessageFormat.format("building text glyph element id={0}\n\torigin text overridden text='{1}'",
+      logger.fine(MessageFormat.format(
+        "Building text glyph element id={0}\n\torigin text overridden text='{1}'",
         textGlyph.getId(), text));
     }
     else if (textGlyph.isSetOriginOfText()) {
       namedSBase = textGlyph.getOriginOfTextInstance();
       if (namedSBase != null) {
         text = namedSBase.getName();
-        logger.fine(MessageFormat.format("building text glyph element id={0}\n\ttext from origin id={1} text='{2}'",
+        logger.fine(MessageFormat.format(
+          "Building text glyph element id={0}\n\ttext from origin id={1} text='{2}'",
           textGlyph.getId(), namedSBase.getId(), text));
       } else {
-        logger.warning(MessageFormat.format("No such element defined {0}", textGlyph.getOriginOfText()));
+        text = textGlyph.getOriginOfText();
+        logger.warning(MessageFormat.format(
+          "No such element defined ''{0}'', using reference id as label.",
+          textGlyph.getOriginOfText()));
       }
+    } else {
+      text = "";
+      logger.warning(MessageFormat.format(
+        "Encountered text label ''{0}'' with undefined text.",
+        textGlyph.getId()));
     }
     
     if (textGlyph.isSetBoundingBox() &&

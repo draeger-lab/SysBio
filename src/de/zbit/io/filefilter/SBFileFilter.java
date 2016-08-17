@@ -332,7 +332,7 @@ public class SBFileFilter extends GeneralFileFilter {
       }
       
       if (this == SBGN_FILES) {
-        String sbgnDef = "<sbgn%s%sxmlns[\\s]*=[\\s]*[\"']http[s]?://sbgn.org/libsbgn/%s\\.%s[/]?[\"'][\\s]*%s>";
+        String sbgnDef = "<sbgn%s%sxmlns[\\s]*=[\\s]*[\"']http[s]?://sbgn.org/libsbgn/(pd/)?%s\\.%s[/]?[\"'][\\s]*%s>";
         String anyChar = "[\\s\\w\\p{ASCII}]*";
         String whiteSpace = "[\\s]+";
         String number = "[0-9]+[0-9]*";
