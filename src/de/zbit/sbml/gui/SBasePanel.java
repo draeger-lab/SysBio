@@ -473,12 +473,12 @@ public class SBasePanel extends JPanel implements EquationComponent {
    */
   private void addProperties(Compartment c) {
     if (c.isSetCompartmentType() || editable) {
-      JTextField tf = new JTextField(c.isSetCompartmentType() ? c.getCompartmentTypeInstance().toString() : "");
+      JTextField tf = new JTextField(c.isSetCompartmentType() ? print(c.getCompartmentTypeInstance()) : "");
       tf.setEditable(editable);
       addLabeledComponent(bundle.getString("compartmentType"), tf);
     }
     if (c.isSetOutside() || editable) {
-      JTextField tf = new JTextField(c.isSetOutside() ? c.getOutsideInstance().toString() : "");
+      JTextField tf = new JTextField(c.isSetOutside() ? print(c.getOutsideInstance()) : "");
       tf.setEditable(editable);
       addLabeledComponent(bundle.getString("outside"), tf);
     }
@@ -488,6 +488,21 @@ public class SBasePanel extends JPanel implements EquationComponent {
       addLabeledComponent(bundle.getString("spatialDimensions"), spinner);
     }
     addProperties((Symbol) c);
+  }
+  
+  /**
+   * 
+   * @param nsb
+   * @return
+   */
+  private String print(NamedSBase nsb) {
+    if (nsb.isSetName()) {
+      return nsb.getName();
+    }
+    if (nsb.isSetId()) {
+      return nsb.getId();
+    }
+    return nsb.getElementName();
   }
   
   /**
@@ -646,38 +661,38 @@ public class SBasePanel extends JPanel implements EquationComponent {
     }
     String columnNames[] = new String[] { bundle.getString("element"), bundle.getString("quantity") };
     String rowData[][] = new String[][] {
-        { bundle.getString("listOfFunctionDefinitions"),
-          Integer.toString(model.getFunctionDefinitionCount()) },
-          { bundle.getString("listOfUnitDefinitions"),
-            Integer.toString(model.getUnitDefinitionCount()) },
-            { bundle.getString("listOfCompartmentTypes"),
-              Integer.toString(model.getCompartmentTypeCount()) },
-              { bundle.getString("listOfSpeciesTypes"), Integer.toString(model.getSpeciesTypeCount()) },
-              { bundle.getString("listOfCompartments"), Integer.toString(model.getCompartmentCount()) },
-              { bundle.getString("listOfSpecies"), Integer.toString(model.getSpeciesCount()) },
-              { bundle.getString("listOfParameters"), Integer.toString(model.getParameterCount()) },
-              { bundle.getString("listOfLocalParameters"),
-                Integer.toString(model.getLocalParameterCount()) },
-                { bundle.getString("listOfInitialAssignments"),
-                  Integer.toString(model.getInitialAssignmentCount()) },
-                  { bundle.getString("listOfRules"), Integer.toString(model.getRuleCount()) },
-                  { bundle.getString("listOfConstraints"), Integer.toString(model.getConstraintCount()) },
-                  { bundle.getString("listOfReactions"), Integer.toString(model.getReactionCount()) },
-                  { bundle.getString("listOfEvents"), Integer.toString(model.getEventCount()) } };
-    JTable table = new JTable(rowData, columnNames);
-    table.setEnabled(editable);
-    table.setPreferredScrollableViewportSize(new Dimension(200, table
-      .getRowCount()
-      * table.getRowHeight()));
-    for (int i = 0; i < table.getModel().getColumnCount(); i++) {
-      table.setDefaultRenderer(table.getModel().getColumnClass(i), new ColoredBooleanRenderer());
-    }
-    JScrollPane scroll = new JScrollPane(table);
-    Dimension dim = table.getPreferredScrollableViewportSize();
-    scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
-      (int) dim.getHeight() + 18));
-    lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
-    lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
+      { bundle.getString("listOfFunctionDefinitions"),
+        Integer.toString(model.getFunctionDefinitionCount()) },
+      { bundle.getString("listOfUnitDefinitions"),
+          Integer.toString(model.getUnitDefinitionCount()) },
+      { bundle.getString("listOfCompartmentTypes"),
+            Integer.toString(model.getCompartmentTypeCount()) },
+      { bundle.getString("listOfSpeciesTypes"), Integer.toString(model.getSpeciesTypeCount()) },
+      { bundle.getString("listOfCompartments"), Integer.toString(model.getCompartmentCount()) },
+      { bundle.getString("listOfSpecies"), Integer.toString(model.getSpeciesCount()) },
+      { bundle.getString("listOfParameters"), Integer.toString(model.getParameterCount()) },
+      { bundle.getString("listOfLocalParameters"),
+        Integer.toString(model.getLocalParameterCount()) },
+      { bundle.getString("listOfInitialAssignments"),
+          Integer.toString(model.getInitialAssignmentCount()) },
+      { bundle.getString("listOfRules"), Integer.toString(model.getRuleCount()) },
+      { bundle.getString("listOfConstraints"), Integer.toString(model.getConstraintCount()) },
+      { bundle.getString("listOfReactions"), Integer.toString(model.getReactionCount()) },
+      { bundle.getString("listOfEvents"), Integer.toString(model.getEventCount()) } };
+      JTable table = new JTable(rowData, columnNames);
+      table.setEnabled(editable);
+      table.setPreferredScrollableViewportSize(new Dimension(200, table
+        .getRowCount()
+        * table.getRowHeight()));
+      for (int i = 0; i < table.getModel().getColumnCount(); i++) {
+        table.setDefaultRenderer(table.getModel().getColumnClass(i), new ColoredBooleanRenderer());
+      }
+      JScrollPane scroll = new JScrollPane(table);
+      Dimension dim = table.getPreferredScrollableViewportSize();
+      scroll.setPreferredSize(new Dimension((int) dim.getWidth() + 10,
+        (int) dim.getHeight() + 18));
+      lh.add(scroll, 1, ++row, 3, 1, 1d, 1d);
+      lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
   }
   
   /**
@@ -772,7 +787,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
       count = 0;
       for (SpeciesReference specRef : reaction.getListOfReactants()) {
         if (specRef.isSetSpeciesInstance()) {
-          rmp[count++][0] = specRef.getSpeciesInstance().toString();
+          rmp[count++][0] = print(specRef.getSpeciesInstance());
         }
       }
     }
@@ -780,7 +795,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
       count = 0;
       for (ModifierSpeciesReference mSpecRef : reaction.getListOfModifiers()) {
         if (mSpecRef.isSetSpeciesInstance()) {
-          rmp[count++][1] = mSpecRef.getSpeciesInstance().toString();
+          rmp[count++][1] = print(mSpecRef.getSpeciesInstance());
         }
       }
     }
@@ -788,14 +803,14 @@ public class SBasePanel extends JPanel implements EquationComponent {
       count = 0;
       for (SpeciesReference specRef : reaction.getListOfProducts()) {
         if (specRef.isSetSpeciesInstance()) {
-          rmp[count++][2] = specRef.getSpeciesInstance().toString();
+          rmp[count++][2] = print(specRef.getSpeciesInstance());
         }
       }
     }
     JTable table = new JTable(rmp, colNames);
     table.setPreferredScrollableViewportSize(new Dimension(200, (table
         .getRowCount() + 1)
-        * table.getRowHeight()));
+      * table.getRowHeight()));
     table.setEnabled(editable);
     for (int i = 0; i < table.getModel().getColumnCount(); i++) {
       table.setDefaultRenderer(table.getModel().getColumnClass(i), new ColoredBooleanRenderer());
@@ -839,7 +854,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
         for (Creator mc : hist.getListOfCreators()) {
           rowData[i][0] = mc.getGivenName();
           rowData[i][1] = mc.getFamilyName();
-          rowData[i][2] = "<html><a href=\"mailto:" + mc.getEmail() + "?subject=" + sbase.toString().replace(' ', '%') + "\">" + mc.getEmail() + "</a></html>";
+          rowData[i][2] = "<html><a href=\"mailto:" + mc.getEmail() + "?subject=" + print(sbase).replace(' ', '%') + "\">" + mc.getEmail() + "</a></html>";
           rowData[i][3] = mc.getOrganization();
           i++;
         }
@@ -848,7 +863,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
       table.setEnabled(editable);
       table.setPreferredScrollableViewportSize(new Dimension(200, (table
           .getRowCount() + 1)
-          * table.getRowHeight()));
+        * table.getRowHeight()));
       for (int j = 0; j < table.getModel().getColumnCount(); j++) {
         table.setDefaultRenderer(table.getModel().getColumnClass(j), new ColoredBooleanRenderer());
       }
@@ -910,7 +925,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
         if (sbase.getCVTermCount() > 1) {
           sb.append("<li>");
         }
-        String cvtString = cvt.toString();
+        String cvtString = cvt.printCVTerm();
         LinkedList<String> replacedURIs = new LinkedList<String>();
         for (int k = 0; k < cvt.getResourceCount(); k++) {
           String uri = cvt.getResourceURI(k);
@@ -1001,6 +1016,18 @@ public class SBasePanel extends JPanel implements EquationComponent {
   
   /**
    * 
+   * @param sbase
+   * @return
+   */
+  private String print(SBase sbase) {
+    if (sbase instanceof NamedSBase) {
+      return print((NamedSBase) sbase);
+    }
+    return sbase.toString();
+  }
+  
+  /**
+   * 
    * @param text
    * @return
    */
@@ -1071,15 +1098,15 @@ public class SBasePanel extends JPanel implements EquationComponent {
    */
   private void addProperties(Species species) {
     if (species.isSetSpeciesType()) {
-      JTextField tf = new JTextField(species.getSpeciesTypeInstance().toString());
+      JTextField tf = new JTextField(print(species.getSpeciesTypeInstance()));
       tf.setEditable(editable);
       addLabeledComponent(bundle.getString("speciesType"), tf);
     }
-    JTextField tf = new JTextField(species.getCompartmentInstance().toString());
+    JTextField tf = new JTextField(print(species.getCompartmentInstance()));
     tf.setEditable(editable);
     addLabeledComponent(bundle.getString("compartment"), tf);
     if (species.isSetSpeciesType() || editable) {
-      tf = new JTextField(species.getSpeciesTypeInstance().toString());
+      tf = new JTextField(print(species.getSpeciesTypeInstance()));
       tf.setEditable(editable);
       addLabeledComponent(bundle.getString("speciesType"), tf);
     }
@@ -1120,8 +1147,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
       if (isRendererAvailable()) {
         String l;
         try {
-          l = sMath.getMath().compile(latex).toString().replace("\\\\",
-              "\\");
+          l = sMath.getMath().compile(latex).toString().replace("\\\\", "\\");
         } catch (SBMLException e) {
           l = bundleWarnings.getString("invalid");
         }

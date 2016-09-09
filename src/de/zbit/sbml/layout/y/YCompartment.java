@@ -18,9 +18,9 @@ package de.zbit.sbml.layout.y;
 
 import org.sbml.jsbml.SBO;
 
-import y.view.NodeRealizer;
 import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.sbml.layout.Compartment;
+import y.view.NodeRealizer;
 
 /**
  * yFiles implementation of EPN type {@link Compartment}.
@@ -29,20 +29,20 @@ import de.zbit.sbml.layout.Compartment;
  * @version $Rev$
  */
 public class YCompartment extends Compartment<NodeRealizer> {
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
-	 */
-	@Override
-	public NodeRealizer draw(double x, double y, double z, double width,
-			double height, double depth) {
-		NodeRealizer nodeRealizer =
-			SBGNVisualizationProperties.getNodeRealizer(SBO.getCompartment());
-		nodeRealizer = nodeRealizer.createCopy();
-		nodeRealizer.setSize(width, height);
-		nodeRealizer.setLocation(x, y);
-		
-		return nodeRealizer;
-	}
-
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
+   */
+  @Override
+  public NodeRealizer draw(double x, double y, double z, double width,
+    double height, double depth) {
+    NodeRealizer nodeRealizer =
+        SBGNVisualizationProperties.getNodeRealizer(SBO.getCompartment());
+    nodeRealizer = nodeRealizer.createCopy();
+    nodeRealizer.setSize(width, height);
+    nodeRealizer.setLocation(x, y);
+    
+    return nodeRealizer;
+  }
+  
 }

@@ -255,12 +255,14 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     
     ShapeNodeRealizer nodeRealizer = (ShapeNodeRealizer) node.draw(x, y, z, width, height, depth);
     
+    nodeRealizer.setLineColor(Option.parseOrCast(Color.class, prefs.get(DrawingOptions.DEFAULT_LINE_COLOR)));
+    
     //		nodeRealizer.setDropShadowColor(new Color(0, 0, 0, 64));
     //	    nodeRealizer.setDropShadowOffsetX((byte) 3);
     //	    nodeRealizer.setDropShadowOffsetY((byte) 3);
-    //	    Color fillColor = nodeRealizer.getFillColor();
-    //	    nodeRealizer.setFillColor2(fillColor.brighter());
-    //	    nodeRealizer.setFillColor(fillColor);
+    Color fillColor = nodeRealizer.getFillColor();
+    nodeRealizer.setFillColor2(fillColor.brighter());
+    nodeRealizer.setFillColor(fillColor);
     
     logger.fine(MessageFormat.format("building EPN element id={0} sbo={1} (%s)\n\tbounding box= {2} {3}",
       speciesGlyph.getId(), speciesGlyph.getSBOTerm(), SBO.convertSBO2Alias(speciesGlyph.getSBOTerm()),
