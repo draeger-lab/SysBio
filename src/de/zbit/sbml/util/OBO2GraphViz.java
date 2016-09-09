@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.biojava3.ontology.Ontology;
-import org.biojava3.ontology.Term;
-import org.biojava3.ontology.Triple;
-import org.biojava3.ontology.io.OboParser;
+import org.biojava.nbio.ontology.Ontology;
+import org.biojava.nbio.ontology.Term;
+import org.biojava.nbio.ontology.Triple;
+import org.biojava.nbio.ontology.io.OboParser;
 
 /**
  * @author Andreas Dr&auml;ger

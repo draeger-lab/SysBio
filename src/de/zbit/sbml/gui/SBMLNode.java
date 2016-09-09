@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
@@ -34,6 +35,7 @@ import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
+import org.sbml.jsbml.ext.layout.TextGlyph;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.util.TreeNodeRemovedEvent;
 import org.sbml.jsbml.util.TreeNodeWithChangeSupport;
@@ -399,16 +401,28 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
    */
   @Override
   public String toString() {
-    TreeNodeWithChangeSupport node = getUserObject();
+    String label = print(getUserObject());
+    return (label != null) ? label : super.toString();
+  }
+  
+  /**
+   * 
+   * @param node
+   * @return
+   */
+  public String print(TreeNodeWithChangeSupport node) {
     if (node instanceof SBase) {
+      
       if (node instanceof Unit) {
         Unit u = (Unit) node;
         if (u.isSetKind()) {
           return u.toString();
         }
       }
+      
       if (node instanceof NamedSBase) {
         NamedSBase nsb = (NamedSBase) node;
+        
         if (nsb instanceof UnitDefinition) {
           UnitDefinition ud = (UnitDefinition) nsb;
           if (ud.isSetName() && bundle.containsKey(ud.getName())) {
@@ -416,8 +430,24 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
           } else if (ud.getUnitCount() > 0) {
             return ud.toString();
           }
+        } else if (nsb instanceof TextGlyph) {
+          TextGlyph tg = (TextGlyph) nsb;
+          if (tg.isSetText()) {
+            return tg.getText();
+          } else if (tg.isSetOriginOfText()) {
+            NamedSBase n = tg.getOriginOfTextInstance();
+            if (n != null) {
+              String label = print(n);
+              if (label != null) {
+                return label;
+              }
+            }
+            return tg.getOriginOfText();
+          }
+          
         } else if (nsb.isSetName()) {
           return nsb.getName();
+          
         } else if (nsb instanceof SimpleSpeciesReference) {
           SimpleSpeciesReference specRef = (SimpleSpeciesReference) node;
           if (specRef.isSetSpeciesInstance()) {
@@ -432,11 +462,13 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
           return nsb.getId();
         }
       }
+      
       String elementName = ((SBase) node).getElementName();
       if (bundle.containsKey(elementName)) {
         return bundle.getString(elementName);
       }
       return node.toString();
+      
     } else if (node instanceof ASTNode) {
       if (stringRepresentation == null) {
         StringBuilder sb = new StringBuilder();
@@ -459,7 +491,8 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
       }
       return stringRepresentation;
     }
-    return super.toString();
+    
+    return null;
   }
   
 }

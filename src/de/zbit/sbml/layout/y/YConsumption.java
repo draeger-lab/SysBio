@@ -25,8 +25,8 @@ import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
 
-import y.view.EdgeRealizer;
 import de.zbit.sbml.layout.Consumption;
+import y.view.EdgeRealizer;
 
 /**
  * yFiles implementation of arc type {@link Consumption}.
@@ -44,9 +44,9 @@ public class YConsumption extends YAbstractSBGNArc implements Consumption<EdgeRe
     // Reverse order of curve segments an of start and end points because
     // curves are always specified in the direction of the reaction
     // (from substrate process node, from process node to product).
-    curve = curve.clone();
-    curve.removeAllTreeNodeChangeListeners(true);
     if ((curve != null) && curve.isSetListOfCurveSegments()) {
+      curve = curve.clone();
+      curve.removeAllTreeNodeChangeListeners(true);
       List<CurveSegment> listOfCurveSegments = curve.getListOfCurveSegments();
       Collections.reverse(listOfCurveSegments);
       for (CurveSegment curveSegment : listOfCurveSegments) {
