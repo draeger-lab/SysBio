@@ -216,10 +216,13 @@
   <entry key="dimensions">Dimensions</entry>
   <entry key="end">End</entry>
   <entry key="height">Height</entry>
-  <entry key="layout">Layout</entry>  
+  <entry key="layout">Layout</entry>
+  <entry key="lineSegment">Line segment</entry>
   <entry key="listOfCompartmentGlyphs">Compartment glyphs</entry>
+  <entry key="listOfCubicBeziers">Cubic Beziér curves</entry>
   <entry key="listOfCurveSegments">Curve segments</entry>
   <entry key="listOfLayouts">Layouts</entry>
+  <entry key="listOfLineSegments">Line segments</entry>
   <entry key="listOfReactionGlyphs">Reaction glyphs</entry>
   <entry key="listOfSpeciesGlyphs">Species glyphs</entry>
   <entry key="listOfSpeciesReferenceGlyphs">Species reference glyphs</entry>

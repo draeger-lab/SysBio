@@ -17,8 +17,7 @@
 package de.zbit.mapper.compounds;
 
 import java.io.IOException;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 import de.zbit.io.csv.CSVReader;
 import de.zbit.util.progressbar.AbstractProgressBar;
@@ -33,48 +32,48 @@ public class CompoundSynonym2InChIKeyMapper extends AbstractMultiEntryMapper<Str
   
   
   public CompoundSynonym2InChIKeyMapper() throws IOException {
-  	this(null);
+    this(null);
   }
   
-	public CompoundSynonym2InChIKeyMapper(AbstractProgressBar progress) throws IOException {
-	  super(String.class, String.class, progress);
-	  init();
+  public CompoundSynonym2InChIKeyMapper(AbstractProgressBar progress) throws IOException {
+    super(String.class, String.class, progress);
+    init();
   }
   
-
-	/* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#getRemoteURL()
-	 */
-	@Override
-	public String getRemoteURL() {
-		//only available locally
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#getLocalFile()
-	 */
-	@Override
-	public String getLocalFile() {
-		return "2013-09-20_CompoundSynonyms.zip";
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#getMappingName()
-	 */
-	@Override
-	public String getMappingName() {
-		return "CompoundSynonym2InChIKey";
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#getTargetColumn(de.zbit.io.csv.CSVReader)
-	 */
-	@Override
-	public int getTargetColumn(CSVReader r) {
-		return 0;
-	}
-
+  
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getRemoteURL()
+   */
+  @Override
+  public String getRemoteURL() {
+    //only available locally
+    return null;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getLocalFile()
+   */
+  @Override
+  public String getLocalFile() {
+    return "2013-09-20_CompoundSynonyms.zip";
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getMappingName()
+   */
+  @Override
+  public String getMappingName() {
+    return "CompoundSynonym2InChIKey";
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.mapper.AbstractMapper#getTargetColumn(de.zbit.io.csv.CSVReader)
+   */
+  @Override
+  public int getTargetColumn(CSVReader r) {
+    return 0;
+  }
+  
   /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#getMultiSourceColumn(de.zbit.io.CSVReader)
    */
@@ -95,26 +94,30 @@ public class CompoundSynonym2InChIKeyMapper extends AbstractMultiEntryMapper<Str
   
   @Override
   protected String postProcessSourceID(String source) {
-  	if(source==null || source.isEmpty()) return null;
+    if(source==null || source.isEmpty()) {
+      return null;
+    }
     return source.toLowerCase();
   }
   
   @Override
-	protected String preProcessSourceID(String string) {
+  protected String preProcessSourceID(String string) {
     return string.toLowerCase();
   }
-	
+  
   /* (non-Javadoc)
-	 * @see de.zbit.mapper.AbstractMapper#preProcessTargetID(java.lang.String)
-	 */
+   * @see de.zbit.mapper.AbstractMapper#preProcessTargetID(java.lang.String)
+   */
   @Override
   protected String preProcessTargetID(String string) {
-  	if(string==null || string.length() == 0) return string;
-  	else
-  		return string.toUpperCase();
+    if(string==null || string.length() == 0) {
+      return string;
+    } else {
+      return string.toUpperCase();
+    }
   }
-	
-	 /* (non-Javadoc)
+  
+  /* (non-Javadoc)
    * @see de.zbit.mapper.AbstractMapper#configureReader(de.zbit.io.csv.CSVReader)
    */
   @Override
@@ -124,13 +127,13 @@ public class CompoundSynonym2InChIKeyMapper extends AbstractMultiEntryMapper<Str
     r.setSkipLines(0);
     r.setAutoDetectContentStart(false);
   }
-
+  
   /* (non-Javadoc)
-	 * @see de.zbit.mapper.compounds.AbstractMultiSourceEntryMapper#getEntrySeparator()
-	 */
+   * @see de.zbit.mapper.compounds.AbstractMultiSourceEntryMapper#getEntrySeparator()
+   */
   @Override
   public String getEntrySeparator() {
-	  return "\\|\\|";
+    return "\\|\\|";
   }
-
+  
 }
