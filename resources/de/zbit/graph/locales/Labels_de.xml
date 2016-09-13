@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<!-- 
+ * $Id$
+ * $URL$
+ *********************************************************************** 
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2009-2016 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ ***********************************************************************
+ *
+ * Version: $Rev$
+-->
+<properties>
+  <comment>
+  This configuration provides locale-dependent names for labels in
+  a (graphical) user interface. The separator ";" can be used to
+  separate actual labels from associated tool tips.
+  </comment>
+  
+  <!-- DrawingOptions -->
+  
+  <entry key="DrawingOptions">Graph-Darstellung</entry>
+  <entry key="DrawingOptions_TOOLTIP">Legen Sie das Erscheinungsbild von SBGN-Komponenten fest (Systembiolgische Graph-Notation).</entry>
+  <entry key="COMPARTMENT_FILL_COLOR">Füllfarbe Kompartiment</entry>
+  <entry key="COMPARTMENT_FILL_COLOR_TOOLTIP">Diese Einstellungsmöglichkeit steht nur dann zur Verfügung, wenn Sie auswählen, dass Kompartimente ausgefüllt gezeichnet werden sollen.</entry>
+  <entry key="COMPARTMENT_FILLED">Fülle Kompartiment-Glyphen</entry>
+  <entry key="COMPARTMENT_FILLED_TOOLTIP">Legen Sie fest, ob Kompartimente ausgefüllt werden sollen, oder ob lediglich deren äußere Begrenzunglinie gezeichnet werden soll.</entry>
+  <entry key="COMPARTMENT_GLYPH">Kompartiment-Glyphen</entry>
+  <entry key="COMPARTMENT_GLYPH_TOOLTIP">Legen Sie Farbe und Erscheinungsbild von Kompartiment-Glyphen fest.</entry>
+  <entry key="COMPARTMENT_LINE_COLOR">Kompartiment Linienfarbe</entry>
+  <entry key="COMPARTMENT_LINE_COLOR_TOOLTIP">Standardmäßig auf dunkelgelb gesetzt.</entry>
+  <entry key="COMPARTMENT_LINE_WIDTH">Kompartiment Linienstärke</entry>
+  <entry key="COMPARTMENT_LINE_WIDTH_TOOLTIP">Legen Sie die Dicke der Umrandungslinien von Kompartimenten fest.</entry>
+  <entry key="NONCOVALENT_COMPLEX_FILL_COLOR">Füllfarbe Nichtkovalenter Komplex</entry>
+  <entry key="NONCOVALENT_COMPLEX_FILL_COLOR_TOOLTIP">Standardmäßig auf dunkelblau 3 gesetzt.</entry>
+  <entry key="GENE_FILL_COLOR">Füllfarbe Gen</entry>
+  <entry key="GENE_FILL_COLOR_TOOLTIP">Standardmäßig auf gelb gesetzt.</entry>
+  <entry key="MACROMOLECULE_FILL_COLOR">Füllfarbe Makromoleküle</entry>
+  <entry key="MACROMOLECULE_FILL_COLOR_TOOLTIP">Standardmäßig auf grün 3 gesetzt.</entry>
+  <entry key="SIMPLE_MOLECULE_FILL_COLOR">Füllfarbe einfache Chemikalie</entry>
+  <entry key="SIMPLE_MOLECULE_FILL_COLOR_TOOLTIP">Standardmäßig auf hellhimmelblau 1 gesetzt.</entry>
+  <entry key="MAP_FILL_COLOR">Füllfarbe für Pfad-Karten und Teilkarten</entry>
+  <entry key="MAP_FILL_COLOR_TOOLTIP">Standardmäßig auf azure 2 gesetzt.</entry>
+  <entry key="EMPTY_SET_FILL_COLOR">Füllfarbe leere Menge</entry>
+  <entry key="EMPTY_SET_FILL_COLOR_TOOLTIP">Standardmäßig auf rosarot gesetzt.</entry>
+  <entry key="PERTURBING_AGENT_FILL_COLOR">Füllfarbe störendes Agens</entry>
+  <entry key="PERTURBING_AGENT_FILL_COLOR_TOOLTIP">Standardmäßig auf dunkelrosarot gesetzt.</entry>
+  <entry key="DEFAULT_FILL_COLOR">Standardfüllfarbe</entry>
+  <entry key="DEFAULT_FILL_COLOR_TOOLTIP">Hellgrün.</entry>
+  <entry key="DEFAULT_LINE_COLOR">Standardlinienfarbe</entry>
+  <entry key="DEFAULT_LINE_COLOR_TOOLTIP">Schwarz.</entry>
+  <entry key="FONT">Schriftart</entry>
+  <entry key="FONT_TOOLTIP">Einstellungen für das Erscheinungsbild von Texten.</entry>
+  <entry key="FONT_FAMILY">Schriftfamilie</entry>
+  <entry key="FONT_FAMILY_TOOLTIP">Standardmäßig auf Arial gesetzt.</entry>
+  <entry key="FONT_SIZE">Schriftgröße</entry>
+  <entry key="FONT_SIZE_TOOLTIP">Standardmäßig auf 12 gesetzt.</entry>
+  <entry key="FONT_STYLE">Schriftstil</entry>
+  <entry key="FONT_STYLE_TOOLTIP">Legen Sie fest, welche Schrift und Farbe für Beschriftungen genutzt werden sollen und wie diese angezeigt werden sollen.</entry>
+  <entry key="FONT_COLOR">Schriftfarbe</entry>
+  <entry key="FONT_COLOR_TOOLTIP">Standardmäßig auf schwarz gesetzt.</entry>
+  <entry key="GLYPH_LINE_WIDTH">Linienstärke Glyph</entry>
+  <entry key="GLYPH_LINE_WIDTH_TOOLTIP">Standardmäüig auf 2 px gesetzt.</entry>
+  <entry key="EDGE_LINE_WIDTH">Linienstärke Kante</entry>
+  <entry key="EDGE_LINE_WIDTH_TOOLTIP">Standardmäßig auf 2 px gesetzt.</entry>
+  <entry key="PAINT_SLOPPY_TEXT">Zeige Text auch in vereinfachter Darstellung</entry>
+  <entry key="PAINT_SLOPPY_TEXT_TOOLTIP">Legen Sie fest, ob in der vereinfachten Vogelperspektive ebenfalls Text angezeigt werden soll. Standardmäßig wird dies außer Kraft gesetzt..</entry>
+  <entry key="GLYPH_PREFS">Glyph-Einstellungen</entry>
+  <entry key="GLYPH_PREFS_TOOLTIP">Legen Sie fest, wie graphische Komponenten (außer Kompartimenten) gezeichnet werden sollen.</entry>
+  <entry key="REACTION_PREFS">Reaktionseinstellungen</entry>
+  <entry key="REACTION_PREFS_TOOLTIP">Entscheiden Sie, wie Reaktionen gezeichnet werden sollen.</entry>
+  
+  
+  <!-- RestrictedEditMode (Property table on the upper right) -->
+  
+  <entry key="nodeLabel">Alle Namen</entry>
+  <entry key="entrezIds">Entrez-Identifikator(en)</entry>
+  <entry key="type">Typ</entry>
+  <entry key="description">Beschreibung</entry>
+  <entry key="keggIds">KEGG-Idnetifikator(en)</entry>
+  <entry key="uniprotIds">Uniprot-Identifikator(en)</entry>
+  <entry key="ensemblIds">ENSEMBL-Identifikator(en)</entry>
+  <entry key="url">URL</entry>
+  <entry key="nodeColor">Knotenfarbe</entry>
+  <entry key="nodeName">Knotenname</entry>
+  <entry key="nodePosition">Knotenposition</entry>
+  <entry key="nodeSize">Knotengröße</entry>
+  <entry key="interactionType">Interaktionsart</entry>
+  
+  <!-- SB_2GraphML -->
+  
+  <entry key="USING_DEFAULT_SBO_TERM">Für {1} ist kein SBO-Ausdruck definiert, benutze Standard-Ausdruck "{0}".</entry>
+  
+</properties>
