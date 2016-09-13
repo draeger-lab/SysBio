@@ -52,7 +52,7 @@
   <entry key="EMPTY_SET_FILL_COLOR">Empty set fill color</entry>
   <entry key="EMPTY_SET_FILL_COLOR_TOOLTIP">Defaults to pink.</entry>
   <entry key="PERTURBING_AGENT_FILL_COLOR">Perturbing agent fill color</entry>
-  <entry key="PERTURBING_AGENT_FILL_COLOR_TOOLTIP">Defaults to drug pink.</entry>
+  <entry key="PERTURBING_AGENT_FILL_COLOR_TOOLTIP">Defaults to dark pink.</entry>
   <entry key="DEFAULT_FILL_COLOR">Default fill color</entry>
   <entry key="DEFAULT_FILL_COLOR_TOOLTIP">Defaults to light green.</entry>
   <entry key="DEFAULT_LINE_COLOR">Default line color</entry>
