@@ -26,15 +26,15 @@ import org.sbml.jsbml.ext.layout.Curve;
 import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Point;
 
-import y.view.GeneralPathNodePainter;
-import y.view.GenericNodeRealizer;
-import y.view.LineType;
-import y.view.NodeRealizer;
 import de.zbit.graph.sbgn.ProcessNodeRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
 import de.zbit.sbml.layout.AbstractSBGNProcessNode;
 import de.zbit.sbml.layout.Geometry;
 import de.zbit.sbml.layout.ProcessNode;
+import y.view.GeneralPathNodePainter;
+import y.view.GenericNodeRealizer;
+import y.view.LineType;
+import y.view.NodeRealizer;
 
 /**
  * yFiles implementation of process node of type "reaction".

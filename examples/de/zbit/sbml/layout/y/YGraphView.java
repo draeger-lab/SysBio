@@ -41,6 +41,15 @@ import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.util.StringTools;
 
+import de.zbit.graph.RestrictedEditMode;
+import de.zbit.graph.io.Graph2Dwriteable;
+import de.zbit.graph.io.Graph2Dwriter;
+import de.zbit.gui.GUITools;
+import de.zbit.io.OpenedFile;
+import de.zbit.sbml.gui.SBMLReadingTask;
+import de.zbit.sbml.layout.GlyphCreator;
+import de.zbit.sbml.layout.LayoutDirector;
+import de.zbit.util.logging.LogUtil;
 import y.base.Edge;
 import y.base.EdgeCursor;
 import y.base.Node;
@@ -55,15 +64,6 @@ import y.view.Graph2DViewMouseWheelZoomListener;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import yext.svg.io.SVGIOHandler;
-import de.zbit.graph.RestrictedEditMode;
-import de.zbit.graph.io.Graph2Dwriteable;
-import de.zbit.graph.io.Graph2Dwriter;
-import de.zbit.gui.GUITools;
-import de.zbit.io.OpenedFile;
-import de.zbit.sbml.gui.SBMLReadingTask;
-import de.zbit.sbml.layout.GlyphCreator;
-import de.zbit.sbml.layout.LayoutDirector;
-import de.zbit.util.logging.LogUtil;
 
 /**
  * Simple GUI to display a Graph2DView.
@@ -108,7 +108,7 @@ public class YGraphView implements PropertyChangeListener {
   public static void main(final String[] args) {
     LogUtil.initializeLogging(YGraphView.class.getPackage().toString());
     final File in = new File(args[0]);
-    out = args[1];
+    out = args.length > 1 ? args[1] : null;
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       /* (non-Javadoc)
        * @see java.lang.Runnable#run()

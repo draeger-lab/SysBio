@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.sbml.jsbml.util.StringTools;
 
+import de.zbit.math.MathUtils;
 import y.base.Edge;
 import y.base.EdgeCursor;
 import y.base.Node;
@@ -31,7 +32,6 @@ import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
-import de.zbit.math.MathUtils;
 
 /**
  * Superclass for all reaction nodes. Subclasses decide which specific shape to
@@ -93,7 +93,8 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     double offsetX = (width - min)/2d;
     double offsetY = (height - min)/2d;
     
-    //    rotate(gfx, rotationAngle, rotationCenter);
+    // TODO: in order to do it right, the entire node needs to be transformed to the interval [0,1]^2 and needs to be rotated there.
+    rotate(gfx, rotationAngle, rotationCenter);
     
     drawShape(gfx);
     
@@ -105,7 +106,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     //        gfx.drawLine((0 + x) - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
     //        gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
     
-    //    rotate(gfx, -rotationAngle, rotationCenter);
+    rotate(gfx, -rotationAngle, rotationCenter);
   }
   
   /**
