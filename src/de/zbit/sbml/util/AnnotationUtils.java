@@ -18,6 +18,7 @@
 package de.zbit.sbml.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,7 +27,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
+import javax.swing.tree.TreeNode;
 import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.AbstractNamedSBase;
@@ -40,10 +43,13 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.SBMLWriter;
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Species;
+import org.sbml.jsbml.TidySBMLWriter;
 
 import de.zbit.cache.InfoManagement;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
+import de.zbit.util.Utils;
 import de.zbit.util.progressbar.ProgressBar;
 
 /**
@@ -58,23 +64,104 @@ import de.zbit.util.progressbar.ProgressBar;
 public class AnnotationUtils {
   
   /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(AnnotationUtils.class.getName());
+  
+  /**
+   * Takes a MIRIAM URN as input and creates a corresponding identifiers.org
+   * resource URI.
    * 
    * @param miriamURN
-   * @return
+   *        a MIRIAM URN for which a corresponding identifiers.org URI is to be
+   *        created.
+   * @return a {@link String} representing an identifiers.org URI or
+   *         {@code null} if the given input {@link String} does not conform the
+   *         MIRIAM URN scheme.
    */
   public static String convertURN2URI(String miriamURN) {
     if ((miriamURN != null) && miriamURN.startsWith("urn:miriam:")) {
       try {
         return "http://identifiers.org/" + miriamURN.substring(11).replaceFirst(":", "/").replaceAll("%3[Aa]", ":");
       } catch (Throwable t) {
+        logger.finest(Utils.getMessage(t));
       }
     }
     return null;
   }
   
+  /**
+   * Recursively updates all resources from the MIRIAM URN scheme to
+   * identifiers.org within a given {@link CVTerm}, i.e., considering nested terms.
+   * 
+   * @param term the controlled vocabulary term whose resources are to be updated.
+   * @return {@code true} if at least one resource was updated.
+   */
+  public static boolean convertURN2URI(CVTerm term) {
+    boolean success = false;
+    // recursive call
+    if (term.isSetListOfNestedCVTerms()) {
+      for (CVTerm t : term.getListOfNestedCVTerms()) {
+        success |= convertURN2URI(t);
+      }
+    }
+    for (int i = term.getResourceCount() - 1; i >= 0; i--) {
+      String resource = convertURN2URI(term.getResource(i));
+      if ((resource != null) && !resource.equals(term.getResource(i))) {
+        String oldResource = term.getResources().remove(i);
+        term.getResources().add(i, resource);
+        logger.fine("Updating resource '" + oldResource + "' to '" + resource + "'.");
+        success = true;
+      }
+    }
+    return success;
+  }
+  
+  /**
+   * Recursively updates all {@link CVTerm} objects in the SBML subtree rooted
+   * at the given {@link SBase} from the MIRIAM URN scheme to identifiers.org.
+   * 
+   * @param sbase The root of the SBML subtree whose annotation is to be updated.
+   * @return {@code true} if at least one resource was updated.
+   */
+  public static boolean convertURN2URI(SBase sbase) {
+    boolean success = false;
+    if (!sbase.isLeaf()) {
+      for (int i = 0; i < sbase.getChildCount(); i++) {
+        TreeNode child = sbase.getChildAt(i);
+        if (child instanceof SBase) {
+          success |= convertURN2URI((SBase) child);
+        }
+      }
+    }
+    for (int i = 0; i < sbase.getCVTermCount(); i++) {
+      success |= convertURN2URI(sbase.getCVTerm(i));
+    }
+    return success;
+  }
+  
+  /**
+   * 
+   * @param input
+   * @param output
+   * @throws XMLStreamException
+   * @throws IOException
+   */
+  public static void convertURN2URI(File input, File output) throws XMLStreamException, IOException {
+    long time = System.currentTimeMillis();
+    SBMLDocument doc = SBMLReader.read(input);
+    logger.info("Reading done (" + Utils.getPrettyTimeString(System.currentTimeMillis() - time) + ")");
+    if (convertURN2URI(doc)) {
+      TidySBMLWriter.write(doc, output, ' ', (short) 2);
+      logger.info("Successfully updated all URNs within the given SBML document to identifiers.org URIs.");
+    } else {
+      logger.info("No URN for update in the given SBML document.");
+    }
+  }
+  
   public static void addAnnotations(String inputFile, String outputFile,
     String annotationFile, int col, int altCol) throws XMLStreamException,
-    SBMLException, IOException {
+  SBMLException, IOException {
     //format of annotationFile should be as followed:
     //first row is expected as header
     //second and following: species/reaction id \t kegg id as C00000, EC:1.1.1.1, R00000
@@ -274,7 +361,7 @@ public class AnnotationUtils {
    */
   public static void addModifiers(String inputFile, String outputFile,
     String modifierFile, String annotationModifiers) throws XMLStreamException,
-    SBMLException, IOException {
+  SBMLException, IOException {
     //read species for catalyzed reactions
     SBMLDocument doc = (new SBMLReader()).readSBML(inputFile);
     
@@ -465,7 +552,7 @@ public class AnnotationUtils {
   
   public static void addSBOTerms(String inputFile, String outputFile,
     String sboFile, int col) throws XMLStreamException,
-    SBMLException, IOException {
+  SBMLException, IOException {
     
     SBMLDocument doc = (new SBMLReader()).readSBML(inputFile);
     

@@ -90,8 +90,8 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
     //    rxnShape.add(new Area(l2));
     
     //    AffineTransform affineTransform = new AffineTransform();
-    //    //    affineTransform.rotate(Math.toRadians(rotationAngle), rect2d.getCenterX(), rect2d.getCenterY());
-    //
+    //    affineTransform.rotate(Math.toRadians(rotationAngle), rect2d.getCenterX(), rect2d.getCenterY());
+    
     //    rxnShape.transform(affineTransform);
     
     if (whiskers) {
