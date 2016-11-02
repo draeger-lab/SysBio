@@ -43,48 +43,53 @@ import de.zbit.util.objectwrapper.ValuePair;
  * @author Clemens Wrzodek
  * @author Andreas Dr&auml;ger
  * @version $Rev$
+ * @param <Type>
  * @since 1.0
  */
 public class Range<Type> implements Serializable, Comparable<Range<Type>> {
-  private static final long serialVersionUID = 5376431888251283263L;
-
+  
   /**
-	 * The {@link Logger} of this {@link Class}.
-	 */
-	public static final Logger logger = Logger.getLogger(Range.class.getName());
-	
-	/**
-	 * 
-	 * @author Andreas Dr&auml;ger
-	 * @version $Rev$
-	 */
-	public static enum Relation {
-	  /**
-	   * Less than
-	   */
-	  LT,
-	  /**
-	   * Less or equal than
-	   */
-	  LE,
-	  /**
-	   * Equal to
-	   */
-	  EQ,
-	  /**
-	   * Greater than or equal to
-	   */
-	  GE,
-	  /**
-	   * Greater than
-	   */
-	  GT;
-	  
-	  /**
-	   * 
-	   */
-	  public String getRelationSymbol() {
-	    switch (this) {
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = 5376431888251283263L;
+  
+  /**
+   * The {@link Logger} of this {@link Class}.
+   */
+  public static final Logger logger = Logger.getLogger(Range.class.getName());
+  
+  /**
+   * 
+   * @author Andreas Dr&auml;ger
+   * @version $Rev$
+   */
+  public static enum Relation {
+    /**
+     * Less than
+     */
+    LT,
+    /**
+     * Less or equal than
+     */
+    LE,
+    /**
+     * Equal to
+     */
+    EQ,
+    /**
+     * Greater than or equal to
+     */
+    GE,
+    /**
+     * Greater than
+     */
+    GT;
+    
+    /**
+     * @return
+     */
+    public String getRelationSymbol() {
+      switch (this) {
         case LT:
           return "<";
         case LE:
@@ -98,32 +103,47 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
         default:
           return null;
       }
-	  }
-	}
-	
-	/**
-	 * If {@link #getAllAcceptableValues()} is called, if there are more than
-	 * this much acceptable values, null is returned. E.g. between {@link Double} 0.0
-	 * and 1.0 there are infinite many values, but between integer 0 and 10, there
-	 * only a finite number of values.
-	 */
-	private final static short defaultMaxAcceptableValuesToReturn = 50;
-	
-	/**
-	 * A range of any type. Consisting of lower and upper bound and
-	 * the information, if the lower/upper bound itself is included
-	 * or not. 
-	 * @author Clemens Wrzodek
-	 */
-	class SubRange implements Serializable {
+    }
+  }
+  
+  /**
+   * If {@link #getAllAcceptableValues()} is called, if there are more than
+   * this much acceptable values, null is returned. E.g. between {@link Double} 0.0
+   * and 1.0 there are infinite many values, but between integer 0 and 10, there
+   * only a finite number of values.
+   */
+  private final static short defaultMaxAcceptableValuesToReturn = 50;
+  
+  /**
+   * A range of any type. Consisting of lower and upper bound and
+   * the information, if the lower/upper bound itself is included
+   * or not.
+   * @author Clemens Wrzodek
+   */
+  class SubRange implements Serializable {
+    /**
+     * Generated serial version identifier.
+     */
     private static final long serialVersionUID = 6791332324080634829L;
+    /**
+     * 
+     */
     private Type lBound;
-		private Type uBound;
-		private boolean excludingLBound=false;
-		private boolean excludingUBound=false;
-		
-		/**
-		 * @return 
+    /**
+     * 
+     */
+    private Type uBound;
+    /**
+     * 
+     */
+    private boolean excludingLBound=false;
+    /**
+     * 
+     */
+    private boolean excludingUBound=false;
+    
+    /**
+     * @return
      */
     @SuppressWarnings("unchecked")
     public Type getMinimum() {
@@ -142,7 +162,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     }
     
     /**
-     * @return  
+     * @return
      */
     @SuppressWarnings("unchecked")
     public Type getMaximum() {
@@ -160,265 +180,274 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
       }
     }
     
-		/**
-		 * 
-		 */
-		private SubRange() {
-			super();
-		}
-		
-		/**
-		 * 
-		 * @param value
-		 */
-		public SubRange(Type value) {
-			this (value, value);
-		}
-		
-		/**
-		 * 
-		 * @param lowerBound
-		 * @param upperBound
-		 */
-		public SubRange (Type lowerBound, Type upperBound) {
-			this (lowerBound, upperBound, false, false);
-		}
-		
-		/**
-		 * 
-		 * @param lowerBound
-		 * @param upperBound
-		 * @param excludingLBound
-		 * @param excludingUBound
-		 */
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public SubRange (Type lowerBound, Type upperBound, boolean excludingLBound, boolean excludingUBound) {
-			super();
-			lBound = lowerBound;
-			uBound = upperBound;
-			
-			this.excludingLBound = excludingLBound;
-			this.excludingUBound = excludingUBound;
-			
-			// Ensure, that lBound is always smaller than uBound
-			if (lBound instanceof Comparable) {
-				if (((Comparable) lBound).compareTo(((Comparable)uBound)) > 0) {
-					// SWAP
-					Type temp = lBound;
-					lBound=uBound;
-					uBound=temp;
-					
-					boolean temp2 = this.excludingLBound;
-					this.excludingLBound = this.excludingUBound;
-					this.excludingUBound = temp2;
-				}
-			}
-		}
-	  
-
-		/**
-		 * Returns true, if and only if the given value is in the
-		 * Range defined by this SubRange.
-		 * @param value
-		 * @return
-		 */
-		@SuppressWarnings({ "rawtypes", "unchecked" })
+    /**
+     * 
+     */
+    private SubRange() {
+      super();
+    }
+    
+    /**
+     * 
+     * @param value
+     */
+    public SubRange(Type value) {
+      this (value, value);
+    }
+    
+    /**
+     * 
+     * @param lowerBound
+     * @param upperBound
+     */
+    public SubRange (Type lowerBound, Type upperBound) {
+      this (lowerBound, upperBound, false, false);
+    }
+    
+    /**
+     * 
+     * @param lowerBound
+     * @param upperBound
+     * @param excludingLBound
+     * @param excludingUBound
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public SubRange (Type lowerBound, Type upperBound, boolean excludingLBound, boolean excludingUBound) {
+      super();
+      lBound = lowerBound;
+      uBound = upperBound;
+      
+      this.excludingLBound = excludingLBound;
+      this.excludingUBound = excludingUBound;
+      
+      // Ensure, that lBound is always smaller than uBound
+      if (lBound instanceof Comparable) {
+        if (((Comparable) lBound).compareTo((uBound)) > 0) {
+          // SWAP
+          Type temp = lBound;
+          lBound=uBound;
+          uBound=temp;
+          
+          boolean temp2 = this.excludingLBound;
+          this.excludingLBound = this.excludingUBound;
+          this.excludingUBound = temp2;
+        }
+      }
+    }
+    
+    
+    /**
+     * Returns true, if and only if the given value is in the
+     * Range defined by this SubRange.
+     * @param value
+     * @return
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public boolean isInRange(Type value) {
-			if (value instanceof Comparable) {
-				try {
-					// Check lower bound
-					int r = ((Comparable) value).compareTo(((Comparable) lBound));
-					if ((r < 0) || ((r == 0) && excludingLBound)) { 
-						return false;
-					}
-					
-					// Check upper bound
-					r = ((Comparable) value).compareTo(((Comparable) uBound));
-					if ((r > 0) || ((r == 0) && excludingUBound)) {
-						return false;
-					}
-				} catch (Exception e) {
-					// E.g., when a float is expected and value is "Hallo", a
-					// Float cannot be cast to String Exception is raised when
-					// casting to comparable
-					return false;
-				}
-				return true;
-			} else if (lBound.equals(uBound)) {
-			  // Check absolute value
-				if (!excludingLBound && !excludingUBound) {
-				  // Special treatment for classes
-				  if (value instanceof Class) {
-				    if (((Class) value).getSimpleName().equals(lBound)) {
-				      return true;
-				    }
-				  }
-				  //---
-				  if (value.equals(lBound)) {
-				  	return true;
-				  } else {
-				  	return false;
-				  }
-				} else {
-					return false;
-				}
-			} else {
-				logger.warning(String.format(ResourceManager.getBundle("de.zbit.locales.Warnings")
-						.getString("CLASS_NOT_COMPARABLE"), value.getClass().getName()));
-				return false;
-			}
-		}
-		
-		/**
-		 * If there are less or equal than 'maximumToReturn'
-		 * acceptable values, all those are returned. Else: null is returned. 
-		 * @param maximumToReturn
-		 * @return
-		 */
-		public List<Type> getAllAcceptableValues(int maximumToReturn) {
-			List<Type> r = new LinkedList<Type>();
-			
-			// Check absolute value
-		  if (lBound.equals(uBound)) {
-		  	if (!excludingLBound && !excludingUBound)
-		  	  r.add(lBound);
-		  	return r;
-		  }
-		  
-		  // Check if ranges have a finite length
-		  double start = 0, end = 0;
-		  if (Utils.isInteger(lBound.getClass())) {
-		  	start = ((Number) lBound).doubleValue();
-		  	end = ((Number) uBound).doubleValue();
-		  	
-		  } else if (lBound instanceof Character) {
-		  	start = (int) (Character) lBound;
-		  	end = (int) (Character) uBound;
-		  	
-		  } else {
-		  	// E.g. Strings
-		  	return null;
-		  }
-		  
-		  // Exit if too much choices and handle bounds
-	  	if ((end-start)>maximumToReturn) return null;
-	  	if (!excludingLBound) addNumberOrCharacter(lBound.getClass(), r, start);
-	  	// Collect all possible choices
-	  	for (start+=1; start<end; start++) {
-	  		addNumberOrCharacter(lBound.getClass(), r, start);
-	  	}
-	  	if (!excludingUBound) addNumberOrCharacter(lBound.getClass(), r, end);
-	  	
-	  	return r;
-		}
-		
-		/**
-		 * Add a value to a list.
-		 * @param Type - the Type of 'val'
-		 * @param list - the list to add the value 'val'.
-		 * @param val - value, actually if type Type. It will be converted into type
-		 * and added to the list.
-		 * @return
-		 */
-		@SuppressWarnings("unchecked")
-		private boolean addNumberOrCharacter(Class<?> Type, List<Type> list, double val) {
-			//Integer.decode(nm)
-			//Object re = Reflect.invokeIfContains(Type, "decode", String.class, Double.toString(val));
-			
-			// Make an Integer value of the double
-			String strVal = Double.toString(val);
-			int pos = strVal.indexOf('.');
-			if (pos>0) strVal = strVal.substring(0, pos);
-			
-			// Parse it into Type and add it to the list.
-			Object re;
+      if (value instanceof Comparable) {
+        try {
+          // Check lower bound
+          int r = ((Comparable) value).compareTo((lBound));
+          if ((r < 0) || ((r == 0) && excludingLBound)) {
+            return false;
+          }
+          
+          // Check upper bound
+          r = ((Comparable) value).compareTo((uBound));
+          if ((r > 0) || ((r == 0) && excludingUBound)) {
+            return false;
+          }
+        } catch (Exception e) {
+          // E.g., when a float is expected and value is "Hallo", a
+          // Float cannot be cast to String Exception is raised when
+          // casting to comparable
+          return false;
+        }
+        return true;
+      } else if (lBound.equals(uBound)) {
+        // Check absolute value
+        if (!excludingLBound && !excludingUBound) {
+          // Special treatment for classes
+          if (value instanceof Class) {
+            if (((Class) value).getSimpleName().equals(lBound)) {
+              return true;
+            }
+          }
+          //---
+          if (value.equals(lBound)) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      } else {
+        logger.warning(String.format(ResourceManager.getBundle("de.zbit.locales.Warnings")
+          .getString("CLASS_NOT_COMPARABLE"), value.getClass().getName()));
+        return false;
+      }
+    }
+    
+    /**
+     * If there are less or equal than 'maximumToReturn'
+     * acceptable values, all those are returned. Else: null is returned.
+     * @param maximumToReturn
+     * @return
+     */
+    public List<Type> getAllAcceptableValues(int maximumToReturn) {
+      List<Type> r = new LinkedList<Type>();
+      
+      // Check absolute value
+      if (lBound.equals(uBound)) {
+        if (!excludingLBound && !excludingUBound) {
+          r.add(lBound);
+        }
+        return r;
+      }
+      
+      // Check if ranges have a finite length
+      double start = 0, end = 0;
+      if (Utils.isInteger(lBound.getClass())) {
+        start = ((Number) lBound).doubleValue();
+        end = ((Number) uBound).doubleValue();
+        
+      } else if (lBound instanceof Character) {
+        start = (Character) lBound;
+        end = (Character) uBound;
+        
+      } else {
+        // E.g. Strings
+        return null;
+      }
+      
+      // Exit if too much choices and handle bounds
+      if ((end-start)>maximumToReturn) {
+        return null;
+      }
+      if (!excludingLBound) {
+        addNumberOrCharacter(lBound.getClass(), r, start);
+      }
+      // Collect all possible choices
+      for (start+=1; start<end; start++) {
+        addNumberOrCharacter(lBound.getClass(), r, start);
+      }
+      if (!excludingUBound) {
+        addNumberOrCharacter(lBound.getClass(), r, end);
+      }
+      
+      return r;
+    }
+    
+    /**
+     * Add a value to a list.
+     * @param Type - the Type of 'val'
+     * @param list - the list to add the value 'val'.
+     * @param val - value, actually if type Type. It will be converted into type
+     * and added to the list.
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private boolean addNumberOrCharacter(Class<?> Type, List<Type> list, double val) {
+      //Integer.decode(nm)
+      //Object re = Reflect.invokeIfContains(Type, "decode", String.class, Double.toString(val));
+      
+      // Make an Integer value of the double
+      String strVal = Double.toString(val);
+      int pos = strVal.indexOf('.');
+      if (pos>0) {
+        strVal = strVal.substring(0, pos);
+      }
+      
+      // Parse it into Type and add it to the list.
+      Object re;
       try {
         re = Reflect.invokeParser(Type, strVal);
       } catch (Throwable e) {
         re=null;
       }
-			if (re == null) {
-				// Character
-				if (Type.equals(Character.class)) {
-					((List<Character>)list).add(( (char)val) );
-					return true;
-				} else {
-					try {
-					  list.add( (Type)Type.cast(val) );
-					} catch(Throwable t) {return false;}
-				}
-			} else {
-				try {
-				  list.add((Type) (re));
-				} catch(Throwable t) {
-					return false;
-				}
-				return true;
-			}
-			return false;
-		}
-	 }
-	
-	/*
-	 * END OF SUB-CLASSES
-	 */
-	
-	/**
-	 * The list of all subRanges in this Range.
-	 * (e.g. {1,2,3} has subRanges "1","2" and "3".
-	 */
-	private List<SubRange> ranges = new LinkedList<SubRange>();
-	
-	/**
-	 * The original RangeString.
-	 */
-	private String rangeString;
-	
-	/**
-	 * The class object of the Type.
-	 */
-	private Class<Type> typee;
-	
-	/**
-	 * Additional constraints to restrict an input.
-	 */
-	private Object constraints = null;
-	
-	/**
-	 * If this Range has been initialized with
-	 * {@link #Range(Class, Collection)}, this is the original
-	 * list of acceptable values.
-	 */
+      if (re == null) {
+        // Character
+        if (Type.equals(Character.class)) {
+          ((List<Character>)list).add(( (char)val) );
+          return true;
+        } else {
+          try {
+            list.add( (Type)Type.cast(val) );
+          } catch(Throwable t) {return false;}
+        }
+      } else {
+        try {
+          list.add((Type) (re));
+        } catch(Throwable t) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    }
+  }
+  
+  /*
+   * END OF SUB-CLASSES
+   */
+  
+  /**
+   * The list of all subRanges in this Range.
+   * (e.g. {1,2,3} has subRanges "1","2" and "3".
+   */
+  private List<SubRange> ranges = new LinkedList<SubRange>();
+  
+  /**
+   * The original RangeString.
+   */
+  private String rangeString;
+  
+  /**
+   * The class object of the Type.
+   */
+  private Class<Type> typee;
+  
+  /**
+   * Additional constraints to restrict an input.
+   */
+  private Object constraints = null;
+  
+  /**
+   * If this Range has been initialized with
+   * {@link #Range(Class, Collection)}, this is the original
+   * list of acceptable values.
+   */
   private List<Type> listOfAccpetedObjects = null;
-	
-	/**
-	 * @return the constraints
-	 */
-	public Object getConstraints() {
-		return constraints;
-	}
-
-	/**
-	 * 
-	 * @param requiredType must be an instance of {@link File}!
-	 * @param filter
-	 */
-	public Range(Class<Type> requiredType, GeneralFileFilter filter) {
-		this(requiredType);
-		if (!requiredType.isAssignableFrom(File.class)) {
+  
+  /**
+   * @return the constraints
+   */
+  public Object getConstraints() {
+    return constraints;
+  }
+  
+  /**
+   * 
+   * @param requiredType must be an instance of {@link File}!
+   * @param filter
+   */
+  public Range(Class<Type> requiredType, GeneralFileFilter filter) {
+    this(requiredType);
+    if (!requiredType.isAssignableFrom(File.class)) {
       throw new IllegalArgumentException(
-			  String.format(ResourceManager.getBundle("de.zbit.locales.Warnings")
-				  	.getString("REQUIRED_TYPE_FOR_X_MUST_BE"), GeneralFileFilter.class
-					  .getName(), File.class.getName()));
-		}
-		constraints = filter;
-	}
-	
-	/**
-	 * This is a convenient constructors that builds a range string from
-	 * a list of all acceptable objects automatically.
-	 * 
-	 * @see {@link #Range(Class, String)} for more information.
+        String.format(ResourceManager.getBundle("de.zbit.locales.Warnings")
+          .getString("REQUIRED_TYPE_FOR_X_MUST_BE"), GeneralFileFilter.class
+          .getName(), File.class.getName()));
+    }
+    constraints = filter;
+  }
+  
+  /**
+   * This is a convenient constructors that builds a range string from
+   * a list of all acceptable objects automatically.
+   * 
+   * @see {@link #Range(Class, String)} for more information.
    * @param requiredType
    * @param acceptedObjects
    */
@@ -519,7 +548,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     }
   }
   
-   /**
+  /**
    * 
    * @param requiredType
    */
@@ -529,10 +558,10 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     this.rangeString = "";
     this.constraints = null;
   }
-
-	/**
-	 * Preserve the original list, if this range has been initialized with
-	 * {@link #Range(Class, Collection)} !
+  
+  /**
+   * Preserve the original list, if this range has been initialized with
+   * {@link #Range(Class, Collection)} !
    * @param acceptedObjects
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -547,103 +576,109 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
       t.printStackTrace();
     }
   }
-
+  
   /**
-	 * Checks whether additional side constraints have been set.
-	 * @return
-	 */
-	public boolean isSetConstraints() {
-		return constraints != null;
-	}
-		
-	/**
-	 * The source String that has been used to build this class.
-	 * @return
-	 */
-	public String getRangeSpecString() {
-		return rangeString;
-	}
-	
-	/**
-	 * Add a SubRange to this collection of ranges.
-	 * @param range
-	 */
-	private void addRange(SubRange range) {
-		ranges.add(range);
-	}
-	
-	/**
-	 * Add a SubRange to this collection of ranges.
-	 * @param lowerBound
-	 * @param upperBound
-	 */
-	private void addRange(Type lowerBound, Type upperBound) {
-	  ranges.add(new SubRange(lowerBound, upperBound));
-	}
-	
-	/**
-	 * If there are less or equal than {@link #defaultMaxAcceptableValuesToReturn}
-	 * acceptable values, all those are returned. Else: null is returned.
-	 * @return
-	 */
-	public List<Type> getAllAcceptableValues() {
-		return getAllAcceptableValues(defaultMaxAcceptableValuesToReturn);
-	}
-	
-	/**
-	 * If there are less or equal than 'maximumToReturn'
-	 * acceptable values, all those are returned. Else: null is returned. 
-	 * @param maximumToReturn
-	 * @return
-	 */
-	public List<Type> getAllAcceptableValues(int maximumToReturn) {
-	  if (listOfAccpetedObjects!=null) return listOfAccpetedObjects;
-		List<Type> ret = new LinkedList<Type>();
-		for (SubRange r : ranges) {
-			List<Type> newItems = r.getAllAcceptableValues(maximumToReturn);
-			// Too many elements, or invalid Type
-			if (newItems==null) return null;
-			for (Type type : newItems) {
-				if (!ret.contains(type)) ret.add(type);
-			}
-			if (ret.size() > maximumToReturn) {
-			  return null;
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public boolean isInRange(Type value) {
-	  return isInRange(value, null);
-	}
-	
-	/**
-	 * Checks, if the given value is in range of all ranges. See also
-	 * {@link #castAndCheckIsInRange(Object)}.
-	 * 
-	 * @param value
-	 * @param props
-	 * @return
-	 */
-	//@SuppressWarnings("unchecked")
+   * Checks whether additional side constraints have been set.
+   * @return
+   */
+  public boolean isSetConstraints() {
+    return constraints != null;
+  }
+  
+  /**
+   * The source String that has been used to build this class.
+   * @return
+   */
+  public String getRangeSpecString() {
+    return rangeString;
+  }
+  
+  /**
+   * Add a SubRange to this collection of ranges.
+   * @param range
+   */
+  private void addRange(SubRange range) {
+    ranges.add(range);
+  }
+  
+  /**
+   * Add a SubRange to this collection of ranges.
+   * @param lowerBound
+   * @param upperBound
+   */
+  private void addRange(Type lowerBound, Type upperBound) {
+    ranges.add(new SubRange(lowerBound, upperBound));
+  }
+  
+  /**
+   * If there are less or equal than {@link #defaultMaxAcceptableValuesToReturn}
+   * acceptable values, all those are returned. Else: null is returned.
+   * @return
+   */
+  public List<Type> getAllAcceptableValues() {
+    return getAllAcceptableValues(defaultMaxAcceptableValuesToReturn);
+  }
+  
+  /**
+   * If there are less or equal than 'maximumToReturn'
+   * acceptable values, all those are returned. Else: null is returned.
+   * @param maximumToReturn
+   * @return
+   */
+  public List<Type> getAllAcceptableValues(int maximumToReturn) {
+    if (listOfAccpetedObjects!=null) {
+      return listOfAccpetedObjects;
+    }
+    List<Type> ret = new LinkedList<Type>();
+    for (SubRange r : ranges) {
+      List<Type> newItems = r.getAllAcceptableValues(maximumToReturn);
+      // Too many elements, or invalid Type
+      if (newItems==null) {
+        return null;
+      }
+      for (Type type : newItems) {
+        if (!ret.contains(type)) {
+          ret.add(type);
+        }
+      }
+      if (ret.size() > maximumToReturn) {
+        return null;
+      }
+    }
+    return ret;
+  }
+  
+  /**
+   * 
+   * @param value
+   * @return
+   */
+  public boolean isInRange(Type value) {
+    return isInRange(value, null);
+  }
+  
+  /**
+   * Checks, if the given value is in range of all ranges. See also
+   * {@link #castAndCheckIsInRange(Object)}.
+   * 
+   * @param value
+   * @param props
+   * @return
+   */
+  //@SuppressWarnings("unchecked")
   public boolean isInRange(Type value, SBProperties props) {
-		if (isSetConstraints()) {
-			if (constraints instanceof GeneralFileFilter) {
-				// in this case, Type must be a String or a File.
-				File file;
-				if (value instanceof String) {
-					file = new File(value.toString());
-				} else {
-					file = (File) value;
-				}
-				return ((GeneralFileFilter) constraints).accept(file);
-				
-			/*} else if (constraints instanceof ValuePair<?, ?>) {
+    if (isSetConstraints()) {
+      if (constraints instanceof GeneralFileFilter) {
+        // in this case, Type must be a String or a File.
+        File file;
+        if (value instanceof String) {
+          file = new File(value.toString());
+        } else {
+          file = (File) value;
+        }
+        return ((GeneralFileFilter) constraints).accept(file);
+        
+        /*} else if (constraints instanceof ValuePair<?, ?>) {
 	      // XXX: What is this used for, besides the (FINE!) log-message???
 			  Relation relation = (Relation) ((ValuePair<?, ?>) constraints).getA();
         Option<? extends Comparable<Type>> option = (Option<? extends Comparable<Type>>) ((ValuePair<?, ?>) constraints)
@@ -669,19 +704,19 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
           message += value;
           logger.fine(String.format(message, v, option));
         }*/
-			}
-		}
+      }
+    }
     // Special treatment for concrete lists (e.g., for classes).
     if (listOfAccpetedObjects != null) {
-    	if (value instanceof Class) {
-    		for (Type clazz : listOfAccpetedObjects) {
-    			if (((Class<?>) clazz).isAssignableFrom((Class<?>) value)) {
-    				return true;
-    			}
-    		}
-    		return false;
-    	}
-    	return listOfAccpetedObjects.contains(value);
+      if (value instanceof Class) {
+        for (Type clazz : listOfAccpetedObjects) {
+          if (((Class<?>) clazz).isAssignableFrom((Class<?>) value)) {
+            return true;
+          }
+        }
+        return false;
+      }
+      return listOfAccpetedObjects.contains(value);
     }
     for (SubRange r : ranges) {
       if (r.isInRange(value)) {
@@ -689,96 +724,101 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
       }
     }
     return false;
-	}
-	
-	/**
-	 * A convenient wrapper method, that calls {@link Option#parseOrCast(Class, Object)}
-	 * before calling {@link #isInRange(Object)}.
-	 * 
-	 * @see Option#castAndCheckIsInRange(Object)
-	 * @param value
-	 * @return
-	 * @deprecated use {@link #isInRange(Object, SBProperties)}
-	 */
-	@SuppressWarnings("unused")
+  }
+  
+  /**
+   * A convenient wrapper method, that calls {@link Option#parseOrCast(Class, Object)}
+   * before calling {@link #isInRange(Object)}.
+   * 
+   * @see Option#castAndCheckIsInRange(Object)
+   * @param value
+   * @return
+   * @deprecated use {@link #isInRange(Object, SBProperties)}
+   */
+  @SuppressWarnings("unused")
   @Deprecated
-	private boolean castAndCheckIsInRange(Object value, SBProperties props) {
-		Type value2 = Option.parseOrCast(typee, value);
-		if (value2 == null) { 
-		  return false;
-		}
-		return isInRange(value2, props);
-	}
-	
-
+  private boolean castAndCheckIsInRange(Object value, SBProperties props) {
+    Type value2 = Option.parseOrCast(typee, value);
+    if (value2 == null) {
+      return false;
+    }
+    return isInRange(value2, props);
+  }
+  
+  
   /**
    * Parse the range specification string into a more convenient
    * data structure. See {@link #getRangeSpecification()} for
    * more information on possible Strings.
    * @param range
    * @return rangeCollection<Type>
-   * @throws ParseException 
+   * @throws ParseException
    */
   private void parseRangeSpec(String range) throws ParseException {
-  	int positionTracker = 0;
-		try {
-			range = range.substring(range.indexOf('{') + 1, range.lastIndexOf('}'));
-			// Be carefull with " and '
-			//String[] items = range.split(Pattern.quote(","));
-			List<Character> stringSep = new LinkedList<Character>();
-			stringSep.add('\''); stringSep.add('"');
-			String[] items = CSVReader.getSplits(range, ',', true, true, stringSep);
-			
-			SubRange r = null;
-			for (int i = 0; i < items.length; i++) {
-				positionTracker += items[i].length() + 1; // +1 for the ','
-				String item = items[i].trim();
-				String item2 = item;
-				r = new SubRange();
-				
-				// Check if we have a range
-				char c = item.charAt(0);
-				if ((c == '(') || (c == '[')) {
-					if (c == '(') {
-					  r.excludingLBound = true;
-					}
-					i++;
-					item = item.substring(1);
-					item2 = items[i].trim();
-					
-					c = item2.charAt(item2.length()-1);
-					if (c!=')' && c!=']') throw new Exception();
-					else if (c==')') r.excludingUBound=true;
-					item2 = item2.substring(0, item2.length()-1);
-				}
-				
-				// Trim the string indicators
-				for (Character sep : stringSep) {
-					if ((item.length() > 2) && (item.charAt(0) == sep) && (item.charAt(item.length()-1) == sep)) {
-						item = item.substring(1, item.length() - 1);
-					}
-					if ((item2.length() > 2) && (item2.charAt(0) ==sep) && (item2.charAt(item2.length() - 1) == sep)) {
-						item2 = item2.substring(1, item2.length() - 1);
-					}
-				}
-				
-				r.lBound = Option.parseOrCast(typee, item);
-				r.uBound = Option.parseOrCast(typee, item2);
-				
-				addRange(r);
-			}
-			
-		} catch (Exception e) {
-			// Erase it, so that other methods can see that it is invalid.
-			if (range.equals(this.rangeString)) this.rangeString=null;
-			logger.log(Level.SEVERE, "Invalid range string.", e);
-			
-			throw new ParseException(String.format(ResourceManager.getBundle(
-				"de.zbit.locales.Warnings").getString("RANGE_IN_WRONG_FORMAT"),
-				(range == null ? "null" : range)), positionTracker);
-			//e.printStackTrace();
-		}
-
+    int positionTracker = 0;
+    try {
+      range = range.substring(range.indexOf('{') + 1, range.lastIndexOf('}'));
+      // Be carefull with " and '
+      //String[] items = range.split(Pattern.quote(","));
+      List<Character> stringSep = new LinkedList<Character>();
+      stringSep.add('\''); stringSep.add('"');
+      String[] items = CSVReader.getSplits(range, ',', true, true, stringSep);
+      
+      SubRange r = null;
+      for (int i = 0; i < items.length; i++) {
+        positionTracker += items[i].length() + 1; // +1 for the ','
+        String item = items[i].trim();
+        String item2 = item;
+        r = new SubRange();
+        
+        // Check if we have a range
+        char c = item.charAt(0);
+        if ((c == '(') || (c == '[')) {
+          if (c == '(') {
+            r.excludingLBound = true;
+          }
+          i++;
+          item = item.substring(1);
+          item2 = items[i].trim();
+          
+          c = item2.charAt(item2.length()-1);
+          if (c!=')' && c!=']') {
+            throw new Exception();
+          } else if (c==')') {
+            r.excludingUBound=true;
+          }
+          item2 = item2.substring(0, item2.length()-1);
+        }
+        
+        // Trim the string indicators
+        for (Character sep : stringSep) {
+          if ((item.length() > 2) && (item.charAt(0) == sep) && (item.charAt(item.length()-1) == sep)) {
+            item = item.substring(1, item.length() - 1);
+          }
+          if ((item2.length() > 2) && (item2.charAt(0) ==sep) && (item2.charAt(item2.length() - 1) == sep)) {
+            item2 = item2.substring(1, item2.length() - 1);
+          }
+        }
+        
+        r.lBound = Option.parseOrCast(typee, item);
+        r.uBound = Option.parseOrCast(typee, item2);
+        
+        addRange(r);
+      }
+      
+    } catch (Exception e) {
+      // Erase it, so that other methods can see that it is invalid.
+      if (range.equals(this.rangeString)) {
+        this.rangeString=null;
+      }
+      logger.log(Level.SEVERE, "Invalid range string.", e);
+      
+      throw new ParseException(String.format(ResourceManager.getBundle(
+          "de.zbit.locales.Warnings").getString("RANGE_IN_WRONG_FORMAT"),
+        (range == null ? "null" : range)), positionTracker);
+      //e.printStackTrace();
+    }
+    
   }
   
   /**
@@ -796,10 +836,10 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     if ((acceptedObjects != null) && (Class.class.isAssignableFrom(acceptedObjects.iterator().next().getClass()))) {
       List<Type> classStrings = new LinkedList<Type>();
       for (Type object : acceptedObjects) {
-      	/* Simple name for classes doesn't work. It is not precise and 
-      	 * causes errors at other positions...
-      	 * Therefore, getName is the only possible option here.
-      	 */
+        /* Simple name for classes doesn't work. It is not precise and
+         * causes errors at other positions...
+         * Therefore, getName is the only possible option here.
+         */
         classStrings.add((Type) ((Class<Type>) object).getName());
       }
       accObjects = classStrings;
@@ -821,7 +861,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
    * <p>NOTE: THIS METHOD IS FOR *NICE* FORMATTED RANGES.
    * IT IS *NOT* FOR ARGUMENT PARSING OR OTHER REAL
    * USES (EXCEPT SYSOUTS/ HELP/ ETC.).
-   * See {@link #toRangeString(Iterable)} for argument parsing and others! 
+   * See {@link #toRangeString(Iterable)} for argument parsing and others!
    * @param <Type>
    * @param acceptedObjects - a simple list of all acceptable objects.
    * @return String
@@ -831,7 +871,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     Iterable<Type> accObjects = acceptedObjects;
     Iterator<Type> iterator = acceptedObjects.iterator();
     
-    /* 
+    /*
      */
     
     //If the range consists of classes, use the simple class names
@@ -895,69 +935,69 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     return result;
   }
   
-	/**
-	 * Builds a range string that accepts exclusively all
-	 * elements in the given {@link Enum}.
-	 * @param <T>
-	 * @param cazz
-	 * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.
-	 */
-	public static <T extends Enum<?>> String toRangeString(Class<T> cazz) {
-		return toRangeString(cazz.getEnumConstants());
-	}
-	
-	/**
-	 * Builds a range string that accepts exclusively all
-	 * given {@code constants}.
-	 * @param <T>
-	 * @param constants
-	 * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.
-	 */
-	private static <T> String toRangeString(T... constants) {
-	  StringBuilder sb = new StringBuilder();
-	  sb.append('{');
-	  int i = 0;
-	  for (T element : constants) {
-	    if (i > 0) {
-	      sb.append(',');
-	    }
-	    sb.append(element.toString());
-	    i++;
-	  }
-	  sb.append('}');
-	  return sb.toString();
-	}
-	
-	/**
+  /**
+   * Builds a range string that accepts exclusively all
+   * elements in the given {@link Enum}.
+   * @param <T>
+   * @param cazz
+   * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.
+   */
+  public static <T extends Enum<?>> String toRangeString(Class<T> cazz) {
+    return toRangeString(cazz.getEnumConstants());
+  }
+  
+  /**
+   * Builds a range string that accepts exclusively all
+   * given {@code constants}.
+   * @param <T>
+   * @param constants
+   * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.
+   */
+  private static <T> String toRangeString(T... constants) {
+    StringBuilder sb = new StringBuilder();
+    sb.append('{');
+    int i = 0;
+    for (T element : constants) {
+      if (i > 0) {
+        sb.append(',');
+      }
+      sb.append(element.toString());
+      i++;
+    }
+    sb.append('}');
+    return sb.toString();
+  }
+  
+  /**
    * Builds a range string that accepts exclusively all
    * elements in the parent Enum of the given {@link Enum} element.
-	 * @param <T>
-	 * @param cazz
-	 * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.
-	 */
-	public static <T extends Enum<?>> String toRangeString(Enum<?> cazz) {
-	  return toRangeString(cazz.getDeclaringClass().getEnumConstants());
-	}
+   * @param <T>
+   * @param cazz
+   * @return {@link String} that can be used, e.g. in {@link Range#Range(Class, String)}.
+   */
+  public static <T extends Enum<?>> String toRangeString(Enum<?> cazz) {
+    return toRangeString(cazz.getDeclaringClass().getEnumConstants());
+  }
   
-	/**
-	 * Returns a range specification for boolean values. This can be used to
-	 * specifiy that a boolean option expects an argument that is either {@code true} or
-	 * {@code false}.
-	 * 
-	 * @return a range specification for boolean values
-	 */
-	public static Range<Boolean> booleanRange() {
-	  return new Range<Boolean>(Boolean.class, "{\"true\", \"false\"}");
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
+  /**
+   * Returns a range specification for boolean values. This can be used to
+   * specifiy that a boolean option expects an argument that is either {@code true} or
+   * {@code false}.
+   * 
+   * @return a range specification for boolean values
+   */
+  public static Range<Boolean> booleanRange() {
+    return new Range<Boolean>(Boolean.class, "{\"true\", \"false\"}");
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
   public String toString() {
     return getRangeSpecString();
   }
-
+  
   /**
    * @return the minimum acceptable value. Only if {@link #typee} is
    * an instance of {@link Comparable}. Currently, this implementation
@@ -978,7 +1018,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
           min = r.getMinimum();
         }
         else if ((min instanceof Comparable<?>) && (r.lBound instanceof Comparable<?>)) {
-          min = ((Comparable) min).compareTo((Comparable) r.lBound) < 0 ? min : r.lBound;
+          min = ((Comparable) min).compareTo(r.lBound) < 0 ? min : r.lBound;
         }
         // Too much effort to process this...
         //if (r.excludingLBound) {}
@@ -1007,7 +1047,7 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
           max = r.getMaximum();
         }
         else if ((max instanceof Comparable<?>) && (r.uBound instanceof Comparable<?>)) {
-          max = ((Comparable)max).compareTo((Comparable)r.uBound) > 0 ? max : r.uBound;
+          max = ((Comparable)max).compareTo(r.uBound) > 0 ? max : r.uBound;
         }
         // Too much effort to process this...
         //if (r.excludinguBound) {}
@@ -1015,10 +1055,11 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     }
     return max;
   }
-
+  
   /* (non-Javadoc)
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
+  @Override
   public int compareTo(Range<Type> other) {
     // Is only approximative...
     if (this == other) {
@@ -1061,5 +1102,5 @@ public class Range<Type> implements Serializable, Comparable<Range<Type>> {
     
     return ret;
   }
-
+  
 }

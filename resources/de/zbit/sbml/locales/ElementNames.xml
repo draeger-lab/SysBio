@@ -215,6 +215,7 @@
   <entry key="depth">Depth</entry>
   <entry key="dimensions">Dimensions</entry>
   <entry key="end">End</entry>
+  <entry key="graphicalObject">Graphical object</entry>
   <entry key="height">Height</entry>
   <entry key="layout">Layout</entry>
   <entry key="lineSegment">Line segment</entry>
@@ -227,11 +228,14 @@
   <entry key="listOfSpeciesGlyphs">Species glyphs</entry>
   <entry key="listOfSpeciesReferenceGlyphs">Species reference glyphs</entry>
   <entry key="listOfTextGlyphs">Text glyphs</entry>
+  <entry key="originOfText">Origin of text</entry>
   <entry key="position">Position</entry>  
   <entry key="reactionGlyph">Reaction glyph</entry>
   <entry key="speciesGlyph">Species glyph</entry>
   <entry key="speciesReferenceGlyph">Species reference glyph</entry>
+  <entry key="speciesReferenceRole">Role</entry>
   <entry key="start">Start</entry>
+  <entry key="text">Text</entry>
   <entry key="textGlyph">Text glyph</entry>
   <entry key="width">Width</entry>
   <entry key="x">x-coordinate</entry>
