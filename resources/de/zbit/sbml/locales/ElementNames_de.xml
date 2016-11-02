@@ -217,6 +217,7 @@
   <entry key="depth">Tiefe</entry>
   <entry key="dimensions">Dimensionen</entry>
   <entry key="end">Ende</entry>
+  <entry key="graphicalObject">Graphisches Objekt</entry>
   <entry key="height">Höhe</entry>
   <entry key="layout">Layout</entry>
   <entry key="lineSegment">Liniensegment</entry>
@@ -229,11 +230,14 @@
   <entry key="listOfSpeciesGlyphs">Speziesglyphen</entry>
   <entry key="listOfSpeciesReferenceGlyphs">Speziesverweisglyphen</entry>
   <entry key="listOfTextGlyphs">Textglyphen</entry>
+  <entry key="originOfText">Text-Quelle</entry>
   <entry key="position">Position</entry>  
   <entry key="reactionGlyph">Reaktionsglyphe</entry>
   <entry key="speciesGlyph">Speziesglyphe</entry>
   <entry key="speciesReferenceGlyph">Speziesverweisglyphen</entry>
+  <entry key="speciesReferenceRole">Rolle</entry>
   <entry key="start">Start</entry>
+  <entry key="text">Text</entry>
   <entry key="textGlyph">Textglyphe</entry>
   <entry key="width">Breite</entry>
   <entry key="x">Abzissenwert</entry>
