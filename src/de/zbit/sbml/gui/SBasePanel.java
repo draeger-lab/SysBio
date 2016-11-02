@@ -90,12 +90,16 @@ import org.sbml.jsbml.ext.fbc.FBCConstants;
 import org.sbml.jsbml.ext.fbc.FBCSpeciesPlugin;
 import org.sbml.jsbml.ext.groups.Group;
 import org.sbml.jsbml.ext.groups.Member;
+import org.sbml.jsbml.ext.layout.AbstractReferenceGlyph;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CubicBezier;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.LineSegment;
 import org.sbml.jsbml.ext.layout.Point;
+import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
+import org.sbml.jsbml.ext.layout.SpeciesReferenceRole;
+import org.sbml.jsbml.ext.layout.TextGlyph;
 import org.sbml.jsbml.ontology.Term;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
@@ -262,6 +266,13 @@ public class SBasePanel extends JPanel implements EquationComponent {
         if (go.isSetBoundingBox()) {
           lh.add(new SBasePanel(go.getBoundingBox()), 1, ++row, 3, 1, 0d, 0d );
         }
+        if (go instanceof TextGlyph) {
+          addProperties((TextGlyph) go);
+        } else if (go instanceof SpeciesReferenceGlyph) {
+          addProperties((SpeciesReferenceGlyph) go);
+        } else if (go instanceof AbstractReferenceGlyph) {
+          addProperties((AbstractReferenceGlyph) go);
+        }
       }
       if (sbase instanceof LineSegment) {
         addProperties((LineSegment) sbase);
@@ -278,6 +289,58 @@ public class SBasePanel extends JPanel implements EquationComponent {
       }
     }
     //GUITools.setOpaqueForAllElements(this, false);
+  }
+  
+  /**
+   * 
+   * @param srg
+   */
+  private void addProperties(SpeciesReferenceGlyph srg) {
+    if (srg.isSetSpeciesReferenceRole()) {
+      addLabeledComponent(bundle.getString("speciesReferenceRole"),
+        enumComboBox(Arrays.asList(SpeciesReferenceRole.values()), srg.getSpeciesReferenceRole()));
+    }
+    addProperties((AbstractReferenceGlyph) srg);
+  }
+  
+  /**
+   * @param arg
+   */
+  public void addProperties(AbstractReferenceGlyph arg) {
+    if (arg.isSetReference()) {
+      NamedSBase nsb = arg.getReferenceInstance();
+      if (nsb != null) {
+        lh.add(new SBasePanel(nsb), 1, ++row, 3, 1, 0d, 0d );
+      } else {
+        String clazz = arg.getClass().getSimpleName();
+        addLabeledTextField(bundle.getString(clazz.substring(0, clazz.indexOf("G") - 1)), arg.getReference());
+      }
+    }
+  }
+  
+  /**
+   * @param tg
+   */
+  public void addProperties(TextGlyph tg) {
+    GraphicalObject go = tg.getGraphicalObjectInstance();
+    if (tg.isSetOriginOfText()) {
+      NamedSBase nsb = tg.getOriginOfTextInstance();
+      if ((nsb == null) || ((go != null) && (go instanceof AbstractReferenceGlyph) && ((AbstractReferenceGlyph) go).getReference().equals(nsb.getId()))) {
+        // The second condition avoids that we end up writing the same component twice
+        addLabeledTextField(bundle.getString("originOfText"), (nsb != null) && nsb.isSetName() ? nsb.getName() : tg.getOriginOfText());
+      } else {
+        lh.add(new SBasePanel(nsb), 1, ++row, 3, 1, 0d, 0d );
+      }
+    } else if (tg.isSetText()) {
+      addLabeledTextField(bundle.getString("text"), tg.getText());
+    }
+    if (tg.isSetGraphicalObject()) {
+      if (go != null) {
+        lh.add(new SBasePanel(go), 1, ++row, 3, 1, 0d, 0d );
+      } else {
+        addLabeledTextField(bundle.getString("graphicalObject"), tg.getGraphicalObject());
+      }
+    }
   }
   
   /**
@@ -628,6 +691,15 @@ public class SBasePanel extends JPanel implements EquationComponent {
     lh.add(jlabel, 1, ++row, 1, 1, 0d, 0d);
     lh.add(component, 3, row, 1, 1, 1, 0d);
     lh.add(createJPanel(), 1, ++row, 5, 1, 0d, 0d);
+  }
+  
+  /**
+   * 
+   * @param label
+   * @param text
+   */
+  private void addLabeledTextField(Object label, Object text) {
+    addLabeledComponent(label, createTextField(text.toString()));
   }
   
   /**
