@@ -136,7 +136,7 @@ public class InitDefaults implements Callable<Void> {
         for (Layout layout : lmp.getListOfLayouts()) {
           if (layout.isSetListOfReactionGlyphs()) {
             for (ReactionGlyph rg : layout.getListOfReactionGlyphs()) {
-              if (rg.isSetListOfSpeciesReferencesGlyphs()) {
+              if (rg.isSetListOfSpeciesReferenceGlyphs()) {
                 for (SpeciesReferenceGlyph srg : rg.getListOfSpeciesReferenceGlyphs()) {
                   if (rg.isSetBoundingBox() && !srg.isSetBoundingBox() && !srg.isSetCurve() && srg.isSetSpeciesGlyph()) {
                     SpeciesGlyph sg = srg.getSpeciesGlyphInstance();
