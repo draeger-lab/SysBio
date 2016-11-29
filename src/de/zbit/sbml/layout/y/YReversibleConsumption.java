@@ -18,9 +18,9 @@ package de.zbit.sbml.layout.y;
 
 import org.sbml.jsbml.ext.layout.Curve;
 
+import de.zbit.sbml.layout.ReversibleConsumption;
 import y.view.Arrow;
 import y.view.EdgeRealizer;
-import de.zbit.sbml.layout.ReversibleConsumption;
 
 /**
  * yFiles implementation of arc type {@link ReversibleConsumption}.
@@ -34,15 +34,16 @@ import de.zbit.sbml.layout.ReversibleConsumption;
  * @version $Rev$
  */
 public class YReversibleConsumption extends YAbstractSBGNArc implements ReversibleConsumption<EdgeRealizer> {
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
-	 */
-	@Override
-	public EdgeRealizer draw(Curve curve) {
-		EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve);
-		edgeRealizer.setTargetArrow(Arrow.DELTA);
-		return edgeRealizer;
-	}
-
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.SBGNArc#draw(org.sbml.jsbml.ext.layout.Curve)
+   */
+  @Override
+  public EdgeRealizer draw(Curve curve) {
+    // TODO: We need to check what really needs to be reversed...
+    EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve, false);
+    edgeRealizer.setTargetArrow(Arrow.DELTA);
+    return edgeRealizer;
+  }
+  
 }

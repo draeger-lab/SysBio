@@ -325,7 +325,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       edgeRealizer.setSourcePoint(new YPoint(x, y));
     }
     else {
-      logger.fine(MessageFormat.format("Algorithm did not calculate relative docking position at process node for species reference glyph {0}", srg.getId()));
+      logger.fine(MessageFormat.format(
+        "Algorithm did not calculate relative docking position at process node for species reference glyph ''{0}''",
+        srg.getId()));
     }
     
     // docking at species works automatically, YFiles points the edge towards the center of the node
@@ -627,6 +629,17 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
    * @return
    */
   public static EdgeRealizer createEdgeRealizerFromCurve(Curve curve) {
+    return createEdgeRealizerFromCurve(curve, true);
+  }
+  
+  /**
+   * 
+   * @param curve
+   * @param forward
+   * @return
+   */
+  public static EdgeRealizer createEdgeRealizerFromCurve(Curve curve,
+    boolean forward) {
     EdgeRealizer edgeRealizer = new GenericEdgeRealizer();
     
     // Note: if multiple curve segments (beziers) are specified, the resulting
@@ -650,9 +663,16 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       
       edgeRealizer = drawBezier ? new BezierEdgeRealizer() : new PolyLineEdgeRealizer();
       
-      for (int i = listOfCurveSegments.size() - 1; i >= 0; i--) {
-        CurveSegment curveSegment = listOfCurveSegments.get(i);
-        drawCurveSegment(edgeRealizer, curveSegment);
+      if (forward) {
+        for (int i = 0; i < listOfCurveSegments.size(); i++) {
+          CurveSegment curveSegment = listOfCurveSegments.get(i);
+          drawCurveSegment(edgeRealizer, curveSegment, forward);
+        }
+      } else {
+        for (int i = listOfCurveSegments.size() - 1; i >= 0; i--) {
+          CurveSegment curveSegment = listOfCurveSegments.get(i);
+          drawCurveSegment(edgeRealizer, curveSegment, forward);
+        }
       }
     }
     
@@ -675,24 +695,46 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
    * @return
    */
   private static EdgeRealizer drawCurveSegment(EdgeRealizer edgeRealizer, CurveSegment curveSegment) {
+    return drawCurveSegment(edgeRealizer, curveSegment, true);
+  }
+  
+  /**
+   * 
+   * @param edgeRealizer
+   * @param curveSegment
+   * @param forward
+   * @return
+   */
+  private static EdgeRealizer drawCurveSegment(EdgeRealizer edgeRealizer, CurveSegment curveSegment, boolean forward) {
     LineSegment ls = (LineSegment) curveSegment;
     
-    Point end = ls.getEnd();
-    edgeRealizer.addPoint(end.getX(), end.getY());
+    Point start = forward ? ls.getStart() : ls.getEnd();
+    edgeRealizer.addPoint(start.getX(), start.getY());
     if ((edgeRealizer instanceof BezierEdgeRealizer) && (curveSegment instanceof CubicBezier)) {
       CubicBezier cb = (CubicBezier) curveSegment;
       BezierEdgeRealizer ber = (BezierEdgeRealizer) edgeRealizer;
-      if (cb.isSetBasePoint2()) {
-        Point basePoint2 = cb.getBasePoint2();
-        ber.appendBend(basePoint2.getX(), basePoint2.getY());
-      }
-      if (cb.isSetBasePoint1()) {
-        Point basePoint1 = cb.getBasePoint1();
-        ber.appendBend(basePoint1.getX(), basePoint1.getY());
+      if (forward) {
+        if (cb.isSetBasePoint1()) {
+          Point basePoint1 = cb.getBasePoint1();
+          ber.appendBend(basePoint1.getX(), basePoint1.getY());
+        }
+        if (cb.isSetBasePoint2()) {
+          Point basePoint2 = cb.getBasePoint2();
+          ber.appendBend(basePoint2.getX(), basePoint2.getY());
+        }
+      } else {
+        if (cb.isSetBasePoint2()) {
+          Point basePoint2 = cb.getBasePoint2();
+          ber.appendBend(basePoint2.getX(), basePoint2.getY());
+        }
+        if (cb.isSetBasePoint1()) {
+          Point basePoint1 = cb.getBasePoint1();
+          ber.appendBend(basePoint1.getX(), basePoint1.getY());
+        }
       }
     }
-    Point start = ls.getStart();
-    edgeRealizer.addPoint(start.getX(), start.getY());
+    Point end = forward ? ls.getEnd() : ls.getStart();
+    edgeRealizer.addPoint(end.getX(), end.getY());
     
     return edgeRealizer;
   }

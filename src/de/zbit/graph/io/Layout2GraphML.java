@@ -92,7 +92,7 @@ public class Layout2GraphML extends SB_2GraphML<Layout> {
     SBMLCreateEdgeMode createEdgeMode = (SBMLCreateEdgeMode) this.editMode.getCreateEdgeMode();
     if (layout.isSetListOfReactionGlyphs()) {
     	for (ReactionGlyph r : layout.getListOfReactionGlyphs()) {
-    		if (r.isSetListOfSpeciesReferencesGlyphs()) {
+    		if (r.isSetListOfSpeciesReferenceGlyphs()) {
     			for (SpeciesReferenceGlyph sRef : r.getListOfSpeciesReferenceGlyphs()) {
     				if ((sRef.getSpeciesReferenceRole() != SpeciesReferenceRole.PRODUCT) && (sRef.getSpeciesReferenceRole() != SpeciesReferenceRole.SUBSTRATE)) {
     					Node source = (Node) sRef.getSpeciesGlyphInstance().getUserObject(Constants.GLYPH_NODE_KEY);
@@ -135,7 +135,7 @@ public class Layout2GraphML extends SB_2GraphML<Layout> {
 				
 				Node source = null;
 				Node target = null;
-				if (r.isSetListOfSpeciesReferencesGlyphs()) {
+				if (r.isSetListOfSpeciesReferenceGlyphs()) {
 					for (SpeciesReferenceGlyph sRef : r.getListOfSpeciesReferenceGlyphs()) {
 						if (sRef.getSpeciesReferenceRole() == SpeciesReferenceRole.SUBSTRATE) {
 							source = (Node) sRef.getSpeciesGlyphInstance().getUserObject(Constants.GLYPH_NODE_KEY);
