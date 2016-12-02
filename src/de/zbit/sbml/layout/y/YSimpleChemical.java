@@ -18,10 +18,10 @@ package de.zbit.sbml.layout.y;
 
 import org.sbml.jsbml.SBO;
 
-import y.view.NodeRealizer;
 import de.zbit.graph.io.def.SBGNVisualizationProperties;
 import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
 import de.zbit.sbml.layout.SimpleChemical;
+import y.view.NodeRealizer;
 
 /**
  * yFiles implementation of EPN type {@link SimpleChemical}.
@@ -30,24 +30,24 @@ import de.zbit.sbml.layout.SimpleChemical;
  * @version $Rev$
  */
 public class YSimpleChemical extends SimpleChemical<NodeRealizer> {
-
-	/* (non-Javadoc)
-	 * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
-	 */
-	@Override
-	public NodeRealizer draw(double x, double y, double z, double width,
-			double height, double depth) {
-		NodeRealizer nodeRealizer =
-			SBGNVisualizationProperties.getNodeRealizer(SBO.getSimpleMolecule());
-		
-		ShapeNodeRealizerSupportingCloneMarker shapeNodeRealizer =
-			new ShapeNodeRealizerSupportingCloneMarker(nodeRealizer);
-		
-		shapeNodeRealizer.setNodeIsCloned(hasCloneMarker());
-		shapeNodeRealizer.setSize(width, height);
-		shapeNodeRealizer.setLocation(x, y);
-		
-		return shapeNodeRealizer;
-	}
-
+  
+  /* (non-Javadoc)
+   * @see de.zbit.sbml.layout.SBGNNode#draw(double, double, double, double, double, double)
+   */
+  @Override
+  public NodeRealizer draw(double x, double y, double z, double width,
+    double height, double depth) {
+    NodeRealizer nodeRealizer =
+        SBGNVisualizationProperties.getNodeRealizer(SBO.getSimpleMolecule());
+    
+    ShapeNodeRealizerSupportingCloneMarker shapeNodeRealizer =
+        new ShapeNodeRealizerSupportingCloneMarker(nodeRealizer);
+    
+    shapeNodeRealizer.setNodeIsCloned(hasCloneMarker());
+    shapeNodeRealizer.setSize(width, height);
+    shapeNodeRealizer.setLocation(x, y);
+    
+    return shapeNodeRealizer;
+  }
+  
 }

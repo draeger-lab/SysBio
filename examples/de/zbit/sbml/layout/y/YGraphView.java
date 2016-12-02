@@ -222,7 +222,7 @@ public class YGraphView implements PropertyChangeListener {
     updateSBMLDocument(director);
     // experimental or debug features
     //    writeModifiedModel(System.getProperty("user.dir")+"/out.xml");
-    //    writeSVGImage(out);
+    //writeSVGImage(director.getProduct().getGraph2D(), out);
     //dumpGraph();
     
     displayGraph2DView(director.getProduct().getGraph2D());
