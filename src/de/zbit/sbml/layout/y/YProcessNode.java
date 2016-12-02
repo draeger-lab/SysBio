@@ -95,7 +95,7 @@ implements ProcessNode<NodeRealizer> {
     String configName = "General Path";
     Map<Class<?>, Object> implementationsMap = factory.createDefaultConfigurationMap();
     GeneralPathNodePainter painter = new GeneralPathNodePainter(gp);
-    implementationsMap.put(GenericNodeRealizer.Painter.class, painter); //new ShadowNodePainter(
+    implementationsMap.put(GenericNodeRealizer.Painter.class, painter);
     implementationsMap.put(GenericNodeRealizer.ContainsTest.class, painter);
     factory.addConfiguration(configName, implementationsMap);
     
