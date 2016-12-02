@@ -20,6 +20,7 @@ import static de.zbit.graph.sbgn.DrawingOptions.FONT;
 import static de.zbit.graph.sbgn.DrawingOptions.FONT_COLOR;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,6 +72,7 @@ import de.zbit.sbml.layout.OmittedProcessNode;
 import de.zbit.sbml.layout.PerturbingAgent;
 import de.zbit.sbml.layout.ProcessNode;
 import de.zbit.sbml.layout.Production;
+import de.zbit.sbml.layout.RenderProcessor;
 import de.zbit.sbml.layout.ReversibleConsumption;
 import de.zbit.sbml.layout.SBGNArc;
 import de.zbit.sbml.layout.SBGNNode;
@@ -196,6 +198,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     }
     labelTextGlyphs = new HashSet<TextGlyph>();
     // TODO for all p in progressListeners: progress.setNumberOfTotalCalls(xyz);
+    // TODO: grant access to the graph to listeners.
   }
   
   /* (non-Javadoc)
@@ -260,8 +263,13 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     //		nodeRealizer.setDropShadowColor(new Color(0, 0, 0, 64));
     //	    nodeRealizer.setDropShadowOffsetX((byte) 3);
     //	    nodeRealizer.setDropShadowOffsetY((byte) 3);
-    Color fillColor = nodeRealizer.getFillColor();
-    nodeRealizer.setFillColor2(fillColor.brighter());
+    Color fillColor = RenderProcessor.getRenderFillColor(speciesGlyph);
+    if (fillColor == null) {
+      fillColor = nodeRealizer.getFillColor();
+      nodeRealizer.setFillColor2(fillColor.brighter());
+    } else {
+      nodeRealizer.setFillColor2(fillColor.darker());
+    }
     nodeRealizer.setFillColor(fillColor);
     
     logger.fine(MessageFormat.format("building EPN element id={0} sbo={1} (%s)\n\tbounding box= {2} {3}",
@@ -495,7 +503,10 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       IndependentTextRealizer textRealizer =
           new IndependentTextRealizer(x, y, width, height,text);
       textRealizer.setLineColor(Option.parseOrCast(Color.class, prefs.get(FONT_COLOR)));
-      textRealizer.setFont(FONT.parseOrCast(prefs.get(FONT)));
+      Font font = FONT.parseOrCast(prefs.get(FONT));
+      // TODO: this is a quick hack.. get font information from Render if possible.
+      Font f = new Font(font.getFontName(), font.getStyle(), font.getSize() * 3);
+      textRealizer.setFont(f);
       graph.setRealizer(ynode, textRealizer);
     }
     else if (textGlyph.isSetGraphicalObject() &&

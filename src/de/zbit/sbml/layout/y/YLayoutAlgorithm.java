@@ -229,22 +229,21 @@ public class YLayoutAlgorithm extends SimpleLayoutAlgorithm {
       }
       
       // Graph2D structure
-      NodeRealizer nodeRealizer = (glyph instanceof CompartmentGlyph) ?
-          new CompartmentRealizer() : new ShapeNodeRealizer();
-          nodeRealizer.setSize(width, height);
-          nodeRealizer.setLocation(x, y);
-          Node node = graph2D.createNode(nodeRealizer);
-          
-          logger.fine(String.format("%d,%d %dx%d", x, y, width, height));
-          
-          handleHierarchy(glyph, node);
-          
-          // GraphTools helper
-          graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
-          graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
-          
-          setOfLayoutedGlyphs.add(glyph);
-          glyphNodeMap.put(glyph.getId(), node);
+      NodeRealizer nodeRealizer = (glyph instanceof CompartmentGlyph) ? new CompartmentRealizer() : new ShapeNodeRealizer();
+      nodeRealizer.setSize(width, height);
+      nodeRealizer.setLocation(x, y);
+      Node node = graph2D.createNode(nodeRealizer);
+      
+      logger.fine(String.format("%d,%d %dx%d", x, y, width, height));
+      
+      handleHierarchy(glyph, node);
+      
+      // GraphTools helper
+      graphTools.setInfo(node, GraphMLmaps.NODE_POSITION, x + "|" + y);
+      graphTools.setInfo(node, GraphMLmaps.NODE_SIZE, width + "|" + height);
+      
+      setOfLayoutedGlyphs.add(glyph);
+      glyphNodeMap.put(glyph.getId(), node);
     }
   }
   
