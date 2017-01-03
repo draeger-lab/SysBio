@@ -100,10 +100,14 @@ import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceRole;
 import org.sbml.jsbml.ext.layout.TextGlyph;
+import org.sbml.jsbml.ext.render.ColorDefinition;
+import org.sbml.jsbml.ext.render.LocalStyle;
+import org.sbml.jsbml.ext.render.RenderGroup;
 import org.sbml.jsbml.ontology.Term;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
+import de.zbit.gui.ColorChooserWithPreview;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.SystemBrowser;
 import de.zbit.gui.layout.LayoutHelper;
@@ -287,8 +291,79 @@ public class SBasePanel extends JPanel implements EquationComponent {
       } else if (sbase instanceof Member) {
         addProperties((Member) sbase);
       }
+      if (sbase instanceof ColorDefinition) {
+        addProperties((ColorDefinition) sbase);
+      } else if (sbase instanceof LocalStyle) {
+        addProperties((LocalStyle) sbase);
+      } else if (sbase instanceof RenderGroup) {
+        addProperties((RenderGroup) sbase);
+      }
     }
     //GUITools.setOpaqueForAllElements(this, false);
+  }
+  
+  /**
+   * 
+   * @param g
+   */
+  private void addProperties(RenderGroup g) {
+    // TODO!
+    if (g.isSetStartHead()) {
+      
+    }
+    if (g.isSetEndHead()) {
+      
+    }
+    if (g.isSetFontFamily()) {
+      
+    }
+    if (g.isSetFontSize()) {
+      
+    }
+    if (g.isSetFontStyleItalic()) {
+      
+    }
+    if (g.isSetFontWeightBold()) {
+      
+    }
+    if (g.isSetTextAnchor()) {
+      
+    }
+    if (g.isSetVTextAnchor()) {
+      
+    }
+    if (g.isSetFill()) {
+      
+    }
+    if (g.isSetStrokeWidth()) {
+      
+    }
+    if (g.isSetTransform()) {
+      
+    }
+  }
+  
+  /**
+   * 
+   * @param ls
+   */
+  private void addProperties(LocalStyle ls) {
+    if (ls.isSetIDList()) {
+      addLabeledComponent(bundle.getString("idList"), new JList<String>(ls.getIDList().toArray(new String[0])));
+    }
+    if (ls.isSetRoleList()) {
+      addLabeledComponent(bundle.getString("roleList"), new JList<String>(ls.getRoleList().toArray(new String[0])));
+    }
+  }
+  
+  /**
+   * 
+   * @param cd
+   */
+  private void addProperties(ColorDefinition cd) {
+    if (cd.isSetValue()) {
+      addLabeledComponent(bundle.getObject("value"), new ColorChooserWithPreview(cd.getValue()));
+    }
   }
   
   /**

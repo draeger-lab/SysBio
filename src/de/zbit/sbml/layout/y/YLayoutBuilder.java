@@ -266,9 +266,9 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     Color fillColor = RenderProcessor.getRenderFillColor(speciesGlyph);
     if (fillColor == null) {
       fillColor = nodeRealizer.getFillColor();
-      nodeRealizer.setFillColor2(fillColor.brighter());
+      /*      nodeRealizer.setFillColor2(fillColor.brighter());
     } else {
-      nodeRealizer.setFillColor2(fillColor.darker());
+      nodeRealizer.setFillColor2(fillColor.darker());*/
     }
     nodeRealizer.setFillColor(fillColor);
     
