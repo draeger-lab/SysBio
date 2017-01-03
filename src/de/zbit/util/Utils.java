@@ -235,6 +235,15 @@ public class Utils {
   }
   
   /**
+   * 
+   * @param n
+   * @return
+   */
+  public static int getDigitCount(int n) {
+    return (int) Math.floor(1 + Math.log10(Math.abs(n)));
+  }
+  
+  /**
    * The same as {@link #getTimeString(long)} but a little less detail,
    * making the resulting string more "pretty".
    * @param miliseconds

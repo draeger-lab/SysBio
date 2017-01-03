@@ -45,7 +45,9 @@ import de.zbit.graph.RestrictedEditMode;
 import de.zbit.graph.io.Graph2Dwriteable;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.gui.GUITools;
+import de.zbit.gui.JTabbedPaneDraggableAndCloseable;
 import de.zbit.io.OpenedFile;
+import de.zbit.sbml.gui.SBMLModelSplitPane;
 import de.zbit.sbml.gui.SBMLReadingTask;
 import de.zbit.sbml.layout.GlyphCreator;
 import de.zbit.sbml.layout.LayoutDirector;
@@ -79,29 +81,23 @@ import yext.svg.io.SVGIOHandler;
 public class YGraphView implements PropertyChangeListener {
   
   /**
-   * Initial dimensions  of the window.
+   * A {@link Logger} for this class.
    */
-  private static final int WINDOW_WIDTH = 960;
+  private static final transient Logger logger = Logger.getLogger(YGraphView.class.getName());
+  
+  /**
+   * 
+   */
+  private static String out;
   /**
    * 
    */
   private static final int WINDOW_HEIGHT = 720;
   
   /**
-   * SBML document from which to create the graph.
+   * Initial dimensions  of the window.
    */
-  private SBMLDocument document;
-  
-  /**
-   * 
-   */
-  private static String out;
-  
-  /**
-   * A {@link Logger} for this class.
-   */
-  private static final transient Logger logger = Logger.getLogger(YGraphView.class.getName());
-  
+  private static final int WINDOW_WIDTH = 960;
   /**
    * @param args
    */
@@ -109,17 +105,11 @@ public class YGraphView implements PropertyChangeListener {
     LogUtil.initializeLogging(YGraphView.class.getPackage().toString());
     final File in = new File(args[0]);
     out = args.length > 1 ? args[1] : null;
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-      /* (non-Javadoc)
-       * @see java.lang.Runnable#run()
-       */
-      @Override
-      public void run() {
-        try {
-          new YGraphView(in);
-        } catch (Throwable e) {
-          e.printStackTrace();
-        }
+    javax.swing.SwingUtilities.invokeLater(() -> {
+      try {
+        new YGraphView(in);
+      } catch (Throwable e) {
+        e.printStackTrace();
       }
     });
     
@@ -130,6 +120,16 @@ public class YGraphView implements PropertyChangeListener {
       }
     }
   }
+  
+  /**
+   * SBML document from which to create the graph.
+   */
+  private OpenedFile<SBMLDocument> document;
+  
+  /**
+   * Title for the the window.
+   */
+  private String title;
   
   /**
    * 
@@ -155,30 +155,154 @@ public class YGraphView implements PropertyChangeListener {
     setSBMLDocument(doc);
   }
   
+  /**
+   * 
+   * @param product
+   * @param windowWidth
+   * @param windowHeight
+   * @return
+   */
+  public Graph2DView createGraph2DView(Graph2D product, int windowWidth, int windowHeight) {
+    Graph2DView view = new Graph2DView(product);
+    DefaultGraph2DRenderer dgr = new DefaultGraph2DRenderer();
+    dgr.setDrawEdgesFirst(true);
+    view.setGraph2DRenderer(dgr);
+    Rectangle box = view.getGraph2D().getBoundingBox();
+    Dimension dim = box.getSize();
+    view.setSize(dim);
+    // view.zoomToArea(box.getX() - 10, box.getY() - 10, box.getWidth() + 20, box.getHeight() + 20);
+    Dimension minimumSize = new Dimension(
+      Math.min(windowWidth, Math.max((int) view.getMinimumSize().getWidth(), 100)),
+      (int) Math.max(view.getMinimumSize().getHeight(), windowHeight/2d));
+    view.setMinimumSize(minimumSize);
+    view.setPreferredSize(new Dimension(100, (int) Math.max(windowHeight * 0.6d, 50d)));
+    view.setOpaque(false);
+    
+    DefaultGraph2DRenderer renderer = new DefaultGraph2DRenderer() {
+      /* (non-Javadoc)
+       * @see y.view.DefaultGraph2DRenderer#getLayer(y.view.Graph2D, y.base.Edge)
+       */
+      @Override
+      protected int getLayer(Graph2D graph, Edge edge) {
+        return 1;
+      }
+      /* (non-Javadoc)
+       * @see y.view.DefaultGraph2DRenderer#getLayer(y.view.Graph2D, y.base.Node)
+       */
+      @Override
+      protected int getLayer(Graph2D graph, Node node) {
+        return 0;
+      }
+    };
+    renderer.setLayeredPainting(true);
+    view.setGraph2DRenderer(renderer);
+    
+    view.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
+    try {
+      view.fitContent(true);
+    } catch (Throwable t) {
+      // Not really a problem
+    }
+    RestrictedEditMode.addOverviewAndNavigation(view);
+    view.addViewMode(new RestrictedEditMode());
+    view.setFitContentOnResize(true);
+    
+    return view;
+  }
+  
+  /**
+   * Create a window showing the graph view.
+   * @param product
+   */
+  private void displayGraph2DView(Graph2D product) {
+    // Create a viewer for the graph
+    Graph2DView view = createGraph2DView(product, WINDOW_WIDTH, WINDOW_HEIGHT);
+    
+    // Create and show window
+    JFrame frame = new JFrame();
+    frame.setTitle(getTitle());
+    JTabbedPaneDraggableAndCloseable tabs = new JTabbedPaneDraggableAndCloseable();
+    tabs.add("Graph", view);
+    tabs.add("Detail", new SBMLModelSplitPane(document, true));
+    frame.getContentPane().add(tabs);
+    frame.setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+    frame.pack();
+    frame.setLocationRelativeTo(null);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setVisible(true);
+  }
+  
+  /**
+   * Write a textual representation of the graph (all nodes and edges
+   * including realizier information) to standard out for debugging purposes.
+   */
+  private void dumpGraph(Graph2D product) {
+    NodeCursor nodeCursor = product.nodes();
+    System.out.println("Nodes:");
+    for (; nodeCursor.ok(); nodeCursor.next()) {
+      Node n = (Node) nodeCursor.current();
+      NodeRealizer nr = product.getRealizer(n);
+      NodeLabel nodeLabel = nr.getLabel();
+      System.out.println(n);
+      System.out.println("  " + product.getRealizer(n));
+      System.out.println(nodeLabel.toString());
+    }
+    System.out.println("Edges:");
+    EdgeCursor edgeCursor = product.edges();
+    for (; edgeCursor.ok(); edgeCursor.next()) {
+      Edge e = (Edge) edgeCursor.current();
+      System.out.println(e);
+      System.out.println("  " + prettyPrintEdgeRealizer(product.getRealizer(e)));
+    }
+  }
+  
+  /**
+   * @return
+   */
+  public String getTitle() {
+    return title != null ? title: YGraphView.class.getSimpleName();
+  }
+  
+  /**
+   * @param realizer
+   * @return a textual representation of an edge realizer
+   */
+  private String prettyPrintEdgeRealizer(EdgeRealizer r) {
+    return StringTools.concat(r.getClass().getSimpleName(),
+      " [sourcePoint=", r.getSourcePoint(),
+      ", targetPoint=", r.getTargetPoint(),
+        "]").toString();
+  }
+  
   /* (non-Javadoc)
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
     if (evt.getPropertyName().equals(SBMLReadingTask.SBML_READING_SUCCESSFULLY_DONE)) {
-      @SuppressWarnings("unchecked")
-      OpenedFile<SBMLDocument> openedFile = (OpenedFile<SBMLDocument>) evt.getNewValue();
-      SBMLDocument doc = openedFile.getDocument();
-      setSBMLDocument(doc);
+      setOpenedFile((OpenedFile<SBMLDocument>) evt.getNewValue());
     }
+  }
+  
+  
+  public void setSBMLDocument(SBMLDocument doc) {
+    setOpenedFile(new OpenedFile<>(doc));
   }
   
   /**
    * 
    * @param doc
    */
-  private void setSBMLDocument(SBMLDocument doc) {
-    if (doc == null) {
+  public void setOpenedFile(OpenedFile<SBMLDocument> of) {
+    if ((of == null) || !of.isSetDocument()) {
       logger.warning("No SBML document given.");
       System.exit(1);
     }
     
-    document = doc;
+    document = of;
+    
+    SBMLDocument doc = of.getDocument();
     
     Model model = doc.getModel();
     LayoutModelPlugin ext = (LayoutModelPlugin) model.getExtension(LayoutConstants.getNamespaceURI(doc.getLevel(), doc.getVersion()));
@@ -229,6 +353,13 @@ public class YGraphView implements PropertyChangeListener {
   }
   
   /**
+   * @param title the title to set
+   */
+  public void setTitle(String title) {
+    this.title = title;
+  }
+  
+  /**
    * 
    * @param director
    */
@@ -247,100 +378,6 @@ public class YGraphView implements PropertyChangeListener {
       value.getBoundingBox().getDimensions().setWidth(graph.getWidth(key));
       value.getBoundingBox().getDimensions().setHeight(graph.getHeight(key));
       
-    }
-  }
-  
-  /**
-   * Create a window showing the graph view.
-   * @param product
-   */
-  private void displayGraph2DView(Graph2D product) {
-    // Create a viewer for the graph
-    Graph2DView view = createGraph2DView(product, WINDOW_WIDTH, WINDOW_HEIGHT);
-    
-    // Create and show window
-    JFrame frame = new JFrame();
-    frame.setTitle(YGraphView.class.getSimpleName());
-    frame.getContentPane().add(view);
-    frame.setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-    frame.pack();
-    frame.setLocationRelativeTo(null);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setVisible(true);
-  }
-  
-  /**
-   * 
-   * @param product
-   * @param windowWidth
-   * @param windowHeight
-   * @return
-   */
-  public Graph2DView createGraph2DView(Graph2D product, int windowWidth, int windowHeight) {
-    Graph2DView view = new Graph2DView(product);
-    DefaultGraph2DRenderer dgr = new DefaultGraph2DRenderer();
-    dgr.setDrawEdgesFirst(true);
-    view.setGraph2DRenderer(dgr);
-    Rectangle box = view.getGraph2D().getBoundingBox();
-    Dimension dim = box.getSize();
-    view.setSize(dim);
-    // view.zoomToArea(box.getX() - 10, box.getY() - 10, box.getWidth() + 20, box.getHeight() + 20);
-    Dimension minimumSize = new Dimension(
-      Math.min(windowWidth, Math.max((int) view.getMinimumSize().getWidth(), 100)),
-      (int) Math.max(view.getMinimumSize().getHeight(), windowHeight/2d));
-    view.setMinimumSize(minimumSize);
-    view.setPreferredSize(new Dimension(100, (int) Math.max(windowHeight * 0.6d, 50d)));
-    view.setOpaque(false);
-    
-    DefaultGraph2DRenderer renderer = new DefaultGraph2DRenderer() {
-      /* (non-Javadoc)
-       * @see y.view.DefaultGraph2DRenderer#getLayer(y.view.Graph2D, y.base.Node)
-       */
-      @Override
-      protected int getLayer(Graph2D graph, Node node) {
-        return 0;
-      }
-      /* (non-Javadoc)
-       * @see y.view.DefaultGraph2DRenderer#getLayer(y.view.Graph2D, y.base.Edge)
-       */
-      @Override
-      protected int getLayer(Graph2D graph, Edge edge) {
-        return 1;
-      }
-    };
-    renderer.setLayeredPainting(true);
-    view.setGraph2DRenderer(renderer);
-    
-    view.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
-    try {
-      view.fitContent(true);
-    } catch (Throwable t) {
-      // Not really a problem
-    }
-    RestrictedEditMode.addOverviewAndNavigation(view);
-    view.addViewMode(new RestrictedEditMode());
-    view.setFitContentOnResize(true);
-    
-    return view;
-  }
-  
-  /**
-   * Write svg image file
-   * @param product
-   * 
-   * @param outFile path of the output file
-   */
-  private void writeSVGImage(Graph2D product, String outFile) {
-    SVGIOHandler svgio = new SVGIOHandler();
-    SVGDOMEnhancerForHierarchy svgEFH = new SVGDOMEnhancerForHierarchy(document.getModel());
-    svgEFH.setDrawEdgesFirst(false);
-    svgio.setSVGGraph2DRenderer(svgEFH);
-    
-    try {
-      svgio.write(product, outFile);
-      logger.info(MessageFormat.format("Image written to ''{0}''.", outFile));
-    } catch (IOException e) {
-      logger.warning("Could not write image: ImageWriter not available.");
     }
   }
   
@@ -376,7 +413,7 @@ public class YGraphView implements PropertyChangeListener {
    */
   private void writeModifiedModel(String outFile) {
     try {
-      SBMLWriter.write(document, new File(outFile), ' ', (short) 2);
+      SBMLWriter.write(document.getDocument(), new File(outFile), ' ', (short) 2);
     } catch (SBMLException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -391,38 +428,23 @@ public class YGraphView implements PropertyChangeListener {
   }
   
   /**
-   * Write a textual representation of the graph (all nodes and edges
-   * including realizier information) to standard out for debugging purposes.
+   * Write svg image file
+   * @param product
+   * 
+   * @param outFile path of the output file
    */
-  private void dumpGraph(Graph2D product) {
-    NodeCursor nodeCursor = product.nodes();
-    System.out.println("Nodes:");
-    for (; nodeCursor.ok(); nodeCursor.next()) {
-      Node n = (Node) nodeCursor.current();
-      NodeRealizer nr = product.getRealizer(n);
-      NodeLabel nodeLabel = nr.getLabel();
-      System.out.println(n);
-      System.out.println("  " + product.getRealizer(n));
-      System.out.println(nodeLabel.toString());
+  private void writeSVGImage(Graph2D product, String outFile) {
+    SVGIOHandler svgio = new SVGIOHandler();
+    SVGDOMEnhancerForHierarchy svgEFH = new SVGDOMEnhancerForHierarchy(document.getDocument().getModel());
+    svgEFH.setDrawEdgesFirst(false);
+    svgio.setSVGGraph2DRenderer(svgEFH);
+    
+    try {
+      svgio.write(product, outFile);
+      logger.info(MessageFormat.format("Image written to ''{0}''.", outFile));
+    } catch (IOException e) {
+      logger.warning("Could not write image: ImageWriter not available.");
     }
-    System.out.println("Edges:");
-    EdgeCursor edgeCursor = product.edges();
-    for (; edgeCursor.ok(); edgeCursor.next()) {
-      Edge e = (Edge) edgeCursor.current();
-      System.out.println(e);
-      System.out.println("  " + prettyPrintEdgeRealizer(product.getRealizer(e)));
-    }
-  }
-  
-  /**
-   * @param realizer
-   * @return a textual representation of an edge realizer
-   */
-  private String prettyPrintEdgeRealizer(EdgeRealizer r) {
-    return StringTools.concat(r.getClass().getSimpleName(),
-      " [sourcePoint=", r.getSourcePoint(),
-      ", targetPoint=", r.getTargetPoint(),
-        "]").toString();
   }
   
 }
