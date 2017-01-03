@@ -107,6 +107,12 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     //        gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
     
     rotate(gfx, -rotationAngle, rotationCenter);
+    
+    //    Rectangle2D myRect = new Rectangle2D.Double(0d, 0d, 1d, 1d);
+    //    AffineTransform at = AffineTransform.getRotateInstance(rotationAngle);
+    //    Shape rotatedRect = at.createTransformedShape(myRect);
+    //    gfx.draw(rotatedRect);
+    //    setFrame(offsetX, offsetY, width, height);
   }
   
   /**

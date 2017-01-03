@@ -267,6 +267,16 @@
 
   <!-- Render -->
   
+  <entry key="colorDefinition">Color definition</entry>
+  <entry key="g">Rendering group</entry>
+  <entry key="idList">ID list</entry>
+  <entry key="listOfColorDefinitions">Color definitions</entry>
+  <entry key="listOfRenderInformation">List of render information</entry>
+  <entry key="listOfStyles">Styles</entry>
+  <entry key="renderInformation">Render information</entry>
+  <entry key="roleList">Role list</entry>
+  <entry key="style">Style</entry>
+  
   <!-- Req -->
   
   <!-- Spatial -->

@@ -21,16 +21,23 @@
  */
 package de.zbit.sbml;
 
+import static de.zbit.sbml.layout.RenderProcessor.RENDER_LINK;
+import static java.text.MessageFormat.format;
+
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
@@ -39,11 +46,15 @@ import javax.swing.tree.TreeNode;
 import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.Annotation;
+import org.sbml.jsbml.CVTerm;
+import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBMLError;
+import org.sbml.jsbml.SBMLErrorLog;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.SBO;
@@ -52,23 +63,33 @@ import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.TidySBMLWriter;
+import org.sbml.jsbml.ext.layout.AbstractReferenceGlyph;
+import org.sbml.jsbml.ext.layout.BoundingBox;
+import org.sbml.jsbml.ext.layout.Dimensions;
+import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
+import org.sbml.jsbml.ext.layout.Point;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesReferenceRole;
 import org.sbml.jsbml.ext.layout.TextGlyph;
+import org.sbml.jsbml.ext.render.ColorDefinition;
 import org.sbml.jsbml.ext.render.LocalRenderInformation;
 import org.sbml.jsbml.ext.render.LocalStyle;
 import org.sbml.jsbml.ext.render.RenderConstants;
+import org.sbml.jsbml.ext.render.RenderGroup;
 import org.sbml.jsbml.ext.render.RenderLayoutPlugin;
 import org.sbml.jsbml.ext.render.XMLTools;
+import org.sbml.jsbml.util.StringTools;
 import org.sbml.jsbml.util.filters.NameFilter;
+import org.sbml.jsbml.xml.XMLNode;
 
 import de.zbit.sbml.layout.RenderProcessor;
 import de.zbit.sbml.layout.y.YGraphView;
+import de.zbit.util.Utils;
 import de.zbit.util.logging.LogUtil;
 
 /**
@@ -82,6 +103,13 @@ import de.zbit.util.logging.LogUtil;
  */
 public class LayoutPostprocessor {
   
+  /**
+   * 
+   * @param args
+   * @throws XMLStreamException
+   * @throws SBMLException
+   * @throws IOException
+   */
   public static void main(String args[]) throws XMLStreamException, SBMLException, IOException {
     LogUtil.initializeLogging("de.zbit");
     SBMLDocument doc = SBMLReader.read(new ProgressMonitorInputStream(null, "Reading File", new FileInputStream(new File(args[0]))));
@@ -97,12 +125,218 @@ public class LayoutPostprocessor {
     lp.removeUnconnecedStyles();
     logger.info("Defining SBO terms based on color");
     lp.setSBOtermsByFillColor(XMLTools.decodeStringToColor("#CCFF66FF"));
+    logger.info("Merging MIRIAM annotations with identical qualifier");
+    lp.mergeMIRIAMannotations(doc);
+    logger.info("Updating species ids to BiGG ids");
+    lp.constructBiGGidsFromNames(doc);
+    logger.info("Removing empty XHTML head statements");
+    lp.shrinkXHTML(doc);
     
     // for testing
     TidySBMLWriter.write(doc, new File(args[1]), ' ', (short) 2);
+    lp.validate(doc);
     new YGraphView(doc);
   }
   
+  
+  /**
+   * 
+   * @param sbase
+   */
+  private void mergeMIRIAMannotations(SBase sbase) {
+    if (sbase.isSetAnnotation()) {
+      SortedMap<Qualifier, SortedSet<String>> miriam = new TreeMap<>();
+      boolean doMerge = false;
+      doMerge = hashMIRIAMuris(sbase, miriam);
+      if (doMerge) {
+        sbase.getAnnotation().unsetCVTerms();
+        for (Entry<Qualifier, SortedSet<String>> entry : miriam.entrySet()) {
+          logger.info(format("Merging all resources with identical MIRIAM qualifier ''{0}'' in {1} with id=''{2}''.",
+            entry.getKey(), sbase.getClass().getSimpleName(), sbase.getId()));
+          sbase.addCVTerm(new CVTerm(entry.getKey(), entry.getValue().toArray(new String[0])));
+        }
+      }
+    }
+    for (int i = 0; i < sbase.getChildCount(); i++) {
+      TreeNode node = sbase.getChildAt(i);
+      if (node instanceof SBase) {
+        mergeMIRIAMannotations((SBase) node);
+      }
+    }
+  }
+  
+  
+  /**
+   * @param sbase
+   * @param miriam
+   * @return
+   */
+  public boolean hashMIRIAMuris(SBase sbase, SortedMap<Qualifier, SortedSet<String>> miriam) {
+    boolean doMerge = false;
+    for (int i = 0; i < sbase.getCVTermCount(); i++) {
+      CVTerm term = sbase.getCVTerm(i);
+      Qualifier qualifier = term.getQualifier();
+      if (!miriam.containsKey(qualifier)) {
+        if (sbase instanceof Model) {
+          if (!qualifier.isModelQualifier()) {
+            logger.info(format("Correcting invalid use of biological qualifier ''{0}'' on model with id=''{1}''.",
+              qualifier.getElementNameEquivalent(), sbase.getId()));
+            qualifier = Qualifier.getModelQualifierFor(qualifier.getElementNameEquivalent());
+          }
+        } else if (!qualifier.isBiologicalQualifier()) {
+          logger.info(format("Correcting invalid use of model qualifier ''{0}'' on {1} with id=''{2}''.",
+            qualifier.getElementNameEquivalent(), sbase.getClass().getSimpleName(), sbase.getId()));
+          qualifier = Qualifier.getBiologicalQualifierFor(qualifier.getElementNameEquivalent());
+        }
+        miriam.put(qualifier, new TreeSet<String>());
+      } else {
+        doMerge = true;
+      }
+      miriam.get(qualifier).addAll(term.getResources());
+    }
+    return doMerge;
+  }
+  
+  
+  /**
+   * 
+   * @param sbase
+   */
+  private void shrinkXHTML(SBase sbase) {
+    if (sbase.isSetNotes()) {
+      XMLNode node = sbase.getNotes();
+      if ((node.getChildCount() > 1) && (node.getChildAt(1) != null)
+          && (node.getChildAt(1).getChildCount() > 1)
+          && (node.getChildAt(1).getChild(1) != null)
+          && (node.getChildAt(1).getChildAt(1).getChildCount() == 3)
+          && (node.getChild(1).getChildAt(1).getChildAt(1).getName().equals("title"))) {
+        logger.info(format(
+          "Removing unnecessary XHTML header entry with empty title tag from {0} with id=''{1}''.",
+          sbase.getClass().getSimpleName(), sbase.getId()));
+        node.getChildAt(1).removeChild(1);
+      }
+    }
+    for (int i = 0; i < sbase.getChildCount(); i++) {
+      TreeNode node = sbase.getChildAt(i);
+      if (node instanceof SBase) {
+        shrinkXHTML((SBase) node);
+      }
+    }
+  }
+  
+  /**
+   * 
+   * @param doc
+   */
+  @SuppressWarnings("unchecked")
+  public void constructBiGGidsFromNames(SBMLDocument doc) {
+    Model model = doc.getModel();
+    for (int i = model.getSpeciesCount() - 1; i >= 0; i--) {
+      Species species = model.getSpecies(i);
+      if (species.isSetName() && species.getName().endsWith("]")) {
+        String biggId = "M_" + species.getName().substring(0, species.getName().length() - 1).replace('[', '_');
+        for (String rId : (SortedSet<String>) species.getUserObject(SPECIES_REACTION_LINK)) {
+          updateReferences(model.getReaction(rId), species.getId(), biggId);
+        }
+        for (String gId : (SortedSet<String>) species.getUserObject(SPECIES_GLYPH_LINK)) {
+          updateReferences(model.getSBaseById(gId), species.getId(), biggId);
+        }
+        SortedSet<String> setOfTextGlyphReferences = (SortedSet<String>) species.getUserObject(TEXT_GLYPH_LINK);
+        if (setOfTextGlyphReferences != null) {
+          for (String tId : setOfTextGlyphReferences) {
+            TextGlyph tg = (TextGlyph) model.getSBaseById(tId);
+            if (tg.getOriginOfText().equals(species.getId())) {
+              tg.setOriginOfText(biggId);
+            }
+          }
+        }
+        if (model.getSpecies(biggId) != null) {
+          logger.info(format("Deleting core species with id=''{0}'' because of duplicate BiGG id=''{1}''", species.getId(), biggId));
+          // compare deleted species and existing one...
+          Species other = model.getSpecies(biggId);
+          if (species.isSetNotes() && !other.isSetNotes()) {
+            other.setNotes(species.getNotes().clone());
+          } else if (species.isSetNotes() && other.isSetNotes()) {
+            try {
+              if (!species.getNotesString().equals(other.getNotesString())) {
+                // TODO: serious problem! But doesn't happen in Recon-2.01...
+                System.out.println("Detected unsolved conflict - halting algorithm now. Need fix!");
+                System.exit(1);
+              }
+            } catch (XMLStreamException exc) {
+              exc.printStackTrace();
+            }
+          }
+          if (!species.getCVTerms().equals(other.getCVTerms())) {
+            logger.info(format("Merging non matching MIRIAM annotations for species with BiGG id=''{0}''", biggId));
+            SortedMap<Qualifier, SortedSet<String>> miriam = new TreeMap<>();
+            hashMIRIAMuris(species, miriam);
+            hashMIRIAMuris(other, miriam);
+            other.unsetCVTerms();
+            for (Entry<Qualifier, SortedSet<String>> entry : miriam.entrySet()) {
+              other.addCVTerm(new CVTerm(entry.getKey(), entry.getValue().toArray(new String[0])));
+            }
+          }
+          species.removeFromParent();
+        } else {
+          logger.info(format("Updating species id=''{0}'' to BiGG id=''{1}''.", species.getId(), biggId));
+          species.setId(biggId);
+        }
+      } else {
+        System.out.println(species);
+      }
+    }
+  }
+  
+  /**
+   * 
+   * @param root
+   * @param oldId
+   * @param newId
+   * @return
+   */
+  public boolean updateReferences(SBase root, String oldId, String newId) {
+    if (root instanceof SimpleSpeciesReference) {
+      SimpleSpeciesReference ssr = (SimpleSpeciesReference) root;
+      if (ssr.isSetSpecies() && ssr.getSpecies().equals(oldId)) {
+        ssr.setSpecies(newId);
+        return true;
+      }
+    } else if (root instanceof SpeciesGlyph) {
+      SpeciesGlyph sg = (SpeciesGlyph) root;
+      if (sg.isSetSpecies() && sg.getSpecies().equals(oldId)) {
+        sg.setSpecies(newId);
+        return true;
+      }
+    } else if (!root.isLeaf()) {
+      boolean change = false;
+      for (int i = 0; i < root.getChildCount(); i++) {
+        TreeNode node = root.getChildAt(i);
+        if (node instanceof SBase) {
+          change |= updateReferences((SBase) node, oldId, newId);
+        }
+      }
+      return change;
+    }
+    return false;
+  }
+  
+  /**
+   * Validate.
+   * @param doc
+   */
+  public void validate(SBMLDocument doc) {
+    doc.checkConsistencyOffline();
+    SBMLErrorLog errorLog = doc.getListOfErrors();
+    List<SBMLError> errorList = errorLog.getValidationErrors();
+    for (SBMLError e : errorList) {
+      System.out.println(e.getLine() + " " + e.getMessage());
+    }
+  }
+  
+  /**
+   * 
+   */
   public void removeUnconnecedStyles() {
     Model model = doc.getModel();
     LayoutModelPlugin lmp = (LayoutModelPlugin) model.getExtension(LayoutConstants.shortLabel);
@@ -111,30 +345,41 @@ public class LayoutPostprocessor {
         Layout layout = lmp.getLayout(i);
         RenderLayoutPlugin rlp = (RenderLayoutPlugin) layout.getExtension(RenderConstants.shortLabel);
         if ((rlp != null) && rlp.isSetListOfLocalRenderInformation()) {
+          RenderProcessor.preprocess(layout);
           ListOf<LocalRenderInformation> listOfLocalRenderInformation = rlp.getListOfLocalRenderInformation();
+          Map<LocalStyle, Set<GraphicalObject>> usedStyles = new HashMap<>();
+          layout.getListOfAdditionalGraphicalObjects().forEach(go -> {findUsedStyles(usedStyles, go);});
+          layout.getListOfCompartmentGlyphs().forEach(go -> {findUsedStyles(usedStyles, go);});
+          layout.getListOfReactionGlyphs().forEach(go -> {findUsedStyles(usedStyles, go);});
+          layout.getListOfSpeciesGlyphs().forEach(go -> {findUsedStyles(usedStyles, go);});
+          layout.getListOfTextGlyphs().forEach(go -> {findUsedStyles(usedStyles, go);});
+          
           for (LocalRenderInformation lri : listOfLocalRenderInformation) {
             if (lri.isSetListOfLocalStyles() && lri.isSetListOfColorDefinitions()) {
               for (int k = lri.getListOfLocalStyles().size() - 1; k >= 0; k--) {
                 LocalStyle ls = lri.getListOfLocalStyles().get(k);
-                List<String> idList = new LinkedList<>();
-                idList.addAll(ls.getIDList());
-                for (int j = idList.size() - 1; j >= 0; j--) {
-                  String id = idList.get(j);
-                  SBase sbase = model.getSBaseById(id);
-                  if (sbase == null) {
-                    idList.remove(j);
+                
+                List<String> idList = null;
+                if ((ls.isSetId() && !ls.getIDList().isEmpty())) {
+                  idList = new LinkedList<>(ls.getIDList());
+                  for (int j = idList.size() - 1; j >= 0; j--) {
+                    String id = idList.get(j);
+                    SBase sbase = model.getSBaseById(id);
+                    if (sbase == null) {
+                      idList.remove(j);
+                    }
                   }
                 }
-                if (idList.isEmpty()) {
-                  logger.info("Removing local style " + ls.getId());
-                  if (ls.isSetGroup() && ls.getGroup().isSetFill()) {
-                    String color = ls.getGroup().getFill();
-                    logger.info("Deleting Color definition " + color);
-                    lri.getListOfColorDefinitions().removeFirst(new NameFilter(color));
+                if (((idList != null) && idList.isEmpty()) || !usedStyles.containsKey(ls)) {
+                  removeLocalStyle(lri, k);
+                } else {
+                  if ((idList != null) && (idList.size() != ls.getIDList().size())) {
+                    ls.setIDList(idList);
+                  } else if (ls.isSetIDList() && ls.getIDList().isEmpty()) {
+                    ls.unsetIDList();
                   }
-                  lri.removeLocalStyle(k);
-                } else if (idList.size() != ls.getIDList().size()) {
-                  ls.setIDList(idList);
+                  int pos = k + 1;
+                  ls.setId(ls.getId().substring(0, ls.getId().indexOf('_')) + StringTools.fill(Utils.getDigitCount(lri.getLocalStyleCount()) - Utils.getDigitCount(pos), '0') + pos);
                 }
               }
             }
@@ -142,6 +387,59 @@ public class LayoutPostprocessor {
         }
       }
     }
+  }
+  
+  private Set<String> processedColor = new HashSet<>();
+  
+  /**
+   * @param usedStyles
+   * @param go
+   */
+  @SuppressWarnings("unchecked")
+  private void findUsedStyles(Map<LocalStyle, Set<GraphicalObject>> usedStyles, GraphicalObject go) {
+    if (go.getUserObject(RENDER_LINK) != null) {
+      for (LocalStyle style : (List<LocalStyle>) go.getUserObject(RENDER_LINK)) {
+        if (go instanceof AbstractReferenceGlyph) {
+          AbstractReferenceGlyph arg = (AbstractReferenceGlyph) go;
+          if (arg.isSetReference() && (go.getModel().getSBaseById(arg.getReference()) == null)) {
+            continue;
+          }
+        }
+        if (!usedStyles.containsKey(style)) {
+          usedStyles.put(style, new HashSet<>());
+        }
+        if (style.isSetGroup()) {
+          RenderGroup g = style.getGroup();
+          if (g.isSetFill() && !processedColor.contains(g.getFill())) {
+            LocalRenderInformation lri = (LocalRenderInformation) style.getParent().getParent();
+            ColorDefinition cd = lri.getColorDefinition(g.getFill());
+            int pos = lri.getListOfColorDefinitions().indexOf(cd) + 1;
+            Set<GraphicalObject> set = usedStyles.remove(style);
+            cd.setId("color_" + StringTools.fill(Utils.getDigitCount(lri.getColorDefinitionCount()) - Utils.getDigitCount(pos), '0') + pos);
+            g.setFill(cd.getId());
+            processedColor.add(g.getFill());
+            usedStyles.put(style, set);
+          }
+        }
+        usedStyles.get(style).add(go);
+      }
+    }
+  }
+  
+  /**
+   * 
+   * @param ls
+   * @return
+   */
+  private void removeLocalStyle(LocalRenderInformation lri, int k) {
+    LocalStyle ls = lri.getListOfLocalStyles().get(k);
+    logger.info("Removing local style " + ls.getId());
+    if (ls.isSetGroup() && ls.getGroup().isSetFill()) {
+      String color = ls.getGroup().getFill();
+      logger.info("Deleting Color definition " + color);
+      lri.getListOfColorDefinitions().removeFirst(new NameFilter(color));
+    }
+    lri.removeLocalStyle(k);
   }
   
   /**
@@ -168,7 +466,6 @@ public class LayoutPostprocessor {
    */
   public void setSBOtermsByFillColor(Layout layout, Color color) {
     Model model = layout.getModel();
-    RenderProcessor.preprocess(layout);
     if (layout.isSetListOfSpeciesGlyphs()) {
       for (SpeciesGlyph sg : layout.getListOfSpeciesGlyphs()) {
         Color c = RenderProcessor.getRenderFillColor(sg);
@@ -199,7 +496,7 @@ public class LayoutPostprocessor {
               }
               int sbo = srg.getRole().toSBOterm();
               if (!srg.isSetSBOTerm() || (srg.getSBOTerm() != sbo)) {
-                logger.info(MessageFormat.format("Updating SBO term from {0} to {1} in SpeciesReferenceGlyph with id=''{2}''", srg.getSBOTerm(), sbo, srg.getId()));
+                logger.info(generateSBOTermUpdateMessage(srg, sbo));
                 srg.setSBOTerm(sbo);
               }
             }
@@ -213,17 +510,21 @@ public class LayoutPostprocessor {
               } else if (r.getListOfModifiers() == specRef.getParent()) {
                 sbo = SBO.getModifier();
               }
-              if (!specRef.isSetSBOTerm() || SBO.isChildOf(sbo, specRef.getSBOTerm())) {
-                logger.info(MessageFormat.format("Updating SBO term from {0} to {1} in SpeciesReference with id=''{2}''", specRef.getSBOTerm(), sbo, specRef.getId()));
+              if (!specRef.isSetSBOTerm() || (SBO.isChildOf(sbo, specRef.getSBOTerm()) && (sbo != specRef.getSBOTerm()))) {
+                logger.info(generateSBOTermUpdateMessage(specRef, sbo));
                 specRef.setSBOTerm(sbo);
               }
               if (srg.isSetSBOTerm()) {
-                if (SBO.isChildOf(srg.getSBOTerm(), specRef.getSBOTerm())) {
-                  logger.info(MessageFormat.format("Updating SBO term from {0} to {1} in SpeciesReference with id=''{2}''", specRef.getSBOTerm(), srg.getSBOTerm(), specRef.getId()));
+                if (SBO.isChildOf(srg.getSBOTerm(), specRef.getSBOTerm()) && (srg.getSBOTerm() != specRef.getSBOTerm())) {
+                  logger.info(generateSBOTermUpdateMessage(specRef, srg.getSBOTerm()));
                   specRef.setSBOTerm(srg.getSBOTerm());
                 }
               } else {
-                // TODO set SBO term and role of srg appropriately...
+                logger.info(generateSBOTermUpdateMessage(srg, specRef.getSBOTerm()));
+                srg.setSBOTerm(specRef.getSBOTerm());
+                if (!srg.isSetSpeciesReferenceRole()) {
+                  srg.setRole(SpeciesReferenceRole.valueOf(srg.getSBOTerm()));
+                }
               }
             }
           }
@@ -233,11 +534,26 @@ public class LayoutPostprocessor {
   }
   
   /**
+   * 
+   * @param sbase
+   * @param sboTerm
+   * @return
+   */
+  private String generateSBOTermUpdateMessage(SBase sbase, int sboTerm) {
+    return format(
+      "Updating SBO term from ''{0}'' to ''{1}'' in {3} with id=''{2}''",
+      sbase.isSetSBOTerm() ? SBO.getTerm(sbase.getSBOTerm()).getName() : "undefined",
+          SBO.getTerm(sboTerm).getName(),
+          sbase.getId(), sbase.getClass().getSimpleName());
+  }
+  
+  /**
    * Recursively removes all non-RDF annotation from the SBML data structure,
    * beginning at the level of the {@link SBMLDocument}
    */
   public void trimCellDesignerAnnotation() {
     trimCellDesignerAnnotation(doc);
+    doc.getDeclaredNamespaces().remove("xmlns:celldesigner");
   }
   
   private SBMLDocument doc;
@@ -246,11 +562,18 @@ public class LayoutPostprocessor {
    * A {@link Logger} for this class.
    */
   private static final Logger logger = Logger.getLogger(LayoutPostprocessor.class.getName());
+  /**
+   * Links each species to a {@link SortedSet} of reaction ids where it participates.
+   */
   private static final String SPECIES_REACTION_LINK = "SPECIES_REACTION_LINK";
   /**
    * Links speciesGlyphs to reaction glyphs
    */
   private static final String SPECIES_GLYPH_LINK = "SPECIES_GLYPH_LINK";
+  /**
+   * Links species to corresponding text glyphs
+   */
+  private static final String TEXT_GLYPH_LINK = "TEXT_GLYPH_LINK";
   private static final String LAYOUT_LINK = "LAYOUT_LINK";
   
   private Map<String, String> id2name;
@@ -284,11 +607,19 @@ public class LayoutPostprocessor {
         fillMap(r.getId(), r.getListOfProducts());
       }
     }
-    // build links within each layout from species glyphs to reaction glyphs
+    // preprocess species names
+    for (int i = 0; i < model.getSpeciesCount(); i++) {
+      Species s = model.getSpecies(i);
+      if (s.isSetName() && !s.getName().equals(s.getName().trim())) {
+        logger.info(format("Trimming species name ''{0}''.", s.getName()));
+        s.setName(s.getName().trim());
+      }
+    }
     LayoutModelPlugin layoutPlugin = (LayoutModelPlugin) model.getExtension(LayoutConstants.shortLabel);
     if (layoutPlugin != null) {
       for (int i = 0; i < layoutPlugin.getLayoutCount(); i++) {
         Layout layout = layoutPlugin.getLayout(i);
+        // build links within each layout from species glyphs to reaction glyphs
         for (int j = 0; j < layout.getReactionGlyphCount(); j++) {
           ReactionGlyph rg = layout.getReactionGlyph(j);
           if (rg.isSetListOfSpeciesReferenceGlyphs()) {
@@ -300,6 +631,29 @@ public class LayoutPostprocessor {
                 }
                 ((Set<String>) sg.getUserObject(SPECIES_GLYPH_LINK)).add(rg.getId());
               }
+            }
+          }
+        }
+        // build links from species to corresponding species glyphs across all layouts
+        for (int j = 0; j < layout.getSpeciesGlyphCount(); j++) {
+          SpeciesGlyph sg = layout.getSpeciesGlyph(j);
+          if (sg.isSetSpecies()) {
+            Species species = model.getSpecies(sg.getSpecies());
+            if (species.getUserObject(SPECIES_GLYPH_LINK) == null) {
+              species.putUserObject(SPECIES_GLYPH_LINK, new TreeSet<String>());
+            }
+            ((Set<String>) species.getUserObject(SPECIES_GLYPH_LINK)).add(sg.getId());
+          }
+        }
+        for (int j = 0; j < layout.getTextGlyphCount(); j++) {
+          TextGlyph tg = layout.getTextGlyph(j);
+          if (tg.isSetOriginOfText()) {
+            Species s = model.getSpecies(tg.getOriginOfText());
+            if (s != null) {
+              if (s.getUserObject(TEXT_GLYPH_LINK) == null) {
+                s.putUserObject(TEXT_GLYPH_LINK, new TreeSet<String>());
+              }
+              ((Set<String>) s.getUserObject(TEXT_GLYPH_LINK)).add(tg.getId());
             }
           }
         }
@@ -320,7 +674,7 @@ public class LayoutPostprocessor {
           SpeciesGlyph sg = layout.getSpeciesGlyph(j);
           //if (sg.getUserObject(SPECIES_GLYPH_LINK) == null) {
           if (sg.getSpeciesInstance() == null) {
-            logger.info(MessageFormat.format("Removing species glyph with id=''{0}''", layout.removeSpeciesGlyph(j).getId()));
+            logger.info(format("Removing species glyph with id=''{0}''", layout.removeSpeciesGlyph(j).getId()));
           }
         }
         for (int j = layout.getTextGlyphCount() - 1; j >= 0; j--) {
@@ -334,6 +688,15 @@ public class LayoutPostprocessor {
                 tg.setText(nsb.isSetName() ? nsb.getName() : nsb.getId());
               }
               tg.unsetReference();
+              
+              // Adjust positioning of the text
+              BoundingBox bbox = tg.getBoundingBox();
+              Point pos = bbox.getPosition();
+              Dimensions dim = bbox.getDimensions();
+              double width = tg.getText().length() * 20d; // experimental values...
+              pos.setX(pos.x() + dim.getWidth() / 2d - width / 2d);
+              pos.setY(pos.y() + dim.getHeight() * 1d/4d);
+              dim.setWidth(width * 3d/4d);
             }
             tg.unsetGraphicalObject();
           }
@@ -351,7 +714,7 @@ public class LayoutPostprocessor {
       Species s = model.getSpecies(i);
       if (s.getUserObject(SPECIES_REACTION_LINK) == null) {
         id2name.put(s.getId(), s.getName());
-        logger.info(MessageFormat.format("Removing species with id=''{0}''", model.removeSpecies(i).getId()));
+        logger.info(format("Removing species with id=''{0}''", model.removeSpecies(i).getId()));
       }
     }
   }
@@ -376,6 +739,10 @@ public class LayoutPostprocessor {
     }
   }
   
+  /**
+   * 
+   * @param sbase
+   */
   public void trimCellDesignerAnnotation(SBase sbase) {
     Annotation a = sbase.getAnnotation();
     if (a.isSetNonRDFannotation()) {

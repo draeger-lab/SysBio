@@ -269,6 +269,16 @@
   
   <!-- Render -->
   
+  <entry key="colorDefinition">Farbdefinition</entry>
+  <entry key="g">Dargstellungsgruppe</entry>
+  <entry key="idList">Identifikator-Liste</entry>
+  <entry key="listOfColorDefinitions">Farbdefinitionen</entry>
+  <entry key="listOfRenderInformation">Darstellungsinformationen</entry>
+  <entry key="listOfStyles">Stile</entry>
+  <entry key="renderInformation">Darstellungsinformation</entry>
+  <entry key="roleList">Rollenliste</entry>
+  <entry key="style">Stil</entry>
+  
   <!-- Req -->
   
   <!-- Spatial -->

@@ -66,7 +66,8 @@ public class AssociationNodeRealizer extends ProcessNodeRealizer {
     gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
     
     // Draw a filled circle.
-    gfx.fillOval((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
+    gfx.fillOval(0, 0, 1, 1);
+    setFrame((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
   }
   
 }
