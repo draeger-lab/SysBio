@@ -65,6 +65,10 @@ import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.TidySBMLWriter;
 import org.sbml.jsbml.ext.layout.AbstractReferenceGlyph;
 import org.sbml.jsbml.ext.layout.BoundingBox;
+import org.sbml.jsbml.ext.layout.CompartmentGlyph;
+import org.sbml.jsbml.ext.layout.CubicBezier;
+import org.sbml.jsbml.ext.layout.Curve;
+import org.sbml.jsbml.ext.layout.CurveSegment;
 import org.sbml.jsbml.ext.layout.Dimensions;
 import org.sbml.jsbml.ext.layout.GraphicalObject;
 import org.sbml.jsbml.ext.layout.Layout;
@@ -131,11 +135,140 @@ public class LayoutPostprocessor {
     lp.constructBiGGidsFromNames(doc);
     logger.info("Removing empty XHTML head statements");
     lp.shrinkXHTML(doc);
+    logger.info("Scaling spaces in layout");
+    lp.scaleLayoutDistances(doc, 2d, 2d);
     
     // for testing
-    TidySBMLWriter.write(doc, new File(args[1]), ' ', (short) 2);
+    logger.info("Validating SBML document");
     lp.validate(doc);
+    File outFile = new File(args[1]);
+    logger.info(format("Writing output file {0}", outFile));
+    TidySBMLWriter.write(doc, outFile, ' ', (short) 2);
+    logger.info("Launching preview");
     new YGraphView(doc);
+  }
+  
+  /**
+   * 
+   * @param doc
+   * @param scale
+   */
+  public void scaleLayoutDistances(SBMLDocument doc, double xScale, double yScale) {
+    Model model = doc.getModel();
+    LayoutModelPlugin lmp = (LayoutModelPlugin) model.getPlugin(LayoutConstants.shortLabel);
+    for (Layout layout : lmp.getListOfLayouts()) {
+      scaleLayoutDistances(layout, xScale, yScale);
+    }
+  }
+  
+  /**
+   * 
+   * @param layout
+   * @param xScale
+   * @param yScale
+   */
+  public void scaleLayoutDistances(Layout layout, double xScale, double yScale) {
+    resize(layout.getDimensions(), xScale, yScale);
+    if (layout.isSetListOfCompartmentGlyphs()) {
+      logger.info("Repositioning all compartment glyps");
+      for (CompartmentGlyph cg : layout.getListOfCompartmentGlyphs()) {
+        resize(cg, xScale, yScale);
+      }
+    }
+    if (layout.isSetListOfSpeciesGlyphs()) {
+      logger.info("Repositioning all species glyphs");
+      for (SpeciesGlyph sg : layout.getListOfSpeciesGlyphs()) {
+        reposition(sg, xScale, yScale);
+      }
+    }
+    if (layout.isSetListOfReactionGlyphs()) {
+      logger.info("Repositioning all reaction glyphs");
+      for (ReactionGlyph rg : layout.getListOfReactionGlyphs()) {
+        reposition(rg, xScale, yScale);
+        for (SpeciesReferenceGlyph srg : rg.getListOfSpeciesReferenceGlyphs()) {
+          if (srg.isSetBoundingBox()) {
+            reposition(srg, xScale, yScale);
+            resize(srg, xScale, yScale);
+          }
+          if (srg.isSetCurve()) {
+            Curve curve = srg.getCurve();
+            for (int i = 0; i < curve.getCurveSegmentCount(); i++) {
+              CurveSegment cs = curve.getCurveSegment(i);
+              reposition(cs.getStart(), xScale, yScale);
+              reposition(cs.getEnd(), xScale, yScale);
+              if (cs instanceof CubicBezier) {
+                CubicBezier cb = (CubicBezier) cs;
+                reposition(cb.getBasePoint1(), xScale, yScale);
+                reposition(cb.getBasePoint2(), xScale, yScale);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (layout.isSetListOfTextGlyphs()) {
+      logger.info("Repositioning all text glyphs");
+      for (TextGlyph tg : layout.getListOfTextGlyphs()) {
+        reposition(tg, tg.isSetGraphicalObject() ? xScale : xScale, yScale);
+      }
+    }
+    if (layout.isSetListOfAdditionalGraphicalObjects()) {
+      logger.info("Repositioning all other graphical objects");
+      for (GraphicalObject go : layout.getListOfAdditionalGraphicalObjects())  {
+        reposition(go, xScale, yScale);
+      }
+    }
+  }
+  
+  /**
+   * @param go
+   * @param xScale
+   * @param yScale
+   */
+  public void reposition(GraphicalObject go, double xScale, double yScale) {
+    BoundingBox bbox = go.getBoundingBox();
+    Point pos = bbox.getPosition();
+    reposition(pos, xScale, yScale);
+  }
+  
+  /**
+   * @param pos
+   * @param xScale
+   * @param yScale
+   */
+  public void reposition(Point pos, double xScale, double yScale) {
+    pos.setX(pos.x() * xScale);
+    pos.setY(pos.y() * yScale);
+  }
+  
+  /**
+   * 
+   * @param go
+   * @param xScale
+   * @param yScale
+   */
+  public void resize(GraphicalObject go, double xScale, double yScale) {
+    resize(go.getBoundingBox(), xScale, yScale);
+  }
+  
+  /**
+   * 
+   * @param bbox
+   * @param xScale
+   * @param yScale
+   */
+  public void resize(BoundingBox bbox, double xScale, double yScale) {
+    resize(bbox.getDimensions(), xScale, yScale);
+  }
+  
+  /**
+   * @param dim
+   * @param xScale
+   * @param yScale
+   */
+  public void resize(Dimensions dim, double xScale, double yScale) {
+    dim.setWidth(dim.getWidth() * xScale);
+    dim.setHeight(dim.getHeight() * yScale);
   }
   
   
