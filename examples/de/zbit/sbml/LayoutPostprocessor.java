@@ -1,23 +1,18 @@
 /*
  * $IdLayoutPostprocessor.java 10:48:35 draeger $
  * $URLLayoutPostprocessor.java $
- * ----------------------------------------------------------------------------
- * This file is part of JSBML. Please visit <http://sbml.org/Software/JSBML>
- * for the latest version of JSBML and more information about SBML.
- * 
- * Copyright (C) 2009-2016  jointly by the following organizations:
- * 1. The University of Tuebingen, Germany
- * 2. EMBL European Bioinformatics Institute (EBML-EBI), Hinxton, UK
- * 3. The California Institute of Technology, Pasadena, CA, USA
- * 4. The University of California, San Diego, La Jolla, CA, USA
- * 5. The Babraham Institute, Cambridge, UK
- * 
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation. A copy of the license agreement is provided
- * in the file named "LICENSE.txt" included with this software distribution
- * and also available online as <http://sbml.org/Software/JSBML/License>.
- * ----------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
+ * This file is part of the SysBio API library.
+ *
+ * Copyright (C) 2009-2017 by the University of Tuebingen, Germany.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
  */
 package de.zbit.sbml;
 
@@ -92,9 +87,6 @@ import org.sbml.jsbml.util.filters.NameFilter;
 import org.sbml.jsbml.xml.XMLNode;
 
 import de.zbit.sbml.layout.RenderProcessor;
-import de.zbit.sbml.layout.y.YGraphView;
-import de.zbit.util.Utils;
-import de.zbit.util.logging.LogUtil;
 
 /**
  * This takes an SBML file as input that has been converted from CellDesigner
@@ -115,7 +107,6 @@ public class LayoutPostprocessor {
    * @throws IOException
    */
   public static void main(String args[]) throws XMLStreamException, SBMLException, IOException {
-    LogUtil.initializeLogging("de.zbit");
     SBMLDocument doc = SBMLReader.read(new ProgressMonitorInputStream(null, "Reading File", new FileInputStream(new File(args[0]))));
     //new YGraphView(doc);
     LayoutPostprocessor lp = new LayoutPostprocessor(doc);
@@ -145,7 +136,6 @@ public class LayoutPostprocessor {
     logger.info(format("Writing output file {0}", outFile));
     TidySBMLWriter.write(doc, outFile, ' ', (short) 2);
     logger.info("Launching preview");
-    new YGraphView(doc);
   }
   
   /**
@@ -512,7 +502,7 @@ public class LayoutPostprocessor {
                     ls.unsetIDList();
                   }
                   int pos = k + 1;
-                  ls.setId(ls.getId().substring(0, ls.getId().indexOf('_')) + StringTools.fill(Utils.getDigitCount(lri.getLocalStyleCount()) - Utils.getDigitCount(pos), '0') + pos);
+                  ls.setId(ls.getId().substring(0, ls.getId().indexOf('_')) + StringTools.fill(getDigitCount(lri.getLocalStyleCount()) - getDigitCount(pos), '0') + pos);
                 }
               }
             }
@@ -520,6 +510,15 @@ public class LayoutPostprocessor {
         }
       }
     }
+  }
+  
+  /**
+   * 
+   * @param n
+   * @return
+   */
+  public static int getDigitCount(int n) {
+    return (int) Math.floor(1 + Math.log10(Math.abs(n)));
   }
   
   private Set<String> processedColor = new HashSet<>();
@@ -548,7 +547,7 @@ public class LayoutPostprocessor {
             ColorDefinition cd = lri.getColorDefinition(g.getFill());
             int pos = lri.getListOfColorDefinitions().indexOf(cd) + 1;
             Set<GraphicalObject> set = usedStyles.remove(style);
-            cd.setId("color_" + StringTools.fill(Utils.getDigitCount(lri.getColorDefinitionCount()) - Utils.getDigitCount(pos), '0') + pos);
+            cd.setId("color_" + StringTools.fill(getDigitCount(lri.getColorDefinitionCount()) - getDigitCount(pos), '0') + pos);
             g.setFill(cd.getId());
             processedColor.add(g.getFill());
             usedStyles.put(style, set);
