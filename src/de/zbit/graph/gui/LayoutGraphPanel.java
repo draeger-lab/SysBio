@@ -17,11 +17,13 @@
 package de.zbit.graph.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
@@ -172,5 +174,5 @@ public class LayoutGraphPanel extends JPanel {
   public Graph2DView getGraph2DView() {
     return graph2DView;
   }
-  
+
 }

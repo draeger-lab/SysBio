@@ -73,5 +73,11 @@ public class OmittedProcessNodeRealizer extends ProcessNodeRealizer {
       (float) (offsetX + x),
       (float) (offsetY + y + .93d * min));
   }
+
+@Override
+protected void defineShape(Graphics2D gfx, int resizeFactor) {
+	// TODO Auto-generated method stub
+	
+}
   
 }

@@ -208,6 +208,7 @@ public class CSVImporter {
 				} else {
 					panel.add(c, BorderLayout.CENTER);
 				}
+
 			}
 			if(acceptWithoutEdit||(c.getColumnChoosers().size() < 1)
 					|| (JOptionPane.showConfirmDialog(parent, panel,

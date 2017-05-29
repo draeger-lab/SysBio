@@ -576,7 +576,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       nodeLabel = new NodeLabel(text);
       nodeLabel.setLabelModel(new FreeNodeLabelModel());
       nodeLabel.setFontSize(fontSize);
-      originRealizer.setLabel(nodeLabel);
+      originRealizer.setLabel(nodeLabel); 
       
       // text glyph position
       Point position = textGlyph.getBoundingBox().getPosition();
@@ -716,7 +716,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
    * @param forward
    * @return
    */
-  private static EdgeRealizer drawCurveSegment(EdgeRealizer edgeRealizer, CurveSegment curveSegment, boolean forward) {
+  private static EdgeRealizer drawCurveSegment(EdgeRealizer edgeRealizer, CurveSegment curveSegment, 
+		  boolean forward) {
     LineSegment ls = (LineSegment) curveSegment;
     
     Point start = forward ? ls.getStart() : ls.getEnd();
