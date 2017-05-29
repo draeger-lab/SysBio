@@ -76,5 +76,11 @@ public class UncertainProcessNodeRealizer extends ProcessNodeRealizer {
       (float) (offsetX + x + .2d * min),
       (float) (offsetY + y + .93d * min));
   }
+
+@Override
+protected void defineShape(Graphics2D gfx, int resizeFactor) {
+	// TODO Auto-generated method stub
+	
+}
   
 }

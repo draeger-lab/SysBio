@@ -40,8 +40,7 @@ import y.view.ShapeNodeRealizer;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
-  
+public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {  
   /**
    * line width of reaction node
    */
@@ -84,6 +83,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
   /* (non-Javadoc)
    * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
    */
+  //---------------HIER gfx IST EIN PAPIER AUF DAS GEMALT WIRD--------------------
   @Override
   protected void paintShapeBorder(Graphics2D gfx) {
     int extendBesidesBorder = 0;
@@ -92,10 +92,15 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     double min = Math.min(width, height);
     double offsetX = (width - min)/2d;
     double offsetY = (height - min)/2d;
+
+    defineShape(gfx, 30);
+    
+    rotateNode();
     
     // TODO: in order to do it right, the entire node needs to be transformed to the interval [0,1]^2 and needs to be rotated there.
     rotate(gfx, rotationAngle, rotationCenter);
     
+    //-----------HIER WIRD DANN NODE ERSTELLT UND GEMALT-----------------
     drawShape(gfx);
     
     int halfHeight = (int) (height/2d);
@@ -107,7 +112,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
     //        gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
     
     rotate(gfx, -rotationAngle, rotationCenter);
-    
+        
     //    Rectangle2D myRect = new Rectangle2D.Double(0d, 0d, 1d, 1d);
     //    AffineTransform at = AffineTransform.getRotateInstance(rotationAngle);
     //    Shape rotatedRect = at.createTransformedShape(myRect);
@@ -121,6 +126,8 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
    * @param gfx
    */
   protected abstract void drawShape(Graphics2D gfx);
+  
+  protected abstract void defineShape(Graphics2D gfx, int resizeFactor);
   
   /**
    * Configures the orientation of this node and the docking point
@@ -291,7 +298,7 @@ public abstract class ProcessNodeRealizer extends ShapeNodeRealizer {
    * @param rotationCenter
    */
   protected void rotate(Graphics2D gfx, double rotationAngle, java.awt.geom.Point2D.Double rotationCenter) {
-    if ((rotationAngle % 180) != 0) {
+	if ((rotationAngle % 180) != 0) {
       if (rotationCenter != null) {
         gfx.rotate(Math.toRadians(rotationAngle), rotationCenter.getX(), rotationCenter.getY());
       } else {

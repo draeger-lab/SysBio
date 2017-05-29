@@ -19,6 +19,7 @@ package de.zbit.graph.sbgn;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.geom.Area;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import y.view.NodeRealizer;
@@ -30,6 +31,7 @@ import y.view.NodeRealizer;
  * @author Jakob Matthes
  * @version $Rev$
  */
+
 public class ReactionNodeRealizer extends ProcessNodeRealizer {
   
   private Boolean whiskers = true;
@@ -37,7 +39,7 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
    *
    */
   public ReactionNodeRealizer() {
-    super();
+	  super();
   }
   
   /**
@@ -53,7 +55,7 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
    * @param nr
    */
   public ReactionNodeRealizer(NodeRealizer nr) {
-    super(nr);
+	  super(nr);
   }
   
   /* (non-Javadoc)
@@ -69,9 +71,40 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
    */
   @Override
   protected void drawShape(Graphics2D gfx) {
-    
+	
+	  Rectangle2D.Double reactionNode = new Rectangle2D.Double(startOfNode.getX(), 
+			  startOfNode.getY(), half*resizeFactor, half*resizeFactor);	  	  
+	  
+	  if (whiskers) {
+		  //draws whiskers on top and bottom of the reactionGlyph
+		  gfx.drawLine((int)(startOfNode.getX()+quart*resizeFactor),
+				  	   (int)(startOfNode.getY()),
+				  	   (int)(startOfNode.getX()+quart*resizeFactor),
+				  	   (int)(startOfNode.getY()-quart*resizeFactor));
+		  gfx.drawLine((int)(startOfNode.getX()+quart*resizeFactor),
+				  	   (int)(startOfNode.getY()+half*resizeFactor),
+				  	   (int)(startOfNode.getX()+quart*resizeFactor),
+				  	   (int)(startOfNode.getY()+quart3*resizeFactor));
+		  /*
+		   //draws whiskers on left and right of the reactionGlyph
+		   gfx.drawLine((int)(startOfNode.getX()-quart*resizeFactor), 
+				   		(int)(startOfNode.getY()+quart*resizeFactor), 
+				        (int)(startOfNode.getX()), 
+				        (int)(startOfNode.getY()+quart*resizeFactor));
+		   gfx.drawLine((int)(startOfNode.getX()+half*resizeFactor), 
+				   		(int)(startOfNode.getY()+quart*resizeFactor), 
+				   		(int)(startOfNode.getX()+quart3*resizeFactor), 
+				   		(int)(startOfNode.getY()+quart*resizeFactor));
+				   		*/
+	  }
+	  
+	  Area rxnShape = new Area(reactionNode);
+	  gfx.draw(rxnShape);
+
+	  /*
     int extendBesidesBorder = 0;
-    int x = (int) getX(); int y = (int) getY();
+    int x = (int) getX(); int y = (int) getY();    
+    //-------------HIER BREITE UND HÖHE DEFINIERT------------------------
     double width = getWidth(), height = getHeight();
     double min = Math.min(width, height);
     double offsetX = (width - min)/2d;
@@ -82,6 +115,7 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
     
     int halfHeight = (int) (height/2d);
     
+    //---------HIER IST RECHTECK GEMALT----------------
     Rectangle2D.Double rect2d = new Rectangle2D.Double((offsetX + x), (offsetY + y), min, min);
     
     Area rxnShape = new Area(rect2d);
@@ -94,6 +128,7 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
     
     //    rxnShape.transform(affineTransform);
     
+    //---------HIER ANTENNEN GEMALT-------------------
     if (whiskers) {
       gfx.drawLine((0 + x) - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
       gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
@@ -110,6 +145,29 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
     // and products should dock.
     //    gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
     //    gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
+ */
+  }
+  
+  Point2D startOfNode;
+  int resizeFactor;
+  double quart;
+  double half;
+  double quart3;
+  
+  public void defineShape(Graphics2D gfx, int resizeFactor) {
+	  	this.resizeFactor = resizeFactor;
+	  	
+	  	int x = (int) getX(); 
+		int y = (int) getY();
+		
+		quart = 0.25;
+	  	half = 0.5;
+	  	quart3 = 0.75;
+					
+		gfx.setColor(getLineColor());
+		gfx.setStroke(new BasicStroke(lineWidth > 0 ? lineWidth : 1));
+			
+		startOfNode = new Point2D.Double(x,y);			
   }
   
   /**
@@ -156,3 +214,4 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
   }
   
 }
+

@@ -98,6 +98,8 @@ public class YGraphView implements PropertyChangeListener {
    * Initial dimensions  of the window.
    */
   private static final int WINDOW_WIDTH = 960;
+  
+  private YLayoutAlgorithm algorithm = new YLayoutAlgorithm();
   /**
    * @param args
    */
@@ -333,7 +335,7 @@ public class YGraphView implements PropertyChangeListener {
     
     // Run LayoutDirector and create product
     LayoutDirector<ILayoutGraph> director =
-        new LayoutDirector<ILayoutGraph>(doc, new YLayoutBuilder(), new YLayoutAlgorithm());
+        new LayoutDirector<ILayoutGraph>(doc, new YLayoutBuilder(), algorithm); //new YLayoutAlgorithm());
     director.setLayoutIndex(layoutIndex);
     director.run();
     //    ILayoutGraph hello = director.getProduct();
@@ -350,6 +352,10 @@ public class YGraphView implements PropertyChangeListener {
     //dumpGraph();
     
     displayGraph2DView(director.getProduct().getGraph2D());
+  }
+  
+  public YLayoutAlgorithm getAlgorithm() {
+	  return algorithm;
   }
   
   /**

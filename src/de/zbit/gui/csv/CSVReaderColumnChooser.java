@@ -140,7 +140,9 @@ public class CSVReaderColumnChooser extends JPanel {
       
     initGUI();
     setSplitRequiredAndOptional(true);
-  }
+    }
+  
+  
   private void initGUI() {
     removeAll();
     optionalPanel = new JPanel(new GridLayout(0,1));
