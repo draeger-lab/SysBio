@@ -175,6 +175,7 @@ public class SBMLReadingTask extends SwingWorker<SBMLDocument, Void> {
         openedFile.getDocument().addTreeNodeChangeListener(new SBMLfileChangeListener(openedFile));
       }
       firePropertyChange(SBML_READING_SUCCESSFULLY_DONE, null, openedFile);
+      
     } catch (InterruptedException exc) {
       exc.printStackTrace();
       GUITools.showErrorMessage(parent, getMessage(exc));

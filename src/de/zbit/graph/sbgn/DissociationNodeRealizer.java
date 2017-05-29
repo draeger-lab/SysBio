@@ -85,5 +85,11 @@ public class DissociationNodeRealizer extends ProcessNodeRealizer {
     gfx.drawRect(innerX, innerY, (int) diameter, (int) diameter);
     gfx.setColor(getLineColor());
   }
+
+@Override
+protected void defineShape(Graphics2D gfx, int resizeFactor) {
+	// TODO Auto-generated method stub
+	
+}
   
 }

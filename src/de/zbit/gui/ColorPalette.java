@@ -83,7 +83,8 @@ public class ColorPalette {
 	/**
 	 * Warm red
 	 */
-	public static final Color SECOND_180 = new Color(180, 81, 65); 
+	//public static final Color SECOND_180 = new Color(180, 81, 65); 
+	public static final Color SECOND_180 = new Color(166, 50, 34);
 		//new Color(CMYK, new float[] {20, 80, 80, 0}, 0f);
 	
 	/**
@@ -95,7 +96,8 @@ public class ColorPalette {
 	/**
 	 * Blue
 	 */
-	public static final Color SECOND_3015 = new Color(0, 93, 151); 
+	//public static final Color SECOND_3015 = new Color(0, 93, 151); 
+	public static final Color SECOND_3015 = new Color(210,152,144); 
 		// new Color(CMYK, new float[] {100, 50, 10, 0}, 0f);
 	
 	/**

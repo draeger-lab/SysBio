@@ -69,5 +69,11 @@ public class AssociationNodeRealizer extends ProcessNodeRealizer {
     gfx.fillOval(0, 0, 1, 1);
     setFrame((int) (offsetX + x), (int) (offsetY + y), (int) min, (int) min);
   }
+
+@Override
+protected void defineShape(Graphics2D gfx, int resizeFactor) {
+	// TODO Auto-generated method stub
+	
+}
   
 }
