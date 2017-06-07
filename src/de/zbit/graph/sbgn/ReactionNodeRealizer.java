@@ -71,7 +71,7 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
    */
   @Override
   protected void drawShape(Graphics2D gfx) {
-	
+	  /*
 	  Rectangle2D.Double reactionNode = new Rectangle2D.Double(startOfNode.getX(), 
 			  startOfNode.getY(), half*resizeFactor, half*resizeFactor);	  	  
 	  
@@ -85,7 +85,6 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
 				  	   (int)(startOfNode.getY()+half*resizeFactor),
 				  	   (int)(startOfNode.getX()+quart*resizeFactor),
 				  	   (int)(startOfNode.getY()+quart3*resizeFactor));
-		  /*
 		   //draws whiskers on left and right of the reactionGlyph
 		   gfx.drawLine((int)(startOfNode.getX()-quart*resizeFactor), 
 				   		(int)(startOfNode.getY()+quart*resizeFactor), 
@@ -95,13 +94,13 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
 				   		(int)(startOfNode.getY()+quart*resizeFactor), 
 				   		(int)(startOfNode.getX()+quart3*resizeFactor), 
 				   		(int)(startOfNode.getY()+quart*resizeFactor));
-				   		*/
+				   		
 	  }
 	  
 	  Area rxnShape = new Area(reactionNode);
 	  gfx.draw(rxnShape);
-
-	  /*
+	  */
+	  
     int extendBesidesBorder = 0;
     int x = (int) getX(); int y = (int) getY();    
     //-------------HIER BREITE UND HÖHE DEFINIERT------------------------
@@ -145,7 +144,7 @@ public class ReactionNodeRealizer extends ProcessNodeRealizer {
     // and products should dock.
     //    gfx.drawLine(0 + x - extendBesidesBorder, halfHeight + y, (int) (offsetX + x), halfHeight + y);
     //    gfx.drawLine((int) (offsetX + min) + x, halfHeight + y, (int) width + x + extendBesidesBorder, halfHeight + y);
- */
+ 
   }
   
   Point2D startOfNode;

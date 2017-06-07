@@ -81,11 +81,16 @@ public class ColorPalette {
 		// new Color(CMYK, new float[] {10, 40, 100, 10}, 0f);
 	
 	/**
-	 * Warm red
+	 * Dark red
 	 */
 	//public static final Color SECOND_180 = new Color(180, 81, 65); 
-	public static final Color SECOND_180 = new Color(166, 50, 34);
+	public static final Color SECOND_180 = new Color(118,33,19); 
 		//new Color(CMYK, new float[] {20, 80, 80, 0}, 0f);
+	
+	/**
+	 * Light red
+	 */
+	public static final Color LIGHT_RED = new Color(219,135,124); 
 	
 	/**
 	 * Light blue
@@ -94,10 +99,10 @@ public class ColorPalette {
 		// new Color(CMYK, new float[] {60, 0, 0, 20}, 0f);
 	
 	/**
-	 * Blue
+	 * Warm red
 	 */
 	//public static final Color SECOND_3015 = new Color(0, 93, 151); 
-	public static final Color SECOND_3015 = new Color(210,152,144); 
+	public static final Color SECOND_3015 = new Color(196,55,37);
 		// new Color(CMYK, new float[] {100, 50, 10, 0}, 0f);
 	
 	/**
