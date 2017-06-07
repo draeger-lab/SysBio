@@ -133,6 +133,8 @@ public class SBPreferences implements Map<Object, Object> {
    */
   private static boolean clean;
   
+  private static boolean chooseOwnColors = false;
+  
   /**
    * The logger of this {@link Class}.
    */
@@ -1389,6 +1391,14 @@ public class SBPreferences implements Map<Object, Object> {
       return System.getProperty(k);
     }
     return v;
+  }
+  
+  public static void setOptionBoxChecked(boolean chooseOwn) {
+	  chooseOwnColors = chooseOwn;
+  }
+  
+  public static boolean getOptionBoxChecked() {
+	  return chooseOwnColors;
   }
   
   /* (non-Javadoc)
