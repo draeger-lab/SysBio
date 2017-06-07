@@ -33,6 +33,7 @@ import javax.swing.event.ChangeListener;
 
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.util.StringUtil;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * @author Clemens Wrzodek
@@ -126,8 +127,10 @@ public class ColorChooserWithPreview extends JLabel {
        */
       @Override
       public void mouseClicked(MouseEvent e) {
-        showJColorChooser();
-        //e.consume();
+    	if(SBPreferences.getOptionBoxChecked()) {
+    		showJColorChooser();
+    		//e.consume();   		
+    	}
       }
     });
     

@@ -49,6 +49,7 @@ import de.zbit.gui.GUITools;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * A specialized {@link JDialog} that shows several configuration options in a
@@ -549,6 +550,14 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
 	 */
 	public void stateChanged(ChangeEvent e) {
+		if(e.getSource() instanceof OptionCheckBox) {			
+			OptionCheckBox cb = (OptionCheckBox) e.getSource();
+			if(cb.getName().equals("CHOOSE_OWN_NODE_COLORS") && (boolean)cb.getCurrentValue()) {
+				SBPreferences.setOptionBoxChecked(true);
+			} else {
+				SBPreferences.setOptionBoxChecked(false);
+			}
+		}
 		apply.setEnabled(!allPrefsPanel.isUserConfiguration());
 		defaults.setEnabled(!allPrefsPanel.isDefaultConfiguration());
 		ok.setEnabled(true);
