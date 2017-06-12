@@ -18,8 +18,10 @@ package de.zbit.graph.sbgn;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.File;
 import java.util.ResourceBundle;
 
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.objectwrapper.ValuePairUncomparable;
 import de.zbit.util.prefs.KeyProvider;
@@ -39,7 +41,7 @@ public interface DrawingOptions extends KeyProvider {
    * Localization support
    */
   public static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.graph.locales.Labels");
-  
+
   /**
    * Decide if inner part of compartment glyphs should be filled, or if only the
    * outside should be drawn.

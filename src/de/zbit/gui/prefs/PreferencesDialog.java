@@ -45,6 +45,8 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.sbml.jsbml.ext.arrays.Dimension;
+
 import de.zbit.gui.GUITools;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.StringUtil;
@@ -349,6 +351,15 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
 	public void itemStateChanged(ItemEvent e) {
+		if(e.getSource() instanceof OptionCheckBox) {			
+			OptionCheckBox cb = (OptionCheckBox) e.getSource();
+			if(cb.getName().equals("CHOOSE_OWN_NODE_COLORS") && (boolean)cb.getCurrentValue()) {
+				SBPreferences.setOptionBoxChecked(true);
+			} else {
+				SBPreferences.setOptionBoxChecked(false);
+				allPrefsPanel.restoreDefaultColors();
+			}
+		}
 		apply.setEnabled(!allPrefsPanel.isUserConfiguration());
 		defaults.setEnabled(!allPrefsPanel.isDefaultConfiguration());
 		ok.setEnabled(true);
@@ -550,14 +561,6 @@ public class PreferencesDialog extends JDialog implements ActionListener,
 	 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
 	 */
 	public void stateChanged(ChangeEvent e) {
-		if(e.getSource() instanceof OptionCheckBox) {			
-			OptionCheckBox cb = (OptionCheckBox) e.getSource();
-			if(cb.getName().equals("CHOOSE_OWN_NODE_COLORS") && (boolean)cb.getCurrentValue()) {
-				SBPreferences.setOptionBoxChecked(true);
-			} else {
-				SBPreferences.setOptionBoxChecked(false);
-			}
-		}
 		apply.setEnabled(!allPrefsPanel.isUserConfiguration());
 		defaults.setEnabled(!allPrefsPanel.isDefaultConfiguration());
 		ok.setEnabled(true);
