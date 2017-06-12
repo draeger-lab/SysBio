@@ -176,6 +176,7 @@ ItemListener, ChangeListener {
   public static JComponent createJComponentForOption(Option<?> option,
     Object defaultValue, ItemListener itemListener,
     ChangeListener changeListener, KeyListener keyListener) {
+
     // Create swing option based on field type
     JComponent component = null;
     String optionTitle = option.isSetDisplayName() ? option.getDisplayName()
@@ -1330,6 +1331,10 @@ ItemListener, ChangeListener {
    */
   public void restoreDefaults() {
     setProperties(preferences != null ? preferences.getDefaults() : new SBProperties());
+  }
+  
+  public void restoreDefaultColors() {
+	  setProperties(preferences != null ? preferences.getDefaultColors() : new SBProperties());
   }
   
   /**

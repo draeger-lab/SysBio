@@ -30,18 +30,21 @@ public class FillLevelNodeRealizer extends ShapeNodeRealizer implements SimpleCl
 	private Color color;
 	public static final Map<Node,FillLevelNodeRealizer> node2FillRealizer = new HashMap<Node,FillLevelNodeRealizer>();
 
-	//public FillLevelNodeRealizer(NodeRealizer arg0, double percent, int[] angles, Color color, NodeLabel label) {
-	public FillLevelNodeRealizer(NodeRealizer arg0) {
+	public FillLevelNodeRealizer(NodeRealizer arg0, double percent, int[] angles, Color color) {
 		
 		super(arg0);
-		//this.percent = percent;
-		//this.angles = angles;
-		//this.color = color;
+		this.percent = percent;
+		this.angles = angles;
+		this.color = color;
 	}
+	
+	public FillLevelNodeRealizer(NodeRealizer nr) {
+	    super(nr);
+	  }
 
 	@Override
-	public NodeRealizer createCopy(NodeRealizer arg0) {
-		return null;
+	public NodeRealizer createCopy(NodeRealizer fillNodeRealizer) {
+		return new FillLevelNodeRealizer(this);
 	}
 
 	@Override
@@ -63,12 +66,7 @@ public class FillLevelNodeRealizer extends ShapeNodeRealizer implements SimpleCl
 			System.out.println("NodeRealizer in ManipulatorOfFillLevel: \n "
 					+ "I do not have a correct concentration value to display");	
 		}
-
-	}
-	
-	@Override
-	public void paintSloppy(Graphics2D g) {
-		paintNode(g);
+		paintText(g);
 	}
 	
 	public int[] getAngles() {

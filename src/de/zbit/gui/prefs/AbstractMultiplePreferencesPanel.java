@@ -297,6 +297,11 @@ public abstract class AbstractMultiplePreferencesPanel extends PreferencesPanel 
     validate();
   }
   
+  public void restoreDefaultColors() {
+	  getPreferencesPanel(getPreferencesPanelCount()-1).restoreDefaultColors();
+	  validate();
+  }
+  
   /* (non-Javadoc)
    * @see de.zbit.gui.prefs.PreferencesPanel#loadPreferences()
    */
