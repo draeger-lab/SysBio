@@ -538,12 +538,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       return;
     }
     NodeRealizer originRealizer = graph.getRealizer(origin);
-    FillLevelNodeRealizer fnr = null;
-    if(originRealizer instanceof ShapeNodeRealizerSupportingCloneMarker) {
-    	fnr = new FillLevelNodeRealizer(originRealizer);
-    	FillLevelNodeRealizer.node2FillRealizer.put(origin, fnr);
-    }
-    
+ 
     String text = null;
     if (textGlyph.isSetText()) {
       text = textGlyph.getText();
@@ -583,9 +578,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       nodeLabel = new NodeLabel(text);
       nodeLabel.setLabelModel(new FreeNodeLabelModel());
       nodeLabel.setFontSize(fontSize);
-      if(fnr != null) {
-    	  fnr.setLabel(nodeLabel);    	  
-      }
       originRealizer.setLabel(nodeLabel);
       
       // text glyph position
@@ -638,12 +630,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
         }
         nodeLabel.setFontSize(fontSize);
         originRealizer.setLabel(nodeLabel);
-        if(fnr != null) {
-        	fnr.setLabel(nodeLabel);
-        }
       } else {
         originRealizer.setLabelText(text);
-        fnr.setLabelText(text);
         NodeLabel nodeLabel = originRealizer.getLabel();
         nodeLabel.setFontSize(fontSize);
         

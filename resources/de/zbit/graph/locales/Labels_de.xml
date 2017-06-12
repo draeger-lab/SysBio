@@ -24,7 +24,7 @@
   a (graphical) user interface. The separator ";" can be used to
   separate actual labels from associated tool tips.
   </comment>
-  
+    
   <!-- DrawingOptions -->
   
   <entry key="DrawingOptions">Graph-Darstellung</entry>

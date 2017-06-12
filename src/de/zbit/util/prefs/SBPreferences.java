@@ -18,6 +18,7 @@ package de.zbit.util.prefs;
 
 import static de.zbit.util.Utils.getMessage;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -133,7 +134,7 @@ public class SBPreferences implements Map<Object, Object> {
    */
   private static boolean clean;
   
-  private static boolean chooseOwnColors = false;
+  public static boolean chooseOwnColors = false;
   
   /**
    * The logger of this {@link Class}.
@@ -1225,6 +1226,50 @@ public class SBPreferences implements Map<Object, Object> {
    */
   public final boolean getDefaultBoolean(Object key) {
     return Boolean.parseBoolean(defaults.getProperty(key.toString()).toString());
+  }
+  
+  public final Map<Object, Object> getDefaultColors() {
+	  Map<Object,Object> map = new HashMap<Object,Object>();
+	  map.put("COLOR1", getDefaultColor(defaults.get("COLOR1")));
+	  map.put("COLOR2", getDefaultColor(defaults.get("COLOR2")));
+	  map.put("COLOR3", getDefaultColor(defaults.get("COLOR3")));
+	  
+	  return map;
+  }
+  
+  public final Color getDefaultColor(Object key) {
+	  char[] c = ((String) key).toCharArray();
+	  int r = 0; 
+	  int g = 0;
+	  int b = 0;
+	  for(int i = 0 ; i < c.length ; i++) {
+		  if(c[i] == 'r' && c[(i+1)] == '=') {
+			  String tmpR = "";
+			  i = i+2;
+			  while(c[i] != ',') {
+				  tmpR += c[i];
+				  i++;
+			  }
+			  r = Integer.parseInt(tmpR);
+		  } else if(c[i] == 'g' && c[(i+1)] == '=') {
+			  String tmpG = "";
+			  i = i+2;
+			  while(c[i] != ',') {
+				  tmpG += c[i];
+				  i++;
+			  }
+			  g = Integer.parseInt(tmpG);
+		  } else if(c[i] == 'b' && c[(i+1)] == '=') {
+			  String tmpB = "";
+			  i = i+2;
+			  while(c[i] != ']') {
+				  tmpB += c[i];
+				  i++;
+			  }
+			  b = Integer.parseInt(tmpB);
+		  } 
+	  }
+	  return new Color(r,g,b);
   }
   
   /**
