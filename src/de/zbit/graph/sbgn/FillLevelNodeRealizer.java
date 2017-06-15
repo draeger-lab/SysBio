@@ -69,6 +69,11 @@ public class FillLevelNodeRealizer extends ShapeNodeRealizer implements SimpleCl
 		paintText(g);
 	}
 	
+	@Override
+	public void paintSloppy(Graphics2D g) {
+		paintNode(g);
+	}
+	
 	public int[] getAngles() {
 		return angles;
 	}
