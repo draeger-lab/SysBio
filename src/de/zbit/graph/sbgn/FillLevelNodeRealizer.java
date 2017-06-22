@@ -97,6 +97,14 @@ public class FillLevelNodeRealizer extends ShapeNodeRealizer implements SimpleCl
 	public void setColor(Color color) {
 		this.color = color;
 	}
+	
+	/**
+	 * returns the size of the noderealizer for the camera animation to reset the correct size
+	 * @return
+	 */
+	public double[] getSize() {
+		return new double[] { getWidth() , getHeight() };
+	}
 
 	@Override
 	public void setNodeIsCloned(boolean b) {
