@@ -45,8 +45,7 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
    * instance must exist in the same graph)?
    */
   private boolean isClonedNode = false;
-  
-  
+    
   /**
    * 
    */
@@ -160,6 +159,14 @@ public class ShapeNodeRealizerSupportingCloneMarker extends ShapeNodeRealizer
 			isClonedNode, ", x=", x, ", y=", y, ", width=", width, ", height=",
 			height, ", fill=", getFillColor(), ", line=", getLineColor(),
 			"]").toString();
+	}
+	
+	/**
+	 * returns the size of the noderealizer for the camera animation to reset the correct size
+	 * @return
+	 */
+	public double[] getSize() {
+		return new double[] { getWidth() , getHeight() };
 	}
 
 }
