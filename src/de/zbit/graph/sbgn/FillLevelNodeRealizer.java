@@ -3,8 +3,11 @@ package de.zbit.graph.sbgn;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.sbml.jsbml.ext.render.Ellipse;
 
 import y.base.Node;
 import y.view.NodeRealizer;
@@ -46,19 +49,39 @@ public class FillLevelNodeRealizer extends ShapeNodeRealizer implements SimpleCl
 	public NodeRealizer createCopy(NodeRealizer fillNodeRealizer) {
 		return new FillLevelNodeRealizer(this);
 	}
+	
+	/*
+	@Override
+	public void paintFilledShape(Graphics2D g) {
+		super.paintFilledShape(g);
+		Ellipse2D fillLevelEllipse = new Ellipse2D.Double((int)getX(),(int)getY(),(int)getWidth(),(int)getHeight());
+		if (!isTransparent() && (getFillColor() != null)) {
+			CloneMarker.Tools.paintLowerBlackIfCloned(g, this, fillLevelEllipse);
+		}
+	}
+	*/
 
 	@Override
 	protected void paintNode(Graphics2D g) {
 		// draws node with filling color
+		g.setColor(Color.black);
+		g.fillOval((int)getX()-1,(int)getY()-1,(int)getWidth()+2,(int)getHeight()+2);
+		Ellipse2D blackEllipse = new Ellipse2D.Double((int)getX()-1,(int)getY()-1,(int)getWidth()+2,(int)getHeight()+2);
+		//g.fill(blackEllipse);
+		//g.setClip(blackEllipse);
+		Ellipse2D fillLevelEllipse = new Ellipse2D.Double((int)getX(),(int)getY(),(int)getWidth(),(int)getHeight());
+		//g.clip(fillLevelEllipse);
 		g.setColor(getColor()); 
+		//g.fill(g.getClip());
 		g.fillOval((int)getX(),(int)getY(),(int)getWidth(),(int)getHeight()); 
 		
+		Arc2D arc = new Arc2D.Double();
 		if(getPercent() != -1) {								
 			int[] angles = getAngles();
 		
 			// draws white not filled part
 			g.setPaint(Color.white);
-			Arc2D arc = new Arc2D.Double(getX()+1, getY()+1, getWidth()-3, getHeight()-3,
+			arc = new Arc2D.Double(getX()+1, getY()+1, getWidth()-3, getHeight()-3,
 					angles[0],angles[1], Arc2D.CHORD);
 			g.fill(arc);	
 			
@@ -67,6 +90,10 @@ public class FillLevelNodeRealizer extends ShapeNodeRealizer implements SimpleCl
 					+ "I do not have a correct concentration value to display");	
 		}
 		paintText(g);
+		if (!isTransparent() && (getFillColor() != null)) {
+			CloneMarker.Tools.paintRightBlackIfCloned(g, this, fillLevelEllipse);
+		}
+
 	}
 	
 	@Override
