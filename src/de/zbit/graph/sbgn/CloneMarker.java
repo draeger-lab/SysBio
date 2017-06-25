@@ -106,6 +106,31 @@ public interface CloneMarker {
   			gfx.setColor(nr.getFillColor());
   		}
   	}
+  	
+  	/**
+  	 * Use this method, e.g., in your "y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)"
+  	 * method to make the right part black.
+  	 * @param gfx
+  	 * @param nr
+  	 * @param shape
+  	 */
+  	public static <T extends NodeRealizer & CloneMarker> void paintRightBlackIfCloned(Graphics2D gfx, T nr, Shape shape) {
+  		// Eventually paint the right part black
+  		if (nr.isNodeCloned()) {
+  			// Create clip and draw black
+  			gfx.setClip(shape);
+				double x = nr.getX(), y = nr.getY();
+				double height = nr.getHeight(), width = nr.getWidth();
+				gfx.clip(new Rectangle((int) (x + width * (1d - partToPaintBlack)), (int) y, 
+						(int) Math.ceil((width * partToPaintBlack)), (int) height));
+				
+  			gfx.setColor(Color.BLACK);
+  			gfx.fill(gfx.getClip());
+  			// Reset
+  			gfx.setClip(null);
+  			gfx.setColor(nr.getFillColor());
+  		}
+  	}
 
   }
   
