@@ -46,37 +46,37 @@ import de.zbit.util.ResourceManager;
 /**
  * A specialized {@link JTree} that shows the elements of a JSBML model as a
  * hierarchical structure.
- * 
+ *
  * @author Sebastian Nagel
  * @version $Rev$
  * @since 1.4
  */
 public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeListener {
-  
+
   /**
    * Localization for SBML element names.
    */
   private static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.sbml.locales.ElementNames");
-  
+
   /**
    * A {@link Logger} for this class.
    */
   private static final Logger logger = Logger.getLogger(SBMLNode.class.getName());
-  
+
   /**
    * Generated serial version identifier.
    */
   private static final long serialVersionUID = 9057010975355065921L;
-  
+
   /**
    * true: show invisible nodes
    */
   private static boolean showInvisible = false;
-  
+
   /**
    * Helper method, necessary because the tree might hide some nodes... Index
    * determination of child elements is therefore a bit more complicated.
-   * 
+   *
    * @param parent
    * @param child
    * @param acceptedType
@@ -102,63 +102,63 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
     // not found => node is not a child.
     return -1;
   }
-  
+
   /**
-   * 
+   *
    * @return
    */
   public static boolean isShowInvisible() {
     return showInvisible;
   }
-  
+
   /**
-   * 
+   *
    * @param showInvisible
    */
   public static void setShowInvisible(boolean showInvisible) {
     SBMLNode.showInvisible = showInvisible;
   }
-  
-  
+
+
   private Class<? extends TreeNode> acceptedType;
-  
+
   /**
-   * 
+   *
    */
   private boolean boldFont, expanded, isVisible;
-  
+
   /**
    * Memorizes the result of the {@link #toString()} method.
    */
   private String stringRepresentation;
-  
+
   /**
-   * 
+   *
    * @param ast
    */
   public SBMLNode(ASTNode ast) {
     this(ast, true, ASTNode.class);
   }
-  
+
   /**
-   * 
+   *
    * @param sbase
    */
   public SBMLNode(SBase sbase) {
     this(sbase, true);
   }
-  
+
   /**
-   * 
+   *
    * @param sbase
    * @param isVisible
    */
   public SBMLNode(SBase sbase, boolean isVisible) {
     this(sbase, isVisible, SBase.class);
   }
-  
+
   /**
-   * 
+   *
    * @param node
    * @param isVisible
    * @param accepted
@@ -169,7 +169,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
     boldFont = false;
     expanded = false;
     this.isVisible = isVisible;
-    
+
     if (node == null) {
       return;
     }
@@ -189,16 +189,16 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
       }
     }
   }
-  
+
   /**
-   * 
+   *
    */
   public void collapse() {
     expanded = false;
   }
-  
+
   /**
-   * 
+   *
    * @param obj
    * @return
    */
@@ -215,14 +215,14 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
       return result;
     }
   }
-  
+
   /**
-   * 
+   *
    */
   public void expand() {
     expanded = true;
   }
-  
+
   /* (non-Javadoc)
    * @see javax.swing.tree.DefaultMutableTreeNode#getChildAt(int)
    */
@@ -234,7 +234,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
     if (children == null) {
       throw new ArrayIndexOutOfBoundsException("node has no children");
     }
-    
+
     int realIndex = -1;
     int visibleIndex = -1;
     Enumeration<?> e = children.elements();
@@ -248,10 +248,10 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
         return (TreeNode) children.elementAt(realIndex);
       }
     }
-    
+
     throw new ArrayIndexOutOfBoundsException("index unmatched");
   }
-  
+
   /* (non-Javadoc)
    * @see javax.swing.tree.DefaultMutableTreeNode#getChildCount()
    */
@@ -273,7 +273,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
     }
     return count;
   }
-  
+
   /* (non-Javadoc)
    * @see javax.swing.tree.DefaultMutableTreeNode#getUserObject()
    */
@@ -281,31 +281,31 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
   public TreeNodeWithChangeSupport getUserObject() {
     return (TreeNodeWithChangeSupport) super.getUserObject();
   }
-  
+
   /**
-   * 
+   *
    * @return
    */
   public boolean isBoldFont() {
     return boldFont;
   }
-  
+
   /**
-   * 
+   *
    * @return
    */
   public boolean isExpanded() {
     return expanded;
   }
-  
+
   /**
-   * 
+   *
    * @return
    */
   public boolean isVisible() {
     return isVisible;
   }
-  
+
   /* (non-Javadoc)
    * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeAdded(javax.swing.tree.TreeNode)
    */
@@ -314,7 +314,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
   public void nodeAdded(TreeNode node) {
     stringRepresentation = null;
     stringRepresentation = toString();
-    
+
     // Add the new node to this tree
     TreeNode parent = node.getParent();
     if (parent == getUserObject()) {
@@ -352,7 +352,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
       }
     }
   }
-  
+
   /* (non-Javadoc)
    * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(org.sbml.jsbml.util.TreeNodeRemovedEvent)
    */
@@ -361,7 +361,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
   public void nodeRemoved(TreeNodeRemovedEvent evt) {
     stringRepresentation = null;
     stringRepresentation = toString();
-    
+
     SBMLNode parentNode = (SBMLNode) getParent();
     TreeNode parent = evt.getPreviousParent();
     if ((parent == parentNode.getUserObject()) && (evt.getSource() == getUserObject())) {
@@ -369,7 +369,7 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
       logger.finer("removing " + evt.getSource());
     }
   }
-  
+
   /* (non-Javadoc)
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
@@ -379,23 +379,23 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
     stringRepresentation = null;
     stringRepresentation = toString();
   }
-  
+
   /**
-   * 
+   *
    * @param boldFont
    */
   public void setBoldFont(boolean boldFont) {
     this.boldFont = boldFont;
   }
-  
+
   /**
-   * 
+   *
    * @param visible
    */
   public void setVisible(boolean visible) {
     isVisible = visible;
   }
-  
+
   /* (non-Javadoc)
    * @see javax.swing.tree.DefaultMutableTreeNode#toString()
    */
@@ -404,25 +404,25 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
     String label = print(getUserObject());
     return (label != null) ? label : super.toString();
   }
-  
+
   /**
-   * 
+   *
    * @param node
    * @return
    */
   public String print(TreeNodeWithChangeSupport node) {
     if (node instanceof SBase) {
-      
+
       if (node instanceof Unit) {
         Unit u = (Unit) node;
         if (u.isSetKind()) {
           return u.toString();
         }
       }
-      
+
       if (node instanceof NamedSBase) {
         NamedSBase nsb = (NamedSBase) node;
-        
+
         if (nsb instanceof UnitDefinition) {
           UnitDefinition ud = (UnitDefinition) nsb;
           if (ud.isSetName() && bundle.containsKey(ud.getName())) {
@@ -444,10 +444,10 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
             }
             return tg.getOriginOfText();
           }
-          
+
         } else if (nsb.isSetName()) {
           return nsb.getName();
-          
+
         } else if (nsb instanceof SimpleSpeciesReference) {
           SimpleSpeciesReference specRef = (SimpleSpeciesReference) node;
           if (specRef.isSetSpeciesInstance()) {
@@ -462,13 +462,13 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
           return nsb.getId();
         }
       }
-      
+
       String elementName = ((SBase) node).getElementName();
       if (bundle.containsKey(elementName)) {
         return bundle.getString(elementName);
       }
       return node.toString();
-      
+
     } else if (node instanceof ASTNode) {
       if (stringRepresentation == null) {
         StringBuilder sb = new StringBuilder();
@@ -491,8 +491,8 @@ public class SBMLNode extends DefaultMutableTreeNode implements TreeNodeChangeLi
       }
       return stringRepresentation;
     }
-    
+
     return null;
   }
-  
+
 }

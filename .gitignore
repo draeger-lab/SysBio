@@ -3,3 +3,5 @@
 /lib/graph/ysvg.jar
 .classpath
 .project
+.settings
+.settings/*

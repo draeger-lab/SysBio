@@ -40,7 +40,7 @@ import sun.reflect.ReflectionFactory;
  * This class loads other classes that implement certain interfaces or extend
  * certain super types. With this method it becomes possible to load and
  * initialize instances of certain classes at runtime.
- * 
+ *
  * @author Marcel Kronfeld
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
@@ -49,49 +49,49 @@ import sun.reflect.ReflectionFactory;
  * @version $Rev$
  */
 public class Reflect {
-  
+
   /**
    * The {@link Logger}.
    */
   public static Logger logger = Logger.getLogger(Reflect.class.getName());
-  
+
   /**
    * Compares the string values of given objects.
-   * 
+   *
    * @author draeger
    * @param <T>
    */
   static class ClassComparator<T> implements Comparator<T> {
     /**
-     * 
+     *
      */
     @Override
     public int compare(Object o1, Object o2) {
       return (o1.toString().compareTo(o2.toString()));
     }
   }
-  
+
   /**
-   * 
+   *
    */
   private static String[] dynCP = null;
-  
+
   /**
-   * 
+   *
    */
   static int missedJarsOnClassPath = 0;
-  
+
   /**
-   * 
+   *
    */
   private static boolean useFilteredClassPath;
-  
+
   /**
-   * 
+   *
    */
   private static final String ERROR_MSG = String.format(
     "%s: Could not retrieve Class from jar for", Reflect.class.getName());
-  
+
   /**
    * @param <T>
    * @param set
@@ -109,7 +109,7 @@ public class Reflect {
       return 1;
     }
   }
-  
+
   /**
    * @return true if this instance has been started via Java WebStart.
    */
@@ -122,11 +122,11 @@ public class Reflect {
       return false;
     }
   }
-  
+
   /**
    * Collect all classes from a given package on the classpath. If includeSubs
    * is true, the sub-packages are listed as well.
-   * 
+   *
    * @param <T>
    * @param pckg
    * @param includeSubs
@@ -140,7 +140,7 @@ public class Reflect {
     return getClassesInPackageFltr(new HashSet<Class<T>>(), pckg, includeSubs,
       bSort, null);
   }
-  
+
   /**
    * @param <T>
    * @param pckg
@@ -154,13 +154,13 @@ public class Reflect {
     return getClassesInPackageFltr(new HashSet<Class<T>>(), pckg, includeSubs,
       bSort, superClass);
   }
-  
+
   /**
    * Determines all classes in the given package (and probably subpackages) that
    * inherit from the given superclass. In case of this beeing included into a
    * jar file, the path to the jar might be important and can therefore be given
    * as an additional argument.
-   * 
+   *
    * @param <T>
    * @param packageName
    *        The name of the package of interest.
@@ -181,7 +181,7 @@ public class Reflect {
     if ((classes == null) || (classes.length == 0)) {
       HashSet<Class<T>> set = new HashSet<Class<T>>();
       boolean tryDir = true;
-      if (tryDir && jarPath!=null) {
+      if (tryDir && (jarPath!=null)) {
         File f = new File(jarPath);
         if (f.isDirectory()) {
           String[] pathElements = f.list();
@@ -196,7 +196,7 @@ public class Reflect {
     }
     return classes;
   }
-  
+
   /**
    * @param <T>
    * @param packageName
@@ -224,10 +224,10 @@ public class Reflect {
     }
     return classes;
   }
-  
+
   /**
    * Retrieve assignable classes of the given package from classpath.
-   * 
+   *
    * @param <T>
    * @param pckg
    *        String denoting the package
@@ -240,13 +240,13 @@ public class Reflect {
     return getClassesInPackageFltr(new HashSet<Class<T>>(), pckg, includeSubs,
       bSort, reqSuperCls);
   }
-  
+
   /**
    * Return the names of all classes in the same package that are assignable
    * from the named class, and that can be loaded through the classpath. If a
    * class has a declared field called "hideFromGOE" this method will skip it.
    * Abstract classes and interfaces will be skipped as well.
-   * 
+   *
    * @see ReflectPackage.getAssignableClassesInPackage
    * @param className
    * @return
@@ -309,7 +309,7 @@ public class Reflect {
     }
     return classes;
   }
-  
+
   /**
    * @param <T>
    * @param set
@@ -334,7 +334,7 @@ public class Reflect {
             Class<T> cls = null;
             String className = StringUtil.concat(pckgname, ".",
               files[i].substring(0, files[i].length() - 6))
-              .toString();
+                .toString();
             if (!ClassLoader.getSystemClassLoader().loadClass(className).isInterface()) {
               cls=(Class<T>) Class.forName(className);
               if (reqSuperCls != null) {
@@ -366,10 +366,10 @@ public class Reflect {
     }
     return cntAdded;
   }
-  
+
   /**
    * Collect classes of a given package from the file system.
-   * 
+   *
    * @param <T>
    * @param pckgname
    * @return
@@ -384,11 +384,11 @@ public class Reflect {
         throw new ClassNotFoundException("Can't get class loader.");
       }
       String dir = path + "/" + pckgname.replace(".", "/");
-      
+
       logger.fine(String.format(".. opening %s", path));
-      
+
       File directory =  new File(dir);
-      
+
       if (directory.exists()) {
         // Get the list of the files contained in the package
         return getClassesFromDirFltr(set, directory, pckgname, includeSubs, reqSuperCls);
@@ -404,10 +404,10 @@ public class Reflect {
       return 0;
     }
   }
-  
+
   /**
    * Collect classes of a given package from a jar file.
-   * 
+   *
    * @param <T>
    * @param jarName
    * @param packageName
@@ -419,13 +419,13 @@ public class Reflect {
     Class<T> reqSuperCls) {
     boolean isInSubPackage = true;
     int cntAdded = 0;
-    
+
     String newPackageName = packageName.replace('.', '/');
     logger.fine(String.format("Jar %s looking for %s", jarName, newPackageName));
     try {
       JarInputStream jarFile = new JarInputStream(new FileInputStream(jarName));
       JarEntry jarEntry;
-      
+
       while ((jarEntry = jarFile.getNextJarEntry()) != null) {
         String jarEntryName = jarEntry.getName();
         // if (TRACE) { logger.info("- " + jarEntry.getName()); }
@@ -435,7 +435,7 @@ public class Reflect {
           if (!includeSubs) { // check if the class belongs to a
             // subpackage
             int lastDash = jarEntryName.lastIndexOf('/');
-            if (lastDash > newPackageName.length() + 1) {
+            if (lastDash > (newPackageName.length() + 1)) {
               isInSubPackage = true;
             } else {isInSubPackage = false;}
           }
@@ -463,7 +463,7 @@ public class Reflect {
               // e.printStackTrace();
             }
           }
-          
+
           // classes.add (jarEntry.getName().replaceAll("/", "\\."));
         }
       }
@@ -480,7 +480,7 @@ public class Reflect {
     }
     return cntAdded;
   }
-  
+
   /**
    * Read the classes available for user selection from the properties or the
    * classpath respectively
@@ -490,17 +490,17 @@ public class Reflect {
       "getClassesFromProperties - requesting className: %s", className));
     return getClassesFromClassPath(className);
   }
-  
-  
+
+
   /**
    * Collect classes from a given package on the classpath which have the given
    * Class as superclass or superinterface. If includeSubs is true, the
    * sub-packages are listed as well.
-   * 
+   *
    * <p>NOTE (wrzodek,2011): This method does not work in java web-start
    * applications, because no (valid) class path is defined here and it is not
    * possible to get the actual location of the currently running jar file!</p>
-   * 
+   *
    * @param <T>
    * @see Class.assignableFromClass(Class cls)
    * @param pckg
@@ -509,7 +509,7 @@ public class Reflect {
   public static <T> Class<T>[] getClassesInPackageFltr(HashSet<Class<T>> set,
     String pckg, boolean includeSubs, boolean bSort, Class<T> reqSuperCls) {
     String classPath = null;
-    
+
     if (!useFilteredClassPath || (dynCP == null)) {
       classPath = System.getProperty("java.class.path", ".");
       if (useFilteredClassPath) {
@@ -522,7 +522,7 @@ public class Reflect {
         dynCP = getClassPathElements();
       }
     }
-    
+
     /*
      * Alternative Method to marcel's one (from http://snippets.dzone.com/posts/show/4831).
      * This is much faster, because the current classLoader is used, instead of using the
@@ -541,10 +541,10 @@ public class Reflect {
         URL resource = resources.nextElement();
         String fileName = resource.getFile();
         String fileNameDecoded = URLDecoder.decode(fileName, "UTF-8");
-        
+
         // E.g., http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/KEGGtranslator.jar!/de/zbit/gui/prefs
         // - Remove the package extension from the string and remove eventual "!"'s and "file:/" prefixes.
-         
+
         if (fileNameDecoded.endsWith(path)) {
           fileNameDecoded = fileNameDecoded.substring(0, fileNameDecoded.length()-path.length());
         }
@@ -557,9 +557,9 @@ public class Reflect {
         if (fileNameDecoded.startsWith("file:/")) {
           fileNameDecoded = fileNameDecoded.substring(6);
         }
-        
+
         logger.info(fileNameDecoded);
-        
+
         dirs.add((fileNameDecoded));
     }
 		} catch (Exception e) {
@@ -567,9 +567,9 @@ public class Reflect {
 		}
 		dynCP = dirs.toArray(new String[0]);
 
-     * 
+     *
      */
-    
+
     logger.fine(String.format("classpath is %s", classPath));
     for (int i = 0; i < dynCP.length; i++) {
       logger.fine("reading element " + dynCP[i]);
@@ -582,7 +582,7 @@ public class Reflect {
     }
     return hashSetToClassArray(set, bSort);
   }
-  
+
   /**
    * @return
    */
@@ -591,7 +591,7 @@ public class Reflect {
     // logger.info("classpath: " + classPath);
     return classPath.split(File.pathSeparator);
   }
-  
+
   /**
    * @return
    */
@@ -604,7 +604,7 @@ public class Reflect {
     }
     return vp;
   }
-  
+
   /**
    * @return
    */
@@ -622,7 +622,7 @@ public class Reflect {
     }
     return valids;
   }
-  
+
   /**
    * @param <T>
    * @param set
@@ -636,13 +636,13 @@ public class Reflect {
     if (bSort) {
       Arrays.sort(clsArr, new ClassComparator<Object>());
     }
-    
+
     List<Object> list;
     list = Arrays.asList(clsArr);
     return (Class<T>[]) list.toArray(new Class<?>[list.size()]);
   }
-  
-  
+
+
   /**
    * Returns true if and only if the given class
    * contains a String-parser (e.g. Boolean.parseBoolean()
@@ -653,7 +653,7 @@ public class Reflect {
   public static boolean containsParser(Class<?> clazz) {
     return getStringParser(clazz) != null;
   }
-  
+
   /**
    * Returns the parse-Method for the given class
    * (e.g. Boolean.parseBoolean())
@@ -679,7 +679,7 @@ public class Reflect {
       return null;
     }
   }
-  
+
   /**
    * Invokes the parse-Method of clazz on the given Object.
    * @param clazz
@@ -692,24 +692,24 @@ public class Reflect {
     if (m == null) {
       return null;
     }
-    
+
     try {
       return m.invoke(clazz, toParse);
-      
+
     } catch (Exception e) {
       // IllegalArgumentException, IllegalAccessException, InvocationTargetException
-      if (e.getCause()!=null &&
-          e.getCause() instanceof java.lang.NumberFormatException) {
+      if ((e.getCause()!=null) &&
+          (e.getCause() instanceof java.lang.NumberFormatException)) {
         // E.g. if Integer.parseInt("Hallo") is Called, thow the NumberFormatException.
         throw e.getCause();
       } else {
         throw e;
       }
     }
-    
+
     //return null;
   }
-  
+
   /**
    * Checks, if a class contains a certain Method. If it does, this
    * Method is executed and the return value is returned. If the
@@ -723,7 +723,7 @@ public class Reflect {
    */
   public static Object invokeIfContains(Object clazz, String methodName,
     Class<?>[] parameterTypes, Object[] parameters) {
-    
+
     try {
       Method m = clazz.getClass().getMethod(methodName, parameterTypes);
       return m.invoke(clazz, parameters);
@@ -732,7 +732,7 @@ public class Reflect {
       return null;
     }
   }
-  
+
   /**
    * Checks, if a class contains a certain Method. If it does, this
    * Method is executed and the return value is returned. If the
@@ -762,7 +762,7 @@ public class Reflect {
     }
     return null;
   }
-  
+
   /**
    * Checks, if a class contains a certain Method. If it does, this
    * Method is executed and the return value is returned. If the
@@ -773,7 +773,7 @@ public class Reflect {
    * invoked Method instead.
    */
   public static Object invokeIfContains(Object clazz, String methodName) {
-    
+
     try {
       Method m = clazz.getClass().getMethod(methodName);
       return m.invoke(clazz);
@@ -782,11 +782,11 @@ public class Reflect {
       return null;
     }
   }
-  
+
   /**
    * Checks whether a method with this name and the given parameter types exists
    * for the given {@link Object} clazz.
-   * 
+   *
    * @param clazz
    * @param methodName
    * @param parameterTypes
@@ -807,9 +807,9 @@ public class Reflect {
     }
     return false;
   }
-  
+
   /**
-   * 
+   *
    * @param clazz
    * @param methodName
    * @param parameterTypes
@@ -821,7 +821,7 @@ public class Reflect {
     Method m = clazz.getClass().getMethod(methodName, parameterTypes);
     return m;
   }
-  
+
   /**
    * Checks if a certain method exists and invokes it.
    * Just a wrapper for
@@ -837,14 +837,14 @@ public class Reflect {
     return invokeIfContains(clazz, methodName, new Class<?>[]{parameterType},
       new Object[]{parameter});
   }
-  
+
   /**
-   * 
+   *
    */
   public Reflect() {
     super();
   }
-  
+
   /**
    * @return the name of the parent class of the current calling classe.
    * i.e. the class the called the method, that is calling this method.
@@ -854,10 +854,10 @@ public class Reflect {
     // Get the list of classes from the stackTrace
     final Throwable t = new Throwable();
     StackTraceElement[] se = t.getStackTrace();
-    
+
     /*return Class.forName(se[2].getClassName());
      *is wrong because multipleMethids from class[1] might be in the stack trace.*/
-    
+
     int diffClassName=0;
     String lastClassName="";
     for (StackTraceElement s: se) {
@@ -876,20 +876,20 @@ public class Reflect {
         }
       }
     }
-    
+
     return null;
   }
-  
+
   /**
    * Returns the name of the main Class that has been used to execute this application.
    * More detailed, the last main class in the current stack trace.
-   * 
+   *
    * <p>This method does NOT work in Java Web Start applications!</p>
    * @return
    */
   public static Class<?> getMainClass() {
     Class<?> lastMain = null;
-    
+
     /* Get the main class from the stackTrace
      *
      * This may not be the nicest solution, but it works in most cases. It WON'T
@@ -909,10 +909,10 @@ public class Reflect {
         }
       }
     }
-    
+
     return lastMain;
   }
-  
+
   /**
    * Set the value of a (eventually private) final field.
    * Found at http://www.javaspecialists.eu/archive/Issue161.html
@@ -926,7 +926,7 @@ public class Reflect {
     ReflectionFactory reflection =
         ReflectionFactory.getReflectionFactory();
     final String MODIFIERS_FIELD = "modifiers";
-    
+
     // we mark the field to be public
     field.setAccessible(true);
     // next we change the modifier in the Field instance to
@@ -944,7 +944,7 @@ public class Reflect {
         );
     fa.set(null, value);
   }
-  
+
   /**
    * Creates an {@link Enumeration} for the Values of all static final variables
    * inside a given class.
@@ -975,7 +975,7 @@ public class Reflect {
       }
     };
   }
-  
+
   /**
    * If the given class 'c' is inside a JAR file, this function returns the name
    * of the jar file. Else, if it is a class file, outside of a JAR file, an empty
@@ -998,5 +998,5 @@ public class Reflect {
     }
     return null;
   }
-  
+
 }
