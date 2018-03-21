@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: DrawingOptions.java 1408 2017-06-12 22:06:51Z lbuchweitz $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/graph/sbgn/DrawingOptions.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -18,10 +18,8 @@ package de.zbit.graph.sbgn;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.io.File;
 import java.util.ResourceBundle;
 
-import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.ResourceManager;
 import de.zbit.util.objectwrapper.ValuePairUncomparable;
 import de.zbit.util.prefs.KeyProvider;
@@ -33,7 +31,7 @@ import de.zbit.util.prefs.Range;
  * Options to let the user decide how SBGN elements should appear.
  * 
  * @author Andreas Dr&auml;ger
- * @version $Rev$
+ * @version $Rev: 1408 $
  */
 public interface DrawingOptions extends KeyProvider {
   
@@ -41,7 +39,7 @@ public interface DrawingOptions extends KeyProvider {
    * Localization support
    */
   public static final ResourceBundle bundle = ResourceManager.getBundle("de.zbit.graph.locales.Labels");
-
+  
   /**
    * Decide if inner part of compartment glyphs should be filled, or if only the
    * outside should be drawn.
@@ -160,6 +158,12 @@ public interface DrawingOptions extends KeyProvider {
           "{[0, 1024]}"), Double.valueOf(1d));
   
   /**
+   * Default edge color
+   */
+  public static final Option<Color> EDGE_LINE_COLOR = new Option<Color>(
+      "EDGE_LINE_COLOR", Color.class, bundle, new Color(51, 78, 117));
+  
+  /**
    * Define color and appearance of compartment glyphs.
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -182,7 +186,7 @@ public interface DrawingOptions extends KeyProvider {
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static final OptionGroup<?> REACTION_PREFS = new OptionGroup(
-    "REACTION_PREFS", bundle, EDGE_LINE_WIDTH);
+    "REACTION_PREFS", bundle, EDGE_LINE_WIDTH, EDGE_LINE_COLOR);
   
   /**
    * Define which fonts and colors to use for text labels and when these should

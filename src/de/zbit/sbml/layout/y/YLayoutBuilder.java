@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: YLayoutBuilder.java 1408 2017-06-12 22:06:51Z lbuchweitz $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/layout/y/YLayoutBuilder.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -55,9 +55,7 @@ import org.sbml.jsbml.ext.layout.TextGlyph;
 import org.sbml.jsbml.util.StringTools;
 
 import de.zbit.graph.sbgn.DrawingOptions;
-import de.zbit.graph.sbgn.FillLevelNodeRealizer;
 import de.zbit.graph.sbgn.ReactionNodeRealizer;
-import de.zbit.graph.sbgn.ShapeNodeRealizerSupportingCloneMarker;
 import de.zbit.sbml.layout.AbstractLayoutBuilder;
 import de.zbit.sbml.layout.AssociationNode;
 import de.zbit.sbml.layout.Catalysis;
@@ -107,7 +105,7 @@ import y.view.hierarchy.HierarchyManager;
 
 /**
  * @author Jakob Matthes
- * @version $Rev$
+ * @version $Rev: 1408 $
  */
 public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeRealizer, EdgeRealizer> {
   
@@ -428,7 +426,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
     }
     assert processNode != null;
     
-    processNode.setLineWidth(prefs.getDouble(DrawingOptions.GLYPH_LINE_WIDTH));
+    processNode.setLineWidth(prefs.getDouble(DrawingOptions.EDGE_LINE_WIDTH));
     
     if (reactionGlyph.isSetCurve()) {
       processNodeRealizer = processNode.draw(reactionGlyph.getCurve(), 0d, null);
@@ -538,7 +536,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       return;
     }
     NodeRealizer originRealizer = graph.getRealizer(origin);
- 
+    
     String text = null;
     if (textGlyph.isSetText()) {
       text = textGlyph.getText();
@@ -578,6 +576,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
       nodeLabel = new NodeLabel(text);
       nodeLabel.setLabelModel(new FreeNodeLabelModel());
       nodeLabel.setFontSize(fontSize);
+      
       originRealizer.setLabel(nodeLabel);
       
       // text glyph position
@@ -599,7 +598,7 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
         logger.fine("using extra positioning for textglyph " + textGlyph.getId());
         nodeLabel.setModelParameter(param);
       }
-            
+      
     } else if (text != null) {
       if (namedSBase != null) {
         NodeLabel nodeLabel;
@@ -634,7 +633,6 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
         originRealizer.setLabelText(text);
         NodeLabel nodeLabel = originRealizer.getLabel();
         nodeLabel.setFontSize(fontSize);
-        
       }
     }
   }
@@ -720,8 +718,8 @@ public class YLayoutBuilder extends AbstractLayoutBuilder<ILayoutGraph, NodeReal
    * @param forward
    * @return
    */
-  private static EdgeRealizer drawCurveSegment(EdgeRealizer edgeRealizer, CurveSegment curveSegment, 
-		  boolean forward) {
+  private static EdgeRealizer drawCurveSegment(EdgeRealizer edgeRealizer, CurveSegment curveSegment,
+    boolean forward) {
     LineSegment ls = (LineSegment) curveSegment;
     
     Point start = forward ? ls.getStart() : ls.getEnd();
