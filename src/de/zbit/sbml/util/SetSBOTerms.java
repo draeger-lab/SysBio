@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: SetSBOTerms.java 1388 2016-01-24 05:16:09Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/util/SetSBOTerms.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -39,13 +39,13 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.SBMLWriter;
 import org.sbml.jsbml.SBO;
+import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
-import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ontology.Term;
 
 /**
  * @author Stephanie Tscherneck
- * @version $Rev$
+ * @version $Rev: 1388 $
  */
 public class SetSBOTerms {
   
@@ -368,12 +368,12 @@ public class SetSBOTerms {
         
         // for each reactant/product set SBO.getReactant/SBO.getProduct
         if (r.isSetListOfReactants()) {
-          for (SpeciesReference sr : r.getListOfReactants()) {
+          for (SimpleSpeciesReference sr : r.getListOfReactants()) {
             sr.setSBOTerm(SBO.getReactant());
           }
         }
         if (r.isSetListOfProducts()) {
-          for (SpeciesReference sr : r.getListOfProducts()) {
+          for (SimpleSpeciesReference sr : r.getListOfProducts()) {
             sr.setSBOTerm(SBO.getProduct());
           }
         }

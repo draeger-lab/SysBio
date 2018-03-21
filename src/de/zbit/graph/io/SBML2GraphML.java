@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: SBML2GraphML.java 1388 2016-01-24 05:16:09Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/graph/io/SBML2GraphML.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -85,7 +85,7 @@ import de.zbit.util.objectwrapper.ValuePair;
  * following extensions are supported:
  * <ul><li>Core</li><li>Qual</li><li>Layout</li></ul>
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 1388 $
  */
 public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   public static final Logger log = Logger.getLogger(SBML2GraphML.class.getName());
@@ -478,7 +478,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
           // product on product node
           
           // Add edges to the reaction node
-          for (SpeciesReference sr : reactants) {
+          for (SimpleSpeciesReference sr : reactants) {
             Node source = id2node.get(sr.getSpecies());
             if (source != null) {
               Edge e = simpleGraph.createEdge(source, rNode);
@@ -494,7 +494,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
             }
           }
           
-          for (SpeciesReference sr : products) {
+          for (SimpleSpeciesReference sr : products) {
             Node target = id2node.get(sr.getSpecies());
             if (target != null) {
               Edge e = simpleGraph.createEdge(rNode, target);

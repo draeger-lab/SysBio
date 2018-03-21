@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: ModelFilter.java 1388 2016-01-24 05:16:09Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/util/ModelFilter.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -37,6 +37,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.SBMLWriter;
+import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.util.filters.CVTermFilter;
@@ -161,7 +162,7 @@ public class ModelFilter {
         boolean reactantsContained = true;
         boolean productsContained = true;
         if (r.isSetListOfReactants()) {
-        	for (SpeciesReference sr : r.getListOfReactants()) {
+        	for (SimpleSpeciesReference sr : r.getListOfReactants()) {
         		Species sp = sr.getSpeciesInstance();
         		if (!speciesToAdd.contains(sp)) {
         			reactantsContained = false;
@@ -170,7 +171,7 @@ public class ModelFilter {
         	}
         }
         if (r.isSetListOfProducts()) {
-        	for (SpeciesReference sr : r.getListOfProducts()) {
+        	for (SimpleSpeciesReference sr : r.getListOfProducts()) {
         		Species sp = sr.getSpeciesInstance();
         		if (!speciesToAdd.contains(sp)) {
         			productsContained = false;
@@ -227,7 +228,7 @@ public class ModelFilter {
     boolean productContained = false;
     boolean reactantContained = false;
     if (r.isSetListOfReactants()) {
-    	for (SpeciesReference sr : r.getListOfReactants()) {
+    	for (SimpleSpeciesReference sr : r.getListOfReactants()) {
     		String id = sr.getSpecies();
     		if (speciesSet.contains(id)) {
     			reactantContained = true;
@@ -236,7 +237,7 @@ public class ModelFilter {
     	}
     }
     if (r.isSetListOfProducts()) {
-    	for (SpeciesReference sr : r.getListOfProducts()) {
+    	for (SimpleSpeciesReference sr : r.getListOfProducts()) {
     		String id = sr.getSpecies();
     		if (speciesSet.contains(id)) {
     			productContained = true;
@@ -256,7 +257,7 @@ public class ModelFilter {
     boolean productsContained = true;
     boolean reactantsContained = true;
     if (r.isSetListOfReactants()) {
-    	for (SpeciesReference sr : r.getListOfReactants()) {
+    	for (SimpleSpeciesReference sr : r.getListOfReactants()) {
     		String id = sr.getSpecies();
     		if (!speciesSet.contains(id)) {
     			reactantsContained = false;
@@ -265,7 +266,7 @@ public class ModelFilter {
     	}
     }
     if (r.isSetListOfProducts()) {
-    	for (SpeciesReference sr : r.getListOfProducts()) {
+    	for (SimpleSpeciesReference sr : r.getListOfProducts()) {
     		String id = sr.getSpecies();
     		if (!speciesSet.contains(id)) {
     			productsContained = false;
@@ -289,7 +290,7 @@ public class ModelFilter {
     //find reactions where all products of r take part
     Set<Reaction> commonInterestingReactions = null;
     if (r.isSetListOfProducts()) {
-    	for (SpeciesReference sr : r.getListOfProducts()) {
+    	for (SimpleSpeciesReference sr : r.getListOfProducts()) {
     		Species sp = sr.getSpeciesInstance();
     		Set<Reaction> interestingReactions = new HashSet<Reaction>();
     		if (speciesToReaction.get(sp) != null) {
@@ -436,7 +437,7 @@ public class ModelFilter {
   		for (Reaction r : model.getListOfReactions()) {
   			Set<Species> species = new HashSet<Species>();
   			if (r.isSetListOfReactants()) {
-  				for (SpeciesReference sr : r.getListOfReactants()) {
+  				for (SimpleSpeciesReference sr : r.getListOfReactants()) {
   					Species sp = sr.getSpeciesInstance();
   					species.add(sp);
   					Set<Reaction> reactions = speciesToReaction.get(species);
@@ -448,7 +449,7 @@ public class ModelFilter {
   				}
   			}
   			if (r.isSetListOfProducts()) {
-  				for (SpeciesReference sr : r.getListOfProducts()) {
+  				for (SimpleSpeciesReference sr : r.getListOfProducts()) {
   					Species sp = sr.getSpeciesInstance();
   					species.add(sp);
   					Set<Reaction> reactions = speciesToReaction.get(species);

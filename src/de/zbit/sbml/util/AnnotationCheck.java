@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: AnnotationCheck.java 1388 2016-01-24 05:16:09Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/util/AnnotationCheck.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -37,6 +37,7 @@ import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.util.StringTools;
@@ -1577,13 +1578,13 @@ public class AnnotationCheck {
           continue;
         }
         if (r1.isSetListOfReactants()) {
-          for (SpeciesReference specRef : r1.getListOfReactants()) {
+          for (SimpleSpeciesReference specRef : r1.getListOfReactants()) {
             identical &= r2.getListOfReactants().contains(
               specRef.getSpeciesInstance());
           }
         }
         if (r1.isSetListOfProducts()) {
-          for (SpeciesReference specRef : r1.getListOfProducts()) {
+          for (SimpleSpeciesReference specRef : r1.getListOfProducts()) {
             identical &= r2.getListOfProducts().contains(
               specRef.getSpeciesInstance());
           }
@@ -1698,13 +1699,13 @@ public class AnnotationCheck {
   private String[] getKEGGIDsOfReactantsAndProducts(Reaction r) {
     List<String> keggIDs = new LinkedList<String>();
     if (r.isSetListOfReactants()) {
-      for (SpeciesReference specRef : r.getListOfReactants()) {
+      for (SimpleSpeciesReference specRef : r.getListOfReactants()) {
         keggIDs.addAll(getKeggsIDs(specRef.getSpeciesInstance(),
           Qualifier.BQB_IS));
       }
     }
     if (r.isSetListOfProducts()) {
-      for (SpeciesReference specRef : r.getListOfProducts()) {
+      for (SimpleSpeciesReference specRef : r.getListOfProducts()) {
         keggIDs.addAll(getKeggsIDs(specRef.getSpeciesInstance(),
           Qualifier.BQB_IS));
       }

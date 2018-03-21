@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: ModelMerging.java 1388 2016-01-24 05:16:09Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/util/ModelMerging.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -36,8 +36,8 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.SBMLWriter;
+import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
-import org.sbml.jsbml.SpeciesReference;
 
 public class ModelMerging {
   /**
@@ -238,7 +238,7 @@ public class ModelMerging {
     			continue;
     		}
     		if (r.isSetListOfProducts()) {
-    			for (SpeciesReference sr : r.getListOfProducts()) {
+    			for (SimpleSpeciesReference sr : r.getListOfProducts()) {
     				String newSpeciesId = ids.get(sr.getSpecies());
     				sr.setSpecies(newSpeciesId);
     			}
@@ -250,7 +250,7 @@ public class ModelMerging {
     			}
     		}
     		if (r.isSetListOfReactants()) {
-    			for (SpeciesReference sr : r.getListOfReactants()) {
+    			for (SimpleSpeciesReference sr : r.getListOfReactants()) {
     				String newSpeciesId = ids.get(sr.getSpecies());
     				sr.setSpecies(newSpeciesId);
     			}
@@ -323,7 +323,7 @@ public class ModelMerging {
       if (model.isSetListOfReactions()) {
       	for (Reaction r : model.getListOfReactions()) {
       		if (r.isSetListOfProducts()) {
-      			for (SpeciesReference sr : r.getListOfProducts()) {
+      			for (SimpleSpeciesReference sr : r.getListOfProducts()) {
       				if (sr.getSpeciesInstance() == s2) {
       					if (r.getId().equals("r0422")) {
       						System.out.println();
@@ -333,7 +333,7 @@ public class ModelMerging {
       			}
       		}
       		if (r.isSetListOfReactants()) {
-      			for (SpeciesReference sr : r.getListOfReactants()) {
+      			for (SimpleSpeciesReference sr : r.getListOfReactants()) {
       				if (sr.getSpeciesInstance() == s2) {
       					if (r.getId().equals("r0422")) {
       						System.out.println();

@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: SVGDOMEnhancerForHierarchy.java 1388 2016-01-24 05:16:09Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/examples/de/zbit/sbml/layout/y/SVGDOMEnhancerForHierarchy.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -29,7 +29,7 @@ import yext.svg.io.SVGDOMEnhancer;
 
 /**
  * 
- * @version $Rev$
+ * @version $Rev: 1388 $
  */
 public class SVGDOMEnhancerForHierarchy extends SVGDOMEnhancer {
   

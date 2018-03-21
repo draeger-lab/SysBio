@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: YReversibleConsumption.java 1400 2016-11-29 15:51:11Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/layout/y/YReversibleConsumption.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -16,8 +16,13 @@
  */
 package de.zbit.sbml.layout.y;
 
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.ext.layout.Curve;
+import org.sbml.jsbml.ext.layout.CurveSegment;
+import org.sbml.jsbml.ext.layout.Point;
+import org.sbml.jsbml.ext.layout.ReactionGlyph;
 
+import de.zbit.sbml.layout.Geometry;
 import de.zbit.sbml.layout.ReversibleConsumption;
 import y.view.Arrow;
 import y.view.EdgeRealizer;
@@ -31,7 +36,7 @@ import y.view.EdgeRealizer;
  * Note: This is not a dedicated SBGN arc by specification.
  * 
  * @author Jakob Matthes
- * @version $Rev$
+ * @version $Rev: 1400 $
  */
 public class YReversibleConsumption extends YAbstractSBGNArc implements ReversibleConsumption<EdgeRealizer> {
   
@@ -40,8 +45,19 @@ public class YReversibleConsumption extends YAbstractSBGNArc implements Reversib
    */
   @Override
   public EdgeRealizer draw(Curve curve) {
-    // TODO: We need to check what really needs to be reversed...
-    EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve, false);
+    // We need to check what really needs to be reversed...
+    boolean forward = false;
+    if (curve.isSetParent()) {
+      CurveSegment firstSegment = curve.getCurveSegment(0);
+      CurveSegment lastSegment = curve.getCurveSegment(curve.getCurveSegmentCount() - 1);
+      SBase sbase = curve.getParent();
+      if (sbase instanceof ReactionGlyph) {
+        ReactionGlyph rg = (ReactionGlyph) sbase;
+        Point center = Geometry.center(rg.getBoundingBox());
+        forward = Geometry.euclideanDistance(firstSegment.getStart(), center) < Geometry.euclideanDistance(lastSegment.getEnd(), center);
+      }
+    }
+    EdgeRealizer edgeRealizer = YLayoutBuilder.createEdgeRealizerFromCurve(curve, forward);
     edgeRealizer.setTargetArrow(Arrow.DELTA);
     return edgeRealizer;
   }

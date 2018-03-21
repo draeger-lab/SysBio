@@ -43,6 +43,7 @@ import javax.xml.stream.XMLStreamException;
 import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.CVTerm.Qualifier;
+import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
@@ -56,8 +57,8 @@ import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
-import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.TidySBMLWriter;
+import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.ext.layout.AbstractReferenceGlyph;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.CompartmentGlyph;
@@ -87,13 +88,14 @@ import org.sbml.jsbml.util.filters.NameFilter;
 import org.sbml.jsbml.xml.XMLNode;
 
 import de.zbit.sbml.layout.RenderProcessor;
+import de.zbit.sbml.layout.y.YGraphView;
 
 /**
  * This takes an SBML file as input that has been converted from CellDesigner
  * and postprocesses the layout in there.
  * 
  * @author Andreas Dr&auml;ger
- * @version $Rev$
+ * @version $Rev: 1404 $
  * @since 1.2
  * @date 09.11.2016
  */
@@ -107,6 +109,7 @@ public class LayoutPostprocessor {
    * @throws IOException
    */
   public static void main(String args[]) throws XMLStreamException, SBMLException, IOException {
+    
     SBMLDocument doc = SBMLReader.read(new ProgressMonitorInputStream(null, "Reading File", new FileInputStream(new File(args[0]))));
     //new YGraphView(doc);
     LayoutPostprocessor lp = new LayoutPostprocessor(doc);
@@ -122,7 +125,7 @@ public class LayoutPostprocessor {
     lp.setSBOtermsByFillColor(XMLTools.decodeStringToColor("#CCFF66FF"));
     logger.info("Merging MIRIAM annotations with identical qualifier");
     lp.mergeMIRIAMannotations(doc);
-    logger.info("Updating species ids to BiGG ids");
+    logger.info("Updating species ids to BiGG ids and updating compartment information");
     lp.constructBiGGidsFromNames(doc);
     logger.info("Removing empty XHTML head statements");
     lp.shrinkXHTML(doc);
@@ -130,12 +133,13 @@ public class LayoutPostprocessor {
     lp.scaleLayoutDistances(doc, 2d, 2d);
     
     // for testing
+    logger.info("Launching preview");
+    new YGraphView(doc);
     logger.info("Validating SBML document");
     lp.validate(doc);
     File outFile = new File(args[1]);
     logger.info(format("Writing output file {0}", outFile));
     TidySBMLWriter.write(doc, outFile, ' ', (short) 2);
-    logger.info("Launching preview");
   }
   
   /**
@@ -266,7 +270,7 @@ public class LayoutPostprocessor {
    * 
    * @param sbase
    */
-  private void mergeMIRIAMannotations(SBase sbase) {
+  public void mergeMIRIAMannotations(SBase sbase) {
     if (sbase.isSetAnnotation()) {
       SortedMap<Qualifier, SortedSet<String>> miriam = new TreeMap<>();
       boolean doMerge = false;
@@ -294,7 +298,7 @@ public class LayoutPostprocessor {
    * @param miriam
    * @return
    */
-  public boolean hashMIRIAMuris(SBase sbase, SortedMap<Qualifier, SortedSet<String>> miriam) {
+  private boolean hashMIRIAMuris(SBase sbase, SortedMap<Qualifier, SortedSet<String>> miriam) {
     boolean doMerge = false;
     for (int i = 0; i < sbase.getCVTermCount(); i++) {
       CVTerm term = sbase.getCVTerm(i);
@@ -404,6 +408,7 @@ public class LayoutPostprocessor {
         } else {
           logger.info(format("Updating species id=''{0}'' to BiGG id=''{1}''.", species.getId(), biggId));
           species.setId(biggId);
+          updateCompartment(species);
         }
       } else {
         System.out.println(species);
@@ -449,7 +454,7 @@ public class LayoutPostprocessor {
    * @param doc
    */
   public void validate(SBMLDocument doc) {
-    doc.checkConsistencyOffline();
+    System.out.println(doc.checkConsistencyOffline());
     SBMLErrorLog errorLog = doc.getListOfErrors();
     List<SBMLError> errorList = errorLog.getValidationErrors();
     for (SBMLError e : errorList) {
@@ -509,6 +514,60 @@ public class LayoutPostprocessor {
           }
         }
       }
+    }
+  }
+  
+  public void updateCompartment(Species s) {
+    Compartment c = s.getCompartmentInstance();
+    if ((c != null) && !c.isSetSpatialDimensions()) {
+      c.setSpatialDimensions(3d);
+    }
+    if (((c == null) || c.getId().equals("default")) && s.getId().matches(".*_.")) {
+      logger.info(format("Updating compartment information of species with id=''0''", s.getId()));
+      Model m = s.getModel();
+      char compartmentCode = s.getId().charAt(s.getId().length() - 1);
+      String cId = Character.toString(compartmentCode);
+      c = m.getCompartment(cId);
+      if (c == null) {
+        c = m.createCompartment(cId);
+        switch (compartmentCode) {
+          case 'c':
+            c.setName("cytosol");
+            break;
+          case 'n':
+            c.setName("nucleus");
+            break;
+          case 'g':
+            c.setName("golgi apparatus");
+            break;
+          case 'r':
+            c.setName("endoplasmic reticulum");
+            break;
+          case 'e':
+            c.setName("extracellular space");
+            break;
+          case 'l':
+            c.setName("lysosome");
+            break;
+          case 'm':
+            c.setName("mitochondria");
+            break;
+          case 'x':
+            c.setName("peroxisome");
+            break;
+          default:
+            break;
+        }
+        if (c.isSetName()) {
+          c.addCVTerm(new CVTerm(CVTerm.Qualifier.BQB_IS, "http://identifiers.org/bigg.compartment/" + compartmentCode));
+          c.setSBOTerm(290);
+        }
+        c.setConstant(true);
+        c.setSpatialDimensions(3d);
+        c.setUnits(UnitDefinition.VOLUME);
+        c.setMetaId(c.getId());
+      }
+      s.setCompartment(c);
     }
   }
   
@@ -608,7 +667,7 @@ public class LayoutPostprocessor {
             SpeciesReferenceGlyph srg = rg.getListOfSpeciesReferenceGlyphs().firstHit((Object o) -> {
               return ((SpeciesReferenceGlyph) o).getSpeciesGlyph().equals(sg.getId());
             });
-            SpeciesReference specRef = (SpeciesReference) srg.getReferenceInstance();
+            SimpleSpeciesReference specRef = (SimpleSpeciesReference) srg.getReferenceInstance();
             
             //Species species = (Species) sg.getReferenceInstance();
             
@@ -693,7 +752,7 @@ public class LayoutPostprocessor {
   /**
    * A {@link Logger} for this class.
    */
-  private static final Logger logger = Logger.getLogger(LayoutPostprocessor.class.getName());
+  private static final transient Logger logger = Logger.getLogger(LayoutPostprocessor.class.getName());
   /**
    * Links each species to a {@link SortedSet} of reaction ids where it participates.
    */
