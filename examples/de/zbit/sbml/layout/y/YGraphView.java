@@ -65,7 +65,6 @@ import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
-import yext.svg.io.SVGIOHandler;
 
 /**
  * Simple GUI to display a Graph2DView.
@@ -217,6 +216,7 @@ public class YGraphView implements PropertyChangeListener {
    * @param product
    */
   private void displayGraph2DView(Graph2D product) {
+    YImageTools.writeSVGImage(document.getDocument().getModel(), product, "/Users/draeger/out.svg");
     // Create a viewer for the graph
     Graph2DView view = createGraph2DView(product, WINDOW_WIDTH, WINDOW_HEIGHT);
     
@@ -355,7 +355,7 @@ public class YGraphView implements PropertyChangeListener {
   }
   
   public YLayoutAlgorithm getAlgorithm() {
-	  return algorithm;
+    return algorithm;
   }
   
   /**
@@ -431,26 +431,6 @@ public class YGraphView implements PropertyChangeListener {
       e.printStackTrace();
     }
     logger.info(MessageFormat.format("Modified model written to ''{0}''.", outFile));
-  }
-  
-  /**
-   * Write svg image file
-   * @param product
-   * 
-   * @param outFile path of the output file
-   */
-  private void writeSVGImage(Graph2D product, String outFile) {
-    SVGIOHandler svgio = new SVGIOHandler();
-    SVGDOMEnhancerForHierarchy svgEFH = new SVGDOMEnhancerForHierarchy(document.getDocument().getModel());
-    svgEFH.setDrawEdgesFirst(false);
-    svgio.setSVGGraph2DRenderer(svgEFH);
-    
-    try {
-      svgio.write(product, outFile);
-      logger.info(MessageFormat.format("Image written to ''{0}''.", outFile));
-    } catch (IOException e) {
-      logger.warning("Could not write image: ImageWriter not available.");
-    }
   }
   
 }

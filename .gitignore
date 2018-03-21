@@ -1,0 +1,5 @@
+/bin/
+/lib/graph/y.jar
+/lib/graph/ysvg.jar
+.classpath
+.project

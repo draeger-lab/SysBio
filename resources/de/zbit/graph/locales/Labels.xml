@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <!-- 
- * $Id$
- * $URL$
+ * $Id: Labels.xml 1397 2016-09-13 22:54:56Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/resources/de/zbit/graph/locales/Labels.xml $
  *********************************************************************** 
  * This file is part of the SysBio API library.
  *
@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  ***********************************************************************
  *
- * Version: $Rev$
+ * Version: $Rev: 1397 $
 -->
 <properties>
   <comment>
@@ -71,6 +71,8 @@
   <entry key="GLYPH_LINE_WIDTH_TOOLTIP">Defaults to 2 px.</entry>
   <entry key="EDGE_LINE_WIDTH">Edge line width</entry>
   <entry key="EDGE_LINE_WIDTH_TOOLTIP">Defaults to 2 px.</entry>
+  <entry key="EDGE_LINE_COLOR">Edge line color</entry>
+  <entry key="EDGE_LINE_COLOR_TOOLTIP">The default color of arcs</entry>
   <entry key="PAINT_SLOPPY_TEXT">Paint text in sloppy mode</entry>
   <entry key="PAINT_SLOPPY_TEXT_TOOLTIP">Decide if in sloppy representations text should be drawn. By default, text will be omitted in sloppy drawings (highly zoomed out).</entry>
   <entry key="GLYPH_PREFS">Glyph options</entry>

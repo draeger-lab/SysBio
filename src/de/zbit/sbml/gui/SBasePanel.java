@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: SBasePanel.java 1402 2017-01-03 12:17:57Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/src/de/zbit/sbml/gui/SBasePanel.java $
  * ---------------------------------------------------------------------
  * This file is part of the SysBio API library.
  *
@@ -127,7 +127,7 @@ import de.zbit.util.Utils;
  * @author Clemens Wrzodek
  * @author Sebastian Nagel
  * @since 1.0 (originates from SBMLsqueezer 1.3)
- * @version $Rev$
+ * @version $Rev: 1402 $
  */
 @SuppressWarnings("deprecation")
 public class SBasePanel extends JPanel implements EquationComponent {
@@ -932,7 +932,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     int count;
     if (reaction.isSetListOfReactants()) {
       count = 0;
-      for (SpeciesReference specRef : reaction.getListOfReactants()) {
+      for (SimpleSpeciesReference specRef : reaction.getListOfReactants()) {
         if (specRef.isSetSpeciesInstance()) {
           rmp[count++][0] = print(specRef.getSpeciesInstance());
         }
@@ -948,7 +948,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
     }
     if (reaction.isSetListOfProducts()) {
       count = 0;
-      for (SpeciesReference specRef : reaction.getListOfProducts()) {
+      for (SimpleSpeciesReference specRef : reaction.getListOfProducts()) {
         if (specRef.isSetSpeciesInstance()) {
           rmp[count++][2] = print(specRef.getSpeciesInstance());
         }
@@ -1425,7 +1425,7 @@ public class SBasePanel extends JPanel implements EquationComponent {
   /**
    * 
    * @author Andreas Dr&auml;ger
-   * @version $Rev$
+   * @version $Rev: 1402 $
    */
   private class ListTextRenderer implements ListCellRenderer {
     

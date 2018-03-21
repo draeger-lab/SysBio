@@ -1,5 +1,7 @@
 import java.io.IOException;
+import java.util.List;
 
+import javax.swing.tree.TreeNode;
 import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.Model;
@@ -13,6 +15,7 @@ import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.layout.TextGlyph;
+import org.sbml.jsbml.util.filters.NameFilter;
 
 
 public class TestSBML {
@@ -38,6 +41,11 @@ public class TestSBML {
       
     }
     
+    
+    List<? extends TreeNode> hitList = null;
+    if (model.isSetListOfSpecies()) {
+      hitList = model.getListOfSpecies().filter(new NameFilter(null, "name"));
+    }
     
     //doc = SBMLReader.read(new File("~/Desktop/test.xml"));
     

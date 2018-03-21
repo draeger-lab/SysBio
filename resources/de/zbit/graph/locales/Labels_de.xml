@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <!-- 
- * $Id$
- * $URL$
+ * $Id: Labels_de.xml 1408 2017-06-12 22:06:51Z lbuchweitz $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn-path/SysBio/trunk/resources/de/zbit/graph/locales/Labels_de.xml $
  *********************************************************************** 
  * This file is part of the SysBio API library.
  *
@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  ***********************************************************************
  *
- * Version: $Rev$
+ * Version: $Rev: 1408 $
 -->
 <properties>
   <comment>
@@ -71,6 +71,8 @@
   <entry key="GLYPH_LINE_WIDTH_TOOLTIP">Standardmäüig auf 2 px gesetzt.</entry>
   <entry key="EDGE_LINE_WIDTH">Linienstärke Kante</entry>
   <entry key="EDGE_LINE_WIDTH_TOOLTIP">Standardmäßig auf 2 px gesetzt.</entry>
+  <entry key="EDGE_LINE_COLOR">Linienfarbe für Kanten</entry>
+  <entry key="EDGE_LINE_COLOR_TOOLTIP">Die Standardfarbe für Kanten</entry>
   <entry key="PAINT_SLOPPY_TEXT">Zeige Text auch in vereinfachter Darstellung</entry>
   <entry key="PAINT_SLOPPY_TEXT_TOOLTIP">Legen Sie fest, ob in der vereinfachten Vogelperspektive ebenfalls Text angezeigt werden soll. Standardmäßig wird dies außer Kraft gesetzt..</entry>
   <entry key="GLYPH_PREFS">Glyph-Einstellungen</entry>
