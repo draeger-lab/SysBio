@@ -47,7 +47,7 @@ public class YReversibleConsumption extends YAbstractSBGNArc implements Reversib
   public EdgeRealizer draw(Curve curve) {
     // We need to check what really needs to be reversed...
     boolean forward = false;
-    if (curve.isSetParent()) {
+    if ((curve != null) && curve.isSetParent()) {
       CurveSegment firstSegment = curve.getCurveSegment(0);
       CurveSegment lastSegment = curve.getCurveSegment(curve.getCurveSegmentCount() - 1);
       SBase sbase = curve.getParent();
