@@ -33,108 +33,109 @@ import javax.swing.SwingWorker;
  * {@link SerialWorker}. Tasks that have been completed, are directly removed
  * from this {@link SerialWorker}, but it is possible to add more tasks at
  * running time. To this end, you can use the {@link #add(SwingWorker)} method.
- * 
+ *
  * @author Andreas Dr&auml;ger
  * @since 1.1
  * @version $Rev$
  */
 public class SerialWorker implements PropertyChangeListener {
-	
-	/**
-	 * A {@link Logger} for this class.
-	 */
-	private static final transient Logger logger = Logger.getLogger(SerialWorker.class.getName());
-	/**
-	 * Listeners that respond to changes triggered by the individual workers.
-	 */
-	private List<PropertyChangeListener> listOfPropertyChangeListeners;
-	/**
-	 * The {@link SwingWorker}s that can be executed.
-	 */
-	private LinkedList<SwingWorker<?, ?>> workers;
-	
-	/**
-	 * Creates a new {@link SerialWorker} that doesn't have any tasks.
-	 */
-	public SerialWorker() {
-		super();
-		this.listOfPropertyChangeListeners = new LinkedList<PropertyChangeListener>();
-		workers = new LinkedList<SwingWorker<?, ?>>();
-	}
-	
-	/**
-	 * 
-	 * @param worker
-	 */
-	public SerialWorker(SwingWorker<?, ?>... worker) {
-		this();
-		if (worker != null) {
-			for (SwingWorker<?, ?> w : worker) {
-				add(w);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 * @param worker
-	 */
-	public void add(SwingWorker<?, ?> worker) {
-		if (worker != null) {
-			workers.add(worker);
-		} else {
-			logger.fine("ignoring null value for worker");
-		}
-	}
 
-	/**
-	 * 
-	 * @param listener
-	 * @return
-	 */
-	public boolean addPropertyChangeListener(PropertyChangeListener listener) {
-		return listOfPropertyChangeListeners.add(listener);
-	}
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(SerialWorker.class.getName());
+  /**
+   * Listeners that respond to changes triggered by the individual workers.
+   */
+  private List<PropertyChangeListener> listOfPropertyChangeListeners;
+  /**
+   * The {@link SwingWorker}s that can be executed.
+   */
+  private LinkedList<SwingWorker<?, ?>> workers;
 
-	/**
-	 * 
-	 */
-	public void execute() {
-		if (!workers.isEmpty()) {
-			SwingWorker<?, ?> worker = workers.removeFirst();
-			worker.addPropertyChangeListener(this);
-			worker.execute();
-		} else {
-			firePropertyChange("done", null, null);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param propertyName
-	 * @param oldValue
-	 * @param newValue
-	 */
-	public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-		PropertyChangeEvent evt = new PropertyChangeEvent(this, propertyName, oldValue, newValue);
-		for (PropertyChangeListener listener : listOfPropertyChangeListeners) {
-			listener.propertyChange(evt);
-		}
-	}
+  /**
+   * Creates a new {@link SerialWorker} that doesn't have any tasks.
+   */
+  public SerialWorker() {
+    super();
+    this.listOfPropertyChangeListeners = new LinkedList<PropertyChangeListener>();
+    workers = new LinkedList<SwingWorker<?, ?>>();
+  }
 
-	/* (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	 */
-	public void propertyChange(PropertyChangeEvent evt) {
-		for (PropertyChangeListener listener : listOfPropertyChangeListeners) {
-			listener.propertyChange(evt);
-		}
-		if ((evt.getSource() instanceof SwingWorker) && ((SwingWorker<?, ?>) evt.getSource()).isDone()) {
-			if (evt.getSource() instanceof SwingWorker<?, ?>) {
-				((SwingWorker<?, ?>) evt.getSource()).removePropertyChangeListener(this);
-			}
-			execute();
-		}
-	}
-	
+  /**
+   *
+   * @param worker
+   */
+  public SerialWorker(SwingWorker<?, ?>... worker) {
+    this();
+    if (worker != null) {
+      for (SwingWorker<?, ?> w : worker) {
+        add(w);
+      }
+    }
+  }
+
+  /**
+   *
+   * @param worker
+   */
+  public void add(SwingWorker<?, ?> worker) {
+    if (worker != null) {
+      workers.add(worker);
+    } else {
+      logger.fine("ignoring null value for worker");
+    }
+  }
+
+  /**
+   *
+   * @param listener
+   * @return
+   */
+  public boolean addPropertyChangeListener(PropertyChangeListener listener) {
+    return listOfPropertyChangeListeners.add(listener);
+  }
+
+  /**
+   *
+   */
+  public void execute() {
+    if (!workers.isEmpty()) {
+      SwingWorker<?, ?> worker = workers.removeFirst();
+      worker.addPropertyChangeListener(this);
+      worker.execute();
+    } else {
+      firePropertyChange("done", null, null);
+    }
+  }
+
+  /**
+   *
+   * @param propertyName
+   * @param oldValue
+   * @param newValue
+   */
+  public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+    PropertyChangeEvent evt = new PropertyChangeEvent(this, propertyName, oldValue, newValue);
+    for (PropertyChangeListener listener : listOfPropertyChangeListeners) {
+      listener.propertyChange(evt);
+    }
+  }
+
+  /* (non-Javadoc)
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    for (PropertyChangeListener listener : listOfPropertyChangeListeners) {
+      listener.propertyChange(evt);
+    }
+    if ((evt.getSource() instanceof SwingWorker) && ((SwingWorker<?, ?>) evt.getSource()).isDone()) {
+      if (evt.getSource() instanceof SwingWorker<?, ?>) {
+        ((SwingWorker<?, ?>) evt.getSource()).removePropertyChangeListener(this);
+      }
+      execute();
+    }
+  }
+
 }
