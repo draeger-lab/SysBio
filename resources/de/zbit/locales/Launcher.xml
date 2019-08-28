@@ -34,8 +34,8 @@
   <entry key="COPYRIGHT_HOLDER">Copyright © {0} {1}</entry>
   <entry key="PROVIDER">{0},
 {1}</entry>
-  <entry key="ORGANIZATION">University of Tuebingen</entry>
-  <entry key="INSTITUTE">Center for Bioinformatics Tuebingen (ZBIT)</entry>
+  <entry key="ORGANIZATION">University of Tübingen</entry>
+  <entry key="INSTITUTE">Institute for Biomedical Informatics (IBMI)</entry>
   <entry key="COPYRIGHT_MESSAGE">
 {0}
 {1}.
